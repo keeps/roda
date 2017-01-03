@@ -187,6 +187,11 @@ public class BrowserHelper {
       // do nothing
     }
 
+    // Count child AIPs
+    Filter childAIPfilter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aip.getId()));
+    Long childAIPCount = RodaCoreFactory.getIndexService().count(IndexedAIP.class, childAIPfilter);
+    bundle.setChildAIPCount(childAIPCount);
+
     // Count representations
     Filter repFilter = new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aipId));
     Long repCount = RodaCoreFactory.getIndexService().count(IndexedRepresentation.class, repFilter);

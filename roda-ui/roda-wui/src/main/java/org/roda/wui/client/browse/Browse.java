@@ -19,7 +19,6 @@ import java.util.Map;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
@@ -258,15 +257,11 @@ public class Browse extends Composite {
   @UiField(provided = true)
   FlowPanel facetHasRepresentations;
 
-  private boolean viewingTop;
-
   private List<HandlerRegistration> handlers;
 
   boolean justActive = true;
-  boolean searchable = false;
 
   private Browse() {
-    viewingTop = true;
     handlers = new ArrayList<HandlerRegistration>();
 
     String summary = messages.listOfItems();
@@ -308,21 +303,6 @@ public class Browse extends Composite {
       }
     });
 
-    aipList.addValueChangeHandler(new ValueChangeHandler<IndexResult<IndexedAIP>>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<IndexResult<IndexedAIP>> event) {
-        if (!viewingTop && event.getValue().getTotalCount() > 0 && !searchable) {
-          searchable = true;
-        }
-
-        fondsPanelTitle.setVisible(searchable);
-        searchPanel.setVisible(viewingTop || searchable);
-        aipList.setVisible(viewingTop || searchable);
-        // itemsFacets.setVisible(viewingTop);
-      }
-    });
-
     aipList.addCheckboxSelectionListener(new CheckboxSelectionListener<IndexedAIP>() {
 
       @Override
@@ -342,18 +322,6 @@ public class Browse extends Composite {
         IndexedRepresentation representation = representationsList.getSelectionModel().getSelectedObject();
         if (representation != null) {
           HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, representation.getAipId(), representation.getId());
-        }
-      }
-    });
-
-    representationsList.addValueChangeHandler(new ValueChangeHandler<IndexResult<IndexedRepresentation>>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<IndexResult<IndexedRepresentation>> event) {
-        if (event.getValue().getTotalCount() > 0) {
-          representationsPanelTitle.setVisible(true);
-          representationsSearchPanel.setVisible(true);
-          representationsList.setVisible(true);
         }
       }
     });
@@ -460,8 +428,8 @@ public class Browse extends Composite {
           }
 
           @Override
-          public void onSuccess(BrowseAIPBundle itemBundle) {
-            viewAction(itemBundle);
+          public void onSuccess(BrowseAIPBundle bundle) {
+            viewAction(bundle);
           }
         });
     }
@@ -493,9 +461,6 @@ public class Browse extends Composite {
     removeHandlerRegistrations();
 
     newDescriptiveMetadata.setVisible(false);
-
-    viewingTop = false;
-    searchable = false;
 
     // Representations list
     representationsPanelTitle.setVisible(false);
@@ -560,7 +525,6 @@ public class Browse extends Composite {
     if (bundle != null) {
       this.itemBundle = bundle;
 
-      viewingTop = false;
       this.justActive = AIPState.ACTIVE.equals(bundle.getAip().getState());
 
       IndexedAIP aip = bundle.getAip();
@@ -676,10 +640,20 @@ public class Browse extends Composite {
         representationsList.set(filter, justActive, Facets.NONE);
       }
 
-      Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aip.getId()));
-      searchPanel.setDefaultFilter(filter);
-      searchPanel.clearSearchInputBox();
-      aipList.set(filter, justActive, FACETS);
+      representationsPanelTitle.setVisible(bundle.getRepresentationCount() > 0);
+      representationsSearchPanel.setVisible(bundle.getRepresentationCount() > 0);
+      representationsList.setVisible(bundle.getRepresentationCount() > 0);
+
+      if (bundle.getChildAIPCount() > 0) {
+        Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aip.getId()));
+        searchPanel.setDefaultFilter(filter);
+        searchPanel.clearSearchInputBox();
+        aipList.set(filter, justActive, FACETS);
+      }
+
+      fondsPanelTitle.setVisible(bundle.getChildAIPCount() > 0);
+      searchPanel.setVisible(bundle.getChildAIPCount() > 0);
+      aipList.setVisible(bundle.getChildAIPCount() > 0);
 
       appraisalSidebar.setVisible(aip.getState().equals(AIPState.UNDER_APPRAISAL));
       preservationSidebar.setVisible(true);
@@ -711,7 +685,6 @@ public class Browse extends Composite {
 
   protected void viewAction() {
     aipId = null;
-    viewingTop = true;
 
     browseTitle.setVisible(true);
     browseDescription.setVisible(true);
@@ -728,6 +701,9 @@ public class Browse extends Composite {
 
     searchPanel.setDefaultFilter(COLLECTIONS_FILTER);
     aipList.set(COLLECTIONS_FILTER, justActive, FACETS);
+
+    searchPanel.setVisible(true);
+    aipList.setVisible(true);
 
     actionsSidebar.setVisible(true);
 
