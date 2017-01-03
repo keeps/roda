@@ -41,8 +41,8 @@ import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.SelectAipDialog;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.RepresentationList;
-import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell.CheckboxSelectionListener;
+import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
@@ -160,7 +160,7 @@ public class Browse extends Composite {
   }
 
   private static final Filter COLLECTIONS_FILTER = new Filter(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID));
-  private static final Facets FACETS = new Facets(new SimpleFacetParameter(RodaConstants.AIP_LEVEL),
+  private static Facets FACETS = new Facets(new SimpleFacetParameter(RodaConstants.AIP_LEVEL),
     new SimpleFacetParameter(RodaConstants.AIP_HAS_REPRESENTATIONS));
 
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
@@ -525,6 +525,9 @@ public class Browse extends Composite {
     for (AIPState state : AIPState.values()) {
       this.removeStyleName(state.toString().toLowerCase());
     }
+
+    FACETS = new Facets(new SimpleFacetParameter(RodaConstants.AIP_LEVEL),
+      new SimpleFacetParameter(RodaConstants.AIP_HAS_REPRESENTATIONS));
   }
 
   protected void showError(String id, Throwable caught) {
