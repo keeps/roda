@@ -313,6 +313,10 @@ public interface ClientMessages extends Messages {
   String executingTaskMessage();
 
   String noItemsToDisplay();
+  
+  String noItemsToDisplayButFacetsActive();
+  
+  String disableFacets();
 
   String browserOfflineError();
 

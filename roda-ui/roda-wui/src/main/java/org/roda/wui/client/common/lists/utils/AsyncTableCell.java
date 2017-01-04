@@ -32,6 +32,7 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.ClientLogger;
+import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.widgets.MyCellTableResources;
 import org.roda.wui.common.client.widgets.wcag.AccessibleCellTable;
@@ -42,7 +43,6 @@ import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.dom.client.TableCellElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
@@ -68,8 +68,8 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.CellPreviewEvent;
 import com.google.gwt.view.client.CellPreviewEvent.Handler;
 import com.google.gwt.view.client.DefaultSelectionEventManager;
@@ -242,8 +242,32 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
       }
     });
 
-    Label emptyInfo = new Label(messages.noItemsToDisplay());
-    display.setEmptyTableWidget(emptyInfo);
+    updateEmptyTableWidget();
+  }
+
+  private void updateEmptyTableWidget() {
+    if (FacetUtils.hasSelected(getFacets())) {
+      HorizontalPanel hp = new HorizontalPanel();
+      Label l = new Label(messages.noItemsToDisplayButFacetsActive());
+      Button resetFacets = new Button(messages.disableFacets());
+      resetFacets.addStyleName("facets-clear btn btn-danger btn-ban");
+
+      resetFacets.addClickHandler(new ClickHandler() {
+
+        @Override
+        public void onClick(ClickEvent event) {
+          for (Map.Entry<String, FacetParameter> entry : getFacets().getParameters().entrySet()) {
+            entry.getValue().getValues().clear();
+          }
+          update();
+        }
+      });
+      hp.add(l);
+      hp.add(resetFacets);
+      display.setEmptyTableWidget(hp);
+    } else {
+      display.setEmptyTableWidget(new Label(messages.noItemsToDisplay()));
+    }
   }
 
   private void configure(final CellTable<T> display) {
@@ -369,6 +393,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     hideSelectAllPanel();
     display.setVisibleRangeAndClearData(new Range(0, getInitialPageSize()), true);
     getSelectionModel().clear();
+    updateEmptyTableWidget();
   }
 
   public void update() {

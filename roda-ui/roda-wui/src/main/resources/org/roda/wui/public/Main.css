@@ -3317,6 +3317,9 @@ td.datePickerMonth, td.datePickerYear {
     margin: 0 5px;
 }
 
+.searchResults .facets-clear{
+	margin-left:10px;
+}
 /**********************************************
 				SEARCH
 ************************************************/
