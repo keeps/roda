@@ -155,7 +155,6 @@ public class ShowPreservationEvent extends Composite {
 
   private String aipId;
   private String representationId;
-  private String eventId;
 
   private PreservationEventViewBundle bundle;
 
@@ -170,7 +169,6 @@ public class ShowPreservationEvent extends Composite {
   public ShowPreservationEvent(final String aipId, final String representationId, final String eventId) {
     this.aipId = aipId;
     this.representationId = representationId;
-    this.eventId = eventId;
 
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -451,7 +449,6 @@ public class ShowPreservationEvent extends Composite {
     IndexedRepresentation irep = bundle.getRepresentations().get(idValue);
 
     if (irep != null) {
-
       Label originalLabel = new Label(messages.representationStatus());
       originalLabel.addStyleName("label");
       Label originalValue = new Label(

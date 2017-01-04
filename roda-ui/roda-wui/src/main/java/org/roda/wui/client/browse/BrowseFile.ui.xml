@@ -81,6 +81,12 @@
 					<g:Button ui:field="optionDownload" addStyleNames="btn btn-block btn-default-alt btn-download">
 						<ui:text from='{messages.viewRepresentationDownloadFileButton}' />
 					</g:Button>
+					<g:Button ui:field="optionRisk" addStyleNames="btn btn-block btn-default-alt btn-play">
+						<ui:text from='{messages.preservationRisks}' />
+					</g:Button>
+					<g:Button ui:field="optionIdentify" addStyleNames="btn btn-block btn-default-alt btn-play">
+						<ui:text from='{messages.identifyFormatsButton}' />
+					</g:Button>
 					<g:Button ui:field="optionNewProcess" addStyleNames="btn btn-block btn-default-alt btn-play">
 						<ui:text from='{messages.viewRepresentationNewProcessButton}' />
 					</g:Button>

@@ -803,6 +803,8 @@ public final class RodaConstants {
   public static final String RISK_INCIDENCE_MITIGATED_BY = "mitigatedBy";
   public static final String RISK_INCIDENCE_MITIGATED_DESCRIPTION = "mitigatedDescription";
 
+  public static final String RISK_INCIDENCE_FILE_PATH_COMPUTED = "filePathComputed";
+  public static final String RISK_INCIDENCE_FILE_PATH_COMPUTED_SEPARATOR = "/";
   public static final String RISK_INCIDENCE_FILE_EXTENSION = ".json";
   public static final String RISK_INCIDENCE_SEARCH = "search";
 

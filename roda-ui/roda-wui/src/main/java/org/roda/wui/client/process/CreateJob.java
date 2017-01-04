@@ -31,8 +31,8 @@ import org.roda.wui.client.ingest.process.PluginOptionsPanel;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.ListUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -153,13 +153,11 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
     this.selected = items;
     getInformation(classToReceive, pluginType);
   }
-  
-  
 
   public CreateJob(Class<T> classToReceive, final List<PluginType> pluginType) {
     getInformation(classToReceive, pluginType);
   }
-  
+
   @Override
   protected void onLoad() {
     super.onLoad();
@@ -224,7 +222,6 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
       for (PluginInfo pluginInfo : plugins) {
 
         if (pluginInfo != null) {
-
           List<String> pluginCategories = pluginInfo.getCategories();
 
           if (pluginCategories != null) {

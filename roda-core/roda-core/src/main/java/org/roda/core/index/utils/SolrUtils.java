@@ -2189,6 +2189,10 @@ public class SolrUtils {
     doc.addField(RodaConstants.RISK_INCIDENCE_MITIGATED_ON, incidence.getMitigatedOn());
     doc.addField(RodaConstants.RISK_INCIDENCE_MITIGATED_BY, incidence.getMitigatedBy());
     doc.addField(RodaConstants.RISK_INCIDENCE_MITIGATED_DESCRIPTION, incidence.getMitigatedDescription());
+
+    doc.addField(RodaConstants.RISK_INCIDENCE_FILE_PATH_COMPUTED,
+      StringUtils.join(incidence.getFilePath(), RodaConstants.RISK_INCIDENCE_FILE_PATH_COMPUTED_SEPARATOR));
+
     return doc;
   }
 

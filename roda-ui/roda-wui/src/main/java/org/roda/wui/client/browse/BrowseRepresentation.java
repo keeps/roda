@@ -585,7 +585,7 @@ public class BrowseRepresentation extends Composite {
   @UiHandler("preservationEvents")
   void buttonPreservationEventsHandler(ClickEvent e) {
     if (aipId != null) {
-      HistoryUtils.newHistory(PreservationEvents.RESOLVER, aipId, repId);
+      HistoryUtils.newHistory(PreservationEvents.RESOLVER, aipId, representation.getId());
     }
   }
 

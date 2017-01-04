@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -38,6 +39,7 @@ import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
+import org.roda.wui.client.planning.RiskIncidenceRegister;
 import org.roda.wui.client.process.CreateJob;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
@@ -180,7 +182,7 @@ public class BrowseFile extends Composite {
   FocusPanel downloadSchemasButton;
 
   @UiField
-  Button optionDownload, optionNewProcess, optionRemove;
+  Button optionDownload, optionNewProcess, optionRemove, optionRisk, optionIdentify;
 
   /**
    * Create a new panel to view a representation
@@ -268,7 +270,6 @@ public class BrowseFile extends Composite {
     selectedItems.setSelectedItems(selected);
     selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
     HistoryUtils.newHistory(CreateJob.RESOLVER, "action");
-
   }
 
   @UiHandler("optionRemove")
@@ -314,6 +315,38 @@ public class BrowseFile extends Composite {
           // nothing to do
         }
       });
+  }
+
+  @UiHandler("optionRisk")
+  void buttonRisksButtonHandler(ClickEvent e) {
+    List<String> history = new ArrayList<>();
+    history.add(bundle.getAip().getId());
+    history.add(bundle.getRepresentation().getId());
+    history.addAll(bundle.getFile().getPath());
+    history.add(bundle.getFile().getId());
+    HistoryUtils.newHistory(RiskIncidenceRegister.RESOLVER, history);
+  }
+
+  @UiHandler("optionIdentify")
+  void buttonIdentifyFormatsButtonHandler(ClickEvent e) {
+    SelectedItemsList<IndexedFile> selected = new SelectedItemsList<IndexedFile>(
+      Arrays.asList(bundle.getFile().getUUID()), IndexedFile.class.getName());
+
+    BrowserService.Util.getInstance().createFormatIdentificationJob(selected, new AsyncCallback<Void>() {
+      @Override
+      public void onSuccess(Void object) {
+        Toast.showInfo(messages.identifyingFormatsTitle(), messages.identifyingFormatsDescription());
+      }
+
+      @Override
+      public void onFailure(Throwable caught) {
+        if (caught instanceof NotFoundException) {
+          Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
+        } else {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
+        }
+      }
+    });
   }
 
   @UiHandler("infoFileButton")

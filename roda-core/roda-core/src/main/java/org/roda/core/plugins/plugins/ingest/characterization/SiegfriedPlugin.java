@@ -179,7 +179,6 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
       LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), representation.getAipId());
       try {
         sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(this, model, representation));
-        model.notifyRepresentationUpdated(representation);
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
         reportItem.setPluginState(PluginState.SUCCESS);
       } catch (PluginException | NotFoundException | GenericException | RequestNotValidException

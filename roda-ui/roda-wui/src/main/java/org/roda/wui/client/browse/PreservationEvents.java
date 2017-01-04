@@ -26,9 +26,9 @@ import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.RestUtils;
-import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -146,7 +146,7 @@ public class PreservationEvents extends Composite {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, aipId));
 
     if (repId != null) {
-      filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_REPRESENTATION_UUID, repId));
+      filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_REPRESENTATION_ID, repId));
     }
 
     eventList = new PreservationEventList(filter, facets, messages.preservationEventsTitle(), false);
@@ -209,9 +209,9 @@ public class PreservationEvents extends Composite {
   @UiHandler("backButton")
   void buttonBackHandler(ClickEvent e) {
     if (repId == null) {
-      HistoryUtils.newHistory(ListUtils.concat(Browse.RESOLVER.getHistoryPath(), aipId));
+      HistoryUtils.newHistory(HistoryUtils.getHistoryBrowse(aipId));
     } else {
-      HistoryUtils.newHistory(ListUtils.concat(BrowseRepresentation.RESOLVER.getHistoryPath(), aipId, repId));
+      HistoryUtils.newHistory(HistoryUtils.getHistoryBrowse(aipId, repId));
     }
   }
 }

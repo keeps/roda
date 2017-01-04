@@ -117,10 +117,12 @@ public class FacetUtils {
 
   public static boolean hasSelected(Facets facets) {
     boolean hasSelected = false;
-    for (FacetParameter fp : facets.getParameters().values()) {
-      if (!fp.getValues().isEmpty()) {
-        hasSelected = true;
-        break;
+    if (facets != null) {
+      for (FacetParameter fp : facets.getParameters().values()) {
+        if (!fp.getValues().isEmpty()) {
+          hasSelected = true;
+          break;
+        }
       }
     }
     return hasSelected;

@@ -21,6 +21,7 @@ import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.common.iterables.CloseableIterable;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -83,8 +84,8 @@ public class FileStorageService implements StorageService {
 
     initialize(basePath);
     initialize(historyPath);
-    initialize(historyDataPath);
-    initialize(historyMetadataPath);
+    initialize(historyDataPath.resolve(RodaConstants.STORAGE_CONTAINER_AIP));
+    initialize(historyMetadataPath.resolve(RodaConstants.STORAGE_CONTAINER_AIP));
     FSUtils.deletePathQuietly(trashPath);
     initialize(trashPath);
 

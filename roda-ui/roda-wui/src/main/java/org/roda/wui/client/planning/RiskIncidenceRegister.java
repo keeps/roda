@@ -10,6 +10,7 @@
  */
 package org.roda.wui.client.planning;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -33,10 +34,11 @@ import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
-import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -251,6 +253,26 @@ public class RiskIncidenceRegister extends Composite {
       setAipId(aipId);
       riskIncidenceList.setFilter(new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, aipId),
         new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, repId)));
+      riskIncidenceList.refresh();
+      callback.onSuccess(this);
+    } else if (historyTokens.size() >= 3) {
+      List<String> tokens = new ArrayList<>(historyTokens);
+      final String aipId = tokens.remove(0);
+      final String repId = tokens.remove(0);
+      final String fileId = tokens.remove(tokens.size() - 1);
+
+      setAipId(aipId);
+
+      Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, aipId),
+        new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, repId),
+        new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_FILE_ID, fileId));
+
+      if (!tokens.isEmpty()) {
+        filter.add(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_FILE_PATH_COMPUTED,
+          StringUtils.join(tokens, RodaConstants.RISK_INCIDENCE_FILE_PATH_COMPUTED_SEPARATOR)));
+      }
+
+      riskIncidenceList.setFilter(filter);
       riskIncidenceList.refresh();
       callback.onSuccess(this);
     } else {
