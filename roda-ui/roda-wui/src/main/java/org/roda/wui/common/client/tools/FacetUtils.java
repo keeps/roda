@@ -125,4 +125,10 @@ public class FacetUtils {
     }
     return hasSelected;
   }
+
+  public static void clearFacets(Facets facets) {
+    for (Map.Entry<String, FacetParameter> entry : facets.getParameters().entrySet()) {
+      entry.getValue().getValues().clear();
+    }
+  }
 }

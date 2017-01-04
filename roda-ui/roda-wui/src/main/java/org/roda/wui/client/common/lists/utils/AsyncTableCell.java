@@ -247,26 +247,29 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
   private void updateEmptyTableWidget() {
     if (FacetUtils.hasSelected(getFacets())) {
-      HorizontalPanel hp = new HorizontalPanel();
+      FlowPanel layout = new FlowPanel();
       Label l = new Label(messages.noItemsToDisplayButFacetsActive());
       Button resetFacets = new Button(messages.disableFacets());
-      resetFacets.addStyleName("facets-clear btn btn-danger btn-ban");
+
+      layout.addStyleName("table-empty");
+      resetFacets.addStyleName("table-empty-clear-facets btn btn-primary btn-ban");
 
       resetFacets.addClickHandler(new ClickHandler() {
 
         @Override
         public void onClick(ClickEvent event) {
-          for (Map.Entry<String, FacetParameter> entry : getFacets().getParameters().entrySet()) {
-            entry.getValue().getValues().clear();
-          }
-          update();
+          FacetUtils.clearFacets(getFacets());
+          refresh();
         }
+
       });
-      hp.add(l);
-      hp.add(resetFacets);
-      display.setEmptyTableWidget(hp);
+      layout.add(l);
+      layout.add(resetFacets);
+      display.setEmptyTableWidget(layout);
     } else {
-      display.setEmptyTableWidget(new Label(messages.noItemsToDisplay()));
+      Label layout = new Label(messages.noItemsToDisplay());
+      layout.addStyleName("table-empty");
+      display.setEmptyTableWidget(layout);
     }
   }
 
