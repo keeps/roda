@@ -17,13 +17,18 @@
 	<g:FlowPanel styleName="browse" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
+				<!-- HEADER -->
 				<g:Label styleName="h1" addStyleNames="browseTitle"
 					ui:field="browseTitle">
 					<ui:text from='{messages.catalogueTitle}' />
 				</g:Label>
 				<g:FlowPanel addStyleNames="page-description" ui:field="browseDescription">
 				</g:FlowPanel>
+
+				<!-- STATUS -->
 				<g:HTML ui:field="aipState" />
+
+				<!-- IDENTIFICATION -->
 				<g:FlowPanel styleName="browseItemPanel browseTitle-allCollections-wrapper">
 					<g:Label addStyleNames="browseItemHeader" ui:field="browseItemHeader">
 						<ui:text from='{messages.catalogueItemTitle}' />
@@ -41,23 +46,36 @@
 				</g:FlowPanel>
 				<m:BreadcrumbPanel ui:field="breadcrumb"
 					addStyleNames="browseBreadcrumb" />
-				<g:TabPanel ui:field="itemMetadata" addStyleNames="browseItemMetadata" />
+
+				<!-- DESCRIPTIVE METADATA -->
+				<g:TabPanel ui:field="descriptiveMetadata" addStyleNames="browseItemMetadata" />
 				<g:Button addStyleNames="btn btn-plus browseNewDescriptiveMetadataButton"
 					ui:field="newDescriptiveMetadata">
 					<ui:text from='{messages.newDescriptiveMetadataTitle}' />
 				</g:Button>
 
-				<g:Label addStyleNames="h5 browseSearchListTitle" ui:field="representationsPanelTitle">
+				<!-- REPRESENTATIONS -->
+				<g:Label addStyleNames="h5" ui:field="representationsTitle">
 					<ui:text from='{messages.representationsTitle}' />
 				</g:Label>
-				<commonsearch:SearchPanel ui:field="representationsSearchPanel" />
+				<commonsearch:SearchPanel ui:field="representationsSearch" />
 				<lists:RepresentationList addStyleNames="searchResults"
 					ui:field="representationsList" />
-				<g:Label addStyleNames="h5 browseSearchListTitle" ui:field="fondsPanelTitle">
+
+				<!-- DIPs -->
+				<g:Label addStyleNames="h5" ui:field="disseminationsTitle">
+					<ui:text from='{messages.disseminationsTitle}' />
+				</g:Label>
+				<commonsearch:SearchPanel ui:field="disseminationsSearch" />
+				<lists:DIPList addStyleNames="searchResults" ui:field="disseminationsList" />
+
+
+				<!-- AIP CHILDREN -->
+				<g:Label addStyleNames="h5" ui:field="aipChildrenTitle">
 					<ui:text from='{messages.sublevels}' />
 				</g:Label>
-				<commonsearch:SearchPanel ui:field="searchPanel" />
-				<lists:AIPList addStyleNames="searchResults" ui:field="aipList" />
+				<commonsearch:SearchPanel ui:field="aipChildrenSearch" />
+				<lists:AIPList addStyleNames="searchResults" ui:field="aipChildrenList" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">
@@ -123,10 +141,12 @@
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.searchTitle}' />
 							</g:Label>
-							<g:Button addStyleNames="btn btn-default btn-search" ui:field="searchContext">
+							<g:Button addStyleNames="btn btn-default btn-search"
+								ui:field="searchContext">
 								<ui:text from='{messages.searchContext}' />
 							</g:Button>
-							<g:Button addStyleNames="btn btn-default btn-search" ui:field="searchAIP">
+							<g:Button addStyleNames="btn btn-default btn-search"
+								ui:field="searchAIP">
 								<ui:text from='{messages.searchAIP}' />
 							</g:Button>
 						</g:FlowPanel>

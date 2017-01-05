@@ -102,12 +102,12 @@ public class BrowseFile extends Composite {
 
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRole(Browse.RESOLVER, callback);
+      UserLogin.getInstance().checkRole(BrowseAIP.RESOLVER, callback);
     }
 
     @Override
     public List<String> getHistoryPath() {
-      return ListUtils.concat(Browse.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(BrowseAIP.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     @Override

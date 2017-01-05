@@ -87,4 +87,41 @@ public class BrowseAIPBundle implements Serializable {
     this.dipCount = dipCount;
   }
 
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append("BrowseAIPBundle [");
+    if (aip != null) {
+      builder.append("aip=");
+      builder.append(aip);
+      builder.append(", ");
+    }
+    if (aipAncestors != null) {
+      builder.append("aipAncestors=");
+      builder.append(aipAncestors);
+      builder.append(", ");
+    }
+    if (descriptiveMetadata != null) {
+      builder.append("descriptiveMetadata=");
+      builder.append(descriptiveMetadata);
+      builder.append(", ");
+    }
+    if (childAIPCount != null) {
+      builder.append("childAIPCount=");
+      builder.append(childAIPCount);
+      builder.append(", ");
+    }
+    if (representationCount != null) {
+      builder.append("representationCount=");
+      builder.append(representationCount);
+      builder.append(", ");
+    }
+    if (dipCount != null) {
+      builder.append("dipCount=");
+      builder.append(dipCount);
+    }
+    builder.append("]");
+    return builder.toString();
+  }
+
 }

@@ -28,7 +28,7 @@ import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.wui.client.browse.Browse;
+import org.roda.wui.client.browse.BrowseAIP;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.EditPermissions;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
@@ -255,7 +255,7 @@ public class Search extends Composite {
   void buttonEditPermissionsHandler(ClickEvent e) {
     LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
     selectedItems.setSelectedItems(mainSearch.getSelected());
-    HistoryUtils.newHistory(Browse.RESOLVER, EditPermissions.RESOLVER.getHistoryToken());
+    HistoryUtils.newHistory(BrowseAIP.RESOLVER, EditPermissions.RESOLVER.getHistoryToken());
   }
 
   @UiHandler("moveItem")
@@ -312,7 +312,7 @@ public class Search extends Composite {
                   @Override
                   public void onSuccessImpl(IndexedAIP result) {
                     if (result != null) {
-                      HistoryUtils.newHistory(Browse.RESOLVER, result.getId());
+                      HistoryUtils.newHistory(BrowseAIP.RESOLVER, result.getId());
                     } else {
                       HistoryUtils.newHistory(Search.RESOLVER);
                     }

@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.v2.user.User;
-import org.roda.wui.client.browse.Browse;
+import org.roda.wui.client.browse.BrowseAIP;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
@@ -91,7 +91,7 @@ public class ContentPanel extends SimplePanel {
     // Theme static pages
     resolvers.add(Theme.RESOLVER);
     // Browse
-    resolvers.add(Browse.RESOLVER);
+    resolvers.add(BrowseAIP.RESOLVER);
     // Search
     resolvers.add(Search.RESOLVER);
     resolvers.add(Relation.RESOLVER);

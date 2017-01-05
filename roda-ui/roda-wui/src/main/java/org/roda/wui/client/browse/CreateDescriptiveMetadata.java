@@ -90,7 +90,7 @@ public class CreateDescriptiveMetadata extends Composite {
 
         callback.onSuccess(create);
       } else {
-        HistoryUtils.newHistory(Browse.RESOLVER);
+        HistoryUtils.newHistory(BrowseAIP.RESOLVER);
         callback.onSuccess(null);
       }
     }
@@ -98,11 +98,11 @@ public class CreateDescriptiveMetadata extends Composite {
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
       // TODO check for edit metadata permission
-      UserLogin.getInstance().checkRoles(new HistoryResolver[] {Browse.RESOLVER}, false, callback);
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {BrowseAIP.RESOLVER}, false, callback);
     }
 
     public List<String> getHistoryPath() {
-      return ListUtils.concat(Browse.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(BrowseAIP.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
@@ -362,7 +362,7 @@ public class CreateDescriptiveMetadata extends Composite {
             errors.setVisible(false);
             Toast.showInfo(messages.dialogSuccess(), messages.metadataFileCreated());
             if (representationId == null) {
-              HistoryUtils.newHistory(Browse.RESOLVER, aipId);
+              HistoryUtils.newHistory(BrowseAIP.RESOLVER, aipId);
             } else {
               HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
             }
@@ -408,9 +408,9 @@ public class CreateDescriptiveMetadata extends Composite {
           @Override
           public void onSuccess(String parentId) {
             if (parentId != null) {
-              HistoryUtils.newHistory(Browse.RESOLVER, parentId);
+              HistoryUtils.newHistory(BrowseAIP.RESOLVER, parentId);
             } else {
-              HistoryUtils.newHistory(Browse.RESOLVER);
+              HistoryUtils.newHistory(BrowseAIP.RESOLVER);
             }
           }
         });
@@ -419,7 +419,7 @@ public class CreateDescriptiveMetadata extends Composite {
       }
     } else {
       if (representationId == null) {
-        HistoryUtils.newHistory(Browse.RESOLVER, aipId);
+        HistoryUtils.newHistory(BrowseAIP.RESOLVER, aipId);
       } else {
         HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
       }

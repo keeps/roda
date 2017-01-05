@@ -34,7 +34,7 @@
 					ui:field="newDescriptiveMetadata">
 					<ui:text from='{messages.newDescriptiveMetadataTitle}' />
 				</g:Button>
-				<g:Label addStyleNames="h5 browseSearchListTitle" ui:field="filesPanelTitle">
+				<g:Label addStyleNames="h5" ui:field="filesPanelTitle">
 					<ui:text from='{messages.representationFiles}' />
 				</g:Label>
 				<commonsearch:SearchPanel ui:field="searchPanel" />

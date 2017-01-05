@@ -2284,7 +2284,7 @@ public class SolrUtils {
     OptionalWithCause<String> openURL = DIPUtils.getCompleteOpenExternalURL(dip);
     if (openURL.isPresent()) {
       doc.addField(RodaConstants.DIP_OPEN_EXTERNAL_URL, openURL.get());
-    } else {
+    } else if (openURL.getCause() != null) {
       LOGGER.error("Error indexing DIP open external URL", openURL.getCause());
     }
 

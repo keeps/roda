@@ -74,14 +74,14 @@ public class ShowPreservationEvent extends Composite {
         ShowPreservationEvent preservationEvents = new ShowPreservationEvent(aipId, representationId, eventId);
         callback.onSuccess(preservationEvents);
       } else {
-        HistoryUtils.newHistory(Browse.RESOLVER);
+        HistoryUtils.newHistory(BrowseAIP.RESOLVER);
         callback.onSuccess(null);
       }
     }
 
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRoles(new HistoryResolver[] {Browse.RESOLVER}, false, callback);
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {BrowseAIP.RESOLVER}, false, callback);
     }
 
     public List<String> getHistoryPath() {
@@ -415,7 +415,7 @@ public class ShowPreservationEvent extends Composite {
       layout.add(footer);
 
       Anchor link = new Anchor(messages.inspectIntellectualEntity(),
-        HistoryUtils.createHistoryHashLink(Browse.RESOLVER, iAIP.getId()));
+        HistoryUtils.createHistoryHashLink(BrowseAIP.RESOLVER, iAIP.getId()));
       footer.add(link);
 
       link.addStyleName("btn");

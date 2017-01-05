@@ -27,7 +27,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.wui.client.browse.Browse;
+import org.roda.wui.client.browse.BrowseAIP;
 import org.roda.wui.client.browse.BrowseDIP;
 import org.roda.wui.client.browse.BrowseFile;
 import org.roda.wui.client.browse.BrowseFolder;
@@ -167,17 +167,25 @@ public class HistoryUtils {
 
   public static List<String> getHistoryBrowse(String aipId) {
     List<String> history = new ArrayList<>();
-    history.addAll(Browse.RESOLVER.getHistoryPath());
+    history.addAll(BrowseAIP.RESOLVER.getHistoryPath());
     history.add(aipId);
     return history;
   }
 
-  public static List<String> getDIPHistoryBrowse(String dipId) {
+  public static List<String> getHistoryBrowseDIP(String dipId) {
     List<String> history = new ArrayList<>();
-    history.addAll(Browse.RESOLVER.getHistoryPath());
+    history.addAll(BrowseAIP.RESOLVER.getHistoryPath());
     history.add(BrowseDIP.RESOLVER.getHistoryToken());
     history.add(dipId);
     return history;
+  }
+
+  public static void openBrowse(IndexedDIP dip) {
+    HistoryUtils.newHistory(getHistoryBrowseDIP(dip.getId()));
+  }
+
+  public static void openBrowseDIP(String dipId) {
+    HistoryUtils.newHistory(getHistoryBrowseDIP(dipId));
   }
 
   public static void openBrowse(String aipId) {
@@ -190,7 +198,7 @@ public class HistoryUtils {
 
   public static List<String> getHistoryBrowse(String aipId, String representationId) {
     List<String> history = new ArrayList<>();
-    history.addAll(Browse.RESOLVER.getHistoryPath());
+    history.addAll(BrowseAIP.RESOLVER.getHistoryPath());
     history.add(BrowseRepresentation.RESOLVER.getHistoryToken());
     history.add(aipId);
     history.add(representationId);
@@ -212,7 +220,7 @@ public class HistoryUtils {
   public static List<String> getHistoryBrowse(String aipId, String representationId, List<String> filePath,
     String fileId, boolean isDirectory) {
     List<String> history = new ArrayList<>();
-    history.addAll(Browse.RESOLVER.getHistoryPath());
+    history.addAll(BrowseAIP.RESOLVER.getHistoryPath());
     history.add(isDirectory ? BrowseFolder.RESOLVER.getHistoryToken() : BrowseFile.RESOLVER.getHistoryToken());
     history.add(aipId);
     history.add(representationId);
@@ -236,9 +244,9 @@ public class HistoryUtils {
     openBrowse(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(), file.isDirectory());
   }
 
-  public static List<String> getDIPFileHistoryBrowse(String dipId, List<String> dipFilePath, String dipFileId) {
+  public static List<String> getHistoryBrowseDIPFile(String dipId, List<String> dipFilePath, String dipFileId) {
     List<String> history = new ArrayList<>();
-    history.addAll(Browse.RESOLVER.getHistoryPath());
+    history.addAll(BrowseAIP.RESOLVER.getHistoryPath());
     history.add(BrowseDIP.RESOLVER.getHistoryToken());
     history.add(dipId);
     history.addAll(dipFilePath);
@@ -248,7 +256,7 @@ public class HistoryUtils {
 
   public static List<String> getHistoryUpload(IndexedFile folder) {
     List<String> history = new ArrayList<>();
-    history.addAll(Browse.RESOLVER.getHistoryPath());
+    history.addAll(BrowseAIP.RESOLVER.getHistoryPath());
     history.add(TransferUpload.BROWSE_RESOLVER.getHistoryToken());
     history.add(folder.getAipId());
     history.add(folder.getRepresentationId());
@@ -304,10 +312,10 @@ public class HistoryUtils {
       path = HistoryUtils.getHistoryBrowse(file);
     } else if (object instanceof IndexedDIP) {
       IndexedDIP dip = (IndexedDIP) object;
-      path = HistoryUtils.getDIPHistoryBrowse(dip.getId());
+      path = HistoryUtils.getHistoryBrowseDIP(dip.getId());
     } else if (object instanceof DIPFile) {
       DIPFile dipFile = (DIPFile) object;
-      path = HistoryUtils.getDIPFileHistoryBrowse(dipFile.getDipId(), dipFile.getPath(), dipFile.getId());
+      path = HistoryUtils.getHistoryBrowseDIPFile(dipFile.getDipId(), dipFile.getPath(), dipFile.getId());
     } else if (object instanceof TransferredResource) {
       TransferredResource resource = (TransferredResource) object;
       path = HistoryUtils.getHistory(IngestTransfer.RESOLVER.getHistoryPath(), resource.getUUID());

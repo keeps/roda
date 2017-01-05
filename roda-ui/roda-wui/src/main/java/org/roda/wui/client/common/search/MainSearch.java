@@ -27,7 +27,7 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.wui.client.browse.Browse;
+import org.roda.wui.client.browse.BrowseAIP;
 import org.roda.wui.client.browse.BrowseFile;
 import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.common.lists.AIPList;

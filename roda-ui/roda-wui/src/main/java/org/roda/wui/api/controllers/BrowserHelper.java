@@ -199,7 +199,7 @@ public class BrowserHelper {
     bundle.setRepresentationCount(repCount);
 
     // Count DIPs
-    Filter dipsFilter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_AIP_IDS, aip.getId()));
+    Filter dipsFilter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_AIP_UUIDS, aip.getId()));
     Long dipCount = RodaCoreFactory.getIndexService().count(IndexedDIP.class, dipsFilter);
     bundle.setDipCount(dipCount);
 

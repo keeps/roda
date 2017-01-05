@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.v2.user.User;
-import org.roda.wui.client.browse.Browse;
+import org.roda.wui.client.browse.BrowseAIP;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.Ingest;
@@ -123,7 +123,7 @@ public class Menu extends Composite {
     about = customMenuItem("fa fa-home", messages.title("about"), "menu-item-label", null,
       createCommand(Welcome.RESOLVER.getHistoryPath()));
 
-    dissemination_browse = new MenuItem(messages.title("browse"), createCommand(Browse.RESOLVER.getHistoryPath()));
+    dissemination_browse = new MenuItem(messages.title("browse"), createCommand(BrowseAIP.RESOLVER.getHistoryPath()));
     dissemination_searchBasic = new MenuItem(messages.title("search"), createCommand(Search.RESOLVER.getHistoryPath()));
 
     ingestMenu = new MenuBar(true);
@@ -234,7 +234,7 @@ public class Menu extends Composite {
     updateResolverTopItemVisibility(Welcome.RESOLVER, about, 0);
 
     // Dissemination
-    updateResolverTopItemVisibility(Browse.RESOLVER, dissemination_browse, 1);
+    updateResolverTopItemVisibility(BrowseAIP.RESOLVER, dissemination_browse, 1);
     updateResolverTopItemVisibility(Search.RESOLVER, dissemination_searchBasic, 2);
 
     // Ingest

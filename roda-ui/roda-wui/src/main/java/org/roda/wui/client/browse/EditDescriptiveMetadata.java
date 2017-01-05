@@ -86,7 +86,7 @@ public class EditDescriptiveMetadata extends Composite {
             }
           });
       } else {
-        HistoryUtils.newHistory(Browse.RESOLVER);
+        HistoryUtils.newHistory(BrowseAIP.RESOLVER);
         callback.onSuccess(null);
       }
     }
@@ -94,11 +94,11 @@ public class EditDescriptiveMetadata extends Composite {
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
       // TODO check for edit metadata permission
-      UserLogin.getInstance().checkRoles(new HistoryResolver[] {Browse.RESOLVER}, false, callback);
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {BrowseAIP.RESOLVER}, false, callback);
     }
 
     public List<String> getHistoryPath() {
-      return ListUtils.concat(Browse.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(BrowseAIP.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
@@ -464,7 +464,7 @@ public class EditDescriptiveMetadata extends Composite {
           errors.setVisible(false);
           Toast.showInfo(messages.dialogSuccess(), messages.metadataFileSaved());
           if (representationId == null) {
-            HistoryUtils.newHistory(Browse.RESOLVER, aipId);
+            HistoryUtils.newHistory(BrowseAIP.RESOLVER, aipId);
           } else {
             HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
           }
@@ -500,7 +500,7 @@ public class EditDescriptiveMetadata extends Composite {
         public void onSuccess(Void result) {
           Toast.showInfo(messages.dialogSuccess(), messages.metadataFileRemoved());
           if (representationId == null) {
-            HistoryUtils.newHistory(Browse.RESOLVER, aipId);
+            HistoryUtils.newHistory(BrowseAIP.RESOLVER, aipId);
           } else {
             HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
           }
@@ -515,7 +515,7 @@ public class EditDescriptiveMetadata extends Composite {
 
   private void cancel() {
     if (representationId == null) {
-      HistoryUtils.newHistory(Browse.RESOLVER, aipId);
+      HistoryUtils.newHistory(BrowseAIP.RESOLVER, aipId);
     } else {
       HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
     }

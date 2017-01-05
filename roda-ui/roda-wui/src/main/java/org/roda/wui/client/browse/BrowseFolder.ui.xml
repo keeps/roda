@@ -30,7 +30,7 @@
 				</g:FlowPanel>
 				<m:BreadcrumbPanel ui:field="breadcrumb"
 					addStyleNames="browseBreadcrumb" />
-				<g:Label addStyleNames="h5 browseSearchListTitle" ui:field="filesPanelTitle">
+				<g:Label addStyleNames="h5" ui:field="filesPanelTitle">
 					<ui:text from='{messages.folderFiles}' />
 				</g:Label>
 				<commonsearch:SearchPanel ui:field="searchPanel" />

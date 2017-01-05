@@ -253,7 +253,7 @@ public class BrowseDIP extends Composite {
 
     @Override
     public List<String> getHistoryPath() {
-      return ListUtils.concat(Browse.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(BrowseAIP.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     @Override
@@ -295,7 +295,7 @@ public class BrowseDIP extends Composite {
     }
 
     private void errorRedirect(AsyncCallback<Widget> callback) {
-      HistoryUtils.newHistory(Browse.RESOLVER);
+      HistoryUtils.newHistory(BrowseAIP.RESOLVER);
       callback.onSuccess(null);
     }
 

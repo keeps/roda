@@ -1246,6 +1246,8 @@ public interface ClientMessages extends Messages {
   String appraisalReject();
 
   String representationsTitle();
+  
+  String disseminationsTitle();
 
   String filesTitle();
 
@@ -1295,7 +1297,11 @@ public interface ClientMessages extends Messages {
 
   String permissionAssignedUsersEmpty();
 
-  String listOfItems();
+  String listOfAIPs();
+  
+  String listOfRepresentations();
+  
+  String listOfDisseminations();
 
   String unknownAncestorError();
 

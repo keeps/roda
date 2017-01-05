@@ -19,7 +19,7 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.wui.client.browse.Browse;
+import org.roda.wui.client.browse.BrowseAIP;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -97,7 +97,7 @@ public class Relation {
           @Override
           public void onSuccess(IndexResult<IndexedAIP> result) {
             if (result.getTotalCount() == 1) {
-              HistoryUtils.newHistory(Browse.RESOLVER, result.getResults().get(0).getUUID());
+              HistoryUtils.newHistory(BrowseAIP.RESOLVER, result.getResults().get(0).getUUID());
             } else {
               HistoryUtils.newHistory(Search.RESOLVER, historyTokens);
             }

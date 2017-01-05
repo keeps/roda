@@ -91,7 +91,7 @@ public class DescriptiveMetadataHistory extends Composite {
         });
 
       } else {
-        HistoryUtils.newHistory(Browse.RESOLVER);
+        HistoryUtils.newHistory(BrowseAIP.RESOLVER);
         callback.onSuccess(null);
       }
     }
@@ -99,11 +99,11 @@ public class DescriptiveMetadataHistory extends Composite {
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
       // TODO check for browse metadata history permission
-      UserLogin.getInstance().checkRoles(new HistoryResolver[] {Browse.RESOLVER}, false, callback);
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {BrowseAIP.RESOLVER}, false, callback);
     }
 
     public List<String> getHistoryPath() {
-      return ListUtils.concat(Browse.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(BrowseAIP.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
@@ -344,7 +344,7 @@ public class DescriptiveMetadataHistory extends Composite {
         @Override
         public void onSuccess(Void result) {
           Toast.showInfo(messages.dialogDone(), messages.versionReverted());
-          HistoryUtils.newHistory(Browse.RESOLVER, aipId);
+          HistoryUtils.newHistory(BrowseAIP.RESOLVER, aipId);
         }
       });
   }
@@ -364,7 +364,7 @@ public class DescriptiveMetadataHistory extends Composite {
           Toast.showInfo(messages.dialogDone(), messages.versionDeleted());
           refresh();
           if (bundle.getVersions().isEmpty()) {
-            HistoryUtils.newHistory(Browse.RESOLVER, aipId);
+            HistoryUtils.newHistory(BrowseAIP.RESOLVER, aipId);
           }
         }
       });
@@ -402,7 +402,7 @@ public class DescriptiveMetadataHistory extends Composite {
   }
 
   private void cancel() {
-    HistoryUtils.newHistory(Browse.RESOLVER, aipId);
+    HistoryUtils.newHistory(BrowseAIP.RESOLVER, aipId);
   }
 
 }

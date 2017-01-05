@@ -72,18 +72,18 @@ public class PreservationEvents extends Composite {
         PreservationEvents preservationEvents = new PreservationEvents(aipId, repId);
         callback.onSuccess(preservationEvents);
       } else {
-        HistoryUtils.newHistory(Browse.RESOLVER);
+        HistoryUtils.newHistory(BrowseAIP.RESOLVER);
         callback.onSuccess(null);
       }
     }
 
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRoles(new HistoryResolver[] {Browse.RESOLVER}, false, callback);
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {BrowseAIP.RESOLVER}, false, callback);
     }
 
     public List<String> getHistoryPath() {
-      return ListUtils.concat(Browse.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(BrowseAIP.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
@@ -174,7 +174,7 @@ public class PreservationEvents extends Composite {
         @Override
         public void onFailure(Throwable caught) {
           AsyncCallbackUtils.defaultFailureTreatment(caught);
-          HistoryUtils.newHistory(Browse.RESOLVER);
+          HistoryUtils.newHistory(BrowseAIP.RESOLVER);
         }
 
         @Override

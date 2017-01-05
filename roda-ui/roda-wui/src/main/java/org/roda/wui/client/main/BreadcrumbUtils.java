@@ -17,7 +17,7 @@ import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.wui.client.browse.Browse;
+import org.roda.wui.client.browse.BrowseAIP;
 import org.roda.wui.client.browse.BrowseDIP;
 import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
@@ -63,7 +63,7 @@ public class BreadcrumbUtils {
   public static List<BreadcrumbItem> getAipBreadcrumbs(List<IndexedAIP> aipAncestors, IndexedAIP aip, boolean events) {
     List<BreadcrumbItem> breadcrumb = new ArrayList<>();
     breadcrumb
-      .add(new BreadcrumbItem(DescriptionLevelUtils.getTopIconSafeHtml(), "", Browse.RESOLVER.getHistoryPath()));
+      .add(new BreadcrumbItem(DescriptionLevelUtils.getTopIconSafeHtml(), "", BrowseAIP.RESOLVER.getHistoryPath()));
 
     if (aipAncestors != null) {
       for (IndexedAIP ancestor : aipAncestors) {
@@ -114,7 +114,7 @@ public class BreadcrumbUtils {
 
     List<BreadcrumbItem> breadcrumb = new ArrayList<>();
     breadcrumb
-      .add(new BreadcrumbItem(DescriptionLevelUtils.getTopIconSafeHtml(), "", Browse.RESOLVER.getHistoryPath()));
+      .add(new BreadcrumbItem(DescriptionLevelUtils.getTopIconSafeHtml(), "", BrowseAIP.RESOLVER.getHistoryPath()));
 
     if (aipAncestors != null) {
       for (IndexedAIP ancestor : aipAncestors) {
@@ -122,7 +122,7 @@ public class BreadcrumbUtils {
           SafeHtml breadcrumbLabel = getBreadcrumbLabel(ancestor);
           String breadcrumbTitle = getBreadcrumbTitle(ancestor);
           BreadcrumbItem ancestorBreadcrumb = new BreadcrumbItem(breadcrumbLabel, breadcrumbTitle,
-            ListUtils.concat(Browse.RESOLVER.getHistoryPath(), ancestor.getId()));
+            ListUtils.concat(BrowseAIP.RESOLVER.getHistoryPath(), ancestor.getId()));
           breadcrumb.add(1, ancestorBreadcrumb);
         } else {
           SafeHtml breadcrumbLabel = DescriptionLevelUtils.getElementLevelIconSafeHtml(RodaConstants.AIP_GHOST, false);
@@ -335,10 +335,10 @@ public class BreadcrumbUtils {
   }
 
   private static final List<String> getViewItemEventsHistoryToken(String id) {
-    return ListUtils.concat(Browse.RESOLVER.getHistoryPath(), PreservationEvents.RESOLVER.getHistoryToken(), id);
+    return ListUtils.concat(BrowseAIP.RESOLVER.getHistoryPath(), PreservationEvents.RESOLVER.getHistoryToken(), id);
   }
 
   private static final List<String> getViewItemHistoryToken(String id) {
-    return ListUtils.concat(Browse.RESOLVER.getHistoryPath(), id);
+    return ListUtils.concat(BrowseAIP.RESOLVER.getHistoryPath(), id);
   }
 }

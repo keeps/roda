@@ -128,11 +128,11 @@ public class BrowseRepresentation extends Composite {
 
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRole(Browse.RESOLVER, callback);
+      UserLogin.getInstance().checkRole(BrowseAIP.RESOLVER, callback);
     }
 
     public List<String> getHistoryPath() {
-      return ListUtils.concat(Browse.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(BrowseAIP.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
@@ -140,7 +140,7 @@ public class BrowseRepresentation extends Composite {
     }
 
     private void errorRedirect(AsyncCallback<Widget> callback) {
-      HistoryUtils.newHistory(Browse.RESOLVER);
+      HistoryUtils.newHistory(BrowseAIP.RESOLVER);
       callback.onSuccess(null);
     }
   };
@@ -496,7 +496,7 @@ public class BrowseRepresentation extends Composite {
 
                         @Override
                         public void onSuccess(Void result) {
-                          HistoryUtils.newHistory(Browse.RESOLVER, aipId);
+                          HistoryUtils.newHistory(BrowseAIP.RESOLVER, aipId);
                         }
 
                         @Override
@@ -706,7 +706,7 @@ public class BrowseRepresentation extends Composite {
         public void onSuccess(String details) {
           LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
           selectedItems.setDetailsMessage(details);
-          HistoryUtils.newHistory(Browse.RESOLVER, TransferUpload.BROWSE_RESOLVER.getHistoryToken(), aipId, repId);
+          HistoryUtils.newHistory(BrowseAIP.RESOLVER, TransferUpload.BROWSE_RESOLVER.getHistoryToken(), aipId, repId);
         }
       });
   }

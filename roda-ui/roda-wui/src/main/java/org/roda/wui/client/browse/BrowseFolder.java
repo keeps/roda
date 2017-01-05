@@ -95,21 +95,21 @@ public class BrowseFolder extends Composite {
               } else {
                 // TODO i18n
                 Toast.showError("Trying to open a file as a folder");
-                HistoryUtils.newHistory(Browse.RESOLVER);
+                HistoryUtils.newHistory(BrowseAIP.RESOLVER);
                 callback.onSuccess(null);
               }
             }
 
             @Override
             public void onFailure(Throwable caught) {
-              if (!AsyncCallbackUtils.treatCommonFailures(caught, Browse.RESOLVER.getHistoryPath())) {
+              if (!AsyncCallbackUtils.treatCommonFailures(caught, BrowseAIP.RESOLVER.getHistoryPath())) {
                 Toast.showError(caught);
               }
               callback.onSuccess(null);
             }
           });
       } else {
-        HistoryUtils.newHistory(Browse.RESOLVER);
+        HistoryUtils.newHistory(BrowseAIP.RESOLVER);
         callback.onSuccess(null);
       }
     }
@@ -126,7 +126,7 @@ public class BrowseFolder extends Composite {
 
     @Override
     public List<String> getHistoryPath() {
-      return ListUtils.concat(Browse.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(BrowseAIP.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
   };
