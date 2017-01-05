@@ -109,7 +109,7 @@
    -->   
    <field name="uuid" type="string" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="id" type="string" indexed="true" stored="true" required="false" multiValued="false" />
-   <field name="aipId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="aipID" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="representationUUID" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="fileUUID" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="objectClass" type="string" indexed="true" stored="true" required="false" multiValued="false" />

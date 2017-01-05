@@ -12,8 +12,11 @@ import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.DIP;
+import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
@@ -55,6 +58,10 @@ public class SearchFilters {
       return new Filter(new BasicSearchFilterParameter(RodaConstants.LOG_SEARCH, "*"));
     } else if (actualClass.equals(RODAMember.class.getName())) {
       return new Filter(new BasicSearchFilterParameter(RodaConstants.MEMBERS_SEARCH, "*"));
+    } else if (actualClass.equals(DIP.class.getName()) || actualClass.equals(IndexedDIP.class.getName())) {
+      return new Filter(new BasicSearchFilterParameter(RodaConstants.DIP_SEARCH, "*"));
+    } else if (actualClass.equals(DIPFile.class.getName())) {
+      return new Filter(new BasicSearchFilterParameter(RodaConstants.DIPFILE_SEARCH, "*"));
     } else {
       return Filter.NULL;
     }
@@ -86,6 +93,10 @@ public class SearchFilters {
       return RodaConstants.LOG_SEARCH;
     } else if (actualClass.equals(RODAMember.class.getName())) {
       return RodaConstants.MEMBERS_SEARCH;
+    } else if (actualClass.equals(DIP.class.getName()) || actualClass.equals(IndexedDIP.class.getName())) {
+      return RodaConstants.DIP_SEARCH;
+    } else if (actualClass.equals(DIPFile.class.getName())) {
+      return RodaConstants.DIPFILE_SEARCH;
     } else {
       return "";
     }

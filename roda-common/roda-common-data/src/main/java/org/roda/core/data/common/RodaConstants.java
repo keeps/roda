@@ -874,25 +874,25 @@ public final class RodaConstants {
   public static final String DIP_ALL_AIP_UUIDS = "allAipUUIDs";
   public static final String DIP_ALL_REPRESENTATION_UUIDS = "allRepresentationUUIDs";
 
-  public static final String DIP_EXTENSION = ".json";
+  public static final String DIP_FILE_EXTENSION = ".json";
   public static final String DIP_SEARCH = "search";
 
   public static final String DIPFILE_ID = "id";
-  public static final String DIP_FILE_UUID = "uuid";
+  public static final String DIPFILE_UUID = "uuid";
   public static final String DIPFILE_DIP_ID = "dipId";
   public static final String DIPFILE_PATH = "path";
   public static final String DIPFILE_ANCESTORS_PATH = "ancestorsPath";
   public static final String DIPFILE_SIZE = "size";
   public static final String DIPFILE_IS_DIRECTORY = "isDirectory";
   public static final String DIPFILE_STORAGE_PATH = "storagePath";
-  public static final String DIP_FILE_FILE_FORMAT = "fileFormat";
-  public static final String DIP_FILE_FORMAT_VERSION = "formatVersion";
-  public static final String DIP_FILE_FORMAT_MIMETYPE = "formatMimetype";
-  public static final String DIP_FILE_FORMAT_PRONOM = "formatPronom";
-  public static final String DIP_FILE_FORMAT_EXTENSION = "formatExtension";
+  public static final String DIPFILE_FILE_FORMAT = "fileFormat";
+  public static final String DIPFILE_FORMAT_VERSION = "formatVersion";
+  public static final String DIPFILE_FORMAT_MIMETYPE = "formatMimetype";
+  public static final String DIPFILE_FORMAT_PRONOM = "formatPronom";
+  public static final String DIPFILE_FORMAT_EXTENSION = "formatExtension";
 
-  public static final String DIP_FILE_FILE_EXTENSION = ".json";
-  public static final String DIP_FILE_SEARCH = "search";
+  public static final String DIPFILE_FILE_EXTENSION = ".json";
+  public static final String DIPFILE_SEARCH = "search";
 
   /* View representation */
   public static final String VIEW_REPRESENTATION_DESCRIPTION_LEVEL = "description-level-representation";

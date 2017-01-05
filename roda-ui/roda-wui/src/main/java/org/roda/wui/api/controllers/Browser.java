@@ -2233,7 +2233,7 @@ public class Browser extends RodaWuiController {
     EntityResponse aipRepresentationFile = BrowserHelper.retrieveDIPFile(fileUUID, acceptFormat);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.DIP_FILE_UUID, fileUUID);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.DIPFILE_UUID, fileUUID);
 
     return aipRepresentationFile;
   }
