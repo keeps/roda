@@ -118,6 +118,9 @@ import config.i18n.client.ClientMessages;
  */
 public class BrowseAIP extends Composite {
 
+  private static final String BROWSE_TOP_CSS = "browse_top";
+  private static final String BROWSE_AIP_CSS = "browse_aip";
+
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
@@ -299,7 +302,7 @@ public class BrowseAIP extends Composite {
       true);
 
     representationsSearch = new SearchPanel(Filter.NULL, RodaConstants.REPRESENTATION_SEARCH,
-      messages.searchPlaceHolder(), false, false, false);
+      messages.searchPlaceHolder(), false, false, true);
     representationsSearch.setDefaultFilterIncremental(true);
     representationsSearch.setList(representationsList);
 
@@ -308,7 +311,7 @@ public class BrowseAIP extends Composite {
     disseminationsList = new DIPList(Filter.NULL, Facets.NONE, messages.listOfDisseminations(), true);
 
     disseminationsSearch = new SearchPanel(Filter.NULL, RodaConstants.DIP_SEARCH, messages.searchPlaceHolder(), false,
-      false, false);
+      false, true);
     disseminationsSearch.setDefaultFilterIncremental(true);
     disseminationsSearch.setList(disseminationsList);
 
@@ -317,7 +320,7 @@ public class BrowseAIP extends Composite {
     aipChildrenList = new AIPList(Filter.NULL, justActive, FACETS, messages.listOfAIPs(), selectable);
 
     aipChildrenSearch = new SearchPanel(COLLECTIONS_FILTER, RodaConstants.AIP_SEARCH, messages.searchPlaceHolder(),
-      false, false, false);
+      false, false, true);
     aipChildrenSearch.setDefaultFilterIncremental(true);
     aipChildrenSearch.setList(aipChildrenList);
 
@@ -355,7 +358,7 @@ public class BrowseAIP extends Composite {
       public void onSelectionChange(SelectionChangeEvent event) {
         IndexedDIP dissemination = disseminationsList.getSelectionModel().getSelectedObject();
         if (dissemination != null) {
-          HistoryUtils.openBrowse(dissemination);
+          HistoryUtils.openBrowse(dissemination, aipId);
         }
       }
     });
@@ -498,6 +501,10 @@ public class BrowseAIP extends Composite {
   }
 
   private void clear() {
+
+    removeStyleName(BROWSE_TOP_CSS);
+    removeStyleName(BROWSE_AIP_CSS);
+
     justActive = true;
     browseItemHeader.setVisible(false);
     browseTitle.setVisible(false);
@@ -529,18 +536,21 @@ public class BrowseAIP extends Composite {
     representationsSearch.setVisible(false);
     representationsSearch.clearSearchInputBox();
     representationsList.setVisible(false);
+    representationsList.getParent().setVisible(false);
 
     // Disseminations list
     disseminationsTitle.setVisible(false);
     disseminationsSearch.setVisible(false);
     disseminationsSearch.clearSearchInputBox();
     disseminationsList.setVisible(false);
+    disseminationsList.getParent().setVisible(false);
 
     // AIP children list
     aipChildrenTitle.setVisible(false);
     aipChildrenSearch.setVisible(false);
     aipChildrenSearch.clearSearchInputBox();
     aipChildrenList.setVisible(false);
+    aipChildrenList.getParent().setVisible(false);
 
     appraisalSidebar.setVisible(false);
     preservationSidebar.setVisible(false);
@@ -591,6 +601,8 @@ public class BrowseAIP extends Composite {
 
   protected void viewAction(BrowseAIPBundle bundle) {
     if (bundle != null) {
+      addStyleName(BROWSE_AIP_CSS);
+
       this.bundle = bundle;
 
       this.justActive = AIPState.ACTIVE.equals(bundle.getAip().getState());
@@ -623,6 +635,7 @@ public class BrowseAIP extends Composite {
       representationsTitle.setVisible(bundle.getRepresentationCount() > 0);
       representationsSearch.setVisible(bundle.getRepresentationCount() > 0);
       representationsList.setVisible(bundle.getRepresentationCount() > 0);
+      representationsList.getParent().setVisible(bundle.getRepresentationCount() > 0);
 
       // DISSEMINATIONS
       if (bundle.getDipCount() > 0) {
@@ -635,6 +648,7 @@ public class BrowseAIP extends Composite {
       disseminationsTitle.setVisible(bundle.getDipCount() > 0);
       disseminationsSearch.setVisible(bundle.getDipCount() > 0);
       disseminationsList.setVisible(bundle.getDipCount() > 0);
+      disseminationsList.getParent().setVisible(bundle.getDipCount() > 0);
 
       // AIP CHILDREN
       if (bundle.getChildAIPCount() > 0) {
@@ -647,6 +661,7 @@ public class BrowseAIP extends Composite {
       aipChildrenTitle.setVisible(bundle.getChildAIPCount() > 0);
       aipChildrenSearch.setVisible(bundle.getChildAIPCount() > 0);
       aipChildrenList.setVisible(bundle.getChildAIPCount() > 0);
+      aipChildrenList.getParent().setVisible(bundle.getChildAIPCount() > 0);
 
       // SIDEBAR
       appraisalSidebar.setVisible(aip.getState().equals(AIPState.UNDER_APPRAISAL));
@@ -786,6 +801,7 @@ public class BrowseAIP extends Composite {
 
     browseTitle.setVisible(true);
     browseDescription.setVisible(true);
+    addStyleName(BROWSE_TOP_CSS);
 
     breadcrumb.updatePath(
       Arrays.asList(new BreadcrumbItem(DescriptionLevelUtils.getTopIconSafeHtml(), "", RESOLVER.getHistoryPath())));
@@ -802,6 +818,7 @@ public class BrowseAIP extends Composite {
 
     aipChildrenSearch.setVisible(true);
     aipChildrenList.setVisible(true);
+    aipChildrenList.getParent().setVisible(true);
 
     actionsSidebar.setVisible(true);
 
@@ -1149,7 +1166,8 @@ public class BrowseAIP extends Composite {
 
   private void newDescriptiveMetadataRedirect() {
     if (aipId != null) {
-      HistoryUtils.newHistory(RESOLVER, CreateDescriptiveMetadata.RESOLVER.getHistoryToken(), "aip", aipId);
+      HistoryUtils.newHistory(RESOLVER, CreateDescriptiveMetadata.RESOLVER.getHistoryToken(),
+        CreateDescriptiveMetadata.AIP, aipId);
     }
   }
 

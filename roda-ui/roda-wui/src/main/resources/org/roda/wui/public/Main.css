@@ -258,6 +258,59 @@ div.inline {
     background: linear-gradient(-90deg, #eee 30%, rgba(255, 255, 255, 0) 100%);
 }
 
+
+.card {
+    box-shadow: -1px 0px 8px #888888;
+    padding: 14px;
+}
+
+.card + .card {
+    margin-top: 20px;
+}
+
+.card > .h5 {
+    margin-top: 0;
+    color: #089de3;
+    font-weight: 300;
+}
+
+.representationsCard > .h5:before {
+    content: '\f1b3';
+    font-family: 'FontAwesome';
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    padding-right: 10px;
+}
+
+.disseminationsCard > .h5:before {
+    content: '\f144';
+    font-family: 'FontAwesome';
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    padding-right: 10px;
+}
+
+.aipChildrenCard > .h5:before {
+    content: '\f0c5';
+    font-family: 'FontAwesome';
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    padding-right: 10px;
+}
+
+.browse_top .aipChildrenCard {
+	box-shadow: none;
+	padding: 0;
+}
+
+.descriptiveMetadataCard {
+	box-shadow: none;
+	padding: 0;
+}
+
 /**********************************************
 				SKELETON
 ************************************************/
@@ -396,7 +449,8 @@ pre code {
 }
 .form-separator {
 	color: #089de3;
-	font-size: 1.8rem;
+	font-size: 1.6rem;
+	font-weight: 300;
 	margin: 1em -15px 0 -15px !important;
 	padding: 5px 15px !important;
 }
@@ -2083,7 +2137,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .browseItemMetadata .gwt-TabBarItem .gwt-Label {
     color: inherit;
-    font-weight: normal;
+    font-weight: 300;
     font-size: 1.5rem;
 }
 
@@ -2104,7 +2158,6 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .browseItemMetadata .gwt-TabBarItem-selected .gwt-Label {
-    font-weight: normal;
     color: inherit;
 }
 

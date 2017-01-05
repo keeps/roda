@@ -463,11 +463,7 @@ public class EditDescriptiveMetadata extends Composite {
           errors.setText("");
           errors.setVisible(false);
           Toast.showInfo(messages.dialogSuccess(), messages.metadataFileSaved());
-          if (representationId == null) {
-            HistoryUtils.newHistory(BrowseAIP.RESOLVER, aipId);
-          } else {
-            HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
-          }
+          back();
         }
       });
 
@@ -499,25 +495,21 @@ public class EditDescriptiveMetadata extends Composite {
         @Override
         public void onSuccess(Void result) {
           Toast.showInfo(messages.dialogSuccess(), messages.metadataFileRemoved());
-          if (representationId == null) {
-            HistoryUtils.newHistory(BrowseAIP.RESOLVER, aipId);
-          } else {
-            HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
-          }
+          back();
         }
       });
   }
 
   @UiHandler("buttonCancel")
   void buttonCancelHandler(ClickEvent e) {
-    cancel();
+    back();
   }
 
-  private void cancel() {
+  private void back() {
     if (representationId == null) {
-      HistoryUtils.newHistory(BrowseAIP.RESOLVER, aipId);
+      HistoryUtils.openBrowse(aipId);
     } else {
-      HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
+      HistoryUtils.openBrowse(aipId, representationId);
     }
   }
 

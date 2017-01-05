@@ -64,6 +64,9 @@ import config.i18n.client.ClientMessages;
  */
 public class CreateDescriptiveMetadata extends Composite {
 
+  public static final String AIP = "aip";
+  public static final String REPRESENTATION = "representation";
+
   public static final String NEW = "new";
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
@@ -71,11 +74,10 @@ public class CreateDescriptiveMetadata extends Composite {
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       GWT.log(historyTokens.toString());
-      boolean isAIP = historyTokens.get(0).equals("aip");
+      boolean isAIP = historyTokens.get(0).equals(AIP);
 
       if ((isAIP && (historyTokens.size() == 2 || historyTokens.size() == 3))
-        || (historyTokens.get(0).equals("representation")
-          && (historyTokens.size() == 3 || historyTokens.size() == 4))) {
+        || (historyTokens.get(0).equals(REPRESENTATION) && (historyTokens.size() == 3 || historyTokens.size() == 4))) {
         final String aipId = historyTokens.get(1);
         boolean isNew;
         CreateDescriptiveMetadata create;

@@ -172,16 +172,17 @@ public class HistoryUtils {
     return history;
   }
 
-  public static List<String> getHistoryBrowseDIP(String dipId) {
+  public static List<String> getHistoryBrowseDIP(String dipId, String... refererUUIDs) {
     List<String> history = new ArrayList<>();
     history.addAll(BrowseAIP.RESOLVER.getHistoryPath());
     history.add(BrowseDIP.RESOLVER.getHistoryToken());
     history.add(dipId);
+    history.addAll(Arrays.asList(refererUUIDs));
     return history;
   }
 
-  public static void openBrowse(IndexedDIP dip) {
-    HistoryUtils.newHistory(getHistoryBrowseDIP(dip.getId()));
+  public static void openBrowse(IndexedDIP dip, String... refererUUIDs) {
+    HistoryUtils.newHistory(getHistoryBrowseDIP(dip.getId(), refererUUIDs));
   }
 
   public static void openBrowseDIP(String dipId) {
@@ -262,6 +263,20 @@ public class HistoryUtils {
     history.add(folder.getRepresentationId());
     history.addAll(folder.getPath());
     history.add(folder.getId());
+
+    return history;
+  }
+
+  public static void openUpload(IndexedRepresentation representation) {
+    HistoryUtils.newHistory(getHistoryUpload(representation));
+  }
+
+  public static List<String> getHistoryUpload(IndexedRepresentation representation) {
+    List<String> history = new ArrayList<>();
+    history.addAll(BrowseAIP.RESOLVER.getHistoryPath());
+    history.add(TransferUpload.BROWSE_RESOLVER.getHistoryToken());
+    history.add(representation.getAipId());
+    history.add(representation.getId());
 
     return history;
   }

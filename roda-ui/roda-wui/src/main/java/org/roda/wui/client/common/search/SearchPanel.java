@@ -92,10 +92,13 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
   private FlowPanel fieldsPanel;
   private AsyncTableCell<?, ?> list;
 
+  private boolean hidePreFilters;
+
   public SearchPanel(Filter defaultFilter, String allFilter, String placeholder, boolean showSearchInputListBox,
     boolean showSearchAdvancedDisclosureButton, boolean hidePreFilters) {
     this.defaultFilter = defaultFilter;
     this.allFilter = allFilter;
+    this.hidePreFilters = hidePreFilters;
 
     initWidget(binder.createAndBindUi(this));
 
@@ -305,7 +308,9 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
 
   public void setDefaultFilter(Filter defaultFilter) {
     this.defaultFilter = defaultFilter;
-    drawSearchPreFilters();
+    if (!hidePreFilters) {
+      drawSearchPreFilters();
+    }
   }
 
   public void setAllFilter(String allFilter) {
