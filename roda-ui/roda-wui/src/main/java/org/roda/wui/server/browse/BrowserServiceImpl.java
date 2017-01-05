@@ -558,11 +558,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public List<SupportedMetadataTypeBundle> retrieveSupportedMetadata(String aipId, String representationUUID,
+  public List<SupportedMetadataTypeBundle> retrieveSupportedMetadata(String aipId, String representationId,
     String localeString) throws AuthorizationDeniedException, GenericException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Locale locale = ServerTools.parseLocale(localeString);
-    return Browser.retrieveSupportedMetadata(user, aipId, representationUUID, locale);
+    return Browser.retrieveSupportedMetadata(user, aipId, representationId, locale);
   }
 
   @Override

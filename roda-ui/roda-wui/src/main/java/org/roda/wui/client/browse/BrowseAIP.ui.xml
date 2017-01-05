@@ -48,34 +48,43 @@
 					addStyleNames="browseBreadcrumb" />
 
 				<!-- DESCRIPTIVE METADATA -->
-				<g:TabPanel ui:field="descriptiveMetadata" addStyleNames="browseItemMetadata" />
-				<g:Button addStyleNames="btn btn-plus browseNewDescriptiveMetadataButton"
-					ui:field="newDescriptiveMetadata">
-					<ui:text from='{messages.newDescriptiveMetadataTitle}' />
-				</g:Button>
+				<g:FlowPanel addStyleNames="card descriptiveMetadataCard">
+					<g:TabPanel ui:field="descriptiveMetadata"
+						addStyleNames="browseItemMetadata" />
+					<g:Button addStyleNames="btn btn-plus browseNewDescriptiveMetadataButton"
+						ui:field="newDescriptiveMetadata">
+						<ui:text from='{messages.newDescriptiveMetadataTitle}' />
+					</g:Button>
+				</g:FlowPanel>
 
 				<!-- REPRESENTATIONS -->
-				<g:Label addStyleNames="h5" ui:field="representationsTitle">
-					<ui:text from='{messages.representationsTitle}' />
-				</g:Label>
-				<commonsearch:SearchPanel ui:field="representationsSearch" />
-				<lists:RepresentationList addStyleNames="searchResults"
-					ui:field="representationsList" />
-
+				<g:FlowPanel addStyleNames="card representationsCard">
+					<g:Label addStyleNames="h5" ui:field="representationsTitle">
+						<ui:text from='{messages.representationsTitle}' />
+					</g:Label>
+					<commonsearch:SearchPanel ui:field="representationsSearch" />
+					<lists:RepresentationList addStyleNames="searchResults"
+						ui:field="representationsList" />
+				</g:FlowPanel>
 				<!-- DIPs -->
-				<g:Label addStyleNames="h5" ui:field="disseminationsTitle">
-					<ui:text from='{messages.disseminationsTitle}' />
-				</g:Label>
-				<commonsearch:SearchPanel ui:field="disseminationsSearch" />
-				<lists:DIPList addStyleNames="searchResults" ui:field="disseminationsList" />
-
+				<g:FlowPanel addStyleNames="card disseminationsCard">
+					<g:Label addStyleNames="h5" ui:field="disseminationsTitle">
+						<ui:text from='{messages.disseminationsTitle}' />
+					</g:Label>
+					<commonsearch:SearchPanel ui:field="disseminationsSearch" />
+					<lists:DIPList addStyleNames="searchResults"
+						ui:field="disseminationsList" />
+				</g:FlowPanel>
 
 				<!-- AIP CHILDREN -->
-				<g:Label addStyleNames="h5" ui:field="aipChildrenTitle">
-					<ui:text from='{messages.sublevels}' />
-				</g:Label>
-				<commonsearch:SearchPanel ui:field="aipChildrenSearch" />
-				<lists:AIPList addStyleNames="searchResults" ui:field="aipChildrenList" />
+				<g:FlowPanel addStyleNames="card aipChildrenCard">
+					<g:Label addStyleNames="h5" ui:field="aipChildrenTitle">
+						<ui:text from='{messages.sublevels}' />
+					</g:Label>
+					<commonsearch:SearchPanel ui:field="aipChildrenSearch" />
+					<lists:AIPList addStyleNames="searchResults"
+						ui:field="aipChildrenList" />
+				</g:FlowPanel>
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">

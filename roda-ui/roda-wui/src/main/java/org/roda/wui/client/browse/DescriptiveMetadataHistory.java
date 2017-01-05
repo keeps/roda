@@ -243,13 +243,13 @@ public class DescriptiveMetadataHistory extends Composite {
     SafeUri uri;
     if (inHTML) {
       if (representationId != null) {
-        uri = RestUtils.createRepresentationDescriptiveMetadataHTMLUri(representationId, descId, versionKey);
+        uri = RestUtils.createRepresentationDescriptiveMetadataHTMLUri(aipId, representationId, descId, versionKey);
       } else {
         uri = RestUtils.createDescriptiveMetadataHTMLUri(aipId, descId, versionKey);
       }
     } else {
       if (representationId != null) {
-        uri = RestUtils.createRepresentationDescriptiveMetadataDownloadUri(representationId, descId, versionKey);
+        uri = RestUtils.createRepresentationDescriptiveMetadataDownloadUri(aipId, representationId, descId, versionKey);
       } else {
         uri = RestUtils.createDescriptiveMetadataDownloadUri(aipId, descId, versionKey);
       }

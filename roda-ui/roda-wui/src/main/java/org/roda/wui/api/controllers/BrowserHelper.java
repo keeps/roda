@@ -1990,9 +1990,15 @@ public class BrowserHelper {
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     DescriptiveMetadataVersionsBundle bundle = new DescriptiveMetadataVersionsBundle();
 
-    IndexedAIP aip = retrieve(IndexedAIP.class, aipId);
+    bundle.setAip(retrieve(IndexedAIP.class, aipId));
+    if (representationId != null) {
+      IndexedRepresentation representation = retrieve(IndexedRepresentation.class,
+        IdUtils.getRepresentationId(aipId, representationId));
+      bundle.setRepresentation(representation);
+    }
     DescriptiveMetadataViewBundle descriptiveMetadataBundle = retrieveDescriptiveMetadataBundle(aipId, representationId,
       metadataId, locale);
+    bundle.setDescriptiveMetadata(descriptiveMetadataBundle);
 
     List<BinaryVersionBundle> versionBundles = new ArrayList<>();
 
@@ -2002,8 +2008,6 @@ public class BrowserHelper {
     }
     IOUtils.closeQuietly(it);
 
-    bundle.setAip(aip);
-    bundle.setDescriptiveMetadata(descriptiveMetadataBundle);
     bundle.setVersions(versionBundles);
     return bundle;
   }
