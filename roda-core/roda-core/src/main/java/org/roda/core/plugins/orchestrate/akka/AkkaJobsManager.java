@@ -151,18 +151,17 @@ public class AkkaJobsManager extends AkkaBaseActor {
 
   private void initMetrics(int maxNumberOfJobsInParallel) {
     MetricRegistry metrics = RodaCoreFactory.getMetrics();
+    String className = AkkaJobsManager.class.getSimpleName();
     Counter maxNumberOfJobsInParallelCounter = metrics
-      .counter(MetricRegistry.name(AkkaJobsManager.class, "maxNumberOfJobsInParallel"));
+      .counter(MetricRegistry.name(className, "maxNumberOfJobsInParallel"));
     maxNumberOfJobsInParallelCounter.inc(maxNumberOfJobsInParallel);
-    jobsBeingExecuted = metrics.counter(MetricRegistry.name(AkkaJobsManager.class, "jobsBeingExecuted"));
-    jobsWaitingToBeExecuted = metrics.counter(MetricRegistry.name(AkkaJobsManager.class, "jobsWaitingToBeExecuted"));
-    ticksWaitingToBeProcessed = metrics
-      .counter(MetricRegistry.name(AkkaJobsManager.class, "ticksWaitingToBeProcessed"));
-    jobsBeingExecutedHisto = metrics.histogram(MetricRegistry.name(AkkaJobsManager.class, "jobsBeingExecutedHisto"));
+    jobsBeingExecuted = metrics.counter(MetricRegistry.name(className, "jobsBeingExecuted"));
+    jobsWaitingToBeExecuted = metrics.counter(MetricRegistry.name(className, "jobsWaitingToBeExecuted"));
+    ticksWaitingToBeProcessed = metrics.counter(MetricRegistry.name(className, "ticksWaitingToBeProcessed"));
+    jobsBeingExecutedHisto = metrics.histogram(MetricRegistry.name(className, "jobsBeingExecutedHistogram"));
     jobsWaitingToBeExecutedHisto = metrics
-      .histogram(MetricRegistry.name(AkkaJobsManager.class, "jobsWaitingToBeExecutedHisto"));
-    jobsTimeInTheQueueInMilis = metrics
-      .histogram(MetricRegistry.name(AkkaJobsManager.class, "jobsTimeInTheQueueInMilis"));
+      .histogram(MetricRegistry.name(className, "jobsWaitingToBeExecutedHistogram"));
+    jobsTimeInTheQueueInMilis = metrics.histogram(MetricRegistry.name(className, "jobsTimeInTheQueueInMilis"));
   }
 
   private class JobWaiting {

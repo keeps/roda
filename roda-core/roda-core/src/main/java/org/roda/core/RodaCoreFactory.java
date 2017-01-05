@@ -368,7 +368,7 @@ public class RodaCoreFactory {
   private static void initializeMetrics() {
     metricsRegistry = new MetricRegistry();
     if (getSystemProperty("com.sun.management.jmxremote", null) != null) {
-      jmxMetricsReporter = JmxReporter.forRegistry(metricsRegistry).build();
+      jmxMetricsReporter = JmxReporter.forRegistry(metricsRegistry).inDomain("RODA").build();
       jmxMetricsReporter.start();
     }
   }
