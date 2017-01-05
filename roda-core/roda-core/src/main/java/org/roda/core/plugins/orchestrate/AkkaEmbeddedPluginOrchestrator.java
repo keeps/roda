@@ -51,6 +51,7 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginOrchestrator;
 import org.roda.core.plugins.orchestrate.akka.AkkaJobsManager;
+import org.roda.core.plugins.orchestrate.akka.DeadLetterActor;
 import org.roda.core.plugins.orchestrate.akka.Messages;
 import org.roda.core.plugins.orchestrate.akka.Messages.JobPartialUpdate;
 import org.roda.core.plugins.orchestrate.akka.Messages.JobStateUpdated;
@@ -64,6 +65,7 @@ import com.typesafe.config.ConfigFactory;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
+import akka.actor.AllDeadLetters;
 import akka.actor.Props;
 import akka.actor.Terminated;
 import akka.dispatch.OnComplete;
@@ -106,6 +108,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     Config akkaConfig = getAkkaConfiguration();
     jobsSystem = ActorSystem.create("JobsSystem", akkaConfig);
+    // 20170105 hsilva: subscribe all dead letter so they are logged
+    jobsSystem.eventStream().subscribe(jobsSystem.actorOf(Props.create(DeadLetterActor.class)), AllDeadLetters.class);
 
     jobsManager = jobsSystem.actorOf(Props.create(AkkaJobsManager.class, maxNumberOfJobsInParallel), "jobsManager");
 
