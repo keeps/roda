@@ -53,12 +53,13 @@ public final class IdUtils {
       idBuilder.append(representationId);
       idBuilder.append(ID_SEPARATOR);
     }
-    for (String dir : fileDirectoryPath) {
-      idBuilder.append(dir);
-      idBuilder.append(ID_SEPARATOR);
+    if (fileDirectoryPath != null) {
+      for (String dir : fileDirectoryPath) {
+        idBuilder.append(dir);
+        idBuilder.append(ID_SEPARATOR);
+      }
     }
     idBuilder.append(fileId);
-
     return UUID.nameUUIDFromBytes(idBuilder.toString().getBytes()).toString();
   }
 

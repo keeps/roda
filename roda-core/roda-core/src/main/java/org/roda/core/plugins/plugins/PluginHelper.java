@@ -735,6 +735,8 @@ public final class PluginHelper {
     pm.setId(id);
     pm.setAipId(aipId);
     pm.setRepresentationId(representationId);
+    pm.setFileDirectoryPath(filePath);
+    pm.setFileId(fileId);
     pm.setType(PreservationMetadataType.EVENT);
     return pm;
   }

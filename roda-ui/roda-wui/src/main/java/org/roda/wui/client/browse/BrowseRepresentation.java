@@ -186,20 +186,20 @@ public class BrowseRepresentation extends Composite {
   private List<HandlerRegistration> handlers;
   private IndexedRepresentation representation;
   private String aipId;
-  private String repId;
+  private String representationUUID;
 
   private static final String ALL_FILTER = SearchFilters.allFilter(IndexedFile.class.getName());
 
   public BrowseRepresentation(BrowseRepresentationBundle bundle) {
     this.representation = bundle.getRepresentation();
     this.aipId = representation.getAipId();
-    this.repId = representation.getUUID();
+    this.representationUUID = representation.getUUID();
 
     handlers = new ArrayList<HandlerRegistration>();
     String summary = messages.representationListOfFiles();
     boolean selectable = true;
 
-    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_UUID, repId),
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_UUID, representationUUID),
       new EmptyKeyFilterParameter(RodaConstants.FILE_PARENT_UUID));
     filesList = new SearchFileList(filter, true, Facets.NONE, summary, selectable);
 
@@ -353,7 +353,7 @@ public class BrowseRepresentation extends Composite {
 
   private void getDescriptiveMetadataHTML(final String descId, final DescriptiveMetadataViewBundle bundle,
     final AsyncCallback<SafeHtml> callback) {
-    SafeUri uri = RestUtils.createRepresentationDescriptiveMetadataHTMLUri(repId, descId);
+    SafeUri uri = RestUtils.createRepresentationDescriptiveMetadataHTMLUri(representationUUID, descId);
     RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri.asString());
     requestBuilder.setHeader("Authorization", "Custom");
     try {
@@ -369,20 +369,21 @@ public class BrowseRepresentation extends Composite {
 
             if (bundle.hasHistory()) {
               // History link
-              String historyLink = HistoryUtils.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId, repId,
-                descId);
+              String historyLink = HistoryUtils.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId,
+                representationUUID, descId);
               String historyLinkHtml = "<a href='" + historyLink
                 + "' class='toolbarLink'><i class='fa fa-history'></i></a>";
               b.append(SafeHtmlUtils.fromSafeConstant(historyLinkHtml));
             }
             // Edit link
-            String editLink = HistoryUtils.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId, repId,
-              descId);
+            String editLink = HistoryUtils.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId,
+              representationUUID, descId);
             String editLinkHtml = "<a href='" + editLink + "' class='toolbarLink'><i class='fa fa-edit'></i></a>";
             b.append(SafeHtmlUtils.fromSafeConstant(editLinkHtml));
 
             // Download link
-            SafeUri downloadUri = RestUtils.createRepresentationDescriptiveMetadataDownloadUri(repId, descId);
+            SafeUri downloadUri = RestUtils.createRepresentationDescriptiveMetadataDownloadUri(representationUUID,
+              descId);
             String downloadLinkHtml = "<a href='" + downloadUri.asString()
               + "' class='toolbarLink'><i class='fa fa-download'></i></a>";
             b.append(SafeHtmlUtils.fromSafeConstant(downloadLinkHtml));
@@ -410,16 +411,16 @@ public class BrowseRepresentation extends Composite {
 
             if (bundle.hasHistory()) {
               // History link
-              String historyLink = HistoryUtils.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId, repId,
-                descId);
+              String historyLink = HistoryUtils.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId,
+                representationUUID, descId);
               String historyLinkHtml = "<a href='" + historyLink
                 + "' class='toolbarLink'><i class='fa fa-history'></i></a>";
               b.append(SafeHtmlUtils.fromSafeConstant(historyLinkHtml));
             }
 
             // Edit link
-            String editLink = HistoryUtils.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId, repId,
-              descId);
+            String editLink = HistoryUtils.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId,
+              representationUUID, descId);
             String editLinkHtml = "<a href='" + editLink + "' class='toolbarLink'><i class='fa fa-edit'></i></a>";
             b.append(SafeHtmlUtils.fromSafeConstant(editLinkHtml));
 
@@ -448,7 +449,7 @@ public class BrowseRepresentation extends Composite {
   }
 
   private void newRepresentationDescriptiveMetadata() {
-    HistoryUtils.newHistory(CreateDescriptiveMetadata.RESOLVER, "representation", aipId, repId);
+    HistoryUtils.newHistory(CreateDescriptiveMetadata.RESOLVER, "representation", aipId, representationUUID);
   }
 
   @UiHandler("newDescriptiveMetadata")
@@ -459,8 +460,8 @@ public class BrowseRepresentation extends Composite {
   @UiHandler("download")
   void buttonDownloadHandler(ClickEvent e) {
     SafeUri downloadUri = null;
-    if (repId != null) {
-      downloadUri = RestUtils.createRepresentationDownloadUri(repId);
+    if (representationUUID != null) {
+      downloadUri = RestUtils.createRepresentationDownloadUri(representationUUID);
     }
     if (downloadUri != null) {
       Window.Location.assign(downloadUri.asString());
@@ -473,7 +474,7 @@ public class BrowseRepresentation extends Composite {
 
     if (ClientSelectedItemsUtils.isEmpty(selected)) {
       final SelectedItems<IndexedRepresentation> selectedList = new SelectedItemsList<IndexedRepresentation>(
-        Arrays.asList(repId), IndexedRepresentation.class.getName());
+        Arrays.asList(representationUUID), IndexedRepresentation.class.getName());
 
       Dialogs.showConfirmDialog(messages.representationRemoveTitle(), messages.representationRemoveMessage(),
         messages.dialogCancel(), messages.dialogYes(), new AsyncCallback<Boolean>() {
@@ -565,7 +566,7 @@ public class BrowseRepresentation extends Composite {
     SelectedItems selected = (SelectedItems) filesList.getSelected();
 
     if (ClientSelectedItemsUtils.isEmpty(selected)) {
-      selected = new SelectedItemsList<IndexedRepresentation>(Arrays.asList(repId),
+      selected = new SelectedItemsList<IndexedRepresentation>(Arrays.asList(representationUUID),
         IndexedRepresentation.class.getName());
     }
 
@@ -585,7 +586,7 @@ public class BrowseRepresentation extends Composite {
   @UiHandler("preservationEvents")
   void buttonPreservationEventsHandler(ClickEvent e) {
     if (aipId != null) {
-      HistoryUtils.newHistory(PreservationEvents.RESOLVER, aipId, representation.getId());
+      HistoryUtils.newHistory(PreservationEvents.BROWSE_RESOLVER, aipId, representationUUID);
     }
   }
 
@@ -639,7 +640,7 @@ public class BrowseRepresentation extends Composite {
   @UiHandler("moveFiles")
   void buttonMoveHandler(ClickEvent e) {
     // FIXME missing filter to remove the files themselves
-    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_UUID, repId),
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_UUID, representationUUID),
       new SimpleFilterParameter(RodaConstants.FILE_AIP_ID, aipId),
       new SimpleFilterParameter(RodaConstants.FILE_ISDIRECTORY, Boolean.toString(true)));
     SelectFileDialog selectFileDialog = new SelectFileDialog(messages.moveItemTitle(), filter, true, false);
@@ -664,15 +665,15 @@ public class BrowseRepresentation extends Composite {
 
               @Override
               public void onSuccess(String details) {
-                BrowserService.Util.getInstance().moveFiles(aipId, repId, selected, toFolder, details,
+                BrowserService.Util.getInstance().moveFiles(aipId, representationUUID, selected, toFolder, details,
                   new LoadingAsyncCallback<Void>() {
 
                     @Override
                     public void onSuccessImpl(Void nothing) {
                       if (toFolder != null) {
-                        HistoryUtils.newHistory(BrowseFolder.RESOLVER, aipId, repId, toFolder.getUUID());
+                        HistoryUtils.newHistory(BrowseFolder.RESOLVER, aipId, representationUUID, toFolder.getUUID());
                       } else {
-                        HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, repId);
+                        HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, representationUUID);
                       }
                     }
 
@@ -706,7 +707,8 @@ public class BrowseRepresentation extends Composite {
         public void onSuccess(String details) {
           LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
           selectedItems.setDetailsMessage(details);
-          HistoryUtils.newHistory(BrowseAIP.RESOLVER, TransferUpload.BROWSE_RESOLVER.getHistoryToken(), aipId, repId);
+          HistoryUtils.newHistory(BrowseAIP.RESOLVER, TransferUpload.BROWSE_RESOLVER.getHistoryToken(), aipId,
+            representationUUID);
         }
       });
   }
@@ -732,7 +734,7 @@ public class BrowseRepresentation extends Composite {
 
               @Override
               public void onSuccess(final String details) {
-                BrowserService.Util.getInstance().createFolder(aipId, repId, null, newName, details,
+                BrowserService.Util.getInstance().createFolder(aipId, representationUUID, null, newName, details,
                   new LoadingAsyncCallback<String>() {
 
                     @Override

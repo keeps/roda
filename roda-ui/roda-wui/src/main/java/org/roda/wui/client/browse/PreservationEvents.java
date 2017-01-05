@@ -10,22 +10,30 @@
  */
 package org.roda.wui.client.browse;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.facet.Facets;
+import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
-import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
+import org.roda.wui.client.browse.bundle.BrowseFileBundle;
+import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.PreservationEventList;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
+import org.roda.wui.client.planning.Planning;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.RestUtils;
@@ -41,6 +49,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -55,7 +64,7 @@ import config.i18n.client.ClientMessages;
  */
 public class PreservationEvents extends Composite {
 
-  public static final HistoryResolver RESOLVER = new HistoryResolver() {
+  public static final HistoryResolver BROWSE_RESOLVER = new HistoryResolver() {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
@@ -68,8 +77,14 @@ public class PreservationEvents extends Composite {
         ShowPreservationEvent.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else if (historyTokens.size() == 2) {
         final String aipId = historyTokens.get(0);
-        final String repId = historyTokens.get(1);
-        PreservationEvents preservationEvents = new PreservationEvents(aipId, repId);
+        final String representationUUID = historyTokens.get(1);
+        PreservationEvents preservationEvents = new PreservationEvents(aipId, representationUUID);
+        callback.onSuccess(preservationEvents);
+      } else if (historyTokens.size() == 2) {
+        final String aipId = historyTokens.get(0);
+        final String representationUUID = historyTokens.get(1);
+        final String fileUUID = historyTokens.get(2);
+        PreservationEvents preservationEvents = new PreservationEvents(aipId, representationUUID, fileUUID);
         callback.onSuccess(preservationEvents);
       } else {
         HistoryUtils.newHistory(BrowseAIP.RESOLVER);
@@ -91,8 +106,35 @@ public class PreservationEvents extends Composite {
     }
   };
 
+  public static final HistoryResolver PLANNING_RESOLVER = new HistoryResolver() {
+
+    @Override
+    public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
+      if (historyTokens.size() == 0) {
+        PreservationEvents preservationEvents = new PreservationEvents();
+        callback.onSuccess(preservationEvents);
+      } else {
+        HistoryUtils.newHistory(PLANNING_RESOLVER);
+        callback.onSuccess(null);
+      }
+    }
+
+    @Override
+    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
+      UserLogin.getInstance().checkRole(this, callback);
+    }
+
+    public List<String> getHistoryPath() {
+      return ListUtils.concat(Planning.RESOLVER.getHistoryPath(), getHistoryToken());
+    }
+
+    public String getHistoryToken() {
+      return "events";
+    }
+  };
+
   public static final List<String> getViewItemHistoryToken(String id) {
-    return ListUtils.concat(RESOLVER.getHistoryPath(), id);
+    return ListUtils.concat(BROWSE_RESOLVER.getHistoryPath(), id);
   }
 
   interface MyUiBinder extends UiBinder<Widget, PreservationEvents> {
@@ -101,6 +143,9 @@ public class PreservationEvents extends Composite {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
+
+  @UiField(provided = true)
+  FlowPanel facetClasses;
 
   @UiField
   BreadcrumbPanel breadcrumb;
@@ -121,8 +166,8 @@ public class PreservationEvents extends Composite {
   Button backButton;
 
   private String aipId;
-  private String repId;
-  private BrowseAIPBundle itemBundle;
+  private String representationUUID;
+  private String fileUUID;
 
   /**
    * Create a new panel to edit a user
@@ -130,26 +175,44 @@ public class PreservationEvents extends Composite {
    * @param itemBundle
    * 
    */
+  public PreservationEvents() {
+    this(null);
+  }
+
   public PreservationEvents(final String aipId) {
-    this(aipId, null, null);
+    this(aipId, null);
   }
 
-  public PreservationEvents(final String aipId, final String repId) {
-    this(aipId, repId, null);
+  public PreservationEvents(final String aipId, final String representationUUID) {
+    this(aipId, representationUUID, null);
   }
 
-  public PreservationEvents(final String aipId, final String repId, final String fileId) {
+  public PreservationEvents(final String aipId, final String representationUUID, final String fileUUID) {
     this.aipId = aipId;
-    this.repId = repId;
+    this.representationUUID = representationUUID;
+    this.fileUUID = fileUUID;
 
-    Facets facets = null;
-    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, aipId));
+    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS));
+    Filter filter = new Filter();
 
-    if (repId != null) {
-      filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_REPRESENTATION_ID, repId));
+    if (aipId != null) {
+      filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, aipId));
+    }
+
+    if (representationUUID != null) {
+      filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_REPRESENTATION_UUID, representationUUID));
+    }
+
+    if (fileUUID != null) {
+      filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_FILE_UUID, fileUUID));
     }
 
     eventList = new PreservationEventList(filter, facets, messages.preservationEventsTitle(), false);
+
+    facetClasses = new FlowPanel();
+    Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
+    facetPanels.put(RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS, facetClasses);
+    FacetUtils.bindFacets(eventList, facetPanels);
 
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -159,15 +222,39 @@ public class PreservationEvents extends Composite {
       public void onSelectionChange(SelectionChangeEvent event) {
         IndexedPreservationEvent selected = eventList.getSelectionModel().getSelectedObject();
         if (selected != null) {
-          if (repId == null) {
+          if (fileUUID != null) {
+            HistoryUtils.newHistory(ShowPreservationEvent.RESOLVER, aipId, representationUUID, fileUUID,
+              selected.getId());
+          } else if (representationUUID != null) {
+            HistoryUtils.newHistory(ShowPreservationEvent.RESOLVER, aipId, representationUUID, selected.getId());
+          } else if (aipId != null) {
             HistoryUtils.newHistory(ShowPreservationEvent.RESOLVER, aipId, selected.getId());
           } else {
-            HistoryUtils.newHistory(ShowPreservationEvent.RESOLVER, aipId, repId, selected.getId());
+            HistoryUtils.newHistory(ShowPreservationEvent.RESOLVER, selected.getId());
           }
         }
       }
     });
 
+    // create breadcrumbs
+    if (fileUUID != null) {
+      getFileBreadCrumbs();
+    } else if (representationUUID != null) {
+      getRepresentationBreadCrumbs();
+    } else if (aipId != null) {
+      getAIPBreadCrumbs();
+    } else {
+      breadcrumb.setVisible(false);
+    }
+  }
+
+  @Override
+  protected void onLoad() {
+    super.onLoad();
+    JavascriptUtils.stickSidebar();
+  }
+
+  private void getAIPBreadCrumbs() {
     BrowserService.Util.getInstance().retrieveBrowseAIPBundle(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
       new AsyncCallback<BrowseAIPBundle>() {
 
@@ -179,23 +266,71 @@ public class PreservationEvents extends Composite {
 
         @Override
         public void onSuccess(BrowseAIPBundle itemBundle) {
-          PreservationEvents.this.itemBundle = itemBundle;
-          viewAction();
+          breadcrumb
+            .updatePath(BreadcrumbUtils.getAipBreadcrumbs(itemBundle.getAIPAncestors(), itemBundle.getAip(), true));
+          breadcrumb.setVisible(true);
         }
       });
   }
 
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
+  private void getRepresentationBreadCrumbs() {
+    BrowserService.Util.getInstance().retrieve(IndexedRepresentation.class.getName(), representationUUID,
+      new AsyncCallback<IndexedRepresentation>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
+        }
+
+        @Override
+        public void onSuccess(IndexedRepresentation representation) {
+          BrowserService.Util.getInstance().retrieveBrowseRepresentationBundle(representation.getAipId(),
+            representation.getId(), LocaleInfo.getCurrentLocale().getLocaleName(),
+            new AsyncCallback<BrowseRepresentationBundle>() {
+
+              @Override
+              public void onFailure(Throwable caught) {
+                AsyncCallbackUtils.defaultFailureTreatment(caught);
+              }
+
+              @Override
+              public void onSuccess(BrowseRepresentationBundle repBundle) {
+                breadcrumb.updatePath(BreadcrumbUtils.getRepresentationBreadcrumbs(repBundle));
+                breadcrumb.setVisible(true);
+              }
+            });
+        }
+      });
   }
 
-  public void viewAction() {
-    IndexedAIP aip = itemBundle.getAip();
-    boolean aipEvents = true;
-    breadcrumb.updatePath(BreadcrumbUtils.getAipBreadcrumbs(itemBundle.getAIPAncestors(), aip, aipEvents));
-    breadcrumb.setVisible(true);
+  private void getFileBreadCrumbs() {
+    BrowserService.Util.getInstance().retrieve(IndexedFile.class.getName(), representationUUID,
+      new AsyncCallback<IndexedFile>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
+        }
+
+        @Override
+        public void onSuccess(IndexedFile file) {
+          BrowserService.Util.getInstance().retrieveBrowseFileBundle(file.getAipId(), file.getRepresentationId(),
+            file.getPath(), file.getId(), LocaleInfo.getCurrentLocale().getLocaleName(),
+            new AsyncCallback<BrowseFileBundle>() {
+
+              @Override
+              public void onFailure(Throwable caught) {
+                AsyncCallbackUtils.defaultFailureTreatment(caught);
+              }
+
+              @Override
+              public void onSuccess(BrowseFileBundle fileBundle) {
+                breadcrumb.updatePath(BreadcrumbUtils.getFileBreadcrumbs(fileBundle));
+                breadcrumb.setVisible(true);
+              }
+            });
+        }
+      });
   }
 
   @UiHandler("downloadButton")
@@ -208,10 +343,15 @@ public class PreservationEvents extends Composite {
 
   @UiHandler("backButton")
   void buttonBackHandler(ClickEvent e) {
-    if (repId == null) {
+    if (fileUUID != null) {
+      HistoryUtils.newHistory(HistoryUtils.getHistoryUuidResolver(IndexedFile.class.getName(), fileUUID));
+    } else if (representationUUID != null) {
+      HistoryUtils
+        .newHistory(HistoryUtils.getHistoryUuidResolver(IndexedRepresentation.class.getName(), representationUUID));
+    } else if (aipId != null) {
       HistoryUtils.newHistory(HistoryUtils.getHistoryBrowse(aipId));
     } else {
-      HistoryUtils.newHistory(HistoryUtils.getHistoryBrowse(aipId, repId));
+      // goto repository events page
     }
   }
 }

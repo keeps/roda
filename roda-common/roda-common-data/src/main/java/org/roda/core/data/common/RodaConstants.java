@@ -914,9 +914,9 @@ public final class RodaConstants {
   /* Preservation events fields */
   public static final String PRESERVATION_EVENT_ID = "id";
   public static final String PRESERVATION_EVENT_AIP_ID = "aipID";
-  public static final String PRESERVATION_EVENT_REPRESENTATION_ID = "representationID";
   public static final String PRESERVATION_EVENT_REPRESENTATION_UUID = "representationUUID";
-  public static final String PRESERVATION_EVENT_FILE_ID = "fileID";
+  public static final String PRESERVATION_EVENT_FILE_UUID = "fileUUID";
+  public static final String PRESERVATION_EVENT_OBJECT_CLASS = "objectClass";
   public static final String PRESERVATION_EVENT_DATETIME = "eventDateTime";
   public static final String PRESERVATION_EVENT_DETAIL = "eventDetail";
   public static final String PRESERVATION_EVENT_TYPE = "eventType";

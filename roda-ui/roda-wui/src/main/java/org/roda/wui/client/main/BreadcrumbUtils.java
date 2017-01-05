@@ -105,13 +105,11 @@ public class BreadcrumbUtils {
     List<IndexedAIP> aipAncestors = bundle.getAipAncestors();
     IndexedAIP aip = bundle.getAip();
     IndexedRepresentation representation = bundle.getRepresentation();
-
     return getRepresentationBreadcrumbs(aipAncestors, aip, representation);
   }
 
   public static List<BreadcrumbItem> getRepresentationBreadcrumbs(List<IndexedAIP> aipAncestors, IndexedAIP aip,
     IndexedRepresentation representation) {
-
     List<BreadcrumbItem> breadcrumb = new ArrayList<>();
     breadcrumb
       .add(new BreadcrumbItem(DescriptionLevelUtils.getTopIconSafeHtml(), "", BrowseAIP.RESOLVER.getHistoryPath()));
@@ -149,12 +147,10 @@ public class BreadcrumbUtils {
   }
 
   public static List<BreadcrumbItem> getFileBreadcrumbs(BrowseFileBundle bundle) {
-
     IndexedAIP aip = bundle.getAip();
     IndexedRepresentation representation = bundle.getRepresentation();
     IndexedFile file = bundle.getFile();
     return getFileBreadcrumbs(aip, representation, file);
-
   }
 
   public static List<BreadcrumbItem> getFileBreadcrumbs(IndexedAIP aip, IndexedRepresentation representation,
@@ -335,7 +331,8 @@ public class BreadcrumbUtils {
   }
 
   private static final List<String> getViewItemEventsHistoryToken(String id) {
-    return ListUtils.concat(BrowseAIP.RESOLVER.getHistoryPath(), PreservationEvents.RESOLVER.getHistoryToken(), id);
+    return ListUtils.concat(BrowseAIP.RESOLVER.getHistoryPath(), PreservationEvents.BROWSE_RESOLVER.getHistoryToken(),
+      id);
   }
 
   private static final List<String> getViewItemHistoryToken(String id) {

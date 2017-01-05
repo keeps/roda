@@ -182,7 +182,7 @@ public class BrowseFile extends Composite {
   FocusPanel downloadSchemasButton;
 
   @UiField
-  Button optionDownload, optionNewProcess, optionRemove, optionRisk, optionIdentify;
+  Button optionDownload, optionNewProcess, optionRemove, optionRisk, optionIdentify, optionEvents;
 
   /**
    * Create a new panel to view a representation
@@ -315,6 +315,15 @@ public class BrowseFile extends Composite {
           // nothing to do
         }
       });
+  }
+
+  @UiHandler("optionEvents")
+  void buttonPreservationEventsHandler(ClickEvent e) {
+    List<String> history = new ArrayList<>();
+    history.add(bundle.getAip().getId());
+    history.add(bundle.getRepresentation().getUUID());
+    history.add(bundle.getFile().getUUID());
+    HistoryUtils.newHistory(RiskIncidenceRegister.RESOLVER, history);
   }
 
   @UiHandler("optionRisk")

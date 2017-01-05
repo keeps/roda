@@ -16,10 +16,16 @@ import org.roda.core.data.v2.index.IsIndexed;
 
 public class IndexedPreservationEvent implements IsIndexed {
   private static final long serialVersionUID = 7328069950706217131L;
-  private String aipId;
-  private String representationId;
-  private String fileId;
+
+  public static enum PreservationMetadataEventClass {
+    REPOSITORY, AIP, REPRESENTATION, FILE;
+  }
+
   private String id;
+  private String aipID;
+  private String representationUUID;
+  private String fileUUID;
+  private PreservationMetadataEventClass objectClass;
   private Date eventDateTime;
   private String eventDetail;
   private String eventType;
@@ -30,36 +36,44 @@ public class IndexedPreservationEvent implements IsIndexed {
   private List<LinkingIdentifier> outcomeObjectIds;
   private List<LinkingIdentifier> sourcesObjectIds;
 
-  public String getAipId() {
-    return aipId;
-  }
-
-  public void setAipId(String aipId) {
-    this.aipId = aipId;
-  }
-
-  public String getRepresentationId() {
-    return representationId;
-  }
-
-  public void setRepresentationId(String representationId) {
-    this.representationId = representationId;
-  }
-
-  public String getFileId() {
-    return fileId;
-  }
-
-  public void setFileId(String fileId) {
-    this.fileId = fileId;
-  }
-
   public String getId() {
     return id;
   }
 
   public void setId(String id) {
     this.id = id;
+  }
+
+  public String getAipID() {
+    return aipID;
+  }
+
+  public void setAipID(String aipId) {
+    this.aipID = aipId;
+  }
+
+  public String getRepresentationUUID() {
+    return representationUUID;
+  }
+
+  public void setRepresentationUUID(String representationUUID) {
+    this.representationUUID = representationUUID;
+  }
+
+  public String getFileUUID() {
+    return fileUUID;
+  }
+
+  public void setFileUUID(String fileUUID) {
+    this.fileUUID = fileUUID;
+  }
+
+  public PreservationMetadataEventClass getObjectClass() {
+    return objectClass;
+  }
+
+  public void setObjectClass(PreservationMetadataEventClass objectClass) {
+    this.objectClass = objectClass;
   }
 
   public Date getEventDateTime() {
@@ -136,24 +150,26 @@ public class IndexedPreservationEvent implements IsIndexed {
 
   @Override
   public String toString() {
-    return "IndexedPreservationEvent [aipId=" + aipId + ", representationId=" + representationId + ", fileId=" + fileId
-      + ", id=" + id + ", eventDateTime=" + eventDateTime + ", eventDetail=" + eventDetail + ", eventType=" + eventType
-      + ", eventOutcome=" + eventOutcome + ", eventOutcomeDetailExtension=" + eventOutcomeDetailExtension
-      + ", eventOutcomeDetailNote=" + eventOutcomeDetailNote + ", linkingAgentIds=" + linkingAgentIds
-      + ", outcomeObjectIds=" + outcomeObjectIds + ", sourcesObjectIds=" + sourcesObjectIds + "]";
+    return "IndexedPreservationEvent [id=" + id + ", aipID=" + aipID + ", representationUUID=" + representationUUID
+      + ", fileUUID=" + fileUUID + ", objectClass=" + objectClass + ", eventDateTime=" + eventDateTime
+      + ", eventDetail=" + eventDetail + ", eventType=" + eventType + ", eventOutcome=" + eventOutcome
+      + ", eventOutcomeDetailExtension=" + eventOutcomeDetailExtension + ", eventOutcomeDetailNote="
+      + eventOutcomeDetailNote + ", linkingAgentIds=" + linkingAgentIds + ", outcomeObjectIds=" + outcomeObjectIds
+      + ", sourcesObjectIds=" + sourcesObjectIds + "]";
   }
 
   @Override
   public List<String> toCsvHeaders() {
-    return Arrays.asList("aipId", "representationId", "fileId", "id", "eventDateTime", "eventDetail", "eventType",
-      "eventOutcome", "eventOutcomeDetailExtension", "eventOutcomeDetailNote", "linkingAgentIds", "outcomeObjectIds",
-      "sourcesObjectIds");
+    return Arrays.asList("id", "aipID", "representationUUID", "fileUUID", "objectClass", "eventDateTime", "eventDetail",
+      "eventType", "eventOutcome", "eventOutcomeDetailExtension", "eventOutcomeDetailNote", "linkingAgentIds",
+      "outcomeObjectIds", "sourcesObjectIds");
   }
 
   @Override
   public List<Object> toCsvValues() {
-    return Arrays.asList(aipId, representationId, fileId, id, eventDateTime, eventDetail, eventType, eventOutcome,
-      eventOutcomeDetailExtension, eventOutcomeDetailNote, linkingAgentIds, outcomeObjectIds, sourcesObjectIds);
+    return Arrays.asList(id, aipID, representationUUID, fileUUID, objectClass, eventDateTime, eventDetail, eventType,
+      eventOutcome, eventOutcomeDetailExtension, eventOutcomeDetailNote, linkingAgentIds, outcomeObjectIds,
+      sourcesObjectIds);
   }
 
   @Override
@@ -163,8 +179,8 @@ public class IndexedPreservationEvent implements IsIndexed {
 
   @Override
   public List<String> liteFields() {
-    return Arrays.asList(RodaConstants.PRESERVATION_EVENT_AIP_ID, RodaConstants.PRESERVATION_EVENT_REPRESENTATION_ID,
-      RodaConstants.PRESERVATION_EVENT_FILE_ID, RodaConstants.INDEX_UUID);
+    return Arrays.asList(RodaConstants.PRESERVATION_EVENT_AIP_ID, RodaConstants.PRESERVATION_EVENT_REPRESENTATION_UUID,
+      RodaConstants.PRESERVATION_EVENT_FILE_UUID, RodaConstants.INDEX_UUID);
   }
 
 }

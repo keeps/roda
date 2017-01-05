@@ -38,6 +38,7 @@ import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
+import org.roda.wui.client.planning.RiskIncidenceRegister;
 import org.roda.wui.client.process.CreateJob;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
@@ -93,8 +94,7 @@ public class BrowseFolder extends Composite {
               if (bundle.getFile().isDirectory()) {
                 callback.onSuccess(new BrowseFolder(bundle));
               } else {
-                // TODO i18n
-                Toast.showError("Trying to open a file as a folder");
+                Toast.showError(messages.openFileAsFolderError());
                 HistoryUtils.newHistory(BrowseAIP.RESOLVER);
                 callback.onSuccess(null);
               }
@@ -153,7 +153,7 @@ public class BrowseFolder extends Composite {
   Label folderId;
 
   @UiField
-  Button rename, createFolder, identifyFormats;
+  Button rename, createFolder, identifyFormats, risks, preservationEvents;
 
   @UiField
   BreadcrumbPanel breadcrumb;
@@ -585,6 +585,25 @@ public class BrowseFolder extends Composite {
         }
       }
     });
+  }
+
+  @UiHandler("risks")
+  void buttonRisksButtonHandler(ClickEvent e) {
+    List<String> history = new ArrayList<>();
+    history.add(bundle.getAip().getId());
+    history.add(bundle.getRepresentation().getId());
+    history.addAll(bundle.getFile().getPath());
+    history.add(bundle.getFile().getId());
+    HistoryUtils.newHistory(RiskIncidenceRegister.RESOLVER, history);
+  }
+
+  @UiHandler("preservationEvents")
+  void buttonPreservationEventsHandler(ClickEvent e) {
+    List<String> history = new ArrayList<>();
+    history.add(bundle.getAip().getId());
+    history.add(bundle.getRepresentation().getUUID());
+    history.add(bundle.getFile().getUUID());
+    HistoryUtils.newHistory(RiskIncidenceRegister.RESOLVER, history);
   }
 
 }

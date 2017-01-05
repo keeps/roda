@@ -251,7 +251,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
 
   @Override
   public Plugin<T> cloneMe() {
-    SiegfriedPlugin siegfriedPlugin = new SiegfriedPlugin();
+    SiegfriedPlugin<T> siegfriedPlugin = new SiegfriedPlugin<T>();
     try {
       siegfriedPlugin.init();
     } catch (PluginException e) {

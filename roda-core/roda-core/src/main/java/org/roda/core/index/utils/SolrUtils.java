@@ -111,6 +111,7 @@ import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent.PreservationMetadataEventClass;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
@@ -1628,18 +1629,24 @@ public class SolrUtils {
 
   private static IndexedPreservationEvent solrDocumentToIndexedPreservationEvent(SolrDocument doc, boolean returnLite) {
     final String id = objectToString(doc.get(RodaConstants.INDEX_UUID));
-    final String aipID = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_AIP_ID), null);
-    final String representationID = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_REPRESENTATION_ID), null);
-    final String fileID = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_FILE_ID), null);
+    final String aipId = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_AIP_ID), null);
+    final String representationUUID = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_REPRESENTATION_UUID),
+      null);
+    final String fileUUID = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_FILE_UUID), null);
 
     IndexedPreservationEvent ipe = new IndexedPreservationEvent();
     ipe.setId(id);
-    ipe.setAipId(aipID);
-    ipe.setRepresentationId(representationID);
-    ipe.setFileId(fileID);
+    ipe.setAipID(aipId);
+    ipe.setRepresentationUUID(representationUUID);
+    ipe.setFileUUID(fileUUID);
 
     if (returnLite) {
       return ipe;
+    }
+
+    String objectClass = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS), null);
+    if (StringUtils.isNotBlank(objectClass)) {
+      ipe.setObjectClass(PreservationMetadataEventClass.valueOf(objectClass.toUpperCase()));
     }
 
     final Date eventDateTime = objectToDate(doc.get(RodaConstants.PRESERVATION_EVENT_DATETIME));
@@ -1900,7 +1907,7 @@ public class SolrUtils {
   }
 
   private static <T extends Serializable> String getObjectLabel(SolrClient index, String className, String id) {
-    if (className != null && id != null) {
+    if (StringUtils.isNotBlank(className) && StringUtils.isNotBlank(id)) {
       try {
         Class<T> objectClass = (Class<T>) Class.forName(className);
         String field = getIndexName(objectClass).get(0);
@@ -2592,22 +2599,27 @@ public class SolrUtils {
   }
 
   public static SolrInputDocument premisToSolr(PreservationMetadataType preservationMetadataType, AIP aip,
-    String representationID, String fileID, Binary binary) throws GenericException {
+    String representationUUID, String fileUUID, Binary binary) throws GenericException {
 
     SolrInputDocument doc;
 
     Map<String, String> stylesheetOpt = new HashMap<String, String>();
+    stylesheetOpt.put(RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS,
+      PreservationMetadataEventClass.REPOSITORY.toString());
     if (aip != null) {
+      stylesheetOpt.put(RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS, PreservationMetadataEventClass.AIP.toString());
       stylesheetOpt.put(RodaConstants.PRESERVATION_EVENT_AIP_ID, aip.getId());
-      if (representationID != null) {
-        stylesheetOpt.put(RodaConstants.PRESERVATION_EVENT_REPRESENTATION_ID, representationID);
-        stylesheetOpt.put(RodaConstants.PRESERVATION_EVENT_REPRESENTATION_UUID,
-          IdUtils.getRepresentationId(aip.getId(), representationID));
+      if (representationUUID != null) {
+        stylesheetOpt.put(RodaConstants.PRESERVATION_EVENT_REPRESENTATION_UUID, representationUUID);
+        stylesheetOpt.put(RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS,
+          PreservationMetadataEventClass.REPRESENTATION.toString());
       }
-    }
 
-    if (fileID != null) {
-      stylesheetOpt.put(RodaConstants.PRESERVATION_EVENT_FILE_ID, fileID);
+      if (fileUUID != null) {
+        stylesheetOpt.put(RodaConstants.PRESERVATION_EVENT_FILE_UUID, fileUUID);
+        stylesheetOpt.put(RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS,
+          PreservationMetadataEventClass.FILE.toString());
+      }
     }
 
     try {
@@ -2673,6 +2685,7 @@ public class SolrUtils {
         setPermissions(aip.getPermissions(), doc);
       }
     }
+
     // set uuid from id defined in xslt
     doc.addField(RodaConstants.INDEX_UUID, doc.getFieldValue(RodaConstants.PRESERVATION_EVENT_ID));
     return doc;

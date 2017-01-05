@@ -313,9 +313,9 @@ public interface ClientMessages extends Messages {
   String executingTaskMessage();
 
   String noItemsToDisplay();
-  
+
   String noItemsToDisplayButFacetsActive();
-  
+
   String disableFacets();
 
   String browserOfflineError();
@@ -710,6 +710,8 @@ public interface ClientMessages extends Messages {
 
   String dipLastModified();
 
+  String openFileAsFolderError();
+
   /************* Preservation Event List ****************/
 
   String preservationEventListHeaderDate();
@@ -763,6 +765,8 @@ public interface ClientMessages extends Messages {
   String preservationEventOutcomeDetailNote();
 
   String preservationEventOutcomeDetailExtension();
+
+  String preservationEventClass();
 
   String descriptiveMetadataHistoryLabel(String versionKey, Date createdDate);
 

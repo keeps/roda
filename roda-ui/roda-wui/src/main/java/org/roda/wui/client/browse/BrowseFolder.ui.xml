@@ -72,6 +72,14 @@
 								ui:field="identifyFormats">
 								<ui:text from='{messages.identifyFormatsButton}' />
 							</g:Button>
+							<g:Button addStyleNames="btn btn-default btn-clock"
+								ui:field="preservationEvents">
+								<ui:text from='{messages.preservationEvents}' />
+							</g:Button>
+							<g:Button addStyleNames="btn btn-default btn-exclamation-triangle"
+								ui:field="risks">
+								<ui:text from='{messages.preservationRisks}' />
+							</g:Button>
 						</g:FlowPanel>
 					</g:FlowPanel>
 				</g:FlowPanel>

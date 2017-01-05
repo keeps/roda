@@ -186,8 +186,19 @@ public class IndexModelObserver implements ModelObserver {
     StoragePath filePath = ModelUtils.getPreservationMetadataStoragePath(pm);
     Binary binary = model.getStorage().getBinary(filePath);
     AIP aip = model.retrieveAIP(pm.getAipId());
-    SolrInputDocument premisEventDocument = SolrUtils.premisToSolr(pm.getType(), aip, pm.getRepresentationId(),
-      pm.getId(), binary);
+    String representationUUID = null;
+    String fileUUID = null;
+
+    if (pm.getRepresentationId() != null) {
+      representationUUID = IdUtils.getRepresentationId(aip.getId(), pm.getRepresentationId());
+
+      if (pm.getFileId() != null) {
+        fileUUID = IdUtils.getFileId(aip.getId(), pm.getRepresentationId(), pm.getFileDirectoryPath(), pm.getFileId());
+      }
+    }
+
+    SolrInputDocument premisEventDocument = SolrUtils.premisToSolr(pm.getType(), aip, representationUUID, fileUUID,
+      binary);
     index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisEventDocument);
   }
 
@@ -732,8 +743,20 @@ public class IndexModelObserver implements ModelObserver {
       StoragePath storagePath = ModelUtils.getPreservationMetadataStoragePath(pm);
       Binary binary = model.getStorage().getBinary(storagePath);
       AIP aip = pm.getAipId() != null ? model.retrieveAIP(pm.getAipId()) : null;
-      SolrInputDocument premisFileDocument = SolrUtils.premisToSolr(pm.getType(), aip, pm.getRepresentationId(),
-        pm.getId(), binary);
+      String representationUUID = null;
+      String fileUUID = null;
+
+      if (pm.getRepresentationId() != null) {
+        representationUUID = IdUtils.getRepresentationId(aip.getId(), pm.getRepresentationId());
+
+        if (pm.getFileId() != null) {
+          fileUUID = IdUtils.getFileId(aip.getId(), pm.getRepresentationId(), pm.getFileDirectoryPath(),
+            pm.getFileId());
+        }
+      }
+
+      SolrInputDocument premisFileDocument = SolrUtils.premisToSolr(pm.getType(), aip, representationUUID, fileUUID,
+        binary);
       PreservationMetadataType type = pm.getType();
       if (PreservationMetadataType.EVENT.equals(type)) {
         index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisFileDocument);

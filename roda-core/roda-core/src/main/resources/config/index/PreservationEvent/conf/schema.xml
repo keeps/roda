@@ -29,7 +29,7 @@
  http://wiki.apache.org/solr/SchemaXml
 -->
 
-<schema name="schema-version-2" version="1.5">
+<schema name="schema-version-3" version="1.5">
   <!--
     2 - removed field 'state' default value (it was leftovers from previous field definition);
   -->
@@ -109,10 +109,10 @@
    -->   
    <field name="uuid" type="string" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="id" type="string" indexed="true" stored="true" required="false" multiValued="false" />
-   <field name="aipID" type="string" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="representationID" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="aipId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="representationUUID" type="string" indexed="true" stored="true" required="false" multiValued="false" />
-   <field name="fileID" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="fileUUID" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="objectClass" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="eventDateTime" type="tdate" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="eventDetail" type="text_general" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="eventType" type="string" indexed="true" stored="true" required="false" multiValued="false" />

@@ -12,6 +12,8 @@
 	<xsl:param name="representationID" />
 	<xsl:param name="representationUUID" />
 	<xsl:param name="fileID" />
+	<xsl:param name="fileUUID" />
+	<xsl:param name="objectClass" />
 
 	<xsl:template match="/">
 		<doc>
@@ -79,6 +81,16 @@
 		<xsl:if test="$fileID">
 			<field name="fileID">
 				<xsl:value-of select="$fileID" />
+			</field>
+		</xsl:if>
+		<xsl:if test="$fileUUID">
+			<field name="fileUUID">
+				<xsl:value-of select="$fileUUID" />
+			</field>
+		</xsl:if>
+		<xsl:if test="$objectClass">
+			<field name="objectClass">
+				<xsl:value-of select="$objectClass" />
 			</field>
 		</xsl:if>
 		<xsl:if test="prem:eventDateTime">

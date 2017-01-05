@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.BrowseAIP;
+import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.Ingest;
@@ -102,6 +103,7 @@ public class Menu extends Composite {
   private MenuItem planning_risk;
   // private MenuItem planning_agents;
   private MenuItem planning_format;
+  private MenuItem planning_event;
 
   private final MenuItem help;
 
@@ -163,6 +165,9 @@ public class Menu extends Composite {
     // createCommand(AgentRegister.RESOLVER.getHistoryPath()));
     planning_format = planningMenu.addItem(messages.title("planning_format"),
       createCommand(FormatRegister.RESOLVER.getHistoryPath()));
+
+    planning_event = planningMenu.addItem(messages.title("planning_event"),
+      createCommand(PreservationEvents.PLANNING_RESOLVER.getHistoryPath()));
 
     help = new MenuItem(messages.title("help"), createCommand(Help.RESOLVER.getHistoryPath()));
 
@@ -260,6 +265,7 @@ public class Menu extends Composite {
     updateResolverSubItemVisibility(RiskRegister.RESOLVER, planning_risk);
     // updateResolverSubItemVisibility(Planning.RESOLVER, planning_agents);
     updateResolverSubItemVisibility(FormatRegister.RESOLVER, planning_format);
+    updateResolverSubItemVisibility(PreservationEvents.PLANNING_RESOLVER, planning_event);
     updateResolverTopItemVisibility(Planning.RESOLVER, new MenuItem(messages.title("planning"), planningMenu), 5);
 
     // Help

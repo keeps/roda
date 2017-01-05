@@ -66,12 +66,28 @@ public class ShowPreservationEvent extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      int size = historyTokens.size();
-      if (size == 2 || size == 3) {
+      if (historyTokens.size() == 1) {
+        final String eventId = historyTokens.get(0);
+        ShowPreservationEvent preservationEvents = new ShowPreservationEvent(eventId);
+        callback.onSuccess(preservationEvents);
+      } else if (historyTokens.size() == 2) {
         final String aipId = historyTokens.get(0);
-        final String representationId = size == 3 ? historyTokens.get(1) : null;
-        final String eventId = historyTokens.get(historyTokens.size() - 1);
-        ShowPreservationEvent preservationEvents = new ShowPreservationEvent(aipId, representationId, eventId);
+        final String eventId = historyTokens.get(1);
+        ShowPreservationEvent preservationEvents = new ShowPreservationEvent(aipId, eventId);
+        callback.onSuccess(preservationEvents);
+      } else if (historyTokens.size() == 3) {
+        final String aipId = historyTokens.get(0);
+        final String representationUUID = historyTokens.get(1);
+        final String eventId = historyTokens.get(2);
+        ShowPreservationEvent preservationEvents = new ShowPreservationEvent(aipId, representationUUID, eventId);
+        callback.onSuccess(preservationEvents);
+      } else if (historyTokens.size() == 4) {
+        final String aipId = historyTokens.get(0);
+        final String representationUUID = historyTokens.get(1);
+        final String fileUUID = historyTokens.get(2);
+        final String eventId = historyTokens.get(3);
+        ShowPreservationEvent preservationEvents = new ShowPreservationEvent(aipId, representationUUID, fileUUID,
+          eventId);
         callback.onSuccess(preservationEvents);
       } else {
         HistoryUtils.newHistory(BrowseAIP.RESOLVER);
@@ -85,7 +101,7 @@ public class ShowPreservationEvent extends Composite {
     }
 
     public List<String> getHistoryPath() {
-      return ListUtils.concat(PreservationEvents.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(PreservationEvents.BROWSE_RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
@@ -154,7 +170,8 @@ public class ShowPreservationEvent extends Composite {
   Button backButton;
 
   private String aipId;
-  private String representationId;
+  private String representationUUID;
+  private String fileUUID;
 
   private PreservationEventViewBundle bundle;
 
@@ -166,9 +183,23 @@ public class ShowPreservationEvent extends Composite {
    * @param itemBundle
    * 
    */
-  public ShowPreservationEvent(final String aipId, final String representationId, final String eventId) {
+  public ShowPreservationEvent(final String eventId) {
+    this(null, eventId);
+  }
+
+  public ShowPreservationEvent(final String aipId, final String eventId) {
+    this(aipId, null, eventId);
+  }
+
+  public ShowPreservationEvent(final String aipId, final String representationUUID, final String eventId) {
+    this(aipId, representationUUID, null, eventId);
+  }
+
+  public ShowPreservationEvent(final String aipId, final String representationUUID, final String fileUUID,
+    final String eventId) {
     this.aipId = aipId;
-    this.representationId = representationId;
+    this.representationUUID = representationUUID;
+    this.fileUUID = fileUUID;
 
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -179,7 +210,7 @@ public class ShowPreservationEvent extends Composite {
         public void onFailure(Throwable caught) {
           if (caught instanceof NotFoundException) {
             Toast.showError(messages.notFoundError(), messages.couldNotFindPreservationEvent());
-            HistoryUtils.newHistory(ListUtils.concat(PreservationEvents.RESOLVER.getHistoryPath(), aipId));
+            HistoryUtils.newHistory(ListUtils.concat(PreservationEvents.BROWSE_RESOLVER.getHistoryPath(), aipId));
           } else {
             AsyncCallbackUtils.defaultFailureTreatment(caught);
           }
@@ -229,7 +260,6 @@ public class ShowPreservationEvent extends Composite {
     for (LinkingIdentifier sourceObjectId : event.getSourcesObjectIds()) {
       if (sourceObjectId.getRoles() != null
         && sourceObjectId.getRoles().contains(RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE)) {
-        GWT.log("Event source id: " + sourceObjectId);
         addObjectPanel(sourceObjectId, bundle, sourceObjectsPanel);
         showSourceObjects = true;
       }
@@ -385,7 +415,6 @@ public class ShowPreservationEvent extends Composite {
   }
 
   private void addAipPanel(PreservationEventViewBundle bundle, FlowPanel layout, String idValue) {
-
     FlowPanel heading = new FlowPanel();
     heading.addStyleName("panel-heading");
     layout.add(heading);
@@ -401,7 +430,6 @@ public class ShowPreservationEvent extends Composite {
     IndexedAIP iAIP = bundle.getAips().get(idValue);
 
     if (iAIP != null) {
-
       Label titleLabel = new Label(messages.genericTitle());
       titleLabel.addStyleName("label");
       Label titleValue = new Label(iAIP.getTitle());
@@ -415,7 +443,7 @@ public class ShowPreservationEvent extends Composite {
       layout.add(footer);
 
       Anchor link = new Anchor(messages.inspectIntellectualEntity(),
-        HistoryUtils.createHistoryHashLink(BrowseAIP.RESOLVER, iAIP.getId()));
+        HistoryUtils.createHistoryHashLink(HistoryUtils.getHistoryBrowse(iAIP.getId())));
       footer.add(link);
 
       link.addStyleName("btn");
@@ -433,7 +461,6 @@ public class ShowPreservationEvent extends Composite {
   }
 
   private void addRepresentationPanel(PreservationEventViewBundle bundle, FlowPanel layout, String idValue) {
-
     FlowPanel heading = new FlowPanel();
     heading.addStyleName("panel-heading");
     layout.add(heading);
@@ -459,7 +486,7 @@ public class ShowPreservationEvent extends Composite {
       body.add(originalValue);
 
       Anchor link = new Anchor(messages.inspectRepresentation(),
-        HistoryUtils.createHistoryHashLink(BrowseRepresentation.RESOLVER, irep.getAipId(), irep.getId()));
+        HistoryUtils.createHistoryHashLink(HistoryUtils.getHistoryBrowse(irep.getAipId(), irep.getId())));
 
       link.addStyleName("btn");
 
@@ -480,7 +507,6 @@ public class ShowPreservationEvent extends Composite {
   }
 
   private void addFilePanel(PreservationEventViewBundle bundle, FlowPanel layout, String idValue) {
-
     FlowPanel heading = new FlowPanel();
     heading.addStyleName("panel-heading");
     layout.add(heading);
@@ -542,8 +568,9 @@ public class ShowPreservationEvent extends Composite {
       footer.addStyleName("panel-footer");
       layout.add(footer);
 
-      Anchor link = new Anchor(messages.inspectFile(), HistoryUtils.createHistoryHashLink(BrowseFile.RESOLVER,
-        ifile.getAipId(), ifile.getRepresentationUUID(), ifile.getUUID()));
+      Anchor link = new Anchor(messages.inspectFile(),
+        HistoryUtils.createHistoryHashLink(HistoryUtils.getHistoryBrowse(ifile.getAipId(), ifile.getRepresentationId(),
+          ifile.getPath(), ifile.getId(), ifile.isDirectory())));
 
       link.addStyleName("btn");
       footer.add(link);
@@ -615,10 +642,14 @@ public class ShowPreservationEvent extends Composite {
 
   @UiHandler("backButton")
   void buttonBackHandler(ClickEvent e) {
-    if (representationId == null) {
-      HistoryUtils.newHistory(PreservationEvents.RESOLVER, aipId);
+    if (fileUUID != null) {
+      HistoryUtils.newHistory(PreservationEvents.BROWSE_RESOLVER, aipId, representationUUID, fileUUID);
+    } else if (representationUUID != null) {
+      HistoryUtils.newHistory(PreservationEvents.BROWSE_RESOLVER, aipId, representationUUID);
+    } else if (aipId != null) {
+      HistoryUtils.newHistory(PreservationEvents.BROWSE_RESOLVER, aipId);
     } else {
-      HistoryUtils.newHistory(PreservationEvents.RESOLVER, aipId, representationId);
+      // goto repository events page
     }
   }
 }

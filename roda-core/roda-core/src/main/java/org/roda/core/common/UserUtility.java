@@ -270,7 +270,7 @@ public class UserUtility {
 
   public static void checkPreservationEventPermissions(User user, IndexedPreservationEvent event,
     PermissionType permissionType) throws AuthorizationDeniedException {
-    checkObjectPermissions(user, event, f -> f.getAipId(), permissionType);
+    checkObjectPermissions(user, event, f -> f.getAipID(), permissionType);
   }
 
   public static void checkAIPPermissions(User user, SelectedItems<IndexedAIP> selected, PermissionType permission)

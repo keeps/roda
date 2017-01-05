@@ -13,6 +13,7 @@ package org.roda.wui.client.planning;
 import java.util.Arrays;
 import java.util.List;
 
+import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -88,6 +89,8 @@ public class Planning {
       RiskRegister.getInstance().resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.get(0).equals(RiskIncidenceRegister.RESOLVER.getHistoryToken())) {
       RiskIncidenceRegister.getInstance().resolve(HistoryUtils.tail(historyTokens), callback);
+    } else if (historyTokens.get(0).equals(PreservationEvents.PLANNING_RESOLVER.getHistoryToken())) {
+      PreservationEvents.PLANNING_RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     }
   }
 }
