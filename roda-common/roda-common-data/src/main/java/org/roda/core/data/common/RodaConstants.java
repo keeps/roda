@@ -182,6 +182,8 @@ public final class RodaConstants {
   public static final String API_PATH_PARAM_DIP_FILE_UUID = "dip_file_uuid";
   public static final String API_PATH_PARAM_PART = "part";
   public static final String API_PATH_PARAM_NAME = "name";
+  public static final String API_PATH_PARAM_USERNAME = "username";
+  public static final String API_PATH_PARAM_PERMISSION_TYPE = "permission_type";
 
   public static final String API_QUERY_PARAM_ID = "id";
   public static final String API_QUERY_PARAM_VERSION_ID = "version_id";
@@ -308,6 +310,8 @@ public final class RodaConstants {
   public static final String CONTROLLER_REJECT_REASON_PARAM = "rejectReason";
   public static final String CONTROLLER_SELECTED_VERSION_PARAM = "selectedVersion";
   public static final String CONTROLLER_FILES_PARAM = "files";
+  public static final String CONTROLLER_USERNAME_PARAM = "username";
+  public static final String CONTROLLER_PERMISSION_TYPE_PARAM = "permissionType";
 
   /*
    * Core (storage, index, orchestrator, etc.)

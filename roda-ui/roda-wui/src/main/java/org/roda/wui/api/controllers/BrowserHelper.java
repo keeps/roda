@@ -28,6 +28,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.custommonkey.xmlunit.Diff;
@@ -63,6 +65,8 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.LinkingObjectUtils;
+import org.roda.core.data.v2.common.ObjectPermission;
+import org.roda.core.data.v2.common.ObjectPermissionResult;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.formats.Format;
@@ -3061,6 +3065,47 @@ public class BrowserHelper {
     }
 
     index.commit(IndexedRepresentation.class);
+  }
+
+  public static ObjectPermissionResult verifyPermissions(User user, String username, String permissionType,
+    MultivaluedMap<String, String> queryParams)
+    throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
+    ObjectPermissionResult result = new ObjectPermissionResult();
+    for (String queryKey : queryParams.keySet()) {
+      for (String queryValues : queryParams.get(queryKey)) {
+        boolean hasPermission = checkObjectPermission(username, permissionType, queryKey, queryValues);
+        result.addObject(new ObjectPermission(queryKey, queryValues, hasPermission));
+      }
+    }
+    return result;
+  }
+
+  private static boolean checkObjectPermission(String username, String permissionType, String objectClass, String id)
+    throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
+    ModelService model = RodaCoreFactory.getModelService();
+    boolean hasPermission = false;
+
+    try {
+      if (DIP.class.getName().equals(objectClass)) {
+        DIP dip = model.retrieveDIP(id);
+        Permissions permissions = dip.getPermissions();
+        Set<PermissionType> userPermissions = permissions.getUserPermissions(username);
+        PermissionType type = PermissionType.valueOf(permissionType.toUpperCase());
+        hasPermission = userPermissions.contains(type);
+      } else if (AIP.class.getName().equals(objectClass)) {
+        AIP aip = model.retrieveAIP(id);
+        Permissions permissions = aip.getPermissions();
+        Set<PermissionType> userPermissions = permissions.getUserPermissions(username);
+        PermissionType type = PermissionType.valueOf(permissionType.toUpperCase());
+        hasPermission = userPermissions.contains(type);
+      } else {
+        throw new RequestNotValidException(objectClass + " permission verification is not supported");
+      }
+    } catch (IllegalArgumentException e) {
+      throw new RequestNotValidException(e);
+    }
+
+    return hasPermission;
   }
 
 }

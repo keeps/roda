@@ -22,6 +22,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.transform.TransformerException;
 
 import org.roda.core.common.ConsumesOutputStream;
@@ -38,6 +39,7 @@ import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.common.ObjectPermissionResult;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -2356,6 +2358,23 @@ public class Browser extends RodaWuiController {
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_SELECTED_PARAM,
       selected);
+  }
+
+  public static ObjectPermissionResult verifyPermissions(User user, String username, String permissionType,
+    MultivaluedMap<String, String> queryParams)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    // delegate
+    ObjectPermissionResult result = BrowserHelper.verifyPermissions(user, username, permissionType, queryParams);
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_USERNAME_PARAM, username,
+      RodaConstants.CONTROLLER_PERMISSION_TYPE_PARAM, permissionType);
+    return result;
   }
 
 }
