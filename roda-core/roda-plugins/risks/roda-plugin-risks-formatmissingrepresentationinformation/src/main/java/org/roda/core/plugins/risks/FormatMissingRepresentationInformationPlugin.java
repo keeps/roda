@@ -70,7 +70,7 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
   private static final Logger LOGGER = LoggerFactory.getLogger(FormatMissingRepresentationInformationPlugin.class);
 
   /** Plugin version. */
-  private static final String VERSION = "1.1";
+  private static final String VERSION = "1.1.1";
 
   /** Risk ID. */
   private static final String RISK_ID = "urn:FormatMissingRepresentationInformation:r1";
@@ -158,7 +158,7 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
 
   @Override
   public Report execute(final IndexService index, final ModelService model, final StorageService storage,
-    List<LiteOptionalWithCause> liteList) throws PluginException {
+    final List<LiteOptionalWithCause> liteList) throws PluginException {
     return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<File>() {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
@@ -579,17 +579,6 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
     abstract List<FormatResult> formatResults();
 
     @Override
-    public boolean isMissingAttributes() {
-      final boolean missingFormat = checkFormatDesignation()
-        && (StringUtils.isBlank(this.fileFormat.getFormatDesignationName())
-          || StringUtils.isBlank(this.fileFormat.getFormatDesignationVersion()));
-      final boolean missingMimetype = checkMimetype() && StringUtils.isBlank(this.fileFormat.getMimeType());
-      final boolean missingPronom = checkPronom() && StringUtils.isBlank(this.fileFormat.getPronom());
-      final boolean missingExtension = checkExtension() && StringUtils.isBlank(this.fileFormat.getExtension());
-      return missingFormat || missingMimetype || missingPronom || missingExtension;
-    }
-
-    @Override
     public boolean isInRisk() {
       return this.formatResults().isEmpty();
     }
@@ -633,17 +622,17 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
 
       if (checkMimetype()) {
         checks.add(new AttributeCheck(MIMETYPE_NAME, fileFormat.getMimeType(), present,
-          new SimpleFilterParameter(RodaConstants.FORMAT_MIMETYPES, fileFormat.getMimeType())));
+          new SimpleFilterParameter(RodaConstants.FORMAT_MIMETYPES, fileFormat.getMimeType()), isMissingMimetype()));
       }
 
       if (checkPronom()) {
         checks.add(new AttributeCheck(PRONOM_NAME, fileFormat.getPronom(), present,
-          new SimpleFilterParameter(RodaConstants.FORMAT_PRONOMS, fileFormat.getPronom())));
+          new SimpleFilterParameter(RodaConstants.FORMAT_PRONOMS, fileFormat.getPronom()), isMissingPronom()));
       }
 
       if (checkExtension()) {
         checks.add(new AttributeCheck(EXTENSION_NAME, fileFormat.getExtension(), present,
-          new SimpleFilterParameter(RodaConstants.FORMAT_EXTENSIONS, fileFormat.getExtension())));
+          new SimpleFilterParameter(RodaConstants.FORMAT_EXTENSIONS, fileFormat.getExtension()), isMissingExtension()));
       }
 
       if (checkFormatDesignation()) {
@@ -658,13 +647,37 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
         final FilterParameter nameAndVersion = new AndFiltersParameters(Arrays.asList(name, version));
         final FilterParameter nameAndVersionOrName = new OrFiltersParameters(Arrays.asList(nameAndVersion, name));
 
-        final String value = String.format("%s\", \"%s", fileFormat.getFormatDesignationName(),
-          fileFormat.getFormatDesignationVersion());
+        if (StringUtils.isBlank(fileFormat.getFormatDesignationVersion())) {
+          checks.add(new AttributeCheck(FORMAT_DESIGNATION_NAME, fileFormat.getFormatDesignationName(), present, name,
+            isMissingFormatDesignation()));
+        } else {
+          checks
+            .add(new AttributeCheck(FORMAT_DESIGNATION_NAME,
+              String.format("%s\" with version: \"%s", fileFormat.getFormatDesignationName(),
+                fileFormat.getFormatDesignationVersion()),
+              present, nameAndVersionOrName, isMissingFormatDesignation()));
+        }
 
-        checks.add(new AttributeCheck(FORMAT_DESIGNATION_NAME, value, present, nameAndVersionOrName));
       }
 
       return checks;
+    }
+
+    boolean isMissingFormatDesignation() {
+      return checkFormatDesignation() && (StringUtils.isBlank(this.fileFormat.getFormatDesignationName())
+        && StringUtils.isBlank(this.fileFormat.getFormatDesignationVersion()));
+    }
+
+    boolean isMissingMimetype() {
+      return checkMimetype() && StringUtils.isBlank(this.fileFormat.getMimeType());
+    }
+
+    boolean isMissingPronom() {
+      return checkPronom() && StringUtils.isBlank(this.fileFormat.getPronom());
+    }
+
+    boolean isMissingExtension() {
+      return checkExtension() && StringUtils.isBlank(this.fileFormat.getExtension());
     }
   }
 
@@ -698,6 +711,11 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
     }
 
     @Override
+    public boolean isMissingAttributes() {
+      return isMissingFormatDesignation() || isMissingMimetype() || isMissingPronom() || isMissingExtension();
+    }
+
+    @Override
     List<FormatResult> formatResults() {
       if (this.formatResults == null) {
         this.formatResults = new ArrayList<>();
@@ -721,6 +739,7 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
    * @author Rui Castro <rui.castro@gmail.com>
    */
   class MatchOneResult extends AbstractResult {
+
     /**
      * List of {@link FormatResult}.
      */
@@ -745,14 +764,21 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
     }
 
     @Override
+    public boolean isMissingAttributes() {
+      return isMissingFormatDesignation() && isMissingMimetype() && isMissingPronom() && isMissingExtension();
+    }
+
+    @Override
     List<FormatResult> formatResults() {
       if (this.formatResults == null) {
         this.formatResults = new ArrayList<>();
         for (AttributeCheck check : attributeChecks(true)) {
-          final Iterator<Format> formats = this.indexService
-            .findAll(Format.class, new Filter(check.getFilterParameter())).iterator();
-          formats.forEachRemaining(
-            format -> this.formatResults.add(new FormatResult(format, Collections.singletonList(check))));
+          if (!check.isMissingAttribute()) {
+            final Iterator<Format> formats = this.indexService
+              .findAll(Format.class, new Filter(check.getFilterParameter())).iterator();
+            formats.forEachRemaining(
+              format -> this.formatResults.add(new FormatResult(format, Collections.singletonList(check))));
+          }
         }
         consolidateResults();
       }
@@ -862,6 +888,10 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
      * The {@link FilterParameter} corresponding to this check.
      */
     private final FilterParameter filterParameter;
+    /**
+     * Is the value missing?
+     */
+    private final boolean missing;
 
     /**
      * Constructor.
@@ -874,13 +904,16 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
      *          Is it present?
      * @param filterParameter
      *          The {@link FilterParameter} corresponding to this check.
+     * @param missing
+     *          Is the value missing?
      */
-    AttributeCheck(final String name, final String value, final boolean present,
-      final FilterParameter filterParameter) {
+    AttributeCheck(final String name, final String value, final boolean present, final FilterParameter filterParameter,
+      final boolean missing) {
       this.name = name;
       this.value = value;
       this.present = present;
       this.filterParameter = filterParameter;
+      this.missing = missing;
     }
 
     FilterParameter getFilterParameter() {
@@ -891,5 +924,10 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
     public String toString() {
       return String.format("%s %s \"%s\"", this.present ? "has" : "does NOT have", this.name, this.value);
     }
+
+    boolean isMissingAttribute() {
+      return missing;
+    }
+
   }
 }
