@@ -10,13 +10,13 @@
  */
 package org.roda.wui.client.browse;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
+import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.sort.SortParameter;
@@ -128,8 +128,6 @@ public class BrowseDIP extends Composite {
     previousButton.setVisible(false);
     nextButton.setVisible(false);
 
-    
-
     if (bundle.getDipFile() != null) {
       index = -1;
       showFromBundle(bundle.getDipFile());
@@ -151,10 +149,17 @@ public class BrowseDIP extends Composite {
     breadcrumb.updatePath(getBreadcrumbs());
     breadcrumb.setVisible(true);
   }
-  
+
   private void showFromBundle(DIPFile selected) {
     dipFile = selected;
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIPFILE_DIP_ID, dip.getId()));
+
+    if (dipFile.getAncestorsPath().isEmpty()) {
+      filter.add(new EmptyKeyFilterParameter(RodaConstants.DIPFILE_PARENT_UUID));
+    } else {
+      String parentId = dipFile.getAncestorsPath().get(dipFile.getAncestorsPath().size() - 1);
+      filter.add(new SimpleFilterParameter(RodaConstants.DIPFILE_PARENT_UUID, parentId));
+    }
 
     BrowserService.Util.getInstance().count(DIPFile.class.getName(), filter, new AsyncCallback<Long>() {
 
@@ -174,7 +179,8 @@ public class BrowseDIP extends Composite {
   }
 
   public void show() {
-    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIPFILE_DIP_ID, dip.getId()));
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIPFILE_DIP_ID, dip.getId()),
+      new EmptyKeyFilterParameter(RodaConstants.DIPFILE_PARENT_UUID));
     Sorter sorter = new Sorter(new SortParameter(RodaConstants.DIPFILE_ID, false));
     Sublist sublist = new Sublist(index, 1);
     String localeString = LocaleInfo.getCurrentLocale().getLocaleName();

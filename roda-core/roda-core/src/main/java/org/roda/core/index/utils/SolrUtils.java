@@ -2343,9 +2343,13 @@ public class SolrUtils {
     if (path != null && !path.isEmpty()) {
       List<String> ancestorsPath = getDIPFileAncestorsPath(file.getDipId(), path);
       if (!ancestorsPath.isEmpty()) {
-        doc.addField(RodaConstants.DIPFILE_ANCESTORS_PATH, ancestorsPath);
+        doc.addField(RodaConstants.DIPFILE_ANCESTORS_UUIDS, ancestorsPath);
       }
+
+      doc.addField(RodaConstants.DIPFILE_PARENT_UUID,
+        IdUtils.getDIPFileId(file.getDipId(), path.subList(0, path.size() - 1), path.get(path.size() - 1)));
     }
+
     doc.addField(RodaConstants.DIPFILE_DIP_ID, file.getDipId());
     doc.addField(RodaConstants.DIPFILE_ID, file.getId());
     doc.addField(RodaConstants.DIPFILE_IS_DIRECTORY, file.isDirectory());

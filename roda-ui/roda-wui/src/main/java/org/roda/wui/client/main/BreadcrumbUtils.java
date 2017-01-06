@@ -238,6 +238,11 @@ public class BreadcrumbUtils {
     ret.add(getBreadcrumbItem(dip, aip, representation, file));
 
     if (dipFile != null) {
+      // DIP File ancestors
+      for(String dipFileAncestorUUID : dipFile.getAncestorsPath()) {
+        // TODO add ancestors
+      }
+      
       ret.add(getBreadcrumbItem(dipFile, aip, representation, file));
     }
 

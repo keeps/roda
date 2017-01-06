@@ -882,7 +882,8 @@ public final class RodaConstants {
   public static final String DIPFILE_UUID = "uuid";
   public static final String DIPFILE_DIP_ID = "dipId";
   public static final String DIPFILE_PATH = "path";
-  public static final String DIPFILE_ANCESTORS_PATH = "ancestorsPath";
+  public static final String DIPFILE_ANCESTORS_UUIDS = "ancestorsUUIDs";
+  public static final String DIPFILE_PARENT_UUID = "parentUUID";
   public static final String DIPFILE_SIZE = "size";
   public static final String DIPFILE_IS_DIRECTORY = "isDirectory";
   public static final String DIPFILE_STORAGE_PATH = "storagePath";
