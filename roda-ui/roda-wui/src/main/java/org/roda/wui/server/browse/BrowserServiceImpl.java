@@ -22,6 +22,7 @@ import java.util.UUID;
 
 import org.apache.commons.configuration.Configuration;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.IdUtils;
 import org.roda.core.common.Messages;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.common.SelectedItemsUtils;
@@ -863,30 +864,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public DipBundle getDipBundle(String dipUUID, String aipUUID, String representationUUID, String fileUUID)
-    throws RequestNotValidException, AuthorizationDeniedException, GenericException, NotFoundException {
-    DipBundle bundle = new DipBundle();
+  public DipBundle getDipBundle(String dipUUID, String dipFileUUID, String aipId, String representationId, List<String> filePath,
+    String fileId) throws RequestNotValidException, AuthorizationDeniedException, GenericException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
 
-    if (dipUUID != null) {
-      bundle.setDip(Browser.retrieve(user, IndexedDIP.class, dipUUID));
-    } else {
-      throw new RequestNotValidException("DIP id must be defined in request and it was null");
-    }
-
-    if (aipUUID != null) {
-      bundle.setAip(Browser.retrieve(user, IndexedAIP.class, aipUUID));
-    }
-
-    if (representationUUID != null) {
-      bundle.setRepresentation(Browser.retrieve(user, IndexedRepresentation.class, representationUUID));
-    }
-
-    if (fileUUID != null) {
-      bundle.setFile(Browser.retrieve(user, IndexedFile.class, fileUUID));
-    }
-
-    return bundle;
+    return Browser.retrieveDipBundle(user, dipUUID, dipFileUUID, aipId, representationId, filePath, fileId);
   }
 
   @Override

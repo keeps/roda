@@ -21,18 +21,20 @@ public class BrowseRepresentationBundle implements Serializable {
   private IndexedAIP aip;
   private IndexedRepresentation representation;
   private List<DescriptiveMetadataViewBundle> representationDescriptiveMetadata;
+  private Long dipCount;
 
   public BrowseRepresentationBundle() {
     super();
   }
 
   public BrowseRepresentationBundle(List<IndexedAIP> aipAncestors, IndexedAIP aip, IndexedRepresentation representation,
-    List<DescriptiveMetadataViewBundle> representationDescriptiveMetadata) {
+    List<DescriptiveMetadataViewBundle> representationDescriptiveMetadata, Long dipCount) {
     super();
     this.aipAncestors = aipAncestors;
     this.aip = aip;
     this.representation = representation;
     this.representationDescriptiveMetadata = representationDescriptiveMetadata;
+    this.dipCount = dipCount;
   }
 
   public List<IndexedAIP> getAipAncestors() {
@@ -66,6 +68,14 @@ public class BrowseRepresentationBundle implements Serializable {
   public void setRepresentationDescriptiveMetadata(
     List<DescriptiveMetadataViewBundle> representationDescriptiveMetadata) {
     this.representationDescriptiveMetadata = representationDescriptiveMetadata;
+  }
+
+  public Long getDipCount() {
+    return dipCount;
+  }
+
+  public void setDipCount(Long dipCount) {
+    this.dipCount = dipCount;
   }
 
 }

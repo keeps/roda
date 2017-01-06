@@ -15,6 +15,7 @@
 		addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
+				<!-- IDENTIFICATION -->
 				<g:FlowPanel styleName="browseItemPanel">
 					<g:Label addStyleNames="browseItemHeader" ui:field="browseItemHeader">
 						<ui:text from='{messages.catalogueRepresentationTitle}' />
@@ -29,17 +30,35 @@
 				</g:FlowPanel>
 				<m:BreadcrumbPanel ui:field="breadcrumb"
 					addStyleNames="browseBreadcrumb" />
-				<g:TabPanel ui:field="itemMetadata" addStyleNames="browseItemMetadata" />
-				<g:Button addStyleNames="btn btn-plus browseNewDescriptiveMetadataButton"
-					ui:field="newDescriptiveMetadata">
-					<ui:text from='{messages.newDescriptiveMetadataTitle}' />
-				</g:Button>
-				<g:Label addStyleNames="h5" ui:field="filesPanelTitle">
-					<ui:text from='{messages.representationFiles}' />
-				</g:Label>
-				<commonsearch:SearchPanel ui:field="searchPanel" />
-				<lists:SearchFileList addStyleNames="searchResults"
-					ui:field="filesList" />
+
+				<!-- DESCRIPTIVE METADATA -->
+				<g:FlowPanel addStyleNames="card descriptiveMetadataCard">
+					<g:TabPanel ui:field="itemMetadata" addStyleNames="browseItemMetadata" />
+					<g:Button addStyleNames="btn btn-plus browseNewDescriptiveMetadataButton"
+						ui:field="newDescriptiveMetadata">
+						<ui:text from='{messages.newDescriptiveMetadataTitle}' />
+					</g:Button>
+				</g:FlowPanel>
+				<!-- FILES -->
+				<g:FlowPanel addStyleNames="card filesCard">
+					<g:Label addStyleNames="h5" ui:field="filesPanelTitle">
+						<ui:text from='{messages.representationFiles}' />
+					</g:Label>
+					<commonsearch:SearchPanel ui:field="filesSearch" />
+					<lists:SearchFileList addStyleNames="searchResults"
+						ui:field="filesList" />
+				</g:FlowPanel>
+
+				<!-- DIPs -->
+				<g:FlowPanel addStyleNames="card disseminationsCard">
+					<g:Label addStyleNames="h5" ui:field="disseminationsTitle">
+						<ui:text from='{messages.disseminationsTitle}' />
+					</g:Label>
+					<commonsearch:SearchPanel ui:field="disseminationsSearch" />
+					<lists:DIPList addStyleNames="searchResults"
+						ui:field="disseminationsList" />
+				</g:FlowPanel>
+
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">
@@ -48,8 +67,7 @@
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.representation}' />
 							</g:Label>
-							<g:Button addStyleNames="btn btn-edit"
-								ui:field="changeType">
+							<g:Button addStyleNames="btn btn-edit" ui:field="changeType">
 								<ui:text from='{messages.changeTypeButton}' />
 							</g:Button>
 							<g:Button addStyleNames="btn btn-danger btn-ban"
@@ -68,8 +86,7 @@
 							<g:Button addStyleNames="btn btn-play" ui:field="newProcess">
 								<ui:text from='{messages.newProcessPreservation}' />
 							</g:Button>
-							<g:Button addStyleNames="btn btn-play"
-								ui:field="identifyFormats">
+							<g:Button addStyleNames="btn btn-play" ui:field="identifyFormats">
 								<ui:text from='{messages.identifyFormatsButton}' />
 							</g:Button>
 							<g:Button addStyleNames="btn btn-default btn-clock"

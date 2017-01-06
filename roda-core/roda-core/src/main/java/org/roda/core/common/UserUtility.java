@@ -28,6 +28,7 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
@@ -213,6 +214,25 @@ public class UserUtility {
 
     LOGGER.debug("Checking if user '{}' has permissions to {} object {} (object read permissions: {} & {})",
       user.getId(), permissionType, aip.getId(), users, groups);
+
+    if (!users.contains(user.getId()) && iterativeDisjoint(groups, user.getGroups())) {
+      throw new AuthorizationDeniedException(
+        "The user '" + user.getId() + "' does not have permissions to " + permissionType);
+    }
+  }
+  
+  public static void checkDIPPermissions(User user, IndexedDIP dip, PermissionType permissionType)
+    throws AuthorizationDeniedException {
+    
+    if (isAdministrator(user)) {
+      return;
+    }
+
+    Set<String> users = dip.getPermissions().getUsers().get(permissionType);
+    Set<String> groups = dip.getPermissions().getGroups().get(permissionType);
+
+    LOGGER.debug("Checking if user '{}' has permissions to {} dip {} (object read permissions: {} & {})",
+      user.getId(), permissionType, dip.getId(), users, groups);
 
     if (!users.contains(user.getId()) && iterativeDisjoint(groups, user.getGroups())) {
       throw new AuthorizationDeniedException(

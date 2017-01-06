@@ -144,6 +144,7 @@ import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataViewBundle;
+import org.roda.wui.client.browse.bundle.DipBundle;
 import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
 import org.roda.wui.client.planning.MitigationPropertiesBundle;
@@ -225,6 +226,12 @@ public class BrowserHelper {
     } catch (NotFoundException e) {
       // do nothing
     }
+
+    // Count DIPs
+    Filter dipsFilter = new Filter(
+      new SimpleFilterParameter(RodaConstants.DIP_REPRESENTATION_UUIDS, representation.getUUID()));
+    Long dipCount = RodaCoreFactory.getIndexService().count(IndexedDIP.class, dipsFilter);
+    bundle.setDipCount(dipCount);
 
     return bundle;
   }
@@ -428,6 +435,32 @@ public class BrowserHelper {
     }
 
     return ret;
+  }
+
+  public static DipBundle retrieveDipBundle(String dipUUID, String dipFileUUID, String aipId, String representationId,
+    List<String> filePath, String fileId) throws GenericException, NotFoundException {
+    DipBundle bundle = new DipBundle();
+
+    bundle.setDip(BrowserHelper.retrieve(IndexedDIP.class, dipUUID));
+
+    if (dipFileUUID != null) {
+      bundle.setDipFile(BrowserHelper.retrieve(DIPFile.class, dipFileUUID));
+    }
+
+    if (aipId != null) {
+      bundle.setAip(BrowserHelper.retrieve(IndexedAIP.class, aipId));
+    }
+
+    if (representationId != null) {
+      bundle.setRepresentation(
+        BrowserHelper.retrieve(IndexedRepresentation.class, IdUtils.getRepresentationId(aipId, representationId)));
+    }
+
+    if (fileId != null) {
+      bundle.setFile(
+        BrowserHelper.retrieve(IndexedFile.class, IdUtils.getFileId(aipId, representationId, filePath, fileId)));
+    }
+    return bundle;
   }
 
   protected static List<IndexedAIP> retrieveAncestors(IndexedAIP aip) throws GenericException, NotFoundException {

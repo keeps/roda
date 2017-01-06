@@ -238,47 +238,44 @@ public class BreadcrumbUtils {
     ret.add(getBreadcrumbItem(dip, aip, representation, file));
 
     if (dipFile != null) {
-      // TODO missing dipFile path
-      ret.add(getBreadcrumbItem(dipFile));
+      ret.add(getBreadcrumbItem(dipFile, aip, representation, file));
     }
 
     return ret;
   }
 
-  private static BreadcrumbItem getBreadcrumbItem(IndexedDIP dip, IndexedAIP aip, IndexedRepresentation representation,
-    IndexedFile file) {
+  private static BreadcrumbItem getBreadcrumbItem(final IndexedDIP dip, final IndexedAIP aip,
+    final IndexedRepresentation representation, final IndexedFile file) {
     SafeHtmlBuilder b = new SafeHtmlBuilder();
     // TODO get icon from config
     b.append(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-play-circle-o'></i>"));
     b.append(SafeHtmlUtils.fromString(dip.getTitle()));
     SafeHtml label = b.toSafeHtml();
 
-    List<String> history = ListUtils.concat(BrowseDIP.RESOLVER.getHistoryPath(), dip.getUUID());
+    return new BreadcrumbItem(label, dip.getTitle(), new Command() {
 
-    if (aip != null) {
-      history.add(aip.getUUID());
-
-      if (representation != null) {
-        history.add(representation.getUUID());
-
-        if (file != null) {
-          history.add(file.getUUID());
-        }
+      @Override
+      public void execute() {
+        HistoryUtils.openBrowse(dip, aip, representation, file);
       }
-    }
-
-    return new BreadcrumbItem(label, dip.getTitle(), history);
+    });
   }
 
-  private static BreadcrumbItem getBreadcrumbItem(DIPFile dipFile) {
+  private static BreadcrumbItem getBreadcrumbItem(final DIPFile dipFile, final IndexedAIP aip,
+    final IndexedRepresentation representation, final IndexedFile file) {
     SafeHtmlBuilder b = new SafeHtmlBuilder();
     // TODO get icon from config
-    b.append(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-file-o'></i>"));
+    b.append(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-play-circle'></i>"));
     b.append(SafeHtmlUtils.fromString(dipFile.getId()));
     SafeHtml label = b.toSafeHtml();
 
-    return new BreadcrumbItem(label, dipFile.getId(),
-      ListUtils.concat(BrowseDIP.RESOLVER.getHistoryPath(), dipFile.getDipId(), dipFile.getUUID()));
+    return new BreadcrumbItem(label, dipFile.getId(), new Command() {
+
+      @Override
+      public void execute() {
+        HistoryUtils.openBrowse(dipFile, aip, representation, file);
+      }
+    });
   }
 
   private static IndexedRepresentation selectRepresentation(List<IndexedRepresentation> representations,

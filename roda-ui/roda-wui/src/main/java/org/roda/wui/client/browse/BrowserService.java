@@ -320,7 +320,7 @@ public interface BrowserService extends RemoteService {
   void changeRepresentationType(SelectedItemsList<IndexedRepresentation> selectedRepresentation, String newType,
     String details) throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
-  DipBundle getDipBundle(String dipUUID, String aipUUID, String representationUUID, String fileUUID)
+  DipBundle getDipBundle(String dipUUID, String dipFileUUID, String aipId, String representationId, List<String> filePath, String fileId)
     throws RequestNotValidException, AuthorizationDeniedException, GenericException, NotFoundException;
 
   void deleteDIP(String dipId)

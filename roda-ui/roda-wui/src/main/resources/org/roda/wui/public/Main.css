@@ -260,8 +260,14 @@ div.inline {
 
 
 .card {
-    box-shadow: -1px 0px 8px #888888;
-    padding: 14px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+    border-radius: 2px;
+    padding: 14px 16px;
+}
+
+.card:hover {
+  box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
 }
 
 .card + .card {
@@ -283,6 +289,15 @@ div.inline {
     padding-right: 10px;
 }
 
+.filesCard > .h5:before {
+    content: '\f0c5';
+    font-family: 'FontAwesome';
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    padding-right: 10px;
+}
+
 .disseminationsCard > .h5:before {
     content: '\f144';
     font-family: 'FontAwesome';
@@ -293,7 +308,7 @@ div.inline {
 }
 
 .aipChildrenCard > .h5:before {
-    content: '\f0c5';
+    content: '\f0e8';
     font-family: 'FontAwesome';
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
@@ -304,11 +319,21 @@ div.inline {
 .browse_top .aipChildrenCard {
 	box-shadow: none;
 	padding: 0;
+	transition: none;
+}
+
+.browse_top .aipChildrenCard:hover {
+	box-shadow: none;
 }
 
 .descriptiveMetadataCard {
 	box-shadow: none;
 	padding: 0;
+	transition: none;
+}
+
+.descriptiveMetadataCard:hover {
+	box-shadow: none;
 }
 
 /**********************************************

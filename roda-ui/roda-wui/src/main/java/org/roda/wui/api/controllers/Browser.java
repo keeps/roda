@@ -52,6 +52,7 @@ import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
@@ -77,6 +78,7 @@ import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
+import org.roda.wui.client.browse.bundle.DipBundle;
 import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
 import org.roda.wui.client.planning.MitigationPropertiesBundle;
@@ -227,6 +229,30 @@ public class Browser extends RodaWuiController {
     controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_AIP_ID_PARAM,
       aipId, RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId,
       RodaConstants.CONTROLLER_METADATA_ID_PARAM, metadataId);
+
+    return bundle;
+  }
+
+  public static DipBundle retrieveDipBundle(User user, String dipUUID, String dipFileUUID, String aipId,
+    String representationId, List<String> filePath, String fileId)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    IndexedDIP dip = BrowserHelper.retrieve(IndexedDIP.class, dipUUID);
+
+    UserUtility.checkDIPPermissions(user, dip, PermissionType.READ);
+
+    // delegate
+
+    DipBundle bundle = BrowserHelper.retrieveDipBundle(dipUUID, dipFileUUID, aipId, representationId, filePath, fileId);
+
+    // register action
+    controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_DIP_ID_PARAM,
+      dipUUID, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId, RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM,
+      representationId);
 
     return bundle;
   }

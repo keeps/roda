@@ -10,14 +10,16 @@ package org.roda.wui.client.common;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.select.SelectedItems;
 
 public class LastSelectedItemsSingleton {
 
   private static LastSelectedItemsSingleton singleton = null;
-  private static SelectedItems<?> selected = null;
-  private static String detailsMessage = "";
-  private static List<String> lastHistory = new ArrayList<String>();
+  private SelectedItems<? extends IsIndexed> selected = null;
+  private String detailsMessage = "";
+  private List<String> lastHistory = new ArrayList<String>();
+  private IsIndexed lastObject = null;
 
   private LastSelectedItemsSingleton() {
   }
@@ -29,20 +31,20 @@ public class LastSelectedItemsSingleton {
     return singleton;
   }
 
-  public SelectedItems<?> getSelectedItems() {
+  public SelectedItems<? extends IsIndexed> getSelectedItems() {
     return selected;
   }
 
-  public void setSelectedItems(SelectedItems<?> items) {
-    selected = items;
+  public void setSelectedItems(SelectedItems<? extends IsIndexed> selected) {
+    this.selected = selected;
   }
 
   public String getDetailsMessage() {
     return detailsMessage;
   }
 
-  public void setDetailsMessage(String details) {
-    detailsMessage = details;
+  public void setDetailsMessage(String detailsMessage) {
+    this.detailsMessage = detailsMessage;
   }
 
   public List<String> getLastHistory() {
@@ -50,7 +52,15 @@ public class LastSelectedItemsSingleton {
   }
 
   public void setLastHistory(List<String> lastHistory) {
-    LastSelectedItemsSingleton.lastHistory = lastHistory;
+    this.lastHistory = lastHistory;
+  }
+
+  public IsIndexed getLastObject() {
+    return this.lastObject;
+  }
+
+  public void setLastObject(IsIndexed lastObject) {
+    this.lastObject = lastObject;
   }
 
 }

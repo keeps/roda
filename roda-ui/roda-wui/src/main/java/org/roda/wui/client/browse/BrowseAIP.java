@@ -296,50 +296,10 @@ public class BrowseAIP extends Composite {
 
     boolean selectable = true;
 
-    // REPRESENTATIONS (PRE-INIT)
+    // REPRESENTATIONS
 
     representationsList = new RepresentationList(Filter.NULL, justActive, Facets.NONE, messages.listOfRepresentations(),
       true);
-
-    representationsSearch = new SearchPanel(Filter.NULL, RodaConstants.REPRESENTATION_SEARCH,
-      messages.searchPlaceHolder(), false, false, true);
-    representationsSearch.setDefaultFilterIncremental(true);
-    representationsSearch.setList(representationsList);
-
-    // DISSEMINATIONS (PRE-INIT)
-
-    disseminationsList = new DIPList(Filter.NULL, Facets.NONE, messages.listOfDisseminations(), true);
-
-    disseminationsSearch = new SearchPanel(Filter.NULL, RodaConstants.DIP_SEARCH, messages.searchPlaceHolder(), false,
-      false, true);
-    disseminationsSearch.setDefaultFilterIncremental(true);
-    disseminationsSearch.setList(disseminationsList);
-
-    // AIP CHILDREN (PRE-INIT)
-
-    aipChildrenList = new AIPList(Filter.NULL, justActive, FACETS, messages.listOfAIPs(), selectable);
-
-    aipChildrenSearch = new SearchPanel(COLLECTIONS_FILTER, RodaConstants.AIP_SEARCH, messages.searchPlaceHolder(),
-      false, false, true);
-    aipChildrenSearch.setDefaultFilterIncremental(true);
-    aipChildrenSearch.setList(aipChildrenList);
-
-    facetDescriptionLevels = new FlowPanel();
-    facetHasRepresentations = new FlowPanel();
-
-    Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
-    facetPanels.put(RodaConstants.AIP_LEVEL, facetDescriptionLevels);
-    facetPanels.put(RodaConstants.AIP_HAS_REPRESENTATIONS, facetHasRepresentations);
-
-    FacetUtils.bindFacets(aipChildrenList, facetPanels);
-
-    // INIT
-    initWidget(uiBinder.createAndBindUi(this));
-
-    // HEADER
-    browseDescription.add(new HTMLWidgetWrapper("BrowseDescription.html"));
-
-    // REPRESENTATIONS
     representationsList.getSelectionModel().addSelectionChangeHandler(new Handler() {
 
       @Override
@@ -350,21 +310,33 @@ public class BrowseAIP extends Composite {
         }
       }
     });
+    representationsSearch = new SearchPanel(Filter.NULL, RodaConstants.REPRESENTATION_SEARCH,
+      messages.searchPlaceHolder(), false, false, true);
+    representationsSearch.setDefaultFilterIncremental(true);
+    representationsSearch.setList(representationsList);
 
     // DISSEMINATIONS
+
+    disseminationsList = new DIPList(Filter.NULL, Facets.NONE, messages.listOfDisseminations(), true);
     disseminationsList.getSelectionModel().addSelectionChangeHandler(new Handler() {
 
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
         IndexedDIP dissemination = disseminationsList.getSelectionModel().getSelectedObject();
         if (dissemination != null) {
-          HistoryUtils.openBrowse(dissemination, aipId);
+          HistoryUtils.openBrowse(dissemination, bundle.getAip());
         }
       }
     });
 
+    disseminationsSearch = new SearchPanel(Filter.NULL, RodaConstants.DIP_SEARCH, messages.searchPlaceHolder(), false,
+      false, true);
+    disseminationsSearch.setDefaultFilterIncremental(true);
+    disseminationsSearch.setList(disseminationsList);
+
     // AIP CHILDREN
 
+    aipChildrenList = new AIPList(Filter.NULL, justActive, FACETS, messages.listOfAIPs(), selectable);
     aipChildrenList.getSelectionModel().addSelectionChangeHandler(new Handler() {
 
       @Override
@@ -388,8 +360,27 @@ public class BrowseAIP extends Composite {
       }
     });
 
-    // OTHER
+    aipChildrenSearch = new SearchPanel(COLLECTIONS_FILTER, RodaConstants.AIP_SEARCH, messages.searchPlaceHolder(),
+      false, false, true);
+    aipChildrenSearch.setDefaultFilterIncremental(true);
+    aipChildrenSearch.setList(aipChildrenList);
 
+    facetDescriptionLevels = new FlowPanel();
+    facetHasRepresentations = new FlowPanel();
+
+    Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
+    facetPanels.put(RodaConstants.AIP_LEVEL, facetDescriptionLevels);
+    facetPanels.put(RodaConstants.AIP_HAS_REPRESENTATIONS, facetHasRepresentations);
+
+    FacetUtils.bindFacets(aipChildrenList, facetPanels);
+
+    // INIT
+    initWidget(uiBinder.createAndBindUi(this));
+
+    // HEADER
+    browseDescription.add(new HTMLWidgetWrapper("BrowseDescription.html"));
+
+    // OTHER
     UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<User>() {
 
       @Override

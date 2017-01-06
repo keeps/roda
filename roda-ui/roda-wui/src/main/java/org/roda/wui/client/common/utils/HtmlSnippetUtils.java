@@ -32,9 +32,11 @@ import org.roda.wui.client.browse.BrowseFile;
 import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.builder.shared.HtmlAnchorBuilder;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Label;
@@ -42,6 +44,18 @@ import com.google.gwt.user.client.ui.Label;
 import config.i18n.client.ClientMessages;
 
 public class HtmlSnippetUtils {
+
+  private static final String OPEN_SPAN_CLASS_LABEL_INFO = "<span class='label-info'>";
+
+  private static final String OPEN_SPAN_CLASS_LABEL_DEFAULT = "<span class='label-default'>";
+
+  private static final String OPEN_SPAN_CLASS_LABEL_DANGER = "<span class='label-danger'>";
+
+  private static final String OPEN_SPAN_CLASS_LABEL_WARNING = "<span class='label-warning'>";
+
+  private static final String OPEN_SPAN_CLASS_LABEL_SUCCESS = "<span class='label-success'>";
+
+  private static final String CLOSE_SPAN = "</span>";
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
@@ -55,32 +69,32 @@ public class HtmlSnippetUtils {
       if (JOB_STATE.COMPLETED.equals(state)) {
         if (job.getJobStats().getSourceObjectsCount() == job.getJobStats().getSourceObjectsProcessedWithSuccess()) {
           ret = SafeHtmlUtils
-            .fromSafeConstant("<span class='label-success'>" + messages.showJobStatusCompleted() + "</span>");
+            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS + messages.showJobStatusCompleted() + CLOSE_SPAN);
         } else if (job.getJobStats().getSourceObjectsProcessedWithSuccess() > 0) {
           ret = SafeHtmlUtils
-            .fromSafeConstant("<span class='label-warning'>" + messages.showJobStatusCompleted() + "</span>");
+            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusCompleted() + CLOSE_SPAN);
         } else {
           ret = SafeHtmlUtils
-            .fromSafeConstant("<span class='label-danger'>" + messages.showJobStatusCompleted() + "</span>");
+            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DANGER + messages.showJobStatusCompleted() + CLOSE_SPAN);
         }
       } else if (JOB_STATE.FAILED_DURING_CREATION.equals(state)) {
         ret = SafeHtmlUtils
-          .fromSafeConstant("<span class='label-default'>" + messages.showJobStatusFailedDuringCreation() + "</span>");
+          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT + messages.showJobStatusFailedDuringCreation() + CLOSE_SPAN);
       } else if (JOB_STATE.FAILED_TO_COMPLETE.equals(state)) {
         ret = SafeHtmlUtils
-          .fromSafeConstant("<span class='label-default'>" + messages.showJobStatusFailedToComplete() + "</span>");
+          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT + messages.showJobStatusFailedToComplete() + CLOSE_SPAN);
       } else if (JOB_STATE.STOPPING.equals(state)) {
         ret = SafeHtmlUtils
-          .fromSafeConstant("<span class='label-default'>" + messages.showJobStatusStopping() + "</span>");
+          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT + messages.showJobStatusStopping() + CLOSE_SPAN);
       } else if (JOB_STATE.STOPPED.equals(state)) {
         ret = SafeHtmlUtils
-          .fromSafeConstant("<span class='label-default'>" + messages.showJobStatusStopped() + "</span>");
+          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT + messages.showJobStatusStopped() + CLOSE_SPAN);
       } else if (JOB_STATE.CREATED.equals(state)) {
-        ret = SafeHtmlUtils.fromSafeConstant("<span class='label-info'>" + messages.showJobStatusCreated() + "</span>");
+        ret = SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_INFO + messages.showJobStatusCreated() + CLOSE_SPAN);
       } else if (JOB_STATE.STARTED.equals(state)) {
-        ret = SafeHtmlUtils.fromSafeConstant("<span class='label-info'>" + messages.showJobStatusStarted() + "</span>");
+        ret = SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_INFO + messages.showJobStatusStarted() + CLOSE_SPAN);
       } else {
-        ret = SafeHtmlUtils.fromSafeConstant("<span class='label-warning'>" + state + "</span>");
+        ret = SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + state + CLOSE_SPAN);
       }
     }
     return ret;
@@ -91,18 +105,18 @@ public class HtmlSnippetUtils {
 
     switch (aipState) {
       case ACTIVE:
-        b.append(SafeHtmlUtils.fromSafeConstant("<span class='label-success'>"));
+        b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS));
         break;
       case UNDER_APPRAISAL:
-        b.append(SafeHtmlUtils.fromSafeConstant("<span class='label-warning'>"));
+        b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING));
         break;
       default:
-        b.append(SafeHtmlUtils.fromSafeConstant("<span class='label-danger'>"));
+        b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DANGER));
         break;
     }
 
     b.append(SafeHtmlUtils.fromString(messages.aipState(aipState)));
-    b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
+    b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
 
     return b.toSafeHtml();
   }
@@ -112,16 +126,16 @@ public class HtmlSnippetUtils {
     switch (pluginState) {
       case SUCCESS:
         pluginStateHTML = SafeHtmlUtils
-          .fromSafeConstant("<span class='label-success'>" + messages.pluginStateMessage(pluginState) + "</span>");
+          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS + messages.pluginStateMessage(pluginState) + CLOSE_SPAN);
         break;
       case RUNNING:
         pluginStateHTML = SafeHtmlUtils
-          .fromSafeConstant("<span class='label-default'>" + messages.pluginStateMessage(pluginState) + "</span>");
+          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT + messages.pluginStateMessage(pluginState) + CLOSE_SPAN);
         break;
       case FAILURE:
       default:
         pluginStateHTML = SafeHtmlUtils
-          .fromSafeConstant("<span class='label-danger'>" + messages.pluginStateMessage(pluginState) + "</span>");
+          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DANGER + messages.pluginStateMessage(pluginState) + CLOSE_SPAN);
         break;
     }
     return pluginStateHTML;
@@ -138,14 +152,14 @@ public class HtmlSnippetUtils {
     SafeHtml notificationStateHTML;
     switch (state) {
       case COMPLETED:
-        notificationStateHTML = SafeHtmlUtils.fromSafeConstant("<span class='label-success'>" + label + "</span>");
+        notificationStateHTML = SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS + label + CLOSE_SPAN);
         break;
       case FAILED:
-        notificationStateHTML = SafeHtmlUtils.fromSafeConstant("<span class='label-danger'>" + label + "</span>");
+        notificationStateHTML = SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DANGER + label + CLOSE_SPAN);
         break;
       case CREATED:
       default:
-        notificationStateHTML = SafeHtmlUtils.fromSafeConstant("<span class='label-default'>" + label + "</span>");
+        notificationStateHTML = SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT + label + CLOSE_SPAN);
         break;
     }
     return notificationStateHTML;
@@ -170,15 +184,15 @@ public class HtmlSnippetUtils {
     switch (level) {
       case LOW:
         ret = SafeHtmlUtils
-          .fromSafeConstant("<span class='label-success'>" + messages.severityLevel(level) + "</span>");
+          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS + messages.severityLevel(level) + CLOSE_SPAN);
         break;
       case MODERATE:
         ret = SafeHtmlUtils
-          .fromSafeConstant("<span class='label-warning'>" + messages.severityLevel(level) + "</span>");
+          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.severityLevel(level) + CLOSE_SPAN);
         break;
       case HIGH:
       default:
-        ret = SafeHtmlUtils.fromSafeConstant("<span class='label-danger'>" + messages.severityLevel(level) + "</span>");
+        ret = SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DANGER + messages.severityLevel(level) + CLOSE_SPAN);
         break;
     }
     return ret;
@@ -187,10 +201,10 @@ public class HtmlSnippetUtils {
   public static SafeHtml getStatusDefinition(INCIDENCE_STATUS status) {
     if (status.equals(INCIDENCE_STATUS.UNMITIGATED)) {
       return SafeHtmlUtils
-        .fromSafeConstant("<span class='label-danger'>" + messages.riskIncidenceStatusValue(status) + "</span>");
+        .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DANGER + messages.riskIncidenceStatusValue(status) + CLOSE_SPAN);
     } else {
       return SafeHtmlUtils
-        .fromSafeConstant("<span class='label-success'>" + messages.riskIncidenceStatusValue(status) + "</span>");
+        .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS + messages.riskIncidenceStatusValue(status) + CLOSE_SPAN);
     }
   }
 
@@ -216,7 +230,7 @@ public class HtmlSnippetUtils {
     }
 
     return SafeHtmlUtils
-      .fromSafeConstant("<span class='" + labelClass + "'>" + messages.logEntryStateValue(state) + "</span>");
+      .fromSafeConstant("<span class='" + labelClass + "'>" + messages.logEntryStateValue(state) + CLOSE_SPAN);
   }
 
   public static void addRiskIncidenceObjectLinks(RiskIncidence incidence, final Label objectLabel,
@@ -272,14 +286,13 @@ public class HtmlSnippetUtils {
     String html = null;
     if (facets != null) {
       for (FacetFieldResult ffr : facets) {
-        if (ffr.getField().equalsIgnoreCase("actionComponent")) {
-          if (ffr.getValues() != null) {
-            for (FacetValue fv : ffr.getValues()) {
-              if (fv.getValue().equalsIgnoreCase(entry.getActionComponent())) {
-                html = fv.getLabel();
-                break;
-              }
+        if ("actionComponent".equalsIgnoreCase(ffr.getField()) && ffr.getValues() != null) {
+          for (FacetValue fv : ffr.getValues()) {
+            if (fv.getValue().equalsIgnoreCase(entry.getActionComponent())) {
+              html = fv.getLabel();
+              break;
             }
+
           }
         }
         if (html != null) {
@@ -292,4 +305,5 @@ public class HtmlSnippetUtils {
     }
     return SafeHtmlUtils.fromSafeConstant(html);
   }
+
 }

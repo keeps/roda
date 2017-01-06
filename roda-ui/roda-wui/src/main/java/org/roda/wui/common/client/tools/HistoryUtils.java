@@ -33,6 +33,7 @@ import org.roda.wui.client.browse.BrowseFile;
 import org.roda.wui.client.browse.BrowseFolder;
 import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.ingest.process.ShowJobReport;
@@ -172,17 +173,89 @@ public class HistoryUtils {
     return history;
   }
 
-  public static List<String> getHistoryBrowseDIP(String dipId, String... refererUUIDs) {
+  public static List<String> getHistoryBrowseDIP(String dipId) {
     List<String> history = new ArrayList<>();
     history.addAll(BrowseAIP.RESOLVER.getHistoryPath());
     history.add(BrowseDIP.RESOLVER.getHistoryToken());
     history.add(dipId);
-    history.addAll(Arrays.asList(refererUUIDs));
     return history;
   }
 
-  public static void openBrowse(IndexedDIP dip, String... refererUUIDs) {
-    HistoryUtils.newHistory(getHistoryBrowseDIP(dip.getId(), refererUUIDs));
+  public static List<String> getHistoryBrowseDIPFile(String dipId, String dipFileUUID) {
+    List<String> history = new ArrayList<>();
+    history.addAll(BrowseAIP.RESOLVER.getHistoryPath());
+    history.add(BrowseDIP.RESOLVER.getHistoryToken());
+    history.add(dipId);
+    history.add(dipFileUUID);
+    return history;
+  }
+
+  public static List<String> getHistoryBrowse(DIPFile dipFile) {
+    return getHistoryBrowseDIPFile(dipFile.getDipId(), dipFile.getUUID());
+  }
+
+  public static void openBrowse(IndexedDIP dip) {
+    HistoryUtils.newHistory(getHistoryBrowseDIP(dip.getId()));
+  }
+
+  public static void openBrowse(DIPFile dipFile) {
+    HistoryUtils.newHistory(getHistoryBrowseDIPFile(dipFile.getDipId(), dipFile.getUUID()));
+  }
+
+  public static void openBrowse(DIPFile dipFile, IndexedAIP refererAIP) {
+    LastSelectedItemsSingleton.getInstance().setLastObject(refererAIP);
+    openBrowse(dipFile);
+  }
+
+  public static void openBrowse(DIPFile dipFile, IndexedRepresentation refererRepresentation) {
+    LastSelectedItemsSingleton.getInstance().setLastObject(refererRepresentation);
+    openBrowse(dipFile);
+  }
+
+  public static void openBrowse(DIPFile dipFile, IndexedFile refererFile) {
+    LastSelectedItemsSingleton.getInstance().setLastObject(refererFile);
+    openBrowse(dipFile);
+  }
+
+  public static void openBrowse(DIPFile dipFile, IndexedAIP refererAIP, IndexedRepresentation refererRepresentation,
+    IndexedFile refererFile) {
+    if (refererFile != null) {
+      openBrowse(dipFile, refererFile);
+    } else if (refererRepresentation != null) {
+      openBrowse(dipFile, refererRepresentation);
+    } else if (refererAIP != null) {
+      openBrowse(dipFile, refererAIP);
+    } else {
+      openBrowse(dipFile);
+    }
+  }
+
+  public static void openBrowse(IndexedDIP dip, IndexedAIP refererAIP) {
+    LastSelectedItemsSingleton.getInstance().setLastObject(refererAIP);
+    openBrowse(dip);
+  }
+
+  public static void openBrowse(IndexedDIP dip, IndexedRepresentation refererRepresentation) {
+    LastSelectedItemsSingleton.getInstance().setLastObject(refererRepresentation);
+    openBrowse(dip);
+  }
+
+  public static void openBrowse(IndexedDIP dip, IndexedFile refererFile) {
+    LastSelectedItemsSingleton.getInstance().setLastObject(refererFile);
+    openBrowse(dip);
+  }
+
+  public static void openBrowse(IndexedDIP dip, IndexedAIP refererAIP, IndexedRepresentation refererRepresentation,
+    IndexedFile refererFile) {
+    if (refererFile != null) {
+      openBrowse(dip, refererFile);
+    } else if (refererRepresentation != null) {
+      openBrowse(dip, refererRepresentation);
+    } else if (refererAIP != null) {
+      openBrowse(dip, refererAIP);
+    } else {
+      openBrowse(dip);
+    }
   }
 
   public static void openBrowseDIP(String dipId) {
@@ -243,16 +316,6 @@ public class HistoryUtils {
 
   public static void openBrowse(IndexedFile file) {
     openBrowse(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(), file.isDirectory());
-  }
-
-  public static List<String> getHistoryBrowseDIPFile(String dipId, List<String> dipFilePath, String dipFileId) {
-    List<String> history = new ArrayList<>();
-    history.addAll(BrowseAIP.RESOLVER.getHistoryPath());
-    history.add(BrowseDIP.RESOLVER.getHistoryToken());
-    history.add(dipId);
-    history.addAll(dipFilePath);
-    history.add(dipFileId);
-    return history;
   }
 
   public static List<String> getHistoryUpload(IndexedFile folder) {
@@ -330,7 +393,7 @@ public class HistoryUtils {
       path = HistoryUtils.getHistoryBrowseDIP(dip.getId());
     } else if (object instanceof DIPFile) {
       DIPFile dipFile = (DIPFile) object;
-      path = HistoryUtils.getHistoryBrowseDIPFile(dipFile.getDipId(), dipFile.getPath(), dipFile.getId());
+      path = HistoryUtils.getHistoryBrowseDIPFile(dipFile.getDipId(), dipFile.getUUID());
     } else if (object instanceof TransferredResource) {
       TransferredResource resource = (TransferredResource) object;
       path = HistoryUtils.getHistory(IngestTransfer.RESOLVER.getHistoryPath(), resource.getUUID());

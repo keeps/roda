@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.FacetParameter;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
@@ -352,8 +353,8 @@ public class MainSearch extends Composite {
     });
   }
 
-  public SelectedItems<?> getSelected() {
-    SelectedItems<?> selected = null;
+  public SelectedItems<? extends IsIndexed> getSelected() {
+    SelectedItems<? extends IsIndexed> selected = null;
 
     if (itemsSearchResultPanel != null && itemsSearchResultPanel.hasElementsSelected()) {
       selected = itemsSearchResultPanel.getSelected();

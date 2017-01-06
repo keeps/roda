@@ -247,7 +247,7 @@ public class Search extends Composite {
     mainSearch.clearSelected();
   }
 
-  public SelectedItems<?> getSelected() {
+  public SelectedItems<? extends IsIndexed> getSelected() {
     return mainSearch.getSelected();
   }
 

@@ -19,12 +19,15 @@ import java.util.Map;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
+import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
@@ -34,6 +37,7 @@ import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.SelectFileDialog;
+import org.roda.wui.client.common.lists.DIPList;
 import org.roda.wui.client.common.lists.SearchFileList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
@@ -88,6 +92,7 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.SelectionChangeEvent;
+import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
 import config.i18n.client.ClientMessages;
 
@@ -97,15 +102,19 @@ import config.i18n.client.ClientMessages;
  */
 public class BrowseRepresentation extends Composite {
 
+  private static final MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+
+  private static final ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
+
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 2) {
-        final String aipId = historyTokens.get(0);
-        final String representationId = historyTokens.get(1);
+        final String historyAipId = historyTokens.get(0);
+        final String histortyRepresentationId = historyTokens.get(1);
 
-        BrowserService.Util.getInstance().retrieveBrowseRepresentationBundle(aipId, representationId,
+        BrowserService.Util.getInstance().retrieveBrowseRepresentationBundle(historyAipId, histortyRepresentationId,
           LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<BrowseRepresentationBundle>() {
 
             @Override
@@ -130,10 +139,12 @@ public class BrowseRepresentation extends Composite {
       UserLogin.getInstance().checkRole(BrowseAIP.RESOLVER, callback);
     }
 
+    @Override
     public List<String> getHistoryPath() {
       return ListUtils.concat(BrowseAIP.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
+    @Override
     public String getHistoryToken() {
       return "representation";
     }
@@ -144,16 +155,10 @@ public class BrowseRepresentation extends Composite {
     }
   };
 
-  public static final List<String> getViewItemHistoryToken(String id) {
-    return ListUtils.concat(RESOLVER.getHistoryPath(), id);
-  }
-
   interface MyUiBinder extends UiBinder<Widget, BrowseRepresentation> {
   }
 
-  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
-  private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
+  // IDENTIFICATION
 
   @UiField
   SimplePanel representationIcon;
@@ -167,20 +172,37 @@ public class BrowseRepresentation extends Composite {
   @UiField
   BreadcrumbPanel breadcrumb;
 
+  // DESCRIPTIVE METADATA
+
   @UiField
   TabPanel itemMetadata;
 
   @UiField
   Button newDescriptiveMetadata;
 
-  @UiField
-  Button renameFolders, moveFiles, uploadFiles, createFolder, identifyFormats, changeType;
+  // FILES
 
   @UiField(provided = true)
-  SearchPanel searchPanel;
+  SearchPanel filesSearch;
 
   @UiField(provided = true)
   SearchFileList filesList;
+
+  // DISSEMINATIONS
+
+  @UiField
+  Label disseminationsTitle;
+
+  @UiField(provided = true)
+  SearchPanel disseminationsSearch;
+
+  @UiField(provided = true)
+  DIPList disseminationsList;
+
+  // SIDEBAR
+
+  @UiField
+  Button renameFolders, moveFiles, uploadFiles, createFolder, identifyFormats, changeType;
 
   private List<HandlerRegistration> handlers;
   private IndexedRepresentation representation;
@@ -200,6 +222,8 @@ public class BrowseRepresentation extends Composite {
     String summary = messages.representationListOfFiles();
     boolean selectable = true;
 
+    // FILES
+
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_UUID, repUUID),
       new EmptyKeyFilterParameter(RodaConstants.FILE_PARENT_UUID));
     filesList = new SearchFileList(filter, true, Facets.NONE, summary, selectable);
@@ -218,7 +242,7 @@ public class BrowseRepresentation extends Composite {
 
       @Override
       public void onSelectionChange(SelectedItems<IndexedFile> selected) {
-        final SelectedItems<IndexedFile> files = (SelectedItems<IndexedFile>) filesList.getSelected();
+        final SelectedItems<IndexedFile> files = filesList.getSelected();
         boolean empty = ClientSelectedItemsUtils.isEmpty(selected);
         moveFiles.setEnabled(!empty);
         createFolder.setEnabled(empty);
@@ -257,11 +281,32 @@ public class BrowseRepresentation extends Composite {
       }
     });
 
-    searchPanel = new SearchPanel(filter, ALL_FILTER, messages.searchPlaceHolder(), false, false, false);
-    searchPanel.setDefaultFilterIncremental(true);
-    searchPanel.setList(filesList);
+    filesSearch = new SearchPanel(filter, ALL_FILTER, messages.searchPlaceHolder(), false, false, true);
+    filesSearch.setDefaultFilterIncremental(true);
+    filesSearch.setList(filesList);
 
+    // DISSEMINATIONS
+    disseminationsList = new DIPList(Filter.NULL, Facets.NONE, messages.listOfDisseminations(), true);
+    disseminationsList.getSelectionModel().addSelectionChangeHandler(new Handler() {
+
+      @Override
+      public void onSelectionChange(SelectionChangeEvent event) {
+        IndexedDIP dissemination = disseminationsList.getSelectionModel().getSelectedObject();
+        if (dissemination != null) {
+          HistoryUtils.openBrowse(dissemination, representation);
+        }
+      }
+    });
+
+    disseminationsSearch = new SearchPanel(Filter.NULL, RodaConstants.DIP_SEARCH, messages.searchPlaceHolder(), false,
+      false, true);
+    disseminationsSearch.setDefaultFilterIncremental(true);
+    disseminationsSearch.setList(disseminationsList);
+
+    // INIT
     initWidget(uiBinder.createAndBindUi(this));
+
+    // IDENTIFICATION
 
     HTMLPanel representationIconHtmlPanel = new HTMLPanel(
       DescriptionLevelUtils.getRepresentationTypeIcon(representation.getType(), false));
@@ -272,6 +317,8 @@ public class BrowseRepresentation extends Composite {
 
     breadcrumb.updatePath(BreadcrumbUtils.getRepresentationBreadcrumbs(bundle));
     breadcrumb.setVisible(true);
+
+    // DESCRIPTIVE METADATA
 
     final List<Pair<String, HTML>> descriptiveMetadataContainers = new ArrayList<Pair<String, HTML>>();
     final Map<String, DescriptiveMetadataViewBundle> bundles = new HashMap<>();
@@ -340,6 +387,17 @@ public class BrowseRepresentation extends Composite {
       itemMetadata.setVisible(false);
     }
 
+    // DISSEMINATIONS (POST-INIT)
+    if (bundle.getDipCount() > 0) {
+      Filter disseminationsFilter = new Filter(
+        new SimpleFilterParameter(RodaConstants.DIP_REPRESENTATION_UUIDS, repUUID));
+      disseminationsList.set(disseminationsFilter, bundle.getAip().getState().equals(AIPState.ACTIVE), Facets.NONE);
+      disseminationsSearch.setDefaultFilter(disseminationsFilter);
+      disseminationsSearch.clearSearchInputBox();
+    }
+    disseminationsList.getParent().setVisible(bundle.getDipCount() > 0);
+
+    // SIDEBAR
     renameFolders.setEnabled(false);
     moveFiles.setEnabled(false);
     uploadFiles.setEnabled(true);
@@ -563,7 +621,7 @@ public class BrowseRepresentation extends Composite {
 
   @UiHandler("newProcess")
   void buttonNewProcessHandler(ClickEvent e) {
-    SelectedItems selected = (SelectedItems) filesList.getSelected();
+    SelectedItems<? extends IsIndexed> selected = filesList.getSelected();
 
     if (ClientSelectedItemsUtils.isEmpty(selected)) {
       selected = new SelectedItemsList<IndexedRepresentation>(Arrays.asList(repUUID),
@@ -596,7 +654,7 @@ public class BrowseRepresentation extends Composite {
       final String folderUUID;
       if (filesList.getSelected() instanceof SelectedItemsList) {
         SelectedItemsList<IndexedFile> fileList = (SelectedItemsList<IndexedFile>) filesList.getSelected();
-        folderUUID = (String) fileList.getIds().get(0);
+        folderUUID = fileList.getIds().get(0);
       } else {
         return;
       }

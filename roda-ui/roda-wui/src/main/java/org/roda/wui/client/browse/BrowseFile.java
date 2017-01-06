@@ -629,9 +629,7 @@ public class BrowseFile extends Composite {
           Window.open(dip.getOpenExternalURL(), "_blank", "");
           Toast.showInfo(messages.browseFileDipOpenedExternalURL(), dip.getOpenExternalURL());
         } else {
-          IndexedFile file = bundle.getFile();
-          HistoryUtils.newHistory(BrowseDIP.RESOLVER, dip.getUUID(), file.getAipId(), file.getRepresentationUUID(),
-            file.getUUID());
+          HistoryUtils.openBrowse(dip, bundle.getFile());
         }
       }
     });

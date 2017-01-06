@@ -66,6 +66,7 @@
 					<lists:RepresentationList addStyleNames="searchResults"
 						ui:field="representationsList" />
 				</g:FlowPanel>
+				
 				<!-- DIPs -->
 				<g:FlowPanel addStyleNames="card disseminationsCard">
 					<g:Label addStyleNames="h5" ui:field="disseminationsTitle">
