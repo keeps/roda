@@ -437,7 +437,8 @@ public class BrowseAIP extends Composite {
       BrowseFile.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.size() > 1 && historyTokens.get(0).equals(BrowseDIP.RESOLVER.getHistoryToken())) {
       BrowseDIP.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
-    } else if (historyTokens.size() > 1 && historyTokens.get(0).equals(PreservationEvents.BROWSE_RESOLVER.getHistoryToken())) {
+    } else if (historyTokens.size() > 1
+      && historyTokens.get(0).equals(PreservationEvents.BROWSE_RESOLVER.getHistoryToken())) {
       PreservationEvents.BROWSE_RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.size() > 1
       && historyTokens.get(0).equals(DescriptiveMetadataHistory.RESOLVER.getHistoryToken())) {
@@ -999,24 +1000,37 @@ public class BrowseAIP extends Composite {
               @Override
               public void onSuccess(Boolean confirmed) {
                 if (confirmed) {
-                  SelectedItemsList<IndexedAIP> selected = new SelectedItemsList<IndexedAIP>(Arrays.asList(aipId),
-                    IndexedAIP.class.getName());
-                  BrowserService.Util.getInstance().deleteAIP(selected, new AsyncCallback<String>() {
+                  Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
+                    RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(),
+                    new AsyncCallback<String>() {
 
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      AsyncCallbackUtils.defaultFailureTreatment(caught);
-                    }
-
-                    @Override
-                    public void onSuccess(String parentId) {
-                      if (parentId != null) {
-                        HistoryUtils.newHistory(BrowseAIP.RESOLVER, parentId);
-                      } else {
-                        HistoryUtils.newHistory(BrowseAIP.RESOLVER);
+                      @Override
+                      public void onFailure(Throwable caught) {
+                        // do nothing
                       }
-                    }
-                  });
+
+                      @Override
+                      public void onSuccess(final String details) {
+                        SelectedItemsList<IndexedAIP> selected = new SelectedItemsList<IndexedAIP>(Arrays.asList(aipId),
+                          IndexedAIP.class.getName());
+                        BrowserService.Util.getInstance().deleteAIP(selected, details, new AsyncCallback<String>() {
+
+                          @Override
+                          public void onFailure(Throwable caught) {
+                            AsyncCallbackUtils.defaultFailureTreatment(caught);
+                          }
+
+                          @Override
+                          public void onSuccess(String parentId) {
+                            if (parentId != null) {
+                              HistoryUtils.newHistory(BrowseAIP.RESOLVER, parentId);
+                            } else {
+                              HistoryUtils.newHistory(BrowseAIP.RESOLVER);
+                            }
+                          }
+                        });
+                      }
+                    });
                 }
               }
             });
@@ -1085,20 +1099,34 @@ public class BrowseAIP extends Composite {
               @Override
               public void onSuccess(Boolean confirmed) {
                 if (confirmed) {
-                  BrowserService.Util.getInstance().deleteAIP(selected, new LoadingAsyncCallback<String>() {
+                  Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
+                    RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(),
+                    new AsyncCallback<String>() {
 
-                    @Override
-                    public void onFailureImpl(Throwable caught) {
-                      AsyncCallbackUtils.defaultFailureTreatment(caught);
-                      aipChildrenList.refresh();
-                    }
+                      @Override
+                      public void onFailure(Throwable caught) {
+                        // do nothing
+                      }
 
-                    @Override
-                    public void onSuccessImpl(String parentId) {
-                      Toast.showInfo(messages.removeSuccessTitle(), messages.removeSuccessMessage(size));
-                      aipChildrenList.refresh();
-                    }
-                  });
+                      @Override
+                      public void onSuccess(final String details) {
+                        BrowserService.Util.getInstance().deleteAIP(selected, details,
+                          new LoadingAsyncCallback<String>() {
+
+                            @Override
+                            public void onFailureImpl(Throwable caught) {
+                              AsyncCallbackUtils.defaultFailureTreatment(caught);
+                              aipChildrenList.refresh();
+                            }
+
+                            @Override
+                            public void onSuccessImpl(String parentId) {
+                              Toast.showInfo(messages.removeSuccessTitle(), messages.removeSuccessMessage(size));
+                              aipChildrenList.refresh();
+                            }
+                          });
+                      }
+                    });
                 }
               }
 

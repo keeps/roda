@@ -359,7 +359,7 @@ public class Search extends Composite {
                   public void onSuccess(final String details) {
                     if (IndexedAIP.class.getName().equals(selectedClass)) {
                       final SelectedItems<IndexedAIP> aips = (SelectedItems<IndexedAIP>) selected;
-                      BrowserService.Util.getInstance().deleteAIP(aips, new LoadingAsyncCallback<String>() {
+                      BrowserService.Util.getInstance().deleteAIP(aips, details, new LoadingAsyncCallback<String>() {
 
                         @Override
                         public void onFailureImpl(Throwable caught) {

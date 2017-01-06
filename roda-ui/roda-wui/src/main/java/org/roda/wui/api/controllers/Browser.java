@@ -876,7 +876,7 @@ public class Browser extends RodaWuiController {
     return updatedAip;
   }
 
-  public static String deleteAIP(User user, SelectedItems<IndexedAIP> aips)
+  public static String deleteAIP(User user, SelectedItems<IndexedAIP> aips, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -885,7 +885,7 @@ public class Browser extends RodaWuiController {
     UserUtility.checkAIPPermissions(user, aips, PermissionType.DELETE);
 
     // delegate
-    String parentId = BrowserHelper.deleteAIP(aips, user);
+    String parentId = BrowserHelper.deleteAIP(user, aips, details);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_SELECTED_PARAM, aips);

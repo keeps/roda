@@ -210,7 +210,7 @@ public class ShowPreservationEvent extends Composite {
         public void onFailure(Throwable caught) {
           if (caught instanceof NotFoundException) {
             Toast.showError(messages.notFoundError(), messages.couldNotFindPreservationEvent());
-            HistoryUtils.newHistory(ListUtils.concat(PreservationEvents.BROWSE_RESOLVER.getHistoryPath(), aipId));
+            HistoryUtils.newHistory(ListUtils.concat(PreservationEvents.PLANNING_RESOLVER.getHistoryPath()));
           } else {
             AsyncCallbackUtils.defaultFailureTreatment(caught);
           }
@@ -649,7 +649,7 @@ public class ShowPreservationEvent extends Composite {
     } else if (aipId != null) {
       HistoryUtils.newHistory(PreservationEvents.BROWSE_RESOLVER, aipId);
     } else {
-      // goto repository events page
+      HistoryUtils.newHistory(PreservationEvents.PLANNING_RESOLVER);
     }
   }
 }

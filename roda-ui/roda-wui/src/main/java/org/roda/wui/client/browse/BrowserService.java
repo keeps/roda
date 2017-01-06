@@ -120,7 +120,7 @@ public interface BrowserService extends RemoteService {
   String createAIP(String parentId, String type) throws AuthorizationDeniedException, GenericException,
     NotFoundException, RequestNotValidException, AlreadyExistsException;
 
-  String deleteAIP(SelectedItems<IndexedAIP> aips)
+  String deleteAIP(SelectedItems<IndexedAIP> aips, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   void deleteRepresentation(SelectedItems<IndexedRepresentation> representations, String details)

@@ -156,9 +156,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
-import com.github.jknack.handlebars.Handlebars;
-import com.github.jknack.handlebars.Template;
-
 /**
  * @author Luis Faria <lfaria@keep.pt>
  */
@@ -1260,27 +1257,28 @@ public class BrowserHelper {
     return updatedAIP;
   }
 
-  public static String deleteAIP(SelectedItems<IndexedAIP> selected, User user)
+  public static String deleteAIP(User user, SelectedItems<IndexedAIP> selected, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     List<String> aipIds = consolidate(user, IndexedAIP.class, selected);
+    ModelService model = RodaCoreFactory.getModelService();
+    String parentId = null;
 
     try {
       Job job = new Job();
       job.setName(RiskIncidenceRemoverPlugin.class.getSimpleName() + " " + job.getStartDate());
       job.setPlugin(RiskIncidenceRemoverPlugin.class.getName());
       job.setSourceObjects(SelectedItemsList.create(AIP.class, aipIds));
-      Jobs.createJob(user, job);
+      Jobs.createJob(user, job, false);
     } catch (JobAlreadyStartedException e) {
       LOGGER.error("Could not delete AIP associated incidences");
     }
 
-    String parentId = null;
-
     for (String aipId : aipIds) {
       try {
-        AIP aip = RodaCoreFactory.getModelService().retrieveAIP(aipId);
+        AIP aip = model.retrieveAIP(aipId);
         parentId = aip.getParentId();
-        RodaCoreFactory.getModelService().deleteAIP(aip.getId());
+        model.deleteAIP(aip.getId());
+        deleteAIPEvent(model, user, aipId, details);
 
         Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aip.getId()));
         RodaCoreFactory.getIndexService().execute(IndexedAIP.class, filter, new IndexRunnable<IndexedAIP>() {
@@ -1289,9 +1287,8 @@ public class BrowserHelper {
           public void run(IndexedAIP item)
             throws GenericException, RequestNotValidException, AuthorizationDeniedException {
             try {
-              // UserUtility.checkObjectPermissions(user, item,
-              // PermissionType.DELETE);
-              RodaCoreFactory.getModelService().deleteAIP(item.getId());
+              model.deleteAIP(item.getId());
+              deleteAIPEvent(model, user, aipId, details);
             } catch (NotFoundException e) {
               // already deleted, ignore
             }
@@ -1306,6 +1303,12 @@ public class BrowserHelper {
     return parentId;
   }
 
+  private static void deleteAIPEvent(ModelService model, User user, String aipId, String details) {
+    String outcomeText = "The AIP '" + aipId + "' has been manually deleted.";
+    model.createRepositoryEvent(PreservationEventType.DELETION, "The process of deleting an object of the repository.",
+      PluginState.SUCCESS, outcomeText, details, user.getName(), true);
+  }
+
   public static void deleteRepresentation(User user, SelectedItems<IndexedRepresentation> selected, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     List<String> representationIds = consolidate(user, IndexedRepresentation.class, selected);
@@ -1318,7 +1321,7 @@ public class BrowserHelper {
       job.setName(RiskIncidenceRemoverPlugin.class.getSimpleName() + " " + job.getStartDate());
       job.setPlugin(RiskIncidenceRemoverPlugin.class.getName());
       job.setSourceObjects(SelectedItemsList.create(IndexedRepresentation.class, representationIds));
-      Jobs.createJob(user, job);
+      Jobs.createJob(user, job, false);
     } catch (JobAlreadyStartedException e) {
       LOGGER.error("Could not delete representation associated incidences");
     }
@@ -1361,7 +1364,7 @@ public class BrowserHelper {
       job.setName(RiskIncidenceRemoverPlugin.class.getSimpleName() + " " + job.getStartDate());
       job.setPlugin(RiskIncidenceRemoverPlugin.class.getName());
       job.setSourceObjects(SelectedItemsList.create(IndexedFile.class, fileIds));
-      Jobs.createJob(user, job);
+      Jobs.createJob(user, job, false);
     } catch (JobAlreadyStartedException e) {
       LOGGER.error("Could not delete file associated incidences");
     }
@@ -1521,7 +1524,7 @@ public class BrowserHelper {
         RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
 
       String outcomeText = "The Representation '" + representation.getId() + "' has been manually created.";
-      model.createUpdateAIPEvent(aipId, null, null, null, PreservationEventType.CREATION,
+      model.createEvent(aipId, null, null, null, PreservationEventType.CREATION,
         "The process of creating an object of the repository.", null, targets, PluginState.SUCCESS, outcomeText,
         details, user.getName(), true);
 
@@ -1561,7 +1564,7 @@ public class BrowserHelper {
         RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
 
       String outcomeText = "The File '" + file.getId() + "' has been manually created.";
-      model.createUpdateAIPEvent(aipId, representationId, null, null, PreservationEventType.CREATION,
+      model.createEvent(aipId, representationId, null, null, PreservationEventType.CREATION,
         "The process of creating an object of the repository.", null, targets, PluginState.SUCCESS, outcomeText,
         details, user.getName(), true);
 
@@ -2317,15 +2320,15 @@ public class BrowserHelper {
     InvalidParameterException, JobAlreadyStartedException {
     List<String> idList = consolidate(user, IndexedRisk.class, selected);
 
-    for (String riskId : idList) {
-      RodaCoreFactory.getModelService().deleteRisk(riskId, true);
-    }
-
     Job job = new Job();
     job.setName(RiskIncidenceRemoverPlugin.class.getSimpleName() + " " + job.getStartDate());
     job.setPlugin(RiskIncidenceRemoverPlugin.class.getName());
     job.setSourceObjects(SelectedItemsList.create(Risk.class, idList));
-    Jobs.createJob(user, job);
+    Jobs.createJob(user, job, false);
+
+    for (String riskId : idList) {
+      RodaCoreFactory.getModelService().deleteRisk(riskId, true);
+    }
   }
 
   public static void deleteFormat(User user, SelectedItems<Format> selected)
@@ -2464,9 +2467,9 @@ public class BrowserHelper {
       job.setName(RiskIncidenceRemoverPlugin.class.getSimpleName() + " " + job.getStartDate());
       job.setPlugin(RiskIncidenceRemoverPlugin.class.getName());
       job.setSourceObjects(SelectedItemsList.create(AIP.class, aipsToDelete));
-      Jobs.createJob(user, job);
+      Jobs.createJob(user, job, false);
     } catch (JobAlreadyStartedException e) {
-      LOGGER.error("Could not delete AIP assoaciated incidences");
+      LOGGER.error("Could not delete AIP associated incidences");
     }
 
     // update job counters

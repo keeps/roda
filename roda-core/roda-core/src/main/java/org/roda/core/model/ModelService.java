@@ -1128,14 +1128,20 @@ public class ModelService extends ModelObservable {
   /***************** Preservation related *****************/
   /********************************************************/
 
-  public void createUpdateAIPEvent(String aipId, String representationId, List<String> filePath, String fileId,
-    PreservationEventType eventType, String eventDescription, PluginState outcomeState, String outcomeText,
-    String outcomeDetail, String agentName, boolean notify) {
-    createUpdateAIPEvent(aipId, representationId, filePath, fileId, eventType, eventDescription, null, null,
-      outcomeState, outcomeText, outcomeDetail, agentName, notify);
+  public void createRepositoryEvent(PreservationEventType eventType, String eventDescription, PluginState outcomeState,
+    String outcomeText, String outcomeDetail, String agentName, boolean notify) {
+    createEvent(null, null, null, null, eventType, eventDescription, null, null, outcomeState, outcomeText,
+      outcomeDetail, agentName, notify);
   }
 
   public void createUpdateAIPEvent(String aipId, String representationId, List<String> filePath, String fileId,
+    PreservationEventType eventType, String eventDescription, PluginState outcomeState, String outcomeText,
+    String outcomeDetail, String agentName, boolean notify) {
+    createEvent(aipId, representationId, filePath, fileId, eventType, eventDescription, null, null, outcomeState,
+      outcomeText, outcomeDetail, agentName, notify);
+  }
+
+  public void createEvent(String aipId, String representationId, List<String> filePath, String fileId,
     PreservationEventType eventType, String eventDescription, List<LinkingIdentifier> sources,
     List<LinkingIdentifier> targets, PluginState outcomeState, String outcomeText, String outcomeDetail,
     String agentName, boolean notify) {
@@ -1406,7 +1412,22 @@ public class ModelService extends ModelObservable {
     StoragePath storagePath = ModelUtils.getPreservationAgentStoragePath();
 
     try {
-      CloseableIterable<Resource> resources = storage.listResourcesUnderDirectory(storagePath, true);
+      CloseableIterable<Resource> resources = storage.listResourcesUnderDirectory(storagePath, false);
+      ret = ResourceParseUtils.convert(getStorage(), resources, PreservationMetadata.class);
+    } catch (NotFoundException e) {
+      ret = new EmptyClosableIterable<OptionalWithCause<PreservationMetadata>>();
+    }
+
+    return ret;
+  }
+
+  public CloseableIterable<OptionalWithCause<PreservationMetadata>> listPreservationRepositoryEvents()
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException {
+    CloseableIterable<OptionalWithCause<PreservationMetadata>> ret;
+    StoragePath storagePath = ModelUtils.getPreservationRepositoryEventStoragePath();
+
+    try {
+      CloseableIterable<Resource> resources = storage.listResourcesUnderDirectory(storagePath, false);
       ret = ResourceParseUtils.convert(getStorage(), resources, PreservationMetadata.class);
     } catch (NotFoundException e) {
       ret = new EmptyClosableIterable<OptionalWithCause<PreservationMetadata>>();

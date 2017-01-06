@@ -29,8 +29,8 @@ public class Jobs extends RodaWuiController {
    * ---------------- REST related methods - start -----------------------------
    * ---------------------------------------------------------------------------
    */
-  public static Job createJob(User user, Job job) throws AuthorizationDeniedException, RequestNotValidException,
-    NotFoundException, GenericException, JobAlreadyStartedException {
+  public static Job createJob(User user, Job job, boolean async) throws AuthorizationDeniedException,
+    RequestNotValidException, NotFoundException, GenericException, JobAlreadyStartedException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // validate input and set missing information when possible
@@ -40,7 +40,7 @@ public class Jobs extends RodaWuiController {
     controllerAssistant.checkRoles(user);
 
     // delegate
-    Job updatedJob = JobsHelper.createJob(job);
+    Job updatedJob = JobsHelper.createJob(job, async);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "job", updatedJob);

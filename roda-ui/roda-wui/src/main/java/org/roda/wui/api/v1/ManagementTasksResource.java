@@ -159,7 +159,7 @@ public class ManagementTasksResource {
     ApiResponseMessage response, Job job, Object... params) {
     boolean success = true;
     try {
-      Job jobCreated = Jobs.createJob(user, job);
+      Job jobCreated = Jobs.createJob(user, job, true);
       response.setMessage(job.getName() + " created (" + jobCreated + ")");
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
       | JobAlreadyStartedException e) {

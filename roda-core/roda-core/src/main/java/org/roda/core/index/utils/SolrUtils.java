@@ -62,6 +62,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.NotSupportedException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
@@ -1910,6 +1911,9 @@ public class SolrUtils {
     if (StringUtils.isNotBlank(className) && StringUtils.isNotBlank(id)) {
       try {
         Class<T> objectClass = (Class<T>) Class.forName(className);
+        if (objectClass.equals(LiteRODAObject.class)) {
+          return null;
+        }
         String field = getIndexName(objectClass).get(0);
         SolrDocument doc = index.getById(field, id);
         if (doc != null) {
@@ -2683,6 +2687,8 @@ public class SolrUtils {
       if (aip != null) {
         doc.addField(RodaConstants.STATE, aip.getState().toString());
         setPermissions(aip.getPermissions(), doc);
+      } else {
+        doc.addField(RodaConstants.STATE, AIPState.ACTIVE);
       }
     }
 

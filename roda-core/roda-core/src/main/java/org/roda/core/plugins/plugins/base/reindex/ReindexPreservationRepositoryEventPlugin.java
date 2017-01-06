@@ -42,9 +42,9 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ReindexPreservationAgentPlugin extends AbstractPlugin<Void> {
+public class ReindexPreservationRepositoryEventPlugin extends AbstractPlugin<Void> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ReindexPreservationAgentPlugin.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ReindexPreservationRepositoryEventPlugin.class);
   private boolean clearIndexes = false;
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
@@ -66,7 +66,7 @@ public class ReindexPreservationAgentPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getName() {
-    return "Rebuild preservation agent index";
+    return "Rebuild preservation repository event index";
   }
 
   @Override
@@ -107,8 +107,8 @@ public class ReindexPreservationAgentPlugin extends AbstractPlugin<Void> {
       PluginHelper.updateJobInformation(this, jobPluginInfo);
       pluginReport.setPluginState(PluginState.SUCCESS);
 
-      CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable = model.listPreservationAgents();
-      int agentCounter = 0;
+      CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable = model.listPreservationRepositoryEvents();
+      int eventCounter = 0;
 
       for (OptionalWithCause<PreservationMetadata> opm : iterable) {
         if (opm.isPresent()) {
@@ -117,18 +117,19 @@ public class ReindexPreservationAgentPlugin extends AbstractPlugin<Void> {
         } else {
           jobPluginInfo.incrementObjectsProcessedWithFailure();
           pluginReport.setPluginState(PluginState.FAILURE)
-            .addPluginDetails("Could not add preservation agent: " + opm.getCause());
+            .addPluginDetails("Could not add preservation repository event: " + opm.getCause());
         }
-        agentCounter++;
+        eventCounter++;
       }
       IOUtils.closeQuietly(iterable);
-      jobPluginInfo.setSourceObjectsCount(agentCounter);
+      jobPluginInfo.setSourceObjectsCount(eventCounter);
 
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
     } catch (JobException | RequestNotValidException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error reindexing RODA entity", e);
-      pluginReport.setPluginState(PluginState.FAILURE).setPluginDetails("Could not list preservation agents");
+      pluginReport.setPluginState(PluginState.FAILURE)
+        .setPluginDetails("Could not list preservation repository events");
     }
 
     return pluginReport;
@@ -140,7 +141,7 @@ public class ReindexPreservationAgentPlugin extends AbstractPlugin<Void> {
     if (clearIndexes) {
       LOGGER.debug("Clearing indexes");
       try {
-        index.clearIndex(RodaConstants.INDEX_PRESERVATION_AGENTS);
+        index.clearRepositoryEventIndex();
       } catch (GenericException e) {
         throw new PluginException("Error clearing index", e);
       }
@@ -155,7 +156,7 @@ public class ReindexPreservationAgentPlugin extends AbstractPlugin<Void> {
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     LOGGER.debug("Optimizing indexes");
     try {
-      index.optimizeIndex(RodaConstants.INDEX_PRESERVATION_AGENTS);
+      index.optimizeIndex(RodaConstants.INDEX_PRESERVATION_EVENTS);
     } catch (GenericException e) {
       throw new PluginException("Error optimizing index", e);
     }
@@ -165,7 +166,7 @@ public class ReindexPreservationAgentPlugin extends AbstractPlugin<Void> {
 
   @Override
   public Plugin<Void> cloneMe() {
-    return new ReindexPreservationAgentPlugin();
+    return new ReindexPreservationRepositoryEventPlugin();
   }
 
   @Override

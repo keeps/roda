@@ -58,6 +58,7 @@ import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent.PreservationMetadataEventClass;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
@@ -270,10 +271,10 @@ public class IndexService {
   public void reindexPreservationAgents()
     throws RequestNotValidException, GenericException, AuthorizationDeniedException {
     CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable = model.listPreservationAgents();
-    reindexPreservationAgents(iterable);
+    reindexPreservationMetadata(iterable);
   }
 
-  public void reindexPreservationAgents(CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable)
+  public void reindexPreservationMetadata(CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException {
     for (OptionalWithCause<PreservationMetadata> opm : iterable) {
       observer.preservationMetadataCreated(opm.get());
@@ -479,6 +480,18 @@ public class IndexService {
   public void clearIndexes(List<String> indexNames) throws GenericException {
     for (String indexName : indexNames) {
       clearIndex(indexName);
+    }
+  }
+
+  public void clearRepositoryEventIndex() throws GenericException {
+    String indexName = RodaConstants.INDEX_PRESERVATION_EVENTS;
+    try {
+      getSolrClient().deleteByQuery(indexName,
+        RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS + ":" + PreservationMetadataEventClass.REPOSITORY.toString());
+      getSolrClient().commit(indexName);
+    } catch (SolrServerException | IOException e) {
+      LOGGER.error("Error cleaning up index {}", indexName, e);
+      throw new GenericException("Error cleaning up index " + indexName, e);
     }
   }
 

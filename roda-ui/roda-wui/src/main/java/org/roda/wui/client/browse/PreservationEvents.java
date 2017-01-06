@@ -160,6 +160,9 @@ public class PreservationEvents extends Composite {
   PreservationEventList eventList;
 
   @UiField
+  FlowPanel actionsPanel;
+
+  @UiField
   Button downloadButton;
 
   @UiField
@@ -215,6 +218,8 @@ public class PreservationEvents extends Composite {
     FacetUtils.bindFacets(eventList, facetPanels);
 
     initWidget(uiBinder.createAndBindUi(this));
+
+    actionsPanel.setVisible(aipId != null);
 
     eventList.getSelectionModel().addSelectionChangeHandler(new Handler() {
 
@@ -335,9 +340,11 @@ public class PreservationEvents extends Composite {
 
   @UiHandler("downloadButton")
   void buttonDownloadHandler(ClickEvent e) {
-    SafeUri downloadUri = RestUtils.createPreservationMetadataDownloadUri(aipId);
-    if (downloadUri != null) {
-      Window.Location.assign(downloadUri.asString());
+    if (aipId != null) {
+      SafeUri downloadUri = RestUtils.createPreservationMetadataDownloadUri(aipId);
+      if (downloadUri != null) {
+        Window.Location.assign(downloadUri.asString());
+      }
     }
   }
 
@@ -351,7 +358,7 @@ public class PreservationEvents extends Composite {
     } else if (aipId != null) {
       HistoryUtils.newHistory(HistoryUtils.getHistoryBrowse(aipId));
     } else {
-      // goto repository events page
+      // button not visible
     }
   }
 }

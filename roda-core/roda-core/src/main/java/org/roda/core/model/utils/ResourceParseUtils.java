@@ -127,7 +127,6 @@ public class ResourceParseUtils {
 
     StoragePath resourcePath = resource.getStoragePath();
     String filename = resourcePath.getName();
-
     PreservationMetadata pm = new PreservationMetadata();
 
     String id;

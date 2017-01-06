@@ -97,8 +97,8 @@ public class JobsHelper {
     }
   }
 
-  protected static Job createJob(Job job) throws NotFoundException, GenericException, JobAlreadyStartedException,
-    RequestNotValidException, AuthorizationDeniedException {
+  protected static Job createJob(Job job, boolean async) throws NotFoundException, GenericException,
+    JobAlreadyStartedException, RequestNotValidException, AuthorizationDeniedException {
     Job updatedJob = new Job(job);
 
     // serialize job to file & index it
@@ -106,7 +106,7 @@ public class JobsHelper {
 
     // ask plugin orchestrator to execute the job (which will be executed
     // asynchronously)
-    RodaCoreFactory.getPluginOrchestrator().executeJob(updatedJob, true);
+    RodaCoreFactory.getPluginOrchestrator().executeJob(updatedJob, async);
 
     // force commit
     RodaCoreFactory.getIndexService().commit(Job.class);

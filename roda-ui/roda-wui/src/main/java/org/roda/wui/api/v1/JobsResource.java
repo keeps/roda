@@ -74,7 +74,7 @@ public class JobsResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    Job updatedJob = org.roda.wui.api.controllers.Jobs.createJob(user, job);
+    Job updatedJob = org.roda.wui.api.controllers.Jobs.createJob(user, job, true);
     return Response.created(ApiUtils.getUriFromRequest(request)).entity(updatedJob).type(mediaType).build();
   }
 

@@ -346,10 +346,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public String deleteAIP(SelectedItems<IndexedAIP> aips)
+  public String deleteAIP(SelectedItems<IndexedAIP> aips, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.deleteAIP(user, aips);
+    return Browser.deleteAIP(user, aips, details);
   }
 
   @Override
@@ -488,7 +488,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public Job createJob(Job job) throws RequestNotValidException, AuthorizationDeniedException, NotFoundException,
     GenericException, JobAlreadyStartedException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return Jobs.createJob(user, job);
+    return Jobs.createJob(user, job, true);
   }
 
   @Override
@@ -723,7 +723,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     job.setPlugin(id);
     job.setPluginParameters(value);
 
-    return Jobs.createJob(user, job);
+    return Jobs.createJob(user, job, true);
   }
 
   private SelectedItems getAllItemsByClass(String selectedClass) {

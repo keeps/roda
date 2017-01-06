@@ -512,6 +512,12 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(path);
   }
 
+  public static StoragePath getPreservationRepositoryEventStoragePath() throws RequestNotValidException {
+    List<String> path = Arrays.asList(RodaConstants.STORAGE_CONTAINER_PRESERVATION,
+      RodaConstants.STORAGE_DIRECTORY_EVENTS);
+    return DefaultStoragePath.parse(path);
+  }
+
   public static StoragePath getPreservationMetadataStoragePath(String id, PreservationMetadataType type, String aipId,
     String representationId, List<String> fileDirectoryPath, String fileId) throws RequestNotValidException {
     List<String> path = null;
@@ -536,9 +542,9 @@ public final class ModelUtils {
             String pFileId = id + RodaConstants.PREMIS_SUFFIX;
             path = build(getAIPPreservationMetadataPath(aipId), pFileId);
           }
-
         } else {
-          throw new RequestNotValidException("Requested an event preservation object with null AIP id");
+          path = Arrays.asList(RodaConstants.STORAGE_CONTAINER_PRESERVATION, RodaConstants.STORAGE_DIRECTORY_EVENTS,
+            id + RodaConstants.PREMIS_SUFFIX);
         }
       } else if (type.equals(PreservationMetadataType.FILE)) {
         path = getRepresentationMetadataPath(aipId, representationId);
