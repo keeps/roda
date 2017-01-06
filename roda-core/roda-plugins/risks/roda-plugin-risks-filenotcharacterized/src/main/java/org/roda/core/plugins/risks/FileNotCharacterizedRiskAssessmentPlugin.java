@@ -455,8 +455,8 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
   private Result assessRiskOnFileFormat(final FileFormat fileFormat) {
     final boolean missingFormatName = checkFormatDesignationName()
       && (StringUtils.isBlank(fileFormat.getFormatDesignationName()));
-    final boolean missingFormatVersion = checkFormatDesignationName()
-      && (StringUtils.isBlank(fileFormat.getFormatDesignationName()));
+    final boolean missingFormatVersion = checkFormatDesignationVersion()
+      && (StringUtils.isBlank(fileFormat.getFormatDesignationVersion()));
     final boolean missingMimetype = checkMimetype() && StringUtils.isBlank(fileFormat.getMimeType());
     final boolean missingPronom = checkPronom() && StringUtils.isBlank(fileFormat.getPronom());
     return new Result(missingFormatName, missingFormatVersion, missingMimetype, missingPronom);
