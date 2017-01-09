@@ -108,7 +108,8 @@
 	<field name="id" type="string" indexed="true" stored="true" required="false" multiValued="false" />
 	<field name="dipId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
 	<field name="path" type="string" indexed="true" stored="true" required="false" multiValued="true" />
-	<field name="ancestorsPath" type="string" indexed="true" stored="true" required="false" multiValued="true" />
+	<field name="parentUUID" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+	<field name="ancestorsUUIDs" type="string" indexed="true" stored="true" required="false" multiValued="true" />
 	<field name="isDirectory" type="boolean" indexed="true" stored="true" required="false" multiValued="false" />
 	<field name="size" type="long" indexed="true" stored="true" required="true" multiValued="false" />
 	<field name="storagePath" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 

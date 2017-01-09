@@ -1,6 +1,7 @@
 package org.roda.wui.client.browse.bundle;
 
 import java.io.Serializable;
+import java.util.List;
 
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -17,7 +18,9 @@ public class DipBundle implements Serializable {
   private IndexedFile file;
 
   private IndexedDIP dip;
+
   private DIPFile dipFile;
+  private List<DIPFile> dipFileAncestors;
 
   public DipBundle() {
     super();
@@ -61,6 +64,14 @@ public class DipBundle implements Serializable {
 
   public void setDipFile(DIPFile dipFile) {
     this.dipFile = dipFile;
+  }
+
+  public List<DIPFile> getDipFileAncestors() {
+    return dipFileAncestors;
+  }
+
+  public void setDipFileAncestors(List<DIPFile> dipFileAncestors) {
+    this.dipFileAncestors = dipFileAncestors;
   }
 
 }

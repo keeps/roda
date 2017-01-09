@@ -72,6 +72,7 @@ public class BrowseDIP extends Composite {
 
   // system
   private final Viewers viewers;
+  private final DipBundle bundle;
 
   // source
   private IndexedAIP aip;
@@ -100,6 +101,8 @@ public class BrowseDIP extends Composite {
   int index;
   int totalCount = -1;
 
+  private List<DIPFile> dipFileAncestors;
+
   /**
    * Create a new panel to view a representation
    * 
@@ -113,6 +116,7 @@ public class BrowseDIP extends Composite {
    */
   public BrowseDIP(Viewers viewers, DipBundle bundle) {
     this.viewers = viewers;
+    this.bundle = bundle;
 
     this.aip = bundle.getAip();
     this.representation = bundle.getRepresentation();
@@ -130,7 +134,7 @@ public class BrowseDIP extends Composite {
 
     if (bundle.getDipFile() != null) {
       index = -1;
-      showFromBundle(bundle.getDipFile());
+      showFromBundle(bundle.getDipFile(), bundle.getDipFileAncestors());
     } else {
       index = 0;
       show();
@@ -150,8 +154,10 @@ public class BrowseDIP extends Composite {
     breadcrumb.setVisible(true);
   }
 
-  private void showFromBundle(DIPFile selected) {
-    dipFile = selected;
+  private void showFromBundle(DIPFile selected, List<DIPFile> selectedAncestors) {
+    this.dipFile = selected;
+    this.dipFileAncestors = selectedAncestors;
+
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIPFILE_DIP_ID, dip.getId()));
 
     if (dipFile.getAncestorsPath().isEmpty()) {
@@ -179,8 +185,15 @@ public class BrowseDIP extends Composite {
   }
 
   public void show() {
-    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIPFILE_DIP_ID, dip.getId()),
-      new EmptyKeyFilterParameter(RodaConstants.DIPFILE_PARENT_UUID));
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIPFILE_DIP_ID, dip.getId()));
+
+    if (dipFile == null || dipFile.getAncestorsPath().isEmpty()) {
+      filter.add(new EmptyKeyFilterParameter(RodaConstants.DIPFILE_PARENT_UUID));
+    } else {
+      String parentId = dipFile.getAncestorsPath().get(dipFile.getAncestorsPath().size() - 1);
+      filter.add(new SimpleFilterParameter(RodaConstants.DIPFILE_PARENT_UUID, parentId));
+    }
+
     Sorter sorter = new Sorter(new SortParameter(RodaConstants.DIPFILE_ID, false));
     Sublist sublist = new Sublist(index, 1);
     String localeString = LocaleInfo.getCurrentLocale().getLocaleName();
@@ -215,9 +228,14 @@ public class BrowseDIP extends Composite {
   }
 
   protected void updateVisibles() {
-    previousButton.setVisible(index > 0);
-    nextButton.setVisible(index < totalCount - 1);
-    downloadButton.setVisible(dipFile != null && !dipFile.isDirectory());
+    if (index < 0) {
+      previousButton.setVisible(false);
+      nextButton.setVisible(totalCount > 1);
+    } else {
+      previousButton.setVisible(index > 0);
+      nextButton.setVisible(index < totalCount - 1);
+      downloadButton.setVisible(dipFile != null && !dipFile.isDirectory());
+    }
   }
 
   @UiHandler("previousButton")
@@ -260,7 +278,7 @@ public class BrowseDIP extends Composite {
   }
 
   private List<BreadcrumbItem> getBreadcrumbs() {
-    return BreadcrumbUtils.getDipBreadcrumbs(aip, representation, file, dip, dipFile);
+    return BreadcrumbUtils.getDipBreadcrumbs(aip, representation, file, dip, dipFile, dipFileAncestors);
   }
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {

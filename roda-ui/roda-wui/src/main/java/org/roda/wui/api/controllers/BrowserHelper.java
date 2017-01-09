@@ -448,7 +448,18 @@ public class BrowserHelper {
     bundle.setDip(BrowserHelper.retrieve(IndexedDIP.class, dipUUID));
 
     if (dipFileUUID != null) {
-      bundle.setDipFile(BrowserHelper.retrieve(DIPFile.class, dipFileUUID));
+      DIPFile dipFile = BrowserHelper.retrieve(DIPFile.class, dipFileUUID);
+      bundle.setDipFile(dipFile);
+
+      List<DIPFile> dipFileAncestors = new ArrayList<>();
+      for (String dipFileAncestor : dipFile.getAncestorsPath()) {
+        try {
+          dipFileAncestors.add(BrowserHelper.retrieve(DIPFile.class, dipFileAncestor));
+        } catch (NotFoundException e) {
+          // ignore
+        }
+      }
+      bundle.setDipFileAncestors(dipFileAncestors);
     }
 
     if (aipId != null) {

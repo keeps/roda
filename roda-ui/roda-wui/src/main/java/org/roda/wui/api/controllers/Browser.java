@@ -168,8 +168,11 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
-    IndexedRepresentation rep = BrowserHelper.retrieve(IndexedRepresentation.class,
-      IdUtils.getRepresentationId(aipId, representationId));
+    IndexedRepresentation rep = null;
+
+    if (representationId != null) {
+      rep = BrowserHelper.retrieve(IndexedRepresentation.class, IdUtils.getRepresentationId(aipId, representationId));
+    }
 
     UserUtility.checkAIPPermissions(user, aip, PermissionType.READ);
 
@@ -194,8 +197,11 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
 
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
-    IndexedRepresentation rep = BrowserHelper.retrieve(IndexedRepresentation.class,
-      IdUtils.getRepresentationId(aipId, representationId));
+    IndexedRepresentation rep = null;
+
+    if (representationId != null) {
+      rep = BrowserHelper.retrieve(IndexedRepresentation.class, IdUtils.getRepresentationId(aipId, representationId));
+    }
 
     UserUtility.checkAIPPermissions(user, aip, PermissionType.READ);
 

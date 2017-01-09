@@ -1,6 +1,7 @@
 package org.roda.wui.client.browse;
 
 import org.apache.commons.httpclient.HttpStatus;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
@@ -28,10 +29,11 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
 
-public class BitstreamPreview extends Composite {
+public class BitstreamPreview<T extends IsIndexed> extends Composite {
 
   private static final String VIEWER_TYPE_VIDEO = "video";
 
@@ -61,20 +63,23 @@ public class BitstreamPreview extends Composite {
   // other
   private final Command onPreviewFailure;
 
+  private final T object;
+
   public BitstreamPreview(Viewers viewers, SafeUri bitstreamDownloadUri, FileFormat format, String filename, long size,
-    boolean isDirectory) {
+    boolean isDirectory, T object) {
     this(viewers, bitstreamDownloadUri, format, filename, size, isDirectory, new Command() {
 
       @Override
       public void execute() {
         // do nothing
       }
-    });
+    }, object);
   }
 
   public BitstreamPreview(Viewers viewers, SafeUri bitstreamDownloadUri, FileFormat format, String filename, long size,
-    boolean isDirectory, Command onPreviewFailure) {
+    boolean isDirectory, Command onPreviewFailure, T object) {
     super();
+    this.object = object;
     this.panel = new FlowPanel();
 
     this.viewers = viewers;
@@ -134,8 +139,7 @@ public class BitstreamPreview extends Composite {
         notSupportedPreview();
       }
     } else {
-      directoryPreview();
-      // TODO add a directory preview
+      panel.add(directoryPreview());
     }
   }
 
@@ -367,24 +371,28 @@ public class BitstreamPreview extends Composite {
 
   }
 
-  private void directoryPreview() {
+  protected Widget directoryPreview() {
     HTML html = new HTML();
     SafeHtmlBuilder b = new SafeHtmlBuilder();
 
-    b.append(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-file fa-5'></i>"));
+    b.append(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-folder-open fa-5'></i>"));
     b.append(SafeHtmlUtils.fromSafeConstant("<h4 class='emptymessage'>"));
-    b.append(SafeHtmlUtils.fromString(messages.viewRepresentationEmptyPreview()));
+    b.append(SafeHtmlUtils.fromString(filename + " /"));
     b.append(SafeHtmlUtils.fromSafeConstant("</h4>"));
 
     html.setHTML(b.toSafeHtml());
-    panel.add(html);
     html.setStyleName("viewRepresentationEmptyPreview");
+    return html;
   }
 
   private void downloadFile() {
     if (bitstreamDownloadUri != null) {
       Window.Location.assign(bitstreamDownloadUri.asString());
     }
+  }
+
+  public T getObject() {
+    return object;
   }
 
 }

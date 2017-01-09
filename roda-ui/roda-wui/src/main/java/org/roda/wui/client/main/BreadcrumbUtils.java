@@ -22,6 +22,7 @@ import org.roda.wui.client.browse.BrowseDIP;
 import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
+import org.roda.wui.client.browse.bundle.DipBundle;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -222,7 +223,7 @@ public class BreadcrumbUtils {
   }
 
   public static List<BreadcrumbItem> getDipBreadcrumbs(IndexedAIP aip, IndexedRepresentation representation,
-    IndexedFile file, IndexedDIP dip, DIPFile dipFile) {
+    IndexedFile file, IndexedDIP dip, DIPFile dipFile, List<DIPFile> dipFileAncestors) {
     List<BreadcrumbItem> ret = new ArrayList<>();
 
     if (aip != null && representation != null && file != null) {
@@ -239,10 +240,13 @@ public class BreadcrumbUtils {
 
     if (dipFile != null) {
       // DIP File ancestors
-      for(String dipFileAncestorUUID : dipFile.getAncestorsPath()) {
-        // TODO add ancestors
+      if (dipFileAncestors != null) {
+        for (DIPFile dipFileAncestor : dipFileAncestors) {
+          ret.add(getBreadcrumbItem(dipFileAncestor, aip, representation, file));
+        }
       }
-      
+
+      // DIP File
       ret.add(getBreadcrumbItem(dipFile, aip, representation, file));
     }
 

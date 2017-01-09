@@ -2390,10 +2390,10 @@ public class SolrUtils {
       return file;
     }
     file.setPath(objectToListString(doc.get(RodaConstants.DIPFILE_PATH)));
-    file.setAncestorsPath(objectToListString(doc.get(RodaConstants.FILE_ANCESTORS_PATH)));
+    file.setAncestorsUUIDs(objectToListString(doc.get(RodaConstants.DIPFILE_ANCESTORS_UUIDS)));
     file.setDirectory(objectToBoolean(doc.get(RodaConstants.DIPFILE_IS_DIRECTORY), Boolean.FALSE));
     file.setStoragePath(objectToString(doc.get(RodaConstants.DIPFILE_STORAGE_PATH), null));
-    file.setSize(objectToLong(doc.get(RodaConstants.FILE_SIZE), 0L));
+    file.setSize(objectToLong(doc.get(RodaConstants.DIPFILE_SIZE), 0L));
     return file;
   }
 
