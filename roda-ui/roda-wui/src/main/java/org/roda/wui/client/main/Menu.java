@@ -32,6 +32,7 @@ import org.roda.wui.client.management.Statistics;
 import org.roda.wui.client.management.UserLog;
 import org.roda.wui.client.planning.FormatRegister;
 import org.roda.wui.client.planning.Planning;
+import org.roda.wui.client.planning.PreservationAgents;
 import org.roda.wui.client.planning.RiskRegister;
 import org.roda.wui.client.process.ActionProcess;
 import org.roda.wui.client.process.IngestProcess;
@@ -103,7 +104,7 @@ public class Menu extends Composite {
   private MenuItem planning_risk;
   private MenuItem planning_format;
   private MenuItem planning_event;
-  // private MenuItem planning_agent;
+  private MenuItem planning_agent;
 
   private final MenuItem help;
 
@@ -167,8 +168,8 @@ public class Menu extends Composite {
     planning_event = planningMenu.addItem(messages.title("planning_event"),
       createCommand(PreservationEvents.PLANNING_RESOLVER.getHistoryPath()));
 
-    // planning_agent = planningMenu.addItem(messages.title("planning_agent"),
-    // createCommand(PreservationAgents.RESOLVER.getHistoryPath()));
+    planning_agent = planningMenu.addItem(messages.title("planning_agent"),
+      createCommand(PreservationAgents.RESOLVER.getHistoryPath()));
 
     help = new MenuItem(messages.title("help"), createCommand(Help.RESOLVER.getHistoryPath()));
 
@@ -266,7 +267,7 @@ public class Menu extends Composite {
     updateResolverSubItemVisibility(RiskRegister.RESOLVER, planning_risk);
     updateResolverSubItemVisibility(FormatRegister.RESOLVER, planning_format);
     updateResolverSubItemVisibility(PreservationEvents.PLANNING_RESOLVER, planning_event);
-    // updateResolverSubItemVisibility(Planning.RESOLVER, planning_agent);
+    updateResolverSubItemVisibility(PreservationAgents.RESOLVER, planning_agent);
     updateResolverTopItemVisibility(Planning.RESOLVER, new MenuItem(messages.title("planning"), planningMenu), 5);
 
     // Help

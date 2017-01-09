@@ -91,6 +91,8 @@ public class Planning {
       RiskIncidenceRegister.getInstance().resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.get(0).equals(PreservationEvents.PLANNING_RESOLVER.getHistoryToken())) {
       PreservationEvents.PLANNING_RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+    } else if (historyTokens.get(0).equals(PreservationAgents.RESOLVER.getHistoryToken())) {
+      PreservationAgents.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     }
   }
 }

@@ -770,6 +770,24 @@ public interface ClientMessages extends Messages {
 
   String descriptiveMetadataHistoryLabel(String versionKey, Date createdDate);
 
+  /************* Preservation Agent List ****************/
+
+  String preservationAgentsTitle();
+
+  String preservationAgentTitle();
+
+  String preservationAgentName();
+
+  String preservationAgentType();
+
+  String preservationAgentVersion();
+
+  String preservationAgentId();
+
+  String preservationAgentNote();
+
+  String preservationAgentExtension();
+
   /************* Select AIP Dialog ****************/
 
   String selectAipCancelButton();
@@ -1250,7 +1268,7 @@ public interface ClientMessages extends Messages {
   String appraisalReject();
 
   String representationsTitle();
-  
+
   String disseminationsTitle();
 
   String filesTitle();
@@ -1302,9 +1320,9 @@ public interface ClientMessages extends Messages {
   String permissionAssignedUsersEmpty();
 
   String listOfAIPs();
-  
+
   String listOfRepresentations();
-  
+
   String listOfDisseminations();
 
   String unknownAncestorError();

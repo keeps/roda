@@ -938,7 +938,7 @@ public final class RodaConstants {
   public static final String PRESERVATION_AGENT_NAME = "name";
   public static final String PRESERVATION_AGENT_TYPE = "type";
   public static final String PRESERVATION_AGENT_EXTENSION = "extension";
-  public static final Object PRESERVATION_AGENT_VERSION = "version";
+  public static final String PRESERVATION_AGENT_VERSION = "version";
   public static final String PRESERVATION_AGENT_NOTE = "note";
   public static final String PRESERVATION_AGENT_ROLES = "roles";
 

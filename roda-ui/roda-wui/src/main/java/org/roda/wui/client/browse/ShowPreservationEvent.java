@@ -32,6 +32,7 @@ import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
+import org.roda.wui.client.planning.ShowPreservationAgent;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
@@ -234,7 +235,6 @@ public class ShowPreservationEvent extends Composite {
     IndexedPreservationEvent event = bundle.getEvent();
 
     eventIdValue.setText(event.getId());
-
     eventTypeLabel.setText(event.getEventType());
     eventDetailLabel.setText(event.getEventDetail());
     eventDatetimeLabel
@@ -386,6 +386,16 @@ public class ShowPreservationEvent extends Composite {
       body.add(extensionLabel);
       body.add(extensionValue);
     }
+
+    FlowPanel footer = new FlowPanel();
+    footer.addStyleName("panel-footer");
+    layout.add(footer);
+
+    Anchor link = new Anchor(messages.inspectFile(),
+      HistoryUtils.createHistoryHashLink(ShowPreservationAgent.RESOLVER, agent.getId()));
+
+    link.addStyleName("btn");
+    footer.add(link);
     return layout;
   }
 
