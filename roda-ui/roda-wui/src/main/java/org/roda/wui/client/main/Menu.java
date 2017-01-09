@@ -101,9 +101,9 @@ public class Menu extends Composite {
   private final MenuBar planningMenu;
   // private MenuItem planning_monitoring;
   private MenuItem planning_risk;
-  // private MenuItem planning_agents;
   private MenuItem planning_format;
   private MenuItem planning_event;
+  // private MenuItem planning_agent;
 
   private final MenuItem help;
 
@@ -161,13 +161,14 @@ public class Menu extends Composite {
     planning_risk = planningMenu.addItem(messages.title("planning_risk"),
       createCommand(RiskRegister.RESOLVER.getHistoryPath()));
 
-    // planning_agents = planningMenu.addItem(messages.title("planning_agent"),
-    // createCommand(AgentRegister.RESOLVER.getHistoryPath()));
     planning_format = planningMenu.addItem(messages.title("planning_format"),
       createCommand(FormatRegister.RESOLVER.getHistoryPath()));
 
     planning_event = planningMenu.addItem(messages.title("planning_event"),
       createCommand(PreservationEvents.PLANNING_RESOLVER.getHistoryPath()));
+
+    // planning_agent = planningMenu.addItem(messages.title("planning_agent"),
+    // createCommand(PreservationAgents.RESOLVER.getHistoryPath()));
 
     help = new MenuItem(messages.title("help"), createCommand(Help.RESOLVER.getHistoryPath()));
 
@@ -263,9 +264,9 @@ public class Menu extends Composite {
     // Planning
     // updateResolverSubItemVisibility(Planning.RESOLVER, planning_monitoring);
     updateResolverSubItemVisibility(RiskRegister.RESOLVER, planning_risk);
-    // updateResolverSubItemVisibility(Planning.RESOLVER, planning_agents);
     updateResolverSubItemVisibility(FormatRegister.RESOLVER, planning_format);
     updateResolverSubItemVisibility(PreservationEvents.PLANNING_RESOLVER, planning_event);
+    // updateResolverSubItemVisibility(Planning.RESOLVER, planning_agent);
     updateResolverTopItemVisibility(Planning.RESOLVER, new MenuItem(messages.title("planning"), planningMenu), 5);
 
     // Help

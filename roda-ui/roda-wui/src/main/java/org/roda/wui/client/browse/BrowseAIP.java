@@ -1306,20 +1306,24 @@ public class BrowseAIP extends Composite {
 
   @UiHandler("newProcess")
   void buttonNewProcessHandler(ClickEvent e) {
-    final SelectedItems<IndexedRepresentation> selected = representationsList.getSelected();
-    if (ClientSelectedItemsUtils.isEmpty(selected)) {
-      if (aipId != null) {
-        LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
-        selectedItems.setSelectedItems(SelectedItemsList.create(IndexedAIP.class, aipId));
-        selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
-        HistoryUtils.newHistory(CreateJob.RESOLVER, "action");
+    LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
+    final SelectedItems<IndexedAIP> selectedSubs = aipChildrenList.getSelected();
+
+    if (ClientSelectedItemsUtils.isEmpty(selectedSubs)) {
+      final SelectedItems<IndexedRepresentation> selectedReps = representationsList.getSelected();
+      if (ClientSelectedItemsUtils.isEmpty(selectedReps)) {
+        if (aipId != null) {
+          selectedItems.setSelectedItems(SelectedItemsList.create(IndexedAIP.class, aipId));
+        }
+      } else {
+        selectedItems.setSelectedItems(selectedReps);
       }
     } else {
-      LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
-      selectedItems.setSelectedItems(selected);
-      selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
-      HistoryUtils.newHistory(CreateJob.RESOLVER, "action");
+      selectedItems.setSelectedItems(selectedSubs);
     }
+
+    selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
+    HistoryUtils.newHistory(CreateJob.RESOLVER, "action");
   }
 
   @UiHandler("editPermissions")
