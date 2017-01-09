@@ -9,6 +9,7 @@ package org.roda.core.plugins.orchestrate.akka;
 
 import java.util.ArrayList;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -28,6 +29,9 @@ import org.roda.core.plugins.plugins.PluginHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.codahale.metrics.Histogram;
+import com.codahale.metrics.MetricRegistry;
+
 import akka.actor.ActorRef;
 import akka.actor.Props;
 import akka.actor.Terminated;
@@ -43,6 +47,10 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
   private ActorRef workersRouter;
   boolean stopping = false;
   private String jobId;
+
+  // metrics
+  // private Map<String, Histogram> stateMessagesMetrics;
+  private Histogram stateMessagesMetricsHistogram;
 
   public AkkaJobStateInfoActor(Plugin<?> plugin, ActorRef jobCreator, ActorRef jobsManager, String jobId,
     int numberOfJobsWorkers) {
@@ -60,6 +68,14 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
     getContext().watch(workersRouter);
 
     JobsHelper.createJobWorkingDirectory(jobId);
+
+    // 20170109 hsilva: this is easier but should be done via parameter
+    // injection
+    MetricRegistry metrics = RodaCoreFactory.getMetrics();
+    String className = AkkaJobStateInfoActor.class.getSimpleName();
+    // stateMessagesMetrics = new HashMap<>();
+    stateMessagesMetricsHistogram = metrics
+      .histogram(MetricRegistry.name(className, "msgCreationToProcessingStartedInMilis"));
   }
 
   @Override
@@ -95,7 +111,7 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
 
   private void handleJobStateUpdated(Object msg) {
     Messages.JobStateUpdated message = (Messages.JobStateUpdated) msg;
-    message.logProcessingStarted();
+    markMessageProcessingAsStarted(message);
     Plugin<?> p = message.getPlugin() == null ? this.plugin : message.getPlugin();
     try {
       Job job = PluginHelper.getJob(p, super.getIndex());
@@ -113,12 +129,12 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
       JobsHelper.deleteJobWorkingDirectory(jobId);
       getContext().stop(getSelf());
     }
-    message.logProcessingEnded();
+    markMessageProcessingAsEnded(message);
   }
 
   private <T extends IsRODAObject> void handleJobSourceObjectsUpdated(Object msg) {
     Messages.JobSourceObjectsUpdated message = (Messages.JobSourceObjectsUpdated) msg;
-    message.logProcessingStarted();
+    markMessageProcessingAsStarted(message);
     try {
       Job job = PluginHelper.getJob(plugin, getModel());
       SelectedItems<?> sourceObjects = job.getSourceObjects();
@@ -139,26 +155,26 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
       LOGGER.error("Error while retrieving Job for doing an update", e);
     }
 
-    message.logProcessingEnded();
+    markMessageProcessingAsEnded(message);
   }
 
   private void handleJobInfoUpdated(Object msg) {
     Messages.JobInfoUpdated message = (Messages.JobInfoUpdated) msg;
-    message.logProcessingStarted();
+    markMessageProcessingAsStarted(message);
     jobInfo.put(message.getPlugin(), message.getJobPluginInfo());
     JobPluginInfo infoUpdated = message.getJobPluginInfo().processJobPluginInformation(message.getPlugin(), jobInfo);
     jobInfo.setObjectsCount(infoUpdated.getSourceObjectsCount());
     JobsHelper.updateJobInformation(message.getPlugin(), super.getModel(), infoUpdated);
-    message.logProcessingEnded();
+    markMessageProcessingAsEnded(message);
   }
 
   private void handleJobStop(Object msg) {
     Messages.JobStop message = (Messages.JobStop) msg;
-    message.logProcessingStarted();
+    markMessageProcessingAsStarted(message);
     getSelf().tell(new Messages.JobStateUpdated(plugin, JOB_STATE.STOPPING), getSelf());
     stopping = true;
     getContext().getChildren().forEach(e -> getContext().stop(e));
-    message.logProcessingEnded();
+    markMessageProcessingAsEnded(message);
   }
 
   private void handleTerminated(Object msg) {
@@ -179,56 +195,56 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
 
   private void handleExecuteIsReady(Object msg) {
     Messages.PluginExecuteIsReady message = (Messages.PluginExecuteIsReady) msg;
-    message.logProcessingStarted();
+    markMessageProcessingAsStarted(message);
     jobInfo.setStarted(message.getPlugin());
     // 20160819 hsilva: the following it's just for debugging purposes
     message.setHasBeenForwarded();
     workersRouter.tell(message, getSelf());
-    message.logProcessingEnded();
+    markMessageProcessingAsEnded(message);
   }
 
   private void handleJobInitEnded(Object msg) {
     Messages.JobInitEnded message = (Messages.JobInitEnded) msg;
-    message.logProcessingStarted();
+    markMessageProcessingAsStarted(message);
     jobInfo.setInitEnded(true);
     // INFO 20160630 hsilva: the following test is needed because messages can
     // be out of order and a plugin might already arrived to the end
     if (jobInfo.isDone()) {
       workersRouter.tell(new Messages.PluginAfterAllExecuteIsReady(plugin), getSelf());
     }
-    message.logProcessingEnded();
+    markMessageProcessingAsEnded(message);
   }
 
   private void handleBeforeAllExecuteIsReady(Object msg) throws PluginException {
     Messages.PluginBeforeAllExecuteIsReady message = (Messages.PluginBeforeAllExecuteIsReady) msg;
-    message.logProcessingStarted();
+    markMessageProcessingAsStarted(message);
     message.getPlugin().beforeAllExecute(super.getIndex(), super.getModel(), super.getStorage());
     // do nothing because if all goes good, the next messages are of type
     // PluginExecuteIsReady
-    message.logProcessingEnded();
+    markMessageProcessingAsEnded(message);
   }
 
   private void handleExecuteIsDone(Object msg) {
     Messages.PluginExecuteIsDone message = (Messages.PluginExecuteIsDone) msg;
-    message.logProcessingStarted();
+    markMessageProcessingAsStarted(message);
     jobInfo.setDone(message.getPlugin());
     if (jobInfo.isDone() && jobInfo.isInitEnded()) {
       workersRouter.tell(new Messages.PluginAfterAllExecuteIsReady(plugin), getSelf());
     }
-    message.logProcessingEnded();
+    markMessageProcessingAsEnded(message);
   }
 
   private void handleAfterAllExecuteIsDone(Object msg) {
     Messages.PluginAfterAllExecuteIsDone message = (Messages.PluginAfterAllExecuteIsDone) msg;
-    message.logProcessingStarted();
+    markMessageProcessingAsStarted(message);
     getSelf().tell(new Messages.JobCleanup(), getSelf());
     getSelf().tell(new Messages.JobStateUpdated(plugin, JOB_STATE.COMPLETED), getSelf());
-    message.logProcessingEnded();
+    markMessageProcessingAsEnded(message);
   }
 
   private void handleJobCleanup(Object msg) {
     Messages.JobCleanup message = (Messages.JobCleanup) msg;
-    message.logProcessingStarted();
+    markMessageProcessingAsStarted(message);
     try {
       LOGGER.info("Doing job cleanup");
       IndexService indexService = super.getIndex();
@@ -238,6 +254,15 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
     } catch (NotFoundException | GenericException e) {
       LOGGER.error("Unable to get Job for doing cleanup", e);
     }
+    markMessageProcessingAsEnded(message);
+  }
+
+  private void markMessageProcessingAsStarted(Messages.AbstractMessage message) {
+    message.logProcessingStarted();
+    stateMessagesMetricsHistogram.update(message.getTimeSinceCreation());
+  }
+
+  private void markMessageProcessingAsEnded(Messages.AbstractMessage message) {
     message.logProcessingEnded();
   }
 

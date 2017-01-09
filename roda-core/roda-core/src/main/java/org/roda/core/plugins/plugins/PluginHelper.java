@@ -144,7 +144,7 @@ public final class PluginHelper {
       .setOutcomeObjectClass(clazz.getName()).setOutcomeObjectState(initialOutcomeObjectState);
   }
 
-  public static <T extends IsRODAObject> Report initPluginReportItem(Plugin<T> plugin, String outcomeObjectId,
+  private static <T extends IsRODAObject> Report initPluginReportItem(Plugin<T> plugin, String outcomeObjectId,
     String sourceObjectId) {
     String jobId = getJobId(plugin);
     Report reportItem = new Report();

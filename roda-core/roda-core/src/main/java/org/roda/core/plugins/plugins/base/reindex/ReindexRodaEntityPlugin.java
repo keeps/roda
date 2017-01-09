@@ -129,7 +129,7 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
         } else {
           jobPluginInfo.incrementObjectsProcessedWithFailure();
-          Report reportItem = PluginHelper.initPluginReportItem(this, object.getId(), object.getId());
+          Report reportItem = PluginHelper.initPluginReportItem(this, object.getId(), object.getClass());
           reportItem.setPluginState(PluginState.FAILURE);
 
           for (Exception e : exceptionList) {

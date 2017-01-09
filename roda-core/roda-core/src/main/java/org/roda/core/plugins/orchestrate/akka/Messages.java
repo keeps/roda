@@ -8,6 +8,7 @@
 package org.roda.core.plugins.orchestrate.akka;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,15 +25,18 @@ import org.slf4j.LoggerFactory;
 public class Messages {
   private static final Logger LOGGER = LoggerFactory.getLogger(Messages.class);
 
-  private static abstract class AbstractMessage implements Serializable {
+  public static abstract class AbstractMessage implements Serializable {
     private static final long serialVersionUID = 1898368418865765060L;
     private String uuid;
+    private long creationTime;
 
     private AbstractMessage() {
       if (LOGGER.isTraceEnabled()) {
         uuid = UUID.randomUUID().toString();
         LOGGER.trace("{} Created message {}", uuid, getClass().getSimpleName());
       }
+
+      creationTime = new Date().getTime();
     }
 
     public void logProcessingStarted() {
@@ -45,6 +49,10 @@ public class Messages {
       if (LOGGER.isTraceEnabled()) {
         LOGGER.trace("{} Ended processing message {}", uuid, getClass().getSimpleName());
       }
+    }
+
+    public long getTimeSinceCreation() {
+      return new Date().getTime() - creationTime;
     }
   }
 
