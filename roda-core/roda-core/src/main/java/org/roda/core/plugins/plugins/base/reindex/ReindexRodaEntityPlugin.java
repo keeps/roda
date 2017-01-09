@@ -175,16 +175,15 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
 
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    if (clearIndexes) {
-      LOGGER.debug("Optimizing indexes");
-      try {
-        Job job = PluginHelper.getJob(this, index);
-        Class selectedClass = Class.forName(job.getSourceObjects().getSelectedClass());
-        index.optimizeIndexes(SolrUtils.getIndexName(selectedClass));
-      } catch (GenericException | NotFoundException | ClassNotFoundException e) {
-        throw new PluginException("Error optimizing index", e);
-      }
+    LOGGER.debug("Optimizing indexes");
+    try {
+      Job job = PluginHelper.getJob(this, index);
+      Class selectedClass = Class.forName(job.getSourceObjects().getSelectedClass());
+      index.optimizeIndexes(SolrUtils.getIndexName(selectedClass));
+    } catch (GenericException | NotFoundException | ClassNotFoundException e) {
+      throw new PluginException("Error optimizing index", e);
     }
+
     return new Report();
   }
 
