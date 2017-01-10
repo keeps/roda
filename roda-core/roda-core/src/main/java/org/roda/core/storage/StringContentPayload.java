@@ -66,5 +66,4 @@ public class StringContentPayload implements ContentPayload {
   public String toString() {
     return content;
   }
-
 }

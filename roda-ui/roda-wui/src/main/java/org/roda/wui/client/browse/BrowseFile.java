@@ -42,6 +42,7 @@ import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
+import org.roda.wui.client.planning.Planning;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
 import org.roda.wui.client.process.CreateJob;
 import org.roda.wui.common.client.ClientLogger;
@@ -463,11 +464,12 @@ public class BrowseFile extends Composite {
   @UiHandler("optionRisk")
   void buttonRisksButtonHandler(ClickEvent e) {
     List<String> history = new ArrayList<>();
+    history.add(RiskIncidenceRegister.RESOLVER.getHistoryToken());
     history.add(bundle.getAip().getId());
     history.add(bundle.getRepresentation().getId());
     history.addAll(bundle.getFile().getPath());
     history.add(bundle.getFile().getId());
-    HistoryUtils.newHistory(RiskIncidenceRegister.RESOLVER, history);
+    HistoryUtils.newHistory(Planning.RESOLVER, history);
   }
 
   @UiHandler("optionIdentify")
