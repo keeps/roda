@@ -81,7 +81,7 @@ public class PreservationEvents extends Composite {
         final String representationUUID = historyTokens.get(1);
         PreservationEvents preservationEvents = new PreservationEvents(aipId, representationUUID);
         callback.onSuccess(preservationEvents);
-      } else if (historyTokens.size() == 2) {
+      } else if (historyTokens.size() == 3) {
         final String aipId = historyTokens.get(0);
         final String representationUUID = historyTokens.get(1);
         final String fileUUID = historyTokens.get(2);
@@ -317,33 +317,32 @@ public class PreservationEvents extends Composite {
   }
 
   private void getFileBreadCrumbs() {
-    BrowserService.Util.getInstance().retrieve(IndexedFile.class.getName(), representationUUID,
-      new AsyncCallback<IndexedFile>() {
+    BrowserService.Util.getInstance().retrieve(IndexedFile.class.getName(), fileUUID, new AsyncCallback<IndexedFile>() {
 
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
-        }
+      @Override
+      public void onFailure(Throwable caught) {
+        AsyncCallbackUtils.defaultFailureTreatment(caught);
+      }
 
-        @Override
-        public void onSuccess(IndexedFile file) {
-          BrowserService.Util.getInstance().retrieveBrowseFileBundle(file.getAipId(), file.getRepresentationId(),
-            file.getPath(), file.getId(), LocaleInfo.getCurrentLocale().getLocaleName(),
-            new AsyncCallback<BrowseFileBundle>() {
+      @Override
+      public void onSuccess(IndexedFile file) {
+        BrowserService.Util.getInstance().retrieveBrowseFileBundle(file.getAipId(), file.getRepresentationId(),
+          file.getPath(), file.getId(), LocaleInfo.getCurrentLocale().getLocaleName(),
+          new AsyncCallback<BrowseFileBundle>() {
 
-              @Override
-              public void onFailure(Throwable caught) {
-                AsyncCallbackUtils.defaultFailureTreatment(caught);
-              }
+            @Override
+            public void onFailure(Throwable caught) {
+              AsyncCallbackUtils.defaultFailureTreatment(caught);
+            }
 
-              @Override
-              public void onSuccess(BrowseFileBundle fileBundle) {
-                breadcrumb.updatePath(BreadcrumbUtils.getFileBreadcrumbs(fileBundle));
-                breadcrumb.setVisible(true);
-              }
-            });
-        }
-      });
+            @Override
+            public void onSuccess(BrowseFileBundle fileBundle) {
+              breadcrumb.updatePath(BreadcrumbUtils.getFileBreadcrumbs(fileBundle));
+              breadcrumb.setVisible(true);
+            }
+          });
+      }
+    });
   }
 
   @UiHandler("downloadButton")

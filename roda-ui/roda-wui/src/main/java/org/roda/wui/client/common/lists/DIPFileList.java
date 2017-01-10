@@ -17,11 +17,15 @@ import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.DIPFile;
+import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
 import org.roda.wui.common.client.ClientLogger;
 
+import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
@@ -36,8 +40,8 @@ public class DIPFileList extends BasicAsyncTableCell<DIPFile> {
   private final ClientLogger logger = new ClientLogger(getClass().getName());
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
+  private Column<DIPFile, SafeHtml> iconColumn;
   private TextColumn<DIPFile> idColumn;
-  private TextColumn<DIPFile> sizeColumn;
 
   public DIPFileList() {
     this(null, null, null, false);
@@ -55,6 +59,23 @@ public class DIPFileList extends BasicAsyncTableCell<DIPFile> {
   @Override
   protected void configureDisplay(CellTable<DIPFile> display) {
 
+    iconColumn = new Column<DIPFile, SafeHtml>(new SafeHtmlCell()) {
+
+      @Override
+      public SafeHtml getValue(DIPFile file) {
+        if (file != null) {
+          if (file.isDirectory()) {
+            return SafeHtmlUtils.fromSafeConstant("<i class='fa fa-folder-o'></i>");
+          } else {
+            return SafeHtmlUtils.fromSafeConstant("<i class='fa fa-file-o'></i>");
+          }
+        } else {
+          logger.error("Trying to display a NULL item");
+        }
+        return null;
+      }
+    };
+
     idColumn = new TextColumn<DIPFile>() {
 
       @Override
@@ -63,19 +84,11 @@ public class DIPFileList extends BasicAsyncTableCell<DIPFile> {
       }
     };
 
-    sizeColumn = new TextColumn<DIPFile>() {
-
-      @Override
-      public String getValue(DIPFile file) {
-        return file != null ? Long.toString(file.getSize()) : null;
-      }
-    };
-
+    iconColumn.setSortable(true);
     idColumn.setSortable(true);
-    sizeColumn.setSortable(true);
 
-    display.addColumn(idColumn, messages.fileId());
-    display.addColumn(sizeColumn, messages.fileSize());
+    addColumn(iconColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-files-o'></i>"), false, false, 2);
+    display.addColumn(idColumn, messages.fileName());
 
     Label emptyInfo = new Label(messages.noItemsToDisplay());
     display.setEmptyTableWidget(emptyInfo);
@@ -83,10 +96,9 @@ public class DIPFileList extends BasicAsyncTableCell<DIPFile> {
     // define default sorting
     display.getColumnSortList().push(new ColumnSortInfo(idColumn, true));
 
-    // display.setColumnWidth(titleColumn, 7.0, Unit.EM);
-    display.setColumnWidth(sizeColumn, 13.0, Unit.EM);
+    display.setColumnWidth(iconColumn, 2.5, Unit.EM);
 
-    sizeColumn.setCellStyleNames("nowrap");
+    // sizeColumn.setCellStyleNames("nowrap");
 
     addStyleName("my-collections-table");
     emptyInfo.addStyleName("my-collections-empty-info");
@@ -96,8 +108,8 @@ public class DIPFileList extends BasicAsyncTableCell<DIPFile> {
   protected Sorter getSorter(ColumnSortList columnSortList) {
     Map<Column<DIPFile, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<DIPFile, ?>, List<String>>();
     // setting secondary sorter to title
+    columnSortingKeyMap.put(iconColumn, Arrays.asList(RodaConstants.DIPFILE_IS_DIRECTORY));
     columnSortingKeyMap.put(idColumn, Arrays.asList(RodaConstants.DIPFILE_ID));
-    columnSortingKeyMap.put(sizeColumn, Arrays.asList(RodaConstants.DIPFILE_SIZE));
     return createSorter(columnSortList, columnSortingKeyMap);
   }
 

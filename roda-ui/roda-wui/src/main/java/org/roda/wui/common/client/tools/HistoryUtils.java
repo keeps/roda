@@ -181,52 +181,53 @@ public class HistoryUtils {
     return history;
   }
 
-  public static List<String> getHistoryBrowseDIPFile(String dipId, String dipFileUUID) {
+  public static List<String> getHistoryBrowseDIPFile(String dipId, String dipFileUUID, int index) {
     List<String> history = new ArrayList<>();
     history.addAll(BrowseAIP.RESOLVER.getHistoryPath());
     history.add(BrowseDIP.RESOLVER.getHistoryToken());
     history.add(dipId);
     history.add(dipFileUUID);
+    history.add(Integer.toString(index));
     return history;
   }
 
-  public static List<String> getHistoryBrowse(DIPFile dipFile) {
-    return getHistoryBrowseDIPFile(dipFile.getDipId(), dipFile.getUUID());
+  public static List<String> getHistoryBrowse(DIPFile dipFile, int index) {
+    return getHistoryBrowseDIPFile(dipFile.getDipId(), dipFile.getUUID(), index);
   }
 
   public static void openBrowse(IndexedDIP dip) {
     HistoryUtils.newHistory(getHistoryBrowseDIP(dip.getId()));
   }
 
-  public static void openBrowse(DIPFile dipFile) {
-    HistoryUtils.newHistory(getHistoryBrowseDIPFile(dipFile.getDipId(), dipFile.getUUID()));
+  public static void openBrowse(DIPFile dipFile, int index) {
+    HistoryUtils.newHistory(getHistoryBrowseDIPFile(dipFile.getDipId(), dipFile.getUUID(), index));
   }
 
-  public static void openBrowse(DIPFile dipFile, IndexedAIP refererAIP) {
+  public static void openBrowse(DIPFile dipFile, int index, IndexedAIP refererAIP) {
     LastSelectedItemsSingleton.getInstance().setLastObject(refererAIP);
-    openBrowse(dipFile);
+    openBrowse(dipFile, index);
   }
 
-  public static void openBrowse(DIPFile dipFile, IndexedRepresentation refererRepresentation) {
+  public static void openBrowse(DIPFile dipFile, int index, IndexedRepresentation refererRepresentation) {
     LastSelectedItemsSingleton.getInstance().setLastObject(refererRepresentation);
-    openBrowse(dipFile);
+    openBrowse(dipFile, index);
   }
 
-  public static void openBrowse(DIPFile dipFile, IndexedFile refererFile) {
+  public static void openBrowse(DIPFile dipFile, int index, IndexedFile refererFile) {
     LastSelectedItemsSingleton.getInstance().setLastObject(refererFile);
-    openBrowse(dipFile);
+    openBrowse(dipFile, index);
   }
 
-  public static void openBrowse(DIPFile dipFile, IndexedAIP refererAIP, IndexedRepresentation refererRepresentation,
-    IndexedFile refererFile) {
+  public static void openBrowse(DIPFile dipFile, int index, IndexedAIP refererAIP,
+    IndexedRepresentation refererRepresentation, IndexedFile refererFile) {
     if (refererFile != null) {
-      openBrowse(dipFile, refererFile);
+      openBrowse(dipFile, index, refererFile);
     } else if (refererRepresentation != null) {
-      openBrowse(dipFile, refererRepresentation);
+      openBrowse(dipFile, index, refererRepresentation);
     } else if (refererAIP != null) {
-      openBrowse(dipFile, refererAIP);
+      openBrowse(dipFile, index, refererAIP);
     } else {
-      openBrowse(dipFile);
+      openBrowse(dipFile, index);
     }
   }
 
@@ -393,7 +394,7 @@ public class HistoryUtils {
       path = HistoryUtils.getHistoryBrowseDIP(dip.getId());
     } else if (object instanceof DIPFile) {
       DIPFile dipFile = (DIPFile) object;
-      path = HistoryUtils.getHistoryBrowseDIPFile(dipFile.getDipId(), dipFile.getUUID());
+      path = HistoryUtils.getHistoryBrowseDIPFile(dipFile.getDipId(), dipFile.getUUID(), 0);
     } else if (object instanceof TransferredResource) {
       TransferredResource resource = (TransferredResource) object;
       path = HistoryUtils.getHistory(IngestTransfer.RESOLVER.getHistoryPath(), resource.getUUID());

@@ -429,7 +429,7 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
 
             if (veraPDFResult.getFirst() != null) {
               model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
-                ".xml", "VeraPDF", veraPDFResult.getFirst(), false);
+                ".html", "VeraPDF", veraPDFResult.getFirst(), false);
 
               if (!veraPDFResult.getSecond().booleanValue()) {
                 resourceList.add(file);

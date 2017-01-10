@@ -30,6 +30,7 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.browse.bundle.DipBundle;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.lists.DIPFileList;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
@@ -54,8 +55,11 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.SelectionChangeEvent;
+import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
 import config.i18n.client.ClientMessages;
+import javassist.bytecode.stackmap.BasicBlock.Catch;
 
 /**
  * @author Luis Faria
@@ -107,6 +111,7 @@ public class BrowseDIP extends Composite {
    * Create a new panel to view a representation
    * 
    * @param viewers
+   * @param index
    * @param aipId
    * @param itemBundle
    * @param representationUUID
@@ -114,7 +119,7 @@ public class BrowseDIP extends Composite {
    * @param file
    * 
    */
-  public BrowseDIP(Viewers viewers, DipBundle bundle) {
+  public BrowseDIP(Viewers viewers, DipBundle bundle, int index) {
     this.viewers = viewers;
     this.bundle = bundle;
 
@@ -123,6 +128,7 @@ public class BrowseDIP extends Composite {
     this.file = bundle.getFile();
 
     this.dip = bundle.getDip();
+    this.index = index;
 
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -133,11 +139,9 @@ public class BrowseDIP extends Composite {
     nextButton.setVisible(false);
 
     if (bundle.getDipFile() != null) {
-      index = -1;
       showFromBundle(bundle.getDipFile(), bundle.getDipFileAncestors());
     } else {
-      index = 0;
-      show();
+      update();
     }
   }
 
@@ -146,7 +150,22 @@ public class BrowseDIP extends Composite {
     if (dipFile != null) {
       center.add(new DipFilePreview(viewers, dipFile));
     } else {
-      // TODO prompt to select some file or that are no files
+      final Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIPFILE_DIP_ID, dip.getId()),
+        new EmptyKeyFilterParameter(RodaConstants.DIPFILE_PARENT_UUID));
+      // TODO summary
+      final DIPFileList list = new DIPFileList(filter, Facets.NONE, "", false);
+
+      list.getSelectionModel().addSelectionChangeHandler(new Handler() {
+
+        @Override
+        public void onSelectionChange(SelectionChangeEvent event) {
+          DIPFile selectedDipFile = list.getSelectionModel().getSelectedObject();
+          if (selectedDipFile != null) {
+            HistoryUtils.openBrowse(selectedDipFile, 0);
+          }
+        }
+      });
+      center.add(list);
     }
 
     // update breadcrumb
@@ -318,6 +337,17 @@ public class BrowseDIP extends Composite {
       if (!historyTokens.isEmpty()) {
         final String historyDipUUID = historyTokens.get(0);
         final String historyDipFileUUID = historyTokens.size() > 1 ? historyTokens.get(1) : null;
+        int historyDipFileIndex = 0;
+        try {
+          if (historyTokens.size() > 2) {
+            historyDipFileIndex = Integer.valueOf(historyTokens.get(1));
+          }
+
+        } catch (NumberFormatException e) {
+          // do nothing
+        }
+
+        final int index = historyDipFileIndex;
 
         IsIndexed lastObject = LastSelectedItemsSingleton.getInstance().getLastObject();
 
@@ -351,7 +381,7 @@ public class BrowseDIP extends Composite {
 
             @Override
             public void onSuccess(DipBundle dipBundle) {
-              callback.onSuccess(new BrowseDIP(viewers, dipBundle));
+              callback.onSuccess(new BrowseDIP(viewers, dipBundle, index));
             }
           });
 

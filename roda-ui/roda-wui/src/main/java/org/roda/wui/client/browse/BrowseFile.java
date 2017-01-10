@@ -323,7 +323,7 @@ public class BrowseFile extends Composite {
     history.add(bundle.getAip().getId());
     history.add(bundle.getRepresentation().getUUID());
     history.add(bundle.getFile().getUUID());
-    HistoryUtils.newHistory(RiskIncidenceRegister.RESOLVER, history);
+    HistoryUtils.newHistory(PreservationEvents.BROWSE_RESOLVER, history);
   }
 
   @UiHandler("optionRisk")

@@ -43,7 +43,7 @@ public class DipFilePreview extends BitstreamPreview<DIPFile> {
       public void onSelectionChange(SelectionChangeEvent event) {
         DIPFile selectedDipFile = folderList.getSelectionModel().getSelectedObject();
         if (selectedDipFile != null) {
-          HistoryUtils.openBrowse(selectedDipFile);
+          HistoryUtils.openBrowse(selectedDipFile, 0);
         }
       }
     });

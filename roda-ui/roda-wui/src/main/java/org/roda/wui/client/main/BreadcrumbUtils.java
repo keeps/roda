@@ -282,7 +282,7 @@ public class BreadcrumbUtils {
 
       @Override
       public void execute() {
-        HistoryUtils.openBrowse(dipFile, aip, representation, file);
+        HistoryUtils.openBrowse(dipFile, 0, aip, representation, file);
       }
     });
   }

@@ -19,6 +19,10 @@ import java.nio.file.StandardCopyOption;
 import org.apache.commons.io.IOUtils;
 import org.roda.core.storage.fs.FSUtils;
 
+/**
+ * @author lfaria
+ *
+ */
 public class StringContentPayload implements ContentPayload {
   private String content;
   private Path contentPath;
@@ -56,6 +60,11 @@ public class StringContentPayload implements ContentPayload {
       writeToPath(contentPath);
     }
     return contentPath.toUri();
+  }
+
+  @Override
+  public String toString() {
+    return content;
   }
 
 }

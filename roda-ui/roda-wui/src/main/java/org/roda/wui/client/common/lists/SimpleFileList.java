@@ -87,6 +87,7 @@ public class SimpleFileList extends BasicAsyncTableCell<IndexedFile> {
     };
 
     /* add sortable */
+    iconColumn.setSortable(true);
     filenameColumn.setSortable(true);
 
     // TODO externalize strings into constants
@@ -105,6 +106,7 @@ public class SimpleFileList extends BasicAsyncTableCell<IndexedFile> {
   @Override
   protected Sorter getSorter(ColumnSortList columnSortList) {
     Map<Column<IndexedFile, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<IndexedFile, ?>, List<String>>();
+    columnSortingKeyMap.put(iconColumn, Arrays.asList(RodaConstants.FILE_ISDIRECTORY));
     columnSortingKeyMap.put(filenameColumn, Arrays.asList(RodaConstants.FILE_ORIGINALNAME));
 
     return createSorter(columnSortList, columnSortingKeyMap);
