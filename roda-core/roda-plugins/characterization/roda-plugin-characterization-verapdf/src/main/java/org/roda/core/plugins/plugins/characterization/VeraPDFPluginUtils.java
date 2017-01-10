@@ -27,7 +27,7 @@ import org.verapdf.features.FeatureExtractorConfig;
 import org.verapdf.features.FeatureFactory;
 import org.verapdf.metadata.fixer.FixerFactory;
 import org.verapdf.metadata.fixer.MetadataFixerConfig;
-import org.verapdf.pdfa.PdfBoxFoundryProvider;
+import org.verapdf.pdfa.VeraGreenfieldFoundryProvider;
 import org.verapdf.pdfa.flavours.PDFAFlavour;
 import org.verapdf.pdfa.validation.validators.ValidatorConfig;
 import org.verapdf.pdfa.validation.validators.ValidatorFactory;
@@ -50,7 +50,7 @@ public class VeraPDFPluginUtils {
         String profile = config.getFirst();
         Boolean hasFeatures = config.getSecond();
 
-        PdfBoxFoundryProvider.initialise();
+        VeraGreenfieldFoundryProvider.initialise();
         PDFAFlavour flavour = PDFAFlavour.byFlavourId(profile);
 
         ValidatorConfig validatorConfig = ValidatorFactory.createConfig(flavour, true, 10);
