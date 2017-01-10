@@ -1701,6 +1701,25 @@ public class ModelService extends ModelObservable {
     return UserUtility.getLdapUtility().getUsers();
   }
 
+  public RODAMember retrieveRODAMember(String name) throws GenericException {
+    RODAMember member = null;
+    try {
+      member = UserUtility.getLdapUtility().getUser(name);
+    } catch (GenericException e) {
+      try {
+        member = UserUtility.getLdapUtility().getGroup(name);
+      } catch (GenericException | NotFoundException e1) {
+        LOGGER.error("Could not retrieve any user or group with name: {}", name);
+        throw e;
+      }
+    }
+    return member;
+  }
+
+  public User retrieveUser(String name) throws GenericException {
+    return UserUtility.getLdapUtility().getUser(name);
+  }
+
   public Group retrieveGroup(String name) throws GenericException, NotFoundException {
     return UserUtility.getLdapUtility().getGroup(name);
   }
@@ -2844,18 +2863,4 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  public RODAMember retrieveRODAMember(String name) throws GenericException {
-    RODAMember member = null;
-    try {
-      member = UserUtility.getLdapUtility().getUser(name);
-    } catch (GenericException e) {
-      try {
-        member = UserUtility.getLdapUtility().getGroup(name);
-      } catch (GenericException | NotFoundException e1) {
-        LOGGER.error("Could not retrieve any user or group with name: {}", name);
-        throw e;
-      }
-    }
-    return member;
-  }
 }

@@ -47,7 +47,8 @@ import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.core.data.v2.user.RODAMember;
+import org.roda.core.data.v2.user.Group;
+import org.roda.core.data.v2.user.User;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.utils.ModelUtils;
 import org.slf4j.Logger;
@@ -113,8 +114,12 @@ import org.slf4j.LoggerFactory;
  * <td>org.roda.core.data.v2.log.LogEntry|logId</td>
  * </tr>
  * <tr>
- * <td>RODAMember</td>
- * <td>org.roda.core.data.v2.user.RODAMember|username</td>
+ * <td>User</td>
+ * <td>org.roda.core.data.v2.user.User|name</td>
+ * </tr>
+ * <tr>
+ * <td>Group</td>
+ * <td>org.roda.core.data.v2.user.Group|name</td>
  * </tr>
  * </table>
  * 
@@ -125,8 +130,9 @@ import org.slf4j.LoggerFactory;
 public final class LiteRODAObjectFactory {
   private static final Logger LOGGER = LoggerFactory.getLogger(LiteRODAObjectFactory.class);
 
-  private static final String SEPARATOR = "|";
+  public static final String SEPARATOR = "|";
   public static final String SEPARATOR_REGEX = "\\|";
+  public static final String SEPARATOR_URL_ENCODED = "%7C";
 
   private LiteRODAObjectFactory() {
     // do nothing
@@ -166,9 +172,12 @@ public final class LiteRODAObjectFactory {
     } else if (object instanceof Representation || object instanceof IndexedRepresentation) {
       Representation o = (Representation) object;
       ret = get(Representation.class, Arrays.asList(o.getAipId(), o.getId()), false);
-    } else if (object instanceof RODAMember) {
-      RODAMember o = (RODAMember) object;
-      ret = get(RODAMember.class, Arrays.asList(o.getName()), false);
+    } else if (object instanceof User) {
+      User o = (User) object;
+      ret = get(User.class, Arrays.asList(o.getName()), false);
+    } else if (object instanceof Group) {
+      Group o = (Group) object;
+      ret = get(Group.class, Arrays.asList(o.getName()), false);
     }
 
     if (!ret.isPresent()) {
@@ -185,8 +194,8 @@ public final class LiteRODAObjectFactory {
 
     if (objectClass == AIP.class || objectClass == IndexedAIP.class || objectClass == DIP.class
       || objectClass == Format.class || objectClass == Job.class || objectClass == Notification.class
-      || objectClass == Risk.class || objectClass == RiskIncidence.class || objectClass == RODAMember.class
-      || objectClass == LogEntry.class) {
+      || objectClass == Risk.class || objectClass == RiskIncidence.class || objectClass == User.class
+      || objectClass == Group.class || objectClass == LogEntry.class) {
       ret = create(objectClass, 1, ids);
     } else if (objectClass == DescriptiveMetadata.class) {
       if (ids.size() == 2 || ids.size() == 3) {
@@ -288,44 +297,47 @@ public final class LiteRODAObjectFactory {
       String[] split = liteRODAObject.getInfo().split(SEPARATOR_REGEX);
       if (split.length >= 2) {
         String clazz = split[0];
+        String firstId = decodeId(split[1]);
         if (AIP.class.getName().equals(clazz) || IndexedAIP.class.getName().equals(clazz)) {
-          ret = (T) model.retrieveAIP(split[1]);
+          ret = (T) model.retrieveAIP(firstId);
         } else if (DescriptiveMetadata.class.getName().equals(clazz)) {
           ret = getDescriptiveMetadata(model, split);
         } else if (DIP.class.getName().equals(clazz) || IndexedDIP.class.getName().equals(clazz)) {
-          ret = (T) model.retrieveDIP(split[1]);
+          ret = (T) model.retrieveDIP(firstId);
         } else if (DIPFile.class.getName().equals(clazz)) {
           ret = getDIPFile(model, split);
         } else if (File.class.getName().equals(clazz) || IndexedFile.class.getName().equals(clazz)) {
           ret = getFile(model, split);
         } else if (Format.class.getName().equals(clazz)) {
-          ret = (T) model.retrieveFormat(split[1]);
+          ret = (T) model.retrieveFormat(firstId);
         } else if (Job.class.getName().equals(clazz)) {
-          ret = (T) model.retrieveJob(split[1]);
+          ret = (T) model.retrieveJob(firstId);
         } else if (LogEntry.class.getName().equals(clazz)) {
           // XXX 20161229 nvieira It is too complex to use model/storage and
           // using index creates a circular dependency
         } else if (Notification.class.getName().equals(clazz)) {
-          ret = (T) model.retrieveNotification(split[1]);
+          ret = (T) model.retrieveNotification(firstId);
         } else if (PreservationMetadata.class.getName().equals(clazz)) {
           ret = getPreservationMetadata(model, split);
         } else if (Report.class.getName().equals(clazz) || IndexedReport.class.getName().equals(clazz)) {
           if (split.length == 3) {
-            ret = (T) model.retrieveJobReport(split[1], split[2], false);
+            ret = (T) model.retrieveJobReport(firstId, decodeId(split[2]), false);
           }
         } else if (Risk.class.getName().equals(clazz) || IndexedRisk.class.getName().equals(clazz)) {
-          ret = (T) model.retrieveRisk(split[1]);
+          ret = (T) model.retrieveRisk(firstId);
         } else if (RiskIncidence.class.getName().equals(clazz)) {
-          ret = (T) model.retrieveRiskIncidence(split[1]);
+          ret = (T) model.retrieveRiskIncidence(firstId);
         } else if (Representation.class.getName().equals(clazz)
           || IndexedRepresentation.class.getName().equals(clazz)) {
           if (split.length == 3) {
-            ret = (T) model.retrieveRepresentation(split[1], split[2]);
+            ret = (T) model.retrieveRepresentation(firstId, decodeId(split[2]));
           }
         } else if (TransferredResource.class.getName().equals(clazz)) {
-          ret = (T) model.retrieveTransferredResource(split[1]);
-        } else if (RODAMember.class.getName().equals(clazz)) {
-          ret = (T) model.retrieveRODAMember(split[1]);
+          ret = (T) model.retrieveTransferredResource(firstId);
+        } else if (User.class.getName().equals(clazz)) {
+          ret = (T) model.retrieveUser(firstId);
+        } else if (Group.class.getName().equals(clazz)) {
+          ret = (T) model.retrieveGroup(firstId);
         }
       }
 
@@ -341,9 +353,9 @@ public final class LiteRODAObjectFactory {
     T ret = null;
 
     if (split.length == 3) {
-      ret = (T) model.retrieveDescriptiveMetadata(split[1], split[2]);
+      ret = (T) model.retrieveDescriptiveMetadata(decodeId(split[1]), decodeId(split[2]));
     } else if (split.length == 4) {
-      ret = (T) model.retrieveDescriptiveMetadata(split[1], split[2], split[3]);
+      ret = (T) model.retrieveDescriptiveMetadata(decodeId(split[1]), decodeId(split[2]), decodeId(split[3]));
     }
 
     return ret;
@@ -353,25 +365,25 @@ public final class LiteRODAObjectFactory {
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     T ret = null;
     int size = split.length;
-    PreservationMetadataType type = IdUtils.getPreservationTypeFromId(split[size - 1]);
+    PreservationMetadataType type = IdUtils.getPreservationTypeFromId(decodeId(split[size - 1]));
 
     if (split.length == 2) {
       ret = (T) model.retrievePreservationMetadata(null, null, null, null, type);
     } else if (split.length == 3) {
-      ret = (T) model.retrievePreservationMetadata(split[1], null, null, null, type);
+      ret = (T) model.retrievePreservationMetadata(decodeId(split[1]), null, null, null, type);
     } else if (split.length == 4) {
-      ret = (T) model.retrievePreservationMetadata(split[1], split[2], null, null, type);
+      ret = (T) model.retrievePreservationMetadata(decodeId(split[1]), decodeId(split[2]), null, null, type);
     } else if (split.length > 4) {
       List<String> directoryPath = new ArrayList<>();
       String fileId = null;
       for (int i = 2; i < split.length - 1; i++) {
         if (i + 1 == split.length) {
-          fileId = split[i];
+          fileId = decodeId(split[i]);
         } else {
-          directoryPath.add(split[i]);
+          directoryPath.add(decodeId(split[i]));
         }
       }
-      ret = (T) model.retrievePreservationMetadata(split[1], split[2], directoryPath, fileId, type);
+      ret = (T) model.retrievePreservationMetadata(decodeId(split[1]), decodeId(split[2]), directoryPath, fileId, type);
     }
 
     return ret;
@@ -386,12 +398,12 @@ public final class LiteRODAObjectFactory {
       String fileId = null;
       for (int i = 2; i < split.length; i++) {
         if (i + 1 == split.length) {
-          fileId = split[i];
+          fileId = decodeId(split[i]);
         } else {
-          directoryPath.add(split[i]);
+          directoryPath.add(decodeId(split[i]));
         }
       }
-      ret = (T) model.retrieveDIPFile(split[1], directoryPath, fileId);
+      ret = (T) model.retrieveDIPFile(decodeId(split[1]), directoryPath, fileId);
     }
 
     return ret;
@@ -406,12 +418,12 @@ public final class LiteRODAObjectFactory {
       String fileId = null;
       for (int i = 3; i < split.length; i++) {
         if (i + 1 == split.length) {
-          fileId = split[i];
+          fileId = decodeId(split[i]);
         } else {
-          directoryPath.add(split[i]);
+          directoryPath.add(decodeId(split[i]));
         }
       }
-      ret = (T) model.retrieveFile(split[1], split[2], directoryPath, fileId);
+      ret = (T) model.retrieveFile(decodeId(split[1]), decodeId(split[2]), directoryPath, fileId);
     }
 
     return ret;
@@ -425,12 +437,33 @@ public final class LiteRODAObjectFactory {
       StringBuilder sb = new StringBuilder();
       sb.append(objectClass.getName());
       for (String id : ids) {
-        sb.append(SEPARATOR).append(id);
+        sb.append(SEPARATOR);
+        try {
+          sb.append(encodeId(id));
+        } catch (GenericException e) {
+          // do nothing
+        }
       }
       ret = new LiteRODAObject(sb.toString());
     }
 
     return Optional.ofNullable(ret);
+  }
+
+  private static String encodeId(String id) throws GenericException {
+    if (id != null) {
+      return id.replaceAll(SEPARATOR_REGEX, SEPARATOR_URL_ENCODED);
+    } else {
+      throw new GenericException("Was trying to encode an 'id' but it is NULL");
+    }
+  }
+
+  private static String decodeId(String id) throws GenericException {
+    if (id != null) {
+      return id.replaceAll(SEPARATOR_URL_ENCODED, SEPARATOR);
+    } else {
+      throw new GenericException("Was trying to decode an 'id' but it is NULL");
+    }
   }
 
   public static <T extends IsRODAObject> List<LiteRODAObject> transformIntoLite(ModelService model,
