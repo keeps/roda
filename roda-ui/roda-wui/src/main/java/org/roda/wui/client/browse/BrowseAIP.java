@@ -297,7 +297,6 @@ public class BrowseAIP extends Composite {
     boolean selectable = true;
 
     // REPRESENTATIONS
-
     representationsList = new RepresentationList(Filter.NULL, justActive, Facets.NONE, messages.listOfRepresentations(),
       true);
     representationsList.getSelectionModel().addSelectionChangeHandler(new Handler() {

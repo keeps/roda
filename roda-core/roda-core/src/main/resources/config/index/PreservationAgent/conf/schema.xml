@@ -29,7 +29,7 @@
  http://wiki.apache.org/solr/SchemaXml
 -->
 
-<schema name="schema-version-1" version="1.5">
+<schema name="schema-version-2" version="1.5">
   <!-- attribute "name" is the name of this schema and is only used for display purposes.
        version="x.y" is Solr's version number for the schema syntax and 
        semantics.  It should not normally be changed by applications.
@@ -111,6 +111,13 @@
    <field name="extension" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="note" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="version" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
+   
+   <field name="search" type="text_general" indexed="true" stored="false" multiValued="true" />
+   
+   <copyField source="*" dest="search" />
+   <copyField source="name" dest="name_txt" />
+   <copyField source="type" dest="type_txt" />
+   <copyField source="version" dest="version_txt" />
     
    <!-- Dynamic field definitions allow using convention over configuration
        for fields via the specification of patterns to match field names. 

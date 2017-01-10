@@ -932,6 +932,7 @@ public final class RodaConstants {
   public static final String PRESERVATION_EVENT_LINKING_AGENT_IDENTIFIER = "linkingAgentIdentifier";
   public static final String PRESERVATION_EVENT_LINKING_OUTCOME_OBJECT_IDENTIFIER = "linkingOutcomeObjectIdentifier";
   public static final String PRESERVATION_EVENT_LINKING_SOURCE_OBJECT_IDENTIFIER = "linkingSourceObjectIdentifier";
+  public static final String PRESERVATION_EVENT_SEARCH = "search";
 
   /* Preservation agents fields */
   public static final String PRESERVATION_AGENT_ID = "id";
@@ -941,6 +942,7 @@ public final class RodaConstants {
   public static final String PRESERVATION_AGENT_VERSION = "version";
   public static final String PRESERVATION_AGENT_NOTE = "note";
   public static final String PRESERVATION_AGENT_ROLES = "roles";
+  public static final String PRESERVATION_AGENT_SEARCH = "search";
 
   public static final String PRESERVATION_TYPE_AGENT = "agent";
   public static final String PRESERVATION_TYPE_FILE = "file";

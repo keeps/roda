@@ -173,6 +173,7 @@ public class ShowPreservationEvent extends Composite {
   private String aipId;
   private String representationUUID;
   private String fileUUID;
+  private String eventId;
 
   private PreservationEventViewBundle bundle;
 
@@ -201,6 +202,7 @@ public class ShowPreservationEvent extends Composite {
     this.aipId = aipId;
     this.representationUUID = representationUUID;
     this.fileUUID = fileUUID;
+    this.eventId = eventId;
 
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -311,6 +313,31 @@ public class ShowPreservationEvent extends Composite {
 
   }
 
+  private void addObjectPanel(LinkingIdentifier object, PreservationEventViewBundle bundle, FlowPanel objectsPanel) {
+
+    FlowPanel layout = new FlowPanel();
+    layout.addStyleName("panel");
+
+    if (object.getType().equalsIgnoreCase("URN")) {
+      String idValue = object.getValue();
+      RODA_TYPE type = LinkingObjectUtils.getLinkingIdentifierType(idValue);
+
+      if (type == RODA_TYPE.TRANSFERRED_RESOURCE) {
+        addTransferredResourcePanel(bundle, layout, idValue);
+      } else if (type == RODA_TYPE.FILE) {
+        addFilePanel(bundle, layout, idValue);
+      } else if (type == RODA_TYPE.REPRESENTATION) {
+        addRepresentationPanel(bundle, layout, idValue);
+      } else if (type == RODA_TYPE.AIP) {
+        addAipPanel(bundle, layout, idValue);
+      } else {
+        // TODO send warning
+      }
+
+      objectsPanel.add(layout);
+    }
+  }
+
   private FlowPanel createAgentPanel(LinkingIdentifier agentId, IndexedPreservationAgent agent) {
     FlowPanel layout = new FlowPanel();
     layout.addStyleName("panel");
@@ -391,37 +418,12 @@ public class ShowPreservationEvent extends Composite {
     footer.addStyleName("panel-footer");
     layout.add(footer);
 
-    Anchor link = new Anchor(messages.inspectFile(),
-      HistoryUtils.createHistoryHashLink(ShowPreservationAgent.RESOLVER, agent.getId()));
+    Anchor link = new Anchor(messages.inspectPreservationAgent(),
+      HistoryUtils.createHistoryHashLink(ShowPreservationAgent.RESOLVER, agent.getId(), eventId));
 
     link.addStyleName("btn");
     footer.add(link);
     return layout;
-  }
-
-  private void addObjectPanel(LinkingIdentifier object, PreservationEventViewBundle bundle, FlowPanel objectsPanel) {
-
-    FlowPanel layout = new FlowPanel();
-    layout.addStyleName("panel");
-
-    if (object.getType().equalsIgnoreCase("URN")) {
-      String idValue = object.getValue();
-      RODA_TYPE type = LinkingObjectUtils.getLinkingIdentifierType(idValue);
-
-      if (type == RODA_TYPE.TRANSFERRED_RESOURCE) {
-        addTransferredResourcePanel(bundle, layout, idValue);
-      } else if (type == RODA_TYPE.FILE) {
-        addFilePanel(bundle, layout, idValue);
-      } else if (type == RODA_TYPE.REPRESENTATION) {
-        addRepresentationPanel(bundle, layout, idValue);
-      } else if (type == RODA_TYPE.AIP) {
-        addAipPanel(bundle, layout, idValue);
-      } else {
-        // TODO send warning
-      }
-
-      objectsPanel.add(layout);
-    }
   }
 
   private void addAipPanel(PreservationEventViewBundle bundle, FlowPanel layout, String idValue) {

@@ -27,6 +27,7 @@ import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.PreservationEventList;
+import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.main.BreadcrumbPanel;
@@ -157,6 +158,9 @@ public class PreservationEvents extends Composite {
   Label itemTitle;
 
   @UiField(provided = true)
+  SearchPanel eventSearch;
+
+  @UiField(provided = true)
   PreservationEventList eventList;
 
   @UiField
@@ -217,10 +221,6 @@ public class PreservationEvents extends Composite {
     facetPanels.put(RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS, facetClasses);
     FacetUtils.bindFacets(eventList, facetPanels);
 
-    initWidget(uiBinder.createAndBindUi(this));
-
-    actionsPanel.setVisible(aipId != null);
-
     eventList.getSelectionModel().addSelectionChangeHandler(new Handler() {
 
       @Override
@@ -240,6 +240,14 @@ public class PreservationEvents extends Composite {
         }
       }
     });
+
+    eventSearch = new SearchPanel(Filter.NULL, RodaConstants.PRESERVATION_EVENT_SEARCH, messages.searchPlaceHolder(),
+      false, false, true);
+    eventSearch.setDefaultFilterIncremental(true);
+    eventSearch.setList(eventList);
+
+    initWidget(uiBinder.createAndBindUi(this));
+    actionsPanel.setVisible(aipId != null);
 
     // create breadcrumbs
     if (fileUUID != null) {

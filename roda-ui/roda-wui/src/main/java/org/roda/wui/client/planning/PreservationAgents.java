@@ -21,6 +21,7 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.PreservationAgentList;
+import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
@@ -54,7 +55,7 @@ public class PreservationAgents extends Composite {
       if (historyTokens.size() == 0) {
         PreservationAgents preservationAgents = new PreservationAgents();
         callback.onSuccess(preservationAgents);
-      } else if (historyTokens.size() == 2
+      } else if (historyTokens.size() >= 1
         && historyTokens.get(0).equals(ShowPreservationAgent.RESOLVER.getHistoryToken())) {
         ShowPreservationAgent.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else {
@@ -90,6 +91,9 @@ public class PreservationAgents extends Composite {
   Label itemTitle;
 
   @UiField(provided = true)
+  SearchPanel agentSearch;
+
+  @UiField(provided = true)
   PreservationAgentList agentList;
 
   @UiField(provided = true)
@@ -104,17 +108,22 @@ public class PreservationAgents extends Composite {
     facetPanels.put(RodaConstants.PRESERVATION_AGENT_TYPE, facetClasses);
     FacetUtils.bindFacets(agentList, facetPanels);
 
-    initWidget(uiBinder.createAndBindUi(this));
-
     agentList.getSelectionModel().addSelectionChangeHandler(new Handler() {
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
         IndexedPreservationAgent selected = agentList.getSelectionModel().getSelectedObject();
         if (selected != null) {
-          HistoryUtils.newHistory(RESOLVER, ShowPreservationAgent.RESOLVER.getHistoryToken(), selected.getId());
+          HistoryUtils.newHistory(ShowPreservationAgent.RESOLVER, selected.getId());
         }
       }
     });
+
+    agentSearch = new SearchPanel(Filter.NULL, RodaConstants.PRESERVATION_AGENT_SEARCH, messages.searchPlaceHolder(),
+      false, false, true);
+    agentSearch.setDefaultFilterIncremental(true);
+    agentSearch.setList(agentList);
+
+    initWidget(uiBinder.createAndBindUi(this));
   }
 
   @Override

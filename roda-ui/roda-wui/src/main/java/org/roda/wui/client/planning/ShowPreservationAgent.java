@@ -15,6 +15,7 @@ import java.util.List;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.browse.ShowPreservationEvent;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -49,9 +50,15 @@ public class ShowPreservationAgent extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
+      GWT.log(historyTokens.toString());
       if (historyTokens.size() == 1) {
         final String agentId = historyTokens.get(0);
         ShowPreservationAgent preservationAgents = new ShowPreservationAgent(agentId);
+        callback.onSuccess(preservationAgents);
+      } else if (historyTokens.size() == 2) {
+        final String eventId = historyTokens.get(0);
+        final String agentId = historyTokens.get(1);
+        ShowPreservationAgent preservationAgents = new ShowPreservationAgent(eventId, agentId);
         callback.onSuccess(preservationAgents);
       } else {
         HistoryUtils.newHistory(PreservationAgents.RESOLVER);
@@ -99,6 +106,7 @@ public class ShowPreservationAgent extends Composite {
   Button backButton;
 
   private IndexedPreservationAgent agent = null;
+  private String eventId = null;
 
   public ShowPreservationAgent(final String agentId) {
     initWidget(uiBinder.createAndBindUi(this));
@@ -124,6 +132,11 @@ public class ShowPreservationAgent extends Composite {
       });
   }
 
+  public ShowPreservationAgent(final String eventId, final String agentId) {
+    this(agentId);
+    this.eventId = eventId;
+  }
+
   @Override
   protected void onLoad() {
     super.onLoad();
@@ -147,6 +160,10 @@ public class ShowPreservationAgent extends Composite {
 
   @UiHandler("backButton")
   void buttonBackHandler(ClickEvent e) {
-    HistoryUtils.newHistory(PreservationAgents.RESOLVER);
+    if (StringUtils.isNotBlank(eventId)) {
+      HistoryUtils.newHistory(ShowPreservationEvent.RESOLVER, eventId);
+    } else {
+      HistoryUtils.newHistory(PreservationAgents.RESOLVER);
+    }
   }
 }

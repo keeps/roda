@@ -7,14 +7,11 @@
  */
 package org.roda.core.plugins.plugins.characterization;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -29,7 +26,6 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
@@ -63,7 +59,6 @@ import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StringContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.verapdf.core.VeraPDFException;
 
 public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
   private static final Logger LOGGER = LoggerFactory.getLogger(VeraPDFPlugin.class);
@@ -254,7 +249,8 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
             reportState = PluginState.FAILURE;
           }
 
-        } catch (RODAException | IOException | VeraPDFException | JAXBException | RuntimeException e) {
+        } catch (GenericException | RuntimeException | NotFoundException | RequestNotValidException
+          | AuthorizationDeniedException e) {
           LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage(), e);
           pluginResultState = PluginState.FAILURE;
           reportState = PluginState.FAILURE;
@@ -366,7 +362,7 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
             reportState = PluginState.FAILURE;
           }
 
-        } catch (RODAException | IOException | VeraPDFException | JAXBException | RuntimeException e) {
+        } catch (GenericException | RuntimeException e) {
           LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage(), e);
           pluginResultState = PluginState.FAILURE;
           reportState = PluginState.FAILURE;
@@ -469,7 +465,7 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
         jobPluginInfo.incrementObjectsProcessed(reportState);
 
       } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
-        | IOException | IllegalArgumentException | JAXBException | VeraPDFException e) {
+        | IllegalArgumentException e) {
         jobPluginInfo.incrementObjectsProcessedWithFailure();
         LOGGER.error("Could not run VeraPDF successfully");
         reportState = PluginState.FAILURE;

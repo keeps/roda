@@ -270,6 +270,8 @@ public interface ClientMessages extends Messages {
 
   String inspectFile();
 
+  String inspectPreservationAgent();
+
   String allPlugins();
 
   String allIntellectualEntities();

@@ -29,7 +29,7 @@
  http://wiki.apache.org/solr/SchemaXml
 -->
 
-<schema name="schema-version-3" version="1.5">
+<schema name="schema-version-4" version="1.5">
   <!--
     2 - removed field 'state' default value (it was leftovers from previous field definition);
   -->
@@ -127,6 +127,13 @@
    <field name="state" type="string" indexed="true" stored="true" required="true" multiValued="false" />
    <dynamicField name="permission_users_*" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    <dynamicField name="permission_groups_*" type="string" indexed="true" stored="true" required="false" multiValued="true" />
+   
+   <field name="search" type="text_general" indexed="true" stored="false" multiValued="true" />
+   
+   <copyField source="*" dest="search" />
+   <copyField source="eventDateTime" dest="eventDateTime_txt" />
+   <copyField source="eventDetail" dest="eventDetail_txt" />
+   <copyField source="eventType" dest="eventType_txt" />
    
    
    <!-- Dynamic field definitions allow using convention over configuration
