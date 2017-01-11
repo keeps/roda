@@ -40,6 +40,7 @@ import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
 
@@ -304,6 +305,14 @@ public class HtmlSnippetUtils {
       html = entry.getActionComponent();
     }
     return SafeHtmlUtils.fromSafeConstant(html);
+  }
+
+  public static final void setCssClassDisabled(Widget widget, boolean disabled) {
+    if (disabled) {
+      widget.addStyleName("disabled");
+    } else {
+      widget.removeStyleName("disabled");
+    }
   }
 
 }

@@ -375,6 +375,10 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
   protected abstract Sorter getSorter(ColumnSortList columnSortList);
 
+  public Sorter getSorter() {
+    return dataProvider.getSorter();
+  }
+
   protected int getPageSizePagerIncrement() {
     return pageSizeIncrement;
   }
@@ -641,6 +645,12 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     selected.clear();
     redraw();
     fireOnCheckboxSelectionChanged();
+  }
+
+  public int getIndexOfVisibleObject(T object) {
+    int visibleIndex = getVisibleItems().indexOf(object);
+    int visibleStartIndex = display.getVisibleRange().getStart();
+    return visibleStartIndex + visibleIndex;
   }
 
   // LISTENER

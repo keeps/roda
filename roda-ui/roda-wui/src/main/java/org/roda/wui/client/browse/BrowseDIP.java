@@ -31,7 +31,10 @@ import org.roda.wui.client.browse.bundle.DipBundle;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.DIPFileList;
+import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.common.utils.HtmlSnippetUtils;
+import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
@@ -42,13 +45,22 @@ import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
+import com.github.nmorel.gwtjackson.client.exception.JsonDeserializationException;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
+import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.Event.NativePreviewEvent;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
@@ -59,7 +71,6 @@ import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
 import config.i18n.client.ClientMessages;
-import javassist.bytecode.stackmap.BasicBlock.Catch;
 
 /**
  * @author Luis Faria
@@ -73,6 +84,10 @@ public class BrowseDIP extends Composite {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
+
+  public static final int DEFAULT_DIPFILE_INDEX = 0;
+
+  public static final Sorter DEFAULT_DIPFILE_SORTER = new Sorter(new SortParameter(RodaConstants.DIPFILE_ID, false));
 
   // system
   private final Viewers viewers;
@@ -93,6 +108,9 @@ public class BrowseDIP extends Composite {
   // interface
 
   @UiField
+  FocusPanel keyboardFocus;
+
+  @UiField
   BreadcrumbPanel breadcrumb;
 
   @UiField
@@ -102,6 +120,7 @@ public class BrowseDIP extends Composite {
   FocusPanel previousButton, nextButton, downloadButton;
 
   // state
+  Sorter sorter;
   int index;
   int totalCount = -1;
 
@@ -119,7 +138,7 @@ public class BrowseDIP extends Composite {
    * @param file
    * 
    */
-  public BrowseDIP(Viewers viewers, DipBundle bundle, int index) {
+  public BrowseDIP(Viewers viewers, DipBundle bundle, Sorter sorter, int index) {
     this.viewers = viewers;
     this.bundle = bundle;
 
@@ -128,6 +147,11 @@ public class BrowseDIP extends Composite {
     this.file = bundle.getFile();
 
     this.dip = bundle.getDip();
+
+    this.dipFile = bundle.getDipFile();
+    this.dipFileAncestors = bundle.getDipFileAncestors();
+
+    this.sorter = sorter;
     this.index = index;
 
     initWidget(uiBinder.createAndBindUi(this));
@@ -135,37 +159,68 @@ public class BrowseDIP extends Composite {
     // TODO set title for previous and next button
     downloadButton.setTitle(messages.viewRepresentationDownloadFileButton());
 
-    previousButton.setVisible(false);
-    nextButton.setVisible(false);
+    HtmlSnippetUtils.setCssClassDisabled(previousButton, true);
+    HtmlSnippetUtils.setCssClassDisabled(nextButton, true);
+    downloadButton.setVisible(false);
 
-    if (bundle.getDipFile() != null) {
-      showFromBundle(bundle.getDipFile(), bundle.getDipFileAncestors());
-    } else {
-      update();
-    }
+    show();
+
+    keyboardFocus.setFocus(true);
+    keyboardFocus.addKeyDownHandler(new KeyDownHandler() {
+
+      @Override
+      public void onKeyDown(KeyDownEvent event) {
+        if (dipFile != null && !dipFile.isDirectory()) {
+          NativeEvent ne = event.getNativeEvent();
+          if (ne.getKeyCode() == KeyCodes.KEY_RIGHT) {
+            ne.preventDefault();
+            next();
+          } else if (ne.getKeyCode() == KeyCodes.KEY_LEFT) {
+            ne.preventDefault();
+            previous();
+          }
+        }
+      }
+    });
+
+  }
+
+  @Override
+  protected void onLoad() {
+    super.onLoad();
+    JavascriptUtils.scrollToHeader();
   }
 
   private void update() {
     center.clear();
     if (dipFile != null) {
-      center.add(new DipFilePreview(viewers, dipFile));
+      center.add(new DipFilePreview(viewers, dipFile, aip, representation, file));
     } else {
       final Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIPFILE_DIP_ID, dip.getId()),
         new EmptyKeyFilterParameter(RodaConstants.DIPFILE_PARENT_UUID));
       // TODO summary
-      final DIPFileList list = new DIPFileList(filter, Facets.NONE, "", false);
+      final SearchPanel dipFileSearch = new SearchPanel(filter, RodaConstants.DIPFILE_SEARCH,
+        messages.searchPlaceHolder(), false, false, true);
 
-      list.getSelectionModel().addSelectionChangeHandler(new Handler() {
+      final DIPFileList dipFileList = new DIPFileList(filter, Facets.NONE, "", false);
+      dipFileSearch.setList(dipFileList);
+      dipFileSearch.setDefaultFilter(filter);
+      dipFileSearch.setDefaultFilterIncremental(true);
+      dipFileList.getSelectionModel().addSelectionChangeHandler(new Handler() {
 
         @Override
         public void onSelectionChange(SelectionChangeEvent event) {
-          DIPFile selectedDipFile = list.getSelectionModel().getSelectedObject();
+          DIPFile selectedDipFile = dipFileList.getSelectionModel().getSelectedObject();
+          int selectedDipFileIndex = dipFileList.getIndexOfVisibleObject(selectedDipFile);
           if (selectedDipFile != null) {
-            HistoryUtils.openBrowse(selectedDipFile, 0);
+            // TODO infer referer object
+            HistoryUtils.openBrowse(selectedDipFile, dipFileList.getSorter(), selectedDipFileIndex, aip, representation,
+              file);
           }
         }
       });
-      center.add(list);
+      center.add(dipFileSearch);
+      center.add(dipFileList);
     }
 
     // update breadcrumb
@@ -173,48 +228,50 @@ public class BrowseDIP extends Composite {
     breadcrumb.setVisible(true);
   }
 
-  private void showFromBundle(DIPFile selected, List<DIPFile> selectedAncestors) {
-    this.dipFile = selected;
-    this.dipFileAncestors = selectedAncestors;
+  private void show() {
+    if (dipFile != null) {
 
-    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIPFILE_DIP_ID, dip.getId()));
+      Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIPFILE_DIP_ID, dip.getId()));
 
-    if (dipFile.getAncestorsPath().isEmpty()) {
-      filter.add(new EmptyKeyFilterParameter(RodaConstants.DIPFILE_PARENT_UUID));
+      if (dipFile.getAncestorsPath().isEmpty()) {
+        filter.add(new EmptyKeyFilterParameter(RodaConstants.DIPFILE_PARENT_UUID));
+      } else {
+        String parentId = dipFile.getAncestorsPath().get(dipFile.getAncestorsPath().size() - 1);
+        filter.add(new SimpleFilterParameter(RodaConstants.DIPFILE_PARENT_UUID, parentId));
+      }
+
+      BrowserService.Util.getInstance().count(DIPFile.class.getName(), filter, new AsyncCallback<Long>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
+        }
+
+        @Override
+        public void onSuccess(Long count) {
+          totalCount = count.intValue();
+          update();
+          updateVisibles();
+        }
+      });
     } else {
-      String parentId = dipFile.getAncestorsPath().get(dipFile.getAncestorsPath().size() - 1);
-      filter.add(new SimpleFilterParameter(RodaConstants.DIPFILE_PARENT_UUID, parentId));
+      totalCount = 0;
+      update();
+      updateVisibles();
     }
-
-    BrowserService.Util.getInstance().count(DIPFile.class.getName(), filter, new AsyncCallback<Long>() {
-
-      @Override
-      public void onFailure(Throwable caught) {
-        AsyncCallbackUtils.defaultFailureTreatment(caught);
-      }
-
-      @Override
-      public void onSuccess(Long count) {
-        totalCount = count.intValue();
-        update();
-        updateVisibles();
-      }
-    });
 
   }
 
-  public void show() {
+  public void open(String parentDipDileUUID, final Sorter sorter, final int openIndex) {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIPFILE_DIP_ID, dip.getId()));
 
-    if (dipFile == null || dipFile.getAncestorsPath().isEmpty()) {
+    if (parentDipDileUUID == null) {
       filter.add(new EmptyKeyFilterParameter(RodaConstants.DIPFILE_PARENT_UUID));
     } else {
-      String parentId = dipFile.getAncestorsPath().get(dipFile.getAncestorsPath().size() - 1);
-      filter.add(new SimpleFilterParameter(RodaConstants.DIPFILE_PARENT_UUID, parentId));
+      filter.add(new SimpleFilterParameter(RodaConstants.DIPFILE_PARENT_UUID, parentDipDileUUID));
     }
 
-    Sorter sorter = new Sorter(new SortParameter(RodaConstants.DIPFILE_ID, false));
-    Sublist sublist = new Sublist(index, 1);
+    Sublist sublist = new Sublist(openIndex, 1);
     String localeString = LocaleInfo.getCurrentLocale().getLocaleName();
     boolean justActive = true;
 
@@ -230,17 +287,11 @@ public class BrowseDIP extends Composite {
         public void onSuccess(IndexResult<DIPFile> result) {
           if (!result.getResults().isEmpty()) {
             DIPFile firstDipFile = result.getResults().get(0);
-            dipFile = firstDipFile;
-            totalCount = (int) result.getTotalCount();
-
-            update();
+            HistoryUtils.openBrowse(firstDipFile, sorter, openIndex, aip, representation, file);
           } else {
             Toast.showError("No files in the DIP");
             // TODO better handle this case
           }
-
-          updateVisibles();
-
         }
       });
 
@@ -248,11 +299,11 @@ public class BrowseDIP extends Composite {
 
   protected void updateVisibles() {
     if (index < 0) {
-      previousButton.setVisible(false);
-      nextButton.setVisible(totalCount > 1);
+      HtmlSnippetUtils.setCssClassDisabled(previousButton, true);
+      HtmlSnippetUtils.setCssClassDisabled(nextButton, totalCount < 2);
     } else {
-      previousButton.setVisible(index > 0);
-      nextButton.setVisible(index < totalCount - 1);
+      HtmlSnippetUtils.setCssClassDisabled(previousButton, index == 0);
+      HtmlSnippetUtils.setCssClassDisabled(nextButton, index >= totalCount - 1);
       downloadButton.setVisible(dipFile != null && !dipFile.isDirectory());
     }
   }
@@ -264,16 +315,18 @@ public class BrowseDIP extends Composite {
 
   private void previous() {
     if (index > 0) {
-      index--;
+      String parentUUID = dipFile != null && !dipFile.getAncestorsPath().isEmpty()
+        ? dipFile.getAncestorsPath().get(dipFile.getAncestorsPath().size() - 1) : null;
+      open(parentUUID, sorter, index - 1);
     }
-    show();
   }
 
   private void next() {
     if (index < totalCount - 1) {
-      index++;
+      String parentUUID = dipFile != null && !dipFile.getAncestorsPath().isEmpty()
+        ? dipFile.getAncestorsPath().get(dipFile.getAncestorsPath().size() - 1) : null;
+      open(parentUUID, sorter, index + 1);
     }
-    show();
   }
 
   @UiHandler("nextButton")
@@ -337,17 +390,21 @@ public class BrowseDIP extends Composite {
       if (!historyTokens.isEmpty()) {
         final String historyDipUUID = historyTokens.get(0);
         final String historyDipFileUUID = historyTokens.size() > 1 ? historyTokens.get(1) : null;
-        int historyDipFileIndex = 0;
+        Sorter historyDipFileSorter = DEFAULT_DIPFILE_SORTER;
+        int historyDipFileIndex = DEFAULT_DIPFILE_INDEX;
         try {
-          if (historyTokens.size() > 2) {
-            historyDipFileIndex = Integer.valueOf(historyTokens.get(1));
+          if (historyTokens.size() > 3) {
+            historyDipFileSorter = HistoryUtils.SORTER_MAPPER.read(historyTokens.get(2));
+            historyDipFileIndex = Integer.valueOf(historyTokens.get(3));
           }
 
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException | JsonDeserializationException e) {
           // do nothing
+          GWT.log("Could not parse sorter or index from history", e);
         }
 
-        final int index = historyDipFileIndex;
+        final Sorter loadSorter = historyDipFileSorter;
+        final int loadIndex = historyDipFileIndex;
 
         IsIndexed lastObject = LastSelectedItemsSingleton.getInstance().getLastObject();
 
@@ -356,7 +413,9 @@ public class BrowseDIP extends Composite {
         List<String> filePath = null;
         String fileId = null;
 
-        if (lastObject instanceof IndexedAIP) {
+        if (lastObject == null) {
+          // infer from DIP
+        } else if (lastObject instanceof IndexedAIP) {
           IndexedAIP lastAIP = (IndexedAIP) lastObject;
           aipId = lastAIP.getId();
         } else if (lastObject instanceof IndexedRepresentation) {
@@ -381,7 +440,7 @@ public class BrowseDIP extends Composite {
 
             @Override
             public void onSuccess(DipBundle dipBundle) {
-              callback.onSuccess(new BrowseDIP(viewers, dipBundle, index));
+              callback.onSuccess(new BrowseDIP(viewers, dipBundle, loadSorter, loadIndex));
             }
           });
 

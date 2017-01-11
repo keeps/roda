@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
@@ -46,6 +47,8 @@ import org.roda.wui.client.planning.ShowRiskIncidence;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.widgets.Toast;
 
+import com.github.nmorel.gwtjackson.client.ObjectMapper;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -181,53 +184,61 @@ public class HistoryUtils {
     return history;
   }
 
-  public static List<String> getHistoryBrowseDIPFile(String dipId, String dipFileUUID, int index) {
+  public static interface SorterMapper extends ObjectMapper<Sorter> {
+  }
+
+  public static SorterMapper SORTER_MAPPER = GWT.create(SorterMapper.class);
+
+  public static List<String> getHistoryBrowseDIPFile(String dipId, String dipFileUUID, Sorter sorter, int index) {
     List<String> history = new ArrayList<>();
     history.addAll(BrowseAIP.RESOLVER.getHistoryPath());
     history.add(BrowseDIP.RESOLVER.getHistoryToken());
     history.add(dipId);
     history.add(dipFileUUID);
+
+    history.add(SORTER_MAPPER.write(sorter));
     history.add(Integer.toString(index));
     return history;
   }
 
-  public static List<String> getHistoryBrowse(DIPFile dipFile, int index) {
-    return getHistoryBrowseDIPFile(dipFile.getDipId(), dipFile.getUUID(), index);
+  public static List<String> getHistoryBrowse(DIPFile dipFile, Sorter sorter, int index) {
+    return getHistoryBrowseDIPFile(dipFile.getDipId(), dipFile.getUUID(), sorter, index);
   }
 
   public static void openBrowse(IndexedDIP dip) {
     HistoryUtils.newHistory(getHistoryBrowseDIP(dip.getId()));
   }
 
-  public static void openBrowse(DIPFile dipFile, int index) {
-    HistoryUtils.newHistory(getHistoryBrowseDIPFile(dipFile.getDipId(), dipFile.getUUID(), index));
+  public static void openBrowse(DIPFile dipFile, Sorter sorter, int index) {
+    HistoryUtils.newHistory(getHistoryBrowseDIPFile(dipFile.getDipId(), dipFile.getUUID(), sorter, index));
   }
 
-  public static void openBrowse(DIPFile dipFile, int index, IndexedAIP refererAIP) {
+  public static void openBrowse(DIPFile dipFile, Sorter sorter, int index, IndexedAIP refererAIP) {
     LastSelectedItemsSingleton.getInstance().setLastObject(refererAIP);
-    openBrowse(dipFile, index);
+    openBrowse(dipFile, sorter, index);
   }
 
-  public static void openBrowse(DIPFile dipFile, int index, IndexedRepresentation refererRepresentation) {
+  public static void openBrowse(DIPFile dipFile, Sorter sorter, int index,
+    IndexedRepresentation refererRepresentation) {
     LastSelectedItemsSingleton.getInstance().setLastObject(refererRepresentation);
-    openBrowse(dipFile, index);
+    openBrowse(dipFile, sorter, index);
   }
 
-  public static void openBrowse(DIPFile dipFile, int index, IndexedFile refererFile) {
+  public static void openBrowse(DIPFile dipFile, Sorter sorter, int index, IndexedFile refererFile) {
     LastSelectedItemsSingleton.getInstance().setLastObject(refererFile);
-    openBrowse(dipFile, index);
+    openBrowse(dipFile, sorter, index);
   }
 
-  public static void openBrowse(DIPFile dipFile, int index, IndexedAIP refererAIP,
+  public static void openBrowse(DIPFile dipFile, Sorter sorter, int index, IndexedAIP refererAIP,
     IndexedRepresentation refererRepresentation, IndexedFile refererFile) {
     if (refererFile != null) {
-      openBrowse(dipFile, index, refererFile);
+      openBrowse(dipFile, sorter, index, refererFile);
     } else if (refererRepresentation != null) {
-      openBrowse(dipFile, index, refererRepresentation);
+      openBrowse(dipFile, sorter, index, refererRepresentation);
     } else if (refererAIP != null) {
-      openBrowse(dipFile, index, refererAIP);
+      openBrowse(dipFile, sorter, index, refererAIP);
     } else {
-      openBrowse(dipFile, index);
+      openBrowse(dipFile, sorter, index);
     }
   }
 
@@ -394,7 +405,8 @@ public class HistoryUtils {
       path = HistoryUtils.getHistoryBrowseDIP(dip.getId());
     } else if (object instanceof DIPFile) {
       DIPFile dipFile = (DIPFile) object;
-      path = HistoryUtils.getHistoryBrowseDIPFile(dipFile.getDipId(), dipFile.getUUID(), 0);
+      path = HistoryUtils.getHistoryBrowseDIPFile(dipFile.getDipId(), dipFile.getUUID(),
+        BrowseDIP.DEFAULT_DIPFILE_SORTER, BrowseDIP.DEFAULT_DIPFILE_INDEX);
     } else if (object instanceof TransferredResource) {
       TransferredResource resource = (TransferredResource) object;
       path = HistoryUtils.getHistory(IngestTransfer.RESOLVER.getHistoryPath(), resource.getUUID());

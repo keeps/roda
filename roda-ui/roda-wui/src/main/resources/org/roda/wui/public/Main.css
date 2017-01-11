@@ -867,6 +867,11 @@ pre code {
     
 }
 
+.toolbarLink.disabled, .toolbarLink.disabled:hover {
+	background-color: #ddd;
+	cursor: auto;
+}
+
 .nowrap {
     white-space: nowrap;
 }
@@ -3818,8 +3823,9 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .viewRepresentationFile-center {
-	width: 100%;
-	position: relative;
+    width: 96%;
+    position: relative;
+    margin: 2%;
 }
 
 .viewRepresentationFilePreview {

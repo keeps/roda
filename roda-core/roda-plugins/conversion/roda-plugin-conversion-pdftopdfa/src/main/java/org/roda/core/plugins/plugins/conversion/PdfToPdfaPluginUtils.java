@@ -19,7 +19,7 @@ import org.verapdf.features.FeatureExtractorConfig;
 import org.verapdf.features.FeatureFactory;
 import org.verapdf.metadata.fixer.FixerFactory;
 import org.verapdf.metadata.fixer.MetadataFixerConfig;
-import org.verapdf.pdfa.PdfBoxFoundryProvider;
+import org.verapdf.pdfa.VeraGreenfieldFoundryProvider;
 import org.verapdf.pdfa.flavours.PDFAFlavour;
 import org.verapdf.pdfa.results.MetadataFixerResult.RepairStatus;
 import org.verapdf.pdfa.validation.validators.ValidatorConfig;
@@ -41,7 +41,7 @@ public class PdfToPdfaPluginUtils {
       }
 
       // metadata fixer transformation
-      PdfBoxFoundryProvider.initialise();
+      VeraGreenfieldFoundryProvider.initialise();
       ValidatorConfig validatorConfig = ValidatorFactory.createConfig(PDFAFlavour.PDFA_1_B, true, 10);
       FeatureExtractorConfig featureConfig = FeatureFactory.defaultConfig();
       MetadataFixerConfig fixerConfig = FixerFactory.defaultConfig();

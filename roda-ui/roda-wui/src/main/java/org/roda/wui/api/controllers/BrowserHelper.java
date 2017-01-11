@@ -91,6 +91,7 @@ import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.FileLink;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -98,6 +99,7 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.RepresentationLink;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
@@ -462,6 +464,19 @@ public class BrowserHelper {
       bundle.setDipFileAncestors(dipFileAncestors);
     }
 
+    if (aipId == null && representationId == null && fileId == null) {
+      // infer from DIP
+      IndexedDIP dip = bundle.getDip();
+      if (!dip.getFileIds().isEmpty()) {
+        bundle.setFile(BrowserHelper.retrieve(IndexedFile.class, IdUtils.getFileId(dip.getFileIds().get(0))));
+      } else if (!dip.getRepresentationIds().isEmpty()) {
+        bundle.setRepresentation(BrowserHelper.retrieve(IndexedRepresentation.class,
+          IdUtils.getRepresentationId(dip.getRepresentationIds().get(0))));
+      } else if (!dip.getAipIds().isEmpty()) {
+        bundle.setAip(BrowserHelper.retrieve(IndexedAIP.class, dip.getAipIds().get(0).getAipId()));
+      }
+    }
+
     if (aipId != null) {
       bundle.setAip(BrowserHelper.retrieve(IndexedAIP.class, aipId));
     }
@@ -475,6 +490,7 @@ public class BrowserHelper {
       bundle.setFile(
         BrowserHelper.retrieve(IndexedFile.class, IdUtils.getFileId(aipId, representationId, filePath, fileId)));
     }
+
     return bundle;
   }
 
