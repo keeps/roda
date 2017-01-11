@@ -15,89 +15,105 @@
 	}
 	</ui:style>
 
-	<g:FlowPanel styleName="viewRepresentationFile"
-		addStyleNames="wrapper skip_padding">
-		<g:FlowPanel addStyleNames="filePreviewToolbar">
-			<m:BreadcrumbPanel ui:field="breadcrumb"
-				addStyleNames="viewRepresentationBreadcrumb" />
-			<g:FlowPanel addStyleNames="filePreviewToolbarIcons">
-				<g:FocusPanel ui:field="downloadDocumentationButton"
-					addStyleNames="toolbarLink">
-					<g:HTML>
-						<i class="fa fa-book"></i>
-					</g:HTML>
-				</g:FocusPanel>
-				<g:FocusPanel ui:field="downloadSchemasButton"
-					addStyleNames="toolbarLink">
-					<g:HTML>
-						<i class="fa fa-list-alt"></i>
-					</g:HTML>
-				</g:FocusPanel>
-				<g:FocusPanel ui:field="optionsButton"
-					addStyleNames="toolbarLink filePreviewToolbarOptionsIcon">
-					<g:HTML>
-						<i class="fa fa-cog"></i>
-					</g:HTML>
-				</g:FocusPanel>
-				<g:FocusPanel ui:field="disseminationsButton"
-					addStyleNames="toolbarLink filePreviewToolbarInfoIcon">
-					<g:HTML>
-						<i class="fa fa-play-circle-o"></i>
-					</g:HTML>
-				</g:FocusPanel>
-				<g:FocusPanel ui:field="infoFileButton"
-					addStyleNames="toolbarLink filePreviewToolbarInfoIcon">
-					<g:HTML>
-						<i class="fa fa-info-circle"></i>
-					</g:HTML>
-				</g:FocusPanel>
+	<g:FocusPanel ui:field="keyboardFocus">
+		<g:FlowPanel styleName="viewRepresentationFile">
+			<g:FlowPanel addStyleNames="filePreviewToolbar">
+				<m:BreadcrumbPanel ui:field="breadcrumb"
+					addStyleNames="viewRepresentationBreadcrumb" />
+				<g:FlowPanel addStyleNames="filePreviewToolbarIcons">
+					<g:FocusPanel ui:field="downloadDocumentationButton"
+						addStyleNames="toolbarLink">
+						<g:HTML>
+							<i class="fa fa-book"></i>
+						</g:HTML>
+					</g:FocusPanel>
+					<g:FocusPanel ui:field="downloadSchemasButton"
+						addStyleNames="toolbarLink">
+						<g:HTML>
+							<i class="fa fa-list-alt"></i>
+						</g:HTML>
+					</g:FocusPanel>
+					<g:FocusPanel ui:field="optionsButton"
+						addStyleNames="toolbarLink filePreviewToolbarOptionsIcon">
+						<g:HTML>
+							<i class="fa fa-cog"></i>
+						</g:HTML>
+					</g:FocusPanel>
+					<g:FocusPanel ui:field="disseminationsButton"
+						addStyleNames="toolbarLink filePreviewToolbarInfoIcon">
+						<g:HTML>
+							<i class="fa fa-play-circle-o"></i>
+						</g:HTML>
+					</g:FocusPanel>
+					<g:FocusPanel ui:field="infoFileButton"
+						addStyleNames="toolbarLink filePreviewToolbarInfoIcon">
+						<g:HTML>
+							<i class="fa fa-info-circle"></i>
+						</g:HTML>
+					</g:FocusPanel>
+					<g:FocusPanel ui:field="previousButton" addStyleNames="toolbarLink">
+						<g:HTML>
+							<i class="fa fa-chevron-left"></i>
+						</g:HTML>
+					</g:FocusPanel>
+					<g:FocusPanel ui:field="nextButton" addStyleNames="toolbarLink">
+						<g:HTML>
+							<i class="fa fa-chevron-right"></i>
+						</g:HTML>
+					</g:FocusPanel>
+				</g:FlowPanel>
+			</g:FlowPanel>
+			<g:FlowPanel addStyleNames="viewRepresentationFile-center">
+				<b:IndexedFilePreview addStyleNames="viewRepresentationFilePreview"
+					ui:field="filePreview"></b:IndexedFilePreview>
+				<!-- INFO PANEL -->
+				<g:FlowPanel addStyleNames="infoFilePanel blueSlider">
+					<g:Label styleName="h1" addStyleNames="infoFileTitle">
+						<ui:text from='{messages.viewRepresentationInfoTitle}' />
+					</g:Label>
+					<g:FlowPanel ui:field="infoFilePanel">
+					</g:FlowPanel>
+				</g:FlowPanel>
+				<!-- DIP PANEL -->
+				<g:FlowPanel addStyleNames="dipFilePanel blueSlider">
+					<g:Label styleName="h1" addStyleNames="fileDipTitle">
+						<ui:text from='{messages.viewRepresentationFileDisseminationTitle}' />
+					</g:Label>
+					<g:FlowPanel ui:field="dipFilePanel">
+					</g:FlowPanel>
+				</g:FlowPanel>
+				<!-- OPTIONS PANEL -->
+				<g:FlowPanel addStyleNames="optionsFilePanel blueSlider">
+					<g:Label styleName="h1" addStyleNames="optionsFileTitle ">
+						<ui:text from='{messages.viewRepresentationFileOptionsTitle}' />
+					</g:Label>
+					<g:FlowPanel ui:field="optionsPanel">
+						<g:Button ui:field="optionDownload"
+							addStyleNames="btn btn-block btn-default-alt btn-download">
+							<ui:text from='{messages.viewRepresentationDownloadFileButton}' />
+						</g:Button>
+						<g:Button ui:field="optionEvents"
+							addStyleNames="btn btn-block btn-default-alt btn-play">
+							<ui:text from='{messages.preservationEvents}' />
+						</g:Button>
+						<g:Button ui:field="optionRisk"
+							addStyleNames="btn btn-block btn-default-alt btn-play">
+							<ui:text from='{messages.preservationRisks}' />
+						</g:Button>
+						<g:Button ui:field="optionIdentify"
+							addStyleNames="btn btn-block btn-default-alt btn-play">
+							<ui:text from='{messages.identifyFormatsButton}' />
+						</g:Button>
+						<g:Button ui:field="optionNewProcess"
+							addStyleNames="btn btn-block btn-default-alt btn-play">
+							<ui:text from='{messages.viewRepresentationNewProcessButton}' />
+						</g:Button>
+						<g:Button ui:field="optionRemove" addStyleNames="btn btn-block btn-danger btn-ban">
+							<ui:text from='{messages.viewRepresentationRemoveFileButton}' />
+						</g:Button>
+					</g:FlowPanel>
+				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>
-		<g:FlowPanel addStyleNames="viewRepresentationFile-center">
-			<b:IndexedFilePreview addStyleNames="viewRepresentationFilePreview"
-				ui:field="filePreview"></b:IndexedFilePreview>
-			<!-- INFO PANEL -->
-			<g:FlowPanel addStyleNames="infoFilePanel blueSlider">
-				<g:Label styleName="h1" addStyleNames="infoFileTitle">
-					<ui:text from='{messages.viewRepresentationInfoTitle}' />
-				</g:Label>
-				<g:FlowPanel ui:field="infoFilePanel">
-				</g:FlowPanel>
-			</g:FlowPanel>
-			<!-- DIP PANEL -->
-			<g:FlowPanel addStyleNames="dipFilePanel blueSlider">
-				<g:Label styleName="h1" addStyleNames="fileDipTitle">
-					<ui:text from='{messages.viewRepresentationFileDisseminationTitle}' />
-				</g:Label>
-				<g:FlowPanel ui:field="dipFilePanel">
-				</g:FlowPanel>
-			</g:FlowPanel>
-			<!-- OPTIONS PANEL -->
-			<g:FlowPanel addStyleNames="optionsFilePanel blueSlider">
-				<g:Label styleName="h1" addStyleNames="optionsFileTitle ">
-					<ui:text from='{messages.viewRepresentationFileOptionsTitle}' />
-				</g:Label>
-				<g:FlowPanel ui:field="optionsPanel">
-					<g:Button ui:field="optionDownload" addStyleNames="btn btn-block btn-default-alt btn-download">
-						<ui:text from='{messages.viewRepresentationDownloadFileButton}' />
-					</g:Button>
-					<g:Button ui:field="optionEvents" addStyleNames="btn btn-block btn-default-alt btn-play">
-						<ui:text from='{messages.preservationEvents}' />
-					</g:Button>
-					<g:Button ui:field="optionRisk" addStyleNames="btn btn-block btn-default-alt btn-play">
-						<ui:text from='{messages.preservationRisks}' />
-					</g:Button>
-					<g:Button ui:field="optionIdentify" addStyleNames="btn btn-block btn-default-alt btn-play">
-						<ui:text from='{messages.identifyFormatsButton}' />
-					</g:Button>
-					<g:Button ui:field="optionNewProcess" addStyleNames="btn btn-block btn-default-alt btn-play">
-						<ui:text from='{messages.viewRepresentationNewProcessButton}' />
-					</g:Button>
-					<g:Button ui:field="optionRemove" addStyleNames="btn btn-block btn-danger btn-ban">
-						<ui:text from='{messages.viewRepresentationRemoveFileButton}' />
-					</g:Button>
-				</g:FlowPanel>
-			</g:FlowPanel>
-		</g:FlowPanel>
-	</g:FlowPanel>
+	</g:FocusPanel>
 </ui:UiBinder>

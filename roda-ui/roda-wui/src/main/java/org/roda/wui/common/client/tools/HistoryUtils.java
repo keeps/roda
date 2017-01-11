@@ -195,7 +195,6 @@ public class HistoryUtils {
     history.add(BrowseDIP.RESOLVER.getHistoryToken());
     history.add(dipId);
     history.add(dipFileUUID);
-
     history.add(SORTER_MAPPER.write(sorter));
     history.add(Integer.toString(index));
     return history;
@@ -304,10 +303,10 @@ public class HistoryUtils {
   }
 
   public static List<String> getHistoryBrowse(String aipId, String representationId, List<String> filePath,
-    String fileId, boolean isDirectory) {
+    String fileId) {
     List<String> history = new ArrayList<>();
     history.addAll(BrowseAIP.RESOLVER.getHistoryPath());
-    history.add(isDirectory ? BrowseFolder.RESOLVER.getHistoryToken() : BrowseFile.RESOLVER.getHistoryToken());
+    history.add(BrowseFile.RESOLVER.getHistoryToken());
     history.add(aipId);
     history.add(representationId);
     history.addAll(filePath);
@@ -317,17 +316,20 @@ public class HistoryUtils {
   }
 
   public static List<String> getHistoryBrowse(IndexedFile file) {
-    return getHistoryBrowse(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
-      file.isDirectory());
+    return getHistoryBrowse(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId());
   }
 
-  public static void openBrowse(String aipId, String representationId, List<String> filePath, String fileId,
-    boolean isDirectory) {
-    HistoryUtils.newHistory(getHistoryBrowse(aipId, representationId, filePath, fileId, isDirectory));
+  public static void openBrowse(String aipId, String representationId, List<String> filePath, String fileId) {
+    HistoryUtils.newHistory(getHistoryBrowse(aipId, representationId, filePath, fileId));
   }
 
   public static void openBrowse(IndexedFile file) {
-    openBrowse(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(), file.isDirectory());
+    openBrowse(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId());
+  }
+
+  public static void openBrowse(IndexedFile file, Sorter sorter, int selectedFileIndex) {
+    LastSelectedItemsSingleton.getInstance().setLastSelectionDetails(sorter, selectedFileIndex);
+    openBrowse(file);
   }
 
   public static List<String> getHistoryUpload(IndexedFile folder) {

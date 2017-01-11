@@ -101,7 +101,7 @@ public interface BrowserService extends RemoteService {
 
   BrowseFileBundle retrieveBrowseFileBundle(String historyAipId, String historyRepresentationId,
     List<String> historyFilePath, String historyFileId, String localeName)
-    throws AuthorizationDeniedException, GenericException, NotFoundException;
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(String aipId, String representationId,
     String descId, String type, String version, String localeString)

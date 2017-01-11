@@ -174,7 +174,8 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   @Override
   public BrowseFileBundle retrieveBrowseFileBundle(String aipId, String representationId, List<String> filePath,
-    String fileId, String localeString) throws AuthorizationDeniedException, GenericException, NotFoundException {
+    String fileId, String localeString)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Locale locale = ServerTools.parseLocale(localeString);
     return Browser.retrieveBrowseFileBundle(user, aipId, representationId, filePath, fileId, locale);
@@ -864,8 +865,9 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public DipBundle getDipBundle(String dipUUID, String dipFileUUID, String aipId, String representationId, List<String> filePath,
-    String fileId) throws RequestNotValidException, AuthorizationDeniedException, GenericException, NotFoundException {
+  public DipBundle getDipBundle(String dipUUID, String dipFileUUID, String aipId, String representationId,
+    List<String> filePath, String fileId)
+    throws RequestNotValidException, AuthorizationDeniedException, GenericException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
 
     return Browser.retrieveDipBundle(user, dipUUID, dipFileUUID, aipId, representationId, filePath, fileId);

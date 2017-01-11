@@ -182,7 +182,7 @@ public class BrowseFolder extends Composite {
       public void onSelectionChange(SelectionChangeEvent event) {
         IndexedFile selected = filesList.getSelectionModel().getSelectedObject();
         if (selected != null) {
-          HistoryUtils.openBrowse(selected);
+          HistoryUtils.openBrowse(selected, filesList.getSorter(), filesList.getIndexOfVisibleObject(selected));
         }
       }
     });

@@ -580,9 +580,8 @@ public class ShowPreservationEvent extends Composite {
       footer.addStyleName("panel-footer");
       layout.add(footer);
 
-      Anchor link = new Anchor(messages.inspectFile(),
-        HistoryUtils.createHistoryHashLink(HistoryUtils.getHistoryBrowse(ifile.getAipId(), ifile.getRepresentationId(),
-          ifile.getPath(), ifile.getId(), ifile.isDirectory())));
+      Anchor link = new Anchor(messages.inspectFile(), HistoryUtils.createHistoryHashLink(
+        HistoryUtils.getHistoryBrowse(ifile.getAipId(), ifile.getRepresentationId(), ifile.getPath(), ifile.getId())));
 
       link.addStyleName("btn");
       footer.add(link);

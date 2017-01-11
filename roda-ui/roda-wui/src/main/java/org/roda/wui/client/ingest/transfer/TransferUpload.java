@@ -310,7 +310,7 @@ public class TransferUpload extends Composite {
     } else {
 
       if (folderId != null) {
-        HistoryUtils.openBrowse(aipId, representationId, folderPath, folderId, true);
+        HistoryUtils.openBrowse(aipId, representationId, folderPath, folderId);
       } else {
         HistoryUtils.openBrowse(aipId, representationId);
       }

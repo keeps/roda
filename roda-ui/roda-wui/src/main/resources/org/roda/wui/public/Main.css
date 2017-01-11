@@ -3823,9 +3823,8 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .viewRepresentationFile-center {
-    width: 96%;
+    width: 100%;
     position: relative;
-    margin: 2%;
 }
 
 .viewRepresentationFilePreview {

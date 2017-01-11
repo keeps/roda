@@ -142,7 +142,7 @@ public class Browser extends RodaWuiController {
 
   public static BrowseFileBundle retrieveBrowseFileBundle(User user, String aipId, String representationId,
     List<String> filePath, String fileId, Locale locale)
-    throws AuthorizationDeniedException, GenericException, NotFoundException {
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     // check user permissions
     controllerAssistant.checkRoles(user);
@@ -151,7 +151,7 @@ public class Browser extends RodaWuiController {
 
     // delegate
     BrowseFileBundle browseFileBundle = BrowserHelper.retrieveBrowseFileBundle(aip, representationId, filePath, fileId,
-      locale);
+      locale, user);
 
     // register action
     controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_AIP_ID_PARAM,

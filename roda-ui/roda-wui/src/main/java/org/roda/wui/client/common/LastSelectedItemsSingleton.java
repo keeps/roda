@@ -10,8 +10,10 @@ package org.roda.wui.client.common;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.index.sort.Sorter;
 
 public class LastSelectedItemsSingleton {
 
@@ -20,6 +22,8 @@ public class LastSelectedItemsSingleton {
   private String detailsMessage = "";
   private List<String> lastHistory = new ArrayList<String>();
   private IsIndexed lastObject = null;
+  private Sorter sorter;
+  private Integer selectedFileIndex;
 
   private LastSelectedItemsSingleton() {
   }
@@ -55,12 +59,23 @@ public class LastSelectedItemsSingleton {
     this.lastHistory = lastHistory;
   }
 
-  public IsIndexed getLastObject() {
-    return this.lastObject;
+  public <T extends IsIndexed> T getLastObject() {
+    return (T) this.lastObject;
   }
 
-  public void setLastObject(IsIndexed lastObject) {
+  public <T extends IsIndexed> void setLastObject(T lastObject) {
     this.lastObject = lastObject;
   }
+
+  public void setLastSelectionDetails(Sorter sorter, Integer selectedFileIndex) {
+    this.sorter = sorter;
+    this.selectedFileIndex = selectedFileIndex;
+  }
+  
+  public Pair<Sorter, Integer> getLastSelectionDetails() {
+    return Pair.create(sorter, selectedFileIndex);
+  }
+  
+  
 
 }

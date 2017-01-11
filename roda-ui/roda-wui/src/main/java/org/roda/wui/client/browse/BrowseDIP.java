@@ -47,8 +47,6 @@ import org.roda.wui.common.client.widgets.Toast;
 
 import com.github.nmorel.gwtjackson.client.exception.JsonDeserializationException;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -59,8 +57,6 @@ import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.Event;
-import com.google.gwt.user.client.Event.NativePreviewEvent;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
@@ -188,7 +184,7 @@ public class BrowseDIP extends Composite {
   @Override
   protected void onLoad() {
     super.onLoad();
-    JavascriptUtils.scrollToHeader();
+    JavascriptUtils.smoothScroll(breadcrumb.getElement());
   }
 
   private void update() {
@@ -297,7 +293,7 @@ public class BrowseDIP extends Composite {
 
   }
 
-  protected void updateVisibles() {
+  private void updateVisibles() {
     if (index < 0) {
       HtmlSnippetUtils.setCssClassDisabled(previousButton, true);
       HtmlSnippetUtils.setCssClassDisabled(nextButton, totalCount < 2);
@@ -306,11 +302,6 @@ public class BrowseDIP extends Composite {
       HtmlSnippetUtils.setCssClassDisabled(nextButton, index >= totalCount - 1);
       downloadButton.setVisible(dipFile != null && !dipFile.isDirectory());
     }
-  }
-
-  @UiHandler("previousButton")
-  void previousButtonHandler(ClickEvent e) {
-    previous();
   }
 
   private void previous() {
@@ -327,6 +318,11 @@ public class BrowseDIP extends Composite {
         ? dipFile.getAncestorsPath().get(dipFile.getAncestorsPath().size() - 1) : null;
       open(parentUUID, sorter, index + 1);
     }
+  }
+
+  @UiHandler("previousButton")
+  void previousButtonHandler(ClickEvent e) {
+    previous();
   }
 
   @UiHandler("nextButton")

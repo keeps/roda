@@ -156,7 +156,7 @@ public class SearchFileList extends BasicAsyncTableCell<IndexedFile> {
   protected Sorter getSorter(ColumnSortList columnSortList) {
     Map<Column<IndexedFile, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<IndexedFile, ?>, List<String>>();
     columnSortingKeyMap.put(iconColumn, Arrays.asList(RodaConstants.FILE_ISDIRECTORY));
-    columnSortingKeyMap.put(pathColumn, Arrays.asList(RodaConstants.FILE_ORIGINALNAME));
+    columnSortingKeyMap.put(pathColumn, Arrays.asList(RodaConstants.FILE_ORIGINALNAME, RodaConstants.FILE_FILE_ID));
     columnSortingKeyMap.put(sizeColumn, Arrays.asList(RodaConstants.FILE_SIZE));
     columnSortingKeyMap.put(formatColumn, Arrays.asList(RodaConstants.FILE_FORMAT_MIMETYPE));
     return createSorter(columnSortList, columnSortingKeyMap);

@@ -22,18 +22,10 @@ public class BrowseFileBundle implements Serializable {
   private IndexedAIP aip;
   private IndexedRepresentation representation;
   private IndexedFile file;
+  private long totalSiblingCount;
 
   public BrowseFileBundle() {
     super();
-  }
-
-  public BrowseFileBundle(List<IndexedAIP> aipAncestors, IndexedAIP aip, IndexedRepresentation representation,
-    IndexedFile file) {
-    super();
-    this.aipAncestors = aipAncestors;
-    this.aip = aip;
-    this.representation = representation;
-    this.file = file;
   }
 
   public List<IndexedAIP> getAipAncestors() {
@@ -66,6 +58,14 @@ public class BrowseFileBundle implements Serializable {
 
   public void setFile(IndexedFile file) {
     this.file = file;
+  }
+
+  public long getTotalSiblingCount() {
+    return totalSiblingCount;
+  }
+
+  public void setTotalSiblingCount(long totalSiblingCount) {
+    this.totalSiblingCount = totalSiblingCount;
   }
 
 }

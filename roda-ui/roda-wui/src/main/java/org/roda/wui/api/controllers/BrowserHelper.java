@@ -77,6 +77,7 @@ import org.roda.core.data.v2.index.facet.FacetFieldResult;
 import org.roda.core.data.v2.index.facet.FacetValue;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
+import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -243,7 +244,8 @@ public class BrowserHelper {
   }
 
   public static BrowseFileBundle retrieveBrowseFileBundle(IndexedAIP aip, String representationId,
-    List<String> filePath, String fileId, Locale locale) throws NotFoundException, GenericException {
+    List<String> filePath, String fileId, Locale locale, User user)
+    throws NotFoundException, GenericException, RequestNotValidException {
     BrowseFileBundle bundle = new BrowseFileBundle();
 
     bundle.setAip(aip);
@@ -257,6 +259,20 @@ public class BrowserHelper {
     } catch (NotFoundException e) {
       LOGGER.warn("Found an item with invalid ancestors: {}", aip.getId(), e);
     }
+
+    // set sibling count
+    String parentUUID = bundle.getFile().getParentUUID();
+
+    Filter siblingFilter = new Filter(
+      new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_UUID, bundle.getFile().getRepresentationUUID()));
+
+    if (parentUUID != null) {
+      siblingFilter.add(new SimpleFilterParameter(RodaConstants.FILE_PARENT_UUID, parentUUID));
+    } else {
+      siblingFilter.add(new EmptyKeyFilterParameter(RodaConstants.FILE_PARENT_UUID));
+    }
+
+    bundle.setTotalSiblingCount(count(IndexedFile.class, siblingFilter, user));
 
     return bundle;
   }
