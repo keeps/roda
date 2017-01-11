@@ -67,12 +67,12 @@ public class DigitalSignaturePluginUtils {
           ContentPayload mainPayload = new FSPathContentPayload(extractResult.get(0));
           ContentPayload contentsPayload = new FSPathContentPayload(extractResult.get(1));
 
-          model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(),
+          model.createOrUpdateOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(),
             file.getId().substring(0, file.getId().lastIndexOf('.')), ".xml",
             RodaConstants.OTHER_METADATA_TYPE_DIGITAL_SIGNATURE, mainPayload, true);
 
           if (extractResult.get(1).toFile().length() > 0) {
-            model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(),
+            model.createOrUpdateOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(),
               file.getId().substring(0, file.getId().lastIndexOf('.')), ".pkcs7",
               RodaConstants.OTHER_METADATA_TYPE_DIGITAL_SIGNATURE, contentsPayload, true);
           }
@@ -83,7 +83,7 @@ public class DigitalSignaturePluginUtils {
 
         for (Path p : extractResult) {
           ContentPayload mainPayload = new FSPathContentPayload(p);
-          model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(),
+          model.createOrUpdateOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(),
             file.getId().substring(0, file.getId().lastIndexOf('.')) + "_" + extractMap.get(p), ".xml",
             RodaConstants.OTHER_METADATA_TYPE_DIGITAL_SIGNATURE, mainPayload, true);
         }
@@ -92,7 +92,7 @@ public class DigitalSignaturePluginUtils {
 
         if (!extractResult.isEmpty()) {
           ContentPayload mainPayload = new FSPathContentPayload(extractResult.get(0));
-          model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(),
+          model.createOrUpdateOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(),
             file.getId().substring(0, file.getId().lastIndexOf('.')), ".xml",
             RodaConstants.OTHER_METADATA_TYPE_DIGITAL_SIGNATURE, mainPayload, true);
         }

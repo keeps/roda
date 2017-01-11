@@ -246,9 +246,6 @@ public class BrowseAIP extends Composite {
   FlowPanel appraisalSidebar;
 
   @UiField
-  FlowPanel preservationSidebar;
-
-  @UiField
   FlowPanel actionsSidebar;
 
   @UiField
@@ -293,7 +290,6 @@ public class BrowseAIP extends Composite {
 
   private BrowseAIP() {
     handlers = new ArrayList<HandlerRegistration>();
-
     boolean selectable = true;
 
     // REPRESENTATIONS
@@ -309,9 +305,9 @@ public class BrowseAIP extends Composite {
         }
       }
     });
-    representationsSearch = new SearchPanel(Filter.NULL, RodaConstants.REPRESENTATION_SEARCH,
+
+    representationsSearch = new SearchPanel(Filter.NULL, RodaConstants.REPRESENTATION_SEARCH, true,
       messages.searchPlaceHolder(), false, false, true);
-    representationsSearch.setDefaultFilterIncremental(true);
     representationsSearch.setList(representationsList);
 
     // DISSEMINATIONS
@@ -328,9 +324,8 @@ public class BrowseAIP extends Composite {
       }
     });
 
-    disseminationsSearch = new SearchPanel(Filter.NULL, RodaConstants.DIP_SEARCH, messages.searchPlaceHolder(), false,
-      false, true);
-    disseminationsSearch.setDefaultFilterIncremental(true);
+    disseminationsSearch = new SearchPanel(Filter.NULL, RodaConstants.DIP_SEARCH, true, messages.searchPlaceHolder(),
+      false, false, true);
     disseminationsSearch.setList(disseminationsList);
 
     // AIP CHILDREN
@@ -354,14 +349,14 @@ public class BrowseAIP extends Composite {
         if (aipId == null) {
           boolean empty = ClientSelectedItemsUtils.isEmpty(selected);
           moveItem.setEnabled(!empty);
+          newProcess.setEnabled(!empty);
           editPermissions.setEnabled(!empty);
         }
       }
     });
 
-    aipChildrenSearch = new SearchPanel(COLLECTIONS_FILTER, RodaConstants.AIP_SEARCH, messages.searchPlaceHolder(),
-      false, false, true);
-    aipChildrenSearch.setDefaultFilterIncremental(true);
+    aipChildrenSearch = new SearchPanel(COLLECTIONS_FILTER, RodaConstants.AIP_SEARCH, true,
+      messages.searchPlaceHolder(), false, false, true);
     aipChildrenSearch.setList(aipChildrenList);
 
     facetDescriptionLevels = new FlowPanel();
@@ -543,7 +538,10 @@ public class BrowseAIP extends Composite {
     aipChildrenList.getParent().setVisible(false);
 
     appraisalSidebar.setVisible(false);
-    preservationSidebar.setVisible(false);
+    newProcess.setEnabled(false);
+    preservationEvents.setVisible(false);
+    risks.setVisible(false);
+    logs.setVisible(false);
     actionsSidebar.setVisible(false);
 
     searchSection.setVisible(false);
@@ -594,9 +592,7 @@ public class BrowseAIP extends Composite {
       addStyleName(BROWSE_AIP_CSS);
 
       this.bundle = bundle;
-
       this.justActive = AIPState.ACTIVE.equals(bundle.getAip().getState());
-
       IndexedAIP aip = bundle.getAip();
 
       // STATUS
@@ -617,7 +613,7 @@ public class BrowseAIP extends Composite {
       // REPRESENTATIONS
       if (bundle.getRepresentationCount() > 0) {
         Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aip.getId()));
-        representationsSearch.setDefaultFilter(filter);
+        representationsSearch.setDefaultFilter(filter, true);
         representationsSearch.clearSearchInputBox();
         representationsList.set(filter, justActive, Facets.NONE);
       }
@@ -630,7 +626,7 @@ public class BrowseAIP extends Composite {
       // DISSEMINATIONS
       if (bundle.getDipCount() > 0) {
         Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_AIP_UUIDS, aip.getId()));
-        disseminationsSearch.setDefaultFilter(filter);
+        disseminationsSearch.setDefaultFilter(filter, true);
         disseminationsSearch.clearSearchInputBox();
         disseminationsList.set(filter, justActive, Facets.NONE);
       }
@@ -643,7 +639,7 @@ public class BrowseAIP extends Composite {
       // AIP CHILDREN
       if (bundle.getChildAIPCount() > 0) {
         Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aip.getId()));
-        aipChildrenSearch.setDefaultFilter(filter);
+        aipChildrenSearch.setDefaultFilter(filter, true);
         aipChildrenSearch.clearSearchInputBox();
         aipChildrenList.set(filter, justActive, FACETS);
       }
@@ -655,11 +651,12 @@ public class BrowseAIP extends Composite {
 
       // SIDEBAR
       appraisalSidebar.setVisible(aip.getState().equals(AIPState.UNDER_APPRAISAL));
-      preservationSidebar.setVisible(true);
+      preservationEvents.setVisible(true);
+      risks.setVisible(true);
+      logs.setVisible(true);
       actionsSidebar.setVisible(true);
 
       // Set button visibility
-
       createItem.setVisible(true);
       moveItem.setVisible(true);
       moveItem.setEnabled(true);
@@ -803,7 +800,7 @@ public class BrowseAIP extends Composite {
     itemTitle.addStyleName("browseTitle-allCollections");
     itemIcon.getParent().addStyleName("browseTitle-allCollections-wrapper");
 
-    aipChildrenSearch.setDefaultFilter(COLLECTIONS_FILTER);
+    aipChildrenSearch.setDefaultFilter(COLLECTIONS_FILTER, true);
     aipChildrenList.set(COLLECTIONS_FILTER, justActive, FACETS);
 
     aipChildrenSearch.setVisible(true);

@@ -282,8 +282,7 @@ public class BrowseRepresentation extends Composite {
       }
     });
 
-    filesSearch = new SearchPanel(filter, ALL_FILTER, messages.searchPlaceHolder(), false, false, true);
-    filesSearch.setDefaultFilterIncremental(true);
+    filesSearch = new SearchPanel(filter, ALL_FILTER, true, messages.searchPlaceHolder(), false, false, true);
     filesSearch.setList(filesList);
 
     // DISSEMINATIONS
@@ -299,9 +298,8 @@ public class BrowseRepresentation extends Composite {
       }
     });
 
-    disseminationsSearch = new SearchPanel(Filter.NULL, RodaConstants.DIP_SEARCH, messages.searchPlaceHolder(), false,
-      false, true);
-    disseminationsSearch.setDefaultFilterIncremental(true);
+    disseminationsSearch = new SearchPanel(Filter.NULL, RodaConstants.DIP_SEARCH, true, messages.searchPlaceHolder(),
+      false, false, true);
     disseminationsSearch.setList(disseminationsList);
 
     // INIT
@@ -393,7 +391,7 @@ public class BrowseRepresentation extends Composite {
       Filter disseminationsFilter = new Filter(
         new SimpleFilterParameter(RodaConstants.DIP_REPRESENTATION_UUIDS, repUUID));
       disseminationsList.set(disseminationsFilter, bundle.getAip().getState().equals(AIPState.ACTIVE), Facets.NONE);
-      disseminationsSearch.setDefaultFilter(disseminationsFilter);
+      disseminationsSearch.setDefaultFilter(disseminationsFilter, true);
       disseminationsSearch.clearSearchInputBox();
     }
     disseminationsList.getParent().setVisible(bundle.getDipCount() > 0);

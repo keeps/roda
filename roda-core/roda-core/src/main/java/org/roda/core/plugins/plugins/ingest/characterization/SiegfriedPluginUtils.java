@@ -162,7 +162,7 @@ public class SiegfriedPluginUtils {
 
         ContentPayload payload = new StringContentPayload(file.toString());
 
-        model.createOtherMetadata(aipId, representationId, jsonFilePath, jsonFileId, SiegfriedPlugin.FILE_SUFFIX,
+        model.createOrUpdateOtherMetadata(aipId, representationId, jsonFilePath, jsonFileId, SiegfriedPlugin.FILE_SUFFIX,
           RodaConstants.OTHER_METADATA_TYPE_SIEGFRIED, payload, notify);
 
         sources.add(PluginHelper.getLinkingIdentifier(aipId, representationId, jsonFilePath, jsonFileId,

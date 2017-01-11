@@ -133,7 +133,7 @@ public class FITSPlugin extends AbstractPlugin<AIP> {
                   ContentPayload payload = new FSPathContentPayload(p);
                   LOGGER.debug("Creating other metadata (AIP: {}, REPRESENTATION: {}, FILE: {})", aip.getId(),
                     representation.getId(), file.getId());
-                  model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(), ".xml",
+                  model.createOrUpdateOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(), ".xml",
                     RodaConstants.OTHER_METADATA_TYPE_FITS, payload, inotify);
 
                   sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), representation.getId(), file.getPath(),

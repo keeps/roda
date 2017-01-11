@@ -94,11 +94,12 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
 
   private boolean hidePreFilters;
 
-  public SearchPanel(Filter defaultFilter, String allFilter, String placeholder, boolean showSearchInputListBox,
-    boolean showSearchAdvancedDisclosureButton, boolean hidePreFilters) {
+  public SearchPanel(Filter defaultFilter, String allFilter, boolean incremental, String placeholder,
+    boolean showSearchInputListBox, boolean showSearchAdvancedDisclosureButton, boolean hidePreFilters) {
     this.defaultFilter = defaultFilter;
     this.allFilter = allFilter;
     this.hidePreFilters = hidePreFilters;
+    this.defaultFilterIncremental = incremental;
 
     initWidget(binder.createAndBindUi(this));
 
@@ -306,26 +307,28 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
     this.list = list;
   }
 
-  public void setDefaultFilter(Filter defaultFilter) {
+  public void setDefaultFilter(Filter defaultFilter, boolean incremental) {
     this.defaultFilter = defaultFilter;
     if (!hidePreFilters) {
       drawSearchPreFilters();
     }
+    this.defaultFilterIncremental = incremental;
   }
 
   public void setAllFilter(String allFilter) {
     this.allFilter = allFilter;
   }
 
-  public void setVariables(Filter defaultFilter, String allFilter, AsyncTableCell<?, ?> list, FlowPanel fieldsPanel) {
-    setDefaultFilter(defaultFilter);
+  public void setVariables(Filter defaultFilter, String allFilter, boolean incremental, AsyncTableCell<?, ?> list,
+    FlowPanel fieldsPanel) {
+    setDefaultFilter(defaultFilter, incremental);
     setAllFilter(allFilter);
     setList(list);
     setFieldsPanel(fieldsPanel);
   }
 
-  public void setDefaultFilterIncremental(boolean defaultFilterIncremental) {
-    this.defaultFilterIncremental = defaultFilterIncremental;
+  public void setDefaultFilterIncremental(boolean incremental) {
+    this.defaultFilterIncremental = incremental;
   }
 
   public boolean isDefaultFilterIncremental() {

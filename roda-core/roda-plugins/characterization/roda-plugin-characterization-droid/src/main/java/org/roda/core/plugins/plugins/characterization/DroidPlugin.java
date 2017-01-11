@@ -142,7 +142,7 @@ public class DroidPlugin extends AbstractPlugin<AIP> {
                   String xmlOutput = "<droid>" + pronom + "</droid>";
                   ContentPayload payload = new StringContentPayload(xmlOutput);
 
-                  model.createOtherMetadata(aip.getId(), representation.getId(), fileDirectoryPath, fileId, ".xml",
+                  model.createOrUpdateOtherMetadata(aip.getId(), representation.getId(), fileDirectoryPath, fileId, ".xml",
                     RodaConstants.OTHER_METADATA_TYPE_DROID, payload, inotify);
 
                   PremisV3Utils.updateFormatPreservationMetadata(model, aip.getId(), representation.getId(),

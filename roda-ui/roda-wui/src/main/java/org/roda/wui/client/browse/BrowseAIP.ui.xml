@@ -127,7 +127,7 @@
 								<ui:text from='{messages.downloadButton}' />
 							</g:Button>
 						</g:FlowPanel>
-						<g:FlowPanel ui:field="preservationSidebar">
+						<g:FlowPanel>
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.preservationTitle}' />
 							</g:Label>

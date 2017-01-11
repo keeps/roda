@@ -108,6 +108,8 @@ import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataList;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
+import org.roda.core.data.v2.ip.metadata.OtherMetadata;
+import org.roda.core.data.v2.ip.metadata.OtherMetadataList;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadataList;
@@ -635,6 +637,16 @@ public class BrowserHelper {
     }
   }
 
+  public static void validateGetOtherMetadataParams(String acceptFormat) throws RequestNotValidException {
+    if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)
+      && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
+      && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
+      throw new RequestNotValidException("Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT
+        + "' value. Expected values: " + Arrays.asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML,
+          RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON, RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN));
+    }
+  }
+
   protected static EntityResponse listAIPDescriptiveMetadata(String aipId, String start, String limit,
     String acceptFormat)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
@@ -1023,7 +1035,7 @@ public class BrowserHelper {
     }
   }
 
-  protected static void validateListAIPPreservationMetadataParams(String acceptFormat) throws RequestNotValidException {
+  protected static void validateListAIPMetadataParams(String acceptFormat) throws RequestNotValidException {
     if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP.equals(acceptFormat)
       && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
       && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
@@ -1278,6 +1290,118 @@ public class BrowserHelper {
     String representationId, String id, boolean notify)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     RodaCoreFactory.getModelService().deletePreservationMetadata(type, aipId, representationId, id, notify);
+  }
+
+  public static EntityResponse listOtherMetadata(String aipId, String representationId, List<String> filePath,
+    String fileId, String type, String acceptFormat)
+    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+
+    if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP.equals(acceptFormat)) {
+      CloseableIterable<OptionalWithCause<OtherMetadata>> otherFiles = RodaCoreFactory.getModelService()
+        .listOtherMetadata(aipId, representationId, filePath, fileId, type);
+      StorageService storage = RodaCoreFactory.getStorageService();
+      List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
+
+      for (OptionalWithCause<OtherMetadata> oFile : otherFiles) {
+        if (oFile.isPresent()) {
+          OtherMetadata file = oFile.get();
+          StoragePath storagePath = ModelUtils.getOtherMetadataStoragePath(aipId, representationId, filePath, fileId,
+            file.getFileSuffix(), file.getType());
+          Binary binary = storage.getBinary(storagePath);
+
+          ZipEntryInfo info = new ZipEntryInfo(FSUtils.getStoragePathAsString(storagePath, true), binary.getContent());
+          zipEntries.add(info);
+        } else {
+          LOGGER.error("Cannot get list other metadata", oFile.getCause());
+        }
+      }
+
+      IOUtils.closeQuietly(otherFiles);
+      return createZipStreamResponse(zipEntries, aipId);
+    } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
+      || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
+      CloseableIterable<OptionalWithCause<OtherMetadata>> otherFiles = RodaCoreFactory.getModelService()
+        .listOtherMetadata(aipId, representationId, filePath, fileId, type);
+      OtherMetadataList metadataList = new OtherMetadataList();
+
+      for (OptionalWithCause<OtherMetadata> oFile : otherFiles) {
+        if (oFile.isPresent()) {
+          metadataList.addObject(oFile.get());
+        }
+      }
+
+      IOUtils.closeQuietly(otherFiles);
+      return new ObjectResponse<OtherMetadataList>(acceptFormat, metadataList);
+    } else {
+      throw new GenericException("Unsupported accept format: " + acceptFormat);
+    }
+  }
+
+  public static EntityResponse retrieveOtherMetadata(String aipId, String representationId, List<String> filePath,
+    String fileId, String type, String suffix, String acceptFormat)
+    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+
+    if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
+      final ConsumesOutputStream stream;
+      Binary otherMetadataBinary = RodaCoreFactory.getModelService().retrieveOtherMetadataBinary(aipId,
+        representationId, filePath, fileId, suffix, type);
+      String filename = otherMetadataBinary.getStoragePath().getName();
+      String mediaType = RodaConstants.MEDIA_TYPE_WILDCARD;
+
+      stream = new ConsumesOutputStream() {
+
+        @Override
+        public String getMediaType() {
+          return acceptFormat;
+        }
+
+        @Override
+        public String getFileName() {
+          return filename;
+        }
+
+        @Override
+        public void consumeOutputStream(OutputStream out) throws IOException {
+          InputStream fileInputStream = null;
+          try {
+            fileInputStream = otherMetadataBinary.getContent().createInputStream();
+            IOUtils.copy(fileInputStream, out);
+          } finally {
+            IOUtils.closeQuietly(fileInputStream);
+          }
+        }
+      };
+      return new StreamResponse(filename, mediaType, stream);
+    } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
+      || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
+      OtherMetadata other = RodaCoreFactory.getModelService().retrieveOtherMetadata(aipId, representationId, filePath,
+        fileId, suffix, type);
+      return new ObjectResponse<OtherMetadata>(acceptFormat, other);
+    } else {
+      throw new GenericException("Unsupported accept format: " + acceptFormat);
+    }
+  }
+
+  public static OtherMetadata createOrUpdateOtherMetadataFile(String aipId, String representationId,
+    List<String> fileDirectoryPath, String fileId, String type, String fileSuffix, InputStream is)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    try {
+      Path tempFile = Files.createTempFile("descriptive", ".tmp");
+      Files.copy(is, tempFile, StandardCopyOption.REPLACE_EXISTING);
+      ContentPayload payload = new FSPathContentPayload(tempFile);
+
+      return RodaCoreFactory.getModelService().createOrUpdateOtherMetadata(aipId, representationId, fileDirectoryPath,
+        fileId, fileSuffix, type, payload, false);
+    } catch (IOException e) {
+      throw new GenericException("Error creating or updating other metadata");
+    }
+  }
+
+  public static void deleteOtherMetadataFile(String aipId, String representationId, List<String> fileDirectoryPath,
+    String fileId, String fileSuffix, String type)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    RodaCoreFactory.getModelService().deleteOtherMetadata(aipId, representationId, fileDirectoryPath, fileId,
+      fileSuffix, type);
   }
 
   public static IndexedAIP moveAIPInHierarchy(User user, SelectedItems<IndexedAIP> selected, String parentId,

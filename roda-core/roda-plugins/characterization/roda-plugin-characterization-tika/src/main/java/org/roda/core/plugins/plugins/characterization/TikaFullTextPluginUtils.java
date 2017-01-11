@@ -73,7 +73,7 @@ public class TikaFullTextPluginUtils {
         });
 
         if (doFulltextExtraction) {
-          model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
+          model.createOrUpdateOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
             RodaConstants.TIKA_FILE_SUFFIX_FULLTEXT, RodaConstants.OTHER_METADATA_TYPE_APACHE_TIKA, payload, notify);
         }
 
@@ -87,7 +87,7 @@ public class TikaFullTextPluginUtils {
         if (doFeatureExtraction && metadata != null && metadata.size() > 0) {
           String metadataAsString = generateMetadataFile(metadata);
           ContentPayload metadataAsPayload = new StringContentPayload(metadataAsString);
-          model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
+          model.createOrUpdateOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
             RodaConstants.TIKA_FILE_SUFFIX_METADATA, RodaConstants.OTHER_METADATA_TYPE_APACHE_TIKA, metadataAsPayload,
             notify);
 

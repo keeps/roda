@@ -134,6 +134,7 @@ public final class RodaConstants {
   public static final Object API_FILE = "file";
   public static final String API_DESCRIPTIVE_METADATA = "descriptive_metadata";
   public static final String API_PRESERVATION_METADATA = "preservation_metadata";
+  public static final String API_OTHER_METADATA = "other_metadata";
   public static final String API_FIND = "find";
   // "http query string" related strings
   public static final String API_QUERY_START = "?";
@@ -184,6 +185,8 @@ public final class RodaConstants {
   public static final String API_PATH_PARAM_NAME = "name";
   public static final String API_PATH_PARAM_USERNAME = "username";
   public static final String API_PATH_PARAM_PERMISSION_TYPE = "permission_type";
+  public static final String API_PATH_PARAM_OTHER_METADATA_TYPE = "type";
+  public static final String API_PATH_PARAM_OTHER_METADATA_FILE_SUFFIX = "file_suffix";
 
   public static final String API_QUERY_PARAM_ID = "id";
   public static final String API_QUERY_PARAM_VERSION_ID = "version_id";

@@ -58,10 +58,9 @@ public class DefaultSelectDialog<T extends IsIndexed, O> extends DialogBox imple
     boolean hidePreFilters) {
     this.searchResultsPanel = searchResultsPanel;
 
-    searchPanel = new SearchPanel(filter, searchField, messages.selectAipSearchPlaceHolder(), false, false,
+    searchPanel = new SearchPanel(filter, searchField, true, messages.selectAipSearchPlaceHolder(), false, false,
       hidePreFilters);
     searchPanel.setList(searchResultsPanel);
-    searchPanel.setDefaultFilterIncremental(true);
 
     setWidget(binder.createAndBindUi(this));
 

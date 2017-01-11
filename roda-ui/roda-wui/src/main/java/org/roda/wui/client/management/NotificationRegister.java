@@ -28,8 +28,8 @@ import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
-import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.core.client.GWT;
@@ -133,7 +133,8 @@ public class NotificationRegister extends Composite {
       new SimpleFacetParameter(RodaConstants.NOTIFICATION_STATE));
     notificationList = new NotificationList(Filter.NULL, facets, messages.notificationsTitle(), false);
 
-    searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, messages.messageSearchPlaceHolder(), false, false, false);
+    searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, true, messages.messageSearchPlaceHolder(), false, false,
+      false);
     searchPanel.setList(notificationList);
 
     facetRecipientUsers = new FlowPanel();
@@ -182,7 +183,7 @@ public class NotificationRegister extends Composite {
     inputDateInitial.getElement().setPropertyString("placeholder", messages.sidebarFilterFromDatePlaceHolder());
     inputDateFinal.getElement().setPropertyString("placeholder", messages.sidebarFilterToDatePlaceHolder());
   }
-  
+
   @Override
   protected void onLoad() {
     super.onLoad();

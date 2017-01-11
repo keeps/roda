@@ -58,15 +58,12 @@ public class DipFilePreview extends BitstreamPreview<DIPFile> {
 
     final FlowPanel layout = new FlowPanel();
 
-    final SearchPanel dipFileSearch = new SearchPanel(filter, RodaConstants.DIPFILE_SEARCH,
+    final SearchPanel dipFileSearch = new SearchPanel(filter, RodaConstants.DIPFILE_SEARCH, true,
       messages.searchPlaceHolder(), false, false, true);
 
     // TODO add summary
     final DIPFileList folderList = new DIPFileList(filter, Facets.NONE, "", false);
-
     dipFileSearch.setList(folderList);
-    dipFileSearch.setDefaultFilter(filter);
-    dipFileSearch.setDefaultFilterIncremental(true);
 
     layout.add(dipFileSearch);
     layout.add(folderList);

@@ -124,7 +124,7 @@ public class JpylyzerPlugin extends AbstractPlugin<AIP> {
 
                       String jpylyzerResults = JpylyzerPluginUtils.runJpylyzer(binary, getParameterValues());
                       ContentPayload payload = new StringContentPayload(jpylyzerResults);
-                      model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(),
+                      model.createOrUpdateOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(),
                         ".xml", "jpylyzer", payload, inotify);
 
                       sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), representation.getId(), file.getPath(),

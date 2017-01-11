@@ -241,9 +241,8 @@ public class PreservationEvents extends Composite {
       }
     });
 
-    eventSearch = new SearchPanel(filter, RodaConstants.PRESERVATION_EVENT_SEARCH, messages.searchPlaceHolder(), false,
-      false, true);
-    eventSearch.setDefaultFilterIncremental(true);
+    eventSearch = new SearchPanel(filter, RodaConstants.PRESERVATION_EVENT_SEARCH, true, messages.searchPlaceHolder(),
+      false, false, true);
     eventSearch.setList(eventList);
 
     initWidget(uiBinder.createAndBindUi(this));

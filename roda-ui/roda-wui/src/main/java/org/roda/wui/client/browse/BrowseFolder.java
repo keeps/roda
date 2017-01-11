@@ -231,8 +231,7 @@ public class BrowseFolder extends Composite {
       }
     });
 
-    searchPanel = new SearchPanel(filter, ALL_FILTER, messages.searchPlaceHolder(), false, false, false);
-    searchPanel.setDefaultFilterIncremental(true);
+    searchPanel = new SearchPanel(filter, ALL_FILTER, true, messages.searchPlaceHolder(), false, false, false);
     searchPanel.setList(filesList);
 
     initWidget(uiBinder.createAndBindUi(this));

@@ -782,7 +782,6 @@ public class BrowseFile extends Composite {
         public void onSuccess(Boolean confirmed) {
           if (confirmed) {
             BrowserService.Util.getInstance().deleteDIP(dip.getId(), new AsyncCallback<Void>() {
-
               @Override
               public void onSuccess(Void result) {
                 updateDisseminations();
@@ -793,7 +792,6 @@ public class BrowseFile extends Composite {
                 AsyncCallbackUtils.defaultFailureTreatment(caught);
               }
             });
-
           }
         }
 

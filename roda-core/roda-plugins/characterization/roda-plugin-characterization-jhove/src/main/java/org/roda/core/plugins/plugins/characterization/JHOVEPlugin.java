@@ -121,7 +121,7 @@ public class JHOVEPlugin extends AbstractPlugin<AIP> {
 
                     Path jhoveResults = JHOVEPluginUtils.runJhove(binary, getParameterValues());
                     ContentPayload payload = new FSPathContentPayload(jhoveResults);
-                    model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(), ".xml",
+                    model.createOrUpdateOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(), ".xml",
                       RodaConstants.OTHER_METADATA_TYPE_JHOVE, payload, inotify);
                     jhoveResults.toFile().delete();
 

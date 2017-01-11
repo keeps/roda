@@ -39,8 +39,8 @@ public class IndexedFilePreview extends BitstreamPreview<IndexedFile> {
 
     final FlowPanel layout = new FlowPanel();
 
-    final SearchPanel fileSearch = new SearchPanel(filter, RodaConstants.FILE_SEARCH, messages.searchPlaceHolder(),
-      false, false, true);
+    final SearchPanel fileSearch = new SearchPanel(filter, RodaConstants.FILE_SEARCH, true,
+      messages.searchPlaceHolder(), false, false, true);
 
     boolean justActive = true;
     boolean selectable = false;
@@ -49,8 +49,6 @@ public class IndexedFilePreview extends BitstreamPreview<IndexedFile> {
       messages.representationListOfFiles(), selectable, showFilesPath);
 
     fileSearch.setList(folderList);
-    fileSearch.setDefaultFilter(filter);
-    fileSearch.setDefaultFilterIncremental(true);
 
     layout.add(fileSearch);
     layout.add(folderList);

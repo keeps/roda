@@ -62,6 +62,9 @@ import org.slf4j.LoggerFactory;
 
 public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
   private static final Logger LOGGER = LoggerFactory.getLogger(VeraPDFPlugin.class);
+  private static final String VERAPDF_OTHER_METADATA_TYPE = "VeraPDF";
+  private static final String VERAPDF_OTHER_METADATA_SUFFIX = ".html";
+
   private String profile;
   private boolean ignoreFiles = true;
   private boolean hasFeatures = false;
@@ -175,13 +178,15 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
 
     for (AIP aip : list) {
       LOGGER.debug("Processing AIP {}", aip.getId());
-      Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
+      Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING)
+        .setHtmlPluginDetails(true);
       PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
       PluginState pluginResultState = PluginState.SUCCESS;
       PluginState reportState = PluginState.SUCCESS;
       ValidationReport validationReport = new ValidationReport();
+      ValidationReport metadataReport = new ValidationReport();
       boolean hasNonPdfFiles = false;
-      List<File> resourceList = new ArrayList<File>();
+      List<File> failedList = new ArrayList<File>();
       List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
 
       for (Representation representation : aip.getRepresentations()) {
@@ -205,6 +210,7 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
                 String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1, ifile.getId().length());
                 String fileInfoPath = StringUtils.join(Arrays.asList(aip.getId(), representation.getId(),
                   StringUtils.join(file.getPath(), '/'), file.getId()), '/');
+                fileInfoPath = fileInfoPath.replace("//", "/").replace("/[]/", "/");
 
                 if ("pdf".equalsIgnoreCase(fileFormat) || "application/pdf".equals(fileMimetype)) {
                   LOGGER.debug("Running veraPDF validator on {}", file.getId());
@@ -215,22 +221,34 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
                   sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), representation.getId(), file.getPath(),
                     file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
+                  ValidationIssue issue = new ValidationIssue();
                   if (veraPDFResult.getFirst() != null) {
-                    model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
-                      ".xml", "VeraPDF", veraPDFResult.getFirst(), false);
-                  }
+                    model.createOrUpdateOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(),
+                      file.getId(), VERAPDF_OTHER_METADATA_SUFFIX, VERAPDF_OTHER_METADATA_TYPE,
+                      veraPDFResult.getFirst(), false);
 
-                  if (veraPDFResult.getFirst() == null || !veraPDFResult.getSecond().booleanValue()) {
-                    resourceList.add(file);
+                    String url = "<a href='" + VeraPDFPluginUtils.createOtherMetadataDownloadUri(ifile.getUUID(),
+                      VERAPDF_OTHER_METADATA_TYPE, VERAPDF_OTHER_METADATA_SUFFIX) + "'>" + fileInfoPath + "</a>";
+
+                    if (!veraPDFResult.getSecond().booleanValue()) {
+                      failedList.add(file);
+                      pluginResultState = PluginState.PARTIAL_SUCCESS;
+                      issue.setMessage("VeraPDF validation failed on: " + url);
+                    } else {
+                      issue.setMessage("VeraPDF validation succeeded on: " + url);
+                    }
+
+                  } else {
+                    failedList.add(file);
                     pluginResultState = PluginState.PARTIAL_SUCCESS;
-                    reportItem.addPluginDetails(
-                      "VeraPDF validation failed on " + fileInfoPath.replace("//", "/").replace("/[]/", "/") + ".\n");
+                    issue.setMessage("VeraPDF validation failed on: " + fileInfoPath + "");
                   }
 
+                  metadataReport.addIssue(issue);
+                  IOUtils.closeQuietly(directAccess);
                 } else {
                   if (ignoreFiles) {
-                    ValidationIssue issue = new ValidationIssue(
-                      StringUtils.join(Arrays.asList(representation.getId(), file.getPath(), file.getId()), '/'));
+                    ValidationIssue issue = new ValidationIssue(fileInfoPath);
                     validationReport.addIssue(issue);
                   } else {
                     pluginResultState = PluginState.FAILURE;
@@ -260,20 +278,19 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
       }
 
       LOGGER.debug("Creating veraPDF event on AIP {}", aip.getId());
-      createEvent(model, index, aip.getId(), null, null, null, pluginResultState, "", resourceList, sources);
+      createEvent(model, index, aip.getId(), null, null, null, pluginResultState, "", failedList, sources);
 
       jobPluginInfo.incrementObjectsProcessed(reportState);
       reportItem.setPluginState(reportState);
 
-      if (reportState.equals(PluginState.SUCCESS)) {
-        if (ignoreFiles && !validationReport.getIssues().isEmpty()) {
-          reportItem.setHtmlPluginDetails(true)
-            .setPluginDetails(validationReport.toHtml(false, false, false, "Ignored files"));
-        }
+      reportItem.addPluginDetails(metadataReport.toHtml(false, false, false, "VeraPDF reports"));
+
+      if (ignoreFiles && !validationReport.getIssues().isEmpty()) {
+        reportItem.addPluginDetails(validationReport.toHtml(false, false, false, "Ignored files"));
       }
 
       if (hasNonPdfFiles) {
-        reportItem.setPluginDetails("Non PDF files were not ignored");
+        reportItem.addPluginDetails("It could have failed due to not ignoring PDF files");
       }
 
       report.addReport(reportItem);
@@ -288,17 +305,18 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
 
     try {
       for (Representation representation : list) {
-        List<File> resourceList = new ArrayList<File>();
+        List<File> failedList = new ArrayList<File>();
         List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
         // FIXME 20160516 hsilva: see how to set initial
         // initialOutcomeObjectState
         Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getRepresentationId(representation),
-          Representation.class, AIPState.INGEST_PROCESSING);
+          Representation.class, AIPState.INGEST_PROCESSING).setHtmlPluginDetails(true);
         PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
         PluginState pluginResultState = PluginState.SUCCESS;
         PluginState reportState = PluginState.SUCCESS;
         AIP aip = model.retrieveAIP(representation.getAipId());
         ValidationReport validationReport = new ValidationReport();
+        ValidationReport metadataReport = new ValidationReport();
         boolean hasNonPdfFiles = false;
 
         try {
@@ -318,6 +336,7 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
                 String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1, ifile.getId().length());
                 String fileInfoPath = StringUtils.join(
                   Arrays.asList(representation.getId(), StringUtils.join(file.getPath(), '/'), file.getId()), '/');
+                fileInfoPath = fileInfoPath.replace("//", "/").replace("/[]/", "/");
 
                 if ("pdf".equalsIgnoreCase(fileFormat) || "application/pdf".equals(fileMimetype)) {
                   LOGGER.debug("Running veraPDF validator on {}", file.getId());
@@ -328,23 +347,35 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
                   sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), representation.getId(), file.getPath(),
                     file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
+                  ValidationIssue issue = new ValidationIssue();
                   if (veraPDFResult.getFirst() != null) {
-                    model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
-                      ".xml", "VeraPDF", veraPDFResult.getFirst(), false);
-                  }
+                    model.createOrUpdateOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(),
+                      file.getId(), VERAPDF_OTHER_METADATA_SUFFIX, VERAPDF_OTHER_METADATA_TYPE,
+                      veraPDFResult.getFirst(), false);
 
-                  if (veraPDFResult.getFirst() == null || !veraPDFResult.getSecond().booleanValue()) {
-                    resourceList.add(file);
+                    String url = "<a href='" + VeraPDFPluginUtils.createOtherMetadataDownloadUri(ifile.getUUID(),
+                      VERAPDF_OTHER_METADATA_TYPE, VERAPDF_OTHER_METADATA_SUFFIX) + "'>" + fileInfoPath + "</a>";
+
+                    if (!veraPDFResult.getSecond().booleanValue()) {
+                      failedList.add(file);
+                      pluginResultState = PluginState.PARTIAL_SUCCESS;
+                      issue.setMessage("VeraPDF validation failed on: " + url);
+                    } else {
+                      issue.setMessage("VeraPDF validation succeeded on: " + url);
+                    }
+
+                  } else {
+                    failedList.add(file);
                     pluginResultState = PluginState.PARTIAL_SUCCESS;
-                    reportItem.addPluginDetails(
-                      "VeraPDF validation failed on " + fileInfoPath.replace("//", "/").replace("/[]/", "/") + ".\n");
+                    issue.setMessage("VeraPDF validation failed on: " + fileInfoPath + "");
                   }
 
+                  metadataReport.addIssue(issue);
                   IOUtils.closeQuietly(directAccess);
 
                 } else {
                   if (ignoreFiles) {
-                    validationReport.addIssue(new ValidationIssue(file.getId()));
+                    validationReport.addIssue(new ValidationIssue(fileInfoPath));
                   } else {
                     reportState = PluginState.FAILURE;
                     hasNonPdfFiles = true;
@@ -369,22 +400,22 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
           reportItem.setPluginDetails(e.getMessage());
         } finally {
           LOGGER.debug("Creating veraPDF event for the representation {}", representation.getId());
-          createEvent(model, index, aip.getId(), representation.getId(), null, null, pluginResultState, "",
-            resourceList, sources);
+          createEvent(model, index, aip.getId(), representation.getId(), null, null, pluginResultState, "", failedList,
+            sources);
         }
 
         jobPluginInfo.incrementObjectsProcessed(reportState);
         reportItem.setPluginState(reportState);
 
-        if (reportState.equals(PluginState.SUCCESS)) {
-          if (ignoreFiles && !validationReport.getIssues().isEmpty()) {
-            reportItem.setHtmlPluginDetails(true)
-              .setPluginDetails(validationReport.toHtml(false, false, false, "Ignored files"));
-          }
+        reportItem.addPluginDetails(metadataReport.toHtml(false, false, false, "VeraPDF reports"));
+
+        if (ignoreFiles && !validationReport.getIssues().isEmpty()) {
+          reportItem.setHtmlPluginDetails(true)
+            .addPluginDetails(validationReport.toHtml(false, false, false, "Ignored files"));
         }
 
         if (hasNonPdfFiles) {
-          reportItem.setPluginDetails("Non PDF files were not ignored");
+          reportItem.addPluginDetails("It could have failed due to not ignoring PDF files");
         }
 
         report.addReport(reportItem);
@@ -402,13 +433,15 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
     SimpleJobPluginInfo jobPluginInfo, List<File> list) throws PluginException {
 
     for (File file : list) {
-      Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getFileId(file), File.class,
-        AIPState.INGEST_PROCESSING);
+      Report reportItem = PluginHelper
+        .initPluginReportItem(this, IdUtils.getFileId(file), File.class, AIPState.INGEST_PROCESSING)
+        .setHtmlPluginDetails(true);
       PluginState reportState = PluginState.SUCCESS;
       String details = "";
+      ValidationReport metadataReport = new ValidationReport();
 
       try {
-        List<File> resourceList = new ArrayList<File>();
+        List<File> failedList = new ArrayList<File>();
         // FIXME 20160516 hsilva: see how to set initial
         // initialOutcomeObjectState
         PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
@@ -419,6 +452,9 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
           IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
           String fileMimetype = ifile.getFileFormat().getMimeType();
           String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1, ifile.getId().length());
+          String fileInfoPath = StringUtils.join(Arrays.asList(file.getAipId(), file.getRepresentationId(),
+            StringUtils.join(file.getPath(), '/'), file.getId()), '/');
+          fileInfoPath = fileInfoPath.replace("//", "/").replace("/[]/", "/");
 
           if ("pdf".equalsIgnoreCase(fileFormat) || "application/pdf".equals(fileMimetype)) {
             LOGGER.debug("Running veraPDF validator on {}", file.getId());
@@ -427,30 +463,38 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
             Pair<StringContentPayload, Boolean> veraPDFResult = VeraPDFPluginUtils.runVeraPDF(directAccess.getPath(),
               profile, hasFeatures);
 
+            ValidationIssue issue = new ValidationIssue();
             if (veraPDFResult.getFirst() != null) {
-              model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
-                ".html", "VeraPDF", veraPDFResult.getFirst(), false);
+              model.createOrUpdateOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(),
+                file.getId(), VERAPDF_OTHER_METADATA_SUFFIX, VERAPDF_OTHER_METADATA_TYPE, veraPDFResult.getFirst(),
+                false);
+
+              String url = "<a href='" + VeraPDFPluginUtils.createOtherMetadataDownloadUri(ifile.getUUID(),
+                VERAPDF_OTHER_METADATA_TYPE, VERAPDF_OTHER_METADATA_SUFFIX) + "'>" + fileInfoPath + "</a>";
 
               if (!veraPDFResult.getSecond().booleanValue()) {
-                resourceList.add(file);
+                failedList.add(file);
                 pluginResultState = PluginState.PARTIAL_SUCCESS;
-                reportItem.addPluginDetails("VeraPDF validation failed on " + file.getId().replace("//", "/") + ".\n");
-                details = veraPDFResult.getFirst().toString();
+                issue.setMessage("VeraPDF validation failed on: " + url);
+              } else {
+                issue.setMessage("VeraPDF validation succeeded on: " + url);
               }
 
             } else {
+              failedList.add(file);
               pluginResultState = PluginState.PARTIAL_SUCCESS;
-              reportItem.addPluginDetails("VeraPDF validation failed on " + file.getId().replace("//", "/") + ".\n");
+              issue.setMessage("VeraPDF validation failed on: " + fileInfoPath + "");
             }
 
+            metadataReport.addIssue(issue);
             IOUtils.closeQuietly(directAccess);
           } else {
             if (reportState.equals(PluginState.SUCCESS)) {
               if (ignoreFiles) {
-                reportItem.setPluginDetails("This file was ignored.");
+                reportItem.addPluginDetails("This file was ignored.");
               } else {
                 pluginResultState = PluginState.FAILURE;
-                reportItem.setPluginDetails("This file format is not supported.");
+                reportItem.addPluginDetails("This file format is not supported.");
               }
             }
           }
@@ -460,8 +504,10 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
           reportState = PluginState.FAILURE;
         }
 
+        reportItem.addPluginDetails(metadataReport.toHtml(false, false, false, "VeraPDF reports"));
+
         createEvent(model, index, file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
-          pluginResultState, details, resourceList, null);
+          pluginResultState, details, failedList, null);
         jobPluginInfo.incrementObjectsProcessed(reportState);
 
       } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
@@ -482,7 +528,7 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
   }
 
   private void createEvent(ModelService model, IndexService index, String aipId, String representationId,
-    List<String> filePath, String fileId, PluginState pluginState, String details, List<File> resourceList,
+    List<String> filePath, String fileId, PluginState pluginState, String details, List<File> failedList,
     List<LinkingIdentifier> sources) throws PluginException {
     String outcomeDetails = null;
     try {
@@ -490,7 +536,7 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
       StringBuilder noteStringBuilder = new StringBuilder();
       noteStringBuilder.append("The following files did not pass veraPDF's validation with success: ");
 
-      for (File file : resourceList) {
+      for (File file : failedList) {
         noteStringBuilder.append(file.getId() + ", ");
       }
 

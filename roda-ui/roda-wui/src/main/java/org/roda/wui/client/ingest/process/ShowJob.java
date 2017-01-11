@@ -255,14 +255,12 @@ public class ShowJob extends Composite {
 
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getUUID()));
 
-    ingestJobReportsSearchPanel = new SearchPanel(filter, RodaConstants.JOB_REPORT_SEARCH,
+    ingestJobReportsSearchPanel = new SearchPanel(filter, RodaConstants.JOB_REPORT_SEARCH, true,
       messages.jobProcessedSearchPlaceHolder(), false, false, false);
-    ingestJobReportsSearchPanel.setDefaultFilterIncremental(true);
     ingestJobReportsSearchPanel.setList(ingestJobReports);
 
-    simpleJobReportsSearchPanel = new SearchPanel(filter, RodaConstants.JOB_REPORT_SEARCH,
+    simpleJobReportsSearchPanel = new SearchPanel(filter, RodaConstants.JOB_REPORT_SEARCH, true,
       messages.jobProcessedSearchPlaceHolder(), false, false, false);
-    simpleJobReportsSearchPanel.setDefaultFilterIncremental(true);
     simpleJobReportsSearchPanel.setList(simpleJobReports);
 
     jobReportStatus = new FlowPanel();

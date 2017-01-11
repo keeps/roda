@@ -118,9 +118,8 @@ public class PreservationAgents extends Composite {
       }
     });
 
-    agentSearch = new SearchPanel(Filter.NULL, RodaConstants.PRESERVATION_AGENT_SEARCH, messages.searchPlaceHolder(),
-      false, false, true);
-    agentSearch.setDefaultFilterIncremental(true);
+    agentSearch = new SearchPanel(Filter.ALL, RodaConstants.PRESERVATION_AGENT_SEARCH, true,
+      messages.searchPlaceHolder(), false, false, true);
     agentSearch.setList(agentList);
 
     initWidget(uiBinder.createAndBindUi(this));

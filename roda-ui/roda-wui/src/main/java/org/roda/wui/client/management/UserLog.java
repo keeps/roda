@@ -32,8 +32,8 @@ import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
-import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.core.client.GWT;
@@ -150,7 +150,8 @@ public class UserLog extends Composite {
     Facets facets = new Facets(fp1, fp2, fp3, fp4);
     logList = new LogEntryList(Filter.NULL, facets, messages.logsTitle(), false);
 
-    searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, messages.userLogSearchPlaceHolder(), false, false, false);
+    searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, true, messages.userLogSearchPlaceHolder(), false, false,
+      false);
     searchPanel.setList(logList);
 
     facetComponents = new FlowPanel();
@@ -204,7 +205,7 @@ public class UserLog extends Composite {
     inputDateInitial.getElement().setPropertyString("placeholder", messages.sidebarFilterFromDatePlaceHolder());
     inputDateFinal.getElement().setPropertyString("placeholder", messages.sidebarFilterToDatePlaceHolder());
   }
-  
+
   @Override
   protected void onLoad() {
     super.onLoad();

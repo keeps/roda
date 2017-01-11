@@ -142,7 +142,7 @@ public class ExifToolPlugin extends AbstractPlugin<AIP> {
                     }
 
                     String fileId = path.getFileName().toString();
-                    model.createOtherMetadata(aip.getId(), representation.getId(), fileDirectoryPath, fileId, ".xml",
+                    model.createOrUpdateOtherMetadata(aip.getId(), representation.getId(), fileDirectoryPath, fileId, ".xml",
                       RodaConstants.OTHER_METADATA_TYPE_EXIFTOOL, payload, inotify);
                   }
                 }

@@ -177,9 +177,13 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(getRepresentationOtherMetadataFolderPath(aipId, representationId));
   }
 
-  public static StoragePath getRepresentationOtherMetadataStoragePath(String aipId, String representationId,
+  public static List<String> getRepresentationOtherMetadataStoragePath(String aipId, String representationId,
     String type) throws RequestNotValidException {
-    return DefaultStoragePath.parse(getRepresentationOtherMetadataPath(aipId, representationId, type));
+    if (type == null) {
+      return getRepresentationOtherMetadataFolderPath(aipId, representationId);
+    } else {
+      return getRepresentationOtherMetadataPath(aipId, representationId, type);
+    }
   }
 
   private static List<String> getRepresentationDataPath(String aipId, String representationId) {
@@ -835,7 +839,7 @@ public final class ModelUtils {
 
       recursive = false;
       CloseableIterable<OptionalWithCause<org.roda.core.data.v2.ip.metadata.OtherMetadata>> allOtherMetadata = model
-        .listOtherMetadata(aip.getId(), rep.getId());
+        .listOtherMetadata(aip.getId(), rep.getId(), null, null, null);
       for (OptionalWithCause<org.roda.core.data.v2.ip.metadata.OtherMetadata> otherMetadata : allOtherMetadata) {
         if (otherMetadata.isPresent()) {
           OtherMetadata o = otherMetadata.get();

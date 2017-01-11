@@ -24,8 +24,8 @@ import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.lists.FormatList;
-import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell.CheckboxSelectionListener;
+import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
@@ -139,8 +139,8 @@ public class FormatRegister extends Composite {
     Facets facets = null;
     formatList = new FormatList(Filter.NULL, facets, messages.formatsTitle(), true);
 
-    searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, messages.formatRegisterSearchPlaceHolder(), false, false,
-      false);
+    searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, true, messages.formatRegisterSearchPlaceHolder(), false,
+      false, false);
     searchPanel.setList(formatList);
 
     formatList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {

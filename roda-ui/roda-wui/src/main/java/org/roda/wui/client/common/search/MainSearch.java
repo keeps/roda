@@ -149,9 +149,8 @@ public class MainSearch extends Composite {
 
     defaultFilters();
 
-    searchPanel = new SearchPanel(filter_aips, RodaConstants.AIP_SEARCH, messages.searchPlaceHolder(), true, true,
+    searchPanel = new SearchPanel(filter_aips, RodaConstants.AIP_SEARCH, true, messages.searchPlaceHolder(), true, true,
       false);
-    searchPanel.setDefaultFilterIncremental(false);
 
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -195,7 +194,7 @@ public class MainSearch extends Composite {
       createItemsSearchResultPanel();
     }
 
-    searchPanel.setVariables(filter_aips, RodaConstants.AIP_SEARCH, itemsSearchResultPanel,
+    searchPanel.setVariables(filter_aips, RodaConstants.AIP_SEARCH, true, itemsSearchResultPanel,
       itemsSearchAdvancedFieldsPanel);
     searchPanel.setSearchAdvancedFieldOptionsAddVisible(true);
     searchPanel.setSearchAdvancedGoEnabled(itemsSearchAdvancedFieldsPanel.getWidgetCount() == 0 ? false : true);
@@ -217,7 +216,7 @@ public class MainSearch extends Composite {
       createRepresentationsSearchResultPanel();
     }
 
-    searchPanel.setVariables(filter_representations, RodaConstants.REPRESENTATION_SEARCH,
+    searchPanel.setVariables(filter_representations, RodaConstants.REPRESENTATION_SEARCH, true,
       representationsSearchResultPanel, representationsSearchAdvancedFieldsPanel);
     searchPanel.setSearchAdvancedFieldOptionsAddVisible(true);
     searchPanel
@@ -240,7 +239,7 @@ public class MainSearch extends Composite {
       createFilesSearchResultPanel();
     }
 
-    searchPanel.setVariables(filter_files, RodaConstants.FILE_SEARCH, filesSearchResultPanel,
+    searchPanel.setVariables(filter_files, RodaConstants.FILE_SEARCH, true, filesSearchResultPanel,
       filesSearchAdvancedFieldsPanel);
     searchPanel.setSearchAdvancedFieldOptionsAddVisible(true);
     searchPanel.setSearchAdvancedGoEnabled(filesSearchAdvancedFieldsPanel.getWidgetCount() == 0 ? false : true);
@@ -430,7 +429,7 @@ public class MainSearch extends Composite {
           filter_aips = filter;
           filter_representations = filter;
           filter_files = filter;
-          searchPanel.setDefaultFilterIncremental(true);
+          searchPanel.setDefaultFilter(filter, true);
         }
       }
     }

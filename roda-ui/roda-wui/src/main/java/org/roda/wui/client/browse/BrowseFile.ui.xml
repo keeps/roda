@@ -105,7 +105,7 @@
 								<ui:text from='{messages.createFolderButton}' />
 							</g:Button>
 							<g:Button ui:field="optionRemove" addStyleNames="btn btn-block btn-danger btn-ban">
-								<ui:text from='{messages.viewRepresentationRemoveFileButton}' />
+								<ui:text from='{messages.removeButton}' />
 							</g:Button>
 						</g:FlowPanel>
 						<g:FlowPanel ui:field="preservationSidebar">
@@ -114,7 +114,7 @@
 							</g:Label>
 							<g:Button ui:field="optionNewProcess"
 								addStyleNames="btn btn-block btn-default-alt btn-play">
-								<ui:text from='{messages.viewRepresentationNewProcessButton}' />
+								<ui:text from='{messages.newProcessPreservation}' />
 							</g:Button>
 							<g:Button ui:field="optionIdentify"
 								addStyleNames="btn btn-block btn-default-alt btn-play">

@@ -74,9 +74,7 @@ public class VeraPDFPluginUtils {
     });
 
   private static final String resourceRoot = "org/verapdf/report/"; //$NON-NLS-1$
-  private static final String xslExt = ".xsl"; //$NON-NLS-1$
-  private static final String detailedReport = resourceRoot + "DetailedHtmlReport" + xslExt; //$NON-NLS-1$
-  private static final String summaryReport = resourceRoot + "SummaryHtmlReport" + xslExt; //$NON-NLS-1$
+  private static final String detailedReport = resourceRoot + "DetailedHtmlReport.xsl"; //$NON-NLS-1$
 
   public static Pair<StringContentPayload, Boolean> runVeraPDF(Path input, String profile, boolean hasFeatures)
     throws GenericException {
@@ -116,5 +114,15 @@ public class VeraPDFPluginUtils {
       ret.add(pdfaFlavour.getId());
     }
     return ret;
+  }
+
+  public static String createOtherMetadataDownloadUri(String fileUUID, String type, String suffix) {
+    // api/v1/files/{fileUUID}/other_metadata/{type}/{suffix}?acceptFormat=bin
+    StringBuilder b = new StringBuilder();
+    b.append(RodaConstants.API_REST_V1_FILES).append(fileUUID).append(RodaConstants.API_SEP)
+      .append(RodaConstants.API_OTHER_METADATA).append(RodaConstants.API_SEP).append(type).append(RodaConstants.API_SEP)
+      .append(suffix).append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT)
+      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN);
+    return b.toString();
   }
 }

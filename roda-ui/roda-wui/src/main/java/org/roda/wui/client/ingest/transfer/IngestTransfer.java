@@ -191,10 +191,9 @@ public class IngestTransfer extends Composite {
     Facets facets = null;
     transferredResourceList = new TransferredResourceList(Filter.NULL, facets, messages.ingestTransferList(), true);
 
-    searchPanel = new SearchPanel(Filter.NULL, RodaConstants.TRANSFERRED_RESOURCE_SEARCH,
+    searchPanel = new SearchPanel(Filter.NULL, RodaConstants.TRANSFERRED_RESOURCE_SEARCH, true,
       messages.ingestTransferSearchPlaceHolder(), false, false, false);
     searchPanel.setList(transferredResourceList);
-    searchPanel.setDefaultFilterIncremental(true);
 
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -281,7 +280,7 @@ public class IngestTransfer extends Composite {
       Filter filter = new Filter(
         new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID, r.getRelativePath()));
       transferredResourceList.setFilter(filter);
-      searchPanel.setDefaultFilter(filter);
+      searchPanel.setDefaultFilter(filter, true);
 
       searchPanel.setVisible(true);
       transferredResourceList.setVisible(true);
@@ -320,7 +319,7 @@ public class IngestTransfer extends Composite {
     download.setVisible(false);
 
     transferredResourceList.setFilter(DEFAULT_FILTER);
-    searchPanel.setDefaultFilter(DEFAULT_FILTER);
+    searchPanel.setDefaultFilter(DEFAULT_FILTER, true);
     breadcrumb.setVisible(false);
 
     lastScanned.setText("");

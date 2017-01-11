@@ -1383,7 +1383,6 @@ public class ModelService extends ModelObservable {
     } else {
       return aipPreservationMetadata;
     }
-
   }
 
   public CloseableIterable<OptionalWithCause<PreservationMetadata>> listPreservationMetadata(String aipId,
@@ -1455,9 +1454,21 @@ public class ModelService extends ModelObservable {
     return binary;
   }
 
-  public OtherMetadata createOtherMetadata(String aipId, String representationId, List<String> fileDirectoryPath,
-    String fileId, String fileSuffix, String type, ContentPayload payload, boolean notify)
+  public OtherMetadata retrieveOtherMetadata(String aipId, String representationId, List<String> fileDirectoryPath,
+    String fileId, String fileSuffix, String type)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    try {
+      retrieveOtherMetadataBinary(aipId, representationId, fileDirectoryPath, fileId, fileSuffix, type);
+      String id = IdUtils.getOtherMetadataId(type, aipId, representationId, fileDirectoryPath, fileId);
+      return new OtherMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, fileSuffix);
+    } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+      throw e;
+    }
+  }
+
+  public OtherMetadata createOrUpdateOtherMetadata(String aipId, String representationId,
+    List<String> fileDirectoryPath, String fileId, String fileSuffix, String type, ContentPayload payload,
+    boolean notify) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     OtherMetadata om = null;
 
     StoragePath binaryPath = ModelUtils.getOtherMetadataStoragePath(aipId, representationId, fileDirectoryPath, fileId,
@@ -1479,6 +1490,14 @@ public class ModelService extends ModelObservable {
     }
 
     return om;
+  }
+
+  public void deleteOtherMetadata(String aipId, String representationId, List<String> fileDirectoryPath, String fileId,
+    String fileSuffix, String type)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    StoragePath binaryPath = ModelUtils.getOtherMetadataStoragePath(aipId, representationId, fileDirectoryPath, fileId,
+      fileSuffix, type);
+    storage.deleteResource(binaryPath);
   }
 
   public CloseableIterable<OptionalWithCause<OtherMetadata>> listOtherMetadata(String aipId, String type,
@@ -1505,7 +1524,7 @@ public class ModelService extends ModelObservable {
       AIP aip = retrieveAIP(aipId);
       for (Representation representation : aip.getRepresentations()) {
         CloseableIterable<OptionalWithCause<OtherMetadata>> representationOtherMetadata = listOtherMetadata(aipId,
-          representation.getId(), type);
+          representation.getId(), null, null, type);
         list.add(representationOtherMetadata);
       }
       return CloseableIterables.concat(list);
@@ -1534,8 +1553,10 @@ public class ModelService extends ModelObservable {
   }
 
   public CloseableIterable<OptionalWithCause<OtherMetadata>> listOtherMetadata(String aipId, String representationId,
-    String type) throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
-    StoragePath storagePath = ModelUtils.getRepresentationOtherMetadataStoragePath(aipId, representationId, type);
+    List<String> filePath, String fileId, String type)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    List<String> metadataPath = ModelUtils.getRepresentationOtherMetadataStoragePath(aipId, representationId, type);
+    StoragePath storagePath = DefaultStoragePath.parse(metadataPath);
 
     boolean recursive = true;
     CloseableIterable<OptionalWithCause<OtherMetadata>> ret;
@@ -1543,11 +1564,16 @@ public class ModelService extends ModelObservable {
       CloseableIterable<Resource> resources = storage.listResourcesUnderDirectory(storagePath, recursive);
       ret = ResourceParseUtils.convert(getStorage(), resources, OtherMetadata.class);
     } catch (NotFoundException e) {
-      // check if Representation exists
-      storage.getDirectory(ModelUtils.getRepresentationStoragePath(aipId, representationId));
+      // check if Representation or AIP exists
+      if (representationId != null) {
+        storage.getDirectory(ModelUtils.getRepresentationStoragePath(aipId, representationId));
+      } else {
+        storage.getDirectory(ModelUtils.getAIPStoragePath(aipId));
+      }
       // if no exception was sent by above method, return empty list
       ret = new EmptyClosableIterable<OptionalWithCause<OtherMetadata>>();
     }
+
     return ret;
   }
 

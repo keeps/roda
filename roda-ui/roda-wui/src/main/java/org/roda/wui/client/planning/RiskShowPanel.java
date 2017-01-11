@@ -17,8 +17,8 @@ import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.lists.RiskIncidenceList;
-import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell.CheckboxSelectionListener;
+import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
@@ -152,8 +152,8 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
   public RiskShowPanel() {
     incidenceList = new RiskIncidenceList(null, null, messages.riskIncidences(), true);
 
-    searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, messages.riskIncidenceRegisterSearchPlaceHolder(), false,
-      false, false);
+    searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, true, messages.riskIncidenceRegisterSearchPlaceHolder(),
+      false, false, false);
     searchPanel.setList(incidenceList);
 
     initWidget(uiBinder.createAndBindUi(this));
@@ -163,10 +163,11 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISK_ID, risk.getId()));
     incidenceList = new RiskIncidenceList(filter, null, messages.riskIncidences(), hasTitle);
 
-    searchPanel = new SearchPanel(
-      new Filter(new BasicSearchFilterParameter(RodaConstants.RISK_SEARCH, "*"),
-        new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISK_ID, risk.getId())),
-      ALL_FILTER, messages.riskIncidenceRegisterSearchPlaceHolder(), false, false, false);
+    Filter incidenceFilter = new Filter(new BasicSearchFilterParameter(RodaConstants.RISK_INCIDENCE_SEARCH, "*"),
+      new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISK_ID, risk.getId()));
+
+    searchPanel = new SearchPanel(incidenceFilter, ALL_FILTER, true, messages.riskIncidenceRegisterSearchPlaceHolder(),
+      false, false, false);
     searchPanel.setList(incidenceList);
 
     incidenceList.addCheckboxSelectionListener(new CheckboxSelectionListener<RiskIncidence>() {

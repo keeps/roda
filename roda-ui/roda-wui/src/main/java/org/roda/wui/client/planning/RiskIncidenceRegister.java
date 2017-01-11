@@ -150,8 +150,8 @@ public class RiskIncidenceRegister extends Composite {
 
     riskIncidenceList = new RiskIncidenceList(Filter.NULL, facets, messages.riskIncidencesTitle(), true);
 
-    searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, messages.riskIncidenceRegisterSearchPlaceHolder(), false,
-      false, false);
+    searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, true, messages.riskIncidenceRegisterSearchPlaceHolder(),
+      false, false, false);
     searchPanel.setList(riskIncidenceList);
 
     facetDetectedBy = new FlowPanel();

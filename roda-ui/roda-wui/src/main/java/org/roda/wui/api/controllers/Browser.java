@@ -608,7 +608,7 @@ public class Browser extends RodaWuiController {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // validate input
-    BrowserHelper.validateListAIPPreservationMetadataParams(acceptFormat);
+    BrowserHelper.validateListAIPMetadataParams(acceptFormat);
 
     // check user permissions
     controllerAssistant.checkRoles(user);
@@ -662,7 +662,7 @@ public class Browser extends RodaWuiController {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // validate input
-    BrowserHelper.validateListAIPPreservationMetadataParams(acceptFormat);
+    BrowserHelper.validateListAIPMetadataParams(acceptFormat);
 
     // check user permissions
     controllerAssistant.checkRoles(user);
@@ -785,6 +785,191 @@ public class Browser extends RodaWuiController {
     controllerAssistant.registerAction(user, rep.getAipId(), LOG_ENTRY_STATE.SUCCESS,
       RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId, RodaConstants.CONTROLLER_ID_PARAM, id);
 
+  }
+
+  public static EntityResponse listOtherMetadata(User user, String aipId, String representationId, String type,
+    String acceptFormat)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // validate input
+    BrowserHelper.validateListAIPMetadataParams(acceptFormat);
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
+    UserUtility.checkAIPPermissions(user, aip, PermissionType.READ);
+
+    // delegate
+    EntityResponse aipOtherMetadataList = BrowserHelper.listOtherMetadata(aipId, representationId, null, null, type,
+      acceptFormat);
+
+    // register action
+    controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_AIP_ID_PARAM,
+      aipId, RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId);
+
+    return aipOtherMetadataList;
+  }
+
+  public static EntityResponse listOtherMetadata(User user, String fileUUID, String type, String acceptFormat)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // validate input
+    BrowserHelper.validateListAIPMetadataParams(acceptFormat);
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+    IndexedFile file = BrowserHelper.retrieve(IndexedFile.class, fileUUID);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, file.getAipId());
+    UserUtility.checkAIPPermissions(user, aip, PermissionType.READ);
+
+    // delegate
+    EntityResponse aipOtherMetadataList = BrowserHelper.listOtherMetadata(file.getAipId(), file.getRepresentationId(),
+      file.getPath(), file.getId(), type, acceptFormat);
+
+    // register action
+    controllerAssistant.registerAction(user, file.getAipId(), LOG_ENTRY_STATE.SUCCESS,
+      RodaConstants.CONTROLLER_FILE_UUID_PARAM, fileUUID);
+
+    return aipOtherMetadataList;
+  }
+
+  public static EntityResponse retrieveOtherMetadata(User user, String aipId, String representationId, String type,
+    String suffix, String acceptFormat)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // validate input
+    BrowserHelper.validateGetOtherMetadataParams(acceptFormat);
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
+    UserUtility.checkAIPPermissions(user, aip, PermissionType.READ);
+
+    // delegate
+    EntityResponse otherMetadata = BrowserHelper.retrieveOtherMetadata(aipId, representationId, null, null, type,
+      suffix, acceptFormat);
+
+    // register action
+    controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_AIP_ID_PARAM,
+      aipId, RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId);
+
+    return otherMetadata;
+  }
+
+  public static EntityResponse retrieveOtherMetadata(User user, String fileUUID, String type, String suffix,
+    String acceptFormat)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // validate input
+    BrowserHelper.validateGetOtherMetadataParams(acceptFormat);
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+    IndexedFile file = BrowserHelper.retrieve(IndexedFile.class, fileUUID);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, file.getAipId());
+    UserUtility.checkAIPPermissions(user, aip, PermissionType.READ);
+
+    // delegate
+    EntityResponse otherMetadata = BrowserHelper.retrieveOtherMetadata(file.getAipId(), file.getRepresentationId(),
+      file.getPath(), file.getId(), type, suffix, acceptFormat);
+
+    // register action
+    controllerAssistant.registerAction(user, file.getAipId(), LOG_ENTRY_STATE.SUCCESS,
+      RodaConstants.CONTROLLER_FILE_UUID_PARAM, fileUUID);
+
+    return otherMetadata;
+  }
+
+  public static void createOrUpdateOtherMetadata(User user, String aipId, String representationId, String type,
+    InputStream is, String fileName) throws AuthorizationDeniedException, GenericException, NotFoundException,
+    RequestNotValidException, ValidationException, AlreadyExistsException {
+
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
+    UserUtility.checkAIPPermissions(user, aip, PermissionType.UPDATE);
+
+    if (fileName.contains(".")) {
+      fileName = fileName.substring(fileName.lastIndexOf('.'));
+    }
+
+    // delegate
+    BrowserHelper.createOrUpdateOtherMetadataFile(aipId, representationId, null, null, type, fileName, is);
+
+    // register action
+    controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_AIP_ID_PARAM,
+      aipId, RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId);
+  }
+
+  public static void createOrUpdateOtherMetadata(User user, String fileUUID, String type, InputStream is,
+    String fileName) throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
+    ValidationException, AlreadyExistsException {
+
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+    IndexedFile file = BrowserHelper.retrieve(IndexedFile.class, fileUUID);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, file.getAipId());
+    UserUtility.checkAIPPermissions(user, aip, PermissionType.UPDATE);
+
+    if (fileName.contains(".")) {
+      fileName = fileName.substring(fileName.lastIndexOf('.'));
+    }
+
+    // delegate
+    BrowserHelper.createOrUpdateOtherMetadataFile(file.getAipId(), file.getRepresentationId(), file.getPath(),
+      file.getId(), type, fileName, is);
+
+    // register action
+    controllerAssistant.registerAction(user, file.getAipId(), LOG_ENTRY_STATE.SUCCESS,
+      RodaConstants.CONTROLLER_FILE_UUID_PARAM, fileUUID);
+  }
+
+  public static void deleteOtherMetadata(User user, String aipId, String representationId, String suffix, String type)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
+    ValidationException, AlreadyExistsException {
+
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
+    UserUtility.checkAIPPermissions(user, aip, PermissionType.UPDATE);
+
+    // delegate
+    BrowserHelper.deleteOtherMetadataFile(aipId, representationId, null, null, suffix, type);
+
+    // register action
+    controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_AIP_ID_PARAM,
+      aipId, RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId);
+  }
+
+  public static void deleteOtherMetadata(User user, String fileUUID, String suffix, String type)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
+    ValidationException, AlreadyExistsException {
+
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+    IndexedFile file = BrowserHelper.retrieve(IndexedFile.class, fileUUID);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, file.getAipId());
+    UserUtility.checkAIPPermissions(user, aip, PermissionType.UPDATE);
+
+    // delegate
+    BrowserHelper.deleteOtherMetadataFile(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
+      suffix, type);
+
+    // register action
+    controllerAssistant.registerAction(user, file.getAipId(), LOG_ENTRY_STATE.SUCCESS,
+      RodaConstants.CONTROLLER_FILE_UUID_PARAM, fileUUID);
   }
 
   /*

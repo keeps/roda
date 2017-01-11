@@ -127,7 +127,7 @@ public class AvprobePlugin extends AbstractPlugin<AIP> {
 
                     String probeResults = AvprobePluginUtils.runAvprobe(binary, fileFormat, getParameterValues());
                     ContentPayload payload = new StringContentPayload(probeResults);
-                    model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(),
+                    model.createOrUpdateOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(),
                       "." + AvprobePluginUtils.AVPROBE_METADATA_FORMAT, RodaConstants.OTHER_METADATA_TYPE_AVPROBE,
                       payload, inotify);
                   }
