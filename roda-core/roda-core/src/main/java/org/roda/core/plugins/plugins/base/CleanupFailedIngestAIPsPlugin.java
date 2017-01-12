@@ -95,6 +95,7 @@ public class CleanupFailedIngestAIPsPlugin extends AbstractPlugin<Void> {
 
       // find & delete aips
       IterableIndexResult<IndexedAIP> aipsToDelete = findAipsToDelete(index, activeJobsIds);
+      Job job = PluginHelper.getJob(this, model);
       for (IndexedAIP indexedAIP : aipsToDelete) {
         String error = null;
         try {
@@ -115,12 +116,13 @@ public class CleanupFailedIngestAIPsPlugin extends AbstractPlugin<Void> {
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
         }
         report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
       }
       jobPluginInfo.setSourceObjectsCount((int) aipsToDelete.getTotalObjects());
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (JobException e) {
+    } catch (JobException | AuthorizationDeniedException | NotFoundException | GenericException
+      | RequestNotValidException e) {
       LOGGER.error("Could not update Job information");
     }
 

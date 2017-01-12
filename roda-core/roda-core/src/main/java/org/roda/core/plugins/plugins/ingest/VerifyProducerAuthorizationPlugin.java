@@ -98,13 +98,14 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
-      List<AIP> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, jobPluginInfo, liteList);
+      Job job = PluginHelper.getJob(this, model);
+      List<AIP> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, jobPluginInfo, liteList, job);
 
       for (AIP aip : list) {
         LOGGER.debug("Checking producer authorization for AIPingest.submitP {}", aip.getId());
 
         Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
 
         reportItem.setPluginState(PluginState.SUCCESS)
           .setPluginDetails(String.format("Done with checking producer authorization for AIP %s", aip.getId()));
@@ -129,13 +130,14 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
         LOGGER.debug("Done with checking producer authorization for AIP {}", aip.getId());
 
         report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
 
       }
 
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (JobException e) {
+    } catch (JobException | AuthorizationDeniedException | NotFoundException | GenericException
+      | RequestNotValidException e) {
       throw new PluginException("A job exception has occurred", e);
     }
 

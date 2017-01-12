@@ -12,8 +12,13 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
@@ -59,10 +64,15 @@ public class DummyPlugin extends AbstractPlugin<AIP> {
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> liteList) throws PluginException {
 
-    List<AIP> list = PluginHelper.transformLitesIntoObjects(model, index, this, null, null, liteList);
+    try {
+      Job job = PluginHelper.getJob(this, model);
+      List<AIP> list = PluginHelper.transformLitesIntoObjects(model, index, this, null, null, liteList, job);
 
-    for (AIP aip : list) {
-      LOGGER.debug("AIP " + aip.getId());
+      for (AIP aip : list) {
+        LOGGER.debug("AIP " + aip.getId());
+      }
+    } catch (AuthorizationDeniedException | NotFoundException | GenericException | RequestNotValidException e) {
+      // do nothing
     }
 
     return null;

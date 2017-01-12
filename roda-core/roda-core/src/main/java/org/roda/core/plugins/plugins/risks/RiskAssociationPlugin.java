@@ -147,22 +147,22 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
-      List<T> list = PluginHelper.transformLitesIntoObjects(model, index, this, pluginReport, jobPluginInfo, liteList);
+      Job job = PluginHelper.getJob(this, model);
+      List<T> list = PluginHelper.transformLitesIntoObjects(model, index, this, pluginReport, jobPluginInfo, liteList,
+        job);
 
       String jobId = PluginHelper.getJobId(this);
-      Job job = index.retrieve(Job.class, jobId);
 
       if (!list.isEmpty() && riskIds != null) {
         List<String> risks = Arrays.asList(riskIds.split(","));
         Pair<SimpleJobPluginInfo, Report> jobInfo = new Pair<SimpleJobPluginInfo, Report>();
 
         if (list.get(0) instanceof AIP) {
-          jobInfo = addIncidenceToAIPList(model, index, list, risks, job.getUsername(), jobPluginInfo, pluginReport);
+          jobInfo = addIncidenceToAIPList(model, index, list, risks, jobPluginInfo, pluginReport, job);
         } else if (list.get(0) instanceof Representation) {
-          jobInfo = addIncidenceToRepresentationList(model, index, list, risks, job.getUsername(), jobPluginInfo,
-            pluginReport);
+          jobInfo = addIncidenceToRepresentationList(model, index, list, risks, jobPluginInfo, pluginReport, job);
         } else if (list.get(0) instanceof File) {
-          jobInfo = addIncidenceToFileList(model, index, list, risks, job.getUsername(), jobPluginInfo, pluginReport);
+          jobInfo = addIncidenceToFileList(model, index, list, risks, jobPluginInfo, pluginReport, job);
         }
 
         jobPluginInfo = jobInfo.getFirst();
@@ -171,10 +171,9 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
 
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (JobException e) {
+    } catch (JobException | AuthorizationDeniedException | NotFoundException | GenericException
+      | RequestNotValidException e) {
       throw new PluginException("A job exception has occurred", e);
-    } catch (NotFoundException | GenericException e) {
-      LOGGER.error("Could not get job information when creating an incidence");
     }
 
     return pluginReport;
@@ -191,8 +190,8 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
   }
 
   private <T extends Serializable> Pair<SimpleJobPluginInfo, Report> addIncidenceToAIPList(ModelService model,
-    IndexService index, List<T> list, List<String> risks, String jobUsername, SimpleJobPluginInfo jobPluginInfo,
-    Report pluginReport) throws JobException {
+    IndexService index, List<T> list, List<String> risks, SimpleJobPluginInfo jobPluginInfo, Report pluginReport,
+    Job job) throws JobException {
 
     List<AIP> aipList = (List<AIP>) list;
     for (AIP aip : aipList) {
@@ -202,7 +201,7 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
         try {
           RiskIncidence incidence = new RiskIncidence();
           incidence.setDetectedOn(new Date());
-          incidence.setDetectedBy(jobUsername);
+          incidence.setDetectedBy(job.getUsername());
           incidence.setRiskId(riskId);
           incidence.setAipId(aip.getId());
           incidence.setObjectClass(AIP.class.getSimpleName());
@@ -219,7 +218,7 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
       Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
       reportItem.setPluginState(state).setPluginDetails("Risk job plugin ran on an AIP");
       pluginReport.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
 
       try {
         PluginHelper.createPluginEvent(this, aip.getId(), model, index, state, "", true);
@@ -233,8 +232,8 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
   }
 
   private <T extends Serializable> Pair<SimpleJobPluginInfo, Report> addIncidenceToRepresentationList(
-    ModelService model, IndexService index, List<T> list, List<String> risks, String jobUsername,
-    SimpleJobPluginInfo jobPluginInfo, Report pluginReport) throws JobException {
+    ModelService model, IndexService index, List<T> list, List<String> risks, SimpleJobPluginInfo jobPluginInfo,
+    Report pluginReport, Job job) throws JobException {
 
     List<Representation> representationList = (List<Representation>) list;
     for (Representation representation : representationList) {
@@ -244,7 +243,7 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
         try {
           RiskIncidence incidence = new RiskIncidence();
           incidence.setDetectedOn(new Date());
-          incidence.setDetectedBy(jobUsername);
+          incidence.setDetectedBy(job.getUsername());
           incidence.setRiskId(riskId);
           incidence.setAipId(representation.getAipId());
           incidence.setRepresentationId(representation.getId());
@@ -262,7 +261,7 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
         Representation.class);
       reportItem.setPluginState(state).setPluginDetails("Risk job plugin ran on a representation");
       pluginReport.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
 
       try {
         PluginHelper.createPluginEvent(this, representation.getAipId(), representation.getId(), model, index, null,
@@ -277,8 +276,8 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
   }
 
   private <T extends Serializable> Pair<SimpleJobPluginInfo, Report> addIncidenceToFileList(ModelService model,
-    IndexService index, List<T> list, List<String> risks, String jobUsername, SimpleJobPluginInfo jobPluginInfo,
-    Report pluginReport) throws JobException {
+    IndexService index, List<T> list, List<String> risks, SimpleJobPluginInfo jobPluginInfo, Report pluginReport,
+    Job job) throws JobException {
 
     List<File> fileList = (List<File>) list;
     for (File file : fileList) {
@@ -288,7 +287,7 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
         try {
           RiskIncidence incidence = new RiskIncidence();
           incidence.setDetectedOn(new Date());
-          incidence.setDetectedBy(jobUsername);
+          incidence.setDetectedBy(job.getUsername());
           incidence.setRiskId(riskId);
           incidence.setAipId(file.getAipId());
           incidence.setRepresentationId(file.getRepresentationId());
@@ -307,7 +306,7 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
       Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getFileId(file), File.class);
       reportItem.setPluginState(state).setPluginDetails("Risk job plugin ran on a file");
       pluginReport.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
 
       try {
         PluginHelper.createPluginEvent(this, file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),

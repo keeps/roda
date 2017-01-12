@@ -12,8 +12,13 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
@@ -67,27 +72,32 @@ public class SIPRemovePlugin extends AbstractPlugin<TransferredResource> {
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> liteList) throws PluginException {
     Report report = PluginHelper.initPluginReport(this);
+    try {
+      Job job = PluginHelper.getJob(this, model);
+      List<TransferredResource> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, null,
+        liteList, job);
 
-    List<TransferredResource> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, null, liteList);
+      for (TransferredResource transferredResource : list) {
+        Report reportItem = PluginHelper.initPluginReportItem(this, transferredResource);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
 
-    for (TransferredResource transferredResource : list) {
-      Report reportItem = PluginHelper.initPluginReportItem(this, transferredResource);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
+        try {
+          LOGGER.debug("Removing SIP {}", transferredResource.getFullPath());
+          model.deleteTransferredResource(transferredResource);
+          LOGGER.debug("Done with removing SIP {}", transferredResource.getFullPath());
+          // TODO: create event...
+          // PluginHelper.createPluginEvent(this, aipID, model, index, sources,
+          // targets, outcome, outcomeDetailExtension, notify)
 
-      try {
-        LOGGER.debug("Removing SIP {}", transferredResource.getFullPath());
-        model.deleteTransferredResource(transferredResource);
-        LOGGER.debug("Done with removing SIP {}", transferredResource.getFullPath());
-        // TODO: create event...
-        // PluginHelper.createPluginEvent(this, aipID, model, index, sources,
-        // targets, outcome, outcomeDetailExtension, notify)
-
-      } catch (RuntimeException e) {
-        reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
-        LOGGER.error("Error removing transferred resource " + transferredResource.getFullPath(), e);
+        } catch (RuntimeException e) {
+          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
+          LOGGER.error("Error removing transferred resource " + transferredResource.getFullPath(), e);
+        }
+        report.addReport(reportItem);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
       }
-      report.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+    } catch (AuthorizationDeniedException | NotFoundException | GenericException | RequestNotValidException e) {
+      throw new PluginException("A job exception has occurred", e);
     }
 
     return report;

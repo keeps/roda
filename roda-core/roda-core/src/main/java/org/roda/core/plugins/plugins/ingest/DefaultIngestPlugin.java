@@ -133,8 +133,9 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       final IngestJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, IngestJobPluginInfo.class);
       PluginHelper.updateJobInformation(this, jobPluginInfo.setTotalSteps(getTotalSteps()));
 
+      Job job = PluginHelper.getJob(this, model);
       List<TransferredResource> resources = PluginHelper.transformLitesIntoObjects(model, index, this, report,
-        jobPluginInfo, liteList);
+        jobPluginInfo, liteList, job);
 
       // 0) process "parent id" and "force parent id" info. (because we might
       // need to fallback to default values)
@@ -275,7 +276,8 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
       return report;
-    } catch (JobException e) {
+    } catch (JobException | AuthorizationDeniedException | NotFoundException | GenericException
+      | RequestNotValidException e) {
       throw new PluginException("A job exception has occurred", e);
     }
 
@@ -308,8 +310,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       TransferredResource.class);
     try {
       plugin.setParameterValues(getParameterValues());
-      List<LiteOptionalWithCause> lites = LiteRODAObjectFactory.transformIntoLiteWithCause(model,
-        transferredResources);
+      List<LiteOptionalWithCause> lites = LiteRODAObjectFactory.transformIntoLiteWithCause(model, transferredResources);
       report = plugin.execute(index, model, storage, lites);
     } catch (PluginException | InvalidParameterException e) {
       // FIXME handle failure

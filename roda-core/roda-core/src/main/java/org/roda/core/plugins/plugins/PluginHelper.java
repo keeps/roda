@@ -211,7 +211,7 @@ public final class PluginHelper {
   }
 
   public static <T extends IsRODAObject> void updatePartialJobReport(Plugin<T> plugin, ModelService model,
-    IndexService index, Report reportItem, boolean replaceLastReportItemIfTheSame) {
+    IndexService index, Report reportItem, boolean replaceLastReportItemIfTheSame, Job cachedJob) {
     String jobId = getJobId(plugin);
     boolean retrieved = true;
     try {
@@ -242,9 +242,8 @@ public final class PluginHelper {
         }
       }
 
-      Job job = model.retrieveJob(jobId);
-      model.createOrUpdateJobReport(jobReport, job);
-    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
+      model.createOrUpdateJobReport(jobReport, cachedJob);
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException e) {
       LOGGER.error("Error while updating Job Report", e);
     }
   }
@@ -1038,7 +1037,7 @@ public final class PluginHelper {
   }
 
   public static <T extends IsRODAObject> List<T> transformLitesIntoObjects(ModelService model, IndexService index,
-    Plugin<T> plugin, Report report, JobPluginInfo pluginInfo, List<LiteOptionalWithCause> lites) {
+    Plugin<T> plugin, Report report, JobPluginInfo pluginInfo, List<LiteOptionalWithCause> lites, Job job) {
     List<T> finalObjects = new ArrayList<>();
 
     for (LiteOptionalWithCause lite : lites) {
@@ -1077,7 +1076,7 @@ public final class PluginHelper {
           Report reportItem = PluginHelper.initPluginReportItem(plugin, id, LiteRODAObject.class);
           reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(failureMessage);
           report.addReport(reportItem);
-          PluginHelper.updatePartialJobReport(plugin, model, index, reportItem, true);
+          PluginHelper.updatePartialJobReport(plugin, model, index, reportItem, true, job);
         }
       }
     }

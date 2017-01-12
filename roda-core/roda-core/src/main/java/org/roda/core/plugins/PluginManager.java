@@ -99,10 +99,14 @@ public class PluginManager {
   }
 
   public <T extends IsRODAObject> void registerPlugin(Plugin<T> plugin) throws PluginException {
-    plugin.init();
-    externalPluginChache.put(plugin.getClass().getName(), plugin);
-    processAndCachePluginInformation(plugin);
-    LOGGER.debug("Plugin added dynamically started {} (version {})", plugin.getName(), plugin.getVersion());
+    try {
+      plugin.init();
+      externalPluginChache.put(plugin.getClass().getName(), plugin);
+      processAndCachePluginInformation(plugin);
+      LOGGER.debug("Plugin added dynamically started {} (version {})", plugin.getName(), plugin.getVersion());
+    } catch (Exception e) {
+      throw new PluginException("An exception have occured during plugin registration", e);
+    }
   }
 
   /**

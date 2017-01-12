@@ -29,6 +29,7 @@ import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
@@ -97,21 +98,24 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
-      List<T> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, jobPluginInfo, liteList);
+      Job job = PluginHelper.getJob(this, model);
+      List<T> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, jobPluginInfo, liteList, job);
 
       if (!list.isEmpty()) {
         if (list.get(0) instanceof AIP) {
-          report = executeOnAIP(index, model, storage, report, jobPluginInfo, (List<AIP>) list);
+          report = executeOnAIP(index, model, storage, report, jobPluginInfo, (List<AIP>) list, job);
         } else if (list.get(0) instanceof Representation) {
-          report = executeOnRepresentation(index, model, storage, report, jobPluginInfo, (List<Representation>) list);
+          report = executeOnRepresentation(index, model, storage, report, jobPluginInfo, (List<Representation>) list,
+            job);
         } else if (list.get(0) instanceof File) {
-          report = executeOnFile(index, model, storage, report, jobPluginInfo, (List<File>) list);
+          report = executeOnFile(index, model, storage, report, jobPluginInfo, (List<File>) list, job);
         }
       }
 
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (JobException e) {
+    } catch (JobException | AuthorizationDeniedException | NotFoundException | GenericException
+      | RequestNotValidException e) {
       throw new PluginException("A job exception has occurred", e);
     }
 
@@ -119,11 +123,11 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
   }
 
   public Report executeOnAIP(IndexService index, ModelService model, StorageService storage, Report report,
-    SimpleJobPluginInfo jobPluginInfo, List<AIP> list) throws PluginException {
+    SimpleJobPluginInfo jobPluginInfo, List<AIP> list, Job job) throws PluginException {
     try {
       for (AIP aip : list) {
         Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
 
         LOGGER.debug("Processing AIP {}", aip.getId());
         List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
@@ -157,7 +161,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
         }
 
         report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
       }
     } catch (ClassCastException e) {
       LOGGER.error("Trying to execute an AIP-only plugin with other objects");
@@ -168,14 +172,14 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
   }
 
   public Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage, Report report,
-    SimpleJobPluginInfo jobPluginInfo, List<Representation> list) throws PluginException {
+    SimpleJobPluginInfo jobPluginInfo, List<Representation> list, Job job) throws PluginException {
 
     for (Representation representation : list) {
       List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
 
       Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getRepresentationId(representation),
         Representation.class, AIPState.ACTIVE);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
+      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
       LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), representation.getAipId());
       try {
         sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(this, model, representation));
@@ -201,20 +205,20 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
       }
 
       report.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
     }
 
     return report;
   }
 
   public Report executeOnFile(IndexService index, ModelService model, StorageService storage, Report report,
-    SimpleJobPluginInfo jobPluginInfo, List<File> list) throws PluginException {
+    SimpleJobPluginInfo jobPluginInfo, List<File> list, Job job) throws PluginException {
 
     for (File file : list) {
       List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
 
       Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getFileId(file), File.class, AIPState.ACTIVE);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
+      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
       LOGGER.debug("Processing file {} from representation {} of AIP {}", file.getId(), file.getRepresentationId(),
         file.getAipId());
 
@@ -243,7 +247,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
       }
 
       report.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
     }
 
     return report;

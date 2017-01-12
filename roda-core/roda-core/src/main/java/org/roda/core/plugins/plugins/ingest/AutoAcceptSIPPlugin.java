@@ -21,6 +21,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
@@ -83,11 +84,12 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
     try {
       String username = PluginHelper.getJobUsername(this, index);
 
-      List<AIP> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, null, liteList);
+      Job job = PluginHelper.getJob(this, model);
+      List<AIP> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, null, liteList, job);
 
       for (AIP aip : list) {
         Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
 
         String outcomeDetail = "";
         try {
@@ -114,7 +116,7 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
         }
 
         report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
       }
     } catch (RODAException e) {
       LOGGER.error("Error getting job from plugin", e);

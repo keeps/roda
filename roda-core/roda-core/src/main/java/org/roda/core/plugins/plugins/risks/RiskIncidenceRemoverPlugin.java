@@ -30,6 +30,7 @@ import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.risks.Risk;
@@ -88,7 +89,9 @@ public class RiskIncidenceRemoverPlugin<T extends IsRODAObject> extends Abstract
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
-      List<T> list = PluginHelper.transformLitesIntoObjects(model, index, this, pluginReport, jobPluginInfo, liteList);
+      Job job = PluginHelper.getJob(this, model);
+      List<T> list = PluginHelper.transformLitesIntoObjects(model, index, this, pluginReport, jobPluginInfo, liteList,
+        job);
 
       try {
         Filter filter = new Filter();
@@ -124,8 +127,9 @@ public class RiskIncidenceRemoverPlugin<T extends IsRODAObject> extends Abstract
         LOGGER.error("Could not delete risk incidence", e);
         jobPluginInfo.incrementObjectsProcessedWithFailure(list.size());
       }
-    } catch (JobException e) {
-      LOGGER.error("Error updating job information", e);
+    } catch (JobException | AuthorizationDeniedException | NotFoundException | GenericException
+      | RequestNotValidException e) {
+      throw new PluginException("A job exception has occurred", e);
     }
 
     LOGGER.debug("Done removing old risk incidences");

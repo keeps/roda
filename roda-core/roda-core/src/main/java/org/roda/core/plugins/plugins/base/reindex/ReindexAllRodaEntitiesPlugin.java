@@ -15,10 +15,13 @@ import java.util.UUID;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
@@ -87,6 +90,8 @@ public class ReindexAllRodaEntitiesPlugin extends AbstractPlugin<Void> {
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
+      Job job = PluginHelper.getJob(this, model);
+
       List<Class<? extends IsRODAObject>> classes = PluginHelper.getReindexObjectClasses();
       classes.remove(Job.class);
       jobPluginInfo.setSourceObjectsCount(classes.size());
@@ -95,14 +100,15 @@ public class ReindexAllRodaEntitiesPlugin extends AbstractPlugin<Void> {
         Report reportItem = reindexRODAObject(model, reindexClass, jobPluginInfo);
         if (reportItem != null) {
           pluginReport.addReport(reportItem);
-          PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+          PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
         }
       }
 
       pluginReport.setPluginState(PluginState.SUCCESS);
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (JobException e) {
+    } catch (JobException | AuthorizationDeniedException | NotFoundException | GenericException
+      | RequestNotValidException e) {
       LOGGER.error("Error reindexing RODA entity", e);
     }
 

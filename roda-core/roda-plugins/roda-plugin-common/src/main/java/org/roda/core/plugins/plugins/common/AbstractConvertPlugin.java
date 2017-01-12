@@ -46,6 +46,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -229,21 +230,24 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
-      List<T> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, jobPluginInfo, liteList);
+      Job job = PluginHelper.getJob(this, model);
+      List<T> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, jobPluginInfo, liteList, job);
 
       if (!list.isEmpty()) {
         if (list.get(0) instanceof AIP) {
-          report = executeOnAIP(index, model, storage, report, jobPluginInfo, (List<AIP>) list);
+          report = executeOnAIP(index, model, storage, report, jobPluginInfo, (List<AIP>) list, job);
         } else if (list.get(0) instanceof Representation) {
-          report = executeOnRepresentation(index, model, storage, report, jobPluginInfo, (List<Representation>) list);
+          report = executeOnRepresentation(index, model, storage, report, jobPluginInfo, (List<Representation>) list,
+            job);
         } else if (list.get(0) instanceof File) {
-          report = executeOnFile(index, model, storage, report, jobPluginInfo, (List<File>) list);
+          report = executeOnFile(index, model, storage, report, jobPluginInfo, (List<File>) list, job);
         }
       }
 
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (JobException e) {
+    } catch (JobException | AuthorizationDeniedException | NotFoundException | GenericException
+      | RequestNotValidException e) {
       throw new PluginException("A job exception has occurred", e);
     }
 
@@ -251,7 +255,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
   }
 
   private Report executeOnAIP(IndexService index, ModelService model, StorageService storage, Report report,
-    SimpleJobPluginInfo jobPluginInfo, List<AIP> list) throws PluginException {
+    SimpleJobPluginInfo jobPluginInfo, List<AIP> list, Job job) throws PluginException {
 
     for (AIP aip : list) {
       LOGGER.debug("Processing AIP {}", aip.getId());
@@ -408,7 +412,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
           reportItem.setPluginState(pluginResultState).setPluginDetails(e.getMessage());
         } finally {
           report.addReport(reportItem);
-          PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+          PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
 
           if (!createDIP) {
             try {
@@ -439,7 +443,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
   }
 
   private Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage, Report report,
-    SimpleJobPluginInfo jobPluginInfo, List<Representation> list) throws PluginException {
+    SimpleJobPluginInfo jobPluginInfo, List<Representation> list, Job job) throws PluginException {
 
     List<String> newRepresentations = new ArrayList<String>();
     String aipId = null;
@@ -588,7 +592,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
         }
 
         report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
 
         // add unchanged files to the new representation
         if (!alteredFiles.isEmpty()) {
@@ -601,7 +605,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
 
       } catch (RuntimeException | NotFoundException | GenericException | RequestNotValidException
         | AuthorizationDeniedException | IOException | AlreadyExistsException e) {
-        LOGGER.error("Error processing Representation " + representation.getId() + ": " + e.getMessage(), e);
+        LOGGER.error("Error processing Representation {}: {}", representation.getId(), e.getMessage(), e);
         reportState = PluginState.FAILURE;
 
         reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
@@ -635,7 +639,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
   }
 
   private Report executeOnFile(IndexService index, ModelService model, StorageService storage, Report report,
-    SimpleJobPluginInfo jobPluginInfo, List<File> list) throws PluginException {
+    SimpleJobPluginInfo jobPluginInfo, List<File> list, Job job) throws PluginException {
 
     Map<String, String> changedRepresentationsOnAIPs = new HashMap<String, String>();
     boolean notify = true;
@@ -767,14 +771,14 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
 
       } catch (RuntimeException | NotFoundException | GenericException | RequestNotValidException
         | AuthorizationDeniedException | ValidationException | IOException | AlreadyExistsException e) {
-        LOGGER.error("Error processing File " + file.getId() + ": " + e.getMessage(), e);
+        LOGGER.error("Error processing File {}: {}", file.getId(), e.getMessage(), e);
         reportState = PluginState.FAILURE;
         reportItem.setPluginDetails(e.getMessage());
         jobPluginInfo.incrementObjectsProcessedWithFailure();
       } finally {
         reportItem.setPluginState(pluginResultState);
         report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
       }
 
       boolean notifyEvent = false;

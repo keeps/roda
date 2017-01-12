@@ -13,7 +13,11 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.JobException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.formats.Format;
@@ -44,8 +48,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DummyListPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(DummyListPlugin.class);
 
   @Override
   public void init() throws PluginException {
@@ -81,7 +83,8 @@ public class DummyListPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
-      List<T> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, jobPluginInfo, liteList);
+      Job job = PluginHelper.getJob(this, model);
+      List<T> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, jobPluginInfo, liteList, job);
 
       for (T object : list) {
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
@@ -90,7 +93,8 @@ public class DummyListPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
       // finalize
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (JobException e) {
+    } catch (JobException | AuthorizationDeniedException | NotFoundException | GenericException
+      | RequestNotValidException e) {
       // do nothing
     }
 
