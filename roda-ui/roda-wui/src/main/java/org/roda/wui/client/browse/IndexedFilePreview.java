@@ -2,13 +2,11 @@ package org.roda.wui.client.browse;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.facet.Facets;
+import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
-import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.wui.client.common.lists.DIPFileList;
 import org.roda.wui.client.common.lists.SearchFileList;
-import org.roda.wui.client.common.lists.SimpleFileList;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.RestUtils;
@@ -38,16 +36,18 @@ public class IndexedFilePreview extends BitstreamPreview<IndexedFile> {
 
   @Override
   protected Widget directoryPreview() {
-    final Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_PARENT_UUID, getObject().getUUID()));
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_PARENT_UUID, getObject().getUUID()));
 
     final FlowPanel layout = new FlowPanel();
 
     final SearchPanel fileSearch = new SearchPanel(filter, RodaConstants.FILE_SEARCH, messages.searchPlaceHolder(),
       false, false, true);
 
-    // TODO add summary
     boolean justActive = true;
-    final SearchFileList folderList = new SearchFileList(filter, justActive, Facets.NONE, "", false);
+    boolean selectable = false;
+    boolean showFilesPath = false;
+    final SearchFileList folderList = new SearchFileList(filter, justActive, Facets.NONE,
+      messages.representationListOfFiles(), selectable, showFilesPath);
 
     fileSearch.setList(folderList);
     fileSearch.setDefaultFilter(filter);

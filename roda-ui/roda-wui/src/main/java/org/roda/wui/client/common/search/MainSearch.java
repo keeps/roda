@@ -28,9 +28,6 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.wui.client.browse.BrowseAIP;
-import org.roda.wui.client.browse.BrowseFile;
-import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.RepresentationList;
 import org.roda.wui.client.common.lists.SearchFileList;
@@ -324,8 +321,9 @@ public class MainSearch extends Composite {
 
   private void createFilesSearchResultPanel() {
     Facets facets = new Facets(filesFacetsMap.keySet());
+    boolean showFilesPath = false;
     filesSearchResultPanel = new SearchFileList(filter_files, justActive, facets, messages.searchResults(),
-      filesSelectable);
+      filesSelectable, showFilesPath);
 
     Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
     for (FacetParameter facetParameter : filesFacetsMap.keySet()) {

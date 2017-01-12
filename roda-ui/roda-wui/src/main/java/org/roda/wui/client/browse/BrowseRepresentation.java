@@ -221,19 +221,20 @@ public class BrowseRepresentation extends Composite {
     handlers = new ArrayList<HandlerRegistration>();
     String summary = messages.representationListOfFiles();
     boolean selectable = true;
-
+    boolean showFilesPath = false;
     // FILES
 
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_UUID, repUUID),
       new EmptyKeyFilterParameter(RodaConstants.FILE_PARENT_UUID));
-    filesList = new SearchFileList(filter, true, Facets.NONE, summary, selectable);
+
+    filesList = new SearchFileList(filter, true, Facets.NONE, summary, selectable, showFilesPath);
 
     filesList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
         IndexedFile selected = filesList.getSelectionModel().getSelectedObject();
         if (selected != null) {
-          HistoryUtils.openBrowse(selected);
+          HistoryUtils.openBrowse(selected, filesList.getSorter(), filesList.getIndexOfVisibleObject(selected));
         }
       }
     });

@@ -7,6 +7,7 @@
  */
 package org.roda.wui.client.common.lists;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +26,7 @@ import org.roda.wui.common.client.tools.Humanize;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -45,13 +47,12 @@ public class SearchFileList extends BasicAsyncTableCell<IndexedFile> {
   private Column<IndexedFile, SafeHtml> pathColumn;
   private TextColumn<IndexedFile> formatColumn;
   private TextColumn<IndexedFile> sizeColumn;
+  private boolean showFilePath;
 
-  public SearchFileList() {
-    this(null, true, null, null, false);
-  }
-
-  public SearchFileList(Filter filter, boolean justActive, Facets facets, String summary, boolean selectable) {
+  public SearchFileList(Filter filter, boolean justActive, Facets facets, String summary, boolean selectable,
+    boolean showFilePath) {
     super(IndexedFile.class, filter, justActive, facets, summary, selectable);
+    this.showFilePath = showFilePath;
   }
 
   @Override
@@ -79,18 +80,22 @@ public class SearchFileList extends BasicAsyncTableCell<IndexedFile> {
       public SafeHtml getValue(IndexedFile file) {
         SafeHtmlBuilder b = new SafeHtmlBuilder();
         if (file != null) {
-          // if (file.getPath() != null && !file.getPath().isEmpty()) {
-          // String path = Tools.join(file.getPath(), "/");
-          // b.append(SafeHtmlUtils.fromSafeConstant("<span
-          // class='file-path'>"));
-          // b.append(SafeHtmlUtils.fromString(path));
-          // b.append(SafeHtmlUtils.fromSafeConstant("/"));
-          // b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
-          // }
-
           String fileName = file.getOriginalName() != null ? file.getOriginalName() : file.getId();
-          b.append(SafeHtmlUtils.fromString(fileName));
+          List<String> fullpath = new ArrayList<>(file.getPath());
+          fullpath.add(fileName);
+          b.append(SafeHtmlUtils.fromSafeConstant("<div title='"));
+          b.append(SafeHtmlUtils.fromString(StringUtils.join(fullpath, "/")));
+          b.append(SafeHtmlUtils.fromSafeConstant("'>"));
+          if (showFilePath && file.getPath() != null && !file.getPath().isEmpty()) {
+            String path = StringUtils.join(file.getPath(), "/");
+            b.append(SafeHtmlUtils.fromSafeConstant("<span class='file-path'>"));
+            b.append(SafeHtmlUtils.fromString(path));
+            b.append(SafeHtmlUtils.fromSafeConstant("/"));
+            b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
+          }
 
+          b.append(SafeHtmlUtils.fromString(fileName));
+          b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
         }
 
         return b.toSafeHtml();
@@ -138,13 +143,20 @@ public class SearchFileList extends BasicAsyncTableCell<IndexedFile> {
     formatColumn.setSortable(true);
     sizeColumn.setSortable(true);
 
-    // TODO externalize strings into constants
 
     addColumn(iconColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-files-o'></i>"), false, false, 3);
     addColumn(pathColumn, messages.filePath(), true, false);
     addColumn(formatColumn, messages.fileFormat(), true, false);
     addColumn(sizeColumn, messages.fileSize(), true, false, 7);
 
+    // define column width priority
+    display.setColumnWidth(iconColumn, 3.0, Unit.EM);
+    display.setColumnWidth(sizeColumn, 6.0, Unit.EM);
+    
+    pathColumn.setCellStyleNames("text-align-left");
+    formatColumn.setCellStyleNames("text-align-left");
+    sizeColumn.setCellStyleNames("text-align-right");
+    
     // define default sorting
     display.getColumnSortList().push(new ColumnSortInfo(pathColumn, false));
 

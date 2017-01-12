@@ -175,7 +175,7 @@ public class BrowseFolder extends Composite {
 
     final IndexedFile folder = bundle.getFile();
     final Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_PARENT_UUID, folder.getUUID()));
-    filesList = new SearchFileList(filter, true, Facets.NONE, summary, selectable);
+    filesList = new SearchFileList(filter, true, Facets.NONE, summary, selectable, false);
 
     filesList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
       @Override

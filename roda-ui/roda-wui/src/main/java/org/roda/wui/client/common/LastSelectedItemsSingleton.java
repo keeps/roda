@@ -22,8 +22,8 @@ public class LastSelectedItemsSingleton {
   private String detailsMessage = "";
   private List<String> lastHistory = new ArrayList<String>();
   private IsIndexed lastObject = null;
-  private Sorter sorter;
-  private Integer selectedFileIndex;
+  private Sorter selectedSorter;
+  private Integer selectedIndex;
 
   private LastSelectedItemsSingleton() {
   }
@@ -67,15 +67,18 @@ public class LastSelectedItemsSingleton {
     this.lastObject = lastObject;
   }
 
-  public void setLastSelectionDetails(Sorter sorter, Integer selectedFileIndex) {
-    this.sorter = sorter;
-    this.selectedFileIndex = selectedFileIndex;
+  public void setLastSelectionDetails(Sorter selectedSorter, Integer selectedIndex) {
+    this.selectedSorter = selectedSorter;
+    this.selectedIndex = selectedIndex;
   }
-  
+
   public Pair<Sorter, Integer> getLastSelectionDetails() {
-    return Pair.create(sorter, selectedFileIndex);
+    return Pair.create(selectedSorter, selectedIndex);
   }
-  
-  
+
+  public void resetLastSelectionDetails() {
+    this.selectedSorter = null;
+    this.selectedIndex = null;
+  }
 
 }

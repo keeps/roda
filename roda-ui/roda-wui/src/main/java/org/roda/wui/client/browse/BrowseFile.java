@@ -20,6 +20,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.facet.Facets;
+import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
@@ -129,8 +130,12 @@ public class BrowseFile extends Composite {
         final String historyFileId = historyTokens.get(historyTokens.size() - 1);
 
         Pair<Sorter, Integer> lastSelectionDetails = LastSelectedItemsSingleton.getInstance().getLastSelectionDetails();
-        final Sorter sorter = lastSelectionDetails.getFirst() != null ? lastSelectionDetails.getFirst() : DEFAULT_FILE_SORTER;
-        final Integer index = lastSelectionDetails.getSecond()!= null ? lastSelectionDetails.getSecond() : DEFAULT_FILE_INDEX;
+        final Sorter sorter = lastSelectionDetails.getFirst() != null ? lastSelectionDetails.getFirst()
+          : DEFAULT_FILE_SORTER;
+        final Integer index = lastSelectionDetails.getSecond() != null ? lastSelectionDetails.getSecond()
+          : DEFAULT_FILE_INDEX;
+
+        LastSelectedItemsSingleton.getInstance().resetLastSelectionDetails();
 
         BrowserService.Util.getInstance().retrieveBrowseFileBundle(historyAipId, historyRepresentationId,
           historyFilePath, historyFileId, LocaleInfo.getCurrentLocale().getLocaleName(),
@@ -199,7 +204,8 @@ public class BrowseFile extends Composite {
   FocusPanel downloadSchemasButton;
 
   @UiField
-  Button optionDownload, optionNewProcess, optionRemove, optionRisk, optionIdentify, optionEvents;
+  Button optionDownload, optionRename, optionMove, optionUploadFiles, optionCreateFolder, optionRemove,
+    optionNewProcess, optionRisk, optionIdentify, optionEvents;
 
   private final Sorter sorter;
 
@@ -275,7 +281,7 @@ public class BrowseFile extends Composite {
 
       @Override
       public void onKeyDown(KeyDownEvent event) {
-        if (!bundle.getFile().isDirectory()) {
+        if (event.isControlKeyDown()) {
           NativeEvent ne = event.getNativeEvent();
           if (ne.getKeyCode() == KeyCodes.KEY_RIGHT) {
             ne.preventDefault();
@@ -296,6 +302,19 @@ public class BrowseFile extends Composite {
       HtmlSnippetUtils.setCssClassDisabled(previousButton, index == 0);
       HtmlSnippetUtils.setCssClassDisabled(nextButton, index >= bundle.getTotalSiblingCount() - 1);
     }
+
+    boolean directory = bundle.getFile().isDirectory();
+    optionDownload.setVisible(!directory);
+    optionRename.setVisible(directory);
+    optionMove.setVisible(true);
+    optionUploadFiles.setVisible(directory);
+    optionCreateFolder.setVisible(directory);
+    optionRemove.setVisible(true);
+    optionNewProcess.setVisible(true);
+    optionIdentify.setVisible(true);
+    optionEvents.setVisible(true);
+    optionRisk.setVisible(true);
+
   }
 
   @UiHandler("optionDownload")
@@ -315,8 +334,15 @@ public class BrowseFile extends Composite {
     }
   }
 
-  public void open(String parentUUID, final Sorter sorter, final int openIndex) {
-    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_PARENT_UUID, parentUUID));
+  public void open(final String parentUUID, final Sorter sorter, final int openIndex) {
+    Filter filter = new Filter(
+      new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_UUID, bundle.getFile().getRepresentationUUID()));
+
+    if (parentUUID != null) {
+      filter.add(new SimpleFilterParameter(RodaConstants.FILE_PARENT_UUID, parentUUID));
+    } else {
+      filter.add(new EmptyKeyFilterParameter(RodaConstants.FILE_PARENT_UUID));
+    }
 
     Sublist sublist = new Sublist(openIndex, 1);
     String localeString = LocaleInfo.getCurrentLocale().getLocaleName();
@@ -334,7 +360,13 @@ public class BrowseFile extends Composite {
         public void onSuccess(IndexResult<IndexedFile> result) {
           if (!result.getResults().isEmpty()) {
             IndexedFile firstFile = result.getResults().get(0);
-            HistoryUtils.openBrowse(firstFile, sorter, openIndex);
+
+            // if we are jumping to the same file, try the next one
+            if (firstFile.getUUID().equals(bundle.getFile().getUUID())) {
+              open(parentUUID, sorter, openIndex + 1);
+            } else {
+              HistoryUtils.openBrowse(firstFile, sorter, openIndex);
+            }
           } else {
             Toast.showError("No files were found");
             // TODO better handle this case
