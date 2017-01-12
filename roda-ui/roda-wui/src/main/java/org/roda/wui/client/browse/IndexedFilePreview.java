@@ -2,7 +2,6 @@ package org.roda.wui.client.browse;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.facet.Facets;
-import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.IndexedFile;

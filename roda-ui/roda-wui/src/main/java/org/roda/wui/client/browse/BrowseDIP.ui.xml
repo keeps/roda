@@ -18,6 +18,50 @@
 	<g:FocusPanel ui:field="keyboardFocus">
 		<g:FlowPanel styleName="viewRepresentationFile">
 			<g:FlowPanel addStyleNames="filePreviewToolbar">
+				<g:Label addStyleNames="browseItemHeader">
+					<ui:text from='{messages.catalogueFileTitle}' />
+					&rsaquo;
+				</g:Label>
+				<m:BreadcrumbPanel ui:field="fileBreadcrumb"
+					addStyleNames="viewRepresentationBreadcrumb" />
+				<g:FlowPanel addStyleNames="filePreviewToolbarIcons">
+					<g:FocusPanel ui:field="disseminationsButton"
+						addStyleNames="toolbarLink filePreviewToolbarInfoIcon">
+						<g:HTML>
+							<i class="fa fa-play-circle-o"></i>
+						</g:HTML>
+					</g:FocusPanel>
+					<g:FocusPanel ui:field="infoFileButton"
+						addStyleNames="toolbarLink filePreviewToolbarInfoIcon">
+						<g:HTML>
+							<i class="fa fa-info-circle"></i>
+						</g:HTML>
+					</g:FocusPanel>
+					<g:FocusPanel ui:field="filePreviousButton"
+						addStyleNames="toolbarLink" title="CTRL &#8678;">
+						<g:HTML>
+							<i class="fa fa-chevron-left"></i>
+						</g:HTML>
+					</g:FocusPanel>
+					<g:FocusPanel ui:field="fileNextButton" addStyleNames="toolbarLink"
+						title="CTRL &#8680;">
+						<g:HTML>
+							<i class="fa fa-chevron-right"></i>
+						</g:HTML>
+					</g:FocusPanel>
+					<g:FocusPanel ui:field="fileOptionsButton"
+						addStyleNames="toolbarLink filePreviewToolbarOptionsIcon">
+						<g:HTML>
+							<i class="fa fa-ellipsis-v"></i>
+						</g:HTML>
+					</g:FocusPanel>
+				</g:FlowPanel>
+			</g:FlowPanel>
+			<g:FlowPanel addStyleNames="filePreviewToolbar filePreviewToolbar-alt">
+				<g:Label addStyleNames="browseItemHeader" ui:field="browseItemHeader">
+					<ui:text from='{messages.catalogueDIPTitle}' />
+					&rsaquo;
+				</g:Label>
 				<m:BreadcrumbPanel ui:field="breadcrumb"
 					addStyleNames="viewRepresentationBreadcrumb" />
 				<g:FlowPanel addStyleNames="filePreviewToolbarIcons">
@@ -37,7 +81,12 @@
 							<i class="fa fa-chevron-right"></i>
 						</g:HTML>
 					</g:FocusPanel>
-
+					<g:FocusPanel ui:field="dipOptionsButton"
+						addStyleNames="toolbarLink filePreviewToolbarOptionsIcon">
+						<g:HTML>
+							<i class="fa fa-ellipsis-v"></i>
+						</g:HTML>
+					</g:FocusPanel>
 				</g:FlowPanel>
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="viewRepresentationFile-center"

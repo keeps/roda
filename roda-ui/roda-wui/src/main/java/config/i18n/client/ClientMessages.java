@@ -93,6 +93,8 @@ public interface ClientMessages extends Messages {
   String catalogueFolderTitle();
 
   String catalogueFileTitle();
+  
+  String catalogueDIPTitle();
 
   String preservationActionsTitle();
 

@@ -7,6 +7,7 @@ import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.ErrorEvent;
@@ -65,6 +66,8 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
 
   private final T object;
 
+  private JavaScriptObject imageViewerObject;
+
   public BitstreamPreview(Viewers viewers, SafeUri bitstreamDownloadUri, FileFormat format, String filename, long size,
     boolean isDirectory, T object) {
     this(viewers, bitstreamDownloadUri, format, filename, size, isDirectory, new Command() {
@@ -94,7 +97,13 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
 
     initWidget(panel);
 
+    setStyleName("bitstreamPreview");
+    if (isDirectory) {
+      addStyleDependentName("directory");
+    }
+
     init();
+
   }
 
   public SafeUri getBitstreamDownloadUri() {
@@ -179,6 +188,14 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
     });
     panel.add(image);
     image.setStyleName("viewRepresentationImageFilePreview");
+
+//    imageViewerObject = JavascriptUtils.runImageViewerOn(image.getElement());
+  }
+  
+  @Override
+  protected void onDetach() {
+    super.onDetach();
+//    JavascriptUtils.stopImageViewer(imageViewerObject);
   }
 
   private void pdfPreview() {

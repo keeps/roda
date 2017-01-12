@@ -1699,6 +1699,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .main .wui-breadcrumbPanel .breadcrumb {
     display: inline-block;
+    vertical-align: bottom;
     color: #a7a9ac;
     cursor: pointer;
     cursor: hand;
@@ -1736,10 +1737,10 @@ td.datePickerMonth, td.datePickerYear {
 
 .main .wui-breadcrumbPanel .breadcrumb-separator {
     display: inline-block;
+    vertical-align: bottom;
     font-size: 1.2rem;
     color: #a7a9ac;
     cursor: text;
-    vertical-align: top;
 }
 
 /**********************************************
@@ -3076,6 +3077,11 @@ td.datePickerMonth, td.datePickerYear {
     color: red;
 }
 
+.browseDip-topList {
+	width: 96%;
+	margin: 2%;
+}
+
 /** Preservation Metadata Panel **/
 .wui-metadata-preservation {
     width: 100%;
@@ -3811,13 +3817,49 @@ td.datePickerMonth, td.datePickerYear {
 
 .viewRepresentationFile .filePreviewToolbar {
     min-height: 35px;
-    background-color: #eee;
+    line-height: 35px;
+    background-color: #ddd;
     position: relative;
 }
 
+.viewRepresentationFile .filePreviewToolbar-alt {
+	background-color: #eee;
+}
+
+
+.filePreviewToolbar-alt .toolbarLink {
+	background: none;
+	color: #999;
+}
+
+.filePreviewToolbar-alt .toolbarLink:hover {
+	color: white;
+	background-color: #089de3;
+}
+
+.filePreviewToolbar-alt .toolbarLink.disabled {
+	color: #ddd;
+	background: none;
+}
+
+.filePreviewToolbar-alt .toolbarLink.disabled:hover {
+	color: #ddd;
+	background: none;
+}
+
+.viewRepresentationFile .filePreviewToolbar .browseItemHeader {
+	display: inline-block;
+	vertical-align: bottom;
+    margin-left: 40px;
+    margin-right: 2px;
+    font-size: 1.4rem;
+    color: #222;
+}
+
 .viewRepresentationFile .filePreviewToolbar .viewRepresentationBreadcrumb {
-    padding: 5px 100px 4px 20px;
     margin: 0;
+    padding: 0;
+    display: inline-block;
 }
 
 .viewRepresentationFile.single .filePreviewToolbar .viewRepresentationBreadcrumb {
@@ -3826,7 +3868,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .viewRepresentationFile .filePreviewToolbar .filePreviewToolbarIcons {
     position: absolute;
-    bottom: 0;
+    top: 0;
     right: 0;
 }
 
@@ -3842,6 +3884,11 @@ td.datePickerMonth, td.datePickerYear {
     width: 100%;
     text-align: center;
     padding-top: 0px !important;
+}
+
+.bitstreamPreview-directory {
+    margin: 2%;
+    width: 96%;
 }
 
 .viewRepresentationImageFilePreview {

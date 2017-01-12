@@ -226,14 +226,14 @@ public class BreadcrumbUtils {
     IndexedFile file, IndexedDIP dip, DIPFile dipFile, List<DIPFile> dipFileAncestors) {
     List<BreadcrumbItem> ret = new ArrayList<>();
 
-    if (aip != null && representation != null && file != null) {
-      ret.addAll(getFileBreadcrumbs(aip, representation, file));
-    } else if (aip != null && representation != null) {
-      ret.add(getBreadcrumbItem(aip));
-      ret.add(getBreadcrumbItem(representation));
-    } else if (aip != null) {
-      ret.add(getBreadcrumbItem(aip));
-    }
+//    if (aip != null && representation != null && file != null) {
+//      ret.addAll(getFileBreadcrumbs(aip, representation, file));
+//    } else if (aip != null && representation != null) {
+//      ret.add(getBreadcrumbItem(aip));
+//      ret.add(getBreadcrumbItem(representation));
+//    } else if (aip != null) {
+//      ret.add(getBreadcrumbItem(aip));
+//    }
 
     // DIP
     ret.add(getBreadcrumbItem(dip, aip, representation, file));

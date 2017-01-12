@@ -30,6 +30,8 @@ public class JavascriptUtils {
 			$wnd.hljs.highlightBlock(block);
 		});
   }-*/;
+  
+
 
   public static native void slideToggle(String selector) /*-{
 		$wnd.jQuery(selector).click(function() {
@@ -310,6 +312,17 @@ public class JavascriptUtils {
   public static native void stickRecalc() /*-{
     $wnd.jQuery('body').trigger("sticky_kit:recalc");
   }-*/;
+
+  
+  public static native JavaScriptObject runImageViewerOn(JavaScriptObject parent) /*-{
+    var viewer = $wnd.jQuery(parent).ImageViewer();
+    return viewer;
+}-*/;
+  
+  public static native void stopImageViewer(JavaScriptObject imageViewerObject) /*-{
+    console.log( "obj:" + imageViewerObject );
+    imageViewerObject.destroy();
+}-*/;
   
 
 }

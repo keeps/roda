@@ -107,7 +107,7 @@ public class BrowseDIP extends Composite {
   FocusPanel keyboardFocus;
 
   @UiField
-  BreadcrumbPanel breadcrumb;
+  BreadcrumbPanel fileBreadcrumb, breadcrumb;
 
   @UiField
   FlowPanel center;
@@ -215,13 +215,22 @@ public class BrowseDIP extends Composite {
           }
         }
       });
-      center.add(dipFileSearch);
-      center.add(dipFileList);
+
+      FlowPanel layout = new FlowPanel();
+      layout.add(dipFileSearch);
+      layout.add(dipFileList);
+
+      center.add(layout);
+
+      layout.addStyleName("browseDip-topList");
     }
 
     // update breadcrumb
     breadcrumb.updatePath(getBreadcrumbs());
     breadcrumb.setVisible(true);
+
+    fileBreadcrumb.updatePath(BreadcrumbUtils.getFileBreadcrumbs(aip, representation, file));
+    fileBreadcrumb.setVisible(true);
   }
 
   private void show() {
@@ -294,7 +303,10 @@ public class BrowseDIP extends Composite {
   }
 
   private void updateVisibles() {
-    if (index < 0) {
+    if (totalCount < 2) {
+      previousButton.setVisible(false);
+      nextButton.setVisible(false);
+    } else if (index < 0) {
       HtmlSnippetUtils.setCssClassDisabled(previousButton, true);
       HtmlSnippetUtils.setCssClassDisabled(nextButton, totalCount < 2);
     } else {

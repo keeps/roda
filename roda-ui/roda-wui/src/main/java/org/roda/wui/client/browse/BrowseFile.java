@@ -198,12 +198,6 @@ public class BrowseFile extends Composite {
   FlowPanel infoFilePanel, dipFilePanel, optionsPanel;
 
   @UiField
-  FocusPanel downloadDocumentationButton;
-
-  @UiField
-  FocusPanel downloadSchemasButton;
-
-  @UiField
   Button optionDownload, optionRename, optionMove, optionUploadFiles, optionCreateFolder, optionRemove,
     optionNewProcess, optionRisk, optionIdentify, optionEvents;
 
@@ -273,8 +267,10 @@ public class BrowseFile extends Composite {
     // update visibles
     optionDownload.setEnabled(!bundle.getFile().isDirectory());
     infoFileButton.setVisible(!bundle.getFile().isDirectory());
-    downloadDocumentationButton.setVisible(bundle.getRepresentation().getNumberOfDocumentationFiles() > 0);
-    downloadSchemasButton.setVisible(bundle.getRepresentation().getNumberOfSchemaFiles() > 0);
+    // downloadDocumentationButton.setVisible(bundle.getRepresentation().getNumberOfDocumentationFiles()
+    // > 0);
+    // downloadSchemasButton.setVisible(bundle.getRepresentation().getNumberOfSchemaFiles()
+    // > 0);
 
     keyboardFocus.setFocus(true);
     keyboardFocus.addKeyDownHandler(new KeyDownHandler() {
@@ -295,7 +291,10 @@ public class BrowseFile extends Composite {
     });
 
     // update visibility
-    if (index < 0) {
+    if (bundle.getTotalSiblingCount() < 2) {
+      previousButton.setVisible(false);
+      nextButton.setVisible(false);
+    } else if (index < 0) {
       HtmlSnippetUtils.setCssClassDisabled(previousButton, true);
       HtmlSnippetUtils.setCssClassDisabled(nextButton, bundle.getTotalSiblingCount() < 2);
     } else {
