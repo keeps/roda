@@ -11,12 +11,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 
-import org.apache.commons.io.IOUtils;
 import org.roda.core.storage.fs.FSUtils;
 
 /**
@@ -40,17 +37,18 @@ public class StringContentPayload implements ContentPayload {
   @Override
   public void writeToPath(Path path) throws IOException {
     InputStream inputStream = createInputStream();
-    try {
-      Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
-    } catch (FileAlreadyExistsException e) {
-      // XFS sometimes sends this exception
-      // although we've chosen to replace existing
-      FSUtils.deletePathQuietly(path);
-      Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
-    } finally {
-      IOUtils.closeQuietly(inputStream);
-    }
+    FSUtils.safeUpdate(inputStream, path);
 
+    // try {
+    // Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
+    // } catch (FileAlreadyExistsException e) {
+    // // XFS sometimes sends this exception
+    // // although we've chosen to replace existing
+    // FSUtils.deletePathQuietly(path);
+    // Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
+    // } finally {
+    // IOUtils.closeQuietly(inputStream);
+    // }
   }
 
   @Override

@@ -22,6 +22,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.index.IndexService;
@@ -90,8 +91,9 @@ public class BagitToAIPPlugin extends SIPToAIPPlugin {
     Report report = PluginHelper.initPluginReport(this);
 
     try {
+      Job job = PluginHelper.getJob(this, model);
       List<TransferredResource> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, null,
-        liteList);
+        liteList, job);
 
       String username = PluginHelper.getJobUsername(this, index);
       String jobId = PluginHelper.getJobId(this);

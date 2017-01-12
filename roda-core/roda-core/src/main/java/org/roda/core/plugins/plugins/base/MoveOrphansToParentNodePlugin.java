@@ -22,6 +22,7 @@ import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
@@ -80,7 +81,8 @@ public class MoveOrphansToParentNodePlugin extends AbstractPlugin<AIP> {
     try {
       String username = PluginHelper.getJobUsername(this, index);
 
-      List<AIP> aipList = PluginHelper.transformLitesIntoObjects(model, index, this, null, null, liteList);
+      Job job = PluginHelper.getJob(this, model);
+      List<AIP> aipList = PluginHelper.transformLitesIntoObjects(model, index, this, null, null, liteList, job);
       List<String> aipIds = aipList.stream().map(aip -> aip.getId()).collect(Collectors.toList());
 
       IndexResult<IndexedAIP> indexResults = index.find(IndexedAIP.class,

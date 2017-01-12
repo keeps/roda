@@ -30,10 +30,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -210,7 +215,8 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
-      List<AIP> list = PluginHelper.transformLitesIntoObjects(model, index, this, null, jobPluginInfo, liteList);
+      Job job = PluginHelper.getJob(this, model);
+      List<AIP> list = PluginHelper.transformLitesIntoObjects(model, index, this, null, jobPluginInfo, liteList, job);
 
       Path jobCSVTempFolder = getJobCSVTempFolder();
       Path csvTempFile = jobCSVTempFolder.resolve(UUID.randomUUID().toString() + ".csv");
@@ -247,7 +253,8 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
       LOGGER.debug("(1st: {}) Done exporting to CSV a total of {} files", firstAIPId, list.size());
-    } catch (JobException e) {
+    } catch (JobException | AuthorizationDeniedException | NotFoundException | GenericException
+      | RequestNotValidException e) {
       LOGGER.error("Could not update Job information");
     } catch (IOException e) {
       LOGGER.error("Error executing FileExportPlugin: " + e.getMessage(), e);

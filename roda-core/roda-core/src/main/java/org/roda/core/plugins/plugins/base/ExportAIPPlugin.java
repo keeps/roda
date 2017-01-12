@@ -36,6 +36,7 @@ import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -146,7 +147,8 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
-      List<AIP> aips = PluginHelper.transformLitesIntoObjects(model, index, this, report, jobPluginInfo, liteList);
+      Job job = PluginHelper.getJob(this, model);
+      List<AIP> aips = PluginHelper.transformLitesIntoObjects(model, index, this, report, jobPluginInfo, liteList, job);
 
       Path outputPath = Paths.get(outputFolder);
       String error = null;
@@ -163,9 +165,9 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
       }
 
       if (error == null && exportType == ExportType.ZIP) {
-        report = exportMultiZip(aips, outputPath, report, model, index, storage, jobPluginInfo);
+        report = exportMultiZip(aips, outputPath, report, model, index, storage, jobPluginInfo, job);
       } else if (error == null && exportType == ExportType.FOLDER) {
-        report = exportFolders(aips, outputPath, storage, model, index, report, jobPluginInfo);
+        report = exportFolders(aips, outputPath, storage, model, index, report, jobPluginInfo, job);
       } else if (error != null) {
         jobPluginInfo.incrementObjectsProcessedWithFailure(aips.size());
         report.setCompletionPercentage(100);
@@ -175,14 +177,15 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
 
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (JobException e) {
+    } catch (JobException | AuthorizationDeniedException | NotFoundException | GenericException
+      | RequestNotValidException e) {
       LOGGER.error("Could not update Job information");
     }
     return report;
   }
 
   private Report exportFolders(List<AIP> aips, Path outputPath, StorageService storage, ModelService model,
-    IndexService index, Report report, SimpleJobPluginInfo jobPluginInfo) {
+    IndexService index, Report report, SimpleJobPluginInfo jobPluginInfo, Job job) {
     try {
       FileStorageService localStorage = new FileStorageService(Paths.get(outputFolder));
       for (AIP aip : aips) {
@@ -214,7 +217,7 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
         }
         report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
 
         try {
           boolean notify = true;
@@ -231,7 +234,7 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
   }
 
   private Report exportMultiZip(List<AIP> aips, Path outputPath, Report report, ModelService model, IndexService index,
-    StorageService storage, SimpleJobPluginInfo jobPluginInfo) {
+    StorageService storage, SimpleJobPluginInfo jobPluginInfo, Job job) {
     for (AIP aip : aips) {
       LOGGER.debug("Exporting AIP {} to ZIP", aip.getId());
       OutputStream os = null;
@@ -269,7 +272,7 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
       }
       report.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
     }
     return report;
   }

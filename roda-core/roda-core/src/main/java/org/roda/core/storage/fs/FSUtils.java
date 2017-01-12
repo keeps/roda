@@ -8,6 +8,7 @@
 package org.roda.core.storage.fs;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.CopyOption;
@@ -77,6 +78,35 @@ public final class FSUtils {
    */
   private FSUtils() {
 
+  }
+
+  /**
+   * Method that safely updates a file, given an inputstream, by copying the
+   * content of the stream to a temporary file which then gets moved into the
+   * final location (doing an atomic move). </br>
+   * </br>
+   * In theory (as it depends on the file system implementation), this method is
+   * useful for ensuring thread safety. </br>
+   * </br>
+   * NOTE: the stream is closed in the end.
+   * 
+   * @param stream
+   *          stream with the content to be updated
+   * @param toPath
+   *          location of the file being updated
+   * 
+   * @throws IOException
+   *           if an error occurs while copying/moving
+   * 
+   */
+  public static void safeUpdate(InputStream stream, Path toPath) throws IOException {
+    try {
+      Path tempToPath = toPath.getParent().resolve(toPath.getFileName().toString() + ".temp" + System.nanoTime());
+      Files.copy(stream, tempToPath);
+      Files.move(tempToPath, toPath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+    } finally {
+      IOUtils.closeQuietly(stream);
+    }
   }
 
   /**

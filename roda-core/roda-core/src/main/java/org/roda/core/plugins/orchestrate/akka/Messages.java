@@ -8,7 +8,6 @@
 package org.roda.core.plugins.orchestrate.akka;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -36,7 +35,7 @@ public class Messages {
         LOGGER.trace("{} Created message {}", uuid, getClass().getSimpleName());
       }
 
-      creationTime = new Date().getTime();
+      creationTime = System.currentTimeMillis();
     }
 
     public void logProcessingStarted() {
@@ -52,7 +51,7 @@ public class Messages {
     }
 
     public long getTimeSinceCreation() {
-      return new Date().getTime() - creationTime;
+      return System.currentTimeMillis() - creationTime;
     }
   }
 

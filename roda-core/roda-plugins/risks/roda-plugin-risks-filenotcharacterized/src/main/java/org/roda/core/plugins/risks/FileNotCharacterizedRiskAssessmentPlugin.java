@@ -31,6 +31,7 @@ import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -240,12 +241,13 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
       final SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
+      final Job job = PluginHelper.getJob(this, model);
       final List<File> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, jobPluginInfo,
-        liteList);
+        liteList, job);
 
       final Result result = new Result();
       for (File file : list) {
-        result.addResult(executeOnFile(file, index, model, jobPluginInfo, report));
+        result.addResult(executeOnFile(file, index, model, jobPluginInfo, report, job));
       }
 
       report.addPluginDetails(result.toString());
@@ -255,7 +257,8 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
 
       return report;
 
-    } catch (final JobException | GenericException e) {
+    } catch (JobException | AuthorizationDeniedException | NotFoundException | GenericException
+      | RequestNotValidException e) {
       throw new PluginException("A job exception has occurred", e);
     }
   }
@@ -278,7 +281,7 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
    *           if some error occurred.
    */
   private Result executeOnFile(final File file, final IndexService index, final ModelService model,
-    final JobPluginInfo jobPluginInfo, final Report jobReport) throws GenericException {
+    final JobPluginInfo jobPluginInfo, final Report jobReport, final Job job) throws GenericException {
     LOGGER.debug("Processing File {}", file.getId());
 
     final String fileUUID = IdUtils.getFileId(file);
@@ -314,7 +317,7 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
     createPreservationEvent(file, index, model, fileReport);
 
     jobReport.addReport(fileReport);
-    PluginHelper.updatePartialJobReport(this, model, index, fileReport, true);
+    PluginHelper.updatePartialJobReport(this, model, index, fileReport, true, job);
     return result;
   }
 

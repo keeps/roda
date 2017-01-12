@@ -22,6 +22,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
@@ -78,7 +79,8 @@ public class RemoveAIPPlugin extends AbstractPlugin<AIP> {
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
-      List<AIP> aips = PluginHelper.transformLitesIntoObjects(model, index, this, report, jobPluginInfo, liteList);
+      Job job = PluginHelper.getJob(this, model);
+      List<AIP> aips = PluginHelper.transformLitesIntoObjects(model, index, this, report, jobPluginInfo, liteList, job);
 
       for (AIP aip : aips) {
         String error = null;
@@ -99,11 +101,12 @@ public class RemoveAIPPlugin extends AbstractPlugin<AIP> {
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
         }
         report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
       }
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (JobException e) {
+    } catch (JobException | AuthorizationDeniedException | NotFoundException | GenericException
+      | RequestNotValidException e) {
       LOGGER.error("Could not update Job information");
     }
     return report;

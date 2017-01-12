@@ -31,6 +31,7 @@ import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.model.ModelService;
+import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.DummyPlugin;
 import org.roda.core.plugins.plugins.PluginThatFailsDuringInit;
 import org.roda.core.plugins.plugins.PluginThatFailsDuringXMethod;
@@ -80,6 +81,12 @@ public class JobsTest {
   @Test
   public void testJobExecutingPluginThatFailsDuringInit()
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    try {
+      RodaCoreFactory.getPluginManager().registerPlugin(new PluginThatFailsDuringInit());
+      Assert.fail("Plugin should not load & therefore an exception was expected!");
+    } catch (PluginException e) {
+      // do nothing as it is expected
+    }
     Job job = TestsHelper.executeJob(PluginThatFailsDuringInit.class, PluginType.MISC, SelectedItemsNone.create(),
       JOB_STATE.FAILED_TO_COMPLETE);
     Assert.assertEquals(job.getStateDetails(), "Plugin is NULL");

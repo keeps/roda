@@ -25,6 +25,7 @@ import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
@@ -109,13 +110,14 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
-      List<AIP> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, jobPluginInfo, liteList);
+      Job job = PluginHelper.getJob(this, model);
+      List<AIP> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, jobPluginInfo, liteList, job);
 
       try {
         for (AIP aip : list) {
           Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class,
             AIPState.INGEST_PROCESSING);
-          PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
+          PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
           PluginState reportState = PluginState.SUCCESS;
 
           VirusCheckResult virusCheckResult = null;
@@ -145,7 +147,7 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
             try {
               createEvent(virusCheckResult, exception, reportItem.getPluginState(), aip, model, index, true);
               report.addReport(reportItem);
-              PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+              PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
             } catch (PluginException e) {
               LOGGER.error("Error updating event and job", e);
             }
@@ -158,7 +160,8 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
 
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (JobException e) {
+    } catch (JobException | AuthorizationDeniedException | RequestNotValidException | GenericException
+      | NotFoundException e) {
       throw new PluginException("A job exception has occurred", e);
     }
 

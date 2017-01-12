@@ -14,11 +14,16 @@ import java.util.List;
 import org.roda.core.common.validation.ValidationUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.JobException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -126,14 +131,15 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
-      List<AIP> list = PluginHelper.transformLitesIntoObjects(model, index, this, pluginReport, jobPluginInfo,
-        liteList);
+      Job job = PluginHelper.getJob(this, model);
+      List<AIP> list = PluginHelper.transformLitesIntoObjects(model, index, this, pluginReport, jobPluginInfo, liteList,
+        job);
 
       try {
         for (AIP aip : list) {
           Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class,
             AIPState.INGEST_PROCESSING);
-          PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
+          PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
           PluginState state = PluginState.SUCCESS;
 
           try {
@@ -158,7 +164,7 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
             jobPluginInfo.incrementObjectsProcessed(state);
 
             pluginReport.addReport(reportItem);
-            PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+            PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
           } catch (PluginException | RuntimeException e) {
             LOGGER.error("Error updating job report", e);
           }
@@ -170,7 +176,8 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
 
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (JobException e) {
+    } catch (JobException | AuthorizationDeniedException | NotFoundException | GenericException
+      | RequestNotValidException e) {
       throw new PluginException("A job exception has occurred", e);
     }
 

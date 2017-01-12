@@ -35,6 +35,7 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.validation.ValidationException;
@@ -105,26 +106,34 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
     List<LiteOptionalWithCause> liteList) throws PluginException {
     Report report = PluginHelper.initPluginReport(this);
 
-    List<TransferredResource> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, null, liteList);
+    try {
 
-    String jobId = PluginHelper.getJobId(this);
-    Optional<String> computedSearchScope = PluginHelper.getSearchScopeFromParameters(this, model);
-    Path jobWorkingDirectory = PluginHelper.getJobWorkingDirectory(this);
-    boolean forceSearchScope = PluginHelper.getForceParentIdFromParameters(this);
+      Job job = PluginHelper.getJob(this, model);
+      List<TransferredResource> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, null,
+        liteList, job);
 
-    for (TransferredResource transferredResource : list) {
-      Report reportItem = PluginHelper.initPluginReportItem(this, transferredResource);
+      String jobId = PluginHelper.getJobId(this);
+      Optional<String> computedSearchScope = PluginHelper.getSearchScopeFromParameters(this, model);
+      Path jobWorkingDirectory = PluginHelper.getJobWorkingDirectory(this);
+      boolean forceSearchScope = PluginHelper.getForceParentIdFromParameters(this);
 
-      Path earkSIPPath = Paths.get(transferredResource.getFullPath());
-      LOGGER.debug("Converting {} to AIP", earkSIPPath);
+      for (TransferredResource transferredResource : list) {
+        Report reportItem = PluginHelper.initPluginReportItem(this, transferredResource);
 
-      transformTransferredResourceIntoAnAIP(index, model, storage, transferredResource, earkSIPPath, createSubmission,
-        reportItem, jobId, computedSearchScope, forceSearchScope, jobWorkingDirectory);
-      report.addReport(reportItem);
+        Path earkSIPPath = Paths.get(transferredResource.getFullPath());
+        LOGGER.debug("Converting {} to AIP", earkSIPPath);
 
-      PluginHelper.createJobReport(this, model, reportItem);
+        transformTransferredResourceIntoAnAIP(index, model, storage, transferredResource, earkSIPPath, createSubmission,
+          reportItem, jobId, computedSearchScope, forceSearchScope, jobWorkingDirectory);
+        report.addReport(reportItem);
 
+        PluginHelper.createJobReport(this, model, reportItem);
+
+      }
+    } catch (AuthorizationDeniedException | NotFoundException | GenericException | RequestNotValidException e) {
+      throw new PluginException("A job exception has occurred", e);
     }
+
     return report;
   }
 

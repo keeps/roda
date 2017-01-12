@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import org.roda.core.common.ReturnWithExceptions;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobException;
@@ -102,18 +103,19 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
-      List<T> list = PluginHelper.transformLitesIntoObjects(model, index, this, pluginReport, jobPluginInfo, liteList);
+      Job job = PluginHelper.getJob(this, model);
+      List<T> list = PluginHelper.transformLitesIntoObjects(model, index, this, pluginReport, jobPluginInfo, liteList,
+        job);
       pluginReport.setPluginState(PluginState.SUCCESS);
 
       // clearing specific indexes from a id list
       try {
-        Job job = PluginHelper.getJob(this, index);
         SelectedItems<?> selectedItems = job.getSourceObjects();
         if (!(selectedItems instanceof SelectedItemsAll) && clearIndexes) {
           List<String> ids = list.stream().map(obj -> obj.getId()).collect(Collectors.toList());
           clearSpecificIndexes(index, ids);
         }
-      } catch (GenericException | RequestNotValidException | NotFoundException e) {
+      } catch (GenericException | RequestNotValidException e) {
         LOGGER.error("Error clearing specific indexes of a RODA entity", e);
       }
 
@@ -137,14 +139,15 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
           }
 
           pluginReport.addReport(reportItem);
-          PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+          PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
         }
       }
 
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
-    } catch (JobException e) {
+    } catch (JobException | AuthorizationDeniedException | NotFoundException | GenericException
+      | RequestNotValidException e) {
       LOGGER.error("Error reindexing RODA entity", e);
     }
 
