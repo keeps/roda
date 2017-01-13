@@ -216,15 +216,14 @@ public interface BrowserServiceAsync {
     String details, AsyncCallback<Void> asyncCallback);
 
   void createFolder(String aipId, String representationId, String folderUUID, String newName, String details,
-    AsyncCallback<String> asyncCallback);
+    AsyncCallback<IndexedFile> asyncCallback);
 
   void createFormatIdentificationJob(SelectedItems selected, AsyncCallback<Void> loadingAsyncCallback);
 
   void changeRepresentationType(SelectedItemsList<IndexedRepresentation> selectedRepresentation, String newType,
     String details, AsyncCallback<Void> loadingAsyncCallback);
 
-  void getDipBundle(String dipUUID, String dipFileUUID, String aipId, String representationId, List<String> filePath,
-    String fileId, AsyncCallback<DipBundle> callback);
+  void getDipBundle(String dipUUID, String dipFileUUID, AsyncCallback<DipBundle> callback);
 
   void deleteDIP(String dipId, AsyncCallback<Void> async);
 
@@ -234,6 +233,6 @@ public interface BrowserServiceAsync {
   void retrieveBrowseFileBundle(String historyAipId, String historyRepresentationId, List<String> historyFilePath,
     String historyFileId, String localeName, AsyncCallback<BrowseFileBundle> asyncCallback);
 
-  void retrieveFromModel(String objectClass, String objectUUID, AsyncCallback<IsIndexed> asyncCallback);
+  <T extends IsIndexed> void retrieveFromModel(String objectClass, String objectUUID, AsyncCallback<T> asyncCallback);
 
 }

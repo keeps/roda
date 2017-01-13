@@ -22,7 +22,6 @@ import java.util.UUID;
 
 import org.apache.commons.configuration.Configuration;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.IdUtils;
 import org.roda.core.common.Messages;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.common.SelectedItemsUtils;
@@ -51,7 +50,6 @@ import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
@@ -789,9 +787,9 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public String createFolder(String aipId, String representationId, String folderUUID, String newName, String details)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, AlreadyExistsException,
-    NotFoundException {
+  public IndexedFile createFolder(String aipId, String representationId, String folderUUID, String newName,
+    String details) throws AuthorizationDeniedException, GenericException, RequestNotValidException,
+    AlreadyExistsException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.createFolder(user, aipId, representationId, folderUUID, newName, details);
   }
@@ -865,12 +863,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public DipBundle getDipBundle(String dipUUID, String dipFileUUID, String aipId, String representationId,
-    List<String> filePath, String fileId)
+  public DipBundle getDipBundle(String dipUUID, String dipFileUUID)
     throws RequestNotValidException, AuthorizationDeniedException, GenericException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
 
-    return Browser.retrieveDipBundle(user, dipUUID, dipFileUUID, aipId, representationId, filePath, fileId);
+    return Browser.retrieveDipBundle(user, dipUUID, dipFileUUID);
   }
 
   @Override

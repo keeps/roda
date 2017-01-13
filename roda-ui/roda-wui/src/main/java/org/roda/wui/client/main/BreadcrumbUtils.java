@@ -8,6 +8,7 @@
 package org.roda.wui.client.main;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
@@ -18,11 +19,9 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.browse.BrowseAIP;
-import org.roda.wui.client.browse.BrowseDIP;
 import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
-import org.roda.wui.client.browse.bundle.DipBundle;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -59,6 +58,10 @@ public class BreadcrumbUtils {
 
   public static List<BreadcrumbItem> getAipBreadcrumbs(List<IndexedAIP> aipAncestors, IndexedAIP aip) {
     return getAipBreadcrumbs(aipAncestors, aip, false);
+  }
+
+  public static List<BreadcrumbItem> getAipBreadcrumbs(IndexedAIP aip) {
+    return Arrays.asList(getBreadcrumbItem(aip));
   }
 
   public static List<BreadcrumbItem> getAipBreadcrumbs(List<IndexedAIP> aipAncestors, IndexedAIP aip, boolean events) {
@@ -147,6 +150,11 @@ public class BreadcrumbUtils {
     return breadcrumb;
   }
 
+  public static List<BreadcrumbItem> getRepresentationBreadcrumbs(IndexedAIP aip,
+    IndexedRepresentation representation) {
+    return Arrays.asList(getBreadcrumbItem(aip), getBreadcrumbItem(representation));
+  }
+
   public static List<BreadcrumbItem> getFileBreadcrumbs(BrowseFileBundle bundle) {
     IndexedAIP aip = bundle.getAip();
     IndexedRepresentation representation = bundle.getRepresentation();
@@ -226,14 +234,14 @@ public class BreadcrumbUtils {
     IndexedFile file, IndexedDIP dip, DIPFile dipFile, List<DIPFile> dipFileAncestors) {
     List<BreadcrumbItem> ret = new ArrayList<>();
 
-//    if (aip != null && representation != null && file != null) {
-//      ret.addAll(getFileBreadcrumbs(aip, representation, file));
-//    } else if (aip != null && representation != null) {
-//      ret.add(getBreadcrumbItem(aip));
-//      ret.add(getBreadcrumbItem(representation));
-//    } else if (aip != null) {
-//      ret.add(getBreadcrumbItem(aip));
-//    }
+    // if (aip != null && representation != null && file != null) {
+    // ret.addAll(getFileBreadcrumbs(aip, representation, file));
+    // } else if (aip != null && representation != null) {
+    // ret.add(getBreadcrumbItem(aip));
+    // ret.add(getBreadcrumbItem(representation));
+    // } else if (aip != null) {
+    // ret.add(getBreadcrumbItem(aip));
+    // }
 
     // DIP
     ret.add(getBreadcrumbItem(dip, aip, representation, file));
@@ -265,7 +273,7 @@ public class BreadcrumbUtils {
 
       @Override
       public void execute() {
-        HistoryUtils.openBrowse(dip, aip, representation, file);
+        HistoryUtils.openBrowse(dip);
       }
     });
   }
@@ -282,8 +290,7 @@ public class BreadcrumbUtils {
 
       @Override
       public void execute() {
-        HistoryUtils.openBrowse(dipFile, BrowseDIP.DEFAULT_DIPFILE_SORTER, BrowseDIP.DEFAULT_DIPFILE_INDEX, aip,
-          representation, file);
+        HistoryUtils.openBrowse(dipFile);
       }
     });
   }

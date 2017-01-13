@@ -37,7 +37,32 @@ public class FileLink extends RepresentationLink implements Serializable {
 
   @Override
   public String toString() {
-    return "FileLink [path=" + path + ", fileId=" + fileId + "]";
+    StringBuilder builder = new StringBuilder();
+    builder.append("FileLink [");
+    
+    if (getAipId() != null) {
+      builder.append("getAipId()=");
+      builder.append(getAipId());
+    }
+    if (getRepresentationId() != null) {
+      builder.append("getRepresentationId()=");
+      builder.append(getRepresentationId());
+      builder.append(", ");
+    }
+    if (path != null) {
+      builder.append("path=");
+      builder.append(path);
+      builder.append(", ");
+    }
+    if (fileId != null) {
+      builder.append("fileId=");
+      builder.append(fileId);
+      builder.append(", ");
+    }
+    builder.append("]");
+    return builder.toString();
   }
+
+ 
 
 }

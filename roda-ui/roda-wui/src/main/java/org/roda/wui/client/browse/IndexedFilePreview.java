@@ -1,26 +1,30 @@
 package org.roda.wui.client.browse;
 
+import java.util.Arrays;
+
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.wui.client.common.lists.SearchFileList;
+import org.roda.wui.client.common.lists.pagination.ListSelectionState;
+import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchPanel;
-import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.RestUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.SelectionChangeEvent;
-import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
 import config.i18n.client.ClientMessages;
 
 public class IndexedFilePreview extends BitstreamPreview<IndexedFile> {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
+  private SearchFileList folderList = null;
 
   public IndexedFilePreview(Viewers viewers, IndexedFile file) {
     super(viewers, RestUtils.createRepresentationFileDownloadUri(file.getUUID()), file.getFileFormat(),
@@ -43,30 +47,40 @@ public class IndexedFilePreview extends BitstreamPreview<IndexedFile> {
       messages.searchPlaceHolder(), false, false, true);
 
     boolean justActive = true;
-    boolean selectable = false;
+    boolean selectable = true;
     boolean showFilesPath = false;
-    final SearchFileList folderList = new SearchFileList(filter, justActive, Facets.NONE,
+
+    final SearchFileList list = new SearchFileList(filter, justActive, Facets.NONE,
       messages.representationListOfFiles(), selectable, showFilesPath);
+    this.folderList = list;
 
     fileSearch.setList(folderList);
 
     layout.add(fileSearch);
-    layout.add(folderList);
+    layout.add(list);
 
-    folderList.getSelectionModel().addSelectionChangeHandler(new Handler() {
-
-      @Override
-      public void onSelectionChange(SelectionChangeEvent event) {
-        IndexedFile selectedFile = folderList.getSelectionModel().getSelectedObject();
-        int selectedFileIndex = folderList.getIndexOfVisibleObject(selectedFile);
-
-        if (selectedFile != null) {
-          HistoryUtils.openBrowse(selectedFile, folderList.getSorter(), selectedFileIndex);
-        }
-      }
-    });
+    ListSelectionState.bindBrowseOpener(folderList);
 
     return layout;
+  }
+
+  public SelectedItems<IndexedFile> getSelected() {
+
+    SelectedItems<IndexedFile> ret = SelectedItemsList.create(IndexedFile.class, Arrays.asList(getObject().getUUID()));
+    if (folderList != null) {
+      SelectedItems<IndexedFile> listSelected = folderList.getSelected();
+
+      if (!ClientSelectedItemsUtils.isEmpty(listSelected)) {
+        ret = listSelected;
+      }
+    }
+    return ret;
+  }
+
+  public void refresh() {
+    if (folderList != null) {
+      folderList.refresh();
+    }
   }
 
 }

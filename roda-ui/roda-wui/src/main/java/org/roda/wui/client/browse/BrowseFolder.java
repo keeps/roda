@@ -30,6 +30,7 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.SelectFileDialog;
 import org.roda.wui.client.common.lists.SearchFileList;
+import org.roda.wui.client.common.lists.pagination.ListSelectionState;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchFilters;
@@ -177,15 +178,7 @@ public class BrowseFolder extends Composite {
     final Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_PARENT_UUID, folder.getUUID()));
     filesList = new SearchFileList(filter, true, Facets.NONE, summary, selectable, false);
 
-    filesList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
-      @Override
-      public void onSelectionChange(SelectionChangeEvent event) {
-        IndexedFile selected = filesList.getSelectionModel().getSelectedObject();
-        if (selected != null) {
-          HistoryUtils.openBrowse(selected, filesList.getSorter(), filesList.getIndexOfVisibleObject(selected));
-        }
-      }
-    });
+    ListSelectionState.bindBrowseOpener(filesList);
 
     filesList.addCheckboxSelectionListener(new CheckboxSelectionListener<IndexedFile>() {
 
@@ -418,11 +411,11 @@ public class BrowseFolder extends Composite {
                 String repId = folder.getRepresentationId();
                 String folderUUID = folder.getUUID();
                 BrowserService.Util.getInstance().createFolder(aipId, repId, folderUUID, newName, details,
-                  new LoadingAsyncCallback<String>() {
+                  new LoadingAsyncCallback<IndexedFile>() {
 
                     @Override
-                    public void onSuccessImpl(String newUUID) {
-                      filesList.refresh();
+                    public void onSuccessImpl(IndexedFile newFolder) {
+                      HistoryUtils.openBrowse(newFolder);
                     }
 
                     @Override

@@ -40,6 +40,7 @@ import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -307,11 +308,11 @@ public class HtmlSnippetUtils {
     return SafeHtmlUtils.fromSafeConstant(html);
   }
 
-  public static final void setCssClassDisabled(Widget widget, boolean disabled) {
+  public static final void setCssClassDisabled(UIObject uiobject, boolean disabled) {
     if (disabled) {
-      widget.addStyleName("disabled");
+      uiobject.addStyleName("disabled");
     } else {
-      widget.removeStyleName("disabled");
+      uiobject.removeStyleName("disabled");
     }
   }
 

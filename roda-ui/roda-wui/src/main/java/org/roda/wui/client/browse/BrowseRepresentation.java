@@ -27,7 +27,6 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIPState;
-import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
@@ -39,6 +38,7 @@ import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.SelectFileDialog;
 import org.roda.wui.client.common.lists.DIPList;
 import org.roda.wui.client.common.lists.SearchFileList;
+import org.roda.wui.client.common.lists.pagination.ListSelectionState;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchFilters;
@@ -85,14 +85,13 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.SelectionChangeEvent;
-import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
 import config.i18n.client.ClientMessages;
 
@@ -158,6 +157,10 @@ public class BrowseRepresentation extends Composite {
   interface MyUiBinder extends UiBinder<Widget, BrowseRepresentation> {
   }
 
+  // Focus
+  @UiField
+  FocusPanel keyboardFocus;
+
   // IDENTIFICATION
 
   @UiField
@@ -202,7 +205,10 @@ public class BrowseRepresentation extends Composite {
   // SIDEBAR
 
   @UiField
-  Button renameFolders, moveFiles, uploadFiles, createFolder, identifyFormats, changeType;
+  Button renameFolders, moveFiles, uploadFiles, createFolder, identifyFormats, changeType, searchPrevious, searchNext;
+
+  @UiField
+  FlowPanel searchSection;
 
   private List<HandlerRegistration> handlers;
   private IndexedRepresentation representation;
@@ -229,15 +235,7 @@ public class BrowseRepresentation extends Composite {
 
     filesList = new SearchFileList(filter, true, Facets.NONE, summary, selectable, showFilesPath);
 
-    filesList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
-      @Override
-      public void onSelectionChange(SelectionChangeEvent event) {
-        IndexedFile selected = filesList.getSelectionModel().getSelectedObject();
-        if (selected != null) {
-          HistoryUtils.openBrowse(selected, filesList.getSorter(), filesList.getIndexOfVisibleObject(selected));
-        }
-      }
-    });
+    ListSelectionState.bindBrowseOpener(filesList);
 
     filesList.addCheckboxSelectionListener(new CheckboxSelectionListener<IndexedFile>() {
 
@@ -287,16 +285,7 @@ public class BrowseRepresentation extends Composite {
 
     // DISSEMINATIONS
     disseminationsList = new DIPList(Filter.NULL, Facets.NONE, messages.listOfDisseminations(), true);
-    disseminationsList.getSelectionModel().addSelectionChangeHandler(new Handler() {
-
-      @Override
-      public void onSelectionChange(SelectionChangeEvent event) {
-        IndexedDIP dissemination = disseminationsList.getSelectionModel().getSelectedObject();
-        if (dissemination != null) {
-          HistoryUtils.openBrowse(dissemination, representation);
-        }
-      }
-    });
+    ListSelectionState.bindBrowseOpener(disseminationsList);
 
     disseminationsSearch = new SearchPanel(Filter.NULL, RodaConstants.DIP_SEARCH, true, messages.searchPlaceHolder(),
       false, false, true);
@@ -401,6 +390,9 @@ public class BrowseRepresentation extends Composite {
     moveFiles.setEnabled(false);
     uploadFiles.setEnabled(true);
     createFolder.setEnabled(true);
+
+    ListSelectionState.bindLayout(IndexedRepresentation.class, searchPrevious, searchNext, keyboardFocus, true, false,
+      false, searchSection);
   }
 
   @Override
@@ -787,11 +779,11 @@ public class BrowseRepresentation extends Composite {
               @Override
               public void onSuccess(final String details) {
                 BrowserService.Util.getInstance().createFolder(aipId, repId, null, newName, details,
-                  new LoadingAsyncCallback<String>() {
+                  new LoadingAsyncCallback<IndexedFile>() {
 
                     @Override
-                    public void onSuccessImpl(String newUUID) {
-                      filesList.refresh();
+                    public void onSuccessImpl(IndexedFile newFolder) {
+                      HistoryUtils.openBrowse(newFolder);
                     }
 
                     @Override

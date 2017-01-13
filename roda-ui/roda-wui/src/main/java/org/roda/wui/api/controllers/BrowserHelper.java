@@ -251,7 +251,8 @@ public class BrowserHelper {
     bundle.setAip(aip);
     bundle.setRepresentation(
       retrieve(IndexedRepresentation.class, IdUtils.getRepresentationId(aip.getId(), representationId)));
-    bundle.setFile(retrieve(IndexedFile.class, IdUtils.getFileId(aip.getId(), representationId, filePath, fileId)));
+    String fileUUID = IdUtils.getFileId(aip.getId(), representationId, filePath, fileId);
+    bundle.setFile(retrieve(IndexedFile.class, fileUUID));
 
     // set aip ancestors
     try {
@@ -273,6 +274,11 @@ public class BrowserHelper {
     }
 
     bundle.setTotalSiblingCount(count(IndexedFile.class, siblingFilter, user));
+
+    // Count DIPs
+    Filter dipsFilter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, fileUUID));
+    Long dipCount = RodaCoreFactory.getIndexService().count(IndexedDIP.class, dipsFilter);
+    bundle.setDipCount(dipCount);
 
     return bundle;
   }
@@ -459,52 +465,51 @@ public class BrowserHelper {
     return ret;
   }
 
-  public static DipBundle retrieveDipBundle(String dipUUID, String dipFileUUID, String aipId, String representationId,
-    List<String> filePath, String fileId) throws GenericException, NotFoundException {
+  public static DipBundle retrieveDipBundle(String dipUUID, String dipFileUUID, User user)
+    throws GenericException, NotFoundException, RequestNotValidException {
     DipBundle bundle = new DipBundle();
 
-    bundle.setDip(BrowserHelper.retrieve(IndexedDIP.class, dipUUID));
+    bundle.setDip(retrieve(IndexedDIP.class, dipUUID));
 
     if (dipFileUUID != null) {
-      DIPFile dipFile = BrowserHelper.retrieve(DIPFile.class, dipFileUUID);
+      DIPFile dipFile = retrieve(DIPFile.class, dipFileUUID);
       bundle.setDipFile(dipFile);
 
       List<DIPFile> dipFileAncestors = new ArrayList<>();
       for (String dipFileAncestor : dipFile.getAncestorsPath()) {
         try {
-          dipFileAncestors.add(BrowserHelper.retrieve(DIPFile.class, dipFileAncestor));
+          dipFileAncestors.add(retrieve(DIPFile.class, dipFileAncestor));
         } catch (NotFoundException e) {
           // ignore
         }
       }
       bundle.setDipFileAncestors(dipFileAncestors);
-    }
-
-    if (aipId == null && representationId == null && fileId == null) {
-      // infer from DIP
-      IndexedDIP dip = bundle.getDip();
-      if (!dip.getFileIds().isEmpty()) {
-        bundle.setFile(BrowserHelper.retrieve(IndexedFile.class, IdUtils.getFileId(dip.getFileIds().get(0))));
-      } else if (!dip.getRepresentationIds().isEmpty()) {
-        bundle.setRepresentation(BrowserHelper.retrieve(IndexedRepresentation.class,
-          IdUtils.getRepresentationId(dip.getRepresentationIds().get(0))));
-      } else if (!dip.getAipIds().isEmpty()) {
-        bundle.setAip(BrowserHelper.retrieve(IndexedAIP.class, dip.getAipIds().get(0).getAipId()));
+    } else {
+      // if there is only one DIPFile in the DIP and it is NOT a directory
+      // then select it
+      Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIPFILE_DIP_ID, dipUUID));
+      Sublist sublist = new Sublist(0, 1);
+      IndexResult<DIPFile> dipFiles = find(DIPFile.class, filter, Sorter.NONE, sublist, Facets.NONE, user, false);
+      if (dipFiles.getTotalCount() == 1 && !dipFiles.getResults().get(0).isDirectory()) {
+        bundle.setDipFile(dipFiles.getResults().get(0));
       }
     }
 
-    if (aipId != null) {
-      bundle.setAip(BrowserHelper.retrieve(IndexedAIP.class, aipId));
-    }
-
-    if (representationId != null) {
-      bundle.setRepresentation(
-        BrowserHelper.retrieve(IndexedRepresentation.class, IdUtils.getRepresentationId(aipId, representationId)));
-    }
-
-    if (fileId != null) {
-      bundle.setFile(
-        BrowserHelper.retrieve(IndexedFile.class, IdUtils.getFileId(aipId, representationId, filePath, fileId)));
+    // infer from DIP
+    IndexedDIP dip = bundle.getDip();
+    if (!dip.getFileIds().isEmpty()) {
+      IndexedFile file = BrowserHelper.retrieve(IndexedFile.class, IdUtils.getFileId(dip.getFileIds().get(0)));
+      bundle.setFile(file);
+      bundle.setRepresentation(BrowserHelper.retrieve(IndexedRepresentation.class, file.getRepresentationUUID()));
+      bundle.setAip(BrowserHelper.retrieve(IndexedAIP.class, file.getAipId()));
+    } else if (!dip.getRepresentationIds().isEmpty()) {
+      IndexedRepresentation representation = BrowserHelper.retrieve(IndexedRepresentation.class,
+        IdUtils.getRepresentationId(dip.getRepresentationIds().get(0)));
+      bundle.setRepresentation(representation);
+      bundle.setAip(BrowserHelper.retrieve(IndexedAIP.class, representation.getAipId()));
+    } else if (!dip.getAipIds().isEmpty()) {
+      IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, dip.getAipIds().get(0).getAipId());
+      bundle.setAip(aip);
     }
 
     return bundle;
@@ -2910,9 +2915,9 @@ public class BrowserHelper {
 
   }
 
-  public static String createFolder(User user, String aipId, String representationId, String folderUUID, String newName,
-    String details) throws GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException,
-    AuthorizationDeniedException {
+  public static IndexedFile createFolder(User user, String aipId, String representationId, String folderUUID,
+    String newName, String details) throws GenericException, RequestNotValidException, AlreadyExistsException,
+    NotFoundException, AuthorizationDeniedException {
     ModelService model = RodaCoreFactory.getModelService();
     IndexService index = RodaCoreFactory.getIndexService();
     File newFolder;
@@ -2934,7 +2939,7 @@ public class BrowserHelper {
         user.getName(), true);
 
       index.commit(IndexedFile.class);
-      return IdUtils.getFileId(newFolder);
+      return index.retrieve(IndexedFile.class, IdUtils.getFileId(newFolder));
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       String outcomeText = "The folder '" + newName + "' has not been manually created.";
       model.createUpdateAIPEvent(aipId, irep.getId(), null, null, PreservationEventType.CREATION,

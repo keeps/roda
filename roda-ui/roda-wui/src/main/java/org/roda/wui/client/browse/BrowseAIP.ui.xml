@@ -14,169 +14,179 @@
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
-	<g:FlowPanel styleName="browse" addStyleNames="wrapper skip_padding">
-		<g:FlowPanel addStyleNames="row full_width skip_padding">
-			<g:FlowPanel addStyleNames="col_10 content">
-				<!-- HEADER -->
-				<g:Label styleName="h1" addStyleNames="browseTitle"
-					ui:field="browseTitle">
-					<ui:text from='{messages.catalogueTitle}' />
-				</g:Label>
-				<g:FlowPanel addStyleNames="page-description" ui:field="browseDescription">
-				</g:FlowPanel>
-
-				<!-- STATUS -->
-				<g:HTML ui:field="aipState" />
-
-				<!-- IDENTIFICATION -->
-				<g:FlowPanel styleName="browseItemPanel browseTitle-allCollections-wrapper">
-					<g:Label addStyleNames="browseItemHeader" ui:field="browseItemHeader">
-						<ui:text from='{messages.catalogueItemTitle}' />
+	<g:FocusPanel ui:field="keyboardFocus">
+		<g:FlowPanel styleName="browse" addStyleNames="wrapper skip_padding">
+			<g:FlowPanel addStyleNames="row full_width skip_padding">
+				<g:FlowPanel addStyleNames="col_10 content">
+					<!-- HEADER -->
+					<g:Label styleName="h1" addStyleNames="browseTitle"
+						ui:field="browseTitle">
+						<ui:text from='{messages.catalogueTitle}' />
 					</g:Label>
-					<g:SimplePanel styleName="browseItemIcon" ui:field="itemIcon" />
-					<g:FlowPanel styleName="browseItemPanelText">
-						<g:Label styleName="h4" addStyleNames="browseItemText"
-							ui:field="itemTitle" />
+					<g:FlowPanel addStyleNames="page-description" ui:field="browseDescription">
 					</g:FlowPanel>
-					<g:Label addStyleNames="browseItemId" ui:field="itemId"
-						title="{messages.itemId}" />
-					<g:Label addStyleNames="browseSipId" ui:field="sipId"
-						title="{messages.sipId}" />
-					<g:FlowPanel ui:field="ingestJobId" title="{messages.sipId}" />
-				</g:FlowPanel>
-				<m:BreadcrumbPanel ui:field="breadcrumb"
-					addStyleNames="browseBreadcrumb" />
 
-				<!-- DESCRIPTIVE METADATA -->
-				<g:FlowPanel addStyleNames="card descriptiveMetadataCard">
-					<g:TabPanel ui:field="descriptiveMetadata"
-						addStyleNames="browseItemMetadata" />
-					<g:Button addStyleNames="btn btn-plus browseNewDescriptiveMetadataButton"
-						ui:field="newDescriptiveMetadata">
-						<ui:text from='{messages.newDescriptiveMetadataTitle}' />
-					</g:Button>
-				</g:FlowPanel>
+					<!-- STATUS -->
+					<g:HTML ui:field="aipState" />
 
-				<!-- REPRESENTATIONS -->
-				<g:FlowPanel addStyleNames="card representationsCard">
-					<g:Label addStyleNames="h5" ui:field="representationsTitle">
-						<ui:text from='{messages.representationsTitle}' />
-					</g:Label>
-					<commonsearch:SearchPanel ui:field="representationsSearch" />
-					<lists:RepresentationList addStyleNames="searchResults"
-						ui:field="representationsList" />
-				</g:FlowPanel>
-				
-				<!-- DIPs -->
-				<g:FlowPanel addStyleNames="card disseminationsCard">
-					<g:Label addStyleNames="h5" ui:field="disseminationsTitle">
-						<ui:text from='{messages.disseminationsTitle}' />
-					</g:Label>
-					<commonsearch:SearchPanel ui:field="disseminationsSearch" />
-					<lists:DIPList addStyleNames="searchResults"
-						ui:field="disseminationsList" />
-				</g:FlowPanel>
+					<!-- IDENTIFICATION -->
+					<g:FlowPanel styleName="browseItemPanel browseTitle-allCollections-wrapper">
+						<g:Label addStyleNames="browseItemHeader" ui:field="browseItemHeader">
+							<ui:text from='{messages.catalogueItemTitle}' />
+						</g:Label>
+						<g:SimplePanel styleName="browseItemIcon" ui:field="itemIcon" />
+						<g:FlowPanel styleName="browseItemPanelText">
+							<g:Label styleName="h4" addStyleNames="browseItemText"
+								ui:field="itemTitle" />
+						</g:FlowPanel>
+						<g:Label addStyleNames="browseItemId" ui:field="itemId"
+							title="{messages.itemId}" />
+						<g:Label addStyleNames="browseSipId" ui:field="sipId"
+							title="{messages.sipId}" />
+						<g:FlowPanel ui:field="ingestJobId" title="{messages.sipId}" />
+					</g:FlowPanel>
+					<m:BreadcrumbPanel ui:field="breadcrumb"
+						addStyleNames="browseBreadcrumb" />
 
-				<!-- AIP CHILDREN -->
-				<g:FlowPanel addStyleNames="card aipChildrenCard">
-					<g:Label addStyleNames="h5" ui:field="aipChildrenTitle">
-						<ui:text from='{messages.sublevels}' />
-					</g:Label>
-					<commonsearch:SearchPanel ui:field="aipChildrenSearch" />
-					<lists:AIPList addStyleNames="searchResults"
-						ui:field="aipChildrenList" />
+					<!-- DESCRIPTIVE METADATA -->
+					<g:FlowPanel addStyleNames="card descriptiveMetadataCard">
+						<g:TabPanel ui:field="descriptiveMetadata"
+							addStyleNames="browseItemMetadata" />
+						<g:Button addStyleNames="btn btn-plus browseNewDescriptiveMetadataButton"
+							ui:field="newDescriptiveMetadata">
+							<ui:text from='{messages.newDescriptiveMetadataTitle}' />
+						</g:Button>
+					</g:FlowPanel>
+
+					<!-- REPRESENTATIONS -->
+					<g:FlowPanel addStyleNames="card representationsCard">
+						<g:Label addStyleNames="h5" ui:field="representationsTitle">
+							<ui:text from='{messages.representationsTitle}' />
+						</g:Label>
+						<commonsearch:SearchPanel ui:field="representationsSearch" />
+						<lists:RepresentationList addStyleNames="searchResults"
+							ui:field="representationsList" />
+					</g:FlowPanel>
+
+					<!-- DIPs -->
+					<g:FlowPanel addStyleNames="card disseminationsCard">
+						<g:Label addStyleNames="h5" ui:field="disseminationsTitle">
+							<ui:text from='{messages.disseminationsTitle}' />
+						</g:Label>
+						<commonsearch:SearchPanel ui:field="disseminationsSearch" />
+						<lists:DIPList addStyleNames="searchResults"
+							ui:field="disseminationsList" />
+					</g:FlowPanel>
+
+					<!-- AIP CHILDREN -->
+					<g:FlowPanel addStyleNames="card aipChildrenCard">
+						<g:Label addStyleNames="h5" ui:field="aipChildrenTitle">
+							<ui:text from='{messages.sublevels}' />
+						</g:Label>
+						<commonsearch:SearchPanel ui:field="aipChildrenSearch" />
+						<lists:AIPList addStyleNames="searchResults"
+							ui:field="aipChildrenList" />
+					</g:FlowPanel>
 				</g:FlowPanel>
-			</g:FlowPanel>
-			<g:FlowPanel addStyleNames="col_2 last sidebar">
-				<g:FlowPanel addStyleNames="sticky-flow">
-					<g:FlowPanel addStyleNames="sticky-padding">
-						<g:FlowPanel ui:field="appraisalSidebar">
-							<g:Label addStyleNames="h4">
-								<ui:text from='{messages.appraisalTitle}' />
-							</g:Label>
-							<g:Button addStyleNames="btn btn-play" ui:field="appraisalAccept">
-								<ui:text from='{messages.appraisalAccept}' />
-							</g:Button>
-							<g:Button addStyleNames="btn btn-danger btn-ban"
-								ui:field="appraisalReject">
-								<ui:text from='{messages.appraisalReject}' />
-							</g:Button>
-						</g:FlowPanel>
-						<g:FlowPanel ui:field="actionsSidebar">
-							<g:Label addStyleNames="h4">
-								<ui:text from='{messages.archivalPackageTitle}' />
-							</g:Label>
-							<g:Button addStyleNames="btn btn-plus" ui:field="createItem">
-								<ui:text from='{messages.newArchivalPackage}' />
-							</g:Button>
-							<g:Button addStyleNames="btn btn-edit" ui:field="moveItem">
-								<ui:text from='{messages.moveArchivalPackage}' />
-							</g:Button>
-							<g:Button addStyleNames="btn btn-edit" ui:field="editPermissions">
-								<ui:text from='{messages.archivalPackagePermissions}' />
-							</g:Button>
-							<g:Button addStyleNames="btn btn-danger btn-ban"
-								ui:field="remove">
-								<ui:text from='{messages.removeArchivalPackage}' />
-							</g:Button>
-							<g:Button addStyleNames="btn btn-plus" ui:field="newRepresentation">
-								<ui:text from='{messages.addRepresentation}' />
-							</g:Button>
-							<g:Button addStyleNames="btn btn-default btn-download"
-								ui:field="download">
-								<ui:text from='{messages.downloadButton}' />
-							</g:Button>
-						</g:FlowPanel>
-						<g:FlowPanel>
-							<g:Label addStyleNames="h4">
-								<ui:text from='{messages.preservationTitle}' />
-							</g:Label>
-							<g:Button addStyleNames="btn btn-play" ui:field="newProcess">
-								<ui:text from='{messages.newProcessPreservation}' />
-							</g:Button>
-							<g:Button addStyleNames="btn btn-default btn-clock"
-								ui:field="preservationEvents">
-								<ui:text from='{messages.preservationEvents}' />
-							</g:Button>
-							<g:Button addStyleNames="btn btn-default btn-exclamation-triangle"
-								ui:field="risks">
-								<ui:text from='{messages.preservationRisks}' />
-							</g:Button>
-							<g:Button addStyleNames="btn btn-default btn-clock"
-								ui:field="logs">
-								<ui:text from='{messages.preservationLogs}' />
-							</g:Button>
-						</g:FlowPanel>
-						<g:FlowPanel ui:field="searchSection">
-							<g:Label addStyleNames="h4">
-								<ui:text from='{messages.searchTitle}' />
-							</g:Label>
-							<g:Button addStyleNames="btn btn-default btn-search"
-								ui:field="searchContext">
-								<ui:text from='{messages.searchContext}' />
-							</g:Button>
-							<g:Button addStyleNames="btn btn-default btn-search"
-								ui:field="searchAIP">
-								<ui:text from='{messages.searchAIP}' />
-							</g:Button>
-						</g:FlowPanel>
-						<g:FlowPanel styleName="sidebar-group" ui:field="itemsFacets">
-							<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-								<g:Label addStyleNames="h5 sidebar-facet-title">
-									<ui:text from='{messages.searchDescriptionLevels}' />
+				<g:FlowPanel addStyleNames="col_2 last sidebar">
+					<g:FlowPanel addStyleNames="sticky-flow">
+						<g:FlowPanel addStyleNames="sticky-padding">
+							<g:FlowPanel ui:field="appraisalSidebar">
+								<g:Label addStyleNames="h4">
+									<ui:text from='{messages.appraisalTitle}' />
 								</g:Label>
-								<g:FlowPanel ui:field="facetDescriptionLevels" />
+								<g:Button addStyleNames="btn btn-play" ui:field="appraisalAccept">
+									<ui:text from='{messages.appraisalAccept}' />
+								</g:Button>
+								<g:Button addStyleNames="btn btn-danger btn-ban"
+									ui:field="appraisalReject">
+									<ui:text from='{messages.appraisalReject}' />
+								</g:Button>
 							</g:FlowPanel>
-							<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-								<g:Label addStyleNames="h5 sidebar-facet-title">
-									<ui:text from='{messages.searchRepresentations}' />
+							<g:FlowPanel ui:field="actionsSidebar">
+								<g:Label addStyleNames="h4">
+									<ui:text from='{messages.archivalPackageTitle}' />
 								</g:Label>
-								<g:FlowPanel ui:field="facetHasRepresentations" />
+								<g:Button addStyleNames="btn btn-plus" ui:field="createItem">
+									<ui:text from='{messages.newArchivalPackage}' />
+								</g:Button>
+								<g:Button addStyleNames="btn btn-edit" ui:field="moveItem">
+									<ui:text from='{messages.moveArchivalPackage}' />
+								</g:Button>
+								<g:Button addStyleNames="btn btn-edit" ui:field="editPermissions">
+									<ui:text from='{messages.archivalPackagePermissions}' />
+								</g:Button>
+								<g:Button addStyleNames="btn btn-danger btn-ban"
+									ui:field="remove">
+									<ui:text from='{messages.removeArchivalPackage}' />
+								</g:Button>
+								<g:Button addStyleNames="btn btn-plus" ui:field="newRepresentation">
+									<ui:text from='{messages.addRepresentation}' />
+								</g:Button>
+								<g:Button addStyleNames="btn btn-default btn-download"
+									ui:field="download">
+									<ui:text from='{messages.downloadButton}' />
+								</g:Button>
+							</g:FlowPanel>
+							<g:FlowPanel ui:field="preservationSidebar">
+								<g:Label addStyleNames="h4">
+									<ui:text from='{messages.preservationTitle}' />
+								</g:Label>
+								<g:Button addStyleNames="btn btn-play" ui:field="newProcess">
+									<ui:text from='{messages.newProcessPreservation}' />
+								</g:Button>
+								<g:Button addStyleNames="btn btn-default btn-clock"
+									ui:field="preservationEvents">
+									<ui:text from='{messages.preservationEvents}' />
+								</g:Button>
+								<g:Button addStyleNames="btn btn-default btn-exclamation-triangle"
+									ui:field="risks">
+									<ui:text from='{messages.preservationRisks}' />
+								</g:Button>
+								<g:Button addStyleNames="btn btn-default btn-clock"
+									ui:field="logs">
+									<ui:text from='{messages.preservationLogs}' />
+								</g:Button>
+							</g:FlowPanel>
+							<g:FlowPanel ui:field="searchSection">
+								<g:Label addStyleNames="h4">
+									<ui:text from='{messages.searchTitle}' />
+								</g:Label>
+								<g:Button addStyleNames="btn btn-default btn-chevron-left"
+									ui:field="searchPrevious">
+									<ui:text from='{messages.searchPrevious}' />
+								</g:Button>
+								<g:Button addStyleNames="btn btn-default btn-chevron-right"
+									ui:field="searchNext">
+									<ui:text from='{messages.searchNext}' />
+								</g:Button>
+								<g:Button addStyleNames="btn btn-default btn-search"
+									ui:field="searchContext">
+									<ui:text from='{messages.searchContext}' />
+								</g:Button>
+								<g:Button addStyleNames="btn btn-default btn-search"
+									ui:field="searchAIP">
+									<ui:text from='{messages.searchAIP}' />
+								</g:Button>
+							</g:FlowPanel>
+							<g:FlowPanel styleName="sidebar-group" ui:field="itemsFacets">
+								<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+									<g:Label addStyleNames="h5 sidebar-facet-title">
+										<ui:text from='{messages.searchDescriptionLevels}' />
+									</g:Label>
+									<g:FlowPanel ui:field="facetDescriptionLevels" />
+								</g:FlowPanel>
+								<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+									<g:Label addStyleNames="h5 sidebar-facet-title">
+										<ui:text from='{messages.searchRepresentations}' />
+									</g:Label>
+									<g:FlowPanel ui:field="facetHasRepresentations" />
+								</g:FlowPanel>
 							</g:FlowPanel>
 						</g:FlowPanel>
 					</g:FlowPanel>
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>
-	</g:FlowPanel>
+	</g:FocusPanel>
 </ui:UiBinder>

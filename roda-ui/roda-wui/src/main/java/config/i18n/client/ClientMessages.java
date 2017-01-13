@@ -1337,6 +1337,10 @@ public interface ClientMessages extends Messages {
 
   String selectAnItemToMoveDescription();
 
+  String searchPrevious();
+  
+  String searchNext();
+  
   String searchContext();
 
   String searchAIP();

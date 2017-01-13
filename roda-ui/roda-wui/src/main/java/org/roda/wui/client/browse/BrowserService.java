@@ -310,7 +310,7 @@ public interface BrowserService extends RemoteService {
     String details) throws AuthorizationDeniedException, GenericException, RequestNotValidException,
     AlreadyExistsException, NotFoundException;
 
-  String createFolder(String aipId, String representationId, String folderUUID, String newName, String details)
+  IndexedFile createFolder(String aipId, String representationId, String folderUUID, String newName, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, AlreadyExistsException,
     NotFoundException;
 
@@ -320,7 +320,7 @@ public interface BrowserService extends RemoteService {
   void changeRepresentationType(SelectedItemsList<IndexedRepresentation> selectedRepresentation, String newType,
     String details) throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
-  DipBundle getDipBundle(String dipUUID, String dipFileUUID, String aipId, String representationId, List<String> filePath, String fileId)
+  DipBundle getDipBundle(String dipUUID, String dipFileUUID)
     throws RequestNotValidException, AuthorizationDeniedException, GenericException, NotFoundException;
 
   void deleteDIP(String dipId)
