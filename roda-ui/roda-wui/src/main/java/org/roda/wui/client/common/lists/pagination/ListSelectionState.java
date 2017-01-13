@@ -56,8 +56,23 @@ public class ListSelectionState<T extends IsIndexed> {
     return new ListSelectionState<>(selected, filter, justActive, facets, sorter, index);
   }
 
+  public interface ProcessRelativeItem<T> {
+    void process(T object);
+  }
+
   private static <T extends IsIndexed> void openRelative(final ListSelectionState<T> state, final int relativeIndex,
     final AsyncCallback<ListSelectionState<T>> callback) {
+    openRelative(state, relativeIndex, callback, new ProcessRelativeItem<T>() {
+
+      @Override
+      public void process(T object) {
+        HistoryUtils.resolve(object);
+      }
+    });
+  }
+
+  private static <T extends IsIndexed> void openRelative(final ListSelectionState<T> state, final int relativeIndex,
+    final AsyncCallback<ListSelectionState<T>> callback, final ProcessRelativeItem<T> processor) {
     final int newIndex = state.getIndex() + relativeIndex;
     BrowserService.Util.getInstance().find(state.getSelected().getClass().getName(), state.getFilter(),
       state.getSorter(), new Sublist(newIndex, 1), state.getFacets(), LocaleInfo.getCurrentLocale().getLocaleName(),
@@ -75,9 +90,9 @@ public class ListSelectionState<T extends IsIndexed> {
 
             // if we are jumping to the same file, try the next one
             if (first.getUUID().equals(state.getSelected().getUUID())) {
-              openRelative(state, relativeIndex < 0 ? relativeIndex - 1 : relativeIndex + 1, callback);
+              openRelative(state, relativeIndex < 0 ? relativeIndex - 1 : relativeIndex + 1, callback, processor);
             } else {
-              HistoryUtils.resolve(first);
+              processor.process(first);
               callback.onSuccess(ListSelectionState.create(first, state.getFilter(), state.getJustActive(),
                 state.getFacets(), state.getSorter(), newIndex));
             }
@@ -101,10 +116,26 @@ public class ListSelectionState<T extends IsIndexed> {
     return CLIPBOARD.containsKey(objectClass);
   }
 
-  public static <T extends IsIndexed> void previous(final Class<T> objectClass) {
+  public static <T extends IsIndexed> void jump(final Class<T> objectClass, int relativeIndex) {
+    ProcessRelativeItem<T> processor = new ProcessRelativeItem<T>() {
+
+      @Override
+      public void process(T object) {
+        HistoryUtils.resolve(object);
+      }
+    };
+
+    jump(objectClass, relativeIndex, processor);
+
+  }
+
+  public static <T extends IsIndexed> void jump(final Class<T> objectClass, int relativeIndex,
+    ProcessRelativeItem<T> processor) {
+
     ListSelectionState<T> last = last(objectClass);
     if (last != null) {
-      openRelative(last, -1, new AsyncCallback<ListSelectionState<T>>() {
+
+      AsyncCallback<ListSelectionState<T>> callback = new AsyncCallback<ListSelectionState<T>>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -115,26 +146,26 @@ public class ListSelectionState<T extends IsIndexed> {
         public void onSuccess(ListSelectionState<T> newState) {
           save(newState);
         }
-      });
+      };
+
+      openRelative(last, relativeIndex, callback, processor);
     }
   }
 
+  public static <T extends IsIndexed> void previous(final Class<T> objectClass) {
+    jump(objectClass, -1);
+  }
+
   public static <T extends IsIndexed> void next(Class<T> objectClass) {
-    ListSelectionState<T> last = last(objectClass);
-    if (last != null) {
-      openRelative(last, +1, new AsyncCallback<ListSelectionState<T>>() {
+    jump(objectClass, +1);
+  }
 
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
-        }
+  public static <T extends IsIndexed> void previous(final Class<T> objectClass, ProcessRelativeItem<T> processor) {
+    jump(objectClass, -1, processor);
+  }
 
-        @Override
-        public void onSuccess(ListSelectionState<T> newState) {
-          save(newState);
-        }
-      });
-    }
+  public static <T extends IsIndexed> void next(Class<T> objectClass, ProcessRelativeItem<T> processor) {
+    jump(objectClass, +1, processor);
   }
 
   public static <T extends IsIndexed> void hasPreviousNext(final Class<T> objectClass,
