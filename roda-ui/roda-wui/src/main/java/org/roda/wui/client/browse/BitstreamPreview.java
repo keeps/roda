@@ -10,8 +10,8 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.ErrorEvent;
-import com.google.gwt.event.dom.client.ErrorHandler;
+import com.google.gwt.event.logical.shared.AttachEvent;
+import com.google.gwt.event.logical.shared.AttachEvent.Handler;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -29,7 +29,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -65,8 +65,6 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
   private final Command onPreviewFailure;
 
   private final T object;
-
-  private JavaScriptObject imageViewerObject;
 
   public BitstreamPreview(Viewers viewers, SafeUri bitstreamDownloadUri, FileFormat format, String filename, long size,
     boolean isDirectory, T object) {
@@ -177,25 +175,30 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
   }
 
   private void imagePreview() {
-    Image image = new Image(bitstreamDownloadUri);
-    image.addErrorHandler(new ErrorHandler() {
+    final SimplePanel imageContainer = new SimplePanel();
+
+    panel.add(imageContainer);
+    imageContainer.setStyleName("viewRepresentationImageFilePreview");
+
+    imageContainer.addAttachHandler(new Handler() {
+
+      private JavaScriptObject imageViewer = null;
 
       @Override
-      public void onError(ErrorEvent event) {
-        panel.clear();
-        errorPreview();
+      public void onAttachOrDetach(AttachEvent event) {
+        if (event.isAttached()) {
+          // load image
+          imageViewer = JavascriptUtils.runImageViewerOn(imageContainer.getElement(), bitstreamDownloadUri.asString());
+        } else {
+          // destroy
+          if (imageViewer != null) {
+            JavascriptUtils.stopImageViewer(imageViewer);
+          }
+        }
+
       }
     });
-    panel.add(image);
-    image.setStyleName("viewRepresentationImageFilePreview");
 
-//    imageViewerObject = JavascriptUtils.runImageViewerOn(image.getElement());
-  }
-  
-  @Override
-  protected void onDetach() {
-    super.onDetach();
-//    JavascriptUtils.stopImageViewer(imageViewerObject);
   }
 
   private void pdfPreview() {

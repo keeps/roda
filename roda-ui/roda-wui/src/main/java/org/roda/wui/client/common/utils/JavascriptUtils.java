@@ -314,13 +314,14 @@ public class JavascriptUtils {
   }-*/;
 
   
-  public static native JavaScriptObject runImageViewerOn(JavaScriptObject parent) /*-{
-    var viewer = $wnd.jQuery(parent).ImageViewer();
+  public static native JavaScriptObject runImageViewerOn(JavaScriptObject imageContainer, String imageURL) /*-{
+    var container = $wnd.jQuery(imageContainer);
+    var viewer = $wnd.ImageViewer(container);
+    viewer.load(imageURL);
     return viewer;
 }-*/;
   
   public static native void stopImageViewer(JavaScriptObject imageViewerObject) /*-{
-    console.log( "obj:" + imageViewerObject );
     imageViewerObject.destroy();
 }-*/;
   
