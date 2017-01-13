@@ -92,7 +92,6 @@ import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.FileLink;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -100,7 +99,6 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.RepresentationLink;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
@@ -1296,9 +1294,10 @@ public class BrowserHelper {
     String fileId, String type, String acceptFormat)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
 
+    CloseableIterable<OptionalWithCause<OtherMetadata>> otherFiles = RodaCoreFactory.getModelService()
+      .listOtherMetadata(aipId, representationId, filePath, fileId, type);
+
     if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP.equals(acceptFormat)) {
-      CloseableIterable<OptionalWithCause<OtherMetadata>> otherFiles = RodaCoreFactory.getModelService()
-        .listOtherMetadata(aipId, representationId, filePath, fileId, type);
       StorageService storage = RodaCoreFactory.getStorageService();
       List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
 
@@ -1320,8 +1319,6 @@ public class BrowserHelper {
       return createZipStreamResponse(zipEntries, aipId);
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
-      CloseableIterable<OptionalWithCause<OtherMetadata>> otherFiles = RodaCoreFactory.getModelService()
-        .listOtherMetadata(aipId, representationId, filePath, fileId, type);
       OtherMetadataList metadataList = new OtherMetadataList();
 
       for (OptionalWithCause<OtherMetadata> oFile : otherFiles) {

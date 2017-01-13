@@ -20,6 +20,7 @@ import java.util.function.Function;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.IdUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
 import org.roda.core.data.common.RodaConstants;
@@ -178,10 +179,7 @@ public class ResourceParseUtils {
     }
 
     StoragePath resourcePath = resource.getStoragePath();
-
     String filename = resourcePath.getName();
-
-    OtherMetadata om = new OtherMetadata();
 
     String aipId = ModelUtils.extractAipId(resourcePath);
     String representationId = ModelUtils.extractRepresentationId(resourcePath);
@@ -193,6 +191,8 @@ public class ResourceParseUtils {
     String fileId = filename.substring(0, filename.lastIndexOf('.'));
     String suffix = filename.substring(filename.lastIndexOf('.'), filename.length());
 
+    OtherMetadata om = new OtherMetadata();
+    om.setId(IdUtils.getOtherMetadataId(type, aipId, representationId, fileDirectoryPath, fileId));
     om.setAipId(aipId);
     om.setRepresentationId(representationId);
     om.setFileDirectoryPath(fileDirectoryPath);

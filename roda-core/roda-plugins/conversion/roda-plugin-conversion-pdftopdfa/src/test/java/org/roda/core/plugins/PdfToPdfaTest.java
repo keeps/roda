@@ -171,6 +171,7 @@ public class PdfToPdfaTest {
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_OUTPUT_FORMAT, "pdf");
+    parameters.put(RodaConstants.PLUGIN_PARAMS_VERAPDF_VALIDATION, "False");
 
     Job job = TestsHelper.executeJob(PdfToPdfaPlugin.class, parameters, PluginType.AIP_TO_AIP,
       SelectedItemsAll.create(Representation.class));

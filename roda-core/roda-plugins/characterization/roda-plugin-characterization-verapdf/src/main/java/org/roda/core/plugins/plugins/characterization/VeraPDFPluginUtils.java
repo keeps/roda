@@ -73,8 +73,8 @@ public class VeraPDFPluginUtils {
       }
     });
 
-  private static final String resourceRoot = "org/verapdf/report/"; //$NON-NLS-1$
-  private static final String detailedReport = resourceRoot + "DetailedHtmlReport.xsl"; //$NON-NLS-1$
+  private static final String resourceRoot = "org/verapdf/report/";
+  private static final String detailedReport = resourceRoot + "DetailedHtmlReport.xsl";
 
   public static Pair<StringContentPayload, Boolean> runVeraPDF(Path input, String profile, boolean hasFeatures)
     throws GenericException {
@@ -91,8 +91,8 @@ public class VeraPDFPluginUtils {
 
       xmlInput = new ByteArrayInputStream(xmlOutput.toByteArray());
       Map<String, String> arguments = new HashMap<>();
-      arguments.put("wikiPath", ""); //$NON-NLS-1$
-      arguments.put("isFullHTML", Boolean.toString(true)); //$NON-NLS-1$
+      arguments.put("wikiPath", "");
+      arguments.put("isFullHTML", Boolean.toString(true));
       XsltTransformer.transform(xmlInput, HTMLReport.class.getClassLoader().getResourceAsStream(detailedReport),
         htmlOutput, arguments);
 

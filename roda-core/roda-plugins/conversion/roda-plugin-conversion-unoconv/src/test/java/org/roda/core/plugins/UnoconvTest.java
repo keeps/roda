@@ -190,7 +190,7 @@ public class UnoconvTest {
     int changedCounter = 0;
 
     for (File f : reusableAllFiles) {
-      if (f.getId().matches(".*[.](pdf|docx|txt|xls|odp|ppt|pptx|doc|rtf|xlsx|ods|odt|xml)$")) {
+      if (f.getId().matches(".*[.](pdf|docx|txt|xls|odp|ppt|pptx|doc|xlsx|ods|odt|xml)$")) {
         changedCounter++;
         String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
         AssertJUnit.assertEquals(1,

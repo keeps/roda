@@ -32,7 +32,7 @@ import org.roda.core.util.CommandException;
 
 public class PdfToPdfaPlugin<T extends IsRODAObject> extends AbstractConvertPlugin<T> {
   private static final String TOOLNAME = "pdftopdfa";
-  private static boolean validatePDF = true;
+  private static boolean validatePDF = false;
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
@@ -41,9 +41,9 @@ public class PdfToPdfaPlugin<T extends IsRODAObject> extends AbstractConvertPlug
         PluginParameterType.BOOLEAN, "true", false, false,
         "Ignore files that are not identified as Portable Document Format (PDF)."));
 
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_IGNORE_VERAPDF_VALIDATION,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_IGNORE_VERAPDF_VALIDATION, "Apply veraPDF metadata fixer",
-        PluginParameterType.BOOLEAN, "true", false, false,
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_VERAPDF_VALIDATION,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_VERAPDF_VALIDATION, "Apply veraPDF metadata fixer",
+        PluginParameterType.BOOLEAN, "false", false, false,
         "Apply veraPDF validation and metadata fixing on the document."));
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP, new PluginParameter(
@@ -72,7 +72,7 @@ public class PdfToPdfaPlugin<T extends IsRODAObject> extends AbstractConvertPlug
   public List<PluginParameter> getParameters() {
     List<PluginParameter> parameters = new ArrayList<PluginParameter>();
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES));
-    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_IGNORE_VERAPDF_VALIDATION));
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_VERAPDF_VALIDATION));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_TITLE));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_DESCRIPTION));
@@ -85,8 +85,8 @@ public class PdfToPdfaPlugin<T extends IsRODAObject> extends AbstractConvertPlug
     setInputFormat("pdf");
     setOutputFormat("pdf");
 
-    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_IGNORE_VERAPDF_VALIDATION)) {
-      validatePDF = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_IGNORE_VERAPDF_VALIDATION));
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_VERAPDF_VALIDATION)) {
+      validatePDF = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_VERAPDF_VALIDATION));
     }
   }
 

@@ -1482,7 +1482,6 @@ public class ModelService extends ModelObservable {
     }
 
     String id = IdUtils.getOtherMetadataId(type, aipId, representationId, fileDirectoryPath, fileId);
-
     om = new OtherMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, fileSuffix);
 
     if (notify) {
