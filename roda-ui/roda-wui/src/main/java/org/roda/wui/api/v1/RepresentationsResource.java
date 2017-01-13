@@ -478,38 +478,6 @@ public class RepresentationsResource {
 
   @GET
   @Path("/{" + RodaConstants.API_PATH_PARAM_AIP_ID + "}/{" + RodaConstants.API_PATH_PARAM_REPRESENTATION_ID + "}/"
-    + RodaConstants.API_OTHER_METADATA + "/")
-  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_ZIP})
-  @ApiOperation(value = "List other metadata", notes = "List other metadata (JSON info or ZIP file).\nOptional query params of **start** and **limit** "
-    + "defined the returned array.", response = OtherMetadataList.class)
-  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = OtherMetadataList.class),
-    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
-
-  public Response retrieveOtherMetadataList(
-    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
-    @ApiParam(value = "The ID of the existing representation") @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
-    @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam(RodaConstants.API_QUERY_KEY_START) String start,
-    @ApiParam(value = "Maximum number of elements to return", defaultValue = RodaConstants.DEFAULT_PAGINATION_STRING_VALUE) @QueryParam(RodaConstants.API_QUERY_KEY_LIMIT) String limit,
-    @ApiParam(value = "Choose format in which to get the metadata", allowableValues = RodaConstants.API_GET_LIST_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
-    throws RODAException {
-    String mediaType = ApiUtils.getMediaType(acceptFormat, request);
-
-    // get user
-    User user = UserUtility.getApiUser(request);
-
-    // delegate action to controller
-    EntityResponse otherMetadataList = Browser.listOtherMetadata(user, aipId, representationId, null, acceptFormat);
-
-    if (otherMetadataList instanceof ObjectResponse) {
-      ObjectResponse<OtherMetadataList> list = (ObjectResponse<OtherMetadataList>) otherMetadataList;
-      return Response.ok(list.getObject(), mediaType).build();
-    } else {
-      return ApiUtils.okResponse((StreamResponse) otherMetadataList);
-    }
-  }
-
-  @GET
-  @Path("/{" + RodaConstants.API_PATH_PARAM_AIP_ID + "}/{" + RodaConstants.API_PATH_PARAM_REPRESENTATION_ID + "}/"
     + RodaConstants.API_OTHER_METADATA + "/{" + RodaConstants.API_PATH_PARAM_OTHER_METADATA_TYPE + "}/{"
     + RodaConstants.API_PATH_PARAM_OTHER_METADATA_FILE_SUFFIX + "}")
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_ZIP})
@@ -577,7 +545,7 @@ public class RepresentationsResource {
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = OtherMetadata.class),
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
-  public Response updatePreservationMetadataOnAIP(
+  public Response updateOtherMetadata(
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
     @ApiParam(value = "The type of the other metadata", required = true) @PathParam(RodaConstants.API_PATH_PARAM_OTHER_METADATA_TYPE) String type,
@@ -603,7 +571,7 @@ public class RepresentationsResource {
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = OtherMetadata.class),
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
-  public Response deletePreservationMetadata(
+  public Response deleteOtherMetadata(
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
     @ApiParam(value = "The type of the other metadata", required = true) @PathParam(RodaConstants.API_PATH_PARAM_OTHER_METADATA_TYPE) String type,

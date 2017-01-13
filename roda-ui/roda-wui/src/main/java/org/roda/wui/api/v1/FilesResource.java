@@ -345,7 +345,7 @@ public class FilesResource {
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = OtherMetadata.class),
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
-  public Response updatePreservationMetadataOnAIP(
+  public Response updateOtherMetadata(
     @ApiParam(value = "The UUID of the existing File", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_UUID) String fileUUID,
     @ApiParam(value = "The type of the other metadata", required = true) @PathParam(RodaConstants.API_PATH_PARAM_OTHER_METADATA_TYPE) String type,
     @FormDataParam(RodaConstants.API_PARAM_FILE) InputStream inputStream,
@@ -370,7 +370,7 @@ public class FilesResource {
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = OtherMetadata.class),
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
-  public Response deletePreservationMetadata(
+  public Response deleteOtherMetadata(
     @ApiParam(value = "The UUID of the existing File", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_UUID) String fileUUID,
     @ApiParam(value = "The type of the other metadata", required = true) @PathParam(RodaConstants.API_PATH_PARAM_OTHER_METADATA_TYPE) String type,
     @ApiParam(value = "The file suffix of the other metadata", required = true) @PathParam(RodaConstants.API_PATH_PARAM_OTHER_METADATA_FILE_SUFFIX) String suffix,

@@ -7,6 +7,8 @@
  */
 package org.roda.core.plugins.misc;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,11 +17,15 @@ import java.util.List;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPLink;
 import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -47,9 +53,9 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Rui Castro <rui.castro@gmail.com>
  */
-public class CreateMetsPlugin extends AbstractPlugin<AIP> {
+public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
   /** Logger. */
-  private static final Logger LOGGER = LoggerFactory.getLogger(CreateMetsPlugin.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(CreateMetsDIPPlugin.class);
 
   /** Plugin version. */
   private static final String VERSION = "1.0";
@@ -66,12 +72,12 @@ public class CreateMetsPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getName() {
-    return "Create E-ARK AIP manifest files (METS.xml)";
+    return "Create E-ARK DIP manifest files (METS.xml)";
   }
 
   @Override
   public String getDescription() {
-    return "Plugin that generates E-ARK AIP manifest files (\"METS.xml\") from "
+    return "Plugin that generates E-ARK DIP manifest files (\"METS.xml\") from "
       + "existing AIP information in the storage layer.";
   }
 
@@ -82,7 +88,7 @@ public class CreateMetsPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public Plugin<AIP> cloneMe() {
-    return new CreateMetsPlugin();
+    return new CreateMetsDIPPlugin();
   }
 
   @Override
@@ -193,16 +199,30 @@ public class CreateMetsPlugin extends AbstractPlugin<AIP> {
     PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
 
     try {
-      final Path aipPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(),
-        ModelUtils.getAIPStoragePath(aip.getId()));
-      LOGGER.debug(String.format("aipPath=%s", aipPath));
+      AIPLink aipLink = new AIPLink(aip.getId());
+      List<AIPLink> links = new ArrayList<AIPLink>();
+      links.add(aipLink);
 
-      new EARKAIP(RodaFolderAIP.parse(aipPath)).build(aipPath.getParent(), true);
+      DIP dip = new DIP();
+      dip.setAipIds(links);
+      dip.setPermissions(aip.getPermissions());
+      dip.setTitle("DIP EARK");
+      dip.setDescription("Description of DIP EARK");
+      dip.setType(RodaConstants.DIP_TYPE_CONVERSION);
+      dip = model.createDIP(dip, false);
+
+      Path aipPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), ModelUtils.getAIPStoragePath(aip.getId()));
+      Path dipDataPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(),
+        ModelUtils.getDIPDataStoragePath(dip.getId()));
+      Path aipOnDIPPath = Files.createDirectories(dipDataPath.resolve(aip.getId()));
+
+      copyFilteredAIP(aipPath, aipOnDIPPath);
+      new EARKAIP(RodaFolderAIP.parse(aipOnDIPPath)).build(aipOnDIPPath.getParent(), true);
 
       jobPluginInfo.incrementObjectsProcessedWithSuccess();
       reportItem.setPluginState(PluginState.SUCCESS);
 
-    } catch (final RODAException | ParseException | IPException | InterruptedException e) {
+    } catch (final RODAException | ParseException | IPException | InterruptedException | IOException e) {
       final String message = String.format("Error creating manifest files for AIP %s. Cause: %s.", aip.getId(),
         e.getMessage());
       LOGGER.debug(message, e);
@@ -213,5 +233,9 @@ public class CreateMetsPlugin extends AbstractPlugin<AIP> {
 
     report.addReport(reportItem);
     PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+  }
+
+  private void copyFilteredAIP(Path aipPath, Path aipOnDIPPath) throws AlreadyExistsException, GenericException {
+    FSUtils.copy(aipPath, aipOnDIPPath, true);
   }
 }

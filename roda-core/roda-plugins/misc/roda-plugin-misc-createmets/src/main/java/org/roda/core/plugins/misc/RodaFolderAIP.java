@@ -136,7 +136,9 @@ final class RodaFolderAIP extends AIPWrap {
       final JsonNode json = mapper.readTree(getBasePath().resolve("aip.json").toFile());
 
       this.setId(getBasePath().getFileName().toString());
-      this.setAncestors(Collections.singletonList(json.get("parentId").asText()));
+      if (json.has("parentId")) {
+        this.setAncestors(Collections.singletonList(json.get("parentId").asText()));
+      }
       this.setContentType(new IPContentType(json.get(TYPE).asText()));
       this.setState(json.get("state").asText());
 
@@ -152,7 +154,6 @@ final class RodaFolderAIP extends AIPWrap {
       readRepresentations(this, json);
 
       return this;
-
     } catch (final IOException | IPException e) {
       LOGGER.debug("Error reading aip.json", e);
       throw new ParseException("Error reading aip.json", e);
