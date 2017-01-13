@@ -660,6 +660,7 @@ public class BrowseAIP extends Composite {
       createItem.setVisible(true);
       moveItem.setVisible(true);
       moveItem.setEnabled(true);
+      newProcess.setEnabled(true);
       editPermissions.setVisible(true);
       editPermissions.setEnabled(true);
       remove.setVisible(true);
