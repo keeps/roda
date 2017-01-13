@@ -10,17 +10,15 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.wui.client.common.lists.SearchFileList;
+import org.roda.wui.client.common.lists.pagination.ListSelectionState;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchPanel;
-import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.RestUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.SelectionChangeEvent;
-import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
 import config.i18n.client.ClientMessages;
 
@@ -63,18 +61,7 @@ public class IndexedFilePreview extends BitstreamPreview<IndexedFile> {
     layout.add(fileSearch);
     layout.add(list);
 
-    folderList.getSelectionModel().addSelectionChangeHandler(new Handler() {
-
-      @Override
-      public void onSelectionChange(SelectionChangeEvent event) {
-        IndexedFile selectedFile = list.getSelectionModel().getSelectedObject();
-        int selectedFileIndex = list.getIndexOfVisibleObject(selectedFile);
-
-        if (selectedFile != null) {
-          HistoryUtils.openBrowse(selectedFile, list.getSorter(), selectedFileIndex);
-        }
-      }
-    });
+    ListSelectionState.bindBrowseOpener(folderList);
 
     return layout;
   }

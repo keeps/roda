@@ -10,10 +10,9 @@ package org.roda.wui.client.common;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.index.sort.Sorter;
+import org.roda.wui.client.common.lists.pagination.ListSelectionState;
 
 public class LastSelectedItemsSingleton {
 
@@ -22,8 +21,7 @@ public class LastSelectedItemsSingleton {
   private String detailsMessage = "";
   private List<String> lastHistory = new ArrayList<String>();
   private IsIndexed lastObject = null;
-  private Sorter selectedSorter;
-  private Integer selectedIndex;
+  private ListSelectionState<? extends IsIndexed> lastListSelectionState = null;
 
   private LastSelectedItemsSingleton() {
   }
@@ -67,18 +65,12 @@ public class LastSelectedItemsSingleton {
     this.lastObject = lastObject;
   }
 
-  public void setLastSelectionDetails(Sorter selectedSorter, Integer selectedIndex) {
-    this.selectedSorter = selectedSorter;
-    this.selectedIndex = selectedIndex;
+  public <T extends IsIndexed> void setLastListSelectionState(ListSelectionState<T> lastListSelectionState) {
+    this.lastListSelectionState = lastListSelectionState;
   }
 
-  public Pair<Sorter, Integer> getLastSelectionDetails() {
-    return Pair.create(selectedSorter, selectedIndex);
-  }
-
-  public void resetLastSelectionDetails() {
-    this.selectedSorter = null;
-    this.selectedIndex = null;
+  public ListSelectionState<? extends IsIndexed> getLastListSelectionState() {
+    return lastListSelectionState;
   }
 
 }

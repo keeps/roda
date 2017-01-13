@@ -327,11 +327,6 @@ public class HistoryUtils {
     openBrowse(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId());
   }
 
-  public static void openBrowse(IndexedFile file, Sorter sorter, int selectedFileIndex) {
-    LastSelectedItemsSingleton.getInstance().setLastSelectionDetails(sorter, selectedFileIndex);
-    openBrowse(file);
-  }
-
   public static List<String> getHistoryUpload(IndexedFile folder) {
     List<String> history = new ArrayList<>();
     history.addAll(BrowseAIP.RESOLVER.getHistoryPath());
@@ -375,8 +370,9 @@ public class HistoryUtils {
     resolve(objectClass, objectUUID, false);
   }
 
-  public static void resolve(final String objectClass, final String objectUUID, final boolean replace) {
-    BrowserService.Util.getInstance().retrieveFromModel(objectClass, objectUUID, new AsyncCallback<IsIndexed>() {
+  public static <T extends IsIndexed> void resolve(final String objectClass, final String objectUUID,
+    final boolean replace) {
+    BrowserService.Util.getInstance().retrieveFromModel(objectClass, objectUUID, new AsyncCallback<T>() {
 
       @Override
       public void onFailure(Throwable caught) {
@@ -384,13 +380,17 @@ public class HistoryUtils {
       }
 
       @Override
-      public void onSuccess(IsIndexed object) {
+      public void onSuccess(T object) {
         resolve(object, replace);
       }
     });
   }
 
-  private static void resolve(IsIndexed object, boolean replace) {
+  public static <T extends IsIndexed> void resolve(T object) {
+    resolve(object, false);
+  }
+
+  public static <T extends IsIndexed> void resolve(T object, boolean replace) {
     List<String> path = null;
 
     if (object instanceof IndexedAIP) {

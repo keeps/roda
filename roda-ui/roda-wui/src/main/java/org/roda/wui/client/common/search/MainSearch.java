@@ -31,6 +31,7 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.RepresentationList;
 import org.roda.wui.client.common.lists.SearchFileList;
+import org.roda.wui.client.common.lists.pagination.ListSelectionState;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.common.client.tools.FacetUtils;
@@ -266,17 +267,8 @@ public class MainSearch extends Composite {
       facetPanels.put(facetParameter.getName(), itemsFacetsMap.get(facetParameter));
     }
     FacetUtils.bindFacets(itemsSearchResultPanel, facetPanels);
-
-    itemsSearchResultPanel.getSelectionModel().addSelectionChangeHandler(new Handler() {
-
-      @Override
-      public void onSelectionChange(SelectionChangeEvent event) {
-        IndexedAIP aip = itemsSearchResultPanel.getSelectionModel().getSelectedObject();
-        if (aip != null) {
-          HistoryUtils.openBrowse(aip);
-        }
-      }
-    });
+    
+    ListSelectionState.bindBrowseOpener(itemsSearchResultPanel);
 
     itemsSearchResultPanel.addCheckboxSelectionListener(new CheckboxSelectionListener<IndexedAIP>() {
 
@@ -298,16 +290,7 @@ public class MainSearch extends Composite {
     }
     FacetUtils.bindFacets(representationsSearchResultPanel, facetPanels);
 
-    representationsSearchResultPanel.getSelectionModel().addSelectionChangeHandler(new Handler() {
-
-      @Override
-      public void onSelectionChange(SelectionChangeEvent event) {
-        IndexedRepresentation rep = representationsSearchResultPanel.getSelectionModel().getSelectedObject();
-        if (rep != null) {
-          HistoryUtils.openBrowse(rep);
-        }
-      }
-    });
+    ListSelectionState.bindBrowseOpener(representationsSearchResultPanel);
 
     representationsSearchResultPanel
       .addCheckboxSelectionListener(new CheckboxSelectionListener<IndexedRepresentation>() {
@@ -331,16 +314,7 @@ public class MainSearch extends Composite {
     }
     FacetUtils.bindFacets(filesSearchResultPanel, facetPanels);
 
-    filesSearchResultPanel.getSelectionModel().addSelectionChangeHandler(new Handler() {
-
-      @Override
-      public void onSelectionChange(SelectionChangeEvent event) {
-        IndexedFile file = filesSearchResultPanel.getSelectionModel().getSelectedObject();
-        if (file != null) {
-          HistoryUtils.openBrowse(file);
-        }
-      }
-    });
+    ListSelectionState.bindBrowseOpener(filesSearchResultPanel);
 
     filesSearchResultPanel.addCheckboxSelectionListener(new CheckboxSelectionListener<IndexedFile>() {
 

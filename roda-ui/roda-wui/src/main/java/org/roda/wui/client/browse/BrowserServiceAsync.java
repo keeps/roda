@@ -234,6 +234,6 @@ public interface BrowserServiceAsync {
   void retrieveBrowseFileBundle(String historyAipId, String historyRepresentationId, List<String> historyFilePath,
     String historyFileId, String localeName, AsyncCallback<BrowseFileBundle> asyncCallback);
 
-  void retrieveFromModel(String objectClass, String objectUUID, AsyncCallback<IsIndexed> asyncCallback);
+  <T extends IsIndexed> void retrieveFromModel(String objectClass, String objectUUID, AsyncCallback<T> asyncCallback);
 
 }

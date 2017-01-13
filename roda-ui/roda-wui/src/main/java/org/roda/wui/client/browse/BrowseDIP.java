@@ -10,7 +10,6 @@
  */
 package org.roda.wui.client.browse;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
@@ -32,6 +31,7 @@ import org.roda.wui.client.browse.bundle.DipBundle;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.DIPFileList;
+import org.roda.wui.client.common.lists.pagination.ListSelectionState;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
@@ -187,23 +187,28 @@ public class BrowseDIP extends Composite {
       }
     });
 
-    List<IndexedAIP> aipAncestors = new ArrayList<IndexedAIP>();
+    boolean requireCtrlModifier = true;
+    boolean requireShiftModifier = true;
+    boolean requireAltModifier = false;
 
     if (aip != null && representation != null && file != null) {
       refererTitle.setText(file.isDirectory() ? messages.catalogueFolderTitle() : messages.catalogueFileTitle());
       refererBreadcrumb.updatePath(BreadcrumbUtils.getFileBreadcrumbs(aip, representation, file));
       refererBreadcrumb.setVisible(true);
-
-      LastSelectedItemsSingleton.getInstance().getLastSelectionDetails();
-
+      ListSelectionState.bindLayout(IndexedFile.class, refererPreviousButton, refererNextButton, keyboardFocus,
+        requireCtrlModifier, requireShiftModifier, requireAltModifier);
     } else if (aip != null && representation != null) {
       refererTitle.setText(messages.catalogueRepresentationTitle());
-      refererBreadcrumb.updatePath(BreadcrumbUtils.getRepresentationBreadcrumbs(aipAncestors, aip, representation));
+      refererBreadcrumb.updatePath(BreadcrumbUtils.getRepresentationBreadcrumbs(aip, representation));
       refererBreadcrumb.setVisible(true);
+      ListSelectionState.bindLayout(IndexedRepresentation.class, refererPreviousButton, refererNextButton,
+        keyboardFocus, requireCtrlModifier, requireShiftModifier, requireAltModifier);
     } else if (aip != null) {
       refererTitle.setText(messages.catalogueItemTitle());
-      refererBreadcrumb.updatePath(BreadcrumbUtils.getAipBreadcrumbs(aipAncestors, aip));
+      refererBreadcrumb.updatePath(BreadcrumbUtils.getAipBreadcrumbs(aip));
       refererBreadcrumb.setVisible(true);
+      ListSelectionState.bindLayout(IndexedAIP.class, refererPreviousButton, refererNextButton, keyboardFocus,
+        requireCtrlModifier, requireShiftModifier, requireAltModifier);
     } else {
       refererToolbar.setVisible(false);
     }
@@ -257,6 +262,7 @@ public class BrowseDIP extends Composite {
     // update breadcrumb
     breadcrumb.updatePath(getBreadcrumbs());
     breadcrumb.setVisible(true);
+
   }
 
   private void show() {
@@ -366,28 +372,6 @@ public class BrowseDIP extends Composite {
   @UiHandler("nextButton")
   void nextButtonHandler(ClickEvent e) {
     next();
-  }
-
-  private void refererPrevious() {
-    if (refererIndex > 0) {
-//      open(bundle.getFile().getParentUUID(), sorter, index - 1);
-    }
-  }
-
-  private void refererNext() {
-    if (refererIndex < bundle.getTotalRefererSiblingCount() - 1) {
-//      open(bundle.getFile().getParentUUID(), sorter, index + 1);
-    }
-  }
-
-  @UiHandler("refererPreviousButton")
-  void refererPreviousButtonHandler(ClickEvent e) {
-    refererPrevious();
-  }
-
-  @UiHandler("refererNextButton")
-  void refererNextButtonHandler(ClickEvent e) {
-    refererNext();
   }
 
   @UiHandler("downloadButton")

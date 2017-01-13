@@ -39,6 +39,7 @@ import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.SelectFileDialog;
 import org.roda.wui.client.common.lists.DIPList;
 import org.roda.wui.client.common.lists.SearchFileList;
+import org.roda.wui.client.common.lists.pagination.ListSelectionState;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchFilters;
@@ -229,15 +230,7 @@ public class BrowseRepresentation extends Composite {
 
     filesList = new SearchFileList(filter, true, Facets.NONE, summary, selectable, showFilesPath);
 
-    filesList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
-      @Override
-      public void onSelectionChange(SelectionChangeEvent event) {
-        IndexedFile selected = filesList.getSelectionModel().getSelectedObject();
-        if (selected != null) {
-          HistoryUtils.openBrowse(selected, filesList.getSorter(), filesList.getIndexOfVisibleObject(selected));
-        }
-      }
-    });
+    ListSelectionState.bindBrowseOpener(filesList);
 
     filesList.addCheckboxSelectionListener(new CheckboxSelectionListener<IndexedFile>() {
 

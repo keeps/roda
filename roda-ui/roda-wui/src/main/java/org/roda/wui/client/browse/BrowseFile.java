@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
@@ -37,9 +36,9 @@ import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.SelectFileDialog;
+import org.roda.wui.client.common.lists.pagination.ListSelectionState;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.main.BreadcrumbItem;
@@ -57,12 +56,8 @@ import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.LocaleInfo;
@@ -134,14 +129,6 @@ public class BrowseFile extends Composite {
         final List<String> historyFilePath = new ArrayList<String>(historyTokens.subList(2, historyTokens.size() - 1));
         final String historyFileId = historyTokens.get(historyTokens.size() - 1);
 
-        Pair<Sorter, Integer> lastSelectionDetails = LastSelectedItemsSingleton.getInstance().getLastSelectionDetails();
-        final Sorter sorter = lastSelectionDetails.getFirst() != null ? lastSelectionDetails.getFirst()
-          : DEFAULT_FILE_SORTER;
-        final Integer index = lastSelectionDetails.getSecond() != null ? lastSelectionDetails.getSecond()
-          : DEFAULT_FILE_INDEX;
-
-        LastSelectedItemsSingleton.getInstance().resetLastSelectionDetails();
-
         BrowserService.Util.getInstance().retrieveBrowseFileBundle(historyAipId, historyRepresentationId,
           historyFilePath, historyFileId, LocaleInfo.getCurrentLocale().getLocaleName(),
           new AsyncCallback<BrowseFileBundle>() {
@@ -153,7 +140,7 @@ public class BrowseFile extends Composite {
 
             @Override
             public void onSuccess(final BrowseFileBundle bundle) {
-              callback.onSuccess(new BrowseFile(viewers, bundle, sorter, index));
+              callback.onSuccess(new BrowseFile(viewers, bundle));
             }
           });
       } else {
@@ -206,10 +193,6 @@ public class BrowseFile extends Composite {
   Button optionDownload, optionRename, optionMove, optionUploadFiles, optionCreateFolder, optionRemove,
     optionNewProcess, optionRisk, optionIdentify, optionEvents;
 
-  private final Sorter sorter;
-
-  private final int index;
-
   /**
    * Create a new panel to view a representation
    * 
@@ -223,10 +206,8 @@ public class BrowseFile extends Composite {
    * @param file
    * 
    */
-  public BrowseFile(Viewers viewers, final BrowseFileBundle bundle, Sorter sorter, Integer index) {
+  public BrowseFile(Viewers viewers, final BrowseFileBundle bundle) {
     this.bundle = bundle;
-    this.sorter = sorter;
-    this.index = index;
 
     // initialize preview
     filePreview = new IndexedFilePreview(viewers, bundle.getFile(), new Command() {
@@ -279,35 +260,11 @@ public class BrowseFile extends Composite {
     disseminationsButton.setVisible(bundle.getDipCount() > 0);
 
     keyboardFocus.setFocus(true);
-    keyboardFocus.addKeyDownHandler(new KeyDownHandler() {
 
-      @Override
-      public void onKeyDown(KeyDownEvent event) {
-        if (event.isControlKeyDown()) {
-          NativeEvent ne = event.getNativeEvent();
-          if (ne.getKeyCode() == KeyCodes.KEY_RIGHT) {
-            ne.preventDefault();
-            next();
-          } else if (ne.getKeyCode() == KeyCodes.KEY_LEFT) {
-            ne.preventDefault();
-            previous();
-          }
-        }
-      }
-    });
+    // bind previous and next buttons
+    ListSelectionState.bindLayout(IndexedFile.class, previousButton, nextButton, keyboardFocus, true, false, false);
 
     // update visibility
-    if (bundle.getTotalSiblingCount() < 2) {
-      previousButton.setVisible(false);
-      nextButton.setVisible(false);
-    } else if (index < 0) {
-      HtmlSnippetUtils.setCssClassDisabled(previousButton, true);
-      HtmlSnippetUtils.setCssClassDisabled(nextButton, bundle.getTotalSiblingCount() < 2);
-    } else {
-      HtmlSnippetUtils.setCssClassDisabled(previousButton, index == 0);
-      HtmlSnippetUtils.setCssClassDisabled(nextButton, index >= bundle.getTotalSiblingCount() - 1);
-    }
-
     boolean directory = bundle.getFile().isDirectory();
     optionDownload.setVisible(!directory);
     optionRename.setVisible(directory);
@@ -325,70 +282,6 @@ public class BrowseFile extends Composite {
   @UiHandler("optionDownload")
   void buttonDownloadFileButtonHandler(ClickEvent e) {
     downloadFile();
-  }
-
-  private void previous() {
-    if (index > 0) {
-      open(bundle.getFile().getParentUUID(), sorter, index - 1);
-    }
-  }
-
-  private void next() {
-    if (index < bundle.getTotalSiblingCount() - 1) {
-      open(bundle.getFile().getParentUUID(), sorter, index + 1);
-    }
-  }
-
-  public void open(final String parentUUID, final Sorter sorter, final int openIndex) {
-    Filter filter = new Filter(
-      new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_UUID, bundle.getFile().getRepresentationUUID()));
-
-    if (parentUUID != null) {
-      filter.add(new SimpleFilterParameter(RodaConstants.FILE_PARENT_UUID, parentUUID));
-    } else {
-      filter.add(new EmptyKeyFilterParameter(RodaConstants.FILE_PARENT_UUID));
-    }
-
-    Sublist sublist = new Sublist(openIndex, 1);
-    String localeString = LocaleInfo.getCurrentLocale().getLocaleName();
-    boolean justActive = true;
-
-    BrowserService.Util.getInstance().find(IndexedFile.class.getName(), filter, sorter, sublist, Facets.NONE,
-      localeString, justActive, new AsyncCallback<IndexResult<IndexedFile>>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
-        }
-
-        @Override
-        public void onSuccess(IndexResult<IndexedFile> result) {
-          if (!result.getResults().isEmpty()) {
-            IndexedFile firstFile = result.getResults().get(0);
-
-            // if we are jumping to the same file, try the next one
-            if (firstFile.getUUID().equals(bundle.getFile().getUUID())) {
-              open(parentUUID, sorter, openIndex + 1);
-            } else {
-              HistoryUtils.openBrowse(firstFile, sorter, openIndex);
-            }
-          } else {
-            Toast.showError("No files were found");
-            // TODO better handle this case
-          }
-        }
-      });
-
-  }
-
-  @UiHandler("previousButton")
-  void previousButtonHandler(ClickEvent e) {
-    previous();
-  }
-
-  @UiHandler("nextButton")
-  void nextButtonHandler(ClickEvent e) {
-    next();
   }
 
   private void downloadFile() {

@@ -29,6 +29,7 @@ import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.lists.pagination.ListSelectionState;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.ClientLogger;
@@ -68,7 +69,6 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.CellPreviewEvent;
 import com.google.gwt.view.client.CellPreviewEvent.Handler;
@@ -651,6 +651,16 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     int visibleIndex = getVisibleItems().indexOf(object);
     int visibleStartIndex = display.getVisibleRange().getStart();
     return visibleStartIndex + visibleIndex;
+  }
+
+  public ListSelectionState<T> getListSelectionState() {
+    ListSelectionState<T> ret = null;
+    T selectedObject = getSelectionModel().getSelectedObject();
+    if (selectedObject != null) {
+      int index = getIndexOfVisibleObject(selectedObject);
+      ret = ListSelectionState.create(selectedObject, getFilter(), getJustActive(), getFacets(), getSorter(), index);
+    }
+    return ret;
   }
 
   // LISTENER
