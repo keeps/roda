@@ -19,7 +19,6 @@ import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
@@ -44,6 +43,8 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.RODAObjectProcessingLogic;
+import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
@@ -234,33 +235,20 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
   @Override
   public Report execute(final IndexService index, final ModelService model, final StorageService storage,
     List<LiteOptionalWithCause> liteList) throws PluginException {
-
-    try {
-      final Report report = PluginHelper.initPluginReport(this);
-
-      final SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-
-      final Job job = PluginHelper.getJob(this, model);
-      final List<File> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, jobPluginInfo,
-        liteList, job);
-
-      final Result result = new Result();
-      for (File file : list) {
-        result.addResult(executeOnFile(file, index, model, jobPluginInfo, report, job));
+    final Result result = new Result();
+    return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<File>() {
+      @Override
+      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+        SimpleJobPluginInfo jobPluginInfo, Plugin<File> plugin, File object) {
+        result.addResult(executeOnFile(object, index, model, jobPluginInfo, report, cachedJob));
       }
-
-      report.addPluginDetails(result.toString());
-
-      jobPluginInfo.finalizeInfo();
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-
-      return report;
-
-    } catch (JobException | AuthorizationDeniedException | NotFoundException | GenericException
-      | RequestNotValidException e) {
-      throw new PluginException("A job exception has occurred", e);
-    }
+    }, new RODAProcessingLogic<File>() {
+      @Override
+      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+        SimpleJobPluginInfo jobPluginInfo, Plugin<File> plugin) {
+        report.addPluginDetails(result.toString());
+      }
+    }, index, model, storage, liteList);
   }
 
   /**
@@ -281,7 +269,7 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
    *           if some error occurred.
    */
   private Result executeOnFile(final File file, final IndexService index, final ModelService model,
-    final JobPluginInfo jobPluginInfo, final Report jobReport, final Job job) throws GenericException {
+    final JobPluginInfo jobPluginInfo, final Report jobReport, final Job job) {
     LOGGER.debug("Processing File {}", file.getId());
 
     final String fileUUID = IdUtils.getFileId(file);

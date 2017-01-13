@@ -347,6 +347,8 @@ public class PluginManager {
     Reflections reflections = new Reflections(
       RodaCoreFactory.getRodaConfigurationAsString("core", "plugins", "internal", "package"));
     Set<Class<? extends AbstractPlugin>> plugins = reflections.getSubTypesOf(AbstractPlugin.class);
+    plugins.addAll(reflections.getSubTypesOf(AbstractAIPComponentsPlugin.class));
+
     for (Class<? extends AbstractPlugin> plugin : plugins) {
       String name = plugin.getName();
       if (!Modifier.isAbstract(plugin.getModifiers()) && !blacklistedPlugins.contains(name)) {

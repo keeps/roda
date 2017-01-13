@@ -28,7 +28,6 @@ import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -58,6 +57,7 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
@@ -109,137 +109,120 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> liteList) throws PluginException {
-    Report report = PluginHelper.initPluginReport(this);
+    return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<AIP>() {
+      @Override
+      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+        SimpleJobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {
+        processAIP(index, model, storage, report, jobPluginInfo, cachedJob, object);
+      }
+    }, index, model, storage, liteList);
+  }
 
-    try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
+  private void processAIP(IndexService index, ModelService model, StorageService storage, Report report,
+    SimpleJobPluginInfo jobPluginInfo, Job job, AIP aip) {
+    boolean aipFailed = false;
+    List<String> passedFiles = new ArrayList<String>();
+    Map<String, Pair<String, String>> failedFiles = new HashMap<>();
+    List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
 
-      Job job = PluginHelper.getJob(this, model);
-      List<AIP> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, jobPluginInfo, liteList, job);
+    for (Representation r : aip.getRepresentations()) {
+      LOGGER.debug("Checking fixity for files in representation {} of AIP {}", r.getId(), aip.getId());
 
       try {
-        for (AIP aip : list) {
-          boolean aipFailed = false;
-          List<String> passedFiles = new ArrayList<String>();
-          Map<String, Pair<String, String>> failedFiles = new HashMap<>();
-          List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
+        boolean recursive = true;
+        CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(), r.getId(), recursive);
 
-          for (Representation r : aip.getRepresentations()) {
-            LOGGER.debug("Checking fixity for files in representation {} of AIP {}", r.getId(), aip.getId());
+        for (OptionalWithCause<File> oFile : allFiles) {
+          if (oFile.isPresent()) {
+            File file = oFile.get();
 
-            try {
-              boolean recursive = true;
-              CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(), r.getId(),
-                recursive);
+            if (!file.isDirectory()) {
+              StoragePath storagePath = ModelUtils.getFileStoragePath(file);
+              Binary currentFileBinary = storage.getBinary(storagePath);
+              Binary premisFile = model.retrievePreservationFile(file);
+              List<Fixity> fixities = PremisV3Utils.extractFixities(premisFile);
+              sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), file.getRepresentationId(), file.getPath(),
+                file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
-              for (OptionalWithCause<File> oFile : allFiles) {
-                if (oFile.isPresent()) {
-                  File file = oFile.get();
+              String fileEntry = file.getRepresentationId()
+                + (file.getPath().isEmpty() ? "" : '/' + String.join("/", file.getPath())) + '/' + file.getId();
 
-                  if (!file.isDirectory()) {
-                    StoragePath storagePath = ModelUtils.getFileStoragePath(file);
-                    Binary currentFileBinary = storage.getBinary(storagePath);
-                    Binary premisFile = model.retrievePreservationFile(file);
-                    List<Fixity> fixities = PremisV3Utils.extractFixities(premisFile);
-                    sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), file.getRepresentationId(),
-                      file.getPath(), file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+              if (fixities != null) {
+                boolean passedFixity = true;
 
-                    String fileEntry = file.getRepresentationId()
-                      + (file.getPath().isEmpty() ? "" : '/' + String.join("/", file.getPath())) + '/' + file.getId();
+                // get all necessary hash algorithms
+                Set<String> algorithms = new HashSet<>();
+                for (Fixity f : fixities) {
+                  algorithms.add(f.getMessageDigestAlgorithm());
+                }
 
-                    if (fixities != null) {
-                      boolean passedFixity = true;
+                // calculate hashes
+                try {
+                  Map<String, String> checksums = FileUtility
+                    .checksums(currentFileBinary.getContent().createInputStream(), algorithms);
 
-                      // get all necessary hash algorithms
-                      Set<String> algorithms = new HashSet<>();
-                      for (Fixity f : fixities) {
-                        algorithms.add(f.getMessageDigestAlgorithm());
-                      }
+                  for (Fixity f : fixities) {
+                    String checksum = checksums.get(f.getMessageDigestAlgorithm());
 
-                      // calculate hashes
-                      try {
-                        Map<String, String> checksums = FileUtility
-                          .checksums(currentFileBinary.getContent().createInputStream(), algorithms);
-
-                        for (Fixity f : fixities) {
-                          String checksum = checksums.get(f.getMessageDigestAlgorithm());
-
-                          if (!f.getMessageDigest().trim().equalsIgnoreCase(checksum.trim())) {
-                            passedFixity = false;
-                            failedFiles.put(fileEntry, new Pair<>(f.getMessageDigest().trim(), checksum.trim()));
-                            break;
-                          }
-                        }
-                      } catch (NoSuchAlgorithmException e) {
-                        passedFixity = false;
-                        // TODO add exception to plugin report
-                        LOGGER.debug("Could not check fixity", e);
-                      }
-
-                      if (passedFixity) {
-                        passedFiles.add(fileEntry);
-                      } else {
-                        aipFailed = true;
-                        createIncidence(model, file, risks.get(0));
-                      }
+                    if (!f.getMessageDigest().trim().equalsIgnoreCase(checksum.trim())) {
+                      passedFixity = false;
+                      failedFiles.put(fileEntry, new Pair<>(f.getMessageDigest().trim(), checksum.trim()));
+                      break;
                     }
                   }
+                } catch (NoSuchAlgorithmException e) {
+                  passedFixity = false;
+                  // TODO add exception to plugin report
+                  LOGGER.debug("Could not check fixity", e);
+                }
+
+                if (passedFixity) {
+                  passedFiles.add(fileEntry);
+                } else {
+                  aipFailed = true;
+                  createIncidence(model, file, risks.get(0));
                 }
               }
-
-              IOUtils.closeQuietly(allFiles);
-              model.notifyAIPUpdated(aip.getId());
-            } catch (IOException | RODAException | XmlException e) {
-              LOGGER.error("Error processing Representation {}", r.getId(), e);
             }
           }
-
-          try {
-            Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
-
-            if (aipFailed) {
-              ValidationReport validationReport = new ValidationReport();
-
-              for (Entry<String, Pair<String, String>> entry : failedFiles.entrySet()) {
-                ValidationIssue issue = new ValidationIssue(entry.getKey() + " (Checksums: ["
-                  + entry.getValue().getFirst() + ", " + entry.getValue().getSecond() + "])");
-                validationReport.addIssue(issue);
-              }
-
-              reportItem.setPluginState(PluginState.FAILURE).setHtmlPluginDetails(true)
-                .setPluginDetails(validationReport.toHtml(false, false, false, "Corrupted files and their checksums"));
-              jobPluginInfo.incrementObjectsProcessedWithFailure();
-              PluginHelper.createPluginEvent(this, aip.getId(), model, index, sources, null, PluginState.FAILURE,
-                validationReport.toHtml(false, false, false, "Corrupted files and their checksums"), true);
-            } else {
-              reportItem.setPluginState(PluginState.SUCCESS).setPluginDetails("Fixity checking ran successfully");
-              jobPluginInfo.incrementObjectsProcessedWithSuccess();
-              PluginHelper.createPluginEvent(this, aip.getId(), model, index, sources, null, PluginState.SUCCESS, "",
-                true);
-            }
-
-            report.addReport(reportItem);
-            PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
-          } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
-            | ValidationException | AlreadyExistsException e) {
-            LOGGER.error("Could not create a Fixity Plugin event");
-          }
-
         }
-      } catch (ClassCastException e) {
-        LOGGER.error("Trying to execute an AIP-only plugin with other objects");
-        jobPluginInfo.incrementObjectsProcessedWithFailure(list.size());
-      }
 
-      jobPluginInfo.finalizeInfo();
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (JobException | AuthorizationDeniedException | NotFoundException | GenericException
-      | RequestNotValidException e) {
-      LOGGER.error("Could not update Job information");
+        IOUtils.closeQuietly(allFiles);
+        model.notifyAIPUpdated(aip.getId());
+      } catch (IOException | RODAException | XmlException e) {
+        LOGGER.error("Error processing Representation {}", r.getId(), e);
+      }
     }
 
-    return report;
+    try {
+      Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
+
+      if (aipFailed) {
+        ValidationReport validationReport = new ValidationReport();
+
+        for (Entry<String, Pair<String, String>> entry : failedFiles.entrySet()) {
+          ValidationIssue issue = new ValidationIssue(entry.getKey() + " (Checksums: [" + entry.getValue().getFirst()
+            + ", " + entry.getValue().getSecond() + "])");
+          validationReport.addIssue(issue);
+        }
+
+        reportItem.setPluginState(PluginState.FAILURE).setHtmlPluginDetails(true)
+          .setPluginDetails(validationReport.toHtml(false, false, false, "Corrupted files and their checksums"));
+        jobPluginInfo.incrementObjectsProcessedWithFailure();
+        PluginHelper.createPluginEvent(this, aip.getId(), model, index, sources, null, PluginState.FAILURE,
+          validationReport.toHtml(false, false, false, "Corrupted files and their checksums"), true);
+      } else {
+        reportItem.setPluginState(PluginState.SUCCESS).setPluginDetails("Fixity checking ran successfully");
+        jobPluginInfo.incrementObjectsProcessedWithSuccess();
+        PluginHelper.createPluginEvent(this, aip.getId(), model, index, sources, null, PluginState.SUCCESS, "", true);
+      }
+
+      report.addReport(reportItem);
+      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
+      | ValidationException | AlreadyExistsException e) {
+      LOGGER.error("Could not create a Fixity Plugin event");
+    }
   }
 
   private void createIncidence(ModelService model, File file, String riskId) throws RequestNotValidException,

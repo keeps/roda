@@ -142,6 +142,8 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> liteList) throws PluginException {
+    // FIXME 20170113 hsilva: see how to put this plugin using
+    // PluginHelper.processObjects
     Report report = PluginHelper.initPluginReport(this);
     try {
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());

@@ -13,7 +13,9 @@ import java.util.stream.Collectors;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -30,6 +32,8 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.RODAObjectsProcessingLogic;
+import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
@@ -77,14 +81,19 @@ public class MoveOrphansToParentNodePlugin extends AbstractPlugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> liteList) throws PluginException {
+    return PluginHelper.processObjects(this, new RODAObjectsProcessingLogic<AIP>() {
+      @Override
+      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+        SimpleJobPluginInfo jobPluginInfo, Plugin<AIP> plugin, List<AIP> objects) {
+        processAIPs(index, model, cachedJob, objects);
+      }
+    }, index, model, storage, liteList);
+  }
+
+  private void processAIPs(IndexService index, ModelService model, Job cachedJob, List<AIP> list) {
+    List<String> aipIds = list.stream().map(aip -> aip.getId()).collect(Collectors.toList());
 
     try {
-      String username = PluginHelper.getJobUsername(this, index);
-
-      Job job = PluginHelper.getJob(this, model);
-      List<AIP> aipList = PluginHelper.transformLitesIntoObjects(model, index, this, null, null, liteList, job);
-      List<String> aipIds = aipList.stream().map(aip -> aip.getId()).collect(Collectors.toList());
-
       IndexResult<IndexedAIP> indexResults = index.find(IndexedAIP.class,
         new Filter(new OneOfManyFilterParameter(RodaConstants.AIP_AIP_ID, aipIds)), Sorter.NONE,
         new Sublist(0, aipIds.size()));
@@ -95,18 +104,17 @@ public class MoveOrphansToParentNodePlugin extends AbstractPlugin<AIP> {
           if (indexedAIP.getLevel() == null || !indexedAIP.getLevel().trim().equalsIgnoreCase("fonds")) {
             AIP aip = model.retrieveAIP(indexedAIP.getId());
             aip.setParentId(newParent.getId());
-            model.updateAIP(aip, username);
+            model.updateAIP(aip, cachedJob.getUsername());
           } else {
             LOGGER.debug("AIP doesn't need to be moved... level: {}", indexedAIP.getLevel());
           }
         } catch (RODAException e) {
-          LOGGER.error("Error processing AIP " + indexedAIP.getId() + " (RemoveOrphansAction)", e);
+          LOGGER.error("Error processing AIP {} (RemoveOrphansAction)", indexedAIP.getId(), e);
         }
       }
-    } catch (RODAException e) {
-      LOGGER.error("Error getting job from plugin", e);
+    } catch (GenericException | RequestNotValidException e) {
+      LOGGER.error("Error while calculating orphans to be moved", e);
     }
-    return null;
   }
 
   @Override

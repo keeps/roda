@@ -23,7 +23,6 @@ import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -34,6 +33,7 @@ import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
@@ -46,6 +46,7 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.ContentPayload;
@@ -92,110 +93,96 @@ public class ExifToolPlugin extends AbstractPlugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> liteList) throws PluginException {
+    return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<AIP>() {
+      @Override
+      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+        SimpleJobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {
+        processAIP(index, model, storage, report, jobPluginInfo, cachedJob, object);
+      }
+    }, index, model, storage, liteList);
+  }
 
-    Report report = PluginHelper.initPluginReport(this);
+  private void processAIP(IndexService index, ModelService model, StorageService storage, Report report,
+    SimpleJobPluginInfo jobPluginInfo, Job job, AIP aip) {
+    LOGGER.debug("Processing AIP {}", aip.getId());
+    boolean inotify = false;
+    Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
+    PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
+    PluginState reportState = PluginState.SUCCESS;
+    ValidationReport validationReport = new ValidationReport();
+    List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
 
-    try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
+    for (Representation representation : aip.getRepresentations()) {
+      LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());
 
-      List<AIP> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, jobPluginInfo, liteList);
-
+      DirectResourceAccess directAccess = null;
       try {
-        for (AIP aip : list) {
-          LOGGER.debug("Processing AIP {}", aip.getId());
-          boolean inotify = false;
-          Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class,
-            AIPState.INGEST_PROCESSING);
-          PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
-          PluginState reportState = PluginState.SUCCESS;
-          ValidationReport validationReport = new ValidationReport();
-          List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
+        StoragePath representationDataPath = ModelUtils.getRepresentationDataStoragePath(aip.getId(),
+          representation.getId());
+        directAccess = storage.getDirectAccess(representationDataPath);
 
-          for (Representation representation : aip.getRepresentations()) {
-            LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());
+        sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), representation.getId(),
+          RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
-            DirectResourceAccess directAccess = null;
-            try {
-              StoragePath representationDataPath = ModelUtils.getRepresentationDataStoragePath(aip.getId(),
-                representation.getId());
-              directAccess = storage.getDirectAccess(representationDataPath);
+        CloseableIterable<OptionalWithCause<org.roda.core.data.v2.ip.File>> allFiles = model.listFilesUnder(aip.getId(),
+          representation.getId(), true);
 
-              sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), representation.getId(),
-                RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+        if (!CloseableIterables.isEmpty(allFiles)) {
+          Path metadata = Files.createTempDirectory("metadata");
+          ExifToolPluginUtils.runExifToolOnPath(directAccess.getPath(), metadata);
 
-              CloseableIterable<OptionalWithCause<org.roda.core.data.v2.ip.File>> allFiles = model
-                .listFilesUnder(aip.getId(), representation.getId(), true);
+          try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(metadata)) {
+            for (Path path : directoryStream) {
+              ContentPayload payload = new FSPathContentPayload(path);
+              List<String> fileDirectoryPath = new ArrayList<>();
 
-              if (!CloseableIterables.isEmpty(allFiles)) {
-                Path metadata = Files.createTempDirectory("metadata");
-                ExifToolPluginUtils.runExifToolOnPath(directAccess.getPath(), metadata);
-
-                try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(metadata)) {
-                  for (Path path : directoryStream) {
-                    ContentPayload payload = new FSPathContentPayload(path);
-                    List<String> fileDirectoryPath = new ArrayList<>();
-
-                    Path relativePath = metadata.relativize(path);
-                    for (int i = 0; i < relativePath.getNameCount() - 2; i++) {
-                      fileDirectoryPath.add(relativePath.getName(i).toString());
-                    }
-
-                    String fileId = path.getFileName().toString();
-                    model.createOrUpdateOtherMetadata(aip.getId(), representation.getId(), fileDirectoryPath, fileId, ".xml",
-                      RodaConstants.OTHER_METADATA_TYPE_EXIFTOOL, payload, inotify);
-                  }
-                }
-
-                FSUtils.deletePath(metadata);
+              Path relativePath = metadata.relativize(path);
+              for (int i = 0; i < relativePath.getNameCount() - 2; i++) {
+                fileDirectoryPath.add(relativePath.getName(i).toString());
               }
-            } catch (RODAException | IOException e) {
-              LOGGER.error("Error processing AIP {}: {}", aip.getId(), e.getMessage());
-              reportState = PluginState.FAILURE;
-              validationReport.addIssue(new ValidationIssue(e.getMessage()));
-            } finally {
-              IOUtils.closeQuietly(directAccess);
+
+              String fileId = path.getFileName().toString();
+              model.createOrUpdateOtherMetadata(aip.getId(), representation.getId(), fileDirectoryPath, fileId, ".xml",
+                RodaConstants.OTHER_METADATA_TYPE_EXIFTOOL, payload, inotify);
             }
           }
 
-          try {
-            model.notifyAIPUpdated(aip.getId());
-          } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
-            LOGGER.error("Error notifying of AIP update", e);
-          }
-
-          if (reportState.equals(PluginState.SUCCESS)) {
-            jobPluginInfo.incrementObjectsProcessedWithSuccess();
-            reportItem.setPluginState(PluginState.SUCCESS);
-          } else {
-            jobPluginInfo.incrementObjectsProcessedWithFailure();
-            reportItem.setHtmlPluginDetails(true).setPluginState(PluginState.FAILURE);
-            reportItem.setPluginDetails(validationReport.toHtml(false, false, false, "Error list"));
-          }
-
-          try {
-            PluginHelper.createPluginEvent(this, aip.getId(), model, index, sources, null, reportItem.getPluginState(),
-              "", true);
-          } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
-            | AuthorizationDeniedException | AlreadyExistsException e) {
-            LOGGER.error("Error creating event: " + e.getMessage(), e);
-          }
-
-          report.addReport(reportItem);
-          PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+          FSUtils.deletePath(metadata);
         }
-      } catch (ClassCastException e) {
-        LOGGER.error("Trying to execute an AIP-only plugin with other objects");
-        jobPluginInfo.incrementObjectsProcessedWithFailure(list.size());
+      } catch (RODAException | IOException e) {
+        LOGGER.error("Error processing AIP {}: {}", aip.getId(), e.getMessage());
+        reportState = PluginState.FAILURE;
+        validationReport.addIssue(new ValidationIssue(e.getMessage()));
+      } finally {
+        IOUtils.closeQuietly(directAccess);
       }
-
-      jobPluginInfo.finalizeInfo();
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (JobException e) {
-      throw new PluginException("A job exception has occurred", e);
     }
 
-    return report;
+    try {
+      model.notifyAIPUpdated(aip.getId());
+    } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+      LOGGER.error("Error notifying of AIP update", e);
+    }
+
+    if (reportState.equals(PluginState.SUCCESS)) {
+      jobPluginInfo.incrementObjectsProcessedWithSuccess();
+      reportItem.setPluginState(PluginState.SUCCESS);
+    } else {
+      jobPluginInfo.incrementObjectsProcessedWithFailure();
+      reportItem.setHtmlPluginDetails(true).setPluginState(PluginState.FAILURE);
+      reportItem.setPluginDetails(validationReport.toHtml(false, false, false, "Error list"));
+    }
+
+    try {
+      PluginHelper.createPluginEvent(this, aip.getId(), model, index, sources, null, reportItem.getPluginState(), "",
+        true);
+    } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
+      | AuthorizationDeniedException | AlreadyExistsException e) {
+      LOGGER.error("Error creating event: {}", e.getMessage(), e);
+    }
+
+    report.addReport(reportItem);
+    PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
   }
 
   @Override

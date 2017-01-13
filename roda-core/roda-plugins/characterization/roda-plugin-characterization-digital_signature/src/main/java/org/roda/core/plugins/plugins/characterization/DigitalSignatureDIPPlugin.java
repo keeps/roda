@@ -30,11 +30,9 @@ import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
-import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
@@ -45,13 +43,14 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
-import org.roda.core.plugins.AbstractPlugin;
+import org.roda.core.plugins.AbstractAIPComponentsPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
@@ -65,7 +64,7 @@ import org.slf4j.LoggerFactory;
 
 import com.itextpdf.text.DocumentException;
 
-public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
+public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractAIPComponentsPlugin<T> {
 
   private static Logger LOGGER = LoggerFactory.getLogger(DigitalSignatureDIPPlugin.class);
   private boolean doEmbeddedSignature;
@@ -120,38 +119,8 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractP
     return "Digital signed dissemination of a file, possibly embedded";
   }
 
-  @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage,
-    List<LiteOptionalWithCause> liteList) throws PluginException {
-    Report report = PluginHelper.initPluginReport(this);
-
-    try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-
-      List<T> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, jobPluginInfo, liteList);
-
-      if (!list.isEmpty()) {
-        if (list.get(0) instanceof AIP) {
-          report = executeOnAIP(index, model, storage, report, jobPluginInfo, (List<AIP>) list);
-        } else if (list.get(0) instanceof Representation) {
-          report = executeOnRepresentation(index, model, storage, report, jobPluginInfo, (List<Representation>) list);
-        } else if (list.get(0) instanceof File) {
-          report = executeOnFile(index, model, storage, report, jobPluginInfo, (List<File>) list);
-        }
-      }
-
-      jobPluginInfo.finalizeInfo();
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (JobException e) {
-      throw new PluginException("A job exception has occurred", e);
-    }
-
-    return report;
-  }
-
   public Report executeOnAIP(IndexService index, ModelService model, StorageService storage, Report report,
-    SimpleJobPluginInfo jobPluginInfo, List<AIP> list) throws PluginException {
+    SimpleJobPluginInfo jobPluginInfo, List<AIP> list, Job job) throws PluginException {
 
     for (AIP aip : list) {
       // FIXME 20160516 hsilva: see how to set initial
@@ -208,7 +177,7 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractP
           }
         } finally {
           report.addReport(reportItem);
-          PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+          PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
         }
       }
 
@@ -220,14 +189,14 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractP
 
       reportItem.setPluginState(pluginState);
       report.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
     }
 
     return report;
   }
 
   public Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage, Report report,
-    SimpleJobPluginInfo jobPluginInfo, List<Representation> list) throws PluginException {
+    SimpleJobPluginInfo jobPluginInfo, List<Representation> list, Job job) throws PluginException {
 
     for (Representation representation : list) {
       Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getRepresentationId(representation),
@@ -286,7 +255,7 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractP
         }
       } finally {
         report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
       }
     }
 
@@ -294,7 +263,7 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractP
   }
 
   public Report executeOnFile(IndexService index, ModelService model, StorageService storage, Report report,
-    SimpleJobPluginInfo jobPluginInfo, List<File> list) throws PluginException {
+    SimpleJobPluginInfo jobPluginInfo, List<File> list, Job job) throws PluginException {
 
     for (File file : list) {
       String dipId = UUID.randomUUID().toString();
@@ -342,7 +311,7 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractP
           model.deleteDIP(dipId);
         } finally {
           report.addReport(reportItem);
-          PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+          PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
         }
       } catch (GenericException | AuthorizationDeniedException | RequestNotValidException | NotFoundException e1) {
         LOGGER.error("Error creating DIP for file " + file.getId());

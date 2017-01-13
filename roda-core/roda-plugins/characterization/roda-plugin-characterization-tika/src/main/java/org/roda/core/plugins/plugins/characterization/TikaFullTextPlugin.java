@@ -20,11 +20,9 @@ import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
-import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
@@ -32,6 +30,7 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.RepresentationLink;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -40,7 +39,7 @@ import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
-import org.roda.core.plugins.AbstractPlugin;
+import org.roda.core.plugins.AbstractAIPComponentsPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
@@ -49,7 +48,7 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
+public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractAIPComponentsPlugin<T> {
   private static final Logger LOGGER = LoggerFactory.getLogger(TikaFullTextPlugin.class);
 
   private boolean doFeatureExtraction = true;
@@ -124,43 +123,13 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractPlugin<T
     }
   }
 
-  @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage,
-    List<LiteOptionalWithCause> liteList) throws PluginException {
-    Report report = PluginHelper.initPluginReport(this);
-
-    try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-
-      List<T> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, jobPluginInfo, liteList);
-
-      if (!list.isEmpty()) {
-        if (list.get(0) instanceof AIP) {
-          report = executeOnAIP(index, model, storage, report, jobPluginInfo, (List<AIP>) list);
-        } else if (list.get(0) instanceof Representation) {
-          report = executeOnRepresentation(index, model, storage, report, jobPluginInfo, (List<Representation>) list);
-        } else if (list.get(0) instanceof File) {
-          report = executeOnFile(index, model, storage, report, jobPluginInfo, (List<File>) list);
-        }
-      }
-
-      jobPluginInfo.finalizeInfo();
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (JobException e) {
-      throw new PluginException("A job exception has occurred", e);
-    }
-
-    return report;
-  }
-
   public Report executeOnAIP(IndexService index, ModelService model, StorageService storage, Report report,
-    SimpleJobPluginInfo jobPluginInfo, List<AIP> list) throws PluginException {
+    SimpleJobPluginInfo jobPluginInfo, List<AIP> list, Job job) throws PluginException {
 
     try {
       for (AIP aip : list) {
         Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
         LOGGER.debug("Processing AIP {}", aip.getId());
         String outcomeDetailExtension = "";
         List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
@@ -191,7 +160,7 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractPlugin<T
           reportItem.setPluginState(PluginState.SUCCESS);
         } catch (Exception e) {
           outcomeDetailExtension = e.getMessage();
-          LOGGER.error("Error running Tika on AIP " + aip.getId() + ": " + e.getMessage());
+          LOGGER.error("Error running Tika on AIP {}: {}", aip.getId(), e.getMessage());
           if (reportItem != null) {
             String details = reportItem.getPluginDetails();
             if (details == null) {
@@ -207,7 +176,7 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractPlugin<T
         }
 
         report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
 
         try {
           List<LinkingIdentifier> outcomes = null;
@@ -228,14 +197,14 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractPlugin<T
   }
 
   public Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage, Report report,
-    SimpleJobPluginInfo jobPluginInfo, List<Representation> list) throws PluginException {
+    SimpleJobPluginInfo jobPluginInfo, List<Representation> list, Job job) throws PluginException {
 
     try {
       for (Representation representation : list) {
         LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), representation.getAipId());
         Report reportItem = PluginHelper.initPluginReportItem(this, representation.getId(), Representation.class,
           AIPState.INGEST_PROCESSING);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
         List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
         String outcomeDetailExtension = "";
 
@@ -260,7 +229,7 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractPlugin<T
           reportItem.setPluginState(PluginState.SUCCESS);
         } catch (Exception e) {
           outcomeDetailExtension = e.getMessage();
-          LOGGER.error("Error running Tika on Representation " + representation.getId() + ": " + e.getMessage());
+          LOGGER.error("Error running Tika on Representation {}: {}", representation.getId(), e.getMessage());
           if (reportItem != null) {
             String details = reportItem.getPluginDetails();
             if (details == null) {
@@ -276,7 +245,7 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractPlugin<T
         }
 
         report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
 
         try {
           List<LinkingIdentifier> outcomes = null;
@@ -298,7 +267,7 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractPlugin<T
   }
 
   public Report executeOnFile(IndexService index, ModelService model, StorageService storage, Report report,
-    SimpleJobPluginInfo jobPluginInfo, List<File> list) throws PluginException {
+    SimpleJobPluginInfo jobPluginInfo, List<File> list, Job job) throws PluginException {
 
     List<RepresentationLink> representationsToUpdate = new ArrayList<RepresentationLink>();
 
@@ -306,7 +275,7 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractPlugin<T
       LOGGER.debug("Processing file {} of representation {} of AIP {}", file.getId(), file.getRepresentationId(),
         file.getAipId());
       Report reportItem = PluginHelper.initPluginReportItem(this, file.getId(), File.class, AIPState.INGEST_PROCESSING);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
+      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
       List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
       String outcomeDetailExtension = "";
 
@@ -324,7 +293,7 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractPlugin<T
 
       } catch (Exception e) {
         outcomeDetailExtension = e.getMessage();
-        LOGGER.error("Error running Tika on File " + file.getId() + ": " + e.getMessage());
+        LOGGER.error("Error running Tika on File {}: {}", file.getId(), e.getMessage());
         if (reportItem != null) {
           String details = reportItem.getPluginDetails();
           if (details == null) {
@@ -340,7 +309,7 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractPlugin<T
       }
 
       report.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
 
       try {
         List<LinkingIdentifier> outcomes = null;
@@ -371,7 +340,7 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractPlugin<T
     try {
       tikaPlugin.init();
     } catch (PluginException e) {
-      LOGGER.error("Error doing " + TikaFullTextPlugin.class.getName() + "init", e);
+      LOGGER.error("Error doing {} init", TikaFullTextPlugin.class.getName(), e);
     }
     return tikaPlugin;
   }

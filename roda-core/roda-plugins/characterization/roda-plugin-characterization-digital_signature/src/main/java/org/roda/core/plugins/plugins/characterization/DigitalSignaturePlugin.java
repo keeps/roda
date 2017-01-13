@@ -28,12 +28,10 @@ import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
-import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
@@ -42,6 +40,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -53,7 +52,7 @@ import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
-import org.roda.core.plugins.AbstractPlugin;
+import org.roda.core.plugins.AbstractAIPComponentsPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
@@ -67,7 +66,7 @@ import org.roda.core.storage.fs.FSPathContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
+public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPComponentsPlugin<T> {
   private static Logger LOGGER = LoggerFactory.getLogger(DigitalSignaturePlugin.class);
 
   private boolean doVerify;
@@ -176,43 +175,13 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
 
   }
 
-  @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage,
-    List<LiteOptionalWithCause> liteList) throws PluginException {
-    Report report = PluginHelper.initPluginReport(this);
-
-    try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-
-      List<T> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, jobPluginInfo, liteList);
-
-      if (!list.isEmpty()) {
-        if (list.get(0) instanceof AIP) {
-          report = executeOnAIP(index, model, storage, report, jobPluginInfo, (List<AIP>) list);
-        } else if (list.get(0) instanceof Representation) {
-          report = executeOnRepresentation(index, model, storage, report, jobPluginInfo, (List<Representation>) list);
-        } else if (list.get(0) instanceof File) {
-          report = executeOnFile(index, model, storage, report, jobPluginInfo, (List<File>) list);
-        }
-      }
-
-      jobPluginInfo.finalizeInfo();
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (JobException e) {
-      throw new PluginException("A job exception has occurred", e);
-    }
-
-    return report;
-  }
-
   public Report executeOnAIP(IndexService index, ModelService model, StorageService storage, Report report,
-    SimpleJobPluginInfo jobPluginInfo, List<AIP> list) throws PluginException {
+    SimpleJobPluginInfo jobPluginInfo, List<AIP> list, Job job) throws PluginException {
     List<String> newRepresentations = new ArrayList<String>();
 
     for (AIP aip : list) {
       Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
+      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
       PluginState reportState = PluginState.SUCCESS;
       ValidationReport validationReport = new ValidationReport();
       boolean hasNonPdfFiles = false;
@@ -363,7 +332,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
         jobPluginInfo.incrementObjectsProcessedWithFailure();
       } finally {
         report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
 
         LOGGER.debug("Creating digital signature plugin event on AIP {}", aip.getId());
         boolean notifyEvent = true;
@@ -376,7 +345,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
   }
 
   public Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage, Report report,
-    SimpleJobPluginInfo jobPluginInfo, List<Representation> list) throws PluginException {
+    SimpleJobPluginInfo jobPluginInfo, List<Representation> list, Job job) throws PluginException {
     List<String> newRepresentations = new ArrayList<String>();
 
     for (Representation representation : list) {
@@ -395,7 +364,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
       // initialOutcomeObjectState
       Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getRepresentationId(representation),
         Representation.class, AIPState.INGEST_PROCESSING);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
+      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
       PluginState reportState = PluginState.SUCCESS;
       ValidationReport validationReport = new ValidationReport();
       boolean hasNonPdfFiles = false;
@@ -538,7 +507,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
         jobPluginInfo.incrementObjectsProcessedWithFailure();
       } finally {
         report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
       }
     }
 
@@ -546,7 +515,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
   }
 
   public Report executeOnFile(IndexService index, ModelService model, StorageService storage, Report report,
-    SimpleJobPluginInfo jobPluginInfo, List<File> list) throws PluginException {
+    SimpleJobPluginInfo jobPluginInfo, List<File> list, Job job) throws PluginException {
     List<String> newRepresentations = new ArrayList<String>();
 
     String newRepresentationID = UUID.randomUUID().toString();
@@ -567,7 +536,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
       LOGGER.debug("Processing file {}", file);
       Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getFileId(file), File.class,
         AIPState.INGEST_PROCESSING);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
+      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
       PluginState reportState = PluginState.SUCCESS;
 
       try {
@@ -680,7 +649,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractPlug
         reportItem.setPluginState(reportState).setPluginDetails(e.getMessage());
       } finally {
         report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
       }
 
       LOGGER.debug("Creating digital signature plugin event for the representation {}", file.getRepresentationId());

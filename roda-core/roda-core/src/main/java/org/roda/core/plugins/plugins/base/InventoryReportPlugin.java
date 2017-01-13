@@ -30,12 +30,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.exceptions.JobException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.jobs.Job;
@@ -48,6 +43,8 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.RODAObjectProcessingLogic;
+import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
@@ -206,64 +203,68 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> liteList) throws PluginException {
-    String firstAIPId = "";
-    // LOGGER.debug("(1st: {}) Exporting to CSV a total of {} files",
-    // firstAIPId, list.size());
-    BufferedWriter fileWriter = null;
-    CSVPrinter csvFilePrinter = null;
-    try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
+    final CSVPrinter csvFilePrinter = createCSVPrinter();
 
-      Job job = PluginHelper.getJob(this, model);
-      List<AIP> list = PluginHelper.transformLitesIntoObjects(model, index, this, null, jobPluginInfo, liteList, job);
-
-      Path jobCSVTempFolder = getJobCSVTempFolder();
-      Path csvTempFile = jobCSVTempFolder.resolve(UUID.randomUUID().toString() + ".csv");
-
-      CSVFormat csvFileFormat = CSVFormat.DEFAULT.withRecordSeparator("\n");
-      fileWriter = Files.newBufferedWriter(csvTempFile);
-      csvFilePrinter = new CSVPrinter(fileWriter, csvFileFormat);
-      for (AIP aip : list) {
-        if (StringUtils.isNotBlank(firstAIPId)) {
-          firstAIPId = aip.getId();
-        }
-        if (outputDataInformation && aip.getRepresentations() != null) {
-          List<List<String>> dataInformation = InventoryReportPluginUtils.getDataInformation(fields, aip, model,
-            storage);
-          csvFilePrinter.printRecords(dataInformation);
-        }
-        if (outputDescriptiveMetadataInformation && aip.getDescriptiveMetadata() != null) {
-          List<List<String>> dataInformation = InventoryReportPluginUtils.getDescriptiveMetadataInformation(fields, aip,
-            model, storage);
-          csvFilePrinter.printRecords(dataInformation);
-        }
-        if (otherMetadataTypes != null && otherMetadataTypes.size() > 0) {
-          for (String otherMetadataType : otherMetadataTypes) {
-            List<List<String>> otherMetadataInformation = InventoryReportPluginUtils.getOtherMetadataInformation(fields,
-              otherMetadataType, aip, model, storage);
-            csvFilePrinter.printRecords(otherMetadataInformation);
-          }
-        }
-        // if(outputOtherMetadataInformation && aip.getOtherMetadata()!=null){
-        //
-        // }
-        jobPluginInfo.incrementObjectsProcessedWithSuccess();
+    return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<AIP>() {
+      @Override
+      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+        SimpleJobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {
+        processAIP(model, storage, jobPluginInfo, csvFilePrinter, object);
       }
-      jobPluginInfo.finalizeInfo();
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-      LOGGER.debug("(1st: {}) Done exporting to CSV a total of {} files", firstAIPId, list.size());
-    } catch (JobException | AuthorizationDeniedException | NotFoundException | GenericException
-      | RequestNotValidException e) {
-      LOGGER.error("Could not update Job information");
+    }, new RODAProcessingLogic<AIP>() {
+      @Override
+      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+        SimpleJobPluginInfo jobPluginInfo, Plugin<AIP> plugin) {
+        IOUtils.closeQuietly(csvFilePrinter);
+      }
+    }, index, model, storage, liteList);
+  }
+
+  private CSVPrinter createCSVPrinter() {
+    Path jobCSVTempFolder = getJobCSVTempFolder();
+    Path csvTempFile = jobCSVTempFolder.resolve(UUID.randomUUID().toString() + ".csv");
+
+    CSVFormat csvFileFormat = CSVFormat.DEFAULT.withRecordSeparator("\n");
+    try {
+      BufferedWriter fileWriter = Files.newBufferedWriter(csvTempFile);
+      return new CSVPrinter(fileWriter, csvFileFormat);
     } catch (IOException e) {
-      LOGGER.error("Error executing FileExportPlugin: " + e.getMessage(), e);
-    } finally {
-      IOUtils.closeQuietly(fileWriter);
-      IOUtils.closeQuietly(csvFilePrinter);
+      LOGGER.error("Unable to instantiate CSVPrinter", e);
+      return null;
+    }
+  }
+
+  private void processAIP(ModelService model, StorageService storage, SimpleJobPluginInfo jobPluginInfo,
+    CSVPrinter csvFilePrinter, AIP aip) {
+    if (csvFilePrinter == null) {
+      LOGGER.warn("CSVPrinter is NULL! Skipping...");
+      return;
     }
 
-    return PluginHelper.initPluginReport(this);
+    try {
+      if (outputDataInformation && aip.getRepresentations() != null) {
+        List<List<String>> dataInformation = InventoryReportPluginUtils.getDataInformation(fields, aip, model, storage);
+        csvFilePrinter.printRecords(dataInformation);
+      }
+      if (outputDescriptiveMetadataInformation && aip.getDescriptiveMetadata() != null) {
+        List<List<String>> dataInformation = InventoryReportPluginUtils.getDescriptiveMetadataInformation(fields, aip,
+          model, storage);
+        csvFilePrinter.printRecords(dataInformation);
+      }
+      if (otherMetadataTypes != null && !otherMetadataTypes.isEmpty()) {
+        for (String otherMetadataType : otherMetadataTypes) {
+          List<List<String>> otherMetadataInformation = InventoryReportPluginUtils.getOtherMetadataInformation(fields,
+            otherMetadataType, aip, model, storage);
+          csvFilePrinter.printRecords(otherMetadataInformation);
+        }
+      }
+      // if(outputOtherMetadataInformation && aip.getOtherMetadata()!=null){
+      //
+      // }
+      jobPluginInfo.incrementObjectsProcessedWithSuccess();
+    } catch (IOException e) {
+      jobPluginInfo.incrementObjectsProcessedWithFailure();
+    }
   }
 
   @Override
@@ -309,14 +310,14 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
         for (Path path : directoryStream) {
           partials.add(path);
         }
-      } catch (IOException ex) {
-        LOGGER.error("Error while merging partial CSVs: " + ex.getMessage(), ex);
+      } catch (IOException e) {
+        LOGGER.error("Error while merging partial CSVs", e);
       }
       try {
         InventoryReportPluginUtils.mergeFiles(partials, output);
         FSUtils.deletePathQuietly(csvTempFolder);
       } catch (IOException e) {
-        LOGGER.error("Error while merging partial CSVs: " + e.getMessage(), e);
+        LOGGER.error("Error while merging partial CSVs", e);
       }
     }
     return new Report();

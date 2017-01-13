@@ -22,12 +22,10 @@ import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
-import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
@@ -39,7 +37,7 @@ import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
-import org.roda.core.plugins.AbstractPlugin;
+import org.roda.core.plugins.AbstractAIPComponentsPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
@@ -48,7 +46,7 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
+public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPComponentsPlugin<T> {
   private static final Logger LOGGER = LoggerFactory.getLogger(PremisSkeletonPlugin.class);
 
   @Override
@@ -91,39 +89,6 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractPlugin
     super.setParameterValues(parameters);
   }
 
-  @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage,
-    List<LiteOptionalWithCause> liteList) throws PluginException {
-    Report report = PluginHelper.initPluginReport(this);
-
-    try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-
-      Job job = PluginHelper.getJob(this, model);
-      List<T> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, jobPluginInfo, liteList, job);
-
-      if (!list.isEmpty()) {
-        if (list.get(0) instanceof AIP) {
-          report = executeOnAIP(index, model, storage, report, jobPluginInfo, (List<AIP>) list, job);
-        } else if (list.get(0) instanceof Representation) {
-          report = executeOnRepresentation(index, model, storage, report, jobPluginInfo, (List<Representation>) list,
-            job);
-        } else if (list.get(0) instanceof File) {
-          report = executeOnFile(index, model, storage, report, jobPluginInfo, (List<File>) list, job);
-        }
-      }
-
-      jobPluginInfo.finalizeInfo();
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (JobException | AuthorizationDeniedException | NotFoundException | GenericException
-      | RequestNotValidException e) {
-      throw new PluginException("A job exception has occurred", e);
-    }
-
-    return report;
-  }
-
   public Report executeOnAIP(IndexService index, ModelService model, StorageService storage, Report report,
     SimpleJobPluginInfo jobPluginInfo, List<AIP> list, Job job) throws PluginException {
 
@@ -145,7 +110,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractPlugin
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
           reportItem.setPluginState(PluginState.SUCCESS);
         } catch (RODAException | XmlException | IOException e) {
-          LOGGER.error("Error processing AIP " + aip.getId(), e);
+          LOGGER.error("Error processing AIP {}", aip.getId(), e);
 
           jobPluginInfo.incrementObjectsProcessedWithFailure();
           reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
@@ -156,7 +121,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractPlugin
           PluginHelper.createPluginEvent(this, aip.getId(), model, index, reportItem.getPluginState(), "", notify);
         } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
           | AuthorizationDeniedException | AlreadyExistsException e) {
-          LOGGER.error("Error creating event: " + e.getMessage(), e);
+          LOGGER.error("Error creating event: {}", e.getMessage(), e);
         }
 
         report.addReport(reportItem);
@@ -187,7 +152,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractPlugin
         model.notifyRepresentationUpdated(representation);
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
       } catch (RODAException | XmlException | IOException e) {
-        LOGGER.error("Error processing representation " + representation.getId(), e);
+        LOGGER.error("Error processing representation {}", representation.getId(), e);
         jobPluginInfo.incrementObjectsProcessedWithFailure();
         reportItem.setPluginState(PluginState.FAILURE).addPluginDetails(e.getMessage() + "\n");
       }
@@ -198,7 +163,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractPlugin
           null, reportItem.getPluginState(), "", notify);
       } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
         | AuthorizationDeniedException | AlreadyExistsException e) {
-        LOGGER.error("Error creating event: " + e.getMessage(), e);
+        LOGGER.error("Error creating event: {}", e.getMessage(), e);
       }
 
       report.addReport(reportItem);
@@ -224,7 +189,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractPlugin
           algorithms);
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
       } catch (RODAException | XmlException | IOException e) {
-        LOGGER.error("Error processing file " + file.getId(), e);
+        LOGGER.error("Error processing file {}", file.getId(), e);
         jobPluginInfo.incrementObjectsProcessedWithFailure();
         reportItem.setPluginState(PluginState.FAILURE).addPluginDetails(e.getMessage() + "\n");
       }
@@ -235,7 +200,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractPlugin
           model, index, null, null, reportItem.getPluginState(), "", notify);
       } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
         | AuthorizationDeniedException | AlreadyExistsException e) {
-        LOGGER.error("Error creating event: " + e.getMessage(), e);
+        LOGGER.error("Error creating event: {}", e.getMessage(), e);
       }
 
       report.addReport(reportItem);

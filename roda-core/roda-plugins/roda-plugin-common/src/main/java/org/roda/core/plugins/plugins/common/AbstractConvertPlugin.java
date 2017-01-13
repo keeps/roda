@@ -58,7 +58,7 @@ import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
-import org.roda.core.plugins.AbstractPlugin;
+import org.roda.core.plugins.AbstractAIPComponentsPlugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
@@ -72,7 +72,7 @@ import org.roda.core.util.CommandException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
+public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends AbstractAIPComponentsPlugin<T> {
   private static Logger LOGGER = LoggerFactory.getLogger(AbstractConvertPlugin.class);
 
   private String inputFormat;
@@ -254,7 +254,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
     return report;
   }
 
-  private Report executeOnAIP(IndexService index, ModelService model, StorageService storage, Report report,
+  protected Report executeOnAIP(IndexService index, ModelService model, StorageService storage, Report report,
     SimpleJobPluginInfo jobPluginInfo, List<AIP> list, Job job) throws PluginException {
 
     for (AIP aip : list) {
@@ -442,8 +442,8 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
     return report;
   }
 
-  private Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage, Report report,
-    SimpleJobPluginInfo jobPluginInfo, List<Representation> list, Job job) throws PluginException {
+  protected Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage,
+    Report report, SimpleJobPluginInfo jobPluginInfo, List<Representation> list, Job job) throws PluginException {
 
     List<String> newRepresentations = new ArrayList<String>();
     String aipId = null;
@@ -638,7 +638,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
     return report;
   }
 
-  private Report executeOnFile(IndexService index, ModelService model, StorageService storage, Report report,
+  protected Report executeOnFile(IndexService index, ModelService model, StorageService storage, Report report,
     SimpleJobPluginInfo jobPluginInfo, List<File> list, Job job) throws PluginException {
 
     Map<String, String> changedRepresentationsOnAIPs = new HashMap<String, String>();

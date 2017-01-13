@@ -43,6 +43,8 @@ import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.RODAObjectProcessingLogic;
+import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
@@ -59,6 +61,10 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
   public static String UNPACK_DESCRIPTION = "Extracted objects from package in E-ARK SIP format.";
 
   private boolean createSubmission = false;
+
+  private Optional<String> computedSearchScope;
+  private boolean forceSearchScope;
+  private Path jobWorkingDirectory;
 
   @Override
   public void init() throws PluginException {
@@ -104,37 +110,31 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> liteList) throws PluginException {
-    Report report = PluginHelper.initPluginReport(this);
+    computedSearchScope = PluginHelper.getSearchScopeFromParameters(this, model);
+    forceSearchScope = PluginHelper.getForceParentIdFromParameters(this);
+    jobWorkingDirectory = PluginHelper.getJobWorkingDirectory(this);
 
-    try {
-
-      Job job = PluginHelper.getJob(this, model);
-      List<TransferredResource> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, null,
-        liteList, job);
-
-      String jobId = PluginHelper.getJobId(this);
-      Optional<String> computedSearchScope = PluginHelper.getSearchScopeFromParameters(this, model);
-      Path jobWorkingDirectory = PluginHelper.getJobWorkingDirectory(this);
-      boolean forceSearchScope = PluginHelper.getForceParentIdFromParameters(this);
-
-      for (TransferredResource transferredResource : list) {
-        Report reportItem = PluginHelper.initPluginReportItem(this, transferredResource);
-
-        Path earkSIPPath = Paths.get(transferredResource.getFullPath());
-        LOGGER.debug("Converting {} to AIP", earkSIPPath);
-
-        transformTransferredResourceIntoAnAIP(index, model, storage, transferredResource, earkSIPPath, createSubmission,
-          reportItem, jobId, computedSearchScope, forceSearchScope, jobWorkingDirectory);
-        report.addReport(reportItem);
-
-        PluginHelper.createJobReport(this, model, reportItem);
-
+    return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<TransferredResource>() {
+      @Override
+      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+        SimpleJobPluginInfo jobPluginInfo, Plugin<TransferredResource> plugin, TransferredResource object) {
+        processTransferredResource(index, model, storage, report, cachedJob, object);
       }
-    } catch (AuthorizationDeniedException | NotFoundException | GenericException | RequestNotValidException e) {
-      throw new PluginException("A job exception has occurred", e);
-    }
+    }, index, model, storage, liteList);
+  }
 
-    return report;
+  private void processTransferredResource(IndexService index, ModelService model, StorageService storage, Report report,
+    Job job, TransferredResource transferredResource) {
+    Report reportItem = PluginHelper.initPluginReportItem(this, transferredResource);
+
+    Path earkSIPPath = Paths.get(transferredResource.getFullPath());
+    LOGGER.debug("Converting {} to AIP", earkSIPPath);
+
+    transformTransferredResourceIntoAnAIP(index, model, storage, transferredResource, earkSIPPath, createSubmission,
+      reportItem, job.getId(), computedSearchScope, forceSearchScope, jobWorkingDirectory);
+    report.addReport(reportItem);
+
+    PluginHelper.createJobReport(this, model, reportItem);
   }
 
   private void transformTransferredResourceIntoAnAIP(IndexService index, ModelService model, StorageService storage,

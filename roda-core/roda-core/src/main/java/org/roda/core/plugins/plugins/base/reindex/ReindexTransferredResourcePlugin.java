@@ -20,12 +20,12 @@ import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
-import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -36,6 +36,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
@@ -45,6 +46,7 @@ import org.slf4j.LoggerFactory;
 public class ReindexTransferredResourcePlugin extends AbstractPlugin<Void> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ReindexTransferredResourcePlugin.class);
+
   private boolean clearIndexes = false;
   private int resourceCounter = 0;
 
@@ -100,30 +102,30 @@ public class ReindexTransferredResourcePlugin extends AbstractPlugin<Void> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> list) throws PluginException {
-    Report pluginReport = PluginHelper.initPluginReport(this);
-
-    try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
-      jobPluginInfo.setSourceObjectsCount(0);
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-      pluginReport.setPluginState(PluginState.SUCCESS);
-
-      jobPluginInfo.setSourceObjectsCount(resourceCounter);
-      try {
-        RodaCoreFactory.getTransferredResourcesScanner().updateTransferredResources(Optional.empty(), true);
-        jobPluginInfo.incrementObjectsProcessedWithSuccess(resourceCounter);
-      } catch (IsStillUpdatingException | GenericException e) {
-        LOGGER.error("Error updating transferred resources");
-        jobPluginInfo.incrementObjectsProcessedWithFailure(resourceCounter);
+    return PluginHelper.processVoids(this, new RODAProcessingLogic<Void>() {
+      @Override
+      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+        SimpleJobPluginInfo jobPluginInfo, Plugin<Void> plugin) {
+        reindexTransferredResources(report, jobPluginInfo);
       }
+    }, index, model, storage);
+  }
 
-      jobPluginInfo.finalizeInfo();
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (JobException e) {
-      LOGGER.error("Error reindexing RODA entity", e);
+  private void reindexTransferredResources(Report report, SimpleJobPluginInfo jobPluginInfo) {
+    report.setPluginState(PluginState.SUCCESS);
+    jobPluginInfo.setSourceObjectsCount(resourceCounter);
+    try {
+      RodaCoreFactory.getTransferredResourcesScanner().updateTransferredResources(Optional.empty(), true);
+      // FIXME 20170116 hsilva: it makes no sense relying on a count made
+      // before the indexing start to set counters
+      jobPluginInfo.incrementObjectsProcessedWithSuccess(resourceCounter);
+    } catch (IsStillUpdatingException | GenericException e) {
+      LOGGER.error("Error updating transferred resources");
+      // FIXME 20170116 hsilva: it makes no sense relying on a count made
+      // before the indexing start to set counters
+      jobPluginInfo.incrementObjectsProcessedWithFailure(resourceCounter);
+      report.setPluginState(PluginState.FAILURE);
     }
-
-    return pluginReport;
   }
 
   @Override

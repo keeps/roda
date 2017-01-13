@@ -17,10 +17,8 @@ import java.util.stream.Collectors;
 import org.roda.core.common.ReturnWithExceptions;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
@@ -39,6 +37,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
@@ -97,61 +96,53 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> liteList) throws PluginException {
-    Report pluginReport = PluginHelper.initPluginReport(this);
+    return PluginHelper.processObjects(this, new RODAObjectsProcessingLogic<T>() {
+      @Override
+      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+        SimpleJobPluginInfo jobPluginInfo, Plugin<T> plugin, List<T> objects) {
+        reindex(index, model, report, jobPluginInfo, cachedJob, objects);
+      }
+    }, index, model, storage, liteList);
+  }
 
+  private void reindex(IndexService index, ModelService model, Report pluginReport, SimpleJobPluginInfo jobPluginInfo,
+    Job job, List<T> list) {
+    pluginReport.setPluginState(PluginState.SUCCESS);
+
+    // clearing specific indexes from a id list
     try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-
-      Job job = PluginHelper.getJob(this, model);
-      List<T> list = PluginHelper.transformLitesIntoObjects(model, index, this, pluginReport, jobPluginInfo, liteList,
-        job);
-      pluginReport.setPluginState(PluginState.SUCCESS);
-
-      // clearing specific indexes from a id list
-      try {
-        SelectedItems<?> selectedItems = job.getSourceObjects();
-        if (!(selectedItems instanceof SelectedItemsAll) && clearIndexes) {
-          List<String> ids = list.stream().map(obj -> obj.getId()).collect(Collectors.toList());
-          clearSpecificIndexes(index, ids);
-        }
-      } catch (GenericException | RequestNotValidException e) {
-        LOGGER.error("Error clearing specific indexes of a RODA entity", e);
+      SelectedItems<?> selectedItems = job.getSourceObjects();
+      if (!(selectedItems instanceof SelectedItemsAll) && clearIndexes) {
+        List<String> ids = list.stream().map(obj -> obj.getId()).collect(Collectors.toList());
+        clearSpecificIndexes(index, ids);
       }
-
-      // executing reindex
-      for (T object : list) {
-        if (LOGGER.isTraceEnabled()) {
-          LOGGER.trace("Reindexing {} {}", object.getClass().getSimpleName(), object.getId());
-        }
-
-        ReturnWithExceptions<Void> exceptions = index.reindex(object);
-        List<Exception> exceptionList = exceptions.getExceptions();
-        if (exceptionList.isEmpty()) {
-          jobPluginInfo.incrementObjectsProcessedWithSuccess();
-        } else {
-          jobPluginInfo.incrementObjectsProcessedWithFailure();
-          Report reportItem = PluginHelper.initPluginReportItem(this, object.getId(), object.getClass());
-          reportItem.setPluginState(PluginState.FAILURE);
-
-          for (Exception e : exceptionList) {
-            reportItem.addPluginDetails(e.getMessage() + "\n");
-          }
-
-          pluginReport.addReport(reportItem);
-          PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
-        }
-      }
-
-      jobPluginInfo.finalizeInfo();
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-
-    } catch (JobException | AuthorizationDeniedException | NotFoundException | GenericException
-      | RequestNotValidException e) {
-      LOGGER.error("Error reindexing RODA entity", e);
+    } catch (GenericException | RequestNotValidException e) {
+      LOGGER.error("Error clearing specific indexes of a RODA entity", e);
     }
 
-    return pluginReport;
+    // executing reindex
+    for (T object : list) {
+      if (LOGGER.isTraceEnabled()) {
+        LOGGER.trace("Reindexing {} {}", object.getClass().getSimpleName(), object.getId());
+      }
+
+      ReturnWithExceptions<Void> exceptions = index.reindex(object);
+      List<Exception> exceptionList = exceptions.getExceptions();
+      if (exceptionList.isEmpty()) {
+        jobPluginInfo.incrementObjectsProcessedWithSuccess();
+      } else {
+        jobPluginInfo.incrementObjectsProcessedWithFailure();
+        Report reportItem = PluginHelper.initPluginReportItem(this, object.getId(), object.getClass());
+        reportItem.setPluginState(PluginState.FAILURE);
+
+        for (Exception e : exceptionList) {
+          reportItem.addPluginDetails(e.getMessage() + "\n");
+        }
+
+        pluginReport.addReport(reportItem);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+      }
+    }
   }
 
   @Override

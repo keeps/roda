@@ -19,7 +19,6 @@ import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -31,6 +30,7 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
@@ -43,6 +43,7 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
@@ -86,102 +87,88 @@ public class AvprobePlugin extends AbstractPlugin<AIP> {
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> liteList) throws PluginException {
 
-    Report report = PluginHelper.initPluginReport(this);
+    return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<AIP>() {
+      @Override
+      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+        SimpleJobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {
+        processAIP(index, model, storage, report, jobPluginInfo, cachedJob, object);
+      }
+    }, index, model, storage, liteList);
+  }
 
-    try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
+  private void processAIP(IndexService index, ModelService model, StorageService storage, Report report,
+    SimpleJobPluginInfo jobPluginInfo, Job job, AIP aip) {
+    LOGGER.debug("Processing AIP {}", aip.getId());
+    boolean inotify = false;
+    Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
+    PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
+    PluginState reportState = PluginState.SUCCESS;
+    ValidationReport validationReport = new ValidationReport();
+    List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
 
-      List<AIP> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, jobPluginInfo, liteList);
-
+    for (Representation representation : aip.getRepresentations()) {
+      LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());
       try {
-        for (AIP aip : list) {
-          LOGGER.debug("Processing AIP {}", aip.getId());
-          boolean inotify = false;
-          Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class,
-            AIPState.INGEST_PROCESSING);
-          PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
-          PluginState reportState = PluginState.SUCCESS;
-          ValidationReport validationReport = new ValidationReport();
-          List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
+        boolean recursive = true;
+        CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(), representation.getId(),
+          recursive);
+        for (OptionalWithCause<File> oFile : allFiles) {
+          if (oFile.isPresent()) {
+            File file = oFile.get();
+            if (!file.isDirectory()) {
+              String fileFormat = file.getId().substring(file.getId().lastIndexOf('.') + 1, file.getId().length());
 
-          for (Representation representation : aip.getRepresentations()) {
-            LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());
-            try {
-              boolean recursive = true;
-              CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
-                representation.getId(), recursive);
-              for (OptionalWithCause<File> oFile : allFiles) {
-                if (oFile.isPresent()) {
-                  File file = oFile.get();
-                  if (!file.isDirectory()) {
-                    String fileFormat = file.getId().substring(file.getId().lastIndexOf('.') + 1,
-                      file.getId().length());
+              sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), representation.getId(), file.getPath(),
+                file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
-                    sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), representation.getId(), file.getPath(),
-                      file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+              // TODO check if file is a video
+              StoragePath storagePath = ModelUtils.getFileStoragePath(file);
+              Binary binary = storage.getBinary(storagePath);
 
-                    // TODO check if file is a video
-                    StoragePath storagePath = ModelUtils.getFileStoragePath(file);
-                    Binary binary = storage.getBinary(storagePath);
-
-                    String probeResults = AvprobePluginUtils.runAvprobe(binary, fileFormat, getParameterValues());
-                    ContentPayload payload = new StringContentPayload(probeResults);
-                    model.createOrUpdateOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(),
-                      "." + AvprobePluginUtils.AVPROBE_METADATA_FORMAT, RodaConstants.OTHER_METADATA_TYPE_AVPROBE,
-                      payload, inotify);
-                  }
-                } else {
-                  LOGGER.error("Cannot process AIP representation file", oFile.getCause());
-                }
-              }
-              IOUtils.closeQuietly(allFiles);
-            } catch (RODAException | IOException e) {
-              LOGGER.error("Error processing AIP {}: {}", aip.getId(), e.getMessage());
-              reportState = PluginState.FAILURE;
-              validationReport.addIssue(new ValidationIssue(e.getMessage()));
+              String probeResults = AvprobePluginUtils.runAvprobe(binary, fileFormat, getParameterValues());
+              ContentPayload payload = new StringContentPayload(probeResults);
+              model.createOrUpdateOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(),
+                "." + AvprobePluginUtils.AVPROBE_METADATA_FORMAT, RodaConstants.OTHER_METADATA_TYPE_AVPROBE, payload,
+                inotify);
             }
-
-          }
-
-          try {
-            model.notifyAIPUpdated(aip.getId());
-          } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
-            LOGGER.error("Error notifying of AIP update", e);
-          }
-
-          if (reportState.equals(PluginState.SUCCESS)) {
-            jobPluginInfo.incrementObjectsProcessedWithSuccess();
-            reportItem.setPluginState(PluginState.SUCCESS);
           } else {
-            jobPluginInfo.incrementObjectsProcessedWithFailure();
-            reportItem.setHtmlPluginDetails(true).setPluginState(PluginState.FAILURE);
-            reportItem.setPluginDetails(validationReport.toHtml(false, false, false, "Error list"));
+            LOGGER.error("Cannot process AIP representation file", oFile.getCause());
           }
-
-          try {
-            PluginHelper.createPluginEvent(this, aip.getId(), model, index, sources, null, reportItem.getPluginState(),
-              "", true);
-          } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
-            | AuthorizationDeniedException | AlreadyExistsException e) {
-            LOGGER.error("Error creating event: " + e.getMessage(), e);
-          }
-
-          report.addReport(reportItem);
-          PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
         }
-      } catch (ClassCastException e) {
-        LOGGER.error("Trying to execute an AIP-only plugin with other objects");
-        jobPluginInfo.incrementObjectsProcessedWithFailure(list.size());
+        IOUtils.closeQuietly(allFiles);
+      } catch (RODAException | IOException e) {
+        LOGGER.error("Error processing AIP {}: {}", aip.getId(), e.getMessage());
+        reportState = PluginState.FAILURE;
+        validationReport.addIssue(new ValidationIssue(e.getMessage()));
       }
 
-      jobPluginInfo.finalizeInfo();
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (JobException e) {
-      throw new PluginException("A job exception has occurred", e);
     }
 
-    return report;
+    try {
+      model.notifyAIPUpdated(aip.getId());
+    } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+      LOGGER.error("Error notifying of AIP update", e);
+    }
+
+    if (reportState.equals(PluginState.SUCCESS)) {
+      jobPluginInfo.incrementObjectsProcessedWithSuccess();
+      reportItem.setPluginState(PluginState.SUCCESS);
+    } else {
+      jobPluginInfo.incrementObjectsProcessedWithFailure();
+      reportItem.setHtmlPluginDetails(true).setPluginState(PluginState.FAILURE);
+      reportItem.setPluginDetails(validationReport.toHtml(false, false, false, "Error list"));
+    }
+
+    try {
+      PluginHelper.createPluginEvent(this, aip.getId(), model, index, sources, null, reportItem.getPluginState(), "",
+        true);
+    } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
+      | AuthorizationDeniedException | AlreadyExistsException e) {
+      LOGGER.error("Error creating event: {}", e.getMessage(), e);
+    }
+
+    report.addReport(reportItem);
+    PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
   }
 
   @Override

@@ -23,7 +23,6 @@ import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
@@ -40,6 +39,7 @@ import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -52,6 +52,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
@@ -158,28 +159,13 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
   @Override
   public Report execute(final IndexService index, final ModelService model, final StorageService storage,
     List<LiteOptionalWithCause> liteList) throws PluginException {
-
-    try {
-      final Report report = PluginHelper.initPluginReport(this);
-
-      final SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-
-      final List<File> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, jobPluginInfo,
-        liteList);
-
-      for (File file : list) {
-        executeOnFile(file, index, model, jobPluginInfo, report);
+    return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<File>() {
+      @Override
+      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+        SimpleJobPluginInfo jobPluginInfo, Plugin<File> plugin, File object) {
+        executeOnFile(object, index, model, jobPluginInfo, report, cachedJob);
       }
-
-      jobPluginInfo.finalizeInfo();
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-
-      return report;
-
-    } catch (final JobException e) {
-      throw new PluginException("A job exception has occurred", e);
-    }
+    }, index, model, storage, liteList);
   }
 
   @Override
@@ -312,12 +298,12 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
    *          the {@link Report}.
    */
   private void executeOnFile(final File file, final IndexService index, final ModelService model,
-    final JobPluginInfo jobPluginInfo, final Report jobReport) {
+    final JobPluginInfo jobPluginInfo, final Report jobReport, final Job job) {
     LOGGER.debug("Processing File {}", file.getId());
 
     final String fileId = IdUtils.getFileId(file);
     final Report fileReport = PluginHelper.initPluginReportItem(this, fileId, File.class, AIPState.ACTIVE);
-    PluginHelper.updatePartialJobReport(this, model, index, fileReport, false);
+    PluginHelper.updatePartialJobReport(this, model, index, fileReport, false, job);
 
     try {
       final FileFormat fileFormat = index.retrieve(IndexedFile.class, fileId).getFileFormat();
@@ -362,7 +348,7 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
     }
 
     jobReport.addReport(fileReport);
-    PluginHelper.updatePartialJobReport(this, model, index, fileReport, true);
+    PluginHelper.updatePartialJobReport(this, model, index, fileReport, true, job);
   }
 
   /**

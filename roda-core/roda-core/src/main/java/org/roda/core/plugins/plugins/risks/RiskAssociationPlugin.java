@@ -151,18 +151,17 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
       List<T> list = PluginHelper.transformLitesIntoObjects(model, index, this, pluginReport, jobPluginInfo, liteList,
         job);
 
-      String jobId = PluginHelper.getJobId(this);
-
       if (!list.isEmpty() && riskIds != null) {
         List<String> risks = Arrays.asList(riskIds.split(","));
         Pair<SimpleJobPluginInfo, Report> jobInfo = new Pair<SimpleJobPluginInfo, Report>();
 
         if (list.get(0) instanceof AIP) {
-          jobInfo = addIncidenceToAIPList(model, index, list, risks, jobPluginInfo, pluginReport, job);
+          jobInfo = addIncidenceToAIPList(model, index, (List<AIP>) list, risks, jobPluginInfo, pluginReport, job);
         } else if (list.get(0) instanceof Representation) {
-          jobInfo = addIncidenceToRepresentationList(model, index, list, risks, jobPluginInfo, pluginReport, job);
+          jobInfo = addIncidenceToRepresentationList(model, index, (List<Representation>) list, risks, jobPluginInfo,
+            pluginReport, job);
         } else if (list.get(0) instanceof File) {
-          jobInfo = addIncidenceToFileList(model, index, list, risks, jobPluginInfo, pluginReport, job);
+          jobInfo = addIncidenceToFileList(model, index, (List<File>) list, risks, jobPluginInfo, pluginReport, job);
         }
 
         jobPluginInfo = jobInfo.getFirst();
@@ -190,11 +189,10 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
   }
 
   private <T extends Serializable> Pair<SimpleJobPluginInfo, Report> addIncidenceToAIPList(ModelService model,
-    IndexService index, List<T> list, List<String> risks, SimpleJobPluginInfo jobPluginInfo, Report pluginReport,
+    IndexService index, List<AIP> list, List<String> risks, SimpleJobPluginInfo jobPluginInfo, Report pluginReport,
     Job job) throws JobException {
 
-    List<AIP> aipList = (List<AIP>) list;
-    for (AIP aip : aipList) {
+    for (AIP aip : list) {
       PluginState state = PluginState.SUCCESS;
 
       for (String riskId : risks) {
@@ -232,11 +230,10 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
   }
 
   private <T extends Serializable> Pair<SimpleJobPluginInfo, Report> addIncidenceToRepresentationList(
-    ModelService model, IndexService index, List<T> list, List<String> risks, SimpleJobPluginInfo jobPluginInfo,
-    Report pluginReport, Job job) throws JobException {
+    ModelService model, IndexService index, List<Representation> list, List<String> risks,
+    SimpleJobPluginInfo jobPluginInfo, Report pluginReport, Job job) throws JobException {
 
-    List<Representation> representationList = (List<Representation>) list;
-    for (Representation representation : representationList) {
+    for (Representation representation : list) {
       PluginState state = PluginState.SUCCESS;
 
       for (String riskId : risks) {
@@ -276,11 +273,10 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
   }
 
   private <T extends Serializable> Pair<SimpleJobPluginInfo, Report> addIncidenceToFileList(ModelService model,
-    IndexService index, List<T> list, List<String> risks, SimpleJobPluginInfo jobPluginInfo, Report pluginReport,
+    IndexService index, List<File> list, List<String> risks, SimpleJobPluginInfo jobPluginInfo, Report pluginReport,
     Job job) throws JobException {
 
-    List<File> fileList = (List<File>) list;
-    for (File file : fileList) {
+    for (File file : list) {
       PluginState state = PluginState.SUCCESS;
 
       for (String riskId : risks) {

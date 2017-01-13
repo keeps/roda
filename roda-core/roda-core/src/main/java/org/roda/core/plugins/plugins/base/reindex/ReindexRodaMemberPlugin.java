@@ -18,9 +18,9 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -33,6 +33,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
@@ -96,15 +97,19 @@ public class ReindexRodaMemberPlugin extends AbstractPlugin<Void> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> list) throws PluginException {
+    return PluginHelper.processVoids(this, new RODAProcessingLogic<Void>() {
+      @Override
+      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+        SimpleJobPluginInfo jobPluginInfo, Plugin<Void> plugin) {
+        reindexRodaMembers(model, report, jobPluginInfo);
+      }
+    }, index, model, storage);
+  }
 
-    Report pluginReport = PluginHelper.initPluginReport(this);
+  private void reindexRodaMembers(ModelService model, Report pluginReport, SimpleJobPluginInfo jobPluginInfo) {
+    pluginReport.setPluginState(PluginState.SUCCESS);
 
     try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
-      jobPluginInfo.setSourceObjectsCount(0);
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-      pluginReport.setPluginState(PluginState.SUCCESS);
-
       List<User> users = model.listUsers();
       List<Group> groups = model.listGroups();
 
@@ -122,13 +127,10 @@ public class ReindexRodaMemberPlugin extends AbstractPlugin<Void> {
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
       }
 
-      jobPluginInfo.finalizeInfo();
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (JobException | GenericException e) {
-      LOGGER.error("Error reindexing RODA entity", e);
+    } catch (GenericException e) {
+      LOGGER.error("Error retrieving users/groups for reindexing", e);
+      pluginReport.setPluginState(PluginState.FAILURE);
     }
-
-    return pluginReport;
   }
 
   @Override

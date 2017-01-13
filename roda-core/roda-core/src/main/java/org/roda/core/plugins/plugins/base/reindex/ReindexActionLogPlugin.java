@@ -32,11 +32,11 @@ import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -47,6 +47,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
@@ -131,28 +132,24 @@ public class ReindexActionLogPlugin extends AbstractPlugin<Void> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> list) throws PluginException {
+    return PluginHelper.processVoids(this, new RODAProcessingLogic<Void>() {
+      @Override
+      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+        SimpleJobPluginInfo jobPluginInfo, Plugin<Void> plugin) {
+        reindexActionLogs(index, model, report, jobPluginInfo);
+      }
+    }, index, model, storage);
+  }
 
-    Report pluginReport = PluginHelper.initPluginReport(this);
+  private void reindexActionLogs(IndexService index, ModelService model, Report pluginReport,
+    SimpleJobPluginInfo jobPluginInfo) {
+    pluginReport.setPluginState(PluginState.SUCCESS);
 
-    try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
-      jobPluginInfo.setSourceObjectsCount(0);
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-      pluginReport.setPluginState(PluginState.SUCCESS);
-
-      Date firstDayToIndex = calculateFirstDayToIndex(dontReindexOlderThanXDays);
-      jobPluginInfo = reindexActionLogsStillNotInStorage(index, firstDayToIndex, pluginReport, jobPluginInfo,
-        dontReindexOlderThanXDays);
-      jobPluginInfo = reindexActionLogsInStorage(index, model, firstDayToIndex, pluginReport, jobPluginInfo,
-        dontReindexOlderThanXDays);
-
-      jobPluginInfo.finalizeInfo();
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (JobException e) {
-      LOGGER.error("Error reindexing RODA entity", e);
-    }
-
-    return pluginReport;
+    Date firstDayToIndex = calculateFirstDayToIndex(dontReindexOlderThanXDays);
+    jobPluginInfo = reindexActionLogsStillNotInStorage(index, firstDayToIndex, pluginReport, jobPluginInfo,
+      dontReindexOlderThanXDays);
+    jobPluginInfo = reindexActionLogsInStorage(index, model, firstDayToIndex, pluginReport, jobPluginInfo,
+      dontReindexOlderThanXDays);
   }
 
   private SimpleJobPluginInfo reindexActionLogsInStorage(IndexService index, ModelService model, Date firstDayToIndex,

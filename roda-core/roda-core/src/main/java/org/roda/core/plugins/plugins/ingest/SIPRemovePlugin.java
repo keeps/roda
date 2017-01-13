@@ -12,10 +12,6 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
@@ -27,6 +23,8 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.RODAObjectProcessingLogic;
+import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
@@ -71,36 +69,34 @@ public class SIPRemovePlugin extends AbstractPlugin<TransferredResource> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> liteList) throws PluginException {
-    Report report = PluginHelper.initPluginReport(this);
-    try {
-      Job job = PluginHelper.getJob(this, model);
-      List<TransferredResource> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, null,
-        liteList, job);
-
-      for (TransferredResource transferredResource : list) {
-        Report reportItem = PluginHelper.initPluginReportItem(this, transferredResource);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
-
-        try {
-          LOGGER.debug("Removing SIP {}", transferredResource.getFullPath());
-          model.deleteTransferredResource(transferredResource);
-          LOGGER.debug("Done with removing SIP {}", transferredResource.getFullPath());
-          // TODO: create event...
-          // PluginHelper.createPluginEvent(this, aipID, model, index, sources,
-          // targets, outcome, outcomeDetailExtension, notify)
-
-        } catch (RuntimeException e) {
-          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
-          LOGGER.error("Error removing transferred resource " + transferredResource.getFullPath(), e);
-        }
-        report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+    return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<TransferredResource>() {
+      @Override
+      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+        SimpleJobPluginInfo jobPluginInfo, Plugin<TransferredResource> plugin, TransferredResource object) {
+        processTransferredResource(index, model, report, cachedJob, object);
       }
-    } catch (AuthorizationDeniedException | NotFoundException | GenericException | RequestNotValidException e) {
-      throw new PluginException("A job exception has occurred", e);
-    }
+    }, index, model, storage, liteList);
+  }
 
-    return report;
+  private void processTransferredResource(IndexService index, ModelService model, Report report, Job job,
+    TransferredResource transferredResource) {
+    Report reportItem = PluginHelper.initPluginReportItem(this, transferredResource);
+    PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
+
+    try {
+      LOGGER.debug("Removing SIP {}", transferredResource.getFullPath());
+      model.deleteTransferredResource(transferredResource);
+      LOGGER.debug("Done with removing SIP {}", transferredResource.getFullPath());
+      // TODO: create event...
+      // PluginHelper.createPluginEvent(this, aipID, model, index, sources,
+      // targets, outcome, outcomeDetailExtension, notify)
+
+    } catch (RuntimeException e) {
+      reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
+      LOGGER.error("Error removing transferred resource " + transferredResource.getFullPath(), e);
+    }
+    report.addReport(reportItem);
+    PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
   }
 
   @Override

@@ -15,13 +15,9 @@ import java.util.UUID;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
@@ -40,6 +36,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
@@ -84,35 +81,29 @@ public class ReindexAllRodaEntitiesPlugin extends AbstractPlugin<Void> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> list) throws PluginException {
-    Report pluginReport = PluginHelper.initPluginReport(this);
-
-    try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-
-      Job job = PluginHelper.getJob(this, model);
-
-      List<Class<? extends IsRODAObject>> classes = PluginHelper.getReindexObjectClasses();
-      classes.remove(Job.class);
-      jobPluginInfo.setSourceObjectsCount(classes.size());
-
-      for (Class<? extends IsRODAObject> reindexClass : classes) {
-        Report reportItem = reindexRODAObject(model, reindexClass, jobPluginInfo);
-        if (reportItem != null) {
-          pluginReport.addReport(reportItem);
-          PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
-        }
+    final List<Class<? extends IsRODAObject>> classes = PluginHelper.getReindexObjectClasses();
+    classes.remove(Job.class);
+    return PluginHelper.processVoids(this, new RODAProcessingLogic<Void>() {
+      @Override
+      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+        SimpleJobPluginInfo jobPluginInfo, Plugin<Void> plugin) {
+        reindexAll(index, model, report, jobPluginInfo, cachedJob, classes);
       }
+    }, index, model, storage, classes.size());
+  }
 
-      pluginReport.setPluginState(PluginState.SUCCESS);
-      jobPluginInfo.finalizeInfo();
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (JobException | AuthorizationDeniedException | NotFoundException | GenericException
-      | RequestNotValidException e) {
-      LOGGER.error("Error reindexing RODA entity", e);
+  private void reindexAll(IndexService index, ModelService model, Report pluginReport,
+    SimpleJobPluginInfo jobPluginInfo, Job job, List<Class<? extends IsRODAObject>> classes) {
+
+    for (Class<? extends IsRODAObject> reindexClass : classes) {
+      Report reportItem = reindexRODAObject(model, reindexClass, jobPluginInfo);
+      if (reportItem != null) {
+        pluginReport.addReport(reportItem);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+      }
     }
 
-    return pluginReport;
+    pluginReport.setPluginState(PluginState.SUCCESS);
   }
 
   private Report reindexRODAObject(ModelService model, Class<? extends IsRODAObject> reindexClass,

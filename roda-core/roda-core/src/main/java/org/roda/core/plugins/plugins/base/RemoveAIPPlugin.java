@@ -16,7 +16,6 @@ import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
@@ -31,6 +30,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
@@ -73,43 +73,36 @@ public class RemoveAIPPlugin extends AbstractPlugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> liteList) throws PluginException {
-    Report report = PluginHelper.initPluginReport(this);
-
-    try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-
-      Job job = PluginHelper.getJob(this, model);
-      List<AIP> aips = PluginHelper.transformLitesIntoObjects(model, index, this, report, jobPluginInfo, liteList, job);
-
-      for (AIP aip : aips) {
-        String error = null;
-        try {
-          LOGGER.debug("Removing AIP {}", aip.getId());
-          model.deleteAIP(aip.getId());
-        } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-          error = e.getMessage();
-        }
-        Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
-        if (error != null) {
-          reportItem.setPluginState(PluginState.FAILURE)
-            .setPluginDetails("Removal of AIP " + aip.getId() + " did not end successfully: " + error);
-          jobPluginInfo.incrementObjectsProcessedWithFailure();
-        } else {
-          reportItem.setPluginState(PluginState.SUCCESS)
-            .setPluginDetails("Removal of AIP " + aip.getId() + " ended successfully");
-          jobPluginInfo.incrementObjectsProcessedWithSuccess();
-        }
-        report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+    return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<AIP>() {
+      @Override
+      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+        SimpleJobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {
+        processAIP(index, model, report, jobPluginInfo, cachedJob, object);
       }
-      jobPluginInfo.finalizeInfo();
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (JobException | AuthorizationDeniedException | NotFoundException | GenericException
-      | RequestNotValidException e) {
-      LOGGER.error("Could not update Job information");
+    }, index, model, storage, liteList);
+  }
+
+  private void processAIP(IndexService index, ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo,
+    Job job, AIP aip) {
+    String error = null;
+    try {
+      LOGGER.debug("Removing AIP {}", aip.getId());
+      model.deleteAIP(aip.getId());
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+      error = e.getMessage();
     }
-    return report;
+    Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
+    if (error != null) {
+      reportItem.setPluginState(PluginState.FAILURE)
+        .setPluginDetails("Removal of AIP " + aip.getId() + " did not end successfully: " + error);
+      jobPluginInfo.incrementObjectsProcessedWithFailure();
+    } else {
+      reportItem.setPluginState(PluginState.SUCCESS)
+        .setPluginDetails("Removal of AIP " + aip.getId() + " ended successfully");
+      jobPluginInfo.incrementObjectsProcessedWithSuccess();
+    }
+    report.addReport(reportItem);
+    PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
   }
 
   @Override

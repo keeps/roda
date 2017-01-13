@@ -20,12 +20,12 @@ import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -36,6 +36,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
@@ -99,15 +100,21 @@ public class ReindexPreservationAgentPlugin extends AbstractPlugin<Void> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> list) throws PluginException {
-    Report pluginReport = PluginHelper.initPluginReport(this);
+    return PluginHelper.processVoids(this, new RODAProcessingLogic<Void>() {
+      @Override
+      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+        SimpleJobPluginInfo jobPluginInfo, Plugin<Void> plugin) {
+        reindexPreservationAgents(model, report, jobPluginInfo);
+      }
+    }, index, model, storage);
+  }
 
+  private void reindexPreservationAgents(ModelService model, Report pluginReport, SimpleJobPluginInfo jobPluginInfo) {
+    pluginReport.setPluginState(PluginState.SUCCESS);
+
+    CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable = null;
     try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
-      jobPluginInfo.setSourceObjectsCount(0);
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-      pluginReport.setPluginState(PluginState.SUCCESS);
-
-      CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable = model.listPreservationAgents();
+      iterable = model.listPreservationAgents();
       int agentCounter = 0;
 
       for (OptionalWithCause<PreservationMetadata> opm : iterable) {
@@ -121,17 +128,13 @@ public class ReindexPreservationAgentPlugin extends AbstractPlugin<Void> {
         }
         agentCounter++;
       }
-      IOUtils.closeQuietly(iterable);
       jobPluginInfo.setSourceObjectsCount(agentCounter);
-
-      jobPluginInfo.finalizeInfo();
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (JobException | RequestNotValidException | GenericException | AuthorizationDeniedException e) {
-      LOGGER.error("Error reindexing RODA entity", e);
-      pluginReport.setPluginState(PluginState.FAILURE).setPluginDetails("Could not list preservation agents");
+    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
+      LOGGER.error("Error getting preservation agents to be reindexed", e);
+      pluginReport.setPluginState(PluginState.FAILURE);
+    } finally {
+      IOUtils.closeQuietly(iterable);
     }
-
-    return pluginReport;
   }
 
   @Override

@@ -17,7 +17,6 @@ import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
@@ -38,6 +37,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
@@ -82,51 +82,52 @@ public class CleanupFailedIngestAIPsPlugin extends AbstractPlugin<Void> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> objects) throws PluginException {
-    Report report = PluginHelper.initPluginReport(this);
-
-    try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, 0);
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-
-      // jobs that are running
-      List<String> activeJobsIds = findActiveJobs(index);
-      // remove self
-      activeJobsIds.remove(PluginHelper.getJobId(this));
-
-      // find & delete aips
-      IterableIndexResult<IndexedAIP> aipsToDelete = findAipsToDelete(index, activeJobsIds);
-      Job job = PluginHelper.getJob(this, model);
-      for (IndexedAIP indexedAIP : aipsToDelete) {
-        String error = null;
+    return PluginHelper.processVoids(this, new RODAProcessingLogic<Void>() {
+      @Override
+      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+        SimpleJobPluginInfo jobPluginInfo, Plugin<Void> plugin) {
         try {
-          LOGGER.debug("Removing unwanted AIP {}", indexedAIP.getId());
-          model.deleteAIP(indexedAIP.getId());
-        } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-          error = e.getMessage();
+          processAIPs(index, model, report, cachedJob, jobPluginInfo);
+        } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+          LOGGER.error("Could not update Job information");
         }
-        Report reportItem = PluginHelper.initPluginReportItem(this, indexedAIP.getId(), AIP.class,
-          AIPState.INGEST_PROCESSING);
-        if (error != null) {
-          reportItem.setPluginState(PluginState.FAILURE)
-            .setPluginDetails("Removal of AIP " + indexedAIP.getId() + " did not end successfully: " + error);
-          jobPluginInfo.incrementObjectsProcessedWithFailure();
-        } else {
-          reportItem.setPluginState(PluginState.SUCCESS)
-            .setPluginDetails("Removal of AIP " + indexedAIP.getId() + " ended successfully");
-          jobPluginInfo.incrementObjectsProcessedWithSuccess();
-        }
-        report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
       }
-      jobPluginInfo.setSourceObjectsCount((int) aipsToDelete.getTotalObjects());
-      jobPluginInfo.finalizeInfo();
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (JobException | AuthorizationDeniedException | NotFoundException | GenericException
-      | RequestNotValidException e) {
-      LOGGER.error("Could not update Job information");
-    }
+    }, index, model, storage);
+  }
 
-    return report;
+  private void processAIPs(IndexService index, ModelService model, Report report, Job job,
+    SimpleJobPluginInfo jobPluginInfo)
+    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+    // jobs that are running
+    List<String> activeJobsIds = findActiveJobs(index);
+    // remove self
+    activeJobsIds.remove(job.getId());
+
+    // find & delete aips
+    IterableIndexResult<IndexedAIP> aipsToDelete = findAipsToDelete(index, activeJobsIds);
+    for (IndexedAIP indexedAIP : aipsToDelete) {
+      String error = null;
+      try {
+        LOGGER.debug("Removing unwanted AIP {}", indexedAIP.getId());
+        model.deleteAIP(indexedAIP.getId());
+      } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+        error = e.getMessage();
+      }
+      Report reportItem = PluginHelper.initPluginReportItem(this, indexedAIP.getId(), AIP.class,
+        AIPState.INGEST_PROCESSING);
+      if (error != null) {
+        reportItem.setPluginState(PluginState.FAILURE)
+          .setPluginDetails("Removal of AIP " + indexedAIP.getId() + " did not end successfully: " + error);
+        jobPluginInfo.incrementObjectsProcessedWithFailure();
+      } else {
+        reportItem.setPluginState(PluginState.SUCCESS)
+          .setPluginDetails("Removal of AIP " + indexedAIP.getId() + " ended successfully");
+        jobPluginInfo.incrementObjectsProcessedWithSuccess();
+      }
+      report.addReport(reportItem);
+      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+    }
+    jobPluginInfo.setSourceObjectsCount((int) aipsToDelete.getTotalObjects());
   }
 
   private List<String> findActiveJobs(IndexService index) {

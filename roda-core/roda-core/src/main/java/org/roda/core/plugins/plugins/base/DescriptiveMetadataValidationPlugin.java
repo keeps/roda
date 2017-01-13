@@ -14,12 +14,7 @@ import java.util.List;
 import org.roda.core.common.validation.ValidationUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.JobException;
-import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
@@ -35,6 +30,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
@@ -66,6 +62,12 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
   public static final PluginParameter PARAMETER_VALIDATE_PREMIS = new PluginParameter("parameter.validate_premis",
     "Validate PREMIS", PluginParameterType.BOOLEAN, "true", true, false,
     "Validate PREMIS metadata that exists inside the information package.");
+
+  private boolean validateDescriptiveMetadata;
+  private boolean validatePremis;
+  private boolean forceDescriptiveMetadataType;
+  private String metadataType;
+  private String metadataVersion;
 
   @Override
   public void init() throws PluginException {
@@ -115,73 +117,54 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> liteList) throws PluginException {
-
-    boolean validateDescriptiveMetadata = PluginHelper.getBooleanFromParameters(this,
-      PARAMETER_VALIDATE_DESCRIPTIVE_METADATA);
-    boolean validatePremis = PluginHelper.getBooleanFromParameters(this, PARAMETER_VALIDATE_PREMIS);
-    boolean forceDescriptiveMetadataType = PluginHelper.getBooleanFromParameters(this,
+    validateDescriptiveMetadata = PluginHelper.getBooleanFromParameters(this, PARAMETER_VALIDATE_DESCRIPTIVE_METADATA);
+    validatePremis = PluginHelper.getBooleanFromParameters(this, PARAMETER_VALIDATE_PREMIS);
+    forceDescriptiveMetadataType = PluginHelper.getBooleanFromParameters(this,
       PARAMETER_FORCE_DESCRIPTIVE_METADATA_TYPE);
-    String metadataType = PluginHelper.getStringFromParameters(this, PARAMETER_METADATA_TYPE);
-    String metadataVersion = PluginHelper.getStringFromParameters(this, PARAMETER_METADATA_VERSION);
+    metadataType = PluginHelper.getStringFromParameters(this, PARAMETER_METADATA_TYPE);
+    metadataVersion = PluginHelper.getStringFromParameters(this, PARAMETER_METADATA_VERSION);
 
-    Report pluginReport = PluginHelper.initPluginReport(this);
-    List<ValidationReport> reports = new ArrayList<ValidationReport>();
+    return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<AIP>() {
+      @Override
+      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+        SimpleJobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {
+        processAIP(index, model, report, jobPluginInfo, cachedJob, object);
+      }
+    }, index, model, storage, liteList);
+  }
+
+  private void processAIP(IndexService index, ModelService model, Report pluginReport,
+    SimpleJobPluginInfo jobPluginInfo, Job job, AIP aip) {
+
+    Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
+    PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
+    PluginState state = PluginState.SUCCESS;
 
     try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-
-      Job job = PluginHelper.getJob(this, model);
-      List<AIP> list = PluginHelper.transformLitesIntoObjects(model, index, this, pluginReport, jobPluginInfo, liteList,
-        job);
-
-      try {
-        for (AIP aip : list) {
-          Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class,
-            AIPState.INGEST_PROCESSING);
-          PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
-          PluginState state = PluginState.SUCCESS;
-
-          try {
-            LOGGER.debug("Validating AIP {}", aip.getId());
-            ValidationReport report = ValidationUtils.isAIPMetadataValid(forceDescriptiveMetadataType,
-              validateDescriptiveMetadata, metadataType, metadataVersion, validatePremis, model, aip.getId());
-            reports.add(report);
-            if (report.isValid()) {
-              reportItem.setPluginState(state);
-            } else {
-              state = PluginState.FAILURE;
-              reportItem.setPluginState(state).setHtmlPluginDetails(true).setPluginDetails(report.toHtml(false, false));
-            }
-          } catch (RODAException mse) {
-            state = PluginState.FAILURE;
-            LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage(), mse);
-          }
-
-          try {
-            boolean notify = true;
-            createEvent(aip, model, index, reportItem.getPluginState(), notify);
-            jobPluginInfo.incrementObjectsProcessed(state);
-
-            pluginReport.addReport(reportItem);
-            PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
-          } catch (PluginException | RuntimeException e) {
-            LOGGER.error("Error updating job report", e);
-          }
-        }
-      } catch (ClassCastException e) {
-        LOGGER.error("Trying to execute an AIP-only plugin with other objects");
-        jobPluginInfo.incrementObjectsProcessedWithFailure(list.size());
+      LOGGER.debug("Validating AIP {}", aip.getId());
+      ValidationReport report = ValidationUtils.isAIPMetadataValid(forceDescriptiveMetadataType,
+        validateDescriptiveMetadata, metadataType, metadataVersion, validatePremis, model, aip.getId());
+      if (report.isValid()) {
+        reportItem.setPluginState(state);
+      } else {
+        state = PluginState.FAILURE;
+        reportItem.setPluginState(state).setHtmlPluginDetails(true).setPluginDetails(report.toHtml(false, false));
       }
-
-      jobPluginInfo.finalizeInfo();
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (JobException | AuthorizationDeniedException | NotFoundException | GenericException
-      | RequestNotValidException e) {
-      throw new PluginException("A job exception has occurred", e);
+    } catch (RODAException mse) {
+      state = PluginState.FAILURE;
+      LOGGER.error("Error processing AIP {}: {}", aip.getId(), mse.getMessage(), mse);
     }
 
-    return pluginReport;
+    try {
+      boolean notify = true;
+      createEvent(aip, model, index, reportItem.getPluginState(), notify);
+      jobPluginInfo.incrementObjectsProcessed(state);
+
+      pluginReport.addReport(reportItem);
+      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+    } catch (PluginException | RuntimeException e) {
+      LOGGER.error("Error updating job report", e);
+    }
   }
 
   private void createEvent(AIP aip, ModelService model, IndexService index, PluginState state, boolean notify)

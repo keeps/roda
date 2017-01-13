@@ -43,6 +43,7 @@ import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LinkingObjectUtils;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.LiteRODAObject;
+import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
@@ -80,6 +81,10 @@ import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
+import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.RODAObjectProcessingLogic;
+import org.roda.core.plugins.RODAObjectsProcessingLogic;
+import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.IngestJobPluginInfo;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
@@ -105,6 +110,130 @@ public final class PluginHelper {
   private static final Logger LOGGER = LoggerFactory.getLogger(PluginHelper.class);
 
   private PluginHelper() {
+  }
+
+  public static <T extends IsRODAObject> Report processObjects(Plugin<T> plugin,
+    RODAObjectsProcessingLogic<T> objectsLogic, IndexService index, ModelService model, StorageService storage,
+    List<LiteOptionalWithCause> liteList) throws PluginException {
+    Report report = PluginHelper.initPluginReport(plugin);
+
+    try {
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(plugin, liteList.size());
+      PluginHelper.updateJobInformation(plugin, jobPluginInfo);
+
+      Job job = PluginHelper.getJob(plugin, model);
+      List<T> list = PluginHelper.transformLitesIntoObjects(model, index, plugin, report, jobPluginInfo, liteList, job);
+
+      try {
+        objectsLogic.process(index, model, storage, report, job, jobPluginInfo, plugin, list);
+      } catch (Exception e) {
+        LOGGER.error("Unexpected exception during 'objectsLogic' execution", e);
+      }
+
+      jobPluginInfo.finalizeInfo();
+      PluginHelper.updateJobInformation(plugin, jobPluginInfo);
+    } catch (JobException | AuthorizationDeniedException | RequestNotValidException | GenericException
+      | NotFoundException e) {
+      throw new PluginException("A job exception has occurred", e);
+    }
+
+    return report;
+  }
+
+  public static <T extends IsRODAObject> Report processObjects(Plugin<T> plugin, RODAProcessingLogic<T> beforeLogic,
+    RODAObjectProcessingLogic<T> perObjectLogic, RODAProcessingLogic<T> afterLogic, IndexService index,
+    ModelService model, StorageService storage, List<LiteOptionalWithCause> liteList) throws PluginException {
+    Report report = PluginHelper.initPluginReport(plugin);
+
+    try {
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(plugin, liteList.size());
+      PluginHelper.updateJobInformation(plugin, jobPluginInfo);
+
+      Job job = PluginHelper.getJob(plugin, model);
+      List<T> list = PluginHelper.transformLitesIntoObjects(model, index, plugin, report, jobPluginInfo, liteList, job);
+
+      if (beforeLogic != null) {
+        try {
+          beforeLogic.process(index, model, storage, report, job, jobPluginInfo, plugin);
+        } catch (Exception e) {
+          LOGGER.error("Unexpected exception during 'beforeLogic' execution", e);
+        }
+      }
+
+      for (T object : list) {
+        try {
+          perObjectLogic.process(index, model, storage, report, job, jobPluginInfo, plugin, object);
+        } catch (Exception e) {
+          LOGGER.error("Unexpected exception during 'perObjectLogic' execution", e);
+        }
+      }
+
+      if (afterLogic != null) {
+        try {
+          afterLogic.process(index, model, storage, report, job, jobPluginInfo, plugin);
+        } catch (Exception e) {
+          LOGGER.error("Unexpected exception during 'afterLogic' execution", e);
+        }
+      }
+
+      jobPluginInfo.finalizeInfo();
+      PluginHelper.updateJobInformation(plugin, jobPluginInfo);
+    } catch (JobException | AuthorizationDeniedException | RequestNotValidException | GenericException
+      | NotFoundException e) {
+      throw new PluginException("A job exception has occurred", e);
+    }
+
+    return report;
+  }
+
+  public static <T extends IsRODAObject> Report processObjects(Plugin<T> plugin, RODAProcessingLogic<T> beforeLogic,
+    RODAObjectProcessingLogic<T> perObjectLogic, IndexService index, ModelService model, StorageService storage,
+    List<LiteOptionalWithCause> liteList) throws PluginException {
+    return processObjects(plugin, beforeLogic, perObjectLogic, null, index, model, storage, liteList);
+  }
+
+  public static <T extends IsRODAObject> Report processObjects(Plugin<T> plugin,
+    RODAObjectProcessingLogic<T> perObjectLogic, RODAProcessingLogic<T> afterLogic, IndexService index,
+    ModelService model, StorageService storage, List<LiteOptionalWithCause> liteList) throws PluginException {
+    return processObjects(plugin, null, perObjectLogic, afterLogic, index, model, storage, liteList);
+  }
+
+  public static <T extends IsRODAObject> Report processObjects(Plugin<T> plugin,
+    RODAObjectProcessingLogic<T> perObjectLogic, IndexService index, ModelService model, StorageService storage,
+    List<LiteOptionalWithCause> liteList) throws PluginException {
+    return processObjects(plugin, null, perObjectLogic, null, index, model, storage, liteList);
+  }
+
+  public static Report processVoids(Plugin<Void> plugin, RODAProcessingLogic<Void> logic, IndexService index,
+    ModelService model, StorageService storage) throws PluginException {
+    return processVoids(plugin, logic, index, model, storage, 0);
+  }
+
+  public static Report processVoids(Plugin<Void> plugin, RODAProcessingLogic<Void> logic, IndexService index,
+    ModelService model, StorageService storage, int setSourceObjectsCount) throws PluginException {
+    Report report = PluginHelper.initPluginReport(plugin);
+
+    try {
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(plugin, 0);
+      jobPluginInfo.setSourceObjectsCount(setSourceObjectsCount);
+      PluginHelper.updateJobInformation(plugin, jobPluginInfo);
+
+      Job job = PluginHelper.getJob(plugin, model);
+
+      try {
+        logic.process(index, model, storage, report, job, jobPluginInfo, plugin);
+      } catch (Exception e) {
+        LOGGER.error("Unexpected exception during 'logic' execution", e);
+      }
+
+      jobPluginInfo.finalizeInfo();
+      PluginHelper.updateJobInformation(plugin, jobPluginInfo);
+    } catch (JobException | AuthorizationDeniedException | RequestNotValidException | GenericException
+      | NotFoundException e) {
+      throw new PluginException("A job exception has occurred", e);
+    }
+
+    return report;
   }
 
   /***************** Job report related *****************/
@@ -1043,19 +1172,33 @@ public final class PluginHelper {
     for (LiteOptionalWithCause lite : lites) {
       String failureMessage = "";
 
-      if (lite.isPresent()) {
-        OptionalWithCause<T> retrievedObject = (OptionalWithCause<T>) model
-          .retrieveObjectFromLite(lite.getLite().get());
-        if (retrievedObject.isPresent()) {
-          finalObjects.add(retrievedObject.get());
-        } else {
-          RODAException exception = retrievedObject.getCause();
-          if (exception != null) {
-            failureMessage = "RODA object conversion from lite throwed an error: [" + exception.getClass().getName()
-              + "] " + exception.getMessage();
-          } else {
-            failureMessage = "RODA object conversion from lite throwed an error.";
+      if (lite.isPresent() && StringUtils.isNotBlank(lite.getLite().get().getInfo())) {
+        boolean objectMatchPluginKnownObjectsClass = false;
+
+        String liteString = lite.getLite().get().getInfo();
+        for (Class<T> pluginClass : plugin.getObjectClasses()) {
+          if (liteString.startsWith(pluginClass.getName())) {
+            objectMatchPluginKnownObjectsClass = true;
+            break;
           }
+        }
+
+        if (objectMatchPluginKnownObjectsClass) {
+          OptionalWithCause<T> retrievedObject = (OptionalWithCause<T>) model
+            .retrieveObjectFromLite(lite.getLite().get());
+          if (retrievedObject.isPresent()) {
+            finalObjects.add(retrievedObject.get());
+          } else {
+            RODAException exception = retrievedObject.getCause();
+            if (exception != null) {
+              failureMessage = "RODA object conversion from lite throwed an error: [" + exception.getClass().getName()
+                + "] " + exception.getMessage();
+            } else {
+              failureMessage = "RODA object conversion from lite throwed an error.";
+            }
+          }
+        } else {
+          failureMessage = "RODA object conversion from lite has failed because lite object class does not match any of the plugin known object classes (which might be caused by blank lite)";
         }
       } else {
         failureMessage = "Lite object has an error: [" + lite.getExceptionClass() + "] " + lite.getExceptionMessage();

@@ -17,7 +17,6 @@ import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
@@ -28,20 +27,19 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 // FIXME 20161202 hsilva: expose params PLUGIN_PARAMS_PARENT_ID & PLUGIN_PARAMS_OTHER_JOB_ID
 public class FixAncestorsPlugin extends AbstractPlugin<Void> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(FixAncestorsPlugin.class);
 
   private String originalJobId;
 
@@ -90,33 +88,47 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> list) throws PluginException {
+
+    final int counter = calculateSourceObjectsCount(index);
+    return PluginHelper.processVoids(this, new RODAProcessingLogic<Void>() {
+      @Override
+      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+        SimpleJobPluginInfo jobPluginInfo, Plugin<Void> plugin) {
+        fixAncestors(index, model, report, cachedJob, jobPluginInfo, jobPluginInfo.getSourceObjectsCount());
+      }
+    }, index, model, storage, counter);
+  }
+
+  private int calculateSourceObjectsCount(IndexService index) {
+    int count;
     try {
-      int counter = index.count(IndexedAIP.class,
+      count = index.count(IndexedAIP.class,
         new Filter(new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.TRUE.toString()))).intValue();
 
       // XXX 20160929 Is it really needed? (it is there to be possible to get
       // 100% done reports)
-      if (counter == 0) {
-        counter = index.count(IndexedAIP.class, Filter.ALL).intValue();
+      if (count == 0) {
+        count = index.count(IndexedAIP.class, Filter.ALL).intValue();
       }
+    } catch (RequestNotValidException | GenericException e) {
+      count = 0;
+    }
+    return count;
+  }
 
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, counter);
-      jobPluginInfo.setSourceObjectsCount(counter);
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-
+  private void fixAncestors(IndexService index, ModelService model, Report report, Job cachedJob,
+    SimpleJobPluginInfo jobPluginInfo, int counter) {
+    try {
       Optional<String> computedSearchScope = PluginHelper.getSearchScopeFromParameters(this, model);
       Job originalJob = PluginHelper.getJob(originalJobId, model);
       PluginHelper.fixParents(index, model, Optional.ofNullable(originalJob.getId()), computedSearchScope);
-
       jobPluginInfo.incrementObjectsProcessedWithSuccess(counter);
-      jobPluginInfo.finalizeInfo();
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | JobException
-      | NotFoundException e) {
-      LOGGER.error("Error while fixing the ancestors.", e);
+      report.setPluginState(PluginState.SUCCESS);
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      jobPluginInfo.incrementObjectsProcessedWithFailure(counter);
+      report.setPluginState(PluginState.FAILURE);
     }
 
-    return PluginHelper.initPluginReport(this);
   }
 
   @Override
