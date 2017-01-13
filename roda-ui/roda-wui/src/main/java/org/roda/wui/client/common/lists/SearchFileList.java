@@ -158,7 +158,7 @@ public class SearchFileList extends BasicAsyncTableCell<IndexedFile> {
     sizeColumn.setCellStyleNames("text-align-right");
     
     // define default sorting
-    display.getColumnSortList().push(new ColumnSortInfo(pathColumn, false));
+    display.getColumnSortList().push(new ColumnSortInfo(pathColumn, true));
 
     addStyleName("my-files-table");
 

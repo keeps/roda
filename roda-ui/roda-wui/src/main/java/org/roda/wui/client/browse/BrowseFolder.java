@@ -419,11 +419,11 @@ public class BrowseFolder extends Composite {
                 String repId = folder.getRepresentationId();
                 String folderUUID = folder.getUUID();
                 BrowserService.Util.getInstance().createFolder(aipId, repId, folderUUID, newName, details,
-                  new LoadingAsyncCallback<String>() {
+                  new LoadingAsyncCallback<IndexedFile>() {
 
                     @Override
-                    public void onSuccessImpl(String newUUID) {
-                      filesList.refresh();
+                    public void onSuccessImpl(IndexedFile newFolder) {
+                      HistoryUtils.openBrowse(newFolder);
                     }
 
                     @Override

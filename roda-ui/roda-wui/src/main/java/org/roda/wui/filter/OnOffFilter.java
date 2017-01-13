@@ -82,7 +82,9 @@ public class OnOffFilter implements Filter {
 
   @Override
   public void destroy() {
-    this.innerFilter.destroy();
+    if (this.innerFilter != null) {
+      this.innerFilter.destroy();
+    }
   }
 
   /**

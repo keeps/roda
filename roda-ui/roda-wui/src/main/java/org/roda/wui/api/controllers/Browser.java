@@ -1929,8 +1929,8 @@ public class Browser extends RodaWuiController {
       RodaConstants.CONTROLLER_FILES_PARAM, selectedFiles, RodaConstants.CONTROLLER_FILE_PARAM, toFolder);
   }
 
-  public static String createFolder(User user, String aipId, String representationId, String folderUUID, String newName,
-    String details) throws AuthorizationDeniedException, GenericException, RequestNotValidException,
+  public static IndexedFile createFolder(User user, String aipId, String representationId, String folderUUID,
+    String newName, String details) throws AuthorizationDeniedException, GenericException, RequestNotValidException,
     AlreadyExistsException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1938,7 +1938,7 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
 
     // delegate
-    String ret = BrowserHelper.createFolder(user, aipId, representationId, folderUUID, newName, details);
+    IndexedFile ret = BrowserHelper.createFolder(user, aipId, representationId, folderUUID, newName, details);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_FILE_UUID_PARAM,

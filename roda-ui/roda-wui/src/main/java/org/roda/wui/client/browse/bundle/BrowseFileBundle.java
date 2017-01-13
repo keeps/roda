@@ -22,7 +22,8 @@ public class BrowseFileBundle implements Serializable {
   private IndexedAIP aip;
   private IndexedRepresentation representation;
   private IndexedFile file;
-  private long totalSiblingCount;
+  private Long totalSiblingCount;
+  private Long dipCount;
 
   public BrowseFileBundle() {
     super();
@@ -60,12 +61,20 @@ public class BrowseFileBundle implements Serializable {
     this.file = file;
   }
 
-  public long getTotalSiblingCount() {
+  public Long getTotalSiblingCount() {
     return totalSiblingCount;
   }
 
-  public void setTotalSiblingCount(long totalSiblingCount) {
+  public void setTotalSiblingCount(Long totalSiblingCount) {
     this.totalSiblingCount = totalSiblingCount;
+  }
+
+  public Long getDipCount() {
+    return dipCount;
+  }
+
+  public void setDipCount(Long dipCount) {
+    this.dipCount = dipCount;
   }
 
 }

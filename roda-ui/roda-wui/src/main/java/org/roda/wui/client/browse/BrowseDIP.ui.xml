@@ -17,12 +17,10 @@
 
 	<g:FocusPanel ui:field="keyboardFocus">
 		<g:FlowPanel styleName="viewRepresentationFile">
-			<g:FlowPanel addStyleNames="filePreviewToolbar">
-				<g:Label addStyleNames="browseItemHeader">
-					<ui:text from='{messages.catalogueFileTitle}' />
-					&rsaquo;
-				</g:Label>
-				<m:BreadcrumbPanel ui:field="fileBreadcrumb"
+			<g:FlowPanel addStyleNames="filePreviewToolbar" ui:field="refererToolbar">
+				<g:Label addStyleNames="browseItemHeader" ui:field="refererTitle" />
+				<g:HTML styleName="browseItemHeader-charot">&rsaquo;</g:HTML>
+				<m:BreadcrumbPanel ui:field="refererBreadcrumb"
 					addStyleNames="viewRepresentationBreadcrumb" />
 				<g:FlowPanel addStyleNames="filePreviewToolbarIcons">
 					<g:FocusPanel ui:field="disseminationsButton"
@@ -37,13 +35,13 @@
 							<i class="fa fa-info-circle"></i>
 						</g:HTML>
 					</g:FocusPanel>
-					<g:FocusPanel ui:field="filePreviousButton"
+					<g:FocusPanel ui:field="refererPreviousButton"
 						addStyleNames="toolbarLink" title="CTRL &#8678;">
 						<g:HTML>
 							<i class="fa fa-chevron-left"></i>
 						</g:HTML>
 					</g:FocusPanel>
-					<g:FocusPanel ui:field="fileNextButton" addStyleNames="toolbarLink"
+					<g:FocusPanel ui:field="refererNextButton" addStyleNames="toolbarLink"
 						title="CTRL &#8680;">
 						<g:HTML>
 							<i class="fa fa-chevron-right"></i>

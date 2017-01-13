@@ -10,6 +10,7 @@
  */
 package org.roda.wui.client.browse;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
@@ -62,6 +63,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionChangeEvent.Handler;
@@ -107,13 +109,19 @@ public class BrowseDIP extends Composite {
   FocusPanel keyboardFocus;
 
   @UiField
-  BreadcrumbPanel fileBreadcrumb, breadcrumb;
+  FlowPanel refererToolbar;
+
+  @UiField
+  Label refererTitle;
+
+  @UiField
+  BreadcrumbPanel refererBreadcrumb, breadcrumb;
 
   @UiField
   FlowPanel center;
 
   @UiField
-  FocusPanel previousButton, nextButton, downloadButton;
+  FocusPanel previousButton, nextButton, refererPreviousButton, refererNextButton, downloadButton;
 
   // state
   Sorter sorter;
@@ -179,6 +187,27 @@ public class BrowseDIP extends Composite {
       }
     });
 
+    List<IndexedAIP> aipAncestors = new ArrayList<IndexedAIP>();
+
+    if (aip != null && representation != null && file != null) {
+      refererTitle.setText(file.isDirectory() ? messages.catalogueFolderTitle() : messages.catalogueFileTitle());
+      refererBreadcrumb.updatePath(BreadcrumbUtils.getFileBreadcrumbs(aip, representation, file));
+      refererBreadcrumb.setVisible(true);
+
+      LastSelectedItemsSingleton.getInstance().getLastSelectionDetails();
+
+    } else if (aip != null && representation != null) {
+      refererTitle.setText(messages.catalogueRepresentationTitle());
+      refererBreadcrumb.updatePath(BreadcrumbUtils.getRepresentationBreadcrumbs(aipAncestors, aip, representation));
+      refererBreadcrumb.setVisible(true);
+    } else if (aip != null) {
+      refererTitle.setText(messages.catalogueItemTitle());
+      refererBreadcrumb.updatePath(BreadcrumbUtils.getAipBreadcrumbs(aipAncestors, aip));
+      refererBreadcrumb.setVisible(true);
+    } else {
+      refererToolbar.setVisible(false);
+    }
+
   }
 
   @Override
@@ -228,9 +257,6 @@ public class BrowseDIP extends Composite {
     // update breadcrumb
     breadcrumb.updatePath(getBreadcrumbs());
     breadcrumb.setVisible(true);
-
-    fileBreadcrumb.updatePath(BreadcrumbUtils.getFileBreadcrumbs(aip, representation, file));
-    fileBreadcrumb.setVisible(true);
   }
 
   private void show() {
@@ -340,6 +366,28 @@ public class BrowseDIP extends Composite {
   @UiHandler("nextButton")
   void nextButtonHandler(ClickEvent e) {
     next();
+  }
+
+  private void refererPrevious() {
+    if (refererIndex > 0) {
+//      open(bundle.getFile().getParentUUID(), sorter, index - 1);
+    }
+  }
+
+  private void refererNext() {
+    if (refererIndex < bundle.getTotalRefererSiblingCount() - 1) {
+//      open(bundle.getFile().getParentUUID(), sorter, index + 1);
+    }
+  }
+
+  @UiHandler("refererPreviousButton")
+  void refererPreviousButtonHandler(ClickEvent e) {
+    refererPrevious();
+  }
+
+  @UiHandler("refererNextButton")
+  void refererNextButtonHandler(ClickEvent e) {
+    refererNext();
   }
 
   @UiHandler("downloadButton")

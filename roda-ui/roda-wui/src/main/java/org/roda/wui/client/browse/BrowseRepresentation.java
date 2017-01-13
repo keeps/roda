@@ -789,11 +789,11 @@ public class BrowseRepresentation extends Composite {
               @Override
               public void onSuccess(final String details) {
                 BrowserService.Util.getInstance().createFolder(aipId, repId, null, newName, details,
-                  new LoadingAsyncCallback<String>() {
+                  new LoadingAsyncCallback<IndexedFile>() {
 
                     @Override
-                    public void onSuccessImpl(String newUUID) {
-                      filesList.refresh();
+                    public void onSuccessImpl(IndexedFile newFolder) {
+                      HistoryUtils.openBrowse(newFolder);
                     }
 
                     @Override

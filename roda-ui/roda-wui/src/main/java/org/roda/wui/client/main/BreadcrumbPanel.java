@@ -190,7 +190,7 @@ public class BreadcrumbPanel extends FlowPanel {
      */
     public void setLast(boolean last) {
       this.last = last;
-      this.setEnabled(!last);
+      // this.setEnabled(!last);
       if (last) {
         this.addStyleName("breadcrumb-last");
       } else {

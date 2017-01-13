@@ -251,7 +251,8 @@ public class BrowserHelper {
     bundle.setAip(aip);
     bundle.setRepresentation(
       retrieve(IndexedRepresentation.class, IdUtils.getRepresentationId(aip.getId(), representationId)));
-    bundle.setFile(retrieve(IndexedFile.class, IdUtils.getFileId(aip.getId(), representationId, filePath, fileId)));
+    String fileUUID = IdUtils.getFileId(aip.getId(), representationId, filePath, fileId);
+    bundle.setFile(retrieve(IndexedFile.class, fileUUID));
 
     // set aip ancestors
     try {
@@ -273,6 +274,11 @@ public class BrowserHelper {
     }
 
     bundle.setTotalSiblingCount(count(IndexedFile.class, siblingFilter, user));
+
+    // Count DIPs
+    Filter dipsFilter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, fileUUID));
+    Long dipCount = RodaCoreFactory.getIndexService().count(IndexedDIP.class, dipsFilter);
+    bundle.setDipCount(dipCount);
 
     return bundle;
   }
@@ -484,12 +490,18 @@ public class BrowserHelper {
       // infer from DIP
       IndexedDIP dip = bundle.getDip();
       if (!dip.getFileIds().isEmpty()) {
-        bundle.setFile(BrowserHelper.retrieve(IndexedFile.class, IdUtils.getFileId(dip.getFileIds().get(0))));
+        IndexedFile file = BrowserHelper.retrieve(IndexedFile.class, IdUtils.getFileId(dip.getFileIds().get(0)));
+        bundle.setFile(file);
+        bundle.setRepresentation(BrowserHelper.retrieve(IndexedRepresentation.class, file.getRepresentationUUID()));
+        bundle.setAip(BrowserHelper.retrieve(IndexedAIP.class, file.getAipId()));
       } else if (!dip.getRepresentationIds().isEmpty()) {
-        bundle.setRepresentation(BrowserHelper.retrieve(IndexedRepresentation.class,
-          IdUtils.getRepresentationId(dip.getRepresentationIds().get(0))));
+        IndexedRepresentation representation = BrowserHelper.retrieve(IndexedRepresentation.class,
+          IdUtils.getRepresentationId(dip.getRepresentationIds().get(0)));
+        bundle.setRepresentation(representation);
+        bundle.setAip(BrowserHelper.retrieve(IndexedAIP.class, representation.getAipId()));
       } else if (!dip.getAipIds().isEmpty()) {
-        bundle.setAip(BrowserHelper.retrieve(IndexedAIP.class, dip.getAipIds().get(0).getAipId()));
+        IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, dip.getAipIds().get(0).getAipId());
+        bundle.setAip(aip);
       }
     }
 
@@ -2789,9 +2801,9 @@ public class BrowserHelper {
 
   }
 
-  public static String createFolder(User user, String aipId, String representationId, String folderUUID, String newName,
-    String details) throws GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException,
-    AuthorizationDeniedException {
+  public static IndexedFile createFolder(User user, String aipId, String representationId, String folderUUID,
+    String newName, String details) throws GenericException, RequestNotValidException, AlreadyExistsException,
+    NotFoundException, AuthorizationDeniedException {
     ModelService model = RodaCoreFactory.getModelService();
     IndexService index = RodaCoreFactory.getIndexService();
     File newFolder;
@@ -2813,7 +2825,7 @@ public class BrowserHelper {
         user.getName(), true);
 
       index.commit(IndexedFile.class);
-      return IdUtils.getFileId(newFolder);
+      return index.retrieve(IndexedFile.class, IdUtils.getFileId(newFolder));
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       String outcomeText = "The folder '" + newName + "' has not been manually created.";
       model.createUpdateAIPEvent(aipId, irep.getId(), null, null, PreservationEventType.CREATION,
