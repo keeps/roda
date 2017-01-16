@@ -40,6 +40,7 @@
 		<module>risks/roda-plugin-risks-filenotcharacterized</module>
 		<module>risks/roda-plugin-risks-formatmissingrepresentationinformation</module>
 
+		<module>misc/roda-plugin-misc-createmets</module>
 	</modules>
 	<repositories>
 		<repository>
