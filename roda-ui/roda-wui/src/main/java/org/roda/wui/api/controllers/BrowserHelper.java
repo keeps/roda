@@ -2835,8 +2835,7 @@ public class BrowserHelper {
     }
 
     if (!findResult.getResults().isEmpty()) {
-      String storagePath = toFolder != null ? toFolder.getStoragePath()
-        : ModelUtils.getRepresentationDataStoragePath(aipId, representationId).toString();
+
       StringBuilder outcomeText = new StringBuilder();
 
       for (IndexedFile ifile : findResult.getResults()) {
@@ -2847,10 +2846,16 @@ public class BrowserHelper {
 
         File file = model.retrieveFile(ifile.getAipId(), ifile.getRepresentationId(), ifile.getPath(), ifile.getId());
         try {
-          File movedFile = model.moveFile(aipId, representationId, file, storagePath, true, true);
+          String toAIP = toFolder.getAipId();
+          String toRepresentation = toFolder.getRepresentationId();
+          List<String> toDirectoryPath = new ArrayList<>(toFolder.getPath());
+          toDirectoryPath.add(toFolder.getId());
+          String toId = file.getId();
+
+          File newFile = model.moveFile(file, toAIP, toRepresentation, toDirectoryPath, toId, true, true);
 
           outcomeText.append("The file '" + file.getPath() + "/" + file.getId() + "' has been manually moved to '"
-            + movedFile.getPath() + "/" + movedFile.getId() + "'.\n");
+            + newFile.getPath() + "/" + newFile.getId() + "'.\n");
 
         } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
 

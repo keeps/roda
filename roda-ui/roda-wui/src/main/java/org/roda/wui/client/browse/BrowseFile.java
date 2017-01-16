@@ -384,7 +384,7 @@ public class BrowseFile extends Composite {
                   @Override
                   public void onSuccessImpl(Void nothing) {
                     if (toFolder != null) {
-                      HistoryUtils.newHistory(BrowseFolder.RESOLVER, aipId, repId, toFolder.getUUID());
+                      HistoryUtils.openBrowse(toFolder);
                     } else {
                       HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, repId);
                     }

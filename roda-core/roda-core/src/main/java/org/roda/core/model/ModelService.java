@@ -1100,29 +1100,34 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  public File moveFile(String aipId, String representationId, File file, String newRelativePath,
-    boolean replaceExisting, boolean reindexResources) throws AlreadyExistsException, GenericException,
+  public File moveFile(File file, String newAipId, String newRepresentationId, List<String> newDirectoryPath,
+    String newId, boolean replaceExisting, boolean reindexResources) throws AlreadyExistsException, GenericException,
     NotFoundException, RequestNotValidException, AuthorizationDeniedException {
 
     Path basePath = RodaCoreFactory.getStoragePath();
 
     StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
     Path fullPath = basePath.resolve(FSUtils.getStoragePathAsString(fileStoragePath, false));
-    Path newPath = basePath.resolve(newRelativePath);
 
-    if (Files.exists(fullPath)) {
-      Path newResourcePath = newPath.resolve(file.getId());
-      FSUtils.move(fullPath, newResourcePath, replaceExisting);
-    } else {
+    if (!Files.exists(fullPath)) {
       throw new NotFoundException("Some files/folders were moved or do not exist");
     }
 
+    File newFile = new File(newId, newAipId, newRepresentationId, newDirectoryPath, file.isDirectory());
+    StoragePath newFileStoragePath = ModelUtils.getFileStoragePath(newFile);
+    Path newFullPath = basePath.resolve(FSUtils.getStoragePathAsString(newFileStoragePath, false));
+
+    FSUtils.move(fullPath, newFullPath, replaceExisting);
+
     if (reindexResources) {
-      notifyRepresentationUpdated(retrieveRepresentation(aipId, representationId));
+      notifyRepresentationUpdated(retrieveRepresentation(newAipId, newRepresentationId));
+      if (!newAipId.equals(file.getAipId()) || !newRepresentationId.equals(file.getRepresentationId())) {
+        notifyRepresentationUpdated(retrieveRepresentation(file.getAipId(), file.getRepresentationId()));
+      }
     }
 
-    return retrieveFile(aipId, representationId, Arrays.asList(newPath.toString().split(java.io.File.separator)),
-      file.getId());
+    return newFile;
+
   }
 
   /***************** Preservation related *****************/
