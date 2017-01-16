@@ -19,11 +19,9 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.browse.BrowseAIP;
-import org.roda.wui.client.browse.BrowseDIP;
 import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
-import org.roda.wui.client.browse.bundle.DipBundle;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -275,7 +273,7 @@ public class BreadcrumbUtils {
 
       @Override
       public void execute() {
-        HistoryUtils.openBrowse(dip, aip, representation, file);
+        HistoryUtils.openBrowse(dip);
       }
     });
   }
@@ -292,8 +290,7 @@ public class BreadcrumbUtils {
 
       @Override
       public void execute() {
-        HistoryUtils.openBrowse(dipFile, BrowseDIP.DEFAULT_DIPFILE_SORTER, BrowseDIP.DEFAULT_DIPFILE_INDEX, aip,
-          representation, file);
+        HistoryUtils.openBrowse(dipFile);
       }
     });
   }

@@ -16,7 +16,6 @@ import java.util.List;
 
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
@@ -31,10 +30,8 @@ import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.BrowseAIP;
 import org.roda.wui.client.browse.BrowseDIP;
 import org.roda.wui.client.browse.BrowseFile;
-import org.roda.wui.client.browse.BrowseFolder;
 import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.ingest.process.ShowJobReport;
@@ -47,8 +44,6 @@ import org.roda.wui.client.planning.ShowRiskIncidence;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.widgets.Toast;
 
-import com.github.nmorel.gwtjackson.client.ObjectMapper;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -184,89 +179,25 @@ public class HistoryUtils {
     return history;
   }
 
-  public static interface SorterMapper extends ObjectMapper<Sorter> {
-  }
-
-  public static SorterMapper SORTER_MAPPER = GWT.create(SorterMapper.class);
-
-  public static List<String> getHistoryBrowseDIPFile(String dipId, String dipFileUUID, Sorter sorter, int index) {
+  public static List<String> getHistoryBrowseDIPFile(String dipId, String dipFileUUID) {
     List<String> history = new ArrayList<>();
     history.addAll(BrowseAIP.RESOLVER.getHistoryPath());
     history.add(BrowseDIP.RESOLVER.getHistoryToken());
     history.add(dipId);
     history.add(dipFileUUID);
-    history.add(SORTER_MAPPER.write(sorter));
-    history.add(Integer.toString(index));
     return history;
   }
 
-  public static List<String> getHistoryBrowse(DIPFile dipFile, Sorter sorter, int index) {
-    return getHistoryBrowseDIPFile(dipFile.getDipId(), dipFile.getUUID(), sorter, index);
+  public static List<String> getHistoryBrowse(DIPFile dipFile) {
+    return getHistoryBrowseDIPFile(dipFile.getDipId(), dipFile.getUUID());
   }
 
   public static void openBrowse(IndexedDIP dip) {
     HistoryUtils.newHistory(getHistoryBrowseDIP(dip.getId()));
   }
 
-  public static void openBrowse(DIPFile dipFile, Sorter sorter, int index) {
-    HistoryUtils.newHistory(getHistoryBrowseDIPFile(dipFile.getDipId(), dipFile.getUUID(), sorter, index));
-  }
-
-  public static void openBrowse(DIPFile dipFile, Sorter sorter, int index, IndexedAIP refererAIP) {
-    LastSelectedItemsSingleton.getInstance().setLastObject(refererAIP);
-    openBrowse(dipFile, sorter, index);
-  }
-
-  public static void openBrowse(DIPFile dipFile, Sorter sorter, int index,
-    IndexedRepresentation refererRepresentation) {
-    LastSelectedItemsSingleton.getInstance().setLastObject(refererRepresentation);
-    openBrowse(dipFile, sorter, index);
-  }
-
-  public static void openBrowse(DIPFile dipFile, Sorter sorter, int index, IndexedFile refererFile) {
-    LastSelectedItemsSingleton.getInstance().setLastObject(refererFile);
-    openBrowse(dipFile, sorter, index);
-  }
-
-  public static void openBrowse(DIPFile dipFile, Sorter sorter, int index, IndexedAIP refererAIP,
-    IndexedRepresentation refererRepresentation, IndexedFile refererFile) {
-    if (refererFile != null) {
-      openBrowse(dipFile, sorter, index, refererFile);
-    } else if (refererRepresentation != null) {
-      openBrowse(dipFile, sorter, index, refererRepresentation);
-    } else if (refererAIP != null) {
-      openBrowse(dipFile, sorter, index, refererAIP);
-    } else {
-      openBrowse(dipFile, sorter, index);
-    }
-  }
-
-  public static void openBrowse(IndexedDIP dip, IndexedAIP refererAIP) {
-    LastSelectedItemsSingleton.getInstance().setLastObject(refererAIP);
-    openBrowse(dip);
-  }
-
-  public static void openBrowse(IndexedDIP dip, IndexedRepresentation refererRepresentation) {
-    LastSelectedItemsSingleton.getInstance().setLastObject(refererRepresentation);
-    openBrowse(dip);
-  }
-
-  public static void openBrowse(IndexedDIP dip, IndexedFile refererFile) {
-    LastSelectedItemsSingleton.getInstance().setLastObject(refererFile);
-    openBrowse(dip);
-  }
-
-  public static void openBrowse(IndexedDIP dip, IndexedAIP refererAIP, IndexedRepresentation refererRepresentation,
-    IndexedFile refererFile) {
-    if (refererFile != null) {
-      openBrowse(dip, refererFile);
-    } else if (refererRepresentation != null) {
-      openBrowse(dip, refererRepresentation);
-    } else if (refererAIP != null) {
-      openBrowse(dip, refererAIP);
-    } else {
-      openBrowse(dip);
-    }
+  public static void openBrowse(DIPFile dipFile) {
+    HistoryUtils.newHistory(getHistoryBrowseDIPFile(dipFile.getDipId(), dipFile.getUUID()));
   }
 
   public static void openBrowseDIP(String dipId) {
@@ -407,8 +338,7 @@ public class HistoryUtils {
       path = HistoryUtils.getHistoryBrowseDIP(dip.getId());
     } else if (object instanceof DIPFile) {
       DIPFile dipFile = (DIPFile) object;
-      path = HistoryUtils.getHistoryBrowseDIPFile(dipFile.getDipId(), dipFile.getUUID(),
-        BrowseDIP.DEFAULT_DIPFILE_SORTER, BrowseDIP.DEFAULT_DIPFILE_INDEX);
+      path = HistoryUtils.getHistoryBrowseDIPFile(dipFile.getDipId(), dipFile.getUUID());
     } else if (object instanceof TransferredResource) {
       TransferredResource resource = (TransferredResource) object;
       path = HistoryUtils.getHistory(IngestTransfer.RESOLVER.getHistoryPath(), resource.getUUID());

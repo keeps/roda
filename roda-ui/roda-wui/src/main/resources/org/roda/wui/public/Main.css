@@ -805,6 +805,14 @@ pre code {
     content: "\f002";
 }
 
+.btn-chevron-left:after {
+    content: "\f053";
+}
+
+.btn-chevron-right:after {
+    content: "\f054";
+}
+
 .btn-stop:after{
 	content: "\f04d"
 }
@@ -1995,6 +2003,10 @@ td.datePickerMonth, td.datePickerYear {
 /*******************************************************************/
 
 /* Browser v2*/
+
+.browse {
+	margin-top: 0;
+}
 
 .browse.under_appraisal, .browse.deleted, .browse.created, .browse.ingest_processing {
     background-color: #efefef;

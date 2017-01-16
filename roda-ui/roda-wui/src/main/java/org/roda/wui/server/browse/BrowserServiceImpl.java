@@ -863,12 +863,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public DipBundle getDipBundle(String dipUUID, String dipFileUUID, String aipId, String representationId,
-    List<String> filePath, String fileId)
+  public DipBundle getDipBundle(String dipUUID, String dipFileUUID)
     throws RequestNotValidException, AuthorizationDeniedException, GenericException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
 
-    return Browser.retrieveDipBundle(user, dipUUID, dipFileUUID, aipId, representationId, filePath, fileId);
+    return Browser.retrieveDipBundle(user, dipUUID, dipFileUUID);
   }
 
   @Override

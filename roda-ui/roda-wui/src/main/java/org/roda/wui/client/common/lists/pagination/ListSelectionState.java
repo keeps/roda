@@ -16,16 +16,19 @@ import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FocusPanel;
+import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
@@ -74,33 +77,35 @@ public class ListSelectionState<T extends IsIndexed> {
   private static <T extends IsIndexed> void openRelative(final ListSelectionState<T> state, final int relativeIndex,
     final AsyncCallback<ListSelectionState<T>> callback, final ProcessRelativeItem<T> processor) {
     final int newIndex = state.getIndex() + relativeIndex;
-    BrowserService.Util.getInstance().find(state.getSelected().getClass().getName(), state.getFilter(),
-      state.getSorter(), new Sublist(newIndex, 1), state.getFacets(), LocaleInfo.getCurrentLocale().getLocaleName(),
-      state.getJustActive(), new AsyncCallback<IndexResult<T>>() {
+    if (newIndex >= 0) {
+      BrowserService.Util.getInstance().find(state.getSelected().getClass().getName(), state.getFilter(),
+        state.getSorter(), new Sublist(newIndex, 1), state.getFacets(), LocaleInfo.getCurrentLocale().getLocaleName(),
+        state.getJustActive(), new AsyncCallback<IndexResult<T>>() {
 
-        @Override
-        public void onFailure(Throwable caught) {
-          callback.onFailure(caught);
-        }
-
-        @Override
-        public void onSuccess(IndexResult<T> result) {
-          if (!result.getResults().isEmpty()) {
-            T first = result.getResults().get(0);
-
-            // if we are jumping to the same file, try the next one
-            if (first.getUUID().equals(state.getSelected().getUUID())) {
-              openRelative(state, relativeIndex < 0 ? relativeIndex - 1 : relativeIndex + 1, callback, processor);
-            } else {
-              processor.process(first);
-              callback.onSuccess(ListSelectionState.create(first, state.getFilter(), state.getJustActive(),
-                state.getFacets(), state.getSorter(), newIndex));
-            }
-          } else {
-            callback.onFailure(new NotFoundException("No items were found"));
+          @Override
+          public void onFailure(Throwable caught) {
+            callback.onFailure(caught);
           }
-        }
-      });
+
+          @Override
+          public void onSuccess(IndexResult<T> result) {
+            if (!result.getResults().isEmpty()) {
+              T first = result.getResults().get(0);
+
+              // if we are jumping to the same file, try the next one
+              if (first.getUUID().equals(state.getSelected().getUUID())) {
+                openRelative(state, relativeIndex < 0 ? relativeIndex - 1 : relativeIndex + 1, callback, processor);
+              } else {
+                processor.process(first);
+                callback.onSuccess(ListSelectionState.create(first, state.getFilter(), state.getJustActive(),
+                  state.getFacets(), state.getSorter(), newIndex));
+              }
+            } else {
+              callback.onFailure(new NotFoundException("No items were found"));
+            }
+          }
+        });
+    }
   }
 
   public static <T extends IsIndexed> void save(final ListSelectionState<T> state) {
@@ -117,20 +122,17 @@ public class ListSelectionState<T extends IsIndexed> {
   }
 
   public static <T extends IsIndexed> void jump(final Class<T> objectClass, int relativeIndex) {
-    ProcessRelativeItem<T> processor = new ProcessRelativeItem<T>() {
+    jump(objectClass, relativeIndex, new ProcessRelativeItem<T>() {
 
       @Override
       public void process(T object) {
         HistoryUtils.resolve(object);
       }
-    };
-
-    jump(objectClass, relativeIndex, processor);
-
+    });
   }
 
-  public static <T extends IsIndexed> void jump(final Class<T> objectClass, int relativeIndex,
-    ProcessRelativeItem<T> processor) {
+  public static <T extends IsIndexed> void jump(final Class<T> objectClass, final int relativeIndex,
+    final ProcessRelativeItem<T> processor) {
 
     ListSelectionState<T> last = last(objectClass);
     if (last != null) {
@@ -139,7 +141,17 @@ public class ListSelectionState<T extends IsIndexed> {
 
         @Override
         public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
+          if (caught instanceof NotFoundException) {
+            // TODO i18n
+            if (relativeIndex > 0) {
+              Toast.showInfo("Cannot jump to next", "Reached the end of the list");
+            } else {
+              Toast.showInfo("Cannot jump to previous", "Reached the beggining of the list");
+            }
+
+          } else {
+            AsyncCallbackUtils.defaultFailureTreatment(caught);
+          }
         }
 
         @Override
@@ -207,9 +219,23 @@ public class ListSelectionState<T extends IsIndexed> {
     });
   }
 
-  public static <T extends IsIndexed> void bindLayout(final Class<T> objectClass, final FocusPanel previousButton,
-    final FocusPanel nextButton, final FocusPanel keyboardFocus, final boolean requireControlKeyModifier,
-    final boolean requireShiftKeyModifier, final boolean requireAltKeyModifier) {
+  public static <T extends IsIndexed> void bindLayout(final Class<T> objectClass, final HasClickHandlers previousButton,
+    final HasClickHandlers nextButton, final FocusPanel keyboardFocus, final boolean requireControlKeyModifier,
+    final boolean requireShiftKeyModifier, final boolean requireAltKeyModifier, UIObject... extraUiObjectsToHide) {
+    bindLayout(objectClass, previousButton, nextButton, keyboardFocus, requireControlKeyModifier,
+      requireShiftKeyModifier, requireAltKeyModifier, new ProcessRelativeItem<T>() {
+
+        @Override
+        public void process(T object) {
+          HistoryUtils.resolve(object);
+        }
+      }, extraUiObjectsToHide);
+  }
+
+  public static <T extends IsIndexed> void bindLayout(final Class<T> objectClass, final HasClickHandlers previousButton,
+    final HasClickHandlers nextButton, final FocusPanel keyboardFocus, final boolean requireControlKeyModifier,
+    final boolean requireShiftKeyModifier, final boolean requireAltKeyModifier, final ProcessRelativeItem<T> processor,
+    final UIObject... extraUiObjectsToHide) {
 
     StringBuilder b = new StringBuilder();
 
@@ -225,17 +251,63 @@ public class ListSelectionState<T extends IsIndexed> {
       b.append("ALT + ");
     }
 
-    // TODO add HTML entities or icons
-    previousButton.setTitle(b + "LEFT");
-    nextButton.setTitle(b + "RIGHT");
+    // TODO add HTML entities, icons or i18n
+    if (previousButton instanceof UIObject && nextButton instanceof UIObject) {
+      ((UIObject) previousButton).setTitle(b + "LEFT");
+      ((UIObject) nextButton).setTitle(b + "RIGHT");
+    }
 
+    previousButton.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        previous(objectClass, processor);
+      }
+    });
+
+    nextButton.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        next(objectClass, processor);
+      }
+    });
+
+    keyboardFocus.addKeyDownHandler(new KeyDownHandler() {
+
+      @Override
+      public void onKeyDown(KeyDownEvent event) {
+        boolean controlModifier = !requireControlKeyModifier || event.isControlKeyDown();
+        boolean shiftModifier = !requireShiftKeyModifier || event.isShiftKeyDown();
+        boolean altModifier = !requireAltKeyModifier || event.isAltKeyDown();
+
+        if (controlModifier && shiftModifier && altModifier) {
+          NativeEvent ne = event.getNativeEvent();
+          if (ne.getKeyCode() == KeyCodes.KEY_RIGHT) {
+            ne.preventDefault();
+            next(objectClass, processor);
+          } else if (ne.getKeyCode() == KeyCodes.KEY_LEFT) {
+            ne.preventDefault();
+            previous(objectClass, processor);
+          }
+        }
+      }
+    });
+
+    updateLayout(objectClass, previousButton, nextButton, extraUiObjectsToHide);
+  }
+
+  public static <T extends IsIndexed> void updateLayout(final Class<T> objectClass,
+    final HasClickHandlers previousButton, final HasClickHandlers nextButton, final UIObject... extraUiObjectsToHide) {
     hasPreviousNext(objectClass, new AsyncCallback<Pair<Boolean, Boolean>>() {
 
       @Override
       public void onFailure(Throwable caught) {
         AsyncCallbackUtils.defaultFailureTreatment(caught);
-        previousButton.setVisible(false);
-        nextButton.setVisible(false);
+        if (previousButton instanceof UIObject && nextButton instanceof UIObject) {
+          ((UIObject) previousButton).setVisible(false);
+          ((UIObject) nextButton).setVisible(false);
+        }
       }
 
       @Override
@@ -244,56 +316,17 @@ public class ListSelectionState<T extends IsIndexed> {
         Boolean hasNext = result.getSecond();
 
         // visibility
-        if (!hasPrevious && !hasNext) {
-          previousButton.setVisible(false);
-          nextButton.setVisible(false);
-        } else {
-          HtmlSnippetUtils.setCssClassDisabled(previousButton, !hasPrevious);
-          HtmlSnippetUtils.setCssClassDisabled(nextButton, !hasNext);
+        if (previousButton instanceof UIObject && nextButton instanceof UIObject) {
+          ((UIObject) previousButton).setVisible(hasPrevious || hasNext);
+          ((UIObject) nextButton).setVisible(hasPrevious || hasNext);
+
+          for (UIObject uiObj : extraUiObjectsToHide) {
+            uiObj.setVisible(hasPrevious || hasNext);
+          }
+
+          HtmlSnippetUtils.setCssClassDisabled((UIObject) previousButton, !hasPrevious);
+          HtmlSnippetUtils.setCssClassDisabled((UIObject) nextButton, !hasNext);
         }
-
-        // actions
-        if (hasPrevious) {
-          previousButton.addClickHandler(new ClickHandler() {
-
-            @Override
-            public void onClick(ClickEvent event) {
-              previous(objectClass);
-            }
-          });
-        }
-
-        if (hasNext) {
-          nextButton.addClickHandler(new ClickHandler() {
-
-            @Override
-            public void onClick(ClickEvent event) {
-              next(objectClass);
-            }
-          });
-
-          keyboardFocus.addKeyDownHandler(new KeyDownHandler() {
-
-            @Override
-            public void onKeyDown(KeyDownEvent event) {
-              boolean controlModifier = !requireControlKeyModifier || event.isControlKeyDown();
-              boolean shiftModifier = !requireShiftKeyModifier || event.isShiftKeyDown();
-              boolean altModifier = !requireAltKeyModifier || event.isAltKeyDown();
-
-              if (controlModifier && shiftModifier && altModifier) {
-                NativeEvent ne = event.getNativeEvent();
-                if (ne.getKeyCode() == KeyCodes.KEY_RIGHT) {
-                  ne.preventDefault();
-                  next(objectClass);
-                } else if (ne.getKeyCode() == KeyCodes.KEY_LEFT) {
-                  ne.preventDefault();
-                  previous(objectClass);
-                }
-              }
-            }
-          });
-        }
-
       }
     });
   }

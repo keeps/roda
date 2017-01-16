@@ -223,8 +223,7 @@ public interface BrowserServiceAsync {
   void changeRepresentationType(SelectedItemsList<IndexedRepresentation> selectedRepresentation, String newType,
     String details, AsyncCallback<Void> loadingAsyncCallback);
 
-  void getDipBundle(String dipUUID, String dipFileUUID, String aipId, String representationId, List<String> filePath,
-    String fileId, AsyncCallback<DipBundle> callback);
+  void getDipBundle(String dipUUID, String dipFileUUID, AsyncCallback<DipBundle> callback);
 
   void deleteDIP(String dipId, AsyncCallback<Void> async);
 

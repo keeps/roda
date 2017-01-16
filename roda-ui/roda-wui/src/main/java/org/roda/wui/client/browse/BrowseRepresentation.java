@@ -27,7 +27,6 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIPState;
-import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
@@ -86,14 +85,13 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.SelectionChangeEvent;
-import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
 import config.i18n.client.ClientMessages;
 
@@ -159,6 +157,10 @@ public class BrowseRepresentation extends Composite {
   interface MyUiBinder extends UiBinder<Widget, BrowseRepresentation> {
   }
 
+  // Focus
+  @UiField
+  FocusPanel keyboardFocus;
+
   // IDENTIFICATION
 
   @UiField
@@ -203,7 +205,10 @@ public class BrowseRepresentation extends Composite {
   // SIDEBAR
 
   @UiField
-  Button renameFolders, moveFiles, uploadFiles, createFolder, identifyFormats, changeType;
+  Button renameFolders, moveFiles, uploadFiles, createFolder, identifyFormats, changeType, searchPrevious, searchNext;
+
+  @UiField
+  FlowPanel searchSection;
 
   private List<HandlerRegistration> handlers;
   private IndexedRepresentation representation;
@@ -281,16 +286,7 @@ public class BrowseRepresentation extends Composite {
 
     // DISSEMINATIONS
     disseminationsList = new DIPList(Filter.NULL, Facets.NONE, messages.listOfDisseminations(), true);
-    disseminationsList.getSelectionModel().addSelectionChangeHandler(new Handler() {
-
-      @Override
-      public void onSelectionChange(SelectionChangeEvent event) {
-        IndexedDIP dissemination = disseminationsList.getSelectionModel().getSelectedObject();
-        if (dissemination != null) {
-          HistoryUtils.openBrowse(dissemination, representation);
-        }
-      }
-    });
+    ListSelectionState.bindBrowseOpener(disseminationsList);
 
     disseminationsSearch = new SearchPanel(Filter.NULL, RodaConstants.DIP_SEARCH, messages.searchPlaceHolder(), false,
       false, true);
@@ -396,6 +392,9 @@ public class BrowseRepresentation extends Composite {
     moveFiles.setEnabled(false);
     uploadFiles.setEnabled(true);
     createFolder.setEnabled(true);
+
+    ListSelectionState.bindLayout(IndexedRepresentation.class, searchPrevious, searchNext, keyboardFocus, true, false,
+      false, searchSection);
   }
 
   @Override

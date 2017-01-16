@@ -29,7 +29,6 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
@@ -42,6 +41,7 @@ import org.roda.wui.client.common.dialogs.SelectAipDialog;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.DIPList;
 import org.roda.wui.client.common.lists.RepresentationList;
+import org.roda.wui.client.common.lists.pagination.ListSelectionState;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchPanel;
@@ -100,6 +100,7 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
@@ -107,8 +108,6 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.SelectionChangeEvent;
-import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
 import config.i18n.client.ClientMessages;
 
@@ -171,6 +170,10 @@ public class BrowseAIP extends Composite {
 
   private String aipId;
   private BrowseAIPBundle bundle;
+
+  // Focus
+  @UiField
+  FocusPanel keyboardFocus;
 
   // HEADER
 
@@ -273,7 +276,7 @@ public class BrowseAIP extends Composite {
   FlowPanel searchSection;
 
   @UiField
-  Button searchContext;
+  Button searchPrevious, searchNext, searchContext;
 
   @UiField
   Button searchAIP;
@@ -299,16 +302,9 @@ public class BrowseAIP extends Composite {
     // REPRESENTATIONS
     representationsList = new RepresentationList(Filter.NULL, justActive, Facets.NONE, messages.listOfRepresentations(),
       true);
-    representationsList.getSelectionModel().addSelectionChangeHandler(new Handler() {
 
-      @Override
-      public void onSelectionChange(SelectionChangeEvent event) {
-        IndexedRepresentation representation = representationsList.getSelectionModel().getSelectedObject();
-        if (representation != null) {
-          HistoryUtils.openBrowse(representation);
-        }
-      }
-    });
+    ListSelectionState.bindBrowseOpener(representationsList);
+
     representationsSearch = new SearchPanel(Filter.NULL, RodaConstants.REPRESENTATION_SEARCH,
       messages.searchPlaceHolder(), false, false, true);
     representationsSearch.setDefaultFilterIncremental(true);
@@ -317,16 +313,7 @@ public class BrowseAIP extends Composite {
     // DISSEMINATIONS
 
     disseminationsList = new DIPList(Filter.NULL, Facets.NONE, messages.listOfDisseminations(), true);
-    disseminationsList.getSelectionModel().addSelectionChangeHandler(new Handler() {
-
-      @Override
-      public void onSelectionChange(SelectionChangeEvent event) {
-        IndexedDIP dissemination = disseminationsList.getSelectionModel().getSelectedObject();
-        if (dissemination != null) {
-          HistoryUtils.openBrowse(dissemination, bundle.getAip());
-        }
-      }
-    });
+    ListSelectionState.bindBrowseOpener(disseminationsList);
 
     disseminationsSearch = new SearchPanel(Filter.NULL, RodaConstants.DIP_SEARCH, messages.searchPlaceHolder(), false,
       false, true);
@@ -336,16 +323,7 @@ public class BrowseAIP extends Composite {
     // AIP CHILDREN
 
     aipChildrenList = new AIPList(Filter.NULL, justActive, FACETS, messages.listOfAIPs(), selectable);
-    aipChildrenList.getSelectionModel().addSelectionChangeHandler(new Handler() {
-
-      @Override
-      public void onSelectionChange(SelectionChangeEvent event) {
-        IndexedAIP aip = aipChildrenList.getSelectionModel().getSelectedObject();
-        if (aip != null) {
-          view(aip.getId());
-        }
-      }
-    });
+    ListSelectionState.bindBrowseOpener(aipChildrenList);
 
     aipChildrenList.addCheckboxSelectionListener(new CheckboxSelectionListener<IndexedAIP>() {
 
@@ -392,6 +370,8 @@ public class BrowseAIP extends Composite {
         onPermissionsUpdate(user);
       }
     });
+
+    ListSelectionState.bindLayout(IndexedAIP.class, searchPrevious, searchNext, keyboardFocus, true, false, false);
 
   }
 
@@ -668,6 +648,9 @@ public class BrowseAIP extends Composite {
       remove.setVisible(true);
       download.setVisible(true);
       searchSection.setVisible(true);
+
+      keyboardFocus.setFocus(true);
+      ListSelectionState.updateLayout(IndexedAIP.class, searchPrevious, searchNext);
 
     } else {
       viewAction();

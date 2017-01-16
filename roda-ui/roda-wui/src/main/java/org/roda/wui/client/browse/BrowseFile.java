@@ -843,7 +843,7 @@ public class BrowseFile extends Composite {
           Window.open(dip.getOpenExternalURL(), "_blank", "");
           Toast.showInfo(messages.browseFileDipOpenedExternalURL(), dip.getOpenExternalURL());
         } else {
-          HistoryUtils.openBrowse(dip, bundle.getFile());
+          HistoryUtils.openBrowse(dip);
         }
       }
     });

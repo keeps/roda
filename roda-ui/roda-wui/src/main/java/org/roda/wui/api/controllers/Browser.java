@@ -241,8 +241,7 @@ public class Browser extends RodaWuiController {
     return bundle;
   }
 
-  public static DipBundle retrieveDipBundle(User user, String dipUUID, String dipFileUUID, String aipId,
-    String representationId, List<String> filePath, String fileId)
+  public static DipBundle retrieveDipBundle(User user, String dipUUID, String dipFileUUID)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -254,13 +253,12 @@ public class Browser extends RodaWuiController {
     UserUtility.checkDIPPermissions(user, dip, PermissionType.READ);
 
     // delegate
-
-    DipBundle bundle = BrowserHelper.retrieveDipBundle(dipUUID, dipFileUUID, aipId, representationId, filePath, fileId);
+    DipBundle bundle = BrowserHelper.retrieveDipBundle(dipUUID, dipFileUUID, user);
 
     // register action
+    String aipId = null;
     controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_DIP_ID_PARAM,
-      dipUUID, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId, RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM,
-      representationId);
+      dipUUID, RodaConstants.CONTROLLER_DIP_FILE_ID_PARAM, dipFileUUID);
 
     return bundle;
   }
