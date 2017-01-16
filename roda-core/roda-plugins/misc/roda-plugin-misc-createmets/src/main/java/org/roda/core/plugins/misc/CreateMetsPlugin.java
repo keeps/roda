@@ -15,11 +15,11 @@ import java.util.List;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
-import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -30,6 +30,7 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
@@ -147,26 +148,13 @@ public class CreateMetsPlugin extends AbstractPlugin<AIP> {
   @Override
   public Report execute(final IndexService index, final ModelService model, final StorageService storage,
     final List<LiteOptionalWithCause> liteList) throws PluginException {
-
-    try {
-      final Report report = PluginHelper.initPluginReport(this);
-      final SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-
-      List<AIP> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, jobPluginInfo, liteList);
-
-      for (AIP aip : list) {
-        executeOnAip(aip, index, model, storage, jobPluginInfo, report);
+    return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<AIP>() {
+      @Override
+      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+        SimpleJobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {
+        executeOnAip(object, index, model, storage, jobPluginInfo, report, cachedJob);
       }
-
-      jobPluginInfo.finalizeInfo();
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-
-      return report;
-
-    } catch (final JobException e) {
-      throw new PluginException("A job exception has occurred", e);
-    }
+    }, index, model, storage, liteList);
   }
 
   /**
@@ -186,11 +174,11 @@ public class CreateMetsPlugin extends AbstractPlugin<AIP> {
    *          the {@link Report}.
    */
   private void executeOnAip(final AIP aip, final IndexService index, final ModelService model,
-    final StorageService storage, final JobPluginInfo jobPluginInfo, final Report report) {
+    final StorageService storage, final JobPluginInfo jobPluginInfo, final Report report, final Job job) {
     LOGGER.debug("Processing AIP {}", aip.getId());
 
     final Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
-    PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
+    PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
 
     try {
       final Path aipPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(),
@@ -212,6 +200,6 @@ public class CreateMetsPlugin extends AbstractPlugin<AIP> {
     }
 
     report.addReport(reportItem);
-    PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+    PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
   }
 }
