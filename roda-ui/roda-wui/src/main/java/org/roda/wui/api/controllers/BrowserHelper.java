@@ -3216,10 +3216,7 @@ public class BrowserHelper {
     for (IndexedRepresentation irep : reps.getResults()) {
       String oldType = irep.getType();
       try {
-        // Representation rep = model.retrieveRepresentation(irep.getAipId(),
-        // irep.getId());
         model.updateRepresentationType(irep.getAipId(), irep.getId(), newType);
-        // model.updateRepresentationInfo(rep);
 
         String outcomeText = "The representation '" + irep.getId() + "' changed its type from '" + oldType + "' to '"
           + newType + "'.";
