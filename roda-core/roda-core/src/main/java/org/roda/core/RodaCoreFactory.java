@@ -485,9 +485,8 @@ public class RodaCoreFactory {
           copyFilesFromClasspath(RodaConstants.CORE_DEFAULT_FOLDER + "/", rodaHomePath, true);
 
           // 20160712 hsilva: it needs to be this way as the resources are
-          // copied
-          // to the file system and storage can be of a different type (e.g.
-          // fedora)
+          // copied to the file system and storage can be of a different type
+          // (e.g. fedora)
           FileStorageService fileStorageService = new FileStorageService(storagePath);
 
           index.reindexRisks(fileStorageService);
