@@ -258,7 +258,7 @@ public class BrowseFile extends Composite {
 
     // bind slider buttons
     disseminationsSliderPanel.setToggleButton(disseminationsButton);
-    updateDisseminations();
+    updateDisseminations(bundle.getFile().getUUID(), disseminationsSliderPanel);
 
     infoSliderPanel.setToggleButton(infoFileButton);
     updateInfoSliderPanel();
@@ -683,8 +683,8 @@ public class BrowseFile extends Composite {
     }
   }
 
-  private void updateDisseminations() {
-    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, bundle.getFile().getUUID()));
+  public static void updateDisseminations(String fileUUID, final SliderPanel disseminationsSliderPanel) {
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, fileUUID));
     Sorter sorter = new Sorter(new SortParameter(RodaConstants.DIP_DATE_CREATED, true));
     Sublist sublist = new Sublist(0, 100);
     Facets facets = Facets.NONE;
@@ -701,26 +701,25 @@ public class BrowseFile extends Composite {
 
         @Override
         public void onSuccess(IndexResult<IndexedDIP> result) {
-          updateDisseminations(result.getResults());
+          updateDisseminations(result.getResults(), disseminationsSliderPanel);
         }
       });
   }
 
-  private void updateDisseminations(List<IndexedDIP> dips) {
-    FlowPanel disseminationsContent = disseminationsSliderPanel.getContent();
+  private static void updateDisseminations(List<IndexedDIP> dips, SliderPanel disseminationsSliderPanel) {
 
     if (dips.isEmpty()) {
       Label dipEmpty = new Label(messages.browseFileDipEmpty());
-      disseminationsContent.add(dipEmpty);
+      disseminationsSliderPanel.addContent(dipEmpty);
       dipEmpty.addStyleName("dip-empty");
     } else {
       for (final IndexedDIP dip : dips) {
-        disseminationsContent.add(createDipPanel(dip));
+        disseminationsSliderPanel.addContent(createDipPanel(dip));
       }
     }
   }
 
-  private FlowPanel createDipPanel(final IndexedDIP dip) {
+  private static FlowPanel createDipPanel(final IndexedDIP dip) {
     FlowPanel layout = new FlowPanel();
 
     // open layout
@@ -774,7 +773,7 @@ public class BrowseFile extends Composite {
     return layout;
   }
 
-  protected void deleteDIP(final IndexedDIP dip) {
+  private static void deleteDIP(final IndexedDIP dip) {
     Dialogs.showConfirmDialog(messages.browseFileDipRepresentationConfirmTitle(),
       messages.browseFileDipRepresentationConfirmMessage(), messages.dialogCancel(), messages.dialogYes(),
       new AsyncCallback<Boolean>() {

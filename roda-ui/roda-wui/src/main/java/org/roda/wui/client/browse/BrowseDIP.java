@@ -32,6 +32,7 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.DIPFileList;
 import org.roda.wui.client.common.lists.pagination.ListSelectionState;
 import org.roda.wui.client.common.search.SearchPanel;
+import org.roda.wui.client.common.sidebar.SliderPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -54,6 +55,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
@@ -113,7 +115,14 @@ public class BrowseDIP extends Composite {
   FlowPanel center;
 
   @UiField
-  FocusPanel previousButton, nextButton, refererPreviousButton, refererNextButton, downloadButton;
+  FocusPanel previousButton, nextButton, refererPreviousButton, refererNextButton, disseminationsButton,
+    dipOptionsButton;
+
+  @UiField
+  SliderPanel disseminationsSliderPanel, optionsSliderPanel;
+
+  @UiField
+  Button downloadButton;
 
   private List<DIPFile> dipFileAncestors;
 
@@ -149,15 +158,21 @@ public class BrowseDIP extends Composite {
 
     HtmlSnippetUtils.setCssClassDisabled(previousButton, true);
     HtmlSnippetUtils.setCssClassDisabled(nextButton, true);
-    downloadButton.setVisible(false);
 
     show();
 
     initializeRefererListSelectionState();
     ListSelectionState.bindLayout(DIPFile.class, previousButton, nextButton, keyboardFocus, true, false, false);
-    
+
     keyboardFocus.setFocus(true);
 
+    disseminationsSliderPanel.setToggleButton(disseminationsButton);
+    if (file != null) {
+      BrowseFile.updateDisseminations(file.getUUID(), disseminationsSliderPanel);
+    }
+    // TODO open aip and representation level of disseminations
+
+    optionsSliderPanel.setToggleButton(dipOptionsButton);
   }
 
   private void initializeRefererListSelectionState() {
@@ -211,7 +226,9 @@ public class BrowseDIP extends Composite {
             openReferred(aip, filter);
           }
         });
-    } else {
+    } else
+
+    {
       refererToolbar.setVisible(false);
     }
   }
@@ -246,7 +263,6 @@ public class BrowseDIP extends Composite {
   }
 
   private void update() {
-    center.clear();
     if (dipFile != null) {
       center.add(new DipFilePreview(viewers, dipFile, aip, representation, file));
     } else {
@@ -343,7 +359,7 @@ public class BrowseDIP extends Composite {
   }
 
   private void updateVisibles() {
-    downloadButton.setVisible(dipFile != null && !dipFile.isDirectory());
+    // downloadButton.setVisible(dipFile != null && !dipFile.isDirectory());
   }
 
   @UiHandler("downloadButton")
@@ -355,6 +371,8 @@ public class BrowseDIP extends Composite {
     SafeUri downloadUri = null;
     if (dipFile != null) {
       downloadUri = RestUtils.createDipFileDownloadUri(dipFile.getUUID());
+    } else {
+      Toast.showInfo("Feature not yet supported", "Download of whole DIP is not yet supported");
     }
     if (downloadUri != null) {
       Window.Location.assign(downloadUri.asString());

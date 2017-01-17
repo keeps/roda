@@ -356,6 +356,7 @@ div.inline {
     top: 0;
     padding: 20px;
     box-shadow: 0 0 0 0 transparent, 0 0 0 0 transparent, 0 0 0 0 transparent, -6px 0 15px -4px rgba(31, 73, 125, 0.8);
+    z-index: 1;
 }
 
 .slider-title {
@@ -3126,7 +3127,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .browseDip-topList {
 	width: 96%;
-	margin: 2%;
+	padding: 2%;
 }
 
 /** Preservation Metadata Panel **/
@@ -3921,6 +3922,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .viewRepresentationFile-center {
     width: 100%;
+    min-height: 670px;
     position: relative;
 }
 
@@ -3976,7 +3978,7 @@ td.datePickerMonth, td.datePickerYear {
 .viewRepresentationEmptyPreview, .viewRepresentationErrorPreview,
 .viewRepresentationNotSupportedPreview,
 .viewRepresentationAudioFilePreviewHTML {
-    margin-top: 120px;
+    padding-top: 120px;
     color: #999;
     text-align: center;
 }

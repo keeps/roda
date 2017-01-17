@@ -5,7 +5,8 @@
 	xmlns:i="urn:import:config.i18n.client" xmlns:m="urn:import:org.roda.wui.client.main"
 	xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag"
 	xmlns:commonsearch="urn:import:org.roda.wui.client.common.search"
-	xmlns:lists="urn:import:org.roda.wui.client.common.lists" xmlns:b="urn:import:org.roda.wui.client.browse">
+	xmlns:lists="urn:import:org.roda.wui.client.common.lists" xmlns:b="urn:import:org.roda.wui.client.browse"
+	xmlns:s="urn:import:org.roda.wui.client.common.sidebar">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
@@ -41,8 +42,8 @@
 							<i class="fa fa-chevron-left"></i>
 						</g:HTML>
 					</g:FocusPanel>
-					<g:FocusPanel ui:field="refererNextButton" addStyleNames="toolbarLink"
-						title="CTRL &#8680;">
+					<g:FocusPanel ui:field="refererNextButton"
+						addStyleNames="toolbarLink" title="CTRL &#8680;">
 						<g:HTML>
 							<i class="fa fa-chevron-right"></i>
 						</g:HTML>
@@ -63,12 +64,6 @@
 				<m:BreadcrumbPanel ui:field="breadcrumb"
 					addStyleNames="viewRepresentationBreadcrumb" />
 				<g:FlowPanel addStyleNames="filePreviewToolbarIcons">
-					<g:FocusPanel ui:field="downloadButton"
-						addStyleNames="toolbarLink filePreviewToolbarDownloadIcon">
-						<g:HTML>
-							<i class="fa fa-download"></i>
-						</g:HTML>
-					</g:FocusPanel>
 					<g:FocusPanel ui:field="previousButton" addStyleNames="toolbarLink">
 						<g:HTML>
 							<i class="fa fa-chevron-left"></i>
@@ -89,8 +84,30 @@
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="viewRepresentationFile-center"
 				ui:field="center">
-
+				<!-- DIP PANEL -->
+				<s:SliderPanel ui:field="disseminationsSliderPanel">
+					<s:title>
+						<g:Label>
+							<ui:text from='{messages.viewRepresentationFileDisseminationTitle}' />
+						</g:Label>
+					</s:title>
+				</s:SliderPanel>
+				<!-- DIP OPTIONS PANEL -->
+				<s:SliderPanel ui:field="optionsSliderPanel">
+					<s:title>
+						<g:Label>
+							<ui:text from='{messages.catalogueDIPTitle}' />
+						</g:Label>
+					</s:title>
+					<s:content>
+						<g:Button ui:field="downloadButton"
+							addStyleNames="btn btn-block btn-default-alt btn-download">
+							<ui:text from='{messages.viewRepresentationDownloadFileButton}' />
+						</g:Button>
+					</s:content>
+				</s:SliderPanel>
 			</g:FlowPanel>
+
 		</g:FlowPanel>
 	</g:FocusPanel>
 </ui:UiBinder>
