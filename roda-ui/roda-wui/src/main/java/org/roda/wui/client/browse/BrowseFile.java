@@ -386,7 +386,7 @@ public class BrowseFile extends Composite {
                     if (toFolder != null) {
                       HistoryUtils.openBrowse(toFolder);
                     } else {
-                      HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, repId);
+                      HistoryUtils.openBrowse(aipId, repId);
                     }
                   }
 
@@ -510,8 +510,16 @@ public class BrowseFile extends Composite {
 
                       @Override
                       public void onSuccess(Void result) {
-                        HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, bundle.getFile().getAipId(),
-                          bundle.getFile().getRepresentationId());
+                        IndexedFile file = bundle.getFile();
+                        List<String> path = file.getPath();
+                        if (path.isEmpty()) {
+                          HistoryUtils.openBrowse(file.getAipId(), file.getRepresentationId());
+                        } else {
+                          int lastIndex = path.size() - 1;
+                          List<String> parentPath = new ArrayList<>(path.subList(0, lastIndex));
+                          String parentId = path.get(lastIndex);
+                          HistoryUtils.openBrowse(file.getAipId(), file.getRepresentationId(), parentPath, parentId);
+                        }
                       }
 
                       @Override
