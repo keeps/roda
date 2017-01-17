@@ -37,8 +37,8 @@ import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.SelectFileDialog;
 import org.roda.wui.client.common.lists.pagination.ListSelectionState;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
+import org.roda.wui.client.common.sidebar.SliderPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
@@ -167,10 +167,6 @@ public class BrowseFile extends Composite {
 
   private BrowseFileBundle bundle;
 
-  private boolean infoPanelOpen = false;
-  private boolean disseminationsPanelOpen = false;
-  private boolean optionsPanelOpen = false;
-
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
@@ -187,7 +183,7 @@ public class BrowseFile extends Composite {
   FocusPanel optionsButton, infoFileButton, disseminationsButton, previousButton, nextButton;
 
   @UiField
-  FlowPanel infoFilePanel, dipFilePanel, optionsPanel;
+  SliderPanel disseminationsSliderPanel, infoSliderPanel, optionsSliderPanel;
 
   @UiField
   Button optionDownload, optionRename, optionMove, optionUploadFiles, optionCreateFolder, optionRemove,
@@ -229,7 +225,8 @@ public class BrowseFile extends Composite {
               @Override
               public void onSuccess(Long dipCount) {
                 if (dipCount > 0) {
-                  toggleDisseminationsPanel();
+                  // toggleDisseminationsPanel();
+                  disseminationsSliderPanel.open();
                 }
               }
             });
@@ -258,6 +255,15 @@ public class BrowseFile extends Composite {
     // downloadSchemasButton.setVisible(bundle.getRepresentation().getNumberOfSchemaFiles()
     // > 0);
     disseminationsButton.setVisible(bundle.getDipCount() > 0);
+
+    // bind slider buttons
+    disseminationsSliderPanel.setToggleButton(disseminationsButton);
+    updateDisseminations();
+
+    infoSliderPanel.setToggleButton(infoFileButton);
+    updateInfoSliderPanel();
+
+    optionsSliderPanel.setToggleButton(optionsButton);
 
     keyboardFocus.setFocus(true);
 
@@ -581,104 +587,12 @@ public class BrowseFile extends Composite {
     });
   }
 
-  @UiHandler("infoFileButton")
-  void buttonInfoFileButtonHandler(ClickEvent e) {
-    toggleInfoPanel();
-  }
-
-  @UiHandler("disseminationsButton")
-  void buttonDisseminationsButtonHandler(ClickEvent e) {
-    toggleDisseminationsPanel();
-  }
-
-  @UiHandler("optionsButton")
-  void buttonOptionsButtonHandler(ClickEvent e) {
-    toggleOptionsPanel();
-  }
-
-  private void toggleInfoPanel() {
-    infoPanelOpen = !infoPanelOpen;
-
-    updateInfoPanel();
-  }
-
-  private void updateInfoPanel() {
-    if (infoPanelOpen) {
-      infoFileButton.addStyleName("active");
-      updateInfoFile();
-
-      if (disseminationsPanelOpen) {
-        toggleDisseminationsPanel();
-      }
-
-      if (optionsPanelOpen) {
-        toggleOptionsPanel();
-      }
-
-    } else {
-      infoFileButton.removeStyleName("active");
-    }
-
-    JavascriptUtils.toggleRightPanel(".infoFilePanel");
-  }
-
-  private void toggleDisseminationsPanel() {
-    disseminationsPanelOpen = !disseminationsPanelOpen;
-    updateDisseminationPanel();
-  }
-
-  private void updateDisseminationPanel() {
-    if (disseminationsPanelOpen) {
-      disseminationsButton.addStyleName("active");
-      updateDisseminations();
-
-      if (infoPanelOpen) {
-        toggleInfoPanel();
-      }
-
-      if (optionsPanelOpen) {
-        toggleOptionsPanel();
-      }
-
-    } else {
-      disseminationsButton.removeStyleName("active");
-    }
-
-    JavascriptUtils.toggleRightPanel(".dipFilePanel");
-  }
-
-  private void toggleOptionsPanel() {
-    optionsPanelOpen = !optionsPanelOpen;
-    updateOptionsPanel();
-  }
-
-  private void updateOptionsPanel() {
-    if (optionsPanelOpen) {
-      optionsButton.addStyleName("active");
-      updateDisseminations();
-
-      if (infoPanelOpen) {
-        toggleInfoPanel();
-      }
-
-      if (disseminationsPanelOpen) {
-        toggleDisseminationsPanel();
-      }
-
-    } else {
-      optionsButton.removeStyleName("active");
-    }
-
-    JavascriptUtils.toggleRightPanel(".optionsFilePanel");
-  }
-
   private List<BreadcrumbItem> getBreadcrumbs() {
     return BreadcrumbUtils.getFileBreadcrumbs(bundle);
   }
 
-  public void updateInfoFile() {
+  public void updateInfoSliderPanel() {
     HashMap<String, SafeHtml> values = new HashMap<String, SafeHtml>();
-    infoFilePanel.clear();
     IndexedFile file = bundle.getFile();
 
     if (file != null) {
@@ -761,7 +675,7 @@ public class BrowseFile extends Composite {
       entry.add(keyLabel);
       entry.add(valueLabel);
 
-      infoFilePanel.add(entry);
+      infoSliderPanel.addContent(entry);
 
       keyLabel.addStyleName("infoFileEntryKey");
       valueLabel.addStyleName("infoFileEntryValue");
@@ -793,15 +707,15 @@ public class BrowseFile extends Composite {
   }
 
   private void updateDisseminations(List<IndexedDIP> dips) {
-    dipFilePanel.clear();
+    FlowPanel disseminationsContent = disseminationsSliderPanel.getContent();
 
     if (dips.isEmpty()) {
       Label dipEmpty = new Label(messages.browseFileDipEmpty());
-      dipFilePanel.add(dipEmpty);
+      disseminationsContent.add(dipEmpty);
       dipEmpty.addStyleName("dip-empty");
     } else {
       for (final IndexedDIP dip : dips) {
-        dipFilePanel.add(createDipPanel(dip));
+        disseminationsContent.add(createDipPanel(dip));
       }
     }
   }
@@ -871,7 +785,7 @@ public class BrowseFile extends Composite {
             BrowserService.Util.getInstance().deleteDIP(dip.getId(), new AsyncCallback<Void>() {
               @Override
               public void onSuccess(Void result) {
-                updateDisseminations();
+                // updateDisseminations();
               }
 
               @Override

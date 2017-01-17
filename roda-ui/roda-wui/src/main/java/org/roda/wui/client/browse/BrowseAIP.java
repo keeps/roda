@@ -415,8 +415,6 @@ public class BrowseAIP extends Composite {
     } else if (historyTokens.size() > 1
       && historyTokens.get(0).equals(BrowseRepresentation.RESOLVER.getHistoryToken())) {
       BrowseRepresentation.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
-    } else if (historyTokens.size() > 1 && historyTokens.get(0).equals(BrowseFolder.RESOLVER.getHistoryToken())) {
-      BrowseFolder.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.size() > 0
       && historyTokens.get(0).equals(TransferUpload.BROWSE_RESOLVER.getHistoryToken())) {
       TransferUpload.BROWSE_RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);

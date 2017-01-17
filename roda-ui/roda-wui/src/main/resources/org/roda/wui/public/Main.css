@@ -344,6 +344,34 @@ div.inline {
 	box-shadow: none;
 }
 
+
+.slider {
+    height: 630px;
+    width: 300px;
+    background: #089de3;
+    display: none;
+    color: white;
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 20px;
+    box-shadow: 0 0 0 0 transparent, 0 0 0 0 transparent, 0 0 0 0 transparent, -6px 0 15px -4px rgba(31, 73, 125, 0.8);
+}
+
+.slider-title {
+    font-size: 2.2rem;
+    margin: 1.2rem 0;
+}
+
+.slider .slider-layout {
+	opacity: 0;
+	transition: opacity 0.25s ease-in-out;
+}
+
+.slider-active .slider-layout {
+	opacity: 1;
+}
+
 /**********************************************
 				SKELETON
 ************************************************/

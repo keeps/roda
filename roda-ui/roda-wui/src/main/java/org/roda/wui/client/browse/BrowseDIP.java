@@ -153,10 +153,10 @@ public class BrowseDIP extends Composite {
 
     show();
 
-    keyboardFocus.setFocus(true);
-
     initializeRefererListSelectionState();
     ListSelectionState.bindLayout(DIPFile.class, previousButton, nextButton, keyboardFocus, true, false, false);
+    
+    keyboardFocus.setFocus(true);
 
   }
 

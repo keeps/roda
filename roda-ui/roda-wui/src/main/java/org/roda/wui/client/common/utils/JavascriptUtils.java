@@ -250,11 +250,17 @@ public class JavascriptUtils {
 		$wnd.history.pushState(newUrl, "", newUrl);
   }-*/;
 
-  public static native void toggleRightPanel(String panel) /*-{
+  public static native void toggle(String panel) /*-{
 		$wnd.jQuery(panel).animate({
 			width : 'toggle'
 		}, 100);
   }-*/;
+  
+  public static native void toggle(JavaScriptObject element) /*-{
+                $wnd.jQuery(element).animate({
+                        width : 'toggle'
+                }, 100);
+}-*/;
 
   public static native void hideRightPanel(String panel) /*-{
 		$wnd.jQuery(panel).hide();

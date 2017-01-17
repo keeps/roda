@@ -15,7 +15,7 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.wui.client.browse.BrowseFolder;
+import org.roda.wui.client.browse.BrowseFile;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
@@ -98,7 +98,7 @@ public class TransferUpload extends Composite {
 
     @Override
     public List<String> getHistoryPath() {
-      return ListUtils.concat(BrowseFolder.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(BrowseFile.RESOLVER.getHistoryPath(), getHistoryToken());
     }
   };
 

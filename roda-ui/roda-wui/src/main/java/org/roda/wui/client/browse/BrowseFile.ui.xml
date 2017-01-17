@@ -5,7 +5,8 @@
 	xmlns:i="urn:import:config.i18n.client" xmlns:m="urn:import:org.roda.wui.client.main"
 	xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag"
 	xmlns:commonsearch="urn:import:org.roda.wui.client.common.search"
-	xmlns:lists="urn:import:org.roda.wui.client.common.lists" xmlns:b="urn:import:org.roda.wui.client.browse">
+	xmlns:lists="urn:import:org.roda.wui.client.common.lists" xmlns:b="urn:import:org.roda.wui.client.browse"
+	xmlns:s="urn:import:org.roda.wui.client.common.sidebar">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
@@ -37,14 +38,12 @@
 							<i class="fa fa-info-circle"></i>
 						</g:HTML>
 					</g:FocusPanel>
-					<g:FocusPanel ui:field="previousButton" addStyleNames="toolbarLink"
-						title="CTRL &#8678;">
+					<g:FocusPanel ui:field="previousButton" addStyleNames="toolbarLink">
 						<g:HTML>
 							<i class="fa fa-chevron-left"></i>
 						</g:HTML>
 					</g:FocusPanel>
-					<g:FocusPanel ui:field="nextButton" addStyleNames="toolbarLink"
-						title="CTRL &#8680;">
+					<g:FocusPanel ui:field="nextButton" addStyleNames="toolbarLink">
 						<g:HTML>
 							<i class="fa fa-chevron-right"></i>
 						</g:HTML>
@@ -61,29 +60,31 @@
 				<b:IndexedFilePreview addStyleNames="viewRepresentationFilePreview"
 					ui:field="filePreview"></b:IndexedFilePreview>
 				<!-- INFO PANEL -->
-				<g:FlowPanel addStyleNames="infoFilePanel blueSlider">
-					<g:Label styleName="h1" addStyleNames="infoFileTitle">
-						<ui:text from='{messages.viewRepresentationInfoTitle}' />
-					</g:Label>
-					<g:FlowPanel ui:field="infoFilePanel">
-					</g:FlowPanel>
-				</g:FlowPanel>
+				<s:SliderPanel ui:field="infoSliderPanel">
+					<s:title>
+						<g:Label>
+							<ui:text from='{messages.viewRepresentationInfoTitle}' />
+						</g:Label>
+					</s:title>
+				</s:SliderPanel>
 				<!-- DIP PANEL -->
-				<g:FlowPanel addStyleNames="dipFilePanel blueSlider">
-					<g:Label styleName="h1" addStyleNames="fileDipTitle">
-						<ui:text from='{messages.viewRepresentationFileDisseminationTitle}' />
-					</g:Label>
-					<g:FlowPanel ui:field="dipFilePanel">
-					</g:FlowPanel>
-				</g:FlowPanel>
+				<s:SliderPanel ui:field="disseminationsSliderPanel">
+					<s:title>
+						<g:Label>
+							<ui:text from='{messages.viewRepresentationFileDisseminationTitle}' />
+						</g:Label>
+					</s:title>
+				</s:SliderPanel>
 				<!-- OPTIONS PANEL -->
-				<g:FlowPanel addStyleNames="optionsFilePanel blueSlider">
-					<g:FlowPanel ui:field="optionsPanel">
+				<s:SliderPanel ui:field="optionsSliderPanel">
+					<s:title>
+						<g:Label>
+							<ui:text from='{messages.sidebarFoldersFilesTitle}' />
+						</g:Label>
+					</s:title>
+					<s:content>
 						<!-- FOLDER ACTIONS -->
 						<g:FlowPanel>
-							<g:Label addStyleNames="h4">
-								<ui:text from='{messages.sidebarFoldersFilesTitle}' />
-							</g:Label>
 							<g:Button ui:field="optionDownload"
 								addStyleNames="btn btn-block btn-default-alt btn-download">
 								<ui:text from='{messages.viewRepresentationDownloadFileButton}' />
@@ -108,10 +109,14 @@
 								<ui:text from='{messages.removeButton}' />
 							</g:Button>
 						</g:FlowPanel>
+					</s:content>
+					<s:title>
+						<g:Label ui:field="preservationSidebarTitle">
+							<ui:text from='{messages.preservationTitle}' />
+						</g:Label>
+					</s:title>
+					<s:content>
 						<g:FlowPanel ui:field="preservationSidebar">
-							<g:Label addStyleNames="h4">
-								<ui:text from='{messages.preservationTitle}' />
-							</g:Label>
 							<g:Button ui:field="optionNewProcess"
 								addStyleNames="btn btn-block btn-default-alt btn-play">
 								<ui:text from='{messages.newProcessPreservation}' />
@@ -130,8 +135,8 @@
 								<ui:text from='{messages.preservationRisks}' />
 							</g:Button>
 						</g:FlowPanel>
-					</g:FlowPanel>
-				</g:FlowPanel>
+					</s:content>
+				</s:SliderPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FocusPanel>
