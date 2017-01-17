@@ -13,7 +13,6 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.roda.core.data.v2.IsModelObject;
-import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;

@@ -895,6 +895,21 @@ public class ModelService extends ModelObservable {
     return representation;
   }
 
+  public void updateRepresentationType(String aipId, String representationId, String type)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    AIP aip = retrieveAIP(aipId);
+
+    for (Iterator<Representation> it = aip.getRepresentations().iterator(); it.hasNext();) {
+      Representation representation = it.next();
+      if (representation.getId().equals(representationId)) {
+        representation.setType(type);
+        break;
+      }
+    }
+
+    updateAIPMetadata(aip);
+  }
+
   public Representation updateRepresentation(String aipId, String representationId, boolean original, String type,
     StorageService sourceStorage, StoragePath sourcePath) throws RequestNotValidException, NotFoundException,
     GenericException, AuthorizationDeniedException, ValidationException {

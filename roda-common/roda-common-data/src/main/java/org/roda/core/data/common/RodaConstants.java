@@ -447,6 +447,9 @@ public final class RodaConstants {
   public static final String AIP_HAS_REPRESENTATIONS = "hasRepresentations";
   public static final String AIP_GHOST = "ghost";
 
+  public static final String AIP_DESCRIPTIVE_METADATA = "descriptiveMetadata";
+  public static final String AIP_REPRESENTATIONS = "representations";
+
   // public static final String AIP_PRESERVATION_OBJECTS_ID =
   // "preservationObjectsId";
   // public static final String AIP_PRESERVATION_EVENTS_ID =
@@ -672,6 +675,17 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_REPRESENTATION_OR_DIP = "parameter.representation_or_dip";
   public static final String PLUGIN_PARAMS_DISSEMINATION_TITLE = "parameter.dissemination_title";
   public static final String PLUGIN_PARAMS_DISSEMINATION_DESCRIPTION = "parameter.dissemination_description";
+
+  public static final String PLUGIN_PARAMS_INCLUDE_SELECTED_DESCRIPTIVE_METADATA = "parameter.include_selected_descriptive_metadata";
+  public static final String PLUGIN_PARAMS_SELECTED_DESCRIPTIVE_METADATA = "parameter.selected_descriptive_metadata";
+  public static final String PLUGIN_PARAMS_INCLUDE_ALL_PRESERVATION_METADATA = "parameter.include_all_preservation_metadata";
+  public static final String PLUGIN_PARAMS_INCLUDE_SELECTED_OTHER_METADATA = "parameter.include_selected_other_metadata";
+  public static final String PLUGIN_PARAMS_SELECTED_OTHER_METADATA = "parameter.selected_other_metadata";
+  public static final String PLUGIN_PARAMS_INCLUDE_SELECTED_REPRESENTATIONS = "parameter.include_selected_representations";
+  public static final String PLUGIN_PARAMS_SELECTED_REPRESENTATIONS = "parameter.selected_representations";
+  public static final String PLUGIN_PARAMS_INCLUDE_SUBMISSION = "parameter.include_submission";
+  public static final String PLUGIN_PARAMS_INCLUDE_SCHEMAS = "parameter.include_schemas";
+  public static final String PLUGIN_PARAMS_INCLUDE_DOCUMENTATION = "parameter.include_documentation";
 
   public static final String PLUGIN_CLASS_DIGITAL_SIGNATURE = "org.roda.core.plugins.plugins.validation.DigitalSignaturePlugin";
   public static final String PLUGIN_CLASS_VERAPDF = "org.roda.core.plugins.plugins.validation.VeraPDFPlugin";
