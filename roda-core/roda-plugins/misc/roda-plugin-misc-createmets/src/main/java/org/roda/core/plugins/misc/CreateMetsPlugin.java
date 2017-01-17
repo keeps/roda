@@ -73,7 +73,7 @@ public class CreateMetsPlugin extends AbstractPlugin<AIP> {
   @Override
   public String getDescription() {
     return "Plugin that generates E-ARK AIP manifest files (\"METS.xml\") from "
-      + "existing AIP information in the storage layer.";
+      + "existing AIP information in the storage layer. This plugin only works with filesystem as the storage service.";
   }
 
   @Override

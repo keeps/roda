@@ -165,6 +165,15 @@ public interface StorageService {
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException;
 
   /**
+   * Tests if directory exists.
+   * 
+   * @param storagePath
+   *          storage path that identifies the directory
+   * 
+   */
+  public boolean hasDirectory(StoragePath storagePath);
+
+  /**
    * List all resources, container or binaries, under this directory.
    * 
    * @param storagePath

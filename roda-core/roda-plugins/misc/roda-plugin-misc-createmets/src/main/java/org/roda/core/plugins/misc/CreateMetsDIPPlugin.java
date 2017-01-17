@@ -151,7 +151,7 @@ public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
   @Override
   public String getDescription() {
     return "Plugin that generates E-ARK DIP manifest files (\"METS.xml\") from "
-      + "existing AIP information in the storage layer.";
+      + "existing AIP information in the storage layer. This plugin only works with filesystem as the storage service.";
   }
 
   @Override
@@ -340,10 +340,10 @@ public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
       // filter AIP structure using plugin parameters
       copyAndFilterAIP(aip, aipPath, aipOnDIPPath);
 
-      // create mets file
-      EARKAIP eark = new EARKAIP(RodaFolderAIP.parse(aipOnDIPPath));
-      eark.setType(IPType.DIP);
-      eark.build(aipOnDIPPath.getParent(), true);
+      // create mets files
+      EARKAIP earkAIPonDIP = new EARKAIP(RodaFolderAIP.parse(aipOnDIPPath));
+      earkAIPonDIP.setType(IPType.DIP);
+      earkAIPonDIP.build(aipOnDIPPath.getParent(), true);
 
       // delete aip.json
       FSUtils.deletePath(aipOnDIPPath.resolve(RodaConstants.STORAGE_AIP_METADATA_FILENAME));
@@ -387,10 +387,12 @@ public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
       FSUtils.copy(aipPath.resolve(RodaConstants.STORAGE_DIRECTORY_SUBMISSION),
         aipOnDIPPath.resolve(RodaConstants.STORAGE_DIRECTORY_SUBMISSION), true);
     }
+
     if (includeSchemas && Files.exists(aipPath.resolve(RodaConstants.STORAGE_DIRECTORY_SCHEMAS))) {
       FSUtils.copy(aipPath.resolve(RodaConstants.STORAGE_DIRECTORY_SCHEMAS),
         aipOnDIPPath.resolve(RodaConstants.STORAGE_DIRECTORY_SCHEMAS), true);
     }
+
     if (includeDocumentation && Files.exists(aipPath.resolve(RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION))) {
       FSUtils.copy(aipPath.resolve(RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION),
         aipOnDIPPath.resolve(RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION), true);
@@ -409,34 +411,38 @@ public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
 
       if (!includeSelectedRepresentations
         || (includeSelectedRepresentations && representationTypes.contains(representation.getType().toLowerCase()))) {
+        representationIds.add(representationId);
         Path representationPath = aipPath.resolve(RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS)
           .resolve(representationId);
-        Path representationDIPPath = aipOnDIPPath.resolve(RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS)
-          .resolve(representationId);
 
-        Path oldRepresentationPath = representationPath.resolve(RodaConstants.STORAGE_DIRECTORY_DATA);
-        Path newRepresentationPath = representationDIPPath.resolve(RodaConstants.STORAGE_DIRECTORY_DATA);
-        FSUtils.copy(oldRepresentationPath, newRepresentationPath, true);
-        representationIds.add(representationId);
+        if (Files.exists(representationPath)) {
+          Path representationDIPPath = aipOnDIPPath.resolve(RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS)
+            .resolve(representationId);
 
-        if (includeSchemas && Files.exists(representationPath.resolve(RodaConstants.STORAGE_DIRECTORY_SCHEMAS))) {
-          FSUtils.copy(representationPath.resolve(RodaConstants.STORAGE_DIRECTORY_SCHEMAS),
-            representationDIPPath.resolve(RodaConstants.STORAGE_DIRECTORY_SCHEMAS), true);
+          if (Files.exists(representationPath.resolve(RodaConstants.STORAGE_DIRECTORY_DATA))) {
+            FSUtils.copy(representationPath.resolve(RodaConstants.STORAGE_DIRECTORY_DATA),
+              representationDIPPath.resolve(RodaConstants.STORAGE_DIRECTORY_DATA), true);
+          }
+
+          if (includeSchemas && Files.exists(representationPath.resolve(RodaConstants.STORAGE_DIRECTORY_SCHEMAS))) {
+            FSUtils.copy(representationPath.resolve(RodaConstants.STORAGE_DIRECTORY_SCHEMAS),
+              representationDIPPath.resolve(RodaConstants.STORAGE_DIRECTORY_SCHEMAS), true);
+          }
+
+          if (includeDocumentation
+            && Files.exists(representationPath.resolve(RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION))) {
+            FSUtils.copy(representationPath.resolve(RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION),
+              representationDIPPath.resolve(RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION), true);
+          }
+
+          List<String> metadataTypes = Arrays.asList(selectedDescriptiveMetadata.toLowerCase().split(",\\s*"));
+          for (DescriptiveMetadata dm : representation.getDescriptiveMetadata()) {
+            copyDescriptiveMetadata(dm, metadataTypes, representationPath, representationDIPPath);
+          }
+
+          copyPreservationMetadata(representationPath, representationDIPPath);
+          copyOtherMetadata(representationPath, representationDIPPath);
         }
-
-        if (includeDocumentation
-          && Files.exists(representationPath.resolve(RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION))) {
-          FSUtils.copy(representationPath.resolve(RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION),
-            representationDIPPath.resolve(RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION), true);
-        }
-
-        List<String> metadataTypes = Arrays.asList(selectedDescriptiveMetadata.toLowerCase().split(",\\s*"));
-        for (DescriptiveMetadata dm : representation.getDescriptiveMetadata()) {
-          copyDescriptiveMetadata(dm, metadataTypes, representationPath, representationDIPPath);
-        }
-
-        copyPreservationMetadata(representationPath, representationDIPPath);
-        copyOtherMetadata(representationPath, representationDIPPath);
       }
     }
 
@@ -467,10 +473,13 @@ public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
       || (includeSelectedDescriptiveMetadata && metadataTypes.contains(versionType.toLowerCase()))) {
       Path oldMetadataPath = sourcePath.resolve(RodaConstants.STORAGE_DIRECTORY_METADATA)
         .resolve(RodaConstants.STORAGE_DIRECTORY_DESCRIPTIVE).resolve(dmId);
-      Path newMetadataPath = targetPath.resolve(RodaConstants.STORAGE_DIRECTORY_METADATA)
-        .resolve(RodaConstants.STORAGE_DIRECTORY_DESCRIPTIVE).resolve(dmId);
-      FSUtils.copy(oldMetadataPath, newMetadataPath, true);
-      return dmId;
+
+      if (Files.exists(oldMetadataPath)) {
+        Path newMetadataPath = targetPath.resolve(RodaConstants.STORAGE_DIRECTORY_METADATA)
+          .resolve(RodaConstants.STORAGE_DIRECTORY_DESCRIPTIVE).resolve(dmId);
+        FSUtils.copy(oldMetadataPath, newMetadataPath, true);
+        return dmId;
+      }
     }
 
     return null;
@@ -481,9 +490,11 @@ public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
     if (includeAllPreservationMetadata) {
       Path oldMetadataPath = sourcePath.resolve(RodaConstants.STORAGE_DIRECTORY_METADATA)
         .resolve(RodaConstants.STORAGE_DIRECTORY_PRESERVATION);
-      Path newMetadataPath = targetPath.resolve(RodaConstants.STORAGE_DIRECTORY_METADATA)
-        .resolve(RodaConstants.STORAGE_DIRECTORY_PRESERVATION);
-      FSUtils.copy(oldMetadataPath, newMetadataPath, true);
+      if (Files.exists(oldMetadataPath)) {
+        Path newMetadataPath = targetPath.resolve(RodaConstants.STORAGE_DIRECTORY_METADATA)
+          .resolve(RodaConstants.STORAGE_DIRECTORY_PRESERVATION);
+        FSUtils.copy(oldMetadataPath, newMetadataPath, true);
+      }
     }
   }
 
@@ -509,13 +520,16 @@ public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
     } else {
       Path oldMetadataPath = sourcePath.resolve(RodaConstants.STORAGE_DIRECTORY_METADATA)
         .resolve(RodaConstants.STORAGE_DIRECTORY_OTHER);
-      Path newMetadataPath = targetPath.resolve(RodaConstants.STORAGE_DIRECTORY_METADATA)
-        .resolve(RodaConstants.STORAGE_DIRECTORY_OTHER);
 
-      try {
-        FSUtils.copy(oldMetadataPath, newMetadataPath, true);
-      } catch (AlreadyExistsException | GenericException e) {
-        LOGGER.error("Error copying other metadata '{}' when creating EARK-DIP", e);
+      if (Files.exists(oldMetadataPath)) {
+        Path newMetadataPath = targetPath.resolve(RodaConstants.STORAGE_DIRECTORY_METADATA)
+          .resolve(RodaConstants.STORAGE_DIRECTORY_OTHER);
+
+        try {
+          FSUtils.copy(oldMetadataPath, newMetadataPath, true);
+        } catch (AlreadyExistsException | GenericException e) {
+          LOGGER.error("Error copying other metadata '{}' when creating EARK-DIP", e);
+        }
       }
     }
   }

@@ -50,7 +50,7 @@ public class ResourceListUtils {
                   StoragePath repPath = DefaultStoragePath.parse(aipIterator.next().getStoragePath(),
                     RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS);
 
-                  if (testIfDirectoryExists(storage, repPath)) {
+                  if (storage.hasDirectory(repPath)) {
                     repResources = storage.listResourcesUnderDirectory(repPath, false);
                     repIterator = repResources.iterator();
 
@@ -58,7 +58,7 @@ public class ResourceListUtils {
                       StoragePath filePath = DefaultStoragePath.parse(repIterator.next().getStoragePath(),
                         RodaConstants.STORAGE_DIRECTORY_DATA);
 
-                      if (testIfDirectoryExists(storage, filePath)) {
+                      if (storage.hasDirectory(filePath)) {
                         fileResources = storage.listResourcesUnderDirectory(filePath, true);
                         fileIterator = fileResources.iterator();
                         if (fileIterator.hasNext()) {
@@ -98,7 +98,7 @@ public class ResourceListUtils {
                   StoragePath filePath = DefaultStoragePath.parse(repIterator.next().getStoragePath(),
                     RodaConstants.STORAGE_DIRECTORY_DATA);
 
-                  if (testIfDirectoryExists(storage, filePath)) {
+                  if (storage.hasDirectory(filePath)) {
                     IOUtils.closeQuietly(fileResources);
                     fileResources = storage.listResourcesUnderDirectory(filePath, true);
                     fileIterator = fileResources.iterator();
@@ -121,7 +121,7 @@ public class ResourceListUtils {
                     StoragePath repPath = DefaultStoragePath.parse(aipIterator.next().getStoragePath(),
                       RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS);
 
-                    if (testIfDirectoryExists(storage, repPath)) {
+                    if (storage.hasDirectory(repPath)) {
                       IOUtils.closeQuietly(repResources);
                       repResources = storage.listResourcesUnderDirectory(repPath, false);
                       repIterator = repResources.iterator();
@@ -129,7 +129,7 @@ public class ResourceListUtils {
                         StoragePath filePath = DefaultStoragePath.parse(repIterator.next().getStoragePath(),
                           RodaConstants.STORAGE_DIRECTORY_DATA);
 
-                        if (testIfDirectoryExists(storage, filePath)) {
+                        if (storage.hasDirectory(filePath)) {
                           IOUtils.closeQuietly(fileResources);
                           fileResources = storage.listResourcesUnderDirectory(filePath, true);
                           fileIterator = fileResources.iterator();
@@ -187,7 +187,7 @@ public class ResourceListUtils {
                   StoragePath repPath = DefaultStoragePath.parse(aipIterator.next().getStoragePath(),
                     RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS);
 
-                  if (testIfDirectoryExists(storage, repPath)) {
+                  if (storage.hasDirectory(repPath)) {
                     repResources = storage.listResourcesUnderDirectory(repPath, false);
                     repIterator = repResources.iterator();
 
@@ -220,7 +220,7 @@ public class ResourceListUtils {
                   StoragePath repPath = DefaultStoragePath.parse(aipIterator.next().getStoragePath(),
                     RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS);
 
-                  if (testIfDirectoryExists(storage, repPath)) {
+                  if (storage.hasDirectory(repPath)) {
                     repResources = storage.listResourcesUnderDirectory(repPath, false);
                     repIterator = repResources.iterator();
 
@@ -272,7 +272,7 @@ public class ResourceListUtils {
                   StoragePath dataPath = DefaultStoragePath.parse(dipIterator.next().getStoragePath(),
                     RodaConstants.STORAGE_DIRECTORY_DATA);
 
-                  if (testIfDirectoryExists(storage, dataPath)) {
+                  if (storage.hasDirectory(dataPath)) {
                     fileResources = storage.listResourcesUnderDirectory(dataPath, true);
                     fileIterator = fileResources.iterator();
 
@@ -305,7 +305,7 @@ public class ResourceListUtils {
                   StoragePath dataPath = DefaultStoragePath.parse(dipIterator.next().getStoragePath(),
                     RodaConstants.STORAGE_DIRECTORY_DATA);
 
-                  if (testIfDirectoryExists(storage, dataPath)) {
+                  if (storage.hasDirectory(dataPath)) {
                     fileResources = storage.listResourcesUnderDirectory(dataPath, true);
                     fileIterator = fileResources.iterator();
 
@@ -358,7 +358,7 @@ public class ResourceListUtils {
                   StoragePath metadataPath = DefaultStoragePath.parse(aipIteratorTop.next().getStoragePath(),
                     RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION);
 
-                  if (testIfDirectoryExists(storage, metadataPath)) {
+                  if (storage.hasDirectory(metadataPath)) {
                     metadataResources = storage.listResourcesUnderDirectory(metadataPath, false);
                     metadataIterator = metadataResources.iterator();
 
@@ -391,7 +391,7 @@ public class ResourceListUtils {
                   StoragePath metadataPath = DefaultStoragePath.parse(aipIteratorTop.next().getStoragePath(),
                     RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION);
 
-                  if (testIfDirectoryExists(storage, metadataPath)) {
+                  if (storage.hasDirectory(metadataPath)) {
                     metadataResources = storage.listResourcesUnderDirectory(metadataPath, false);
                     metadataIterator = metadataResources.iterator();
 
@@ -443,7 +443,7 @@ public class ResourceListUtils {
                   StoragePath repPath = DefaultStoragePath.parse(aipIteratorSub.next().getStoragePath(),
                     RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS);
 
-                  if (testIfDirectoryExists(storage, repPath)) {
+                  if (storage.hasDirectory(repPath)) {
                     repResources = storage.listResourcesUnderDirectory(repPath, false);
                     repIterator = repResources.iterator();
 
@@ -451,7 +451,7 @@ public class ResourceListUtils {
                       StoragePath metadataPath = DefaultStoragePath.parse(repIterator.next().getStoragePath(),
                         RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION);
 
-                      if (testIfDirectoryExists(storage, metadataPath)) {
+                      if (storage.hasDirectory(metadataPath)) {
                         metadataResources = storage.listResourcesUnderDirectory(metadataPath, true);
                         metadataIterator = metadataResources.iterator();
                         if (metadataIterator.hasNext()) {
@@ -491,7 +491,7 @@ public class ResourceListUtils {
                   StoragePath metadataPath = DefaultStoragePath.parse(repIterator.next().getStoragePath(),
                     RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION);
 
-                  if (testIfDirectoryExists(storage, metadataPath)) {
+                  if (storage.hasDirectory(metadataPath)) {
                     IOUtils.closeQuietly(metadataResources);
                     metadataResources = storage.listResourcesUnderDirectory(metadataPath, true);
                     metadataIterator = metadataResources.iterator();
@@ -514,7 +514,7 @@ public class ResourceListUtils {
                     StoragePath repPath = DefaultStoragePath.parse(aipIteratorSub.next().getStoragePath(),
                       RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS);
 
-                    if (testIfDirectoryExists(storage, repPath)) {
+                    if (storage.hasDirectory(repPath)) {
                       IOUtils.closeQuietly(repResources);
                       repResources = storage.listResourcesUnderDirectory(repPath, false);
                       repIterator = repResources.iterator();
@@ -522,7 +522,7 @@ public class ResourceListUtils {
                         StoragePath metadataPath = DefaultStoragePath.parse(repIterator.next().getStoragePath(),
                           RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION);
 
-                        if (testIfDirectoryExists(storage, metadataPath)) {
+                        if (storage.hasDirectory(metadataPath)) {
                           IOUtils.closeQuietly(metadataResources);
                           metadataResources = storage.listResourcesUnderDirectory(metadataPath, true);
                           metadataIterator = metadataResources.iterator();
@@ -587,7 +587,7 @@ public class ResourceListUtils {
                   StoragePath metadataPath = DefaultStoragePath.parse(aipIteratorTop.next().getStoragePath(),
                     RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_DESCRIPTIVE);
 
-                  if (testIfDirectoryExists(storage, metadataPath)) {
+                  if (storage.hasDirectory(metadataPath)) {
                     metadataResources = storage.listResourcesUnderDirectory(metadataPath, false);
                     metadataIterator = metadataResources.iterator();
 
@@ -620,7 +620,7 @@ public class ResourceListUtils {
                   StoragePath metadataPath = DefaultStoragePath.parse(aipIteratorTop.next().getStoragePath(),
                     RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_DESCRIPTIVE);
 
-                  if (testIfDirectoryExists(storage, metadataPath)) {
+                  if (storage.hasDirectory(metadataPath)) {
                     metadataResources = storage.listResourcesUnderDirectory(metadataPath, false);
                     metadataIterator = metadataResources.iterator();
 
@@ -672,7 +672,7 @@ public class ResourceListUtils {
                   StoragePath repPath = DefaultStoragePath.parse(aipIteratorSub.next().getStoragePath(),
                     RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS);
 
-                  if (testIfDirectoryExists(storage, repPath)) {
+                  if (storage.hasDirectory(repPath)) {
                     repResources = storage.listResourcesUnderDirectory(repPath, false);
                     repIterator = repResources.iterator();
 
@@ -680,7 +680,7 @@ public class ResourceListUtils {
                       StoragePath metadataPath = DefaultStoragePath.parse(repIterator.next().getStoragePath(),
                         RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_DESCRIPTIVE);
 
-                      if (testIfDirectoryExists(storage, metadataPath)) {
+                      if (storage.hasDirectory(metadataPath)) {
                         metadataResources = storage.listResourcesUnderDirectory(metadataPath, true);
                         metadataIterator = metadataResources.iterator();
                         if (metadataIterator.hasNext()) {
@@ -720,7 +720,7 @@ public class ResourceListUtils {
                   StoragePath metadataPath = DefaultStoragePath.parse(repIterator.next().getStoragePath(),
                     RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_DESCRIPTIVE);
 
-                  if (testIfDirectoryExists(storage, metadataPath)) {
+                  if (storage.hasDirectory(metadataPath)) {
                     IOUtils.closeQuietly(metadataResources);
                     metadataResources = storage.listResourcesUnderDirectory(metadataPath, true);
                     metadataIterator = metadataResources.iterator();
@@ -743,7 +743,7 @@ public class ResourceListUtils {
                     StoragePath repPath = DefaultStoragePath.parse(aipIteratorSub.next().getStoragePath(),
                       RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS);
 
-                    if (testIfDirectoryExists(storage, repPath)) {
+                    if (storage.hasDirectory(repPath)) {
                       IOUtils.closeQuietly(repResources);
                       repResources = storage.listResourcesUnderDirectory(repPath, false);
                       repIterator = repResources.iterator();
@@ -751,7 +751,7 @@ public class ResourceListUtils {
                         StoragePath metadataPath = DefaultStoragePath.parse(repIterator.next().getStoragePath(),
                           RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_DESCRIPTIVE);
 
-                        if (testIfDirectoryExists(storage, metadataPath)) {
+                        if (storage.hasDirectory(metadataPath)) {
                           IOUtils.closeQuietly(metadataResources);
                           metadataResources = storage.listResourcesUnderDirectory(metadataPath, true);
                           metadataIterator = metadataResources.iterator();
@@ -781,15 +781,6 @@ public class ResourceListUtils {
     };
 
     return CloseableIterables.concat(aipMetadata, repMetadata);
-  }
-
-  private static boolean testIfDirectoryExists(StorageService storage, StoragePath path) {
-    try {
-      storage.getDirectory(path);
-      return true;
-    } catch (RODAException e) {
-      return false;
-    }
   }
 
 }

@@ -708,4 +708,14 @@ public class FileStorageService implements StorageService {
     }
   }
 
+  @Override
+  public boolean hasDirectory(StoragePath storagePath) {
+    try {
+      this.getDirectory(storagePath);
+      return true;
+    } catch (NotFoundException | RequestNotValidException | GenericException e) {
+      return false;
+    }
+  }
+
 }

@@ -834,4 +834,14 @@ public class FedoraStorageService implements StorageService {
     return fullID;
   }
 
+  @Override
+  public boolean hasDirectory(StoragePath storagePath) {
+    try {
+      this.getDirectory(storagePath);
+      return true;
+    } catch (NotFoundException | RequestNotValidException | GenericException | AuthorizationDeniedException e) {
+      return false;
+    }
+  }
+
 }
