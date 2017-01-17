@@ -47,12 +47,17 @@ import org.slf4j.LoggerFactory;
 public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
   private static final Logger LOGGER = LoggerFactory.getLogger(ReindexRodaEntityPlugin.class);
   private boolean clearIndexes = false;
+  private boolean optimizeIndexes = true;
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "Clear indexes", PluginParameterType.BOOLEAN,
         "false", false, false, "Clear all indexes before reindexing them."));
+
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES, "Optimize indexes", PluginParameterType.BOOLEAN,
+        "true", false, false, "Optimize indexes after reindexing them."));
   }
 
   @Override
@@ -82,6 +87,7 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
   public List<PluginParameter> getParameters() {
     ArrayList<PluginParameter> parameters = new ArrayList<PluginParameter>();
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES));
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES));
     return parameters;
   }
 
@@ -90,6 +96,10 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
     super.setParameterValues(parameters);
     if (parameters != null && parameters.containsKey(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES)) {
       clearIndexes = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES));
+    }
+
+    if (parameters != null && parameters.containsKey(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES)) {
+      optimizeIndexes = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES));
     }
   }
 
@@ -170,12 +180,14 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     LOGGER.debug("Optimizing indexes");
-    try {
-      Job job = PluginHelper.getJob(this, index);
-      Class selectedClass = Class.forName(job.getSourceObjects().getSelectedClass());
-      index.optimizeIndexes(SolrUtils.getIndexName(selectedClass));
-    } catch (GenericException | NotFoundException | ClassNotFoundException e) {
-      throw new PluginException("Error optimizing index", e);
+    if (optimizeIndexes) {
+      try {
+        Job job = PluginHelper.getJob(this, index);
+        Class selectedClass = Class.forName(job.getSourceObjects().getSelectedClass());
+        index.optimizeIndexes(SolrUtils.getIndexName(selectedClass));
+      } catch (GenericException | NotFoundException | ClassNotFoundException e) {
+        throw new PluginException("Error optimizing index", e);
+      }
     }
 
     return new Report();

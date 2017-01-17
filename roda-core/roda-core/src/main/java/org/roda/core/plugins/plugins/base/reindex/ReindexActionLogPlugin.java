@@ -61,18 +61,23 @@ public class ReindexActionLogPlugin extends AbstractPlugin<Void> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ReindexActionLogPlugin.class);
   private boolean clearIndexes = false;
+  private boolean optimizeIndexes = true;
   private static int dontReindexOlderThanXDays = RodaCoreFactory.getRodaConfigurationAsInt(0, "core", "actionlogs",
     "delete_older_than_x_days");
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INT_VALUE,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_INT_VALUE, "Delete older logs", PluginParameterType.INTEGER,
+        Integer.toString(dontReindexOlderThanXDays), false, false, "Delete logs older than x days."));
+
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "Clear indexes", PluginParameterType.BOOLEAN,
         "false", false, false, "Clear all indexes before reindexing them."));
 
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INT_VALUE,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_INT_VALUE, "Delete older logs", PluginParameterType.INTEGER,
-        Integer.toString(dontReindexOlderThanXDays), false, false, "Delete logs older than x days."));
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES, "Optimize indexes", PluginParameterType.BOOLEAN,
+        "true", false, false, "Optimize indexes after reindexing them."));
   }
 
   @Override
@@ -105,8 +110,9 @@ public class ReindexActionLogPlugin extends AbstractPlugin<Void> {
   @Override
   public List<PluginParameter> getParameters() {
     ArrayList<PluginParameter> parameters = new ArrayList<PluginParameter>();
-    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_INT_VALUE));
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES));
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES));
     return parameters;
   }
 
@@ -115,6 +121,10 @@ public class ReindexActionLogPlugin extends AbstractPlugin<Void> {
     super.setParameterValues(parameters);
     if (parameters != null && parameters.containsKey(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES)) {
       clearIndexes = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES));
+    }
+
+    if (parameters != null && parameters.containsKey(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES)) {
+      optimizeIndexes = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES));
     }
 
     if (parameters != null && parameters.containsKey(RodaConstants.PLUGIN_PARAMS_INT_VALUE)) {
@@ -258,19 +268,21 @@ public class ReindexActionLogPlugin extends AbstractPlugin<Void> {
       LOGGER.debug("Skipping clear indexes");
     }
 
-    return null;
+    return new Report();
   }
 
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    LOGGER.debug("Optimizing indexes");
-    try {
-      index.optimizeIndex(RodaConstants.INDEX_ACTION_LOG);
-    } catch (GenericException e) {
-      throw new PluginException("Error optimizing index", e);
+    if (optimizeIndexes) {
+      LOGGER.debug("Optimizing indexes");
+      try {
+        index.optimizeIndex(RodaConstants.INDEX_ACTION_LOG);
+      } catch (GenericException e) {
+        throw new PluginException("Error optimizing index", e);
+      }
     }
 
-    return null;
+    return new Report();
   }
 
   @Override
