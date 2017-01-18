@@ -125,6 +125,10 @@ public interface ClientMessages extends Messages {
   String createFolderTitle();
 
   String createFolderPlaceholder();
+  
+  String createFolderAlreadyExistsTitle();
+  
+  String createFolderAlreadyExistsMessage();
 
   String outcomeDetailTitle();
 

@@ -1321,6 +1321,7 @@ td.datePickerMonth, td.datePickerYear {
     font-size: 1.1rem;
     font-weight: 300;
     color: #fff;
+    z-index: 10;
 }
 
 .wui-toast.toast-error {
@@ -3931,7 +3932,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .viewRepresentationFilePreview {
-    height: 670px;
+    min-height: 670px;
     display: inline-block;
     vertical-align: top;
     width: 100%;

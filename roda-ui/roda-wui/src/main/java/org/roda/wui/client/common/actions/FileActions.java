@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -373,8 +374,9 @@ public class FileActions {
 
                     @Override
                     public void onFailureImpl(Throwable caught) {
-                      if (caught instanceof NotFoundException) {
-                        Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
+                      if (caught instanceof AlreadyExistsException) {
+                        Dialogs.showInformationDialog(messages.createFolderAlreadyExistsTitle(),
+                          messages.createFolderAlreadyExistsMessage(), messages.dialogOk());
                       } else {
                         callback.onFailure(caught);
                       }
