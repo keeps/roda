@@ -30,6 +30,7 @@ import java.util.TimerTask;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
+import java.util.stream.Collectors;
 
 import org.reflections.Reflections;
 import org.roda.core.RodaCoreFactory;
@@ -134,13 +135,7 @@ public class PluginManager {
    * @return a {@link List} of {@link PluginInfo}s.
    */
   public List<PluginInfo> getPluginsInfo() {
-    List<PluginInfo> pluginsInfo = new ArrayList<PluginInfo>();
-
-    for (Plugin<? extends IsRODAObject> plugin : getPlugins()) {
-      pluginsInfo.add(getPluginInfo(plugin));
-    }
-
-    return pluginsInfo;
+    return getPlugins().stream().map(e -> getPluginInfo(e)).collect(Collectors.toList());
   }
 
   public List<PluginInfo> getPluginsInfo(PluginType pluginType) {
@@ -257,11 +252,14 @@ public class PluginManager {
    * @throws PluginManagerException
    */
   private PluginManager() throws PluginManagerException {
-    LOGGER.debug("Starting plugin scanner timer...");
+    // load, for the first time, all the plugins (internal & external)
+    loadPlugins();
 
+    // schedule
+    LOGGER.debug("Starting plugin scanner timer...");
     int timeInSeconds = RodaCoreFactory.getRodaConfiguration().getInt("core.plugins.external.scheduler.interval");
     this.loadPluginsTimer = new Timer("Plugin scanner timer", true);
-    this.loadPluginsTimer.schedule(new SearchPluginsTask(), 1000, timeInSeconds * 1000);
+    this.loadPluginsTimer.schedule(new SearchPluginsTask(), timeInSeconds * 1000, timeInSeconds * 1000);
 
     LOGGER.info("{} init OK", getClass().getSimpleName());
   }
@@ -272,8 +270,13 @@ public class PluginManager {
   }
 
   private void loadPlugins() {
+    // reload backlisted plugins
+    blacklistedPlugins = RodaCoreFactory.getRodaConfigurationAsList("core", "plugins", "blacklist");
+
     // load "external" RODA plugins, i.e., those available in the plugins folder
-    loadExternalPlugins();
+    if (Files.exists(RODA_PLUGINS_PATH) && Files.isDirectory(RODA_PLUGINS_PATH)) {
+      loadExternalPlugins();
+    }
 
     // load internal RODA plugins
     if (!internalPluginStarted) {
@@ -292,16 +295,17 @@ public class PluginManager {
         if (iterator.hasNext()) {
           LOGGER.error(
             "'{}' has jars that will not be loaded as they are expected inside a folder (don't use folder '{}' to put them if you're not 100% sure that they should be used when loading each plugin. Instead, consider putting them inside folder '{}' to remove this error)! And the jars are:",
-            RODA_PLUGINS_PATH, RodaConstants.CORE_PLUGINS_SHARED_FOLDER, RodaConstants.CORE_PLUGINS_DEACTIVATED_FOLDER);
+            RODA_PLUGINS_PATH, RodaConstants.CORE_PLUGINS_SHARED_FOLDER, RodaConstants.CORE_PLUGINS_DISABLED_FOLDER);
           iterator.forEachRemaining(path -> LOGGER.error("   {}", path));
         }
       }
 
-      // process each folder inside the plugins folder (except shared & deactivated)
+      // process each folder inside the plugins folder (except shared &
+      // disabled)
       try (DirectoryStream<Path> pluginsFolders = Files.newDirectoryStream(RODA_PLUGINS_PATH,
         path -> Files.isDirectory(path)
           && !RodaConstants.CORE_PLUGINS_SHARED_FOLDER.equals(path.getFileName().toString())
-          && !RodaConstants.CORE_PLUGINS_DEACTIVATED_FOLDER.equals(path.getFileName().toString()))) {
+          && !RodaConstants.CORE_PLUGINS_DISABLED_FOLDER.equals(path.getFileName().toString()))) {
         for (Path pluginFolder : pluginsFolders) {
           LOGGER.debug("Processing plugin folder '{}'", pluginFolder);
           List<Path> pluginJarFiles = new ArrayList<>();
@@ -398,7 +402,7 @@ public class PluginManager {
     for (Class<? extends AbstractPlugin> plugin : plugins) {
       String name = plugin.getName();
       if (!Modifier.isAbstract(plugin.getModifiers()) && !blacklistedPlugins.contains(name)) {
-        LOGGER.debug("Loading internal plugin '{}'", name);
+        LOGGER.info("Loading internal plugin '{}'", name);
         try {
           Plugin<? extends IsRODAObject> p = (Plugin<?>) ClassLoaderUtility.createObject(plugin.getName());
           p.init();
@@ -544,20 +548,18 @@ public class PluginManager {
 
       LOGGER.debug("Searching for plugins...");
 
-      blacklistedPlugins = RodaCoreFactory.getRodaConfigurationAsList("core", "plugins", "blacklist");
-
       loadPlugins();
 
-      LOGGER.debug("Search complete - {} jar files", jarPluginCache.size());
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Search complete - {} jar files", jarPluginCache.size());
 
-      for (Path jarFile : jarPluginCache.keySet()) {
-
-        List<Plugin<?>> plugins = jarPluginCache.get(jarFile).plugins;
-
-        if (!plugins.isEmpty()) {
-          for (Plugin<?> plugin : plugins) {
-            LOGGER.debug("- {}", jarFile.getFileName());
-            LOGGER.debug("--- {} - {} - {}", plugin.getName(), plugin.getVersion(), plugin.getDescription());
+        for (Path jarFile : jarPluginCache.keySet()) {
+          List<Plugin<?>> plugins = jarPluginCache.get(jarFile).plugins;
+          if (!plugins.isEmpty()) {
+            for (Plugin<?> plugin : plugins) {
+              LOGGER.debug("- {}", jarFile.getFileName());
+              LOGGER.debug("--- {} - {} - {}", plugin.getName(), plugin.getVersion(), plugin.getDescription());
+            }
           }
         }
       }
