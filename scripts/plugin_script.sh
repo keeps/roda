@@ -24,8 +24,9 @@ mkdir -p "$PLUGINS_DST_DIR"
 
 for i in "${JARS[@]}"
 do :
-	SIZE=${#i}-4
-	PLUGIN_FOLDER="$PLUGINS_DST_DIR/${i:0:$SIZE}"
+	JARBASENAME=$(basename "$i"); 
+	SIZE=${#JARBASENAME}-4
+	PLUGIN_FOLDER="$PLUGINS_DST_DIR${JARBASENAME:0:$SIZE}"
 	mkdir -p "$PLUGIN_FOLDER"
 	cp -v -f  "$i" "$PLUGIN_FOLDER"
 done
