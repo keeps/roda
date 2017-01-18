@@ -344,9 +344,12 @@ div.inline {
 	box-shadow: none;
 }
 
+.slider-container {
+	position: relative;
+}
 
 .slider {
-    height: 630px;
+    height: 100%;
     width: 300px;
     background: #089de3;
     display: none;
@@ -354,7 +357,7 @@ div.inline {
     position: absolute;
     right: 0;
     top: 0;
-    padding: 20px;
+    padding: 0;
     box-shadow: 0 0 0 0 transparent, 0 0 0 0 transparent, 0 0 0 0 transparent, -6px 0 15px -4px rgba(31, 73, 125, 0.8);
     z-index: 1;
 }
@@ -365,6 +368,7 @@ div.inline {
 }
 
 .slider .slider-layout {
+	margin: 25px;
 	opacity: 0;
 	transition: opacity 0.25s ease-in-out;
 }
@@ -3936,7 +3940,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .bitstreamPreview-directory {
-    margin: 2%;
+    padding: 2%;
     width: 96%;
 }
 

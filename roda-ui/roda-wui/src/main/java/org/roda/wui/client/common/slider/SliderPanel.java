@@ -1,4 +1,4 @@
-package org.roda.wui.client.common.sidebar;
+package org.roda.wui.client.common.slider;
 
 import org.roda.wui.client.common.utils.JavascriptUtils;
 
@@ -86,10 +86,6 @@ public class SliderPanel extends Composite implements HasChangeHandlers {
     OPEN_SLIDER.setActive(true);
   }
 
-  public FlowPanel getContent() {
-    return layout;
-  }
-
   @UiChild(tagname = "title")
   public void addTitle(Label title) {
     layout.add(title);
@@ -99,6 +95,10 @@ public class SliderPanel extends Composite implements HasChangeHandlers {
   @UiChild(tagname = "content")
   public void addContent(Widget widget) {
     layout.add(widget);
+  }
+
+  public void clear() {
+    layout.clear();
   }
 
   private void setActive(boolean active) {

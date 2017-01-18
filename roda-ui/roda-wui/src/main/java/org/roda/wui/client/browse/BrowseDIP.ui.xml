@@ -6,7 +6,7 @@
 	xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag"
 	xmlns:commonsearch="urn:import:org.roda.wui.client.common.search"
 	xmlns:lists="urn:import:org.roda.wui.client.common.lists" xmlns:b="urn:import:org.roda.wui.client.browse"
-	xmlns:s="urn:import:org.roda.wui.client.common.sidebar">
+	xmlns:s="urn:import:org.roda.wui.client.common.slider">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
@@ -84,14 +84,6 @@
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="viewRepresentationFile-center"
 				ui:field="center">
-				<!-- DIP PANEL -->
-				<s:SliderPanel ui:field="disseminationsSliderPanel">
-					<s:title>
-						<g:Label>
-							<ui:text from='{messages.viewRepresentationFileDisseminationTitle}' />
-						</g:Label>
-					</s:title>
-				</s:SliderPanel>
 				<!-- DIP OPTIONS PANEL -->
 				<s:SliderPanel ui:field="optionsSliderPanel">
 					<s:title>
