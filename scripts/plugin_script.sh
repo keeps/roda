@@ -24,9 +24,11 @@ mkdir -p "$PLUGINS_DST_DIR"
 
 for i in "${JARS[@]}"
 do :
-	JARBASENAME=$(basename "$i"); 
+	JARBASENAME=$(basename "$i");
 	SIZE=${#JARBASENAME}-4
 	PLUGIN_FOLDER="$PLUGINS_DST_DIR${JARBASENAME:0:$SIZE}"
 	mkdir -p "$PLUGIN_FOLDER"
 	cp -v -f  "$i" "$PLUGIN_FOLDER"
 done
+
+mv -v "${PLUGINS_DST_DIR}roda-plugin-common-"* "${PLUGINS_DST_DIR}shared"
