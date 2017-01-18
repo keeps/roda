@@ -570,7 +570,7 @@ public class RodaCoreFactory {
   private static void instantiatePluginManager() {
     if (nodeType == NodeType.MASTER || nodeType == NodeType.WORKER || TEST_DEPLOY_PLUGIN_MANAGER) {
       try {
-        pluginManager = PluginManager.getDefaultPluginManager(getConfigPath(), getPluginsPath());
+        pluginManager = PluginManager.instantiatePluginManager(getConfigPath(), getPluginsPath());
       } catch (PluginManagerException e) {
         LOGGER.error("Error instantiating PluginManager", e);
         instantiatedWithoutErrors = false;
@@ -980,7 +980,7 @@ public class RodaCoreFactory {
   }
 
   public static PluginManager getPluginManager() {
-    return pluginManager;
+    return PluginManager.getInstance();
   }
 
   public static PluginOrchestrator getPluginOrchestrator() {

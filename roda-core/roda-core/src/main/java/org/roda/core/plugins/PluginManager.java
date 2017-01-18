@@ -92,14 +92,19 @@ public class PluginManager {
    * 
    * @throws PluginManagerException
    */
-  public synchronized static PluginManager getDefaultPluginManager(Path rodaConfigPath, Path rodaPluginsPath)
+  public synchronized static PluginManager instantiatePluginManager(Path rodaConfigPath, Path rodaPluginsPath)
     throws PluginManagerException {
     if (defaultPluginManager == null) {
       RODA_CONFIG_PATH = rodaConfigPath;
       RODA_PLUGINS_PATH = rodaPluginsPath;
       RODA_PLUGINS_SHARED_PATH = rodaPluginsPath.resolve(RodaConstants.CORE_PLUGINS_SHARED_FOLDER);
       defaultPluginManager = new PluginManager();
+      defaultPluginManager.init();
     }
+    return defaultPluginManager;
+  }
+
+  public static PluginManager getInstance() {
     return defaultPluginManager;
   }
 
@@ -252,6 +257,10 @@ public class PluginManager {
    * @throws PluginManagerException
    */
   private PluginManager() throws PluginManagerException {
+    // do nothing
+  }
+
+  private void init() {
     // load, for the first time, all the plugins (internal & external)
     loadPlugins();
 
@@ -402,7 +411,7 @@ public class PluginManager {
     for (Class<? extends AbstractPlugin> plugin : plugins) {
       String name = plugin.getName();
       if (!Modifier.isAbstract(plugin.getModifiers()) && !blacklistedPlugins.contains(name)) {
-        LOGGER.info("Loading internal plugin '{}'", name);
+        LOGGER.debug("Loading internal plugin '{}'", name);
         try {
           Plugin<? extends IsRODAObject> p = (Plugin<?>) ClassLoaderUtility.createObject(plugin.getName());
           p.init();

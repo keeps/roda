@@ -691,8 +691,8 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_INCLUDE_SCHEMAS = "parameter.include_schemas";
   public static final String PLUGIN_PARAMS_INCLUDE_DOCUMENTATION = "parameter.include_documentation";
 
-  public static final String PLUGIN_CLASS_DIGITAL_SIGNATURE = "org.roda.core.plugins.plugins.validation.DigitalSignaturePlugin";
-  public static final String PLUGIN_CLASS_VERAPDF = "org.roda.core.plugins.plugins.validation.VeraPDFPlugin";
+  public static final String PLUGIN_CLASS_DIGITAL_SIGNATURE = "org.roda.core.plugins.plugins.characterization.DigitalSignaturePlugin";
+  public static final String PLUGIN_CLASS_VERAPDF = "org.roda.core.plugins.plugins.characterization.VeraPDFPlugin";
   public static final String PLUGIN_CLASS_TIKA_FULLTEXT = "org.roda.core.plugins.plugins.characterization.TikaFullTextPlugin";
 
   public static final Map<String, String> PLUGIN_PARAMETER_TO_CLASS = new HashMap<>();
