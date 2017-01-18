@@ -27,7 +27,9 @@ import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FocusPanel;
+import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionChangeEvent.Handler;
@@ -324,8 +326,13 @@ public class ListSelectionState<T extends IsIndexed> {
             uiObj.setVisible(hasPrevious || hasNext);
           }
 
-          HtmlSnippetUtils.setCssClassDisabled((UIObject) previousButton, !hasPrevious);
-          HtmlSnippetUtils.setCssClassDisabled((UIObject) nextButton, !hasNext);
+          if (previousButton instanceof FocusWidget && nextButton instanceof FocusWidget) {
+            ((FocusWidget) previousButton).setEnabled(hasPrevious);
+            ((FocusWidget) nextButton).setEnabled(hasNext);
+          } else {
+            HtmlSnippetUtils.setCssClassDisabled((UIObject) previousButton, !hasPrevious);
+            HtmlSnippetUtils.setCssClassDisabled((UIObject) nextButton, !hasNext);
+          }
         }
       }
     });
