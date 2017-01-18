@@ -106,7 +106,7 @@ public class SiegfriedPluginUtils {
 
     Path representationFsPath = directAccess.getPath();
     List<LinkingIdentifier> sources = runSiegfriedOnRepresentationOrFile(plugin, model, representation.getAipId(),
-      representation.getId(), null, null, representationFsPath);
+      representation.getId(), new ArrayList<>(), null, representationFsPath);
 
     IOUtils.closeQuietly(directAccess);
     return sources;
@@ -148,7 +148,9 @@ public class SiegfriedPluginUtils {
         String jsonFileId = relativeFsPath.getFileName().toString();
 
         List<String> jsonFilePath = new ArrayList<>(fileDirectoryPath);
-        jsonFilePath.add(fileId);
+        if (fileId != null) {
+          jsonFilePath.add(fileId);
+        }
         for (int j = 0; j < relativeFsPath.getNameCount(); j++) {
           jsonFilePath.add(relativeFsPath.getName(j).toString());
         }
