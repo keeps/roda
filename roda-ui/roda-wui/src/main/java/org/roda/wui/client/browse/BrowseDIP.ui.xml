@@ -30,7 +30,7 @@
 							<i class="fa fa-play-circle-o"></i>
 						</g:HTML>
 					</g:FocusPanel>
-					<g:FocusPanel ui:field="infoFileButton"
+					<g:FocusPanel ui:field="refererInfoButton"
 						addStyleNames="toolbarLink filePreviewToolbarInfoIcon">
 						<g:HTML>
 							<i class="fa fa-info-circle"></i>
@@ -48,7 +48,7 @@
 							<i class="fa fa-chevron-right"></i>
 						</g:HTML>
 					</g:FocusPanel>
-					<g:FocusPanel ui:field="fileOptionsButton"
+					<g:FocusPanel ui:field="refererOptionsButton"
 						addStyleNames="toolbarLink filePreviewToolbarOptionsIcon">
 						<g:HTML>
 							<i class="fa fa-ellipsis-v"></i>

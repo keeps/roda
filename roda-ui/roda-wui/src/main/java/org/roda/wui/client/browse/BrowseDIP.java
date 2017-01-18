@@ -116,7 +116,7 @@ public class BrowseDIP extends Composite {
   FlowPanel center;
 
   @UiField
-  FocusPanel disseminationsButton, refererPreviousButton, refererNextButton, infoFileButton;
+  FocusPanel disseminationsButton, refererPreviousButton, refererNextButton, refererInfoButton, refererOptionsButton;
 
   @UiField
   FocusPanel previousButton, nextButton, dipOptionsButton;
@@ -171,16 +171,20 @@ public class BrowseDIP extends Composite {
 
     if (file != null) {
       Sliders.createDisseminationsSlider(center, disseminationsButton, file);
-      Sliders.createInfoSlider(center, infoFileButton, bundle.getFile());
+      Sliders.createInfoSlider(center, refererInfoButton, bundle.getFile());
+      Sliders.createOptionsSlider(center, refererOptionsButton, bundle.getFile());
     } else if (representation != null) {
       Sliders.createDisseminationsSlider(center, disseminationsButton, representation);
-      Sliders.createInfoSlider(center, infoFileButton, bundle.getRepresentation());
+      Sliders.createInfoSlider(center, refererInfoButton, bundle.getRepresentation());
+      refererOptionsButton.setVisible(false);
     } else if (aip != null) {
       Sliders.createDisseminationsSlider(center, disseminationsButton, aip);
-      Sliders.createInfoSlider(center, infoFileButton, bundle.getAip());
+      Sliders.createInfoSlider(center, refererInfoButton, bundle.getAip());
+      refererOptionsButton.setVisible(false);
     } else {
       disseminationsButton.setVisible(false);
-      infoFileButton.setVisible(false);
+      refererInfoButton.setVisible(false);
+      refererOptionsButton.setVisible(false);
     }
 
     optionsSliderPanel.setToggleButton(dipOptionsButton);
@@ -238,9 +242,7 @@ public class BrowseDIP extends Composite {
             openReferred(aip, filter);
           }
         });
-    } else
-
-    {
+    } else {
       refererToolbar.setVisible(false);
     }
   }

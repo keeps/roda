@@ -56,71 +56,10 @@
 					</g:FocusPanel>
 				</g:FlowPanel>
 			</g:FlowPanel>
-			<g:FlowPanel addStyleNames="viewRepresentationFile-center" ui:field="center">
+			<g:FlowPanel addStyleNames="viewRepresentationFile-center"
+				ui:field="center">
 				<b:IndexedFilePreview addStyleNames="viewRepresentationFilePreview"
 					ui:field="filePreview"></b:IndexedFilePreview>
-				<!-- OPTIONS PANEL -->
-				<s:SliderPanel ui:field="optionsSliderPanel">
-					<s:title>
-						<g:Label>
-							<ui:text from='{messages.sidebarFoldersFilesTitle}' />
-						</g:Label>
-					</s:title>
-					<s:content>
-						<!-- FOLDER ACTIONS -->
-						<g:FlowPanel>
-							<g:Button ui:field="optionDownload"
-								addStyleNames="btn btn-block btn-default-alt btn-download">
-								<ui:text from='{messages.viewRepresentationDownloadFileButton}' />
-							</g:Button>
-							<g:Button addStyleNames="btn btn-block btn-default-alt  btn-edit"
-								ui:field="optionRename">
-								<ui:text from='{messages.renameButton}' />
-							</g:Button>
-							<g:Button addStyleNames="btn btn-block btn-default-alt  btn-edit"
-								ui:field="optionMove">
-								<ui:text from='{messages.moveButton}' />
-							</g:Button>
-							<g:Button addStyleNames="btn btn-block btn-default-alt btn-upload"
-								ui:field="optionUploadFiles">
-								<ui:text from='{messages.uploadFilesButton}' />
-							</g:Button>
-							<g:Button addStyleNames="btn btn-block btn-default-alt btn-plus"
-								ui:field="optionCreateFolder">
-								<ui:text from='{messages.createFolderButton}' />
-							</g:Button>
-							<g:Button ui:field="optionRemove" addStyleNames="btn btn-block btn-danger btn-ban">
-								<ui:text from='{messages.removeButton}' />
-							</g:Button>
-						</g:FlowPanel>
-					</s:content>
-					<s:title>
-						<g:Label ui:field="preservationSidebarTitle">
-							<ui:text from='{messages.preservationTitle}' />
-						</g:Label>
-					</s:title>
-					<s:content>
-						<g:FlowPanel ui:field="preservationSidebar">
-							<g:Button ui:field="optionNewProcess"
-								addStyleNames="btn btn-block btn-default-alt btn-play">
-								<ui:text from='{messages.newProcessPreservation}' />
-							</g:Button>
-							<g:Button ui:field="optionIdentify"
-								addStyleNames="btn btn-block btn-default-alt btn-play">
-								<ui:text from='{messages.identifyFormatsButton}' />
-							</g:Button>
-
-							<g:Button ui:field="optionEvents"
-								addStyleNames="btn btn-block btn-default-alt btn-play">
-								<ui:text from='{messages.preservationEvents}' />
-							</g:Button>
-							<g:Button ui:field="optionRisk"
-								addStyleNames="btn btn-block btn-default-alt btn-play">
-								<ui:text from='{messages.preservationRisks}' />
-							</g:Button>
-						</g:FlowPanel>
-					</s:content>
-				</s:SliderPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FocusPanel>
