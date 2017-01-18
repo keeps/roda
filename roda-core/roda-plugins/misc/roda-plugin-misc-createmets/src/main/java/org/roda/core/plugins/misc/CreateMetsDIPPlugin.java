@@ -323,6 +323,7 @@ public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
     final Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
     PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
 
+    // FIXME 20170118 nvieira this condition should be removed in the future
     if (storage instanceof FileStorageService) {
       try {
         AIPLink aipLink = new AIPLink(aip.getId());
@@ -335,7 +336,7 @@ public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
         dip.setTitle("EARK-DIP");
         dip.setDescription("EARK-DIP generated and filtered based on an AIP");
         dip.setType(RodaConstants.DIP_TYPE_CONVERSION);
-        dip = model.createDIP(dip, false);
+        dip = model.createDIP(dip, true);
 
         StoragePath aipPath = ModelUtils.getAIPStoragePath(aip.getId());
         StoragePath dipDataPath = ModelUtils.getDIPDataStoragePath(dip.getId());
