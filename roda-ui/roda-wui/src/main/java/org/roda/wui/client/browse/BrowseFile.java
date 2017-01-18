@@ -240,8 +240,6 @@ public class BrowseFile extends Composite {
     infoFileButton.setTitle(messages.viewRepresentationInfoFileButton());
 
     // update visibles
-    optionDownload.setEnabled(!bundle.getFile().isDirectory());
-    infoFileButton.setVisible(!bundle.getFile().isDirectory());
     disseminationsButton.setVisible(bundle.getDipCount() > 0);
 
     // bind slider buttons
@@ -257,7 +255,7 @@ public class BrowseFile extends Composite {
 
     // update visibility
     boolean directory = bundle.getFile().isDirectory();
-    optionDownload.setVisible(!directory);
+    optionDownload.setVisible(true);
     optionRename.setVisible(directory);
     optionMove.setVisible(true);
     optionUploadFiles.setVisible(directory);

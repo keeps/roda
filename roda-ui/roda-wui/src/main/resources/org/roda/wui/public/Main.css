@@ -3936,7 +3936,7 @@ td.datePickerMonth, td.datePickerYear {
     vertical-align: top;
     width: 100%;
     text-align: center;
-    padding-top: 0px !important;
+    padding-top: 0px;
 }
 
 .bitstreamPreview-directory {
