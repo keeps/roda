@@ -130,6 +130,7 @@ public final class RodaConstants {
   public static final String API_REST_V1_RESOURCES = "api/v1/transfers/";
   public static final String API_REST_V1_THEME = "api/v1/theme/";
   public static final String API_REST_V1_INDEX = "api/v1/index/";
+  public static final String API_REST_V1_DIPS = "api/v1/dips/";
   public static final String API_REST_V1_DIPFILES = "api/v1/dipfiles/";
   // sub-resources strings
   public static final String API_DATA = "data";

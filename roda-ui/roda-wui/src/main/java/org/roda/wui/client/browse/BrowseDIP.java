@@ -378,7 +378,7 @@ public class BrowseDIP extends Composite {
     if (dipFile != null) {
       downloadUri = RestUtils.createDipFileDownloadUri(dipFile.getUUID());
     } else {
-      Toast.showInfo("Feature not yet supported", "Download of whole DIP is not yet supported");
+      downloadUri = RestUtils.createDipDownloadUri(dip.getUUID());
     }
     if (downloadUri != null) {
       Window.Location.assign(downloadUri.asString());

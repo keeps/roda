@@ -21,6 +21,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.roda.core.common.EntityResponse;
+import org.roda.core.common.StreamResponse;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
@@ -37,6 +39,7 @@ import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.ExtraMediaType;
+import org.roda.wui.api.v1.utils.ObjectResponse;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -89,7 +92,7 @@ public class DipsResource {
 
   public Response retrieveDIP(
     @ApiParam(value = "The ID of the DIP to retrieve.", required = true) @PathParam(RodaConstants.API_PATH_PARAM_DIP_ID) String dipId,
-    @ApiParam(value = "Choose format in which to get the DIP", allowableValues = RodaConstants.API_GET_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
+    @ApiParam(value = "Choose format in which to get the DIP", allowableValues = RodaConstants.API_GET_LIST_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
@@ -97,8 +100,14 @@ public class DipsResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    DIP dip = Browser.retrieve(user, IndexedDIP.class, dipId);
-    return Response.ok(dip, mediaType).build();
+    EntityResponse dipResponse = Browser.retrieveDIP(user, dipId, acceptFormat);
+
+    if (dipResponse instanceof ObjectResponse) {
+      ObjectResponse<DIP> rep = (ObjectResponse<DIP>) dipResponse;
+      return Response.ok(rep.getObject(), mediaType).build();
+    } else {
+      return ApiUtils.okResponse((StreamResponse) dipResponse);
+    }
   }
 
   @POST

@@ -585,6 +585,16 @@ public class BrowserHelper {
     }
   }
 
+  protected static void validateGetDIPParams(String acceptFormat) throws RequestNotValidException {
+    if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP.equals(acceptFormat)
+      && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
+      && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
+      throw new RequestNotValidException("Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT
+        + "' value. Expected values: " + Arrays.asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON,
+          RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML, RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP));
+    }
+  }
+
   protected static EntityResponse retrieveAIPRepresentation(IndexedRepresentation representation, String acceptFormat)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
 
@@ -1819,15 +1829,16 @@ public class BrowserHelper {
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
 
     IndexedFile iFile = RodaCoreFactory.getIndexService().retrieve(IndexedFile.class, fileUuid);
+    StoragePath filePath = ModelUtils.getFileStoragePath(iFile.getAipId(), iFile.getRepresentationId(), iFile.getPath(),
+      iFile.getId());
 
-    if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
+    if (!iFile.isDirectory() && RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
       final String filename;
       final String mediaType;
       final ConsumesOutputStream stream;
 
       StorageService storage = RodaCoreFactory.getStorageService();
-      Binary representationFileBinary = storage.getBinary(
-        ModelUtils.getFileStoragePath(iFile.getAipId(), iFile.getRepresentationId(), iFile.getPath(), iFile.getId()));
+      Binary representationFileBinary = storage.getBinary(filePath);
       filename = representationFileBinary.getStoragePath().getName();
       mediaType = RodaConstants.MEDIA_TYPE_WILDCARD;
 
@@ -1855,6 +1866,10 @@ public class BrowserHelper {
         }
       };
       return new StreamResponse(filename, mediaType, stream);
+    } else if (iFile.isDirectory() && (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP.equals(acceptFormat)
+      || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat))) {
+      Directory directory = RodaCoreFactory.getStorageService().getDirectory(filePath);
+      return ApiUtils.download(directory);
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
       File file = RodaCoreFactory.getModelService().retrieveFile(iFile.getAipId(), iFile.getRepresentationId(),
@@ -3092,12 +3107,28 @@ public class BrowserHelper {
     RodaCoreFactory.getIndexService().commit(IndexedDIP.class);
   }
 
+  protected static EntityResponse retrieveDIP(String dipId, String acceptFormat)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+
+    if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP.equals(acceptFormat)) {
+      StoragePath storagePath = ModelUtils.getDIPDataStoragePath(dipId);
+      Directory directory = RodaCoreFactory.getStorageService().getDirectory(storagePath);
+      return ApiUtils.download(directory);
+    } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
+      || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
+      DIP dip = RodaCoreFactory.getModelService().retrieveDIP(dipId);
+      return new ObjectResponse<DIP>(acceptFormat, dip);
+    } else {
+      throw new GenericException("Unsupported accept format: " + acceptFormat);
+    }
+  }
+
   public static EntityResponse retrieveDIPFile(String fileUuid, String acceptFormat)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
 
     DIPFile iFile = RodaCoreFactory.getIndexService().retrieve(DIPFile.class, fileUuid);
 
-    if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
+    if (!iFile.isDirectory() && RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
       final String filename;
       final String mediaType;
       final ConsumesOutputStream stream;
@@ -3131,6 +3162,11 @@ public class BrowserHelper {
         }
       };
       return new StreamResponse(filename, mediaType, stream);
+    } else if (iFile.isDirectory() && (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP.equals(acceptFormat)
+      || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat))) {
+      StoragePath filePath = ModelUtils.getDIPFileStoragePath(iFile);
+      Directory directory = RodaCoreFactory.getStorageService().getDirectory(filePath);
+      return ApiUtils.download(directory);
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
       DIPFile file = RodaCoreFactory.getModelService().retrieveDIPFile(iFile.getDipId(), iFile.getPath(),
