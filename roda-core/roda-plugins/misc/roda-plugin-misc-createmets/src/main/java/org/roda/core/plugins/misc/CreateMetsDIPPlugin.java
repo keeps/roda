@@ -7,8 +7,6 @@
  */
 package org.roda.core.plugins.misc;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,9 +21,12 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
@@ -33,6 +34,7 @@ import org.roda.core.data.v2.ip.AIPLink;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -50,9 +52,11 @@ import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
+import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StringContentPayload;
 import org.roda.core.storage.fs.FSUtils;
+import org.roda.core.storage.fs.FileStorageService;
 import org.roda_project.commons_ip.model.ParseException;
 import org.roda_project.commons_ip.model.impl.eark.EARKAIP;
 import org.roda_project.commons_ip.utils.IPEnums.IPType;
@@ -319,88 +323,96 @@ public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
     final Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
     PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
 
-    try {
-      AIPLink aipLink = new AIPLink(aip.getId());
-      List<AIPLink> links = new ArrayList<AIPLink>();
-      links.add(aipLink);
+    if (storage instanceof FileStorageService) {
+      try {
+        AIPLink aipLink = new AIPLink(aip.getId());
+        List<AIPLink> links = new ArrayList<AIPLink>();
+        links.add(aipLink);
 
-      DIP dip = new DIP();
-      dip.setAipIds(links);
-      dip.setPermissions(aip.getPermissions());
-      dip.setTitle("EARK-DIP");
-      dip.setDescription("EARK-DIP generated and filtered based on an AIP");
-      dip.setType(RodaConstants.DIP_TYPE_CONVERSION);
-      dip = model.createDIP(dip, false);
+        DIP dip = new DIP();
+        dip.setAipIds(links);
+        dip.setPermissions(aip.getPermissions());
+        dip.setTitle("EARK-DIP");
+        dip.setDescription("EARK-DIP generated and filtered based on an AIP");
+        dip.setType(RodaConstants.DIP_TYPE_CONVERSION);
+        dip = model.createDIP(dip, false);
 
-      Path aipPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), ModelUtils.getAIPStoragePath(aip.getId()));
-      Path dipDataPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(),
-        ModelUtils.getDIPDataStoragePath(dip.getId()));
-      Path aipOnDIPPath = Files.createDirectories(dipDataPath.resolve(aip.getId()));
+        StoragePath aipPath = ModelUtils.getAIPStoragePath(aip.getId());
+        StoragePath dipDataPath = ModelUtils.getDIPDataStoragePath(dip.getId());
+        StoragePath aipOnDIPPath = DefaultStoragePath.parse(dipDataPath, aip.getId());
+        storage.createDirectory(aipOnDIPPath);
 
-      // filter AIP structure using plugin parameters
-      copyAndFilterAIP(aip, aipPath, aipOnDIPPath);
+        // filter AIP structure using plugin parameters
+        copyAndFilterAIP(storage, aip, aipPath, aipOnDIPPath);
 
-      // create mets files
-      EARKAIP earkAIPonDIP = new EARKAIP(RodaFolderAIP.parse(aipOnDIPPath));
-      earkAIPonDIP.setType(IPType.DIP);
-      earkAIPonDIP.build(aipOnDIPPath.getParent(), true);
+        // create mets files
+        Path fsPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), aipOnDIPPath);
+        EARKAIP earkAIPonDIP = new EARKAIP(RodaFolderAIP.parse(fsPath));
+        earkAIPonDIP.setType(IPType.DIP);
+        earkAIPonDIP.build(fsPath.getParent(), true);
 
-      // delete aip.json
-      FSUtils.deletePath(aipOnDIPPath.resolve(RodaConstants.STORAGE_AIP_METADATA_FILENAME));
+        // delete aip.json
+        storage.deleteResource(DefaultStoragePath.parse(aipOnDIPPath, RodaConstants.STORAGE_AIP_METADATA_FILENAME));
 
-      jobPluginInfo.incrementObjectsProcessedWithSuccess();
-      reportItem.setPluginState(PluginState.SUCCESS);
+        jobPluginInfo.incrementObjectsProcessedWithSuccess();
+        reportItem.setPluginState(PluginState.SUCCESS);
 
-    } catch (final RODAException | ParseException | IPException | InterruptedException | IOException e) {
-      final String message = String.format("Error creating manifest files for AIP %s. Cause: %s.", aip.getId(),
-        e.getMessage());
-      LOGGER.debug(message, e);
+      } catch (RODAException | ParseException | IPException | InterruptedException e) {
+        String message = String.format("Error creating manifest files for AIP %s. Cause: %s.", aip.getId(),
+          e.getMessage());
+        LOGGER.debug(message, e);
+        jobPluginInfo.incrementObjectsProcessedWithFailure();
+        reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(message);
+      }
+    } else {
       jobPluginInfo.incrementObjectsProcessedWithFailure();
-      reportItem.setPluginState(PluginState.FAILURE);
-      reportItem.setPluginDetails(message);
+      reportItem.setPluginState(PluginState.FAILURE).setPluginDetails("Storage service type used is not supported");
     }
 
     report.addReport(reportItem);
     PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
   }
 
-  private void copyAndFilterAIP(AIP aip, Path aipPath, Path aipOnDIPPath)
-    throws AlreadyExistsException, GenericException {
+  private void copyAndFilterAIP(StorageService storage, AIP aip, StoragePath aipPath, StoragePath aipOnDIPPath)
+    throws RequestNotValidException, AlreadyExistsException, GenericException, NotFoundException,
+    AuthorizationDeniedException {
     LOGGER.info("Copying AIP to a new DIP");
 
-    copyAIPBaseFiles(aipPath, aipOnDIPPath);
+    copyAIPBaseFiles(storage, aipPath, aipOnDIPPath);
 
-    List<String> representationIds = copyRepresentationsAndItsMetadata(aip, aipPath, aipOnDIPPath);
-    List<String> descriptiveMetadataIds = copyAIPDescriptiveMetadata(aip, aipPath, aipOnDIPPath);
-    copyPreservationMetadata(aipPath, aipOnDIPPath);
-    copyOtherMetadata(aipPath, aipOnDIPPath);
+    List<String> representationIds = copyRepresentationsAndItsMetadata(storage, aip, aipPath, aipOnDIPPath);
+    List<String> descriptiveMetadataIds = copyAIPDescriptiveMetadata(storage, aip, aipPath, aipOnDIPPath);
+    copyPreservationMetadata(storage, aipPath, aipOnDIPPath);
+    copyOtherMetadata(storage, aipPath, aipOnDIPPath);
 
-    try {
-      copyAndUpdateAIPJson(aip, aipOnDIPPath, representationIds, descriptiveMetadataIds);
-    } catch (IOException | GenericException e) {
-      LOGGER.error("Error updating aip.json file on DIP");
+    copyAndUpdateAIPJson(storage, aip, aipOnDIPPath, representationIds, descriptiveMetadataIds);
+  }
+
+  private void copyAIPBaseFiles(StorageService storage, StoragePath aipPath, StoragePath aipOnDIPPath)
+    throws RequestNotValidException, AlreadyExistsException, GenericException, NotFoundException,
+    AuthorizationDeniedException {
+    StoragePath submissionPath = DefaultStoragePath.parse(aipPath, RodaConstants.STORAGE_DIRECTORY_SUBMISSION);
+    if (includeSubmission && storage.hasDirectory(submissionPath)) {
+      storage.copy(storage, submissionPath,
+        DefaultStoragePath.parse(aipOnDIPPath, RodaConstants.STORAGE_DIRECTORY_SUBMISSION));
+    }
+
+    StoragePath schemasPath = DefaultStoragePath.parse(aipPath, RodaConstants.STORAGE_DIRECTORY_SCHEMAS);
+    if (includeSchemas && storage.hasDirectory(schemasPath)) {
+      storage.copy(storage, schemasPath,
+        DefaultStoragePath.parse(aipOnDIPPath, RodaConstants.STORAGE_DIRECTORY_SCHEMAS));
+    }
+
+    StoragePath documentationPath = DefaultStoragePath.parse(aipPath, RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION);
+    if (includeDocumentation && storage.hasDirectory(documentationPath)) {
+      storage.copy(storage, documentationPath,
+        DefaultStoragePath.parse(aipOnDIPPath, RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION));
     }
   }
 
-  private void copyAIPBaseFiles(Path aipPath, Path aipOnDIPPath) throws AlreadyExistsException, GenericException {
-    if (includeSubmission && Files.exists(aipPath.resolve(RodaConstants.STORAGE_DIRECTORY_SUBMISSION))) {
-      FSUtils.copy(aipPath.resolve(RodaConstants.STORAGE_DIRECTORY_SUBMISSION),
-        aipOnDIPPath.resolve(RodaConstants.STORAGE_DIRECTORY_SUBMISSION), true);
-    }
-
-    if (includeSchemas && Files.exists(aipPath.resolve(RodaConstants.STORAGE_DIRECTORY_SCHEMAS))) {
-      FSUtils.copy(aipPath.resolve(RodaConstants.STORAGE_DIRECTORY_SCHEMAS),
-        aipOnDIPPath.resolve(RodaConstants.STORAGE_DIRECTORY_SCHEMAS), true);
-    }
-
-    if (includeDocumentation && Files.exists(aipPath.resolve(RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION))) {
-      FSUtils.copy(aipPath.resolve(RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION),
-        aipOnDIPPath.resolve(RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION), true);
-    }
-  }
-
-  private List<String> copyRepresentationsAndItsMetadata(AIP aip, Path aipPath, Path aipOnDIPPath)
-    throws AlreadyExistsException, GenericException {
+  private List<String> copyRepresentationsAndItsMetadata(StorageService storage, AIP aip, StoragePath aipPath,
+    StoragePath aipOnDIPPath) throws RequestNotValidException, AlreadyExistsException, GenericException,
+    NotFoundException, AuthorizationDeniedException {
     List<String> representationTypes = Arrays.asList(selectedRepresentations.toLowerCase().split(",\\s*"));
     List<String> representationIds = new ArrayList<String>();
 
@@ -412,36 +424,40 @@ public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
       if (!includeSelectedRepresentations
         || (includeSelectedRepresentations && representationTypes.contains(representation.getType().toLowerCase()))) {
         representationIds.add(representationId);
-        Path representationPath = aipPath.resolve(RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS)
-          .resolve(representationId);
+        StoragePath representationPath = DefaultStoragePath.parse(aipPath,
+          RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS, representationId);
 
-        if (Files.exists(representationPath)) {
-          Path representationDIPPath = aipOnDIPPath.resolve(RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS)
-            .resolve(representationId);
+        if (storage.hasDirectory(representationPath)) {
+          StoragePath representationDIPPath = DefaultStoragePath.parse(aipOnDIPPath,
+            RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS, representationId);
 
-          if (Files.exists(representationPath.resolve(RodaConstants.STORAGE_DIRECTORY_DATA))) {
-            FSUtils.copy(representationPath.resolve(RodaConstants.STORAGE_DIRECTORY_DATA),
-              representationDIPPath.resolve(RodaConstants.STORAGE_DIRECTORY_DATA), true);
+          StoragePath representationDataPath = DefaultStoragePath.parse(representationPath,
+            RodaConstants.STORAGE_DIRECTORY_DATA);
+          if (storage.hasDirectory(representationDataPath)) {
+            storage.copy(storage, representationDataPath,
+              DefaultStoragePath.parse(representationDIPPath, RodaConstants.STORAGE_DIRECTORY_DATA));
           }
 
-          if (includeSchemas && Files.exists(representationPath.resolve(RodaConstants.STORAGE_DIRECTORY_SCHEMAS))) {
-            FSUtils.copy(representationPath.resolve(RodaConstants.STORAGE_DIRECTORY_SCHEMAS),
-              representationDIPPath.resolve(RodaConstants.STORAGE_DIRECTORY_SCHEMAS), true);
+          StoragePath representationSchemasPath = DefaultStoragePath.parse(representationPath,
+            RodaConstants.STORAGE_DIRECTORY_SCHEMAS);
+          if (includeSchemas && storage.hasDirectory(representationSchemasPath)) {
+            storage.copy(storage, representationSchemasPath,
+              DefaultStoragePath.parse(representationDIPPath, RodaConstants.STORAGE_DIRECTORY_SCHEMAS));
           }
 
-          if (includeDocumentation
-            && Files.exists(representationPath.resolve(RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION))) {
-            FSUtils.copy(representationPath.resolve(RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION),
-              representationDIPPath.resolve(RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION), true);
+          StoragePath representationDocPath = DefaultStoragePath.parse(representationPath,
+            RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION);
+          if (includeDocumentation && storage.hasDirectory(representationDocPath)) {
+            storage.copy(storage, representationDocPath,
+              DefaultStoragePath.parse(representationDIPPath, RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION));
           }
 
-          List<String> metadataTypes = Arrays.asList(selectedDescriptiveMetadata.toLowerCase().split(",\\s*"));
           for (DescriptiveMetadata dm : representation.getDescriptiveMetadata()) {
-            copyDescriptiveMetadata(dm, metadataTypes, representationPath, representationDIPPath);
+            copyDescriptiveMetadata(storage, dm, representationPath, representationDIPPath);
           }
 
-          copyPreservationMetadata(representationPath, representationDIPPath);
-          copyOtherMetadata(representationPath, representationDIPPath);
+          copyPreservationMetadata(storage, representationPath, representationDIPPath);
+          copyOtherMetadata(storage, representationPath, representationDIPPath);
         }
       }
     }
@@ -449,13 +465,13 @@ public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
     return representationIds;
   }
 
-  private List<String> copyAIPDescriptiveMetadata(AIP aip, Path aipPath, Path aipOnDIPPath)
-    throws AlreadyExistsException, GenericException {
-    List<String> metadataTypes = Arrays.asList(selectedDescriptiveMetadata.toLowerCase().split(",\\s*"));
+  private List<String> copyAIPDescriptiveMetadata(StorageService storage, AIP aip, StoragePath aipPath,
+    StoragePath aipOnDIPPath) throws RequestNotValidException, AlreadyExistsException, GenericException,
+    NotFoundException, AuthorizationDeniedException {
     List<String> descriptiveMetadataIds = new ArrayList<String>();
 
     for (DescriptiveMetadata dm : aip.getDescriptiveMetadata()) {
-      String dmId = copyDescriptiveMetadata(dm, metadataTypes, aipPath, aipOnDIPPath);
+      String dmId = copyDescriptiveMetadata(storage, dm, aipPath, aipOnDIPPath);
       if (StringUtils.isNotBlank(dmId)) {
         descriptiveMetadataIds.add(dmId);
       }
@@ -464,20 +480,23 @@ public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
     return descriptiveMetadataIds;
   }
 
-  private String copyDescriptiveMetadata(DescriptiveMetadata dm, List<String> metadataTypes, Path sourcePath,
-    Path targetPath) throws AlreadyExistsException, GenericException {
+  private String copyDescriptiveMetadata(StorageService storage, DescriptiveMetadata dm, StoragePath sourcePath,
+    StoragePath targetPath) throws RequestNotValidException, AlreadyExistsException, GenericException,
+    NotFoundException, AuthorizationDeniedException {
+    List<String> metadataTypes = Arrays.asList(selectedDescriptiveMetadata.toLowerCase().split(",\\s*"));
     String versionType = dm.getType() + "_" + dm.getVersion();
     String dmId = dm.getId();
 
     if (!includeSelectedDescriptiveMetadata
       || (includeSelectedDescriptiveMetadata && metadataTypes.contains(versionType.toLowerCase()))) {
-      Path oldMetadataPath = sourcePath.resolve(RodaConstants.STORAGE_DIRECTORY_METADATA)
-        .resolve(RodaConstants.STORAGE_DIRECTORY_DESCRIPTIVE).resolve(dmId);
+      StoragePath oldMetadataPath = DefaultStoragePath.parse(sourcePath, RodaConstants.STORAGE_DIRECTORY_METADATA,
+        RodaConstants.STORAGE_DIRECTORY_DESCRIPTIVE, dmId);
 
-      if (Files.exists(oldMetadataPath)) {
-        Path newMetadataPath = targetPath.resolve(RodaConstants.STORAGE_DIRECTORY_METADATA)
-          .resolve(RodaConstants.STORAGE_DIRECTORY_DESCRIPTIVE).resolve(dmId);
-        FSUtils.copy(oldMetadataPath, newMetadataPath, true);
+      if (storage.hasBinary(oldMetadataPath)) {
+        StoragePath newMetadataPath = DefaultStoragePath.parse(targetPath, RodaConstants.STORAGE_DIRECTORY_METADATA,
+          RodaConstants.STORAGE_DIRECTORY_DESCRIPTIVE, dmId);
+
+        storage.copy(storage, oldMetadataPath, newMetadataPath);
         return dmId;
       }
     }
@@ -485,57 +504,63 @@ public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
     return null;
   }
 
-  private void copyPreservationMetadata(Path sourcePath, Path targetPath)
-    throws AlreadyExistsException, GenericException {
+  private void copyPreservationMetadata(StorageService storage, StoragePath sourcePath, StoragePath targetPath)
+    throws RequestNotValidException, AlreadyExistsException, GenericException, NotFoundException,
+    AuthorizationDeniedException {
     if (includeAllPreservationMetadata) {
-      Path oldMetadataPath = sourcePath.resolve(RodaConstants.STORAGE_DIRECTORY_METADATA)
-        .resolve(RodaConstants.STORAGE_DIRECTORY_PRESERVATION);
-      if (Files.exists(oldMetadataPath)) {
-        Path newMetadataPath = targetPath.resolve(RodaConstants.STORAGE_DIRECTORY_METADATA)
-          .resolve(RodaConstants.STORAGE_DIRECTORY_PRESERVATION);
-        FSUtils.copy(oldMetadataPath, newMetadataPath, true);
+      StoragePath oldMetadataPath = DefaultStoragePath.parse(sourcePath, RodaConstants.STORAGE_DIRECTORY_METADATA,
+        RodaConstants.STORAGE_DIRECTORY_PRESERVATION);
+
+      if (storage.hasDirectory(oldMetadataPath)) {
+        StoragePath newMetadataPath = DefaultStoragePath.parse(targetPath, RodaConstants.STORAGE_DIRECTORY_METADATA,
+          RodaConstants.STORAGE_DIRECTORY_PRESERVATION);
+
+        storage.copy(storage, oldMetadataPath, newMetadataPath);
       }
     }
   }
 
-  private void copyOtherMetadata(Path sourcePath, Path targetPath) {
+  private void copyOtherMetadata(StorageService storage, StoragePath sourcePath, StoragePath targetPath) {
     List<String> metadataTypes = Arrays.asList(selectedOtherMetadata.split(",\\s*"));
 
     if (includeSelectedOtherMetadata) {
       for (String type : metadataTypes) {
-        Path oldMetadataPath = sourcePath.resolve(RodaConstants.STORAGE_DIRECTORY_METADATA)
-          .resolve(RodaConstants.STORAGE_DIRECTORY_OTHER).resolve(type);
+        try {
+          StoragePath oldMetadataPath = DefaultStoragePath.parse(sourcePath, RodaConstants.STORAGE_DIRECTORY_METADATA,
+            RodaConstants.STORAGE_DIRECTORY_OTHER, type);
 
-        if (Files.exists(oldMetadataPath)) {
-          Path newMetadataPath = targetPath.resolve(RodaConstants.STORAGE_DIRECTORY_METADATA)
-            .resolve(RodaConstants.STORAGE_DIRECTORY_OTHER).resolve(type);
+          if (storage.hasDirectory(oldMetadataPath)) {
+            StoragePath newMetadataPath = DefaultStoragePath.parse(targetPath, RodaConstants.STORAGE_DIRECTORY_METADATA,
+              RodaConstants.STORAGE_DIRECTORY_OTHER, type);
 
-          try {
-            FSUtils.copy(oldMetadataPath, newMetadataPath, true);
-          } catch (AlreadyExistsException | GenericException e) {
-            LOGGER.error("Error copying other metadata type '{}' when creating EARK-DIP", type, e);
+            storage.copy(storage, oldMetadataPath, newMetadataPath);
           }
+        } catch (RequestNotValidException | AlreadyExistsException | GenericException | NotFoundException
+          | AuthorizationDeniedException e) {
+          LOGGER.error("Error copying other metadata type '{}' when creating EARK-DIP", type, e);
         }
       }
     } else {
-      Path oldMetadataPath = sourcePath.resolve(RodaConstants.STORAGE_DIRECTORY_METADATA)
-        .resolve(RodaConstants.STORAGE_DIRECTORY_OTHER);
+      try {
+        StoragePath oldMetadataPath = DefaultStoragePath.parse(sourcePath, RodaConstants.STORAGE_DIRECTORY_METADATA,
+          RodaConstants.STORAGE_DIRECTORY_OTHER);
 
-      if (Files.exists(oldMetadataPath)) {
-        Path newMetadataPath = targetPath.resolve(RodaConstants.STORAGE_DIRECTORY_METADATA)
-          .resolve(RodaConstants.STORAGE_DIRECTORY_OTHER);
+        if (storage.hasDirectory(oldMetadataPath)) {
+          StoragePath newMetadataPath = DefaultStoragePath.parse(targetPath, RodaConstants.STORAGE_DIRECTORY_METADATA,
+            RodaConstants.STORAGE_DIRECTORY_OTHER);
 
-        try {
-          FSUtils.copy(oldMetadataPath, newMetadataPath, true);
-        } catch (AlreadyExistsException | GenericException e) {
-          LOGGER.error("Error copying other metadata '{}' when creating EARK-DIP", e);
+          storage.copy(storage, oldMetadataPath, newMetadataPath);
         }
+      } catch (RequestNotValidException | AlreadyExistsException | GenericException | NotFoundException
+        | AuthorizationDeniedException e) {
+        LOGGER.error("Error copying other metadata '{}' when creating EARK-DIP", e);
       }
     }
   }
 
-  private void copyAndUpdateAIPJson(AIP aip, Path aipOnDIPPath, List<String> representationIds,
-    List<String> descriptiveMetadataIds) throws GenericException, IOException {
+  private void copyAndUpdateAIPJson(StorageService storage, AIP aip, StoragePath aipOnDIPPath,
+    List<String> representationIds, List<String> descriptiveMetadataIds) throws GenericException,
+    RequestNotValidException, AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
     String json = JsonUtils.getJsonFromObject(aip);
     JsonNode parseJson = JsonUtils.parseJson(json);
 
@@ -557,7 +582,8 @@ public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
 
     String updatedJson = parseJson.toString();
     StringContentPayload content = new StringContentPayload(updatedJson);
-    content.writeToPath(aipOnDIPPath.resolve(RodaConstants.STORAGE_AIP_METADATA_FILENAME));
+    StoragePath aipJson = DefaultStoragePath.parse(aipOnDIPPath, RodaConstants.STORAGE_AIP_METADATA_FILENAME);
+    storage.createBinary(aipJson, content, false);
   }
 
 }

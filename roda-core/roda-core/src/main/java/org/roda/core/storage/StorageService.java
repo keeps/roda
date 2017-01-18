@@ -258,6 +258,15 @@ public interface StorageService {
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException;
 
   /**
+   * Tests if binary exists.
+   * 
+   * @param storagePath
+   *          storage path that identifies the binary
+   * 
+   */
+  public boolean hasBinary(StoragePath storagePath);
+
+  /**
    * Replace existing binary content with given one, not changing any associated
    * metadata.
    * 

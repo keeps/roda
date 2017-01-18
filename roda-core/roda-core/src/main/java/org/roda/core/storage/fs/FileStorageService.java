@@ -718,4 +718,14 @@ public class FileStorageService implements StorageService {
     }
   }
 
+  @Override
+  public boolean hasBinary(StoragePath storagePath) {
+    try {
+      this.getBinary(storagePath);
+      return true;
+    } catch (NotFoundException | RequestNotValidException | GenericException e) {
+      return false;
+    }
+  }
+
 }
