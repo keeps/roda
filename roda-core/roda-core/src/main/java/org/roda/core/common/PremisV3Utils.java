@@ -839,7 +839,12 @@ public final class PremisV3Utils {
       } catch (NotFoundException e) {
         LOGGER.debug("PREMIS object skeleton does not exist yet. Creating PREMIS object!");
         List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
-        PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aipId, representationId, algorithms);
+        if (fileId == null) {
+          PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aipId, representationId, algorithms);
+        } else {
+          File file = model.retrieveFile(aipId, representationId, fileDirectoryPath, fileId);
+          PremisSkeletonPluginUtils.createPremisSkeletonOnFile(model, file, algorithms);
+        }
         premisBin = model.retrievePreservationFile(aipId, representationId, fileDirectoryPath, fileId);
         LOGGER.debug("PREMIS object skeleton created");
       }

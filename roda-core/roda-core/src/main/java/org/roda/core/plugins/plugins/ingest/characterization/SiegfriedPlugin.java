@@ -143,7 +143,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
       List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
 
       Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getRepresentationId(representation),
-        Representation.class, AIPState.ACTIVE);
+        Representation.class);
       PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
       LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), representation.getAipId());
       try {
@@ -182,7 +182,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
     for (File file : list) {
       List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
 
-      Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getFileId(file), File.class, AIPState.ACTIVE);
+      Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getFileId(file), File.class);
       PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
       LOGGER.debug("Processing file {} from representation {} of AIP {}", file.getId(), file.getRepresentationId(),
         file.getAipId());

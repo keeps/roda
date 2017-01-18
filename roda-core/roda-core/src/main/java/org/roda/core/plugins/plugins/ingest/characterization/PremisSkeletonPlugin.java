@@ -185,8 +185,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
 
       try {
         List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
-        PremisSkeletonPluginUtils.createPremisSkeletonOnFile(model, file.getAipId(), file.getRepresentationId(), file,
-          algorithms);
+        PremisSkeletonPluginUtils.createPremisSkeletonOnFile(model, file, algorithms);
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
       } catch (RODAException | XmlException | IOException e) {
         LOGGER.error("Error processing file {}", file.getId(), e);

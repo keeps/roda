@@ -69,8 +69,7 @@ public class PremisSkeletonPluginUtils {
             model.retrievePreservationFile(aipId, representationId, file.getPath(), file.getId(),
               PreservationMetadataType.FILE);
           } catch (NotFoundException e1) {
-            PremisSkeletonPluginUtils.createPremisSkeletonOnFile(model, aipId, representationId, file, fixityAlgorithms,
-              representation);
+            PremisSkeletonPluginUtils.createPremisSkeletonOnFile(model, file, fixityAlgorithms, representation);
           }
         }
       } else {
@@ -91,49 +90,45 @@ public class PremisSkeletonPluginUtils {
     }
   }
 
-  public static void createPremisSkeletonOnFile(ModelService model, String aipId, String representationId, File file,
-    Collection<String> fixityAlgorithms) throws RequestNotValidException, GenericException,
-    AuthorizationDeniedException, NotFoundException, ValidationException, XmlException, IOException {
+  public static void createPremisSkeletonOnFile(ModelService model, File file, Collection<String> fixityAlgorithms)
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException, NotFoundException,
+    ValidationException, XmlException, IOException {
     gov.loc.premis.v3.Representation representation;
 
     try {
-      Binary preservationObject = model.retrievePreservationRepresentation(aipId, representationId);
+      Binary preservationObject = model.retrievePreservationRepresentation(file.getAipId(), file.getRepresentationId());
       representation = PremisV3Utils.binaryToRepresentation(preservationObject.getContent(), false);
     } catch (NotFoundException e) {
-      representation = PremisV3Utils.createBaseRepresentation(aipId, representationId);
+      representation = PremisV3Utils.createBaseRepresentation(file.getAipId(), file.getRepresentationId());
     }
 
-    PremisSkeletonPluginUtils.createPremisSkeletonOnFile(model, aipId, representationId, file, fixityAlgorithms,
-      representation);
+    PremisSkeletonPluginUtils.createPremisSkeletonOnFile(model, file, fixityAlgorithms, representation);
   }
 
-  
-  public static void createPremisSkeletonOnFile(ModelService model, String aipId, String representationId, File file,
-    Collection<String> fixityAlgorithms, gov.loc.premis.v3.Representation representation)
-    throws RequestNotValidException, GenericException, AuthorizationDeniedException, NotFoundException,
-    ValidationException, XmlException, IOException {
+  public static void createPremisSkeletonOnFile(ModelService model, File file, Collection<String> fixityAlgorithms,
+    gov.loc.premis.v3.Representation representation) throws RequestNotValidException, GenericException,
+    AuthorizationDeniedException, NotFoundException, ValidationException, XmlException, IOException {
     boolean notifyInSteps = false;
 
     if (!file.isDirectory()) {
       LOGGER.debug("Processing {}", file);
       try {
-        model.retrievePreservationFile(aipId, representationId, file.getPath(), file.getId(),
+        model.retrievePreservationFile(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
           PreservationMetadataType.FILE);
-      } catch (NotFoundException e1) {
+      } catch (NotFoundException e) {
         ContentPayload filePreservation = PremisV3Utils.createBaseFile(file, model, fixityAlgorithms);
         String pmId;
         try {
-          PreservationMetadata pm = model.createPreservationMetadata(PreservationMetadataType.FILE, aipId,
-            representationId, file.getPath(), file.getId(), filePreservation, notifyInSteps);
+          PreservationMetadata pm = model.createPreservationMetadata(PreservationMetadataType.FILE, file.getAipId(),
+            file.getRepresentationId(), file.getPath(), file.getId(), filePreservation, notifyInSteps);
           pmId = pm.getId();
           model.notifyFileCreated(file);
-        } catch (AlreadyExistsException e2) {
-          pmId = IdUtils.getPreservationId(PreservationMetadataType.FILE, aipId, representationId, file.getPath(),
-            file.getId());
-          model.updatePreservationMetadata(pmId, PreservationMetadataType.FILE, aipId, representationId, file.getPath(),
-            file.getId(), filePreservation, notifyInSteps);
+        } catch (AlreadyExistsException e1) {
+          pmId = IdUtils.getPreservationId(PreservationMetadataType.FILE, file.getAipId(), file.getRepresentationId(),
+            file.getPath(), file.getId());
+          model.updatePreservationMetadata(pmId, PreservationMetadataType.FILE, file.getAipId(),
+            file.getRepresentationId(), file.getPath(), file.getId(), filePreservation, notifyInSteps);
           model.notifyFileUpdated(file);
-
         }
 
         PremisV3Utils.linkFileToRepresentation(pmId, RodaConstants.PREMIS_RELATIONSHIP_TYPE_STRUCTURAL,

@@ -38,7 +38,6 @@ import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.StringContentPayload;
-import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.util.Base64;
 import org.roda.core.util.CommandException;
 import org.roda.core.util.CommandUtility;
@@ -123,12 +122,9 @@ public class SiegfriedPluginUtils {
     Path filePath = directAccess.getPath();
     List<LinkingIdentifier> sources = runSiegfriedOnRepresentationOrFile(plugin, model, file.getAipId(),
       file.getRepresentationId(), file.getPath(), file.getId(), filePath);
-
     IOUtils.closeQuietly(directAccess);
-    
-    boolean createIfNotExists = true;
-    boolean notify = true;
-    model.updateFile(file, new FSPathContentPayload(filePath), createIfNotExists, notify);
+
+    model.notifyFileUpdated(file);
     return sources;
   }
 
@@ -146,24 +142,21 @@ public class SiegfriedPluginUtils {
       final JsonNode files = jsonObject.get("files");
 
       for (JsonNode file : files) {
-        String jsonFileId = fileId;
-        List<String> jsonFilePath = fileDirectoryPath;
+        Path fullFsPath = Paths.get(file.get("filename").asText());
+        Path relativeFsPath = path.relativize(fullFsPath);
 
-        if (fileDirectoryPath == null || fileId == null) {
-          Path fullFsPath = Paths.get(file.get("filename").asText());
-          Path relativeFsPath = path.relativize(fullFsPath);
+        String jsonFileId = relativeFsPath.getFileName().toString();
 
-          jsonFileId = relativeFsPath.getFileName().toString();
-          jsonFilePath = new ArrayList<>();
-          for (int j = 0; j < relativeFsPath.getNameCount() - 1; j++) {
-            jsonFilePath.add(relativeFsPath.getName(j).toString());
-          }
+        List<String> jsonFilePath = new ArrayList<>(fileDirectoryPath);
+        jsonFilePath.add(fileId);
+        for (int j = 0; j < relativeFsPath.getNameCount(); j++) {
+          jsonFilePath.add(relativeFsPath.getName(j).toString());
         }
+        jsonFilePath.remove(jsonFilePath.size() - 1);
 
         ContentPayload payload = new StringContentPayload(file.toString());
-
-        model.createOrUpdateOtherMetadata(aipId, representationId, jsonFilePath, jsonFileId, SiegfriedPlugin.FILE_SUFFIX,
-          RodaConstants.OTHER_METADATA_TYPE_SIEGFRIED, payload, notify);
+        model.createOrUpdateOtherMetadata(aipId, representationId, jsonFilePath, jsonFileId,
+          SiegfriedPlugin.FILE_SUFFIX, RodaConstants.OTHER_METADATA_TYPE_SIEGFRIED, payload, notify);
 
         sources.add(PluginHelper.getLinkingIdentifier(aipId, representationId, jsonFilePath, jsonFileId,
           RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));

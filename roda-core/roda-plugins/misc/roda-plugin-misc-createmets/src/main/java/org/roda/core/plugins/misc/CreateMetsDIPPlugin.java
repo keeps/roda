@@ -339,9 +339,7 @@ public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
         dip = model.createDIP(dip, true);
 
         StoragePath aipPath = ModelUtils.getAIPStoragePath(aip.getId());
-        StoragePath dipDataPath = ModelUtils.getDIPDataStoragePath(dip.getId());
-        StoragePath aipOnDIPPath = DefaultStoragePath.parse(dipDataPath, aip.getId());
-        storage.createDirectory(aipOnDIPPath);
+        StoragePath aipOnDIPPath = ModelUtils.getDIPDataStoragePath(dip.getId());
 
         // filter AIP structure using plugin parameters
         copyAndFilterAIP(storage, aip, aipPath, aipOnDIPPath);
