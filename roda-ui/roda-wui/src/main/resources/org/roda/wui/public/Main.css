@@ -993,6 +993,10 @@ pre code {
     text-align: right;
 }
 
+.my-asyncdatagrid {
+	text-align: left;
+}
+
 .my-asyncdatagrid-pager-results {
     display: inline-block;
     line-height: 1;
@@ -5783,16 +5787,33 @@ td.datePickerMonth, td.datePickerYear {
 ****************************************/
 
 .actions-popup {
-	background-color: white;
+	background-color: #089DE3;
+	border-radius: 2px;
+    max-width: 180px;
 	padding: 10px;
 	box-shadow: 0 0px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
 }
 
+.actions-popup::before {
+	content: "";
+	width: 0px;
+	height: 0px;
+    border: 8px solid transparent;
+    position: absolute;
+    right: 16px;
+    bottom: -16px;
+    border-top: 8px solid #089DE3;
+}
+
 .actions-popup .actions-layout-title {
-	
+	color: white;
 }
 
 .actions-layout-button + .actions-layout-title {
 	margin-top: 10px;
+}
+
+.actions-empty-help {
+	color: white;
 }
 

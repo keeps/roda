@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.roda.core.common.SelectedItemsUtils;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
@@ -38,7 +37,6 @@ import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.widgets.MyCellTableResources;
-import org.roda.wui.common.client.widgets.Toast;
 import org.roda.wui.common.client.widgets.wcag.AccessibleCellTable;
 import org.roda.wui.common.client.widgets.wcag.AccessibleSimplePager;
 
@@ -74,6 +72,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PopupPanel;
+import com.google.gwt.user.client.ui.PopupPanel.PositionCallback;
 import com.google.gwt.view.client.CellPreviewEvent;
 import com.google.gwt.view.client.CellPreviewEvent.Handler;
 import com.google.gwt.view.client.DefaultSelectionEventManager;
@@ -851,13 +850,30 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
       if (actionsPopup.isShowing()) {
         actionsPopup.hide();
       } else {
-        SelectedItems<T> selectedItems = getSelected();
-        if (!ClientSelectedItemsUtils.isEmpty(selectedItems)) {
+        if (isAllSelected()) {
+          actionsPopup.setWidget(actionable.createActionsLayout(getSelected()));
+        } else if (selected.size() == 1) {
+          actionsPopup.setWidget(actionable.createActionsLayout(selected.iterator().next()));
+        } else if (selected.size() > 1) {
+          // TODO create action layout based on selected set
           actionsPopup.setWidget(actionable.createActionsLayout(getSelected()));
         } else {
-          actionsPopup.setWidget(new Label("Please select items using the checkboxes"));
+          Label emptyHelpText = new Label(messages.tableActionEmptyHelp());
+          emptyHelpText.addStyleName("actions-empty-help");
+          actionsPopup.setWidget(emptyHelpText);
         }
-        actionsPopup.showRelativeTo(actionsButton);
+
+        actionsPopup.setPopupPositionAndShow(new PositionCallback() {
+
+          @Override
+          public void setPosition(int offsetWidth, int offsetHeight) {
+            int left = actionsButton.getAbsoluteLeft() + actionsButton.getOffsetWidth() - offsetWidth;
+            int top = actionsButton.getAbsoluteTop() - offsetHeight - 4;
+
+            actionsPopup.setPopupPosition(left, top);
+          }
+        });
+
       }
 
     }

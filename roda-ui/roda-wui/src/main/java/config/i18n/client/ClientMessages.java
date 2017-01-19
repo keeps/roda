@@ -93,7 +93,7 @@ public interface ClientMessages extends Messages {
   String catalogueFolderTitle();
 
   String catalogueFileTitle();
-  
+
   String catalogueDIPTitle();
 
   String preservationActionsTitle();
@@ -125,9 +125,9 @@ public interface ClientMessages extends Messages {
   String createFolderTitle();
 
   String createFolderPlaceholder();
-  
+
   String createFolderAlreadyExistsTitle();
-  
+
   String createFolderAlreadyExistsMessage();
 
   String outcomeDetailTitle();
@@ -1342,9 +1342,9 @@ public interface ClientMessages extends Messages {
   String selectAnItemToMoveDescription();
 
   String searchPrevious();
-  
+
   String searchNext();
-  
+
   String searchContext();
 
   String searchAIP();
@@ -2373,8 +2373,10 @@ public interface ClientMessages extends Messages {
   String fileAlreadyExists();
 
   SafeHtml tableDownloadCSV();
-  
+
   SafeHtml tableAction();
+
+  String tableActionEmptyHelp();
 
   String showMore();
 
@@ -2400,4 +2402,5 @@ public interface ClientMessages extends Messages {
   String jobReportSource(@Select String sourceObjectClass);
 
   String jobReportOutcome(@Select String outcomeObjectClass);
+
 }
