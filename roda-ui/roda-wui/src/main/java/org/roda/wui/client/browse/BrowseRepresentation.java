@@ -34,6 +34,7 @@ import org.roda.wui.client.browse.bundle.DescriptiveMetadataViewBundle;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.actions.FileActions;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.SelectFileDialog;
 import org.roda.wui.client.common.lists.DIPList;
@@ -279,6 +280,7 @@ public class BrowseRepresentation extends Composite {
         });
       }
     });
+    filesList.setActionable(FileActions.get(aipId, repId));
 
     filesSearch = new SearchPanel(filter, ALL_FILTER, true, messages.searchPlaceHolder(), false, false, true);
     filesSearch.setList(filesList);

@@ -362,7 +362,7 @@ div.inline {
     z-index: 1;
 }
 
-.slider-title {
+.slider-title, .slider .actions-layout-title {
     font-size: 2.2rem;
     margin: 1.2rem 0;
 }
@@ -376,6 +376,7 @@ div.inline {
 .slider-active .slider-layout {
 	opacity: 1;
 }
+
 
 /**********************************************
 				SKELETON
@@ -3492,6 +3493,7 @@ td.datePickerMonth, td.datePickerYear {
 ************************************************/
 .gwt-DialogBox {
     background-color: white;
+    z-index: 6;
 }
 
 .gwt-DialogBox .Caption {
@@ -5213,6 +5215,7 @@ td.datePickerMonth, td.datePickerYear {
 ************************************************/
 .gwt-PopupPanelGlass {
     background-color: rgba(0, 0, 0, 0.25);
+    z-index: 5;
 }
 
 .office-window-dock {
@@ -5765,7 +5768,7 @@ td.datePickerMonth, td.datePickerYear {
  DOWNLOAD CSV
 ****************************************/
 
-.csvDownloadButton { 
+.csvDownloadButton, .actionsButton { 
 	padding: 7px;
 	float: right;
 }
@@ -5775,4 +5778,21 @@ td.datePickerMonth, td.datePickerYear {
 	max-width: 100px;
 }
 
+/***************************************
+ ACTIONS
+****************************************/
+
+.actions-popup {
+	background-color: white;
+	padding: 10px;
+	box-shadow: 0 0px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+}
+
+.actions-popup .actions-layout-title {
+	
+}
+
+.actions-layout-button + .actions-layout-title {
+	margin-top: 10px;
+}
 

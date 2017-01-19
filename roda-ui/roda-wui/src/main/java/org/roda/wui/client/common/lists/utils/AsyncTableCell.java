@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.roda.core.common.SelectedItemsUtils;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
@@ -29,6 +30,7 @@ import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.lists.pagination.ListSelectionState;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.StringUtils;
@@ -36,6 +38,7 @@ import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.widgets.MyCellTableResources;
+import org.roda.wui.common.client.widgets.Toast;
 import org.roda.wui.common.client.widgets.wcag.AccessibleCellTable;
 import org.roda.wui.common.client.widgets.wcag.AccessibleSimplePager;
 
@@ -70,6 +73,7 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.view.client.CellPreviewEvent;
 import com.google.gwt.view.client.CellPreviewEvent.Handler;
 import com.google.gwt.view.client.DefaultSelectionEventManager;
@@ -94,6 +98,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
   private final AccessibleSimplePager resultsPager;
   private final RodaPageSizePager pageSizePager;
   private Button csvDownloadButton;
+  private Button actionsButton;
   private final CellTable<T> display;
 
   private FlowPanel selectAllPanel;
@@ -119,6 +124,9 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
   private int autoUpdateTimerMillis = 0;
 
   private IndexResult<T> result;
+
+  private Actionable<T> actionable = null;
+  private final PopupPanel actionsPopup = new PopupPanel(true, true);
 
   public AsyncTableCell(Class<T> classToReturn) {
     this(classToReturn, null, false, null, null, false, 20, 100, null);
@@ -197,8 +205,12 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     pageSizePager.setDisplay(display);
 
     csvDownloadButton = new Button(messages.tableDownloadCSV());
-
     csvDownloadButton.addStyleName("btn btn-link csvDownloadButton");
+
+    actionsButton = new Button(messages.tableAction());
+    actionsButton.addStyleName("btn btn-link actionsButton");
+    actionsButton.setVisible(actionable != null);
+    actionsPopup.setStyleName("actions-popup");
 
     createSelectAllPanel();
 
@@ -207,6 +219,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     add(resultsPager);
     add(pageSizePager);
     add(csvDownloadButton);
+    add(actionsButton);
 
     csvDownloadButton.addClickHandler(new ClickHandler() {
 
@@ -214,6 +227,14 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
       public void onClick(ClickEvent event) {
         RestUtils.requestCSVExport(getClassToReturn(), getFilter(), dataProvider.getSorter(), dataProvider.getSublist(),
           getFacets(), getJustActive(), false, notNullSummary + ".csv");
+      }
+    });
+
+    actionsButton.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        showActions();
       }
     });
 
@@ -814,4 +835,32 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
     return true;
   }
+
+  public Actionable<T> getActionable() {
+    return actionable;
+  }
+
+  public void setActionable(Actionable<T> actionable) {
+    this.actionable = actionable;
+
+    actionsButton.setVisible(actionable != null);
+  }
+
+  protected void showActions() {
+    if (actionable != null) {
+      if (actionsPopup.isShowing()) {
+        actionsPopup.hide();
+      } else {
+        SelectedItems<T> selectedItems = getSelected();
+        if (!ClientSelectedItemsUtils.isEmpty(selectedItems)) {
+          actionsPopup.setWidget(actionable.createActionsLayout(getSelected()));
+        } else {
+          actionsPopup.setWidget(new Label("Please select items using the checkboxes"));
+        }
+        actionsPopup.showRelativeTo(actionsButton);
+      }
+
+    }
+  }
+
 }

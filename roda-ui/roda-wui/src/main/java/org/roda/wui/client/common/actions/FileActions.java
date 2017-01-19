@@ -21,7 +21,6 @@ import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.SelectFileDialog;
-import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.planning.Planning;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
 import org.roda.wui.client.process.CreateJob;
@@ -30,19 +29,20 @@ import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
 
-public class FileActions {
+public class FileActions extends AbstractActionable<IndexedFile> {
+
+  private static final FileActions GENERAL_INSTANCE = new FileActions(null, null);
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
@@ -59,15 +59,27 @@ public class FileActions {
   private static final Set<FileAction> POSSIBLE_ACTIONS_ON_MULTIPLE_FILES_FROM_DIFFERENT_REPRESENTATIONS = new HashSet<>(
     Arrays.asList(FileAction.REMOVE, FileAction.NEW_PROCESS, FileAction.IDENTIFY_FORMATS));
 
-  private FileActions() {
+  private final String aipId;
+  private final String representationId;
 
+  private FileActions(String aipId, String representationId) {
+    this.aipId = aipId;
+    this.representationId = representationId;
   }
 
-  public enum FileAction {
+  public enum FileAction implements Actionable.Action<IndexedFile> {
     DOWNLOAD, RENAME, MOVE, REMOVE, UPLOAD_FILES, CREATE_FOLDER, NEW_PROCESS, IDENTIFY_FORMATS, SHOW_EVENTS, SHOW_RISKS;
   }
 
-  public static boolean canAct(FileAction action, IndexedFile file) {
+  public static FileActions get() {
+    return GENERAL_INSTANCE;
+  }
+
+  public static FileActions get(String aipId, String representationId) {
+    return new FileActions(aipId, representationId);
+  }
+
+  public boolean canAct(Actionable.Action<IndexedFile> action, IndexedFile file) {
     boolean ret;
     if (file.isDirectory()) {
       ret = POSSIBLE_ACTIONS_ON_SINGLE_FILE_DIRECTORY.contains(action);
@@ -77,35 +89,20 @@ public class FileActions {
     return ret;
   }
 
-  public static boolean canAct(FileAction action, String aipId, String representationId,
-    SelectedItems<IndexedFile> selectedItems) {
-    return POSSIBLE_ACTIONS_ON_MULTIPLE_FILES_FROM_THE_SAME_REPRESENTATION.contains(action);
+  @Override
+  public boolean canAct(Actionable.Action<IndexedFile> action, SelectedItems<IndexedFile> selectedItems) {
+    boolean ret;
+    if (aipId != null && representationId != null) {
+      ret = POSSIBLE_ACTIONS_ON_MULTIPLE_FILES_FROM_THE_SAME_REPRESENTATION.contains(action);
+    } else {
+      ret = POSSIBLE_ACTIONS_ON_MULTIPLE_FILES_FROM_DIFFERENT_REPRESENTATIONS.contains(action);
+    }
+
+    return ret;
   }
 
-  public static boolean canAct(FileAction action, SelectedItems<IndexedFile> selectedItems) {
-    return POSSIBLE_ACTIONS_ON_MULTIPLE_FILES_FROM_DIFFERENT_REPRESENTATIONS.contains(action);
-  }
-
-  private static AsyncCallback<Void> createDefaultAsyncCallback() {
-    return new AsyncCallback<Void>() {
-
-      @Override
-      public void onFailure(Throwable caught) {
-        AsyncCallbackUtils.defaultFailureTreatment(caught);
-      }
-
-      @Override
-      public void onSuccess(Void result) {
-        // do nothing
-      }
-    };
-  }
-
-  public static void act(FileAction action, IndexedFile file) {
-    act(action, file, createDefaultAsyncCallback());
-  }
-
-  public static void act(FileAction action, IndexedFile file, AsyncCallback<Void> callback) {
+  @Override
+  public void act(Actionable.Action<IndexedFile> action, IndexedFile file, AsyncCallback<Void> callback) {
     if (FileAction.DOWNLOAD.equals(action)) {
       download(file, callback);
     } else if (FileAction.RENAME.equals(action)) {
@@ -132,21 +129,12 @@ public class FileActions {
   }
 
   /**
-   * Act on multiple files from the same representation
-   * 
+   * Act on multiple files from different representations
    */
-  public static void act(FileAction action, String aipId, String representationId,
-    SelectedItems<IndexedFile> selectedItems) {
-    act(action, aipId, representationId, selectedItems, createDefaultAsyncCallback());
-  }
-
-  /**
-   * Act on multiple files from the same representation
-   * 
-   */
-  public static void act(FileAction action, String aipId, String representationId,
-    SelectedItems<IndexedFile> selectedItems, AsyncCallback<Void> callback) {
-    if (FileAction.MOVE.equals(action)) {
+  @Override
+  public void act(Actionable.Action<IndexedFile> action, SelectedItems<IndexedFile> selectedItems,
+    AsyncCallback<Void> callback) {
+    if (FileAction.MOVE.equals(action) && aipId != null && representationId != null) {
       move(aipId, representationId, selectedItems, callback);
     } else if (FileAction.REMOVE.equals(action)) {
       remove(selectedItems, callback);
@@ -159,57 +147,9 @@ public class FileActions {
     }
   }
 
-  /**
-   * Act on multiple files from different representations
-   * 
-   */
-  public static void act(FileAction action, SelectedItems<IndexedFile> selectedItems) {
-    act(action, selectedItems, createDefaultAsyncCallback());
-  }
-
-  /**
-   * Act on multiple files from different representations
-   */
-  public static void act(FileAction action, SelectedItems<IndexedFile> selectedItems, AsyncCallback<Void> callback) {
-    if (FileAction.REMOVE.equals(action)) {
-      remove(selectedItems, callback);
-    } else if (FileAction.NEW_PROCESS.equals(action)) {
-      newProcess(selectedItems, callback);
-    } else if (FileAction.IDENTIFY_FORMATS.equals(action)) {
-      identifyFormats(selectedItems, callback);
-    } else {
-      Toast.showError("Unsupported action in this context: " + action);
-    }
-  }
-
-  public static Button createButton(final String text, final FileAction action, final IndexedFile file,
-    final String... extraCssClasses) {
-
-    // Construct
-    Button downloadButton = new Button(text);
-
-    // CSS
-    downloadButton.addStyleName("btn");
-    downloadButton.addStyleName("btn-block");
-
-    for (String extraCssClass : extraCssClasses) {
-      downloadButton.addStyleName(extraCssClass);
-    }
-
-    // Action
-    downloadButton.addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        FileActions.act(action, file);
-      }
-    });
-    return downloadButton;
-  }
-
   // ACTIONS
 
-  public static void download(IndexedFile file, final AsyncCallback<Void> callback) {
+  public void download(IndexedFile file, final AsyncCallback<Void> callback) {
     SafeUri downloadUri = null;
     if (file != null) {
       downloadUri = RestUtils.createRepresentationFileDownloadUri(file.getUUID());
@@ -220,7 +160,7 @@ public class FileActions {
     callback.onSuccess(null);
   }
 
-  public static void rename(final IndexedFile file, final AsyncCallback<Void> callback) {
+  public void rename(final IndexedFile file, final AsyncCallback<Void> callback) {
     Dialogs.showPromptDialog(messages.renameItemTitle(), null, messages.renamePlaceholder(), RegExp.compile(".*"),
       messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
 
@@ -257,13 +197,13 @@ public class FileActions {
       });
   }
 
-  public static void move(final IndexedFile file, final AsyncCallback<Void> callback) {
+  public void move(final IndexedFile file, final AsyncCallback<Void> callback) {
     move(file.getAipId(), file.getRepresentationId(),
       new SelectedItemsList<IndexedFile>(Arrays.asList(file.getUUID()), IndexedFile.class.getName()), callback);
   }
 
-  public static void move(final String aipId, final String representationId,
-    final SelectedItems<IndexedFile> selectedItems, final AsyncCallback<Void> callback) {
+  public void move(final String aipId, final String representationId, final SelectedItems<IndexedFile> selectedItems,
+    final AsyncCallback<Void> callback) {
     // FIXME missing filter to remove the files themselves
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_AIP_ID, aipId),
       new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_ID, representationId),
@@ -317,7 +257,7 @@ public class FileActions {
     });
   }
 
-  public static void uploadFiles(final IndexedFile file, final AsyncCallback<Void> callback) {
+  public void uploadFiles(final IndexedFile file, final AsyncCallback<Void> callback) {
     if (file.isDirectory()) {
       Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
         RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
@@ -339,7 +279,7 @@ public class FileActions {
     }
   }
 
-  public static void createFolder(final IndexedFile file, final AsyncCallback<Void> callback) {
+  public void createFolder(final IndexedFile file, final AsyncCallback<Void> callback) {
     Dialogs.showPromptDialog(messages.createFolderTitle(), null, messages.createFolderPlaceholder(),
       RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
         @Override
@@ -389,12 +329,12 @@ public class FileActions {
       });
   }
 
-  public static void newProcess(IndexedFile file, final AsyncCallback<Void> callback) {
+  public void newProcess(IndexedFile file, final AsyncCallback<Void> callback) {
     newProcess(new SelectedItemsList<IndexedFile>(Arrays.asList(file.getUUID()), IndexedFile.class.getName()),
       callback);
   }
 
-  public static void newProcess(SelectedItems<IndexedFile> selected, final AsyncCallback<Void> callback) {
+  public void newProcess(SelectedItems<IndexedFile> selected, final AsyncCallback<Void> callback) {
     LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
     selectedItems.setSelectedItems(selected);
     selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
@@ -402,12 +342,12 @@ public class FileActions {
     callback.onSuccess(null);
   }
 
-  public static void identifyFormats(IndexedFile file, final AsyncCallback<Void> callback) {
+  public void identifyFormats(IndexedFile file, final AsyncCallback<Void> callback) {
     identifyFormats(new SelectedItemsList<IndexedFile>(Arrays.asList(file.getUUID()), IndexedFile.class.getName()),
       callback);
   }
 
-  public static void identifyFormats(SelectedItems<IndexedFile> selected, final AsyncCallback<Void> callback) {
+  public void identifyFormats(SelectedItems<IndexedFile> selected, final AsyncCallback<Void> callback) {
     BrowserService.Util.getInstance().createFormatIdentificationJob(selected, new AsyncCallback<Void>() {
       @Override
       public void onSuccess(Void object) {
@@ -426,7 +366,7 @@ public class FileActions {
     });
   }
 
-  public static void remove(final IndexedFile file, final AsyncCallback<Void> callback) {
+  public void remove(final IndexedFile file, final AsyncCallback<Void> callback) {
     Dialogs.showConfirmDialog(messages.viewRepresentationRemoveFileTitle(),
       messages.viewRepresentationRemoveFileMessage(), messages.dialogCancel(), messages.dialogYes(),
       new AsyncCallback<Boolean>() {
@@ -477,7 +417,7 @@ public class FileActions {
       });
   }
 
-  public static void remove(final SelectedItems<IndexedFile> selected, final AsyncCallback<Void> callback) {
+  public void remove(final SelectedItems<IndexedFile> selected, final AsyncCallback<Void> callback) {
     Dialogs.showConfirmDialog(messages.filesRemoveTitle(), messages.selectedFileRemoveMessage(),
       messages.dialogCancel(), messages.dialogYes(), new AsyncCallback<Boolean>() {
 
@@ -518,7 +458,7 @@ public class FileActions {
       });
   }
 
-  public static void showEvents(IndexedFile file, final AsyncCallback<Void> callback) {
+  public void showEvents(IndexedFile file, final AsyncCallback<Void> callback) {
     List<String> history = new ArrayList<>();
     history.add(file.getAipId());
     history.add(file.getRepresentationUUID());
@@ -527,7 +467,7 @@ public class FileActions {
     callback.onSuccess(null);
   }
 
-  public static void showRisks(IndexedFile file, final AsyncCallback<Void> callback) {
+  public void showRisks(IndexedFile file, final AsyncCallback<Void> callback) {
     List<String> history = new ArrayList<>();
     history.add(RiskIncidenceRegister.RESOLVER.getHistoryToken());
     history.add(file.getAipId());
@@ -536,6 +476,64 @@ public class FileActions {
     history.add(file.getId());
     HistoryUtils.newHistory(Planning.RESOLVER, history);
     callback.onSuccess(null);
+  }
+
+  @Override
+  public Widget createActionsLayout(IndexedFile file) {
+    FlowPanel layout = createLayout();
+
+    // MANAGEMENT
+    addTitle(layout, messages.sidebarFoldersFilesTitle());
+
+    // DOWNLOAD, RENAME, MOVE, REMOVE, UPLOAD_FILES, CREATE_FOLDER
+    addButton(layout, messages.downloadButton(), FileAction.DOWNLOAD, file, "btn-default-alt", "btn-download");
+    addButton(layout, messages.renameButton(), FileAction.RENAME, file, "btn-default-alt", "btn-edit");
+    addButton(layout, messages.moveButton(), FileAction.MOVE, file, "btn-default-alt", "btn-edit");
+    addButton(layout, messages.uploadFilesButton(), FileAction.UPLOAD_FILES, file, "btn-default-alt", "btn-upload");
+    addButton(layout, messages.createFolderButton(), FileAction.CREATE_FOLDER, file, "btn-default-alt", "btn-plus");
+    addButton(layout, messages.removeButton(), FileAction.REMOVE, file, "btn-danger", "btn-ban");
+
+    // PRESERVATION
+    addTitle(layout, messages.preservationTitle());
+
+    // NEW_PROCESS, IDENTIFY_FORMATS, SHOW_EVENTS, SHOW_RISKS
+
+    addButton(layout, messages.newProcessPreservation(), FileAction.NEW_PROCESS, file, "btn-default-alt", "btn-play");
+    addButton(layout, messages.identifyFormatsButton(), FileAction.IDENTIFY_FORMATS, file, "btn-default-alt",
+      "btn-play");
+    addButton(layout, messages.preservationEvents(), FileAction.SHOW_EVENTS, file, "btn-default-alt", "btn-play");
+    addButton(layout, messages.preservationRisks(), FileAction.SHOW_RISKS, file, "btn-default-alt", "btn-play");
+
+    return layout;
+  }
+
+  @Override
+  public Widget createActionsLayout(SelectedItems<IndexedFile> files) {
+    FlowPanel layout = createLayout();
+
+    // MANAGEMENT
+    addTitle(layout, messages.sidebarFoldersFilesTitle());
+
+    // DOWNLOAD, RENAME, MOVE, REMOVE, UPLOAD_FILES, CREATE_FOLDER
+    addButton(layout, messages.downloadButton(), FileAction.DOWNLOAD, files, "btn-default-alt", "btn-download");
+    addButton(layout, messages.renameButton(), FileAction.RENAME, files, "btn-default-alt", "btn-edit");
+    addButton(layout, messages.moveButton(), FileAction.MOVE, files, "btn-default-alt", "btn-edit");
+    addButton(layout, messages.uploadFilesButton(), FileAction.UPLOAD_FILES, files, "btn-default-alt", "btn-upload");
+    addButton(layout, messages.createFolderButton(), FileAction.CREATE_FOLDER, files, "btn-default-alt", "btn-plus");
+    addButton(layout, messages.removeButton(), FileAction.REMOVE, files, "btn-danger", "btn-ban");
+
+    // PRESERVATION
+    addTitle(layout, messages.preservationTitle());
+
+    // NEW_PROCESS, IDENTIFY_FORMATS, SHOW_EVENTS, SHOW_RISKS
+
+    addButton(layout, messages.newProcessPreservation(), FileAction.NEW_PROCESS, files, "btn-default-alt", "btn-play");
+    addButton(layout, messages.identifyFormatsButton(), FileAction.IDENTIFY_FORMATS, files, "btn-default-alt",
+      "btn-play");
+    addButton(layout, messages.preservationEvents(), FileAction.SHOW_EVENTS, files, "btn-default-alt", "btn-play");
+    addButton(layout, messages.preservationRisks(), FileAction.SHOW_RISKS, files, "btn-default-alt", "btn-play");
+
+    return layout;
   }
 
 }
