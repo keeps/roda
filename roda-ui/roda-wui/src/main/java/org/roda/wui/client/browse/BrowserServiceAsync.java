@@ -220,7 +220,7 @@ public interface BrowserServiceAsync {
 
   void createFormatIdentificationJob(SelectedItems selected, AsyncCallback<Void> loadingAsyncCallback);
 
-  void changeRepresentationType(SelectedItemsList<IndexedRepresentation> selectedRepresentation, String newType,
+  void changeRepresentationType(SelectedItems<IndexedRepresentation> selectedRepresentation, String newType,
     String details, AsyncCallback<Void> loadingAsyncCallback);
 
   void getDipBundle(String dipUUID, String dipFileUUID, AsyncCallback<DipBundle> callback);

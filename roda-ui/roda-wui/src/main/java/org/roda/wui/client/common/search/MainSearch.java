@@ -28,6 +28,8 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.wui.client.common.actions.FileActions;
+import org.roda.wui.client.common.actions.RepresentationActions;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.RepresentationList;
 import org.roda.wui.client.common.lists.SearchFileList;
@@ -266,7 +268,7 @@ public class MainSearch extends Composite {
       facetPanels.put(facetParameter.getName(), itemsFacetsMap.get(facetParameter));
     }
     FacetUtils.bindFacets(itemsSearchResultPanel, facetPanels);
-    
+
     ListSelectionState.bindBrowseOpener(itemsSearchResultPanel);
 
     itemsSearchResultPanel.addCheckboxSelectionListener(new CheckboxSelectionListener<IndexedAIP>() {
@@ -299,6 +301,8 @@ public class MainSearch extends Composite {
           setButtonsEnabled(representationsSelectionButtons, !(ClientSelectedItemsUtils.isEmpty(selected)));
         }
       });
+
+    representationsSearchResultPanel.setActionable(RepresentationActions.get());
   }
 
   private void createFilesSearchResultPanel() {
@@ -322,6 +326,8 @@ public class MainSearch extends Composite {
         setButtonsEnabled(filesSelectionButtons, !(ClientSelectedItemsUtils.isEmpty(selected)));
       }
     });
+
+    filesSearchResultPanel.setActionable(FileActions.get());
   }
 
   public SelectedItems<? extends IsIndexed> getSelected() {

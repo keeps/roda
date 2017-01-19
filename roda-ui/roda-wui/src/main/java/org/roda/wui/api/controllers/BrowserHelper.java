@@ -3240,9 +3240,8 @@ public class BrowserHelper {
     RodaCoreFactory.getPluginOrchestrator().executeJob(job, true);
   }
 
-  public static void changeRepresentationType(User user, SelectedItemsList<IndexedRepresentation> selected,
-    String newType, String details)
-    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
+  public static void changeRepresentationType(User user, SelectedItems<IndexedRepresentation> selected, String newType,
+    String details) throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     List<String> representationIds = consolidate(user, IndexedRepresentation.class, selected);
     ModelService model = RodaCoreFactory.getModelService();
     IndexService index = RodaCoreFactory.getIndexService();

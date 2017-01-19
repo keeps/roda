@@ -30,7 +30,7 @@ public interface Actionable<T extends IsIndexed> {
 
   // Layout
 
-  Widget createActionsLayout(T object);
+  Widget createActionsLayout(T object, AsyncCallback<Void> callback);
 
-  Widget createActionsLayout(SelectedItems<T> objects);
+  Widget createActionsLayout(SelectedItems<T> objects, AsyncCallback<Void> callback);
 }

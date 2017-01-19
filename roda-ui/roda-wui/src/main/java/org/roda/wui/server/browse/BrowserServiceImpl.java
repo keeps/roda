@@ -856,8 +856,8 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void changeRepresentationType(SelectedItemsList<IndexedRepresentation> selected, String newType,
-    String details) throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+  public void changeRepresentationType(SelectedItems<IndexedRepresentation> selected, String newType, String details)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Browser.changeRepresentationType(user, selected, newType, details);
   }

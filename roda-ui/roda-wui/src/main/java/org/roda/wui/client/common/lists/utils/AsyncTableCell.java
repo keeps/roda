@@ -31,6 +31,7 @@ import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.lists.pagination.ListSelectionState;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.ClientLogger;
@@ -850,13 +851,27 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
       if (actionsPopup.isShowing()) {
         actionsPopup.hide();
       } else {
+        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+
+          @Override
+          public void onFailure(Throwable caught) {
+            AsyncCallbackUtils.defaultFailureTreatment(caught);
+          }
+
+          @Override
+          public void onSuccess(Void result) {
+            update();
+            actionsPopup.hide();
+          }
+        };
+
         if (isAllSelected()) {
-          actionsPopup.setWidget(actionable.createActionsLayout(getSelected()));
+          actionsPopup.setWidget(actionable.createActionsLayout(getSelected(), callback));
         } else if (selected.size() == 1) {
-          actionsPopup.setWidget(actionable.createActionsLayout(selected.iterator().next()));
+          actionsPopup.setWidget(actionable.createActionsLayout(selected.iterator().next(), callback));
         } else if (selected.size() > 1) {
           // TODO create action layout based on selected set
-          actionsPopup.setWidget(actionable.createActionsLayout(getSelected()));
+          actionsPopup.setWidget(actionable.createActionsLayout(getSelected(), callback));
         } else {
           Label emptyHelpText = new Label(messages.tableActionEmptyHelp());
           emptyHelpText.addStyleName("actions-empty-help");

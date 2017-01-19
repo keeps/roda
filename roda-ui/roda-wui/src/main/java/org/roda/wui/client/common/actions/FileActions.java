@@ -479,59 +479,71 @@ public class FileActions extends AbstractActionable<IndexedFile> {
   }
 
   @Override
-  public Widget createActionsLayout(IndexedFile file) {
+  public Widget createActionsLayout(IndexedFile file, AsyncCallback<Void> callback) {
     FlowPanel layout = createLayout();
 
     // MANAGEMENT
     addTitle(layout, messages.sidebarFoldersFilesTitle());
 
     // DOWNLOAD, RENAME, MOVE, REMOVE, UPLOAD_FILES, CREATE_FOLDER
-    addButton(layout, messages.downloadButton(), FileAction.DOWNLOAD, file, "btn-default-alt", "btn-download");
-    addButton(layout, messages.renameButton(), FileAction.RENAME, file, "btn-default-alt", "btn-edit");
-    addButton(layout, messages.moveButton(), FileAction.MOVE, file, "btn-default-alt", "btn-edit");
-    addButton(layout, messages.uploadFilesButton(), FileAction.UPLOAD_FILES, file, "btn-default-alt", "btn-upload");
-    addButton(layout, messages.createFolderButton(), FileAction.CREATE_FOLDER, file, "btn-default-alt", "btn-plus");
-    addButton(layout, messages.removeButton(), FileAction.REMOVE, file, "btn-danger", "btn-ban");
+    addButton(layout, messages.downloadButton(), FileAction.DOWNLOAD, file, callback, "btn-default-alt",
+      "btn-download");
+    addButton(layout, messages.renameButton(), FileAction.RENAME, file, callback, "btn-default-alt", "btn-edit");
+    addButton(layout, messages.moveButton(), FileAction.MOVE, file, callback, "btn-default-alt", "btn-edit");
+    addButton(layout, messages.uploadFilesButton(), FileAction.UPLOAD_FILES, file, callback, "btn-default-alt",
+      "btn-upload");
+    addButton(layout, messages.createFolderButton(), FileAction.CREATE_FOLDER, file, callback, "btn-default-alt",
+      "btn-plus");
+    addButton(layout, messages.removeButton(), FileAction.REMOVE, file, callback, "btn-danger", "btn-ban");
 
     // PRESERVATION
     addTitle(layout, messages.preservationTitle());
 
     // NEW_PROCESS, IDENTIFY_FORMATS, SHOW_EVENTS, SHOW_RISKS
 
-    addButton(layout, messages.newProcessPreservation(), FileAction.NEW_PROCESS, file, "btn-default-alt", "btn-play");
-    addButton(layout, messages.identifyFormatsButton(), FileAction.IDENTIFY_FORMATS, file, "btn-default-alt",
+    addButton(layout, messages.newProcessPreservation(), FileAction.NEW_PROCESS, file, callback, "btn-default-alt",
       "btn-play");
-    addButton(layout, messages.preservationEvents(), FileAction.SHOW_EVENTS, file, "btn-default-alt", "btn-play");
-    addButton(layout, messages.preservationRisks(), FileAction.SHOW_RISKS, file, "btn-default-alt", "btn-play");
+    addButton(layout, messages.identifyFormatsButton(), FileAction.IDENTIFY_FORMATS, file, callback, "btn-default-alt",
+      "btn-play");
+    addButton(layout, messages.preservationEvents(), FileAction.SHOW_EVENTS, file, callback, "btn-default-alt",
+      "btn-play");
+    addButton(layout, messages.preservationRisks(), FileAction.SHOW_RISKS, file, callback, "btn-default-alt",
+      "btn-play");
 
     return layout;
   }
 
   @Override
-  public Widget createActionsLayout(SelectedItems<IndexedFile> files) {
+  public Widget createActionsLayout(SelectedItems<IndexedFile> files, AsyncCallback<Void> callback) {
     FlowPanel layout = createLayout();
 
     // MANAGEMENT
     addTitle(layout, messages.sidebarFoldersFilesTitle());
 
     // DOWNLOAD, RENAME, MOVE, REMOVE, UPLOAD_FILES, CREATE_FOLDER
-    addButton(layout, messages.downloadButton(), FileAction.DOWNLOAD, files, "btn-default-alt", "btn-download");
-    addButton(layout, messages.renameButton(), FileAction.RENAME, files, "btn-default-alt", "btn-edit");
-    addButton(layout, messages.moveButton(), FileAction.MOVE, files, "btn-default-alt", "btn-edit");
-    addButton(layout, messages.uploadFilesButton(), FileAction.UPLOAD_FILES, files, "btn-default-alt", "btn-upload");
-    addButton(layout, messages.createFolderButton(), FileAction.CREATE_FOLDER, files, "btn-default-alt", "btn-plus");
-    addButton(layout, messages.removeButton(), FileAction.REMOVE, files, "btn-danger", "btn-ban");
+    addButton(layout, messages.downloadButton(), FileAction.DOWNLOAD, files, callback, "btn-default-alt",
+      "btn-download");
+    addButton(layout, messages.renameButton(), FileAction.RENAME, files, callback, "btn-default-alt", "btn-edit");
+    addButton(layout, messages.moveButton(), FileAction.MOVE, files, callback, "btn-default-alt", "btn-edit");
+    addButton(layout, messages.uploadFilesButton(), FileAction.UPLOAD_FILES, files, callback, "btn-default-alt",
+      "btn-upload");
+    addButton(layout, messages.createFolderButton(), FileAction.CREATE_FOLDER, files, callback, "btn-default-alt",
+      "btn-plus");
+    addButton(layout, messages.removeButton(), FileAction.REMOVE, files, callback, "btn-danger", "btn-ban");
 
     // PRESERVATION
     addTitle(layout, messages.preservationTitle());
 
     // NEW_PROCESS, IDENTIFY_FORMATS, SHOW_EVENTS, SHOW_RISKS
 
-    addButton(layout, messages.newProcessPreservation(), FileAction.NEW_PROCESS, files, "btn-default-alt", "btn-play");
-    addButton(layout, messages.identifyFormatsButton(), FileAction.IDENTIFY_FORMATS, files, "btn-default-alt",
+    addButton(layout, messages.newProcessPreservation(), FileAction.NEW_PROCESS, files, callback, "btn-default-alt",
       "btn-play");
-    addButton(layout, messages.preservationEvents(), FileAction.SHOW_EVENTS, files, "btn-default-alt", "btn-play");
-    addButton(layout, messages.preservationRisks(), FileAction.SHOW_RISKS, files, "btn-default-alt", "btn-play");
+    addButton(layout, messages.identifyFormatsButton(), FileAction.IDENTIFY_FORMATS, files, callback, "btn-default-alt",
+      "btn-play");
+    addButton(layout, messages.preservationEvents(), FileAction.SHOW_EVENTS, files, callback, "btn-default-alt",
+      "btn-play");
+    addButton(layout, messages.preservationRisks(), FileAction.SHOW_RISKS, files, callback, "btn-default-alt",
+      "btn-play");
 
     return layout;
   }

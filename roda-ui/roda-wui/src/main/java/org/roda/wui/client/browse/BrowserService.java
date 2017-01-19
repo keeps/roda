@@ -317,7 +317,7 @@ public interface BrowserService extends RemoteService {
   void createFormatIdentificationJob(SelectedItems selected) throws GenericException, AuthorizationDeniedException,
     JobAlreadyStartedException, RequestNotValidException, NotFoundException;
 
-  void changeRepresentationType(SelectedItemsList<IndexedRepresentation> selectedRepresentation, String newType,
+  void changeRepresentationType(SelectedItems<IndexedRepresentation> selectedRepresentation, String newType,
     String details) throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
   DipBundle getDipBundle(String dipUUID, String dipFileUUID)

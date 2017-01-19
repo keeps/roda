@@ -69,7 +69,7 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
   }
 
   public void addButton(FlowPanel layout, final String text, final Actionable.Action<T> action, final T object,
-    final String... extraCssClasses) {
+    final AsyncCallback<Void> callback, final String... extraCssClasses) {
 
     if (canAct(action, object)) {
 
@@ -90,7 +90,7 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
 
         @Override
         public void onClick(ClickEvent event) {
-          act(action, object);
+          act(action, object, callback);
         }
       });
 
@@ -99,7 +99,7 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
   }
 
   public void addButton(FlowPanel layout, final String text, final Actionable.Action<T> action,
-    final SelectedItems<T> objects, final String... extraCssClasses) {
+    final SelectedItems<T> objects, final AsyncCallback<Void> callback, final String... extraCssClasses) {
 
     if (canAct(action, objects)) {
 
@@ -120,7 +120,7 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
 
         @Override
         public void onClick(ClickEvent event) {
-          act(action, objects);
+          act(action, objects, callback);
         }
       });
 
@@ -129,8 +129,12 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
   }
 
   @Override
+  public Widget createActionsLayout(T object, AsyncCallback<Void> callback) {
+    return createActionsLayout(objectToSelectedItems(object), callback);
+  }
+
   public Widget createActionsLayout(T object) {
-    return createActionsLayout(objectToSelectedItems(object));
+    return createActionsLayout(objectToSelectedItems(object), createDefaultAsyncCallback());
   }
 
 }

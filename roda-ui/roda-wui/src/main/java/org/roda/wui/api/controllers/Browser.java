@@ -2551,9 +2551,8 @@ public class Browser extends RodaWuiController {
       selected);
   }
 
-  public static void changeRepresentationType(User user, SelectedItemsList<IndexedRepresentation> selected,
-    String newType, String details)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+  public static void changeRepresentationType(User user, SelectedItems<IndexedRepresentation> selected, String newType,
+    String details) throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions

@@ -36,6 +36,7 @@ import org.roda.wui.client.browse.bundle.DescriptiveMetadataViewBundle;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.actions.RepresentationActions;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.SelectAipDialog;
 import org.roda.wui.client.common.lists.AIPList;
@@ -298,12 +299,12 @@ public class BrowseAIP extends Composite {
     // REPRESENTATIONS
     representationsList = new RepresentationList(Filter.NULL, justActive, Facets.NONE, messages.listOfRepresentations(),
       true);
-
     ListSelectionState.bindBrowseOpener(representationsList);
 
     representationsSearch = new SearchPanel(Filter.NULL, RodaConstants.REPRESENTATION_SEARCH, true,
       messages.searchPlaceHolder(), false, false, true);
     representationsSearch.setList(representationsList);
+    
 
     // DISSEMINATIONS
 
@@ -593,6 +594,7 @@ public class BrowseAIP extends Composite {
         representationsSearch.setDefaultFilter(filter, true);
         representationsSearch.clearSearchInputBox();
         representationsList.set(filter, justActive, Facets.NONE);
+        representationsList.setActionable(RepresentationActions.get(aipId));
       }
 
       representationsTitle.setVisible(bundle.getRepresentationCount() > 0);

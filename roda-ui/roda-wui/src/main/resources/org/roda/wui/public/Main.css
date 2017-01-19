@@ -2043,7 +2043,7 @@ td.datePickerMonth, td.datePickerYear {
 
 /* Browser v2*/
 
-.browse {
+.browse, .wui-browse-representation {
 	margin-top: 0;
 }
 
@@ -5789,7 +5789,7 @@ td.datePickerMonth, td.datePickerYear {
 .actions-popup {
 	background-color: #089DE3;
 	border-radius: 2px;
-    max-width: 180px;
+    width: 180px;
 	padding: 10px;
 	box-shadow: 0 0px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
 }
