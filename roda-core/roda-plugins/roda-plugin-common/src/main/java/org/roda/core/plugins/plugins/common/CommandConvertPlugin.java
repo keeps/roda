@@ -7,7 +7,6 @@
  */
 package org.roda.core.plugins.plugins.common;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,10 +56,8 @@ public abstract class CommandConvertPlugin<T extends IsRODAObject> extends Abstr
 
   @Override
   public List<PluginParameter> getParameters() {
-    List<PluginParameter> params = new ArrayList<PluginParameter>();
-    params.addAll(super.getParameters());
-    params.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_COMMAND_ARGUMENTS));
-    return params;
+    Map<String, PluginParameter> parameters = getDefaultParameters();
+    return orderParameters(parameters);
   }
 
   @Override

@@ -112,10 +112,6 @@
 			<version>1.49</version>
 		</dependency>
 		<dependency>
-			<groupId>org.roda-project</groupId>
-			<artifactId>roda-common-data</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 		</dependency>

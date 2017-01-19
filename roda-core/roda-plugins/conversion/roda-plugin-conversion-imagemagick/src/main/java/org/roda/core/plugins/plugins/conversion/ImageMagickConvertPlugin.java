@@ -46,8 +46,7 @@ public class ImageMagickConvertPlugin<T extends IsRODAObject> extends CommandCon
       + "PDF, and SVG.\nImageMagick can also be used to resize, flip, mirror, rotate, distort, shear and transform images, adjust image colours, apply various special effects, "
       + "or draw text, lines, polygons, ellipses and Bézier curves (e.g. set Command arguments to “ -resample 90” to resize the image to 90 dpi)."
       + "\nThe results of conversion will be placed on a new representation under the same Archival Information Package (AIP) where the files were originally found."
-      + " A PREMIS event is also recorded after the task is run."
-      + "\nFor a full list of supported formats, please visit http://www.imagemagick.org/script/formats.php ";
+      + " A PREMIS event is also recorded after the task is run.\nFor a full list of supported formats, please visit http://www.imagemagick.org/script/formats.php ";
   }
 
   @Override

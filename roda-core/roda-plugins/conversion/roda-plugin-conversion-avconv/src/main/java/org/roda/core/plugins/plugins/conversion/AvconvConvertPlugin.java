@@ -16,6 +16,7 @@ package org.roda.core.plugins.plugins.conversion;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -106,11 +107,16 @@ public class AvconvConvertPlugin<T extends IsRODAObject> extends CommandConvertP
     parameters.get(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_DESCRIPTION)
       .setDefaultValue("MP4 format for web visualization.");
 
-    parameters.remove(RodaConstants.PLUGIN_PARAMS_COMMAND_ARGUMENTS);
-    List<PluginParameter> ret = super.orderParameters(parameters);
-    ret.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_COMMAND_ARGUMENTS));
-    ret.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_OUTPUT_ARGUMENTS));
-    return ret;
+    List<PluginParameter> orderedList = new ArrayList<>();
+    orderedList.add(parameters.get(RodaConstants.PLUGIN_PARAMS_INPUT_FORMAT));
+    orderedList.add(parameters.get(RodaConstants.PLUGIN_PARAMS_OUTPUT_FORMAT));
+    orderedList.add(parameters.get(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES));
+    orderedList.add(parameters.get(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP));
+    orderedList.add(parameters.get(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_TITLE));
+    orderedList.add(parameters.get(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_DESCRIPTION));
+    orderedList.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_COMMAND_ARGUMENTS));
+    orderedList.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_OUTPUT_ARGUMENTS));
+    return orderedList;
   }
 
   @Override
