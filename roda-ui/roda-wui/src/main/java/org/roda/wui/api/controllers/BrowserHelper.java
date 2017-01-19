@@ -2870,8 +2870,14 @@ public class BrowserHelper {
 
           File newFile = model.moveFile(file, toAIP, toRepresentation, toDirectoryPath, toId, true, true);
 
-          outcomeText.append("The file '" + file.getPath() + "/" + file.getId() + "' has been manually moved to '"
-            + newFile.getPath() + "/" + newFile.getId() + "'.\n");
+          String pathText = file.getPath().toString().replace("[", "").replace("]", "").replaceAll(",\\s*", "/");
+          String newPathText = "";
+          if (newFile.getPath() != null) {
+            newPathText = newFile.getPath().toString().replace("[", "").replace("]", "").replaceAll(",\\s*", "/");
+          }
+
+          outcomeText.append("The file '" + pathText + "/" + file.getId() + "' has been manually moved to '"
+            + newPathText + "/" + newFile.getId() + "'.\n");
 
         } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
           outcomeText.append("The file '" + file.getId() + "' has not been manually moved: ["
@@ -3248,22 +3254,26 @@ public class BrowserHelper {
 
     for (IndexedRepresentation irep : reps.getResults()) {
       String oldType = irep.getType();
+      List<LinkingIdentifier> sources = new ArrayList<>();
+      sources.add(PluginHelper.getLinkingIdentifier(irep.getAipId(), irep.getId(),
+        RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+
       try {
         model.updateRepresentationType(irep.getAipId(), irep.getId(), newType);
 
         String outcomeText = "The representation '" + irep.getId() + "' changed its type from '" + oldType + "' to '"
           + newType + "'.";
 
-        model.createUpdateAIPEvent(irep.getAipId(), irep.getId(), null, null, PreservationEventType.UPDATE,
-          "The process of updating an object of the repository.", PluginState.SUCCESS, outcomeText, details,
-          user.getName(), true);
+        model.createEvent(irep.getAipId(), irep.getId(), null, null, PreservationEventType.UPDATE,
+          "The process of updating an object of the repository.", sources, null, PluginState.SUCCESS, outcomeText,
+          details, user.getName(), true);
       } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
         String outcomeText = "The representation '" + irep.getId() + "' did not change its type from '" + oldType
           + "' to '" + newType + "'.";
 
-        model.createUpdateAIPEvent(irep.getAipId(), irep.getId(), null, null, PreservationEventType.UPDATE,
-          "The process of updating an object of the repository.", PluginState.FAILURE, outcomeText, details,
-          user.getName(), true);
+        model.createEvent(irep.getAipId(), irep.getId(), null, null, PreservationEventType.UPDATE,
+          "The process of updating an object of the repository.", sources, null, PluginState.FAILURE, outcomeText,
+          details, user.getName(), true);
 
         throw e;
       }

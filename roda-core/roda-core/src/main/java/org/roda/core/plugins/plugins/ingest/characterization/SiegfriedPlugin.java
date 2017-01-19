@@ -150,6 +150,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
         sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(this, model, representation));
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
         reportItem.setPluginState(PluginState.SUCCESS);
+        model.notifyRepresentationUpdated(representation);
       } catch (PluginException | NotFoundException | GenericException | RequestNotValidException
         | AuthorizationDeniedException | AlreadyExistsException e) {
         LOGGER.error("Error running Siegfried {}: {}", representation.getAipId(), e.getMessage(), e);

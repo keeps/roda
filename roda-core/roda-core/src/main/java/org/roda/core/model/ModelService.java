@@ -903,6 +903,7 @@ public class ModelService extends ModelObservable {
       Representation representation = it.next();
       if (representation.getId().equals(representationId)) {
         representation.setType(type);
+        notifyRepresentationUpdated(representation);
         break;
       }
     }
