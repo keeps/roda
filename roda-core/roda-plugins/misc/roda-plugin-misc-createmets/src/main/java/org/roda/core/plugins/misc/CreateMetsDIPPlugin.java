@@ -82,7 +82,6 @@ public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
   private boolean includeSelectedRepresentations = false;
   private String selectedRepresentations = "";
 
-  private boolean includeSubmission = true;
   private boolean includeSchemas = true;
   private boolean includeDocumentation = true;
 
@@ -121,10 +120,6 @@ public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_SELECTED_REPRESENTATIONS,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_SELECTED_REPRESENTATIONS, "Selected representations (type)",
         PluginParameterType.STRING, "pdfa, MIXED", true, false, "The selected representations to filter with types."));
-
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INCLUDE_SUBMISSION,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_INCLUDE_SUBMISSION, "Include submission folder",
-        PluginParameterType.BOOLEAN, "true", false, false, "Include submission folder with SIP file."));
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INCLUDE_SCHEMAS,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_INCLUDE_SCHEMAS, "Include schemas folder",
@@ -183,7 +178,6 @@ public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_SELECTED_OTHER_METADATA));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_INCLUDE_SELECTED_REPRESENTATIONS));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_SELECTED_REPRESENTATIONS));
-    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_INCLUDE_SUBMISSION));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_INCLUDE_SCHEMAS));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_INCLUDE_DOCUMENTATION));
     return parameters;
@@ -223,10 +217,6 @@ public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
 
     if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_SELECTED_REPRESENTATIONS)) {
       selectedRepresentations = parameters.get(RodaConstants.PLUGIN_PARAMS_SELECTED_REPRESENTATIONS);
-    }
-
-    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_INCLUDE_SUBMISSION)) {
-      includeSubmission = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_INCLUDE_SUBMISSION));
     }
 
     if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_INCLUDE_SCHEMAS)) {
@@ -323,7 +313,8 @@ public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
     final Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
     PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
 
-    // FIXME 20170118 nvieira this condition should be removed in the future
+    // FIXME 20170118 nvieira condition should be removed when build is not
+    // depending on FS
     if (storage instanceof FileStorageService) {
       try {
         AIPLink aipLink = new AIPLink(aip.getId());
@@ -339,7 +330,9 @@ public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
         dip = model.createDIP(dip, true);
 
         StoragePath aipPath = ModelUtils.getAIPStoragePath(aip.getId());
-        StoragePath aipOnDIPPath = ModelUtils.getDIPDataStoragePath(dip.getId());
+        StoragePath dipDataPath = ModelUtils.getDIPDataStoragePath(dip.getId());
+        StoragePath aipOnDIPPath = DefaultStoragePath.parse(dipDataPath, aip.getId());
+        storage.createDirectory(aipOnDIPPath);
 
         // filter AIP structure using plugin parameters
         copyAndFilterAIP(storage, aip, aipPath, aipOnDIPPath);
@@ -390,11 +383,6 @@ public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
   private void copyAIPBaseFiles(StorageService storage, StoragePath aipPath, StoragePath aipOnDIPPath)
     throws RequestNotValidException, AlreadyExistsException, GenericException, NotFoundException,
     AuthorizationDeniedException {
-    StoragePath submissionPath = DefaultStoragePath.parse(aipPath, RodaConstants.STORAGE_DIRECTORY_SUBMISSION);
-    if (includeSubmission && storage.hasDirectory(submissionPath)) {
-      storage.copy(storage, submissionPath,
-        DefaultStoragePath.parse(aipOnDIPPath, RodaConstants.STORAGE_DIRECTORY_SUBMISSION));
-    }
 
     StoragePath schemasPath = DefaultStoragePath.parse(aipPath, RodaConstants.STORAGE_DIRECTORY_SCHEMAS);
     if (includeSchemas && storage.hasDirectory(schemasPath)) {
