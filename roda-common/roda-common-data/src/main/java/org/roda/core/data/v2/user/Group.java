@@ -12,9 +12,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.roda.core.data.common.RodaConstants;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * This is a group in RODA.
@@ -22,6 +25,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @author Rui Castro
  * @author Luis Faria <lfaria@keep.pt>
  */
+@XmlRootElement(name = "group")
+@JsonInclude(JsonInclude.Include.ALWAYS)
 public class Group extends RodaPrincipal {
 
   private static final long serialVersionUID = -4051946961307715630L;

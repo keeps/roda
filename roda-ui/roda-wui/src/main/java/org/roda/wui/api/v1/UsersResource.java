@@ -82,7 +82,6 @@ public class UsersResource {
       justActive);
 
     RODAMembers members = new RODAMembers(find.getResults());
-
     return Response.ok(members, mediaType).build();
   }
 

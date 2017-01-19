@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.data.common.RodaConstants;
@@ -137,7 +138,6 @@ public class SiegfriedPluginUtils {
     if (Files.exists(path)) {
       String siegfriedOutput = SiegfriedPluginUtils.runSiegfriedOnPath(path);
 
-      boolean notify = false;
       final JsonNode jsonObject = JsonUtils.parseJson(siegfriedOutput);
       final JsonNode files = jsonObject.get("files");
 
@@ -145,20 +145,21 @@ public class SiegfriedPluginUtils {
         Path fullFsPath = Paths.get(file.get("filename").asText());
         Path relativeFsPath = path.relativize(fullFsPath);
 
-        String jsonFileId = relativeFsPath.getFileName().toString();
+        String jsonFileId = fullFsPath.getFileName().toString();
 
         List<String> jsonFilePath = new ArrayList<>(fileDirectoryPath);
         if (fileId != null) {
           jsonFilePath.add(fileId);
         }
-        for (int j = 0; j < relativeFsPath.getNameCount(); j++) {
+        for (int j = 0; j < relativeFsPath.getNameCount()
+          && StringUtils.isNotBlank(relativeFsPath.getName(j).toString()); j++) {
           jsonFilePath.add(relativeFsPath.getName(j).toString());
         }
         jsonFilePath.remove(jsonFilePath.size() - 1);
 
         ContentPayload payload = new StringContentPayload(file.toString());
         model.createOrUpdateOtherMetadata(aipId, representationId, jsonFilePath, jsonFileId,
-          SiegfriedPlugin.FILE_SUFFIX, RodaConstants.OTHER_METADATA_TYPE_SIEGFRIED, payload, notify);
+          SiegfriedPlugin.FILE_SUFFIX, RodaConstants.OTHER_METADATA_TYPE_SIEGFRIED, payload, false);
 
         sources.add(PluginHelper.getLinkingIdentifier(aipId, representationId, jsonFilePath, jsonFileId,
           RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
@@ -188,7 +189,7 @@ public class SiegfriedPluginUtils {
           }
 
           PremisV3Utils.updateFormatPreservationMetadata(model, aipId, representationId, jsonFilePath, jsonFileId,
-            format, version, pronom, mime, notify);
+            format, version, pronom, mime, true);
         }
       }
     }

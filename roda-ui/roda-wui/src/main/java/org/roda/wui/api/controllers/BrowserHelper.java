@@ -2834,8 +2834,8 @@ public class BrowserHelper {
     IndexService index = RodaCoreFactory.getIndexService();
     IndexResult<IndexedFile> findResult = new IndexResult<IndexedFile>();
 
-    if (toFolder != null && !toFolder.getAipId().equals(aipId)
-      || !toFolder.getRepresentationId().equals(representationId)) {
+    if (toFolder != null
+      && (!toFolder.getAipId().equals(aipId) || !toFolder.getRepresentationId().equals(representationId))) {
       throw new RequestNotValidException("Cannot move to a file outside defined representation");
     }
 
@@ -2850,21 +2850,22 @@ public class BrowserHelper {
     }
 
     if (!findResult.getResults().isEmpty()) {
-
       StringBuilder outcomeText = new StringBuilder();
 
       for (IndexedFile ifile : findResult.getResults()) {
-
         if (ifile != null && !ifile.getAipId().equals(aipId) || !ifile.getRepresentationId().equals(representationId)) {
           throw new RequestNotValidException("Cannot move from a file outside defined representation");
         }
 
         File file = model.retrieveFile(ifile.getAipId(), ifile.getRepresentationId(), ifile.getPath(), ifile.getId());
         try {
-          String toAIP = toFolder.getAipId();
-          String toRepresentation = toFolder.getRepresentationId();
-          List<String> toDirectoryPath = new ArrayList<>(toFolder.getPath());
-          toDirectoryPath.add(toFolder.getId());
+          String toAIP = toFolder == null ? aipId : toFolder.getAipId();
+          String toRepresentation = toFolder == null ? representationId : toFolder.getRepresentationId();
+          List<String> toDirectoryPath = null;
+          if (toFolder != null) {
+            toDirectoryPath = new ArrayList<>(toFolder.getPath());
+            toDirectoryPath.add(toFolder.getId());
+          }
           String toId = file.getId();
 
           File newFile = model.moveFile(file, toAIP, toRepresentation, toDirectoryPath, toId, true, true);
@@ -2873,8 +2874,6 @@ public class BrowserHelper {
             + newFile.getPath() + "/" + newFile.getId() + "'.\n");
 
         } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-
-          // failure
           outcomeText.append("The file '" + file.getId() + "' has not been manually moved: ["
             + e.getClass().getSimpleName() + "] " + e.getMessage());
 
@@ -2883,7 +2882,6 @@ public class BrowserHelper {
             details, user.getName(), true);
 
           index.commitAIPs();
-
           throw e;
         }
       }
@@ -2894,7 +2892,6 @@ public class BrowserHelper {
         user.getName(), true);
 
       index.commitAIPs();
-
     }
   }
 
