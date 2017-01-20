@@ -851,7 +851,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
       if (actionsPopup.isShowing()) {
         actionsPopup.hide();
       } else {
-        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+        AsyncCallback<Actionable.ActionImpact> callback = new AsyncCallback<Actionable.ActionImpact>() {
 
           @Override
           public void onFailure(Throwable caught) {
@@ -859,8 +859,10 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
           }
 
           @Override
-          public void onSuccess(Void result) {
-            update();
+          public void onSuccess(Actionable.ActionImpact impact) {
+            if (!Actionable.ActionImpact.NONE.equals(impact)) {
+              update();
+            }
             actionsPopup.hide();
           }
         };

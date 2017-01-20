@@ -27,6 +27,7 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataViewBundle;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.FileActions;
 import org.roda.wui.client.common.actions.RepresentationActions;
 import org.roda.wui.client.common.lists.DIPList;
@@ -207,8 +208,7 @@ public class BrowseRepresentation extends Composite {
 
   public BrowseRepresentation(BrowseRepresentationBundle bundle) {
     this.representation = bundle.getRepresentation();
-    
-    
+
     this.aipId = representation.getAipId();
     this.repId = representation.getId();
     this.repUUID = representation.getUUID();
@@ -334,8 +334,8 @@ public class BrowseRepresentation extends Composite {
     disseminationsList.getParent().setVisible(bundle.getDipCount() > 0);
 
     // SIDEBAR
-    actionsSidebar
-      .setWidget(RepresentationActions.get(aipId).createActionsLayout(representation, new AsyncCallback<Void>() {
+    actionsSidebar.setWidget(RepresentationActions.get(aipId).createActionsLayout(representation,
+      new AsyncCallback<Actionable.ActionImpact>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -343,7 +343,7 @@ public class BrowseRepresentation extends Composite {
         }
 
         @Override
-        public void onSuccess(Void result) {
+        public void onSuccess(Actionable.ActionImpact impact) {
           // TODO update interface
         }
       }));

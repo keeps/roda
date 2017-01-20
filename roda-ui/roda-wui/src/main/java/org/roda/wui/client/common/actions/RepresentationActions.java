@@ -78,7 +78,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
 
   @Override
   public void act(Actionable.Action<IndexedRepresentation> action, IndexedRepresentation representation,
-    AsyncCallback<Void> callback) {
+    AsyncCallback<ActionImpact> callback) {
     if (RepresentationAction.DOWNLOAD.equals(action)) {
       download(representation, callback);
     } else if (RepresentationAction.CHANGE_TYPE.equals(action)) {
@@ -107,7 +107,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
    */
   @Override
   public void act(Actionable.Action<IndexedRepresentation> action, SelectedItems<IndexedRepresentation> selectedItems,
-    AsyncCallback<Void> callback) {
+    AsyncCallback<ActionImpact> callback) {
     if (RepresentationAction.REMOVE.equals(action)) {
       remove(selectedItems, callback);
     } else if (RepresentationAction.CHANGE_TYPE.equals(action)) {
@@ -122,7 +122,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
   }
 
   // ACTIONS
-  public void download(IndexedRepresentation representation, final AsyncCallback<Void> callback) {
+  public void download(IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
     SafeUri downloadUri = null;
     if (representation != null) {
       downloadUri = RestUtils.createRepresentationDownloadUri(representation.getAipId(), representation.getId());
@@ -130,14 +130,15 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
     if (downloadUri != null) {
       Window.Location.assign(downloadUri.asString());
     }
-    callback.onSuccess(null);
+    callback.onSuccess(ActionImpact.NONE);
   }
 
-  public void remove(final IndexedRepresentation representation, final AsyncCallback<Void> callback) {
+  public void remove(final IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
     remove(objectToSelectedItems(representation), callback);
   }
 
-  public void remove(final SelectedItems<IndexedRepresentation> selectedList, final AsyncCallback<Void> callback) {
+  public void remove(final SelectedItems<IndexedRepresentation> selectedList,
+    final AsyncCallback<ActionImpact> callback) {
 
     Dialogs.showConfirmDialog(messages.representationRemoveTitle(), messages.representationRemoveMessage(),
       messages.dialogCancel(), messages.dialogYes(), new AsyncCallback<Boolean>() {
@@ -164,7 +165,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
                           HistoryUtils.openBrowse(aipId);
                         }
 
-                        callback.onSuccess(null);
+                        callback.onSuccess(ActionImpact.DESTROYED);
                       }
 
                       @Override
@@ -184,12 +185,12 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
       });
   }
 
-  public void changeType(final IndexedRepresentation representations, final AsyncCallback<Void> callback) {
+  public void changeType(final IndexedRepresentation representations, final AsyncCallback<ActionImpact> callback) {
     changeType(objectToSelectedItems(representations), callback);
   }
 
   public void changeType(final SelectedItems<IndexedRepresentation> representations,
-    final AsyncCallback<Void> callback) {
+    final AsyncCallback<ActionImpact> callback) {
     SearchSuggestBox<IndexedRepresentation> suggestBox = new SearchSuggestBox<IndexedRepresentation>(
       IndexedRepresentation.class, RodaConstants.REPRESENTATION_TYPE, true);
 
@@ -219,7 +220,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
                     @Override
                     public void onSuccessImpl(Void nothing) {
                       Toast.showInfo(messages.dialogSuccess(), messages.changeTypeSuccessful());
-                      callback.onSuccess(null);
+                      callback.onSuccess(ActionImpact.UPDATED);
                     }
                   });
               }
@@ -228,28 +229,29 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
       });
   }
 
-  public void newProcess(IndexedRepresentation representation, final AsyncCallback<Void> callback) {
+  public void newProcess(IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
     newProcess(objectToSelectedItems(representation), callback);
   }
 
-  public void newProcess(SelectedItems<IndexedRepresentation> selected, final AsyncCallback<Void> callback) {
+  public void newProcess(SelectedItems<IndexedRepresentation> selected, final AsyncCallback<ActionImpact> callback) {
     LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
     selectedItems.setSelectedItems(selected);
     selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
     HistoryUtils.newHistory(CreateJob.RESOLVER, "action");
-    callback.onSuccess(null);
+    callback.onSuccess(ActionImpact.UPDATED);
   }
 
-  public void identifyFormats(IndexedRepresentation representation, final AsyncCallback<Void> callback) {
+  public void identifyFormats(IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
     identifyFormats(objectToSelectedItems(representation), callback);
   }
 
-  public void identifyFormats(SelectedItems<IndexedRepresentation> selected, final AsyncCallback<Void> callback) {
+  public void identifyFormats(SelectedItems<IndexedRepresentation> selected,
+    final AsyncCallback<ActionImpact> callback) {
     BrowserService.Util.getInstance().createFormatIdentificationJob(selected, new AsyncCallback<Void>() {
       @Override
       public void onSuccess(Void object) {
         Toast.showInfo(messages.identifyingFormatsTitle(), messages.identifyingFormatsDescription());
-        callback.onSuccess(null);
+        callback.onSuccess(ActionImpact.UPDATED);
       }
 
       @Override
@@ -263,24 +265,24 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
     });
   }
 
-  public void showEvents(IndexedRepresentation representation, final AsyncCallback<Void> callback) {
+  public void showEvents(IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
     List<String> history = new ArrayList<>();
     history.add(representation.getAipId());
     history.add(representation.getUUID());
     HistoryUtils.newHistory(PreservationEvents.BROWSE_RESOLVER, history);
-    callback.onSuccess(null);
+    callback.onSuccess(ActionImpact.NONE);
   }
 
-  public void showRisks(IndexedRepresentation representation, final AsyncCallback<Void> callback) {
+  public void showRisks(IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
     List<String> history = new ArrayList<>();
     history.add(RiskIncidenceRegister.RESOLVER.getHistoryToken());
     history.add(representation.getAipId());
     history.add(representation.getId());
     HistoryUtils.newHistory(Planning.RESOLVER, history);
-    callback.onSuccess(null);
+    callback.onSuccess(ActionImpact.NONE);
   }
 
-  public void createFolder(final IndexedRepresentation representation, final AsyncCallback<Void> callback) {
+  public void createFolder(final IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
 
     Dialogs.showPromptDialog(messages.createFolderTitle(), null, messages.createFolderPlaceholder(),
       RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
@@ -307,7 +309,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
                     @Override
                     public void onSuccessImpl(IndexedFile newFolder) {
                       HistoryUtils.openBrowse(newFolder);
-                      callback.onSuccess(null);
+                      callback.onSuccess(ActionImpact.UPDATED);
                     }
 
                     @Override
@@ -326,7 +328,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
       });
   }
 
-  public void uploadFiles(final IndexedRepresentation representation, final AsyncCallback<Void> callback) {
+  public void uploadFiles(final IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
     Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
       RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
 
@@ -340,83 +342,92 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
           LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
           selectedItems.setDetailsMessage(details);
           HistoryUtils.openUpload(representation);
-          callback.onSuccess(null);
+          callback.onSuccess(ActionImpact.UPDATED);
         }
       });
   }
 
   @Override
-  public Widget createActionsLayout(IndexedRepresentation representation, AsyncCallback<Void> callback) {
+  public Widget createActionsLayout(IndexedRepresentation representation, AsyncCallback<ActionImpact> callback) {
     FlowPanel layout = createLayout();
 
     // MANAGEMENT
     addTitle(layout, messages.representation());
 
     // DOWNLOAD, RENAME, MOVE, REMOVE, UPLOAD_FILES, CREATE_FOLDER
-    addButton(layout, messages.downloadButton(), RepresentationAction.DOWNLOAD, representation, callback, "btn-default",
-      "btn-download");
+    addButton(layout, messages.downloadButton(), RepresentationAction.DOWNLOAD, representation, ActionImpact.NONE,
+      callback, "btn-download");
 
-    addButton(layout, messages.changeTypeButton(), RepresentationAction.CHANGE_TYPE, representation, callback,
-      "btn-default", "btn-edit");
-    addButton(layout, messages.removeButton(), RepresentationAction.REMOVE, representation, callback, "btn-danger",
-      "btn-ban");
+    addButton(layout, messages.changeTypeButton(), RepresentationAction.CHANGE_TYPE, representation,
+      ActionImpact.UPDATED, callback, "btn-edit");
+    addButton(layout, messages.removeButton(), RepresentationAction.REMOVE, representation, ActionImpact.DESTROYED,
+      callback, "btn-ban");
 
     // PRESERVATION
     addTitle(layout, messages.preservationTitle());
 
     // NEW_PROCESS, IDENTIFY_FORMATS, SHOW_EVENTS, SHOW_RISKS
 
-    addButton(layout, messages.newProcessPreservation(), RepresentationAction.NEW_PROCESS, representation, callback,
-      "btn-default", "btn-play");
-    addButton(layout, messages.identifyFormatsButton(), RepresentationAction.IDENTIFY_FORMATS, representation, callback,
-      "btn-default", "btn-play");
-    addButton(layout, messages.preservationEvents(), RepresentationAction.SHOW_EVENTS, representation, callback,
-      "btn-default", "btn-play");
-    addButton(layout, messages.preservationRisks(), RepresentationAction.SHOW_RISKS, representation, callback,
-      "btn-default", "btn-play");
+    addButton(layout, messages.newProcessPreservation(), RepresentationAction.NEW_PROCESS, representation,
+      ActionImpact.UPDATED, callback, "btn-play");
+    addButton(layout, messages.identifyFormatsButton(), RepresentationAction.IDENTIFY_FORMATS, representation,
+      ActionImpact.UPDATED, callback, "btn-play");
+    addButton(layout, messages.preservationEvents(), RepresentationAction.SHOW_EVENTS, representation,
+      ActionImpact.NONE, callback, "btn-play");
+    addButton(layout, messages.preservationRisks(), RepresentationAction.SHOW_RISKS, representation, ActionImpact.NONE,
+      callback, "btn-play");
 
     // Files and folders
     addTitle(layout, messages.sidebarFoldersFilesTitle());
 
     // UPLOAD_FILES, CREATE_FOLDER
-    addButton(layout, messages.uploadFilesButton(), RepresentationAction.UPLOAD_FILES, representation, callback,
-      "btn-default", "btn-upload");
-    addButton(layout, messages.createFolderButton(), RepresentationAction.CREATE_FOLDER, representation, callback,
-      "btn-default", "btn-plus");
+    addButton(layout, messages.uploadFilesButton(), RepresentationAction.UPLOAD_FILES, representation,
+      ActionImpact.UPDATED, callback, "btn-upload");
+    addButton(layout, messages.createFolderButton(), RepresentationAction.CREATE_FOLDER, representation,
+      ActionImpact.UPDATED, callback, "btn-plus");
 
     return layout;
   }
 
   @Override
   public Widget createActionsLayout(SelectedItems<IndexedRepresentation> representations,
-    AsyncCallback<Void> callback) {
+    AsyncCallback<ActionImpact> callback) {
     FlowPanel layout = createLayout();
 
     // MANAGEMENT
     addTitle(layout, messages.representation());
 
     // DOWNLOAD, RENAME, MOVE, REMOVE, UPLOAD_FILES, CREATE_FOLDER
-    addButton(layout, messages.downloadButton(), RepresentationAction.DOWNLOAD, representations, callback,
-      "btn-default", "btn-download");
+    addButton(layout, messages.downloadButton(), RepresentationAction.DOWNLOAD, representations, ActionImpact.NONE,
+      callback, "btn-download");
 
-    addButton(layout, messages.changeTypeButton(), RepresentationAction.CHANGE_TYPE, representations, callback,
-      "btn-default", "btn-edit");
-    addButton(layout, messages.removeButton(), RepresentationAction.REMOVE, representations, callback, "btn-danger",
-      "btn-ban");
+    addButton(layout, messages.changeTypeButton(), RepresentationAction.CHANGE_TYPE, representations,
+      ActionImpact.UPDATED, callback, "btn-edit");
+    addButton(layout, messages.removeButton(), RepresentationAction.REMOVE, representations, ActionImpact.DESTROYED,
+      callback, "btn-ban");
 
     // PRESERVATION
     addTitle(layout, messages.preservationTitle());
 
     // NEW_PROCESS, IDENTIFY_FORMATS, SHOW_EVENTS, SHOW_RISKS
 
-    addButton(layout, messages.newProcessPreservation(), RepresentationAction.NEW_PROCESS, representations, callback,
-      "btn-default", "btn-play");
+    addButton(layout, messages.newProcessPreservation(), RepresentationAction.NEW_PROCESS, representations,
+      ActionImpact.UPDATED, callback, "btn-play");
     addButton(layout, messages.identifyFormatsButton(), RepresentationAction.IDENTIFY_FORMATS, representations,
-      callback, "btn-default", "btn-play");
-    addButton(layout, messages.preservationEvents(), RepresentationAction.SHOW_EVENTS, representations, callback,
-      "btn-default", "btn-play");
-    addButton(layout, messages.preservationRisks(), RepresentationAction.SHOW_RISKS, representations, callback,
-      "btn-default", "btn-play");
+      ActionImpact.UPDATED, callback, "btn-play");
+    addButton(layout, messages.preservationEvents(), RepresentationAction.SHOW_EVENTS, representations,
+      ActionImpact.NONE, callback, "btn-play");
+    addButton(layout, messages.preservationRisks(), RepresentationAction.SHOW_RISKS, representations, ActionImpact.NONE,
+      callback, "btn-play");
+
+    // Files and folders
+    addTitle(layout, messages.sidebarFoldersFilesTitle());
+
+    // UPLOAD_FILES, CREATE_FOLDER
+    addButton(layout, messages.uploadFilesButton(), RepresentationAction.UPLOAD_FILES, representations,
+      ActionImpact.UPDATED, callback, "btn-upload");
+    addButton(layout, messages.createFolderButton(), RepresentationAction.CREATE_FOLDER, representations,
+      ActionImpact.UPDATED, callback, "btn-plus");
 
     return layout;
   }

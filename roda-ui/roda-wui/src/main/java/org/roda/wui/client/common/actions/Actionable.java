@@ -11,6 +11,10 @@ public interface Actionable<T extends IsIndexed> {
   static interface Action<T> {
 
   }
+  
+  static enum ActionImpact {
+    NONE, UPDATED, DESTROYED;
+  }
 
   // SINGLE OBJECT
 
@@ -18,7 +22,7 @@ public interface Actionable<T extends IsIndexed> {
 
   void act(Action<T> action, T object);
 
-  void act(Action<T> action, T object, AsyncCallback<Void> callback);
+  void act(Action<T> action, T object, AsyncCallback<ActionImpact> callback);
 
   // MULTIPLE OBJECTS
 
@@ -26,11 +30,11 @@ public interface Actionable<T extends IsIndexed> {
 
   void act(Action<T> action, SelectedItems<T> objects);
 
-  void act(Action<T> action, SelectedItems<T> objects, AsyncCallback<Void> callback);
+  void act(Action<T> action, SelectedItems<T> objects, AsyncCallback<ActionImpact> callback);
 
   // Layout
 
-  Widget createActionsLayout(T object, AsyncCallback<Void> callback);
+  Widget createActionsLayout(T object, AsyncCallback<ActionImpact> callback);
 
-  Widget createActionsLayout(SelectedItems<T> objects, AsyncCallback<Void> callback);
+  Widget createActionsLayout(SelectedItems<T> objects, AsyncCallback<ActionImpact> callback);
 }

@@ -17,8 +17,8 @@ import com.google.gwt.user.client.ui.Widget;
 
 public abstract class AbstractActionable<T extends IsIndexed> implements Actionable<T> {
 
-  protected static AsyncCallback<Void> createDefaultAsyncCallback() {
-    return new AsyncCallback<Void>() {
+  protected static AsyncCallback<ActionImpact> createDefaultAsyncCallback() {
+    return new AsyncCallback<ActionImpact>() {
 
       @Override
       public void onFailure(Throwable caught) {
@@ -26,7 +26,7 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
       }
 
       @Override
-      public void onSuccess(Void result) {
+      public void onSuccess(ActionImpact impact) {
         // do nothing
       }
     };
@@ -47,7 +47,7 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
   }
 
   @Override
-  public void act(Actionable.Action<T> action, T object, AsyncCallback<Void> callback) {
+  public void act(Actionable.Action<T> action, T object, AsyncCallback<ActionImpact> callback) {
     act(action, objectToSelectedItems(object), callback);
   }
 
@@ -69,7 +69,7 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
   }
 
   public void addButton(FlowPanel layout, final String text, final Actionable.Action<T> action, final T object,
-    final AsyncCallback<Void> callback, final String... extraCssClasses) {
+    final ActionImpact impact, final AsyncCallback<ActionImpact> callback, final String... extraCssClasses) {
 
     if (canAct(action, object)) {
 
@@ -78,9 +78,11 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
       button.setTitle(text);
 
       // CSS
-      button.addStyleName("actions-layout-button");
+      button.setStyleName("actions-layout-button");
       button.addStyleName("btn");
       button.addStyleName("btn-block");
+      button.addStyleName(ActionImpact.DESTROYED.equals(impact) ? "btn-default" : "btn-danger");
+      button.addStyleDependentName(impact.name().toLowerCase());
 
       for (String extraCssClass : extraCssClasses) {
         button.addStyleName(extraCssClass);
@@ -100,7 +102,8 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
   }
 
   public void addButton(FlowPanel layout, final String text, final Actionable.Action<T> action,
-    final SelectedItems<T> objects, final AsyncCallback<Void> callback, final String... extraCssClasses) {
+    final SelectedItems<T> objects, final ActionImpact impact, final AsyncCallback<ActionImpact> callback,
+    final String... extraCssClasses) {
 
     if (canAct(action, objects)) {
 
@@ -109,9 +112,10 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
       button.setTitle(text);
 
       // CSS
-      button.addStyleName("actions-layout-button");
+      button.setStyleName("actions-layout-button");
       button.addStyleName("btn");
       button.addStyleName("btn-block");
+      button.addStyleDependentName(impact.name().toLowerCase());
 
       for (String extraCssClass : extraCssClasses) {
         button.addStyleName(extraCssClass);
@@ -131,7 +135,7 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
   }
 
   @Override
-  public Widget createActionsLayout(T object, AsyncCallback<Void> callback) {
+  public Widget createActionsLayout(T object, AsyncCallback<ActionImpact> callback) {
     return createActionsLayout(objectToSelectedItems(object), callback);
   }
 
