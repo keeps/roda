@@ -57,6 +57,10 @@ public class LastSelectedItemsSingleton {
     this.lastHistory = lastHistory;
   }
 
+  public void clearLastHistory() {
+    this.lastHistory = new ArrayList<String>();
+  }
+
   public <T extends IsIndexed> T getLastObject() {
     return (T) this.lastObject;
   }

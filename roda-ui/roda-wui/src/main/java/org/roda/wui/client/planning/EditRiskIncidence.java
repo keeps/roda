@@ -20,8 +20,8 @@ import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -147,7 +147,8 @@ public class EditRiskIncidence extends Composite {
 
     String riskId = incidence.getRiskId();
     riskLink.setText(riskId);
-    riskLink.setHref(HistoryUtils.createHistoryHashLink(RiskRegister.RESOLVER, ShowRisk.RESOLVER.getHistoryToken(), riskId));
+    riskLink
+      .setHref(HistoryUtils.createHistoryHashLink(RiskRegister.RESOLVER, ShowRisk.RESOLVER.getHistoryToken(), riskId));
 
     detectedOn
       .setText(DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT).format(incidence.getDetectedOn()));
@@ -220,13 +221,7 @@ public class EditRiskIncidence extends Composite {
 
       @Override
       public void onSuccess(Void result) {
-        String aipId = RiskIncidenceRegister.getInstance().getAipId();
-
-        if (aipId == null) {
-          HistoryUtils.newHistory(RiskIncidenceRegister.RESOLVER);
-        } else {
-          HistoryUtils.newHistory(RiskIncidenceRegister.RESOLVER, incidence.getAipId());
-        }
+        HistoryUtils.newHistory(ShowRiskIncidence.RESOLVER, incidence.getId());
       }
 
     });
@@ -238,7 +233,7 @@ public class EditRiskIncidence extends Composite {
   }
 
   private void cancel() {
-    HistoryUtils.newHistory(RiskIncidenceRegister.RESOLVER);
+    HistoryUtils.newHistory(ShowRiskIncidence.RESOLVER, incidence.getId());
   }
 
   private void errorMessage(Throwable caught) {

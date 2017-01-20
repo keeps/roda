@@ -5,6 +5,7 @@
 	xmlns:i="urn:import:config.i18n.client" xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
 	xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag"
 	xmlns:commonsearch="urn:import:org.roda.wui.client.common.search"
+	xmlns:m="urn:import:org.roda.wui.client.main"
 	xmlns:lists="urn:import:org.roda.wui.client.common.lists">
 
 	<ui:style>
@@ -19,12 +20,10 @@
 				<g:Label styleName="h1" ui:field="riskIncidenceRegisterTitle">
 					<ui:text from='{messages.riskIncidenceRegisterTitle}' />
 				</g:Label>
-				<g:FlowPanel addStyleNames="page-description"
-					ui:field="riskIncidenceRegisterDescription">
-				</g:FlowPanel>
+				<m:BreadcrumbPanel ui:field="breadcrumb" addStyleNames="browseBreadcrumb" />
+				<g:FlowPanel addStyleNames="page-description" ui:field="riskIncidenceRegisterDescription"/>
 				<commonsearch:SearchPanel ui:field="searchPanel" />
-				<lists:RiskIncidenceList addStyleNames="searchResults"
-					ui:field="riskIncidenceList" />
+				<lists:RiskIncidenceList addStyleNames="searchResults" ui:field="riskIncidenceList" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">

@@ -69,4 +69,9 @@ public class BreadcrumbItem {
     this.command = command;
   }
 
+  @Override
+  public String toString() {
+    return "BreadcrumbItem [label=" + label + ", title=" + title + ", command=" + command + "]";
+  }
+
 }

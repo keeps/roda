@@ -1590,18 +1590,25 @@ public class BrowserHelper {
     IndexResult<IndexedFile> files = index.find(IndexedFile.class, filter, Sorter.NONE, new Sublist(0, fileIds.size()));
 
     for (IndexedFile file : files.getResults()) {
+      List<LinkingIdentifier> sources = new ArrayList<>();
       try {
         model.deleteFile(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(), true);
 
+        sources.add(PluginHelper.getLinkingIdentifier(file.getAipId(), file.getRepresentationId(),
+          RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+
         String outcomeText = "The File '" + file.getId() + "' has been manually deleted.";
-        model.createUpdateAIPEvent(file.getAipId(), file.getRepresentationId(), null, null,
-          PreservationEventType.DELETION, "The process of deleting an object of the repository.", PluginState.SUCCESS,
-          outcomeText, details, user.getName(), true);
+        model.createEvent(file.getAipId(), file.getRepresentationId(), null, null, PreservationEventType.DELETION,
+          "The process of deleting an object of the repository.", sources, null, PluginState.SUCCESS, outcomeText,
+          details, user.getName(), true);
       } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+        sources.add(PluginHelper.getLinkingIdentifier(file.getAipId(), file.getRepresentationId(), file.getPath(),
+          file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+
         String outcomeText = "The File '" + file.getId() + "' has not been manually deleted.";
-        model.createUpdateAIPEvent(file.getAipId(), file.getRepresentationId(), null, null,
-          PreservationEventType.DELETION, "The process of deleting an object of the repository.", PluginState.FAILURE,
-          outcomeText, details, user.getName(), true);
+        model.createEvent(file.getAipId(), file.getRepresentationId(), null, null, PreservationEventType.DELETION,
+          "The process of deleting an object of the repository.", sources, null, PluginState.FAILURE, outcomeText,
+          details, user.getName(), true);
 
         throw e;
       }

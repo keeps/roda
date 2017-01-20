@@ -459,5 +459,4 @@ public class BrowseRepresentation extends Composite {
   void buttonNewDescriptiveMetadataEventsHandler(ClickEvent e) {
     newRepresentationDescriptiveMetadata();
   }
-
 }

@@ -10,19 +10,21 @@
  */
 package org.roda.wui.client.planning;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.ListUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -125,6 +127,7 @@ public class ShowRiskIncidence extends Composite {
   Button buttonCancel;
 
   private RiskIncidence incidence;
+  private String relatedObject = "";
 
   /**
    * Create a new panel to view a risk incidence
@@ -137,17 +140,18 @@ public class ShowRiskIncidence extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
   }
 
-  public ShowRiskIncidence(RiskIncidence incidence) {
+  public ShowRiskIncidence(String relatedObject, RiskIncidence incidence) {
     initWidget(uiBinder.createAndBindUi(this));
     this.incidence = incidence;
+    this.relatedObject = relatedObject;
 
     incidenceId.setText(incidence.getId());
-
     HtmlSnippetUtils.addRiskIncidenceObjectLinks(incidence, objectLabel, objectLink);
 
     String riskId = incidence.getRiskId();
     riskLink.setText(riskId);
-    riskLink.setHref(HistoryUtils.createHistoryHashLink(RiskRegister.RESOLVER, ShowRisk.RESOLVER.getHistoryToken(), riskId));
+    riskLink
+      .setHref(HistoryUtils.createHistoryHashLink(RiskRegister.RESOLVER, ShowRisk.RESOLVER.getHistoryToken(), riskId));
 
     if (incidence.getDescription() != null) {
       descriptionKey.setVisible(true);
@@ -199,7 +203,6 @@ public class ShowRiskIncidence extends Composite {
   }-*/;
 
   void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-
     if (historyTokens.size() == 1) {
       String riskIncidenceId = historyTokens.get(0);
       BrowserService.Util.getInstance().retrieve(RiskIncidence.class.getName(), riskIncidenceId,
@@ -212,7 +215,7 @@ public class ShowRiskIncidence extends Composite {
 
           @Override
           public void onSuccess(RiskIncidence result) {
-            ShowRiskIncidence incidencePanel = new ShowRiskIncidence(result);
+            ShowRiskIncidence incidencePanel = new ShowRiskIncidence(relatedObject, result);
             callback.onSuccess(incidencePanel);
           }
         });
@@ -224,16 +227,15 @@ public class ShowRiskIncidence extends Composite {
 
   @UiHandler("buttonEdit")
   void handleButtonEdit(ClickEvent e) {
-    HistoryUtils.newHistory(RiskIncidenceRegister.RESOLVER, EditRiskIncidence.RESOLVER.getHistoryToken(), incidence.getId());
+    HistoryUtils.newHistory(RiskIncidenceRegister.RESOLVER, EditRiskIncidence.RESOLVER.getHistoryToken(),
+      incidence.getId());
   }
 
   @UiHandler("buttonCancel")
   void handleButtonCancel(ClickEvent e) {
-    cancel();
-  }
-
-  private void cancel() {
-    HistoryUtils.newHistory(RiskIncidenceRegister.RESOLVER);
+    List<String> lastHistory = new ArrayList<>(LastSelectedItemsSingleton.getInstance().getLastHistory());
+    LastSelectedItemsSingleton.getInstance().clearLastHistory();
+    HistoryUtils.newHistory(lastHistory);
   }
 
 }

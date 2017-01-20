@@ -88,7 +88,7 @@ public class Planning {
     } else if (historyTokens.get(0).equals(RiskRegister.RESOLVER.getHistoryToken())) {
       RiskRegister.getInstance().resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.get(0).equals(RiskIncidenceRegister.RESOLVER.getHistoryToken())) {
-      RiskIncidenceRegister.getInstance().resolve(HistoryUtils.tail(historyTokens), callback);
+      RiskIncidenceRegister.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.get(0).equals(PreservationEvents.PLANNING_RESOLVER.getHistoryToken())) {
       PreservationEvents.PLANNING_RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.get(0).equals(PreservationAgents.RESOLVER.getHistoryToken())) {

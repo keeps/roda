@@ -24,7 +24,12 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.wui.client.browse.BrowseAIP;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
+import org.roda.wui.client.browse.bundle.BrowseFileBundle;
+import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
+import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.lists.RiskIncidenceList;
@@ -35,6 +40,8 @@ import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
+import org.roda.wui.client.main.BreadcrumbPanel;
+import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -47,6 +54,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -72,7 +80,49 @@ public class RiskIncidenceRegister extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-      getInstance().resolve(historyTokens, callback);
+      if (historyTokens.size() == 0) {
+        RiskIncidenceRegister riskIncidences = new RiskIncidenceRegister(null, null, null, null, Filter.ALL);
+        callback.onSuccess(riskIncidences);
+      } else if (historyTokens.size() == 2
+        && historyTokens.get(0).equals(ShowRiskIncidence.RESOLVER.getHistoryToken())) {
+        ShowRiskIncidence.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+      } else if (historyTokens.size() == 2
+        && historyTokens.get(0).equals(EditRiskIncidence.RESOLVER.getHistoryToken())) {
+        EditRiskIncidence.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+      } else if (historyTokens.size() == 1) {
+        final String aipId = historyTokens.get(0);
+        Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, aipId));
+        RiskIncidenceRegister riskIncidences = new RiskIncidenceRegister(aipId, null, null, null, filter);
+        callback.onSuccess(riskIncidences);
+      } else if (historyTokens.size() == 2) {
+        final String aipId = historyTokens.get(0);
+        final String representationId = historyTokens.get(1);
+        Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, aipId),
+          new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, representationId));
+        RiskIncidenceRegister riskIncidences = new RiskIncidenceRegister(aipId, representationId, null, null, filter);
+        callback.onSuccess(riskIncidences);
+      } else if (historyTokens.size() >= 3) {
+        List<String> filePath = new ArrayList<>(historyTokens);
+        final String aipId = filePath.remove(0);
+        final String representationId = filePath.remove(0);
+        final String fileId = filePath.remove(filePath.size() - 1);
+
+        Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, aipId),
+          new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, representationId),
+          new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_FILE_ID, fileId));
+
+        if (!filePath.isEmpty()) {
+          filter.add(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_FILE_PATH_COMPUTED,
+            StringUtils.join(filePath, RodaConstants.RISK_INCIDENCE_FILE_PATH_COMPUTED_SEPARATOR)));
+        }
+
+        RiskIncidenceRegister riskIncidences = new RiskIncidenceRegister(aipId, representationId, filePath, fileId,
+          filter);
+        callback.onSuccess(riskIncidences);
+      } else {
+        HistoryUtils.newHistory(RESOLVER);
+        callback.onSuccess(null);
+      }
     }
 
     @Override
@@ -89,25 +139,14 @@ public class RiskIncidenceRegister extends Composite {
     }
   };
 
-  private static RiskIncidenceRegister instance = null;
-
-  /**
-   * Get the singleton instance
-   *
-   * @return the instance
-   */
-  public static RiskIncidenceRegister getInstance() {
-    if (instance == null) {
-      instance = new RiskIncidenceRegister();
-    }
-    return instance;
-  }
-
   interface MyUiBinder extends UiBinder<Widget, RiskIncidenceRegister> {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
+
+  @UiField
+  BreadcrumbPanel breadcrumb;
 
   @UiField
   Label riskIncidenceRegisterTitle;
@@ -133,10 +172,12 @@ public class RiskIncidenceRegister extends Composite {
   @UiField
   Button buttonRemove;
 
-  private static final Filter DEFAULT_FILTER = SearchFilters.defaultFilter(RiskIncidence.class.getName());
   private static final String ALL_FILTER = SearchFilters.allFilter(RiskIncidence.class.getName());
 
   private String aipId = null;
+  private String representationId = null;
+  private List<String> filePath = null;
+  private String fileId = null;
 
   /**
    * Create a risk register page
@@ -144,14 +185,20 @@ public class RiskIncidenceRegister extends Composite {
    * @param user
    */
 
-  public RiskIncidenceRegister() {
+  public RiskIncidenceRegister(String aipId, String representationId, List<String> filePath, String fileId,
+    Filter filter) {
+    this.aipId = aipId;
+    this.representationId = representationId;
+    this.filePath = filePath;
+    this.fileId = fileId;
+
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.RISK_INCIDENCE_DETECTED_BY),
       new SimpleFacetParameter(RodaConstants.RISK_INCIDENCE_STATUS));
 
-    riskIncidenceList = new RiskIncidenceList(Filter.NULL, facets, messages.riskIncidencesTitle(), true);
+    riskIncidenceList = new RiskIncidenceList(filter, facets, messages.riskIncidencesTitle(), true);
 
-    searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, true, messages.riskIncidenceRegisterSearchPlaceHolder(),
-      false, false, false);
+    searchPanel = new SearchPanel(filter, ALL_FILTER, true, messages.riskIncidenceRegisterSearchPlaceHolder(), false,
+      false, false);
     searchPanel.setList(riskIncidenceList);
 
     facetDetectedBy = new FlowPanel();
@@ -163,11 +210,11 @@ public class RiskIncidenceRegister extends Composite {
     FacetUtils.bindFacets(riskIncidenceList, facetPanels);
 
     riskIncidenceList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
-
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
         final RiskIncidence selected = riskIncidenceList.getSelectionModel().getSelectedObject();
         if (selected != null) {
+          LastSelectedItemsSingleton.getInstance().setLastHistory(HistoryUtils.getCurrentHistoryPath());
           HistoryUtils.newHistory(RiskIncidenceRegister.RESOLVER, ShowRiskIncidence.RESOLVER.getHistoryToken(),
             selected.getId());
         }
@@ -175,7 +222,6 @@ public class RiskIncidenceRegister extends Composite {
     });
 
     riskIncidenceList.addCheckboxSelectionListener(new CheckboxSelectionListener<RiskIncidence>() {
-
       @Override
       public void onSelectionChange(SelectedItems<RiskIncidence> selected) {
         boolean empty = ClientSelectedItemsUtils.isEmpty(selected);
@@ -185,7 +231,6 @@ public class RiskIncidenceRegister extends Composite {
           buttonRemove.setEnabled(true);
         }
       }
-
     });
 
     initWidget(uiBinder.createAndBindUi(this));
@@ -213,6 +258,71 @@ public class RiskIncidenceRegister extends Composite {
 
     inputDateInitial.getElement().setPropertyString("placeholder", messages.sidebarFilterFromDatePlaceHolder());
     inputDateFinal.getElement().setPropertyString("placeholder", messages.sidebarFilterToDatePlaceHolder());
+
+    // create breadcrumbs
+    breadcrumb.setVisible(true);
+    if (fileId != null) {
+      getFileBreadCrumbs();
+    } else if (representationId != null) {
+      getRepresentationBreadCrumbs();
+    } else if (aipId != null) {
+      getAIPBreadCrumbs();
+    } else {
+      breadcrumb.setVisible(false);
+    }
+  }
+
+  private void getAIPBreadCrumbs() {
+    BrowserService.Util.getInstance().retrieveBrowseAIPBundle(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
+      new AsyncCallback<BrowseAIPBundle>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
+          HistoryUtils.newHistory(BrowseAIP.RESOLVER);
+        }
+
+        @Override
+        public void onSuccess(BrowseAIPBundle itemBundle) {
+          breadcrumb
+            .updatePath(BreadcrumbUtils.getAipBreadcrumbs(itemBundle.getAIPAncestors(), itemBundle.getAip(), true));
+          breadcrumb.setVisible(true);
+        }
+      });
+  }
+
+  private void getRepresentationBreadCrumbs() {
+    BrowserService.Util.getInstance().retrieveBrowseRepresentationBundle(aipId, representationId,
+      LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<BrowseRepresentationBundle>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
+        }
+
+        @Override
+        public void onSuccess(BrowseRepresentationBundle repBundle) {
+          breadcrumb.updatePath(BreadcrumbUtils.getRepresentationBreadcrumbs(repBundle));
+          breadcrumb.setVisible(true);
+        }
+      });
+  }
+
+  private void getFileBreadCrumbs() {
+    BrowserService.Util.getInstance().retrieveBrowseFileBundle(aipId, representationId, filePath, fileId,
+      LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<BrowseFileBundle>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
+        }
+
+        @Override
+        public void onSuccess(BrowseFileBundle fileBundle) {
+          breadcrumb.updatePath(BreadcrumbUtils.getFileBreadcrumbs(fileBundle));
+          breadcrumb.setVisible(true);
+        }
+      });
   }
 
   @Override
@@ -231,67 +341,8 @@ public class RiskIncidenceRegister extends Composite {
     riskIncidenceList.setFilter(new Filter(filterParameter));
   }
 
-  public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-    if (historyTokens.size() == 0) {
-      setAipId(null);
-      riskIncidenceList.setFilter(Filter.ALL);
-      riskIncidenceList.refresh();
-      callback.onSuccess(this);
-    } else if (historyTokens.size() == 2 && historyTokens.get(0).equals(ShowRiskIncidence.RESOLVER.getHistoryToken())) {
-      ShowRiskIncidence.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
-    } else if (historyTokens.size() == 2 && historyTokens.get(0).equals(EditRiskIncidence.RESOLVER.getHistoryToken())) {
-      EditRiskIncidence.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
-    } else if (historyTokens.size() == 1) {
-      final String aipId = historyTokens.get(0);
-      setAipId(aipId);
-      riskIncidenceList.setFilter(new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, aipId)));
-      riskIncidenceList.refresh();
-      callback.onSuccess(this);
-    } else if (historyTokens.size() == 2) {
-      final String aipId = historyTokens.get(0);
-      final String repId = historyTokens.get(1);
-      setAipId(aipId);
-      riskIncidenceList.setFilter(new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, aipId),
-        new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, repId)));
-      riskIncidenceList.refresh();
-      callback.onSuccess(this);
-    } else if (historyTokens.size() >= 3) {
-      List<String> tokens = new ArrayList<>(historyTokens);
-      final String aipId = tokens.remove(0);
-      final String repId = tokens.remove(0);
-      final String fileId = tokens.remove(tokens.size() - 1);
-
-      setAipId(aipId);
-
-      Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, aipId),
-        new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, repId),
-        new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_FILE_ID, fileId));
-
-      if (!tokens.isEmpty()) {
-        filter.add(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_FILE_PATH_COMPUTED,
-          StringUtils.join(tokens, RodaConstants.RISK_INCIDENCE_FILE_PATH_COMPUTED_SEPARATOR)));
-      }
-
-      riskIncidenceList.setFilter(filter);
-      riskIncidenceList.refresh();
-      callback.onSuccess(this);
-    } else {
-      HistoryUtils.newHistory(RESOLVER);
-      callback.onSuccess(null);
-    }
-  }
-
-  public String getAipId() {
-    return aipId;
-  }
-
-  public void setAipId(String id) {
-    aipId = id;
-  }
-
   @UiHandler("buttonRemove")
   void buttonRemoveRiskHandler(ClickEvent e) {
-
     final SelectedItems<RiskIncidence> selected = riskIncidenceList.getSelected();
 
     ClientSelectedItemsUtils.size(RiskIncidence.class, selected, new AsyncCallback<Long>() {
