@@ -42,6 +42,7 @@ import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
+import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -170,7 +171,7 @@ public class RiskIncidenceRegister extends Composite {
   DateBox inputDateFinal;
 
   @UiField
-  Button buttonRemove;
+  Button buttonRemove, buttonCancel;
 
   private static final String ALL_FILTER = SearchFilters.allFilter(RiskIncidence.class.getName());
 
@@ -386,6 +387,19 @@ public class RiskIncidenceRegister extends Composite {
           });
       }
     });
+  }
+
+  @UiHandler("buttonCancel")
+  void buttonCancelHandler(ClickEvent e) {
+    if (fileId != null) {
+      HistoryUtils.openBrowse(aipId, representationId, filePath, fileId);
+    } else if (representationId != null) {
+      HistoryUtils.openBrowse(aipId, representationId);
+    } else if (aipId != null) {
+      HistoryUtils.openBrowse(aipId);
+    } else {
+      HistoryUtils.newHistory(Welcome.RESOLVER);
+    }
   }
 
 }

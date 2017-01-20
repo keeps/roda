@@ -57,10 +57,10 @@
 						<g:Label addStyleNames="h4">
 							<ui:text from='{messages.sidebarProcessTitle}' />
 						</g:Label>
-						<g:Button addStyleNames="btn btn-play" ui:field="buttonCreate">
+						<g:Button addStyleNames="btn btn-block btn-play" ui:field="buttonCreate">
 							<ui:text from='{messages.createJobCreateTitle}' />
 						</g:Button>
-						<g:Button addStyleNames="btn btn-default btn-times-circle"
+						<g:Button addStyleNames="btn btn-block btn-default btn-times-circle"
 							ui:field="buttonCancel">
 							<ui:text from='{messages.createJobCancelTitle}' />
 						</g:Button>

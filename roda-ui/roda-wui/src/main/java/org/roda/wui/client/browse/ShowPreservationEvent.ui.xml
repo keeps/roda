@@ -123,7 +123,7 @@
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarActionsTitle}' />
 							</g:Label>
-							<g:Button addStyleNames="btn btn-default btn-back"
+							<g:Button addStyleNames="btn btn-block btn-default btn-back"
 								ui:field="backButton">
 								<ui:text from='{messages.preservationEventsBackButton}' />
 							</g:Button>

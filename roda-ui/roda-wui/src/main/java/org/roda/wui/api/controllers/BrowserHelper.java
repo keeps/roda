@@ -1555,6 +1555,7 @@ public class BrowserHelper {
         model.createUpdateAIPEvent(rep.getAipId(), null, null, null, PreservationEventType.DELETION,
           "The process of deleting an object of the repository.", PluginState.SUCCESS, outcomeText, details,
           user.getName(), true);
+
       } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
         String outcomeText = "The Representation '" + rep.getId() + "' has not been manually deleted.";
         model.createUpdateAIPEvent(rep.getAipId(), null, null, null, PreservationEventType.DELETION,
@@ -1568,7 +1569,7 @@ public class BrowserHelper {
     index.commit(IndexedRepresentation.class);
   }
 
-  public static void deleteFile(SelectedItems<IndexedFile> selected, User user, String details)
+  public static void deleteFile(User user, SelectedItems<IndexedFile> selected, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     List<String> fileIds = consolidate(user, IndexedFile.class, selected);
 
@@ -1579,7 +1580,7 @@ public class BrowserHelper {
       Job job = new Job();
       job.setName(RiskIncidenceRemoverPlugin.class.getSimpleName() + " " + job.getStartDate());
       job.setPlugin(RiskIncidenceRemoverPlugin.class.getName());
-      job.setSourceObjects(SelectedItemsList.create(IndexedFile.class, fileIds));
+      job.setSourceObjects(selected);
       Jobs.createJob(user, job, false);
     } catch (JobAlreadyStartedException e) {
       LOGGER.error("Could not delete file associated incidences");
@@ -1808,28 +1809,6 @@ public class BrowserHelper {
     AlreadyExistsException {
     RodaCoreFactory.getModelService().updateFile(file, contentPayload, createIfNotExists, notify);
     return file;
-  }
-
-  public static void deleteRepresentationFile(User user, String fileUUID, String details)
-    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    IndexedFile file = RodaCoreFactory.getIndexService().retrieve(IndexedFile.class, fileUUID);
-    ModelService model = RodaCoreFactory.getModelService();
-
-    try {
-      model.deleteFile(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(), true);
-
-      String outcomeText = "The File '" + file.getId() + "' has been manually deleted.";
-      model.createUpdateAIPEvent(file.getAipId(), file.getRepresentationId(), null, null,
-        PreservationEventType.DELETION, "The process of deleting an object of the repository.", PluginState.SUCCESS,
-        outcomeText, details, user.getName(), true);
-    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      String outcomeText = "The File '" + file.getId() + "' has not been manually deleted.";
-      model.createUpdateAIPEvent(file.getAipId(), file.getRepresentationId(), null, null,
-        PreservationEventType.DELETION, "The process of deleting an object of the repository.", PluginState.FAILURE,
-        outcomeText, details, user.getName(), true);
-
-      throw e;
-    }
   }
 
   public static EntityResponse retrieveAIPRepresentationFile(String fileUuid, String acceptFormat)

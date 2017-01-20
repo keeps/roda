@@ -27,21 +27,18 @@ import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.risks.RiskIncidence.INCIDENCE_STATUS;
 import org.roda.wui.client.browse.BrowseAIP;
+import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.browse.BrowseFile;
 import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.builder.shared.HtmlAnchorBuilder;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.UIObject;
-import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
 
@@ -255,9 +252,9 @@ public class HtmlSnippetUtils {
           public void onSuccess(IndexedRepresentation result) {
             if (result != null) {
               objectLabel.setText(messages.showRepresentationExtended());
-              objectLink.setHref(HistoryUtils.createHistoryHashLink(BrowseAIP.RESOLVER,
-                BrowseFile.RESOLVER.getHistoryToken(), result.getAipId(), result.getUUID()));
-              objectLink.setText(result.getUUID());
+              objectLink.setHref(
+                HistoryUtils.createHistoryHashLink(BrowseRepresentation.RESOLVER, result.getAipId(), result.getId()));
+              objectLink.setText(result.getId());
             }
           }
         });
@@ -274,9 +271,8 @@ public class HtmlSnippetUtils {
         public void onSuccess(IndexedFile result) {
           if (result != null) {
             objectLabel.setText(messages.showFileExtended());
-            objectLink
-              .setHref(HistoryUtils.createHistoryHashLink(BrowseAIP.RESOLVER, BrowseFile.RESOLVER.getHistoryToken(),
-                result.getAipId(), result.getRepresentationUUID(), result.getUUID()));
+            objectLink.setHref(HistoryUtils.createHistoryHashLink(
+              HistoryUtils.getHistoryUuidResolver(IndexedFile.class.getName(), result.getUUID())));
             objectLink.setText(result.getUUID());
           }
         }

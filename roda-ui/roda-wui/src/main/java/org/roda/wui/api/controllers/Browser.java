@@ -1126,7 +1126,7 @@ public class Browser extends RodaWuiController {
     UserUtility.checkFilePermissions(user, files, PermissionType.DELETE);
 
     // delegate
-    BrowserHelper.deleteFile(files, user, details);
+    BrowserHelper.deleteFile(user, files, details);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_SELECTED_PARAM, files);
@@ -2224,7 +2224,7 @@ public class Browser extends RodaWuiController {
     UserUtility.checkFilePermissions(user, file, PermissionType.DELETE);
 
     // delegate
-    BrowserHelper.deleteRepresentationFile(user, fileUUID, details);
+    BrowserHelper.deleteFile(user, SelectedItemsList.create(IndexedFile.class, fileUUID), details);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_FILE_UUID_PARAM,

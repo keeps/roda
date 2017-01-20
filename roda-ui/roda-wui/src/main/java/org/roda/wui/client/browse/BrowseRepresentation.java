@@ -332,18 +332,19 @@ public class BrowseRepresentation extends Composite {
     disseminationsList.getParent().setVisible(bundle.getDipCount() > 0);
 
     // SIDEBAR
-    actionsSidebar.setWidget(RepresentationActions.get().createActionsLayout(representation, new AsyncCallback<Void>() {
+    actionsSidebar
+      .setWidget(RepresentationActions.get(aipId).createActionsLayout(representation, new AsyncCallback<Void>() {
 
-      @Override
-      public void onFailure(Throwable caught) {
-        AsyncCallbackUtils.defaultFailureTreatment(caught);
-      }
+        @Override
+        public void onFailure(Throwable caught) {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
+        }
 
-      @Override
-      public void onSuccess(Void result) {
-        // TODO update interface
-      }
-    }));
+        @Override
+        public void onSuccess(Void result) {
+          // TODO update interface
+        }
+      }));
 
     ListSelectionState.bindLayout(IndexedRepresentation.class, searchPrevious, searchNext, keyboardFocus, true, false,
       false, searchSection);

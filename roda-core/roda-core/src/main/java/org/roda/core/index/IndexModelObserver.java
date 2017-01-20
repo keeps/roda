@@ -110,7 +110,7 @@ public class IndexModelObserver implements ModelObserver {
       ReturnWithExceptions<Void> repExceptions = indexRepresentations(aip, ancestors);
       exceptions.addExceptions(repExceptions.getExceptions());
 
-      ReturnWithExceptions<Void> eventExceptions = indexPreservationsEvents(aip);
+      ReturnWithExceptions<Void> eventExceptions = indexPreservationsEvents(aip.getId(), null);
       exceptions.addExceptions(eventExceptions.getExceptions());
 
       // indexOtherMetadata(aip);
@@ -148,12 +148,16 @@ public class IndexModelObserver implements ModelObserver {
     return exceptions;
   }
 
-  private ReturnWithExceptions<Void> indexPreservationsEvents(final AIP aip) {
+  private ReturnWithExceptions<Void> indexPreservationsEvents(final String aipId, final String representationId) {
     ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
     CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationMetadata = null;
     try {
-      boolean includeRepresentations = true;
-      preservationMetadata = model.listPreservationMetadata(aip.getId(), includeRepresentations);
+      if (representationId == null) {
+        boolean includeRepresentations = true;
+        preservationMetadata = model.listPreservationMetadata(aipId, includeRepresentations);
+      } else {
+        preservationMetadata = model.listPreservationMetadata(aipId, representationId);
+      }
       for (OptionalWithCause<PreservationMetadata> opm : preservationMetadata) {
         if (opm.isPresent()) {
           PreservationMetadata pm = opm.get();
@@ -608,7 +612,12 @@ public class IndexModelObserver implements ModelObserver {
     try {
       AIP aip = model.retrieveAIP(representation.getAipId());
       List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
-      indexRepresentation(aip, representation, ancestors);
+
+      ReturnWithExceptions<Void> representationExceptions = indexRepresentation(aip, representation, ancestors);
+      exceptions.addExceptions(representationExceptions.getExceptions());
+
+      ReturnWithExceptions<Void> eventExceptions = indexPreservationsEvents(aip.getId(), representation.getId());
+      exceptions.addExceptions(eventExceptions.getExceptions());
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Cannot index representation: {}", representation, e);
     }
@@ -642,7 +651,8 @@ public class IndexModelObserver implements ModelObserver {
     try {
       AIP aip = model.retrieveAIP(file.getAipId());
       List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
-      indexFile(aip, file, ancestors, recursive);
+      ReturnWithExceptions<Long> fileExceptions = indexFile(aip, file, ancestors, recursive);
+      exceptions.addExceptions(fileExceptions.getExceptions());
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error indexing file: {}", file, e);
     }
@@ -660,7 +670,6 @@ public class IndexModelObserver implements ModelObserver {
   public void fileDeleted(String aipId, String representationId, List<String> fileDirectoryPath, String fileId,
     boolean deleteIncidences) {
     String uuid = IdUtils.getFileId(aipId, representationId, fileDirectoryPath, fileId);
-
     deleteDocumentFromIndex(IndexedFile.class, uuid);
 
     if (deleteIncidences) {

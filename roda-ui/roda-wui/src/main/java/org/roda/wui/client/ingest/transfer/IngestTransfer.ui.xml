@@ -70,7 +70,7 @@
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarIngestTitle}' />
 							</g:Label>
-							<g:Button addStyleNames="btn btn-play" ui:field="startIngest">
+							<g:Button addStyleNames="btn btn-block btn-play" ui:field="startIngest">
 								<ui:text from='{messages.ingestWholeFolderButton}' />
 							</g:Button>
 						</g:FlowPanel>

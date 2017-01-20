@@ -39,7 +39,7 @@
 						<g:Label addStyleNames="h4">
 							<ui:text from='{messages.sidebarActionsTitle}' />
 						</g:Label>
-						<g:Button addStyleNames="btn btn-default btn-play" ui:field="done">
+						<g:Button addStyleNames="btn btn-block btn-default btn-play" ui:field="done">
 							<ui:text from='{messages.ingestTransferUploadFinishButton}' />
 						</g:Button>
 					</g:FlowPanel>

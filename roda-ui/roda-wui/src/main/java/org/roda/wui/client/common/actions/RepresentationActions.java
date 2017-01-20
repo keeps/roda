@@ -18,7 +18,6 @@ import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.search.SearchSuggestBox;
-import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.planning.Planning;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
 import org.roda.wui.client.process.CreateJob;
@@ -39,7 +38,6 @@ import config.i18n.client.ClientMessages;
 public class RepresentationActions extends AbstractActionable<IndexedRepresentation> {
 
   private static final RepresentationActions GENERAL_INSTANCE = new RepresentationActions(null);
-
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private final String aipId;

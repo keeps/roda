@@ -40,10 +40,10 @@
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarActionsTitle}' />
 							</g:Label>
-							<g:Button addStyleNames="btn btn-download" ui:field="downloadButton">
+							<g:Button addStyleNames="btn btn-block btn-download" ui:field="downloadButton">
 								<ui:text from='{messages.preservationEventsDownloadButton}' />
 							</g:Button>
-							<g:Button addStyleNames="btn btn-default btn-back"
+							<g:Button addStyleNames="btn btn-block btn-default btn-back"
 								ui:field="backButton">
 								<ui:text from='{messages.preservationEventsBackButton}' />
 							</g:Button>

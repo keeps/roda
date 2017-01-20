@@ -69,7 +69,7 @@
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarActionsTitle}' />
 							</g:Label>
-							<g:Button addStyleNames="btn btn-plus" ui:field="newJob">
+							<g:Button addStyleNames="btn btn-block btn-plus" ui:field="newJob">
 								<ui:text from='{messages.newProcessPreservation}' />
 							</g:Button>
 						</g:FlowPanel>
