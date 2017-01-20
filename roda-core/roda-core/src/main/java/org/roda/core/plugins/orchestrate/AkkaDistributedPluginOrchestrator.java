@@ -205,4 +205,10 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
 
   }
 
+  @Override
+  public void setJobInError(String jobId) {
+    // TODO Auto-generated method stub
+
+  }
+
 }

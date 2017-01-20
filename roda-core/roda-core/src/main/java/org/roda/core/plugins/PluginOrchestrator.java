@@ -41,7 +41,7 @@ public interface PluginOrchestrator {
   /** 201603 hsilva: only tests should invoke this method synchronously */
   public void executeJob(Job job, boolean async) throws JobAlreadyStartedException;
 
-  /** 201608 hsilva: this method is sync */
+  /** 201608 hsilva: this method is async */
   public void stopJob(Job job);
 
   /** 201607 hsilva: this method is sync */
@@ -49,6 +49,9 @@ public interface PluginOrchestrator {
 
   /** 201607 hsilva: this method is sync */
   public void setJobContextInformation(String jobId, Object object);
+
+  /** 201701 hsilva: this method is sync */
+  public void setJobInError(String jobId);
 
   /** 201607 hsilva: this method is async */
   public <T extends IsRODAObject> void updateJobInformation(Plugin<T> plugin, JobPluginInfo jobPluginInfo)

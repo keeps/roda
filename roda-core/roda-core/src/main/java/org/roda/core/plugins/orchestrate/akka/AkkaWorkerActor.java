@@ -27,9 +27,9 @@ public class AkkaWorkerActor extends AkkaBaseActor {
 
   public AkkaWorkerActor() {
     super();
-    this.storage = super.getStorage();
-    this.model = super.getModel();
-    this.index = super.getIndex();
+    this.storage = getStorage();
+    this.model = getModel();
+    this.index = getIndex();
   }
 
   @Override
@@ -48,16 +48,15 @@ public class AkkaWorkerActor extends AkkaBaseActor {
   private void handlePluginExecuteIsReady(Object msg) {
     Messages.PluginExecuteIsReady message = (Messages.PluginExecuteIsReady) msg;
     List<LiteOptionalWithCause> objectsToBeProcessed = message.getList();
-    // List<IsRODAObject> objectsToBeProcessed = messageObjects.stream().map(obj
-    // -> getModel().retrieveObjectFromLite(obj))
-    // .filter(obj -> obj.isPresent()).map(obj ->
-    // obj.get()).collect(Collectors.toList());
     message.logProcessingStarted();
     Plugin<IsRODAObject> messagePlugin = message.getPlugin();
     try {
       messagePlugin.execute(index, model, storage, objectsToBeProcessed);
       getSender().tell(new Messages.PluginExecuteIsDone(messagePlugin, false), getSelf());
-    } catch (Exception e) {
+    } catch (Throwable e) {
+      // 20170120 hsilva: it is required to catch Throwable as there are some
+      // linking errors that only will happen during the execution (e.g.
+      // java.lang.NoSuchMethodError)
       LOGGER.error("Error executing plugin.execute()", e);
       getSender().tell(new Messages.PluginExecuteIsDone(messagePlugin, true), getSelf());
     }
@@ -71,7 +70,10 @@ public class AkkaWorkerActor extends AkkaBaseActor {
     try {
       plugin.afterAllExecute(index, model, storage);
       getSender().tell(new Messages.PluginAfterAllExecuteIsDone(plugin, false), getSelf());
-    } catch (Exception e) {
+    } catch (Throwable e) {
+      // 20170120 hsilva: it is required to catch Throwable as there are some
+      // linking errors that only will happen during the execution (e.g.
+      // java.lang.NoSuchMethodError)
       LOGGER.error("Error executing plugin.afterAllExecute()", e);
       getSender().tell(new Messages.PluginAfterAllExecuteIsDone(plugin, true), getSelf());
     }

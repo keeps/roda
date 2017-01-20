@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.v2.jobs.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -150,7 +149,7 @@ public class AkkaJobsManager extends AkkaBaseActor {
   }
 
   private void initMetrics(int maxNumberOfJobsInParallel) {
-    MetricRegistry metrics = RodaCoreFactory.getMetrics();
+    MetricRegistry metrics = getMetricRegistry();
     String className = AkkaJobsManager.class.getSimpleName();
     Counter maxNumberOfJobsInParallelCounter = metrics
       .counter(MetricRegistry.name(className, "maxNumberOfJobsInParallel"));

@@ -83,7 +83,9 @@ public class PluginThatFailsDuringInit extends AbstractPlugin<Void> {
 
   @Override
   public void init() throws PluginException {
-    throw new NullPointerException();
+    // 20170123 hsilva: must test an exception that extend Throwable (besides
+    // the ones that extend RuntimeException)
+    throw new Error();
   }
 
   @Override

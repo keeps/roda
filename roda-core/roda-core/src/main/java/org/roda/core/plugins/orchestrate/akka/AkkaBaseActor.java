@@ -14,6 +14,8 @@ import org.roda.core.plugins.PluginManager;
 import org.roda.core.plugins.PluginOrchestrator;
 import org.roda.core.storage.StorageService;
 
+import com.codahale.metrics.MetricRegistry;
+
 import akka.actor.UntypedActor;
 
 public abstract class AkkaBaseActor extends UntypedActor {
@@ -53,6 +55,10 @@ public abstract class AkkaBaseActor extends UntypedActor {
 
   public PluginManager getPluginManager() {
     return RodaCoreFactory.getPluginManager();
+  }
+
+  public MetricRegistry getMetricRegistry() {
+    return RodaCoreFactory.getMetrics();
   }
 
 }

@@ -20,7 +20,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
 // @RunWith(SpringJUnit4ClassRunner.class)
-@Test(groups = {"all", "travis"})
+@Test(groups = {"travis"})
 @ContextConfiguration("/fcrepo/spring-test/test-container.xml")
 public class FedoraStorageServiceTest extends AbstractTestNGSpringContextTests {
 

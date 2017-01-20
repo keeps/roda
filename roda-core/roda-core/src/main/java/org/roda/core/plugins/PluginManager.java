@@ -114,7 +114,10 @@ public class PluginManager {
       externalPluginChache.put(plugin.getClass().getName(), plugin);
       processAndCachePluginInformation(plugin);
       LOGGER.debug("Plugin added dynamically started {} (version {})", plugin.getName(), plugin.getVersion());
-    } catch (Exception e) {
+    } catch (Throwable e) {
+      // 20170123 hsilva: it is required to catch Throwable as there are some
+      // linking errors that only will happen during the execution (e.g.
+      // java.lang.NoSuchMethodError)
       throw new PluginException("An exception have occured during plugin registration", e);
     }
   }

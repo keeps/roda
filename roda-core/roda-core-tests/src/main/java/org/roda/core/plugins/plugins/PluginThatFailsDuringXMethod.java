@@ -99,7 +99,9 @@ public class PluginThatFailsDuringXMethod extends AbstractPlugin<Void> {
   public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
     if (getParameterValues().get(BEFORE_ALL_EXECUTE) != null) {
-      throw new NullPointerException();
+      // 20170123 hsilva: must test an exception that extend Throwable (besides
+      // the ones that extend RuntimeException)
+      throw new Error();
     } else {
       LOGGER.info("Doing nothing during beforeAllExecute");
     }
@@ -110,7 +112,9 @@ public class PluginThatFailsDuringXMethod extends AbstractPlugin<Void> {
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> list) throws PluginException {
     if (getParameterValues().get(EXECUTE) != null) {
-      throw new NullPointerException();
+      // 20170123 hsilva: must test an exception that extend Throwable (besides
+      // the ones that extend RuntimeException)
+      throw new Error();
     } else {
       LOGGER.info("Doing nothing during execute");
     }
@@ -120,7 +124,9 @@ public class PluginThatFailsDuringXMethod extends AbstractPlugin<Void> {
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     if (getParameterValues().get(AFTER_ALL_EXECUTE) != null) {
-      throw new NullPointerException();
+      // 20170123 hsilva: must test an exception that extend Throwable (besides
+      // the ones that extend RuntimeException)
+      throw new Error();
     } else {
       LOGGER.info("Doing nothing during afterAllExecute");
     }

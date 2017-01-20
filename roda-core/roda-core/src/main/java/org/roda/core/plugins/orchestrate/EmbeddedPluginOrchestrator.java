@@ -183,4 +183,10 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
 
   }
 
+  @Override
+  public void setJobInError(String jobId) {
+    // TODO Auto-generated method stub
+
+  }
+
 }

@@ -9,7 +9,6 @@ package org.roda.core.plugins.orchestrate.akka;
 
 import java.util.Optional;
 
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
@@ -100,7 +99,7 @@ public class AkkaJobActor extends AkkaBaseActor {
     Class<IsRODAObject> sourceObjectsClass = JobsHelper
       .getSelectedClassFromString(job.getSourceObjects().getSelectedClass());
 
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllObjects(getSelf(), plugin, (Class<T>) sourceObjectsClass);
+    getPluginOrchestrator().runPluginOnAllObjects(getSelf(), plugin, (Class<T>) sourceObjectsClass);
   }
 
   private <T extends IsRODAObject> void runFromList(Job job, Plugin<T> plugin) throws GenericException {
@@ -108,7 +107,7 @@ public class AkkaJobActor extends AkkaBaseActor {
     Class<IsRODAObject> sourceObjectsClass = JobsHelper
       .getSelectedClassFromString(job.getSourceObjects().getSelectedClass());
 
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnObjects(getSelf(), plugin,
+    getPluginOrchestrator().runPluginOnObjects(getSelf(), plugin,
       (Class<T>) ModelUtils.giveRespectiveModelClass(sourceObjectsClass),
       ((SelectedItemsList<IsRODAObject>) job.getSourceObjects()).getIds());
   }
@@ -126,7 +125,7 @@ public class AkkaJobActor extends AkkaBaseActor {
     JobsHelper.updateJobObjectsCount(plugin, super.getModel(), objectsCount);
 
     // execute
-    super.getPluginOrchestrator().runPluginFromIndex(getSelf(), sourceObjectsClass, selectedItems.getFilter(),
+    getPluginOrchestrator().runPluginFromIndex(getSelf(), sourceObjectsClass, selectedItems.getFilter(),
       (Plugin) plugin);
   }
 

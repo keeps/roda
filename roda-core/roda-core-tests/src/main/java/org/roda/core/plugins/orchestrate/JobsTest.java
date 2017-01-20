@@ -116,7 +116,7 @@ public class JobsTest {
     Map<String, String> parameters = new HashMap<>();
     parameters.put(PluginThatFailsDuringXMethod.AFTER_ALL_EXECUTE, "");
     TestsHelper.executeJob(PluginThatFailsDuringXMethod.class, parameters, PluginType.MISC, SelectedItemsNone.create(),
-      JOB_STATE.COMPLETED);
+      JOB_STATE.FAILED_TO_COMPLETE);
   }
 
   @Test
