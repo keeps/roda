@@ -64,67 +64,16 @@
 				<g:FlowPanel addStyleNames="col_2 last sidebar">
 					<g:FlowPanel addStyleNames="sticky-flow">
 						<g:FlowPanel addStyleNames="sticky-padding">
-							<g:FlowPanel ui:field="actionsSidebar">
-								<g:Label addStyleNames="h4">
-									<ui:text from='{messages.representation}' />
-								</g:Label>
-								<g:Button addStyleNames="btn btn-edit" ui:field="changeType">
-									<ui:text from='{messages.changeTypeButton}' />
-								</g:Button>
-								<g:Button addStyleNames="btn btn-danger btn-ban"
-									ui:field="remove">
-									<ui:text from='{messages.removeButton}' />
-								</g:Button>
-								<g:Button addStyleNames="btn btn-default btn-download"
-									ui:field="download">
-									<ui:text from='{messages.downloadButton}' />
-								</g:Button>
-							</g:FlowPanel>
-							<g:FlowPanel ui:field="preservationSidebar">
-								<g:Label addStyleNames="h4">
-									<ui:text from='{messages.preservationTitle}' />
-								</g:Label>
-								<g:Button addStyleNames="btn btn-play" ui:field="newProcess">
-									<ui:text from='{messages.newProcessPreservation}' />
-								</g:Button>
-								<g:Button addStyleNames="btn btn-play" ui:field="identifyFormats">
-									<ui:text from='{messages.identifyFormatsButton}' />
-								</g:Button>
-								<g:Button addStyleNames="btn btn-default btn-clock"
-									ui:field="preservationEvents">
-									<ui:text from='{messages.preservationEvents}' />
-								</g:Button>
-								<g:Button addStyleNames="btn btn-default btn-exclamation-triangle"
-									ui:field="risks">
-									<ui:text from='{messages.preservationRisks}' />
-								</g:Button>
-							</g:FlowPanel>
-							<g:FlowPanel ui:field="filesSidebar">
-								<g:Label addStyleNames="h4">
-									<ui:text from='{messages.sidebarFoldersFilesTitle}' />
-								</g:Label>
-								<g:Button addStyleNames="btn btn-edit" ui:field="renameFolders">
-									<ui:text from='{messages.renameButton}' />
-								</g:Button>
-								<g:Button addStyleNames="btn btn-edit" ui:field="moveFiles">
-									<ui:text from='{messages.moveButton}' />
-								</g:Button>
-								<g:Button addStyleNames="btn btn-upload" ui:field="uploadFiles">
-									<ui:text from='{messages.uploadFilesButton}' />
-								</g:Button>
-								<g:Button addStyleNames="btn btn-plus" ui:field="createFolder">
-									<ui:text from='{messages.createFolderButton}' />
-								</g:Button>
-							</g:FlowPanel>
+							<g:SimplePanel ui:field="actionsSidebar" />
 							<g:FlowPanel ui:field="searchSection">
 								<g:Label addStyleNames="h4">
 									<ui:text from='{messages.searchTitle}' />
 								</g:Label>
-								<g:Button addStyleNames="btn btn-default btn-chevron-left"
+								<g:Button addStyleNames="btn btn-block btn-default btn-chevron-left"
 									ui:field="searchPrevious">
 									<ui:text from='{messages.searchPrevious}' />
 								</g:Button>
-								<g:Button addStyleNames="btn btn-default btn-chevron-right"
+								<g:Button addStyleNames="btn btn-block btn-default btn-chevron-right"
 									ui:field="searchNext">
 									<ui:text from='{messages.searchNext}' />
 								</g:Button>

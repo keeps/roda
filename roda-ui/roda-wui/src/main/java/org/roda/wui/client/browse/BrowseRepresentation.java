@@ -11,46 +11,33 @@
 package org.roda.wui.client.browse;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
-import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataViewBundle;
-import org.roda.wui.client.common.LastSelectedItemsSingleton;
-import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.FileActions;
-import org.roda.wui.client.common.dialogs.Dialogs;
-import org.roda.wui.client.common.dialogs.SelectFileDialog;
+import org.roda.wui.client.common.actions.RepresentationActions;
 import org.roda.wui.client.common.lists.DIPList;
 import org.roda.wui.client.common.lists.SearchFileList;
 import org.roda.wui.client.common.lists.pagination.ListSelectionState;
-import org.roda.wui.client.common.lists.utils.AsyncTableCell.CheckboxSelectionListener;
-import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
-import org.roda.wui.client.common.search.SearchSuggestBox;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
-import org.roda.wui.client.planning.RiskIncidenceRegister;
-import org.roda.wui.client.process.CreateJob;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -64,8 +51,6 @@ import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
@@ -73,7 +58,6 @@ import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.i18n.client.LocaleInfo;
-import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -81,7 +65,6 @@ import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -206,10 +189,13 @@ public class BrowseRepresentation extends Composite {
   // SIDEBAR
 
   @UiField
-  Button renameFolders, moveFiles, uploadFiles, createFolder, identifyFormats, changeType, searchPrevious, searchNext;
+  SimplePanel actionsSidebar;
 
   @UiField
   FlowPanel searchSection;
+
+  @UiField
+  Button searchPrevious, searchNext;
 
   private List<HandlerRegistration> handlers;
   private IndexedRepresentation representation;
@@ -229,58 +215,16 @@ public class BrowseRepresentation extends Composite {
     String summary = messages.representationListOfFiles();
     boolean selectable = true;
     boolean showFilesPath = false;
+
     // FILES
 
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_UUID, repUUID),
       new EmptyKeyFilterParameter(RodaConstants.FILE_PARENT_UUID));
 
     filesList = new SearchFileList(filter, true, Facets.NONE, summary, selectable, showFilesPath);
+    filesList.setActionable(FileActions.get(aipId, repId));
 
     ListSelectionState.bindBrowseOpener(filesList);
-
-    filesList.addCheckboxSelectionListener(new CheckboxSelectionListener<IndexedFile>() {
-
-      @Override
-      public void onSelectionChange(SelectedItems<IndexedFile> selected) {
-        final SelectedItems<IndexedFile> files = filesList.getSelected();
-        boolean empty = ClientSelectedItemsUtils.isEmpty(selected);
-        moveFiles.setEnabled(!empty);
-        createFolder.setEnabled(empty);
-        uploadFiles.setEnabled(empty);
-
-        ClientSelectedItemsUtils.size(IndexedFile.class, files, new AsyncCallback<Long>() {
-
-          @Override
-          public void onFailure(Throwable caught) {
-            // do nothing
-          }
-
-          @Override
-          public void onSuccess(Long result) {
-            if (result == 1 && files instanceof SelectedItemsList) {
-              SelectedItemsList<IndexedFile> fileList = (SelectedItemsList<IndexedFile>) files;
-
-              BrowserService.Util.getInstance().retrieve(IndexedFile.class.getName(), fileList.getIds().get(0),
-                new AsyncCallback<IndexedFile>() {
-
-                  @Override
-                  public void onSuccess(IndexedFile file) {
-                    renameFolders.setEnabled(file.isDirectory());
-                  }
-
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    // do nothing
-                  }
-                });
-            } else {
-              renameFolders.setEnabled(false);
-            }
-          }
-        });
-      }
-    });
-    filesList.setActionable(FileActions.get(aipId, repId));
 
     filesSearch = new SearchPanel(filter, ALL_FILTER, true, messages.searchPlaceHolder(), false, false, true);
     filesSearch.setList(filesList);
@@ -388,10 +332,18 @@ public class BrowseRepresentation extends Composite {
     disseminationsList.getParent().setVisible(bundle.getDipCount() > 0);
 
     // SIDEBAR
-    renameFolders.setEnabled(false);
-    moveFiles.setEnabled(false);
-    uploadFiles.setEnabled(true);
-    createFolder.setEnabled(true);
+    actionsSidebar.setWidget(RepresentationActions.get().createActionsLayout(representation, new AsyncCallback<Void>() {
+
+      @Override
+      public void onFailure(Throwable caught) {
+        AsyncCallbackUtils.defaultFailureTreatment(caught);
+      }
+
+      @Override
+      public void onSuccess(Void result) {
+        // TODO update interface
+      }
+    }));
 
     ListSelectionState.bindLayout(IndexedRepresentation.class, searchPrevious, searchNext, keyboardFocus, true, false,
       false, searchSection);
@@ -506,372 +458,6 @@ public class BrowseRepresentation extends Composite {
   @UiHandler("newDescriptiveMetadata")
   void buttonNewDescriptiveMetadataEventsHandler(ClickEvent e) {
     newRepresentationDescriptiveMetadata();
-  }
-
-  @UiHandler("download")
-  void buttonDownloadHandler(ClickEvent e) {
-    SafeUri downloadUri = null;
-    if (repId != null) {
-      downloadUri = RestUtils.createRepresentationDownloadUri(aipId, repId);
-    }
-    if (downloadUri != null) {
-      Window.Location.assign(downloadUri.asString());
-    }
-  }
-
-  @UiHandler("remove")
-  void buttonRemoveHandler(ClickEvent e) {
-    final SelectedItems<IndexedFile> selected = (SelectedItems<IndexedFile>) filesList.getSelected();
-
-    if (ClientSelectedItemsUtils.isEmpty(selected)) {
-      final SelectedItems<IndexedRepresentation> selectedList = new SelectedItemsList<IndexedRepresentation>(
-        Arrays.asList(repUUID), IndexedRepresentation.class.getName());
-
-      Dialogs.showConfirmDialog(messages.representationRemoveTitle(), messages.representationRemoveMessage(),
-        messages.dialogCancel(), messages.dialogYes(), new AsyncCallback<Boolean>() {
-
-          @Override
-          public void onSuccess(Boolean confirmed) {
-            if (confirmed) {
-              Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
-                RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
-
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    // do nothing
-                  }
-
-                  @Override
-                  public void onSuccess(String details) {
-                    BrowserService.Util.getInstance().deleteRepresentation(selectedList, details,
-                      new AsyncCallback<Void>() {
-
-                        @Override
-                        public void onSuccess(Void result) {
-                          HistoryUtils.newHistory(BrowseAIP.RESOLVER, aipId);
-                        }
-
-                        @Override
-                        public void onFailure(Throwable caught) {
-                          AsyncCallbackUtils.defaultFailureTreatment(caught);
-                        }
-                      });
-                  }
-                });
-            }
-          }
-
-          @Override
-          public void onFailure(Throwable caught) {
-            // nothing to do
-          }
-        });
-    } else {
-      Dialogs.showConfirmDialog(messages.filesRemoveTitle(), messages.selectedFileRemoveMessage(),
-        messages.dialogCancel(), messages.dialogYes(), new AsyncCallback<Boolean>() {
-
-          @Override
-          public void onSuccess(Boolean confirmed) {
-            if (confirmed) {
-              Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
-                RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
-
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    // do nothing
-                  }
-
-                  @Override
-                  public void onSuccess(final String details) {
-                    BrowserService.Util.getInstance().deleteFile(selected, details, new AsyncCallback<Void>() {
-
-                      @Override
-                      public void onSuccess(Void result) {
-                        filesList.refresh();
-                        uploadFiles.setEnabled(true);
-                        createFolder.setEnabled(true);
-                        renameFolders.setEnabled(false);
-                      }
-
-                      @Override
-                      public void onFailure(Throwable caught) {
-                        AsyncCallbackUtils.defaultFailureTreatment(caught);
-                      }
-                    });
-                  }
-                });
-            }
-          }
-
-          @Override
-          public void onFailure(Throwable caught) {
-            // nothing to do
-          }
-
-        });
-    }
-  }
-
-  @UiHandler("newProcess")
-  void buttonNewProcessHandler(ClickEvent e) {
-    SelectedItems<? extends IsIndexed> selected = filesList.getSelected();
-
-    if (ClientSelectedItemsUtils.isEmpty(selected)) {
-      selected = new SelectedItemsList<IndexedRepresentation>(Arrays.asList(repUUID),
-        IndexedRepresentation.class.getName());
-    }
-
-    LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
-    selectedItems.setSelectedItems(selected);
-    selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
-    HistoryUtils.newHistory(CreateJob.RESOLVER, "action");
-  }
-
-  @UiHandler("risks")
-  void buttonRisksHandler(ClickEvent e) {
-    if (aipId != null) {
-      HistoryUtils.newHistory(RiskIncidenceRegister.RESOLVER, aipId, representation.getId());
-    }
-  }
-
-  @UiHandler("preservationEvents")
-  void buttonPreservationEventsHandler(ClickEvent e) {
-    if (aipId != null) {
-      HistoryUtils.newHistory(PreservationEvents.BROWSE_RESOLVER, aipId, repUUID);
-    }
-  }
-
-  @UiHandler("renameFolders")
-  void buttonRenameHandler(ClickEvent e) {
-    if (!ClientSelectedItemsUtils.isEmpty(filesList.getSelected())) {
-      final String folderUUID;
-      if (filesList.getSelected() instanceof SelectedItemsList) {
-        SelectedItemsList<IndexedFile> fileList = (SelectedItemsList<IndexedFile>) filesList.getSelected();
-        folderUUID = fileList.getIds().get(0);
-      } else {
-        return;
-      }
-
-      Dialogs.showPromptDialog(messages.renameItemTitle(), null, messages.renamePlaceholder(), RegExp.compile(".*"),
-        messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
-
-          @Override
-          public void onFailure(Throwable caught) {
-            // do nothing
-          }
-
-          @Override
-          public void onSuccess(final String newName) {
-            Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
-              RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
-
-                @Override
-                public void onFailure(Throwable caught) {
-                  // do nothing
-                }
-
-                @Override
-                public void onSuccess(String details) {
-                  BrowserService.Util.getInstance().renameFolder(folderUUID, newName, details,
-                    new LoadingAsyncCallback<IndexedFile>() {
-
-                      @Override
-                      public void onSuccessImpl(IndexedFile newFile) {
-                        Toast.showInfo(messages.dialogSuccess(), messages.renameSuccessful());
-                        HistoryUtils.openBrowse(newFile);
-                      }
-                    });
-                }
-              });
-          }
-        });
-    }
-  }
-
-  @UiHandler("moveFiles")
-  void buttonMoveHandler(ClickEvent e) {
-    // FIXME missing filter to remove the files themselves
-    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_UUID, repUUID),
-      new SimpleFilterParameter(RodaConstants.FILE_AIP_ID, aipId),
-      new SimpleFilterParameter(RodaConstants.FILE_ISDIRECTORY, Boolean.toString(true)));
-    SelectFileDialog selectFileDialog = new SelectFileDialog(messages.moveItemTitle(), filter, true, false);
-    selectFileDialog.setEmptyParentButtonVisible(true);
-    selectFileDialog.setSingleSelectionMode();
-    selectFileDialog.showAndCenter();
-    selectFileDialog.addValueChangeHandler(new ValueChangeHandler<IndexedFile>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<IndexedFile> event) {
-        final IndexedFile toFolder = event.getValue();
-        final SelectedItems<IndexedFile> selected = filesList.getSelected();
-
-        if (!ClientSelectedItemsUtils.isEmpty(selected)) {
-          Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
-            RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
-
-              @Override
-              public void onFailure(Throwable caught) {
-                // do nothing
-              }
-
-              @Override
-              public void onSuccess(String details) {
-                BrowserService.Util.getInstance().moveFiles(aipId, repId, selected, toFolder, details,
-                  new LoadingAsyncCallback<Void>() {
-
-                    @Override
-                    public void onSuccessImpl(Void nothing) {
-                      HistoryUtils.openBrowse(toFolder);
-                    }
-
-                    @Override
-                    public void onFailureImpl(Throwable caught) {
-                      if (caught instanceof NotFoundException) {
-                        Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-                      } else {
-                        AsyncCallbackUtils.defaultFailureTreatment(caught);
-                      }
-                    }
-                  });
-              }
-            });
-        }
-      }
-    });
-  }
-
-  @UiHandler("uploadFiles")
-  void buttonUploadFilesHandler(ClickEvent e) {
-    Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
-      RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          // do nothing
-        }
-
-        @Override
-        public void onSuccess(String details) {
-          LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
-          selectedItems.setDetailsMessage(details);
-          HistoryUtils.openUpload(representation);
-        }
-      });
-  }
-
-  @UiHandler("createFolder")
-  void buttonCreateFolderHandler(ClickEvent e) {
-    Dialogs.showPromptDialog(messages.createFolderTitle(), null, messages.createFolderPlaceholder(),
-      RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
-        @Override
-        public void onFailure(Throwable caught) {
-          Toast.showInfo(messages.dialogFailure(), messages.renameFailed());
-        }
-
-        @Override
-        public void onSuccess(final String newName) {
-          Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
-            RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
-
-              @Override
-              public void onFailure(Throwable caught) {
-                // do nothing
-              }
-
-              @Override
-              public void onSuccess(final String details) {
-                BrowserService.Util.getInstance().createFolder(aipId, repId, null, newName, details,
-                  new LoadingAsyncCallback<IndexedFile>() {
-
-                    @Override
-                    public void onSuccessImpl(IndexedFile newFolder) {
-                      HistoryUtils.openBrowse(newFolder);
-                    }
-
-                    @Override
-                    public void onFailureImpl(Throwable caught) {
-                      if (caught instanceof NotFoundException) {
-                        Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-                      } else {
-                        AsyncCallbackUtils.defaultFailureTreatment(caught);
-                      }
-                    }
-
-                  });
-              }
-            });
-        }
-      });
-  }
-
-  @UiHandler("identifyFormats")
-  void buttonIdentifyFormatsHandler(ClickEvent e) {
-    SelectedItems<?> selected = filesList.getSelected();
-
-    if (ClientSelectedItemsUtils.isEmpty(selected)) {
-      selected = new SelectedItemsList<IndexedRepresentation>(Arrays.asList(representation.getUUID()),
-        IndexedRepresentation.class.getName());
-    }
-
-    BrowserService.Util.getInstance().createFormatIdentificationJob(selected, new AsyncCallback<Void>() {
-
-      @Override
-      public void onSuccess(Void object) {
-        Toast.showInfo(messages.identifyingFormatsTitle(), messages.identifyingFormatsDescription());
-      }
-
-      @Override
-      public void onFailure(Throwable caught) {
-        if (caught instanceof NotFoundException) {
-          Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-        } else {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
-        }
-      }
-    });
-  }
-
-  @UiHandler("changeType")
-  void buttonChangeTypeHandler(ClickEvent e) {
-    final SelectedItemsList<IndexedRepresentation> selectedRepresentation = new SelectedItemsList<IndexedRepresentation>(
-      Arrays.asList(representation.getUUID()), IndexedRepresentation.class.getName());
-
-    SearchSuggestBox<IndexedRepresentation> suggestBox = new SearchSuggestBox<IndexedRepresentation>(
-      IndexedRepresentation.class, RodaConstants.REPRESENTATION_TYPE, true);
-
-    Dialogs.showPromptDialogSuggest(messages.changeTypeTitle(), null, messages.changeTypePlaceHolder(),
-      messages.cancelButton(), messages.confirmButton(), suggestBox, new AsyncCallback<String>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          // do nothing
-        }
-
-        @Override
-        public void onSuccess(final String newType) {
-          Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
-            RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
-
-              @Override
-              public void onFailure(Throwable caught) {
-                // do nothing
-              }
-
-              @Override
-              public void onSuccess(String details) {
-                BrowserService.Util.getInstance().changeRepresentationType(selectedRepresentation, newType, details,
-                  new LoadingAsyncCallback<Void>() {
-
-                    @Override
-                    public void onSuccessImpl(Void nothing) {
-                      Toast.showInfo(messages.dialogSuccess(), messages.changeTypeSuccessful());
-                      representationType.setText(newType);
-                    }
-                  });
-              }
-            });
-        }
-      });
   }
 
 }

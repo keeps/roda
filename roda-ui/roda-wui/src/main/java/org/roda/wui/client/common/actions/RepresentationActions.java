@@ -354,11 +354,11 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
     addTitle(layout, messages.representation());
 
     // DOWNLOAD, RENAME, MOVE, REMOVE, UPLOAD_FILES, CREATE_FOLDER
-    addButton(layout, messages.downloadButton(), RepresentationAction.DOWNLOAD, representation, callback,
-      "btn-default-alt", "btn-download");
+    addButton(layout, messages.downloadButton(), RepresentationAction.DOWNLOAD, representation, callback, "btn-default",
+      "btn-download");
 
     addButton(layout, messages.changeTypeButton(), RepresentationAction.CHANGE_TYPE, representation, callback,
-      "btn-default-alt", "btn-edit");
+      "btn-default", "btn-edit");
     addButton(layout, messages.removeButton(), RepresentationAction.REMOVE, representation, callback, "btn-danger",
       "btn-ban");
 
@@ -368,22 +368,22 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
     // NEW_PROCESS, IDENTIFY_FORMATS, SHOW_EVENTS, SHOW_RISKS
 
     addButton(layout, messages.newProcessPreservation(), RepresentationAction.NEW_PROCESS, representation, callback,
-      "btn-default-alt", "btn-play");
+      "btn-default", "btn-play");
     addButton(layout, messages.identifyFormatsButton(), RepresentationAction.IDENTIFY_FORMATS, representation, callback,
-      "btn-default-alt", "btn-play");
+      "btn-default", "btn-play");
     addButton(layout, messages.preservationEvents(), RepresentationAction.SHOW_EVENTS, representation, callback,
-      "btn-default-alt", "btn-play");
+      "btn-default", "btn-play");
     addButton(layout, messages.preservationRisks(), RepresentationAction.SHOW_RISKS, representation, callback,
-      "btn-default-alt", "btn-play");
+      "btn-default", "btn-play");
 
     // Files and folders
     addTitle(layout, messages.sidebarFoldersFilesTitle());
 
     // UPLOAD_FILES, CREATE_FOLDER
     addButton(layout, messages.uploadFilesButton(), RepresentationAction.UPLOAD_FILES, representation, callback,
-      "btn-default-alt", "btn-upload");
+      "btn-default", "btn-upload");
     addButton(layout, messages.createFolderButton(), RepresentationAction.CREATE_FOLDER, representation, callback,
-      "btn-default-alt", "btn-plus");
+      "btn-default", "btn-plus");
 
     return layout;
   }
@@ -398,10 +398,10 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
 
     // DOWNLOAD, RENAME, MOVE, REMOVE, UPLOAD_FILES, CREATE_FOLDER
     addButton(layout, messages.downloadButton(), RepresentationAction.DOWNLOAD, representations, callback,
-      "btn-default-alt", "btn-download");
+      "btn-default", "btn-download");
 
     addButton(layout, messages.changeTypeButton(), RepresentationAction.CHANGE_TYPE, representations, callback,
-      "btn-default-alt", "btn-edit");
+      "btn-default", "btn-edit");
     addButton(layout, messages.removeButton(), RepresentationAction.REMOVE, representations, callback, "btn-danger",
       "btn-ban");
 
@@ -411,13 +411,13 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
     // NEW_PROCESS, IDENTIFY_FORMATS, SHOW_EVENTS, SHOW_RISKS
 
     addButton(layout, messages.newProcessPreservation(), RepresentationAction.NEW_PROCESS, representations, callback,
-      "btn-default-alt", "btn-play");
+      "btn-default", "btn-play");
     addButton(layout, messages.identifyFormatsButton(), RepresentationAction.IDENTIFY_FORMATS, representations,
-      callback, "btn-default-alt", "btn-play");
+      callback, "btn-default", "btn-play");
     addButton(layout, messages.preservationEvents(), RepresentationAction.SHOW_EVENTS, representations, callback,
-      "btn-default-alt", "btn-play");
+      "btn-default", "btn-play");
     addButton(layout, messages.preservationRisks(), RepresentationAction.SHOW_RISKS, representations, callback,
-      "btn-default-alt", "btn-play");
+      "btn-default", "btn-play");
 
     return layout;
   }

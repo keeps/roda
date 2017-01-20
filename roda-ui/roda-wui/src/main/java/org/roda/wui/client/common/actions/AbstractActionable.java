@@ -105,6 +105,7 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
 
       // Construct
       Button button = new Button(text);
+      button.setTitle(text);
 
       // CSS
       button.addStyleName("actions-layout-button");
@@ -134,7 +135,7 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
   }
 
   public Widget createActionsLayout(T object) {
-    return createActionsLayout(objectToSelectedItems(object), createDefaultAsyncCallback());
+    return createActionsLayout(object, createDefaultAsyncCallback());
   }
 
 }

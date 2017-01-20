@@ -486,13 +486,13 @@ public class FileActions extends AbstractActionable<IndexedFile> {
     addTitle(layout, messages.sidebarFoldersFilesTitle());
 
     // DOWNLOAD, RENAME, MOVE, REMOVE, UPLOAD_FILES, CREATE_FOLDER
-    addButton(layout, messages.downloadButton(), FileAction.DOWNLOAD, file, callback, "btn-default-alt",
+    addButton(layout, messages.downloadButton(), FileAction.DOWNLOAD, file, callback, "btn-default",
       "btn-download");
-    addButton(layout, messages.renameButton(), FileAction.RENAME, file, callback, "btn-default-alt", "btn-edit");
-    addButton(layout, messages.moveButton(), FileAction.MOVE, file, callback, "btn-default-alt", "btn-edit");
-    addButton(layout, messages.uploadFilesButton(), FileAction.UPLOAD_FILES, file, callback, "btn-default-alt",
+    addButton(layout, messages.renameButton(), FileAction.RENAME, file, callback, "btn-default", "btn-edit");
+    addButton(layout, messages.moveButton(), FileAction.MOVE, file, callback, "btn-default", "btn-edit");
+    addButton(layout, messages.uploadFilesButton(), FileAction.UPLOAD_FILES, file, callback, "btn-default",
       "btn-upload");
-    addButton(layout, messages.createFolderButton(), FileAction.CREATE_FOLDER, file, callback, "btn-default-alt",
+    addButton(layout, messages.createFolderButton(), FileAction.CREATE_FOLDER, file, callback, "btn-default",
       "btn-plus");
     addButton(layout, messages.removeButton(), FileAction.REMOVE, file, callback, "btn-danger", "btn-ban");
 
@@ -501,13 +501,13 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
     // NEW_PROCESS, IDENTIFY_FORMATS, SHOW_EVENTS, SHOW_RISKS
 
-    addButton(layout, messages.newProcessPreservation(), FileAction.NEW_PROCESS, file, callback, "btn-default-alt",
+    addButton(layout, messages.newProcessPreservation(), FileAction.NEW_PROCESS, file, callback, "btn-default",
       "btn-play");
-    addButton(layout, messages.identifyFormatsButton(), FileAction.IDENTIFY_FORMATS, file, callback, "btn-default-alt",
+    addButton(layout, messages.identifyFormatsButton(), FileAction.IDENTIFY_FORMATS, file, callback, "btn-default",
       "btn-play");
-    addButton(layout, messages.preservationEvents(), FileAction.SHOW_EVENTS, file, callback, "btn-default-alt",
+    addButton(layout, messages.preservationEvents(), FileAction.SHOW_EVENTS, file, callback, "btn-default",
       "btn-play");
-    addButton(layout, messages.preservationRisks(), FileAction.SHOW_RISKS, file, callback, "btn-default-alt",
+    addButton(layout, messages.preservationRisks(), FileAction.SHOW_RISKS, file, callback, "btn-default",
       "btn-play");
 
     return layout;
@@ -521,13 +521,13 @@ public class FileActions extends AbstractActionable<IndexedFile> {
     addTitle(layout, messages.sidebarFoldersFilesTitle());
 
     // DOWNLOAD, RENAME, MOVE, REMOVE, UPLOAD_FILES, CREATE_FOLDER
-    addButton(layout, messages.downloadButton(), FileAction.DOWNLOAD, files, callback, "btn-default-alt",
+    addButton(layout, messages.downloadButton(), FileAction.DOWNLOAD, files, callback, "btn-default",
       "btn-download");
-    addButton(layout, messages.renameButton(), FileAction.RENAME, files, callback, "btn-default-alt", "btn-edit");
-    addButton(layout, messages.moveButton(), FileAction.MOVE, files, callback, "btn-default-alt", "btn-edit");
-    addButton(layout, messages.uploadFilesButton(), FileAction.UPLOAD_FILES, files, callback, "btn-default-alt",
+    addButton(layout, messages.renameButton(), FileAction.RENAME, files, callback, "btn-default", "btn-edit");
+    addButton(layout, messages.moveButton(), FileAction.MOVE, files, callback, "btn-default", "btn-edit");
+    addButton(layout, messages.uploadFilesButton(), FileAction.UPLOAD_FILES, files, callback, "btn-default",
       "btn-upload");
-    addButton(layout, messages.createFolderButton(), FileAction.CREATE_FOLDER, files, callback, "btn-default-alt",
+    addButton(layout, messages.createFolderButton(), FileAction.CREATE_FOLDER, files, callback, "btn-default",
       "btn-plus");
     addButton(layout, messages.removeButton(), FileAction.REMOVE, files, callback, "btn-danger", "btn-ban");
 
@@ -536,13 +536,13 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
     // NEW_PROCESS, IDENTIFY_FORMATS, SHOW_EVENTS, SHOW_RISKS
 
-    addButton(layout, messages.newProcessPreservation(), FileAction.NEW_PROCESS, files, callback, "btn-default-alt",
+    addButton(layout, messages.newProcessPreservation(), FileAction.NEW_PROCESS, files, callback, "btn-default",
       "btn-play");
-    addButton(layout, messages.identifyFormatsButton(), FileAction.IDENTIFY_FORMATS, files, callback, "btn-default-alt",
+    addButton(layout, messages.identifyFormatsButton(), FileAction.IDENTIFY_FORMATS, files, callback, "btn-default",
       "btn-play");
-    addButton(layout, messages.preservationEvents(), FileAction.SHOW_EVENTS, files, callback, "btn-default-alt",
+    addButton(layout, messages.preservationEvents(), FileAction.SHOW_EVENTS, files, callback, "btn-default",
       "btn-play");
-    addButton(layout, messages.preservationRisks(), FileAction.SHOW_RISKS, files, callback, "btn-default-alt",
+    addButton(layout, messages.preservationRisks(), FileAction.SHOW_RISKS, files, callback, "btn-default",
       "btn-play");
 
     return layout;
