@@ -176,7 +176,7 @@ public class BrowseDIP extends Composite {
     } else if (representation != null) {
       Sliders.createDisseminationsSlider(center, disseminationsButton, representation);
       Sliders.createInfoSlider(center, refererInfoButton, bundle.getRepresentation());
-      refererOptionsButton.setVisible(false);
+      Sliders.createOptionsSlider(center, refererOptionsButton, bundle.getRepresentation());
     } else if (aip != null) {
       Sliders.createDisseminationsSlider(center, disseminationsButton, aip);
       Sliders.createInfoSlider(center, refererInfoButton, bundle.getAip());

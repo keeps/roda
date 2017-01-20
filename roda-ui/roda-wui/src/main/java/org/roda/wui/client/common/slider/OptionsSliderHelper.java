@@ -5,6 +5,7 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.common.actions.FileActions;
+import org.roda.wui.client.common.actions.RepresentationActions;
 
 public class OptionsSliderHelper {
 
@@ -25,13 +26,13 @@ public class OptionsSliderHelper {
   }
 
   private static void updateOptionsSliderPanel(IndexedAIP aip, SliderPanel slider) {
-    // TODO Auto-generated method stub
-
+    slider.clear();
+    // slider.addContent(FileActions.get().createActionsLayout(file));
   }
 
   private static void updateOptionsSliderPanel(IndexedRepresentation representation, SliderPanel slider) {
-    // TODO Auto-generated method stub
-
+    slider.clear();
+    slider.addContent(RepresentationActions.get().createActionsLayout(representation));
   }
 
   private static void updateOptionsSliderPanel(final IndexedFile file, final SliderPanel slider) {

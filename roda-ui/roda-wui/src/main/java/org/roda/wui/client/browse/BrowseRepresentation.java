@@ -207,6 +207,8 @@ public class BrowseRepresentation extends Composite {
 
   public BrowseRepresentation(BrowseRepresentationBundle bundle) {
     this.representation = bundle.getRepresentation();
+    
+    
     this.aipId = representation.getAipId();
     this.repId = representation.getId();
     this.repUUID = representation.getUUID();

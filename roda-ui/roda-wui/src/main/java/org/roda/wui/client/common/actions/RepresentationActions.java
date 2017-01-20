@@ -40,6 +40,13 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
   private static final RepresentationActions GENERAL_INSTANCE = new RepresentationActions(null);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
+  private static final Set<RepresentationAction> POSSIBLE_ACTIONS_ON_SINGLE_REPRESENTATION = new HashSet<>(
+    Arrays.asList(RepresentationAction.values()));
+
+  private static final Set<RepresentationAction> POSSIBLE_ACTIONS_ON_MULTIPLE_REPRESENTATIONS = new HashSet<>(
+    Arrays.asList(RepresentationAction.CHANGE_TYPE, RepresentationAction.REMOVE, RepresentationAction.NEW_PROCESS,
+      RepresentationAction.IDENTIFY_FORMATS));
+
   private final String aipId;
 
   private RepresentationActions(String aipId) {
@@ -50,13 +57,6 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
     DOWNLOAD, CHANGE_TYPE, REMOVE, NEW_PROCESS, IDENTIFY_FORMATS, SHOW_EVENTS, SHOW_RISKS, UPLOAD_FILES, CREATE_FOLDER;
   }
 
-  private static final Set<RepresentationAction> POSSIBLE_ACTIONS_ON_SINGLE_REPRESENTATION = new HashSet<>(
-    Arrays.asList(RepresentationAction.values()));
-
-  private static final Set<RepresentationAction> POSSIBLE_ACTIONS_ON_MULTIPLE_REPRESENTATIONS = new HashSet<>(
-    Arrays.asList(RepresentationAction.CHANGE_TYPE, RepresentationAction.REMOVE, RepresentationAction.NEW_PROCESS,
-      RepresentationAction.IDENTIFY_FORMATS));
-
   public static RepresentationActions get() {
     return GENERAL_INSTANCE;
   }
@@ -65,6 +65,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
     return new RepresentationActions(aipId);
   }
 
+  @Override
   public boolean canAct(Actionable.Action<IndexedRepresentation> action, IndexedRepresentation representation) {
     return POSSIBLE_ACTIONS_ON_SINGLE_REPRESENTATION.contains(action);
   }

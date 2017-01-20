@@ -75,6 +75,7 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
 
       // Construct
       Button button = new Button(text);
+      button.setTitle(text);
 
       // CSS
       button.addStyleName("actions-layout-button");
