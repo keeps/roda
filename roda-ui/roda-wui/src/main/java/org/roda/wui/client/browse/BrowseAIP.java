@@ -36,13 +36,14 @@ import org.roda.wui.client.browse.bundle.DescriptiveMetadataViewBundle;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.actions.DisseminationActions;
 import org.roda.wui.client.common.actions.RepresentationActions;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.SelectAipDialog;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.DIPList;
 import org.roda.wui.client.common.lists.RepresentationList;
-import org.roda.wui.client.common.lists.pagination.ListSelectionState;
+import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchPanel;
@@ -299,17 +300,17 @@ public class BrowseAIP extends Composite {
     // REPRESENTATIONS
     representationsList = new RepresentationList(Filter.NULL, justActive, Facets.NONE, messages.listOfRepresentations(),
       true);
-    ListSelectionState.bindBrowseOpener(representationsList);
+    ListSelectionUtils.bindBrowseOpener(representationsList);
 
     representationsSearch = new SearchPanel(Filter.NULL, RodaConstants.REPRESENTATION_SEARCH, true,
       messages.searchPlaceHolder(), false, false, true);
     representationsSearch.setList(representationsList);
-    
 
     // DISSEMINATIONS
 
     disseminationsList = new DIPList(Filter.NULL, Facets.NONE, messages.listOfDisseminations(), true);
-    ListSelectionState.bindBrowseOpener(disseminationsList);
+    disseminationsList.setActionable(DisseminationActions.get());
+    ListSelectionUtils.bindBrowseOpener(disseminationsList);
 
     disseminationsSearch = new SearchPanel(Filter.NULL, RodaConstants.DIP_SEARCH, true, messages.searchPlaceHolder(),
       false, false, true);
@@ -318,7 +319,7 @@ public class BrowseAIP extends Composite {
     // AIP CHILDREN
 
     aipChildrenList = new AIPList(Filter.NULL, justActive, FACETS, messages.listOfAIPs(), selectable);
-    ListSelectionState.bindBrowseOpener(aipChildrenList);
+    ListSelectionUtils.bindBrowseOpener(aipChildrenList);
 
     aipChildrenList.addCheckboxSelectionListener(new CheckboxSelectionListener<IndexedAIP>() {
 
@@ -365,8 +366,6 @@ public class BrowseAIP extends Composite {
         onPermissionsUpdate(user);
       }
     });
-
-    ListSelectionState.bindLayout(IndexedAIP.class, searchPrevious, searchNext, keyboardFocus, true, false, false);
 
   }
 
@@ -647,7 +646,8 @@ public class BrowseAIP extends Composite {
       searchSection.setVisible(true);
 
       keyboardFocus.setFocus(true);
-      ListSelectionState.updateLayout(IndexedAIP.class, searchPrevious, searchNext);
+
+      ListSelectionUtils.bindLayout(bundle.getAip(), searchPrevious, searchNext, keyboardFocus, true, false, false);
 
     } else {
       viewAction();

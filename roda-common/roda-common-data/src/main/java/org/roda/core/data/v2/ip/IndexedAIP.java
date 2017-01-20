@@ -15,6 +15,8 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.descriptionLevels.DescriptionLevel;
 import org.roda.core.data.v2.index.IsIndexed;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * This class contains the indexed information about an AIP.
  * 
@@ -386,6 +388,7 @@ public class IndexedAIP implements IsIndexed {
       ingestJobId);
   }
 
+  @JsonIgnore
   @Override
   public String getUUID() {
     return getId();

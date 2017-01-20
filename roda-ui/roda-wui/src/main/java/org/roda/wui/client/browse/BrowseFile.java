@@ -22,7 +22,7 @@ import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.lists.pagination.ListSelectionState;
+import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.slider.SliderPanel;
 import org.roda.wui.client.common.slider.Sliders;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
@@ -221,7 +221,7 @@ public class BrowseFile extends Composite {
     keyboardFocus.setFocus(true);
 
     // bind previous and next buttons
-    ListSelectionState.bindLayout(IndexedFile.class, previousButton, nextButton, keyboardFocus, true, false, false);
+    ListSelectionUtils.bindLayout(bundle.getFile(), previousButton, nextButton, keyboardFocus, true, false, false);
 
   }
 

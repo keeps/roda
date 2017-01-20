@@ -28,11 +28,12 @@ import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataViewBundle;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
+import org.roda.wui.client.common.actions.DisseminationActions;
 import org.roda.wui.client.common.actions.FileActions;
 import org.roda.wui.client.common.actions.RepresentationActions;
 import org.roda.wui.client.common.lists.DIPList;
 import org.roda.wui.client.common.lists.SearchFileList;
-import org.roda.wui.client.common.lists.pagination.ListSelectionState;
+import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
@@ -226,14 +227,15 @@ public class BrowseRepresentation extends Composite {
     filesList = new SearchFileList(filter, true, Facets.NONE, summary, selectable, showFilesPath);
     filesList.setActionable(FileActions.get(aipId, repId));
 
-    ListSelectionState.bindBrowseOpener(filesList);
+    ListSelectionUtils.bindBrowseOpener(filesList);
 
     filesSearch = new SearchPanel(filter, ALL_FILTER, true, messages.searchPlaceHolder(), false, false, true);
     filesSearch.setList(filesList);
 
     // DISSEMINATIONS
     disseminationsList = new DIPList(Filter.NULL, Facets.NONE, messages.listOfDisseminations(), true);
-    ListSelectionState.bindBrowseOpener(disseminationsList);
+    disseminationsList.setActionable(DisseminationActions.get());
+    ListSelectionUtils.bindBrowseOpener(disseminationsList);
 
     disseminationsSearch = new SearchPanel(Filter.NULL, RodaConstants.DIP_SEARCH, true, messages.searchPlaceHolder(),
       false, false, true);
@@ -348,8 +350,8 @@ public class BrowseRepresentation extends Composite {
         }
       }));
 
-    ListSelectionState.bindLayout(IndexedRepresentation.class, searchPrevious, searchNext, keyboardFocus, true, false,
-      false, searchSection);
+    ListSelectionUtils.bindLayout(representation, searchPrevious, searchNext, keyboardFocus, true, false, false,
+      searchSection);
   }
 
   @Override

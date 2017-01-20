@@ -117,6 +117,23 @@ public class DisseminationsSliderHelper {
     FocusPanel openFocus = new FocusPanel(leftLayout);
     layout.add(openFocus);
 
+    // options
+    HTML optionsIcon = new HTML(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-ellipsis-v'></i>"));
+    FocusPanel optionsButton = new FocusPanel(optionsIcon);
+
+    optionsButton.addStyleName("lightbtn");
+    optionsIcon.addStyleName("lightbtn-icon");
+    optionsButton.setTitle(messages.browseFileDipDelete());
+
+    optionsButton.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        deleteDissemination(dip, object, disseminationsSliderPanel);
+      }
+    });
+    layout.add(optionsButton);
+
     // delete
     HTML deleteIcon = new HTML(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-ban'></i>"));
     FocusPanel deleteButton = new FocusPanel(deleteIcon);
@@ -132,7 +149,7 @@ public class DisseminationsSliderHelper {
       }
     });
 
-    layout.add(deleteButton);
+    // layout.add(deleteButton);
 
     titleLabel.addStyleName("dipTitle");
     descriptionLabel.addStyleName("dipDescription");

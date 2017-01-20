@@ -31,6 +31,7 @@ import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.lists.pagination.ListSelectionState;
+import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.StringUtils;
@@ -679,7 +680,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     T selectedObject = getSelectionModel().getSelectedObject();
     if (selectedObject != null) {
       int index = getIndexOfVisibleObject(selectedObject);
-      ret = ListSelectionState.create(selectedObject, getFilter(), getJustActive(), getFacets(), getSorter(), index);
+      ret = ListSelectionUtils.create(selectedObject, getFilter(), getJustActive(), getFacets(), getSorter(), index);
     }
     return ret;
   }

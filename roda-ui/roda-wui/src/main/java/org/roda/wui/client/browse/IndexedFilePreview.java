@@ -11,7 +11,7 @@ import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.wui.client.common.actions.FileActions;
 import org.roda.wui.client.common.lists.SearchFileList;
-import org.roda.wui.client.common.lists.pagination.ListSelectionState;
+import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.common.client.tools.RestUtils;
@@ -61,7 +61,7 @@ public class IndexedFilePreview extends BitstreamPreview<IndexedFile> {
     layout.add(fileSearch);
     layout.add(folderList);
 
-    ListSelectionState.bindBrowseOpener(folderList);
+    ListSelectionUtils.bindBrowseOpener(folderList);
 
     return layout;
   }

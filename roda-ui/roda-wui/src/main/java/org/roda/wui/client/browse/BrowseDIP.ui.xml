@@ -83,22 +83,7 @@
 				</g:FlowPanel>
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="viewRepresentationFile-center"
-				ui:field="center">
-				<!-- DIP OPTIONS PANEL -->
-				<s:SliderPanel ui:field="optionsSliderPanel">
-					<s:title>
-						<g:Label>
-							<ui:text from='{messages.catalogueDIPTitle}' />
-						</g:Label>
-					</s:title>
-					<s:content>
-						<g:Button ui:field="downloadButton"
-							addStyleNames="btn btn-block btn-default btn-download">
-							<ui:text from='{messages.viewRepresentationDownloadFileButton}' />
-						</g:Button>
-					</s:content>
-				</s:SliderPanel>
-			</g:FlowPanel>
+				ui:field="center" />
 
 		</g:FlowPanel>
 	</g:FocusPanel>

@@ -10,7 +10,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.wui.client.common.lists.DIPFileList;
-import org.roda.wui.client.common.lists.pagination.ListSelectionState;
+import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.RestUtils;
@@ -69,7 +69,7 @@ public class DipFilePreview extends BitstreamPreview<DIPFile> {
     layout.add(dipFileSearch);
     layout.add(folderList);
 
-    ListSelectionState.bindBrowseOpener(folderList);
+    ListSelectionUtils.bindBrowseOpener(folderList);
 
     return layout;
   }

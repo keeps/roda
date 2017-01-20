@@ -81,7 +81,7 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
       button.setStyleName("actions-layout-button");
       button.addStyleName("btn");
       button.addStyleName("btn-block");
-      button.addStyleName(ActionImpact.DESTROYED.equals(impact) ? "btn-default" : "btn-danger");
+      button.addStyleName(ActionImpact.DESTROYED.equals(impact) ? "btn-danger" : "btn-default");
       button.addStyleDependentName(impact.name().toLowerCase());
 
       for (String extraCssClass : extraCssClasses) {
@@ -115,6 +115,7 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
       button.setStyleName("actions-layout-button");
       button.addStyleName("btn");
       button.addStyleName("btn-block");
+      button.addStyleName(ActionImpact.DESTROYED.equals(impact) ? "btn-danger" : "btn-default");
       button.addStyleDependentName(impact.name().toLowerCase());
 
       for (String extraCssClass : extraCssClasses) {

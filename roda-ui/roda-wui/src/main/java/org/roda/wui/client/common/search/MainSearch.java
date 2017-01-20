@@ -33,7 +33,7 @@ import org.roda.wui.client.common.actions.RepresentationActions;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.RepresentationList;
 import org.roda.wui.client.common.lists.SearchFileList;
-import org.roda.wui.client.common.lists.pagination.ListSelectionState;
+import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.common.client.tools.FacetUtils;
@@ -269,7 +269,7 @@ public class MainSearch extends Composite {
     }
     FacetUtils.bindFacets(itemsSearchResultPanel, facetPanels);
 
-    ListSelectionState.bindBrowseOpener(itemsSearchResultPanel);
+    ListSelectionUtils.bindBrowseOpener(itemsSearchResultPanel);
 
     itemsSearchResultPanel.addCheckboxSelectionListener(new CheckboxSelectionListener<IndexedAIP>() {
 
@@ -291,7 +291,7 @@ public class MainSearch extends Composite {
     }
     FacetUtils.bindFacets(representationsSearchResultPanel, facetPanels);
 
-    ListSelectionState.bindBrowseOpener(representationsSearchResultPanel);
+    ListSelectionUtils.bindBrowseOpener(representationsSearchResultPanel);
 
     representationsSearchResultPanel
       .addCheckboxSelectionListener(new CheckboxSelectionListener<IndexedRepresentation>() {
@@ -317,7 +317,7 @@ public class MainSearch extends Composite {
     }
     FacetUtils.bindFacets(filesSearchResultPanel, facetPanels);
 
-    ListSelectionState.bindBrowseOpener(filesSearchResultPanel);
+    ListSelectionUtils.bindBrowseOpener(filesSearchResultPanel);
 
     filesSearchResultPanel.addCheckboxSelectionListener(new CheckboxSelectionListener<IndexedFile>() {
 

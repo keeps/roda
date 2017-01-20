@@ -30,9 +30,8 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.browse.bundle.DipBundle;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.DIPFileList;
-import org.roda.wui.client.common.lists.pagination.ListSelectionState;
+import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.search.SearchPanel;
-import org.roda.wui.client.common.slider.SliderPanel;
 import org.roda.wui.client.common.slider.Sliders;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
@@ -44,19 +43,13 @@ import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
-import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.LocaleInfo;
-import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
@@ -121,12 +114,6 @@ public class BrowseDIP extends Composite {
   @UiField
   FocusPanel previousButton, nextButton, dipOptionsButton;
 
-  @UiField
-  SliderPanel optionsSliderPanel;
-
-  @UiField
-  Button downloadButton;
-
   private List<DIPFile> dipFileAncestors;
 
   /**
@@ -157,15 +144,15 @@ public class BrowseDIP extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
 
     // TODO set title for previous and next button
-    downloadButton.setTitle(messages.viewRepresentationDownloadFileButton());
-
     HtmlSnippetUtils.setCssClassDisabled(previousButton, true);
     HtmlSnippetUtils.setCssClassDisabled(nextButton, true);
 
     show();
 
     initializeRefererListSelectionState();
-    ListSelectionState.bindLayout(DIPFile.class, previousButton, nextButton, keyboardFocus, true, false, false);
+    if (dipFile != null) {
+      ListSelectionUtils.bindLayout(dipFile, previousButton, nextButton, keyboardFocus, true, false, false);
+    }
 
     keyboardFocus.setFocus(true);
 
@@ -187,8 +174,11 @@ public class BrowseDIP extends Composite {
       refererOptionsButton.setVisible(false);
     }
 
-    optionsSliderPanel.setToggleButton(dipOptionsButton);
-
+    if (dipFile != null) {
+      Sliders.createOptionsSlider(center, dipOptionsButton, dipFile);
+    } else {
+      Sliders.createOptionsSlider(center, dipOptionsButton, dip);
+    }
   }
 
   private void initializeRefererListSelectionState() {
@@ -200,9 +190,8 @@ public class BrowseDIP extends Composite {
       refererTitle.setText(file.isDirectory() ? messages.catalogueFolderTitle() : messages.catalogueFileTitle());
       refererBreadcrumb.updatePath(BreadcrumbUtils.getFileBreadcrumbs(aip, representation, file));
       refererBreadcrumb.setVisible(true);
-      ListSelectionState.bindLayout(IndexedFile.class, refererPreviousButton, refererNextButton, keyboardFocus,
-        requireCtrlModifier, requireShiftModifier, requireAltModifier,
-        new ListSelectionState.ProcessRelativeItem<IndexedFile>() {
+      ListSelectionUtils.bindLayout(file, refererPreviousButton, refererNextButton, keyboardFocus, requireCtrlModifier,
+        requireShiftModifier, requireAltModifier, new ListSelectionUtils.ProcessRelativeItem<IndexedFile>() {
 
           @Override
           public void process(final IndexedFile file) {
@@ -215,9 +204,9 @@ public class BrowseDIP extends Composite {
       refererTitle.setText(messages.catalogueRepresentationTitle());
       refererBreadcrumb.updatePath(BreadcrumbUtils.getRepresentationBreadcrumbs(aip, representation));
       refererBreadcrumb.setVisible(true);
-      ListSelectionState.bindLayout(IndexedRepresentation.class, refererPreviousButton, refererNextButton,
-        keyboardFocus, requireCtrlModifier, requireShiftModifier, requireAltModifier,
-        new ListSelectionState.ProcessRelativeItem<IndexedRepresentation>() {
+      ListSelectionUtils.bindLayout(representation, refererPreviousButton, refererNextButton, keyboardFocus,
+        requireCtrlModifier, requireShiftModifier, requireAltModifier,
+        new ListSelectionUtils.ProcessRelativeItem<IndexedRepresentation>() {
 
           @Override
           public void process(final IndexedRepresentation representation) {
@@ -231,9 +220,8 @@ public class BrowseDIP extends Composite {
       refererTitle.setText(messages.catalogueItemTitle());
       refererBreadcrumb.updatePath(BreadcrumbUtils.getAipBreadcrumbs(aip));
       refererBreadcrumb.setVisible(true);
-      ListSelectionState.bindLayout(IndexedAIP.class, refererPreviousButton, refererNextButton, keyboardFocus,
-        requireCtrlModifier, requireShiftModifier, requireAltModifier,
-        new ListSelectionState.ProcessRelativeItem<IndexedAIP>() {
+      ListSelectionUtils.bindLayout(aip, refererPreviousButton, refererNextButton, keyboardFocus, requireCtrlModifier,
+        requireShiftModifier, requireAltModifier, new ListSelectionUtils.ProcessRelativeItem<IndexedAIP>() {
 
           @Override
           public void process(final IndexedAIP aip) {
@@ -288,7 +276,7 @@ public class BrowseDIP extends Composite {
 
       final DIPFileList dipFileList = new DIPFileList(filter, Facets.NONE, "", false);
       dipFileSearch.setList(dipFileList);
-      ListSelectionState.bindBrowseOpener(dipFileList);
+      ListSelectionUtils.bindBrowseOpener(dipFileList);
 
       FlowPanel layout = new FlowPanel();
       layout.add(dipFileSearch);
@@ -368,23 +356,6 @@ public class BrowseDIP extends Composite {
         }
       });
 
-  }
-
-  @UiHandler("downloadButton")
-  void buttonDownloadFileButtonHandler(ClickEvent e) {
-    download();
-  }
-
-  private void download() {
-    SafeUri downloadUri = null;
-    if (dipFile != null) {
-      downloadUri = RestUtils.createDipFileDownloadUri(dipFile.getUUID());
-    } else {
-      downloadUri = RestUtils.createDipDownloadUri(dip.getUUID());
-    }
-    if (downloadUri != null) {
-      Window.Location.assign(downloadUri.asString());
-    }
   }
 
   private List<BreadcrumbItem> getBreadcrumbs() {

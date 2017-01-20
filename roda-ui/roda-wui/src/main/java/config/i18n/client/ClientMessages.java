@@ -1361,6 +1361,10 @@ public interface ClientMessages extends Messages {
 
   /***** File ****/
 
+  String file();
+  
+  String folder();
+  
   String fileRemoveTitle();
 
   String fileRemoveMessage();
@@ -1370,6 +1374,13 @@ public interface ClientMessages extends Messages {
   String filesRemoveTitle();
 
   String selectedFileRemoveMessage();
+  
+  /***** Dissemination ****/
+  String dissemination();
+  
+  /***** Dissemination File ****/
+  
+  String disseminationFile();
 
   /***** Job processes ****/
 

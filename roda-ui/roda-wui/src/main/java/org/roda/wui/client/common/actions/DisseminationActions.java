@@ -7,8 +7,13 @@ import java.util.Set;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedDIP;
+import org.roda.wui.client.common.actions.Actionable.ActionImpact;
+import org.roda.wui.common.client.tools.RestUtils;
+import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.safehtml.shared.SafeUri;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -79,28 +84,33 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
 
   // ACTIONS
   private void download(IndexedDIP dissemination, AsyncCallback<ActionImpact> callback) {
-    // TODO Auto-generated method stub
+    SafeUri downloadUri = RestUtils.createDipDownloadUri(dissemination.getUUID());
 
+    if (downloadUri != null) {
+      Window.Location.assign(downloadUri.asString());
+    }
+
+    callback.onSuccess(ActionImpact.NONE);
   }
 
   private void remove(IndexedDIP dissemination, AsyncCallback<ActionImpact> callback) {
     // TODO Auto-generated method stub
-
+    Toast.showInfo("Not yet implemented", "The action you have requested has not yet been implemented");
   }
 
   private void remove(SelectedItems<IndexedDIP> selectedItems, AsyncCallback<ActionImpact> callback) {
     // TODO Auto-generated method stub
-
+    Toast.showInfo("Not yet implemented", "The action you have requested has not yet been implemented");
   }
 
   private void newProcess(IndexedDIP dissemination, AsyncCallback<ActionImpact> callback) {
     // TODO Auto-generated method stub
-
+    Toast.showInfo("Not yet implemented", "The action you have requested has not yet been implemented");
   }
 
   private void newProcess(SelectedItems<IndexedDIP> selectedItems, AsyncCallback<ActionImpact> callback) {
     // TODO Auto-generated method stub
-
+    Toast.showInfo("Not yet implemented", "The action you have requested has not yet been implemented");
   }
 
   @Override
