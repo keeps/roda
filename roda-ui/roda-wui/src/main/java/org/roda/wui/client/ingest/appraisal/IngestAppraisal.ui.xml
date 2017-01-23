@@ -66,10 +66,10 @@
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarActionsTitle}' />
 							</g:Label>
-							<g:Button addStyleNames="btn btn-play" ui:field="acceptButton">
+							<g:Button addStyleNames="btn btn-block btn-play" ui:field="acceptButton">
 								<ui:text from='{messages.ingestAppraisalAcceptButton}' />
 							</g:Button>
-							<g:Button addStyleNames="btn btn-ban btn-danger"
+							<g:Button addStyleNames="btn btn-block btn-ban btn-danger"
 								ui:field="rejectButton">
 								<ui:text from='{messages.ingestAppraisalRejectButton}' />
 							</g:Button>

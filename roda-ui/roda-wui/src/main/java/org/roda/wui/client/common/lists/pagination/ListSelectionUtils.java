@@ -39,7 +39,11 @@ import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
+import config.i18n.client.ClientMessages;
+
 public class ListSelectionUtils {
+
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private static final String STORAGE_PREFIX = "ListSelectionState.Clipboard.";
 
@@ -163,7 +167,6 @@ public class ListSelectionUtils {
     @SuppressWarnings("unchecked")
     ListSelectionState<T> last = last((Class<T>) object.getClass());
     if (last != null) {
-
       if (last.getSelected().getUUID().equals(object.getUUID())) {
 
         AsyncCallback<ListSelectionState<T>> callback = new AsyncCallback<ListSelectionState<T>>() {
@@ -171,11 +174,10 @@ public class ListSelectionUtils {
           @Override
           public void onFailure(Throwable caught) {
             if (caught instanceof NotFoundException) {
-              // TODO i18n
               if (relativeIndex > 0) {
-                Toast.showInfo("Cannot jump to next", "Reached the end of the list");
+                Toast.showInfo(messages.cannotJumpToNext(), messages.cannotJumpToNextDescription());
               } else {
-                Toast.showInfo("Cannot jump to previous", "Reached the beggining of the list");
+                Toast.showInfo(messages.cannotJumpToPrevious(), messages.cannotJumpToPreviousDescription());
               }
 
             } else {

@@ -22,10 +22,10 @@
 						<g:Label addStyleNames="h4">
 							<ui:text from='{messages.actions}' />
 						</g:Label>
-						<g:Button addStyleNames="btn btn-play" ui:field="buttonApply">
+						<g:Button addStyleNames="btn btn-block btn-play" ui:field="buttonApply">
 							<ui:text from='{messages.createGroupCreate}' />
 						</g:Button>
-						<g:Button addStyleNames="btn btn-default btn-times-circle"
+						<g:Button addStyleNames="btn btn-block btn-default btn-times-circle"
 							ui:field="buttonCancel">
 							<ui:text from='{messages.createGroupCancel}' />
 						</g:Button>

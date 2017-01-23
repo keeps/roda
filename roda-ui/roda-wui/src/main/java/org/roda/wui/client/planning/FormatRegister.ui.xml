@@ -42,10 +42,10 @@
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarFormatsTitle}' />
 							</g:Label>
-							<g:Button addStyleNames="btn btn-plus" ui:field="buttonAdd">
+							<g:Button addStyleNames="btn btn-block btn-plus" ui:field="buttonAdd">
 								<ui:text from='{messages.newButton}' />
 							</g:Button>
-							<g:Button addStyleNames="btn btn-danger btn-ban"
+							<g:Button addStyleNames="btn btn-block btn-danger btn-ban"
 								ui:field="buttonRemove">
 								<ui:text from='{messages.removeButton}' />
 							</g:Button>
@@ -54,7 +54,7 @@
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarActionsTitle}' />
 							</g:Label>
-							<g:Button addStyleNames="btn btn-play" ui:field="startProcess">
+							<g:Button addStyleNames="btn btn-block btn-play" ui:field="startProcess">
 								<ui:text from='{messages.formatRegisterProcessButton}' />
 							</g:Button>
 						</g:FlowPanel>

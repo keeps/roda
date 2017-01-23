@@ -29,13 +29,13 @@
 						<g:Label addStyleNames="h4">
 							<ui:text from='{messages.sidebarActionsTitle}' />
 						</g:Label>
-						<g:Button addStyleNames="btn btn-play" ui:field="buttonRevert">
+						<g:Button addStyleNames="btn btn-block btn-play" ui:field="buttonRevert">
 							<ui:text from='{messages.revertButton}' />
 						</g:Button>
-						<g:Button addStyleNames="btn btn-ban" ui:field="buttonRemove">
+						<g:Button addStyleNames="btn btn-block btn-ban" ui:field="buttonRemove">
 							<ui:text from='{messages.removeButton}' />
 						</g:Button>
-						<g:Button addStyleNames="btn btn-default btn-times-circle"
+						<g:Button addStyleNames="btn btn-block btn-default btn-times-circle"
 							ui:field="buttonCancel">
 							<ui:text from='{messages.cancelButton}' />
 						</g:Button>

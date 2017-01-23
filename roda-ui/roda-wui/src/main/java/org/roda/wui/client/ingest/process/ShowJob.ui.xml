@@ -123,17 +123,17 @@
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarActionsTitle}' />
 							</g:Label>
-							<g:Button addStyleNames="btn btn-danger btn-stop" ui:field="buttonStop">
+							<g:Button addStyleNames="btn btn-block btn-danger btn-stop" ui:field="buttonStop">
 								<ui:text from='{messages.stopButton}' />
 							</g:Button>
-							<g:Button addStyleNames="btn btn-play" ui:field="buttonAppraisal">
+							<g:Button addStyleNames="btn btn-block btn-play" ui:field="buttonAppraisal">
 								<ui:text from='{messages.sidebarAppraisalTitle}' />
 							</g:Button>
-							<g:Button addStyleNames="btn btn-play"
+							<g:Button addStyleNames="btn btn-block btn-play"
 							ui:field="buttonProcess">
 								<ui:text from='{messages.listButton}' />
 							</g:Button>
-							<g:Button addStyleNames="btn btn-default btn-times-circle"
+							<g:Button addStyleNames="btn btn-block btn-default btn-times-circle"
 								ui:field="buttonBack">
 								<ui:text from='{messages.backButton}' />
 							</g:Button>

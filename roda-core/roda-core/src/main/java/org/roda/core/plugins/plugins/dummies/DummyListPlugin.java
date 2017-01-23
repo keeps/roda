@@ -131,7 +131,7 @@ public class DummyListPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_MISC);
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE);
   }
 
   @Override

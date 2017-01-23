@@ -1362,9 +1362,9 @@ public interface ClientMessages extends Messages {
   /***** File ****/
 
   String file();
-  
+
   String folder();
-  
+
   String fileRemoveTitle();
 
   String fileRemoveMessage();
@@ -1374,12 +1374,12 @@ public interface ClientMessages extends Messages {
   String filesRemoveTitle();
 
   String selectedFileRemoveMessage();
-  
+
   /***** Dissemination ****/
   String dissemination();
-  
+
   /***** Dissemination File ****/
-  
+
   String disseminationFile();
 
   /***** Job processes ****/
@@ -2350,6 +2350,16 @@ public interface ClientMessages extends Messages {
   String editDescriptionMetadataWarning();
 
   String editDescriptiveMetadataFormLabel();
+
+  /********************* SLIDER *************************/
+
+  String cannotJumpToPrevious();
+
+  String cannotJumpToNext();
+
+  String cannotJumpToPreviousDescription();
+
+  String cannotJumpToNextDescription();
 
   /************* TO BE ORGANIZED *************************/
 

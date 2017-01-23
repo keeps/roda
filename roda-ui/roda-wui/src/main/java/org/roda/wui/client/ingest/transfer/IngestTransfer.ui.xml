@@ -46,22 +46,22 @@
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarFoldersFilesTitle}' />
 							</g:Label>
-							<g:Button addStyleNames="btn btn-refresh" ui:field="refresh">
+							<g:Button addStyleNames="btn btn-block btn-refresh" ui:field="refresh">
 								<ui:text from='{messages.refreshButton}' />
 							</g:Button>
-							<g:Button addStyleNames="btn btn-edit" ui:field="rename">
+							<g:Button addStyleNames="btn btn-block btn-edit" ui:field="rename">
 								<ui:text from='{messages.renameButton}' />
 							</g:Button>
-							<g:Button addStyleNames="btn btn-edit" ui:field="move">
+							<g:Button addStyleNames="btn btn-block btn-edit" ui:field="move">
 								<ui:text from='{messages.moveButton}' />
 							</g:Button>
-							<g:Button addStyleNames="btn btn-upload" ui:field="uploadFiles">
+							<g:Button addStyleNames="btn btn-block btn-upload" ui:field="uploadFiles">
 								<ui:text from='{messages.uploadFilesButton}' />
 							</g:Button>
-							<g:Button addStyleNames="btn btn-plus" ui:field="createFolder">
+							<g:Button addStyleNames="btn btn-block btn-plus" ui:field="createFolder">
 								<ui:text from='{messages.createFolderButton}' />
 							</g:Button>
-							<g:Button addStyleNames="btn btn-danger btn-ban"
+							<g:Button addStyleNames="btn btn-block btn-danger btn-ban"
 								ui:field="remove">
 								<ui:text from='{messages.removeWholeFolderButton}' />
 							</g:Button>

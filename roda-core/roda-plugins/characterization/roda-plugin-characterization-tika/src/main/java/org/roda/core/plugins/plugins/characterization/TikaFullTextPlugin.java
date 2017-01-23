@@ -160,7 +160,7 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractAIPCompo
           reportItem.setPluginState(PluginState.SUCCESS);
         } catch (Exception e) {
           outcomeDetailExtension = e.getMessage();
-          LOGGER.error("Error running Tika on AIP {}: {}", aip.getId(), e.getMessage());
+          LOGGER.error("Error running Tika on AIP {}", aip.getId(), e);
           if (reportItem != null) {
             String details = reportItem.getPluginDetails();
             if (details == null) {

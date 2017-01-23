@@ -51,10 +51,10 @@
 							<g:Label addStyleNames="h5">
 								<ui:text from='{messages.sidebarActionsTitle}' />
 							</g:Label>
-							<g:Button addStyleNames="btn btn-plus" ui:field="buttonAddUser">
+							<g:Button addStyleNames="btn btn-block btn-plus" ui:field="buttonAddUser">
 								<ui:text from='{messages.addUserButton}' />
 							</g:Button>
-							<g:Button addStyleNames="btn btn-plus" ui:field="buttonAddGroup">
+							<g:Button addStyleNames="btn btn-block btn-plus" ui:field="buttonAddGroup">
 								<ui:text from='{messages.addGroupButton}' />
 							</g:Button>
 						</g:FlowPanel>

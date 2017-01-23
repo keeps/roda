@@ -12,7 +12,7 @@
 		<relativePath>../..</relativePath>
 	</parent>
 	<properties>
-		<tika.version>1.11</tika.version>
+		<tika.version>1.14</tika.version>
 		<verapdf.version>1.0.2</verapdf.version>
 	</properties>
 	<modules>

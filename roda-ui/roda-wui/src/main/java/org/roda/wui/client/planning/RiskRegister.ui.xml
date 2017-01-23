@@ -32,13 +32,13 @@
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarRisksTitle}' />
 							</g:Label>
-							<g:Button addStyleNames="btn btn-refresh" ui:field="buttonRefresh">
+							<g:Button addStyleNames="btn btn-block btn-refresh" ui:field="buttonRefresh">
 								<ui:text from='{messages.refreshButton}' />
 							</g:Button>
-							<g:Button addStyleNames="btn btn-plus" ui:field="buttonAdd">
+							<g:Button addStyleNames="btn btn-block btn-plus" ui:field="buttonAdd">
 								<ui:text from='{messages.newButton}' />
 							</g:Button>
-							<g:Button addStyleNames="btn btn-danger btn-ban"
+							<g:Button addStyleNames="btn btn-block btn-danger btn-ban"
 								ui:field="buttonRemove">
 								<ui:text from='{messages.removeButton}' />
 							</g:Button>

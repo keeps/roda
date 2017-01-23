@@ -95,7 +95,7 @@
 								<g:Label addStyleNames="h4">
 									<ui:text from='{messages.appraisalTitle}' />
 								</g:Label>
-								<g:Button addStyleNames="btn  btn-block btn-play" ui:field="appraisalAccept">
+								<g:Button addStyleNames="btn btn-block btn-play" ui:field="appraisalAccept">
 									<ui:text from='{messages.appraisalAccept}' />
 								</g:Button>
 								<g:Button addStyleNames="btn  btn-block btn-danger btn-ban"
@@ -107,23 +107,23 @@
 								<g:Label addStyleNames="h4">
 									<ui:text from='{messages.archivalPackageTitle}' />
 								</g:Label>
-								<g:Button addStyleNames="btn  btn-block btn-plus" ui:field="createItem">
+								<g:Button addStyleNames="btn btn-block btn-plus" ui:field="createItem">
 									<ui:text from='{messages.newArchivalPackage}' />
 								</g:Button>
-								<g:Button addStyleNames="btn  btn-block btn-edit" ui:field="moveItem">
+								<g:Button addStyleNames="btn btn-block btn-edit" ui:field="moveItem">
 									<ui:text from='{messages.moveArchivalPackage}' />
 								</g:Button>
-								<g:Button addStyleNames="btn  btn-block btn-edit" ui:field="editPermissions">
+								<g:Button addStyleNames="btn btn-block btn-edit" ui:field="editPermissions">
 									<ui:text from='{messages.archivalPackagePermissions}' />
 								</g:Button>
-								<g:Button addStyleNames="btn  btn-block btn-danger btn-ban"
+								<g:Button addStyleNames="btn btn-block btn-danger btn-ban"
 									ui:field="remove">
 									<ui:text from='{messages.removeArchivalPackage}' />
 								</g:Button>
-								<g:Button addStyleNames="btn  btn-block btn-plus" ui:field="newRepresentation">
+								<g:Button addStyleNames="btn btn-block btn-plus" ui:field="newRepresentation">
 									<ui:text from='{messages.addRepresentation}' />
 								</g:Button>
-								<g:Button addStyleNames="btn  btn-block btn-default btn-download"
+								<g:Button addStyleNames="btn btn-block btn-default btn-download"
 									ui:field="download">
 									<ui:text from='{messages.downloadButton}' />
 								</g:Button>
@@ -132,18 +132,18 @@
 								<g:Label addStyleNames="h4">
 									<ui:text from='{messages.preservationTitle}' />
 								</g:Label>
-								<g:Button addStyleNames="btn  btn-block btn-play" ui:field="newProcess">
+								<g:Button addStyleNames="btn btn-block btn-play" ui:field="newProcess">
 									<ui:text from='{messages.newProcessPreservation}' />
 								</g:Button>
-								<g:Button addStyleNames="btn  btn-block btn-default btn-clock"
+								<g:Button addStyleNames="btn btn-block btn-default btn-clock"
 									ui:field="preservationEvents">
 									<ui:text from='{messages.preservationEvents}' />
 								</g:Button>
-								<g:Button addStyleNames="btn  btn-block btn-default btn-exclamation-triangle"
+								<g:Button addStyleNames="btn btn-block btn-default btn-exclamation-triangle"
 									ui:field="risks">
 									<ui:text from='{messages.preservationRisks}' />
 								</g:Button>
-								<g:Button addStyleNames="btn  btn-block btn-default btn-clock"
+								<g:Button addStyleNames="btn btn-block btn-default btn-clock"
 									ui:field="logs">
 									<ui:text from='{messages.preservationLogs}' />
 								</g:Button>
@@ -152,19 +152,19 @@
 								<g:Label addStyleNames="h4">
 									<ui:text from='{messages.searchTitle}' />
 								</g:Label>
-								<g:Button addStyleNames="btn  btn-block btn-default btn-chevron-left"
+								<g:Button addStyleNames="btn btn-block btn-default btn-chevron-left"
 									ui:field="searchPrevious">
 									<ui:text from='{messages.searchPrevious}' />
 								</g:Button>
-								<g:Button addStyleNames="btn  btn-block btn-default btn-chevron-right"
+								<g:Button addStyleNames="btn btn-block btn-default btn-chevron-right"
 									ui:field="searchNext">
 									<ui:text from='{messages.searchNext}' />
 								</g:Button>
-								<g:Button addStyleNames="btn  btn-block btn-default btn-search"
+								<g:Button addStyleNames="btn btn-block btn-default btn-search"
 									ui:field="searchContext">
 									<ui:text from='{messages.searchContext}' />
 								</g:Button>
-								<g:Button addStyleNames="btn  btn-block btn-default btn-search"
+								<g:Button addStyleNames="btn btn-block btn-default btn-search"
 									ui:field="searchAIP">
 									<ui:text from='{messages.searchAIP}' />
 								</g:Button>
