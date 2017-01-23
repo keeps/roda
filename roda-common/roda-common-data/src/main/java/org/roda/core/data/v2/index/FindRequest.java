@@ -27,8 +27,6 @@ public class FindRequest extends CountRequest {
   public Sublist sublist;
   /** Facets to return. */
   public Facets facets;
-  /** Return only active resources? */
-  public boolean onlyActive;
   /** For CSV results, export only facets? */
   public boolean exportFacets;
   /** The filename for exported CSV. */
@@ -84,11 +82,10 @@ public class FindRequest extends CountRequest {
    */
   public FindRequest(final String classToReturn, final Filter filter, final Sorter sorter, final Sublist sublist,
     final Facets facets, final boolean onlyActive, final boolean exportFacets, final String filename) {
-    super(classToReturn, filter);
+    super(classToReturn, filter, onlyActive);
     this.sorter = sorter;
     this.sublist = sublist;
     this.facets = facets;
-    this.onlyActive = onlyActive;
     this.exportFacets = exportFacets;
     this.filename = filename;
   }

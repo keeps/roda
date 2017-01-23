@@ -20,7 +20,6 @@ import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
-import com.github.nmorel.gwtjackson.client.ObjectMapper;
 import com.github.nmorel.gwtjackson.client.exception.JsonDeserializationException;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.NativeEvent;
@@ -221,21 +220,22 @@ public class ListSelectionUtils {
     if (last != null) {
       if (last.getSelected().getUUID().equals(object.getUUID())) {
 
-        BrowserService.Util.getInstance().count(objectClass.getName(), last.getFilter(), new AsyncCallback<Long>() {
+        BrowserService.Util.getInstance().count(objectClass.getName(), last.getFilter(), last.getJustActive(),
+          new AsyncCallback<Long>() {
 
-          @Override
-          public void onFailure(Throwable caught) {
-            callback.onFailure(caught);
-          }
+            @Override
+            public void onFailure(Throwable caught) {
+              callback.onFailure(caught);
+            }
 
-          @Override
-          public void onSuccess(Long totalCount) {
-            Integer lastIndex = last.getIndex();
-            Boolean hasPrevious = lastIndex > 0;
-            Boolean hasNext = lastIndex < totalCount - 1;
-            callback.onSuccess(Pair.create(hasPrevious, hasNext));
-          }
-        });
+            @Override
+            public void onSuccess(Long totalCount) {
+              Integer lastIndex = last.getIndex();
+              Boolean hasPrevious = lastIndex > 0;
+              Boolean hasNext = lastIndex < totalCount - 1;
+              callback.onSuccess(Pair.create(hasPrevious, hasNext));
+            }
+          });
       } else {
         callback.onSuccess(Pair.create(Boolean.FALSE, Boolean.FALSE));
       }

@@ -304,15 +304,15 @@ public class Browser extends RodaWuiController {
     return result;
   }
 
-  public static <T extends IsIndexed> Long count(final User user, final Class<T> classToReturn, final Filter filter)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
+  public static <T extends IsIndexed> Long count(final User user, final Class<T> classToReturn, final Filter filter,
+    boolean justActive) throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
     controllerAssistant.checkRoles(user, classToReturn);
 
     // delegate
-    final Long count = BrowserHelper.count(classToReturn, filter, user);
+    final Long count = BrowserHelper.count(classToReturn, filter, justActive, user);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_CLASS_PARAM,

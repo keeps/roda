@@ -53,7 +53,7 @@
 
     function inheritDataAttributes(element) {
       var attributes = [
-        "source", "source-class", "source-filters", "source-facets", "source-start", "source-limit", "source-onlyActive",
+        "source", "source-class", "source-filters", "source-facets", "source-start", "source-limit", "source-only-active",
         "view", "view-field", "view-limit", "view-type", "view-filename", "view-type-function",
         "function"
       ];
@@ -89,7 +89,7 @@
       }).join("&");
 
       
-      var onlyActive = $(element).data("source-onlyActive") || "false";
+      var onlyActive = $(element).data("source-only-active") || "false";
       var lang = document.locale;
 
       var url;

@@ -29,8 +29,10 @@ public class ClientSelectedItemsUtils {
       Long size = (long) ((SelectedItemsList<T>) selected).getIds().size();
       callback.onSuccess(size);
     } else if (selected instanceof SelectedItemsFilter) {
-      Filter filter = ((SelectedItemsFilter<T>) selected).getFilter();
-      BrowserService.Util.getInstance().count(classToReturn.getName(), filter, new AsyncCallback<Long>() {
+      SelectedItemsFilter<T> selectedItemsFilter = (SelectedItemsFilter<T>) selected;
+      Filter filter = selectedItemsFilter.getFilter();
+      boolean justActive = selectedItemsFilter.justActive();
+      BrowserService.Util.getInstance().count(classToReturn.getName(), filter, justActive, new AsyncCallback<Long>() {
 
         @Override
         public void onFailure(Throwable caught) {

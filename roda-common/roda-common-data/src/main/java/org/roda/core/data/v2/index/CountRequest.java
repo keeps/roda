@@ -24,12 +24,14 @@ public class CountRequest implements Serializable {
   public String classToReturn;
   /** Filter. */
   public Filter filter;
+  /** Return only active resources? */
+  public boolean onlyActive;
 
   /**
    * Constructor.
    */
   public CountRequest() {
-    this(null, new Filter());
+    this(null, new Filter(), false);
   }
 
   /**
@@ -40,9 +42,10 @@ public class CountRequest implements Serializable {
    * @param filter
    *          Filter.
    */
-  public CountRequest(final String classToReturn, final Filter filter) {
+  public CountRequest(final String classToReturn, final Filter filter, final boolean onlyActive) {
     this.classToReturn = classToReturn;
     this.filter = filter;
+    this.onlyActive = onlyActive;
   }
 
 }

@@ -18,6 +18,7 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
@@ -179,20 +180,22 @@ public class BrowseFile extends Composite {
           public void execute() {
             Filter filter = new Filter(
               new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, bundle.getFile().getUUID()));
-            BrowserService.Util.getInstance().count(IndexedDIP.class.getName(), filter, new AsyncCallback<Long>() {
+            boolean justActive = AIPState.ACTIVE.equals(bundle.getAip().getState());
+            BrowserService.Util.getInstance().count(IndexedDIP.class.getName(), filter, justActive,
+              new AsyncCallback<Long>() {
 
-              @Override
-              public void onFailure(Throwable caught) {
-                AsyncCallbackUtils.defaultFailureTreatment(caught);
-              }
-
-              @Override
-              public void onSuccess(Long dipCount) {
-                if (dipCount > 0) {
-                  disseminationsSlider.open();
+                @Override
+                public void onFailure(Throwable caught) {
+                  AsyncCallbackUtils.defaultFailureTreatment(caught);
                 }
-              }
-            });
+
+                @Override
+                public void onSuccess(Long dipCount) {
+                  if (dipCount > 0) {
+                    disseminationsSlider.open();
+                  }
+                }
+              });
 
           }
         });

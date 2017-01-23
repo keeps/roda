@@ -218,11 +218,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public <T extends IsIndexed> Long count(String classNameToReturn, Filter filter)
+  public <T extends IsIndexed> Long count(String classNameToReturn, Filter filter, boolean justActive)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Class<T> classToReturn = SelectedItemsUtils.parseClass(classNameToReturn);
-    return Browser.count(user, classToReturn, filter);
+    return Browser.count(user, classToReturn, filter, justActive);
   }
 
   @Override

@@ -28,7 +28,6 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -203,7 +202,7 @@ public interface BrowserService extends RemoteService {
     Facets facets, String localeString, boolean justActive)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException;
 
-  <T extends IsIndexed> Long count(String classNameToReturn, Filter filter)
+  <T extends IsIndexed> Long count(String classNameToReturn, Filter filter, boolean justActive)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException;
 
   <T extends IsIndexed> T retrieve(String classNameToReturn, String id)

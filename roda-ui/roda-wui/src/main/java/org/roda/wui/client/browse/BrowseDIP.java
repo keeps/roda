@@ -147,7 +147,7 @@ public class BrowseDIP extends Composite {
     HtmlSnippetUtils.setCssClassDisabled(previousButton, true);
     HtmlSnippetUtils.setCssClassDisabled(nextButton, true);
 
-    show();
+    update();
 
     initializeRefererListSelectionState();
     if (dipFile != null) {
@@ -290,36 +290,6 @@ public class BrowseDIP extends Composite {
     // update breadcrumb
     breadcrumb.updatePath(getBreadcrumbs());
     breadcrumb.setVisible(true);
-
-  }
-
-  private void show() {
-    if (dipFile != null) {
-
-      Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIPFILE_DIP_ID, dip.getId()));
-
-      if (dipFile.getAncestorsPath().isEmpty()) {
-        filter.add(new EmptyKeyFilterParameter(RodaConstants.DIPFILE_PARENT_UUID));
-      } else {
-        String parentId = dipFile.getAncestorsPath().get(dipFile.getAncestorsPath().size() - 1);
-        filter.add(new SimpleFilterParameter(RodaConstants.DIPFILE_PARENT_UUID, parentId));
-      }
-
-      BrowserService.Util.getInstance().count(DIPFile.class.getName(), filter, new AsyncCallback<Long>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
-        }
-
-        @Override
-        public void onSuccess(Long count) {
-          update();
-        }
-      });
-    } else {
-      update();
-    }
 
   }
 

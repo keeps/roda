@@ -273,7 +273,8 @@ public class BrowserHelper {
       siblingFilter.add(new EmptyKeyFilterParameter(RodaConstants.FILE_PARENT_UUID));
     }
 
-    bundle.setTotalSiblingCount(count(IndexedFile.class, siblingFilter, user));
+    boolean justActive = AIPState.ACTIVE.equals(aip.getState());
+    bundle.setTotalSiblingCount(count(IndexedFile.class, siblingFilter, justActive, user));
 
     // Count DIPs
     Filter dipsFilter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, fileUUID));
@@ -529,9 +530,8 @@ public class BrowserHelper {
     return RodaCoreFactory.getIndexService().findAll(returnClass, filter, sorter, sublist, user, justActive, true);
   }
 
-  protected static <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter, User user)
+  protected static <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter, boolean justActive, User user)
     throws GenericException, RequestNotValidException {
-    boolean justActive = false;
     return RodaCoreFactory.getIndexService().count(returnClass, filter, user, justActive);
   }
 
@@ -1914,9 +1914,10 @@ public class BrowserHelper {
     } else if (selected instanceof SelectedItemsFilter) {
       SelectedItemsFilter<T> selectedItemsFilter = (SelectedItemsFilter<T>) selected;
       Filter filter = selectedItemsFilter.getFilter();
-      Long count = count(classToReturn, filter, user);
+      boolean justActive = selectedItemsFilter.justActive();
+      Long count = count(classToReturn, filter, justActive, user);
       IndexResult<T> find = find(classToReturn, filter, Sorter.NONE, new Sublist(0, count.intValue()), Facets.NONE,
-        user, selectedItemsFilter.justActive());
+        user, justActive);
       ret = find.getResults().stream().map(i -> i.getUUID()).collect(Collectors.toList());
     } else {
       throw new RequestNotValidException("Class not supported: " + selected.getClass().getName());
@@ -2385,19 +2386,6 @@ public class BrowserHelper {
       throw new RequestNotValidException("Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT
         + "' value. Expected values: " + Arrays.asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN));
     }
-  }
-
-  public static List<IndexedAIP> matchAIP(Filter filter, User user) throws GenericException, RequestNotValidException {
-    List<IndexedAIP> aips = new ArrayList<IndexedAIP>();
-    long count = count(IndexedAIP.class, filter, user);
-    boolean justActive = true;
-    for (int i = 0; i < count; i += RodaConstants.DEFAULT_PAGINATION_VALUE) {
-      Sorter sorter = new Sorter(new SortParameter(RodaConstants.AIP_ID, true));
-      IndexResult<IndexedAIP> res = find(IndexedAIP.class, filter, sorter,
-        new Sublist(i, RodaConstants.DEFAULT_PAGINATION_VALUE), Facets.NONE, user, justActive);
-      aips.addAll(res.getResults());
-    }
-    return aips;
   }
 
   public static void validateListingParams(String acceptFormat) throws RequestNotValidException {

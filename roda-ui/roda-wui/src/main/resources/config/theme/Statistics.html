@@ -16,7 +16,8 @@
 			<div class="textfill">
 				<span class="statistic" data-source="index"
 					data-source-class="org.roda.core.data.v2.ip.IndexedAIP"
-					data-view="text" data-view-field="totalCount"></span>
+					data-source-only-active="true" data-view="text"
+					data-view-field="totalCount"></span>
 			</div>
 		</div>
 		<div class="col_8 chart_col_card">
@@ -256,7 +257,7 @@
 			<h4>Number of reports</h4>
 			<div class="textfill">
 				<span class="statistic" data-source="index"
-					data-source-class="org.roda.core.data.v2.jobs.Report"
+					data-source-class="org.roda.core.data.v2.jobs.IndexedReport"
 					data-view="text" data-view-field="totalCount"></span>
 			</div>
 		</div>
@@ -264,7 +265,7 @@
 			<h4>Distribution of report plugin (top 5)</h4>
 			<canvas id="process-reports-plugin" class="statistic"
 				data-source="index"
-				data-source-class="org.roda.core.data.v2.jobs.Report"
+				data-source-class="org.roda.core.data.v2.jobs.IndexedReport"
 				data-source-facets="pluginName" data-view="chart"
 				data-source-filters="!plugin=org.roda.core.plugins.plugins.ingest.AutoAcceptSIPPlugin"
 				data-view-field="facetResults" data-view-type="horizontalBar"
@@ -281,7 +282,7 @@
 			<h4>Distribution of report plugin state</h4>
 			<canvas id="process-reports-plugin-state" class="statistic"
 				data-source="index"
-				data-source-class="org.roda.core.data.v2.jobs.Report"
+				data-source-class="org.roda.core.data.v2.jobs.IndexedReport"
 				data-source-facets="pluginState" data-view="chart"
 				data-view-field="facetResults" data-view-type="pie"></canvas>
 			<span class="statistic toolbarLink"

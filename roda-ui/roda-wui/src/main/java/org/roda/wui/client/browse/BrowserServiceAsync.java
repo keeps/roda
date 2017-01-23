@@ -139,7 +139,7 @@ public interface BrowserServiceAsync {
 
   <T extends IsIndexed> void delete(String classNameToReturn, SelectedItems<T> ids, AsyncCallback<Void> callback);
 
-  void count(String classNameToReturn, Filter filter, AsyncCallback<Long> callback);
+  void count(String classNameToReturn, Filter filter, boolean justActive, AsyncCallback<Long> callback);
 
   <T extends IsIndexed> void retrieve(String classNameToReturn, String id, AsyncCallback<T> callback);
 
