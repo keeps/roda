@@ -52,7 +52,8 @@
 					<g:FlowPanel addStyleNames="card descriptiveMetadataCard">
 						<g:TabPanel ui:field="descriptiveMetadata"
 							addStyleNames="browseItemMetadata" />
-						<g:Button addStyleNames="btn  btn-block btn-plus browseNewDescriptiveMetadataButton"
+						<g:Button
+							addStyleNames="btn  btn-block btn-plus browseNewDescriptiveMetadataButton"
 							ui:field="newDescriptiveMetadata">
 							<ui:text from='{messages.newDescriptiveMetadataTitle}' />
 						</g:Button>
@@ -91,63 +92,7 @@
 				<g:FlowPanel addStyleNames="col_2 last sidebar">
 					<g:FlowPanel addStyleNames="sticky-flow">
 						<g:FlowPanel addStyleNames="sticky-padding">
-							<g:FlowPanel ui:field="appraisalSidebar">
-								<g:Label addStyleNames="h4">
-									<ui:text from='{messages.appraisalTitle}' />
-								</g:Label>
-								<g:Button addStyleNames="btn btn-block btn-play" ui:field="appraisalAccept">
-									<ui:text from='{messages.appraisalAccept}' />
-								</g:Button>
-								<g:Button addStyleNames="btn  btn-block btn-danger btn-ban"
-									ui:field="appraisalReject">
-									<ui:text from='{messages.appraisalReject}' />
-								</g:Button>
-							</g:FlowPanel>
-							<g:FlowPanel ui:field="actionsSidebar">
-								<g:Label addStyleNames="h4">
-									<ui:text from='{messages.archivalPackageTitle}' />
-								</g:Label>
-								<g:Button addStyleNames="btn btn-block btn-plus" ui:field="createItem">
-									<ui:text from='{messages.newArchivalPackage}' />
-								</g:Button>
-								<g:Button addStyleNames="btn btn-block btn-edit" ui:field="moveItem">
-									<ui:text from='{messages.moveArchivalPackage}' />
-								</g:Button>
-								<g:Button addStyleNames="btn btn-block btn-edit" ui:field="editPermissions">
-									<ui:text from='{messages.archivalPackagePermissions}' />
-								</g:Button>
-								<g:Button addStyleNames="btn btn-block btn-danger btn-ban"
-									ui:field="remove">
-									<ui:text from='{messages.removeArchivalPackage}' />
-								</g:Button>
-								<g:Button addStyleNames="btn btn-block btn-plus" ui:field="newRepresentation">
-									<ui:text from='{messages.addRepresentation}' />
-								</g:Button>
-								<g:Button addStyleNames="btn btn-block btn-default btn-download"
-									ui:field="download">
-									<ui:text from='{messages.downloadButton}' />
-								</g:Button>
-							</g:FlowPanel>
-							<g:FlowPanel ui:field="preservationSidebar">
-								<g:Label addStyleNames="h4">
-									<ui:text from='{messages.preservationTitle}' />
-								</g:Label>
-								<g:Button addStyleNames="btn btn-block btn-play" ui:field="newProcess">
-									<ui:text from='{messages.newProcessPreservation}' />
-								</g:Button>
-								<g:Button addStyleNames="btn btn-block btn-default btn-clock"
-									ui:field="preservationEvents">
-									<ui:text from='{messages.preservationEvents}' />
-								</g:Button>
-								<g:Button addStyleNames="btn btn-block btn-default btn-exclamation-triangle"
-									ui:field="risks">
-									<ui:text from='{messages.preservationRisks}' />
-								</g:Button>
-								<g:Button addStyleNames="btn btn-block btn-default btn-clock"
-									ui:field="logs">
-									<ui:text from='{messages.preservationLogs}' />
-								</g:Button>
-							</g:FlowPanel>
+							<g:SimplePanel ui:field="actionsSidebar" />
 							<g:FlowPanel ui:field="searchSection">
 								<g:Label addStyleNames="h4">
 									<ui:text from='{messages.searchTitle}' />
