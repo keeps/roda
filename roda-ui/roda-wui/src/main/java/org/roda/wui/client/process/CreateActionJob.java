@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsAll;
@@ -456,29 +455,30 @@ public class CreateActionJob extends Composite {
   @SuppressWarnings({"unchecked", "rawtypes"})
   private void defineTargetInformation(String objectClassName) {
     ListFactory listFactory = new ListFactory();
-    try {
-      isListEmpty = true;
-      BasicAsyncTableCell<?> list = listFactory.getList(objectClassName, "", Filter.ALL, true, 10, 50);
-      SearchPanel searchPanel = new SearchPanel(SearchFilters.defaultFilter(objectClassName),
-        SearchFilters.allFilter(objectClassName), true, "", false, false, true);
-      searchPanel.setList(list);
-      targetListPanel.add(searchPanel);
-      targetListPanel.add(list);
-      targetListPanel.setVisible(true);
-      list.addStyleName("searchResults");
-      this.list = list;
+    isListEmpty = true;
+    BasicAsyncTableCell<?> list = listFactory.getList(objectClassName, "", Filter.ALL, true, 10, 50);
 
-      this.list.addCheckboxSelectionListener(new CheckboxSelectionListener() {
-        @Override
-        public void onSelectionChange(SelectedItems selected) {
-          boolean empty = ClientSelectedItemsUtils.isEmpty(selected);
-          isListEmpty = empty;
-        }
-      });
-
-    } catch (RODAException e) {
+    if (list == null) {
       targetListPanel.setVisible(false);
+      return;
     }
+
+    SearchPanel searchPanel = new SearchPanel(SearchFilters.defaultFilter(objectClassName),
+      SearchFilters.allFilter(objectClassName), true, "", false, false, true);
+    searchPanel.setList(list);
+    targetListPanel.add(searchPanel);
+    targetListPanel.add(list);
+    targetListPanel.setVisible(true);
+    list.addStyleName("searchResults");
+    this.list = list;
+
+    this.list.addCheckboxSelectionListener(new CheckboxSelectionListener() {
+      @Override
+      public void onSelectionChange(SelectedItems selected) {
+        boolean empty = ClientSelectedItemsUtils.isEmpty(selected);
+        isListEmpty = empty;
+      }
+    });
   }
 
   @SuppressWarnings("rawtypes")

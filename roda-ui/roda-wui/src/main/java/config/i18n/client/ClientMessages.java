@@ -112,6 +112,10 @@ public interface ClientMessages extends Messages {
 
   String notificationTitle();
 
+  String showDIPTitle();
+
+  String showDIPFileTitle();
+
   String usersAndGroupsTitle();
 
   String usersAndGroupsSearchPlaceHolder();

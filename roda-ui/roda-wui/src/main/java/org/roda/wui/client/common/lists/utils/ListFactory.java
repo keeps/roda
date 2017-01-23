@@ -7,9 +7,7 @@
  */
 package org.roda.wui.client.common.lists.utils;
 
-import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.formats.Format;
-import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
@@ -53,14 +51,8 @@ public class ListFactory {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  @SuppressWarnings("unchecked")
-  public <T extends IsIndexed> BasicAsyncTableCell<T> getList(Class<T> actualClass, String title, Filter filter,
-    boolean selectable, int pageSize, int incrementPage) throws RODAException {
-    return (BasicAsyncTableCell<T>) getList(actualClass.getName(), title, filter, selectable, pageSize, incrementPage);
-  }
-
   public BasicAsyncTableCell<?> getList(String actualClass, String title, Filter filter, boolean selectable,
-    int pageSize, int incrementPage) throws RODAException {
+    int pageSize, int incrementPage) {
     if (actualClass.equals(AIP.class.getName()) || actualClass.equals(IndexedAIP.class.getName())) {
       return new AIPList(filter, true, null, messages.selectAipSearchResults(), selectable, pageSize, incrementPage);
     } else if (actualClass.equals(Representation.class.getName())
@@ -93,7 +85,7 @@ public class ListFactory {
     } else if (actualClass.equals(DIPFile.class.getName())) {
       return new DIPFileList(filter, null, title, selectable, pageSize, incrementPage);
     } else {
-      throw new RODAException();
+      return null;
     }
   }
 

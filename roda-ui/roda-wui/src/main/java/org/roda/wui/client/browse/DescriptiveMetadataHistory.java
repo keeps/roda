@@ -23,10 +23,10 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.RestErrorOverlayType;
 import org.roda.wui.common.client.tools.RestUtils;
-import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -77,18 +77,18 @@ public class DescriptiveMetadataHistory extends Composite {
           descriptiveMetadataId, LocaleInfo.getCurrentLocale().getLocaleName(),
           new AsyncCallback<DescriptiveMetadataVersionsBundle>() {
 
-          @Override
-          public void onFailure(Throwable caught) {
-            AsyncCallbackUtils.defaultFailureTreatment(caught);
-          }
+            @Override
+            public void onFailure(Throwable caught) {
+              AsyncCallbackUtils.defaultFailureTreatment(caught);
+            }
 
-          @Override
-          public void onSuccess(DescriptiveMetadataVersionsBundle bundle) {
-            DescriptiveMetadataHistory widget = new DescriptiveMetadataHistory(aipId, representationId,
-              descriptiveMetadataId, bundle);
-            callback.onSuccess(widget);
-          }
-        });
+            @Override
+            public void onSuccess(DescriptiveMetadataVersionsBundle bundle) {
+              DescriptiveMetadataHistory widget = new DescriptiveMetadataHistory(aipId, representationId,
+                descriptiveMetadataId, bundle);
+              callback.onSuccess(widget);
+            }
+          });
 
       } else {
         HistoryUtils.newHistory(BrowseAIP.RESOLVER);
