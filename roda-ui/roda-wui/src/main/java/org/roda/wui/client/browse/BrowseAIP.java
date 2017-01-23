@@ -23,50 +23,36 @@ import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
-import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataViewBundle;
-import org.roda.wui.client.common.LastSelectedItemsSingleton;
-import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.actions.Actionable;
+import org.roda.wui.client.common.actions.AipActions;
 import org.roda.wui.client.common.actions.DisseminationActions;
 import org.roda.wui.client.common.actions.RepresentationActions;
-import org.roda.wui.client.common.dialogs.Dialogs;
-import org.roda.wui.client.common.dialogs.SelectAipDialog;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.DIPList;
 import org.roda.wui.client.common.lists.RepresentationList;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
-import org.roda.wui.client.common.lists.utils.AsyncTableCell.CheckboxSelectionListener;
-import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
-import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.ingest.process.ShowJobReport;
 import org.roda.wui.client.ingest.transfer.TransferUpload;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
-import org.roda.wui.client.management.UserLog;
-import org.roda.wui.client.planning.RiskIncidenceRegister;
-import org.roda.wui.client.process.CreateJob;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
-import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.RestErrorOverlayType;
 import org.roda.wui.common.client.tools.RestUtils;
@@ -78,8 +64,6 @@ import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
@@ -87,7 +71,6 @@ import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.i18n.client.LocaleInfo;
-import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -96,7 +79,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.History;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
@@ -151,18 +133,6 @@ public class BrowseAIP extends Composite {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
   private static BrowseAIP instance = null;
-
-  /**
-   * Get the singleton instance
-   * 
-   * @return the instance
-   */
-  public static BrowseAIP getInstance() {
-    if (instance == null) {
-      instance = new BrowseAIP();
-    }
-    return instance;
-  }
 
   private static final Filter COLLECTIONS_FILTER = new Filter(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID));
   private static Facets FACETS = new Facets(new SimpleFacetParameter(RodaConstants.AIP_LEVEL),
@@ -248,28 +218,7 @@ public class BrowseAIP extends Composite {
   // SIDEBAR
 
   @UiField
-  FlowPanel appraisalSidebar;
-
-  @UiField
-  FlowPanel actionsSidebar;
-
-  @UiField
-  Button preservationEvents, risks, logs, newProcess;
-
-  @UiField
-  Button createItem, moveItem, remove, newRepresentation;
-
-  @UiField
-  Button editPermissions;
-
-  @UiField
-  Button download;
-
-  // @UiField
-  // FlowPanel downloadSection;
-
-  // @UiField
-  // Button submission, documentation, schemas;
+  SimplePanel actionsSidebar;
 
   @UiField
   FlowPanel searchSection;
@@ -317,22 +266,8 @@ public class BrowseAIP extends Composite {
     disseminationsSearch.setList(disseminationsList);
 
     // AIP CHILDREN
-
     aipChildrenList = new AIPList(Filter.NULL, justActive, FACETS, messages.listOfAIPs(), selectable);
     ListSelectionUtils.bindBrowseOpener(aipChildrenList);
-
-    aipChildrenList.addCheckboxSelectionListener(new CheckboxSelectionListener<IndexedAIP>() {
-
-      @Override
-      public void onSelectionChange(SelectedItems<IndexedAIP> selected) {
-        if (aipId == null) {
-          boolean empty = ClientSelectedItemsUtils.isEmpty(selected);
-          moveItem.setEnabled(!empty);
-          newProcess.setEnabled(!empty);
-          editPermissions.setEnabled(!empty);
-        }
-      }
-    });
 
     aipChildrenSearch = new SearchPanel(COLLECTIONS_FILTER, RodaConstants.AIP_SEARCH, true,
       messages.searchPlaceHolder(), false, false, true);
@@ -352,21 +287,18 @@ public class BrowseAIP extends Composite {
 
     // HEADER
     browseDescription.add(new HTMLWidgetWrapper("BrowseDescription.html"));
+  }
 
-    // OTHER
-    UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<User>() {
-
-      @Override
-      public void onFailure(Throwable caught) {
-        AsyncCallbackUtils.defaultFailureTreatment(caught);
-      }
-
-      @Override
-      public void onSuccess(User user) {
-        onPermissionsUpdate(user);
-      }
-    });
-
+  /**
+   * Get the singleton instance
+   * 
+   * @return the instance
+   */
+  public static BrowseAIP getInstance() {
+    if (instance == null) {
+      instance = new BrowseAIP();
+    }
+    return instance;
   }
 
   @Override
@@ -375,20 +307,9 @@ public class BrowseAIP extends Composite {
     JavascriptUtils.stickSidebar();
   }
 
-  protected void onPermissionsUpdate(User user) {
-    if (user != null) {
-      logs.setVisible(user.hasRole(RodaConstants.REPOSITORY_PERMISSIONS_LOG_ENTRY_READ));
-      createItem.setVisible(user.hasRole(RodaConstants.REPOSITORY_PERMISSIONS_DESCRIPTIVE_METADATA_UPDATE));
-    } else {
-      logs.setVisible(false);
-      createItem.setVisible(false);
-    }
-
-  }
-
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     clear();
-    if (historyTokens.size() == 0) {
+    if (historyTokens.isEmpty()) {
       viewAction();
       callback.onSuccess(this);
     } else if (historyTokens.size() == 1 && !historyTokens.get(0).equals(EditPermissions.RESOLVER.getHistoryToken())) {
@@ -410,12 +331,12 @@ public class BrowseAIP extends Composite {
     } else if (historyTokens.size() > 1
       && historyTokens.get(0).equals(DescriptiveMetadataHistory.RESOLVER.getHistoryToken())) {
       DescriptiveMetadataHistory.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
-    } else if (historyTokens.size() >= 1 && historyTokens.get(0).equals(EditPermissions.RESOLVER.getHistoryToken())) {
+    } else if (!historyTokens.isEmpty() && historyTokens.get(0).equals(EditPermissions.RESOLVER.getHistoryToken())) {
       EditPermissions.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.size() > 1
       && historyTokens.get(0).equals(BrowseRepresentation.RESOLVER.getHistoryToken())) {
       BrowseRepresentation.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
-    } else if (historyTokens.size() > 0
+    } else if (!historyTokens.isEmpty()
       && historyTokens.get(0).equals(TransferUpload.BROWSE_RESOLVER.getHistoryToken())) {
       TransferUpload.BROWSE_RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else {
@@ -514,22 +435,11 @@ public class BrowseAIP extends Composite {
     aipChildrenList.setVisible(false);
     aipChildrenList.getParent().setVisible(false);
 
-    appraisalSidebar.setVisible(false);
-    newProcess.setEnabled(false);
-    preservationEvents.setVisible(false);
-    risks.setVisible(false);
-    logs.setVisible(false);
     actionsSidebar.setVisible(false);
 
     searchSection.setVisible(false);
 
     // Set button visibility
-    createItem.setVisible(false);
-    moveItem.setVisible(false);
-    editPermissions.setVisible(false);
-    remove.setVisible(false);
-    newRepresentation.setVisible(false);
-
     for (AIPState state : AIPState.values()) {
       this.removeStyleName(state.toString().toLowerCase());
     }
@@ -620,6 +530,7 @@ public class BrowseAIP extends Composite {
         aipChildrenSearch.setDefaultFilter(filter, true);
         aipChildrenSearch.clearSearchInputBox();
         aipChildrenList.set(filter, justActive, FACETS);
+        aipChildrenList.setActionable(AipActions.get(aip.getId(), aip.getState()));
       }
 
       aipChildrenTitle.setVisible(bundle.getChildAIPCount() > 0);
@@ -628,26 +539,28 @@ public class BrowseAIP extends Composite {
       aipChildrenList.getParent().setVisible(bundle.getChildAIPCount() > 0);
 
       // SIDEBAR
-      appraisalSidebar.setVisible(aip.getState().equals(AIPState.UNDER_APPRAISAL));
-      preservationEvents.setVisible(true);
-      risks.setVisible(true);
-      logs.setVisible(true);
       actionsSidebar.setVisible(true);
+      actionsSidebar.setWidget(AipActions.get().createActionsLayout(aip, new AsyncCallback<Actionable.ActionImpact>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
+        }
+
+        @Override
+        public void onSuccess(Actionable.ActionImpact impact) {
+          if (Actionable.ActionImpact.UPDATED.equals(impact)) {
+            // reload
+            clear();
+            viewAction(aipId);
+          }
+        }
+      }));
 
       // Set button visibility
-      createItem.setVisible(true);
-      moveItem.setVisible(true);
-      moveItem.setEnabled(true);
-      newProcess.setEnabled(true);
-      editPermissions.setVisible(true);
-      editPermissions.setEnabled(true);
-      remove.setVisible(true);
-      download.setVisible(true);
-      searchSection.setVisible(true);
-
       keyboardFocus.setFocus(true);
-
-      ListSelectionUtils.bindLayout(bundle.getAip(), searchPrevious, searchNext, keyboardFocus, true, false, false);
+      ListSelectionUtils.bindLayout(bundle.getAip(), searchPrevious, searchNext, keyboardFocus, true, false, false,
+        searchSection);
 
     } else {
       viewAction();
@@ -678,9 +591,9 @@ public class BrowseAIP extends Composite {
           Pair<String, HTML> pair = descriptiveMetadataContainers.get(event.getSelectedItem());
           String descId = pair.getFirst();
           final HTML html = pair.getSecond();
-          final DescriptiveMetadataViewBundle bundle = bundles.get(descId);
+          final DescriptiveMetadataViewBundle descBundle = bundles.get(descId);
           if (html.getText().length() == 0) {
-            getDescriptiveMetadataHTML(aipId, descId, bundle, new AsyncCallback<SafeHtml>() {
+            getDescriptiveMetadataHTML(aipId, descId, descBundle, new AsyncCallback<SafeHtml>() {
 
               @Override
               public void onFailure(Throwable caught) {
@@ -733,7 +646,6 @@ public class BrowseAIP extends Composite {
 
     breadcrumb.updatePath(BreadcrumbUtils.getAipBreadcrumbs(bundle.getAIPAncestors(), aip));
     breadcrumb.setVisible(true);
-    newRepresentation.setVisible(true);
 
     HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(aip.getLevel());
     itemIconHtmlPanel.addStyleName("browseItemIcon-other");
@@ -785,6 +697,7 @@ public class BrowseAIP extends Composite {
 
     aipChildrenSearch.setDefaultFilter(COLLECTIONS_FILTER, true);
     aipChildrenList.set(COLLECTIONS_FILTER, justActive, FACETS);
+    aipChildrenList.setActionable(AipActions.get());
 
     aipChildrenSearch.setVisible(true);
     aipChildrenList.setVisible(true);
@@ -793,18 +706,6 @@ public class BrowseAIP extends Composite {
     actionsSidebar.setVisible(true);
 
     // Set button visibility
-    createItem.setVisible(true);
-    moveItem.setVisible(true);
-    moveItem.setEnabled(false);
-    editPermissions.setVisible(true);
-    editPermissions.setEnabled(false);
-    remove.setVisible(true);
-    newRepresentation.setVisible(false);
-
-    // downloadSection.setVisible(false);
-    download.setVisible(false);
-    newRepresentation.setVisible(false);
-
     searchSection.setVisible(false);
 
     this.removeStyleName("inactive");
@@ -912,11 +813,6 @@ public class BrowseAIP extends Composite {
     }
   }
 
-  @SuppressWarnings("unused")
-  private String getDatesText(IndexedAIP aip) {
-    return Humanize.getDatesText(aip.getDateInitial(), aip.getDateFinal(), true);
-  }
-
   private boolean updateHistory(String id) {
     boolean historyUpdated;
     List<String> path;
@@ -935,200 +831,6 @@ public class BrowseAIP extends Composite {
     return historyUpdated;
   }
 
-  @SuppressWarnings("rawtypes")
-  public SelectedItems getSelected() {
-    return aipChildrenList.getSelected();
-  }
-
-  @UiHandler("preservationEvents")
-  void buttonPreservationEventsHandler(ClickEvent e) {
-    if (aipId != null) {
-      HistoryUtils.newHistory(RESOLVER, PreservationEvents.BROWSE_RESOLVER.getHistoryToken(), aipId);
-    }
-  }
-
-  @UiHandler("createItem")
-  void buttonCreateItemHandler(ClickEvent e) {
-    String aipType = RodaConstants.AIP_TYPE_MIXED;
-    BrowserService.Util.getInstance().createAIP(aipId, aipType, new AsyncCallback<String>() {
-
-      @Override
-      public void onFailure(Throwable caught) {
-        AsyncCallbackUtils.defaultFailureTreatment(caught);
-      }
-
-      @Override
-      public void onSuccess(String itemAIPId) {
-        view(itemAIPId);
-        HistoryUtils.newHistory(CreateDescriptiveMetadata.RESOLVER, "aip", itemAIPId, CreateDescriptiveMetadata.NEW);
-      }
-    });
-  }
-
-  @UiHandler("remove")
-  void buttonRemoveHandler(ClickEvent e) {
-
-    final SelectedItems<IndexedAIP> selected = aipChildrenList.getSelected();
-
-    if (ClientSelectedItemsUtils.isEmpty(selected)) {
-      // Remove the whole folder
-
-      final SelectedItems<IndexedRepresentation> selectedRepresentations = representationsList.getSelected();
-      if (ClientSelectedItemsUtils.isEmpty(selectedRepresentations)) {
-        if (aipId != null) {
-          Dialogs.showConfirmDialog(messages.removeConfirmDialogTitle(), messages.removeAllConfirmDialogMessage(),
-            messages.dialogNo(), messages.dialogYes(), new AsyncCallback<Boolean>() {
-
-              @Override
-              public void onFailure(Throwable caught) {
-                // nothing to do
-              }
-
-              @Override
-              public void onSuccess(Boolean confirmed) {
-                if (confirmed) {
-                  Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
-                    RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(),
-                    new AsyncCallback<String>() {
-
-                      @Override
-                      public void onFailure(Throwable caught) {
-                        // do nothing
-                      }
-
-                      @Override
-                      public void onSuccess(final String details) {
-                        SelectedItemsList<IndexedAIP> selected = new SelectedItemsList<IndexedAIP>(Arrays.asList(aipId),
-                          IndexedAIP.class.getName());
-                        BrowserService.Util.getInstance().deleteAIP(selected, details, new AsyncCallback<String>() {
-
-                          @Override
-                          public void onFailure(Throwable caught) {
-                            AsyncCallbackUtils.defaultFailureTreatment(caught);
-                          }
-
-                          @Override
-                          public void onSuccess(String parentId) {
-                            if (parentId != null) {
-                              HistoryUtils.newHistory(BrowseAIP.RESOLVER, parentId);
-                            } else {
-                              HistoryUtils.newHistory(BrowseAIP.RESOLVER);
-                            }
-                          }
-                        });
-                      }
-                    });
-                }
-              }
-            });
-        } else {
-          Dialogs.showInformationDialog(messages.selectAnItemTitle(), messages.selectAnItemToRemoveDescription(),
-            messages.dialogOk());
-        }
-      } else {
-        Dialogs.showConfirmDialog(messages.removeConfirmDialogTitle(), messages.removeAllSelectedConfirmDialogMessage(),
-          messages.dialogNo(), messages.dialogYes(), new AsyncCallback<Boolean>() {
-
-            @Override
-            public void onFailure(Throwable caught) {
-              // nothing to do
-            }
-
-            @Override
-            public void onSuccess(Boolean confirmed) {
-              if (confirmed) {
-                Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
-                  RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
-
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      // do nothing
-                    }
-
-                    @Override
-                    public void onSuccess(String details) {
-                      BrowserService.Util.getInstance().deleteRepresentation(selectedRepresentations, details,
-                        new AsyncCallback<Void>() {
-
-                          @Override
-                          public void onFailure(Throwable caught) {
-                            AsyncCallbackUtils.defaultFailureTreatment(caught);
-                          }
-
-                          @Override
-                          public void onSuccess(Void nothing) {
-                            representationsList.refresh();
-                          }
-                        });
-                    }
-                  });
-              }
-            }
-          });
-      }
-    } else {
-      // Remove all selected
-
-      ClientSelectedItemsUtils.size(IndexedAIP.class, selected, new AsyncCallback<Long>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
-        }
-
-        @Override
-        public void onSuccess(final Long size) {
-          // TODO update messages
-          Dialogs.showConfirmDialog(messages.removeConfirmDialogTitle(),
-            messages.removeSelectedConfirmDialogMessage(size), messages.dialogNo(), messages.dialogYes(),
-            new AsyncCallback<Boolean>() {
-
-              @Override
-              public void onSuccess(Boolean confirmed) {
-                if (confirmed) {
-                  Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
-                    RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(),
-                    new AsyncCallback<String>() {
-
-                      @Override
-                      public void onFailure(Throwable caught) {
-                        // do nothing
-                      }
-
-                      @Override
-                      public void onSuccess(final String details) {
-                        BrowserService.Util.getInstance().deleteAIP(selected, details,
-                          new LoadingAsyncCallback<String>() {
-
-                            @Override
-                            public void onFailureImpl(Throwable caught) {
-                              AsyncCallbackUtils.defaultFailureTreatment(caught);
-                              aipChildrenList.refresh();
-                            }
-
-                            @Override
-                            public void onSuccessImpl(String parentId) {
-                              Toast.showInfo(messages.removeSuccessTitle(), messages.removeSuccessMessage(size));
-                              aipChildrenList.refresh();
-                            }
-                          });
-                      }
-                    });
-                }
-              }
-
-              @Override
-              public void onFailure(Throwable caught) {
-                AsyncCallbackUtils.defaultFailureTreatment(caught);
-              }
-            });
-        }
-
-      });
-
-    }
-  }
-
   @UiHandler("newDescriptiveMetadata")
   void buttonNewDescriptiveMetadataHandler(ClickEvent e) {
     newDescriptiveMetadataRedirect();
@@ -1141,251 +843,6 @@ public class BrowseAIP extends Composite {
     }
   }
 
-  @UiHandler("moveItem")
-  void buttonMoveItemHandler(ClickEvent e) {
-    final SelectedItems<IndexedAIP> selected = aipChildrenList.getSelected();
-    int counter = 0;
-
-    if (ClientSelectedItemsUtils.isEmpty(selected)) {
-      // Move this item
-
-      if (aipId != null && bundle != null) {
-        Filter filter = new Filter(new NotSimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aipId),
-          new NotSimpleFilterParameter(RodaConstants.AIP_ID, aipId));
-        SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle(), filter, justActive, false);
-        if (bundle.getAip().getParentID() != null) {
-          selectAipDialog.setEmptyParentButtonVisible(true);
-        }
-        selectAipDialog.setSingleSelectionMode();
-        selectAipDialog.showAndCenter();
-        selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {
-
-          @Override
-          public void onValueChange(ValueChangeEvent<IndexedAIP> event) {
-            final IndexedAIP parentAIP = event.getValue();
-            final String parentId = (parentAIP != null) ? parentAIP.getId() : null;
-            final SelectedItemsList<IndexedAIP> selected = new SelectedItemsList<IndexedAIP>(Arrays.asList(aipId),
-              IndexedAIP.class.getName());
-
-            Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
-              RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
-
-                @Override
-                public void onFailure(Throwable caught) {
-                  // do nothing
-                }
-
-                @Override
-                public void onSuccess(String details) {
-                  BrowserService.Util.getInstance().moveAIPInHierarchy(selected, parentId, details,
-                    new AsyncCallback<IndexedAIP>() {
-
-                      @Override
-                      public void onSuccess(IndexedAIP result) {
-                        if (result != null) {
-                          HistoryUtils.newHistory(BrowseAIP.RESOLVER, result.getId());
-                        } else {
-                          HistoryUtils.newHistory(BrowseAIP.RESOLVER);
-                        }
-                      }
-
-                      @Override
-                      public void onFailure(Throwable caught) {
-                        if (caught instanceof NotFoundException) {
-                          Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-                        } else {
-                          AsyncCallbackUtils.defaultFailureTreatment(caught);
-                        }
-                      }
-                    });
-                }
-              });
-          }
-        });
-      } else {
-        Dialogs.showInformationDialog(messages.selectAnItemTitle(), messages.selectAnItemToMoveDescription(),
-          messages.dialogOk());
-      }
-    } else {
-      // Move all selected
-      Filter filter = new Filter();
-      boolean showEmptyParentButton;
-
-      if (aipId != null) {
-        filter.add(new NotSimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aipId));
-        filter.add(new NotSimpleFilterParameter(RodaConstants.AIP_ID, aipId));
-        showEmptyParentButton = true;
-      } else {
-        if (selected instanceof SelectedItemsList) {
-          SelectedItemsList<IndexedAIP> list = (SelectedItemsList<IndexedAIP>) selected;
-          counter = list.getIds().size();
-          if (counter <= RodaConstants.DIALOG_FILTER_LIMIT_NUMBER) {
-            for (String id : list.getIds()) {
-              filter.add(new NotSimpleFilterParameter(RodaConstants.AIP_ANCESTORS, id));
-              filter.add(new NotSimpleFilterParameter(RodaConstants.AIP_ID, id));
-            }
-          }
-        } else {
-          filter = Filter.ALL;
-        }
-        showEmptyParentButton = false;
-      }
-
-      SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle(), filter, justActive, true);
-      selectAipDialog.setEmptyParentButtonVisible(showEmptyParentButton);
-      selectAipDialog.showAndCenter();
-      if (counter > 0 && counter <= RodaConstants.DIALOG_FILTER_LIMIT_NUMBER) {
-        selectAipDialog.addStyleName("object-dialog");
-      }
-      selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {
-
-        @Override
-        public void onValueChange(ValueChangeEvent<IndexedAIP> event) {
-          final IndexedAIP parentAIP = event.getValue();
-          final String parentId = (parentAIP != null) ? parentAIP.getId() : null;
-
-          Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
-            RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
-
-              @Override
-              public void onFailure(Throwable caught) {
-                // do nothing
-              }
-
-              @Override
-              public void onSuccess(String details) {
-                BrowserService.Util.getInstance().moveAIPInHierarchy(selected, parentId, details,
-                  new LoadingAsyncCallback<IndexedAIP>() {
-
-                    @Override
-                    public void onSuccessImpl(IndexedAIP result) {
-                      if (result != null) {
-                        HistoryUtils.newHistory(BrowseAIP.RESOLVER, result.getId());
-                      } else {
-                        HistoryUtils.newHistory(BrowseAIP.RESOLVER);
-                      }
-                    }
-
-                    @Override
-                    public void onFailureImpl(Throwable caught) {
-                      if (caught instanceof NotFoundException) {
-                        Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-                      } else {
-                        AsyncCallbackUtils.defaultFailureTreatment(caught);
-                      }
-                    }
-                  });
-              }
-            });
-        }
-      });
-
-    }
-  }
-
-  @UiHandler("newProcess")
-  void buttonNewProcessHandler(ClickEvent e) {
-    LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
-    final SelectedItems<IndexedAIP> selectedSubs = aipChildrenList.getSelected();
-
-    if (ClientSelectedItemsUtils.isEmpty(selectedSubs)) {
-      final SelectedItems<IndexedRepresentation> selectedReps = representationsList.getSelected();
-      if (ClientSelectedItemsUtils.isEmpty(selectedReps)) {
-        if (aipId != null) {
-          selectedItems.setSelectedItems(SelectedItemsList.create(IndexedAIP.class, aipId));
-        }
-      } else {
-        selectedItems.setSelectedItems(selectedReps);
-      }
-    } else {
-      selectedItems.setSelectedItems(selectedSubs);
-    }
-
-    selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
-    HistoryUtils.newHistory(CreateJob.RESOLVER, "action");
-  }
-
-  @UiHandler("editPermissions")
-  void buttonEditPermissionsHandler(ClickEvent e) {
-    final SelectedItems<IndexedAIP> selected = aipChildrenList.getSelected();
-
-    if (ClientSelectedItemsUtils.isEmpty(selected)) {
-      if (aipId != null) {
-        HistoryUtils.newHistory(RESOLVER, EditPermissions.RESOLVER.getHistoryToken(), aipId);
-      }
-    } else {
-      LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
-      selectedItems.setSelectedItems(selected);
-      HistoryUtils.newHistory(RESOLVER, EditPermissions.RESOLVER.getHistoryToken());
-    }
-  }
-
-  @UiHandler("risks")
-  void buttonRisksHandler(ClickEvent e) {
-    if (aipId != null) {
-      HistoryUtils.newHistory(RiskIncidenceRegister.RESOLVER, aipId);
-    }
-  }
-
-  @UiHandler("logs")
-  void buttonLogsHandler(ClickEvent e) {
-    if (aipId != null) {
-      HistoryUtils.newHistory(UserLog.RESOLVER, aipId);
-    }
-  }
-
-  @UiHandler("download")
-  void downloadButtonHandler(ClickEvent e) {
-    SafeUri downloadUri = null;
-    downloadUri = RestUtils.createAIPDownloadUri(aipId);
-    Window.Location.assign(downloadUri.asString());
-  }
-
-  @UiHandler("appraisalAccept")
-  void appraisalAcceptHandler(ClickEvent e) {
-    final boolean accept = true;
-    final SelectedItems<IndexedAIP> selected = SelectedItemsList.create(IndexedAIP.class, aipId);
-    String rejectReason = null;
-    BrowserService.Util.getInstance().appraisal(selected, accept, rejectReason,
-      LocaleInfo.getCurrentLocale().getLocaleName(), new LoadingAsyncCallback<Void>() {
-
-        @Override
-        public void onSuccessImpl(Void result) {
-          Toast.showInfo(messages.dialogDone(), messages.itemWasAccepted());
-          // reload
-          clear();
-          viewAction(aipId);
-        }
-      });
-  }
-
-  @UiHandler("appraisalReject")
-  void appraisalRejectHandler(ClickEvent e) {
-    final boolean accept = false;
-    final SelectedItems<IndexedAIP> selected = SelectedItemsList.create(IndexedAIP.class, aipId);
-    Dialogs.showPromptDialog(messages.rejectMessage(), messages.rejectQuestion(), null, RegExp.compile(".+"),
-      messages.dialogCancel(), messages.dialogOk(), new AsyncCallback<String>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          // nothing to do
-        }
-
-        @Override
-        public void onSuccess(final String rejectReason) {
-          BrowserService.Util.getInstance().appraisal(selected, accept, rejectReason,
-            LocaleInfo.getCurrentLocale().getLocaleName(), new LoadingAsyncCallback<Void>() {
-
-              @Override
-              public void onSuccessImpl(Void result) {
-                Toast.showInfo(messages.dialogDone(), messages.itemWasRejected());
-                HistoryUtils.newHistory(IngestAppraisal.RESOLVER);
-              }
-            });
-        }
-      });
-  }
-
   @UiHandler("searchContext")
   void searchContextHandler(ClickEvent e) {
     HistoryUtils.newHistory(Search.RESOLVER, RodaConstants.SEARCH_ITEMS, RodaConstants.AIP_ANCESTORS, aipId);
@@ -1396,26 +853,4 @@ public class BrowseAIP extends Composite {
     HistoryUtils.newHistory(Search.RESOLVER, RodaConstants.SEARCH_REPRESENTATIONS, RodaConstants.AIP_AIP_ID, aipId);
   }
 
-  @UiHandler("newRepresentation")
-  void createRepresentationHandler(ClickEvent e) {
-    Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
-      RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          // do nothing
-        }
-
-        @Override
-        public void onSuccess(String details) {
-          BrowserService.Util.getInstance().createRepresentation(aipId, details, new LoadingAsyncCallback<String>() {
-
-            @Override
-            public void onSuccessImpl(String representationId) {
-              HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
-            }
-          });
-        }
-      });
-  }
 }

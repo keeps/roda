@@ -28,6 +28,7 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.wui.client.common.actions.AipActions;
 import org.roda.wui.client.common.actions.FileActions;
 import org.roda.wui.client.common.actions.RepresentationActions;
 import org.roda.wui.client.common.lists.AIPList;
@@ -270,6 +271,8 @@ public class MainSearch extends Composite {
     FacetUtils.bindFacets(itemsSearchResultPanel, facetPanels);
 
     ListSelectionUtils.bindBrowseOpener(itemsSearchResultPanel);
+
+    itemsSearchResultPanel.setActionable(AipActions.get());
 
     itemsSearchResultPanel.addCheckboxSelectionListener(new CheckboxSelectionListener<IndexedAIP>() {
 
