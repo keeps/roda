@@ -50,6 +50,7 @@ import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
@@ -871,10 +872,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void deleteDIP(String dipId)
+  public void deleteDIPs(SelectedItems<IndexedDIP> dips)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.deleteDIP(user, dipId);
+    Browser.deleteDIPs(user, dips);
   }
 
   @Override

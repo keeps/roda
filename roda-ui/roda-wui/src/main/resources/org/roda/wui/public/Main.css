@@ -870,10 +870,18 @@ pre code {
 	cursor: hand;
 	display: inline-block;
 	opacity: 0.5;
+	width: 2rem;
+    height: 2rem;
+    line-height: 2rem;
+    font-size: 1.4rem;
+    text-align: center;
+    transition: all 0.2s;
 }
 
 .lightbtn:HOVER {
 	opacity: 1;
+	background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
 }
 
 .lightbtn-icon {
@@ -4109,7 +4117,7 @@ td.datePickerMonth, td.datePickerYear {
 	margin-right: 20px;
 }
 
-.viewRepresentationFile .dip-delete {
+.viewRepresentationFile .dip-options {
 	position: absolute;
 	top: 0;
 	right: 0;
@@ -5778,17 +5786,29 @@ td.datePickerMonth, td.datePickerYear {
     width: 180px;
 	padding: 10px;
 	box-shadow: 0 0px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+	z-index: 2;
 }
 
-.actions-popup::before {
+.actions-popup-bottom_right::before {
 	content: "";
 	width: 0px;
 	height: 0px;
     border: 8px solid transparent;
     position: absolute;
-    right: 16px;
+    right: 8px;
     bottom: -16px;
     border-top: 8px solid #089DE3;
+}
+
+.actions-popup-top_right::before {
+	content: "";
+	width: 0px;
+	height: 0px;
+    border: 8px solid transparent;
+    position: absolute;
+    right: 8px;
+    top: -16px;
+    border-bottom: 8px solid #089DE3;
 }
 
 .actions-popup .actions-layout-title {

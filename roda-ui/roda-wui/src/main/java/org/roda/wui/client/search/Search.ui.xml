@@ -52,17 +52,17 @@
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarActionsTitle}' />
 							</g:Label>
-							<g:Button addStyleNames="btn btn-edit" ui:field="editPermissions">
+							<g:Button addStyleNames="btn btn-block btn-edit" ui:field="editPermissions">
 								<ui:text from='{messages.archivalPackagePermissions}' />
 							</g:Button>
-							<g:Button addStyleNames="btn btn-edit" ui:field="moveItem">
+							<g:Button addStyleNames="btn btn-block btn-edit" ui:field="moveItem">
 								<ui:text from='{messages.moveArchivalPackage}' />
 							</g:Button>
-							<g:Button addStyleNames="btn btn-danger btn-ban"
+							<g:Button addStyleNames="btn btn-block btn-danger btn-ban"
 								ui:field="remove">
 								<ui:text from='{messages.removeArchivalPackage}' />
 							</g:Button>
-							<g:Button addStyleNames="btn btn-play" ui:field="newJobButton">
+							<g:Button addStyleNames="btn btn-block btn-play" ui:field="newJobButton">
 								<ui:text from='{messages.newProcessPreservation}' />
 							</g:Button>
 						</g:FlowPanel>

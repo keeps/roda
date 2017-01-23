@@ -7,9 +7,12 @@ import java.util.Set;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedDIP;
-import org.roda.wui.client.common.actions.Actionable.ActionImpact;
+import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.LastSelectedItemsSingleton;
+import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.process.CreateJob;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.RestUtils;
-import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeUri;
@@ -94,23 +97,49 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
   }
 
   private void remove(IndexedDIP dissemination, AsyncCallback<ActionImpact> callback) {
-    // TODO Auto-generated method stub
-    Toast.showInfo("Not yet implemented", "The action you have requested has not yet been implemented");
+    remove(objectToSelectedItems(dissemination), callback);
   }
 
-  private void remove(SelectedItems<IndexedDIP> selectedItems, AsyncCallback<ActionImpact> callback) {
-    // TODO Auto-generated method stub
-    Toast.showInfo("Not yet implemented", "The action you have requested has not yet been implemented");
+  private void remove(final SelectedItems<IndexedDIP> selectedItems, final AsyncCallback<ActionImpact> callback) {
+    Dialogs.showConfirmDialog(messages.browseFileDipRepresentationConfirmTitle(),
+      messages.browseFileDipRepresentationConfirmMessage(), messages.dialogCancel(), messages.dialogYes(),
+      new AsyncCallback<Boolean>() {
+
+        @Override
+        public void onSuccess(Boolean confirmed) {
+          if (confirmed) {
+            BrowserService.Util.getInstance().deleteDIPs(selectedItems, new AsyncCallback<Void>() {
+
+              @Override
+              public void onFailure(Throwable caught) {
+                callback.onFailure(caught);
+              }
+
+              @Override
+              public void onSuccess(Void result) {
+                callback.onSuccess(ActionImpact.DESTROYED);
+              }
+            });
+          }
+        }
+
+        @Override
+        public void onFailure(Throwable caught) {
+          // nothing to do
+        }
+      });
   }
 
   private void newProcess(IndexedDIP dissemination, AsyncCallback<ActionImpact> callback) {
-    // TODO Auto-generated method stub
-    Toast.showInfo("Not yet implemented", "The action you have requested has not yet been implemented");
+    newProcess(objectToSelectedItems(dissemination), callback);
   }
 
-  private void newProcess(SelectedItems<IndexedDIP> selectedItems, AsyncCallback<ActionImpact> callback) {
-    // TODO Auto-generated method stub
-    Toast.showInfo("Not yet implemented", "The action you have requested has not yet been implemented");
+  private void newProcess(SelectedItems<IndexedDIP> selected, AsyncCallback<ActionImpact> callback) {
+    LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
+    selectedItems.setSelectedItems(selected);
+    selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
+    HistoryUtils.newHistory(CreateJob.RESOLVER, "action");
+    callback.onSuccess(ActionImpact.UPDATED);
   }
 
   @Override
@@ -118,7 +147,8 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
     FlowPanel layout = createLayout();
 
     // MANAGEMENT
-    addTitle(layout, messages.viewRepresentationFileDisseminationTitle());
+    addTitle(layout, messages.viewRepresentationFileDisseminationTitle(), dissemination, DisseminationAction.DOWNLOAD,
+      DisseminationAction.REMOVE);
 
     // DOWNLOAD,REMOVE
     addButton(layout, messages.downloadButton(), DisseminationAction.DOWNLOAD, dissemination, ActionImpact.NONE,
@@ -128,7 +158,7 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
       callback, "btn-ban");
 
     // PRESERVATION
-    addTitle(layout, messages.preservationTitle());
+    addTitle(layout, messages.preservationTitle(), dissemination, DisseminationAction.NEW_PROCESS);
 
     // NEW_PROCESS
 
@@ -143,7 +173,8 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
     FlowPanel layout = createLayout();
 
     // MANAGEMENT
-    addTitle(layout, messages.viewRepresentationFileDisseminationTitle());
+    addTitle(layout, messages.viewRepresentationFileDisseminationTitle(), disseminations, DisseminationAction.DOWNLOAD,
+      DisseminationAction.REMOVE);
 
     // DOWNLOAD,REMOVE
     addButton(layout, messages.downloadButton(), DisseminationAction.DOWNLOAD, disseminations, ActionImpact.NONE,
@@ -153,7 +184,7 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
       callback, "btn-ban");
 
     // PRESERVATION
-    addTitle(layout, messages.preservationTitle());
+    addTitle(layout, messages.preservationTitle(), disseminations, DisseminationAction.NEW_PROCESS);
 
     // NEW_PROCESS
 

@@ -16,7 +16,10 @@ import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.common.actions.Actionable;
+import org.roda.wui.client.common.actions.DisseminationActions;
+import org.roda.wui.client.common.popup.CalloutPopup;
+import org.roda.wui.client.common.popup.CalloutPopup.CalloutPosition;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -33,6 +36,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.UIObject;
 
 import config.i18n.client.ClientMessages;
 
@@ -119,7 +123,7 @@ public class DisseminationsSliderHelper {
 
     // options
     HTML optionsIcon = new HTML(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-ellipsis-v'></i>"));
-    FocusPanel optionsButton = new FocusPanel(optionsIcon);
+    final FocusPanel optionsButton = new FocusPanel(optionsIcon);
 
     optionsButton.addStyleName("lightbtn");
     optionsIcon.addStyleName("lightbtn-icon");
@@ -129,34 +133,17 @@ public class DisseminationsSliderHelper {
 
       @Override
       public void onClick(ClickEvent event) {
-        deleteDissemination(dip, object, disseminationsSliderPanel);
+        showActions(dip, optionsButton);
       }
     });
     layout.add(optionsButton);
-
-    // delete
-    HTML deleteIcon = new HTML(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-ban'></i>"));
-    FocusPanel deleteButton = new FocusPanel(deleteIcon);
-    deleteButton.addStyleName("lightbtn");
-    deleteIcon.addStyleName("lightbtn-icon");
-    deleteButton.setTitle(messages.browseFileDipDelete());
-
-    deleteButton.addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        deleteDissemination(dip, object, disseminationsSliderPanel);
-      }
-    });
-
-    // layout.add(deleteButton);
 
     titleLabel.addStyleName("dipTitle");
     descriptionLabel.addStyleName("dipDescription");
     layout.addStyleName("dip");
     leftLayout.addStyleName("dip-left");
     openFocus.addStyleName("dip-focus");
-    deleteButton.addStyleName("dip-delete");
+    optionsButton.addStyleName("dip-options");
 
     openFocus.addClickHandler(new ClickHandler() {
 
@@ -187,33 +174,34 @@ public class DisseminationsSliderHelper {
     }
   }
 
-  private static <T extends IsIndexed> void deleteDissemination(final IndexedDIP dip, final T object,
-    final SliderPanel disseminationsSliderPanel) {
-    Dialogs.showConfirmDialog(messages.browseFileDipRepresentationConfirmTitle(),
-      messages.browseFileDipRepresentationConfirmMessage(), messages.dialogCancel(), messages.dialogYes(),
-      new AsyncCallback<Boolean>() {
+  protected static void showActions(final IndexedDIP dip, final UIObject actionsButton) {
+    final CalloutPopup actionsPopup = new CalloutPopup();
 
-        @Override
-        public void onSuccess(Boolean confirmed) {
-          if (confirmed) {
-            BrowserService.Util.getInstance().deleteDIP(dip.getId(), new AsyncCallback<Void>() {
-              @Override
-              public void onSuccess(Void result) {
-                updateDisseminationsObjectSliderPanel(object, disseminationsSliderPanel);
-              }
-
-              @Override
-              public void onFailure(Throwable caught) {
-                AsyncCallbackUtils.defaultFailureTreatment(caught);
-              }
-            });
-          }
-        }
+    if (actionsPopup.isShowing()) {
+      actionsPopup.hide();
+    } else {
+      AsyncCallback<Actionable.ActionImpact> callback = new AsyncCallback<Actionable.ActionImpact>() {
 
         @Override
         public void onFailure(Throwable caught) {
-          // nothing to do
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
         }
-      });
+
+        @Override
+        public void onSuccess(Actionable.ActionImpact impact) {
+          if (!Actionable.ActionImpact.NONE.equals(impact)) {
+            // update();
+          }
+          actionsPopup.hide();
+        }
+      };
+
+      actionsPopup.setWidget(DisseminationActions.get().createActionsLayout(dip, callback));
+
+      actionsPopup.showRelativeTo(actionsButton, CalloutPosition.TOP_RIGHT);
+
+    }
+
   }
+
 }

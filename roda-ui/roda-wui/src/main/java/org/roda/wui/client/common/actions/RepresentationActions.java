@@ -352,9 +352,9 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
     FlowPanel layout = createLayout();
 
     // MANAGEMENT
-    addTitle(layout, messages.representation());
+    addTitle(layout, messages.representation(), representation, RepresentationAction.DOWNLOAD,
+      RepresentationAction.CHANGE_TYPE, RepresentationAction.REMOVE);
 
-    // DOWNLOAD, RENAME, MOVE, REMOVE, UPLOAD_FILES, CREATE_FOLDER
     addButton(layout, messages.downloadButton(), RepresentationAction.DOWNLOAD, representation, ActionImpact.NONE,
       callback, "btn-download");
 
@@ -364,9 +364,8 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
       callback, "btn-ban");
 
     // PRESERVATION
-    addTitle(layout, messages.preservationTitle());
-
-    // NEW_PROCESS, IDENTIFY_FORMATS, SHOW_EVENTS, SHOW_RISKS
+    addTitle(layout, messages.preservationTitle(), representation, RepresentationAction.NEW_PROCESS,
+      RepresentationAction.IDENTIFY_FORMATS, RepresentationAction.SHOW_EVENTS, RepresentationAction.SHOW_RISKS);
 
     addButton(layout, messages.newProcessPreservation(), RepresentationAction.NEW_PROCESS, representation,
       ActionImpact.UPDATED, callback, "btn-play");
@@ -378,7 +377,8 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
       callback, "btn-play");
 
     // Files and folders
-    addTitle(layout, messages.sidebarFoldersFilesTitle());
+    addTitle(layout, messages.sidebarFoldersFilesTitle(), representation, RepresentationAction.UPLOAD_FILES,
+      RepresentationAction.CREATE_FOLDER);
 
     // UPLOAD_FILES, CREATE_FOLDER
     addButton(layout, messages.uploadFilesButton(), RepresentationAction.UPLOAD_FILES, representation,
@@ -395,9 +395,9 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
     FlowPanel layout = createLayout();
 
     // MANAGEMENT
-    addTitle(layout, messages.representation());
+    addTitle(layout, messages.representation(), representations, RepresentationAction.DOWNLOAD,
+      RepresentationAction.CHANGE_TYPE, RepresentationAction.REMOVE);
 
-    // DOWNLOAD, RENAME, MOVE, REMOVE, UPLOAD_FILES, CREATE_FOLDER
     addButton(layout, messages.downloadButton(), RepresentationAction.DOWNLOAD, representations, ActionImpact.NONE,
       callback, "btn-download");
 
@@ -407,9 +407,8 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
       callback, "btn-ban");
 
     // PRESERVATION
-    addTitle(layout, messages.preservationTitle());
-
-    // NEW_PROCESS, IDENTIFY_FORMATS, SHOW_EVENTS, SHOW_RISKS
+    addTitle(layout, messages.preservationTitle(), representations, RepresentationAction.NEW_PROCESS,
+      RepresentationAction.IDENTIFY_FORMATS, RepresentationAction.SHOW_EVENTS, RepresentationAction.SHOW_RISKS);
 
     addButton(layout, messages.newProcessPreservation(), RepresentationAction.NEW_PROCESS, representations,
       ActionImpact.UPDATED, callback, "btn-play");
@@ -421,7 +420,8 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
       callback, "btn-play");
 
     // Files and folders
-    addTitle(layout, messages.sidebarFoldersFilesTitle());
+    addTitle(layout, messages.sidebarFoldersFilesTitle(), representations, RepresentationAction.UPLOAD_FILES,
+      RepresentationAction.CREATE_FOLDER);
 
     // UPLOAD_FILES, CREATE_FOLDER
     addButton(layout, messages.uploadFilesButton(), RepresentationAction.UPLOAD_FILES, representations,

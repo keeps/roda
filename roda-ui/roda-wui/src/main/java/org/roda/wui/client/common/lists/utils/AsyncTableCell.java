@@ -32,6 +32,8 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.lists.pagination.ListSelectionState;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
+import org.roda.wui.client.common.popup.CalloutPopup;
+import org.roda.wui.client.common.popup.CalloutPopup.CalloutPosition;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.StringUtils;
@@ -73,8 +75,6 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.PopupPanel;
-import com.google.gwt.user.client.ui.PopupPanel.PositionCallback;
 import com.google.gwt.view.client.CellPreviewEvent;
 import com.google.gwt.view.client.CellPreviewEvent.Handler;
 import com.google.gwt.view.client.DefaultSelectionEventManager;
@@ -127,7 +127,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
   private IndexResult<T> result;
 
   private Actionable<T> actionable = null;
-  private final PopupPanel actionsPopup = new PopupPanel(true, true);
+  private final CalloutPopup actionsPopup = new CalloutPopup();
 
   public AsyncTableCell(Class<T> classToReturn) {
     this(classToReturn, null, false, null, null, false, 20, 100, null);
@@ -211,7 +211,6 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     actionsButton = new Button(messages.tableAction());
     actionsButton.addStyleName("btn btn-link actionsButton");
     actionsButton.setVisible(actionable != null);
-    actionsPopup.setStyleName("actions-popup");
 
     createSelectAllPanel();
 
@@ -881,16 +880,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
           actionsPopup.setWidget(emptyHelpText);
         }
 
-        actionsPopup.setPopupPositionAndShow(new PositionCallback() {
-
-          @Override
-          public void setPosition(int offsetWidth, int offsetHeight) {
-            int left = actionsButton.getAbsoluteLeft() + actionsButton.getOffsetWidth() - offsetWidth;
-            int top = actionsButton.getAbsoluteTop() - offsetHeight - 4;
-
-            actionsPopup.setPopupPosition(left, top);
-          }
-        });
+        actionsPopup.showRelativeTo(actionsButton, CalloutPosition.BOTTOM_RIGHT);
 
       }
 

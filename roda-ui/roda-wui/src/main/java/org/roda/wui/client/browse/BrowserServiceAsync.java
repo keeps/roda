@@ -22,10 +22,10 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
@@ -225,7 +225,7 @@ public interface BrowserServiceAsync {
 
   void getDipBundle(String dipUUID, String dipFileUUID, AsyncCallback<DipBundle> callback);
 
-  void deleteDIP(String dipId, AsyncCallback<Void> async);
+  void deleteDIPs(SelectedItems<IndexedDIP> dips, AsyncCallback<Void> async);
 
   void retrieveBrowseRepresentationBundle(String aipId, String representationId, String localeString,
     AsyncCallback<BrowseRepresentationBundle> callback);

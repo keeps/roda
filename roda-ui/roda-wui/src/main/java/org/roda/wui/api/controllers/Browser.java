@@ -2383,18 +2383,18 @@ public class Browser extends RodaWuiController {
     return updatedDIP;
   }
 
-  public static void deleteDIP(User user, String dipId)
-    throws AuthorizationDeniedException, GenericException, NotFoundException {
+  public static void deleteDIPs(User user, SelectedItems<IndexedDIP> dips)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
     controllerAssistant.checkRoles(user);
 
     // delegate
-    BrowserHelper.deleteDIP(dipId);
+    BrowserHelper.deleteDIPs(dips, user);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_DIP_ID_PARAM, dipId);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_DIP_ID_PARAM, dips);
   }
 
   public static EntityResponse retrieveDIP(User user, String dipId, String acceptFormat)

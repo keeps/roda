@@ -29,6 +29,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.DIP;
@@ -162,7 +163,7 @@ public class DipsResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    Browser.deleteDIP(user, dipId);
+    Browser.deleteDIPs(user, SelectedItemsList.create(IndexedDIP.class, dipId));
 
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "DIP deleted"), mediaType).build();
   }

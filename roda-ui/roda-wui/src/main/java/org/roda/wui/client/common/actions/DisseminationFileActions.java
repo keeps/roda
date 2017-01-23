@@ -84,7 +84,7 @@ public class DisseminationFileActions extends AbstractActionable<DIPFile> {
     FlowPanel layout = createLayout();
 
     // MANAGEMENT
-    addTitle(layout, messages.disseminationFile());
+    addTitle(layout, messages.disseminationFile(), disseminationFile, DisseminationFileAction.DOWNLOAD);
 
     // DOWNLOAD,REMOVE
     addButton(layout, messages.downloadButton(), DisseminationFileAction.DOWNLOAD, disseminationFile, ActionImpact.NONE,
@@ -98,7 +98,7 @@ public class DisseminationFileActions extends AbstractActionable<DIPFile> {
     FlowPanel layout = createLayout();
 
     // MANAGEMENT
-    addTitle(layout, messages.disseminationFile());
+    // addTitle(layout, messages.disseminationFile());
 
     return layout;
   }

@@ -483,7 +483,8 @@ public class FileActions extends AbstractActionable<IndexedFile> {
     FlowPanel layout = createLayout();
 
     // MANAGEMENT
-    addTitle(layout, messages.sidebarFoldersFilesTitle());
+    addTitle(layout, messages.sidebarFoldersFilesTitle(), file, FileAction.DOWNLOAD, FileAction.RENAME, FileAction.MOVE,
+      FileAction.UPLOAD_FILES, FileAction.CREATE_FOLDER, FileAction.REMOVE);
 
     // DOWNLOAD, RENAME, MOVE, REMOVE, UPLOAD_FILES, CREATE_FOLDER
     addButton(layout, messages.downloadButton(), FileAction.DOWNLOAD, file, ActionImpact.NONE, callback,
@@ -497,9 +498,8 @@ public class FileActions extends AbstractActionable<IndexedFile> {
     addButton(layout, messages.removeButton(), FileAction.REMOVE, file, ActionImpact.DESTROYED, callback, "btn-ban");
 
     // PRESERVATION
-    addTitle(layout, messages.preservationTitle());
-
-    // NEW_PROCESS, IDENTIFY_FORMATS, SHOW_EVENTS, SHOW_RISKS
+    addTitle(layout, messages.preservationTitle(), file, FileAction.NEW_PROCESS, FileAction.IDENTIFY_FORMATS,
+      FileAction.SHOW_EVENTS, FileAction.SHOW_RISKS);
 
     addButton(layout, messages.newProcessPreservation(), FileAction.NEW_PROCESS, file, ActionImpact.UPDATED, callback,
       "btn-play");
@@ -518,7 +518,8 @@ public class FileActions extends AbstractActionable<IndexedFile> {
     FlowPanel layout = createLayout();
 
     // MANAGEMENT
-    addTitle(layout, messages.sidebarFoldersFilesTitle());
+    addTitle(layout, messages.sidebarFoldersFilesTitle(), files, FileAction.DOWNLOAD, FileAction.RENAME,
+      FileAction.MOVE, FileAction.UPLOAD_FILES, FileAction.CREATE_FOLDER, FileAction.REMOVE);
 
     // DOWNLOAD, RENAME, MOVE, REMOVE, UPLOAD_FILES, CREATE_FOLDER
     addButton(layout, messages.downloadButton(), FileAction.DOWNLOAD, files, ActionImpact.NONE, callback,
@@ -532,9 +533,8 @@ public class FileActions extends AbstractActionable<IndexedFile> {
     addButton(layout, messages.removeButton(), FileAction.REMOVE, files, ActionImpact.DESTROYED, callback, "btn-ban");
 
     // PRESERVATION
-    addTitle(layout, messages.preservationTitle());
-
-    // NEW_PROCESS, IDENTIFY_FORMATS, SHOW_EVENTS, SHOW_RISKS
+    addTitle(layout, messages.preservationTitle(), files, FileAction.NEW_PROCESS, FileAction.IDENTIFY_FORMATS,
+      FileAction.SHOW_EVENTS, FileAction.SHOW_RISKS);
 
     addButton(layout, messages.newProcessPreservation(), FileAction.NEW_PROCESS, files, ActionImpact.UPDATED, callback,
       "btn-play");

@@ -32,6 +32,7 @@ import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
@@ -323,7 +324,7 @@ public interface BrowserService extends RemoteService {
   DipBundle getDipBundle(String dipUUID, String dipFileUUID)
     throws RequestNotValidException, AuthorizationDeniedException, GenericException, NotFoundException;
 
-  void deleteDIP(String dipId)
+  void deleteDIPs(SelectedItems<IndexedDIP> dips)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   <T extends IsIndexed> T retrieveFromModel(String classNameToReturn, String id)

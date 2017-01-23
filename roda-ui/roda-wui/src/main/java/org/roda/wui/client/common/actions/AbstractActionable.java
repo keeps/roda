@@ -46,6 +46,30 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
     return canAct(action, objectToSelectedItems(object));
   }
 
+  public boolean canAct(T object, @SuppressWarnings("unchecked") Actionable.Action<T>... actions) {
+    boolean canAct = false;
+    for (Action<T> action : actions) {
+      if (canAct(action, object)) {
+        canAct = true;
+        break;
+      }
+    }
+
+    return canAct;
+  }
+
+  public boolean canAct(SelectedItems<T> objects, @SuppressWarnings("unchecked") Actionable.Action<T>... actions) {
+    boolean canAct = false;
+    for (Action<T> action : actions) {
+      if (canAct(action, objects)) {
+        canAct = true;
+        break;
+      }
+    }
+
+    return canAct;
+  }
+
   @Override
   public void act(Actionable.Action<T> action, T object, AsyncCallback<ActionImpact> callback) {
     act(action, objectToSelectedItems(object), callback);
@@ -62,10 +86,24 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
     return layout;
   }
 
-  public void addTitle(FlowPanel layout, String text) {
-    Label title = new Label(text);
-    title.addStyleName("actions-layout-title");
-    layout.add(title);
+  @SafeVarargs
+  public final void addTitle(FlowPanel layout, String text, T object, Actionable.Action<T>... actions) {
+
+    if (canAct(object, actions)) {
+      Label title = new Label(text);
+      title.addStyleName("actions-layout-title");
+      layout.add(title);
+    }
+  }
+
+  @SafeVarargs
+  public final void addTitle(FlowPanel layout, String text, SelectedItems<T> objects, Actionable.Action<T>... actions) {
+
+    if (canAct(objects, actions)) {
+      Label title = new Label(text);
+      title.addStyleName("actions-layout-title");
+      layout.add(title);
+    }
   }
 
   public void addButton(FlowPanel layout, final String text, final Actionable.Action<T> action, final T object,

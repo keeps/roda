@@ -3091,8 +3091,11 @@ public class BrowserHelper {
     return RodaCoreFactory.getModelService().updateDIP(dip);
   }
 
-  public static void deleteDIP(String dipId) throws GenericException, AuthorizationDeniedException, NotFoundException {
-    RodaCoreFactory.getModelService().deleteDIP(dipId);
+  public static void deleteDIPs(SelectedItems<IndexedDIP> selected, User user)
+    throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException {
+    for (String dipId : consolidate(user, IndexedDIP.class, selected)) {
+      RodaCoreFactory.getModelService().deleteDIP(dipId);
+    }
     RodaCoreFactory.getIndexService().commit(IndexedDIP.class);
   }
 
