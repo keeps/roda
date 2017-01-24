@@ -125,19 +125,28 @@ public class FITSPlugin extends AbstractPlugin<AIP> {
 
         boolean recursive = true;
         allFiles = model.listFilesUnder(aip.getId(), representation.getId(), recursive);
+
         for (OptionalWithCause<File> oFile : allFiles) {
           if (oFile.isPresent()) {
             File file = oFile.get();
-            // TODO the following path is not expecting folders
-            Path p = output.resolve(file.getId() + ".fits.xml");
-            ContentPayload payload = new FSPathContentPayload(p);
-            LOGGER.debug("Creating other metadata (AIP: {}, REPRESENTATION: {}, FILE: {})", aip.getId(),
-              representation.getId(), file.getId());
-            model.createOrUpdateOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(), ".xml",
-              RodaConstants.OTHER_METADATA_TYPE_FITS, payload, inotify);
+            if (!file.isDirectory() && file.getPath().isEmpty()) {
+              try {
+                LOGGER.debug("Creating other metadata (AIP: {}, REPRESENTATION: {}, FILE: {})", aip.getId(),
+                  representation.getId(), file.getId());
 
-            sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), representation.getId(), file.getPath(),
-              file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+                Path p = output.resolve(file.getId() + ".fits.xml");
+                ContentPayload payload = new FSPathContentPayload(p);
+                model.createOrUpdateOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(),
+                  ".xml", RodaConstants.OTHER_METADATA_TYPE_FITS, payload, inotify);
+
+                sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), representation.getId(), file.getPath(),
+                  file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+              } catch (RODAException e) {
+                LOGGER.error("Error creating other metadata for file {}", file.getId(), e);
+                reportState = PluginState.FAILURE;
+                validationReport.addIssue(new ValidationIssue(e.getMessage()));
+              }
+            }
           } else {
             LOGGER.error("Cannot process AIP representation file", oFile.getCause());
           }

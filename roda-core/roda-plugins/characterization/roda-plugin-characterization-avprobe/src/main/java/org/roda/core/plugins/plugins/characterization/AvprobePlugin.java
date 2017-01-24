@@ -46,6 +46,7 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
+import org.roda.core.plugins.plugins.common.FileFormatUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
@@ -55,6 +56,7 @@ import org.slf4j.LoggerFactory;
 
 public class AvprobePlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(AvprobePlugin.class);
+  private static final String TOOLNAME = "avprobe";
 
   @Override
   public void init() throws PluginException {
@@ -86,7 +88,6 @@ public class AvprobePlugin extends AbstractPlugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> liteList) throws PluginException {
-
     return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<AIP>() {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
@@ -121,15 +122,17 @@ public class AvprobePlugin extends AbstractPlugin<AIP> {
               sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), representation.getId(), file.getPath(),
                 file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
-              // TODO check if file is a video
-              StoragePath storagePath = ModelUtils.getFileStoragePath(file);
-              Binary binary = storage.getBinary(storagePath);
+              List<String> inputExtensions = FileFormatUtils.getInputExtensions(TOOLNAME);
+              if (inputExtensions.contains(fileFormat)) {
+                StoragePath storagePath = ModelUtils.getFileStoragePath(file);
+                Binary binary = storage.getBinary(storagePath);
 
-              String probeResults = AvprobePluginUtils.runAvprobe(binary, fileFormat, getParameterValues());
-              ContentPayload payload = new StringContentPayload(probeResults);
-              model.createOrUpdateOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(),
-                "." + AvprobePluginUtils.AVPROBE_METADATA_FORMAT, RodaConstants.OTHER_METADATA_TYPE_AVPROBE, payload,
-                inotify);
+                String probeResults = AvprobePluginUtils.runAvprobe(binary, fileFormat, getParameterValues());
+                ContentPayload payload = new StringContentPayload(probeResults);
+                model.createOrUpdateOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(),
+                  "." + AvprobePluginUtils.AVPROBE_METADATA_FORMAT, RodaConstants.OTHER_METADATA_TYPE_AVPROBE, payload,
+                  inotify);
+              }
             }
           } else {
             LOGGER.error("Cannot process AIP representation file", oFile.getCause());

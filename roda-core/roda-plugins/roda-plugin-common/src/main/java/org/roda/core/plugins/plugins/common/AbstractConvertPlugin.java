@@ -29,12 +29,10 @@ import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
-import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
@@ -222,38 +220,6 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage,
-    List<LiteOptionalWithCause> liteList) throws PluginException {
-    Report report = PluginHelper.initPluginReport(this);
-
-    try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-
-      Job job = PluginHelper.getJob(this, model);
-      List<T> list = PluginHelper.transformLitesIntoObjects(model, index, this, report, jobPluginInfo, liteList, job);
-
-      if (!list.isEmpty()) {
-        if (list.get(0) instanceof AIP) {
-          report = executeOnAIP(index, model, storage, report, jobPluginInfo, (List<AIP>) list, job);
-        } else if (list.get(0) instanceof Representation) {
-          report = executeOnRepresentation(index, model, storage, report, jobPluginInfo, (List<Representation>) list,
-            job);
-        } else if (list.get(0) instanceof File) {
-          report = executeOnFile(index, model, storage, report, jobPluginInfo, (List<File>) list, job);
-        }
-      }
-
-      jobPluginInfo.finalizeInfo();
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
-    } catch (JobException | AuthorizationDeniedException | NotFoundException | GenericException
-      | RequestNotValidException e) {
-      throw new PluginException("A job exception has occurred", e);
-    }
-
-    return report;
-  }
-
   protected Report executeOnAIP(IndexService index, ModelService model, StorageService storage, Report report,
     SimpleJobPluginInfo jobPluginInfo, List<AIP> list, Job job) throws PluginException {
 
@@ -442,6 +408,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
     return report;
   }
 
+  @Override
   protected Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage,
     Report report, SimpleJobPluginInfo jobPluginInfo, List<Representation> list, Job job) throws PluginException {
 
@@ -638,6 +605,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
     return report;
   }
 
+  @Override
   protected Report executeOnFile(IndexService index, ModelService model, StorageService storage, Report report,
     SimpleJobPluginInfo jobPluginInfo, List<File> list, Job job) throws PluginException {
 
