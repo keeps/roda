@@ -35,7 +35,9 @@ import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.FileLink;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
@@ -77,6 +79,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
   private Map<String, List<String>> pronomToExtension;
   private Map<String, List<String>> mimetypeToExtension;
   private boolean ignoreFiles = true;
+  private boolean createDIP = false;
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
@@ -96,6 +99,11 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES, "Ignore non PDF files",
         PluginParameterType.BOOLEAN, "true", false, false, "Ignore files that are not recognised as PDF."));
+
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP, new PluginParameter(
+      RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP, "Create dissemination", PluginParameterType.BOOLEAN, "true",
+      false, false,
+      "If this is selected then the plugin will strip the file to a new dissemination. If not, a new representation will be created."));
   }
 
   public DigitalSignaturePlugin() {
@@ -135,6 +143,14 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
       + "in the Archival Information Package (AIP).";
   }
 
+  private String getDIPTitle() {
+    return "Signature-stripped file";
+  }
+
+  private String getDIPDescription() {
+    return "Result file after stripping its digital signature";
+  }
+
   @Override
   public String getVersionImpl() {
     return "1.0";
@@ -146,6 +162,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_SIGNATURE_VERIFY));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_SIGNATURE_EXTRACT));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_SIGNATURE_STRIP));
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES));
     return parameters;
   }
@@ -173,6 +190,10 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
       ignoreFiles = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES));
     }
 
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP)) {
+      createDIP = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP));
+    }
+
   }
 
   public Report executeOnAIP(IndexService index, ModelService model, StorageService storage, Report report,
@@ -186,13 +207,13 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
       ValidationReport validationReport = new ValidationReport();
       boolean hasNonPdfFiles = false;
       Map<String, String> verifiedFiles = new HashMap<String, String>();
-      List<File> unchangedFiles = new ArrayList<File>();
       List<File> alteredFiles = new ArrayList<File>();
       List<File> extractedFiles = new ArrayList<File>();
       List<File> newFiles = new ArrayList<File>();
 
       try {
         for (Representation representation : aip.getRepresentations()) {
+          List<File> unchangedFiles = new ArrayList<File>();
           String newRepresentationID = UUID.randomUUID().toString();
           String verification = null;
           boolean notify = true;
@@ -235,7 +256,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
 
                     if (!verification.equals("Passed") && verificationAffectsOnOutcome) {
                       reportState = PluginState.FAILURE;
-                      reportItem.addPluginDetails(" Signature validation failed on " + fileInfoPath + ".");
+                      reportItem.addPluginDetails(" Signature validation failed on " + fileInfoPath + ".\n");
                     }
                   }
 
@@ -256,22 +277,39 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
 
                     if (pluginResult != null) {
                       ContentPayload payload = new FSPathContentPayload(pluginResult);
+                      String newFileId = file.getId().replaceFirst("[.][^.]+$", "." + fileFormat);
 
-                      if (!newRepresentations.contains(newRepresentationID)) {
-                        LOGGER.debug("Creating a new representation {} on AIP {}", newRepresentationID, aip.getId());
-                        boolean original = false;
-                        newRepresentations.add(newRepresentationID);
-                        model.createRepresentation(aip.getId(), newRepresentationID, original, representation.getType(),
+                      if (createDIP) {
+                        FileLink fileLink = new FileLink(representation.getAipId(), representation.getId(),
+                          file.getPath(), file.getId());
+                        List<FileLink> links = new ArrayList<FileLink>();
+                        links.add(fileLink);
+
+                        DIP dip = new DIP();
+                        dip.setFileIds(links);
+                        dip.setPermissions(aip.getPermissions());
+                        dip.setTitle(getDIPTitle());
+                        dip.setDescription(getDIPDescription());
+                        dip.setType(RodaConstants.DIP_TYPE_DIGITAL_SIGNATURE);
+                        dip = model.createDIP(dip, true);
+
+                        model.createDIPFile(dip.getId(), file.getPath(), newFileId, 0L, payload, notify);
+                      } else {
+                        if (!newRepresentations.contains(newRepresentationID)) {
+                          LOGGER.debug("Creating a new representation {} on AIP {}", newRepresentationID, aip.getId());
+                          boolean original = false;
+                          newRepresentations.add(newRepresentationID);
+                          model.createRepresentation(aip.getId(), newRepresentationID, original,
+                            representation.getType(), notify);
+                        }
+
+                        // update file on new representation
+                        File f = model.createFile(aip.getId(), newRepresentationID, file.getPath(), newFileId, payload,
                           notify);
+                        newFiles.add(f);
                       }
 
-                      // update file on new representation
-                      String newFileId = file.getId().replaceFirst("[.][^.]+$", "." + fileFormat);
-                      File f = model.createFile(aip.getId(), newRepresentationID, file.getPath(), newFileId, payload,
-                        notify);
                       alteredFiles.add(file);
-                      newFiles.add(f);
-
                     } else {
                       LOGGER.debug("Process failed on file {} of representation {} from AIP {}", file.getId(),
                         representation.getId(), aip.getId());
@@ -290,7 +328,6 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
                     reportState = PluginState.FAILURE;
                     hasNonPdfFiles = true;
                   }
-
                 }
               }
             } else {
@@ -301,7 +338,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
           IOUtils.closeQuietly(allFiles);
 
           // add unchanged files to the new representation
-          if (!alteredFiles.isEmpty()) {
+          if (!alteredFiles.isEmpty() && !createDIP) {
             for (File f : unchangedFiles) {
               StoragePath fileStoragePath = ModelUtils.getFileStoragePath(f);
               Binary binary = storage.getBinary(fileStoragePath);

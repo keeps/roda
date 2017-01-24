@@ -81,10 +81,11 @@
 			<groupId>org.roda-project</groupId>
 			<artifactId>roda-core</artifactId>
 			<scope>provided</scope>
-		</dependency>
+		</dependency>		
 		<dependency>
 			<groupId>org.apache.tika</groupId>
 			<artifactId>tika-parsers</artifactId>
+			<version>1.14</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>bcmail-jdk15on</artifactId>
@@ -103,6 +104,7 @@
 		<dependency>
 			<groupId>org.apache.tika</groupId>
 			<artifactId>tika-core</artifactId>
+			<version>1.14</version>
 		</dependency>
 	</dependencies>
 </project>

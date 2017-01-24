@@ -37,7 +37,6 @@ public final class SignatureUtils {
   }
 
   public static boolean isCertificateSelfSigned(Certificate cert) {
-
     try {
       cert.verify(cert.getPublicKey());
       return true;

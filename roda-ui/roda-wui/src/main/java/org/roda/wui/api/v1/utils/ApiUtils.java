@@ -300,7 +300,11 @@ public class ApiUtils {
   }
 
   public static StreamResponse download(Resource resource) {
-    ConsumesOutputStream download = DownloadUtils.download(RodaCoreFactory.getStorageService(), resource);
+    return download(resource, null);
+  }
+
+  public static StreamResponse download(Resource resource, String fileName) {
+    ConsumesOutputStream download = DownloadUtils.download(RodaCoreFactory.getStorageService(), resource, fileName);
     return new StreamResponse(download.getFileName(), download.getMediaType(), download);
   }
 
@@ -314,7 +318,7 @@ public class ApiUtils {
         StoragePath storagePath = ModelUtils.getAIPStoragePath(indexedAIP.getId());
         StorageService storage = RodaCoreFactory.getStorageService();
         Directory directory = storage.getDirectory(storagePath);
-        representation = download(directory);
+        representation = download(directory, indexedAIP.getTitle());
       } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
         || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
         AIP aip = RodaCoreFactory.getModelService().retrieveAIP(indexedAIP.getId());

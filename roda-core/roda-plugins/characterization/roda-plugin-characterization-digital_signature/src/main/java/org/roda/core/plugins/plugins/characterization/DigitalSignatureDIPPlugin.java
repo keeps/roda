@@ -111,11 +111,11 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractA
       + "installed under “/config/certificates/”.";
   }
 
-  public String getDIPTitle() {
+  private String getDIPTitle() {
     return "Digital signed dissemination";
   }
 
-  public String getDIPDescription() {
+  private String getDIPDescription() {
     return "Digital signed dissemination of a file, possibly embedded";
   }
 

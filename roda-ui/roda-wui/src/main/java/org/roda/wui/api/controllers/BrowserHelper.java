@@ -605,7 +605,7 @@ public class BrowserHelper {
       StoragePath storagePath = ModelUtils.getRepresentationStoragePath(representation.getAipId(),
         representation.getId());
       Directory directory = RodaCoreFactory.getStorageService().getDirectory(storagePath);
-      return ApiUtils.download(directory);
+      return ApiUtils.download(directory, representationId);
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
       ModelService model = RodaCoreFactory.getModelService();
@@ -624,17 +624,17 @@ public class BrowserHelper {
     if (RodaConstants.STORAGE_DIRECTORY_DATA.equals(part)) {
       StoragePath storagePath = ModelUtils.getRepresentationDataStoragePath(aipId, representationId);
       Directory directory = RodaCoreFactory.getStorageService().getDirectory(storagePath);
-      return ApiUtils.download(directory);
+      return ApiUtils.download(directory, part);
     } else if (RodaConstants.STORAGE_DIRECTORY_METADATA.equals(part)) {
       StoragePath storagePath = ModelUtils.getRepresentationMetadataStoragePath(aipId, representationId);
       Directory directory = RodaCoreFactory.getStorageService().getDirectory(storagePath);
-      return ApiUtils.download(directory);
+      return ApiUtils.download(directory, part);
     } else if (RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION.equals(part)) {
       Directory directory = RodaCoreFactory.getModelService().getDocumentationDirectory(aipId, representationId);
-      return ApiUtils.download(directory);
+      return ApiUtils.download(directory, part);
     } else if (RodaConstants.STORAGE_DIRECTORY_SCHEMAS.equals(part)) {
       Directory directory = RodaCoreFactory.getModelService().getSchemasDirectory(aipId, representationId);
-      return ApiUtils.download(directory);
+      return ApiUtils.download(directory, part);
     } else {
       throw new GenericException("Unsupported part: " + part);
     }
@@ -2425,13 +2425,13 @@ public class BrowserHelper {
 
     if (RodaConstants.STORAGE_DIRECTORY_SUBMISSION.equals(part)) {
       Directory directory = RodaCoreFactory.getModelService().getSubmissionDirectory(aipId);
-      return ApiUtils.download(directory);
+      return ApiUtils.download(directory, part);
     } else if (RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION.equals(part)) {
       Directory directory = RodaCoreFactory.getModelService().getDocumentationDirectory(aipId);
-      return ApiUtils.download(directory);
+      return ApiUtils.download(directory, part);
     } else if (RodaConstants.STORAGE_DIRECTORY_SCHEMAS.equals(part)) {
       Directory directory = RodaCoreFactory.getModelService().getSchemasDirectory(aipId);
-      return ApiUtils.download(directory);
+      return ApiUtils.download(directory, part);
     } else {
       throw new GenericException("Unsupported part: " + part);
     }
@@ -3093,7 +3093,7 @@ public class BrowserHelper {
     if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP.equals(acceptFormat)) {
       StoragePath storagePath = ModelUtils.getDIPDataStoragePath(dipId);
       Directory directory = RodaCoreFactory.getStorageService().getDirectory(storagePath);
-      return ApiUtils.download(directory);
+      return ApiUtils.download(directory, dipId);
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
       DIP dip = RodaCoreFactory.getModelService().retrieveDIP(dipId);

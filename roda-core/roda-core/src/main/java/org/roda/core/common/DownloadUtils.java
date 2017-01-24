@@ -35,13 +35,16 @@ public class DownloadUtils {
   private static final String ZIP_PATH_DELIMITER = "/";
 
   public static ConsumesOutputStream download(final StorageService storage, final Resource resource) {
+    return download(storage, resource, null);
+  }
 
+  public static ConsumesOutputStream download(final StorageService storage, final Resource resource, String name) {
     ConsumesOutputStream stream;
-
     final StoragePath storagePath = resource.getStoragePath();
 
     if (resource.isDirectory()) {
       // send zip with directory contents
+      final String fileName = name == null ? storagePath.getName() : name;
 
       stream = new ConsumesOutputStream() {
 
@@ -90,7 +93,7 @@ public class DownloadUtils {
 
         @Override
         public String getFileName() {
-          return storagePath.getName() + ZIP_FILE_NAME_EXTENSION;
+          return fileName + ZIP_FILE_NAME_EXTENSION;
         }
 
         @Override

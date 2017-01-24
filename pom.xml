@@ -8,7 +8,7 @@
 	<artifactId>roda</artifactId>
 	<version>2.0.0-alpha20.3</version>
 	<packaging>pom</packaging>
-	<description>RODA is an full-featured open-source digital preservation repository providing all the functionality
+	<description>RODA is a full-featured open-source digital preservation repository providing all the functionality
 		prescribed by the OAIS reference model.
 	</description>
 	<scm>
@@ -66,14 +66,6 @@
 		<repository>
 			<id>ja-sig</id>
 			<url>http://oss.sonatype.org/content/repositories/releases/</url>
-		</repository>
-		<repository>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-			<id>opf-dev-mvn</id>
-			<name>opf-dev (jhove)</name>
-			<url>http://artifactory.opf-labs.org/artifactory/opf-dev</url>
 		</repository>
 		<repository>
 			<id>jcenter</id>
