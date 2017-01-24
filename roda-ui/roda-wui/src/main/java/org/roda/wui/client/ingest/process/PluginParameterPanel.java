@@ -82,7 +82,7 @@ public class PluginParameterPanel extends Composite {
     } else if (PluginParameterType.AIP_ID.equals(parameter.getType())) {
       createSelectAipLayout();
     } else if (PluginParameterType.RISK_ID.equals(parameter.getType())) {
-      createSelectRiskLayout();
+      createSelectIdLayout();
     } else if (PluginParameterType.SEVERITY.equals(parameter.getType())) {
       createSelectSeverityLayout();
     } else if (PluginParameterType.RODA_OBJECT.equals(parameter.getType())) {
@@ -120,10 +120,14 @@ public class PluginParameterPanel extends Composite {
     addHelp();
   }
 
-  private void createSelectRiskLayout() {
+  private void createSelectIdLayout() {
     Label parameterName = new Label(parameter.getName());
-    IncrementalAssociativeList list = new IncrementalAssociativeList(IndexedRisk.class, RodaConstants.RISK_ID,
-      RodaConstants.RISK_SEARCH, messages.getRisksDialogName());
+    IncrementalAssociativeList list = null;
+
+    if (PluginParameterType.RISK_ID.equals(parameter.getType())) {
+      list = new IncrementalAssociativeList(IndexedRisk.class, RodaConstants.RISK_ID, RodaConstants.RISK_SEARCH,
+        messages.getRisksDialogName());
+    }
 
     list.addChangeHandler(new ChangeHandler() {
 

@@ -679,6 +679,7 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_REPRESENTATION_OR_DIP = "parameter.representation_or_dip";
   public static final String PLUGIN_PARAMS_DISSEMINATION_TITLE = "parameter.dissemination_title";
   public static final String PLUGIN_PARAMS_DISSEMINATION_DESCRIPTION = "parameter.dissemination_description";
+  public static final String PLUGIN_PARAMS_AIP_PARENT_ID = "parameter.aip_parent_id";
 
   public static final String PLUGIN_PARAMS_INCLUDE_SELECTED_DESCRIPTIVE_METADATA = "parameter.include_selected_descriptive_metadata";
   public static final String PLUGIN_PARAMS_SELECTED_DESCRIPTIVE_METADATA = "parameter.selected_descriptive_metadata";
