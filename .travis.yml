@@ -2,9 +2,12 @@ language: java
 jdk:
 - oraclejdk8
 sudo: required
+addons:
+  sonarqube:
+    token:
+      secure: "On53R35PWhHE5kJZophSGhiyfU3w/df/TgdVObsw1N64LGaGXiQQxaYuaYRTYT34SQHuZPRqpV84L8QMW5WGDEwH3EhaN3I3on1w6djrQ4lqk0+2yrqHtKkhL5+hByC50UQcdLoX84q6Ri6A570/tpNhT+/GnT2+1deJ5C+fjiU="
 before_script:
-- curl https://bintray.com/user/downloadSubjectPublicKey?username=bintray | sudo apt-key
-  add -
+- curl https://bintray.com/user/downloadSubjectPublicKey?username=bintray | sudo apt-key add -
 - echo "deb http://dl.bintray.com/siegfried/debian wheezy main" | sudo tee -a /etc/apt/sources.list
 - sudo apt-get update -qq
 - sudo apt-get install siegfried -y
@@ -19,9 +22,8 @@ before_script:
 - sudo apt-get update
 - sudo apt-get install libreoffice libreoffice-script-provider-python -y
 - sudo apt-get install unoconv -y
-- sudo apt-get --only-upgrade install cpio libgcrypt11 libnss3 libreoffice-pdfimport
-  multiarch-support -y
-script: mvn -Dtestng.groups="travis" -Denforcer.skip verify
+- sudo apt-get --only-upgrade install cpio libgcrypt11 libnss3 libreoffice-pdfimport multiarch-support -y
+script: mvn -Dtestng.groups="travis" -Denforcer.skip clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
 notifications:
   slack:
     secure: Hg2xvznD2QGhbCHRXN9DFM6dYIfeiZStj0Ud+OBS2swX9YOM77ufbDkMWF/yAAwxNg45QIC3a3okVy6TLzY5hA/PSKlc/5/ClujgRy02HLXlbYZ9psQH22/VFrER3uFkIpvMPhrxh3NLo/UMWfwvmwq26ziFnW4W6UDn/XXCHPE=
