@@ -25,6 +25,10 @@
 				</g:Label>
 				<m:BreadcrumbPanel ui:field="breadcrumb"
 					addStyleNames="viewRepresentationBreadcrumb" />
+
+				<!-- STATUS -->
+				<g:HTML ui:field="aipState" styleName="aipState small" />
+				
 				<g:FlowPanel addStyleNames="filePreviewToolbarIcons">
 					<g:FocusPanel ui:field="disseminationsButton"
 						addStyleNames="toolbarLink filePreviewToolbarInfoIcon">

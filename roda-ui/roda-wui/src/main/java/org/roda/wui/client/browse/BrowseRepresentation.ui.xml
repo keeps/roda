@@ -16,6 +16,9 @@
 			addStyleNames="wrapper skip_padding">
 			<g:FlowPanel addStyleNames="row full_width skip_padding">
 				<g:FlowPanel addStyleNames="col_10 content">
+					<!-- STATUS -->
+					<g:HTML ui:field="aipState" />
+					
 					<!-- IDENTIFICATION -->
 					<g:FlowPanel styleName="browseItemPanel">
 						<g:Label addStyleNames="browseItemHeader" ui:field="browseItemHeader">

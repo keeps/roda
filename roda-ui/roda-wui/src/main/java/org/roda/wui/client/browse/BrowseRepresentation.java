@@ -37,6 +37,7 @@ import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
@@ -146,6 +147,11 @@ public class BrowseRepresentation extends Composite {
   // Focus
   @UiField
   FocusPanel keyboardFocus;
+  
+  // STATUS
+
+  @UiField
+  HTML aipState;
 
   // IDENTIFICATION
 
@@ -245,6 +251,10 @@ public class BrowseRepresentation extends Composite {
 
     // INIT
     initWidget(uiBinder.createAndBindUi(this));
+    
+    // STATUS
+    aipState.setHTML(HtmlSnippetUtils.getAIPStateHTML(bundle.getAip().getState()));
+    aipState.setVisible(AIPState.ACTIVE != bundle.getAip().getState());
 
     // IDENTIFICATION
 
@@ -354,6 +364,11 @@ public class BrowseRepresentation extends Composite {
 
     ListSelectionUtils.bindLayout(representation, searchPrevious, searchNext, keyboardFocus, true, false, false,
       searchSection);
+
+    // CSS
+    this.addStyleName("browse");
+    this.addStyleName("browse-representation");
+    this.addStyleName(bundle.getAip().getState().toString().toLowerCase());
   }
 
   @Override

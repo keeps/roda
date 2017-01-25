@@ -20,13 +20,13 @@ import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedDIP;
-import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.slider.SliderPanel;
 import org.roda.wui.client.common.slider.Sliders;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
@@ -45,6 +45,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -143,6 +144,9 @@ public class BrowseFile extends Composite {
   @UiField
   BreadcrumbPanel breadcrumb;
 
+  @UiField
+  HTML aipState;
+
   @UiField(provided = true)
   IndexedFilePreview filePreview;
 
@@ -209,8 +213,12 @@ public class BrowseFile extends Composite {
     breadcrumb.updatePath(getBreadcrumbs());
     breadcrumb.setVisible(true);
 
-    // set title
+    // STATUS
+    this.addStyleName(bundle.getAip().getState().toString().toLowerCase());
+    aipState.setHTML(HtmlSnippetUtils.getAIPStateHTML(bundle.getAip().getState()));
+    aipState.setVisible(AIPState.ACTIVE != bundle.getAip().getState());
 
+    // set title
     infoFileButton.setTitle(messages.viewRepresentationInfoFileButton());
 
     // update visibles
@@ -225,6 +233,9 @@ public class BrowseFile extends Composite {
 
     // bind previous and next buttons
     ListSelectionUtils.bindLayout(bundle.getFile(), previousButton, nextButton, keyboardFocus, true, false, false);
+    
+    this.addStyleName("browse");
+    this.addStyleName("browse-file");
 
   }
 

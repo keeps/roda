@@ -711,6 +711,22 @@ pre code {
     background-color: rgba(0,0,0,0.4);
 }
 
+.btn-primary {
+    background-color: #089de3;
+}
+
+.btn-primary:hover {
+    background-color: #2988c0;
+}
+
+.actions-popup .btn-primary, .slider .btn-primary {
+	background-color: rgba(0,0,0,0.5);
+}
+
+.actions-popup .btn-primary:hover, .slider .btn-primary:hover {
+	background-color: rgba(0,0,0,0.6);
+}
+
 
 .btn-danger {
     background-color: #d9534f;
@@ -718,6 +734,14 @@ pre code {
 
 .btn-danger:hover {
     background-color: #c9302c;
+}
+
+.actions-popup .btn-danger, .slider .btn-danger {
+	background-color: rgb(140, 8, 4);
+}
+
+.actions-popup .btn-danger:hover, .slider .btn-danger:hover {
+	background-color: rgb(185, 6, 1);;
 }
 
 .btn-link {
@@ -2057,7 +2081,13 @@ td.datePickerMonth, td.datePickerYear {
 	margin-top: 0;
 }
 
-.browse_aip.under_appraisal, .browse_aip.deleted, .browse_aip.created, .browse_aip.ingest_processing {
+.browse-file .aipState {
+    display: inline-block;
+    margin-left: 1rem;
+    height: 33px;
+}
+
+.browse.under_appraisal, .browse.deleted, .browse.created, .browse.ingest_processing {
     background-color: #efefef;
     background-image: repeating-linear-gradient(-45deg, transparent, transparent 35px, rgba(255, 255, 255, .5) 35px, rgba(255, 255, 255, .5) 70px);
 }
