@@ -84,7 +84,7 @@ public class AsyncCallbackUtils {
               });
           }
         }
-      });
+      }, true);
 
       treatedError = true;
     }

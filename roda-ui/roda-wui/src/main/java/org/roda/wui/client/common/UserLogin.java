@@ -127,6 +127,13 @@ public class UserLogin {
    *          if success.
    */
   public void getAuthenticatedUser(final AsyncCallback<User> callback) {
+    getAuthenticatedUser(callback, false);
+  }
+
+  public void getAuthenticatedUser(final AsyncCallback<User> callback, boolean ensureIsFresh) {
+    if (ensureIsFresh) {
+      getUserRequest.clearCache();
+    }
     getUserRequest.request(callback);
   }
 
