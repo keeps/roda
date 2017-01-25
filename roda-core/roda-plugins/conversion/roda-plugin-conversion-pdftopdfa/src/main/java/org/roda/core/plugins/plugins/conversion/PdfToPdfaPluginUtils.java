@@ -28,6 +28,7 @@ import org.verapdf.processor.ItemProcessor;
 import org.verapdf.processor.ProcessorFactory;
 import org.verapdf.processor.ProcessorResult;
 import org.verapdf.processor.TaskType;
+import org.verapdf.processor.plugins.PluginsCollectionConfig;
 
 public class PdfToPdfaPluginUtils {
 
@@ -45,10 +46,11 @@ public class PdfToPdfaPluginUtils {
       ValidatorConfig validatorConfig = ValidatorFactory.createConfig(PDFAFlavour.PDFA_1_B, true, 10);
       FeatureExtractorConfig featureConfig = FeatureFactory.defaultConfig();
       MetadataFixerConfig fixerConfig = FixerFactory.defaultConfig();
+      PluginsCollectionConfig pluginConfig = PluginsCollectionConfig.defaultConfig();
       EnumSet<TaskType> tasks = EnumSet.of(TaskType.VALIDATE, TaskType.FIX_METADATA);
 
       ItemProcessor processor = ProcessorFactory
-        .createProcessor(ProcessorFactory.fromValues(validatorConfig, featureConfig, fixerConfig, tasks));
+        .createProcessor(ProcessorFactory.fromValues(validatorConfig, featureConfig, pluginConfig, fixerConfig, tasks));
 
       ProcessorResult result = processor.process(fixed.toFile());
 

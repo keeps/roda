@@ -39,6 +39,7 @@ import org.verapdf.processor.ItemProcessor;
 import org.verapdf.processor.ProcessorFactory;
 import org.verapdf.processor.ProcessorResult;
 import org.verapdf.processor.TaskType;
+import org.verapdf.processor.plugins.PluginsCollectionConfig;
 import org.verapdf.report.HTMLReport;
 import org.verapdf.report.XsltTransformer;
 
@@ -62,14 +63,15 @@ public class VeraPDFPluginUtils {
         ValidatorConfig validatorConfig = ValidatorFactory.createConfig(flavour, true, 10);
         FeatureExtractorConfig featureConfig = FeatureFactory.defaultConfig();
         MetadataFixerConfig fixerConfig = FixerFactory.defaultConfig();
+        PluginsCollectionConfig pluginConfig = PluginsCollectionConfig.defaultConfig();
         EnumSet<TaskType> tasks = EnumSet.of(TaskType.VALIDATE);
 
         if (hasFeatures) {
           tasks.add(TaskType.EXTRACT_FEATURES);
         }
 
-        return ProcessorFactory
-          .createProcessor(ProcessorFactory.fromValues(validatorConfig, featureConfig, fixerConfig, tasks));
+        return ProcessorFactory.createProcessor(
+          ProcessorFactory.fromValues(validatorConfig, featureConfig, pluginConfig, fixerConfig, tasks));
       }
     });
 

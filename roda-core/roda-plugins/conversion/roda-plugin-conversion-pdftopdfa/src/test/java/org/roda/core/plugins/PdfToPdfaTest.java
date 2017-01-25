@@ -171,6 +171,9 @@ public class PdfToPdfaTest {
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_OUTPUT_FORMAT, "pdf");
+
+    // FIXME 20170125 nvieira this should be changed to true when metadata
+    // fixing issue is solved (it currently still have problems)
     parameters.put(RodaConstants.PLUGIN_PARAMS_VERAPDF_VALIDATION, "False");
 
     Job job = TestsHelper.executeJob(PdfToPdfaPlugin.class, parameters, PluginType.AIP_TO_AIP,
@@ -189,7 +192,7 @@ public class PdfToPdfaTest {
     AssertJUnit.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
 
     for (File f : reusableAllFiles) {
-      if (f.getId().matches(".*[.](pdf)$")) {
+      if (f.getId().matches(".*\\.(pdf)$")) {
         String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
         AssertJUnit.assertEquals(1,
           newReusableAllFiles.stream().filter(o -> o.getId().equals(filename + ".pdf")).count());
