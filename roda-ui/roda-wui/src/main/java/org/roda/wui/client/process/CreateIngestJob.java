@@ -42,7 +42,7 @@ import config.i18n.client.ClientMessages;
  * @author Luis Faria
  * 
  */
-public class CreateIngestJob extends CreateJob<TransferredResource> {
+public class CreateIngestJob extends CreateSelectedJob<TransferredResource> {
 
   @SuppressWarnings("unused")
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
@@ -56,7 +56,6 @@ public class CreateIngestJob extends CreateJob<TransferredResource> {
 
   @Override
   public boolean updateObjectList() {
-
     SelectedItems selected = getSelected();
     boolean isEmpty = false;
 

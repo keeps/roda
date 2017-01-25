@@ -28,7 +28,7 @@ import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.management.UserLog;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
-import org.roda.wui.client.process.CreateJob;
+import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.widgets.Toast;
@@ -477,14 +477,14 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   private void newProcess(IndexedAIP aip, AsyncCallback<ActionImpact> callback) {
     LastSelectedItemsSingleton.getInstance().setSelectedItems(objectToSelectedItems(aip));
     LastSelectedItemsSingleton.getInstance().setLastHistory(HistoryUtils.getCurrentHistoryPath());
-    HistoryUtils.newHistory(CreateJob.RESOLVER, "action");
+    HistoryUtils.newHistory(CreateSelectedJob.RESOLVER, "action");
     callback.onSuccess(ActionImpact.UPDATED);
   }
 
   private void newProcess(SelectedItems<IndexedAIP> aips, AsyncCallback<ActionImpact> callback) {
     LastSelectedItemsSingleton.getInstance().setSelectedItems(aips);
     LastSelectedItemsSingleton.getInstance().setLastHistory(HistoryUtils.getCurrentHistoryPath());
-    HistoryUtils.newHistory(CreateJob.RESOLVER, "action");
+    HistoryUtils.newHistory(CreateSelectedJob.RESOLVER, "action");
     callback.onSuccess(ActionImpact.UPDATED);
   }
 

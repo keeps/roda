@@ -39,7 +39,6 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.LocaleInfo;
-import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -399,36 +398,24 @@ public class CreateDescriptiveMetadata extends Composite {
   private void cancel() {
     if (isNew) {
       if (representationId == null) {
-        Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
-          RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
+        SelectedItemsList<IndexedAIP> selected = new SelectedItemsList<IndexedAIP>(Arrays.asList(aipId),
+          IndexedAIP.class.getName());
+        BrowserService.Util.getInstance().deleteAIP(selected, null, new AsyncCallback<String>() {
 
-            @Override
-            public void onFailure(Throwable caught) {
-              // do nothing
+          @Override
+          public void onFailure(Throwable caught) {
+            AsyncCallbackUtils.defaultFailureTreatment(caught);
+          }
+
+          @Override
+          public void onSuccess(String parentId) {
+            if (parentId != null) {
+              HistoryUtils.newHistory(BrowseAIP.RESOLVER, parentId);
+            } else {
+              HistoryUtils.newHistory(BrowseAIP.RESOLVER);
             }
-
-            @Override
-            public void onSuccess(final String details) {
-              SelectedItemsList<IndexedAIP> selected = new SelectedItemsList<IndexedAIP>(Arrays.asList(aipId),
-                IndexedAIP.class.getName());
-              BrowserService.Util.getInstance().deleteAIP(selected, details, new AsyncCallback<String>() {
-
-                @Override
-                public void onFailure(Throwable caught) {
-                  AsyncCallbackUtils.defaultFailureTreatment(caught);
-                }
-
-                @Override
-                public void onSuccess(String parentId) {
-                  if (parentId != null) {
-                    HistoryUtils.newHistory(BrowseAIP.RESOLVER, parentId);
-                  } else {
-                    HistoryUtils.newHistory(BrowseAIP.RESOLVER);
-                  }
-                }
-              });
-            }
-          });
+          }
+        });
       } else {
         HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
       }

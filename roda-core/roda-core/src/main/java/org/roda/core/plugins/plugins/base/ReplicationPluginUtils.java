@@ -12,12 +12,8 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.util.CommandException;
 import org.roda.core.util.CommandUtility;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ReplicationPluginUtils {
-  private static final Logger LOGGER = LoggerFactory.getLogger(ReplicationPluginUtils.class);
-
   protected static String PROPERTIES_ERROR_MESSAGE = "Rsync properties are not well defined";
 
   public static String executeRsyncAIP(AIP aip, boolean hasCompression) throws CommandException {

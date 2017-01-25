@@ -23,6 +23,7 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.browse.BrowserService;
@@ -39,7 +40,7 @@ import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
-import org.roda.wui.client.process.CreateJob;
+import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
@@ -230,11 +231,11 @@ public class IngestTransfer extends Composite {
         updateVisibles();
 
         if (selected instanceof SelectedItemsList) {
-          SelectedItemsList selectedList = (SelectedItemsList) selected;
+          SelectedItemsList<TransferredResource> selectedList = (SelectedItemsList<TransferredResource>) selected;
           int size = selectedList.getIds().size();
           move.setEnabled(size > 0);
           rename.setEnabled(size == 1 || (size == 0 && resource != null));
-        } else if (selected instanceof SelectedItemsList) {
+        } else if (selected instanceof SelectedItemsFilter) {
           move.setEnabled(true);
           rename.setEnabled(false);
         }
@@ -555,18 +556,16 @@ public class IngestTransfer extends Composite {
   void buttonStartIngestHandler(ClickEvent e) {
     LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
     selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
-    HistoryUtils.newHistory(CreateJob.RESOLVER, "ingest");
+    selectedItems.setSelectedItems(getSelected());
+    HistoryUtils.newHistory(CreateSelectedJob.RESOLVER, "ingest");
   }
 
-  @Deprecated
-  public SelectedItems getSelected() {
-    SelectedItems selected = transferredResourceList.getSelected();
-    if (selected instanceof SelectedItemsList) {
-      SelectedItemsList selectedset = (SelectedItemsList) selected;
+  public SelectedItems<TransferredResource> getSelected() {
+    SelectedItems<TransferredResource> selected = transferredResourceList.getSelected();
 
-      if (ClientSelectedItemsUtils.isEmpty(selectedset) && resource != null) {
-        selected = new SelectedItemsList(Arrays.asList(resource.getUUID()), TransferredResource.class.getName());
-      }
+    if (ClientSelectedItemsUtils.isEmpty(selected) && resource != null) {
+      selected = new SelectedItemsList<TransferredResource>(Arrays.asList(resource.getUUID()),
+        TransferredResource.class.getName());
     }
 
     return selected;
@@ -597,7 +596,7 @@ public class IngestTransfer extends Composite {
       }
     } else {
       if (getSelected() instanceof SelectedItemsList) {
-        SelectedItemsList resourceList = (SelectedItemsList) getSelected();
+        SelectedItemsList<TransferredResource> resourceList = (SelectedItemsList<TransferredResource>) getSelected();
         transferredResourceId = (String) resourceList.getIds().get(0);
       } else {
         return;
@@ -651,7 +650,6 @@ public class IngestTransfer extends Composite {
   }
 
   private void doTransferredResourceMove(List<TransferredResource> resources) {
-
     Filter filter = new Filter();
 
     if (resource != null) {

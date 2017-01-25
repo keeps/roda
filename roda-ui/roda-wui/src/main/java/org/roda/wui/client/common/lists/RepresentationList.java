@@ -16,10 +16,8 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
-import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
-import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.Humanize;
@@ -38,8 +36,7 @@ import config.i18n.client.ClientMessages;
 
 public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentation> {
 
-  @SuppressWarnings("unused")
-  private final ClientLogger logger = new ClientLogger(getClass().getName());
+  private final ClientLogger LOGGER = new ClientLogger(getClass().getName());
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private TextColumn<IndexedRepresentation> originalColumn;
@@ -78,7 +75,7 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
       public SafeHtml getValue(IndexedRepresentation rep) {
         SafeHtml ret;
         if (rep == null) {
-          logger.error("Trying to display a NULL item");
+          LOGGER.error("Trying to display a NULL item");
           ret = null;
         } else {
           ret = DescriptionLevelUtils.getRepresentationTypeIcon(rep.getType(), true);
@@ -140,7 +137,6 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
     columnSortingKeyMap.put(typeColumn, Arrays.asList(RodaConstants.REPRESENTATION_TYPE));
     columnSortingKeyMap.put(sizeInBytesColumn, Arrays.asList(RodaConstants.REPRESENTATION_SIZE_IN_BYTES));
     columnSortingKeyMap.put(numberOfDataFilesColumn, Arrays.asList(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES));
-
     return createSorter(columnSortList, columnSortingKeyMap);
   }
 

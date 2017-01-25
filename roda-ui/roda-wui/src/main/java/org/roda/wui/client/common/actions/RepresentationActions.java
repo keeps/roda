@@ -20,7 +20,7 @@ import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.search.SearchSuggestBox;
 import org.roda.wui.client.planning.Planning;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
-import org.roda.wui.client.process.CreateJob;
+import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.widgets.Toast;
@@ -237,7 +237,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
     LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
     selectedItems.setSelectedItems(selected);
     selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
-    HistoryUtils.newHistory(CreateJob.RESOLVER, "action");
+    HistoryUtils.newHistory(CreateSelectedJob.RESOLVER, "action");
     callback.onSuccess(ActionImpact.UPDATED);
   }
 

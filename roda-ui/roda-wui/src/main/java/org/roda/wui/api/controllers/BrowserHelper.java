@@ -1520,9 +1520,12 @@ public class BrowserHelper {
   }
 
   private static void deleteAIPEvent(ModelService model, User user, String aipId, String details) {
-    String outcomeText = "The AIP '" + aipId + "' has been manually deleted.";
-    model.createRepositoryEvent(PreservationEventType.DELETION, "The process of deleting an object of the repository.",
-      PluginState.SUCCESS, outcomeText, details, user.getName(), true);
+    if (details != null) {
+      String outcomeText = "The AIP '" + aipId + "' has been manually deleted.";
+      model.createRepositoryEvent(PreservationEventType.DELETION,
+        "The process of deleting an object of the repository.", PluginState.SUCCESS, outcomeText, details,
+        user.getName(), true);
+    }
   }
 
   public static void deleteRepresentation(User user, SelectedItems<IndexedRepresentation> selected, String details)
@@ -3204,7 +3207,7 @@ public class BrowserHelper {
     RodaCoreFactory.getIndexService().commit(DIPFile.class);
   }
 
-  public static void createFormatIdentificationJob(User user, SelectedItems selected) throws GenericException,
+  public static void createFormatIdentificationJob(User user, SelectedItems<?> selected) throws GenericException,
     JobAlreadyStartedException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     Job job = new Job();
     job.setId(UUID.randomUUID().toString());

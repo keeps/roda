@@ -33,8 +33,8 @@ import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -88,7 +88,7 @@ public class EditPermissions extends Composite {
 
       } else if (historyTokens.isEmpty()) {
         LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
-        final SelectedItems selected = selectedItems.getSelectedItems();
+        final SelectedItems<IndexedAIP> selected = (SelectedItems<IndexedAIP>) selectedItems.getSelectedItems();
 
         if (!ClientSelectedItemsUtils.isEmpty(selected)) {
           BrowserService.Util.getInstance().retrieve(IndexedAIP.class.getName(), selected,

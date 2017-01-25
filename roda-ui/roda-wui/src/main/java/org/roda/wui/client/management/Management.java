@@ -15,7 +15,7 @@ import java.util.List;
 
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.process.ActionProcess;
-import org.roda.wui.client.process.CreateJob;
+import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.common.client.BadHistoryTokenException;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -103,8 +103,8 @@ public class Management {
         NotificationRegister.getInstance().resolve(HistoryUtils.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(ActionProcess.RESOLVER.getHistoryToken())) {
         ActionProcess.getInstance().resolve(HistoryUtils.tail(historyTokens), callback);
-      } else if (historyTokens.get(0).equals(CreateJob.RESOLVER.getHistoryToken())) {
-        CreateJob.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+      } else if (historyTokens.get(0).equals(CreateSelectedJob.RESOLVER.getHistoryToken())) {
+        CreateSelectedJob.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(Statistics.RESOLVER.getHistoryToken())) {
         Statistics.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals("help")) {

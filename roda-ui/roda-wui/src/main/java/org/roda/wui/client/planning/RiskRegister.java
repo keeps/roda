@@ -33,8 +33,8 @@ import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.client.process.CreateJob;
-import org.roda.wui.client.process.CreateSearchActionJob;
+import org.roda.wui.client.process.CreateSelectedJob;
+import org.roda.wui.client.process.CreateActionJob;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -258,8 +258,8 @@ public class RiskRegister extends Composite {
     } else if (historyTokens.size() == 2 && historyTokens.get(0).equals(RiskHistory.RESOLVER.getHistoryToken())) {
       RiskHistory.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.size() == 1
-      && historyTokens.get(0).equals(CreateSearchActionJob.RESOLVER.getHistoryToken())) {
-      CreateSearchActionJob.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+      && historyTokens.get(0).equals(CreateActionJob.RESOLVER.getHistoryToken())) {
+      CreateActionJob.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else {
       HistoryUtils.newHistory(RESOLVER);
       callback.onSuccess(null);
@@ -341,7 +341,7 @@ public class RiskRegister extends Composite {
     LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
     selectedItems.setSelectedItems(riskList.getSelected());
     selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
-    HistoryUtils.newHistory(CreateJob.RESOLVER, "action");
+    HistoryUtils.newHistory(CreateSelectedJob.RESOLVER, "action");
   }
 
 }

@@ -24,7 +24,7 @@ import org.roda.wui.client.common.dialogs.EditMultipleRiskIncidenceDialog;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.management.MemberManagement;
-import org.roda.wui.client.process.CreateJob;
+import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -213,7 +213,7 @@ public class ShowRisk extends Composite {
     LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
     selectedItems.setSelectedItems(riskShowPanel.getSelectedIncidences());
     selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
-    HistoryUtils.newHistory(CreateJob.RESOLVER, "action");
+    HistoryUtils.newHistory(CreateSelectedJob.RESOLVER, "action");
   }
 
   @SuppressWarnings({"unchecked", "rawtypes"})

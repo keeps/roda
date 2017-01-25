@@ -211,7 +211,7 @@ public class ActionProcess extends Composite {
 
   @UiHandler("newJob")
   void handleNewJobAction(ClickEvent e) {
-    HistoryUtils.newHistory(CreateActionJob.RESOLVER);
+    HistoryUtils.newHistory(CreateDefaultJob.RESOLVER);
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {

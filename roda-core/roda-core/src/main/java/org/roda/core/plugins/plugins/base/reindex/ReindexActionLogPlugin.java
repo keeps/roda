@@ -129,9 +129,9 @@ public class ReindexActionLogPlugin extends AbstractPlugin<Void> {
 
     if (parameters != null && parameters.containsKey(RodaConstants.PLUGIN_PARAMS_INT_VALUE)) {
       try {
-        int dontReindexOlderThanXDays = Integer.parseInt(parameters.get(RodaConstants.PLUGIN_PARAMS_INT_VALUE));
-        if (dontReindexOlderThanXDays > 0) {
-          this.dontReindexOlderThanXDays = dontReindexOlderThanXDays;
+        int dontReindexOlderThan = Integer.parseInt(parameters.get(RodaConstants.PLUGIN_PARAMS_INT_VALUE));
+        if (dontReindexOlderThan > 0) {
+          dontReindexOlderThanXDays = dontReindexOlderThan;
         }
       } catch (NumberFormatException e) {
         // do nothing

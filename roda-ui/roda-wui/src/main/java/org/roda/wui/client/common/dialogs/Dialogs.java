@@ -223,7 +223,7 @@ public class Dialogs {
   }
 
   public static void showPromptDialogSuggest(String title, String message, String placeHolder, String cancelButtonText,
-    String confirmButtonText, SearchSuggestBox suggestBox, final AsyncCallback<String> callback) {
+    String confirmButtonText, SearchSuggestBox<?> suggestBox, final AsyncCallback<String> callback) {
     final DialogBox dialogBox = new DialogBox(false, true);
     dialogBox.setText(title);
 
@@ -235,7 +235,7 @@ public class Dialogs {
       messageLabel.addStyleName("wui-dialog-message");
     }
 
-    final SearchSuggestBox inputBox = suggestBox;
+    final SearchSuggestBox<?> inputBox = suggestBox;
 
     if (placeHolder != null) {
       inputBox.getElement().setPropertyString("placeholder", placeHolder);

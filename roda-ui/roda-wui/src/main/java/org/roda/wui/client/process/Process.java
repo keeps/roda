@@ -71,12 +71,12 @@ public class Process {
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 0) {
       callback.onSuccess(page);
-    } else if (historyTokens.get(0).equals(CreateJob.RESOLVER.getHistoryToken())) {
-      CreateJob.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+    } else if (historyTokens.get(0).equals(CreateSelectedJob.RESOLVER.getHistoryToken())) {
+      CreateSelectedJob.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.get(0).equals(ShowJob.RESOLVER.getHistoryToken())) {
       ShowJob.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
-    } else if (historyTokens.size() == 1 && historyTokens.get(0).equals(CreateActionJob.RESOLVER.getHistoryToken())) {
-      CreateActionJob.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+    } else if (historyTokens.size() == 1 && historyTokens.get(0).equals(CreateDefaultJob.RESOLVER.getHistoryToken())) {
+      CreateDefaultJob.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else {
       callback.onFailure(new BadHistoryTokenException(historyTokens.get(0)));
     }

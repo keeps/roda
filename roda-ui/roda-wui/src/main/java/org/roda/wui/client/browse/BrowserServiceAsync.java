@@ -218,7 +218,7 @@ public interface BrowserServiceAsync {
   void createFolder(String aipId, String representationId, String folderUUID, String newName, String details,
     AsyncCallback<IndexedFile> asyncCallback);
 
-  void createFormatIdentificationJob(SelectedItems selected, AsyncCallback<Void> loadingAsyncCallback);
+  void createFormatIdentificationJob(SelectedItems<?> selected, AsyncCallback<Void> loadingAsyncCallback);
 
   void changeRepresentationType(SelectedItems<IndexedRepresentation> selectedRepresentation, String newType,
     String details, AsyncCallback<Void> loadingAsyncCallback);

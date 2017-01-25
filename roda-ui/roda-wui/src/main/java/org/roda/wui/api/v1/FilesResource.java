@@ -169,11 +169,10 @@ public class FilesResource {
 
     // delegate action to controller
     try {
-      org.roda.core.data.v2.ip.File file;
       String name = filename == null ? fileDetail.getFileName() : filename;
 
-      file = Browser.createFile(user, aipId, representationId, folderPath, name, inputStream,
-        details != null ? details : "");
+      org.roda.core.data.v2.ip.File file = Browser.createFile(user, aipId, representationId, folderPath, name,
+        inputStream, details != null ? details : "");
 
       return Response.ok(file, mediaType).build();
     } catch (IOException e) {

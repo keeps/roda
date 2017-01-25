@@ -314,7 +314,7 @@ public interface BrowserService extends RemoteService {
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, AlreadyExistsException,
     NotFoundException;
 
-  void createFormatIdentificationJob(SelectedItems selected) throws GenericException, AuthorizationDeniedException,
+  void createFormatIdentificationJob(SelectedItems<?> selected) throws GenericException, AuthorizationDeniedException,
     JobAlreadyStartedException, RequestNotValidException, NotFoundException;
 
   void changeRepresentationType(SelectedItems<IndexedRepresentation> selectedRepresentation, String newType,

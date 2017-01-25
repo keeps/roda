@@ -41,12 +41,9 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.ClientMessages;
-
 public class IncrementalAssociativeList extends Composite implements HasHandlers {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  @SuppressWarnings("rawtypes")
   interface MyUiBinder extends UiBinder<Widget, IncrementalAssociativeList> {
   }
 
@@ -63,8 +60,6 @@ public class IncrementalAssociativeList extends Composite implements HasHandlers
   private Class actualClass;
   private List<String> excludedIds;
   boolean changed = false;
-
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   public <T extends IsIndexed> IncrementalAssociativeList(Class<T> specificClass, String id, String search,
     String dialogName) {

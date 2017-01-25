@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Rui Castro
  */
+@SuppressWarnings("unused")
 public class AVGAntiVirus implements AntiVirus {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AVGAntiVirus.class);
