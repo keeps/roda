@@ -66,7 +66,7 @@ import com.google.common.collect.Iterables;
 
 import jersey.repackaged.com.google.common.collect.Lists;
 
-@Test(groups = {"all"})
+@Test(groups = {"all", "plugin"})
 public class UnoconvTest {
   private static final Logger LOGGER = LoggerFactory.getLogger(UnoconvTest.class);
 
@@ -169,7 +169,8 @@ public class UnoconvTest {
       Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f -> f.get()).collect(Collectors.toList()));
 
     Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_OUTPUT_FORMAT, "pdf");
+    String outputExtension = "pdf";
+    parameters.put(RodaConstants.PLUGIN_PARAMS_OUTPUT_FORMAT, outputExtension);
 
     Job job = TestsHelper.executeJob(UnoconvConvertPlugin.class, parameters, PluginType.AIP_TO_AIP,
       SelectedItemsAll.create(Representation.class));
@@ -187,21 +188,27 @@ public class UnoconvTest {
 
     AssertJUnit.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
 
-    int changedCounter = 0;
+    int finalObjectsCounter = 0;
 
+    String inputExtensionsRegex = RodaCoreFactory.getRodaConfiguration()
+      .getString("core.tools." + UnoconvConvertPlugin.TOOLNAME + ".inputFormatExtensions").replaceAll(" ", "|");
     for (File f : reusableAllFiles) {
-      if (f.getId().matches(".*[.](pdf|docx|txt|xls|odp|ppt|pptx|doc|xlsx|ods|odt|xml)$")) {
-        changedCounter++;
+      if (f.getId().matches(".*\\.(" + inputExtensionsRegex + ")$")) {
+        finalObjectsCounter++;
         String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
         AssertJUnit.assertEquals(1,
-          newReusableAllFiles.stream().filter(o -> o.getId().equals(filename + ".pdf")).count());
+          newReusableAllFiles.stream().filter(o -> o.getId().equals(filename + "." + outputExtension)).count());
+      } else {
+        if (f.getId().endsWith(outputExtension)) {
+          finalObjectsCounter++;
+        }
       }
     }
 
-    List<File> changedFiles = newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]pdf$"))
-      .collect(Collectors.toList());
+    List<File> changedFiles = newReusableAllFiles.stream()
+      .filter(o -> o.getId().matches(".*[.]" + outputExtension + "$")).collect(Collectors.toList());
 
-    AssertJUnit.assertEquals(changedCounter, changedFiles.size());
+    AssertJUnit.assertEquals(finalObjectsCounter, changedFiles.size());
   }
 
 }

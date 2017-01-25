@@ -266,6 +266,10 @@
 			</exclusions>
 		</dependency>
 		<dependency>
+			<groupId>org.roda-project</groupId>
+			<artifactId>roda-plugin-common</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.bytebybyte.gwt</groupId>
 			<artifactId>fontawesome-lib</artifactId>
 		</dependency>

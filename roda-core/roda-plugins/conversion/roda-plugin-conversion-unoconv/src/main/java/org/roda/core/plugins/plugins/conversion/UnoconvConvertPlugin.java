@@ -29,7 +29,7 @@ import org.roda.core.util.CommandException;
 import org.slf4j.LoggerFactory;
 
 public class UnoconvConvertPlugin<T extends IsRODAObject> extends CommandConvertPlugin<T> {
-  private static final String TOOLNAME = "unoconvconvert";
+  public static final String TOOLNAME = "unoconvconvert";
 
   public UnoconvConvertPlugin() {
     super();
