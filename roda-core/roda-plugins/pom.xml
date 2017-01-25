@@ -53,9 +53,13 @@
 	</repositories>
 	<dependencyManagement>
 		<dependencies>
-			<!-- VeraPDF, DigitalSignature and PDFtoPDFA Plugins -->
 			<dependency>
-				<artifactId>gui</artifactId>
+				<artifactId>core</artifactId>
+				<groupId>org.verapdf</groupId>
+				<version>${verapdf.version}</version>
+			</dependency>
+			<dependency>
+				<artifactId>validation-model</artifactId>
 				<groupId>org.verapdf</groupId>
 				<version>${verapdf.version}</version>
 			</dependency>

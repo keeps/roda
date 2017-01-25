@@ -158,7 +158,7 @@ public class PdfToPdfaTest {
     return model.retrieveAIP(indexedAIP.getId());
   }
 
-  @Test(enabled = false)
+  @Test
   public void testPdfToPdfaPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException,
     SolrServerException, IsStillUpdatingException {
     AIP aip = ingestCorpora();

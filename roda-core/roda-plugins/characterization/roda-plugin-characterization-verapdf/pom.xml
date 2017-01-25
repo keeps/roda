@@ -100,7 +100,11 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<artifactId>gui</artifactId>
+			<artifactId>core</artifactId>
+			<groupId>org.verapdf</groupId>
+		</dependency>
+		<dependency>
+			<artifactId>validation-model</artifactId>
 			<groupId>org.verapdf</groupId>
 		</dependency>
 		<dependency>
