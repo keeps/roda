@@ -362,7 +362,6 @@ public class PluginManager {
 
     if (jarPluginCache.containsKey(jarFile)
       && attrs.lastModifiedTime().toMillis() == jarPluginCache.get(jarFile).lastModified) {
-      // The plugin already exists
 
       LOGGER.debug("{} is already loaded", jarFile.getFileName());
 
@@ -372,7 +371,8 @@ public class PluginManager {
 
       List<Plugin<? extends IsRODAObject>> plugins = loadPlugin(jarFile, jars);
       if (!plugins.isEmpty()) {
-        LOGGER.info("'{}' is not loaded or modification dates differ. Inspecting Jar...", jarFile.getFileName());
+        LOGGER.info("'{}' (is new? {}) is not loaded or modification dates differ. Inspecting Jar...",
+          jarFile.getFileName(), jarPluginCache.containsKey(jarFile));
       }
       for (Plugin<? extends IsRODAObject> plugin : plugins) {
         try {
@@ -391,10 +391,12 @@ public class PluginManager {
 
           synchronized (jarPluginCache) {
             if (jarPluginCache.get(jarFile) != null) {
-              jarPluginCache.get(jarFile).plugins.add(plugin);
+              JarPlugins jarPlugins = jarPluginCache.get(jarFile);
+              jarPlugins.plugins = new ArrayList<>();
+              jarPlugins.plugins.add(plugin);
+              jarPlugins.lastModified = attrs.lastModifiedTime().toMillis();
             } else {
-              jarPluginCache.put(jarFile, new JarPlugins(plugin,
-                Files.readAttributes(jarFile, BasicFileAttributes.class).lastModifiedTime().toMillis()));
+              jarPluginCache.put(jarFile, new JarPlugins(plugin, attrs.lastModifiedTime().toMillis()));
             }
           }
         } catch (Exception | LinkageError e) {
