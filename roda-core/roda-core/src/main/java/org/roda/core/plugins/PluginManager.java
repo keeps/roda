@@ -370,10 +370,10 @@ public class PluginManager {
       // The plugin doesn't exist or the modification date is
       // different. Let's load the Plugin
 
-      LOGGER.debug("{} is not loaded or modification dates differ. Inspecting Jar...", jarFile.getFileName());
-
       List<Plugin<? extends IsRODAObject>> plugins = loadPlugin(jarFile, jars);
-
+      if (!plugins.isEmpty()) {
+        LOGGER.info("'{}' is not loaded or modification dates differ. Inspecting Jar...", jarFile.getFileName());
+      }
       for (Plugin<? extends IsRODAObject> plugin : plugins) {
         try {
           if (plugin != null && !blacklistedPlugins.contains(plugin.getClass().getName())) {
@@ -381,11 +381,11 @@ public class PluginManager {
             plugin.init();
             externalPluginChache.put(plugin.getClass().getName(), plugin);
             processAndCachePluginInformation(plugin);
-            LOGGER.debug("Plugin started {} (version {})", plugin.getName(), plugin.getVersion());
+            LOGGER.info("Plugin started '{}' (version {})", plugin.getName(), plugin.getVersion());
 
           } else {
 
-            LOGGER.trace("{} is not a Plugin", jarFile.getFileName());
+            LOGGER.trace("'{}' is not a Plugin", jarFile.getFileName());
 
           }
 
