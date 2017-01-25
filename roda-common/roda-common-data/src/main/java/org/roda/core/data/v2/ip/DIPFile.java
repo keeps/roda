@@ -85,10 +85,6 @@ public class DIPFile implements IsModelObject, IsIndexed {
     this.size = size;
   }
 
-  public static long getSerialversionuid() {
-    return serialVersionUID;
-  }
-
   public List<String> getPath() {
     return path;
   }
@@ -97,7 +93,7 @@ public class DIPFile implements IsModelObject, IsIndexed {
     this.path = path;
   }
 
-  public List<String> getAncestorsPath() {
+  public List<String> getAncestorsUUIDs() {
     return ancestorsUUIDs;
   }
 
@@ -227,7 +223,7 @@ public class DIPFile implements IsModelObject, IsIndexed {
 
   @Override
   public List<String> toCsvHeaders() {
-    return Arrays.asList("uuid", "id", "dipId", "path", "ancestorsPath", "size", "storagePath", "isDirectory");
+    return Arrays.asList("uuid", "id", "dipId", "path", "ancestors", "size", "storagePath", "isDirectory");
   }
 
   @Override

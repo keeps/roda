@@ -268,6 +268,7 @@ div.inline {
 
 
 .card {
+	background-color: white;
     box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
     transition: all 0.3s cubic-bezier(.25,.8,.25,1);
     border-radius: 2px;
@@ -335,6 +336,7 @@ div.inline {
 }
 
 .descriptiveMetadataCard {
+	background-color: inherit;
 	box-shadow: none;
 	padding: 0;
 	transition: none;
@@ -1822,8 +1824,17 @@ td.datePickerMonth, td.datePickerYear {
 
 .sidebar-facet-title {
     color: inherit;
+    margin-top: 0;
     margin-bottom: 5px;
     font-size: 1.8rem;
+}
+
+.sidebar-facet-panel + .sidebar-facet-panel {
+	margin-top: 15px;
+}
+
+.sidebar-group + .sidebar-group {
+	margin-top: 15px;
 }
 
 .sidebar-facet-label {
@@ -1872,6 +1883,10 @@ td.datePickerMonth, td.datePickerYear {
 
 .wui-home {
     color: #58595b;
+}
+
+.content > .gwt-HTML > h1 {
+	margin-top: 0;
 }
 
 /**********************************************
@@ -2042,7 +2057,7 @@ td.datePickerMonth, td.datePickerYear {
 	margin-top: 0;
 }
 
-.browse.under_appraisal, .browse.deleted, .browse.created, .browse.ingest_processing {
+.browse_aip.under_appraisal, .browse_aip.deleted, .browse_aip.created, .browse_aip.ingest_processing {
     background-color: #efefef;
     background-image: repeating-linear-gradient(-45deg, transparent, transparent 35px, rgba(255, 255, 255, .5) 35px, rgba(255, 255, 255, .5) 70px);
 }

@@ -558,6 +558,7 @@ public class IngestTransfer extends Composite {
     HistoryUtils.newHistory(CreateJob.RESOLVER, "ingest");
   }
 
+  @Deprecated
   public SelectedItems getSelected() {
     SelectedItems selected = transferredResourceList.getSelected();
     if (selected instanceof SelectedItemsList) {

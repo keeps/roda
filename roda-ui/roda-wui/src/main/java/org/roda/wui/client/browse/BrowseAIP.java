@@ -704,6 +704,23 @@ public class BrowseAIP extends Composite {
     aipChildrenList.getParent().setVisible(true);
 
     actionsSidebar.setVisible(true);
+    actionsSidebar.setWidget(
+      AipActions.get().createActionsLayout(AipActions.NO_AIP_OBJECT, new AsyncCallback<Actionable.ActionImpact>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
+        }
+
+        @Override
+        public void onSuccess(Actionable.ActionImpact impact) {
+          if (Actionable.ActionImpact.UPDATED.equals(impact)) {
+            // reload
+            clear();
+            viewAction(aipId);
+          }
+        }
+      }));
 
     // Set button visibility
     searchSection.setVisible(false);

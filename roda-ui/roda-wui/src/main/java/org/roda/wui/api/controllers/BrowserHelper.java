@@ -477,7 +477,7 @@ public class BrowserHelper {
       bundle.setDipFile(dipFile);
 
       List<DIPFile> dipFileAncestors = new ArrayList<>();
-      for (String dipFileAncestor : dipFile.getAncestorsPath()) {
+      for (String dipFileAncestor : dipFile.getAncestorsUUIDs()) {
         try {
           dipFileAncestors.add(retrieve(DIPFile.class, dipFileAncestor));
         } catch (NotFoundException e) {

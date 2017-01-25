@@ -48,8 +48,15 @@ import config.i18n.client.ClientMessages;
 
 public class AipActions extends AbstractActionable<IndexedAIP> {
 
-  private static final AipActions GENERAL_INSTANCE = new AipActions(null, null);
+  public static final IndexedAIP NO_AIP_OBJECT = null;
+  public static final String NO_AIP_PARENT = null;
+  public static final AIPState NO_AIP_STATE = null;
+
+  private static final AipActions GENERAL_INSTANCE = new AipActions(NO_AIP_PARENT, NO_AIP_STATE);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
+
+  private static final Set<AipAction> POSSIBLE_ACTIONS_ON_NO_AIP = new HashSet<>(
+    Arrays.asList(AipAction.NEW_CHILD_AIP));
 
   private static final Set<AipAction> POSSIBLE_ACTIONS_ON_SINGLE_AIP = new HashSet<>(
     Arrays.asList(AipAction.NEW_CHILD_AIP, AipAction.DOWNLOAD, AipAction.MOVE_IN_HIERARCHY,
@@ -86,7 +93,9 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   @Override
   public boolean canAct(Actionable.Action<IndexedAIP> action, IndexedAIP aip) {
     boolean canAct;
-    if (AIPState.UNDER_APPRAISAL.equals(aip.getState())) {
+    if (aip == NO_AIP_OBJECT) {
+      canAct = POSSIBLE_ACTIONS_ON_NO_AIP.contains(action);
+    } else if (AIPState.UNDER_APPRAISAL.equals(aip.getState())) {
       canAct = POSSIBLE_ACTIONS_ON_SINGLE_AIP.contains(action) || APPRAISAL_ACTIONS.contains(action);
     } else {
       canAct = POSSIBLE_ACTIONS_ON_SINGLE_AIP.contains(action);
@@ -163,8 +172,10 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
   // ACTIONS
   private void newChildAip(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
+
+    String newChildParentAipId = aip != null ? aip.getId() : null;
     String aipType = RodaConstants.AIP_TYPE_MIXED;
-    BrowserService.Util.getInstance().createAIP(aip.getId(), aipType, new AsyncCallback<String>() {
+    BrowserService.Util.getInstance().createAIP(newChildParentAipId, aipType, new AsyncCallback<String>() {
 
       @Override
       public void onFailure(Throwable caught) {
@@ -579,6 +590,9 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     // MANAGEMENT
     addTitle(layout, messages.intellectualEntity(), aip, AipAction.NEW_CHILD_AIP, AipAction.MOVE_IN_HIERARCHY,
       AipAction.UPDATE_PERMISSIONS, AipAction.ADD_REPRESENTATION, AipAction.REMOVE, AipAction.DOWNLOAD);
+
+    addButton(layout, messages.newArchivalPackage(), AipAction.NEW_CHILD_AIP, aip, ActionImpact.UPDATED, callback,
+      "btn-plus");
 
     addButton(layout, messages.moveArchivalPackage(), AipAction.MOVE_IN_HIERARCHY, aip, ActionImpact.UPDATED, callback,
       "btn-edit");

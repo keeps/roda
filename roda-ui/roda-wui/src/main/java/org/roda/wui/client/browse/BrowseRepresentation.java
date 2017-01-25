@@ -216,6 +216,8 @@ public class BrowseRepresentation extends Composite {
 
     handlers = new ArrayList<HandlerRegistration>();
     String summary = messages.representationListOfFiles();
+
+    boolean justActive = AIPState.ACTIVE.equals(bundle.getAip().getState());
     boolean selectable = true;
     boolean showFilesPath = false;
 
@@ -224,7 +226,7 @@ public class BrowseRepresentation extends Composite {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_UUID, repUUID),
       new EmptyKeyFilterParameter(RodaConstants.FILE_PARENT_UUID));
 
-    filesList = new SearchFileList(filter, true, Facets.NONE, summary, selectable, showFilesPath);
+    filesList = new SearchFileList(filter, justActive, Facets.NONE, summary, selectable, showFilesPath);
     filesList.setActionable(FileActions.get(aipId, repId));
 
     ListSelectionUtils.bindBrowseOpener(filesList);

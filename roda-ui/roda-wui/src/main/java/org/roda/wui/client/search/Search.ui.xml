@@ -28,6 +28,34 @@
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">
 					<g:FlowPanel addStyleNames="sticky-padding">
+						<g:FlowPanel styleName="sidebar-group" ui:field="itemsFacets">
+							<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+								<g:Label addStyleNames="h5 sidebar-facet-title">
+									<ui:text from='{messages.searchDescriptionLevels}' />
+								</g:Label>
+								<g:FlowPanel ui:field="facetDescriptionLevels" />
+							</g:FlowPanel>
+							<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+								<g:Label addStyleNames="h5 sidebar-facet-title">
+									<ui:text from='{messages.searchRepresentations}' />
+								</g:Label>
+								<g:FlowPanel ui:field="facetHasRepresentations" />
+							</g:FlowPanel>
+						</g:FlowPanel>
+						<g:FlowPanel styleName="sidebar-group" ui:field="representationsFacets">
+							<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+								<g:Label addStyleNames="h5 sidebar-facet-title">
+									<ui:text from='{messages.searchRepresentationType}' />
+								</g:Label>
+								<g:FlowPanel ui:field="facetRepresentationType" />
+							</g:FlowPanel>
+							<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+								<g:Label addStyleNames="h5 sidebar-facet-title">
+									<ui:text from='{messages.searchRepresentationOriginal}' />
+								</g:Label>
+								<g:FlowPanel ui:field="facetRepresentationOriginal" />
+							</g:FlowPanel>
+						</g:FlowPanel>
 						<g:FlowPanel styleName="sidebar-group" ui:field="filesFacets">
 							<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
 								<g:Label addStyleNames="h5 sidebar-facet-title">
@@ -46,38 +74,6 @@
 									<ui:text from='{messages.searchMimetypes}' />
 								</g:Label>
 								<g:FlowPanel ui:field="facetMimetypes" />
-							</g:FlowPanel>
-						</g:FlowPanel>
-						<g:FlowPanel addStyleNames="sidebar-facet-panel">
-							<g:Label addStyleNames="h4">
-								<ui:text from='{messages.sidebarActionsTitle}' />
-							</g:Label>
-							<g:Button addStyleNames="btn btn-block btn-edit" ui:field="editPermissions">
-								<ui:text from='{messages.archivalPackagePermissions}' />
-							</g:Button>
-							<g:Button addStyleNames="btn btn-block btn-edit" ui:field="moveItem">
-								<ui:text from='{messages.moveArchivalPackage}' />
-							</g:Button>
-							<g:Button addStyleNames="btn btn-block btn-danger btn-ban"
-								ui:field="remove">
-								<ui:text from='{messages.removeArchivalPackage}' />
-							</g:Button>
-							<g:Button addStyleNames="btn btn-block btn-play" ui:field="newJobButton">
-								<ui:text from='{messages.newProcessPreservation}' />
-							</g:Button>
-						</g:FlowPanel>
-						<g:FlowPanel styleName="sidebar-group" ui:field="itemsFacets">
-							<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-								<g:Label addStyleNames="h5 sidebar-facet-title">
-									<ui:text from='{messages.searchDescriptionLevels}' />
-								</g:Label>
-								<g:FlowPanel ui:field="facetDescriptionLevels" />
-							</g:FlowPanel>
-							<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-								<g:Label addStyleNames="h5 sidebar-facet-title">
-									<ui:text from='{messages.searchRepresentations}' />
-								</g:Label>
-								<g:FlowPanel ui:field="facetHasRepresentations" />
 							</g:FlowPanel>
 						</g:FlowPanel>
 					</g:FlowPanel>

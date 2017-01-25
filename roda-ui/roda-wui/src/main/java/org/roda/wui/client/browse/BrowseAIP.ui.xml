@@ -92,8 +92,9 @@
 				<g:FlowPanel addStyleNames="col_2 last sidebar">
 					<g:FlowPanel addStyleNames="sticky-flow">
 						<g:FlowPanel addStyleNames="sticky-padding">
-							<g:SimplePanel ui:field="actionsSidebar" />
-							<g:FlowPanel ui:field="searchSection">
+							<g:SimplePanel addStyleNames="sidebar-group"
+								ui:field="actionsSidebar" />
+							<g:FlowPanel addStyleNames="sidebar-group" ui:field="searchSection">
 								<g:Label addStyleNames="h4">
 									<ui:text from='{messages.searchTitle}' />
 								</g:Label>

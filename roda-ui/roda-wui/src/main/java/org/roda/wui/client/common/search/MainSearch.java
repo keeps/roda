@@ -23,10 +23,8 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.wui.client.common.actions.AipActions;
 import org.roda.wui.client.common.actions.FileActions;
@@ -35,10 +33,7 @@ import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.RepresentationList;
 import org.roda.wui.client.common.lists.SearchFileList;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
-import org.roda.wui.client.common.lists.utils.AsyncTableCell.CheckboxSelectionListener;
-import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.common.client.tools.FacetUtils;
-import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -47,12 +42,9 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.SelectionChangeEvent;
-import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
 import config.i18n.client.ClientMessages;
 
@@ -72,9 +64,9 @@ public class MainSearch extends Composite {
   private static final Filter DEFAULT_FILTER_FILES = new Filter(
     new BasicSearchFilterParameter(RodaConstants.FILE_SEARCH, "*"));
 
-  Filter filter_aips;
-  Filter filter_representations;
-  Filter filter_files;
+  Filter filterAips;
+  Filter filterRepresentations;
+  Filter filterFiles;
 
   @UiField(provided = true)
   SearchPanel searchPanel;
@@ -98,23 +90,19 @@ public class MainSearch extends Composite {
 
   FlowPanel itemsFacets;
   Map<FacetParameter, FlowPanel> itemsFacetsMap;
-  Map<Button, Boolean> itemsButtons;
-  List<Button> itemsSelectionButtons;
   FlowPanel representationsFacets;
   Map<FacetParameter, FlowPanel> representationsFacetsMap;
-  Map<Button, Boolean> representationsButtons;
-  List<Button> representationsSelectionButtons;
   FlowPanel filesFacets;
   Map<FacetParameter, FlowPanel> filesFacetsMap;
-  Map<Button, Boolean> filesButtons;
-  List<Button> filesSelectionButtons;
+
+  // state
+  final String parentAipId;
+  final AIPState parentAipState;
 
   public MainSearch(boolean justActive, boolean itemsSelectable, boolean representationsSelectable,
     boolean filesSelectable, FlowPanel itemsFacets, Map<FacetParameter, FlowPanel> itemsFacetsMap,
-    Map<Button, Boolean> itemsButtons, List<Button> itemsSelectionButtons, FlowPanel representationsFacets,
-    Map<FacetParameter, FlowPanel> representationsFacetsMap, Map<Button, Boolean> representationsButtons,
-    List<Button> representationsSelectionButtons, FlowPanel filesFacets, Map<FacetParameter, FlowPanel> filesFacetsMap,
-    Map<Button, Boolean> filesButtons, List<Button> filesSelectionButtons) {
+    FlowPanel representationsFacets, Map<FacetParameter, FlowPanel> representationsFacetsMap, FlowPanel filesFacets,
+    Map<FacetParameter, FlowPanel> filesFacetsMap, String parentAipId, AIPState parentAipState) {
     this.justActive = justActive;
     this.itemsSelectable = itemsSelectable;
     this.representationsSelectable = representationsSelectable;
@@ -122,18 +110,15 @@ public class MainSearch extends Composite {
 
     this.itemsFacets = itemsFacets;
     this.itemsFacetsMap = itemsFacetsMap;
-    this.itemsButtons = itemsButtons;
-    this.itemsSelectionButtons = itemsSelectionButtons;
 
     this.representationsFacets = representationsFacets;
     this.representationsFacetsMap = representationsFacetsMap;
-    this.representationsButtons = representationsButtons;
-    this.representationsSelectionButtons = representationsSelectionButtons;
 
     this.filesFacets = filesFacets;
     this.filesFacetsMap = filesFacetsMap;
-    this.filesButtons = filesButtons;
-    this.filesSelectionButtons = filesSelectionButtons;
+
+    this.parentAipId = parentAipId;
+    this.parentAipState = parentAipState;
 
     ValueChangeHandler<Integer> searchAdvancedFieldsPanelHandler = new ValueChangeHandler<Integer>() {
 
@@ -153,7 +138,7 @@ public class MainSearch extends Composite {
 
     defaultFilters();
 
-    searchPanel = new SearchPanel(filter_aips, RodaConstants.AIP_SEARCH, true, messages.searchPlaceHolder(), true, true,
+    searchPanel = new SearchPanel(filterAips, RodaConstants.AIP_SEARCH, true, messages.searchPlaceHolder(), true, true,
       false);
 
     initWidget(uiBinder.createAndBindUi(this));
@@ -198,7 +183,7 @@ public class MainSearch extends Composite {
       createItemsSearchResultPanel();
     }
 
-    searchPanel.setVariables(filter_aips, RodaConstants.AIP_SEARCH, true, itemsSearchResultPanel,
+    searchPanel.setVariables(filterAips, RodaConstants.AIP_SEARCH, true, itemsSearchResultPanel,
       itemsSearchAdvancedFieldsPanel);
     searchPanel.setSearchAdvancedFieldOptionsAddVisible(true);
     searchPanel.setSearchAdvancedGoEnabled(itemsSearchAdvancedFieldsPanel.getWidgetCount() == 0 ? false : true);
@@ -210,9 +195,6 @@ public class MainSearch extends Composite {
     itemsFacets.setVisible(true);
     representationsFacets.setVisible(false);
     filesFacets.setVisible(false);
-
-    setButtons(itemsButtons);
-    setButtonsEnabled(itemsSelectionButtons, false);
   }
 
   public void showRepresentationsSearchAdvancedFieldsPanel() {
@@ -220,7 +202,7 @@ public class MainSearch extends Composite {
       createRepresentationsSearchResultPanel();
     }
 
-    searchPanel.setVariables(filter_representations, RodaConstants.REPRESENTATION_SEARCH, true,
+    searchPanel.setVariables(filterRepresentations, RodaConstants.REPRESENTATION_SEARCH, true,
       representationsSearchResultPanel, representationsSearchAdvancedFieldsPanel);
     searchPanel.setSearchAdvancedFieldOptionsAddVisible(true);
     searchPanel
@@ -233,9 +215,6 @@ public class MainSearch extends Composite {
     itemsFacets.setVisible(false);
     representationsFacets.setVisible(true);
     filesFacets.setVisible(false);
-
-    setButtons(representationsButtons);
-    setButtonsEnabled(representationsSelectionButtons, false);
   }
 
   public void showFilesSearchAdvancedFieldsPanel() {
@@ -243,7 +222,7 @@ public class MainSearch extends Composite {
       createFilesSearchResultPanel();
     }
 
-    searchPanel.setVariables(filter_files, RodaConstants.FILE_SEARCH, true, filesSearchResultPanel,
+    searchPanel.setVariables(filterFiles, RodaConstants.FILE_SEARCH, true, filesSearchResultPanel,
       filesSearchAdvancedFieldsPanel);
     searchPanel.setSearchAdvancedFieldOptionsAddVisible(true);
     searchPanel.setSearchAdvancedGoEnabled(filesSearchAdvancedFieldsPanel.getWidgetCount() == 0 ? false : true);
@@ -255,14 +234,11 @@ public class MainSearch extends Composite {
     itemsFacets.setVisible(false);
     representationsFacets.setVisible(false);
     filesFacets.setVisible(true);
-
-    setButtons(filesButtons);
-    setButtonsEnabled(filesSelectionButtons, false);
   }
 
   private void createItemsSearchResultPanel() {
     Facets facets = new Facets(itemsFacetsMap.keySet());
-    itemsSearchResultPanel = new AIPList(filter_aips, justActive, facets, messages.searchResults(), itemsSelectable);
+    itemsSearchResultPanel = new AIPList(filterAips, justActive, facets, messages.searchResults(), itemsSelectable);
 
     Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
     for (FacetParameter facetParameter : itemsFacetsMap.keySet()) {
@@ -272,20 +248,12 @@ public class MainSearch extends Composite {
 
     ListSelectionUtils.bindBrowseOpener(itemsSearchResultPanel);
 
-    itemsSearchResultPanel.setActionable(AipActions.get());
-
-    itemsSearchResultPanel.addCheckboxSelectionListener(new CheckboxSelectionListener<IndexedAIP>() {
-
-      @Override
-      public void onSelectionChange(SelectedItems<IndexedAIP> selected) {
-        setButtonsEnabled(itemsSelectionButtons, !(ClientSelectedItemsUtils.isEmpty(selected)));
-      }
-    });
+    itemsSearchResultPanel.setActionable(AipActions.get(parentAipId, parentAipState));
   }
 
   private void createRepresentationsSearchResultPanel() {
     Facets facets = new Facets(representationsFacetsMap.keySet());
-    representationsSearchResultPanel = new RepresentationList(filter_representations, justActive, facets,
+    representationsSearchResultPanel = new RepresentationList(filterRepresentations, justActive, facets,
       messages.searchResults(), representationsSelectable);
 
     Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
@@ -296,40 +264,22 @@ public class MainSearch extends Composite {
 
     ListSelectionUtils.bindBrowseOpener(representationsSearchResultPanel);
 
-    representationsSearchResultPanel
-      .addCheckboxSelectionListener(new CheckboxSelectionListener<IndexedRepresentation>() {
-
-        @Override
-        public void onSelectionChange(SelectedItems<IndexedRepresentation> selected) {
-          setButtonsEnabled(representationsSelectionButtons, !(ClientSelectedItemsUtils.isEmpty(selected)));
-        }
-      });
-
     representationsSearchResultPanel.setActionable(RepresentationActions.get());
   }
 
   private void createFilesSearchResultPanel() {
     Facets facets = new Facets(filesFacetsMap.keySet());
     boolean showFilesPath = false;
-    filesSearchResultPanel = new SearchFileList(filter_files, justActive, facets, messages.searchResults(),
+    filesSearchResultPanel = new SearchFileList(filterFiles, justActive, facets, messages.searchResults(),
       filesSelectable, showFilesPath);
 
     Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
     for (FacetParameter facetParameter : filesFacetsMap.keySet()) {
       facetPanels.put(facetParameter.getName(), filesFacetsMap.get(facetParameter));
     }
+
     FacetUtils.bindFacets(filesSearchResultPanel, facetPanels);
-
     ListSelectionUtils.bindBrowseOpener(filesSearchResultPanel);
-
-    filesSearchResultPanel.addCheckboxSelectionListener(new CheckboxSelectionListener<IndexedFile>() {
-
-      @Override
-      public void onSelectionChange(SelectedItems<IndexedFile> selected) {
-        setButtonsEnabled(filesSelectionButtons, !(ClientSelectedItemsUtils.isEmpty(selected)));
-      }
-    });
-
     filesSearchResultPanel.setActionable(FileActions.get());
   }
 
@@ -376,18 +326,6 @@ public class MainSearch extends Composite {
     }
   }
 
-  private void setButtons(Map<Button, Boolean> buttonsMap) {
-    for (Button button : buttonsMap.keySet()) {
-      button.setVisible(buttonsMap.get(button));
-    }
-  }
-
-  private void setButtonsEnabled(List<Button> buttons, boolean active) {
-    for (Button button : buttons) {
-      button.setEnabled(active);
-    }
-  }
-
   public boolean setSearch(List<String> historyTokens) {
     // #search/TYPE/key/value/key/value
     String type = historyTokens.get(0);
@@ -404,14 +342,14 @@ public class MainSearch extends Composite {
 
       if (!params.isEmpty()) {
         if (searchPanel.isDefaultFilterIncremental()) {
-          filter_aips.add(params);
-          filter_representations.add(params);
-          filter_files.add(params);
+          filterAips.add(params);
+          filterRepresentations.add(params);
+          filterFiles.add(params);
         } else {
           Filter filter = new Filter(params);
-          filter_aips = filter;
-          filter_representations = filter;
-          filter_files = filter;
+          filterAips = filter;
+          filterRepresentations = filter;
+          filterFiles = filter;
           searchPanel.setDefaultFilter(filter, true);
         }
       }
@@ -432,24 +370,24 @@ public class MainSearch extends Composite {
   }
 
   public void defaultFilters() {
-    filter_aips = new Filter(DEFAULT_FILTER_AIP);
-    filter_representations = new Filter(DEFAULT_FILTER_REPRESENTATIONS);
-    filter_files = new Filter(DEFAULT_FILTER_FILES);
+    filterAips = new Filter(DEFAULT_FILTER_AIP);
+    filterRepresentations = new Filter(DEFAULT_FILTER_REPRESENTATIONS);
+    filterFiles = new Filter(DEFAULT_FILTER_FILES);
     if (searchPanel != null) {
       searchPanel.setDefaultFilterIncremental(false);
     }
   }
 
   public void setDefaultFilters(Filter defaultFilter) {
-    filter_aips = new Filter(defaultFilter);
-    filter_representations = new Filter(defaultFilter);
-    filter_files = new Filter(defaultFilter);
+    filterAips = new Filter(defaultFilter);
+    filterRepresentations = new Filter(defaultFilter);
+    filterFiles = new Filter(defaultFilter);
     if (searchPanel != null) {
       searchPanel.setDefaultFilterIncremental(true);
     }
   }
 
   public void setAipFilter(Filter filter) {
-    filter_aips = filter;
+    filterAips = filter;
   }
 }

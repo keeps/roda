@@ -890,6 +890,10 @@ public interface ClientMessages extends Messages {
 
   String ingestAppraisalRejectButton();
 
+  String appraisalNoItemsSelectedTitle();
+
+  String appraisalNoItemsSelectedMessage();
+
   String aipState(@Select AIPState state);
 
   /************* Search pre-filters ****************/
@@ -1433,6 +1437,10 @@ public interface ClientMessages extends Messages {
   String searchDescriptionLevels();
 
   String searchRepresentations();
+
+  String searchRepresentationType();
+
+  String searchRepresentationOriginal();
 
   String searchFormats();
 

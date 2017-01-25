@@ -165,6 +165,8 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
   }
 
   private void getInformation(Class<T> classToReceive, final List<PluginType> pluginType) {
+    
+    // TODO use LastSelectedItems instead
     if (classToReceive.getName().equals(TransferredResource.class.getName())) {
       this.selected = IngestTransfer.getInstance().getSelected();
       isIngest = true;

@@ -10,7 +10,6 @@
  */
 package org.roda.wui.client.ingest.appraisal;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,14 +22,15 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.common.actions.Actionable;
+import org.roda.wui.client.common.actions.AipActions;
+import org.roda.wui.client.common.actions.AipActions.AipAction;
+import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.search.MainSearch;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.Ingest;
-import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -39,8 +39,6 @@ import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.i18n.client.LocaleInfo;
-import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -57,6 +55,8 @@ import config.i18n.client.ClientMessages;
  * 
  */
 public class IngestAppraisal extends Composite {
+
+  private static final ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
   private static final Filter BASE_FILTER = new Filter(
     new SimpleFilterParameter(RodaConstants.STATE, AIPState.UNDER_APPRAISAL.toString()));
@@ -86,21 +86,10 @@ public class IngestAppraisal extends Composite {
 
   private static IngestAppraisal instance = null;
 
-  public static IngestAppraisal getInstance() {
-    if (instance == null) {
-      instance = new IngestAppraisal();
-    }
-    return instance;
-  }
-
   interface MyUiBinder extends UiBinder<Widget, IngestAppraisal> {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
-  @SuppressWarnings("unused")
-  private ClientLogger logger = new ClientLogger(getClass().getName());
 
   @UiField
   FlowPanel ingestAppraisalDescription;
@@ -161,35 +150,22 @@ public class IngestAppraisal extends Composite {
     filesFacetsMap.put(new SimpleFacetParameter(RodaConstants.FILE_PRONOM), facetPronoms);
     filesFacetsMap.put(new SimpleFacetParameter(RodaConstants.FILE_FORMAT_MIMETYPE), facetMimetypes);
 
-    // Define hide/visible buttons
-    Map<Button, Boolean> itemsButtons = new HashMap<Button, Boolean>();
-    Map<Button, Boolean> representationsButtons = new HashMap<Button, Boolean>();
-    Map<Button, Boolean> filesButtons = new HashMap<Button, Boolean>();
-
-    // Define active buttons
-    List<Button> itemsSelectionButtons = new ArrayList<>();
-    List<Button> representationsSelectionButtons = new ArrayList<>();
-    List<Button> filesSelectionButtons = new ArrayList<>();
-
-    itemsSelectionButtons.add(acceptButton);
-    itemsSelectionButtons.add(rejectButton);
-    representationsSelectionButtons.add(acceptButton);
-    representationsSelectionButtons.add(rejectButton);
-    filesSelectionButtons.add(acceptButton);
-    filesSelectionButtons.add(rejectButton);
-
     // Create main search
     mainSearch = new MainSearch(justActive, itemsSelectable, representationsSelectable, filesSelectable, itemsFacets,
-      itemsFacetsMap, itemsButtons, itemsSelectionButtons, new FlowPanel(), representationsFacetsMap,
-      representationsButtons, representationsSelectionButtons, filesFacets, filesFacetsMap, filesButtons,
-      filesSelectionButtons);
+      itemsFacetsMap, new FlowPanel(), representationsFacetsMap, filesFacets, filesFacetsMap, null,
+      AIPState.UNDER_APPRAISAL);
 
     initWidget(uiBinder.createAndBindUi(this));
 
     ingestAppraisalDescription.add(new HTMLWidgetWrapper("IngestAppraisalDescription.html"));
 
-    acceptButton.setEnabled(false);
-    rejectButton.setEnabled(false);
+  }
+
+  public static IngestAppraisal getInstance() {
+    if (instance == null) {
+      instance = new IngestAppraisal();
+    }
+    return instance;
   }
 
   @Override
@@ -217,53 +193,36 @@ public class IngestAppraisal extends Composite {
   }
 
   @SuppressWarnings("unchecked")
-  @UiHandler("acceptButton")
-  void buttonAcceptHandler(ClickEvent e) {
-    boolean accept = true;
+  private void appraise(boolean accept) {
     SelectedItems<?> selected = mainSearch.getSelected();
-    String rejectReason = null;
-    // not supporting accept of reps and files for now
-    BrowserService.Util.getInstance().appraisal((SelectedItems<IndexedAIP>) selected, accept, rejectReason,
-      LocaleInfo.getCurrentLocale().getLocaleName(), new LoadingAsyncCallback<Void>() {
+
+    if (ClientSelectedItemsUtils.isEmpty(selected)) {
+      Toast.showInfo(messages.appraisalNoItemsSelectedTitle(), messages.appraisalNoItemsSelectedMessage());
+    } else if (selected.getSelectedClass().equals(IndexedAIP.class.getName())) {
+      AipAction action = accept ? AipAction.APPRAISAL_ACCEPT : AipAction.APPRAISAL_REJECT;
+
+      AipActions.get().act(action, (SelectedItems<IndexedAIP>) selected, new AsyncCallback<Actionable.ActionImpact>() {
 
         @Override
-        public void onSuccessImpl(Void result) {
-          Toast.showInfo(messages.dialogDone(), messages.allItemsWereAccepted());
+        public void onFailure(Throwable caught) {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
+        }
+
+        @Override
+        public void onSuccess(Actionable.ActionImpact result) {
           mainSearch.refresh();
-          acceptButton.setEnabled(false);
-          rejectButton.setEnabled(false);
         }
       });
+    }
+  }
+
+  @UiHandler("acceptButton")
+  void buttonAcceptHandler(ClickEvent e) {
+    appraise(true);
   }
 
   @UiHandler("rejectButton")
   void buttonRejectHandler(ClickEvent e) {
-    final boolean accept = false;
-    final SelectedItems<?> selected = mainSearch.getSelected();
-    Dialogs.showPromptDialog(messages.rejectMessage(), messages.rejectSIPQuestion(), null, RegExp.compile(".+"),
-      messages.dialogCancel(), messages.dialogOk(), new AsyncCallback<String>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          // nothing to do
-        }
-
-        @SuppressWarnings("unchecked")
-        @Override
-        public void onSuccess(final String rejectReason) {
-          // TODO support accept of reps and files
-          BrowserService.Util.getInstance().appraisal((SelectedItems<IndexedAIP>) selected, accept, rejectReason,
-            LocaleInfo.getCurrentLocale().getLocaleName(), new LoadingAsyncCallback<Void>() {
-
-              @Override
-              public void onSuccessImpl(Void result) {
-                Toast.showInfo(messages.dialogDone(), messages.allItemsWereRejected());
-                mainSearch.refresh();
-                acceptButton.setEnabled(false);
-                rejectButton.setEnabled(false);
-              }
-            });
-        }
-      });
+    appraise(false);
   }
 }
