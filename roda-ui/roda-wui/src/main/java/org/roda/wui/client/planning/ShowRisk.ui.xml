@@ -25,13 +25,13 @@
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarActionsTitle}' />
 							</g:Label>
-							<g:Button addStyleNames="btn btn-clock" ui:field="buttonHistory">
+							<g:Button addStyleNames="btn btn-block btn-clock" ui:field="buttonHistory">
 								<ui:text from='{messages.riskHistoryButton}' />
 							</g:Button>
-							<g:Button addStyleNames="btn btn-edit" ui:field="buttonEdit">
+							<g:Button addStyleNames="btn btn-block btn-edit" ui:field="buttonEdit">
 								<ui:text from='{messages.editButton}' />
 							</g:Button>
-							<g:Button addStyleNames="btn btn-default btn-times-circle"
+							<g:Button addStyleNames="btn btn-block btn-default btn-times-circle"
 								ui:field="buttonCancel">
 								<ui:text from='{messages.cancelButton}' />
 							</g:Button>
