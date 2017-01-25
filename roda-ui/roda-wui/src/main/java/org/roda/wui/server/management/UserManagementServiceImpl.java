@@ -141,25 +141,6 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public boolean changeUnverifiedEmail(String username, String email) throws RODAException {
-    boolean successful = false;
-    // FIXME
-    // try {
-    // org.roda.core.data.v2.User user =
-    // RodaClientFactory.getRodaWuiClient().getUserRegistrationService()
-    // .modifyUnconfirmedEmail(username, email);
-    // if (user.getEmailConfirmationToken() != null &&
-    // user.getEmailConfirmationToken().length() > 0) {
-    // successful = sendEmailVerification(user);
-    // }
-    // } catch (RemoteException e) {
-    // logger.error("Remote Exception", e);
-    // throw RODAClient.parseRemoteException(e);
-    // }
-    return successful;
-  }
-
-  @Override
   public void requestPasswordReset(String usernameOrEmail, String captcha, String localeString)
     throws GenericException, NotFoundException, IllegalOperationException, RecaptchaException {
     if (captcha != null) {

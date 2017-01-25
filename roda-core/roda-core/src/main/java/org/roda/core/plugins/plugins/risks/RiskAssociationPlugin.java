@@ -7,7 +7,6 @@
  */
 package org.roda.core.plugins.plugins.risks;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -188,9 +187,9 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
     return new Report();
   }
 
-  private <T extends Serializable> Pair<SimpleJobPluginInfo, Report> addIncidenceToAIPList(ModelService model,
-    IndexService index, List<AIP> list, List<String> risks, SimpleJobPluginInfo jobPluginInfo, Report pluginReport,
-    Job job) throws JobException {
+  private Pair<SimpleJobPluginInfo, Report> addIncidenceToAIPList(ModelService model, IndexService index,
+    List<AIP> list, List<String> risks, SimpleJobPluginInfo jobPluginInfo, Report pluginReport, Job job)
+    throws JobException {
 
     for (AIP aip : list) {
       PluginState state = PluginState.SUCCESS;
@@ -229,9 +228,9 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
     return new Pair<SimpleJobPluginInfo, Report>(jobPluginInfo, pluginReport);
   }
 
-  private <T extends Serializable> Pair<SimpleJobPluginInfo, Report> addIncidenceToRepresentationList(
-    ModelService model, IndexService index, List<Representation> list, List<String> risks,
-    SimpleJobPluginInfo jobPluginInfo, Report pluginReport, Job job) throws JobException {
+  private Pair<SimpleJobPluginInfo, Report> addIncidenceToRepresentationList(ModelService model, IndexService index,
+    List<Representation> list, List<String> risks, SimpleJobPluginInfo jobPluginInfo, Report pluginReport, Job job)
+    throws JobException {
 
     for (Representation representation : list) {
       PluginState state = PluginState.SUCCESS;
@@ -272,9 +271,9 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
     return new Pair<SimpleJobPluginInfo, Report>(jobPluginInfo, pluginReport);
   }
 
-  private <T extends Serializable> Pair<SimpleJobPluginInfo, Report> addIncidenceToFileList(ModelService model,
-    IndexService index, List<File> list, List<String> risks, SimpleJobPluginInfo jobPluginInfo, Report pluginReport,
-    Job job) throws JobException {
+  private Pair<SimpleJobPluginInfo, Report> addIncidenceToFileList(ModelService model, IndexService index,
+    List<File> list, List<String> risks, SimpleJobPluginInfo jobPluginInfo, Report pluginReport, Job job)
+    throws JobException {
 
     for (File file : list) {
       PluginState state = PluginState.SUCCESS;
@@ -362,6 +361,7 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
     return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_RISK_MANAGEMENT);
   }
 
+  @SuppressWarnings({"unchecked", "rawtypes"})
   @Override
   public List<Class<T>> getObjectClasses() {
     List<Class<? extends IsRODAObject>> list = new ArrayList<>();

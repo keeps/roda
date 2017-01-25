@@ -190,6 +190,7 @@ public class RiskIncidenceRemoverPlugin<T extends IsRODAObject> extends Abstract
     return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE);
   }
 
+  @SuppressWarnings({"unchecked", "rawtypes"})
   @Override
   public List<Class<T>> getObjectClasses() {
     List<Class<? extends IsRODAObject>> list = new ArrayList<>();

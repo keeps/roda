@@ -383,9 +383,9 @@ public class IndexService {
       br.close();
     } catch (IOException e) {
       throw new GenericException("Error reading log", e);
-    } finally {
-      return jobPluginInfo;
     }
+
+    return jobPluginInfo;
   }
 
   private ReturnWithExceptions<Void> reindexActionLog(LogEntry entry) {

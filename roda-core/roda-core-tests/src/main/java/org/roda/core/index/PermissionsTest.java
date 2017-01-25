@@ -21,7 +21,6 @@ import org.roda.core.TestsHelper;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.sublist.Sublist;
-import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
@@ -87,7 +86,7 @@ public class PermissionsTest {
 
     // Create AIP
     // TODO move aip id to constants
-    final AIP aip = model.createAIP(aipId, corporaService,
+    model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_PERMISSIONS),
       aipCreator);
 
@@ -142,7 +141,7 @@ public class PermissionsTest {
 
     // Create AIP
     // TODO move aip id to constants
-    final AIP aip = model.createAIP(aipId, corporaService,
+    model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_PERMISSIONS),
       aipCreator);
 
@@ -196,7 +195,7 @@ public class PermissionsTest {
 
     // Create AIP
     // TODO move aip id to constants
-    final AIP aip = model.createAIP(aipId, corporaService,
+    model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_PERMISSIONS),
       aipCreator);
 
@@ -250,7 +249,7 @@ public class PermissionsTest {
 
     // Create AIP
     // TODO move aip id to constants
-    final AIP aip = model.createAIP(aipId, corporaService,
+    model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_PERMISSIONS),
       aipCreator);
 

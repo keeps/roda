@@ -157,6 +157,7 @@ public class GeneralCommandTest {
     return model.retrieveAIP(indexedAIP.getId());
   }
 
+  @SuppressWarnings("unchecked")
   @Test
   public void testGeneralCommandPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
     IOException, SolrServerException, IsStillUpdatingException {

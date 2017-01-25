@@ -232,7 +232,7 @@ public class FedoraStorageServiceTestDelegate extends AbstractStorageServiceTest
     CloseableIterable<BinaryVersion> versions = getStorage().listBinaryVersions(binaryStoragePathVersionning);
     Iterator<BinaryVersion> it = versions.iterator();
     while (it.hasNext()) {
-      BinaryVersion next = it.next();
+      it.next();
       counter++;
     }
     Assert.assertEquals(counter, 4);

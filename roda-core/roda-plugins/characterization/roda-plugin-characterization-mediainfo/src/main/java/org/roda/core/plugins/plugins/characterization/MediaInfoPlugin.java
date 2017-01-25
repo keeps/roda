@@ -27,10 +27,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.data.common.RodaConstants;
@@ -192,11 +189,6 @@ public class MediaInfoPlugin extends AbstractPlugin<AIP> {
   private Map<String, Path> parseMediaInfoOutput(String mediaInfoOutput) throws ParserConfigurationException,
     SAXException, IOException, TransformerFactoryConfigurationError, TransformerException, XPathExpressionException {
     Map<String, Path> parsed = new HashMap<String, Path>();
-
-    XPathFactory factory = XPathFactory.newInstance();
-    XPath xpath = factory.newXPath();
-    XPathExpression expr = xpath.compile("//Complete_name");
-
     DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
     DocumentBuilder db = dbf.newDocumentBuilder();
     InputSource is = new InputSource();

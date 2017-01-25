@@ -295,17 +295,6 @@ public class BreadcrumbUtils {
     });
   }
 
-  private static IndexedRepresentation selectRepresentation(List<IndexedRepresentation> representations,
-    String representationId) {
-    IndexedRepresentation rep = null;
-    for (IndexedRepresentation representation : representations) {
-      if (representation.getId().equals(representationId)) {
-        rep = representation;
-      }
-    }
-    return rep;
-  }
-
   private static SafeHtml getBreadcrumbLabel(String label, String level) {
     SafeHtml elementLevelIconSafeHtml = DescriptionLevelUtils.getElementLevelIconSafeHtml(level, false);
     SafeHtmlBuilder builder = new SafeHtmlBuilder();

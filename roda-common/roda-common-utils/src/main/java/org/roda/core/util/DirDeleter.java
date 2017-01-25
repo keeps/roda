@@ -35,9 +35,9 @@ public class DirDeleter extends Thread {
 
   public void run() {
     synchronized (this) {
-      Iterator iterator = dirList.iterator();
+      Iterator<File> iterator = dirList.iterator();
       while (iterator.hasNext()) {
-        File dir = (File) iterator.next();
+        File dir = iterator.next();
         deleteDirectory(dir);
         iterator.remove();
       }

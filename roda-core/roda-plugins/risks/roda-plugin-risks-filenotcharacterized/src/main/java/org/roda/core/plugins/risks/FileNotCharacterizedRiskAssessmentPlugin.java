@@ -671,7 +671,6 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
      *          the total result count.
      * @return a {@link String} with the human representation of number.
      */
-    @SuppressWarnings("HiddenField")
     private String numberToHuman(final int number, final int count) {
       final String humanString;
       if (count > 0) {

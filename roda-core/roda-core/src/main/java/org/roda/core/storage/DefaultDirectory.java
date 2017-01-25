@@ -18,6 +18,7 @@ import org.roda.core.data.v2.ip.StoragePath;
  *
  */
 public class DefaultDirectory extends AbstractResource implements Directory {
+  private static final long serialVersionUID = -7684121817358536688L;
 
   public DefaultDirectory(StoragePath storagePath) {
     super(storagePath, true);

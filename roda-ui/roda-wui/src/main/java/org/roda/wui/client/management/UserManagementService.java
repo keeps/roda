@@ -222,20 +222,6 @@ public interface UserManagementService extends RemoteService {
     throws InvalidTokenException, NotFoundException, GenericException;
 
   /**
-   * Change the email of a user that is still not active due to a email
-   * unverified
-   *
-   * @param username
-   *          the name of the user
-   * @param email
-   *          the new email
-   * @return true if email was successfully changed, false otherwise
-   * @throws RODAException
-   *
-   */
-  public boolean changeUnverifiedEmail(String username, String email) throws RODAException;
-
-  /**
    * Request to reset the password. An email will be sent to the user with the
    * password reset token.
    *

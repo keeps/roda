@@ -78,9 +78,9 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     Iterator<Container> iterator = iterable.iterator();
     // assertThat("Storage starts with empty list of containers",
     // !iterator.hasNext());
-    
+
     assertThat(iterable, Matchers.iterableWithSize(0));
-    
+
     // 2) container list with one element (which implies creating one
     // container)
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
@@ -914,10 +914,10 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     // 4) create binary version 2
     String message2 = "v2";
     properties.put(RodaConstants.VERSION_MESSAGE, message2);
-    BinaryVersion v2 = getStorage().createBinaryVersion(binaryStoragePath, properties);
+    getStorage().createBinaryVersion(binaryStoragePath, properties);
 
     // 5) create a version with a message that already exists
-    BinaryVersion v3 = getStorage().createBinaryVersion(binaryStoragePath, properties);
+    getStorage().createBinaryVersion(binaryStoragePath, properties);
 
     // 6) list binary versions
     CloseableIterable<BinaryVersion> binaryVersions = getStorage().listBinaryVersions(binaryStoragePath);

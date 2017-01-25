@@ -10,6 +10,7 @@ package org.roda.core.storage;
 import org.roda.core.data.v2.ip.StoragePath;
 
 public class AbstractResource extends AbstractEntity implements Resource {
+  private static final long serialVersionUID = -7138875367059222378L;
 
   private boolean directory;
 

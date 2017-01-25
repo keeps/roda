@@ -711,7 +711,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     User user = UserUtility.getUser(getThreadLocalRequest());
 
     if (selected instanceof SelectedItemsList) {
-      SelectedItemsList items = (SelectedItemsList) selected;
+      SelectedItemsList<T> items = (SelectedItemsList<T>) selected;
 
       if (items.getIds().isEmpty()) {
         selected = getAllItemsByClass(selectedClass);
@@ -727,7 +727,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     return Jobs.createJob(user, job, true);
   }
 
-  private SelectedItems getAllItemsByClass(String selectedClass) {
+  private <T extends IsIndexed> SelectedItems<T> getAllItemsByClass(String selectedClass) {
     if (selectedClass == null || Void.class.getName().equals(selectedClass)) {
       return new SelectedItemsNone<>();
     } else {
@@ -796,9 +796,9 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public String moveTransferredResource(SelectedItems selected, TransferredResource transferredResource)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, AlreadyExistsException,
-    IsStillUpdatingException, NotFoundException {
+  public String moveTransferredResource(SelectedItems<TransferredResource> selected,
+    TransferredResource transferredResource) throws AuthorizationDeniedException, GenericException,
+    RequestNotValidException, AlreadyExistsException, IsStillUpdatingException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.moveTransferredResource(user, selected, transferredResource);
   }
@@ -850,7 +850,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void createFormatIdentificationJob(SelectedItems selected) throws GenericException,
+  public void createFormatIdentificationJob(SelectedItems<?> selected) throws GenericException,
     AuthorizationDeniedException, JobAlreadyStartedException, RequestNotValidException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Browser.createFormatIdentificationJob(user, selected);

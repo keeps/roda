@@ -898,6 +898,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
     return "File conversion failed.";
   }
 
+  @SuppressWarnings({"unchecked", "rawtypes"})
   @Override
   public List<Class<T>> getObjectClasses() {
     List<Class<? extends IsRODAObject>> list = new ArrayList<>();

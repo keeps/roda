@@ -1394,16 +1394,6 @@ public class RodaCoreFactory {
     }
   }
 
-  private static String readPasswordFromConsole(final Console console) throws IOException {
-    final String password = new String(console.readPassword("New admin password: "));
-    final String passwordConfirmation = new String(console.readPassword("Repeat admin password: "));
-    if (password.equals(passwordConfirmation)) {
-      return password;
-    } else {
-      throw new IOException("Passwords don't match.");
-    }
-  }
-
   private static String readPassword(final String message) throws IOException {
     final Console console = System.console();
     if (console == null) {

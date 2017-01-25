@@ -146,7 +146,6 @@ public class Menu extends Composite {
       createCommand(MemberManagement.RESOLVER.getHistoryPath()));
     administration_log = administrationMenu.addItem(messages.title("administration_log"),
       createCommand(UserLog.RESOLVER.getHistoryPath()));
-    // FIXME add constant for notification title
     administration_notifications = administrationMenu.addItem(messages.title("administration_notifications"),
       createCommand(NotificationRegister.RESOLVER.getHistoryPath()));
     administration_statistics = administrationMenu.addItem(messages.title("administration_statistics"),

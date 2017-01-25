@@ -77,7 +77,6 @@ public class BrowseDIP extends Composite {
 
   // system
   private final Viewers viewers;
-  private final DipBundle bundle;
 
   // source
   private IndexedAIP aip;
@@ -130,7 +129,6 @@ public class BrowseDIP extends Composite {
    */
   public BrowseDIP(Viewers viewers, DipBundle bundle) {
     this.viewers = viewers;
-    this.bundle = bundle;
 
     this.aip = bundle.getAip();
     this.representation = bundle.getRepresentation();

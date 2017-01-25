@@ -158,6 +158,7 @@ public class ImageMagickTest {
     return model.retrieveAIP(indexedAIP.getId());
   }
 
+  @SuppressWarnings("unchecked")
   @Test
   public void testImageMagickPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
     IOException, SolrServerException, IsStillUpdatingException {

@@ -20,16 +20,11 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.index.select.SelectedItemsAll;
-import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.select.SelectedItemsNone;
-import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.PluginType;
-import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.DummyPlugin;
@@ -140,8 +135,7 @@ public class JobsTest {
     JobsHelper.setNumberOfJobsWorkers(1);
     JobsHelper.setBlockSize(1);
 
-    TestsHelper.executeJob(PluginThatStopsItself.class, PluginType.MISC,
-      (SelectedItems) SelectedItemsList.create(AIP.class, aips), JOB_STATE.STOPPED);
+    TestsHelper.executeJob(PluginThatStopsItself.class, PluginType.MISC, SelectedItemsNone.create(), JOB_STATE.STOPPED);
 
     // resetting number of job workers & block size
     JobsHelper.setNumberOfJobsWorkers(originalNumberOfJobWorkers);
@@ -162,8 +156,7 @@ public class JobsTest {
     // receive nothing. and if some problem exists with job state transitions 5
     // seconds will be enough as a timeout will be thrown
     JobsHelper.setSyncTimeout(5);
-    TestsHelper.executeJob(DummyPlugin.class, PluginType.MISC, (SelectedItems) SelectedItemsAll.create(Risk.class),
-      JOB_STATE.COMPLETED);
+    TestsHelper.executeJob(DummyPlugin.class, PluginType.MISC, SelectedItemsNone.create(), JOB_STATE.COMPLETED);
 
     JobsHelper.setSyncTimeout(originalSyncTimeout);
 

@@ -7,13 +7,13 @@
  */
 package org.roda.wui.common.client.widgets;
 
+import java.util.Date;
+
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
-import java.util.Date;
-
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
@@ -53,7 +53,6 @@ public class DateTimePicker {
       @Override
       public void onKeyPress(KeyPressEvent event) {
         char keyCode = event.getCharCode();
-        Widget sender = (Widget) event.getSource();
         if ((!Character.isDigit(keyCode)) && (keyCode != (char) KeyCodes.KEY_TAB)
           && (keyCode != (char) KeyCodes.KEY_BACKSPACE) && (keyCode != (char) KeyCodes.KEY_DELETE)
           && (keyCode != (char) KeyCodes.KEY_ENTER) && (keyCode != (char) KeyCodes.KEY_HOME)
@@ -68,7 +67,6 @@ public class DateTimePicker {
     hourPicker.addKeyUpHandler(new KeyUpHandler() {
       @Override
       public void onKeyUp(KeyUpEvent event) {
-        Widget sender = (Widget) event.getSource();
         int hour;
         String hourText = hourPicker.getText();
         boolean cancel = false;
@@ -92,7 +90,6 @@ public class DateTimePicker {
       @Override
       public void onKeyPress(KeyPressEvent event) {
         char keyCode = event.getCharCode();
-        Widget sender = (Widget) event.getSource();
         if ((!Character.isDigit(keyCode)) && (keyCode != (char) KeyCodes.KEY_TAB)
           && (keyCode != (char) KeyCodes.KEY_BACKSPACE) && (keyCode != (char) KeyCodes.KEY_DELETE)
           && (keyCode != (char) KeyCodes.KEY_ENTER) && (keyCode != (char) KeyCodes.KEY_HOME)
@@ -107,7 +104,6 @@ public class DateTimePicker {
     minutePicker.addKeyUpHandler(new KeyUpHandler() {
       @Override
       public void onKeyUp(KeyUpEvent event) {
-        Widget sender = (Widget) event.getSource();
         int minute;
         String minuteText = minutePicker.getText();
         boolean cancel = false;

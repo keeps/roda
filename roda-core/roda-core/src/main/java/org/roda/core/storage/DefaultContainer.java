@@ -25,6 +25,7 @@ import org.roda.core.data.v2.ip.StoragePath;
  *
  */
 public class DefaultContainer extends AbstractEntity implements Container {
+  private static final long serialVersionUID = 8986785383534207670L;
 
   public DefaultContainer(StoragePath storagePath) {
     super(storagePath);

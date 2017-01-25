@@ -40,20 +40,17 @@ import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
-import org.roda.core.data.v2.index.select.SelectedItemsAll;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
-import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
-import org.roda.core.plugins.plugins.characterization.DigitalSignaturePlugin;
 import org.roda.core.plugins.plugins.ingest.TransferredResourceToAIPPlugin;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.fs.FSUtils;
@@ -75,7 +72,6 @@ public class DigitalSignatureTest {
   private static Path basePath;
   private static ModelService model;
   private static IndexService index;
-  private static int numberOfConvertableFiles = 17;
   private static Path corporaPath;
   private static String aipCreator = "admin";
 
@@ -176,11 +172,6 @@ public class DigitalSignatureTest {
     parameters.put(RodaConstants.PLUGIN_PARAMS_SIGNATURE_EXTRACT, "True");
     parameters.put(RodaConstants.PLUGIN_PARAMS_SIGNATURE_STRIP, "True");
     parameters.put(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES, "True");
-
-    Job job = TestsHelper.executeJob(DigitalSignaturePlugin.class, parameters, PluginType.AIP_TO_AIP,
-      SelectedItemsAll.create(Representation.class));
-
-    // this job should fail
 
     aip = model.retrieveAIP(aip.getId());
     AssertJUnit.assertEquals(2, aip.getRepresentations().size());

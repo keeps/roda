@@ -119,7 +119,7 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
       button.setStyleName("actions-layout-button");
       button.addStyleName("btn");
       button.addStyleName("btn-block");
-      String btnClass;
+
       if (ActionImpact.DESTROYED.equals(impact)) {
         button.addStyleName("btn-danger");
       } else if (ActionImpact.UPDATED.equals(impact)) {

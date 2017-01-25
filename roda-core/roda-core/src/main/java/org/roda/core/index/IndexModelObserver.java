@@ -206,10 +206,6 @@ public class IndexModelObserver implements ModelObserver {
     index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisEventDocument);
   }
 
-  private void indexOtherMetadata(final AIP aip) {
-    // TODO index other metadata
-  }
-
   private ReturnWithExceptions<Void> indexRepresentations(final AIP aip, final List<String> ancestors) {
     ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
     for (Representation representation : aip.getRepresentations()) {
@@ -725,24 +721,6 @@ public class IndexModelObserver implements ModelObserver {
   public void groupDeleted(String groupID) {
     deleteDocumentFromIndex(RODAMember.class, groupID);
     // reindexAllMembers();
-  }
-
-  private void reindexAllMembers() {
-    try {
-      for (User user : model.listUsers()) {
-        userUpdated(user);
-      }
-    } catch (GenericException e) {
-      LOGGER.error("Unable to re-index all users", e);
-    }
-    try {
-      for (Group group : model.listGroups()) {
-        deleteDocumentFromIndex(RODAMember.class, group.getId());
-        addDocumentToIndex(RODAMember.class, group);
-      }
-    } catch (GenericException e) {
-      LOGGER.error("Unable to re-index all groups", e);
-    }
   }
 
   @Override

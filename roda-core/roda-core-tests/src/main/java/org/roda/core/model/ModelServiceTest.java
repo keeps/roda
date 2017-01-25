@@ -382,7 +382,7 @@ public class ModelServiceTest {
     final String aipId = UUID.randomUUID().toString();
 
     // testing AIP
-    final AIP aip = model.createAIP(aipId, corporaService,
+    model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_REP_WITH_SUBFOLDERS),
       aipCreator);
 

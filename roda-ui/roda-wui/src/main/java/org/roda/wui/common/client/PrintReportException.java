@@ -16,6 +16,8 @@ package org.roda.wui.common.client;
  */
 public class PrintReportException extends Exception {
 
+  private static final long serialVersionUID = 3495416460695610284L;
+
   public PrintReportException() {
   }
 

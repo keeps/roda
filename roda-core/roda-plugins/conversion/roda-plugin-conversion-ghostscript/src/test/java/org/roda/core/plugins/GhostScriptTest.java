@@ -157,6 +157,7 @@ public class GhostScriptTest {
     return model.retrieveAIP(indexedAIP.getId());
   }
 
+  @SuppressWarnings("unchecked")
   @Test
   public void testGhostScriptPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
     IOException, SolrServerException, IsStillUpdatingException {

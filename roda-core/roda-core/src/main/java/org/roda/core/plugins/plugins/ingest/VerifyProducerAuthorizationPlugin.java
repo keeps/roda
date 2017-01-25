@@ -167,16 +167,6 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
     }
   }
 
-  private Job getJob(IndexService index) {
-    Job currentJob = null;
-    try {
-      currentJob = PluginHelper.getJob(this, index);
-    } catch (NotFoundException | GenericException e) {
-      LOGGER.error("Error retrieving Job from index", e);
-    }
-    return currentJob;
-  }
-
   @Override
   public Plugin<AIP> cloneMe() {
     return new VerifyProducerAuthorizationPlugin();

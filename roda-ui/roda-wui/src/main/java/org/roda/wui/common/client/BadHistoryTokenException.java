@@ -18,6 +18,8 @@ import org.roda.core.data.exceptions.RODAException;
  */
 public class BadHistoryTokenException extends RODAException {
 
+  private static final long serialVersionUID = 3615717199467746307L;
+
   /**
    * Create a new bad history token exception
    */

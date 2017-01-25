@@ -38,13 +38,10 @@ import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.OptionalWithCause;
-import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.index.select.SelectedItemsFilter;
+import org.roda.core.data.v2.index.select.SelectedItemsAll;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
@@ -235,7 +232,8 @@ public class ReplicationPluginTest {
     while (iterator2.hasNext()) {
       OptionalWithCause<File> next = iterator2.next();
       File file = next.get();
-      model.updateFile(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(), binary.getContent(), true, true);
+      model.updateFile(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(), binary.getContent(),
+        true, true);
     }
 
     executeJobWithReplicationPlugin(Arrays.asList(aip2.getId()));
@@ -303,13 +301,7 @@ public class ReplicationPluginTest {
     String targetUser = RodaCoreFactory.getRodaConfigurationAsString("core", "aip_rsync", "target");
     RodaCoreFactory.getRodaConfiguration().setProperty("core.aip_rsync.target", testPath.toString());
 
-    // want everything
-    Filter filter = null;
-    SelectedItemsFilter<IndexedAIP> selectedItemsFilter = new SelectedItemsFilter<IndexedAIP>(filter,
-      IndexedAIP.class.getName(), false);
-    TestsHelper.executeJob(ReplicationPlugin.class, new HashMap<>(), PluginType.MISC,
-      (SelectedItems) selectedItemsFilter);
-
+    TestsHelper.executeJob(ReplicationPlugin.class, PluginType.MISC, SelectedItemsAll.create(AIP.class));
     RodaCoreFactory.getRodaConfiguration().setProperty("core.aip_rsync.target", targetUser);
   }
 

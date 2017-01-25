@@ -8,9 +8,9 @@
 package org.roda.wui.common.server;
 
 import org.apache.log4j.LogManager;
+import org.roda.wui.common.client.ClientLoggerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.roda.wui.common.client.ClientLoggerService;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
@@ -23,9 +23,6 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 public class ClientLoggerImpl extends RemoteServiceServlet implements ClientLoggerService {
 
   private static final long serialVersionUID = 3694771724613537482L;
-
-  private static final String LOG_ACTION_WUI_ERROR = "RODAWUI.error";
-  private static final String LOG_ACTION_WUI_PAGEHIT = "RODAWUI.pageHit";
 
   private String getUserInfo() {
     String ret;
@@ -100,7 +97,6 @@ public class ClientLoggerImpl extends RemoteServiceServlet implements ClientLogg
   }
 
   public void pagehit(String pagename) {
-    Logger logger = LoggerFactory.getLogger(ClientLoggerImpl.class);
     // try {
     // RODAClient rodaClient = RodaClientFactory.getRodaWuiClient();
     // String username = RodaClientFactory.getRodaClient(
@@ -147,7 +143,6 @@ public class ClientLoggerImpl extends RemoteServiceServlet implements ClientLogg
    *          the error throwable
    */
   public void sendError(String classname, String message, Throwable error) {
-    Logger logger = LoggerFactory.getLogger(ClientLoggerImpl.class);
 
     // try {
     // RODAClient rodaClient = RodaClientFactory.getRodaWuiClient();

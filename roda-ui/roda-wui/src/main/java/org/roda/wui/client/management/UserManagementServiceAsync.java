@@ -178,20 +178,6 @@ public interface UserManagementServiceAsync {
   public void confirmUserEmail(String username, String emailConfirmationToken, AsyncCallback<Void> callback);
 
   /**
-   * Change the email of a user that is still not active due to a email
-   * unverified
-   *
-   * @param username
-   *          the name of the user
-   * @param email
-   *          the new email
-   * @return true if email was successfully changed, false otherwise
-   * @throws RODAException
-   *
-   */
-  public void changeUnverifiedEmail(String username, String email, AsyncCallback<Boolean> callback);
-
-  /**
    * Request to reset the password. An email will be sent to the user with the
    * password reset token.
    *

@@ -158,6 +158,7 @@ public class PdfToPdfaTest {
     return model.retrieveAIP(indexedAIP.getId());
   }
 
+  @SuppressWarnings("unchecked")
   @Test
   public void testPdfToPdfaPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException,
     SolrServerException, IsStillUpdatingException {

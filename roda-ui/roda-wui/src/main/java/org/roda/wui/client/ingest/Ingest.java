@@ -18,7 +18,6 @@ import org.roda.wui.client.ingest.preingest.PreIngest;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.client.process.IngestProcess;
 import org.roda.wui.common.client.BadHistoryTokenException;
-import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
@@ -70,12 +69,8 @@ public class Ingest {
     return instance;
   }
 
-  private static ClientLogger logger = new ClientLogger(Ingest.class.getName());
-
   private boolean initialized;
-
   private HTMLWidgetWrapper layout;
-
   private HTMLWidgetWrapper help = null;
 
   private Ingest() {

@@ -262,6 +262,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
     return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_CHARACTERIZATION);
   }
 
+  @SuppressWarnings({"unchecked", "rawtypes"})
   @Override
   public List<Class<T>> getObjectClasses() {
     List<Class<? extends IsRODAObject>> list = new ArrayList<>();

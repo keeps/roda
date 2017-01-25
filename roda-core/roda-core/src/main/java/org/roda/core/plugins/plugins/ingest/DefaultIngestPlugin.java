@@ -420,7 +420,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
    * Recalculates (if failures must be noticed) and updates AIP objects (by
    * obtaining them from model)
    */
-  private void recalculateAIPsList(ModelService model, IndexService index, Plugin executedPlugin,
+  private void recalculateAIPsList(ModelService model, IndexService index, Plugin<?> executedPlugin,
     IngestJobPluginInfo jobPluginInfo, List<AIP> aips, boolean removeAIPProcessingFailed) {
     aips.clear();
     List<AIP> transferredResourceAips;

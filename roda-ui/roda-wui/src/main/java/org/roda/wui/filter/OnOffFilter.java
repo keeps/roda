@@ -62,7 +62,6 @@ public class OnOffFilter implements Filter {
   private OnOffFilterConfig filterConfig = null;
 
   @Override
-  @SuppressWarnings("checkstyle:hiddenfield")
   public void init(final FilterConfig filterConfig) throws ServletException {
     this.webXmlFilterConfig = filterConfig;
   }

@@ -157,6 +157,7 @@ public class AvconvTest {
     return model.retrieveAIP(indexedAIP.getId());
   }
 
+  @SuppressWarnings("unchecked")
   @Test
   public void testAvconvPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException,
     SolrServerException, IsStillUpdatingException {

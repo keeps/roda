@@ -36,8 +36,6 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.ClientMessages;
-
 /**
  * @author Luis Faria
  * 
@@ -73,7 +71,6 @@ public class Search extends Composite {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   @UiField
   FlowPanel searchDescription;

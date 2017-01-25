@@ -68,9 +68,7 @@ public class JHOVEPluginUtils {
       new String[] {targetFile.getAbsolutePath()});
 
     configFile.delete();
-
     return outputFile.toPath();
-
   }
 
   public static Path runJhove(Binary binary, Map<String, String> parameterValues) throws Exception {

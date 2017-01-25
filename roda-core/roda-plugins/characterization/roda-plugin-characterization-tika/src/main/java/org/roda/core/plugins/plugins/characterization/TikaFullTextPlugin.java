@@ -394,6 +394,7 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractAIPCompo
     return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_CHARACTERIZATION);
   }
 
+  @SuppressWarnings({"unchecked", "rawtypes"})
   @Override
   public List<Class<T>> getObjectClasses() {
     List<Class<? extends IsRODAObject>> list = new ArrayList<>();

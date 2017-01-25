@@ -156,7 +156,7 @@ public class BrowseFile extends Composite {
   @UiField
   FlowPanel center;
 
-  private SliderPanel disseminationsSlider, infoSlider, optionsSlider;
+  private SliderPanel disseminationsSlider;
 
   /**
    * Create a new panel to view a representation
@@ -226,14 +226,16 @@ public class BrowseFile extends Composite {
 
     // bind slider buttons
     disseminationsSlider = Sliders.createDisseminationsSlider(center, disseminationsButton, bundle.getFile());
-    infoSlider = Sliders.createInfoSlider(center, infoFileButton, bundle.getFile());
-    optionsSlider = Sliders.createOptionsSlider(center, optionsButton, bundle.getFile());
+    // infoSlider = Sliders.createInfoSlider(center, infoFileButton,
+    // bundle.getFile());
+    // optionsSlider = Sliders.createOptionsSlider(center, optionsButton,
+    // bundle.getFile());
 
     keyboardFocus.setFocus(true);
 
     // bind previous and next buttons
     ListSelectionUtils.bindLayout(bundle.getFile(), previousButton, nextButton, keyboardFocus, true, false, false);
-    
+
     this.addStyleName("browse");
     this.addStyleName("browse-file");
 

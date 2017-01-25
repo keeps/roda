@@ -74,8 +74,6 @@ public class ContentPanel extends SimplePanel {
 
   private Widget currWidget;
 
-  private List<String> currHistoryPath;
-
   private ContentPanel() {
     super();
     this.addStyleName("contentPanel");
@@ -126,7 +124,6 @@ public class ContentPanel extends SimplePanel {
     HistoryResolver foundResolver = null;
     for (final HistoryResolver resolver : resolvers) {
       if (historyTokens.get(0).equals(resolver.getHistoryToken())) {
-        currHistoryPath = historyTokens;
         foundResolver = resolver;
         break;
       }

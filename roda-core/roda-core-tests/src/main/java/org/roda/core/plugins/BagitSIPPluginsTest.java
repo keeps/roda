@@ -20,8 +20,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.solr.client.solrj.SolrServerException;
-import org.hamcrest.MatcherAssert;
-import org.hamcrest.Matchers;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
@@ -48,15 +46,11 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
-import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.ModelServiceTest;
 import org.roda.core.plugins.plugins.ingest.BagitToAIPPlugin;
-import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
-import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.AssertJUnit;
@@ -73,22 +67,15 @@ public class BagitSIPPluginsTest {
 
   private static final int CORPORA_FILES_COUNT = 4;
   private static final int CORPORA_FOLDERS_COUNT = 2;
-  private static final String CORPORA_PDF = "test.docx";
-  private static final String CORPORA_TEST1 = "test1";
-  private static final String CORPORA_TEST1_TXT = "test1.txt";
-  private static final int GENERATED_FILE_SIZE = 100;
-  private static final int AUTO_COMMIT_TIMEOUT = 2000;
   private static Path basePath;
-  private static Path logPath;
 
   private static ModelService model;
   private static IndexService index;
 
   private static Path corporaPath;
-  private static StorageService corporaService;
   private static String aipCreator = "admin";
 
-  private static final Logger logger = LoggerFactory.getLogger(ModelServiceTest.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ModelServiceTest.class);
 
   @BeforeMethod
   public void setUp() throws Exception {
@@ -104,15 +91,13 @@ public class BagitSIPPluginsTest {
     boolean deployDefaultResources = false;
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
       deployPluginManager, deployDefaultResources);
-    logPath = RodaCoreFactory.getLogPath();
     model = RodaCoreFactory.getModelService();
     index = RodaCoreFactory.getIndexService();
 
     URL corporaURL = BagitSIPPluginsTest.class.getResource("/corpora");
     corporaPath = Paths.get(corporaURL.toURI());
-    corporaService = new FileStorageService(corporaPath);
 
-    logger.info("Running internal plugins tests under storage {}", basePath);
+    LOGGER.info("Running internal plugins tests under storage {}", basePath);
   }
 
   @AfterMethod
@@ -138,12 +123,6 @@ public class BagitSIPPluginsTest {
     TransferredResource transferredResource = index.retrieve(TransferredResource.class,
       transferredResourceCreated.getUUID());
     return transferredResource;
-  }
-
-  private void assertReports(List<Report> reports) {
-    for (Report report : reports) {
-      MatcherAssert.assertThat(report.getReports().get(0).getPluginState(), Matchers.is(PluginState.SUCCESS));
-    }
   }
 
   private AIP ingestCorpora() throws RequestNotValidException, NotFoundException, GenericException,

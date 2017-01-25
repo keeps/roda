@@ -27,16 +27,12 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.model.ModelService;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StringContentPayload;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import gov.loc.repository.bagit.Bag;
 import gov.loc.repository.bagit.BagFile;
 import gov.loc.repository.bagit.BagInfoTxt;
 
 public class BagitToAIPPluginUtils {
-  private static final Logger LOGGER = LoggerFactory.getLogger(BagitToAIPPluginUtils.class);
-
   private static final String DATA_FOLDER = "data";
   private static final String METADATA_TYPE = "key-value";
   private static final String METADATA_VERSION = null;

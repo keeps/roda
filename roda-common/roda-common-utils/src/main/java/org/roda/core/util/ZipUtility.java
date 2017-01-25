@@ -332,15 +332,6 @@ public final class ZipUtility {
     }
   }
 
-  private static void copy(InputStream in, File file) throws IOException {
-    OutputStream out = new FileOutputStream(file);
-    try {
-      copy(in, out);
-    } finally {
-      out.close();
-    }
-  }
-
   public static List<File> extractFilesFromInputStream(InputStream inputStream, Path outputDir) throws IOException {
     return extractFilesFromInputStream(inputStream, outputDir.toFile(), false);
 

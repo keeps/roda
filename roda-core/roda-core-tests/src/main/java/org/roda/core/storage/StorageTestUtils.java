@@ -23,7 +23,6 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class StorageTestUtils {
 

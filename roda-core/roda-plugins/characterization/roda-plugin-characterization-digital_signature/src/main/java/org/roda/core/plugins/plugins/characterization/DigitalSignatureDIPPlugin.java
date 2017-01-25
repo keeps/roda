@@ -374,7 +374,7 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractA
 
   @Override
   public Plugin<T> cloneMe() {
-    return new DigitalSignatureDIPPlugin();
+    return new DigitalSignatureDIPPlugin<T>();
   }
 
   @Override
@@ -418,6 +418,7 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractA
     return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_DISSEMINATION);
   }
 
+  @SuppressWarnings({"unchecked", "rawtypes"})
   @Override
   public List<Class<T>> getObjectClasses() {
     List<Class<? extends IsRODAObject>> list = new ArrayList<>();

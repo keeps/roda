@@ -750,7 +750,6 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
       }
     }
 
-    // FIXME revise PREMIS generation
     try {
       PluginHelper.createPluginEvent(this, aipId, representationId, filePath, fileId, model, index,
         premisSourceFilesIdentifiers, premisTargetFilesIdentifiers, pluginResultState, stringBuilder.toString(),
@@ -839,6 +838,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
     return mimetypeToExtension;
   }
 
+  @SuppressWarnings({"unchecked", "rawtypes"})
   @Override
   public List<Class<T>> getObjectClasses() {
     List<Class<? extends IsRODAObject>> list = new ArrayList<>();

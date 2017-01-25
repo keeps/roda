@@ -19,7 +19,6 @@ import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.security.PrivateKey;
 import java.security.Security;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertStore;
@@ -111,10 +110,8 @@ public class SignatureUtility {
   public void initSign(String alias, char[] password)
     throws UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, InvalidAlgorithmParameterException,
     NoSuchProviderException, CertStoreException, CMSException {
-    PrivateKey pk = (PrivateKey) ks.getKey(alias, password);
     java.security.cert.Certificate[] certificateChain = ks.getCertificateChain(alias);
     if (certificateChain != null) {
-      X509Certificate certificate = (X509Certificate) certificateChain[0];
       List<java.security.cert.Certificate> certList = new ArrayList<java.security.cert.Certificate>(
         Arrays.asList(certificateChain));
 

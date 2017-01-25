@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -1649,28 +1648,6 @@ public class LdapUtility {
       groupsDN.add(entry.getDn().getName());
     }
     return groupsDN;
-  }
-
-  /**
-   * No longer need to recursively find groups
-   * 
-   * @param session
-   * @param memberDN
-   * @return
-   * @throws LdapException
-   */
-  @Deprecated
-  private Set<String> getDNsOfAllActiveGroupsForMember(final CoreSession session, final String memberDN)
-    throws LdapException {
-    final Set<String> allGroupsDN = new HashSet<>();
-    final Set<String> directGroupsDN = getDNsOfActiveGroupsContainingMember(session, memberDN);
-    // add the groups that the member directly belongs to
-    allGroupsDN.addAll(directGroupsDN);
-    // For each group, get the groups to which it belongs
-    for (String groupDN : directGroupsDN) {
-      allGroupsDN.addAll(getDNsOfAllActiveGroupsForMember(session, groupDN));
-    }
-    return allGroupsDN;
   }
 
   private Set<String> getDNsOfDirectRolesForMember(final CoreSession session, final String memberDN)

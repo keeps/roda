@@ -301,6 +301,7 @@ public class InternalPluginsTest {
     AssertJUnit.assertEquals(1, events.getTotalCount());
   }
 
+  @SuppressWarnings("unchecked")
   @Test
   public void testPremisSkeleton()
     throws RODAException, FileAlreadyExistsException, InterruptedException, IOException, SolrServerException {
@@ -345,6 +346,7 @@ public class InternalPluginsTest {
 
   }
 
+  @SuppressWarnings("unchecked")
   @Test
   public void testSiegfried() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException,
     SolrServerException, XmlException {

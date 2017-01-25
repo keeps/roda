@@ -47,19 +47,6 @@ public class ZipTools {
     IOUtils.closeQuietly(out);
   }
 
-  private static String createFileName(String original, int append) {
-    String ret;
-    int dotIndex = original.lastIndexOf('.');
-    if (dotIndex > 0 && dotIndex < original.length() - 1) {
-      String name = original.substring(0, dotIndex);
-      String extention = original.substring(dotIndex);
-      ret = name + "_" + append + extention;
-    } else {
-      ret = original + "_" + append;
-    }
-    return ret;
-  }
-
   private static void sendToZip(InputStream in, ZipOutputStream zos) throws IOException {
     byte[] buffer = new byte[4096];
     int retval;

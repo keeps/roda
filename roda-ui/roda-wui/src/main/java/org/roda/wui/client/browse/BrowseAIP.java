@@ -141,7 +141,6 @@ public class BrowseAIP extends Composite {
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
   private String aipId;
-  private BrowseAIPBundle bundle;
 
   // Focus
   @UiField
@@ -287,7 +286,7 @@ public class BrowseAIP extends Composite {
 
     // HEADER
     browseDescription.add(new HTMLWidgetWrapper("BrowseDescription.html"));
-    
+
     // CSS
     this.addStyleName("browse");
   }
@@ -481,7 +480,6 @@ public class BrowseAIP extends Composite {
     if (bundle != null) {
       addStyleName(BROWSE_AIP_CSS);
 
-      this.bundle = bundle;
       this.justActive = AIPState.ACTIVE.equals(bundle.getAip().getState());
       IndexedAIP aip = bundle.getAip();
 
@@ -493,7 +491,6 @@ public class BrowseAIP extends Composite {
       this.addStyleName(aip.getState().toString().toLowerCase());
       aipState.setHTML(HtmlSnippetUtils.getAIPStateHTML(aip.getState()));
       aipState.setVisible(AIPState.ACTIVE != aip.getState());
-      
 
       // IDENTIFICATION
       updateSectionIdentification(bundle);

@@ -12,7 +12,6 @@ import static org.testng.AssertJUnit.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -27,11 +26,7 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.index.IndexService;
-import org.roda.core.model.ModelService;
-import org.roda.core.plugins.InternalPluginsTest;
-import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
-import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterClass;
@@ -40,18 +35,10 @@ import org.testng.annotations.Test;
 
 @Test(groups = {"all", "travis"})
 public class MonitorIndexTest {
-  private static final int AUTO_COMMIT_TIMEOUT = 5000;
-
   private static final Logger LOGGER = LoggerFactory.getLogger(MonitorIndexTest.class);
 
   private static Path basePath;
-  private static Path logPath;
-  private static ModelService model;
   private static IndexService index;
-
-  private static Path corporaPath;
-  private static StorageService corporaService;
-
   private static int fileCounter;
 
   @BeforeClass
@@ -68,14 +55,7 @@ public class MonitorIndexTest {
     boolean deployDefaultResources = false;
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
       deployPluginManager, deployDefaultResources);
-    logPath = RodaCoreFactory.getLogPath();
-    model = RodaCoreFactory.getModelService();
     index = RodaCoreFactory.getIndexService();
-
-    URL corporaURL = InternalPluginsTest.class.getResource("/corpora");
-    corporaPath = Paths.get(corporaURL.toURI());
-    corporaService = new FileStorageService(corporaPath);
-
     fileCounter = 0;
 
     LOGGER.info("Running folder monitor tests under storage {}", basePath);
