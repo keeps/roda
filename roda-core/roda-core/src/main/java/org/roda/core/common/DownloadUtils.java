@@ -18,6 +18,8 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.common.iterables.CloseableIterable;
+import org.roda.core.common.tools.ZipEntryInfo;
+import org.roda.core.common.tools.ZipTools;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -139,6 +141,29 @@ public class DownloadUtils {
     }
 
     return stream;
+  }
+
+  public static StreamResponse createZipStreamResponse(List<ZipEntryInfo> zipEntries, String zipName) {
+
+    final ConsumesOutputStream stream = new ConsumesOutputStream() {
+
+      @Override
+      public String getMediaType() {
+        return "application/zip";
+      }
+
+      @Override
+      public String getFileName() {
+        return zipName;
+      }
+
+      @Override
+      public void consumeOutputStream(OutputStream out) throws IOException {
+        ZipTools.zip(zipEntries, out);
+      }
+    };
+
+    return new StreamResponse(zipName + ".zip", "application/zip", stream);
   }
 
 }

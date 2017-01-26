@@ -1208,6 +1208,14 @@ public class ModelService extends ModelObservable {
     return storage.getBinary(path);
   }
 
+  public Binary retrievePreservationRepresentation(String aipId, String representationId, List<String> filePath,
+    String fileId) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    String urn = IdUtils.getPreservationId(PreservationMetadataType.FILE, aipId, representationId, filePath, fileId);
+    StoragePath path = ModelUtils.getPreservationMetadataStoragePath(urn, PreservationMetadataType.FILE, aipId,
+      representationId, filePath, fileId);
+    return storage.getBinary(path);
+  }
+
   public Binary retrievePreservationFile(String aipId, String representationId, List<String> fileDirectoryPath,
     String fileId) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     return retrievePreservationFile(aipId, representationId, fileDirectoryPath, fileId, PreservationMetadataType.FILE);

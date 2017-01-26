@@ -654,7 +654,7 @@ public class Browser extends RodaWuiController {
 
   }
 
-  public static StreamResponse retrieveAIPRepresentationPreservationMetadataFile(User user, String fileUUID,
+  public static EntityResponse retrieveAIPRepresentationPreservationMetadataFile(User user, String fileUUID,
     String acceptFormat)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -668,9 +668,9 @@ public class Browser extends RodaWuiController {
     UserUtility.checkFilePermissions(user, file, PermissionType.READ);
 
     // delegate
-    StreamResponse aipRepresentationPreservationMetadataFile = BrowserHelper
-      .retrieveAIPRepresentationPreservationMetadataFile(file.getAipId(), file.getRepresentationId(), file.getId(),
-        acceptFormat);
+    EntityResponse aipRepresentationPreservationMetadataFile = BrowserHelper
+      .retrieveAIPRepresentationPreservationMetadataFile(file.getAipId(), file.getRepresentationId(), file.getPath(),
+        file.getId(), acceptFormat);
 
     // register action
     controllerAssistant.registerAction(user, file.getAipId(), LOG_ENTRY_STATE.SUCCESS,

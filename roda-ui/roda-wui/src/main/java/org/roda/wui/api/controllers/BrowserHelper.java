@@ -37,6 +37,7 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.ClassificationPlanUtils;
 import org.roda.core.common.ConsumesOutputStream;
+import org.roda.core.common.DownloadUtils;
 import org.roda.core.common.EntityResponse;
 import org.roda.core.common.HandlebarsUtility;
 import org.roda.core.common.IdUtils;
@@ -49,7 +50,6 @@ import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
 import org.roda.core.common.monitor.TransferredResourcesScanner;
 import org.roda.core.common.tools.ZipEntryInfo;
-import org.roda.core.common.tools.ZipTools;
 import org.roda.core.common.validation.ValidationUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
@@ -707,7 +707,7 @@ public class BrowserHelper {
         counter++;
       }
 
-      return createZipStreamResponse(zipEntries, aipId);
+      return DownloadUtils.createZipStreamResponse(zipEntries, aipId);
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
       int endInt = limitInt == -1 ? metadata.size() : (limitInt > metadata.size() ? metadata.size() : limitInt);
@@ -1118,7 +1118,7 @@ public class BrowserHelper {
       }
 
       IOUtils.closeQuietly(preservationFiles);
-      return createZipStreamResponse(zipEntries, aipId);
+      return DownloadUtils.createZipStreamResponse(zipEntries, aipId);
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
       CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationFiles = RodaCoreFactory.getModelService()
@@ -1212,7 +1212,7 @@ public class BrowserHelper {
 
     IOUtils.closeQuietly(preservationFiles);
     if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP.equals(acceptFormat)) {
-      return createZipStreamResponse(zipEntries, aipId + "_" + representationId);
+      return DownloadUtils.createZipStreamResponse(zipEntries, aipId + "_" + representationId);
     } else {
       return new ObjectResponse<PreservationMetadataList>(acceptFormat, pms);
     }
@@ -1235,13 +1235,13 @@ public class BrowserHelper {
     }
   }
 
-  public static StreamResponse retrieveAIPRepresentationPreservationMetadataFile(String aipId, String representationId,
-    String fileId, String acceptFormat)
+  public static EntityResponse retrieveAIPRepresentationPreservationMetadataFile(String aipId, String representationId,
+    List<String> filePath, String fileId, String acceptFormat)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+    ModelService model = RodaCoreFactory.getModelService();
 
     if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP.equals(acceptFormat)) {
-      Binary binary = RodaCoreFactory.getModelService().retrievePreservationRepresentation(aipId, representationId);
-
+      Binary binary = model.retrievePreservationRepresentation(aipId, representationId, filePath, fileId);
       String filename = binary.getStoragePath().getName();
 
       ConsumesOutputStream stream = new ConsumesOutputStream() {
@@ -1264,8 +1264,12 @@ public class BrowserHelper {
       return new StreamResponse(filename, RodaConstants.MEDIA_TYPE_APPLICATION_OCTET_STREAM, stream);
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
-      // TODO
-      throw new GenericException("Unsupported accept format: " + acceptFormat);
+      PreservationMetadataType type = PreservationMetadataType.REPRESENTATION;
+      if (fileId != null) {
+        type = PreservationMetadataType.FILE;
+      }
+      PreservationMetadata pm = model.retrievePreservationMetadata(aipId, representationId, filePath, fileId, type);
+      return new ObjectResponse<PreservationMetadata>(acceptFormat, pm);
     } else {
       throw new GenericException("Unsupported accept format: " + acceptFormat);
     }
@@ -1335,7 +1339,7 @@ public class BrowserHelper {
       }
 
       IOUtils.closeQuietly(otherFiles);
-      return createZipStreamResponse(zipEntries, aipId);
+      return DownloadUtils.createZipStreamResponse(zipEntries, aipId);
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
       OtherMetadataList metadataList = new OtherMetadataList();
@@ -1423,8 +1427,11 @@ public class BrowserHelper {
   public static IndexedAIP moveAIPInHierarchy(User user, SelectedItems<IndexedAIP> selected, String parentId,
     String details) throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException,
     AlreadyExistsException, ValidationException {
-    List<String> aipIds = consolidate(user, IndexedAIP.class, selected);
+    Locale locale = ServerTools.parseLocale(RodaConstants.DEFAULT_EVENT_LOCALE);
+    Messages messages = RodaCoreFactory.getI18NMessages(locale);
+    String eventDescription = messages.getTranslation(RodaConstants.EVENT_UPDATE_ON_REPOSITORY);
 
+    List<String> aipIds = consolidate(user, IndexedAIP.class, selected);
     ModelService model = RodaCoreFactory.getModelService();
 
     for (String aipId : aipIds) {
@@ -1437,15 +1444,13 @@ public class BrowserHelper {
         try {
           model.moveAIP(aipId, parentId);
 
-          String outcomeText = "The AIP '" + aipId + "' has been manually moved.";
-          model.createUpdateAIPEvent(aipId, null, null, null, PreservationEventType.UPDATE,
-            "The process of modifying an object of the repository.", PluginState.SUCCESS, outcomeText, details,
-            user.getName(), true);
+          String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_MOVE_AIP_SUCCESS, aipId);
+          model.createUpdateAIPEvent(aipId, null, null, null, PreservationEventType.UPDATE, eventDescription,
+            PluginState.SUCCESS, outcomeText, details, user.getName(), true);
         } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
-          String outcomeText = "The AIP '" + aipId + "' has not been manually moved.";
-          model.createUpdateAIPEvent(aipId, null, null, null, PreservationEventType.UPDATE,
-            "The process of modifying an object of the repository.", PluginState.FAILURE, outcomeText, details,
-            user.getName(), true);
+          String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_MOVE_AIP_FAILURE, aipId);
+          model.createUpdateAIPEvent(aipId, null, null, null, PreservationEventType.UPDATE, eventDescription,
+            PluginState.FAILURE, outcomeText, details, user.getName(), true);
 
           throw e;
         }
@@ -1479,6 +1484,9 @@ public class BrowserHelper {
 
   public static String deleteAIP(User user, SelectedItems<IndexedAIP> selected, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    Locale locale = ServerTools.parseLocale(RodaConstants.DEFAULT_EVENT_LOCALE);
+    Messages messages = RodaCoreFactory.getI18NMessages(locale);
+
     List<String> aipIds = consolidate(user, IndexedAIP.class, selected);
     ModelService model = RodaCoreFactory.getModelService();
     String parentId = null;
@@ -1498,7 +1506,7 @@ public class BrowserHelper {
         AIP aip = model.retrieveAIP(aipId);
         parentId = aip.getParentId();
         model.deleteAIP(aip.getId());
-        deleteAIPEvent(model, user, aipId, details);
+        deleteAIPEvent(model, user, aipId, details, messages);
 
         Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aip.getId()));
         RodaCoreFactory.getIndexService().execute(IndexedAIP.class, filter, new IndexRunnable<IndexedAIP>() {
@@ -1508,7 +1516,7 @@ public class BrowserHelper {
             throws GenericException, RequestNotValidException, AuthorizationDeniedException {
             try {
               model.deleteAIP(item.getId());
-              deleteAIPEvent(model, user, aipId, details);
+              deleteAIPEvent(model, user, aipId, details, messages);
             } catch (NotFoundException e) {
               // already deleted, ignore
             }
@@ -1523,19 +1531,22 @@ public class BrowserHelper {
     return parentId;
   }
 
-  private static void deleteAIPEvent(ModelService model, User user, String aipId, String details) {
+  private static void deleteAIPEvent(ModelService model, User user, String aipId, String details, Messages messages) {
     if (details != null) {
-      String outcomeText = "The AIP '" + aipId + "' has been manually deleted.";
-      model.createRepositoryEvent(PreservationEventType.DELETION,
-        "The process of deleting an object of the repository.", PluginState.SUCCESS, outcomeText, details,
-        user.getName(), true);
+      String eventDescription = messages.getTranslation(RodaConstants.EVENT_DELETE_ON_REPOSITORY);
+      String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_DELETE_AIP_SUCCESS, aipId);
+      model.createRepositoryEvent(PreservationEventType.DELETION, eventDescription, PluginState.SUCCESS, outcomeText,
+        details, user.getName(), true);
     }
   }
 
   public static void deleteRepresentation(User user, SelectedItems<IndexedRepresentation> selected, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    List<String> representationIds = consolidate(user, IndexedRepresentation.class, selected);
+    Locale locale = ServerTools.parseLocale(RodaConstants.DEFAULT_EVENT_LOCALE);
+    Messages messages = RodaCoreFactory.getI18NMessages(locale);
+    String eventDescription = messages.getTranslation(RodaConstants.EVENT_DELETE_ON_REPOSITORY);
 
+    List<String> representationIds = consolidate(user, IndexedRepresentation.class, selected);
     ModelService model = RodaCoreFactory.getModelService();
     IndexService index = RodaCoreFactory.getIndexService();
 
@@ -1558,16 +1569,16 @@ public class BrowserHelper {
       try {
         model.deleteRepresentation(rep.getAipId(), rep.getId());
 
-        String outcomeText = "The Representation '" + rep.getId() + "' has been manually deleted.";
-        model.createUpdateAIPEvent(rep.getAipId(), null, null, null, PreservationEventType.DELETION,
-          "The process of deleting an object of the repository.", PluginState.SUCCESS, outcomeText, details,
-          user.getName(), true);
+        String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_DELETE_REPRESENTATION_SUCCESS,
+          rep.getId());
+        model.createUpdateAIPEvent(rep.getAipId(), null, null, null, PreservationEventType.DELETION, eventDescription,
+          PluginState.SUCCESS, outcomeText, details, user.getName(), true);
 
       } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-        String outcomeText = "The Representation '" + rep.getId() + "' has not been manually deleted.";
-        model.createUpdateAIPEvent(rep.getAipId(), null, null, null, PreservationEventType.DELETION,
-          "The process of deleting an object of the repository.", PluginState.FAILURE, outcomeText, details,
-          user.getName(), true);
+        String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_DELETE_REPRESENTATION_FAILURE,
+          rep.getId());
+        model.createUpdateAIPEvent(rep.getAipId(), null, null, null, PreservationEventType.DELETION, eventDescription,
+          PluginState.FAILURE, outcomeText, details, user.getName(), true);
 
         throw e;
       }
@@ -1578,8 +1589,11 @@ public class BrowserHelper {
 
   public static void deleteFile(User user, SelectedItems<IndexedFile> selected, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    List<String> fileIds = consolidate(user, IndexedFile.class, selected);
+    Locale locale = ServerTools.parseLocale(RodaConstants.DEFAULT_EVENT_LOCALE);
+    Messages messages = RodaCoreFactory.getI18NMessages(locale);
+    String eventDescription = messages.getTranslation(RodaConstants.EVENT_DELETE_ON_REPOSITORY);
 
+    List<String> fileIds = consolidate(user, IndexedFile.class, selected);
     ModelService model = RodaCoreFactory.getModelService();
     IndexService index = RodaCoreFactory.getIndexService();
 
@@ -1605,18 +1619,16 @@ public class BrowserHelper {
         sources.add(PluginHelper.getLinkingIdentifier(file.getAipId(), file.getRepresentationId(),
           RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
-        String outcomeText = "The File '" + file.getId() + "' has been manually deleted.";
+        String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_DELETE_FILE_SUCCESS, file.getId());
         model.createEvent(file.getAipId(), file.getRepresentationId(), null, null, PreservationEventType.DELETION,
-          "The process of deleting an object of the repository.", sources, null, PluginState.SUCCESS, outcomeText,
-          details, user.getName(), true);
+          eventDescription, sources, null, PluginState.SUCCESS, outcomeText, details, user.getName(), true);
       } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
         sources.add(PluginHelper.getLinkingIdentifier(file.getAipId(), file.getRepresentationId(), file.getPath(),
           file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
-        String outcomeText = "The File '" + file.getId() + "' has not been manually deleted.";
+        String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_DELETE_FILE_FAILURE, file.getId());
         model.createEvent(file.getAipId(), file.getRepresentationId(), null, null, PreservationEventType.DELETION,
-          "The process of deleting an object of the repository.", sources, null, PluginState.FAILURE, outcomeText,
-          details, user.getName(), true);
+          eventDescription, sources, null, PluginState.FAILURE, outcomeText, details, user.getName(), true);
 
         throw e;
       }
@@ -1718,33 +1730,13 @@ public class BrowserHelper {
     return RodaCoreFactory.getModelService().retrieveDescriptiveMetadata(aipId, descriptiveMetadataId);
   }
 
-  // FIXME allow to create a zip without files/directories???
-  private static StreamResponse createZipStreamResponse(List<ZipEntryInfo> zipEntries, String zipName) {
-
-    final ConsumesOutputStream stream = new ConsumesOutputStream() {
-
-      @Override
-      public String getMediaType() {
-        return "application/zip";
-      }
-
-      @Override
-      public String getFileName() {
-        return zipName;
-      }
-
-      @Override
-      public void consumeOutputStream(OutputStream out) throws IOException {
-        ZipTools.zip(zipEntries, out);
-      }
-    };
-
-    return new StreamResponse(zipName + ".zip", "application/zip", stream);
-  }
-
   public static Representation createRepresentation(User user, String aipId, String representationId, String type,
     String details) throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
     AlreadyExistsException {
+    Locale locale = ServerTools.parseLocale(RodaConstants.DEFAULT_EVENT_LOCALE);
+    Messages messages = RodaCoreFactory.getI18NMessages(locale);
+    String eventDescription = messages.getTranslation(RodaConstants.EVENT_CREATE_ON_REPOSITORY);
+
     ModelService model = RodaCoreFactory.getModelService();
 
     try {
@@ -1754,20 +1746,18 @@ public class BrowserHelper {
       targets.add(PluginHelper.getLinkingIdentifier(aipId, representation.getId(),
         RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
 
-      // TODO get this text from Messages
-      String outcomeText = "The Representation '" + representation.getId() + "' has been manually created.";
-      model.createEvent(aipId, null, null, null, PreservationEventType.CREATION,
-        "The process of creating an object of the repository.", null, targets, PluginState.SUCCESS, outcomeText,
-        details, user.getName(), true);
+      String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_CREATE_REPRESENTATION_SUCCESS,
+        representation.getId());
+      model.createEvent(aipId, null, null, null, PreservationEventType.CREATION, eventDescription, null, targets,
+        PluginState.SUCCESS, outcomeText, details, user.getName(), true);
 
       RodaCoreFactory.getIndexService().commit(IndexedRepresentation.class);
       return representation;
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
       | AlreadyExistsException e) {
-      String outcomeText = "A new representation has not been manually deleted.";
-      model.createUpdateAIPEvent(aipId, null, null, null, PreservationEventType.CREATION,
-        "The process of creation an object of the repository.", PluginState.FAILURE, outcomeText, details,
-        user.getName(), true);
+      String outcomeText = messages.getTranslation(RodaConstants.EVENT_CREATE_REPRESENTATION_FAILURE);
+      model.createUpdateAIPEvent(aipId, null, null, null, PreservationEventType.CREATION, eventDescription,
+        PluginState.FAILURE, outcomeText, details, user.getName(), true);
 
       throw e;
     }
@@ -1786,6 +1776,10 @@ public class BrowserHelper {
   public static File createFile(User user, String aipId, String representationId, List<String> directoryPath,
     String fileId, ContentPayload content, String details) throws GenericException, AuthorizationDeniedException,
     RequestNotValidException, NotFoundException, AlreadyExistsException {
+    Locale locale = ServerTools.parseLocale(RodaConstants.DEFAULT_EVENT_LOCALE);
+    Messages messages = RodaCoreFactory.getI18NMessages(locale);
+    String eventDescription = messages.getTranslation(RodaConstants.EVENT_CREATE_ON_REPOSITORY);
+
     ModelService model = RodaCoreFactory.getModelService();
 
     try {
@@ -1795,18 +1789,16 @@ public class BrowserHelper {
       targets.add(PluginHelper.getLinkingIdentifier(aipId, file.getRepresentationId(), file.getPath(), file.getId(),
         RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
 
-      String outcomeText = "The File '" + file.getId() + "' has been manually created.";
-      model.createEvent(aipId, representationId, null, null, PreservationEventType.CREATION,
-        "The process of creating an object of the repository.", null, targets, PluginState.SUCCESS, outcomeText,
-        details, user.getName(), true);
+      String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_CREATE_FILE_SUCCESS, file.getId());
+      model.createEvent(aipId, representationId, null, null, PreservationEventType.CREATION, eventDescription, null,
+        targets, PluginState.SUCCESS, outcomeText, details, user.getName(), true);
 
       return file;
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
       | AlreadyExistsException e) {
-      String outcomeText = "A new file has not been manually created.";
-      model.createUpdateAIPEvent(aipId, representationId, null, null, PreservationEventType.CREATION,
-        "The process of creation an object of the repository.", PluginState.FAILURE, outcomeText, details,
-        user.getName(), true);
+      String outcomeText = messages.getTranslation(RodaConstants.EVENT_CREATE_FILE_FAILURE);
+      model.createUpdateAIPEvent(aipId, representationId, null, null, PreservationEventType.CREATION, eventDescription,
+        PluginState.FAILURE, outcomeText, details, user.getName(), true);
 
       throw e;
     }
@@ -2249,22 +2241,24 @@ public class BrowserHelper {
   public static void updateAIPPermissions(User user, IndexedAIP indexedAIP, Permissions permissions, String details,
     boolean recursive)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
-    final ModelService model = RodaCoreFactory.getModelService();
+    Locale locale = ServerTools.parseLocale(RodaConstants.DEFAULT_EVENT_LOCALE);
+    Messages messages = RodaCoreFactory.getI18NMessages(locale);
+    final String eventDescription = messages.getTranslation(RodaConstants.EVENT_UPDATE_ON_REPOSITORY);
 
+    final ModelService model = RodaCoreFactory.getModelService();
     AIP aip = model.retrieveAIP(indexedAIP.getId());
     aip.setPermissions(permissions);
+
     try {
       model.updateAIPPermissions(aip, user.getName());
 
-      String outcomeText = "The AIP '" + aip.getId() + "' has been manually updated.";
-      model.createUpdateAIPEvent(aip.getId(), null, null, null, PreservationEventType.UPDATE,
-        "The process of updating an object of the repository.", PluginState.SUCCESS, outcomeText, details,
-        user.getName(), true);
+      String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_UPDATE_AIP_SUCCESS, aip.getId());
+      model.createUpdateAIPEvent(aip.getId(), null, null, null, PreservationEventType.UPDATE, eventDescription,
+        PluginState.SUCCESS, outcomeText, details, user.getName(), true);
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      String outcomeText = "The AIP '" + aip.getId() + "' has not been manually updated.";
-      model.createUpdateAIPEvent(aip.getId(), null, null, null, PreservationEventType.UPDATE,
-        "The process of updating an object of the repository.", PluginState.FAILURE, outcomeText, details,
-        user.getName(), true);
+      String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_UPDATE_AIP_FAILURE, aip.getId());
+      model.createUpdateAIPEvent(aip.getId(), null, null, null, PreservationEventType.UPDATE, eventDescription,
+        PluginState.FAILURE, outcomeText, details, user.getName(), true);
 
       throw e;
     }
@@ -2283,15 +2277,15 @@ public class BrowserHelper {
             try {
               model.updateAIPPermissions(descendant, user.getName());
 
-              String outcomeText = "The AIP '" + descendant.getId() + "' has been manually updated.";
+              String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_UPDATE_AIP_SUCCESS,
+                descendant.getId());
               model.createUpdateAIPEvent(descendant.getId(), null, null, null, PreservationEventType.UPDATE,
-                "The process of updating an object of the repository.", PluginState.SUCCESS, outcomeText, details,
-                user.getName(), true);
+                eventDescription, PluginState.SUCCESS, outcomeText, details, user.getName(), true);
             } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-              String outcomeText = "The AIP '" + descendant.getId() + "' has not been manually updated.";
+              String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_UPDATE_AIP_FAILURE,
+                descendant.getId());
               model.createUpdateAIPEvent(descendant.getId(), null, null, null, PreservationEventType.UPDATE,
-                "The process of updating an object of the repository.", PluginState.FAILURE, outcomeText, details,
-                user.getName(), true);
+                eventDescription, PluginState.FAILURE, outcomeText, details, user.getName(), true);
 
               throw e;
             }
@@ -2462,7 +2456,7 @@ public class BrowserHelper {
         SelectedItemsList<IndexedAIP> selectedItems = (SelectedItemsList<IndexedAIP>) selected;
         zipEntries.addAll(ModelUtils.zipIndexedAIP(ModelUtils.getIndexedAIPsFromObjectIds(selectedItems)));
       }
-      return createZipStreamResponse(zipEntries, "export");
+      return DownloadUtils.createZipStreamResponse(zipEntries, "export");
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)) {
       throw new GenericException("Not yet supported: " + acceptFormat);
     } else {
@@ -2777,6 +2771,10 @@ public class BrowserHelper {
   public static IndexedFile renameFolder(User user, String folderUUID, String newName, String details)
     throws GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException,
     AuthorizationDeniedException {
+    Locale locale = ServerTools.parseLocale(RodaConstants.DEFAULT_EVENT_LOCALE);
+    Messages messages = RodaCoreFactory.getI18NMessages(locale);
+    String eventDescription = messages.getTranslation(RodaConstants.EVENT_UPDATE_ON_REPOSITORY);
+
     ModelService model = RodaCoreFactory.getModelService();
     IndexService index = RodaCoreFactory.getIndexService();
     IndexedFile ifolder = index.retrieve(IndexedFile.class, folderUUID);
@@ -2787,23 +2785,21 @@ public class BrowserHelper {
         ifolder.getId());
       File newFolder = model.renameFolder(folder, newName, true, true);
 
-      String outcomeText = "The folder '" + ifolder.getId() + "' has been manually renamed from '" + oldName + "' to '"
-        + newName + "'.";
+      String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_RENAME_FOLDER_SUCCESS, oldName, newName);
 
       model.createUpdateAIPEvent(ifolder.getAipId(), ifolder.getRepresentationId(), null, null,
-        PreservationEventType.UPDATE, "The process of updating an object of the repository.", PluginState.SUCCESS,
-        outcomeText, details, user.getName(), true);
+        PreservationEventType.UPDATE, eventDescription, PluginState.SUCCESS, outcomeText, details, user.getName(),
+        true);
 
       index.commitAIPs();
 
       return index.retrieve(IndexedFile.class, IdUtils.getFileId(newFolder));
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      String outcomeText = "The folder '" + ifolder.getId() + "' has not been manually renamed from '" + oldName
-        + "' to '" + newName + "'.";
+      String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_RENAME_FOLDER_FAILURE, oldName, newName);
 
       model.createUpdateAIPEvent(ifolder.getAipId(), ifolder.getRepresentationId(), null, null,
-        PreservationEventType.UPDATE, "The process of updating an object of the repository.", PluginState.FAILURE,
-        outcomeText, details, user.getName(), true);
+        PreservationEventType.UPDATE, eventDescription, PluginState.FAILURE, outcomeText, details, user.getName(),
+        true);
 
       throw e;
     }
@@ -2812,6 +2808,10 @@ public class BrowserHelper {
   public static void moveFiles(User user, String aipId, String representationId,
     SelectedItems<IndexedFile> selectedFiles, IndexedFile toFolder, String details) throws GenericException,
     RequestNotValidException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
+    Locale locale = ServerTools.parseLocale(RodaConstants.DEFAULT_EVENT_LOCALE);
+    Messages messages = RodaCoreFactory.getI18NMessages(locale);
+    String eventDescription = messages.getTranslation(RodaConstants.EVENT_UPDATE_ON_REPOSITORY);
+
     ModelService model = RodaCoreFactory.getModelService();
     IndexService index = RodaCoreFactory.getIndexService();
     IndexResult<IndexedFile> findResult = new IndexResult<IndexedFile>();
@@ -2858,16 +2858,15 @@ public class BrowserHelper {
             newPathText = newFile.getPath().toString().replace("[", "").replace("]", "").replaceAll(",\\s*", "/");
           }
 
-          outcomeText.append("The file '" + pathText + "/" + file.getId() + "' has been manually moved to '"
-            + newPathText + "/" + newFile.getId() + "'.\n");
+          outcomeText.append(messages.getTranslationWithArgs(RodaConstants.EVENT_MOVE_FILE_SUCCESS, pathText,
+            file.getId(), newPathText, newFile.getId()));
 
         } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-          outcomeText.append("The file '" + file.getId() + "' has not been manually moved: ["
-            + e.getClass().getSimpleName() + "] " + e.getMessage());
+          outcomeText.append(messages.getTranslationWithArgs(RodaConstants.EVENT_MOVE_FILE_FAILURE, file.getId(),
+            e.getClass().getSimpleName(), e.getMessage()));
 
           model.createUpdateAIPEvent(aipId, representationId, null, null, PreservationEventType.UPDATE,
-            "The process of updating an object of the repository.", PluginState.FAILURE, outcomeText.toString(),
-            details, user.getName(), true);
+            eventDescription, PluginState.FAILURE, outcomeText.toString(), details, user.getName(), true);
 
           index.commitAIPs();
           throw e;
@@ -2875,9 +2874,8 @@ public class BrowserHelper {
       }
 
       // success
-      model.createUpdateAIPEvent(aipId, representationId, null, null, PreservationEventType.UPDATE,
-        "The process of updating an object of the repository.", PluginState.SUCCESS, outcomeText.toString(), details,
-        user.getName(), true);
+      model.createUpdateAIPEvent(aipId, representationId, null, null, PreservationEventType.UPDATE, eventDescription,
+        PluginState.SUCCESS, outcomeText.toString(), details, user.getName(), true);
 
       index.commitAIPs();
     }
@@ -2923,6 +2921,10 @@ public class BrowserHelper {
   public static IndexedFile createFolder(User user, String aipId, String representationId, String folderUUID,
     String newName, String details) throws GenericException, RequestNotValidException, AlreadyExistsException,
     NotFoundException, AuthorizationDeniedException {
+    Locale locale = ServerTools.parseLocale(RodaConstants.DEFAULT_EVENT_LOCALE);
+    Messages messages = RodaCoreFactory.getI18NMessages(locale);
+    String eventDescription = messages.getTranslation(RodaConstants.EVENT_CREATE_ON_REPOSITORY);
+
     ModelService model = RodaCoreFactory.getModelService();
     IndexService index = RodaCoreFactory.getIndexService();
     File newFolder;
@@ -2938,18 +2940,16 @@ public class BrowserHelper {
         newFolder = model.createFile(irep.getAipId(), irep.getId(), null, null, newName, true);
       }
 
-      String outcomeText = "The folder '" + newName + "' has been manually created.";
-      model.createUpdateAIPEvent(aipId, irep.getId(), null, null, PreservationEventType.CREATION,
-        "The process of creating an object of the repository.", PluginState.SUCCESS, outcomeText, details,
-        user.getName(), true);
+      String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_CREATE_FOLDER_SUCCESS, newName);
+      model.createUpdateAIPEvent(aipId, irep.getId(), null, null, PreservationEventType.CREATION, eventDescription,
+        PluginState.SUCCESS, outcomeText, details, user.getName(), true);
 
       index.commit(IndexedFile.class);
       return index.retrieve(IndexedFile.class, IdUtils.getFileId(newFolder));
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      String outcomeText = "The folder '" + newName + "' has not been manually created.";
-      model.createUpdateAIPEvent(aipId, irep.getId(), null, null, PreservationEventType.CREATION,
-        "The process of creating an object of the repository.", PluginState.FAILURE, outcomeText, details,
-        user.getName(), true);
+      String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_CREATE_FOLDER_FAILURE, newName);
+      model.createUpdateAIPEvent(aipId, irep.getId(), null, null, PreservationEventType.CREATION, eventDescription,
+        PluginState.FAILURE, outcomeText, details, user.getName(), true);
 
       throw e;
     }
@@ -3227,6 +3227,10 @@ public class BrowserHelper {
 
   public static void changeRepresentationType(User user, SelectedItems<IndexedRepresentation> selected, String newType,
     String details) throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
+    Locale locale = ServerTools.parseLocale(RodaConstants.DEFAULT_EVENT_LOCALE);
+    Messages messages = RodaCoreFactory.getI18NMessages(locale);
+    String eventDescription = messages.getTranslation(RodaConstants.EVENT_UPDATE_ON_REPOSITORY);
+
     List<String> representationIds = consolidate(user, IndexedRepresentation.class, selected);
     ModelService model = RodaCoreFactory.getModelService();
     IndexService index = RodaCoreFactory.getIndexService();
@@ -3244,20 +3248,17 @@ public class BrowserHelper {
 
       try {
         model.updateRepresentationType(irep.getAipId(), irep.getId(), newType);
+        String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_CHANGE_TYPE_REPRESENTATION_SUCCESS,
+          irep.getId(), oldType, newType);
 
-        String outcomeText = "The representation '" + irep.getId() + "' changed its type from '" + oldType + "' to '"
-          + newType + "'.";
-
-        model.createEvent(irep.getAipId(), irep.getId(), null, null, PreservationEventType.UPDATE,
-          "The process of updating an object of the repository.", sources, null, PluginState.SUCCESS, outcomeText,
-          details, user.getName(), true);
+        model.createEvent(irep.getAipId(), irep.getId(), null, null, PreservationEventType.UPDATE, eventDescription,
+          sources, null, PluginState.SUCCESS, outcomeText, details, user.getName(), true);
       } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-        String outcomeText = "The representation '" + irep.getId() + "' did not change its type from '" + oldType
-          + "' to '" + newType + "'.";
+        String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_CHANGE_TYPE_REPRESENTATION_FAILURE,
+          irep.getId(), oldType, newType);
 
-        model.createEvent(irep.getAipId(), irep.getId(), null, null, PreservationEventType.UPDATE,
-          "The process of updating an object of the repository.", sources, null, PluginState.FAILURE, outcomeText,
-          details, user.getName(), true);
+        model.createEvent(irep.getAipId(), irep.getId(), null, null, PreservationEventType.UPDATE, eventDescription,
+          sources, null, PluginState.FAILURE, outcomeText, details, user.getName(), true);
 
         throw e;
       }

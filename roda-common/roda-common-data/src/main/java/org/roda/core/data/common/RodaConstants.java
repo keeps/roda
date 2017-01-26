@@ -1171,6 +1171,39 @@ public final class RodaConstants {
   public static final String DIP_TYPE_CONVERSION = "conversion";
   public static final String DIP_TYPE_DIGITAL_SIGNATURE = "digital_signature";
 
+  // Default server side event locale
+  public static final String DEFAULT_EVENT_LOCALE = "en";
+
+  public static final String EVENT_CREATE_ON_REPOSITORY = "event.create.on_repository";
+  public static final String EVENT_UPDATE_ON_REPOSITORY = "event.update.on_repository";
+  public static final String EVENT_DELETE_ON_REPOSITORY = "event.delete.on_repository";
+
+  public static final String EVENT_CREATE_FILE_SUCCESS = "event.create.file.success";
+  public static final String EVENT_CREATE_FILE_FAILURE = "event.create.file.failure";
+  public static final String EVENT_MOVE_FILE_SUCCESS = "event.move.file.success";
+  public static final String EVENT_MOVE_FILE_FAILURE = "event.move.file.failure";
+  public static final String EVENT_DELETE_FILE_SUCCESS = "event.delete.file.success";
+  public static final String EVENT_DELETE_FILE_FAILURE = "event.delete.file.failure";
+
+  public static final String EVENT_CREATE_FOLDER_SUCCESS = "event.create.folder.success";
+  public static final String EVENT_CREATE_FOLDER_FAILURE = "event.create.folder.failure";
+  public static final String EVENT_RENAME_FOLDER_SUCCESS = "event.rename.folder.success";
+  public static final String EVENT_RENAME_FOLDER_FAILURE = "event.rename.folder.failure";
+
+  public static final String EVENT_CREATE_REPRESENTATION_SUCCESS = "event.create.representation.success";
+  public static final String EVENT_CREATE_REPRESENTATION_FAILURE = "event.create.representation.failure";
+  public static final String EVENT_CHANGE_TYPE_REPRESENTATION_SUCCESS = "event.change_type.representation.success";
+  public static final String EVENT_CHANGE_TYPE_REPRESENTATION_FAILURE = "event.change_type.representation.failure";
+  public static final String EVENT_DELETE_REPRESENTATION_SUCCESS = "event.delete.representation.success";
+  public static final String EVENT_DELETE_REPRESENTATION_FAILURE = "event.delete.representation.failure";
+
+  public static final String EVENT_MOVE_AIP_SUCCESS = "event.move.aip.success";
+  public static final String EVENT_MOVE_AIP_FAILURE = "event.move.aip.failure";
+  public static final String EVENT_UPDATE_AIP_SUCCESS = "event.update.aip.success";
+  public static final String EVENT_UPDATE_AIP_FAILURE = "event.update.aip.failure";
+  public static final String EVENT_DELETE_AIP_SUCCESS = "event.delete.aip.success";
+  public static final String EVENT_DELETE_AIP_FAILURE = "event.delete.aip.failure";
+
   /** Private empty constructor */
   private RodaConstants() {
 

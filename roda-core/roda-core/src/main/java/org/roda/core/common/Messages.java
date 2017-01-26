@@ -47,6 +47,10 @@ public class Messages {
     return resourceBundle.getString(key);
   }
 
+  public String getTranslationWithArgs(String key, Object... args) {
+    return String.format(getTranslation(key), args);
+  }
+
   public String getTranslation(String key, String fallback) {
     String ret;
     try {
