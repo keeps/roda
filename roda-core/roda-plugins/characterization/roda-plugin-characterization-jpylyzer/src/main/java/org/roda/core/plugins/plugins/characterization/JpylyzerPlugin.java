@@ -187,7 +187,6 @@ public class JpylyzerPlugin extends AbstractPlugin<AIP> {
     return true;
   }
 
-  // TODO FIX
   @Override
   public PreservationEventType getPreservationEventType() {
     return PreservationEventType.METADATA_EXTRACTION;
@@ -195,17 +194,17 @@ public class JpylyzerPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "XXXXXXXXXX";
+    return "Extracted metadata using Jpylyzer";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "XXXXXXXXXXXXXXXXXXXXXXXX";
+    return "Extracted metadata using Jpylyzer successfully";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "XXXXXXXXXXXXXXXXXXXXXXXXXX";
+    return "Extracted metadata using Jpylyzer with failures";
   }
 
   @Override

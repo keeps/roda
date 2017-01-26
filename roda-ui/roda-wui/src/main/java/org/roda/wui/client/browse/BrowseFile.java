@@ -226,10 +226,8 @@ public class BrowseFile extends Composite {
 
     // bind slider buttons
     disseminationsSlider = Sliders.createDisseminationsSlider(center, disseminationsButton, bundle.getFile());
-    // infoSlider = Sliders.createInfoSlider(center, infoFileButton,
-    // bundle.getFile());
-    // optionsSlider = Sliders.createOptionsSlider(center, optionsButton,
-    // bundle.getFile());
+    Sliders.createInfoSlider(center, infoFileButton, bundle.getFile());
+    Sliders.createOptionsSlider(center, optionsButton, bundle.getFile());
 
     keyboardFocus.setFocus(true);
 

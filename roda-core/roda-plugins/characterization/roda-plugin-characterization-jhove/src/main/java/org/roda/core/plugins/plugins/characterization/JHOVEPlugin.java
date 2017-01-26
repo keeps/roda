@@ -183,7 +183,6 @@ public class JHOVEPlugin extends AbstractPlugin<AIP> {
     return true;
   }
 
-  // TODO FIX
   @Override
   public PreservationEventType getPreservationEventType() {
     return PreservationEventType.METADATA_EXTRACTION;
@@ -191,17 +190,17 @@ public class JHOVEPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "XXXXXXXXXX";
+    return "Extracted metadata using JHOVE";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "XXXXXXXXXXXXXXXXXXXXXXXX";
+    return "Extracted metadata using JHOVE successfully";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "XXXXXXXXXXXXXXXXXXXXXXXXXX";
+    return "Extracted metadata using JHOVE with failures";
   }
 
   @Override

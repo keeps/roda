@@ -518,17 +518,17 @@ public final class RodaConstants {
   public static final String REPOSITORY_PERMISSIONS_AIP_DELETE = "aip.delete";
   public static final String REPOSITORY_PERMISSIONS_AIP_READ = "aip.read";
   public static final String REPOSITORY_PERMISSIONS_AIP_UPDATE = "aip.update";
-  
+
   public static final String REPOSITORY_PERMISSIONS_REPRESENTATION_CREATE = "representation.create";
   public static final String REPOSITORY_PERMISSIONS_REPRESENTATION_DELETE = "representation.delete";
   public static final String REPOSITORY_PERMISSIONS_REPRESENTATION_READ = "representation.read";
   public static final String REPOSITORY_PERMISSIONS_REPRESENTATION_UPDATE = "representation.update";
-  
+
   public static final String REPOSITORY_PERMISSIONS_DESCRIPTIVE_METADATA_CREATE = "descriptive_metadata.create";
   public static final String REPOSITORY_PERMISSIONS_DESCRIPTIVE_METADATA_DELETE = "descriptive_metadata.delete";
   public static final String REPOSITORY_PERMISSIONS_DESCRIPTIVE_METADATA_READ = "descriptive_metadata.read";
   public static final String REPOSITORY_PERMISSIONS_DESCRIPTIVE_METADATA_UPDATE = "descriptive_metadata.update";
-  
+
   public static final String REPOSITORY_PERMISSIONS_PRESERVATION_METADATA_CREATE = "preservation_metadata.create";
   public static final String REPOSITORY_PERMISSIONS_PRESERVATION_METADATA_DELETE = "preservation_metadata.delete";
   public static final String REPOSITORY_PERMISSIONS_PRESERVATION_METADATA_READ = "preservation_metadata.read";
@@ -540,7 +540,7 @@ public final class RodaConstants {
 
   public static final String REPOSITORY_PERMISSIONS_JOB_MANAGE = "job.manage";
   public static final String REPOSITORY_PERMISSIONS_JOB_READ = "job.read";
-  
+
   public static final String REPOSITORY_PERMISSIONS_MEMBER_MANAGE = "member.manage";
   public static final String REPOSITORY_PERMISSIONS_MEMBER_READ = "member.read";
 
@@ -1001,7 +1001,7 @@ public final class RodaConstants {
     WELLFORMEDNESS_CHECK("wellformedness check"), UNPACKING("unpacking"), METADATA_EXTRACTION("metadata extraction"),
     ACCESSION("accession"), AUTHORIZATION_CHECK("authorization check"), FORMAT_IDENTIFICATION("format identification"),
     FORMAT_VALIDATION("format validation"), INGEST_START("ingest start"), INGEST_END("ingest end"),
-    RISK_MANAGEMENT("risk management");
+    RISK_MANAGEMENT("risk management"), NONE("none");
 
     private final String text;
 

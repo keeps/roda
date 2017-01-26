@@ -192,7 +192,7 @@ public class ReindexRodaMemberPlugin extends AbstractPlugin<Void> {
 
   @Override
   public PreservationEventType getPreservationEventType() {
-    return PreservationEventType.UPDATE;
+    return PreservationEventType.NONE;
   }
 
   @Override

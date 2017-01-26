@@ -194,7 +194,7 @@ public class ReindexPreservationRepositoryEventPlugin extends AbstractPlugin<Voi
 
   @Override
   public PreservationEventType getPreservationEventType() {
-    return PreservationEventType.UPDATE;
+    return PreservationEventType.NONE;
   }
 
   @Override

@@ -200,7 +200,6 @@ public class ExifToolPlugin extends AbstractPlugin<AIP> {
     return true;
   }
 
-  // TODO FIX
   @Override
   public PreservationEventType getPreservationEventType() {
     return PreservationEventType.METADATA_EXTRACTION;

@@ -338,10 +338,9 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
     return true;
   }
 
-  // TODO FIX
   @Override
   public PreservationEventType getPreservationEventType() {
-    return null;
+    return PreservationEventType.VALIDATION;
   }
 
   @Override

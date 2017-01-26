@@ -189,7 +189,6 @@ public class AvprobePlugin extends AbstractPlugin<AIP> {
     return true;
   }
 
-  // TODO FIX
   @Override
   public PreservationEventType getPreservationEventType() {
     return PreservationEventType.METADATA_EXTRACTION;
@@ -197,17 +196,17 @@ public class AvprobePlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "XXXXXXXXXX";
+    return "Extracted metadata using avprobe";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "XXXXXXXXXXXXXXXXXXXXXXXX";
+    return "Extracted metadata using avprobe successfully";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "XXXXXXXXXXXXXXXXXXXXXXXXXX";
+    return "Extracted metadata using avprobe with failures";
   }
 
   @Override

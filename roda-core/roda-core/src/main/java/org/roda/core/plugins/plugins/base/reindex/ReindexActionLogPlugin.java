@@ -302,7 +302,7 @@ public class ReindexActionLogPlugin extends AbstractPlugin<Void> {
 
   @Override
   public PreservationEventType getPreservationEventType() {
-    return PreservationEventType.UPDATE;
+    return PreservationEventType.NONE;
   }
 
   @Override

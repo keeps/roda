@@ -211,7 +211,7 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
 
   @Override
   public PreservationEventType getPreservationEventType() {
-    return PreservationEventType.UPDATE;
+    return PreservationEventType.NONE;
   }
 
   @Override

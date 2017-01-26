@@ -217,7 +217,6 @@ public class ShowJobReport extends Composite {
       panelBody.addStyleName("panel-body");
       panel.add(panelBody);
 
-      // FIXME
       Label attributeLabel = new Label(messages.reportAgent());
       attributeLabel.setStyleName("label");
       panelBody.add(attributeLabel);

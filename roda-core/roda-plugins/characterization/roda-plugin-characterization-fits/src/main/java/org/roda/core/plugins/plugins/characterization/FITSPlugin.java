@@ -205,7 +205,6 @@ public class FITSPlugin extends AbstractPlugin<AIP> {
     return true;
   }
 
-  // TODO FIX
   @Override
   public PreservationEventType getPreservationEventType() {
     return PreservationEventType.METADATA_EXTRACTION;
@@ -213,17 +212,17 @@ public class FITSPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "XXXXXXXXXX";
+    return "Extracted metadata using FITS";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "XXXXXXXXXXXXXXXXXXXXXXXX";
+    return "Extracted metadata using FITS successfully";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "XXXXXXXXXXXXXXXXXXXXXXXXXX";
+    return "Extracted metadata using FITS with failures";
   }
 
   @Override

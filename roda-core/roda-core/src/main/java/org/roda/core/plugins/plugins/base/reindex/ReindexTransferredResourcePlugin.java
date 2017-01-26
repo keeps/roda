@@ -194,7 +194,7 @@ public class ReindexTransferredResourcePlugin extends AbstractPlugin<Void> {
 
   @Override
   public PreservationEventType getPreservationEventType() {
-    return PreservationEventType.UPDATE;
+    return PreservationEventType.NONE;
   }
 
   @Override

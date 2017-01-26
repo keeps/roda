@@ -203,7 +203,6 @@ public class DroidPlugin extends AbstractPlugin<AIP> {
     return true;
   }
 
-  // TODO FIX
   @Override
   public PreservationEventType getPreservationEventType() {
     return PreservationEventType.FORMAT_IDENTIFICATION;

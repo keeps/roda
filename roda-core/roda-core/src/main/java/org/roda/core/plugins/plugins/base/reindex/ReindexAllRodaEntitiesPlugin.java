@@ -188,7 +188,7 @@ public class ReindexAllRodaEntitiesPlugin extends AbstractPlugin<Void> {
 
   @Override
   public PreservationEventType getPreservationEventType() {
-    return PreservationEventType.UPDATE;
+    return PreservationEventType.NONE;
   }
 
   @Override
