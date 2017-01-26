@@ -21,7 +21,7 @@ public class SchemasCacheLoader extends CacheLoader<Pair<String, String>, Option
     String metadataType = pair.getFirst();
     String metadataTypeLowerCase = metadataType.toLowerCase();
     String metadataVersion = pair.getSecond();
-    String metadataVersionLowerCase = metadataType.toLowerCase();
+    String metadataVersionLowerCase = metadataVersion.toLowerCase();
 
     String schemaFileName;
     if (StringUtils.isNotEmpty(metadataVersion)) {
