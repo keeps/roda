@@ -116,8 +116,8 @@ public class ClassificationPlanUtils {
       node = node.put("descriptionlevel", indexedAIP.getLevel());
     }
     AIP modelAIP = model.retrieveAIP(indexedAIP.getId());
-    
-    if(modelAIP.getType()!=null){
+
+    if (modelAIP.getType() != null) {
       node = node.put("type", modelAIP.getType());
     }
     if (modelAIP != null) {

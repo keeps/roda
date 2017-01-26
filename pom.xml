@@ -156,7 +156,6 @@
 			<id>all</id>
 			<modules>
 				<module>roda-common</module>
-				<module>roda-cas</module>
 				<module>roda-core/roda-core</module>
 				<module>roda-core/roda-plugins</module>
 				<module>roda-core/roda-core-tests</module>
@@ -173,20 +172,11 @@
 			</modules>
 		</profile>
 		<profile>
-			<id>wui-with-cas</id>
-			<modules>
-				<module>roda-common</module>
-				<module>roda-core/roda-core</module>
-				<module>roda-core/roda-core-tests</module>
-				<module>roda-ui/roda-wui</module>
-				<module>roda-cas</module>
-			</modules>
-		</profile>
-		<profile>
 			<id>wui</id>
 			<modules>
 				<module>roda-common</module>
 				<module>roda-core/roda-core</module>
+				<module>roda-core/roda-plugins/roda-plugin-common</module>
 				<module>roda-core/roda-core-tests</module>
 				<module>roda-ui/roda-wui</module>
 			</modules>
@@ -204,7 +194,6 @@
 		<!-- <modules> -->
 		<!-- <module>roda-common</module> -->
 		<!-- <module>roda-ui</module> -->
-		<!-- <module>roda-cas</module> -->
 		<!-- <module>roda-installer</module> -->
 		<!-- </modules> -->
 		<!-- </profile> -->
