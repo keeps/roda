@@ -244,7 +244,7 @@ public class BrowserHelper {
     return bundle;
   }
 
-  public static BrowseFileBundle retrieveBrowseFmeileBundle(IndexedAIP aip, String representationId,
+  public static BrowseFileBundle retrieveBrowseFileBundle(IndexedAIP aip, String representationId,
     List<String> filePath, String fileId, Locale locale, User user)
     throws NotFoundException, GenericException, RequestNotValidException {
     BrowseFileBundle bundle = new BrowseFileBundle();
