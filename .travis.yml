@@ -28,7 +28,7 @@ before_script:
 - sudo apt-get install libreoffice libreoffice-script-provider-python -y
 - sudo apt-get install unoconv -y
 - sudo apt-get --only-upgrade install cpio libgcrypt11 libnss3 libreoffice-pdfimport multiarch-support -y
-script: mvn -Dtestng.groups="travis" -Denforcer.skip clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
+script: mvn -Dtestng.groups="travis" -Denforcer.skip=true clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
 notifications:
   slack:
     secure: Hg2xvznD2QGhbCHRXN9DFM6dYIfeiZStj0Ud+OBS2swX9YOM77ufbDkMWF/yAAwxNg45QIC3a3okVy6TLzY5hA/PSKlc/5/ClujgRy02HLXlbYZ9psQH22/VFrER3uFkIpvMPhrxh3NLo/UMWfwvmwq26ziFnW4W6UDn/XXCHPE=
