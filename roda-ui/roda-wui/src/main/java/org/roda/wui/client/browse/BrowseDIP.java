@@ -268,11 +268,11 @@ public class BrowseDIP extends Composite {
     } else {
       final Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIPFILE_DIP_ID, dip.getId()),
         new EmptyKeyFilterParameter(RodaConstants.DIPFILE_PARENT_UUID));
-      // TODO summary
       final SearchPanel dipFileSearch = new SearchPanel(filter, RodaConstants.DIPFILE_SEARCH, true,
         messages.searchPlaceHolder(), false, false, true);
 
-      final DIPFileList dipFileList = new DIPFileList(filter, Facets.NONE, "", false);
+      final DIPFileList dipFileList = new DIPFileList(filter, Facets.NONE,
+        messages.allOfAObject(DIPFile.class.getName()), false);
       dipFileSearch.setList(dipFileList);
       ListSelectionUtils.bindBrowseOpener(dipFileList);
 

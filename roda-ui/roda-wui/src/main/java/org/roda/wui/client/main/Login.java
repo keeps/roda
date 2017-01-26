@@ -227,7 +227,6 @@ public class Login extends Composite {
     String passwordText = password.getText();
     error.setText("");
 
-    // TODO strings
     if (usernameText.trim().length() == 0 || passwordText.trim().length() == 0) {
       error.setText(messages.fillUsernameAndPasswordMessage());
     } else {

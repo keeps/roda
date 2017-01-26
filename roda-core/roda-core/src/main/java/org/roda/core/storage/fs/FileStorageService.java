@@ -304,7 +304,6 @@ public class FileStorageService implements StorageService {
   public Binary createBinary(StoragePath storagePath, ContentPayload payload, boolean asReference)
     throws GenericException, AlreadyExistsException {
     if (asReference) {
-      // TODO create binary as a reference
       throw new GenericException("Method not yet implemented");
     } else {
       Path binPath = FSUtils.getEntityPath(basePath, storagePath);
@@ -340,7 +339,6 @@ public class FileStorageService implements StorageService {
   public Binary createRandomBinary(StoragePath parentStoragePath, ContentPayload payload, boolean asReference)
     throws GenericException, RequestNotValidException {
     if (asReference) {
-      // TODO create binary as a reference
       throw new GenericException("Method not yet implemented");
     } else {
       Path parent = FSUtils.getEntityPath(basePath, parentStoragePath);
@@ -372,7 +370,6 @@ public class FileStorageService implements StorageService {
   public Binary updateBinaryContent(StoragePath storagePath, ContentPayload payload, boolean asReference,
     boolean createIfNotExists) throws GenericException, NotFoundException, RequestNotValidException {
     if (asReference) {
-      // TODO update binary as a reference
       throw new GenericException("Method not yet implemented");
     } else {
 

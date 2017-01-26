@@ -131,10 +131,9 @@ public class ActionLogCleanerPlugin extends AbstractPlugin<Void> {
     return true;
   }
 
-  // TODO FIX
   @Override
   public PreservationEventType getPreservationEventType() {
-    return null;
+    return PreservationEventType.DELETION;
   }
 
   @Override

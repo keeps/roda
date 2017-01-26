@@ -30,8 +30,8 @@ import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.management.Management;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
-import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.core.client.GWT;
@@ -137,7 +137,6 @@ public class ActionProcess extends Composite {
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.JOB_STATE),
       new SimpleFacetParameter(RodaConstants.JOB_USERNAME), new SimpleFacetParameter(RodaConstants.JOB_PLUGIN_TYPE));
 
-    // TODO externalise strings
     jobList = new JobList(filter, facets, messages.jobList(), false);
     producerFacets = new FlowPanel();
     stateFacets = new FlowPanel();
@@ -190,7 +189,7 @@ public class ActionProcess extends Composite {
     jobList.autoUpdate(10000);
 
   }
-  
+
   @Override
   protected void onLoad() {
     super.onLoad();

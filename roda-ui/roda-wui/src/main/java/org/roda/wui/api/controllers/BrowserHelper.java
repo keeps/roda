@@ -1138,7 +1138,7 @@ public class BrowserHelper {
     }
   }
 
-  protected static void validateGetAIPRepresentationPreservationMetadataParams(String acceptFormat, String language)
+  protected static void validateGetAIPRepresentationPreservationMetadataParams(String acceptFormat)
     throws RequestNotValidException {
     if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP.equals(acceptFormat)
       && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
@@ -1147,12 +1147,6 @@ public class BrowserHelper {
         + "' value. Expected values: " + Arrays.asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP,
           RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON, RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML));
     }
-
-    // FIXME validate language? what exception should be thrown?
-    if (!StringUtils.isNotBlank(language)) {
-      throw new RequestNotValidException("Parameter '" + RodaConstants.API_QUERY_KEY_LANG + "' must have a value");
-    }
-
   }
 
   private static EntityResponse getAIPRepresentationPreservationMetadataEntityResponse(String aipId,
@@ -1220,7 +1214,7 @@ public class BrowserHelper {
 
   public static EntityResponse retrieveAIPRepresentationPreservationMetadata(String aipId, String representationId,
     String startAgent, String limitAgent, String startEvent, String limitEvent, String startFile, String limitFile,
-    String acceptFormat, String language)
+    String acceptFormat)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException, IOException {
 
     if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP.equals(acceptFormat)

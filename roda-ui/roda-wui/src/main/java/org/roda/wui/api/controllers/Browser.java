@@ -625,12 +625,12 @@ public class Browser extends RodaWuiController {
 
   public static EntityResponse retrieveAIPRepresentationPreservationMetadata(User user, String aipId,
     String representationId, String startAgent, String limitAgent, String startEvent, String limitEvent,
-    String startFile, String limitFile, String acceptFormat, String language) throws AuthorizationDeniedException,
-    GenericException, TransformerException, NotFoundException, RequestNotValidException, IOException {
+    String startFile, String limitFile, String acceptFormat) throws AuthorizationDeniedException, GenericException,
+    TransformerException, NotFoundException, RequestNotValidException, IOException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // validate input
-    BrowserHelper.validateGetAIPRepresentationPreservationMetadataParams(acceptFormat, language);
+    BrowserHelper.validateGetAIPRepresentationPreservationMetadataParams(acceptFormat);
 
     // check user permissions
     controllerAssistant.checkRoles(user);
@@ -640,8 +640,7 @@ public class Browser extends RodaWuiController {
 
     // delegate
     EntityResponse aipRepresentationPreservationMetadata = BrowserHelper.retrieveAIPRepresentationPreservationMetadata(
-      rep.getAipId(), rep.getId(), startAgent, limitAgent, startEvent, limitEvent, startFile, limitFile, acceptFormat,
-      language);
+      rep.getAipId(), rep.getId(), startAgent, limitAgent, startEvent, limitEvent, startFile, limitFile, acceptFormat);
 
     // register action
     controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS,
@@ -651,7 +650,6 @@ public class Browser extends RodaWuiController {
       startFile, RodaConstants.CONTROLLER_LIMIT_FILE_PARAM, limitFile);
 
     return aipRepresentationPreservationMetadata;
-
   }
 
   public static EntityResponse retrieveAIPRepresentationPreservationMetadataFile(User user, String fileUUID,

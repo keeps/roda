@@ -185,7 +185,6 @@ public class IngestJobReportList extends BasicAsyncTableCell<IndexedReport> {
     lastPluginRunStateColumn.setSortable(true);
     completionStatusColumn.setSortable(false);
 
-    // TODO externalize strings into constants
     addColumn(sourceObjectColumn, messages.showSIPExtended(), true, false);
     addColumn(outcomeObjectColumn, messages.showAIPExtended(), true, false);
     addColumn(updatedDateColumn, messages.reportLastUpdatedAt(), true, false, 11);

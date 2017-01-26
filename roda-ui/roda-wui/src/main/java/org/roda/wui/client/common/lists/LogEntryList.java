@@ -132,8 +132,6 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
     addressColumn.setSortable(true);
     stateColumn.setSortable(true);
 
-    // TODO externalize strings into constants
-
     addColumn(dateColumn, messages.logEntryDatetimeExtended(), true, false, 14);
     addColumn(actionComponentColumn, messages.logEntryComponent(), true, false);
     addColumn(actionMethodColumn, messages.logEntryMethod(), true, false);

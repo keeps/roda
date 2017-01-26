@@ -115,9 +115,6 @@ public class BagitSIPPluginsTest {
     TransferredResource transferredResourceCreated = f.createFile(null, CorporaConstants.BAGIT_SIP,
       Files.newInputStream(sip));
 
-    // TODO check if 4 times is the expected
-    // Mockito.verify(observer, Mockito.times(4));
-
     index.commit(TransferredResource.class);
 
     TransferredResource transferredResource = index.retrieve(TransferredResource.class,

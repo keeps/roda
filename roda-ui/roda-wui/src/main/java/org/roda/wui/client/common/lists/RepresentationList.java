@@ -106,7 +106,6 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
     sizeInBytesColumn.setSortable(true);
     numberOfDataFilesColumn.setSortable(true);
 
-    // TODO externalize strings into constants
     display.addColumn(typeColumn, messages.representationType());
     display.addColumn(numberOfDataFilesColumn, messages.representationFiles());
     display.addColumn(sizeInBytesColumn, messages.representationSize());

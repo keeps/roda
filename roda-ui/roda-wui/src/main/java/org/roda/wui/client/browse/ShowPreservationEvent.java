@@ -331,7 +331,7 @@ public class ShowPreservationEvent extends Composite {
       } else if (type == RODA_TYPE.AIP) {
         addAipPanel(bundle, layout, idValue);
       } else {
-        // TODO send warning
+        GWT.log("RODA type is not supported");
       }
 
       objectsPanel.add(layout);

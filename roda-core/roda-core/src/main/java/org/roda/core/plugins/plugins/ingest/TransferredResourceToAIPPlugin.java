@@ -54,6 +54,7 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
 
   private static final String METADATA_TYPE = "key-value";
   private static final String METADATA_VERSION = null;
+  private static final String METADATA_FILE = "metadata.xml";
   private static final String UNPACK_DESCRIPTION = "Extracted objects from package in file/folder format.";
 
   private boolean createSubmission = false;
@@ -167,8 +168,7 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
       ContentPayload metadataPayload = MetadataFileUtils.getMetadataPayload(transferredResource);
       boolean notifyDescriptiveMetadataCreated = false;
 
-      // TODO make the following strings constants
-      model.createDescriptiveMetadata(aip.getId(), "metadata.xml", metadataPayload, METADATA_TYPE, METADATA_VERSION,
+      model.createDescriptiveMetadata(aip.getId(), METADATA_FILE, metadataPayload, METADATA_TYPE, METADATA_VERSION,
         notifyDescriptiveMetadataCreated);
 
       // FIXME 20160516 hsilva: put "SIP" inside the AIP???
@@ -213,7 +213,7 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
           boolean notifyFileCreated = false;
           model.createFile(aip.getId(), representationId, directoryPath, fileId, payload, notifyFileCreated);
         } catch (RODAException e) {
-          // TODO log or mark nothing to do
+          LOGGER.error("Could not create file on {}", file.toString(), e);
         }
         return FileVisitResult.CONTINUE;
       }

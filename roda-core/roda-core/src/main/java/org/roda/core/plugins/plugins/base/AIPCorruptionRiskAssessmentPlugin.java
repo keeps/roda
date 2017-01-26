@@ -256,7 +256,6 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
     return true;
   }
 
-  // TODO FIX
   @Override
   public PreservationEventType getPreservationEventType() {
     return PreservationEventType.FIXITY_CHECK;

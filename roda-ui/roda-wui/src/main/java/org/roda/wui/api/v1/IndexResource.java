@@ -267,7 +267,7 @@ public class IndexResource {
       return csvResponse(findRequest, user);
     } else {
       // TODO support JSON type
-      throw new GenericException("type not yet supported:" + type);
+      throw new GenericException("Type not yet supported:" + type);
     }
   }
 

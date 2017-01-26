@@ -164,10 +164,9 @@ public class RiskIncidenceRemoverPlugin<T extends IsRODAObject> extends Abstract
     return true;
   }
 
-  // TODO FIX
   @Override
   public PreservationEventType getPreservationEventType() {
-    return null;
+    return PreservationEventType.DELETION;
   }
 
   @Override

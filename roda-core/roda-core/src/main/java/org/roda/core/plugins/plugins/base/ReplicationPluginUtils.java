@@ -145,7 +145,6 @@ public class ReplicationPluginUtils {
 
     StringBuilder ret = new StringBuilder();
     if (Files.exists(sourceAgentPath)) {
-
       rsyncCommand.add(sourceAgentPath + "/");
       rsyncCommand.add(targetAgentPath);
 

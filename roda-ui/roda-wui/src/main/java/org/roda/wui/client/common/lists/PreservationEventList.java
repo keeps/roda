@@ -42,13 +42,11 @@ import config.i18n.client.ClientMessages;
  */
 public class PreservationEventList extends BasicAsyncTableCell<IndexedPreservationEvent> {
 
-  // private final ClientLogger logger = new ClientLogger(getClass().getName());
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private Column<IndexedPreservationEvent, Date> eventDateTimeColumn;
   private TextColumn<IndexedPreservationEvent> eventTypeColumn;
   private TextColumn<IndexedPreservationEvent> eventDetailColumn;
-
   private Column<IndexedPreservationEvent, SafeHtml> eventOutcomeColumn;
 
   public PreservationEventList() {
@@ -111,7 +109,6 @@ public class PreservationEventList extends BasicAsyncTableCell<IndexedPreservati
     eventTypeColumn.setSortable(true);
     eventDetailColumn.setSortable(true);
     eventOutcomeColumn.setSortable(true);
-    // eventAgentColumn.setSortable(true);
 
     addColumn(eventDateTimeColumn, messages.preservationEventListHeaderDate(), true, false, 11);
     addColumn(eventTypeColumn, messages.preservationEventListHeaderType(), false, false, 13);
@@ -127,10 +124,6 @@ public class PreservationEventList extends BasicAsyncTableCell<IndexedPreservati
   protected Sorter getSorter(ColumnSortList columnSortList) {
     Map<Column<IndexedPreservationEvent, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<IndexedPreservationEvent, ?>, List<String>>();
     columnSortingKeyMap.put(eventDateTimeColumn, Arrays.asList(RodaConstants.PRESERVATION_EVENT_DATETIME));
-    // TODO an event can now have multiple agents... sort by agent id should
-    // maybe be removed...
-    // columnSortingKeyMap.put(eventAgentColumn,
-    // RodaConstants.PRESERVATION_EVENT_LINKING_AGENT_IDENTIFIER);
     columnSortingKeyMap.put(eventTypeColumn, Arrays.asList(RodaConstants.PRESERVATION_EVENT_TYPE));
     columnSortingKeyMap.put(eventDetailColumn, Arrays.asList(RodaConstants.PRESERVATION_EVENT_DETAIL));
     columnSortingKeyMap.put(eventOutcomeColumn, Arrays.asList(RodaConstants.PRESERVATION_EVENT_OUTCOME));

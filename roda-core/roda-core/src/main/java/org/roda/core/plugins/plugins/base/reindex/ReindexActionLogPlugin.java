@@ -300,10 +300,9 @@ public class ReindexActionLogPlugin extends AbstractPlugin<Void> {
     return true;
   }
 
-  // TODO FIX
   @Override
   public PreservationEventType getPreservationEventType() {
-    return null;
+    return PreservationEventType.UPDATE;
   }
 
   @Override

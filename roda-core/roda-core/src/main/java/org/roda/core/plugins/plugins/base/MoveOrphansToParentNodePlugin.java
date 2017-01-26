@@ -161,10 +161,9 @@ public class MoveOrphansToParentNodePlugin extends AbstractPlugin<AIP> {
     return true;
   }
 
-  // TODO FIX
   @Override
   public PreservationEventType getPreservationEventType() {
-    return null;
+    return PreservationEventType.UPDATE;
   }
 
   @Override

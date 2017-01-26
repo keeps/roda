@@ -111,8 +111,6 @@ public class TransferredResourceList extends BasicAsyncTableCell<TransferredReso
     sizeColumn.setSortable(true);
     creationDateColumn.setSortable(true);
 
-    // TODO externalize strings into constants
-
     addColumn(isFileColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-files-o'></i>"), false, false, 3);
     addColumn(nameColumn, messages.transferredResourceName(), true, false);
     addColumn(sizeColumn, messages.transferredResourceSize(), true, true, 7);

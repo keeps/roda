@@ -90,7 +90,6 @@ public class SimpleFileList extends BasicAsyncTableCell<IndexedFile> {
     iconColumn.setSortable(true);
     filenameColumn.setSortable(true);
 
-    // TODO externalize strings into constants
     addColumn(iconColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-files-o'></i>"), false, false, 2);
     addColumn(filenameColumn, messages.fileName(), false, false);
 

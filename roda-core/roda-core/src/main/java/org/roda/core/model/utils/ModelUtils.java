@@ -717,8 +717,7 @@ public final class ModelUtils {
       path = getRepresentationOtherMetadataPath(aipId, representationId, type);
       path.add(representationId + fileSuffix);
       // XXX What if representation id is equal to a file id? Maybe move
-      // this to
-      // AIP metadata folder and have id
+      // this to AIP metadata folder and have id
       // [aipId+"-"+representationId+fileSuffix]
     } else if (aipId != null) {
       path = getRepresentationOtherMetadataPath(aipId, representationId, type);

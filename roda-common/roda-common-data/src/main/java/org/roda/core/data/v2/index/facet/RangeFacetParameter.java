@@ -11,7 +11,7 @@ public class RangeFacetParameter extends FacetParameter {
 
   private static final long serialVersionUID = 2190074263722637165L;
 
-  // XXX these are strings because one might pass dates or numbers
+  // INFO these are strings because one might pass dates or numbers
   private String start;
   private String end;
   private String gap;

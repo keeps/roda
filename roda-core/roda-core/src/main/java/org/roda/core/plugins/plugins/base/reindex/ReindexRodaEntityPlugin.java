@@ -209,10 +209,9 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
     return true;
   }
 
-  // TODO FIX
   @Override
   public PreservationEventType getPreservationEventType() {
-    return null;
+    return PreservationEventType.UPDATE;
   }
 
   @Override

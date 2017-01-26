@@ -415,8 +415,7 @@ public class ModelService extends ModelObservable {
       StoragePath aipPath = ModelUtils.getAIPStoragePath(aipId);
 
       // XXX possible optimization only creating new files, updating
-      // changed and
-      // removing deleted ones.
+      // changed and removing deleted ones.
       storage.deleteResource(aipPath);
 
       storage.copy(sourceStorage, sourcePath, aipPath);
@@ -916,8 +915,7 @@ public class ModelService extends ModelObservable {
 
     if (validationReport.isValid()) {
       // XXX possible optimization only creating new files, updating
-      // changed and
-      // removing deleted
+      // changed and removing deleted
 
       StoragePath representationPath = ModelUtils.getRepresentationStoragePath(aipId, representationId);
       storage.deleteResource(representationPath);
@@ -1651,8 +1649,8 @@ public class ModelService extends ModelObservable {
           }
         }
       }
-      directoryStream.close();
 
+      directoryStream.close();
     } catch (IOException e) {
       LOGGER.error("Error listing directory for log files", e);
     }

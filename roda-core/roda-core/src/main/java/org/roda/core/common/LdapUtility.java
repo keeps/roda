@@ -84,8 +84,6 @@ import org.w3c.util.DateParser;
  * @author Rui Castro
  *
  */
-// FIXME this should be moved back to roda-common-servlet-security or any place
-// more meaningful
 public class LdapUtility {
 
   /** Class logger. */

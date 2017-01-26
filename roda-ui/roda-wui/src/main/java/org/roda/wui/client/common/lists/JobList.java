@@ -221,8 +221,6 @@ public class JobList extends BasicAsyncTableCell<Job> {
     // objectsProcessingCountColumn.setSortable(true);
     progressColumn.setSortable(true);
 
-    // TODO externalize strings into constants
-
     addColumn(nameColumn, messages.jobName(), true, false);
     addColumn(usernameColumn, messages.jobCreator(), true, false);
     addColumn(startDateColumn, messages.jobStartDate(), true, false, 11);

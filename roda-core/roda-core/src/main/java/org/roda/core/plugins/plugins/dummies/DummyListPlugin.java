@@ -95,7 +95,6 @@ public class DummyListPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
     return true;
   }
 
-  // TODO FIX
   @Override
   public PreservationEventType getPreservationEventType() {
     return null;

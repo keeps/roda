@@ -81,11 +81,10 @@ public class PermissionsTest {
 
   @Test
   public void testAIP() throws RODAException, ParseException {
-    // generate AIP ID
+    // Generate AIP Id
     final String aipId = UUID.randomUUID().toString();
 
     // Create AIP
-    // TODO move aip id to constants
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_PERMISSIONS),
       aipCreator);
@@ -136,11 +135,10 @@ public class PermissionsTest {
 
   @Test
   public void testRepresentation() throws RODAException, ParseException {
-    // generate AIP ID
+    // Generate AIP Id
     final String aipId = UUID.randomUUID().toString();
 
     // Create AIP
-    // TODO move aip id to constants
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_PERMISSIONS),
       aipCreator);
@@ -190,11 +188,10 @@ public class PermissionsTest {
 
   @Test
   public void testFiles() throws RODAException, ParseException {
-    // generate AIP ID
+    // Generate AIP Id
     final String aipId = UUID.randomUUID().toString();
 
     // Create AIP
-    // TODO move aip id to constants
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_PERMISSIONS),
       aipCreator);
@@ -244,11 +241,10 @@ public class PermissionsTest {
 
   @Test
   public void testPreservationEvents() throws RODAException, ParseException {
-    // generate AIP ID
+    // Generate AIP Id
     final String aipId = UUID.randomUUID().toString();
 
     // Create AIP
-    // TODO move aip id to constants
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_PERMISSIONS),
       aipCreator);

@@ -116,7 +116,6 @@ public class AIPList extends BasicAsyncTableCell<IndexedAIP> {
     datesColumn.setSortable(true);
     hasRepresentationsColumn.setSortable(true);
 
-    // TODO externalize strings into constants
     display.addColumn(levelColumn,
       SafeHtmlUtils.fromSafeConstant("<i class='fa fa-tag'></i>&nbsp;" + messages.aipLevel()));
     display.addColumn(titleColumn, messages.aipGenericTitle());

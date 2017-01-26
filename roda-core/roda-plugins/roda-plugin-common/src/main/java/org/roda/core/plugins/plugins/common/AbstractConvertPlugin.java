@@ -493,7 +493,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                     } else {
                       // TODO the concrete plugin should define the
                       // representation type
-                      String newRepresentationType = representation.getType();
+                      String newRepresentationType = RodaConstants.REPRESENTATION_TYPE_MIXED;
                       model.createRepresentation(aipId, newRepresentationID, original, newRepresentationType, notify);
                       reportItem.setOutcomeObjectId(
                         IdUtils.getRepresentationId(representation.getAipId(), newRepresentationID));

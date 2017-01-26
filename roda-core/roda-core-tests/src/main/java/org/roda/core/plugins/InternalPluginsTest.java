@@ -192,9 +192,6 @@ public class InternalPluginsTest {
 
     f.createFile(parentUUID, CORPORA_PDF, getClass().getResourceAsStream("/corpora/Media/" + CORPORA_PDF));
 
-    // TODO check if 4 times is the expected
-    // Mockito.verify(observer, Mockito.times(4));
-
     index.commit(TransferredResource.class);
 
     TransferredResource transferredResource = index.retrieve(TransferredResource.class,

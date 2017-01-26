@@ -927,13 +927,13 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     assertEquals(3, reusableBinaryVersions.size());
 
     // 7) get binary version
-    System.out.println(v1.getId());
     BinaryVersion binaryVersion1 = getStorage().getBinaryVersion(binaryStoragePath, v1.getId());
     // TODO compare properties
     assertEquals(message1, binaryVersion1.getProperties().get(RodaConstants.VERSION_MESSAGE));
     if (!(getStorage() instanceof FedoraStorageService)) {
       assertNotNull(binaryVersion1.getCreatedDate());
     }
+
     assertTrue(
       IOUtils.contentEquals(payload1.createInputStream(), binaryVersion1.getBinary().getContent().createInputStream()));
 

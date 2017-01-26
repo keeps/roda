@@ -364,7 +364,7 @@ public class ShowJob extends Composite {
         } else if (PluginParameterType.AIP_ID.equals(parameter.getType())) {
           createSelectAipLayout(parameter);
         } else {
-          // TODO log a warning
+          GWT.log("Plugin parameter type not supported. It will be used 'STRING' as default");
           createStringLayout(parameter);
         }
       }

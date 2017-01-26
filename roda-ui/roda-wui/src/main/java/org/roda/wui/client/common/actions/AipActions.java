@@ -427,7 +427,6 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
       @Override
       public void onSuccess(final Long size) {
-        // TODO update messages
         Dialogs.showConfirmDialog(messages.removeConfirmDialogTitle(),
           messages.removeSelectedConfirmDialogMessage(size), messages.dialogNo(), messages.dialogYes(),
           new AsyncCallback<Boolean>() {

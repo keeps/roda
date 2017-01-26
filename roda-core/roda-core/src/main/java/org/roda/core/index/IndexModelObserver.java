@@ -282,8 +282,6 @@ public class IndexModelObserver implements ModelObserver {
     // Add information from PREMIS
     Binary premisFile = getFilePremisFile(file);
     if (premisFile != null) {
-      // TODO get entry point from PREMIS or remove it
-      // doc.addField(RodaConstants.FILE_ISENTRYPOINT, file.isEntryPoint());
       try {
         SolrInputDocument premisSolrDoc = PremisV3Utils.getSolrDocument(premisFile);
         fileDocument.putAll(premisSolrDoc);

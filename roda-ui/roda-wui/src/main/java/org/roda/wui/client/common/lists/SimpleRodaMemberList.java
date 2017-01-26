@@ -84,7 +84,6 @@ public class SimpleRodaMemberList extends BasicAsyncTableCell<RODAMember> {
     idColumn.setSortable(true);
     nameColumn.setSortable(true);
 
-    // TODO externalize strings into constants
     addColumn(typeColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-user'></i>"), false, false, 2);
     addColumn(idColumn, messages.userIdentifier(), true, false);
     addColumn(nameColumn, messages.userFullName(), true, false);

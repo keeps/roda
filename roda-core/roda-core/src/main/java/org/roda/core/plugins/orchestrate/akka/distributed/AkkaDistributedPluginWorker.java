@@ -7,9 +7,6 @@
  */
 package org.roda.core.plugins.orchestrate.akka.distributed;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 
@@ -20,8 +17,6 @@ import akka.cluster.client.ClusterClient;
 import akka.cluster.client.ClusterClientSettings;
 
 public class AkkaDistributedPluginWorker extends AkkaDistributedPlugin {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-
   // XXX this uses a single threaded worker (as opposite to
   // AkkaEmbeddedPluginOrchestrator which is multi-threaded)
   private ActorSystem workerSystem;

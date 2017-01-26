@@ -199,15 +199,12 @@ public class SimpleJobReportList extends BasicAsyncTableCell<IndexedReport> {
     lastPluginRunStateColumn.setSortable(true);
     completionStatusColumn.setSortable(false);
 
-    // TODO externalize strings into constants
     addColumn(sourceColumn, messages.reportSource(), true, false);
     addColumn(outcomeColumn, messages.reportOutcome(), true, false);
     addColumn(updatedDateColumn, messages.reportLastUpdatedAt(), true, false, 11);
     addColumn(lastPluginRunColumn, messages.reportLastRunTask(), true, false);
     addColumn(lastPluginRunStateColumn, messages.reportStatus(), true, false, 8);
     addColumn(completionStatusColumn, messages.reportProgress(), true, false, 8);
-
-    // display.setColumnWidth(sourceObjectColumn, "100%");
 
     Label emptyInfo = new Label(messages.noItemsToDisplay());
     display.setEmptyTableWidget(emptyInfo);

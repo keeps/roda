@@ -365,9 +365,6 @@ public final class PremisV3Utils {
       try {
         act.addNewAgentExtension().set(XmlObject.Factory.parse(extension));
       } catch (XmlException e) {
-        // e.getError()
-        // TODO convert XmlException to a Valiation Exception in
-        // MetadataUtils
         throw new ValidationException(e.getMessage());
       }
     }
@@ -644,6 +641,7 @@ public final class PremisV3Utils {
 
         // TODO extension
       }
+
       if (premisFile.getObjectCharacteristicsArray() != null && premisFile.getObjectCharacteristicsArray().length > 0) {
         ObjectCharacteristicsComplexType occt = premisFile.getObjectCharacteristicsArray(0);
         doc.setField(RodaConstants.FILE_SIZE, occt.getSize());

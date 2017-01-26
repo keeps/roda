@@ -313,7 +313,7 @@ public final class LiteRODAObjectFactory {
         } else if (Job.class.getName().equals(clazz)) {
           ret = (T) model.retrieveJob(firstId);
         } else if (LogEntry.class.getName().equals(clazz)) {
-          // XXX 20161229 nvieira It is too complex to use model/storage and
+          // INFO 20161229 nvieira It is too complex to use model/storage and
           // using index creates a circular dependency
         } else if (Notification.class.getName().equals(clazz)) {
           ret = (T) model.retrieveNotification(firstId);

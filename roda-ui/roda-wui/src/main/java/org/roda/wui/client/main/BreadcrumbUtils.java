@@ -90,7 +90,6 @@ public class BreadcrumbUtils {
 
             @Override
             public void execute() {
-              // TODO find better error message
               Toast.showError(messages.unknownAncestorError());
             }
           });
@@ -132,7 +131,6 @@ public class BreadcrumbUtils {
 
             @Override
             public void execute() {
-              // TODO find better error message
               Toast.showError(messages.unknownAncestorError());
             }
           });

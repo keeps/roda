@@ -372,8 +372,7 @@ public class RepresentationsResource {
     @ApiParam(value = "Index of the first event to return", defaultValue = "0") @QueryParam("startEvent") String startEvent,
     @ApiParam(value = "Maximum number of events to return", defaultValue = RodaConstants.DEFAULT_PAGINATION_STRING_VALUE) @QueryParam("limitEvent") String limitEvent,
     @ApiParam(value = "Index of the first file to return", defaultValue = "0") @QueryParam("startFile") String startFile,
-    @ApiParam(value = "Maximum number of files to return", defaultValue = RodaConstants.DEFAULT_PAGINATION_STRING_VALUE) @QueryParam("limitFile") String limitFile,
-    @ApiParam(value = "The language for the HTML output", allowableValues = RodaConstants.API_DESCRIPTIVE_METADATA_LANGUAGES, defaultValue = RodaConstants.API_QUERY_VALUE_LANG_DEFAULT) @DefaultValue(RodaConstants.API_QUERY_VALUE_LANG_DEFAULT) @QueryParam(RodaConstants.API_QUERY_KEY_LANG) String language)
+    @ApiParam(value = "Maximum number of files to return", defaultValue = RodaConstants.DEFAULT_PAGINATION_STRING_VALUE) @QueryParam("limitFile") String limitFile)
     throws RODAException {
     try {
       String mediaType = ApiUtils.getMediaType(acceptFormat, request);
@@ -383,7 +382,7 @@ public class RepresentationsResource {
 
       // delegate action to controller
       EntityResponse preservationMetadataList = Browser.retrieveAIPRepresentationPreservationMetadata(user, aipId,
-        representationId, startAgent, limitAgent, startEvent, limitEvent, startFile, limitFile, acceptFormat, language);
+        representationId, startAgent, limitAgent, startEvent, limitEvent, startFile, limitFile, acceptFormat);
 
       if (preservationMetadataList instanceof ObjectResponse) {
         ObjectResponse<PreservationMetadataList> pmlist = (ObjectResponse<PreservationMetadataList>) preservationMetadataList;
