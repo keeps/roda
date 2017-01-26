@@ -512,53 +512,49 @@ public final class RodaConstants {
   public static final String OBJECT_PERMISSIONS_GRANT_GROUPS = "grantGroups";
   public static final String OBJECT_PERMISSIONS_USER_GROUP = "users";
 
-  // TODO create constants for all roles
-  // aip.appraisal
-  // aip.create.top aip.create.below
+  public static final String REPOSITORY_PERMISSIONS_AIP_APPRAISAL = "aip.appraisal";
   public static final String REPOSITORY_PERMISSIONS_AIP_CREATE_TOP = "aip.create.top";
   public static final String REPOSITORY_PERMISSIONS_AIP_CREATE_BELOW = "aip.create.below";
-  // aip.delete
-  // aip.read
-  // aip.update
-
-  // representation.create
-  // representation.delete
-  // representation.read
-  // representation.update
-
-  // descriptive_metadata.create
-  // descriptive_metadata.delete
-  // descriptive_metadata.read
-  // descriptive_metadata.update
+  public static final String REPOSITORY_PERMISSIONS_AIP_DELETE = "aip.delete";
+  public static final String REPOSITORY_PERMISSIONS_AIP_READ = "aip.read";
+  public static final String REPOSITORY_PERMISSIONS_AIP_UPDATE = "aip.update";
+  
+  public static final String REPOSITORY_PERMISSIONS_REPRESENTATION_CREATE = "representation.create";
+  public static final String REPOSITORY_PERMISSIONS_REPRESENTATION_DELETE = "representation.delete";
+  public static final String REPOSITORY_PERMISSIONS_REPRESENTATION_READ = "representation.read";
+  public static final String REPOSITORY_PERMISSIONS_REPRESENTATION_UPDATE = "representation.update";
+  
+  public static final String REPOSITORY_PERMISSIONS_DESCRIPTIVE_METADATA_CREATE = "descriptive_metadata.create";
+  public static final String REPOSITORY_PERMISSIONS_DESCRIPTIVE_METADATA_DELETE = "descriptive_metadata.delete";
+  public static final String REPOSITORY_PERMISSIONS_DESCRIPTIVE_METADATA_READ = "descriptive_metadata.read";
   public static final String REPOSITORY_PERMISSIONS_DESCRIPTIVE_METADATA_UPDATE = "descriptive_metadata.update";
+  
+  public static final String REPOSITORY_PERMISSIONS_PRESERVATION_METADATA_CREATE = "preservation_metadata.create";
+  public static final String REPOSITORY_PERMISSIONS_PRESERVATION_METADATA_DELETE = "preservation_metadata.delete";
+  public static final String REPOSITORY_PERMISSIONS_PRESERVATION_METADATA_READ = "preservation_metadata.read";
 
-  // preservation_metadata.create
-  // preservation_metadata.delete
-  // preservation_metadata.read
+  public static final String REPOSITORY_PERMISSIONS_TRANSFER_CREATE = "transfer.create";
+  public static final String REPOSITORY_PERMISSIONS_TRANSFER_DELETE = "transfer.delete";
+  public static final String REPOSITORY_PERMISSIONS_TRANSFER_READ = "transfer.read";
+  public static final String REPOSITORY_PERMISSIONS_TRANSFER_UPDATE = "transfer.update";
 
-  // transfer.create
-  // transfer.delete
-  // transfer.read
-  // transfer.update
+  public static final String REPOSITORY_PERMISSIONS_JOB_MANAGE = "job.manage";
+  public static final String REPOSITORY_PERMISSIONS_JOB_READ = "job.read";
+  
+  public static final String REPOSITORY_PERMISSIONS_MEMBER_MANAGE = "member.manage";
+  public static final String REPOSITORY_PERMISSIONS_MEMBER_READ = "member.read";
 
-  // job.manage
-  // job.read
+  public static final String REPOSITORY_PERMISSIONS_NOTIFICATION_MANAGE = "notification.manage";
+  public static final String REPOSITORY_PERMISSIONS_NOTIFICATION_READ = "notification.read";
 
-  // member.manage
-  // member.read
-
-  // notification.manage
-  // notification.read
-  //
-  // log_entry.delete
-  // log_entry.read
+  public static final String REPOSITORY_PERMISSIONS_LOG_ENTRY_MANAGE = "log_entry.manage";
   public static final String REPOSITORY_PERMISSIONS_LOG_ENTRY_READ = "log_entry.read";
 
-  // risk.manage
-  // risk.read
+  public static final String REPOSITORY_PERMISSIONS_RISK_MANAGE = "risk.manage";
+  public static final String REPOSITORY_PERMISSIONS_RISK_READ = "risk.read";
 
-  // format.manage
-  // format.read
+  public static final String REPOSITORY_PERMISSIONS_FORMAT_MANAGE = "format.manage";
+  public static final String REPOSITORY_PERMISSIONS_FORMAT_READ = "format.read";
 
   public static final String LOG_ACTION_COMPONENT = "actionComponent";
   public static final String LOG_ACTION_METHOD = "actionMethod";

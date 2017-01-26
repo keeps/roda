@@ -168,6 +168,7 @@ import org.xml.sax.SAXException;
  * @author Luis Faria <lfaria@keep.pt>
  */
 public class BrowserHelper {
+  private static final String HTML_EXT = ".html";
   private static final Logger LOGGER = LoggerFactory.getLogger(BrowserHelper.class);
 
   protected static BrowseAIPBundle retrieveBrowseAipBundle(IndexedAIP aip, Locale locale)
@@ -243,7 +244,7 @@ public class BrowserHelper {
     return bundle;
   }
 
-  public static BrowseFileBundle retrieveBrowseFileBundle(IndexedAIP aip, String representationId,
+  public static BrowseFileBundle retrieveBrowseFmeileBundle(IndexedAIP aip, String representationId,
     List<String> filePath, String fileId, Locale locale, User user)
     throws NotFoundException, GenericException, RequestNotValidException {
     BrowseFileBundle bundle = new BrowseFileBundle();
@@ -760,7 +761,7 @@ public class BrowserHelper {
 
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
       Binary descriptiveMetadataBinary = model.retrieveDescriptiveMetadataBinary(aipId, metadataId);
-      filename = descriptiveMetadataBinary.getStoragePath().getName() + ".html";
+      filename = descriptiveMetadataBinary.getStoragePath().getName() + HTML_EXT;
       DescriptiveMetadata descriptiveMetadata = model.retrieveDescriptiveMetadata(aipId, metadataId);
       mediaType = RodaConstants.MEDIA_TYPE_TEXT_HTML;
       String htmlDescriptive = HTMLUtils.descriptiveMetadataToHtml(descriptiveMetadataBinary,
@@ -839,7 +840,7 @@ public class BrowserHelper {
 
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
       Binary descriptiveMetadataBinary = model.retrieveDescriptiveMetadataBinary(aipId, representationId, metadataId);
-      filename = descriptiveMetadataBinary.getStoragePath().getName() + ".html";
+      filename = descriptiveMetadataBinary.getStoragePath().getName() + HTML_EXT;
       DescriptiveMetadata descriptiveMetadata = model.retrieveDescriptiveMetadata(aipId, representationId, metadataId);
       mediaType = RodaConstants.MEDIA_TYPE_TEXT_HTML;
       String htmlDescriptive = HTMLUtils.descriptiveMetadataToHtml(descriptiveMetadataBinary,
@@ -921,7 +922,7 @@ public class BrowserHelper {
       return new StreamResponse(fileName, mediaType, stream);
 
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
-      filename = fileName + ".html";
+      filename = fileName + HTML_EXT;
       DescriptiveMetadata descriptiveMetadata = model.retrieveDescriptiveMetadata(aipId, metadataId);
       mediaType = RodaConstants.MEDIA_TYPE_TEXT_HTML;
       String htmlDescriptive = HTMLUtils.descriptiveMetadataToHtml(binary, descriptiveMetadata.getType(),
@@ -1001,7 +1002,7 @@ public class BrowserHelper {
       return new StreamResponse(fileName, mediaType, stream);
 
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
-      filename = fileName + ".html";
+      filename = fileName + HTML_EXT;
       DescriptiveMetadata descriptiveMetadata = model.retrieveDescriptiveMetadata(aipId, representationId, metadataId);
       mediaType = RodaConstants.MEDIA_TYPE_TEXT_HTML;
       String htmlDescriptive = HTMLUtils.descriptiveMetadataToHtml(binary, descriptiveMetadata.getType(),
@@ -1016,7 +1017,7 @@ public class BrowserHelper {
 
         @Override
         public String getFileName() {
-          return fileName + ".html";
+          return fileName + HTML_EXT;
         }
 
         @Override
@@ -1750,6 +1751,7 @@ public class BrowserHelper {
       targets.add(PluginHelper.getLinkingIdentifier(aipId, representation.getId(),
         RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
 
+      // TODO get this text from Messages
       String outcomeText = "The Representation '" + representation.getId() + "' has been manually created.";
       model.createEvent(aipId, null, null, null, PreservationEventType.CREATION,
         "The process of creating an object of the repository.", null, targets, PluginState.SUCCESS, outcomeText,
