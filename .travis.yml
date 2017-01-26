@@ -2,6 +2,7 @@ language: java
 jdk:
 - oraclejdk8
 sudo: required
+install: true
 env:
   - MAVEN_OPTS="-Xmx4g"
 addons:
@@ -29,6 +30,10 @@ before_script:
 - sudo apt-get install unoconv -y
 - sudo apt-get --only-upgrade install cpio libgcrypt11 libnss3 libreoffice-pdfimport multiarch-support -y
 script: mvn -Dtestng.groups="travis" -Denforcer.skip=true clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
+cache:
+  directories:
+    - '$HOME/.m2/repository'
+    - '$HOME/.sonar/cache'
 notifications:
   slack:
     secure: Hg2xvznD2QGhbCHRXN9DFM6dYIfeiZStj0Ud+OBS2swX9YOM77ufbDkMWF/yAAwxNg45QIC3a3okVy6TLzY5hA/PSKlc/5/ClujgRy02HLXlbYZ9psQH22/VFrER3uFkIpvMPhrxh3NLo/UMWfwvmwq26ziFnW4W6UDn/XXCHPE=
