@@ -2,6 +2,8 @@ language: java
 jdk:
 - oraclejdk8
 sudo: required
+env:
+  - SONAR_SCANNER_OPTS="-Xmx512m"
 addons:
   sonarqube:
     token:
