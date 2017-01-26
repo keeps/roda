@@ -149,7 +149,7 @@ public class DownloadUtils {
 
       @Override
       public String getMediaType() {
-        return "application/zip";
+        return ZIP_MEDIA_TYPE;
       }
 
       @Override
@@ -163,7 +163,7 @@ public class DownloadUtils {
       }
     };
 
-    return new StreamResponse(zipName + ".zip", "application/zip", stream);
+    return new StreamResponse(zipName + ZIP_FILE_NAME_EXTENSION, ZIP_MEDIA_TYPE, stream);
   }
 
 }

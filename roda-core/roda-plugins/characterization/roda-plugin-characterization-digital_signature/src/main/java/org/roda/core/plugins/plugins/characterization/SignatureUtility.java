@@ -42,6 +42,8 @@ import org.bouncycastle.cms.SignerInformation;
 import org.bouncycastle.cms.SignerInformationStore;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.Store;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility class to help create and validate digital signatures
@@ -50,6 +52,7 @@ import org.bouncycastle.util.Store;
  * 
  */
 public class SignatureUtility {
+  private Logger LOGGER = LoggerFactory.getLogger(getClass());
 
   private static final String DEFAULT_PROVIDER = BouncyCastleProvider.PROVIDER_NAME;
 
@@ -118,7 +121,7 @@ public class SignatureUtility {
       CertStore certs = CertStore.getInstance("Collection", new CollectionCertStoreParameters(certList), provider);
       signGenerator.addCertificatesAndCRLs(certs);
     } else {
-      System.err.println("Certificate chain for " + alias + " not found");
+      LOGGER.error("Certificate chain for '{}' not found", alias);
     }
   }
 
@@ -189,7 +192,6 @@ public class SignatureUtility {
     throws CertificateException, NoSuchAlgorithmException, NoSuchProviderException, CMSException {
     boolean valid = true;
 
-    // CertStore certStore = s.getCertificatesAndCRLs("Collection", provider);
     Store<?> certStore = s.getCertificates();
     SignerInformationStore signers = s.getSignerInfos();
 
@@ -207,7 +209,7 @@ public class SignatureUtility {
       valid &= certValid;
 
       if (!certValid) {
-        System.err.println("Invalid certificate " + cert);
+        LOGGER.error("Invalid certificate '{}'", cert);
       }
 
       if (contentDigest != null) {
@@ -215,7 +217,7 @@ public class SignatureUtility {
         valid &= digestValid;
 
         if (!digestValid) {
-          System.err.println("Invalid digest " + contentDigest);
+          LOGGER.error("Invalid digest '{}'", contentDigest);
         }
       }
     }

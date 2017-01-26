@@ -2,7 +2,7 @@ package org.roda.core.common.dips;
 
 import java.util.Optional;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.HandlebarsUtility;
 import org.roda.core.data.exceptions.GenericException;

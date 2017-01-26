@@ -355,7 +355,7 @@ public class IndexModelObserver implements ModelObserver {
       if (fulltextBinary.getSizeInBytes() < RodaCoreFactory.getRodaConfigurationAsInt(TEN_MB_IN_BYTES,
         "core.index.fulltext_threshold_in_bytes")) {
         inputStream = fulltextBinary.getContent().createInputStream();
-        fulltext = IOUtils.toString(inputStream, Charset.defaultCharset());
+        fulltext = IOUtils.toString(inputStream, Charset.forName(RodaConstants.DEFAULT_ENCODING));
       }
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | IOException e) {
       LOGGER.warn("Error getting fulltext for file: {}", file, e);

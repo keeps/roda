@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -762,10 +762,10 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
 
   private String getNewFileFormat(String fileFormat, String filePronom, String fileMimetype) {
     if (!applicableTo.isEmpty()) {
-      if (filePronom != null && !filePronom.isEmpty() && pronomToExtension.get(filePronom) != null
+      if (StringUtils.isNotBlank(filePronom) && pronomToExtension.get(filePronom) != null
         && !pronomToExtension.get(filePronom).contains(fileFormat)) {
         fileFormat = pronomToExtension.get(filePronom).get(0);
-      } else if (fileMimetype != null && !fileMimetype.isEmpty() && mimetypeToExtension.get(fileMimetype) != null
+      } else if (StringUtils.isNotBlank(fileMimetype) && mimetypeToExtension.get(fileMimetype) != null
         && !mimetypeToExtension.get(fileMimetype).contains(fileFormat)) {
         fileFormat = mimetypeToExtension.get(fileMimetype).get(0);
       }
