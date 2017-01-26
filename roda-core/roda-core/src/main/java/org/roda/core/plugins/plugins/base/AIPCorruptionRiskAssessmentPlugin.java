@@ -188,7 +188,6 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
         }
 
         IOUtils.closeQuietly(allFiles);
-        model.notifyAIPUpdated(aip.getId());
       } catch (IOException | RODAException | XmlException e) {
         LOGGER.error("Error processing Representation {}", r.getId(), e);
       }

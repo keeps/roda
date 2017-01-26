@@ -303,8 +303,9 @@ public class ShowJob extends Composite {
         @Override
         public void onSelectionChange(SelectionChangeEvent event) {
           Report jobReport = ingestJobReports.getSelectionModel().getSelectedObject();
-          GWT.log("new history: " + ShowJobReport.RESOLVER.getHistoryPath() + "/" + jobReport.getId());
-          HistoryUtils.newHistory(ShowJobReport.RESOLVER, jobReport.getId());
+          if (jobReport != null) {
+            HistoryUtils.newHistory(ShowJobReport.RESOLVER, jobReport.getId());
+          }
         }
       });
 
@@ -330,7 +331,9 @@ public class ShowJob extends Composite {
         @Override
         public void onSelectionChange(SelectionChangeEvent event) {
           Report jobReport = simpleJobReports.getSelectionModel().getSelectedObject();
-          HistoryUtils.newHistory(ShowJobReport.RESOLVER, jobReport.getId());
+          if (jobReport != null) {
+            HistoryUtils.newHistory(ShowJobReport.RESOLVER, jobReport.getId());
+          }
         }
       });
 
