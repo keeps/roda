@@ -7,7 +7,6 @@
  */
 package org.roda.core.plugins.plugins.ingest.characterization;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -77,7 +76,7 @@ public class SiegfriedPluginUtils {
         List<String> command = getBatchCommand(sourceDirectory);
         return CommandUtility.execute(command, false);
       }
-    } catch (CommandException | IOException | GenericException e) {
+    } catch (CommandException | GenericException e) {
       throw new PluginException("Error while executing Siegfried: " + e.getMessage());
     }
   }

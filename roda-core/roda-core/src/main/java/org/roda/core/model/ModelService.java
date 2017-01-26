@@ -1626,7 +1626,6 @@ public class ModelService extends ModelObservable {
     addLogEntry(logEntry, logDirectory, true);
   }
 
-  // FIXME this should be synchronized (at least access to logFile)
   public synchronized void findOldLogsAndMoveThemToStorage(Path logDirectory, Path currentLogFile)
     throws RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     try {
@@ -1892,10 +1891,11 @@ public class ModelService extends ModelObservable {
     notifyJobDeleted(jobId);
   }
 
-  public Report retrieveJobReport(String jobId, String id, boolean generateId)
+  public Report retrieveJobReport(String jobId, String givenId, boolean generateId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    String id = givenId;
     if (generateId) {
-      id = IdUtils.getJobReportId(jobId, id);
+      id = IdUtils.getJobReportId(jobId, givenId);
     }
     StoragePath jobReportPath = ModelUtils.getJobReportStoragePath(jobId, id);
     Binary binary = storage.getBinary(jobReportPath);
@@ -2353,20 +2353,9 @@ public class ModelService extends ModelObservable {
       OptionalWithCause<String> deleteURL = DIPUtils.getCompleteDeleteExternalURL(dip);
       Optional<String> httpMethod = DIPUtils.getDeleteMethod(dip);
       if (deleteURL.isPresent() && httpMethod.isPresent()) {
-        String method = httpMethod.get();
         String url = deleteURL.get();
-
-        try {
-          if (method.equalsIgnoreCase("GET")) {
-            HTTPUtility.doGet(url);
-          } else if (method.equalsIgnoreCase("DELETE")) {
-            HTTPUtility.doDelete(url);
-          } else {
-            LOGGER.error("HTTP method of delete external service is not supported");
-          }
-        } catch (IOException e) {
-          LOGGER.error("Could not call delete external URL for DIP {}", dipId);
-        }
+        String method = httpMethod.get();
+        HTTPUtility.doMethod(url, method);
       }
 
       StoragePath dipPath = ModelUtils.getDIPStoragePath(dipId);
