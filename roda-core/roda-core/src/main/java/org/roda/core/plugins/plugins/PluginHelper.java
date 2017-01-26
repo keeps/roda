@@ -283,7 +283,7 @@ public final class PluginHelper {
     String jobReportPartialId = outcomeObjectId;
     // FIXME 20160516 hsilva: this has problems when doing one to many SIP > AIP
     // operation
-    if (jobReportPartialId == null || "".equals(jobReportPartialId)) {
+    if (StringUtils.isBlank(jobReportPartialId)) {
       jobReportPartialId = sourceObjectId;
     }
 
@@ -307,7 +307,7 @@ public final class PluginHelper {
     String reportPartialId = reportItem.getOutcomeObjectId();
     // FIXME 20160516 hsilva: this has problems when doing one to many SIP > AIP
     // operation
-    if (reportPartialId == null || "".equals(reportPartialId)) {
+    if (StringUtils.isBlank(reportPartialId)) {
       reportPartialId = reportItem.getSourceObjectId();
     }
     reportItem.setId(IdUtils.getJobReportId(jobId, reportPartialId));

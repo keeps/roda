@@ -239,8 +239,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
       for (Representation representation : aip.getRepresentations()) {
         newRepresentationID = UUID.randomUUID().toString();
         PluginState pluginResultState = PluginState.SUCCESS;
-        // FIXME 20160516 hsilva: see how to set initial
-        // initialOutcomeObjectState
+
         Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getRepresentationId(representation),
           IdUtils.getRepresentationId(representation), Representation.class, AIPState.ACTIVE);
         if (createDIP) {
@@ -424,8 +423,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
       aipId = representation.getAipId();
       PluginState reportState = PluginState.SUCCESS;
       boolean notify = true;
-      // FIXME 20160516 hsilva: see how to set initial
-      // initialOutcomeObjectState
+
       Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getRepresentationId(representation),
         Representation.class, AIPState.ACTIVE);
       if (createDIP) {
@@ -630,8 +628,6 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
 
         newRepresentationID = UUID.randomUUID().toString();
         pluginResultState = PluginState.SUCCESS;
-        // FIXME 20160516 hsilva: see how to set initial
-        // initialOutcomeObjectState
 
         if (!file.isDirectory()) {
           IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));

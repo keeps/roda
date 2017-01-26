@@ -240,7 +240,7 @@ public class EARKSIPPluginsTest {
 
     index.commitAIPs();
 
-    // FIXME 20161202 hsilva: somehow a reindex is needed for getting ancestors
+    // 20161202 hsilva: somehow a reindex is needed for getting ancestors
     // correctly calculated
     TestsHelper.executeJob(ReindexAIPPlugin.class, fixAncestorsParameters, PluginType.MISC,
       SelectedItemsAll.create(AIP.class));

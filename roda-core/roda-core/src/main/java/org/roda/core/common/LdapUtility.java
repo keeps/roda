@@ -688,14 +688,6 @@ public class LdapUtility {
       // be added to the entry
       entry.add(UNIQUE_MEMBER, RODA_DUMMY_USER);
 
-      // 20160907 lfaria: commenting members as this should be removed if
-      // possible
-      // TODO 20160907 lfaria: remove commented code
-      // Add user members
-      // for (String memberName : group.getMemberUserNames()) {
-      // entry.add(UNIQUE_MEMBER, getUserDN(memberName));
-      // }
-
       final CoreSession session = service.getAdminSession();
       session.add(entry);
 

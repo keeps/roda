@@ -217,8 +217,6 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
           String newRepresentationID = UUID.randomUUID().toString();
           String verification = null;
           boolean notify = true;
-          // FIXME 20160516 hsilva: see how to set initial
-          // initialOutcomeObjectState
 
           LOGGER.debug("Processing representation {}", representation);
           boolean recursive = true;
@@ -235,8 +233,8 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
                 String fileMimetype = ifile.getFileFormat().getMimeType();
                 String filePronom = ifile.getFileFormat().getPronom();
                 String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1);
-                String fileInfoPath = StringUtils.join(Arrays.asList(aip.getId(), representation.getId(),
-                  StringUtils.join(file.getPath(), '/'), file.getId()), '/');
+                String fileInfoPath = ModelUtils
+                  .getFileStoragePath(aip.getId(), representation.getId(), file.getPath(), file.getId()).toString();
 
                 if (((filePronom != null && pronomToExtension.containsKey(filePronom))
                   || (fileMimetype != null && getMimetypeToExtension().containsKey(fileMimetype))
@@ -395,12 +393,9 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
       String aipId = representation.getAipId();
       String verification = null;
       boolean notify = true;
-      // FIXME 20160329 hsilva: the report item should be at AIP level (and
-      // not representation level)
-      // FIXME 20160516 hsilva: see how to set initial
-      // initialOutcomeObjectState
+
       Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getRepresentationId(representation),
-        Representation.class, AIPState.INGEST_PROCESSING);
+        Representation.class);
       PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
       PluginState reportState = PluginState.SUCCESS;
       ValidationReport validationReport = new ValidationReport();
@@ -422,8 +417,9 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
               String fileMimetype = ifile.getFileFormat().getMimeType();
               String filePronom = ifile.getFileFormat().getPronom();
               String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1);
-              String fileInfoPath = StringUtils
-                .join(Arrays.asList(representation.getId(), StringUtils.join(file.getPath(), '/'), file.getId()), '/');
+              String fileInfoPath = ModelUtils
+                .getFileStoragePath(representation.getAipId(), representation.getId(), file.getPath(), file.getId())
+                .toString();
 
               if (((filePronom != null && pronomToExtension.containsKey(filePronom))
                 || (fileMimetype != null && getMimetypeToExtension().containsKey(fileMimetype))
@@ -564,15 +560,10 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
 
     String verification = null;
     boolean notify = true;
-    // FIXME 20160329 hsilva: the report item should be at AIP level (and
-    // not representation level)
-    // FIXME 20160516 hsilva: see how to set initial
-    // initialOutcomeObjectState
 
     for (File file : list) {
       LOGGER.debug("Processing file {}", file);
-      Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getFileId(file), File.class,
-        AIPState.INGEST_PROCESSING);
+      Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getFileId(file), File.class);
       PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
       PluginState reportState = PluginState.SUCCESS;
 

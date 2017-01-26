@@ -127,7 +127,6 @@ public class DescriptionLevelUtils {
   }
 
   public static List<DescriptionLevel> getAllButRepresentationsDescriptionLevels() {
-    // TODO Auto-generated method stub
     return null;
   }
 

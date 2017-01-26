@@ -125,10 +125,12 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
     if (parameters.containsKey(PLUGIN_PARAM_EXPORT_FOLDER_PARAMETER)) {
       outputFolder = parameters.get(PLUGIN_PARAM_EXPORT_FOLDER_PARAMETER);
     }
+
     if (parameters.containsKey(PLUGIN_PARAM_EXPORT_REMOVE_IF_ALREADY_EXISTS)) {
       removeIfAlreadyExists = Boolean
         .parseBoolean(getParameterValues().get(PLUGIN_PARAM_EXPORT_REMOVE_IF_ALREADY_EXISTS));
     }
+
     if (parameters.containsKey(PLUGIN_PARAM_EXPORT_TYPE)) {
       try {
         exportType = ExportType.valueOf(parameters.get(PLUGIN_PARAM_EXPORT_TYPE));

@@ -2396,7 +2396,6 @@ public class ModelService extends ModelObservable {
   public DIPFile createDIPFile(String dipId, List<String> directoryPath, String fileId, long size,
     ContentPayload contentPayload, boolean notify) throws RequestNotValidException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
-    // FIXME how to set this?
     boolean asReference = false;
 
     StoragePath filePath = ModelUtils.getDIPFileStoragePath(dipId, directoryPath, fileId);
@@ -2431,7 +2430,6 @@ public class ModelService extends ModelObservable {
     ContentPayload contentPayload, boolean createIfNotExists, boolean notify) throws RequestNotValidException,
     GenericException, NotFoundException, AuthorizationDeniedException, AlreadyExistsException {
     DIPFile file = null;
-    // FIXME how to set this?
     boolean asReference = false;
 
     StoragePath oldFilePath = ModelUtils.getDIPFileStoragePath(dipId, directoryPath, oldFileId);
@@ -2518,7 +2516,6 @@ public class ModelService extends ModelObservable {
     ContentPayload contentPayload) throws RequestNotValidException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException, NotFoundException {
     File file;
-    // FIXME how to set this?
     boolean asReference = false;
 
     StoragePath filePath = ModelUtils.getDocumentationStoragePath(aipId, representationId, directoryPath, fileId);
@@ -2543,7 +2540,6 @@ public class ModelService extends ModelObservable {
     ContentPayload contentPayload) throws RequestNotValidException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException, NotFoundException {
     File file;
-    // FIXME how to set this?
     boolean asReference = false;
 
     StoragePath filePath = ModelUtils.getSchemaStoragePath(aipId, representationId, directoryPath, fileId);

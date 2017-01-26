@@ -113,7 +113,6 @@ public final class StorageServiceUtils {
       }
     } else {
       Binary binary = fromService.getBinary(fromStoragePath);
-      // FIXME how to set this?
       boolean asReference = false;
       toService.createBinary(toStoragePath, binary.getContent(), asReference);
       if (!copy) {

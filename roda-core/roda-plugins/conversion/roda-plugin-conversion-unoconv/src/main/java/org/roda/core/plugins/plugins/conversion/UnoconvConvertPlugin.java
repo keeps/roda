@@ -85,7 +85,6 @@ public class UnoconvConvertPlugin<T extends IsRODAObject> extends CommandConvert
 
   @Override
   public List<String> getApplicableTo() {
-    // TODO add missing extensions
     return FileFormatUtils.getInputExtensions(TOOLNAME);
   }
 
@@ -97,13 +96,11 @@ public class UnoconvConvertPlugin<T extends IsRODAObject> extends CommandConvert
 
   @Override
   public Map<String, List<String>> getPronomToExtension() {
-    // TODO add missing pronoms
     return FileFormatUtils.getPronomToExtension(TOOLNAME);
   }
 
   @Override
   public Map<String, List<String>> getMimetypeToExtension() {
-    // TODO add missing mimetypes
     return FileFormatUtils.getMimetypeToExtension(TOOLNAME);
   }
 

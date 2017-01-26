@@ -168,13 +168,11 @@ public class VeraPDFTest {
     }
 
     // Plugin<Representation> plugin2 = new PdfToPdfaPlugin<Representation>();
-    // FIXME 20160623 hsilva: passing by null just to make code compiling
     // TestsHelper.executeJob(PdfToPdfaPlugin.class, parameters,
     // PluginType.AIP_TO_AIP, SelectedItemsAll.create(Representation.class));
 
     // Plugin<AIP> plugin3 = new VeraPDFPlugin();
     // plugin3.setParameterValues(parameters);
-    // FIXME 20160623 hsilva: passing by null just to make code compiling
     // TestsHelper.executeJob(VeraPDFPlugin.class, parameters,
     // PluginType.AIP_TO_AIP, SelectedItemsAll.create(Representation.class));
     // Report report1 = reports.get(0).getReports().get(1);

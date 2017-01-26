@@ -132,83 +132,71 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
 
   @Override
   public void setup() {
-    // TODO Auto-generated method stub
-
+    // TODO
   }
 
   @Override
   public void shutdown() {
-    // TODO Auto-generated method stub
-
+    // TODO
   }
 
   @Override
   public <T extends IsRODAObject, T1 extends IsIndexed> void runPluginFromIndex(Object context, Class<T1> classToActOn,
     Filter filter, Plugin<T> plugin) {
-    // TODO Auto-generated method stub
-
+    // TODO
   }
 
   @Override
   public <T extends IsRODAObject> void runPlugin(Object context, Plugin<T> plugin) {
-    // TODO Auto-generated method stub
-
+    // TODO
   }
 
   @Override
   public void executeJob(Job job, boolean async) throws JobAlreadyStartedException {
-    // TODO Auto-generated method stub
-
+    // TODO
   }
 
   @Override
   public void stopJob(Job job) {
-    // TODO Auto-generated method stub
-
+    // TODO
   }
 
   @Override
   public void cleanUnfinishedJobs() {
-    // TODO Auto-generated method stub
-
+    // TODO
   }
 
   @Override
   public void setJobContextInformation(String jobId, Object object) {
-    // TODO Auto-generated method stub
-
+    // TODO
   }
 
   @Override
   public <T extends IsRODAObject> void updateJobInformation(Plugin<T> plugin, JobPluginInfo jobPluginInfo)
     throws JobException {
-    // TODO Auto-generated method stub
-
+    // TODO
   }
 
   @Override
   public <T extends IsRODAObject> void updateJob(Plugin<T> plugin, JobPartialUpdate partialUpdate) {
-    // TODO Auto-generated method stub
+    // TODO
 
   }
 
   @Override
   public <T extends IsRODAObject> void runPluginOnAllObjects(Object context, Plugin<T> plugin, Class<T> objectClass) {
-    // TODO Auto-generated method stub
-
+    // TODO
   }
 
   @Override
   public <T extends IsRODAObject> void runPluginOnObjects(Object context, Plugin<T> plugin, Class<T> objectClass,
     List<String> uuids) {
-    // TODO Auto-generated method stub
-
+    // TODO
   }
 
   @Override
   public void setJobInError(String jobId) {
-    // TODO Auto-generated method stub
-
+    // TODO
   }
 
 }

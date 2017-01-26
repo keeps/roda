@@ -159,9 +159,6 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractAIPComponents
       List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
 
       for (Representation representation : aip.getRepresentations()) {
-        // FIXME 20160516 hsilva: see how to set initial
-        // initialOutcomeObjectState
-
         try {
           LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
 
@@ -177,9 +174,8 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractAIPComponents
                 IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
                 String fileMimetype = ifile.getFileFormat().getMimeType();
                 String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1, ifile.getId().length());
-                String fileInfoPath = StringUtils.join(Arrays.asList(aip.getId(), representation.getId(),
-                  StringUtils.join(file.getPath(), '/'), file.getId()), '/');
-                fileInfoPath = fileInfoPath.replace("//", "/").replace("/[]/", "/");
+                String fileInfoPath = ModelUtils
+                  .getFileStoragePath(aip.getId(), representation.getId(), file.getPath(), file.getId()).toString();
 
                 if ("pdf".equalsIgnoreCase(fileFormat) || "application/pdf".equals(fileMimetype)) {
                   LOGGER.debug("Running veraPDF validator on {}", file.getId());
@@ -276,10 +272,10 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractAIPComponents
       for (Representation representation : list) {
         List<File> failedList = new ArrayList<File>();
         List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
-        // FIXME 20160516 hsilva: see how to set initial
-        // initialOutcomeObjectState
-        Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getRepresentationId(representation),
-          Representation.class, AIPState.INGEST_PROCESSING).setHtmlPluginDetails(true);
+
+        Report reportItem = PluginHelper
+          .initPluginReportItem(this, IdUtils.getRepresentationId(representation), Representation.class)
+          .setHtmlPluginDetails(true);
         PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
         PluginState pluginResultState = PluginState.SUCCESS;
         PluginState reportState = PluginState.SUCCESS;
@@ -303,9 +299,8 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractAIPComponents
                 IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
                 String fileMimetype = ifile.getFileFormat().getMimeType();
                 String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1, ifile.getId().length());
-                String fileInfoPath = StringUtils.join(
-                  Arrays.asList(representation.getId(), StringUtils.join(file.getPath(), '/'), file.getId()), '/');
-                fileInfoPath = fileInfoPath.replace("//", "/").replace("/[]/", "/");
+                String fileInfoPath = ModelUtils
+                  .getFileStoragePath(aip.getId(), representation.getId(), file.getPath(), file.getId()).toString();
 
                 if ("pdf".equalsIgnoreCase(fileFormat) || "application/pdf".equals(fileMimetype)) {
                   LOGGER.debug("Running veraPDF validator on {}", file.getId());
@@ -411,8 +406,6 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractAIPComponents
 
       try {
         List<File> failedList = new ArrayList<File>();
-        // FIXME 20160516 hsilva: see how to set initial
-        // initialOutcomeObjectState
         PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
         PluginState pluginResultState = PluginState.SUCCESS;
 
@@ -421,9 +414,8 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractAIPComponents
           IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
           String fileMimetype = ifile.getFileFormat().getMimeType();
           String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1, ifile.getId().length());
-          String fileInfoPath = StringUtils.join(Arrays.asList(file.getAipId(), file.getRepresentationId(),
-            StringUtils.join(file.getPath(), '/'), file.getId()), '/');
-          fileInfoPath = fileInfoPath.replace("//", "/").replace("/[]/", "/");
+          String fileInfoPath = ModelUtils
+            .getFileStoragePath(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId()).toString();
 
           if ("pdf".equalsIgnoreCase(fileFormat) || "application/pdf".equals(fileMimetype)) {
             LOGGER.debug("Running veraPDF validator on {}", file.getId());

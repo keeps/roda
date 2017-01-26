@@ -172,7 +172,6 @@ public class TransferredResourcesScanner {
 
     List<String> ancestors = new ArrayList<String>();
 
-    // FIXME does this have to change ?
     StringBuilder temp = new StringBuilder();
     Iterator<Path> pathIterator = relativeToBase.iterator();
     while (pathIterator.hasNext()) {

@@ -44,14 +44,13 @@ public class JHOVEPluginUtils {
       "Format Identification Utility", "");
     JhoveBase jhoveBase = new JhoveBase();
 
-    // FIXME why do we have to create a copy of jhove config file??? can this be
-    // optimized???
+    // FIXME why do we have to create a copy of jhove config file? can this be
+    // optimized?
     File configFile = File.createTempFile("jhove", "conf");
     FileOutputStream fos = new FileOutputStream(configFile);
     String jhoveConfigPath = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "jhove", "config");
     IOUtils.copy(FileUtility.getConfigurationFile(RodaCoreFactory.getConfigPath(), jhoveConfigPath), fos);
     fos.close();
-    // System.setProperty("edu.harvard.hul.ois.jhove.saxClass", );
 
     jhoveBase.init(configFile.getAbsolutePath(), null);
 

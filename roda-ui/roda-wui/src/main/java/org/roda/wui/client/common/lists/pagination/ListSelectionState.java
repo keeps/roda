@@ -20,7 +20,6 @@ public class ListSelectionState<T extends IsIndexed> implements Serializable {
 
   public ListSelectionState() {
     super();
-    // TODO Auto-generated constructor stub
   }
 
   public ListSelectionState(T selected, Filter filter, Boolean justActive, Facets facets, Sorter sorter,

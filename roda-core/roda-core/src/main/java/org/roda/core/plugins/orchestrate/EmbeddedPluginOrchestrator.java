@@ -115,8 +115,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
           plugin.execute(index, model, storage, list);
           plugin.shutdown();
         } catch (PluginException e) {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
+          LOGGER.error("Plugin submission or execution failed");
         }
       }
     });
@@ -128,16 +127,14 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
     try {
       return executorService.awaitTermination(TIMEOUT, TIMEOUT_UNIT);
     } catch (InterruptedException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      LOGGER.error("Submission finish action failed");
       return false;
     }
   }
 
   @Override
   public <T extends IsRODAObject> void runPlugin(Object context, Plugin<T> plugin) {
-    // TODO Auto-generated method stub
-
+    // TODO
   }
 
   @Override
@@ -152,42 +149,38 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
 
   @Override
   public <T extends IsRODAObject> void updateJobInformation(Plugin<T> plugin, JobPluginInfo jobPluginInfo) {
-    // TODO Auto-generated method stub
+    // TODO
   }
 
   @Override
   public void cleanUnfinishedJobs() {
-    // TODO Auto-generated method stub
+    // TODO
   }
 
   @Override
   public <T extends IsRODAObject> void updateJob(Plugin<T> plugin, JobPartialUpdate partialUpdate) {
-    // TODO Auto-generated method stub
+    // TODO
   }
 
   @Override
   public <T extends IsRODAObject> void runPluginOnAllObjects(Object context, Plugin<T> plugin, Class<T> objectClass) {
-    // TODO Auto-generated method stub
-
+    // TODO
   }
 
   @Override
   public <T extends IsRODAObject> void runPluginOnObjects(Object context, Plugin<T> plugin, Class<T> objectClass,
     List<String> uuids) {
-    // TODO Auto-generated method stub
-
+    // TODO
   }
 
   @Override
   public void setJobContextInformation(String jobId, Object object) {
-    // TODO Auto-generated method stub
-
+    // TODO
   }
 
   @Override
   public void setJobInError(String jobId) {
-    // TODO Auto-generated method stub
-
+    // TODO
   }
 
 }

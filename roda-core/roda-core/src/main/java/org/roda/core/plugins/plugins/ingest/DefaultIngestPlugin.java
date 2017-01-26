@@ -313,8 +313,8 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       List<LiteOptionalWithCause> lites = LiteRODAObjectFactory.transformIntoLiteWithCause(model, transferredResources);
       report = plugin.execute(index, model, storage, lites);
     } catch (PluginException | InvalidParameterException e) {
-      // FIXME handle failure
-      LOGGER.error("Error executing plugin", e);
+      // TODO handle failure
+      LOGGER.error("Error executing plugin to transform transferred resource into AIP", e);
     }
 
     return report;
@@ -372,9 +372,14 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
         outcome = PluginState.FAILURE.toString();
       }
 
-      // FIXME 20160512 hsilva: this should be a configuration string (at least,
-      // not quite sure about i18n)
-      notification.setSubject("RODA ingest process finished - " + outcome);
+      String subject = RodaCoreFactory.getRodaConfigurationAsString("core", "notification", "ingest_subject");
+      if (StringUtils.isNotBlank(subject)) {
+        subject += outcome;
+      } else {
+        subject = outcome;
+      }
+
+      notification.setSubject(subject);
       notification.setFromUser(this.getClass().getSimpleName());
       notification.setRecipientUsers(emailList);
 

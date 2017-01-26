@@ -123,8 +123,6 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractA
     SimpleJobPluginInfo jobPluginInfo, List<AIP> list, Job job) throws PluginException {
 
     for (AIP aip : list) {
-      // FIXME 20160516 hsilva: see how to set initial
-      // initialOutcomeObjectState
       PluginState pluginState = PluginState.SUCCESS;
       Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
 
@@ -204,8 +202,6 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractA
       String dipId = "";
 
       try {
-        // FIXME 20160516 hsilva: see how to set initial
-        // initialOutcomeObjectState
         LOGGER.debug("Processing representation {}", representation);
         boolean recursive = true;
         CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(representation.getAipId(),
@@ -283,8 +279,6 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractA
         dip.setType(RodaConstants.DIP_TYPE_DIGITAL_SIGNATURE);
         dip = model.createDIP(dip, false);
 
-        // FIXME 20160516 hsilva: see how to set initial
-        // initialOutcomeObjectState
         Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getFileId(file), File.class);
         reportItem.setOutcomeObjectId(dip.getId()).setOutcomeObjectClass(DIP.class.getName());
         reportItem.setPluginState(PluginState.SUCCESS);

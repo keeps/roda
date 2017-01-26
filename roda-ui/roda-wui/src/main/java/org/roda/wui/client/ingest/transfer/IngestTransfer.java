@@ -271,7 +271,6 @@ public class IngestTransfer extends Composite {
     itemIcon.getParent().removeStyleName("browseTitle-allCollections-wrapper");
 
     if (r.isFile()) {
-      // TODO add big download button
       searchPanel.setVisible(false);
       transferredResourceList.setVisible(false);
       download.setVisible(true);

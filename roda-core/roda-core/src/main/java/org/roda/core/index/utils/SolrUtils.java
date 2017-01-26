@@ -1462,7 +1462,7 @@ public class SolrUtils {
       formatRegistries);
 
     return new IndexedFile(uuid, parentUUID, aipId, representationId, representationUUID, path, ancestorsPath, fileId,
-      false, fileFormat, originalName, size, isDirectory, creatingApplicationName, creatingApplicationVersion,
+      fileFormat, originalName, size, isDirectory, creatingApplicationName, creatingApplicationVersion,
       dateCreatedByApplication, hash, storagePath, ancestors, otherProperties);
   }
 
