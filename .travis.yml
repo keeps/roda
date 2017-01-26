@@ -6,6 +6,9 @@ addons:
   sonarqube:
     token:
       secure: "On53R35PWhHE5kJZophSGhiyfU3w/df/TgdVObsw1N64LGaGXiQQxaYuaYRTYT34SQHuZPRqpV84L8QMW5WGDEwH3EhaN3I3on1w6djrQ4lqk0+2yrqHtKkhL5+hByC50UQcdLoX84q6Ri6A570/tpNhT+/GnT2+1deJ5C+fjiU="
+    branches:
+      - master
+      - development
 before_script:
 - curl https://bintray.com/user/downloadSubjectPublicKey?username=bintray | sudo apt-key add -
 - echo "deb http://dl.bintray.com/siegfried/debian wheezy main" | sudo tee -a /etc/apt/sources.list
