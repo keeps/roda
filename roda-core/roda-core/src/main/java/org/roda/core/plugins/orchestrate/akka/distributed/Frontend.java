@@ -54,6 +54,8 @@ public class Frontend extends UntypedActor {
   }
 
   public static final class Ok implements Serializable {
+    private static final long serialVersionUID = -3294129455437847409L;
+
     private Ok() {
     }
 
@@ -70,6 +72,8 @@ public class Frontend extends UntypedActor {
   }
 
   public static final class NotOk implements Serializable {
+    private static final long serialVersionUID = 3982864218335249125L;
+
     private NotOk() {
     }
 

@@ -104,6 +104,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
     }
   }
 
+  @SuppressWarnings("unused")
   private <T extends IsRODAObject> void submitPlugin(List<LiteOptionalWithCause> list, Plugin<T> plugin) {
     executorService.submit(new Runnable() {
 

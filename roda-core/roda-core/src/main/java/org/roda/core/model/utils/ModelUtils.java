@@ -177,13 +177,24 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(getRepresentationOtherMetadataFolderPath(aipId, representationId));
   }
 
-  public static List<String> getRepresentationOtherMetadataStoragePath(String aipId, String representationId,
-    String type) throws RequestNotValidException {
+  public static List<String> getOtherMetadataStoragePath(String aipId, String representationId, List<String> filePath,
+    String fileId, String type) throws RequestNotValidException {
+    List<String> path = null;
     if (type == null) {
-      return getRepresentationOtherMetadataFolderPath(aipId, representationId);
+      path = getRepresentationOtherMetadataFolderPath(aipId, representationId);
     } else {
-      return getRepresentationOtherMetadataPath(aipId, representationId, type);
+      path = getRepresentationOtherMetadataPath(aipId, representationId, type);
     }
+
+    if (filePath != null) {
+      path.addAll(filePath);
+    }
+
+    if (fileId != null) {
+      path.add(fileId);
+    }
+
+    return path;
   }
 
   private static List<String> getRepresentationDataPath(String aipId, String representationId) {

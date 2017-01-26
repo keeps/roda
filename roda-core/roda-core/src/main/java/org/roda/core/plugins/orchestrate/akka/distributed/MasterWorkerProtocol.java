@@ -14,6 +14,7 @@ public abstract class MasterWorkerProtocol {
   // Messages from/to Workers
 
   public static final class RegisterWorker implements Serializable {
+    private static final long serialVersionUID = 1958015449276995915L;
     public final String workerId;
 
     public RegisterWorker(String workerId) {
@@ -22,13 +23,12 @@ public abstract class MasterWorkerProtocol {
 
     @Override
     public String toString() {
-      return "RegisterWorker{" +
-        "workerId='" + workerId + '\'' +
-        '}';
+      return "RegisterWorker{" + "workerId='" + workerId + '\'' + '}';
     }
   }
 
   public static final class WorkerRequestsWork implements Serializable {
+    private static final long serialVersionUID = 5975172522395596054L;
     public final String workerId;
 
     public WorkerRequestsWork(String workerId) {
@@ -37,13 +37,12 @@ public abstract class MasterWorkerProtocol {
 
     @Override
     public String toString() {
-      return "WorkerRequestsWork{" +
-        "workerId='" + workerId + '\'' +
-        '}';
+      return "WorkerRequestsWork{" + "workerId='" + workerId + '\'' + '}';
     }
   }
 
   public static final class WorkIsDone implements Serializable {
+    private static final long serialVersionUID = -2988546494525969435L;
     public final String workerId;
     public final String workId;
     public final Object result;
@@ -56,15 +55,13 @@ public abstract class MasterWorkerProtocol {
 
     @Override
     public String toString() {
-      return "WorkIsDone{" +
-        "workerId='" + workerId + '\'' +
-        ", workId='" + workId + '\'' +
-        ", result=" + result +
-        '}';
+      return "WorkIsDone{" + "workerId='" + workerId + '\'' + ", workId='" + workId + '\'' + ", result=" + result + '}';
     }
   }
 
   public static final class WorkFailed implements Serializable {
+    private static final long serialVersionUID = -3521696564547324113L;
+
     public final String workerId;
     public final String workId;
 
@@ -75,17 +72,16 @@ public abstract class MasterWorkerProtocol {
 
     @Override
     public String toString() {
-      return "WorkFailed{" +
-        "workerId='" + workerId + '\'' +
-        ", workId='" + workId + '\'' +
-        '}';
+      return "WorkFailed{" + "workerId='" + workerId + '\'' + ", workId='" + workId + '\'' + '}';
     }
   }
 
   // Messages to Workers
 
   public static final class WorkIsReady implements Serializable {
+    private static final long serialVersionUID = 1819335575064977572L;
     private static final WorkIsReady instance = new WorkIsReady();
+
     public static WorkIsReady getInstance() {
       return instance;
     }

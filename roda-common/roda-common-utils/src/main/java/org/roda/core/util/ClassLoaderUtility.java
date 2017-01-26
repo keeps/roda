@@ -75,10 +75,8 @@ public class ClassLoaderUtility {
       }
     }
 
-    Class sysclass = URLClassLoader.class;
-
     try {
-      Method method = sysclass.getDeclaredMethod("addURL", PARAMETERS);
+      Method method = URLClassLoader.class.getDeclaredMethod("addURL", PARAMETERS);
       method.setAccessible(true);
       method.invoke(sysLoader, new Object[] {url});
     } catch (Throwable t) {

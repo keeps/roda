@@ -58,7 +58,8 @@ public class Master extends UntypedPersistentActor {
   public Master(FiniteDuration workTimeout) {
     this.workTimeout = workTimeout;
     ClusterClientReceptionist.get(getContext().system()).registerService(getSelf());
-    this.cleanupTask = getContext().system().scheduler().schedule(workTimeout.div(2), workTimeout.div(2), getSelf(), CleanupTick, getContext().dispatcher(), getSelf());
+    this.cleanupTask = getContext().system().scheduler().schedule(workTimeout.div(2), workTimeout.div(2), getSelf(),
+      CleanupTick, getContext().dispatcher(), getSelf());
   }
 
   @Override
@@ -201,6 +202,7 @@ public class Master extends UntypedPersistentActor {
   };
 
   public static final class Work implements Serializable {
+    private static final long serialVersionUID = -6540053444379684588L;
     public final String workId;
     public final Object job;
 
@@ -216,6 +218,8 @@ public class Master extends UntypedPersistentActor {
   }
 
   public static final class WorkResult implements Serializable {
+    private static final long serialVersionUID = -5001415158179493608L;
+
     public final String workId;
     public final Object result;
 
@@ -231,6 +235,7 @@ public class Master extends UntypedPersistentActor {
   }
 
   public static final class Ack implements Serializable {
+    private static final long serialVersionUID = 2755321297242195103L;
     final String workId;
 
     public Ack(String workId) {
@@ -302,13 +307,16 @@ public class Master extends UntypedPersistentActor {
       } else {
         log.info("Work {} is done by worker {}", workId, workerId);
         changeWorkerToIdle(workerId, workId);
-        persist(new WorkState.WorkCompleted(workId,((WorkIsDone) cmd).result), new Procedure<WorkState.WorkCompleted>() {
-          public void apply(WorkCompleted event) throws Exception {
-            workState = workState.updated(event);
-            mediator.tell(new DistributedPubSubMediator.Publish(RESULTS_TOPIC, new WorkResult(event.workId,event.result)), getSelf());
-            getSender().tell(new Ack(event.workId), getSelf());
-          }
-        });
+        persist(new WorkState.WorkCompleted(workId, ((WorkIsDone) cmd).result),
+          new Procedure<WorkState.WorkCompleted>() {
+            public void apply(WorkCompleted event) throws Exception {
+              workState = workState.updated(event);
+              mediator.tell(
+                new DistributedPubSubMediator.Publish(RESULTS_TOPIC, new WorkResult(event.workId, event.result)),
+                getSelf());
+              getSender().tell(new Ack(event.workId), getSelf());
+            }
+          });
       }
     } else if (cmd instanceof WorkFailed) {
       final String workId = ((WorkFailed) cmd).workId;

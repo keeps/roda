@@ -125,8 +125,7 @@ public class AkkaJobActor extends AkkaBaseActor {
     JobsHelper.updateJobObjectsCount(plugin, super.getModel(), objectsCount);
 
     // execute
-    getPluginOrchestrator().runPluginFromIndex(getSelf(), sourceObjectsClass, selectedItems.getFilter(),
-      (Plugin) plugin);
+    getPluginOrchestrator().runPluginFromIndex(getSelf(), sourceObjectsClass, selectedItems.getFilter(), plugin);
   }
 
   @Override

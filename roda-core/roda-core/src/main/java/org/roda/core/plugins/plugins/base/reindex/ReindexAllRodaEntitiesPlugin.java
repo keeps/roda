@@ -134,8 +134,8 @@ public class ReindexAllRodaEntitiesPlugin extends AbstractPlugin<Void> {
     return report;
   }
 
-  private Job initReindexJob(Class reindexClass, String jobId, String jobName, String username)
-    throws NotFoundException {
+  private <T extends IsRODAObject> Job initReindexJob(Class<T> reindexClass, String jobId, String jobName,
+    String username) throws NotFoundException {
     Job job = new Job();
     job.setId(jobId);
     job.setName(jobName);
@@ -214,7 +214,7 @@ public class ReindexAllRodaEntitiesPlugin extends AbstractPlugin<Void> {
 
   @Override
   public List<Class<Void>> getObjectClasses() {
-    return (List) Arrays.asList(Void.class);
+    return Arrays.asList(Void.class);
   }
 
 }

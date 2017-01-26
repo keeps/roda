@@ -9,6 +9,7 @@ package org.roda.core.index;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 
@@ -354,7 +355,7 @@ public class IndexModelObserver implements ModelObserver {
       if (fulltextBinary.getSizeInBytes() < RodaCoreFactory.getRodaConfigurationAsInt(TEN_MB_IN_BYTES,
         "core.index.fulltext_threshold_in_bytes")) {
         inputStream = fulltextBinary.getContent().createInputStream();
-        fulltext = IOUtils.toString(inputStream);
+        fulltext = IOUtils.toString(inputStream, Charset.defaultCharset());
       }
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | IOException e) {
       LOGGER.warn("Error getting fulltext for file: {}", file, e);

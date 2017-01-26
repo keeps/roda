@@ -172,6 +172,7 @@ public class Worker extends UntypedActor {
   }
 
   public static final class WorkComplete implements Serializable {
+    private static final long serialVersionUID = -3884968649942671879L;
     public final Object result;
 
     public WorkComplete(Object result) {

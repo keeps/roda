@@ -190,7 +190,7 @@ public class SignatureUtility {
     boolean valid = true;
 
     // CertStore certStore = s.getCertificatesAndCRLs("Collection", provider);
-    Store certStore = s.getCertificates();
+    Store<?> certStore = s.getCertificates();
     SignerInformationStore signers = s.getSignerInfos();
 
     Collection<SignerInformation> c = signers.getSigners();
@@ -198,9 +198,9 @@ public class SignatureUtility {
 
     while (it.hasNext()) {
       SignerInformation signer = it.next();
-      Collection certCollection = certStore.getMatches(signer.getSID());
+      Collection<?> certCollection = certStore.getMatches(signer.getSID());
 
-      Iterator certIt = certCollection.iterator();
+      Iterator<?> certIt = certCollection.iterator();
       X509CertificateHolder certHolder = (X509CertificateHolder) certIt.next();
       X509Certificate cert = new JcaX509CertificateConverter().setProvider(provider).getCertificate(certHolder);
       boolean certValid = signer.verify(cert, provider);
