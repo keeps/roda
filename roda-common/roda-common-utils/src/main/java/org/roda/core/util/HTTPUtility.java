@@ -13,9 +13,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 import java.util.Optional;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.v2.common.Pair;
 
@@ -31,7 +32,8 @@ public final class HTTPUtility {
 
   }
 
-  public static String doMethod(String url, String method, Optional<Pair<String,String>> basicAuth) throws GenericException {
+  public static String doMethod(String url, String method, Optional<Pair<String, String>> basicAuth)
+    throws GenericException {
     String res = null;
     try {
       URL obj = new URL(url);
@@ -63,7 +65,7 @@ public final class HTTPUtility {
     return doMethod(url, METHOD_GET, Optional.empty());
   }
 
-  public static String doGet(String url, Optional<Pair<String,String>> basicAuth) throws GenericException {
+  public static String doGet(String url, Optional<Pair<String, String>> basicAuth) throws GenericException {
     return doMethod(url, METHOD_GET, basicAuth);
   }
 
@@ -71,14 +73,16 @@ public final class HTTPUtility {
     return doMethod(url, METHOD_DELETE, Optional.empty());
   }
 
-  public static String doDelete(String url, Optional<Pair<String,String>> basicAuth) throws GenericException {
+  public static String doDelete(String url, Optional<Pair<String, String>> basicAuth) throws GenericException {
     return doMethod(url, METHOD_DELETE, basicAuth);
   }
 
-  private static void addBasicAuthToConnection(HttpURLConnection connection, Optional<Pair<String, String>> credentials){
-    if(credentials.isPresent()){
-      String encoded = new String(Base64.encode((credentials.get().getFirst()+":"+credentials.get().getSecond()).getBytes(StandardCharsets.UTF_8)));
-      connection.setRequestProperty("Authorization", "Basic "+encoded);
+  private static void addBasicAuthToConnection(HttpURLConnection connection,
+    Optional<Pair<String, String>> credentials) {
+    if (credentials.isPresent()) {
+      String encoded = new String(Base64.encode((credentials.get().getFirst() + ":" + credentials.get().getSecond())
+        .getBytes(Charset.forName(RodaConstants.DEFAULT_ENCODING))));
+      connection.setRequestProperty("Authorization", "Basic " + encoded);
     }
   }
 }
