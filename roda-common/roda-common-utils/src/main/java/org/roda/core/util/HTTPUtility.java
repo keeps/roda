@@ -13,8 +13,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.v2.common.Pair;
 
 /**
  * @author Sébastien Leroux <sleroux@keep.pt>
@@ -28,12 +31,13 @@ public final class HTTPUtility {
 
   }
 
-  public static String doMethod(String url, String method) throws GenericException {
+  public static String doMethod(String url, String method, Optional<Pair<String,String>> basicAuth) throws GenericException {
     String res = null;
     try {
       URL obj = new URL(url);
       HttpURLConnection con = (HttpURLConnection) obj.openConnection();
       con.setRequestMethod(method);
+      addBasicAuthToConnection(con, basicAuth);
       int responseCode = con.getResponseCode();
       if (responseCode == 200) {
         InputStream is = con.getInputStream();
@@ -56,10 +60,25 @@ public final class HTTPUtility {
   }
 
   public static String doGet(String url) throws GenericException {
-    return doMethod(url, METHOD_GET);
+    return doMethod(url, METHOD_GET, Optional.empty());
+  }
+
+  public static String doGet(String url, Optional<Pair<String,String>> basicAuth) throws GenericException {
+    return doMethod(url, METHOD_GET, basicAuth);
   }
 
   public static String doDelete(String url) throws GenericException {
-    return doMethod(url, METHOD_DELETE);
+    return doMethod(url, METHOD_DELETE, Optional.empty());
+  }
+
+  public static String doDelete(String url, Optional<Pair<String,String>> basicAuth) throws GenericException {
+    return doMethod(url, METHOD_DELETE, basicAuth);
+  }
+
+  private static void addBasicAuthToConnection(HttpURLConnection connection, Optional<Pair<String, String>> credentials){
+    if(credentials.isPresent()){
+      String encoded = new String(Base64.encode((credentials.get().getFirst()+":"+credentials.get().getSecond()).getBytes(StandardCharsets.UTF_8)));
+      connection.setRequestProperty("Authorization", "Basic "+encoded);
+    }
   }
 }

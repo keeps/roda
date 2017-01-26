@@ -61,6 +61,7 @@ import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
+import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
@@ -2354,8 +2355,9 @@ public class ModelService extends ModelObservable {
       Optional<String> httpMethod = DIPUtils.getDeleteMethod(dip);
       if (deleteURL.isPresent() && httpMethod.isPresent()) {
         String url = deleteURL.get();
+        Optional<Pair<String, String>> credentials = DIPUtils.getDeleteCredentials(dip);
         String method = httpMethod.get();
-        HTTPUtility.doMethod(url, method);
+        HTTPUtility.doMethod(url, method, credentials);
       }
 
       StoragePath dipPath = ModelUtils.getDIPStoragePath(dipId);
