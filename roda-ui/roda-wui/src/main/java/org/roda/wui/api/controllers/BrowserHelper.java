@@ -547,17 +547,22 @@ public class BrowserHelper {
 
   protected static <T extends IsIndexed> List<T> retrieve(Class<T> returnClass, SelectedItems<T> selectedItems)
     throws GenericException, NotFoundException, RequestNotValidException {
+    List<T> ret;
+
     if (selectedItems instanceof SelectedItemsList) {
       SelectedItemsList<T> selectedList = (SelectedItemsList<T>) selectedItems;
-      return RodaCoreFactory.getIndexService().retrieve(returnClass, selectedList.getIds());
+      ret = RodaCoreFactory.getIndexService().retrieve(returnClass, selectedList.getIds());
     } else if (selectedItems instanceof SelectedItemsFilter) {
       SelectedItemsFilter<T> selectedFilter = (SelectedItemsFilter<T>) selectedItems;
       int counter = RodaCoreFactory.getIndexService().count(returnClass, selectedFilter.getFilter()).intValue();
-      return RodaCoreFactory.getIndexService()
+      ret = RodaCoreFactory.getIndexService()
         .find(returnClass, selectedFilter.getFilter(), Sorter.NONE, new Sublist(0, counter)).getResults();
+    } else {
+      throw new RequestNotValidException(
+        "Unsupported SelectedItems implementation: " + selectedItems.getClass().getName());
     }
 
-    return null;
+    return ret;
   }
 
   protected static <T extends IsIndexed> List<String> suggest(Class<T> returnClass, String field, String query,
@@ -1059,8 +1064,6 @@ public class BrowserHelper {
     }
   }
 
-  // FIXME 20160406 hsilva: representation preservation metadata is not being
-  // included in the response "package"
   public static EntityResponse listAIPPreservationMetadata(String aipId, String acceptFormat)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
 

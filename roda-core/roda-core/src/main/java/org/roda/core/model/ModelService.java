@@ -112,10 +112,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Class that "relates" Model & Storage
  * 
- * FIXME questions:
- * 
- * 1) how to undo things created/changed upon exceptions??? if using fedora
- * perhaps with transactions
  * 
  * @author Luis Faria <lfaria@keep.pt>
  * @author Hélder Silva <hsilva@keep.pt>
@@ -250,7 +246,6 @@ public class ModelService extends ModelObservable {
     String createdBy) throws RequestNotValidException, GenericException, AuthorizationDeniedException,
     AlreadyExistsException, NotFoundException, ValidationException {
     // XXX possible optimization would be to allow move between storage
-    // TODO support asReference
     ModelService sourceModelService = new ModelService(sourceStorage);
     AIP aip;
 
@@ -285,9 +280,9 @@ public class ModelService extends ModelObservable {
     AIPState state = AIPState.ACTIVE;
     Directory directory = storage.createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP));
     String id = directory.getStoragePath().getName();
-    permissions = this.addParentPermissions(permissions, parentId);
+    Permissions inheritedPermissions = this.addParentPermissions(permissions, parentId);
 
-    AIP aip = new AIP(id, parentId, type, state, permissions, createdBy);
+    AIP aip = new AIP(id, parentId, type, state, inheritedPermissions, createdBy);
 
     aip.setGhost(isGhost);
     aip.setIngestSIPIds(ingestSIPIds);
@@ -323,9 +318,9 @@ public class ModelService extends ModelObservable {
 
     Directory directory = storage.createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP));
     String id = directory.getStoragePath().getName();
-    permissions = this.addParentPermissions(permissions, parentId);
+    Permissions inheritedPermissions = this.addParentPermissions(permissions, parentId);
 
-    AIP aip = new AIP(id, parentId, type, state, permissions, createdBy);
+    AIP aip = new AIP(id, parentId, type, state, inheritedPermissions, createdBy);
     createAIPMetadata(aip);
 
     if (notify) {
@@ -341,9 +336,9 @@ public class ModelService extends ModelObservable {
 
     Directory directory = storage.createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP));
     String id = directory.getStoragePath().getName();
-    permissions = this.addParentPermissions(permissions, parentId);
+    Permissions inheritedPermissions = this.addParentPermissions(permissions, parentId);
 
-    AIP aip = new AIP(id, parentId, type, state, permissions, createdBy).setIngestSIPIds(ingestSIPIds)
+    AIP aip = new AIP(id, parentId, type, state, inheritedPermissions, createdBy).setIngestSIPIds(ingestSIPIds)
       .setIngestJobId(ingestJobId);
 
     createAIPMetadata(aip);
@@ -405,7 +400,6 @@ public class ModelService extends ModelObservable {
     return permissions;
   }
 
-  // TODO support asReference
   public AIP updateAIP(String aipId, StorageService sourceStorage, StoragePath sourcePath, String updatedBy)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
     AlreadyExistsException, ValidationException {
@@ -861,7 +855,6 @@ public class ModelService extends ModelObservable {
     return representation;
   }
 
-  // TODO support asReference
   public Representation createRepresentation(String aipId, String representationId, boolean original, String type,
     StorageService sourceStorage, StoragePath sourcePath) throws RequestNotValidException, GenericException,
     NotFoundException, AuthorizationDeniedException, AlreadyExistsException, ValidationException {
@@ -1028,7 +1021,7 @@ public class ModelService extends ModelObservable {
     ContentPayload contentPayload, boolean notify) throws RequestNotValidException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
     File file;
-    // FIXME how to set this?
+
     boolean asReference = false;
 
     StoragePath filePath = ModelUtils.getFileStoragePath(aipId, representationId, directoryPath, fileId);
@@ -1062,7 +1055,6 @@ public class ModelService extends ModelObservable {
     ContentPayload contentPayload, boolean createIfNotExists, boolean notify)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     File file = null;
-    // FIXME how to set this?
     boolean asReference = false;
 
     StoragePath filePath = ModelUtils.getFileStoragePath(aipId, representationId, directoryPath, fileId);
@@ -1177,7 +1169,7 @@ public class ModelService extends ModelObservable {
         outcomeState, builder.toString(), "", Arrays.asList(IdUtils.getUserAgentId(agentName)), notify);
     } catch (ValidationException | AlreadyExistsException | GenericException | NotFoundException
       | RequestNotValidException | AuthorizationDeniedException e1) {
-      LOGGER.error("Could not create an event for: ", eventDescription);
+      LOGGER.error("Could not create an event for: " + eventDescription, e1);
     }
   }
 
