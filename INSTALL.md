@@ -1,7 +1,12 @@
-# Install instructions
+# Install RODA in Production Mode
 
-## Dependencies
+The following steps describe how RODA can be installed in a real server in order to take full advantage of the available resources. The installation instructions are for Linux servers (especially Ubuntu boxes).
 
+## Requirements
+
+### Operating System
+
+RODA has been tested under Ubuntu Server LTS and CentOS. The instructions that follow accomodate these distributions of the Operating System.
 
 ### Java 8
 
@@ -26,9 +31,11 @@ https://cwiki.apache.org/confluence/display/solr/Taking+Solr+to+Production
 
 
 ### Ingest tools (optional)
+
 The following dependencies are only needed if the following ingest tasks are required.
 
 Install ClamAV (anti-virus)
+
 * Ubuntu
 ```bash
 sudo apt-get install clamav clamav-daemon -y
@@ -43,6 +50,7 @@ Check these instructions: http://linux-audit.com/install-clamav-on-centos-7-usin
 Note: The user `clamav` must have permissions to access the storage. For some folders you might need to add permissions in apparmor file  at `/etc/apparmor.d/local/usr.sbin.clamd`, see [instructions for Ubuntu](https://help.ubuntu.com/community/AppArmor#Profile_customization).
 
 Install Siegfried (format identification)
+
 * Ubuntu 14.04 LTS
 ```bash
 curl https://bintray.com/user/downloadSubjectPublicKey?username=bintray | sudo apt-key add -
@@ -75,6 +83,7 @@ NOTE: Please note that the user must have a correct HOME defined, if using a spe
 NOTE: Please note that the install instruction above include new environment variables that need
 
 ### Format migration tools (optional)
+
 The following dependencies are only needed if support for file formation migration for the following format families are required.
 
 Install Avconv (for video)
@@ -156,14 +165,8 @@ core.plugins.internal.virus_check.clamav.params = -m --fdpass
 core.plugins.internal.virus_check.clamav.get_version = clamdscan --version
 ```
 
-### Configure Apache Solr (optional)
+### Advanced configurations
 
-TBD
+For more information on how to adjust the repository to your particular needs, please contact [KEEP SOLUTIONS](http://www.keep.pt). We will be happy to provide you any support you require.
 
-### Configure tools (optional)
 
-TBD
-
-### Change design (optional)
-
-TBD
