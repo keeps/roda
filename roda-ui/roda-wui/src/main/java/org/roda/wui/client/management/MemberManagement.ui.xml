@@ -28,27 +28,27 @@
 				<g:FlowPanel addStyleNames="sticky-flow">
 					<g:FlowPanel addStyleNames="sticky-padding">
 						<g:FlowPanel>
-							<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-								<g:Label addStyleNames="h5 sidebar-facet-title">
+							<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
+								<g:Label addStyleNames="h4">
 									<ui:text from='{messages.userStatus}' />
 								</g:Label>
 								<g:FlowPanel ui:field="facetIsActive" />
 							</g:FlowPanel>
-							<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-								<g:Label addStyleNames="h5 sidebar-facet-title">
+							<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
+								<g:Label addStyleNames="h4">
 									<ui:text from='{messages.userType}' />
 								</g:Label>
 								<g:FlowPanel ui:field="facetIsUser" />
 							</g:FlowPanel>
-							<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-								<g:Label addStyleNames="h5 sidebar-facet-title">
+							<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
+								<g:Label addStyleNames="h4">
 									<ui:text from='{messages.userGroups}' />
 								</g:Label>
 								<g:FlowPanel ui:field="facetGroups" />
 							</g:FlowPanel>
 						</g:FlowPanel>
 						<g:FlowPanel>
-							<g:Label addStyleNames="h5">
+							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarActionsTitle}' />
 							</g:Label>
 							<g:Button addStyleNames="btn btn-block btn-plus" ui:field="buttonAddUser">

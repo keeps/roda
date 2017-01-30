@@ -30,13 +30,13 @@
 					<g:FlowPanel addStyleNames="sticky-padding">
 						<g:FlowPanel styleName="sidebar-group" ui:field="itemsFacets">
 							<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-								<g:Label addStyleNames="h5 sidebar-facet-title">
+								<g:Label addStyleNames="h4">
 									<ui:text from='{messages.searchDescriptionLevels}' />
 								</g:Label>
 								<g:FlowPanel ui:field="facetDescriptionLevels" />
 							</g:FlowPanel>
 							<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-								<g:Label addStyleNames="h5 sidebar-facet-title">
+								<g:Label addStyleNames="h4">
 									<ui:text from='{messages.searchRepresentations}' />
 								</g:Label>
 								<g:FlowPanel ui:field="facetHasRepresentations" />
@@ -44,13 +44,13 @@
 						</g:FlowPanel>
 						<g:FlowPanel styleName="sidebar-group" ui:field="representationsFacets">
 							<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-								<g:Label addStyleNames="h5 sidebar-facet-title">
+								<g:Label addStyleNames="h4">
 									<ui:text from='{messages.searchRepresentationType}' />
 								</g:Label>
 								<g:FlowPanel ui:field="facetRepresentationType" />
 							</g:FlowPanel>
 							<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-								<g:Label addStyleNames="h5 sidebar-facet-title">
+								<g:Label addStyleNames="h4">
 									<ui:text from='{messages.searchRepresentationOriginal}' />
 								</g:Label>
 								<g:FlowPanel ui:field="facetRepresentationOriginal" />
@@ -58,19 +58,19 @@
 						</g:FlowPanel>
 						<g:FlowPanel styleName="sidebar-group" ui:field="filesFacets">
 							<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-								<g:Label addStyleNames="h5 sidebar-facet-title">
+								<g:Label addStyleNames="h4">
 									<ui:text from='{messages.searchFormats}' />
 								</g:Label>
 								<g:FlowPanel ui:field="facetFormats" />
 							</g:FlowPanel>
 							<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-								<g:Label addStyleNames="h5 sidebar-facet-title">
+								<g:Label addStyleNames="h4">
 									<ui:text from='{messages.searchPronomIds}' />
 								</g:Label>
 								<g:FlowPanel ui:field="facetPronoms" />
 							</g:FlowPanel>
 							<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-								<g:Label addStyleNames="h5 sidebar-facet-title">
+								<g:Label addStyleNames="h4">
 									<ui:text from='{messages.searchMimetypes}' />
 								</g:Label>
 								<g:FlowPanel ui:field="facetMimetypes" />

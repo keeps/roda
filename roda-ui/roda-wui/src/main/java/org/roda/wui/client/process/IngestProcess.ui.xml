@@ -34,13 +34,13 @@
 				<g:FlowPanel addStyleNames="sticky-flow">
 					<g:FlowPanel addStyleNames="sticky-padding">
 						<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
-							<g:Label addStyleNames="h5 sidebar-facet-title">
+							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.processStatus}' />
 							</g:Label>
 							<g:FlowPanel ui:field="stateFacets" />
 						</g:FlowPanel>
 						<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
-							<g:Label addStyleNames="h5 sidebar-facet-title">
+							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.processCreators}' />
 							</g:Label>
 							<g:FlowPanel ui:field="producerFacets" />
@@ -48,7 +48,7 @@
 						<!-- <g:Label addStyleNames="{style.other-producer-label}">Other producer:</g:Label> 
 							<g:TextBox addStyleNames="fieldTextBox {style.other-producer-input}" /> -->
 						<g:FlowPanel styleName="sidebar-group">
-							<g:Label addStyleNames="h5 sidebar-facet-title">
+							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarFilterDates}' />
 							</g:Label>
 							<d:DateBox

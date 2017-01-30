@@ -29,31 +29,31 @@
 				<g:FlowPanel addStyleNames="sticky-flow">
 					<g:FlowPanel addStyleNames="sticky-padding">
 						<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
-							<g:Label addStyleNames="h5 sidebar-facet-title">
+							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.logComponents}' />
 							</g:Label>
 							<g:FlowPanel ui:field="facetComponents" />
 						</g:FlowPanel>
 						<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
-							<g:Label addStyleNames="h5 sidebar-facet-title">
+							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.logMethods}' />
 							</g:Label>
 							<g:FlowPanel ui:field="facetMethods" />
 						</g:FlowPanel>
 						<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
-							<g:Label addStyleNames="h5 sidebar-facet-title">
+							<g:Label addStyleNames="h4">
 								<ui:text from="{messages.logEntryState}" />
 							</g:Label>
 							<g:FlowPanel ui:field="facetStates" />
 						</g:FlowPanel>
 						<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
-							<g:Label addStyleNames="h5 sidebar-facet-title">
+							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.logUsers}' />
 							</g:Label>
 							<g:FlowPanel ui:field="facetUsers" />
 						</g:FlowPanel>
 						<g:FlowPanel addStyleNames="sidebar-group">
-							<g:Label addStyleNames="h5 sidebar-facet-title">
+							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarFilterDates}' />
 							</g:Label>
 							<d:DateBox

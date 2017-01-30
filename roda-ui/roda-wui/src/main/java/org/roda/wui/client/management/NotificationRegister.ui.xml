@@ -29,25 +29,25 @@
 				<g:FlowPanel addStyleNames="sticky-flow">
 					<g:FlowPanel addStyleNames="sticky-padding">
 						<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
-							<g:Label addStyleNames="h5 sidebar-facet-title">
+							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.notificationRecipients}' />
 							</g:Label>
 							<g:FlowPanel ui:field="facetRecipientUsers" />
 						</g:FlowPanel>
 						<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
-							<g:Label addStyleNames="h5 sidebar-facet-title">
+							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.notificationState}' />
 							</g:Label>
 							<g:FlowPanel ui:field="facetState" />
 						</g:FlowPanel>
 						<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
-							<g:Label addStyleNames="h5 sidebar-facet-title">
+							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.notificationAcknowledged}' />
 							</g:Label>
 							<g:FlowPanel ui:field="facetAcknowledged" />
 						</g:FlowPanel>
 						<g:FlowPanel addStyleNames="sidebar-group">
-							<g:Label addStyleNames="h5 sidebar-facet-title">
+							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarFilterDates}' />
 							</g:Label>
 							<d:DateBox

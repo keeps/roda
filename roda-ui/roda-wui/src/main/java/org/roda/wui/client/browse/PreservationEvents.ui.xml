@@ -49,7 +49,7 @@
 							</g:Button>
 						</g:FlowPanel>
 						<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
-							<g:Label addStyleNames="h5 sidebar-facet-title">
+							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.preservationEventClass}' />
 							</g:Label>
 							<g:FlowPanel ui:field="facetClasses" />

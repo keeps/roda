@@ -30,13 +30,13 @@
 					<g:FlowPanel addStyleNames="sticky-padding">
 						<g:FlowPanel styleName="sidebar-group" ui:field="itemsFacets">
 							<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-								<g:Label addStyleNames="h5 sidebar-facet-title">
+								<g:Label addStyleNames="h4">
 									<ui:text from='{messages.ingestAppraisalDescriptionLevels}' />
 								</g:Label>
 								<g:FlowPanel ui:field="facetDescriptionLevels" />
 							</g:FlowPanel>
 							<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-								<g:Label addStyleNames="h5 sidebar-facet-title">
+								<g:Label addStyleNames="h4">
 									<ui:text from='{messages.ingestAppraisalRepresentations}' />
 								</g:Label>
 								<g:FlowPanel ui:field="facetHasRepresentations" />
@@ -44,25 +44,25 @@
 						</g:FlowPanel>
 						<g:FlowPanel styleName="sidebar-group" ui:field="filesFacets">
 							<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-								<g:Label addStyleNames="h5 sidebar-facet-title">
+								<g:Label addStyleNames="h4">
 									<ui:text from='{messages.ingestAppraisalFormats}' />
 								</g:Label>
 								<g:FlowPanel ui:field="facetFormats" />
 							</g:FlowPanel>
 							<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-								<g:Label addStyleNames="h5 sidebar-facet-title">
+								<g:Label addStyleNames="h4">
 									<ui:text from='{messages.ingestAppraisalPronomIds}' />
 								</g:Label>
 								<g:FlowPanel ui:field="facetPronoms" />
 							</g:FlowPanel>
 							<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-								<g:Label addStyleNames="h5 sidebar-facet-title">
+								<g:Label addStyleNames="h4">
 									<ui:text from='{messages.ingestAppraisalMimetypes}' />
 								</g:Label>
 								<g:FlowPanel ui:field="facetMimetypes" />
 							</g:FlowPanel>
 						</g:FlowPanel>
-						<g:FlowPanel addStyleNames="sidebar-facet-panel">
+						<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel">
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarActionsTitle}' />
 							</g:Label>

@@ -28,7 +28,7 @@
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">
 					<g:FlowPanel addStyleNames="sticky-padding">
-						<g:Label addStyleNames="h5 sidebar-facet-title">
+						<g:Label addStyleNames="h4">
 							<ui:text from='{messages.sidebarFilterDates}' />
 						</g:Label>
 						<d:DateBox

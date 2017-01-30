@@ -41,19 +41,19 @@
 							</g:Button>
 						</g:FlowPanel>
 						<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
-							<g:Label addStyleNames="h5 sidebar-facet-title">
+							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.riskIncidenceDetectedBy}' />
 							</g:Label>
 							<g:FlowPanel ui:field="facetDetectedBy" />	
 						</g:FlowPanel>
 						<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
-						<g:Label addStyleNames="h5 sidebar-facet-title">
+						<g:Label addStyleNames="h4">
 								<ui:text from='{messages.riskIncidenceStatus}' />
 							</g:Label>
 							<g:FlowPanel ui:field="facetStatus" />
 						</g:FlowPanel>
 						<g:FlowPanel addStyleNames="sidebar-group">
-							<g:Label addStyleNames="h5 sidebar-facet-title">
+							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarFilterDates}' />
 							</g:Label>
 							<d:DateBox

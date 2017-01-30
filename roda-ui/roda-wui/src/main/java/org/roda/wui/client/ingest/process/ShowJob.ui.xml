@@ -107,19 +107,19 @@
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">
 					<g:FlowPanel addStyleNames="sticky-padding">
-						<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-							<g:Label addStyleNames="h5 sidebar-facet-title">
+						<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
+							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarJobReportStatusTitle}' />
 							</g:Label>
 							<g:FlowPanel ui:field="jobReportStatus" />
 						</g:FlowPanel>
-						<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-							<g:Label addStyleNames="h5 sidebar-facet-title">
+						<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
+							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarJobReportLastActionTitle}' />
 							</g:Label>
 							<g:FlowPanel ui:field="jobReportLastAction" />
 						</g:FlowPanel>
-						<g:FlowPanel>
+						<g:FlowPanel addStyleNames="sidebar-group">
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarActionsTitle}' />
 							</g:Label>

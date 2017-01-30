@@ -35,7 +35,7 @@
 				<g:FlowPanel addStyleNames="sticky-flow">
 					<g:FlowPanel addStyleNames="sticky-padding">
 						<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-							<g:Label addStyleNames="h5 sidebar-facet-title">
+							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.preservationAgentType}' />
 							</g:Label>
 							<g:FlowPanel ui:field="facetClasses" />
