@@ -72,6 +72,9 @@ Misc
 	OR
 	$> INDEXES_PATH=~/roda/roda-core/roda-core/src/main/resources/config/index/; SOLR_BIN=/apps/KEEPS/solr-single-node-tests/solr-5.5.0/bin/solr ; for i in $(find $INDEXES_PATH -mindepth 1 -maxdepth 1 -type d); do COLLECTION="$(basename $i)"; $SOLR_BIN create -c "$COLLECTION" -d "$INDEXES_PATH/$COLLECTION/conf/" -p 8984 ; done
 
+* Analyze RODA dependencies for version update
+	$> mvn versions:display-dependency-updates
+
 * Updating all RODA maven modules
 	$> mvn versions:set -DnewVersion=2.0.0-alpha7 -Pall
 
