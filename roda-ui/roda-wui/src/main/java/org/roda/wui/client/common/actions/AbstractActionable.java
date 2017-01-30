@@ -91,7 +91,7 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
 
     if (canAct(object, actions)) {
       Label title = new Label(text);
-      title.addStyleName("actions-layout-title");
+      title.addStyleName("h4");
       layout.add(title);
     }
   }
@@ -101,7 +101,7 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
 
     if (canAct(objects, actions)) {
       Label title = new Label(text);
-      title.addStyleName("actions-layout-title");
+      title.addStyleName("h4");
       layout.add(title);
     }
   }

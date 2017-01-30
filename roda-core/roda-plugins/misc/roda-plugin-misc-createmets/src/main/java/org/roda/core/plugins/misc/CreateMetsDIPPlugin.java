@@ -471,7 +471,7 @@ public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
     StoragePath targetPath) throws RequestNotValidException, AlreadyExistsException, GenericException,
     NotFoundException, AuthorizationDeniedException {
     List<String> metadataTypes = Arrays.asList(selectedDescriptiveMetadata.toLowerCase().split(",\\s*"));
-    String versionType = dm.getType() + "_" + dm.getVersion();
+    String versionType = dm.getType() + RodaConstants.METADATA_VERSION_SEPARATOR + dm.getVersion();
     String dmId = dm.getId();
 
     if (!includeSelectedDescriptiveMetadata

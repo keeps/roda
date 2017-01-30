@@ -16,6 +16,7 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.lists.RiskIncidenceList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
@@ -185,6 +186,7 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
       public void onSelectionChange(SelectionChangeEvent event) {
         final RiskIncidence selected = incidenceList.getSelectionModel().getSelectedObject();
         if (selected != null) {
+          LastSelectedItemsSingleton.getInstance().setLastHistory(HistoryUtils.getCurrentHistoryPath());
           HistoryUtils.newHistory(RiskIncidenceRegister.RESOLVER, ShowRiskIncidence.RESOLVER.getHistoryToken(),
             selected.getId());
         }

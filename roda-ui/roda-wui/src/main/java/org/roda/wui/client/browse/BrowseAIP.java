@@ -255,7 +255,6 @@ public class BrowseAIP extends Composite {
     representationsSearch.setList(representationsList);
 
     // DISSEMINATIONS
-
     disseminationsList = new DIPList(Filter.NULL, Facets.NONE, messages.listOfDisseminations(), true);
     disseminationsList.setActionable(DisseminationActions.get());
     ListSelectionUtils.bindBrowseOpener(disseminationsList);
@@ -540,6 +539,7 @@ public class BrowseAIP extends Composite {
       aipChildrenList.getParent().setVisible(bundle.getChildAIPCount() > 0);
 
       // SIDEBAR
+      itemsFacets.setVisible(false);
       actionsSidebar.setVisible(true);
       actionsSidebar.setWidget(AipActions.get().createActionsLayout(aip, new AsyncCallback<Actionable.ActionImpact>() {
 
@@ -725,6 +725,7 @@ public class BrowseAIP extends Composite {
 
     // Set button visibility
     searchSection.setVisible(false);
+    itemsFacets.setVisible(true);
 
     this.removeStyleName("inactive");
     aipState.setVisible(false);

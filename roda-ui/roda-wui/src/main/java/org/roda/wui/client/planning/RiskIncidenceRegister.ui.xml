@@ -28,9 +28,9 @@
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">
 					<g:FlowPanel addStyleNames="sticky-padding">
-						<g:FlowPanel ui:field="risksSidebar">
+						<g:FlowPanel addStyleNames="sidebar-group" ui:field="risksSidebar">
 							<g:Label addStyleNames="h4">
-								<ui:text from='{messages.sidebarRisksTitle}' />
+								<ui:text from='{messages.sidebarRiskIncidencesTitle}' />
 							</g:Label>
 							<g:Button addStyleNames="btn btn-danger btn-block btn-ban" ui:field="buttonRemove">
 								<ui:text from='{messages.removeButton}' />
@@ -40,26 +40,30 @@
 								<ui:text from='{messages.cancelButton}' />
 							</g:Button>
 						</g:FlowPanel>
-						<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+						<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
 							<g:Label addStyleNames="h5 sidebar-facet-title">
 								<ui:text from='{messages.riskIncidenceDetectedBy}' />
 							</g:Label>
-							<g:FlowPanel ui:field="facetDetectedBy" />
-							<g:Label addStyleNames="h5 sidebar-facet-title">
+							<g:FlowPanel ui:field="facetDetectedBy" />	
+						</g:FlowPanel>
+						<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
+						<g:Label addStyleNames="h5 sidebar-facet-title">
 								<ui:text from='{messages.riskIncidenceStatus}' />
 							</g:Label>
 							<g:FlowPanel ui:field="facetStatus" />
 						</g:FlowPanel>
-						<g:Label addStyleNames="h5 sidebar-facet-title">
-							<ui:text from='{messages.sidebarFilterDates}' />
-						</g:Label>
-						<d:DateBox
-							addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
-							ui:field="inputDateInitial" />
-						<g:Label addStyleNames="sidebar-facet-date-separator">-</g:Label>
-						<d:DateBox
-							addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
-							ui:field="inputDateFinal" />
+						<g:FlowPanel addStyleNames="sidebar-group">
+							<g:Label addStyleNames="h5 sidebar-facet-title">
+								<ui:text from='{messages.sidebarFilterDates}' />
+							</g:Label>
+							<d:DateBox
+								addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
+								ui:field="inputDateInitial" />
+							<g:Label addStyleNames="sidebar-facet-date-separator">-</g:Label>
+							<d:DateBox
+								addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
+								ui:field="inputDateFinal" />
+						</g:FlowPanel>
 					</g:FlowPanel>
 				</g:FlowPanel>
 			</g:FlowPanel>
