@@ -10,7 +10,6 @@ package org.roda.core.plugins.orchestrate;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -423,9 +422,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   private IterableIndexResult<Job> findUnfinishedJobs() {
-    Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.JOB_STATE,
-      Arrays.asList(Job.JOB_STATE.STARTED.toString(), Job.JOB_STATE.CREATED.toString())));
-
+    Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.JOB_STATE, Job.nonFinalStateList()));
     return index.findAll(Job.class, filter);
   }
 

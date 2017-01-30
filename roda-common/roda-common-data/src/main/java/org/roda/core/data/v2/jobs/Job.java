@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.jobs;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -218,6 +219,18 @@ public class Job implements IsModelObject, IsIndexed {
   public static boolean isFinalState(JOB_STATE state) {
     return JOB_STATE.COMPLETED == state || JOB_STATE.FAILED_TO_COMPLETE == state || JOB_STATE.STOPPED == state
       || JOB_STATE.FAILED_DURING_CREATION == state;
+  }
+
+  public static List<String> nonFinalStateList() {
+    List<String> nonFinalStates = new ArrayList<String>();
+
+    for (JOB_STATE state : JOB_STATE.values()) {
+      if (!isFinalState(state)) {
+        nonFinalStates.add(state.toString());
+      }
+    }
+
+    return nonFinalStates;
   }
 
   @Override
