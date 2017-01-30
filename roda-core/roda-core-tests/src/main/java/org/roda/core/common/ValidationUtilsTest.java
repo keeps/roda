@@ -12,12 +12,13 @@ import static org.testng.AssertJUnit.assertEquals;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 
 import org.roda.core.CorporaConstants;
+import org.roda.core.RodaCoreFactory;
+import org.roda.core.TestsHelper;
 import org.roda.core.common.validation.ValidationUtils;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -44,8 +45,6 @@ import org.testng.annotations.Test;
 @Test(groups = {"all", "travis"})
 public class ValidationUtilsTest {
   private static Path basePath;
-  private static Path indexPath;
-  private static StorageService storage;
   private static ModelService model;
 
   private static Path corporaPath;
@@ -56,10 +55,18 @@ public class ValidationUtilsTest {
 
   @BeforeClass
   public static void setUp() throws IOException, URISyntaxException, GenericException {
+    basePath = TestsHelper.createBaseTempDir(ValidationUtilsTest.class, true);
 
-    basePath = Files.createTempDirectory("modelTests");
-    indexPath = Files.createTempDirectory("indexTests");
-    storage = new FileStorageService(basePath);
+    boolean deploySolr = false;
+    boolean deployLdap = false;
+    boolean deployFolderMonitor = false;
+    boolean deployOrchestrator = false;
+    boolean deployPluginManager = false;
+    boolean deployDefaultResources = false;
+    RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
+      deployPluginManager, deployDefaultResources);
+
+    StorageService storage = new FileStorageService(basePath);
     model = new ModelService(storage);
 
     // Configure Solr
@@ -97,7 +104,6 @@ public class ValidationUtilsTest {
   @AfterClass
   public static void tearDown() throws NotFoundException, GenericException {
     FSUtils.deletePath(basePath);
-    FSUtils.deletePath(indexPath);
   }
 
   @Test

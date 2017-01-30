@@ -176,6 +176,7 @@ public class ModelServiceTest {
     assertEquals(aipId, descMetadata.getAipId());
     assertEquals(CorporaConstants.DESCRIPTIVE_METADATA_ID, descMetadata.getId());
     assertEquals(CorporaConstants.DESCRIPTIVE_METADATA_TYPE, descMetadata.getType());
+    assertEquals(CorporaConstants.DESCRIPTIVE_METADATA_VERSION, descMetadata.getVersion());
 
     StoragePath descriptiveMetadataPath = ModelUtils.getDescriptiveMetadataStoragePath(descMetadata.getAipId(),
       descMetadata.getId());

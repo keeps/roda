@@ -5,7 +5,8 @@
   "permissions": {},
   "descriptiveMetadata": [{
     "id": "ead.xml",
-    "type": "ead_2002"
+    "type": "ead",
+    "version": "2002"
   }],
   "representations": [{
     "id": "representation_1",
