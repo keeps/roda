@@ -1,19 +1,20 @@
 <div id="statistics" class="static-page max-width">
-    <h1>Setting up new statistics</h1>
+    <h1>Configurar novas estatisticas</h1>
 
     <p>
-    This page provides information on how to configure new statistics based on the information available on the repository. It is important to acknowledge, that in order to understand this information one must be an advanced user with knowledge of HTML, CSS and Javascript.
+	Esta página fornece informações sobre como configurar novas estatísticas com base nas informações disponíveis no repositório. É importante saber que, para entender esta informação, é preciso ser-se um utilizador avançado com conhecimento de HTML, CSS e Javascript.
+	</p>
+	
+    <p>
+    As estatísticas trabalham enviando pedidos ao RODA por meio da sua API (inspecionar a documentação da API para obter mais informações), coletando os resultados e apresentando-os como gráficos. Todo o processo é feito no lado do cliente por Javascript.
+    </p>
+    
+    <p>
+    As secções a seguir fornecem trechos de código que podem ser usados ​​para exibir estatísticas sobre o estado do repositório. É só preciso incluir os snippets de código numa nova página HTML e o mecanismo de Javascript incluído irá lidar com toda a comunicação, carga de trabalho e apresentação. Novos gráficos e estatísticas podem ser criados alterando os parâmetros do pedido "data" incluídos nos snippets (e.g. data-source-filters).
     </p>
 
-    <p>
-    Statistics work by sending queries to RODA by means of its API (inspect the API documentation for more information), collecting the results and presenting them as graphics. The entire process is done on the client side by Javascript.
-    </p>
-    <p>
-    The following sections provide code snippets that one can use to display statistics about the status of the repository. One just needs to include the code snippets in a new HTML page and the included Javascript engine will handle all the communication, workload and presentation. New graphics and statistics can be created by changing the query "data" parameters included in the snippets (e.g. data-source-filters).
-    </p>
-
-    <h2>AIP Index</h2>
-    <h3>Total No. of descriptive records:
+    <h2>Índice AIP</h2>
+    <h3>No. total de registos descritivos:
         <span class="statistic"
               data-source="index"
               data-source-class="org.roda.core.data.v2.ip.IndexedAIP"
@@ -30,7 +31,7 @@
         </code>
     </pre>
 
-    <h3>Total No. of fonds:
+    <h3>No. total de fundos:
         <span class="statistic"
               data-source="index"
               data-source-class="org.roda.core.data.v2.ip.IndexedAIP"
@@ -49,7 +50,7 @@
         </code>
     </pre>
 
-    <h3>Distribution of description levels</h3>
+    <h3>Distribuição dos níveis descritivos</h3>
     <div class="half">
         <canvas class="statistic"
                 data-source="index"
@@ -73,8 +74,8 @@
         </pre>
     </div>
 
-    <h2>Representations Index</h2>
-    <h3>Total No. of Representations:
+    <h2>Índice de representações</h2>
+    <h3>No. total de representações:
         <span class="statistic"
               data-source="index"
               data-source-class="org.roda.core.data.v2.ip.IndexedRepresentation"
@@ -91,7 +92,7 @@
         </code>
     </pre>
 
-    <h3>Distribution of representation types</h3>
+    <h3>Distribuição dos tipos de representações</h3>
     <div class="half">
         <canvas class="statistic"
                 data-source="index"
@@ -115,8 +116,8 @@
         </pre>
     </div>
 
-    <h2>Files index</h2>
-    <h3>Total No. of files:
+    <h2>Índice de ficheiros</h2>
+    <h3>No. total de ficheiros:
         <span class="statistic"
               data-source="index"
               data-source-class="org.roda.core.data.v2.ip.IndexedFile"
@@ -133,7 +134,7 @@
         </code>
     </pre>
 
-    <h3>Distribution of mimetypes</h3>
+    <h3>Distribuição de mimetypes</h3>
     <div class="half">
         <canvas class="statistic"
                 data-source="index"
@@ -157,7 +158,7 @@
         </pre>
     </div>
 
-    <h3>Distribution of PRONOM IDs</h3>
+    <h3>Distribuição de PRONOM IDs</h3>
     <div class="half">
         <canvas class="statistic"
                 data-source="index"
@@ -181,8 +182,8 @@
         </pre>
     </div>
 
-    <h2>Job index</h2>
-    <h3>Total No. of Ingest jobs:
+    <h2>Índice de processos</h2>
+    <h3>No. total de processos de ingestão:
         <span class="statistic"
               data-source="index"
               data-source-class="org.roda.core.data.v2.jobs.Job"
@@ -203,8 +204,8 @@
         </code>
     </pre>
 
-    <h2>Log index</h2>
-    <h3>Total No. of logins:
+    <h2>Índice de registros</h2>
+    <h3>No. total de logins:
         <span class="statistic"
               data-source="index"
               data-source-class="org.roda.core.data.v2.log.LogEntry"
@@ -223,7 +224,7 @@
         </code>
     </pre>
 
-    <h3>Total No. of failed logins:
+    <h3>No. total de logins falhados:
         <span class="statistic"
               data-source="index"
               data-source-class="org.roda.core.data.v2.log.LogEntry"
@@ -242,7 +243,7 @@
         </code>
     </pre>
 
-    <h3>Successful vs failed logins</h3>
+    <h3>Login com sucesso vs falhados</h3>
     <div class="half">
         <canvas class="statistic"
                 data-source="index"
@@ -268,10 +269,10 @@
         </pre>
     </div>
 
-    <h1>Other charts</h1>
+    <h1>Outros gráficos</h1>
 
-    <h2>Line charts</h2>
-    <h3>Description level distribution</h3>
+    <h2>Gráficos de linhas</h2>
+    <h3>Distribuição de nivel descritivos</h3>
     <div class="half">
         <canvas class="statistic"
                 data-source="index"
@@ -295,8 +296,8 @@
         </pre>
     </div>
 
-    <h2>Radar charts</h2>
-    <h3>Pronom format distribution</h3>
+    <h2>Gráficos de radar</h2>
+    <h3>Distribuição de formatos PRONOM</h3>
     <div class="half">
         <canvas class="statistic"
                 data-source="index"
@@ -320,8 +321,8 @@
         </pre>
     </div>
 
-    <h2>Polar area charts</h2>
-    <h3>Pronom format distribution</h3>
+    <h2>Gráficos polares</h2>
+    <h3>Distribuição de formatos PRONOM</h3>
     <div class="half">
         <canvas class="statistic"
                 data-source="index"
@@ -345,8 +346,8 @@
         </pre>
     </div>
 
-    <h2>Custom function to handle facet data</h2>
-    <h3>Pronon format distribution</h3>
+    <h2>Função personalizada para manipular dados de facetas</h2>
+    <h3>Distribuição de formatos PRONOM</h3>
     <div class="half">
         <canvas class="statistic"
                 data-source="index"
@@ -430,8 +431,8 @@
         </pre>
     </div>
 
-    <h2>Custom function to create chart</h2>
-    <h3>Bubble chart</h3>
+    <h2>Função personalizada para criar gráfico</h2>
+    <h3>Gráfico de bolhas</h3>
     <div class="half">
         <canvas class="statistic"
                 data-source="function"

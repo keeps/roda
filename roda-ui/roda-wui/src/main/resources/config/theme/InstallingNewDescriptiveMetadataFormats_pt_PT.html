@@ -1,59 +1,57 @@
 <div class="static-page max-width help-page">
 
-  <h1>Installing new descriptive metadata formats</h1>
+  <h1>Instalar novos formatos de metadados descritivos</h1>
 
   <p>
-    RODA supports any descriptive metadata format (i.e. Descriptive Information as stated in the OAIS) as long as it represented by an XML file. If you have a descriptive metadata format that is not based on XML (e.g. CSV, JSON, MARC21, etc.), you will have to convert it to XML before you can use in RODA. Several tools exist on the Web that allow you to convert most data formats into XML.
+	O RODA suporta qualquer formato de metadados descritivo (i.e. Informação Descritiva conforme indicado no OAIS) desde que representado por um ficheiro XML. Se tem um formato de metadados descritivo que não é baseado em XML (por exemplo, CSV, JSON, MARC21, etc.), terá que converter para XML antes de poder usar no RODA. Existem várias ferramentas na Web que permitem converter a maioria dos formatos de dados em XML.
   </p>
 
   <p>
-    Once you have your metadata in XML you are ready to package it into a Submission Information Package (SIP) and ingest it on the repository. Alternatively, you may want to create a metadata file directly on the repository by using the functionality provided by the Catalogue. When the metadata format is new to RODA, the repository will do its best to support without the need to do any reconfiguration of system, however, the following limitations apply:
+	Depois de ter os metadados em XML, está pronto para empacotá-lo num Pacote de Informações de Envio (SIP) e ingeri-lo no repositório. Como alternativa, você pode criar um arquivo de metadados diretamente no repositório usando a funcionalidade fornecida pelo Catálogo. Quando o formato de metadados é novo para o RODA, o repositório fará o seu melhor para suportar sem a necessidade de fazer qualquer reconfiguração do sistema, no entanto, as seguintes limitações se aplicam:
 
     <p>
       <div class="row full_width">
         <div class="col_3 col_card">
-          <h4>Validation</h4>
-          <p>If no schema is provided for your metadata format, the repository will check if the metadata XML file is well-formed, however because the repository has no notion of  the right grammar, it will not verify if the file is valid.</p>
+          <h4>Validação</h4>
+          <p>Se nenhum schema for fornecido para o formato de metadados, o repositório verificará se o arquivo XML de metadados está bem formado, mas como o repositório não tem noção da gramática correta, ele não verificará se o arquivo é válido.</p>
         </div>
         <div class="col_3 col_card">
-          <h4>Indexing</h4>
-          <p>The repository will index all text elements and attribute values found on the metadata file, however because the repository does not know the right mapping between the XML elements and the inner data model, only basic search will possible on the provided metadata.</p>
+          <h4>Indexação</h4>
+		  <p>O repositório irá indexar todos os elementos textuais e valores de atributos encontrados no ficheiro de metadados. No entanto, uma vez que o repositório não conhece o mapeamento correcto entre os elementos XML e o modelo de dados interno, apenas a pesquisa básica será possível nos metadados fornecidos.</p>
         </div>
         <div class="col_3 col_card">
-          <h4>Visualization</h4>
-          <p>When no visualization mappings are configured, a generic metadata viewer will be used by the repository to display the XML-based metadata. All text elements and attributes will shown in no particular order and their XPath will be used as the label.</p>
+          <h4>Visualização</h4>
+          <p>Quando nenhum mapeamento de visualização é configurado, um visualizador de metadados genérico será usado pelo repositório para exibir os metadados baseados em XML. Todos os elementos textuais e atributos serão mostrados com nenhuma ordem específica e seu XPath será usado como rótulo.</p>
         </div>
         <div class="col_3 col_card">
-          <h4>Edition</h4>
-          <p>RODA needs a configuration file to inform how metadata files should be displayed for editing purposes. If no such configuration exists, the repository will display a text area where the user is able to edit the XML directly. </p>
+          <h4>Edição</h4>
+          <p>O RODA precisa de um arquivo de configuração para informar como os arquivos de metadados devem ser exibidos para fins de edição. Se não existir tal configuração, o repositório exibirá uma área de texto onde o usuário é capaz de editar o XML diretamente.</p>
         </div>
       </div>
     </p>
 
     <p>
-    In order to support new metadata formats, the repository must be configured accordingly. The following sections describe in detail the set of actions that need to be performed to fully support a new metadata schema in RODA.
+	Para suportar novos formatos de metadados, o repositório deve ser configurado de acordo com isso. As secções a seguir descrevem com detalhe o conjunto de ações que precisam ser executadas para suportar totalmente um novo esquema de metadados no RODA.
     </p>
 
 
-    <h2>Metadata enhancement files</h2>
+    <h2>Arquivos de melhoramento de metadados</h2>
     <p>
-      To enhance the metadata experience in RODA there are 4 files that need to be added to the repository configuration folders. The following sections describe and provide examples of such files.
+      Para melhorar a experiência de metadados no RODA, há 4 arquivos que precisam ser adicionados às pastas de configuração do repositório. As secções a seguir descrevem e fornecem exemplos de tais arquivos.
     </p>
-    <h3>Validation</h3>
+    <h3>Validação</h3>
     <p>
-      RODA uses a <a href="http://www.w3.org/standards/xml/schema"> XML schema </a> to validate the structure and data types of the provided metadata file. The Validation schema will be used during ingest process to check if the metadata included in the SIP is valid according the the established
-      constraints, as well as when the metadata is edited via the catalogue.
+	  O RODA usa um <a href="http://www.w3.org/standards/xml/schema"> schema XML </a> para validar a estrutura e os tipos de dados do arquivo de metadados fornecido. O esquema de Validação será usado durante o processo de ingestão para verificar se os metadados incluídos no SIP são válidos de acordo com as restrições estabelecidas, bem como quando os metadados são editados através do catálogo.
     </p>
-    <p>
-      You may use a standard schema file for validation purposes or create a specific one that verifies all the particular conditions that you need to check in your repository installation, e.g. mandatory fields, closed-vocabularies for the values of certain
-      elements, etc.
+    <p>      
+	  Pode-se usar um ficheiro de schema padrão para fins de validação ou criar um específico que verifique todas as condições particulares que se precisa verificar na instalação de repositório, e.g. Campos obrigatórios, vocabulários fechados para os valores de certos elementos, etc.
     </p>
     <p>
-      The Validation Schema files should be placed on the configuration folder under <code>[RODA_HOME]/config/schemas/</code>.
+      Os arquivos do schema de Validação devem ser colocados na pasta <code>[RODA_HOME]/config/schemas/</code>.
     </p>
 
     <p>
-      Most metadata formats are published together with documentation and a XML schema. The following example represents the schema for the Simple Dublin Core metadata format:
+   	  A maioria dos formatos de metadados são publicados juntamente com a documentação e um schema XML. O exemplo a seguir representa o esquema para o formato de metadados Simple Dublin Core:
     </p>
     <p>
       <pre>
@@ -117,18 +115,18 @@
     </pre>
     </p>
 
-    <h3>Indexing</h3>
+    <h3>Indexação</h3>
 
     <p>
-      The <em>Indexing</em> activity is supported by a <a href="http://www.w3.org/standards/xml/transformation.html">XSLT (eXtensible Stylesheet Language Transformations)</a> that transforms the XML-based metadata into something that the indexing engine is able to understand. This file is responsible for selecting the data that is expected to be indexed, map data into specific field names, and instruct the engine on how the data is expected to be indexed based on its data type (i.e. text, number, date, etc.).
+   	  A atividade de <em>Indexação</em> é suportada por uma <a href="http://www.w3.org/standards/xml/transformation.html"> XSLT (eXtensible Stylesheet Language Transformations) </a> que transforma os metadados baseados em XML em algo que o mecanismo de indexação é capaz de entender. Esse ficheiro é responsável por selecionar os dados que devem ser indexados, mapear dados em nomes de campos específicos e instruir o mecanismo sobre como os dados devem ser indexados com base no seu tipo de dados (i.e. texto, número, data etc.).
     </p>
 
     <p>
-      The Index map file should be added to the configuration folder under <code>[RODA_HOME]/config/crosswalks/ingest/</code>.
+      O ficheiro com o mapa de índice deve ser adicionado na pasta <code>[RODA_HOME]/config/crosswalks/ingest/</code>.
     </p>
 
     <p>
-      The following is an example of an Index map for the Simple Dublin Core example.
+	  O seguinte é um exemplo de um mapa de índice para o exemplo Simple Dublin Core.
     </p>
     <p>
       <pre>
@@ -323,7 +321,7 @@
     </p>
 
     <p>
-      The output produced by this stylesheet is a <a href="https://wiki.apache.org/solr/UpdateXmlMessages">Solr document</a> ready to be indexed by the RODA search engine. See example bellow:
+      O resultado produzido por esta folha de estilo é um <a href="https://wiki.apache.org/solr/UpdateXmlMessages"> documento Solr </a> pronto para ser indexado pelo mecanismo de pesquisa RODA. Veja o exemplo abaixo:
     </p>
 
     <p>
@@ -341,16 +339,16 @@
     </p>
 
 
-    <h3>Visualization</h3>
-    <p>
-      The <em>Visualization</em> activity is supported by a <a href="http://www.w3.org/standards/xml/transformation.html">XSLT (eXtensible Stylesheet Language Transformations)</a> that transforms the XML-based metadata file into HTML for presentation purposes. The output of this action is a HTML file that will be shown to the user when browsing an existing AIP on the catalogue.
+    <h3>Visualização</h3>
+    <p>    	
+	  A atividade de <em>Visualização</em> é suportada por um <a href="http://www.w3.org/standards/xml/transformation.html"> XSLT (eXtensible Stylesheet Language Transformations) </a> que transforma o arquivo de metadados baseado de XML em HTML para fins de apresentação. O resultado desta ação é um ficheiro HTML que será mostrado ao utilizador quando se navega num AIP existente no catálogo.
     </p>
 
     <p>
-      The visualization mapping file should be added to the the configuration folder under <code>[RODA_HOME]/config/crosswalks/dissemination/html/</code>.
+      O arquivo de mapeamento de visualização deve ser adicionado à pasta <code>[RODA_HOME]/config/crosswalks/dissemination/html/</code>.     
     </p>
     <p>
-      The following example shows how a Simple Dublin Core file can be transformed to HTML for visualization purposes:
+      O exemplo a seguir mostra como um ficheiro Simple Dublin Core pode ser transformado em HTML para fins de visualização:
     </p>
 
     <p>
@@ -603,13 +601,14 @@
 
     </p>
 
-    <h3>Editing</h3>
-    <p>
-      The <em>Editing</em> activity is supported by a configuration file that will instruct the repository on how to display a form to edit existing metadata. The configuration file also serves the purpose of providing a template for creating a new metadata item with some predefined attributes already filled in.
+    <h3>Edição</h3>
+    <p>    
+	  A atividade de <em>Edição</em> é suportada por um ficheiro de configuração que instruirá o repositório sobre como exibir um formulário para editar metadados existentes. O ficheiro de configuração também serve para fornecer um modelo para criar um novo item de metadados com alguns atributos predefinidos já preenchidos.
     </p>
 
     <p>
-      Form templates should be added to the configuration under the folder <code>[RODA_HOME]/config/templates/</code>. The following example shows how a template file can be combined with annotations that will be used to render the metadata editor.
+      Os templates de formulário devem ser adicionados à configuração na pasta <code>[RODA_HOME]/config/templates/</code>. 
+      O exemplo a seguir mostra como um ficheiro de template pode ser combinado com anotações que serão usadas para processar o editor de metadados.
     </p>
     <p>
       <pre>
@@ -642,43 +641,43 @@
     </p>
 
 
-    <p>
-      The Form template files are based on the the powerful <a href="http://handlebarsjs.com">Handlebars engine</a>. Each field that is expected to be shown in the metadata editor should be identified in the beginning of the file by a <em>field </em> handle
-      (e.g. <code>{{~field name="title"~}}</code>). There are several options that can be used to modify the way each field is displayed. These options are a key-value pairs, e.g. <code>label="Title of work"</code>, where the key is the name of the option
-      and the value is the value that will be given to that option.
+    <p> 
+      Os arquivos de template de formulário baseiam-se no poderoso mecanismo <a href="http://handlebarsjs.com">Handlebars engine</a>. Cada campo que é esperado para ser mostrado no editor de metadados deve ser identificado no início do arquivo por um <em>campo</em> identificador
+      (e.g. <code> {{~ field name = "title" ~}} </code>). Há várias opções que podem ser usadas para modificar a maneira como cada campo é exibido. Estas opções são pares de chave-valor, e.g. <code>label="Título do trabalho"</code>, onde a chave é o nome da opção
+      e o valor é o valor que será dado a essa opção.
     </p>
     <p>
-      The available options that alter the fields' behavior are:
+      As opções disponíveis que alteram o comportamento dos campos são:
     </p>
 
     <ul>
-      <li><strong>order</strong> - the order by which the field should be displayed in the metadata editor </li>
-      <li><strong>label</strong> - the label of the field to be shown at the left of the value in the editor. The format is a JSON map. The keys of the map are the language ID. Example: {"en": "Title", ""pt_PT": "Título"}"</li>
-      <li><strong>labeli18n</strong> - the i18n key for the label of the field (see section "Internationalization of strings" below)</li>
-      <li><strong>description</strong> - a text with some help related to the field</li>
-      <li><strong>value</strong> - the predefined value of the field</li>
-      <li><strong>mandatory</strong> - If set to true the label is styled in bold to draw attention.</li>
-      <li><strong>hidden</strong> - if set to true the field is hidden</li>
-      <li><strong>xpath</strong> - the xpath of the metadata XML document to which this field should bind to</li>
-      <li><strong>auto-generate </strong>- Fills the value with one of the available auto-value generators. Overrides the value option:</li>
+      <li><strong>order</strong> - A ordem pela qual o campo deve ser exibido no editor de metadados </li>
+      <li><strong>label</strong> - O rótulo do campo a ser mostrado à esquerda do valor no editor. O formato é um mapa JSON. As chaves do mapa são o ID do idioma. Exemplo: {"en": "Title", ""pt_PT": "Título"}"</li>
+      <li><strong>labeli18n</strong> - A chave i18n para o rótulo do campo (consulte a secção "Internacionalização de texto" abaixo)</li>
+      <li><strong>description</strong> - Um texto com alguma ajuda relacionada com o campo</li>
+      <li><strong>value</strong> - O valor predefinido do campo</li>
+      <li><strong>mandatory</strong> - Se definido como verdadeiro o rótulo é desenhado em negrito para chamar a atenção</li>
+      <li><strong>hidden</strong> - Se definido como verdadeiro, o campo está oculto</li>
+      <li><strong>xpath</strong> - O xpath do documento XML de metadados para o qual este campo deve vincular</li>
+      <li><strong>auto-generate </strong>- Preenche o valor com um dos geradores de valor automático disponíveis. Substitui o valor:</li>
       <ul>
-        <li><strong>now </strong>- the current date in the format year/month/day</li>
-        <li><strong>id </strong>- generates an identifier</li>
-        <li><strong>title</strong> - generates a title</li>
-        <li><strong>level</strong> - adds the current description level</li>
-        <li><strong>parentid</strong> - adds the parent's id, if it exists</li>
-        <li><strong>language</strong> - adds the system language, based on the locale. Example: "português" or "English"</li>
+        <li><strong>now </strong>- A data atual no formato ano/mês/dia</li>
+        <li><strong>id </strong>- Gera um identificador</li>
+        <li><strong>title</strong> - Gera um título</li>
+        <li><strong>level</strong> - Adiciona o nível de descrição atual</li>
+        <li><strong>parentid</strong> - Adiciona o identificador do pai, se ele existir</li>
+        <li><strong>language</strong> - Adiciona o idioma do sistema, com base no locale. Exemplo: "português" or "English"</li>
       </ul>
-      <li><strong>type </strong>- the type of the field. The possible values are:</li>
+      <li><strong>type </strong>- O tipo do campo. Os valores possíveis são:</li>
       <ul>
-        <li><strong>text </strong>- text field</li>
-        <li><strong>text-area </strong>- Text area. Larger than a field text.</li>
-        <li><strong>date </strong>- text field with a date picker</li>
-        <li><strong>list </strong>- list with the possible values (combo box)</li>
+        <li><strong>text </strong>- campo textual</li>
+        <li><strong>text-area </strong>- Área de texto. Maior que um texto de campo.</li>
+        <li><strong>date </strong>- Campo de texto com um seletor de data</li>
+        <li><strong>list </strong>- Lista com os valores possíveis (caixa de combinação)</li>
         <ul>
-          <li><strong>options </strong>- List with the possible values that a field can have. This list is a JSonArray. Example: <code>options="[\"final\",\"revised\",\"draft\"]"</code></pre></li>
-          <li><strong>optionsLabels </strong>- Map with the labels for each option. The key must match one of the options specified in the "options" list. The entry is another map, mapping a language (key) to a label (value). Example: <code>optionsLabels="{\"final\": {\"en\":\"Final\", \"pt_PT\":\"Final\"},\"revised\": {\"en\":\"Revised\", \"pt_PT\":\"Verificado\"},\"draft\": {\"en\":\"Draft\", \"pt_PT\":\"Rascunho\"}}"</code></li>
-          <li><strong>optionsLabelI18nKeyPrefix </strong>- I18n prefix key.  All the key starting with the prefix are used to build the list. Example:<br/><pre><code>optionsLabelI18nKeyPrefix="crosswalks.dissemination.html.ead.level"</code></pre><br/>Properties file:<br/>
+          <li><strong>options </strong>- Lista com os possíveis valores que um campo pode ter. Esta lista é um JsonArray. Exemplo: <code>options="[\"final\",\"revised\",\"draft\"]"</code></pre></li>
+          <li><strong>optionsLabels </strong>- Mapa com os rótulos para cada opção. A chave deve corresponder a uma das opções especificadas na lista "options". A entrada é outro mapa, mapeando um idioma (chave) para um rótulo (valor). Exemplo: <code>optionsLabels="{\"final\": {\"en\":\"Final\", \"pt_PT\":\"Final\"},\"revised\": {\"en\":\"Revised\", \"pt_PT\":\"Verificado\"},\"draft\": {\"en\":\"Draft\", \"pt_PT\":\"Rascunho\"}}"</code></li>
+          <li><strong>optionsLabelI18nKeyPrefix </strong>- I18n prefixo chave. Todas as chaves que começam com o prefixo são usadas para construir a lista. Exemplo:<br/><pre><code>optionsLabelI18nKeyPrefix="crosswalks.dissemination.html.ead.level"</code></pre><br/>Properties file:<br/>
           <pre><code>crosswalks.dissemination.html.ead.level.fonds=Fonds
 crosswalks.dissemination.html.ead.level.class=Class
 crosswalks.dissemination.html.ead.level.collection=Collection
@@ -700,7 +699,7 @@ crosswalks.dissemination.html.ead.level.item=Item</code></pre>
 &lt;/select&gt;</code></pre>
           </li>
           <br/>
-          <li><strong>Full example of a "list" field</strong>:
+          <li><strong>Exemplo completo de um campo "list"</strong>:
           <pre><code>{{~field
 name="statusDescription"
 order="470"
@@ -720,22 +719,21 @@ xpath="/*:ead/*:archdesc/*:odd[@type='statusDescription']/*:p/string()"
 	<br/>
 	<br/>
     <p>
-      The following is an example of how the tags can be used:
+      O seguinte é um exemplo de como as tags podem ser usadas:
     </p>
     <p><pre><code>{{~file name="title" order="1" type="text" label="Template title" mandatory="true" auto-generate="title"~}}</code></pre></p></p>
 
-  <h2>Activate the new format</h2>
+  <h2>Ativar o novo formato</h2>
 
-    After adding all the files described on the previous section, one needs to enable them on the repository. In order to acomplish that, the following activies need to be done.
+    Depois de adicionar todos os arquivos descritos na seção anterior, é preciso habilitá-los no repositório. Para realizar isso, as atividades a seguir precisam ser feitas.
 
-  <h3>Enable the new metadata format</h3>
+  <h3>Ativar o novo formato de metadados</h3>
 
   <p>
-    After you added the previously described files to your configuration folder, you must enable the new format in the RODA main configuration file.
+    Depois de adicionar os arquivos descritos anteriormente à sua pasta de configuração, você deve ativar o novo formato no arquivo de configuração principal do RODA.
   </p>
   <p>
-    Edit the <code>[RODA_HOME]/config/roda-wui.properties</code> file and add a new entry as the ones shown in the following example with the name of your recently added metadata format. This will make RODA aware of the new metadata format.
-  </p>
+	Edite o ficheiro <code>[RODA_HOME]/config/roda-wui.properties</code> e adicione uma nova entrada como as mostradas no exemplo a seguir com o nome do seu formato de metadados recentemente adicionado. Isso fará RODA ciente do novo formato de metadados.</p>
   <p>
     <pre>
     <code>
@@ -746,14 +744,12 @@ ui.browser.metadata.descriptive.types = ead_2002
     </pre>
   </p>
 
-  <h3>Internationalization of strings</h3>
+  <h3>Internacionalização de texto</h3>
 
   <p>
-    In order to have your new metadata schema nicely integrated, your must provide internationalization information (i18n) so that RODA knows how to  display the necessary information on the user interface in the best way possible.
-  </p>
+	Para que seu novo esquema de metadados seja bem integrado, você deve fornecer informações de internacionalização (i18n) para que a RODA saiba como exibir as informações necessárias na interface de utilizador da melhor maneira possível.  </p>
   <p>
-    Edit the <code>[RODA_HOME]/config/i18n/ServerMessages.properties</code> file and add the following entries as necessary making sure that the last part of the key matches the code provided on the <code>[RODA_HOME]/config/roda-wui.properties</code> file described on the previous section:
-  </p>
+	Edite o ficheiro <code>[RODA_HOME]/config/i18n/ServerMessages.properties</code> e adicione as seguintes entradas conforme necessário, assegurando-se de que a última parte da chave corresponde ao código fornecido no <code>[RODA_HOME]/Config/roda-wui.properties</code> descrito na secção anterior:  </p>
   <p>
     <pre>
     <code>
@@ -766,11 +762,11 @@ ui.browse.metadata.descriptive.type.ead.2002=Encoded Archival Description 2002
 
 
   <p>
-    Finally one should provide translations for the field names to be processed by RODA via the <em> vizualization</em> config file. In order to to that, one must edit the <code>[RODA_HOME]/config/i18n/ServerMessages.properties</code> file and add
-    the following entries as necessary, making sure that the last part of the key matches the <code>xsl:params</code>included in the visualization map.
+    Finalmente, deve-se fornecer traduções para os nomes dos campos a serem processados pelo RODA através do ficheiro de configuração de <em>visualização</em>. Para isso, é preciso editar o arquivo <code>[RODA_HOME]/config/i18n/ServerMessages.properties</code> e adicionar
+     as seguintes entradas conforme necessário, certificando-se de que a última parte da chave corresponde ao <code>xsl:params</code> incluído no mapa de visualização.
   </p>
   <p>
-    The following example depicts how the field names in the Simple Dublin Core example should be displayed in the user interface.
+    O exemplo a seguir descreve como os nomes de campo no exemplo Simple Dublin Core devem ser exibidos na interface de utilizador.
   </p>
   <p>
     <pre>
@@ -795,7 +791,7 @@ crosswalks.dissemination.html.dc.type=Type
   </p>
 
   <p>
-    The previous key endings should match the ones on the xsl:param entries as follows:
+    As terminações das chaves anteriores devem corresponder às entradas xsl:param da seguinte forma:
   </p>
   <p>
     <pre>
@@ -819,10 +815,10 @@ crosswalks.dissemination.html.dc.type=Type
     </pre>
   </p>
 
-  <h3>Reload configuration</h3>
+  <h3>Recarregar configuração</h3>
 
   <p>
-    After changing the configuration files you must restart RODA so that your changes become effective. Do that by restarting your container or your application server.
+    Depois de alterar os arquivos de configuração, deve-se reiniciar o RODA para que suas alterações se tornem efetivas. Pode-se fazer isso reiniciando o container ou o servidor de aplicação.
   </p>
 
 </div>
