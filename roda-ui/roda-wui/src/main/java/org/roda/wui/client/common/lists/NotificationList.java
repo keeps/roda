@@ -20,6 +20,7 @@ import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
+import org.roda.wui.client.common.utils.StringUtils;
 
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.SafeHtmlCell;
@@ -42,7 +43,7 @@ public class NotificationList extends BasicAsyncTableCell<Notification> {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private TextColumn<Notification> fromUser;
-  // private TextColumn<Message> recipientUser;
+  private TextColumn<Notification> recipientUsers;
   private Column<Notification, Date> sentOn;
   private TextColumn<Notification> subject;
   private Column<Notification, SafeHtml> acknowledged;
@@ -68,6 +69,14 @@ public class NotificationList extends BasicAsyncTableCell<Notification> {
       @Override
       public String getValue(Notification notification) {
         return notification != null ? notification.getFromUser() : null;
+      }
+    };
+
+    recipientUsers = new TextColumn<Notification>() {
+
+      @Override
+      public String getValue(Notification notification) {
+        return notification != null ? StringUtils.prettyPrint(notification.getRecipientUsers()) : null;
       }
     };
 
@@ -116,12 +125,14 @@ public class NotificationList extends BasicAsyncTableCell<Notification> {
     };
 
     fromUser.setSortable(true);
+    recipientUsers.setSortable(true);
     sentOn.setSortable(true);
     subject.setSortable(true);
     acknowledged.setSortable(true);
     state.setSortable(true);
 
     addColumn(fromUser, messages.notificationFrom(), true, false);
+    addColumn(recipientUsers, messages.notificationTo(), true, false);
     addColumn(sentOn, messages.notificationSentOn(), true, false, 13);
     addColumn(subject, messages.notificationSubject(), true, false);
     addColumn(state, messages.notificationState(), true, false, 7);
@@ -137,6 +148,7 @@ public class NotificationList extends BasicAsyncTableCell<Notification> {
   protected Sorter getSorter(ColumnSortList columnSortList) {
     Map<Column<Notification, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<Notification, ?>, List<String>>();
     columnSortingKeyMap.put(fromUser, Arrays.asList(RodaConstants.NOTIFICATION_FROM_USER));
+    columnSortingKeyMap.put(recipientUsers, Arrays.asList(RodaConstants.NOTIFICATION_RECIPIENT_USERS));
     columnSortingKeyMap.put(sentOn, Arrays.asList(RodaConstants.NOTIFICATION_SENT_ON));
     columnSortingKeyMap.put(subject, Arrays.asList(RodaConstants.NOTIFICATION_SUBJECT));
     columnSortingKeyMap.put(acknowledged, Arrays.asList(RodaConstants.NOTIFICATION_IS_ACKNOWLEDGED));

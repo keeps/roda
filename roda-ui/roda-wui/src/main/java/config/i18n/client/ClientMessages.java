@@ -1500,6 +1500,8 @@ public interface ClientMessages extends Messages {
 
   String notificationSentOn();
 
+  String notificationTo();
+
   String notificationFrom();
 
   String notificationFromUser();
