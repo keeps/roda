@@ -16,7 +16,7 @@
 {{~field name="quote" 					order="160" type="text-area" labeli18n="crosswalks.dissemination.html.ead.quote" label="{\"en\": \"Quote\", \"pt\": \"Citação\"}" xpath="/*:ead/*:archdesc/*:prefercite/*:p/string()"~}}
 
 {{~field name="contextArea" 			order="170" type="separator" labeli18n="crosswalks.dissemination.html.ead.contextarea" label="{\"en\": \"Context\", \"pt\": \"Contexto\"}"~}}
-{{~field name="bioghist"     			order="180" type="text-area" labeli18n="crosswalks.dissemination.html.ead.bioghist" label="{\"en\": \"Administrative and biographical history\", \"pt\": \"Bibliografia\"}" xpath="/*:ead/*:archdesc/*:did/*:origination[@label='creator']/*:name/string()"~}}
+{{~field name="bioghist"     			order="180" type="text-area" labeli18n="crosswalks.dissemination.html.ead.bioghist" label="{\"en\": \"Administrative and biographical history\", \"pt\": \"Bibliografia\"}" xpath="/*:ead/*:archdesc/*:bioghist/*:p/string()"~}}
 {{~field name="creator"     			order="190" labeli18n="crosswalks.dissemination.html.ead.creator" label="{\"en\": \"Name of creator(s)\", \"pt\": \"Nome do(s) autores\"}" xpath="/*:ead/*:archdesc/*:did/*:origination[@label='creator']/*:name/string()"~}}
 {{~field name="producer"    			order="200" labeli18n="crosswalks.dissemination.html.ead.producer" label="{\"en\": \"Producer\", \"pt\": \"Produtor\"}" xpath="/*:ead/*:archdesc/*:did/*:origination[@label='producer']/*:name/string()"~}}
 {{~field name="repositoryCode" 			order="210" labeli18n="crosswalks.dissemination.html.ead.repositorycode" label="{\"en\": \"Repository code\", \"pt\": \"Código do repositório\"}" xpath="/*:ead/*:archdesc/*:did/*:unitid/@repositorycode/string()"~}}
@@ -182,6 +182,11 @@
     <scopecontent>
       <p>{{scopeContent}}</p>
     </scopecontent>
+     {{~/if~}}
+     {{~#if bioghist~}} 
+    <bioghist>
+      <p>{{bioghist}}</p>
+    </bioghist>
      {{~/if~}}
      {{~#if systemOfArrangement~}} 
     <arrangement>
