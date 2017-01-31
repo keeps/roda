@@ -5856,6 +5856,17 @@ td.datePickerMonth, td.datePickerYear {
     border-bottom: 8px solid #089DE3;
 }
 
+.actions-popup-top_left::before {
+	content: "";
+	width: 0px;
+	height: 0px;
+    border: 8px solid transparent;
+    position: absolute;
+    left: 8px;
+    top: -16px;
+    border-bottom: 8px solid #089DE3;
+}
+
 .actions-popup .actions-layout-title {
 	color: white;
 	margin-bottom: 5px;
@@ -5868,4 +5879,3 @@ td.datePickerMonth, td.datePickerYear {
 .actions-empty-help {
 	color: white;
 }
-
