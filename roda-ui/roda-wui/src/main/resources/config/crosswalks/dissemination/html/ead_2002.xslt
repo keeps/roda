@@ -219,13 +219,13 @@
 					</div>
 				</div>
 			</xsl:if>
-			<xsl:if test="//ead:origination/text()">
+			<xsl:if test="//ead:origination[not(@label)]/text()">
 				<div class="field">
 					<div class="label">
 						<xsl:value-of select="$i18n.origination" />
 					</div>
 					<div class="value">
-						<xsl:value-of select="//ead:origination/text()" />
+						<xsl:value-of select="//ead:origination[not(@label)]/text()" />
 					</div>
 				</div>
 			</xsl:if>
