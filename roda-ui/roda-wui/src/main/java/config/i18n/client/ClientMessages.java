@@ -690,6 +690,10 @@ public interface ClientMessages extends Messages {
 
   String fileFormat();
 
+  String fileMimetype();
+
+  String filePronom();
+
   String fileSize();
 
   String fileLength();

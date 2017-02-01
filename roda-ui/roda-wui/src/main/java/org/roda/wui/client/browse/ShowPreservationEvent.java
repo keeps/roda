@@ -558,7 +558,21 @@ public class ShowPreservationEvent extends Composite {
       Label formatValue = new Label(name + " " + version);
       formatValue.addStyleName("value");
 
-      // TODO add pronom and mime type
+      Label mimetypeLabel = new Label(messages.fileMimetype());
+      mimetypeLabel.addStyleName("label");
+      String fileMimetype = fileFormat.getMimeType();
+
+      String mimetype = fileMimetype != null ? fileMimetype : "";
+      Label mimetypeValue = new Label(mimetype);
+      mimetypeValue.addStyleName("value");
+
+      Label pronomLabel = new Label(messages.filePronom());
+      pronomLabel.addStyleName("label");
+      String filePronom = fileFormat.getPronom();
+
+      String pronom = filePronom != null ? filePronom : "";
+      Label pronomValue = new Label(pronom);
+      pronomValue.addStyleName("value");
 
       Label sizeLabel = new Label(messages.fileSize());
       sizeLabel.addStyleName("label");
@@ -573,6 +587,14 @@ public class ShowPreservationEvent extends Composite {
       }
       body.add(formatLabel);
       body.add(formatValue);
+      if (StringUtils.isNotBlank(fileMimetype)) {
+        body.add(mimetypeLabel);
+        body.add(mimetypeValue);
+      }
+      if (StringUtils.isNotBlank(filePronom)) {
+        body.add(pronomLabel);
+        body.add(pronomValue);
+      }
       body.add(sizeLabel);
       body.add(sizeValue);
 

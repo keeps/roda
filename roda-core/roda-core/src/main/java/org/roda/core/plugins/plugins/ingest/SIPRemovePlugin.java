@@ -10,6 +10,7 @@ package org.roda.core.plugins.plugins.ingest;
 import java.util.Arrays;
 import java.util.List;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.v2.LiteOptionalWithCause;
@@ -32,6 +33,8 @@ import org.slf4j.LoggerFactory;
 
 public class SIPRemovePlugin extends AbstractPlugin<TransferredResource> {
   private static final Logger LOGGER = LoggerFactory.getLogger(SIPRemovePlugin.class);
+
+  private boolean createEvent = true;
 
   @Override
   public void init() throws PluginException {
@@ -73,13 +76,13 @@ public class SIPRemovePlugin extends AbstractPlugin<TransferredResource> {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
         SimpleJobPluginInfo jobPluginInfo, Plugin<TransferredResource> plugin, TransferredResource object) {
-        processTransferredResource(index, model, report, cachedJob, object);
+        processTransferredResource(index, model, report, jobPluginInfo, cachedJob, object);
       }
     }, index, model, storage, liteList);
   }
 
-  private void processTransferredResource(IndexService index, ModelService model, Report report, Job job,
-    TransferredResource transferredResource) {
+  private void processTransferredResource(IndexService index, ModelService model, Report report,
+    SimpleJobPluginInfo pluginInfo, Job job, TransferredResource transferredResource) {
     Report reportItem = PluginHelper.initPluginReportItem(this, transferredResource);
     PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
 
@@ -87,11 +90,24 @@ public class SIPRemovePlugin extends AbstractPlugin<TransferredResource> {
       LOGGER.debug("Removing SIP {}", transferredResource.getFullPath());
       model.deleteTransferredResource(transferredResource);
       LOGGER.debug("Done with removing SIP {}", transferredResource.getFullPath());
-      // TODO: create event...
-      // PluginHelper.createPluginEvent(this, aipID, model, index, sources,
-      // targets, outcome, outcomeDetailExtension, notify)
 
+      if (createEvent) {
+        model.createRepositoryEvent(PreservationEventType.DELETION,
+          "The process of deleting an object of the repository", PluginState.SUCCESS,
+          "The transferred resource " + transferredResource.getId() + " has been deleted.", "", job.getUsername(),
+          true);
+      }
+
+      pluginInfo.incrementObjectsProcessedWithSuccess();
     } catch (RuntimeException e) {
+      if (createEvent) {
+        model.createRepositoryEvent(PreservationEventType.DELETION,
+          "The process of deleting an object of the repository", PluginState.SUCCESS,
+          "The transferred resource " + transferredResource.getId() + " has not been deleted.", "", job.getUsername(),
+          true);
+      }
+
+      pluginInfo.incrementObjectsProcessedWithFailure();
       reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
       LOGGER.error("Error removing transferred resource " + transferredResource.getFullPath(), e);
     }
@@ -137,14 +153,13 @@ public class SIPRemovePlugin extends AbstractPlugin<TransferredResource> {
   @Override
   public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
-    // do nothing
-    return null;
+    createEvent = Boolean.parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("event", "create", "all"));
+    return new Report();
   }
 
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    // do nothing
-    return null;
+    return new Report();
   }
 
   @Override

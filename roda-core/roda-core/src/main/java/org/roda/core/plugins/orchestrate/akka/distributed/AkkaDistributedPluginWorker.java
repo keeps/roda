@@ -17,7 +17,7 @@ import akka.cluster.client.ClusterClient;
 import akka.cluster.client.ClusterClientSettings;
 
 public class AkkaDistributedPluginWorker extends AkkaDistributedPlugin {
-  // XXX this uses a single threaded worker (as opposite to
+  // INFO this uses a single threaded worker (as opposite to
   // AkkaEmbeddedPluginOrchestrator which is multi-threaded)
   private ActorSystem workerSystem;
   private ActorRef clusterClient;

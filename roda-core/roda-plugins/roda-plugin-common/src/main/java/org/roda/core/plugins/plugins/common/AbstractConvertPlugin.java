@@ -491,8 +491,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                       dip = model.createDIP(dip, true);
                       newRepresentationID = dip.getId();
                     } else {
-                      // TODO the concrete plugin should define the
-                      // representation type
+                      // INFO will be a parameter
                       String newRepresentationType = RodaConstants.REPRESENTATION_TYPE_MIXED;
                       model.createRepresentation(aipId, newRepresentationID, original, newRepresentationType, notify);
                       reportItem.setOutcomeObjectId(
@@ -677,8 +676,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                 dip = model.createDIP(dip, true);
                 newRepresentationID = dip.getId();
               } else {
-                // TODO the concrete plugin should define the
-                // representation type
+                // INFO will be a parameter
                 String newRepresentationType = RodaConstants.REPRESENTATION_TYPE_MIXED;
                 model.createRepresentation(file.getAipId(), newRepresentationID, original, newRepresentationType,
                   model.getStorage(), storagePath);

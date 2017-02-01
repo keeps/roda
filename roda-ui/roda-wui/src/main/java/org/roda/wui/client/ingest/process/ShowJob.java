@@ -660,45 +660,45 @@ public class ShowJob extends Composite {
 
   private void createPluginSipToAipLayout(PluginParameter parameter) {
     String value = job.getPluginParameters().get(parameter.getId());
+
     if (value == null) {
       value = parameter.getDefaultValue();
     }
+
     if (StringUtils.isNotBlank(value)) {
       Label pluginLabel = new Label(parameter.getName());
       PluginInfo sipToAipPlugin = pluginsInfo.get(value);
-      // Label pluginValue = new
-      // Label(messages.pluginLabel(sipToAipPlugin.getName(),
-      // sipToAipPlugin.getVersion()));
+      RadioButton pluginValue;
+
+      pluginOptions.add(pluginLabel);
+      addHelp(parameter.getDescription());
 
       if (sipToAipPlugin != null) {
-
-        RadioButton pluginValue = new RadioButton(parameter.getId(),
+        pluginValue = new RadioButton(parameter.getId(),
           messages.pluginLabel(sipToAipPlugin.getName(), sipToAipPlugin.getVersion()));
+
         pluginValue.setValue(true);
         pluginValue.setEnabled(false);
-
-        pluginOptions.add(pluginLabel);
-        addHelp(parameter.getDescription());
         pluginOptions.add(pluginValue);
         addHelp(sipToAipPlugin.getDescription());
 
-        pluginLabel.addStyleName("label");
-        pluginValue.addStyleName("form-radiobutton");
       } else {
-        // TODO show value if plugin disapeared
+        pluginValue = new RadioButton(parameter.getId(), value);
+        pluginValue.setValue(true);
+        pluginValue.setEnabled(false);
+        pluginOptions.add(pluginValue);
         GWT.log("Plugin not found: " + value);
       }
 
-      // TODO show SIP_TO_AIP plugin description
+      pluginLabel.addStyleName("label");
+      pluginValue.addStyleName("form-radiobutton");
     }
   }
 
   private void addHelp(String description) {
     if (description != null && description.length() > 0) {
       Label pHelp = new Label(description);
-
       pluginOptions.add(pHelp);
-
       pHelp.addStyleName("form-help");
     }
   }

@@ -8,9 +8,10 @@
 package org.roda.core.plugins.plugins.characterization;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,15 +22,18 @@ import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.storage.Binary;
+import org.roda.core.storage.DirectResourceAccess;
+import org.roda.core.storage.StorageService;
+import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.CommandException;
 import org.roda.core.util.CommandUtility;
 
 public class JpylyzerPluginUtils {
 
-  public static String inspect(File f) throws RODAException {
+  public static String inspect(Path path) throws RODAException {
     try {
       List<String> command = getCommand();
-      command.add(f.getAbsolutePath());
+      command.add(path.toString());
       return CommandUtility.execute(command);
     } catch (CommandException e) {
       throw new RODAException("Error while executing jpylyzer command");
@@ -54,16 +58,20 @@ public class JpylyzerPluginUtils {
     return command;
   }
 
-  public static String runJpylyzer(Binary binary, Map<String, String> parameterValues)
+  public static String runJpylyzer(StorageService storage, Binary binary, Map<String, String> parameterValues)
     throws IOException, RODAException {
-    // TODO f is not deleted in runtime
-    // TODO use storage method to get direct access to file
-    java.io.File f = File.createTempFile("temp", ".temp");
-    FileOutputStream fos = new FileOutputStream(f);
-    InputStream inputStream = binary.getContent().createInputStream();
+    DirectResourceAccess directAccess = storage.getDirectAccess(binary.getStoragePath());
+    InputStream inputStream = Files.newInputStream(directAccess.getPath());
+
+    Path newPath = Files.createTempFile("temp", ".temp");
+    OutputStream fos = Files.newOutputStream(newPath);
     IOUtils.copy(inputStream, fos);
+
     IOUtils.closeQuietly(inputStream);
     fos.close();
-    return inspect(f);
+
+    String inspectString = inspect(newPath);
+    FSUtils.deletePathQuietly(newPath);
+    return inspectString;
   }
 }

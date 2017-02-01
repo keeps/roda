@@ -78,7 +78,7 @@ public class ValidationUtils {
   public static ValidationReport isAIPMetadataValid(boolean forceDescriptiveMetadataType,
     boolean validateDescriptiveMetadata, String fallbackMetadataType, String fallbackMetadataVersion,
     boolean validatePremis, ModelService model, String aipId) throws GenericException, RequestNotValidException,
-      AuthorizationDeniedException, NotFoundException, ValidationException {
+    AuthorizationDeniedException, NotFoundException, ValidationException {
     ValidationReport report = new ValidationReport();
     report.setValid(true);
     List<DescriptiveMetadata> descriptiveMetadata = model.retrieveAIP(aipId).getDescriptiveMetadata();
@@ -205,7 +205,6 @@ public class ValidationUtils {
    */
   public static boolean isAIPPreservationMetadataValid(ModelService model, String aipId, boolean failIfNoSchema)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
-    // TODO !!!!
     return true;
   }
 
@@ -222,7 +221,7 @@ public class ValidationUtils {
    */
   public static ValidationReport isDescriptiveMetadataValid(ModelService model, DescriptiveMetadata metadata,
     boolean failIfNoSchema)
-      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     ValidationReport ret;
     if (metadata != null) {
       StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(metadata.getAipId(),
@@ -260,7 +259,7 @@ public class ValidationUtils {
    */
   public static ValidationReport isPreservationMetadataValid(ModelService model, PreservationMetadata metadata,
     boolean failIfNoSchema)
-      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
 
     StoragePath storagePath = ModelUtils.getPreservationMetadataStoragePath(metadata);
     Binary binary = model.getStorage().getBinary(storagePath);

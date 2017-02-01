@@ -12,6 +12,8 @@ package org.roda.wui.client.browse;
 
 import java.io.Serializable;
 
+import org.roda.core.RodaCoreFactory;
+
 /**
  * @author Luis Faria
  * 
@@ -20,8 +22,8 @@ public class DisseminationInfo implements Serializable {
 
   private static final long serialVersionUID = -6014468773068700324L;
 
-  // TODO set this in properties
-  public static final String DOWNLOAD_DISSEMINATOR_ID = "RepresentationDownload";
+  public static final String DOWNLOAD_DISSEMINATOR_ID = RodaCoreFactory.getRodaConfigurationAsString("core", "download",
+    "disseminator", "id");
 
   private String id;
 

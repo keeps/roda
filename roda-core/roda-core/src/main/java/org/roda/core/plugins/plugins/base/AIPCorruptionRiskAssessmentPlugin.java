@@ -12,11 +12,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
@@ -33,7 +31,6 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.common.OptionalWithCause;
-import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
@@ -122,8 +119,8 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
     SimpleJobPluginInfo jobPluginInfo, Job job, AIP aip) {
     boolean aipFailed = false;
     List<String> passedFiles = new ArrayList<String>();
-    Map<String, Pair<String, String>> failedFiles = new HashMap<>();
     List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
+    ValidationReport validationReport = new ValidationReport();
 
     for (Representation r : aip.getRepresentations()) {
       LOGGER.debug("Checking fixity for files in representation {} of AIP {}", r.getId(), aip.getId());
@@ -166,13 +163,18 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
 
                     if (!f.getMessageDigest().trim().equalsIgnoreCase(checksum.trim())) {
                       passedFixity = false;
-                      failedFiles.put(fileEntry, new Pair<>(f.getMessageDigest().trim(), checksum.trim()));
+
+                      ValidationIssue issue = new ValidationIssue(
+                        fileEntry + " (Checksums: [" + f.getMessageDigest().trim() + ", " + checksum.trim() + "])");
+                      validationReport.addIssue(issue);
+
                       break;
                     }
                   }
-                } catch (NoSuchAlgorithmException e) {
+                } catch (NoSuchAlgorithmException | IOException e) {
                   passedFixity = false;
-                  // TODO add exception to plugin report
+                  ValidationIssue issue = new ValidationIssue("Could not check fixity: " + e.getMessage());
+                  validationReport.addIssue(issue);
                   LOGGER.debug("Could not check fixity", e);
                 }
 
@@ -197,14 +199,6 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
       Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
 
       if (aipFailed) {
-        ValidationReport validationReport = new ValidationReport();
-
-        for (Entry<String, Pair<String, String>> entry : failedFiles.entrySet()) {
-          ValidationIssue issue = new ValidationIssue(entry.getKey() + " (Checksums: [" + entry.getValue().getFirst()
-            + ", " + entry.getValue().getSecond() + "])");
-          validationReport.addIssue(issue);
-        }
-
         reportItem.setPluginState(PluginState.FAILURE).setHtmlPluginDetails(true)
           .setPluginDetails(validationReport.toHtml(false, false, false, "Corrupted files and their checksums"));
         jobPluginInfo.incrementObjectsProcessedWithFailure();

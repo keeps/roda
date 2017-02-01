@@ -134,53 +134,43 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
 
   @Override
   public <T extends IsRODAObject> void runPlugin(Object context, Plugin<T> plugin) {
-    // TODO
   }
 
   @Override
   public void executeJob(Job job, boolean async) throws JobAlreadyStartedException {
-    // TODO
   }
 
   @Override
   public void stopJob(Job job) {
-    // TODO
   }
 
   @Override
   public <T extends IsRODAObject> void updateJobInformation(Plugin<T> plugin, JobPluginInfo jobPluginInfo) {
-    // TODO
   }
 
   @Override
   public void cleanUnfinishedJobs() {
-    // TODO
   }
 
   @Override
   public <T extends IsRODAObject> void updateJob(Plugin<T> plugin, JobPartialUpdate partialUpdate) {
-    // TODO
   }
 
   @Override
   public <T extends IsRODAObject> void runPluginOnAllObjects(Object context, Plugin<T> plugin, Class<T> objectClass) {
-    // TODO
   }
 
   @Override
   public <T extends IsRODAObject> void runPluginOnObjects(Object context, Plugin<T> plugin, Class<T> objectClass,
     List<String> uuids) {
-    // TODO
   }
 
   @Override
   public void setJobContextInformation(String jobId, Object object) {
-    // TODO
   }
 
   @Override
   public void setJobInError(String jobId) {
-    // TODO
   }
 
 }

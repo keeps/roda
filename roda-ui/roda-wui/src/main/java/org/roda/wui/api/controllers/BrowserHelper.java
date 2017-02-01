@@ -3266,9 +3266,14 @@ public class BrowserHelper {
     throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
     ObjectPermissionResult result = new ObjectPermissionResult();
     for (String queryKey : queryParams.keySet()) {
-      for (String queryValues : queryParams.get(queryKey)) {
-        boolean hasPermission = checkObjectPermission(username, permissionType, queryKey, queryValues);
-        result.addObject(new ObjectPermission(queryKey, queryValues, hasPermission));
+      try {
+        Class.forName(queryKey);
+        for (String queryValues : queryParams.get(queryKey)) {
+          boolean hasPermission = checkObjectPermission(username, permissionType, queryKey, queryValues);
+          result.addObject(new ObjectPermission(queryKey, queryValues, hasPermission));
+        }
+      } catch (ClassNotFoundException e) {
+        // do nothing
       }
     }
     return result;
