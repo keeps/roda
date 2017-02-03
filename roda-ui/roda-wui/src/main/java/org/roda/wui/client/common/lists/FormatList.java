@@ -103,7 +103,6 @@ public class FormatList extends BasicAsyncTableCell<Format> {
 
     // default sorting
     display.getColumnSortList().push(new ColumnSortInfo(nameColumn, false));
-
   }
 
   @Override

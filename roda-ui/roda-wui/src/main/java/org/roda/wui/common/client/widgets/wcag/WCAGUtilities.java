@@ -18,6 +18,7 @@ import com.google.gwt.user.client.Random;
 public class WCAGUtilities {
 
   private static final Set<String> INPUT_TAGNAMES = new HashSet<>(Arrays.asList("INPUT", "SELECT"));
+  private static final String IMG_TAGNAME = "img";
 
   private static WCAGUtilities instance = null;
 
@@ -40,6 +41,10 @@ public class WCAGUtilities {
 
     if (INPUT_TAGNAMES.contains(element.getTagName())) {
       addAttributeIfNonExistent(element, "title", "t_" + Random.nextInt(1000), true);
+    }
+
+    if (IMG_TAGNAME.equalsIgnoreCase(element.getTagName())) {
+      addAttributeIfNonExistent(element, "alt", "img_" + Random.nextInt(10000));
     }
 
     if (element.getChildCount() > 0) {

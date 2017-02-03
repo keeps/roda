@@ -83,7 +83,6 @@
 								</g:Label>
 								<g:Label styleName="value" ui:field="mitigatedDescriptionValue" />
 							</g:FlowPanel>
-
 						</g:FlowPanel>
 					</g:FlowPanel>
 				</g:FlowPanel>

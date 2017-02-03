@@ -20,11 +20,11 @@
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.metadataType}' />
 				</g:Label>
-				<g:ListBox ui:field="type" addStyleNames="form-listbox" />
+				<g:ListBox title="{messages.metadataType}" ui:field="type" addStyleNames="form-listbox" />
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.metadataFilename}' />
 				</g:Label>
-				<g:TextBox ui:field="id" addStyleNames="form-textbox" />
+				<g:TextBox title="{messages.metadataFilename}" ui:field="id" addStyleNames="form-textbox" />
 
 				<g:HTML visible="false" ui:field="idError" addStyleNames="error metadata-edit-errors" />
 
@@ -63,7 +63,6 @@
 								ui:field="buttonCancel">
 								<ui:text from='{messages.cancelButton}' />
 							</g:Button>
-
 						</g:FlowPanel>
 					</g:FlowPanel>
 				</g:FlowPanel>

@@ -149,7 +149,6 @@ public class RiskList extends BasicAsyncTableCell<IndexedRisk> {
     columnSortingKeyMap.put(ownerColumn, Arrays.asList(RodaConstants.RISK_MITIGATION_OWNER));
     columnSortingKeyMap.put(severityColumn, Arrays.asList(RodaConstants.RISK_CURRENT_SEVERITY_LEVEL));
     columnSortingKeyMap.put(incidenceCounterColumn, Arrays.asList(RodaConstants.RISK_OBJECTS_SIZE));
-
     return createSorter(columnSortList, columnSortingKeyMap);
   }
 

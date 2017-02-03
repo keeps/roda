@@ -78,7 +78,6 @@ public class ContentPanel extends SimplePanel {
     super();
     this.addStyleName("contentPanel");
     this.currWidget = null;
-
   }
 
   public void init() {

@@ -23,11 +23,11 @@
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.groupName}' />
 				</g:Label>
-				<g:TextBox ui:field="groupname" addStyleNames="form-textbox" />
+				<g:TextBox title="{messages.groupName}" ui:field="groupname" addStyleNames="form-textbox" />
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.groupFullname}' />
 				</g:Label>
-				<g:TextBox ui:field="fullname" addStyleNames="form-textbox" />
+				<g:TextBox title="{messages.groupFullname}" ui:field="fullname" addStyleNames="form-textbox" />
 				<g:Label ui:field="usersLabel" addStyleNames="form-label">
 					<ui:text from='{messages.groupUsers}' />
 				</g:Label>

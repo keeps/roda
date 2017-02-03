@@ -8,6 +8,7 @@
 package org.roda.wui.client.management;
 
 import org.roda.wui.common.client.ClientLogger;
+import org.roda.wui.common.client.widgets.wcag.WCAGUtilities;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -91,9 +92,14 @@ public class PasswordPanel extends SimplePanel implements HasValueChangeHandlers
     this.addStyleName("password");
     editPassword.addStyleName("password-input");
     editPassword.addStyleName("form-textbox");
+    editPassword.getElement().setTitle(messages.password());
+    WCAGUtilities.getInstance().makeAccessible(editPassword.getParent().getElement());
     editPasswordRepeat.addStyleName("passwordinput-repeat");
     editPasswordRepeat.addStyleName("form-textbox");
+    editPasswordRepeat.getElement().setTitle(messages.password());
+    WCAGUtilities.getInstance().makeAccessible(editPasswordRepeat.getParent().getElement());
     editPasswordNote.addStyleName("password-note");
+    WCAGUtilities.getInstance().makeAccessible(editPasswordNote.getParent().getElement());
     editButton.addStyleName("password-button");
     editButton.addStyleName("btn");
     editButton.addStyleName("btn-play");

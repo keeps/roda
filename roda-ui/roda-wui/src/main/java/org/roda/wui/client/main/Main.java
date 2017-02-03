@@ -24,6 +24,8 @@ import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -58,6 +60,13 @@ public class Main extends Composite implements EntryPoint {
 
     // Remove loading image
     RootPanel.getBodyElement().removeChild(DOM.getElementById("loading"));
+    NodeList<Element> bodyChilds = RootPanel.getBodyElement().getElementsByTagName("iframe");
+    for (int i = 0; i < bodyChilds.getLength(); i++) {
+      Element bodyChild = bodyChilds.getItem(i);
+      if (!bodyChild.hasAttribute("title")) {
+        bodyChild.setAttribute("title", "iframe_title");
+      }
+    }
 
     // Add main widget to root panel
     RootPanel.get().add(this);
@@ -124,7 +133,6 @@ public class Main extends Composite implements EntryPoint {
   public Main() {
     menu = new Menu();
     contentPanel = ContentPanel.getInstance();
-
     footer = new Footer();
 
     Binder uiBinder = GWT.create(Binder.class);

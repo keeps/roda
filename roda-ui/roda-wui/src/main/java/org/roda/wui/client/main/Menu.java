@@ -43,6 +43,7 @@ import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.LoginStatusListener;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.widgets.wcag.AcessibleMenuBar;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
@@ -75,23 +76,23 @@ public class Menu extends Composite {
   }
 
   @UiField
-  MenuBar leftMenu;
+  AcessibleMenuBar leftMenu;
 
   @UiField
-  MenuBar rightMenu;
+  AcessibleMenuBar rightMenu;
 
   private final MenuItem about;
 
   private MenuItem dissemination_browse;
   private MenuItem dissemination_searchBasic;
 
-  private final MenuBar ingestMenu;
+  private final AcessibleMenuBar ingestMenu;
   private MenuItem ingest_pre;
   private MenuItem ingest_transfer;
   private MenuItem ingest_list;
   private MenuItem ingest_appraisal;
 
-  private final MenuBar administrationMenu;
+  private final AcessibleMenuBar administrationMenu;
   private MenuItem administration_actions;
   private MenuItem administration_user;
   private MenuItem administration_log;
@@ -99,7 +100,7 @@ public class Menu extends Composite {
   private MenuItem administration_statistics;
   // private MenuItem administration_preferences;
 
-  private final MenuBar planningMenu;
+  private final AcessibleMenuBar planningMenu;
   // private MenuItem planning_monitoring;
   private MenuItem planning_risk;
   private MenuItem planning_format;
@@ -108,9 +109,9 @@ public class Menu extends Composite {
 
   private final MenuItem help;
 
-  private final MenuBar userMenu;
+  private final AcessibleMenuBar userMenu;
 
-  private final MenuBar languagesMenu;
+  private final AcessibleMenuBar languagesMenu;
 
   // private final MenuBar settingsMenu;
 
@@ -129,7 +130,7 @@ public class Menu extends Composite {
     dissemination_browse = new MenuItem(messages.title("browse"), createCommand(BrowseAIP.RESOLVER.getHistoryPath()));
     dissemination_searchBasic = new MenuItem(messages.title("search"), createCommand(Search.RESOLVER.getHistoryPath()));
 
-    ingestMenu = new MenuBar(true);
+    ingestMenu = new AcessibleMenuBar(true);
     ingest_pre = ingestMenu.addItem(messages.title("ingest_preIngest"),
       createCommand(PreIngest.RESOLVER.getHistoryPath()));
     ingest_transfer = ingestMenu.addItem(messages.title("ingest_transfer"),
@@ -139,7 +140,7 @@ public class Menu extends Composite {
     ingest_appraisal = ingestMenu.addItem(messages.title("ingest_appraisal"),
       createCommand(IngestAppraisal.RESOLVER.getHistoryPath()));
 
-    administrationMenu = new MenuBar(true);
+    administrationMenu = new AcessibleMenuBar(true);
     administration_actions = administrationMenu.addItem(messages.title("administration_actions"),
       createCommand(ActionProcess.RESOLVER.getHistoryPath()));
     administration_user = administrationMenu.addItem(messages.title("administration_user"),
@@ -154,7 +155,7 @@ public class Menu extends Composite {
     // administrationMenu.addItem(messages.title("administration_preferences"),
     // createCommand(Management.RESOLVER.getHistoryPath()));
 
-    planningMenu = new MenuBar(true);
+    planningMenu = new AcessibleMenuBar(true);
     // planning_monitoring =
     // planningMenu.addItem(messages.title("planning_monitoring"),
     // createCommand(Planning.RESOLVER.getHistoryPath()));
@@ -172,7 +173,7 @@ public class Menu extends Composite {
 
     help = new MenuItem(messages.title("help"), createCommand(Help.RESOLVER.getHistoryPath()));
 
-    userMenu = new MenuBar(true);
+    userMenu = new AcessibleMenuBar(true);
     userMenu.addItem(messages.loginProfile(), createCommand(Profile.RESOLVER.getHistoryPath()));
     userMenu.addItem(messages.loginLogout(), new ScheduledCommand() {
 
@@ -182,7 +183,7 @@ public class Menu extends Composite {
       }
     });
 
-    languagesMenu = new MenuBar(true);
+    languagesMenu = new AcessibleMenuBar(true);
     setLanguageMenu();
 
     // settingsMenu = new MenuBar(true);

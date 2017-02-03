@@ -43,8 +43,8 @@ import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.widgets.MyCellTableResources;
 import org.roda.wui.common.client.widgets.wcag.AccessibleCellTable;
 import org.roda.wui.common.client.widgets.wcag.AccessibleSimplePager;
+import org.roda.wui.common.client.widgets.wcag.AcessibleCheckboxCell;
 
-import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.core.shared.GWT;
@@ -296,7 +296,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
   private void configure(final CellTable<T> display) {
     if (selectable) {
-      selectColumn = new Column<T, Boolean>(new CheckboxCell(true, false)) {
+      selectColumn = new Column<T, Boolean>(new AcessibleCheckboxCell(true, false)) {
         @Override
         public Boolean getValue(T object) {
           return selected.contains(object);
@@ -318,7 +318,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
         }
       });
 
-      Header<Boolean> selectHeader = new Header<Boolean>(new CheckboxCell(true, true)) {
+      Header<Boolean> selectHeader = new Header<Boolean>(new AcessibleCheckboxCell(true, true)) {
 
         @Override
         public Boolean getValue() {
@@ -765,7 +765,6 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
   protected void addColumn(Column<T, ?> column, SafeHtml headerHTML, boolean nowrap, boolean alignRight) {
     SafeHtmlHeader header = new SafeHtmlHeader(headerHTML);
-
     display.addColumn(column, header);
 
     if (nowrap && alignRight) {
@@ -842,7 +841,6 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
   public void setActionable(Actionable<T> actionable) {
     this.actionable = actionable;
-
     actionsButton.setVisible(actionable != null);
   }
 
@@ -881,9 +879,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
         }
 
         actionsPopup.showRelativeTo(actionsButton, CalloutPosition.BOTTOM_RIGHT);
-
       }
-
     }
   }
 

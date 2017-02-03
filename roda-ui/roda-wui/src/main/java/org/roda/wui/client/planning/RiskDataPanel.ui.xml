@@ -24,19 +24,19 @@
 					<ui:text from='{messages.riskIdentifier}' />
 				</g:Label>
 				<g:Label ui:field="id" styleName="value" />
-				<g:TextBox ui:field="idBox" styleName="form-textbox" />
+				<g:TextBox title="id" ui:field="idBox" styleName="form-textbox" />
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.riskName}' />
 				</g:Label>
-				<g:TextBox ui:field="name" addStyleNames="form-textbox" />
+				<g:TextBox title="{messages.riskName}" ui:field="name" addStyleNames="form-textbox" />
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.riskDescription}' />
 				</g:Label>
-				<g:TextArea ui:field="description" addStyleNames="form-textbox" />
+				<g:TextArea title="{messages.riskDescription}" ui:field="description" addStyleNames="form-textbox" />
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.riskIdentifiedOn}' />
 				</g:Label>
-				<d:DateBox ui:field="identifiedOn" addStyleNames="form-textbox form-textbox-small" />
+				<d:DateBox title="{messages.riskIdentifiedOn}" ui:field="identifiedOn" addStyleNames="form-textbox form-textbox-small" />
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.riskIdentifiedBy}' />
 				</g:Label>
@@ -50,7 +50,7 @@
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.riskNotes}' />
 				</g:Label>
-				<g:TextArea ui:field="notes" addStyleNames="form-textbox" />
+				<g:TextArea title="{messages.riskNotes}" ui:field="notes" addStyleNames="form-textbox" />
 
 				<g:Label styleName="h4">
 					<ui:text from='{messages.riskPreMitigation}' />
@@ -60,14 +60,14 @@
 						<g:Label addStyleNames="form-label">
 							<ui:text from='{messages.riskPreMitigationProbability}' />
 						</g:Label>
-						<g:ListBox ui:field="preMitigationProbability"
+						<g:ListBox title="{messages.riskPreMitigationProbability}" ui:field="preMitigationProbability"
 							addStyleNames="form-selectbox form-textbox-small form-risk-mitigation-margin" />
 					</g:FlowPanel>
 					<g:FlowPanel>
 						<g:Label addStyleNames="form-label">
 							<ui:text from='{messages.riskPreMitigationImpact}' />
 						</g:Label>
-						<g:ListBox ui:field="preMitigationImpact"
+						<g:ListBox title="{messages.riskPreMitigationImpact}" ui:field="preMitigationImpact"
 							addStyleNames="form-selectbox form-textbox-small form-risk-mitigation-margin" />
 					</g:FlowPanel>
 					<g:FlowPanel>
@@ -80,7 +80,7 @@
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.riskPreMitigationNotes}' />
 				</g:Label>
-				<g:TextArea ui:field="preMitigationNotes" addStyleNames="form-textbox" />
+				<g:TextArea title="{messages.riskPreMitigationNotes}" ui:field="preMitigationNotes" addStyleNames="form-textbox" />
 
 				<g:Label styleName="h4">
 					<ui:text from='{messages.riskMitigation}' />
@@ -88,11 +88,11 @@
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.riskMitigationStrategy}' />
 				</g:Label>
-				<g:TextArea ui:field="mitigationStrategy" addStyleNames="form-textbox" />
+				<g:TextArea title="{messages.riskMitigationStrategy}" ui:field="mitigationStrategy" addStyleNames="form-textbox" />
 				<g:Label addStyleNames="form-label" ui:field="mitigationOwnerTypeKey">
 					<ui:text from='{messages.riskMitigationOwnerType}' />
 				</g:Label>
-				<g:TextBox ui:field="mitigationOwnerType" addStyleNames="form-textbox" />
+				<g:TextBox title="{messages.riskMitigationOwnerType}" ui:field="mitigationOwnerType" addStyleNames="form-textbox" />
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.riskMitigationOwner}' />
 				</g:Label>
@@ -101,12 +101,12 @@
 				<g:Label addStyleNames="form-label not-visible">
 					<ui:text from='{messages.riskMitigationRelatedEventIdentifierType}' />
 				</g:Label>
-				<g:TextBox ui:field="mitigationRelatedEventIdentifierType"
+				<g:TextBox title="{messages.riskMitigationRelatedEventIdentifierType}" ui:field="mitigationRelatedEventIdentifierType"
 					addStyleNames="form-textbox" />
 				<g:Label addStyleNames="form-label not-visible">
 					<ui:text from='{messages.riskMitigationRelatedEventIdentifierValue}' />
 				</g:Label>
-				<g:TextBox ui:field="mitigationRelatedEventIdentifierValue"
+				<g:TextBox title="{messages.riskMitigationRelatedEventIdentifierValue}" ui:field="mitigationRelatedEventIdentifierValue"
 					addStyleNames="form-textbox" />
 
 				<g:Label styleName="h4">
@@ -117,14 +117,14 @@
 						<g:Label addStyleNames="form-label">
 							<ui:text from='{messages.riskPostMitigationProbability}' />
 						</g:Label>
-						<g:ListBox ui:field="posMitigationProbability"
+						<g:ListBox title="{messages.riskPostMitigationProbability}" ui:field="posMitigationProbability"
 							addStyleNames="form-selectbox form-textbox-small form-risk-mitigation-margin" />
 					</g:FlowPanel>
 					<g:FlowPanel>
 						<g:Label addStyleNames="form-label">
 							<ui:text from='{messages.riskPostMitigationImpact}' />
 						</g:Label>
-						<g:ListBox ui:field="posMitigationImpact"
+						<g:ListBox title="{messages.riskPostMitigationImpact}" ui:field="posMitigationImpact"
 							addStyleNames="form-selectbox form-textbox-small form-risk-mitigation-margin" />
 					</g:FlowPanel>
 					<g:FlowPanel>
@@ -137,7 +137,7 @@
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.riskPostMitigationNotes}' />
 				</g:Label>
-				<g:TextArea ui:field="posMitigationNotes" addStyleNames="form-textbox" />
+				<g:TextArea title="{messages.riskPostMitigationNotes}" ui:field="posMitigationNotes" addStyleNames="form-textbox" />
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>

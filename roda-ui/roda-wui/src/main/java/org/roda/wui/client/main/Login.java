@@ -122,8 +122,8 @@ public class Login extends Composite {
 
   private Login() {
     initWidget(uiBinder.createAndBindUi(this));
-    addAttachHandler(new AttachEvent.Handler() {
 
+    addAttachHandler(new AttachEvent.Handler() {
       @Override
       public void onAttachOrDetach(AttachEvent event) {
         if (event.isAttached()) {

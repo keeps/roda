@@ -29,6 +29,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.tika.io.IOUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriverService;
@@ -61,13 +62,14 @@ public class SeleniumUtils {
     // welcome page
     saveHTML();
 
-    savePublicPages();
-    saveHelpPages();
+    // savePublicPages();
+    saveLoginPages();
+    // saveHelpPages();
     savePlanningPages();
-    saveAdminPages();
-    saveIngestPages();
-    saveSearchPages();
-    saveBrowsePages();
+    // saveAdminPages();
+    // saveIngestPages();
+    // saveSearchPages();
+    // saveBrowsePages();
 
     driver.quit();
     service.stop();
@@ -150,7 +152,7 @@ public class SeleniumUtils {
   private static void saveIngestPages()
     throws FileNotFoundException, UnsupportedEncodingException, InterruptedException {
     // pre-ingest page
-    WebElement ingestButton = driver.findElement(By.id("gwt-uid-21"));
+    WebElement ingestButton = driver.findElement(By.id("gwt-uid-23"));
     ingestButton.click();
     Thread.sleep(1000);
     WebElement preIngestPage = driver.findElement(By.id("gwt-uid-4"));
@@ -191,7 +193,7 @@ public class SeleniumUtils {
   private static void saveAdminPages()
     throws FileNotFoundException, UnsupportedEncodingException, InterruptedException {
     // administration process
-    WebElement adminButton = driver.findElement(By.id("gwt-uid-22"));
+    WebElement adminButton = driver.findElement(By.id("gwt-uid-24"));
     adminButton.click();
     Thread.sleep(1000);
     WebElement processPage = driver.findElement(By.id("gwt-uid-8"));
@@ -251,7 +253,7 @@ public class SeleniumUtils {
   private static void savePlanningPages()
     throws FileNotFoundException, UnsupportedEncodingException, InterruptedException {
     // risk register page
-    WebElement directoryButton = driver.findElement(By.id("gwt-uid-23"));
+    WebElement directoryButton = driver.findElement(By.id("gwt-uid-31"));
     directoryButton.click();
     Thread.sleep(1000);
     WebElement riskPage = driver.findElement(By.id("gwt-uid-13"));
@@ -281,7 +283,7 @@ public class SeleniumUtils {
     goBack();
 
     // format register page
-    directoryButton = driver.findElement(By.id("gwt-uid-23"));
+    directoryButton = driver.findElement(By.id("gwt-uid-31"));
     directoryButton.click();
     Thread.sleep(1000);
     WebElement formatPage = driver.findElement(By.id("gwt-uid-14"));
@@ -309,11 +311,45 @@ public class SeleniumUtils {
     newFormat.get(1).click();
     saveHTML();
     goBack();
+
+    // event register page
+    directoryButton = driver.findElement(By.id("gwt-uid-31"));
+    directoryButton.click();
+    Thread.sleep(1000);
+    WebElement eventPage = driver.findElement(By.id("gwt-uid-15"));
+    eventPage.click();
+    saveHTML();
+
+    // show format page
+    List<WebElement> tableEvents = driver.findElements(
+      By.className("org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableEvenRow"));
+    if (!tableEvents.isEmpty()) {
+      tableEvents.get(0).click();
+      saveHTML();
+      goBack();
+    }
+
+    // agent register page
+    directoryButton = driver.findElement(By.id("gwt-uid-31"));
+    directoryButton.click();
+    Thread.sleep(1000);
+    WebElement agentPage = driver.findElement(By.id("gwt-uid-16"));
+    agentPage.click();
+    saveHTML();
+
+    // show format page
+    List<WebElement> tableAgents = driver.findElements(
+      By.className("org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableEvenRow"));
+    if (!tableAgents.isEmpty()) {
+      tableAgents.get(0).click();
+      saveHTML();
+      goBack();
+    }
   }
 
   private static void saveHelpPages() throws FileNotFoundException, UnsupportedEncodingException, InterruptedException {
     // help page
-    WebElement helpMenu = driver.findElement(By.id("gwt-uid-15"));
+    WebElement helpMenu = driver.findElement(By.id("gwt-uid-17"));
     helpMenu.click();
     saveHTML();
 
@@ -331,32 +367,17 @@ public class SeleniumUtils {
     driver.get(url + "#theme/AdvancedSearch.html");
     saveHTML();
     goBack();
+
+    // build help page
+    driver.get(url + "#theme/BuildHelpPage.html");
+    saveHTML();
+    goBack();
   }
 
-  private static void savePublicPages()
+  private static void saveLoginPages()
     throws FileNotFoundException, UnsupportedEncodingException, InterruptedException {
-    // publications page
-    driver.get(url + "#theme/Publications.html");
-    saveHTML();
-    goBack();
-
-    // community help page
-    driver.get(url + "#theme/Community_help.html");
-    saveHTML();
-    goBack();
-
-    // license page
-    driver.get(url + "#theme/License.html");
-    saveHTML();
-    goBack();
-
-    // what is roda page
-    driver.get(url + "#theme/What_is_RODA.html");
-    saveHTML();
-    goBack();
-
     // login page
-    WebElement loginMenu = driver.findElement(By.id("gwt-uid-24"));
+    WebElement loginMenu = driver.findElement(By.id("gwt-uid-26"));
     loginMenu.click();
     saveHTML();
 
@@ -382,6 +403,29 @@ public class SeleniumUtils {
     saveHTML();
   }
 
+  private static void savePublicPages()
+    throws FileNotFoundException, UnsupportedEncodingException, InterruptedException {
+    // publications page
+    driver.get(url + "#theme/Publications.html");
+    saveHTML();
+    goBack();
+
+    // community help page
+    driver.get(url + "#theme/Community_help.html");
+    saveHTML();
+    goBack();
+
+    // license page
+    driver.get(url + "#theme/License.html");
+    saveHTML();
+    goBack();
+
+    // what is roda page
+    driver.get(url + "#theme/What_is_RODA.html");
+    saveHTML();
+    goBack();
+  }
+
   private static void saveHTML() throws FileNotFoundException, InterruptedException, UnsupportedEncodingException {
     saveHTML(10000);
   }
@@ -389,6 +433,14 @@ public class SeleniumUtils {
   private static void saveHTML(int sleepTime)
     throws FileNotFoundException, InterruptedException, UnsupportedEncodingException {
     Thread.sleep(sleepTime);
+
+    try {
+      WebElement cookieButton = driver.findElement(By.className("cc_btn"));
+      cookieButton.click();
+    } catch (NoSuchElementException e) {
+      // do nothing
+    }
+
     sendPostRequest(driver.getPageSource());
   }
 
@@ -412,7 +464,7 @@ public class SeleniumUtils {
 
       for (Header h : response.getAllHeaders()) {
         if ("location".equalsIgnoreCase(h.getName())) {
-          locations.put(h.getValue(), driver.getTitle());
+          locations.put(h.getValue(), driver.getCurrentUrl());
         }
       }
     } catch (IOException e) {

@@ -21,21 +21,21 @@
 		<g:FlowPanel addStyleNames="row full_width no_padding">
 			<g:FlowPanel addStyleNames="wui-data-panel">
 				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatName}' /></g:Label>
-				<g:TextBox ui:field="name" addStyleNames="form-textbox" />
+				<g:TextBox title="{messages.formatName}" ui:field="name" addStyleNames="form-textbox" />
 				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatLatestVersion}' /></g:Label>
-				<g:TextBox ui:field="latestVersion" addStyleNames="form-textbox form-textbox-small" />
+				<g:TextBox title="{messages.formatLatestVersion}" ui:field="latestVersion" addStyleNames="form-textbox form-textbox-small" />
 				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatDefinition}' /></g:Label>
-				<g:TextArea ui:field="definition" addStyleNames="form-textbox" />
+				<g:TextArea title="{messages.formatDefinition}" ui:field="definition" addStyleNames="form-textbox" />
 				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatCategory}' /></g:Label>
 				<l:IncrementalList ui:field="category"></l:IncrementalList>
 				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatPopularity}' /></g:Label>
-				<g:IntegerBox ui:field="popularity" addStyleNames="form-textbox form-textbox-small" />
+				<g:IntegerBox title="{messages.formatPopularity}" ui:field="popularity" addStyleNames="form-textbox form-textbox-small" />
 				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatDeveloper}' /></g:Label>
-				<g:TextBox ui:field="developer" addStyleNames="form-textbox" />
+				<g:TextBox title="{messages.formatDeveloper}" ui:field="developer" addStyleNames="form-textbox" />
 				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatInitialRelease}' /></g:Label>
-				<d:DateBox ui:field="initialRelease" addStyleNames="form-textbox form-textbox-small" />
+				<d:DateBox title="{messages.formatInitialRelease}" ui:field="initialRelease" addStyleNames="form-textbox form-textbox-small" />
 				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatStandard}' /></g:Label>
-				<g:TextBox ui:field="standard" addStyleNames="form-textbox" />
+				<g:TextBox title="{messages.formatStandard}" ui:field="standard" addStyleNames="form-textbox" />
 				<g:FlowPanel>
 					<g:Label addStyleNames="form-label"><ui:text from='{messages.formatOpen}' /></g:Label>
 					<g:CheckBox ui:field="isOpenFormat" addStyleNames="form-checkbox" />
@@ -43,7 +43,7 @@
 				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatWebsite}' /></g:Label>
 				<l:IncrementalList ui:field="website"></l:IncrementalList>
 				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatProvenanceInformation}' /></g:Label>
-				<g:TextArea ui:field="provenanceInformation" addStyleNames="form-textbox" />
+				<g:TextArea title="{messages.formatProvenanceInformation}" ui:field="provenanceInformation" addStyleNames="form-textbox" />
 				
 				<g:Label addStyleNames="form-label"><ui:text from='{messages.formatAlternativeDesignations}' /></g:Label>
 				<l:IncrementalList ui:field="alternatives"></l:IncrementalList>

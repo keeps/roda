@@ -15,6 +15,6 @@
 		<g:Label addStyleNames="label associative-label" ui:field="itemName"></g:Label>
 		<g:Anchor addStyleNames="pull-right toolbarLink toolbarLinkSmall" ui:field="removeDynamicTextBoxButton"></g:Anchor>
 		<g:Button addStyleNames="search-field-dialog" ui:field="dialogButton"><i class="fa fa-search"></i></g:Button>
-		<g:TextBox addStyleNames="form-textbox" ui:field="hiddenItemId"></g:TextBox>
+		<g:TextBox title="Removable text box" addStyleNames="form-textbox" ui:field="hiddenItemId"></g:TextBox>
 	</g:FlowPanel>
 </ui:UiBinder>

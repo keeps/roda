@@ -17,7 +17,7 @@
 				<g:Label styleName="h1">
 					<ui:text from='{messages.historyDescriptiveMetadataTitle}' />
 				</g:Label>
-				<g:ListBox ui:field="list" />
+				<g:ListBox title="{messages.historyDescriptiveMetadataTitle}" ui:field="list" />
 				<g:Label styleName="wui-browse-metadata-descriptive-versions-type"
 					ui:field="descriptiveMetadataType" />
 

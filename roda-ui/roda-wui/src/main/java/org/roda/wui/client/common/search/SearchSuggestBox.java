@@ -24,6 +24,7 @@ public class SearchSuggestBox<T extends IsIndexed> extends Composite {
     suggestBox = new SuggestBox(new SearchSuggestOracle<T>(classToRequest, facet, allowPartial));
     initWidget(suggestBox);
     suggestBox.addStyleName("form-textbox");
+    suggestBox.setTitle("suggest box");
     suggestBox.setAutoSelectEnabled(true);
   }
 

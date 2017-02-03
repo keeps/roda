@@ -119,6 +119,8 @@ public class RecoverLogin extends Composite {
 
   private RecoverLogin() {
     initWidget(uiBinder.createAndBindUi(this));
+    usernameOrEmail.getElement().setTitle(messages.recoverLoginUsernameOrEmail());
+
     addAttachHandler(new AttachEvent.Handler() {
 
       @Override
@@ -221,16 +223,16 @@ public class RecoverLogin extends Composite {
               messages.recoverLoginSuccessDialogMessage(), messages.recoverLoginSuccessDialogButton(),
               new AsyncCallback<Void>() {
 
-              @Override
-              public void onFailure(Throwable caught) {
-                HistoryUtils.newHistory(Login.RESOLVER);
-              }
+                @Override
+                public void onFailure(Throwable caught) {
+                  HistoryUtils.newHistory(Login.RESOLVER);
+                }
 
-              @Override
-              public void onSuccess(Void result) {
-                HistoryUtils.newHistory(Login.RESOLVER);
-              }
-            });
+                @Override
+                public void onSuccess(Void result) {
+                  HistoryUtils.newHistory(Login.RESOLVER);
+                }
+              });
           }
         });
     }

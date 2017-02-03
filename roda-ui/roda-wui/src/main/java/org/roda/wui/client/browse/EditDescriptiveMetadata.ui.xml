@@ -21,11 +21,11 @@
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.metadataType}' />
 				</g:Label>
-				<g:ListBox ui:field="type" addStyleNames="form-listbox" />
+				<g:ListBox title="{messages.metadataType}" ui:field="type" addStyleNames="form-listbox" />
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.metadataFilename}' />
 				</g:Label>
-				<g:TextBox ui:field="id" addStyleNames="form-textbox" />
+				<g:TextBox title="{messages.metadataFilename}" ui:field="id" addStyleNames="form-textbox" />
 
 				<g:Label styleName="form-label">
 					<ui:text from='{messages.editDescriptiveMetadataFormLabel}' />

@@ -21,6 +21,7 @@ import org.roda.core.data.v2.index.filter.OrFiltersParameters;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
+import org.roda.wui.common.client.widgets.wcag.WCAGUtilities;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -152,6 +153,8 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
     if (!hidePreFilters) {
       drawSearchPreFilters();
     }
+
+    WCAGUtilities.getInstance().makeAccessible(searchInputListBox.getElement());
   }
 
   private void drawSearchPreFilters() {

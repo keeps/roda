@@ -169,11 +169,13 @@ public class ActionProcess extends Composite {
     inputDateInitial.getDatePicker().setYearArrowsVisible(true);
     inputDateInitial.setFireNullValues(true);
     inputDateInitial.addValueChangeHandler(valueChangeHandler);
+    inputDateInitial.setTitle(messages.dateIntervalLabelInitial());
 
     inputDateFinal.setFormat(dateFormat);
     inputDateFinal.getDatePicker().setYearArrowsVisible(true);
     inputDateFinal.setFireNullValues(true);
     inputDateFinal.addValueChangeHandler(valueChangeHandler);
+    inputDateFinal.setTitle(messages.dateIntervalLabelFinal());
 
     jobList.getSelectionModel().addSelectionChangeHandler(new Handler() {
 

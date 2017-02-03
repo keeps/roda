@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
-	xmlns:i="urn:import:config.i18n.client">
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" 
+	xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+	xmlns:i="urn:import:config.i18n.client"
+	xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag">
 
 	<ui:style>
 	.menubar-right {
@@ -11,7 +13,7 @@
 	</ui:style>
 
 	<g:FlowPanel>
-		<g:MenuBar ui:field="rightMenu" addStyleNames="{style.menubar-right}" />
-		<g:MenuBar ui:field="leftMenu" />
+		<wcag:AcessibleMenuBar ui:field="rightMenu" addStyleNames="{style.menubar-right}" />
+		<wcag:AcessibleMenuBar ui:field="leftMenu" />
 	</g:FlowPanel>
 </ui:UiBinder>

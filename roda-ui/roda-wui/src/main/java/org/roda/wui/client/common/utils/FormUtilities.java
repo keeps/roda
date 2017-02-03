@@ -135,6 +135,7 @@ public class FormUtilities {
     }
     // Field
     final TextBox mvText = new TextBox();
+    mvText.setTitle(mvLabel.getText());
     mvText.addStyleName("form-textbox");
     if (mv.get("value") != null) {
       mvText.setText(mv.get("value"));
@@ -182,6 +183,7 @@ public class FormUtilities {
     }
     // Field
     final TextArea mvText = new TextArea();
+    mvText.setTitle(mvLabel.getText());
     mvText.addStyleName("form-textbox metadata-form-text-area");
     if (mv.get("value") != null) {
       mvText.setText(mv.get("value"));

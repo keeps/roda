@@ -12,9 +12,9 @@
 		</g:HTML>
 		<g:FlowPanel>
 			<g:Label addStyleNames="form-label"><ui:text from='{messages.loginUsername}' /></g:Label>
-			<g:TextBox ui:field="username" addStyleNames="fieldTextBox"></g:TextBox>
+			<g:TextBox title="{messages.loginUsername}" ui:field="username" addStyleNames="fieldTextBox"></g:TextBox>
 			<g:Label addStyleNames="form-label"><ui:text from='{messages.loginPassword}' /></g:Label>
-			<g:PasswordTextBox ui:field="password"
+			<g:PasswordTextBox title="{messages.loginPassword}" ui:field="password"
 				addStyleNames="fieldTextBox"></g:PasswordTextBox>
 		</g:FlowPanel>
 		<g:Label ui:field="error" addStyleNames="login-error"></g:Label>
