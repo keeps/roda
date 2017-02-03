@@ -427,8 +427,11 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   private void cleanUnfinishedJobs(IterableIndexResult<Job> unfinishedJobs) {
+    List<Job> unfinishedJobsList = new ArrayList<>();
+    unfinishedJobs.forEach(job -> unfinishedJobsList.add(job));
+
     List<String> jobsToBeDeletedFromIndex = new ArrayList<>();
-    for (Job job : unfinishedJobs) {
+    for (Job job : unfinishedJobsList) {
       try {
         Job jobToBeCleaned = model.retrieveJob(job.getId());
 
