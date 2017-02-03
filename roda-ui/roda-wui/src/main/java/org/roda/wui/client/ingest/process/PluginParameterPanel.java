@@ -115,6 +115,7 @@ public class PluginParameterPanel extends Composite {
       }
     });
 
+    severityBox.setTitle("severity box");
     layout.add(parameterName);
     layout.add(severityBox);
     addHelp();
@@ -262,6 +263,7 @@ public class PluginParameterPanel extends Composite {
       }
     });
 
+    objectBox.setTitle("object box");
     layout.add(parameterName);
     layout.add(objectBox);
     addHelp();
@@ -299,6 +301,7 @@ public class PluginParameterPanel extends Composite {
             }
 
             Label pHelp = new Label(pluginInfo.getDescription());
+            pRadio.setTitle("radio button");
 
             radioGroup.add(pRadio);
             radioGroup.add(pHelp);
@@ -336,6 +339,7 @@ public class PluginParameterPanel extends Composite {
       value = parameter.getDefaultValue();
     }
 
+    parameterBox.setTitle("parameter box");
     layout.add(parameterName);
     layout.add(parameterBox);
     addHelp();
@@ -361,6 +365,7 @@ public class PluginParameterPanel extends Composite {
       value = parameter.getDefaultValue();
     }
 
+    parameterBox.setTitle("parameter box");
     layout.add(parameterName);
     layout.add(parameterBox);
     addHelp();
@@ -383,6 +388,7 @@ public class PluginParameterPanel extends Composite {
     checkBox.setValue("true".equals(parameter.getDefaultValue()));
     value = "true".equals(parameter.getDefaultValue()) ? "true" : "false";
     checkBox.setEnabled(!parameter.isReadonly());
+    checkBox.getElement().setTitle("checkbox");
 
     layout.add(checkBox);
     addHelp();

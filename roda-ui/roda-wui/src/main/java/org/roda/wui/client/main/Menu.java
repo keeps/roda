@@ -128,29 +128,40 @@ public class Menu extends Composite {
       createCommand(Welcome.RESOLVER.getHistoryPath()));
 
     dissemination_browse = new MenuItem(messages.title("browse"), createCommand(BrowseAIP.RESOLVER.getHistoryPath()));
+    dissemination_browse.addStyleName("browse_menu_item");
     dissemination_searchBasic = new MenuItem(messages.title("search"), createCommand(Search.RESOLVER.getHistoryPath()));
+    dissemination_searchBasic.addStyleName("search_menu_item");
 
     ingestMenu = new AcessibleMenuBar(true);
     ingest_pre = ingestMenu.addItem(messages.title("ingest_preIngest"),
       createCommand(PreIngest.RESOLVER.getHistoryPath()));
+    ingest_pre.addStyleName("ingest_pre_item");
     ingest_transfer = ingestMenu.addItem(messages.title("ingest_transfer"),
       createCommand(IngestTransfer.RESOLVER.getHistoryPath()));
+    ingest_transfer.addStyleName("ingest_transfer_item");
     ingest_list = ingestMenu.addItem(messages.title("ingest_list"),
       createCommand(IngestProcess.RESOLVER.getHistoryPath()));
+    ingest_list.addStyleName("ingest_list_item");
     ingest_appraisal = ingestMenu.addItem(messages.title("ingest_appraisal"),
       createCommand(IngestAppraisal.RESOLVER.getHistoryPath()));
+    ingest_appraisal.addStyleName("ingest_appraisal_item");
 
     administrationMenu = new AcessibleMenuBar(true);
     administration_actions = administrationMenu.addItem(messages.title("administration_actions"),
       createCommand(ActionProcess.RESOLVER.getHistoryPath()));
+    administration_actions.addStyleName("administration_actions_item");
     administration_user = administrationMenu.addItem(messages.title("administration_user"),
       createCommand(MemberManagement.RESOLVER.getHistoryPath()));
+    administration_user.addStyleName("administration_user_item");
     administration_log = administrationMenu.addItem(messages.title("administration_log"),
       createCommand(UserLog.RESOLVER.getHistoryPath()));
+    administration_log.addStyleName("administration_log_item");
     administration_notifications = administrationMenu.addItem(messages.title("administration_notifications"),
       createCommand(NotificationRegister.RESOLVER.getHistoryPath()));
+    administration_notifications.addStyleName("administration_notifications_item");
     administration_statistics = administrationMenu.addItem(messages.title("administration_statistics"),
       createCommand(Statistics.RESOLVER.getHistoryPath()));
+    administration_statistics.addStyleName("administration_statistics_item");
     // administration_preferences =
     // administrationMenu.addItem(messages.title("administration_preferences"),
     // createCommand(Management.RESOLVER.getHistoryPath()));
@@ -161,27 +172,31 @@ public class Menu extends Composite {
     // createCommand(Planning.RESOLVER.getHistoryPath()));
     planning_risk = planningMenu.addItem(messages.title("planning_risk"),
       createCommand(RiskRegister.RESOLVER.getHistoryPath()));
-
+    planning_risk.addStyleName("planning_risk_item");
     planning_format = planningMenu.addItem(messages.title("planning_format"),
       createCommand(FormatRegister.RESOLVER.getHistoryPath()));
-
+    planning_format.addStyleName("planning_format_item");
     planning_event = planningMenu.addItem(messages.title("planning_event"),
       createCommand(PreservationEvents.PLANNING_RESOLVER.getHistoryPath()));
-
+    planning_event.addStyleName("planning_event_item");
     planning_agent = planningMenu.addItem(messages.title("planning_agent"),
       createCommand(PreservationAgents.RESOLVER.getHistoryPath()));
+    planning_agent.addStyleName("planning_agent_item");
 
     help = new MenuItem(messages.title("help"), createCommand(Help.RESOLVER.getHistoryPath()));
+    help.addStyleName("help_menu_item");
 
     userMenu = new AcessibleMenuBar(true);
-    userMenu.addItem(messages.loginProfile(), createCommand(Profile.RESOLVER.getHistoryPath()));
-    userMenu.addItem(messages.loginLogout(), new ScheduledCommand() {
+    MenuItem profile = userMenu.addItem(messages.loginProfile(), createCommand(Profile.RESOLVER.getHistoryPath()));
+    profile.addStyleName("profile_user_item");
+    MenuItem login = userMenu.addItem(messages.loginLogout(), new ScheduledCommand() {
 
       @Override
       public void execute() {
         UserLogin.getInstance().logout();
       }
     });
+    login.addStyleName("login_user_item");
 
     languagesMenu = new AcessibleMenuBar(true);
     setLanguageMenu();
@@ -249,7 +264,10 @@ public class Menu extends Composite {
     updateResolverSubItemVisibility(IngestTransfer.RESOLVER, ingest_transfer);
     updateResolverSubItemVisibility(IngestProcess.RESOLVER, ingest_list);
     updateResolverSubItemVisibility(IngestAppraisal.RESOLVER, ingest_appraisal);
-    updateResolverTopItemVisibility(Ingest.RESOLVER, new MenuItem(messages.title("ingest"), ingestMenu), 3);
+
+    MenuItem ingestItem = new MenuItem(messages.title("ingest"), ingestMenu);
+    ingestItem.addStyleName("ingest_menu_item");
+    updateResolverTopItemVisibility(Ingest.RESOLVER, ingestItem, 3);
 
     // Administration
     updateResolverSubItemVisibility(ActionProcess.RESOLVER, administration_actions);
@@ -259,8 +277,9 @@ public class Menu extends Composite {
     updateResolverSubItemVisibility(Statistics.RESOLVER, administration_statistics);
     // updateResolverSubItemVisibility(Management.RESOLVER,
     // administration_preferences);
-    updateResolverTopItemVisibility(Management.RESOLVER,
-      new MenuItem(messages.title("administration"), administrationMenu), 4);
+    MenuItem adminItem = new MenuItem(messages.title("administration"), administrationMenu);
+    adminItem.addStyleName("administration_menu_item");
+    updateResolverTopItemVisibility(Management.RESOLVER, adminItem, 4);
 
     // Planning
     // updateResolverSubItemVisibility(Planning.RESOLVER, planning_monitoring);
@@ -268,21 +287,30 @@ public class Menu extends Composite {
     updateResolverSubItemVisibility(FormatRegister.RESOLVER, planning_format);
     updateResolverSubItemVisibility(PreservationEvents.PLANNING_RESOLVER, planning_event);
     updateResolverSubItemVisibility(PreservationAgents.RESOLVER, planning_agent);
-    updateResolverTopItemVisibility(Planning.RESOLVER, new MenuItem(messages.title("planning"), planningMenu), 5);
+    MenuItem planningItem = new MenuItem(messages.title("planning"), planningMenu);
+    planningItem.addStyleName("planning_menu_item");
+    updateResolverTopItemVisibility(Planning.RESOLVER, planningItem, 5);
 
     // Help
     updateResolverTopItemVisibility(Help.RESOLVER, help, 6);
 
     // User
     if (user.isGuest()) {
-      rightMenu
-        .addItem(customMenuItem("fa fa-user", messages.loginLogin(), "menu-item-label", null, createLoginCommand()));
-      rightMenu.addItem(customMenuItem("fa fa-user-plus", messages.loginRegister(), "menu-item-label menu-register",
-        null, createCommand(Register.RESOLVER.getHistoryPath())));
+      MenuItem loginItem = customMenuItem("fa fa-user", messages.loginLogin(), "menu-item-label", null,
+        createLoginCommand());
+      loginItem.addStyleName("user_menu_item");
+      rightMenu.addItem(loginItem);
+
+      MenuItem registerItem = customMenuItem("fa fa-user-plus", messages.loginRegister(),
+        "menu-item-label menu-register", null, createCommand(Register.RESOLVER.getHistoryPath()));
+      registerItem.addStyleName("user_menu_item_register");
+      rightMenu.addItem(registerItem);
     } else {
       // rightMenu.addItem(customMenuItem("fa fa-cog",
       // messages.title("settings"), "menu-item-label", settingsMenu, null));
-      rightMenu.addItem(customMenuItem("fa fa-user", user.getName(), "menu-item-label", userMenu, null));
+      MenuItem userItem = customMenuItem("fa fa-user", user.getName(), "menu-item-label", userMenu, null);
+      userItem.addStyleName("user_menu_item");
+      rightMenu.addItem(userItem);
     }
 
     MenuItem languageMenuItem = customMenuItem("fa fa-globe", selectedLanguage, "menu-item-label", languagesMenu, null);

@@ -62,14 +62,14 @@ public class SeleniumUtils {
     // welcome page
     saveHTML();
 
-    // savePublicPages();
+    savePublicPages();
     saveLoginPages();
-    // saveHelpPages();
+    saveHelpPages();
     savePlanningPages();
-    // saveAdminPages();
-    // saveIngestPages();
-    // saveSearchPages();
-    // saveBrowsePages();
+    saveAdminPages();
+    saveIngestPages();
+    saveSearchPages();
+    saveBrowsePages();
 
     driver.quit();
     service.stop();
@@ -84,300 +84,310 @@ public class SeleniumUtils {
     }
   }
 
-  private static void saveBrowsePages()
-    throws FileNotFoundException, UnsupportedEncodingException, InterruptedException {
-    // browse page
-    WebElement searchButton = driver.findElement(By.id("gwt-uid-2"));
-    searchButton.click();
-    saveHTML();
-
-    // show browse page
-    List<WebElement> aipList = driver.findElements(
-      By.className("org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableEvenRow"));
-    aipList.get(0).click();
-    saveHTML();
-
-    // permissions page
-    List<WebElement> permissionPage = driver.findElements(By.className("btn-edit"));
-    permissionPage.get(1).click();
-    saveHTML();
-    goBack();
-
-    // events page
-    List<WebElement> eventsPage = driver.findElements(By.className("btn-clock"));
-    eventsPage.get(0).click();
-    saveHTML();
-    goBack();
-
-    // create metadata page
-    List<WebElement> createMetadataPage = driver.findElements(By.className("btn-plus"));
-    createMetadataPage.get(2).click();
-    saveHTML();
-    goBack();
-    goBack();
-
-    // edit metadata page
-    WebElement editMetadataPage = driver.findElement(By.className("fa-edit"));
-    editMetadataPage.click();
-    saveHTML();
-    goBack();
-
-    // new process page
-    List<WebElement> newProcessPage = driver.findElements(By.className("btn-play"));
-    newProcessPage.get(1).click();
-    saveHTML();
-
-    // risk association plugin new process page
-    WebElement riskAssociationButton = driver
-      .findElement(By.xpath("//option[@value='org.roda.core.plugins.plugins.risks.RiskAssociationPlugin']"));
-    riskAssociationButton.click();
-    saveHTML();
-
-    goBack();
-  }
-
-  private static void saveSearchPages()
-    throws FileNotFoundException, UnsupportedEncodingException, InterruptedException {
-    // search page
-    WebElement searchButton = driver.findElement(By.id("gwt-uid-3"));
-    searchButton.click();
-    saveHTML();
-
-    // advanced search page
-    WebElement loadButton = driver.findElement(By.className("fa-angle-down"));
-    loadButton.click();
-    saveHTML();
-  }
-
-  private static void saveIngestPages()
-    throws FileNotFoundException, UnsupportedEncodingException, InterruptedException {
-    // pre-ingest page
-    WebElement ingestButton = driver.findElement(By.id("gwt-uid-23"));
-    ingestButton.click();
-    Thread.sleep(1000);
-    WebElement preIngestPage = driver.findElement(By.id("gwt-uid-4"));
-    preIngestPage.click();
-    saveHTML();
-
-    // transfer page
-    ingestButton = driver.findElement(By.id("gwt-uid-21"));
-    ingestButton.click();
-    Thread.sleep(1000);
-    WebElement transferPage = driver.findElement(By.id("gwt-uid-5"));
-    transferPage.click();
-    saveHTML();
-
-    // load page
-    WebElement loadButton = driver.findElement(By.className("btn-upload"));
-    loadButton.click();
-    saveHTML();
-    goBack();
-
-    // ingest state page
-    ingestButton = driver.findElement(By.id("gwt-uid-21"));
-    ingestButton.click();
-    Thread.sleep(1000);
-    WebElement statePage = driver.findElement(By.id("gwt-uid-6"));
-    statePage.click();
-    saveHTML();
-
-    // apprasal page
-    ingestButton = driver.findElement(By.id("gwt-uid-21"));
-    ingestButton.click();
-    Thread.sleep(1000);
-    WebElement apprasalPage = driver.findElement(By.id("gwt-uid-7"));
-    apprasalPage.click();
-    saveHTML();
-  }
-
-  private static void saveAdminPages()
-    throws FileNotFoundException, UnsupportedEncodingException, InterruptedException {
-    // administration process
-    WebElement adminButton = driver.findElement(By.id("gwt-uid-24"));
-    adminButton.click();
-    Thread.sleep(1000);
-    WebElement processPage = driver.findElement(By.id("gwt-uid-8"));
-    processPage.click();
-    saveHTML();
-
-    // new process page
-    WebElement newProcess = driver.findElement(By.className("btn-plus"));
-    newProcess.click();
-    saveHTML();
-
-    // risk association plugin new process page
-    WebElement riskAssociationButton = driver
-      .findElement(By.xpath("//option[@value='org.roda.core.plugins.plugins.risks.RiskAssociationPlugin']"));
-    riskAssociationButton.click();
-    saveHTML();
-
-    goBack();
-
-    // administration users
-    adminButton = driver.findElement(By.id("gwt-uid-22"));
-    adminButton.click();
-    Thread.sleep(1000);
-    WebElement usersPage = driver.findElement(By.id("gwt-uid-9"));
-    usersPage.click();
-    saveHTML();
-
-    // new user page
-    List<WebElement> newUser = driver.findElements(By.className("btn-plus"));
-    newUser.get(1).click();
-    saveHTML();
-    goBack();
-
-    // new group page
-    newUser = driver.findElements(By.className("btn-plus"));
-    newUser.get(2).click();
-    saveHTML();
-    goBack();
-
-    // administration activity
-    adminButton = driver.findElement(By.id("gwt-uid-22"));
-    adminButton.click();
-    Thread.sleep(1000);
-    WebElement activityPage = driver.findElement(By.id("gwt-uid-10"));
-    activityPage.click();
-    saveHTML();
-
-    // administration statistics
-    adminButton = driver.findElement(By.id("gwt-uid-22"));
-    adminButton.click();
-    Thread.sleep(1000);
-    WebElement statisticsPage = driver.findElement(By.id("gwt-uid-12"));
-    statisticsPage.click();
-    saveHTML();
-  }
-
-  private static void savePlanningPages()
-    throws FileNotFoundException, UnsupportedEncodingException, InterruptedException {
-    // risk register page
-    WebElement directoryButton = driver.findElement(By.id("gwt-uid-31"));
-    directoryButton.click();
-    Thread.sleep(1000);
-    WebElement riskPage = driver.findElement(By.id("gwt-uid-13"));
-    riskPage.click();
-    saveHTML();
-
-    // show risk page
-    List<WebElement> tableRisks = driver.findElements(
-      By.className("org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableEvenRow"));
-    if (!tableRisks.isEmpty()) {
-      tableRisks.get(0).click();
+  private static void saveBrowsePages() {
+    try {
+      // browse page
+      WebElement searchButton = driver.findElement(By.className("browse_menu_item"));
+      searchButton.click();
       saveHTML();
 
-      // edit risk page
-      WebElement editRisk = driver.findElement(By.className("btn-edit"));
-      editRisk.click();
+      // show browse page
+      List<WebElement> aipList = driver.findElements(
+        By.className("org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableEvenRow"));
+      aipList.get(0).click();
+      saveHTML();
+
+      // permissions page
+      List<WebElement> permissionPage = driver.findElements(By.className("btn-edit"));
+      permissionPage.get(1).click();
+      saveHTML();
+      goBack();
+
+      // create metadata page
+      List<WebElement> createMetadataPage = driver.findElements(By.className("btn-plus"));
+      createMetadataPage.get(2).click();
+      saveHTML();
+      goBack();
+      goBack();
+
+      // edit metadata page
+      WebElement editMetadataPage = driver.findElement(By.className("fa-edit"));
+      editMetadataPage.click();
       saveHTML();
       goBack();
 
       goBack();
-    }
-
-    // new risk page
-    List<WebElement> newRisk = driver.findElements(By.className("btn-plus"));
-    newRisk.get(1).click();
-    saveHTML();
-    goBack();
-
-    // format register page
-    directoryButton = driver.findElement(By.id("gwt-uid-31"));
-    directoryButton.click();
-    Thread.sleep(1000);
-    WebElement formatPage = driver.findElement(By.id("gwt-uid-14"));
-    formatPage.click();
-    saveHTML();
-
-    // show format page
-    List<WebElement> tableFormats = driver.findElements(
-      By.className("org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableEvenRow"));
-    if (!tableFormats.isEmpty()) {
-      tableFormats.get(0).click();
-      saveHTML();
-
-      // edit format page
-      WebElement editFormat = driver.findElement(By.className("btn-edit"));
-      editFormat.click();
-      saveHTML();
-      goBack();
-
-      goBack();
-    }
-
-    // new format page
-    List<WebElement> newFormat = driver.findElements(By.className("btn-plus"));
-    newFormat.get(1).click();
-    saveHTML();
-    goBack();
-
-    // event register page
-    directoryButton = driver.findElement(By.id("gwt-uid-31"));
-    directoryButton.click();
-    Thread.sleep(1000);
-    WebElement eventPage = driver.findElement(By.id("gwt-uid-15"));
-    eventPage.click();
-    saveHTML();
-
-    // show format page
-    List<WebElement> tableEvents = driver.findElements(
-      By.className("org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableEvenRow"));
-    if (!tableEvents.isEmpty()) {
-      tableEvents.get(0).click();
-      saveHTML();
-      goBack();
-    }
-
-    // agent register page
-    directoryButton = driver.findElement(By.id("gwt-uid-31"));
-    directoryButton.click();
-    Thread.sleep(1000);
-    WebElement agentPage = driver.findElement(By.id("gwt-uid-16"));
-    agentPage.click();
-    saveHTML();
-
-    // show format page
-    List<WebElement> tableAgents = driver.findElements(
-      By.className("org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableEvenRow"));
-    if (!tableAgents.isEmpty()) {
-      tableAgents.get(0).click();
-      saveHTML();
-      goBack();
+    } catch (FileNotFoundException | UnsupportedEncodingException | InterruptedException e) {
+      System.err.println("Error running Selenium on browse pages");
     }
   }
 
-  private static void saveHelpPages() throws FileNotFoundException, UnsupportedEncodingException, InterruptedException {
-    // help page
-    WebElement helpMenu = driver.findElement(By.id("gwt-uid-17"));
-    helpMenu.click();
-    saveHTML();
+  private static void saveSearchPages() {
+    try {
+      // search page
+      WebElement searchButton = driver.findElement(By.className("search_menu_item"));
+      searchButton.click();
+      saveHTML();
 
-    // installing descriptive metadata formats help page
-    driver.get(url + "#theme/InstallingNewDescriptiveMetadataFormats.html");
-    saveHTML();
-    goBack();
+      // advanced search page
+      WebElement loadButton = driver.findElement(By.className("fa-angle-down"));
+      loadButton.click();
+      saveHTML();
+    } catch (FileNotFoundException | UnsupportedEncodingException | InterruptedException e) {
+      System.err.println("Error running Selenium on search pages");
+    }
+  }
 
-    // statistics help page
-    driver.get(url + "#theme/HelpStatistics.html");
-    saveHTML();
-    goBack();
+  private static void saveIngestPages() {
+    try {
+      // pre-ingest page
+      WebElement ingestButton = driver.findElement(By.className("ingest_menu_item"));
+      ingestButton.click();
+      Thread.sleep(1000);
+      WebElement preIngestPage = driver.findElement(By.className("ingest_pre_item"));
+      preIngestPage.click();
+      saveHTML();
 
-    // advanced search help page
-    driver.get(url + "#theme/AdvancedSearch.html");
-    saveHTML();
-    goBack();
+      // transfer page
+      ingestButton = driver.findElement(By.className("ingest_menu_item"));
+      ingestButton.click();
+      Thread.sleep(1000);
+      WebElement transferPage = driver.findElement(By.className("ingest_transfer_item"));
+      transferPage.click();
+      saveHTML();
 
-    // build help page
-    driver.get(url + "#theme/BuildHelpPage.html");
-    saveHTML();
-    goBack();
+      // load page
+      WebElement loadButton = driver.findElement(By.className("btn-upload"));
+      loadButton.click();
+      saveHTML();
+      goBack();
+
+      // ingest state page
+      ingestButton = driver.findElement(By.className("ingest_menu_item"));
+      ingestButton.click();
+      Thread.sleep(1000);
+      WebElement statePage = driver.findElement(By.className("ingest_list_item"));
+      statePage.click();
+      saveHTML();
+
+      // apprasal page
+      ingestButton = driver.findElement(By.className("ingest_menu_item"));
+      ingestButton.click();
+      Thread.sleep(1000);
+      WebElement apprasalPage = driver.findElement(By.className("ingest_appraisal_item"));
+      apprasalPage.click();
+      saveHTML();
+    } catch (FileNotFoundException | UnsupportedEncodingException | InterruptedException e) {
+      System.err.println("Error running Selenium on ingest pages");
+    }
+  }
+
+  private static void saveAdminPages() {
+    try {
+      // administration process
+      WebElement adminButton = driver.findElement(By.className("administration_menu_item"));
+      adminButton.click();
+      Thread.sleep(1000);
+      WebElement processPage = driver.findElement(By.className("administration_actions_item"));
+      processPage.click();
+      saveHTML();
+
+      // new process page
+      WebElement newProcess = driver.findElement(By.className("btn-plus"));
+      newProcess.click();
+      saveHTML();
+
+      // risk association plugin new process page
+      // WebElement riskAssociationButton = driver
+      // .findElement(By.xpath("//data-id[@value='org.roda.core.plugins.plugins.risks.RiskAssociationPlugin']"));
+      // riskAssociationButton.click();
+      // saveHTML();
+
+      goBack();
+
+      // administration users
+      adminButton = driver.findElement(By.className("administration_menu_item"));
+      adminButton.click();
+      Thread.sleep(1000);
+      WebElement usersPage = driver.findElement(By.className("administration_user_item"));
+      usersPage.click();
+      saveHTML();
+
+      // new user page
+      List<WebElement> newUser = driver.findElements(By.className("btn-plus"));
+      newUser.get(1).click();
+      saveHTML();
+      goBack();
+
+      // new group page
+      newUser = driver.findElements(By.className("btn-plus"));
+      newUser.get(2).click();
+      saveHTML();
+      goBack();
+
+      // administration activity
+      adminButton = driver.findElement(By.className("administration_menu_item"));
+      adminButton.click();
+      Thread.sleep(1000);
+      WebElement activityPage = driver.findElement(By.className("administration_log_item"));
+      activityPage.click();
+      saveHTML();
+
+      // administration notifications
+      adminButton = driver.findElement(By.className("administration_menu_item"));
+      adminButton.click();
+      Thread.sleep(1000);
+      WebElement notificationsPage = driver.findElement(By.className("administration_notifications_item"));
+      notificationsPage.click();
+      saveHTML();
+
+      // administration statistics
+      adminButton = driver.findElement(By.className("administration_menu_item"));
+      adminButton.click();
+      Thread.sleep(1000);
+      WebElement statisticsPage = driver.findElement(By.className("administration_statistics_item"));
+      statisticsPage.click();
+      saveHTML();
+    } catch (FileNotFoundException | UnsupportedEncodingException | InterruptedException e) {
+      System.err.println("Error running Selenium on admin pages");
+    }
+  }
+
+  private static void savePlanningPages() {
+    try {
+      // risk register page
+      WebElement directoryButton = driver.findElement(By.className("planning_menu_item"));
+      directoryButton.click();
+      Thread.sleep(1000);
+      WebElement riskPage = driver.findElement(By.className("planning_risk_item"));
+      riskPage.click();
+      saveHTML();
+
+      // show risk page
+      List<WebElement> tableRisks = driver.findElements(
+        By.className("org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableEvenRow"));
+      if (!tableRisks.isEmpty()) {
+        tableRisks.get(0).click();
+        saveHTML();
+
+        // edit risk page
+        WebElement editRisk = driver.findElement(By.className("btn-edit"));
+        editRisk.click();
+        saveHTML();
+        goBack();
+
+        goBack();
+      }
+
+      // new risk page
+      List<WebElement> newRisk = driver.findElements(By.className("btn-plus"));
+      newRisk.get(1).click();
+      saveHTML();
+      goBack();
+
+      // format register page
+      directoryButton = driver.findElement(By.className("planning_menu_item"));
+      directoryButton.click();
+      Thread.sleep(1000);
+      WebElement formatPage = driver.findElement(By.className("planning_format_item"));
+      formatPage.click();
+      saveHTML();
+
+      // show format page
+      List<WebElement> tableFormats = driver.findElements(
+        By.className("org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableEvenRow"));
+      if (!tableFormats.isEmpty()) {
+        tableFormats.get(0).click();
+        saveHTML();
+
+        // edit format page
+        WebElement editFormat = driver.findElement(By.className("btn-edit"));
+        editFormat.click();
+        saveHTML();
+        goBack();
+
+        goBack();
+      }
+
+      // new format page
+      List<WebElement> newFormat = driver.findElements(By.className("btn-plus"));
+      newFormat.get(1).click();
+      saveHTML();
+      goBack();
+
+      // event register page
+      directoryButton = driver.findElement(By.className("planning_menu_item"));
+      directoryButton.click();
+      Thread.sleep(1000);
+      WebElement eventPage = driver.findElement(By.className("planning_event_item"));
+      eventPage.click();
+      saveHTML();
+
+      // show format page
+      List<WebElement> tableEvents = driver.findElements(
+        By.className("org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableEvenRow"));
+      if (!tableEvents.isEmpty()) {
+        tableEvents.get(0).click();
+        saveHTML();
+        goBack();
+      }
+
+      // agent register page
+      directoryButton = driver.findElement(By.className("planning_menu_item"));
+      directoryButton.click();
+      Thread.sleep(1000);
+      WebElement agentPage = driver.findElement(By.className("planning_agent_item"));
+      agentPage.click();
+      saveHTML();
+
+      // show format page
+      List<WebElement> tableAgents = driver.findElements(
+        By.className("org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableEvenRow"));
+      if (!tableAgents.isEmpty()) {
+        tableAgents.get(0).click();
+        saveHTML();
+        goBack();
+      }
+    } catch (FileNotFoundException | UnsupportedEncodingException | InterruptedException e) {
+      System.err.println("Error running Selenium on planning pages");
+    }
+  }
+
+  private static void saveHelpPages() {
+    try {
+      // help page
+      WebElement helpMenu = driver.findElement(By.className("help_menu_item"));
+      helpMenu.click();
+      saveHTML();
+
+      // installing descriptive metadata formats help page
+      driver.get(url + "#theme/InstallingNewDescriptiveMetadataFormats.html");
+      saveHTML();
+      goBack();
+
+      // statistics help page
+      driver.get(url + "#theme/HelpStatistics.html");
+      saveHTML();
+      goBack();
+
+      // advanced search help page
+      driver.get(url + "#theme/AdvancedSearch.html");
+      saveHTML();
+      goBack();
+
+      // build help page
+      driver.get(url + "#theme/BuildHelpPage.html");
+      saveHTML();
+      goBack();
+    } catch (FileNotFoundException | UnsupportedEncodingException | InterruptedException e) {
+      System.err.println("Error running Selenium on help pages");
+    }
   }
 
   private static void saveLoginPages()
     throws FileNotFoundException, UnsupportedEncodingException, InterruptedException {
     // login page
-    WebElement loginMenu = driver.findElement(By.id("gwt-uid-26"));
+    WebElement loginMenu = driver.findElement(By.className("user_menu_item"));
     loginMenu.click();
     saveHTML();
 

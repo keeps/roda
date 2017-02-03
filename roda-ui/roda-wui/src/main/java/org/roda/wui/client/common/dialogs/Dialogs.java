@@ -137,6 +137,7 @@ public class Dialogs {
     }
 
     final TextBox inputBox = new TextBox();
+    inputBox.setTitle("input box");
 
     if (placeHolder != null) {
       inputBox.getElement().setPropertyString("placeholder", placeHolder);

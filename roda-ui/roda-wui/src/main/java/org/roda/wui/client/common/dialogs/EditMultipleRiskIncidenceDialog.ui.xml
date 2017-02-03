@@ -25,23 +25,23 @@
 				<g:FlowPanel addStyleNames="page-description" ui:field="titlePanel"></g:FlowPanel>
 				<g:FlowPanel>
 					<g:Label addStyleNames="form-label"><ui:text from='{messages.riskIncidenceStatus}' /></g:Label>
-					<g:ListBox ui:field="status" addStyleNames="form-selectbox form-textbox-small form-risk-mitigation-margin" />
+					<g:ListBox title="{messages.riskIncidenceStatus}" ui:field="status" addStyleNames="form-selectbox form-textbox-small form-risk-mitigation-margin" />
 				</g:FlowPanel>
 				<g:FlowPanel>
 					<g:Label addStyleNames="form-label"><ui:text from='{messages.riskIncidenceSeverity}' /></g:Label>
-					<g:ListBox ui:field="severity" addStyleNames="form-selectbox form-textbox-small form-risk-mitigation-margin" />
+					<g:ListBox title="{messages.riskIncidenceSeverity}" ui:field="severity" addStyleNames="form-selectbox form-textbox-small form-risk-mitigation-margin" />
 				</g:FlowPanel>
 				<g:FlowPanel>
 					<g:Label addStyleNames="form-label"><ui:text from='{messages.riskIncidenceMitigatedOn}' /></g:Label>
-					<d:DateBox ui:field="mitigatedOn" addStyleNames="form-textbox form-textbox-small" />
+					<d:DateBox title="{messages.riskIncidenceMitigatedOn}" ui:field="mitigatedOn" addStyleNames="form-textbox form-textbox-small" />
 				</g:FlowPanel>		
 				<g:FlowPanel>
 					<g:Label addStyleNames="form-label"><ui:text from='{messages.riskIncidenceMitigatedBy}' /></g:Label>
-					<g:TextBox ui:field="mitigatedBy" addStyleNames="form-textbox" />
+					<g:TextBox title="{messages.riskIncidenceMitigatedBy}" ui:field="mitigatedBy" addStyleNames="form-textbox" />
 				</g:FlowPanel>		
 				<g:FlowPanel>
 					<g:Label addStyleNames="form-label"><ui:text from='{messages.riskIncidenceMitigatedDescription}' /></g:Label>
-					<g:TextArea ui:field="mitigatedDescription" addStyleNames="form-textbox" />
+					<g:TextArea title="{messages.riskIncidenceMitigatedDescription}" ui:field="mitigatedDescription" addStyleNames="form-textbox" />
 				</g:FlowPanel>	
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="wui-dialog-layout-footer">
