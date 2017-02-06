@@ -222,6 +222,14 @@ public class RodaUtils {
 
     });
 
+  private static LoadingCache<String, XsltExecutable> EVENT_CACHE = CacheBuilder.newBuilder()
+    .expireAfterWrite(1, TimeUnit.MINUTES).build(new CacheLoader<String, XsltExecutable>() {
+      @Override
+      public XsltExecutable load(String path) throws Exception {
+        return createEventTransformer(path);
+      }
+    });
+
   public static Reader applyMetadataStylesheet(Binary binary, String basePath, String metadataType,
     String metadataVersion, Map<String, String> parameters) throws GenericException {
     Reader descMetadataReader = null;
@@ -256,6 +264,45 @@ public class RodaUtils {
       LOGGER.error(e.getMessage(), e);
       throw new GenericException("Could not process descriptive metadata binary " + binary.getStoragePath()
         + " metadata type " + metadataType + " and version " + metadataVersion, e);
+    } finally {
+      IOUtils.closeQuietly(descMetadataReader);
+    }
+  }
+
+  public static Reader applyEventStylesheet(Binary binary, boolean onlyDetails, Map<String, String> translations,
+    String path) throws GenericException {
+    Reader descMetadataReader = null;
+
+    try {
+      descMetadataReader = new InputStreamReader(new BOMInputStream(binary.getContent().createInputStream()));
+
+      XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+      xmlReader.setEntityResolver(new RodaEntityResolver());
+      InputSource source = new InputSource(descMetadataReader);
+      Source text = new SAXSource(xmlReader, source);
+
+      XsltExecutable xsltExecutable = EVENT_CACHE.get(path);
+
+      XsltTransformer transformer = xsltExecutable.load();
+      CharArrayWriter transformerResult = new CharArrayWriter();
+
+      transformer.setSource(text);
+      transformer.setDestination(PROCESSOR.newSerializer(transformerResult));
+
+      // send param to filter stylesheet work
+      transformer.setParameter(new QName("onlyDetails"), new XdmAtomicValue(Boolean.toString(onlyDetails)));
+
+      for (Entry<String, String> parameter : translations.entrySet()) {
+        QName qName = new QName(parameter.getKey());
+        XdmValue xdmValue = new XdmAtomicValue(parameter.getValue());
+        transformer.setParameter(qName, xdmValue);
+      }
+
+      transformer.transform();
+      return new CharArrayReader(transformerResult.toCharArray());
+    } catch (IOException | SAXException | ExecutionException | SaxonApiException e) {
+      LOGGER.error(e.getMessage(), e);
+      throw new GenericException("Could not process event binary " + binary.getStoragePath(), e);
     } finally {
       IOUtils.closeQuietly(descMetadataReader);
     }
@@ -296,6 +343,21 @@ public class RodaUtils {
       // compiler.setSchemaAware(false);
       return compiler.compile(new StreamSource(transformerStream));
 
+    } finally {
+      IOUtils.closeQuietly(transformerStream);
+    }
+  }
+
+  protected static XsltExecutable createEventTransformer(String path) throws SaxonApiException, GenericException {
+    InputStream transformerStream = RodaCoreFactory.getConfigurationFileAsStream(path);
+    try {
+      if (transformerStream == null) {
+        throw new GenericException("Could not find stylesheet nor fallback at path=" + path);
+      }
+
+      XsltCompiler compiler = PROCESSOR.newXsltCompiler();
+      compiler.setURIResolver(new RodaURIFileResolver());
+      return compiler.compile(new StreamSource(transformerStream));
     } finally {
       IOUtils.closeQuietly(transformerStream);
     }

@@ -718,6 +718,19 @@ public class BrowserHelper {
     return null;
   }
 
+  protected static void validateGetPreservationMetadataParams(String acceptFormat) throws RequestNotValidException {
+    if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)
+      && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML.equals(acceptFormat)
+      && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
+      && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
+      throw new RequestNotValidException(
+        "Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT + "' value. Expected values: "
+          + Arrays.asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML,
+            RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML, RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON,
+            RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN));
+    }
+  }
+
   protected static void validateGetAIPDescriptiveMetadataParams(String acceptFormat) throws RequestNotValidException {
     if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)
       && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML.equals(acceptFormat)
@@ -1305,6 +1318,84 @@ public class BrowserHelper {
     String representationId, String id, boolean notify)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     RodaCoreFactory.getModelService().deletePreservationMetadata(type, aipId, representationId, id, notify);
+  }
+
+  public static EntityResponse retrievePreservationMetadataEvent(String id, String aipId, String representationUUID,
+    String fileUUID, boolean onlyDetails, String acceptFormat, String language)
+    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+    ModelService model = RodaCoreFactory.getModelService();
+    IndexService index = RodaCoreFactory.getIndexService();
+    String representationId = null;
+    List<String> filePath = null;
+    String fileId = null;
+
+    if (fileUUID != null) {
+      IndexedFile file = index.retrieve(IndexedFile.class, fileUUID);
+      representationId = file.getRepresentationId();
+      filePath = file.getPath();
+      fileId = file.getId();
+    } else if (representationUUID != null) {
+      IndexedRepresentation rep = index.retrieve(IndexedRepresentation.class, representationUUID);
+      representationId = rep.getId();
+    }
+
+    if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
+      final Binary binary = model.retrievePreservationEvent(aipId, representationId, id);
+      final String mediaType = RodaConstants.MEDIA_TYPE_TEXT_XML;
+
+      final ConsumesOutputStream stream = new ConsumesOutputStream() {
+
+        @Override
+        public String getMediaType() {
+          return mediaType;
+        }
+
+        @Override
+        public String getFileName() {
+          return binary.getStoragePath().getName();
+        }
+
+        @Override
+        public void consumeOutputStream(OutputStream out) throws IOException {
+          IOUtils.copy(binary.getContent().createInputStream(), out);
+        }
+      };
+
+      return new StreamResponse(stream.getFileName(), mediaType, stream);
+    } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
+      || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
+      PreservationMetadata pm = model.retrievePreservationMetadata(aipId, representationId, filePath, fileId,
+        PreservationMetadataType.EVENT);
+      return new ObjectResponse<PreservationMetadata>(acceptFormat, pm);
+    } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
+      final Binary binary = model.retrievePreservationEvent(aipId, representationId, id);
+      final String filename = binary.getStoragePath().getName() + HTML_EXT;
+      final String mediaType = RodaConstants.MEDIA_TYPE_TEXT_HTML;
+      final String htmlEvent = HTMLUtils.preservationMetadataEventToHtml(binary, onlyDetails,
+        ServerTools.parseLocale(language));
+      final ConsumesOutputStream stream = new ConsumesOutputStream() {
+
+        @Override
+        public String getMediaType() {
+          return mediaType;
+        }
+
+        @Override
+        public String getFileName() {
+          return filename;
+        }
+
+        @Override
+        public void consumeOutputStream(OutputStream out) throws IOException {
+          PrintStream printStream = new PrintStream(out);
+          printStream.print(htmlEvent);
+          printStream.close();
+        }
+      };
+      return new StreamResponse(filename, mediaType, stream);
+    } else {
+      throw new GenericException("Unsupported accept format: " + acceptFormat);
+    }
   }
 
   public static EntityResponse listOtherMetadata(String aipId, String representationId, List<String> filePath,

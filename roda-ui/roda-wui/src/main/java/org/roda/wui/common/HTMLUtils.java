@@ -50,6 +50,21 @@ public final class HTMLUtils {
     }
   }
 
+  public static String preservationMetadataEventToHtml(Binary binary, boolean onlyDetails, final Locale locale)
+    throws GenericException {
+
+    Map<String, String> translations = getEventTranslations(locale);
+
+    Reader reader = RodaUtils.applyEventStylesheet(binary, onlyDetails, translations,
+      RodaConstants.CROSSWALKS_DISSEMINATION_HTML_EVENT_PATH);
+
+    try {
+      return CharStreams.toString(reader);
+    } catch (IOException e) {
+      throw new GenericException("Could not transform PREMIS to HTML", e);
+    }
+  }
+
   public static Map<String, String> getTranslations(String descriptiveMetadataType, String descriptiveMetadataVersion,
     final Locale locale) {
     Map<String, String> translations = null;
@@ -74,6 +89,12 @@ public final class HTMLUtils {
       translations = new HashMap<>();
     }
     return translations;
+  }
+
+  public static Map<String, String> getEventTranslations(final Locale locale) {
+    Messages messages = RodaCoreFactory.getI18NMessages(locale);
+    return messages.getTranslations(RodaConstants.I18N_CROSSWALKS_DISSEMINATION_HTML_PREFIX + "event", String.class,
+      true);
   }
 
 }

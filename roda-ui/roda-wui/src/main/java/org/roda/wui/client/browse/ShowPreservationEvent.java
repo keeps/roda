@@ -37,11 +37,23 @@ import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.RestErrorOverlayType;
+import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.RequestException;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -158,14 +170,9 @@ public class ShowPreservationEvent extends Composite {
 
   @UiField
   Label outcomeDetailHeader;
+
   @UiField
-  Label eventOutcomeDetailNoteLabel;
-  @UiField
-  HTML eventOutcomeDetailNoteValue;
-  @UiField
-  Label eventOutcomeDetailExtensionLabel;
-  @UiField
-  HTML eventOutcomeDetailExtensionValue;
+  HTML eventOutcomeDetails;
 
   @UiField
   Button backButton;
@@ -284,9 +291,6 @@ public class ShowPreservationEvent extends Composite {
 
     // OUTCOME DETAIL
 
-    outcomeDetailHeader.setVisible(StringUtils.isNotBlank(event.getEventOutcomeDetailNote())
-      || StringUtils.isNotBlank(event.getEventOutcomeDetailExtension()));
-
     PluginState eventOutcome = PluginState.valueOf(event.getEventOutcome());
     eventOutcomeLabel.setText(messages.pluginStateMessage(eventOutcome));
     if (PluginState.SUCCESS.equals(eventOutcome)) {
@@ -297,20 +301,21 @@ public class ShowPreservationEvent extends Composite {
       eventOutcomeLabel.setStyleName("label-warning");
     }
 
-    if (StringUtils.isNotBlank(event.getEventOutcomeDetailNote())) {
-      eventOutcomeDetailNoteValue.setHTML(event.getEventOutcomeDetailNote());
-    } else {
-      eventOutcomeDetailNoteLabel.setVisible(false);
-      eventOutcomeDetailNoteValue.setVisible(false);
-    }
+    getEventDetailsHTML(new AsyncCallback<SafeHtml>() {
 
-    if (StringUtils.isNotBlank(event.getEventOutcomeDetailExtension())) {
-      eventOutcomeDetailExtensionValue.setHTML(event.getEventOutcomeDetailExtension());
-    } else {
-      eventOutcomeDetailExtensionLabel.setVisible(false);
-      eventOutcomeDetailExtensionValue.setVisible(false);
-    }
+      @Override
+      public void onFailure(Throwable caught) {
+        if (!AsyncCallbackUtils.treatCommonFailures(caught)) {
+          Toast.showError(messages.errorLoadingPreservationEventDetails(caught.getMessage()));
+        }
+      }
 
+      @Override
+      public void onSuccess(SafeHtml result) {
+        eventOutcomeDetails.setHTML(result);
+        outcomeDetailHeader.setVisible(result.asString().length() > 0);
+      }
+    });
   }
 
   private void addObjectPanel(LinkingIdentifier object, PreservationEventViewBundle bundle, FlowPanel objectsPanel) {
@@ -670,6 +675,61 @@ public class ShowPreservationEvent extends Composite {
 
       body.add(idLabel);
       body.add(id_Value);
+    }
+  }
+
+  private void getEventDetailsHTML(final AsyncCallback<SafeHtml> callback) {
+    IndexedPreservationEvent event = bundle.getEvent();
+    SafeUri uri = RestUtils.createPreservationEventDetailsHTMLUri(eventId, event.getAipID(),
+      event.getRepresentationUUID(), event.getFileUUID());
+    RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri.asString());
+    requestBuilder.setHeader("Authorization", "Custom");
+    try {
+      requestBuilder.sendRequest(null, new RequestCallback() {
+
+        @Override
+        public void onResponseReceived(Request request, Response response) {
+          if (200 == response.getStatusCode()) {
+            String html = response.getText();
+
+            SafeHtmlBuilder b = new SafeHtmlBuilder();
+            b.append(SafeHtmlUtils.fromSafeConstant("<div class='eventHTML'>"));
+            b.append(SafeHtmlUtils.fromTrustedString(html));
+            b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
+            SafeHtml safeHtml = b.toSafeHtml();
+
+            callback.onSuccess(safeHtml);
+          } else {
+            String text = response.getText();
+            String message;
+            try {
+              RestErrorOverlayType error = (RestErrorOverlayType) JsonUtils.safeEval(text);
+              message = error.getMessage();
+            } catch (IllegalArgumentException e) {
+              message = text;
+            }
+
+            SafeHtmlBuilder b = new SafeHtmlBuilder();
+
+            // error message
+            b.append(SafeHtmlUtils.fromSafeConstant("<div class='error'>"));
+            b.append(messages.preservationEventDetailsTransformToHTMLError());
+            b.append(SafeHtmlUtils.fromSafeConstant("<pre><code>"));
+            b.append(SafeHtmlUtils.fromString(message));
+            b.append(SafeHtmlUtils.fromSafeConstant("</core></pre>"));
+            b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
+
+            callback.onSuccess(b.toSafeHtml());
+          }
+        }
+
+        @Override
+        public void onError(Request request, Throwable exception) {
+          callback.onFailure(exception);
+        }
+      });
+    } catch (RequestException e) {
+      callback.onFailure(e);
     }
   }
 

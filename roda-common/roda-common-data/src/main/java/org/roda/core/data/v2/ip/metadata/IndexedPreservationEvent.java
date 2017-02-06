@@ -30,8 +30,6 @@ public class IndexedPreservationEvent implements IsIndexed {
   private String eventDetail;
   private String eventType;
   private String eventOutcome;
-  private String eventOutcomeDetailExtension;
-  private String eventOutcomeDetailNote;
   private List<LinkingIdentifier> linkingAgentIds;
   private List<LinkingIdentifier> outcomeObjectIds;
   private List<LinkingIdentifier> sourcesObjectIds;
@@ -108,22 +106,6 @@ public class IndexedPreservationEvent implements IsIndexed {
     this.eventOutcome = eventOutcome;
   }
 
-  public String getEventOutcomeDetailExtension() {
-    return eventOutcomeDetailExtension;
-  }
-
-  public void setEventOutcomeDetailExtension(String eventOutcomeDetailExtension) {
-    this.eventOutcomeDetailExtension = eventOutcomeDetailExtension;
-  }
-
-  public String getEventOutcomeDetailNote() {
-    return eventOutcomeDetailNote;
-  }
-
-  public void setEventOutcomeDetailNote(String eventOutcomeDetailNote) {
-    this.eventOutcomeDetailNote = eventOutcomeDetailNote;
-  }
-
   public List<LinkingIdentifier> getLinkingAgentIds() {
     return linkingAgentIds;
   }
@@ -153,23 +135,20 @@ public class IndexedPreservationEvent implements IsIndexed {
     return "IndexedPreservationEvent [id=" + id + ", aipID=" + aipID + ", representationUUID=" + representationUUID
       + ", fileUUID=" + fileUUID + ", objectClass=" + objectClass + ", eventDateTime=" + eventDateTime
       + ", eventDetail=" + eventDetail + ", eventType=" + eventType + ", eventOutcome=" + eventOutcome
-      + ", eventOutcomeDetailExtension=" + eventOutcomeDetailExtension + ", eventOutcomeDetailNote="
-      + eventOutcomeDetailNote + ", linkingAgentIds=" + linkingAgentIds + ", outcomeObjectIds=" + outcomeObjectIds
-      + ", sourcesObjectIds=" + sourcesObjectIds + "]";
+      + ", linkingAgentIds=" + linkingAgentIds + ", outcomeObjectIds=" + outcomeObjectIds + ", sourcesObjectIds="
+      + sourcesObjectIds + "]";
   }
 
   @Override
   public List<String> toCsvHeaders() {
     return Arrays.asList("id", "aipID", "representationUUID", "fileUUID", "objectClass", "eventDateTime", "eventDetail",
-      "eventType", "eventOutcome", "eventOutcomeDetailExtension", "eventOutcomeDetailNote", "linkingAgentIds",
-      "outcomeObjectIds", "sourcesObjectIds");
+      "eventType", "eventOutcome", "linkingAgentIds", "outcomeObjectIds", "sourcesObjectIds");
   }
 
   @Override
   public List<Object> toCsvValues() {
     return Arrays.asList(id, aipID, representationUUID, fileUUID, objectClass, eventDateTime, eventDetail, eventType,
-      eventOutcome, eventOutcomeDetailExtension, eventOutcomeDetailNote, linkingAgentIds, outcomeObjectIds,
-      sourcesObjectIds);
+      eventOutcome, linkingAgentIds, outcomeObjectIds, sourcesObjectIds);
   }
 
   @Override

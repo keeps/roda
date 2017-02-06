@@ -180,9 +180,11 @@ public interface ClientMessages extends Messages {
 
   SafeHtml genericErrorMessage(String message);
 
-  SafeHtml descriptiveMetadataTranformToHTMLError();
+  SafeHtml descriptiveMetadataTransformToHTMLError();
 
-  SafeHtml preservationMetadataTranformToHTMLError();
+  SafeHtml preservationMetadataTransformToHTMLError();
+
+  SafeHtml preservationEventDetailsTransformToHTMLError();
 
   String notFoundError();
 
@@ -191,6 +193,8 @@ public interface ClientMessages extends Messages {
   String errorLoadingDescriptiveMetadata(String message);
 
   String errorLoadingPreservationMetadata(String message);
+
+  String errorLoadingPreservationEventDetails(String message);
 
   String downloadRepresentationInfo(@PluralCount int numberOfFiles, String readableFileSize);
 

@@ -56,10 +56,12 @@ public final class RodaConstants {
   }
 
   public static final String CROSSWALKS_DISSEMINATION_HTML_PATH = "crosswalks/dissemination/html/";
+  public static final String CROSSWALKS_DISSEMINATION_HTML_EVENT_PATH = "crosswalks/dissemination/html/event.xslt";
   public static final String CROSSWALKS_DISSEMINATION_OTHER_PATH = "crosswalks/other/";
   public static final String UI_BROWSER_METADATA_DESCRIPTIVE_TYPES = "ui.browser.metadata.descriptive.types";
   public static final String I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX = "ui.browse.metadata.descriptive.type.";
   public static final String I18N_CROSSWALKS_DISSEMINATION_HTML_PREFIX = "crosswalks.dissemination.html.";
+  public static final String I18N_CROSSWALKS_DISSEMINATION_HTML_PREFIX_EVENT = "crosswalks.dissemination.html.event.";
   public static final String I18N_UI_FACETS_PREFIX = "ui.facets.";
   public static final String I18N_UI_APPRAISAL = "ui.appraisal";
 
@@ -132,6 +134,7 @@ public final class RodaConstants {
   public static final String API_REST_V1_INDEX = "api/v1/index/";
   public static final String API_REST_V1_DIPS = "api/v1/dips/";
   public static final String API_REST_V1_DIPFILES = "api/v1/dipfiles/";
+  public static final String API_REST_V1_EVENTS = "api/v1/events/";
   // sub-resources strings
   public static final String API_DATA = "data";
   public static final Object API_FILE = "file";
@@ -207,6 +210,7 @@ public final class RodaConstants {
   public static final String API_QUERY_PARAM_PASSWORD = "password";
   public static final String API_QUERY_PARAM_SIZE_LIMIT = "size";
   public static final String API_QUERY_PARAM_DETAILS = "details";
+  public static final String API_QUERY_PARAM_ONLY_DETAILS = "onlyDetails";
   public static final String API_PARAM_UPLOAD = "upl";
   public static final String API_PARAM_FILE = "file";
   public static final String API_FORM_PARAM_FIND_REQUEST = "findRequest";
@@ -230,7 +234,7 @@ public final class RodaConstants {
   public static final String API_GET_FILE_MEDIA_TYPES = "json, xml, bin";
   public static final String API_POST_PUT_MEDIA_TYPES = "json, xml";
   public static final String API_DELETE_MEDIA_TYPES = "json, xml";
-  public static final String API_GET_DESCRIPTIVE_METADATA_MEDIA_TYPES = "json, xml, html, bin";
+  public static final String API_GET_METADATA_MEDIA_TYPES = "json, xml, html, bin";
   public static final String API_DESCRIPTIVE_METADATA_LANGUAGES = "pt_PT, en_US";
 
   public static final String API_GET_REPORTS_ID_OBJECT = "transferred_resource_uuid, transferred_resource_path, sip";

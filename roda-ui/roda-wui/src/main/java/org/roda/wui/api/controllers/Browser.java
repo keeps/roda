@@ -677,6 +677,34 @@ public class Browser extends RodaWuiController {
     return aipRepresentationPreservationMetadataFile;
   }
 
+  public static EntityResponse retrievePreservationMetadataEvent(User user, String id, String aipId,
+    String representationUUID, String fileUUID, boolean onlyDetails, String acceptFormat, String language)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // validate input
+    BrowserHelper.validateGetPreservationMetadataParams(acceptFormat);
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    if (aipId != null) {
+      IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
+      UserUtility.checkAIPPermissions(user, aip, PermissionType.READ);
+    }
+
+    // delegate
+    EntityResponse event = BrowserHelper.retrievePreservationMetadataEvent(id, aipId, representationUUID, fileUUID,
+      onlyDetails, acceptFormat, language);
+
+    // register action
+    controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_AIP_ID_PARAM,
+      aipId, RodaConstants.CONTROLLER_REPRESENTATION_UUID_PARAM, representationUUID,
+      RodaConstants.CONTROLLER_FILE_UUID_PARAM, fileUUID);
+
+    return event;
+  }
+
   public static void createOrUpdatePreservationMetadataWithAIP(User user, String aipId, String fileId, InputStream is,
     String fileName, boolean create) throws AuthorizationDeniedException, GenericException, NotFoundException,
     RequestNotValidException, ValidationException, AlreadyExistsException {

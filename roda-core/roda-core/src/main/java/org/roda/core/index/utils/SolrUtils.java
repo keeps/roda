@@ -1654,11 +1654,7 @@ public class SolrUtils {
     final String eventDetail = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_DETAIL), null);
     final String eventType = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_TYPE), null);
     final String eventOutcome = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_OUTCOME), null);
-    final String eventOutcomeDetailExtension = objectToString(
-      doc.get(RodaConstants.PRESERVATION_EVENT_OUTCOME_DETAIL_EXTENSION), null);
 
-    final String eventOutcomeDetailNote = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_OUTCOME_DETAIL_NOTE),
-      null);
     final List<String> agents = objectToListString(doc.get(RodaConstants.PRESERVATION_EVENT_LINKING_AGENT_IDENTIFIER));
     final List<String> outcomes = objectToListString(
       doc.get(RodaConstants.PRESERVATION_EVENT_LINKING_OUTCOME_OBJECT_IDENTIFIER));
@@ -1669,8 +1665,7 @@ public class SolrUtils {
     ipe.setEventDetail(eventDetail);
     ipe.setEventType(eventType);
     ipe.setEventOutcome(eventOutcome);
-    ipe.setEventOutcomeDetailExtension(eventOutcomeDetailExtension);
-    ipe.setEventOutcomeDetailNote(eventOutcomeDetailNote);
+
     try {
       List<LinkingIdentifier> ids = new ArrayList<LinkingIdentifier>();
       for (String source : sources) {

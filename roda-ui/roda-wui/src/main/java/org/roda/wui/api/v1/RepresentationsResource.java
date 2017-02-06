@@ -252,7 +252,7 @@ public class RepresentationsResource {
     @ApiParam(value = "The ID of the existing Representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
     @ApiParam(value = "The ID of the existing metadata file to retrieve", required = true) @PathParam(RodaConstants.API_PATH_PARAM_METADATA_ID) String metadataId,
     @ApiParam(value = "The ID of the existing metadata file version to retrieve", required = true) @QueryParam(RodaConstants.API_QUERY_PARAM_VERSION_ID) String versionId,
-    @ApiParam(value = "Choose format in which to get the metadata", allowableValues = RodaConstants.API_GET_DESCRIPTIVE_METADATA_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+    @ApiParam(value = "Choose format in which to get the metadata", allowableValues = RodaConstants.API_GET_METADATA_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
     @ApiParam(value = "The language for the HTML output", allowableValues = RodaConstants.API_DESCRIPTIVE_METADATA_LANGUAGES, defaultValue = RodaConstants.API_QUERY_VALUE_LANG_DEFAULT) @DefaultValue(RodaConstants.API_QUERY_VALUE_LANG_DEFAULT) @QueryParam(RodaConstants.API_QUERY_KEY_LANG) String language)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);

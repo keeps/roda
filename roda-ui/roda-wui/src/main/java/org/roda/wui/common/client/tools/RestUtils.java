@@ -287,6 +287,43 @@ public class RestUtils {
     return UriUtils.fromSafeConstant(b.toString());
   }
 
+  public static SafeUri createPreservationEventDetailsHTMLUri(String eventId, String aipId, String representationUUID,
+    String fileUUID) {
+    // api/v1/events?id={event_id}&aipId={aip_id}&representationUUID={representationUUID}&fileUUID={fileUUID}&onlyDetails=true&acceptFormat=html&lang={lang}
+    StringBuilder b = new StringBuilder();
+
+    b.append(RodaConstants.API_REST_V1_EVENTS).append(RodaConstants.API_QUERY_START)
+      .append(RodaConstants.API_QUERY_PARAM_ID).append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
+      .append(UriUtils.encode(eventId));
+
+    if (aipId != null) {
+      b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_PATH_PARAM_AIP_ID)
+        .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(UriUtils.encode(aipId));
+    }
+
+    if (representationUUID != null) {
+      b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID)
+        .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(UriUtils.encode(representationUUID));
+    }
+
+    if (fileUUID != null) {
+      b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_PATH_PARAM_FILE_UUID)
+        .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(UriUtils.encode(fileUUID));
+    }
+
+    b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_PARAM_ONLY_DETAILS)
+      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(UriUtils.encode(Boolean.toString(true)));
+
+    b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT)
+      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
+      .append(UriUtils.encode(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML));
+
+    b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_KEY_LANG)
+      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(LocaleInfo.getCurrentLocale().getLocaleName());
+
+    return UriUtils.fromSafeConstant(b.toString());
+  }
+
   public static String createTransferredResourceUploadUri(String parentUUID, String locale) {
     // api/v1/transfers/?parentUUID={parentUUID}&locale={locale}
     StringBuilder b = new StringBuilder();

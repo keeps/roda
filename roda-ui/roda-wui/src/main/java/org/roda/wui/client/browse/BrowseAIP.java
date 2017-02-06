@@ -812,7 +812,7 @@ public class BrowseAIP extends Composite {
 
             // error message
             b.append(SafeHtmlUtils.fromSafeConstant("<div class='error'>"));
-            b.append(messages.descriptiveMetadataTranformToHTMLError());
+            b.append(messages.descriptiveMetadataTransformToHTMLError());
             b.append(SafeHtmlUtils.fromSafeConstant("<pre><code>"));
             b.append(SafeHtmlUtils.fromString(message));
             b.append(SafeHtmlUtils.fromSafeConstant("</core></pre>"));

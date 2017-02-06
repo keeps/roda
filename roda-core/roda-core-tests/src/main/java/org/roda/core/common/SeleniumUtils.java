@@ -104,17 +104,19 @@ public class SeleniumUtils {
       goBack();
 
       // create metadata page
-      List<WebElement> createMetadataPage = driver.findElements(By.className("btn-plus"));
-      createMetadataPage.get(2).click();
-      saveHTML();
-      goBack();
-      goBack();
-
-      // edit metadata page
-      WebElement editMetadataPage = driver.findElement(By.className("fa-edit"));
-      editMetadataPage.click();
-      saveHTML();
-      goBack();
+      // List<WebElement> createMetadataPage =
+      // driver.findElements(By.className("btn-plus"));
+      // createMetadataPage.get(2).click();
+      // saveHTML();
+      // goBack();
+      // goBack();
+      //
+      // // edit metadata page
+      // WebElement editMetadataPage =
+      // driver.findElement(By.className("fa-edit"));
+      // editMetadataPage.click();
+      // saveHTML();
+      // goBack();
 
       goBack();
     } catch (FileNotFoundException | UnsupportedEncodingException | InterruptedException e) {
