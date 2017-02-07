@@ -1340,7 +1340,7 @@ public class BrowserHelper {
     }
 
     if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
-      final Binary binary = model.retrievePreservationEvent(aipId, representationId, id);
+      final Binary binary = model.retrievePreservationEvent(aipId, representationId, filePath, fileId, id);
       final String mediaType = RodaConstants.MEDIA_TYPE_TEXT_XML;
 
       final ConsumesOutputStream stream = new ConsumesOutputStream() {
@@ -1368,7 +1368,7 @@ public class BrowserHelper {
         PreservationMetadataType.EVENT);
       return new ObjectResponse<PreservationMetadata>(acceptFormat, pm);
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
-      final Binary binary = model.retrievePreservationEvent(aipId, representationId, id);
+      final Binary binary = model.retrievePreservationEvent(aipId, representationId, filePath, fileId, id);
       final String filename = binary.getStoragePath().getName() + HTML_EXT;
       final String mediaType = RodaConstants.MEDIA_TYPE_TEXT_HTML;
       final String htmlEvent = HTMLUtils.preservationMetadataEventToHtml(binary, onlyDetails,

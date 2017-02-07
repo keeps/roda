@@ -200,10 +200,10 @@ public class IndexModelObserver implements ModelObserver {
 
     if (pm.getRepresentationId() != null) {
       representationUUID = IdUtils.getRepresentationId(aip.getId(), pm.getRepresentationId());
+    }
 
-      if (pm.getFileId() != null) {
-        fileUUID = IdUtils.getFileId(aip.getId(), pm.getRepresentationId(), pm.getFileDirectoryPath(), pm.getFileId());
-      }
+    if (pm.getFileId() != null) {
+      fileUUID = IdUtils.getFileId(aip.getId(), pm.getRepresentationId(), pm.getFileDirectoryPath(), pm.getFileId());
     }
 
     SolrInputDocument premisEventDocument = SolrUtils.premisToSolr(pm.getType(), aip, representationUUID, fileUUID,

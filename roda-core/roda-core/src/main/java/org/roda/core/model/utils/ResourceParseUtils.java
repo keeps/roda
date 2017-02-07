@@ -10,6 +10,8 @@ package org.roda.core.model.utils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -19,6 +21,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -58,8 +61,11 @@ import org.roda.core.storage.DefaultDirectory;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ResourceParseUtils {
+  private static final Logger LOGGER = LoggerFactory.getLogger(ResourceParseUtils.class);
 
   private ResourceParseUtils() {
   }
@@ -145,9 +151,20 @@ public class ResourceParseUtils {
     } else if (filename.startsWith(URNUtils.getPremisPrefix(PreservationMetadataType.EVENT))) {
       id = filename.substring(0, filename.length() - RodaConstants.PREMIS_SUFFIX.length());
       type = PreservationMetadataType.EVENT;
+      try {
+        String separator = URLEncoder.encode(RodaConstants.URN_SEPARATOR, RodaConstants.DEFAULT_ENCODING);
+        if (StringUtils.countMatches(id, separator) > 0) {
+          fileDirectoryPath = ModelUtils.extractFilePathFromRepresentationPreservationMetadata(resourcePath);
+          fileId = id.substring(id.lastIndexOf(separator) + 1);
+        }
+      } catch (UnsupportedEncodingException e) {
+        LOGGER.error("Error encoding urn separator when converting file event preservation metadata");
+      }
     } else if (filename.startsWith(URNUtils.getPremisPrefix(PreservationMetadataType.FILE))) {
       type = PreservationMetadataType.FILE;
       fileDirectoryPath = ModelUtils.extractFilePathFromRepresentationPreservationMetadata(resourcePath);
+      // FIXME nvieira 20170207 this file id is wrong, it is using UUID (may
+      // have impact in future)
       fileId = filename.substring(0, filename.length() - RodaConstants.PREMIS_SUFFIX.length());
       id = fileId;
     } else if (filename.startsWith(URNUtils.getPremisPrefix(PreservationMetadataType.OTHER))) {

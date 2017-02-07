@@ -98,22 +98,6 @@
 								<g:HTML ui:field="eventOutcomeDetails">
 								</g:HTML>
 								
-<!-- 								<g:FlowPanel styleName="field"> -->
-<!-- 									<g:Label ui:field="eventOutcomeDetailNoteLabel" -->
-<!-- 										styleName="label"> -->
-<!-- 										<ui:text from='{messages.preservationEventOutcomeDetailNote}' /> -->
-<!-- 									</g:Label> -->
-<!-- 									<g:HTML ui:field="eventOutcomeDetailNoteValue" -->
-<!-- 										styleName="code-pre" /> -->
-<!-- 								</g:FlowPanel> -->
-<!-- 								<g:FlowPanel styleName="field"> -->
-<!-- 									<g:Label ui:field="eventOutcomeDetailExtensionLabel" -->
-<!-- 										styleName="label"> -->
-<!-- 										<ui:text from='{messages.preservationEventOutcomeDetailExtension}' /> -->
-<!-- 									</g:Label> -->
-<!-- 									<g:HTML ui:field="eventOutcomeDetailExtensionValue" -->
-<!-- 										styleName="code-pre" /> -->
-<!-- 								</g:FlowPanel> -->
 							</g:FlowPanel>
 						</g:FlowPanel>
 					</g:FlowPanel>

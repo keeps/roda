@@ -8,6 +8,8 @@
 package org.roda.core.model.utils;
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -555,12 +557,29 @@ public final class ModelUtils {
             + "AIP id = " + aipId + " and Representation id = " + representationId);
         }
       } else if (type.equals(PreservationMetadataType.EVENT)) {
+        String pFileId = id + RodaConstants.PREMIS_SUFFIX;
         if (aipId != null) {
           if (representationId != null) {
-            String pFileId = id + RodaConstants.PREMIS_SUFFIX;
-            path = build(getRepresentationPreservationMetadataPath(aipId, representationId), pFileId);
+            if (fileId != null) {
+              path = getRepresentationPreservationMetadataPath(aipId, representationId);
+              if (fileDirectoryPath != null) {
+                path.addAll(fileDirectoryPath);
+              }
+
+              try {
+                String separator = URLEncoder.encode(RodaConstants.URN_SEPARATOR, RodaConstants.DEFAULT_ENCODING);
+                if (StringUtils.countMatches(id, separator) > 0) {
+                  path.add(id + RodaConstants.PREMIS_SUFFIX);
+                } else {
+                  path.add(id + separator + fileId + RodaConstants.PREMIS_SUFFIX);
+                }
+              } catch (UnsupportedEncodingException e) {
+                LOGGER.error("Error encoding urn separator when creating file event preservation metadata");
+              }
+            } else {
+              path = build(getRepresentationPreservationMetadataPath(aipId, representationId), pFileId);
+            }
           } else {
-            String pFileId = id + RodaConstants.PREMIS_SUFFIX;
             path = build(getAIPPreservationMetadataPath(aipId), pFileId);
           }
         } else {
@@ -588,6 +607,7 @@ public final class ModelUtils {
     } else {
       throw new RequestNotValidException("Preservation metadata type is null");
     }
+
     return DefaultStoragePath.parse(path);
   }
 

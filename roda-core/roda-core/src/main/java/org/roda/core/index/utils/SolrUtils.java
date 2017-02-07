@@ -398,8 +398,8 @@ public class SolrUtils {
       indexNames.add(RodaConstants.INDEX_AIP);
       indexNames.add(RodaConstants.INDEX_REPRESENTATION);
       indexNames.add(RodaConstants.INDEX_FILE);
-      // indexNames.add(RodaConstants.INDEX_PRESERVATION_EVENTS);
       indexNames.add(RodaConstants.INDEX_PRESERVATION_AGENTS);
+      // INFO nvieira 20170207 events should be cleared on specific plugin
     } else if (resultClass.equals(Representation.class) || resultClass.equals(IndexedRepresentation.class)) {
       indexNames.add(RodaConstants.INDEX_REPRESENTATION);
     } else if (resultClass.equals(IndexedPreservationEvent.class)) {
@@ -2603,15 +2603,16 @@ public class SolrUtils {
 
   public static SolrInputDocument premisToSolr(PreservationMetadataType preservationMetadataType, AIP aip,
     String representationUUID, String fileUUID, Binary binary) throws GenericException {
-
     SolrInputDocument doc;
 
     Map<String, String> stylesheetOpt = new HashMap<String, String>();
     stylesheetOpt.put(RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS,
       PreservationMetadataEventClass.REPOSITORY.toString());
+
     if (aip != null) {
       stylesheetOpt.put(RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS, PreservationMetadataEventClass.AIP.toString());
       stylesheetOpt.put(RodaConstants.PRESERVATION_EVENT_AIP_ID, aip.getId());
+
       if (representationUUID != null) {
         stylesheetOpt.put(RodaConstants.PRESERVATION_EVENT_REPRESENTATION_UUID, representationUUID);
         stylesheetOpt.put(RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS,
@@ -2655,6 +2656,9 @@ public class SolrUtils {
     }
 
     if (preservationMetadataType == PreservationMetadataType.EVENT) {
+      doc.remove(RodaConstants.PRESERVATION_EVENT_OUTCOME_DETAIL_EXTENSION);
+      doc.remove(RodaConstants.PRESERVATION_EVENT_OUTCOME_DETAIL_NOTE);
+
       try {
         List<LinkingIdentifier> agents = PremisV3Utils.extractAgentsFromEvent(binary);
         for (LinkingIdentifier id : agents) {

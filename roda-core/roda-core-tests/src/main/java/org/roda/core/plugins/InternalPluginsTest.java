@@ -267,8 +267,8 @@ public class InternalPluginsTest {
         PreservationMetadata pm = opm.get();
         if (pm.getType().equals(PreservationMetadataType.EVENT)) {
           EventComplexType event = PremisV3Utils
-            .binaryToEvent(model.retrievePreservationEvent(pm.getAipId(), pm.getRepresentationId(), pm.getId())
-              .getContent().createInputStream());
+            .binaryToEvent(model.retrievePreservationEvent(pm.getAipId(), pm.getRepresentationId(),
+              pm.getFileDirectoryPath(), pm.getFileId(), pm.getId()).getContent().createInputStream());
           if (event.getLinkingAgentIdentifierArray() != null && event.getLinkingAgentIdentifierArray().length > 0) {
             for (LinkingAgentIdentifierComplexType laict : event.getLinkingAgentIdentifierArray()) {
               if (laict.getLinkingAgentIdentifierValue() != null
@@ -415,8 +415,8 @@ public class InternalPluginsTest {
         PreservationMetadata pm = opm.get();
         if (pm.getType().equals(PreservationMetadataType.EVENT)) {
           EventComplexType event = PremisV3Utils
-            .binaryToEvent(model.retrievePreservationEvent(pm.getAipId(), pm.getRepresentationId(), pm.getId())
-              .getContent().createInputStream());
+            .binaryToEvent(model.retrievePreservationEvent(pm.getAipId(), pm.getRepresentationId(),
+              pm.getFileDirectoryPath(), pm.getFileId(), pm.getId()).getContent().createInputStream());
           if (event.getLinkingAgentIdentifierArray() != null && event.getLinkingAgentIdentifierArray().length > 0) {
             for (LinkingAgentIdentifierComplexType laict : event.getLinkingAgentIdentifierArray()) {
               if (laict.getLinkingAgentIdentifierValue() != null

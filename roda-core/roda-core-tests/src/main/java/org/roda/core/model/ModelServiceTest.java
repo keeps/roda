@@ -282,7 +282,7 @@ public class ModelServiceTest {
     assertEquals(f0_characteristics.getFormatArray(0).getFormatDesignation().getFormatName().getStringValue(),
       CorporaConstants.TEXT_XML);
 
-    Binary event_premis_bin = model.retrievePreservationEvent(aipId, CorporaConstants.REPRESENTATION_1_ID,
+    Binary event_premis_bin = model.retrievePreservationEvent(aipId, CorporaConstants.REPRESENTATION_1_ID, null, null,
       CorporaConstants.REPRESENTATION_1_PREMIS_EVENT_ID);
     EventComplexType event_premis = PremisV3Utils.binaryToEvent(event_premis_bin.getContent(), true);
     assertEquals(CorporaConstants.INGESTION, event_premis.getEventType().getStringValue());
@@ -800,7 +800,7 @@ public class ModelServiceTest {
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), aipCreator);
 
-    Binary event_bin = model.retrievePreservationEvent(aipId, CorporaConstants.REPRESENTATION_1_ID,
+    Binary event_bin = model.retrievePreservationEvent(aipId, CorporaConstants.REPRESENTATION_1_ID, null, null,
       CorporaConstants.REPRESENTATION_1_PREMIS_EVENT_ID);
     EventComplexType event = PremisV3Utils.binaryToEvent(event_bin.getContent(), true);
 

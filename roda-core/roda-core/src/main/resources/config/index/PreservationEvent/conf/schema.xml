@@ -29,7 +29,7 @@
  http://wiki.apache.org/solr/SchemaXml
 -->
 
-<schema name="schema-version-4" version="1.5">
+<schema name="schema-version-5" version="1.5">
   <!--
     2 - removed field 'state' default value (it was leftovers from previous field definition);
   -->
@@ -117,8 +117,6 @@
    <field name="eventDetail" type="text_general" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="eventType" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="eventOutcome" type="string" indexed="true" stored="true" required="false" multiValued="false" />
-   <field name="eventOutcomeDetailExtension" type="text_general" indexed="true" stored="true" required="false" multiValued="false" />   
-   <field name="eventOutcomeDetailNote" type="text_general" indexed="true" stored="true" required="false" multiValued="false" />   
    <field name="linkingAgentIdentifier" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    <field name="linkingOutcomeObjectIdentifier" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    <field name="linkingSourceObjectIdentifier" type="string" indexed="true" stored="true" required="false" multiValued="true" />
