@@ -149,7 +149,11 @@ public class IndexModelObserver implements ModelObserver {
     return exceptions;
   }
 
-  private ReturnWithExceptions<Void> indexPreservationsEvents(final String aipId, final String representationId) {
+  public ReturnWithExceptions<Void> indexPreservationsEvents(final String aipId) {
+    return indexPreservationsEvents(aipId, null);
+  }
+
+  public ReturnWithExceptions<Void> indexPreservationsEvents(final String aipId, final String representationId) {
     ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
     CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationMetadata = null;
     try {

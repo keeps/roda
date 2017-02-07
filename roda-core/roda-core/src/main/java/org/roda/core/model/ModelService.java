@@ -1339,6 +1339,26 @@ public class ModelService extends ModelObservable {
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     List<CloseableIterable<OptionalWithCause<PreservationMetadata>>> list = new ArrayList<>();
 
+    try {
+      StoragePath storagePath = ModelUtils.getPreservationRepositoryEventStoragePath();
+      CloseableIterable<Resource> resources = storage.listResourcesUnderDirectory(storagePath, true);
+      CloseableIterable<OptionalWithCause<PreservationMetadata>> pms = ResourceParseUtils.convert(getStorage(),
+        resources, PreservationMetadata.class);
+      list.add(pms);
+    } catch (NotFoundException e) {
+      // do nothing
+    }
+
+    try {
+      StoragePath storagePath = ModelUtils.getPreservationAgentStoragePath();
+      CloseableIterable<Resource> resources = storage.listResourcesUnderDirectory(storagePath, true);
+      CloseableIterable<OptionalWithCause<PreservationMetadata>> pms = ResourceParseUtils.convert(getStorage(),
+        resources, PreservationMetadata.class);
+      list.add(pms);
+    } catch (NotFoundException e) {
+      // do nothing
+    }
+
     CloseableIterable<OptionalWithCause<AIP>> aips = listAIPs();
 
     for (OptionalWithCause<AIP> oaip : aips) {

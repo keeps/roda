@@ -268,6 +268,11 @@ public class IndexService {
     return observer.dipFileCreated(file);
   }
 
+  public ReturnWithExceptions<Void> reindexAIPPreservationEvents(AIP aip)
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException {
+    return observer.indexPreservationsEvents(aip.getId());
+  }
+
   public void reindexPreservationAgents()
     throws RequestNotValidException, GenericException, AuthorizationDeniedException {
     CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable = model.listPreservationAgents();
@@ -488,6 +493,18 @@ public class IndexService {
     try {
       getSolrClient().deleteByQuery(indexName,
         RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS + ":" + PreservationMetadataEventClass.REPOSITORY.toString());
+      getSolrClient().commit(indexName);
+    } catch (SolrServerException | IOException e) {
+      LOGGER.error("Error cleaning up index {}", indexName, e);
+      throw new GenericException("Error cleaning up index " + indexName, e);
+    }
+  }
+
+  public void clearAIPEventIndex() throws GenericException {
+    String indexName = RodaConstants.INDEX_PRESERVATION_EVENTS;
+    try {
+      getSolrClient().deleteByQuery(indexName, "*:* -" + RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS + ":"
+        + PreservationMetadataEventClass.REPOSITORY.toString());
       getSolrClient().commit(indexName);
     } catch (SolrServerException | IOException e) {
       LOGGER.error("Error cleaning up index {}", indexName, e);

@@ -398,7 +398,7 @@ public class SolrUtils {
       indexNames.add(RodaConstants.INDEX_AIP);
       indexNames.add(RodaConstants.INDEX_REPRESENTATION);
       indexNames.add(RodaConstants.INDEX_FILE);
-      indexNames.add(RodaConstants.INDEX_PRESERVATION_EVENTS);
+      // indexNames.add(RodaConstants.INDEX_PRESERVATION_EVENTS);
       indexNames.add(RodaConstants.INDEX_PRESERVATION_AGENTS);
     } else if (resultClass.equals(Representation.class) || resultClass.equals(IndexedRepresentation.class)) {
       indexNames.add(RodaConstants.INDEX_REPRESENTATION);

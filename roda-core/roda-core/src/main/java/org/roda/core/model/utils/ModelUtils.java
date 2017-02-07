@@ -533,6 +533,12 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(path);
   }
 
+  public static StoragePath getPreservationAIPStoragePath(String aipId) throws RequestNotValidException {
+    List<String> path = Arrays.asList(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
+      RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION);
+    return DefaultStoragePath.parse(path);
+  }
+
   public static StoragePath getPreservationMetadataStoragePath(String id, PreservationMetadataType type, String aipId,
     String representationId, List<String> fileDirectoryPath, String fileId) throws RequestNotValidException {
     List<String> path = null;
