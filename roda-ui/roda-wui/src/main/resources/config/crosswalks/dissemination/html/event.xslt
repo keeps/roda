@@ -3,7 +3,8 @@
 	<!ENTITY crarr  "&#13;">
 	<!ENTITY crarr  "&#xD;">
 ]>
-<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:premis="http://www.loc.gov/premis/v3">
+<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:premis="http://www.loc.gov/premis/v3"
+	exclude-result-prefixes="premis">
 	<xsl:output method="xml" indent="yes" encoding="UTF-8" omit-xml-declaration="yes" />
 
 	<xsl:param name="i18n.identifierType" />
