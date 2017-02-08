@@ -58,9 +58,11 @@ import org.roda.wui.common.client.tools.RestErrorOverlayType;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
+import org.roda.wui.common.client.widgets.wcag.WCAGUtilities;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
@@ -473,6 +475,7 @@ public class BrowseAIP extends Composite {
     descriptiveMetadata.add(messageHTML, title.asString(), true);
     descriptiveMetadata.selectTab(0);
     descriptiveMetadata.setVisible(true);
+    WCAGUtilities.getInstance().makeAccessible(descriptiveMetadata.getElement());
   }
 
   protected void viewAction(BrowseAIPBundle bundle) {
@@ -637,10 +640,11 @@ public class BrowseAIP extends Composite {
     } else {
       newDescriptiveMetadata.setVisible(true);
     }
+
+    WCAGUtilities.getInstance().makeAccessible(descriptiveMetadata.getElement());
   }
 
   private void updateSectionIdentification(BrowseAIPBundle bundle) {
-
     IndexedAIP aip = bundle.getAip();
 
     browseItemHeader.setVisible(true);
@@ -686,6 +690,11 @@ public class BrowseAIP extends Composite {
     browseDescription.setVisible(true);
     addStyleName(BROWSE_TOP_CSS);
 
+    Element firstElement = this.getElement().getFirstChildElement();
+    if (firstElement.getTagName().equalsIgnoreCase("input")) {
+      firstElement.setAttribute("title", "browse input");
+    }
+
     breadcrumb.updatePath(
       Arrays.asList(new BreadcrumbItem(DescriptionLevelUtils.getTopIconSafeHtml(), "", RESOLVER.getHistoryPath())));
 
@@ -729,6 +738,8 @@ public class BrowseAIP extends Composite {
 
     this.removeStyleName("inactive");
     aipState.setVisible(false);
+
+    WCAGUtilities.getInstance().makeAccessible(descriptiveMetadata.getElement());
   }
 
   private void removeHandlerRegistrations() {

@@ -146,9 +146,7 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Lis
     this.groups = new Vector<GroupCheckbox>();
     this.blacklist = new Vector<String>();
     this.userSelections = new HashMap<String, Group>();
-
     enabled = true;
-
     this.addStyleName("groups");
   }
 

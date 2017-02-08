@@ -695,11 +695,11 @@
 
             container.find('.iv-snap-image,.iv-large-image').remove();
             var snapImageWrap = this.container.find('.iv-snap-image-wrap');
-            snapImageWrap.prepend('<img class="iv-snap-image" src="' + image + '" />');
-            this.imageWrap.prepend('<img class="iv-large-image" src="' + image + '" />');
+            snapImageWrap.prepend('<img alt="iv-snap-image" class="iv-snap-image" src="' + image + '" />');
+            this.imageWrap.prepend('<img alt="iv-large-image" class="iv-large-image" src="' + image + '" />');
 
             if (hiResImg) {
-                this.imageWrap.append('<img class="iv-large-image" src="' + hiResImg + '" />')
+                this.imageWrap.append('<img alt="iv-large-image" class="iv-large-image" src="' + hiResImg + '" />')
             }
 
             var currentImg = this.currentImg = this.container.find('.iv-large-image');

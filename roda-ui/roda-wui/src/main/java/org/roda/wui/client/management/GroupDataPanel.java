@@ -19,6 +19,7 @@ import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.widgets.wcag.WCAGUtilities;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -143,7 +144,6 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
         onChange();
       }
     });
-
   }
 
   /**
@@ -175,6 +175,7 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
 
         permissionsPanel.checkPermissions(directRoles, false);
         permissionsPanel.checkPermissions(indirectRoles, true);
+        WCAGUtilities.getInstance().makeAccessible(permissionsSelectPanel.getElement());
       }
 
       @Override

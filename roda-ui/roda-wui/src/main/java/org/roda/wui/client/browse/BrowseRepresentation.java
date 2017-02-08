@@ -48,9 +48,11 @@ import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.RestErrorOverlayType;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.widgets.Toast;
+import org.roda.wui.common.client.widgets.wcag.WCAGUtilities;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
@@ -147,7 +149,7 @@ public class BrowseRepresentation extends Composite {
   // Focus
   @UiField
   FocusPanel keyboardFocus;
-  
+
   // STATUS
 
   @UiField
@@ -251,7 +253,7 @@ public class BrowseRepresentation extends Composite {
 
     // INIT
     initWidget(uiBinder.createAndBindUi(this));
-    
+
     // STATUS
     aipState.setHTML(HtmlSnippetUtils.getAIPStateHTML(bundle.getAip().getState()));
     aipState.setVisible(AIPState.ACTIVE != bundle.getAip().getState());
@@ -369,6 +371,13 @@ public class BrowseRepresentation extends Composite {
     this.addStyleName("browse");
     this.addStyleName("browse-representation");
     this.addStyleName(bundle.getAip().getState().toString().toLowerCase());
+
+    Element firstElement = this.getElement().getFirstChildElement();
+    if (firstElement.getTagName().equalsIgnoreCase("input")) {
+      firstElement.setAttribute("title", "browse input");
+    }
+
+    WCAGUtilities.getInstance().makeAccessible(itemMetadata.getElement());
   }
 
   @Override

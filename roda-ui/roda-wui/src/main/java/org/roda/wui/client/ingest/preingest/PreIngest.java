@@ -18,6 +18,7 @@ import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
+import org.roda.wui.common.client.widgets.wcag.WCAGUtilities;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -75,6 +76,7 @@ public class PreIngest {
     html = new HTMLWidgetWrapper("PreIngest.html");
     layout.add(html);
     layout.addStyleName("wui-ingest-pre");
+    WCAGUtilities.getInstance().makeAccessible(layout.getElement());
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {

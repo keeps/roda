@@ -230,6 +230,7 @@ public class FormUtilities {
     }
     // Field
     final ListBox mvList = new ListBox();
+    mvList.setTitle(mvLabel.getText());
     mvList.addStyleName("form-textbox");
 
     String options = mv.get("options");
@@ -368,6 +369,7 @@ public class FormUtilities {
     }
     // Field
     final DateBox mvDate = new DateBox();
+    mvDate.setTitle(mvLabel.getText());
     mvDate.getDatePicker().setYearAndMonthDropdownVisible(true);
     mvDate.getDatePicker().setYearArrowsVisible(true);
     mvDate.addStyleName("form-textbox");

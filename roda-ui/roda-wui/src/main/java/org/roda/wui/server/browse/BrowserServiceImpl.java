@@ -316,8 +316,8 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
         if (suggestField != null) {
           searchField.setSuggestField(suggestField);
         }
-        searchField.setSuggestPartial(suggestPartial);
 
+        searchField.setSuggestPartial(suggestPartial);
         searchFields.add(searchField);
       }
     }

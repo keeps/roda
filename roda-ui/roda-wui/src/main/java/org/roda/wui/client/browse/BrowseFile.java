@@ -34,9 +34,12 @@ import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.Toast;
+import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
+import org.roda.wui.common.client.widgets.wcag.WCAGUtilities;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -44,7 +47,6 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -139,7 +141,7 @@ public class BrowseFile extends Composite {
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
   @UiField
-  FocusPanel keyboardFocus;
+  AccessibleFocusPanel keyboardFocus;
 
   @UiField
   BreadcrumbPanel breadcrumb;
@@ -151,7 +153,7 @@ public class BrowseFile extends Composite {
   IndexedFilePreview filePreview;
 
   @UiField
-  FocusPanel optionsButton, infoFileButton, disseminationsButton, previousButton, nextButton;
+  AccessibleFocusPanel optionsButton, infoFileButton, disseminationsButton, previousButton, nextButton;
 
   @UiField
   FlowPanel center;
@@ -200,7 +202,6 @@ public class BrowseFile extends Composite {
                   }
                 }
               });
-
           }
         });
       }
@@ -237,6 +238,12 @@ public class BrowseFile extends Composite {
     this.addStyleName("browse");
     this.addStyleName("browse-file");
 
+    Element firstElement = this.getElement().getFirstChildElement();
+    if (firstElement.getTagName().equalsIgnoreCase("input")) {
+      firstElement.setAttribute("title", "browse input");
+    }
+
+    WCAGUtilities.getInstance().makeAccessible(center.getElement());
   }
 
   private List<BreadcrumbItem> getBreadcrumbs() {

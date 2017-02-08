@@ -259,8 +259,9 @@ public class TransferUpload extends Composite {
     if (uploadUrl != null) {
       SafeHtml html = SafeHtmlUtils.fromSafeConstant("<form id='upload' method='post' action='" + uploadUrl
         + "' enctype='multipart/form-data'>" + "<div id='drop'><h4>" + messages.ingestTransferUploadDropHere()
-        + "</h4><a>" + messages.ingestTransferUploadBrowseFiles() + "</a>" + "<input type='file' name='"
-        + RodaConstants.API_PARAM_UPLOAD + "' multiple='true' />" + "</div>" + "</form>");
+        + "</h4><a>" + messages.ingestTransferUploadBrowseFiles() + "</a>" + "<input title='"
+        + RodaConstants.API_PARAM_UPLOAD + "' type='file' name='" + RodaConstants.API_PARAM_UPLOAD
+        + "' multiple='true' />" + " </div>" + "<input title='hiddenSubmit' type='submit' hidden/> </form>");
 
       uploadForm.setHTML(html);
       uploadList.setHTML(SafeHtmlUtils.fromSafeConstant("<ul id='upload-list'></ul>"));

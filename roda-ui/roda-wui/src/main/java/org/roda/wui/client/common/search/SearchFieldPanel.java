@@ -102,6 +102,7 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
     DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
 
     inputText = new TextBox();
+    inputText.getElement().setAttribute("title", "input text box");
 
     inputDateBox = new DateBox();
     inputDateBox.setFormat(dateFormat);
@@ -109,6 +110,7 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
     inputDateBox.getDatePicker().setYearArrowsVisible(true);
     inputDateBox.setFireNullValues(true);
     inputDateBox.getElement().setPropertyString("placeholder", messages.searchFieldDatePlaceHolder());
+    inputDateBox.getElement().setAttribute("title", "input date box");
 
     inputDateBoxFrom = new DateBox();
     inputDateBoxFrom.setFormat(dateFormat);
@@ -116,6 +118,7 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
     inputDateBoxFrom.getDatePicker().setYearArrowsVisible(true);
     inputDateBoxFrom.setFireNullValues(true);
     inputDateBoxFrom.getElement().setPropertyString("placeholder", messages.searchFieldDateFromPlaceHolder());
+    inputDateBoxFrom.getElement().setAttribute("title", "input date box from");
 
     inputDateBoxTo = new DateBox();
     inputDateBoxTo.setFormat(dateFormat);
@@ -123,31 +126,40 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
     inputDateBoxTo.getDatePicker().setYearArrowsVisible(true);
     inputDateBoxTo.setFireNullValues(true);
     inputDateBoxTo.getElement().setPropertyString("placeholder", messages.searchFieldDateToPlaceHolder());
+    inputDateBoxTo.getElement().setAttribute("title", "input date box to");
 
     inputNumeric = new TextBox();
     inputNumeric.getElement().setPropertyString("placeholder", messages.searchFieldNumericPlaceHolder());
     inputNumeric.getElement().setAttribute("type", "number");
+    inputNumeric.getElement().setAttribute("title", "input numeric box");
     inputNumericFrom = new TextBox();
     inputNumericFrom.getElement().setPropertyString("placeholder", messages.searchFieldNumericFromPlaceHolder());
     inputNumericFrom.getElement().setAttribute("type", "number");
+    inputNumericFrom.getElement().setAttribute("title", "input numeric box from");
     inputNumericTo = new TextBox();
     inputNumericTo.getElement().setPropertyString("placeholder", messages.searchFieldNumericToPlaceHolder());
     inputNumericTo.getElement().setAttribute("type", "number");
+    inputNumericTo.getElement().setAttribute("title", "input numeric box from to");
 
     inputStorageSizeFrom = new TextBox();
     inputStorageSizeFrom.getElement().setPropertyString("placeholder", messages.searchFieldNumericFromPlaceHolder());
     inputStorageSizeFrom.getElement().setAttribute("type", "number");
+    inputStorageSizeFrom.getElement().setAttribute("title", "input storage size from");
     inputStorageSizeTo = new TextBox();
     inputStorageSizeTo.getElement().setPropertyString("placeholder", messages.searchFieldNumericToPlaceHolder());
     inputStorageSizeTo.getElement().setAttribute("type", "number");
+    inputStorageSizeTo.getElement().setAttribute("title", "input storage size to");
     inputStorageSizeList = new ListBox();
     for (String unit : Humanize.UNITS) {
       inputStorageSizeList.addItem(unit, unit);
     }
+    inputStorageSizeList.getElement().setAttribute("title", "input storage size list");
 
     inputCheckBox = new CheckBox();
+    inputCheckBox.getElement().setAttribute("title", "input checkbox");
 
     inputControlled = new ListBox();
+    inputControlled.getElement().setAttribute("title", "input controlled");
 
     panel.add(leftPanel);
 
@@ -170,6 +182,7 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
     fieldLabel.addStyleName("search-field-label");
     fieldBox.addStyleName("form-listbox");
     searchAdvancedFields.addStyleName("form-listbox");
+    searchAdvancedFields.getElement().setAttribute("title", "search advanced fields box");
     duplicateWarning.addStyleName("search-field-warning-label");
     duplicateWarning.setVisible(false);
 

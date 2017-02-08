@@ -44,6 +44,7 @@ import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.Toast;
+import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.LocaleInfo;
@@ -52,7 +53,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -93,7 +93,7 @@ public class BrowseDIP extends Composite {
   // interface
 
   @UiField
-  FocusPanel keyboardFocus;
+  AccessibleFocusPanel keyboardFocus;
 
   @UiField
   FlowPanel refererToolbar;
@@ -108,10 +108,11 @@ public class BrowseDIP extends Composite {
   FlowPanel center;
 
   @UiField
-  FocusPanel disseminationsButton, refererPreviousButton, refererNextButton, refererInfoButton, refererOptionsButton;
+  AccessibleFocusPanel disseminationsButton, refererPreviousButton, refererNextButton, refererInfoButton,
+    refererOptionsButton;
 
   @UiField
-  FocusPanel previousButton, nextButton, dipOptionsButton;
+  AccessibleFocusPanel previousButton, nextButton, dipOptionsButton;
 
   private List<DIPFile> dipFileAncestors;
 

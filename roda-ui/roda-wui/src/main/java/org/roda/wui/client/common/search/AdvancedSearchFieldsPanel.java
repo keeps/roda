@@ -43,7 +43,6 @@ public class AdvancedSearchFieldsPanel extends FlowPanel implements HasValueChan
     super();
 
     this.className = className;
-
     searchAdvancedFieldOptions = new ListBox();
 
     BrowserService.Util.getInstance().retrieveSearchFields(className, LocaleInfo.getCurrentLocale().getLocaleName(),
@@ -76,7 +75,7 @@ public class AdvancedSearchFieldsPanel extends FlowPanel implements HasValueChan
   public void addSearchFieldPanel() {
     addSearchFieldPanel(null);
   }
-  
+
   public void addSearchFieldPanel(String selectedField) {
     final SearchFieldPanel searchFieldPanel = new SearchFieldPanel();
 
@@ -163,7 +162,7 @@ public class AdvancedSearchFieldsPanel extends FlowPanel implements HasValueChan
       }
     }
   }
-  
+
   @Override
   public HandlerRegistration addValueChangeHandler(ValueChangeHandler<Integer> handler) {
     return addHandler(handler, ValueChangeEvent.getType());

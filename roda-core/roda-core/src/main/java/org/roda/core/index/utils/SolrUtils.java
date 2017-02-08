@@ -398,7 +398,6 @@ public class SolrUtils {
       indexNames.add(RodaConstants.INDEX_AIP);
       indexNames.add(RodaConstants.INDEX_REPRESENTATION);
       indexNames.add(RodaConstants.INDEX_FILE);
-      indexNames.add(RodaConstants.INDEX_PRESERVATION_AGENTS);
       // INFO nvieira 20170207 events should be cleared on specific plugin
     } else if (resultClass.equals(Representation.class) || resultClass.equals(IndexedRepresentation.class)) {
       indexNames.add(RodaConstants.INDEX_REPRESENTATION);

@@ -31,6 +31,7 @@ import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -281,6 +282,11 @@ public class EditDescriptiveMetadata extends Composite {
           }
         }
       });
+
+    Element firstElement = showXml.getElement().getFirstChildElement();
+    if (firstElement.getTagName().equalsIgnoreCase("input")) {
+      firstElement.setAttribute("title", "browse input");
+    }
   }
 
   @Override

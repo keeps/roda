@@ -20,7 +20,7 @@
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.createJobName}' />
 				</g:Label>
-				<g:TextBox ui:field="name" addStyleNames="form-textbox" />
+				<g:TextBox title="{messages.createJobName}" ui:field="name" addStyleNames="form-textbox" />
 				<g:Label addStyleNames="form-label" ui:field="selectedObject">
 					<ui:text from='{messages.createJobSelectedSIP}' />
 				</g:Label>

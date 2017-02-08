@@ -132,9 +132,6 @@
 
     function viewTextCallback(element, data) {
       element.text(data[element.data("view-field")]);
-      element.parent().textfill({
-        widthOnly: true
-      });
     }
 
     function initViewDownload(element, dataFunction) {

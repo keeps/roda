@@ -25,6 +25,8 @@ import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsAll;
+import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
@@ -165,6 +167,9 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
         if (job.getSourceObjects() instanceof SelectedItemsAll) {
           Class selectedClass = Class.forName(job.getSourceObjects().getSelectedClass());
           index.clearIndexes(SolrUtils.getIndexName(selectedClass));
+          if (selectedClass.equals(AIP.class) || selectedClass.equals(IndexedAIP.class)) {
+            index.clearAIPEventIndex();
+          }
         }
       } catch (GenericException | NotFoundException | ClassNotFoundException e) {
         throw new PluginException("Error clearing index", e);

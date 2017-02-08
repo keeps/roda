@@ -209,12 +209,6 @@ public class IndexService {
       }
       LOGGER.info("{} > Optimizing indexes", new Date().getTime());
 
-      try {
-        reindexPreservationAgents();
-      } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
-        LOGGER.error("Error reindexing preservation agents");
-      }
-
       commitAIPs();
       optimizeAIPs();
       LOGGER.info("{} > Done", new Date().getTime());

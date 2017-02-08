@@ -62,14 +62,14 @@ public class SeleniumUtils {
     // welcome page
     saveHTML();
 
-    savePublicPages();
+    // savePublicPages();
     saveLoginPages();
     saveHelpPages();
-    savePlanningPages();
-    saveAdminPages();
-    saveIngestPages();
-    saveSearchPages();
-    saveBrowsePages();
+    // savePlanningPages();
+    // saveAdminPages();
+    // saveIngestPages();
+    // saveSearchPages();
+    // saveBrowsePages();
 
     driver.quit();
     service.stop();
@@ -104,19 +104,36 @@ public class SeleniumUtils {
       goBack();
 
       // create metadata page
-      // List<WebElement> createMetadataPage =
-      // driver.findElements(By.className("btn-plus"));
-      // createMetadataPage.get(2).click();
-      // saveHTML();
-      // goBack();
-      // goBack();
-      //
-      // // edit metadata page
-      // WebElement editMetadataPage =
-      // driver.findElement(By.className("fa-edit"));
-      // editMetadataPage.click();
-      // saveHTML();
-      // goBack();
+      WebElement createMetadataPage = driver.findElement(By.className("fa-plus-circle"));
+      createMetadataPage.click();
+      saveHTML();
+      goBack();
+
+      // edit metadata page
+      WebElement editMetadataPage = driver.findElement(By.className("fa-edit"));
+      editMetadataPage.click();
+      saveHTML();
+      goBack();
+
+      // history metadata page
+      WebElement historyMetadataPage = driver.findElement(By.className("fa-history"));
+      historyMetadataPage.click();
+      saveHTML();
+      goBack();
+
+      // show browse representation page
+      List<WebElement> representationList = driver.findElements(
+        By.className("org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableEvenRow"));
+      representationList.get(0).click();
+      saveHTML();
+
+      // show browse file page
+      List<WebElement> fileList = driver.findElements(
+        By.className("org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableEvenRow"));
+      fileList.get(0).click();
+      saveHTML();
+      goBack();
+      goBack();
 
       goBack();
     } catch (FileNotFoundException | UnsupportedEncodingException | InterruptedException e) {
@@ -362,25 +379,26 @@ public class SeleniumUtils {
       helpMenu.click();
       saveHTML();
 
-      // installing descriptive metadata formats help page
-      driver.get(url + "#theme/InstallingNewDescriptiveMetadataFormats.html");
-      saveHTML();
-      goBack();
+      // // installing descriptive metadata formats help page
+      // driver.get(url +
+      // "#theme/InstallingNewDescriptiveMetadataFormats.html");
+      // saveHTML();
+      // goBack();
 
       // statistics help page
       driver.get(url + "#theme/HelpStatistics.html");
       saveHTML();
       goBack();
 
-      // advanced search help page
-      driver.get(url + "#theme/AdvancedSearch.html");
-      saveHTML();
-      goBack();
-
-      // build help page
-      driver.get(url + "#theme/BuildHelpPage.html");
-      saveHTML();
-      goBack();
+      // // advanced search help page
+      // driver.get(url + "#theme/AdvancedSearch.html");
+      // saveHTML();
+      // goBack();
+      //
+      // // build help page
+      // driver.get(url + "#theme/BuildHelpPage.html");
+      // saveHTML();
+      // goBack();
     } catch (FileNotFoundException | UnsupportedEncodingException | InterruptedException e) {
       System.err.println("Error running Selenium on help pages");
     }
@@ -393,17 +411,18 @@ public class SeleniumUtils {
     loginMenu.click();
     saveHTML();
 
-    // forget password page
-    List<WebElement> loginLinks = driver.findElements(By.className("login-link"));
-    loginLinks.get(0).click();
-    saveHTML();
-    goBack();
-
-    // register page
-    loginLinks = driver.findElements(By.className("login-link"));
-    loginLinks.get(1).click();
-    saveHTML();
-    goBack();
+    // // forget password page
+    // List<WebElement> loginLinks =
+    // driver.findElements(By.className("login-link"));
+    // loginLinks.get(0).click();
+    // saveHTML();
+    // goBack();
+    //
+    // // register page
+    // loginLinks = driver.findElements(By.className("login-link"));
+    // loginLinks.get(1).click();
+    // saveHTML();
+    // goBack();
 
     // welcome page after login
     WebElement loginName = driver.findElement(By.className("gwt-TextBox"));
