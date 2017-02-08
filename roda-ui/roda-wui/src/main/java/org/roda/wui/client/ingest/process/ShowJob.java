@@ -189,6 +189,9 @@ public class ShowJob extends Composite {
   HTML status;
 
   @UiField
+  Label stateDetailsLabel, stateDetailsValue;
+
+  @UiField
   FlowPanel selectedListPanel;
 
   @UiField
@@ -501,6 +504,14 @@ public class ShowJob extends Composite {
 
     // set state
     status.setHTML(HtmlSnippetUtils.getJobStateHtml(job));
+
+    // set state details
+    boolean hasStateDetails = StringUtils.isNotBlank(job.getStateDetails());
+    stateDetailsLabel.setVisible(hasStateDetails);
+    stateDetailsValue.setVisible(hasStateDetails);
+    if (hasStateDetails) {
+      stateDetailsValue.setText(job.getStateDetails());
+    }
 
     // set counters
     SafeHtmlBuilder b = new SafeHtmlBuilder();

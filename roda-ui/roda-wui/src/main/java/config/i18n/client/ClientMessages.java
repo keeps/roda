@@ -1083,6 +1083,8 @@ public interface ClientMessages extends Messages {
 
   String jobStatus();
 
+  String jobStateDetails();
+
   String jobProgress();
 
   String jobPlugin();

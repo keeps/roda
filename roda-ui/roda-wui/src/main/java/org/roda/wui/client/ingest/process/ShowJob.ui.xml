@@ -59,6 +59,12 @@
 								<g:HTML ui:field="status" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
+								<g:Label addStyleNames="label" ui:field="stateDetailsLabel">
+									<ui:text from='{messages.jobStateDetails}' />
+								</g:Label>
+								<g:Label styleName="value" ui:field="stateDetailsValue" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
 								<g:Label addStyleNames="label">
 									<ui:text from='{messages.jobProgress}' />
 								</g:Label>
