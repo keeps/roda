@@ -115,23 +115,25 @@
 						select="prem:eventOutcomeInformation/prem:eventOutcome/text()" />
 				</field>
 			</xsl:if>
-			<xsl:if test="prem:eventOutcomeInformation/prem:eventOutcomeDetail">
-				<xsl:if
-					test="prem:eventOutcomeInformation/prem:eventOutcomeDetail/prem:eventOutcomeDetailExtension/xhtml:p/text()">
-					<field name="eventOutcomeDetailExtension">
-						<xsl:value-of
-							select="prem:eventOutcomeInformation/prem:eventOutcomeDetail/prem:eventOutcomeDetailExtension/xhtml:p/text()" />
-					</field>
-				</xsl:if>
-				<xsl:if
-					test="prem:eventOutcomeInformation/prem:eventOutcomeDetail/prem:eventOutcomeDetailNote">
-					<field name="eventOutcomeDetailNote">
-						<xsl:value-of
-							select="prem:eventOutcomeInformation/prem:eventOutcomeDetail/prem:eventOutcomeDetailNote/text()" />
-					</field>
-				</xsl:if>
-			</xsl:if>
-
+			<!-- 20170208 hsilva: the following is commented out because we no longer index this information -->
+			<!-- <xsl:if test="prem:eventOutcomeInformation/prem:eventOutcomeDetail"> -->
+			<!-- <xsl:if -->
+			<!-- test="prem:eventOutcomeInformation/prem:eventOutcomeDetail/prem:eventOutcomeDetailExtension/xhtml:p/text()"> -->
+			<!-- <field name="eventOutcomeDetailExtension"> -->
+			<!-- <xsl:value-of -->
+			<!-- select="prem:eventOutcomeInformation/prem:eventOutcomeDetail/prem:eventOutcomeDetailExtension/xhtml:p/text()" 
+				/> -->
+			<!-- </field> -->
+			<!-- </xsl:if> -->
+			<!-- <xsl:if -->
+			<!-- test="prem:eventOutcomeInformation/prem:eventOutcomeDetail/prem:eventOutcomeDetailNote"> -->
+			<!-- <field name="eventOutcomeDetailNote"> -->
+			<!-- <xsl:value-of -->
+			<!-- select="prem:eventOutcomeInformation/prem:eventOutcomeDetail/prem:eventOutcomeDetailNote/text()" 
+				/> -->
+			<!-- </field> -->
+			<!-- </xsl:if> -->
+			<!-- </xsl:if> -->
 		</xsl:if>
 		<xsl:if test="prem:eventIdentifier">
 			<xsl:if test="prem:eventIdentifier/prem:eventIdentifierValue">

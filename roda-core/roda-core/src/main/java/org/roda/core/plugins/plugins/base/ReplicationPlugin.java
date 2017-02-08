@@ -222,7 +222,7 @@ public class ReplicationPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public PluginType getType() {
-    return PluginType.MISC;
+    return PluginType.AIP_TO_AIP;
   }
 
   @Override

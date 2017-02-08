@@ -2656,9 +2656,6 @@ public class SolrUtils {
     }
 
     if (preservationMetadataType == PreservationMetadataType.EVENT) {
-      doc.remove(RodaConstants.PRESERVATION_EVENT_OUTCOME_DETAIL_EXTENSION);
-      doc.remove(RodaConstants.PRESERVATION_EVENT_OUTCOME_DETAIL_NOTE);
-
       try {
         List<LinkingIdentifier> agents = PremisV3Utils.extractAgentsFromEvent(binary);
         for (LinkingIdentifier id : agents) {
