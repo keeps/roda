@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
 public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
   private static final Logger LOGGER = LoggerFactory.getLogger(ReindexRodaEntityPlugin.class);
   private boolean clearIndexes = false;
-  private boolean optimizeIndexes = true;
+  private boolean optimizeIndexes = false;
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
