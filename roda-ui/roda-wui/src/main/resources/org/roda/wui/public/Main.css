@@ -5784,7 +5784,8 @@ td.datePickerMonth, td.datePickerYear {
 	padding: 0 2em 4em 2em;
 }
 .statistic {
-	font-size: 3rem !important;
+	font-size: 3rem;
+	white-space: nowrap;
 }
 
 
