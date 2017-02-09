@@ -288,7 +288,7 @@ public class TransferredResourcesScanner {
     } catch (NotFoundException e) {
       // do nothing and pass it an empty list
     }
-    return moveTransferredResource(resources, newRelativePath, replaceExisting, true, false, true);
+    return moveTransferredResource(resources, newRelativePath, replaceExisting, false, false, true);
   }
 
   public Map<String, String> moveTransferredResource(List<TransferredResource> resources, String newRelativePath,
@@ -325,8 +325,19 @@ public class TransferredResourcesScanner {
         }
 
         FSUtils.move(Paths.get(resource.getFullPath()), newResourcePath, replaceExisting);
-        oldToNewTransferredResourceIds.put(resource.getUUID(),
-          IdUtils.getTransferredResourceUUID(basePath.relativize(newResourcePath)));
+
+        // create & index transferred resource in the new location
+        TransferredResource newResource = instantiateTransferredResource(newResourcePath, basePath);
+        newResource.setCreationDate(resource.getCreationDate());
+        newResource.setSize(resource.getSize());
+        newResource.setLastScanDate(new Date());
+        try {
+          index.create(TransferredResource.class, newResource);
+        } catch (RequestNotValidException e) {
+          // do nothing
+        }
+
+        oldToNewTransferredResourceIds.put(resource.getUUID(), newResource.getUUID());
         resourcesToIndex.add(resource);
       } else {
         notFoundResources = true;
@@ -335,8 +346,8 @@ public class TransferredResourcesScanner {
 
     if (reindexResources) {
       updateTransferredResources(Optional.of(newRelativePath), true);
-      reindexOldResourcesParentsAfterMove(resourcesToIndex, areResourcesFromSameFolder);
     }
+    reindexOldResourcesParentsAfterMove(resourcesToIndex, areResourcesFromSameFolder);
 
     // doing the throw after the moving process to reindex the moved ones
     if (notFoundResources) {
@@ -352,7 +363,8 @@ public class TransferredResourcesScanner {
     try {
       List<String> resourceUUIDs = resources.stream().map(tr -> tr.getUUID()).collect(Collectors.toList());
       index.delete(TransferredResource.class, resourceUUIDs);
-      index.commit(TransferredResource.class);
+      // 20170209 hsilva: we must avoid doing commit at all cost
+      // index.commit(TransferredResource.class);
     } catch (RequestNotValidException e) {
       LOGGER.error("Could not delete old transferred resources");
     }
