@@ -7,6 +7,12 @@
  */
 package org.roda.wui.common;
 
-public abstract class RodaWuiController {
+import org.roda.core.RodaCoreFactory;
 
+import com.codahale.metrics.MetricRegistry;
+
+public abstract class RodaWuiController {
+  protected static MetricRegistry getMetricRegistry() {
+    return RodaCoreFactory.getMetrics();
+  }
 }

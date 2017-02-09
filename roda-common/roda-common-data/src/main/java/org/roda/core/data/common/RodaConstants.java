@@ -246,6 +246,8 @@ public final class RodaConstants {
   public static final String API_USER_MEMBER = "user";
   public static final String API_GROUP_MEMBER = "group";
 
+  public static final String API_METRICS_TO_OBTAIN = "metricsToObtain";
+
   /*
    * Controllers related
    */
