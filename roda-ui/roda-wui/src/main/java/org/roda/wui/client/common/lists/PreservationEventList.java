@@ -49,12 +49,23 @@ public class PreservationEventList extends BasicAsyncTableCell<IndexedPreservati
   private TextColumn<IndexedPreservationEvent> eventDetailColumn;
   private Column<IndexedPreservationEvent, SafeHtml> eventOutcomeColumn;
 
+  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
+    RodaConstants.PRESERVATION_EVENT_ID, RodaConstants.PRESERVATION_EVENT_DATETIME,
+    RodaConstants.PRESERVATION_EVENT_TYPE, RodaConstants.PRESERVATION_EVENT_DETAIL,
+    RodaConstants.PRESERVATION_EVENT_OUTCOME);
+
   public PreservationEventList() {
     this(null, null, null, false);
   }
 
   public PreservationEventList(Filter filter, Facets facets, String summary, boolean selectable) {
-    super(IndexedPreservationEvent.class, filter, facets, summary, selectable);
+    super(IndexedPreservationEvent.class, filter, facets, summary, selectable, fieldsToReturn);
+  }
+
+  public PreservationEventList(Filter filter, Facets facets, String summary, boolean selectable, int initialPageSize,
+    int pageSizeIncrement) {
+    super(IndexedPreservationEvent.class, filter, facets, summary, selectable, initialPageSize, pageSizeIncrement,
+      fieldsToReturn);
   }
 
   @Override

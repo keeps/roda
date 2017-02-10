@@ -50,6 +50,7 @@ public class IterableIndexResult<T extends IsIndexed> implements Iterable<T> {
   private Facets facets;
   private User user;
   private boolean justActive;
+  private List<String> fieldsToReturn;
 
   private boolean removeDuplicates = true;
   private Set<String> uniqueUUIDs = new HashSet<>();
@@ -60,13 +61,13 @@ public class IterableIndexResult<T extends IsIndexed> implements Iterable<T> {
   private long totalObjects = -1;
 
   public IterableIndexResult(final SolrClient solrClient, final Class<T> returnClass, final Filter filter,
-    final Sorter sorter, final Facets facets, final boolean removeDuplicates) {
-    this(solrClient, returnClass, filter, sorter, Sublist.ALL, facets, null, true, removeDuplicates);
+    final Sorter sorter, final Facets facets, final boolean removeDuplicates, final List<String> fieldsToReturn) {
+    this(solrClient, returnClass, filter, sorter, Sublist.ALL, facets, null, true, removeDuplicates, fieldsToReturn);
   }
 
   public IterableIndexResult(final SolrClient solrClient, final Class<T> returnClass, final Filter filter,
     final Sorter sorter, final Sublist sublist, final Facets facets, final User user, final boolean justActive,
-    final boolean removeDuplicates) {
+    final boolean removeDuplicates, final List<String> fieldsToReturn) {
     this.solrClient = solrClient;
     this.returnClass = returnClass;
     this.filter = filter;
@@ -77,13 +78,15 @@ public class IterableIndexResult<T extends IsIndexed> implements Iterable<T> {
     this.user = user;
     this.justActive = justActive;
     this.removeDuplicates = removeDuplicates;
+    this.fieldsToReturn = fieldsToReturn;
 
     getResults(this.sublist);
   }
 
   private void getResults(final Sublist sublist) {
     try {
-      indexResult = SolrUtils.find(solrClient, returnClass, filter, sorter, sublist, facets, user, justActive);
+      indexResult = SolrUtils.find(solrClient, returnClass, filter, sorter, sublist, facets, user, justActive,
+        fieldsToReturn);
       if (totalObjects == -1) {
         totalObjects = indexResult.getTotalCount();
       }

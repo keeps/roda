@@ -92,15 +92,15 @@ public interface BrowserService extends RemoteService {
     }
   }
 
-  BrowseAIPBundle retrieveBrowseAIPBundle(String aipId, String localeString)
+  BrowseAIPBundle retrieveBrowseAIPBundle(String aipId, String localeString, List<String> aipFieldsToReturn)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   BrowseRepresentationBundle retrieveBrowseRepresentationBundle(String aipId, String representationId,
-    String localeString)
+    String localeString, List<String> representationFieldsToReturn)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   BrowseFileBundle retrieveBrowseFileBundle(String historyAipId, String historyRepresentationId,
-    List<String> historyFilePath, String historyFileId, String localeName)
+    List<String> historyFilePath, String historyFileId, String localeName, List<String> fileFieldsToReturn)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(String aipId, String representationId,
@@ -164,7 +164,8 @@ public interface BrowserService extends RemoteService {
 
   CreateIngestJobBundle retrieveCreateIngestProcessBundle();
 
-  JobBundle retrieveJobBundle(String jobId) throws AuthorizationDeniedException, GenericException, NotFoundException;
+  JobBundle retrieveJobBundle(String jobId, List<String> fieldsToReturn)
+    throws AuthorizationDeniedException, GenericException, NotFoundException;
 
   Viewers retrieveViewersProperties() throws GenericException;
 
@@ -199,16 +200,17 @@ public interface BrowserService extends RemoteService {
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
 
   <T extends IsIndexed> IndexResult<T> find(String classNameToReturn, Filter filter, Sorter sorter, Sublist sublist,
-    Facets facets, String localeString, boolean justActive)
+    Facets facets, String localeString, boolean justActive, List<String> fieldsToReturn)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException;
 
   <T extends IsIndexed> Long count(String classNameToReturn, Filter filter, boolean justActive)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException;
 
-  <T extends IsIndexed> T retrieve(String classNameToReturn, String id)
+  <T extends IsIndexed> T retrieve(String classNameToReturn, String id, List<String> fieldsToReturn)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
 
-  <T extends IsIndexed> List<T> retrieve(String classNameToReturn, SelectedItems<T> selectedItems)
+  <T extends IsIndexed> List<T> retrieve(String classNameToReturn, SelectedItems<T> selectedItems,
+    List<String> fieldsToReturn)
     throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException;
 
   <T extends IsIndexed> void delete(String classNameToReturn, SelectedItems<T> ids)
@@ -270,12 +272,6 @@ public interface BrowserService extends RemoteService {
   void appraisal(SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason, String localeString)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
 
-  IndexedRepresentation retrieveRepresentationById(String representationId)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException;
-
-  IndexedFile retrieveFileById(String fileId)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException;
-
   String renameTransferredResource(String transferredResourceId, String newName)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException,
     IsStillUpdatingException, NotFoundException;
@@ -320,7 +316,7 @@ public interface BrowserService extends RemoteService {
   void changeRepresentationType(SelectedItems<IndexedRepresentation> selectedRepresentation, String newType,
     String details) throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
-  DipBundle getDipBundle(String dipUUID, String dipFileUUID)
+  DipBundle retrieveDipBundle(String dipUUID, String dipFileUUID)
     throws RequestNotValidException, AuthorizationDeniedException, GenericException, NotFoundException;
 
   void deleteDIPs(SelectedItems<IndexedDIP> dips)
@@ -328,5 +324,4 @@ public interface BrowserService extends RemoteService {
 
   <T extends IsIndexed> T retrieveFromModel(String classNameToReturn, String id)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
-
 }

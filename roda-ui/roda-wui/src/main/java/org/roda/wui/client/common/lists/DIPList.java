@@ -42,17 +42,20 @@ public class DIPList extends BasicAsyncTableCell<IndexedDIP> {
   private Column<IndexedDIP, Date> dateCreated;
   private Column<IndexedDIP, Date> lastModified;
 
+  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID,
+    RodaConstants.DIP_DATE_CREATED, RodaConstants.DIP_LAST_MODIFIED, RodaConstants.DIP_TITLE);
+
   public DIPList() {
     this(null, null, null, false);
   }
 
   public DIPList(Filter filter, Facets facets, String summary, boolean selectable) {
-    super(IndexedDIP.class, filter, facets, summary, selectable);
+    super(IndexedDIP.class, filter, facets, summary, selectable, fieldsToReturn);
   }
 
   public DIPList(Filter filter, Facets facets, String summary, boolean selectable, int initialPageSize,
     int pageSizeIncrement) {
-    super(IndexedDIP.class, filter, facets, summary, selectable, initialPageSize, pageSizeIncrement);
+    super(IndexedDIP.class, filter, facets, summary, selectable, initialPageSize, pageSizeIncrement, fieldsToReturn);
   }
 
   @Override

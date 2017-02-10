@@ -14,8 +14,6 @@ import org.roda.core.data.v2.index.facet.FacetValue;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
@@ -28,14 +26,12 @@ import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.risks.RiskIncidence.INCIDENCE_STATUS;
 import org.roda.wui.client.browse.BrowseAIP;
 import org.roda.wui.client.browse.BrowseRepresentation;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.UIObject;
@@ -240,43 +236,16 @@ public class HtmlSnippetUtils {
       objectLink.setText(incidence.getAipId());
 
     } else if (Representation.class.getSimpleName().equals(incidence.getObjectClass())) {
-      BrowserService.Util.getInstance().retrieveRepresentationById(incidence.getRepresentationId(),
-        new AsyncCallback<IndexedRepresentation>() {
-
-          @Override
-          public void onFailure(Throwable caught) {
-            // do nothing
-          }
-
-          @Override
-          public void onSuccess(IndexedRepresentation result) {
-            if (result != null) {
-              objectLabel.setText(messages.showRepresentationExtended());
-              objectLink.setHref(
-                HistoryUtils.createHistoryHashLink(BrowseRepresentation.RESOLVER, result.getAipId(), result.getId()));
-              objectLink.setText(result.getId());
-            }
-          }
-        });
+      objectLabel.setText(messages.showRepresentationExtended());
+      objectLink.setHref(HistoryUtils.createHistoryHashLink(BrowseRepresentation.RESOLVER, incidence.getAipId(),
+        incidence.getRepresentationId()));
+      objectLink.setText(incidence.getRepresentationId());
 
     } else if (File.class.getSimpleName().equals(incidence.getObjectClass())) {
-      BrowserService.Util.getInstance().retrieveFileById(incidence.getFileId(), new AsyncCallback<IndexedFile>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          // do nothing
-        }
-
-        @Override
-        public void onSuccess(IndexedFile result) {
-          if (result != null) {
-            objectLabel.setText(messages.showFileExtended());
-            objectLink.setHref(HistoryUtils.createHistoryHashLink(
-              HistoryUtils.getHistoryUuidResolver(IndexedFile.class.getName(), result.getUUID())));
-            objectLink.setText(result.getUUID());
-          }
-        }
-      });
+      objectLabel.setText(messages.showFileExtended());
+      objectLink.setHref(HistoryUtils.createHistoryHashLink(HistoryUtils.getHistoryBrowse(incidence.getAipId(),
+        incidence.getRepresentationId(), incidence.getFilePath(), incidence.getFileId())));
+      objectLink.setText(incidence.getFileId());
     }
   }
 

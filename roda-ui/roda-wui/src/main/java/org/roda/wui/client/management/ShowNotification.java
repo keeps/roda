@@ -11,8 +11,10 @@
 package org.roda.wui.client.management;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
@@ -51,7 +53,7 @@ public class ShowNotification extends Composite {
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
         String notificationId = historyTokens.get(0);
-        BrowserService.Util.getInstance().retrieve(Notification.class.getName(), notificationId,
+        BrowserService.Util.getInstance().retrieve(Notification.class.getName(), notificationId, fieldsToReturn,
           new AsyncCallback<Notification>() {
 
             @Override
@@ -90,6 +92,12 @@ public class ShowNotification extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
+
+  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
+    RodaConstants.NOTIFICATION_ID, RodaConstants.NOTIFICATION_SUBJECT, RodaConstants.NOTIFICATION_BODY,
+    RodaConstants.NOTIFICATION_SENT_ON, RodaConstants.NOTIFICATION_FROM_USER,
+    RodaConstants.NOTIFICATION_IS_ACKNOWLEDGED, RodaConstants.NOTIFICATION_RECIPIENT_USERS,
+    RodaConstants.NOTIFICATION_ACKNOWLEDGED_USERS, RodaConstants.NOTIFICATION_STATE);
 
   @UiField
   Label notificationId;

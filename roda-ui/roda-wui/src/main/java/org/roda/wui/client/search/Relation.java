@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -86,7 +87,7 @@ public class Relation {
       Filter filter = new Filter(params);
 
       BrowserService.Util.getInstance().find(IndexedAIP.class.getName(), filter, Sorter.NONE, new Sublist(0, 1),
-        Facets.NONE, LocaleInfo.getCurrentLocale().getLocaleName(), false,
+        Facets.NONE, LocaleInfo.getCurrentLocale().getLocaleName(), false, Arrays.asList(RodaConstants.INDEX_UUID),
         new AsyncCallback<IndexResult<IndexedAIP>>() {
 
           @Override

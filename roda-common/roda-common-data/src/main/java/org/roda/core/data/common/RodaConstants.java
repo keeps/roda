@@ -7,10 +7,13 @@
  */
 package org.roda.core.data.common;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.roda.core.data.v2.ip.Permissions.PermissionType;
 
 public final class RodaConstants {
 
@@ -444,7 +447,6 @@ public final class RodaConstants {
    * AIP FIELDS
    */
   public static final String AIP_ID = "id";
-  public static final String AIP_AIP_ID = "aipId";
   public static final String AIP_PARENT_ID = "parentId";
   public static final String AIP_ANCESTORS = "ancestors";
   public static final String STATE = "state";
@@ -733,7 +735,7 @@ public final class RodaConstants {
   public static final String JOB_REPORT_OUTCOME_OBJECT_STATE = "outcomeObjectState";
   public static final String JOB_REPORT_TITLE = "title";
   public static final String JOB_REPORT_DATE_CREATED = "dateCreated";
-  public static final String JOB_REPORT_DATE_UPDATE = "dateUpdated";
+  public static final String JOB_REPORT_DATE_UPDATED = "dateUpdated";
   public static final String JOB_REPORT_COMPLETION_PERCENTAGE = "completionPercentage";
   public static final String JOB_REPORT_STEPS_COMPLETED = "stepsCompleted";
   public static final String JOB_REPORT_TOTAL_STEPS = "totalSteps";
@@ -1209,6 +1211,46 @@ public final class RodaConstants {
   public static final String EVENT_UPDATE_AIP_FAILURE = "event.update.aip.failure";
   public static final String EVENT_DELETE_AIP_SUCCESS = "event.delete.aip.success";
   public static final String EVENT_DELETE_AIP_FAILURE = "event.delete.aip.failure";
+
+  /* Common performance improvements fields to return */
+
+  public static final List<String> AIP_PERMISSIONS_FIELDS_TO_RETURN = new ArrayList<>();
+
+  static {
+    AIP_PERMISSIONS_FIELDS_TO_RETURN.add(RodaConstants.INDEX_UUID);
+    AIP_PERMISSIONS_FIELDS_TO_RETURN.add(RodaConstants.AIP_ID);
+
+    for (PermissionType type : PermissionType.values()) {
+      AIP_PERMISSIONS_FIELDS_TO_RETURN.add(RodaConstants.INDEX_PERMISSION_USERS_PREFIX + type);
+      AIP_PERMISSIONS_FIELDS_TO_RETURN.add(RodaConstants.INDEX_PERMISSION_GROUPS_PREFIX + type);
+    }
+  }
+
+  public static final List<String> REPRESENTATION_FIELDS_TO_RETURN = Arrays.asList(RodaConstants.INDEX_UUID,
+    RodaConstants.REPRESENTATION_ID, RodaConstants.REPRESENTATION_AIP_ID);
+
+  public static final List<String> FILE_FIELDS_TO_RETURN = Arrays.asList(RodaConstants.INDEX_UUID,
+    RodaConstants.FILE_FILE_ID, RodaConstants.FILE_PATH, RodaConstants.FILE_REPRESENTATION_ID,
+    RodaConstants.FILE_AIP_ID, RodaConstants.FILE_ISDIRECTORY);
+
+  public static final List<String> FILE_FORMAT_FIELDS_TO_RETURN = Arrays.asList(RodaConstants.INDEX_UUID,
+    RodaConstants.FILE_FILE_ID, RodaConstants.FILE_FORMAT_MIMETYPE, RodaConstants.FILE_PRONOM);
+
+  public static final List<String> DIP_PERMISSIONS_FIELDS_TO_RETURN = new ArrayList<>();
+
+  static {
+    DIP_PERMISSIONS_FIELDS_TO_RETURN.add(RodaConstants.INDEX_UUID);
+    DIP_PERMISSIONS_FIELDS_TO_RETURN.add(RodaConstants.DIP_ID);
+
+    for (PermissionType type : PermissionType.values()) {
+      DIP_PERMISSIONS_FIELDS_TO_RETURN.add(RodaConstants.INDEX_PERMISSION_USERS_PREFIX + type);
+      DIP_PERMISSIONS_FIELDS_TO_RETURN.add(RodaConstants.INDEX_PERMISSION_GROUPS_PREFIX + type);
+    }
+  }
+
+  public static final List<String> DIPFILE_FIELDS_TO_RETURN = Arrays.asList(RodaConstants.INDEX_UUID,
+    RodaConstants.DIPFILE_ID, RodaConstants.DIPFILE_PATH, RodaConstants.DIPFILE_DIP_ID,
+    RodaConstants.DIPFILE_IS_DIRECTORY);
 
   /** Private empty constructor */
   private RodaConstants() {

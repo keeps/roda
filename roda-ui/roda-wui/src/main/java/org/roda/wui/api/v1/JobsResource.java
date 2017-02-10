@@ -7,6 +7,8 @@
  */
 package org.roda.wui.api.v1;
 
+import java.util.ArrayList;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -58,7 +60,7 @@ public class JobsResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    Jobs jobs = JobsHelper.getJobsFromIndexResult(user, start, limit);
+    Jobs jobs = JobsHelper.getJobsFromIndexResult(user, start, limit, new ArrayList<>());
     return Response.ok(jobs, mediaType).build();
   }
 
@@ -107,7 +109,7 @@ public class JobsResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    Job job = org.roda.wui.api.controllers.Browser.retrieve(user, Job.class, jobId);
+    Job job = org.roda.wui.api.controllers.Browser.retrieve(user, Job.class, jobId, new ArrayList<>());
     return Response.ok(job, mediaType).build();
   }
 
@@ -160,7 +162,7 @@ public class JobsResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    Reports reports = JobsHelper.getJobReportsFromIndexResult(user, jobId, justFailed, start, limit);
+    Reports reports = JobsHelper.getJobReportsFromIndexResult(user, jobId, justFailed, start, limit, new ArrayList<>());
     return Response.ok(reports, mediaType).build();
   }
 

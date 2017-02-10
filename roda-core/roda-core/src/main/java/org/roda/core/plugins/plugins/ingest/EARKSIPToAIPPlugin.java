@@ -216,7 +216,8 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
     if (searchScopeString != null && !forceSearchScope) {
       filter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, searchScopeString));
     }
-    IndexResult<IndexedAIP> result = index.find(IndexedAIP.class, filter, Sorter.NONE, new Sublist(0, 1));
+    IndexResult<IndexedAIP> result = index.find(IndexedAIP.class, filter, Sorter.NONE, new Sublist(0, 1),
+      Arrays.asList(RodaConstants.AIP_ID));
     IndexedAIP indexedAIP = null;
     if (result.getTotalCount() == 1) {
       indexedAIP = result.getResults().get(0);
@@ -225,7 +226,8 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
       if (searchScopeString != null && !forceSearchScope) {
         filter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, searchScopeString));
       }
-      result = index.find(IndexedAIP.class, filter, Sorter.NONE, new Sublist(0, 1));
+      result = index.find(IndexedAIP.class, filter, Sorter.NONE, new Sublist(0, 1),
+        Arrays.asList(RodaConstants.AIP_ID));
       if (result.getTotalCount() == 1) {
         indexedAIP = result.getResults().get(0);
       } else {

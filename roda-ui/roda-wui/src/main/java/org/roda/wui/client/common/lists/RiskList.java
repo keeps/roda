@@ -54,17 +54,22 @@ public class RiskList extends BasicAsyncTableCell<IndexedRisk> {
   private Column<IndexedRisk, SafeHtml> severityColumn;
   private TextColumn<IndexedRisk> incidenceCounterColumn;
 
+  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.RISK_ID,
+    RodaConstants.RISK_NAME, RodaConstants.RISK_IDENTIFIED_ON, RodaConstants.RISK_CATEGORY,
+    RodaConstants.RISK_MITIGATION_OWNER, RodaConstants.RISK_CURRENT_SEVERITY_LEVEL, RodaConstants.RISK_OBJECTS_SIZE,
+    RodaConstants.RISK_POST_MITIGATION_SEVERITY_LEVEL, RodaConstants.RISK_PRE_MITIGATION_SEVERITY_LEVEL);
+
   public RiskList() {
     this(null, null, null, false);
   }
 
   public RiskList(Filter filter, Facets facets, String summary, boolean selectable) {
-    super(IndexedRisk.class, filter, facets, summary, selectable);
+    super(IndexedRisk.class, filter, facets, summary, selectable, fieldsToReturn);
     this.filter = filter;
   }
 
   public RiskList(Filter filter, Facets facets, String summary, boolean selectable, int pageSize, int incrementPage) {
-    super(IndexedRisk.class, filter, facets, summary, selectable, pageSize, incrementPage);
+    super(IndexedRisk.class, filter, facets, summary, selectable, pageSize, incrementPage, fieldsToReturn);
     this.filter = filter;
   }
 

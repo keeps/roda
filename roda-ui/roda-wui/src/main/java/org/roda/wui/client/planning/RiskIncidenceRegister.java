@@ -11,6 +11,7 @@
 package org.roda.wui.client.planning;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -276,8 +277,10 @@ public class RiskIncidenceRegister extends Composite {
   }
 
   private void getAIPBreadCrumbs() {
+    List<String> aipFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_ID, RodaConstants.AIP_GHOST,
+      RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL);
     BrowserService.Util.getInstance().retrieveBrowseAIPBundle(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
-      new AsyncCallback<BrowseAIPBundle>() {
+      aipFields, new AsyncCallback<BrowseAIPBundle>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -295,8 +298,11 @@ public class RiskIncidenceRegister extends Composite {
   }
 
   private void getRepresentationBreadCrumbs() {
+    List<String> representationFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.REPRESENTATION_AIP_ID,
+      RodaConstants.REPRESENTATION_ID, RodaConstants.REPRESENTATION_TYPE);
     BrowserService.Util.getInstance().retrieveBrowseRepresentationBundle(aipId, representationId,
-      LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<BrowseRepresentationBundle>() {
+      LocaleInfo.getCurrentLocale().getLocaleName(), representationFields,
+      new AsyncCallback<BrowseRepresentationBundle>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -312,8 +318,12 @@ public class RiskIncidenceRegister extends Composite {
   }
 
   private void getFileBreadCrumbs() {
+    List<String> fileFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.FILE_PARENT_UUID,
+      RodaConstants.FILE_PATH, RodaConstants.FILE_ANCESTORS_PATH, RodaConstants.FILE_ORIGINALNAME,
+      RodaConstants.FILE_FILE_ID, RodaConstants.FILE_AIP_ID, RodaConstants.FILE_REPRESENTATION_ID,
+      RodaConstants.FILE_ISDIRECTORY);
     BrowserService.Util.getInstance().retrieveBrowseFileBundle(aipId, representationId, filePath, fileId,
-      LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<BrowseFileBundle>() {
+      LocaleInfo.getCurrentLocale().getLocaleName(), fileFields, new AsyncCallback<BrowseFileBundle>() {
 
         @Override
         public void onFailure(Throwable caught) {

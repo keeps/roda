@@ -10,6 +10,7 @@ package org.roda.core.common;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -58,7 +59,7 @@ public class ClassificationPlanUtils {
       boolean justActive = true;
       boolean removeDuplicates = true;
       IterableIndexResult<IndexedAIP> res = index.findAll(IndexedAIP.class, allButRepresentationsFilter, null,
-        Sublist.ALL, user, justActive, removeDuplicates);
+        Sublist.ALL, user, justActive, removeDuplicates, new ArrayList<>());
       Iterator<IndexedAIP> it = res.iterator();
       while (it.hasNext()) {
         array.add(aipToJSON(it.next()));

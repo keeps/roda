@@ -84,7 +84,7 @@ public class DIPFilesResource {
     boolean justActive = false;
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
     IndexResult<DIPFile> result = Browser.find(DIPFile.class, Filter.NULL, Sorter.NONE,
-      new Sublist(pagingParams.getFirst(), pagingParams.getSecond()), null, user, justActive);
+      new Sublist(pagingParams.getFirst(), pagingParams.getSecond()), null, user, justActive, new ArrayList<>());
     return Response.ok(ApiUtils.indexedResultToRODAObjectList(DIPFile.class, result), mediaType).build();
   }
 
@@ -171,7 +171,7 @@ public class DIPFilesResource {
       if (fileUUID == null) {
         file = Browser.createDIPFile(user, dipId, new ArrayList<>(), name, size == -1 ? 0 : size, inputStream);
       } else {
-        file = Browser.createDIPFileWithUUID(user, fileUUID, name, size == -1 ? 0 : size, inputStream);
+        file = Browser.createDIPFileWithParentUUID(user, fileUUID, name, size == -1 ? 0 : size, inputStream);
       }
 
       return Response.ok(file, mediaType).build();

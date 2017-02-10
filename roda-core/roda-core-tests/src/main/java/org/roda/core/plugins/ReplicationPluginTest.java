@@ -146,7 +146,7 @@ public class ReplicationPluginTest {
     String parentUUID = f.createFolder(null, "test").getUUID();
     index.commit(TransferredResource.class);
 
-    index.retrieve(TransferredResource.class, parentUUID);
+    index.retrieve(TransferredResource.class, parentUUID, new ArrayList<>());
     return parentUUID;
   }
 
@@ -158,7 +158,7 @@ public class ReplicationPluginTest {
     f.createFile(test1UUID, "test" + i + ".txt", generateContentData());
     index.commit(TransferredResource.class);
 
-    return index.retrieve(TransferredResource.class, test1UUID);
+    return index.retrieve(TransferredResource.class, test1UUID, new ArrayList<>());
   }
 
   private List<String> ingestCorpora() throws RequestNotValidException, NotFoundException, GenericException,

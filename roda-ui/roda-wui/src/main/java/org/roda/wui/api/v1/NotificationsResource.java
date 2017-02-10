@@ -7,6 +7,8 @@
  */
 package org.roda.wui.api.v1;
 
+import java.util.ArrayList;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -73,7 +75,7 @@ public class NotificationsResource {
     boolean justActive = false;
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
     IndexResult<Notification> result = Browser.find(Notification.class, Filter.NULL, Sorter.NONE,
-      new Sublist(pagingParams.getFirst(), pagingParams.getSecond()), null, user, justActive);
+      new Sublist(pagingParams.getFirst(), pagingParams.getSecond()), null, user, justActive, new ArrayList<>());
     return Response.ok(ApiUtils.indexedResultToRODAObjectList(Notification.class, result), mediaType).build();
   }
 
@@ -136,7 +138,8 @@ public class NotificationsResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    Notification notification = org.roda.wui.api.controllers.Browser.retrieve(user, Notification.class, notificationId);
+    Notification notification = org.roda.wui.api.controllers.Browser.retrieve(user, Notification.class, notificationId,
+      new ArrayList<>());
     return Response.ok(notification, mediaType).build();
   }
 

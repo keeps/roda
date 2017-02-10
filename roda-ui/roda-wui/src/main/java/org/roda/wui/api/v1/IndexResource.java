@@ -7,6 +7,7 @@
  */
 package org.roda.wui.api.v1;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -204,7 +205,7 @@ public class IndexResource {
       final Class<T> classToReturn = getClass(findRequest.classToReturn);
 
       IndexResult<T> indexResult = Browser.find(classToReturn, findRequest.filter, findRequest.sorter,
-        findRequest.sublist, findRequest.facets, user, findRequest.onlyActive);
+        findRequest.sublist, findRequest.facets, user, findRequest.onlyActive, new ArrayList<>());
       indexResult = I18nUtility.translate(indexResult, classToReturn, localeString);
       response = Response.ok(indexResult, mediaType).build();
     }
@@ -237,7 +238,7 @@ public class IndexResource {
       return csvResponse(findRequest, user);
     } else {
       final IndexResult<T> result = Browser.find(getClass(findRequest.classToReturn), findRequest.filter,
-        findRequest.sorter, findRequest.sublist, findRequest.facets, user, findRequest.onlyActive);
+        findRequest.sorter, findRequest.sublist, findRequest.facets, user, findRequest.onlyActive, new ArrayList<>());
       return Response.ok(result, mediaType).build();
     }
 
@@ -325,7 +326,7 @@ public class IndexResource {
     if (findRequest.exportFacets) {
 
       final IndexResult<T> result = Browser.find(returnClass, findRequest.filter, Sorter.NONE, Sublist.NONE,
-        findRequest.facets, user, findRequest.onlyActive);
+        findRequest.facets, user, findRequest.onlyActive, new ArrayList<>());
 
       return ApiUtils.okResponse(
         new RodaStreamingOutput(new FacetsCSVOutputStream(result.getFacetResults(), findRequest.filename, delimiter))
@@ -334,7 +335,7 @@ public class IndexResource {
     } else {
 
       final IterableIndexResult<T> result = Browser.findAll(returnClass, findRequest.filter, findRequest.sorter,
-        findRequest.sublist, user, findRequest.onlyActive);
+        findRequest.sublist, user, findRequest.onlyActive, new ArrayList<>());
 
       return ApiUtils
         .okResponse(new RodaStreamingOutput(new ResultsCSVOutputStream<>(result, findRequest.filename, delimiter))

@@ -9,6 +9,7 @@ package org.roda.wui.api.v1;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -89,7 +90,7 @@ public class FilesResource {
     boolean justActive = false;
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
     IndexResult<IndexedFile> result = Browser.find(IndexedFile.class, Filter.NULL, Sorter.NONE,
-      new Sublist(pagingParams.getFirst(), pagingParams.getSecond()), null, user, justActive);
+      new Sublist(pagingParams.getFirst(), pagingParams.getSecond()), null, user, justActive, new ArrayList<>());
     return Response.ok(ApiUtils.indexedResultToRODAObjectList(IndexedFile.class, result), mediaType).build();
   }
 

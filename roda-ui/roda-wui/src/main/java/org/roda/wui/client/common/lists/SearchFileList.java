@@ -49,9 +49,13 @@ public class SearchFileList extends BasicAsyncTableCell<IndexedFile> {
   private TextColumn<IndexedFile> sizeColumn;
   private boolean showFilePath;
 
+  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.FILE_AIP_ID,
+    RodaConstants.FILE_REPRESENTATION_ID, RodaConstants.FILE_ISDIRECTORY, RodaConstants.FILE_ORIGINALNAME,
+    RodaConstants.FILE_FILE_ID, RodaConstants.FILE_PATH);
+
   public SearchFileList(Filter filter, boolean justActive, Facets facets, String summary, boolean selectable,
     boolean showFilePath) {
-    super(IndexedFile.class, filter, justActive, facets, summary, selectable);
+    super(IndexedFile.class, filter, justActive, facets, summary, selectable, fieldsToReturn);
     this.showFilePath = showFilePath;
   }
 
@@ -80,14 +84,15 @@ public class SearchFileList extends BasicAsyncTableCell<IndexedFile> {
       public SafeHtml getValue(IndexedFile file) {
         SafeHtmlBuilder b = new SafeHtmlBuilder();
         if (file != null) {
+          List<String> filePath = file.getPath();
           String fileName = file.getOriginalName() != null ? file.getOriginalName() : file.getId();
-          List<String> fullpath = new ArrayList<>(file.getPath());
+          List<String> fullpath = new ArrayList<>(filePath);
           fullpath.add(fileName);
           b.append(SafeHtmlUtils.fromSafeConstant("<div title='"));
           b.append(SafeHtmlUtils.fromString(StringUtils.join(fullpath, "/")));
           b.append(SafeHtmlUtils.fromSafeConstant("'>"));
-          if (showFilePath && file.getPath() != null && !file.getPath().isEmpty()) {
-            String path = StringUtils.join(file.getPath(), "/");
+          if (showFilePath && filePath != null && !filePath.isEmpty()) {
+            String path = StringUtils.join(filePath, "/");
             b.append(SafeHtmlUtils.fromSafeConstant("<span class='file-path'>"));
             b.append(SafeHtmlUtils.fromString(path));
             b.append(SafeHtmlUtils.fromSafeConstant("/"));
@@ -143,7 +148,6 @@ public class SearchFileList extends BasicAsyncTableCell<IndexedFile> {
     formatColumn.setSortable(true);
     sizeColumn.setSortable(true);
 
-
     addColumn(iconColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-files-o'></i>"), false, false, 3);
     addColumn(pathColumn, messages.filePath(), true, false);
     addColumn(formatColumn, messages.fileFormat(), true, false);
@@ -152,11 +156,11 @@ public class SearchFileList extends BasicAsyncTableCell<IndexedFile> {
     // define column width priority
     display.setColumnWidth(iconColumn, 3.0, Unit.EM);
     display.setColumnWidth(sizeColumn, 6.0, Unit.EM);
-    
+
     pathColumn.setCellStyleNames("text-align-left");
     formatColumn.setCellStyleNames("text-align-left");
     sizeColumn.setCellStyleNames("text-align-right");
-    
+
     // define default sorting
     display.getColumnSortList().push(new ColumnSortInfo(pathColumn, true));
 

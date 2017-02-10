@@ -402,7 +402,7 @@ public final class PluginHelper {
     throws NotFoundException, GenericException {
     String jobId = getJobId(plugin);
     if (jobId != null) {
-      return index.retrieve(Job.class, jobId);
+      return index.retrieve(Job.class, jobId, new ArrayList<>());
     } else {
       throw new NotFoundException("Job not found");
     }
@@ -427,7 +427,7 @@ public final class PluginHelper {
   public static <T extends IsRODAObject> String getJobUsername(String jobId, IndexService index)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
     if (jobId != null) {
-      Job job = index.retrieve(Job.class, jobId);
+      Job job = index.retrieve(Job.class, jobId, Arrays.asList(RodaConstants.JOB_USERNAME));
       return job.getUsername();
     } else {
       throw new NotFoundException("Job not found");
@@ -618,7 +618,8 @@ public final class PluginHelper {
     Filter ancestorFilter = new Filter(new SimpleFilterParameter(aipField, ancestor));
     if (computedSearchScope.isPresent()) {
       try {
-        IndexedAIP computedParent = index.retrieve(IndexedAIP.class, computedSearchScope.get());
+        IndexedAIP computedParent = index.retrieve(IndexedAIP.class, computedSearchScope.get(),
+          Arrays.asList(RodaConstants.AIP_ID, RodaConstants.AIP_ANCESTORS));
         if (!computedParent.getAncestors().isEmpty()) {
           ancestorFilter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, computedParent.getId()));
         }
@@ -626,9 +627,11 @@ public final class PluginHelper {
         // Do nothing
       }
     }
+
     try {
       // TODO 2016-11-24 sleroux: add user permission
-      IndexResult<IndexedAIP> result = index.find(IndexedAIP.class, ancestorFilter, Sorter.NONE, new Sublist(0, 1));
+      IndexResult<IndexedAIP> result = index.find(IndexedAIP.class, ancestorFilter, Sorter.NONE, new Sublist(0, 1),
+        Arrays.asList(RodaConstants.AIP_ID));
 
       if (result.getTotalCount() >= 1) {
         IndexedAIP indexedAIP = result.getResults().get(0);
@@ -1044,7 +1047,8 @@ public final class PluginHelper {
 
     Filter ghostsFilter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.TRUE.toString()));
     jobId.ifPresent(id -> ghostsFilter.add(new SimpleFilterParameter(RodaConstants.INGEST_JOB_ID, id)));
-    IterableIndexResult<IndexedAIP> ghosts = index.findAll(IndexedAIP.class, ghostsFilter);
+    IterableIndexResult<IndexedAIP> ghosts = index.findAll(IndexedAIP.class, ghostsFilter,
+      Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_ID, RodaConstants.INGEST_SIP_IDS));
 
     for (IndexedAIP aip : ghosts) {
       if (aip.getIngestSIPIds() != null && aip.getIngestSIPIds().size() > 0) {
@@ -1072,7 +1076,8 @@ public final class PluginHelper {
       computedSearchScope
         .ifPresent(id -> nonGhostsFilter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, id)));
 
-      IndexResult<IndexedAIP> result = index.find(IndexedAIP.class, nonGhostsFilter, Sorter.NONE, new Sublist(0, 1));
+      IndexResult<IndexedAIP> result = index.find(IndexedAIP.class, nonGhostsFilter, Sorter.NONE, new Sublist(0, 1),
+        Arrays.asList(RodaConstants.AIP_ID));
 
       if (result.getTotalCount() > 1) {
         LOGGER.debug("Couldn't find non-ghost AIP with ingest SIP ids {}", entry.getKey());
@@ -1100,7 +1105,7 @@ public final class PluginHelper {
     throws GenericException, AuthorizationDeniedException, RequestNotValidException {
     Filter parentFilter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aipId));
     searchScope.ifPresent(id -> parentFilter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, id)));
-    index.execute(IndexedAIP.class, parentFilter, child -> {
+    index.execute(IndexedAIP.class, parentFilter, Arrays.asList(RodaConstants.AIP_ID), child -> {
       try {
         AIP aip = model.retrieveAIP(child.getId());
         aip.setParentId(newParentId);
@@ -1121,7 +1126,7 @@ public final class PluginHelper {
     throws GenericException, AuthorizationDeniedException, RequestNotValidException {
     Filter parentFilter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aipId));
     searchScope.ifPresent(id -> parentFilter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, id)));
-    index.execute(IndexedAIP.class, parentFilter, child -> {
+    index.execute(IndexedAIP.class, parentFilter, Arrays.asList(RodaConstants.AIP_ID), child -> {
       try {
         model.moveAIP(child.getId(), newParentId);
       } catch (NotFoundException e) {

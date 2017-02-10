@@ -50,17 +50,23 @@ public class TransferredResourceList extends BasicAsyncTableCell<TransferredReso
   private TextColumn<TransferredResource> sizeColumn;
   private Column<TransferredResource, Date> creationDateColumn;
 
+  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
+    RodaConstants.TRANSFERRED_RESOURCE_ID, RodaConstants.TRANSFERRED_RESOURCE_ISFILE,
+    RodaConstants.TRANSFERRED_RESOURCE_NAME, RodaConstants.TRANSFERRED_RESOURCE_SIZE,
+    RodaConstants.TRANSFERRED_RESOURCE_DATE);
+
   public TransferredResourceList() {
     this(null, null, null, false);
   }
 
   public TransferredResourceList(Filter filter, Facets facets, String summary, boolean selectable) {
-    super(TransferredResource.class, filter, facets, summary, selectable);
+    super(TransferredResource.class, filter, facets, summary, selectable, fieldsToReturn);
   }
 
   public TransferredResourceList(Filter filter, Facets facets, String summary, boolean selectable, int initialPageSize,
     int pageSizeIncrement) {
-    super(TransferredResource.class, filter, facets, summary, selectable, initialPageSize, pageSizeIncrement);
+    super(TransferredResource.class, filter, facets, summary, selectable, initialPageSize, pageSizeIncrement,
+      fieldsToReturn);
   }
 
   @Override

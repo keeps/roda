@@ -10,6 +10,7 @@
  */
 package org.roda.wui.client.browse;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
@@ -86,6 +87,7 @@ public class BrowseDIP extends Composite {
   // target
   private IndexedDIP dip;
   private DIPFile dipFile;
+  private List<DIPFile> dipFileAncestors;
 
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
@@ -113,8 +115,6 @@ public class BrowseDIP extends Composite {
 
   @UiField
   AccessibleFocusPanel previousButton, nextButton, dipOptionsButton;
-
-  private List<DIPFile> dipFileAncestors;
 
   /**
    * Create a new panel to view a representation
@@ -157,15 +157,15 @@ public class BrowseDIP extends Composite {
 
     if (file != null) {
       Sliders.createDisseminationsSlider(center, disseminationsButton, file);
-      Sliders.createInfoSlider(center, refererInfoButton, bundle.getFile());
-      Sliders.createOptionsSlider(center, refererOptionsButton, bundle.getFile());
+      Sliders.createInfoSlider(center, refererInfoButton, file);
+      Sliders.createOptionsSlider(center, refererOptionsButton, file);
     } else if (representation != null) {
       Sliders.createDisseminationsSlider(center, disseminationsButton, representation);
-      Sliders.createInfoSlider(center, refererInfoButton, bundle.getRepresentation());
-      Sliders.createOptionsSlider(center, refererOptionsButton, bundle.getRepresentation());
+      Sliders.createInfoSlider(center, refererInfoButton, representation);
+      Sliders.createOptionsSlider(center, refererOptionsButton, representation);
     } else if (aip != null) {
       Sliders.createDisseminationsSlider(center, disseminationsButton, aip);
-      Sliders.createInfoSlider(center, refererInfoButton, bundle.getAip());
+      Sliders.createInfoSlider(center, refererInfoButton, aip);
       refererOptionsButton.setVisible(false);
     } else {
       disseminationsButton.setVisible(false);
@@ -237,7 +237,7 @@ public class BrowseDIP extends Composite {
   private static <T extends IsIndexed> void openReferred(final T object, Filter filter) {
     BrowserService.Util.getInstance().find(IndexedDIP.class.getName(), filter, DEFAULT_DIPFILE_SORTER,
       new Sublist(0, 1), Facets.NONE, LocaleInfo.getCurrentLocale().getLocaleName(), true,
-      new AsyncCallback<IndexResult<IndexedDIP>>() {
+      Arrays.asList(RodaConstants.DIP_ID), new AsyncCallback<IndexResult<IndexedDIP>>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -265,7 +265,7 @@ public class BrowseDIP extends Composite {
 
   private void update() {
     if (dipFile != null) {
-      center.add(new DipFilePreview(viewers, dipFile, aip, representation, file));
+      center.add(new DipFilePreview(viewers, dipFile));
     } else {
       final Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIPFILE_DIP_ID, dip.getId()),
         new EmptyKeyFilterParameter(RodaConstants.DIPFILE_PARENT_UUID));
@@ -306,7 +306,8 @@ public class BrowseDIP extends Composite {
     boolean justActive = true;
 
     BrowserService.Util.getInstance().find(DIPFile.class.getName(), filter, sorter, sublist, Facets.NONE, localeString,
-      justActive, new AsyncCallback<IndexResult<DIPFile>>() {
+      justActive, Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIPFILE_DIP_ID, RodaConstants.DIPFILE_ID),
+      new AsyncCallback<IndexResult<DIPFile>>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -328,7 +329,7 @@ public class BrowseDIP extends Composite {
   }
 
   private List<BreadcrumbItem> getBreadcrumbs() {
-    return BreadcrumbUtils.getDipBreadcrumbs(aip, representation, file, dip, dipFile, dipFileAncestors);
+    return BreadcrumbUtils.getDipBreadcrumbs(dip, dipFile, dipFileAncestors);
   }
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
@@ -369,7 +370,7 @@ public class BrowseDIP extends Composite {
         final String historyDipUUID = historyTokens.get(0);
         final String historyDipFileUUID = historyTokens.size() > 1 ? historyTokens.get(1) : null;
 
-        BrowserService.Util.getInstance().getDipBundle(historyDipUUID, historyDipFileUUID,
+        BrowserService.Util.getInstance().retrieveDipBundle(historyDipUUID, historyDipFileUUID,
           new AsyncCallback<DipBundle>() {
 
             @Override

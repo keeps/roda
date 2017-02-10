@@ -899,7 +899,7 @@ public final class ModelUtils {
       SelectedItemsList<IndexedAIP> list = (SelectedItemsList<IndexedAIP>) selectedItems;
       for (String objectId : list.getIds()) {
         try {
-          res.add(RodaCoreFactory.getIndexService().retrieve(IndexedAIP.class, objectId));
+          res.add(RodaCoreFactory.getIndexService().retrieve(IndexedAIP.class, objectId, new ArrayList<>()));
         } catch (GenericException | NotFoundException e) {
           LOGGER.error("Error retrieving TransferredResource", e);
         }

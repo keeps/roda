@@ -9,6 +9,7 @@ package org.roda.wui.api.v1;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -90,7 +91,7 @@ public class TransferredResource {
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
     IndexResult<org.roda.core.data.v2.ip.TransferredResource> result = Browser.find(
       org.roda.core.data.v2.ip.TransferredResource.class, Filter.NULL, Sorter.NONE,
-      new Sublist(pagingParams.getFirst(), pagingParams.getSecond()), null, user, justActive);
+      new Sublist(pagingParams.getFirst(), pagingParams.getSecond()), null, user, justActive, new ArrayList<>());
     return Response
       .ok(ApiUtils.indexedResultToRODAObjectList(org.roda.core.data.v2.ip.TransferredResource.class, result), mediaType)
       .build();

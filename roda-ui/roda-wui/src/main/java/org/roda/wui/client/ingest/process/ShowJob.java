@@ -10,6 +10,8 @@
  */
 package org.roda.wui.client.ingest.process;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -109,30 +111,31 @@ public class ShowJob extends Composite {
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
         String jobId = historyTokens.get(0);
-        BrowserService.Util.getInstance().retrieveJobBundle(jobId, new AsyncCallback<JobBundle>() {
+        BrowserService.Util.getInstance().retrieveJobBundle(jobId, new ArrayList<String>(),
+          new AsyncCallback<JobBundle>() {
 
-          @Override
-          public void onFailure(Throwable caught) {
-            if (caught instanceof NotFoundException) {
-              Toast.showError(messages.notFoundError(), messages.jobNotFound());
-              HistoryUtils.newHistory(Process.RESOLVER);
-            } else {
-              AsyncCallbackUtils.defaultFailureTreatment(caught);
-            }
-          }
-
-          @Override
-          public void onSuccess(JobBundle jobBundle) {
-            Map<String, PluginInfo> pluginsInfo = new HashMap<String, PluginInfo>();
-            for (PluginInfo pluginInfo : jobBundle.getPluginsInfo()) {
-              pluginsInfo.put(pluginInfo.getId(), pluginInfo);
+            @Override
+            public void onFailure(Throwable caught) {
+              if (caught instanceof NotFoundException) {
+                Toast.showError(messages.notFoundError(), messages.jobNotFound());
+                HistoryUtils.newHistory(Process.RESOLVER);
+              } else {
+                AsyncCallbackUtils.defaultFailureTreatment(caught);
+              }
             }
 
-            ShowJob showJob = new ShowJob(jobBundle.getJob(), pluginsInfo);
-            callback.onSuccess(showJob);
-          }
+            @Override
+            public void onSuccess(JobBundle jobBundle) {
+              Map<String, PluginInfo> pluginsInfo = new HashMap<String, PluginInfo>();
+              for (PluginInfo pluginInfo : jobBundle.getPluginsInfo()) {
+                pluginsInfo.put(pluginInfo.getId(), pluginInfo);
+              }
 
-        });
+              ShowJob showJob = new ShowJob(jobBundle.getJob(), pluginsInfo);
+              callback.onSuccess(showJob);
+            }
+
+          });
       } else if (historyTokens.size() > 1 && historyTokens.get(0).equals(ShowJobReport.RESOLVER.getHistoryToken())) {
         ShowJobReport.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else {
@@ -163,6 +166,12 @@ public class ShowJob extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
+
+  // empty to get all job information
+  private static final List<String> fieldsToReturn = new ArrayList<>();
+
+  private static final List<String> aipFieldsToReturn = Arrays.asList(RodaConstants.AIP_ID, RodaConstants.AIP_LEVEL,
+    RodaConstants.AIP_TITLE);
 
   private Job job;
   private final Map<String, PluginInfo> pluginsInfo;
@@ -569,20 +578,21 @@ public class ShowJob extends Composite {
 
           @Override
           public void run() {
-            BrowserService.Util.getInstance().retrieve(Job.class.getName(), job.getId(), new AsyncCallback<Job>() {
+            BrowserService.Util.getInstance().retrieve(Job.class.getName(), job.getId(), fieldsToReturn,
+              new AsyncCallback<Job>() {
 
-              @Override
-              public void onFailure(Throwable caught) {
-                AsyncCallbackUtils.defaultFailureTreatment(caught);
-              }
+                @Override
+                public void onFailure(Throwable caught) {
+                  AsyncCallbackUtils.defaultFailureTreatment(caught);
+                }
 
-              @Override
-              public void onSuccess(Job updatedJob) {
-                ShowJob.this.job = updatedJob;
-                update();
-                scheduleUpdateStatus();
-              }
-            });
+                @Override
+                public void onSuccess(Job updatedJob) {
+                  ShowJob.this.job = updatedJob;
+                  update();
+                  scheduleUpdateStatus();
+                }
+              });
           }
         };
       }
@@ -597,33 +607,34 @@ public class ShowJob extends Composite {
       ? job.getPluginParameters().get(parameter.getId()) : parameter.getDefaultValue();
 
     if (value != null && !value.isEmpty()) {
-      BrowserService.Util.getInstance().retrieve(IndexedAIP.class.getName(), value, new AsyncCallback<IndexedAIP>() {
+      BrowserService.Util.getInstance().retrieve(IndexedAIP.class.getName(), value, aipFieldsToReturn,
+        new AsyncCallback<IndexedAIP>() {
 
-        @Override
-        public void onFailure(Throwable caught) {
-          if (caught instanceof NotFoundException) {
-            Label itemTitle = new Label(value);
-            itemTitle.addStyleName("itemText");
-            aipPanel.clear();
-            aipPanel.add(itemTitle);
-          } else {
-            AsyncCallbackUtils.defaultFailureTreatment(caught);
+          @Override
+          public void onFailure(Throwable caught) {
+            if (caught instanceof NotFoundException) {
+              Label itemTitle = new Label(value);
+              itemTitle.addStyleName("itemText");
+              aipPanel.clear();
+              aipPanel.add(itemTitle);
+            } else {
+              AsyncCallbackUtils.defaultFailureTreatment(caught);
+            }
           }
-        }
 
-        @Override
-        public void onSuccess(IndexedAIP aip) {
-          Label itemTitle = new Label();
-          HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(aip.getLevel());
-          itemIconHtmlPanel.addStyleName("itemIcon");
-          itemTitle.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());
-          itemTitle.addStyleName("itemText");
+          @Override
+          public void onSuccess(IndexedAIP aip) {
+            Label itemTitle = new Label();
+            HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(aip.getLevel());
+            itemIconHtmlPanel.addStyleName("itemIcon");
+            itemTitle.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());
+            itemTitle.addStyleName("itemText");
 
-          aipPanel.clear();
-          aipPanel.add(itemIconHtmlPanel);
-          aipPanel.add(itemTitle);
-        }
-      });
+            aipPanel.clear();
+            aipPanel.add(itemIconHtmlPanel);
+            aipPanel.add(itemTitle);
+          }
+        });
     } else {
       HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getTopIconHTMLPanel();
       aipPanel.clear();

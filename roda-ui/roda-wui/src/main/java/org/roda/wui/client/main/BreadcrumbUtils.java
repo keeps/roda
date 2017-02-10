@@ -228,39 +228,29 @@ public class BreadcrumbUtils {
     return ret;
   }
 
-  public static List<BreadcrumbItem> getDipBreadcrumbs(IndexedAIP aip, IndexedRepresentation representation,
-    IndexedFile file, IndexedDIP dip, DIPFile dipFile, List<DIPFile> dipFileAncestors) {
+  public static List<BreadcrumbItem> getDipBreadcrumbs(IndexedDIP dip, DIPFile dipFile,
+    List<DIPFile> dipFileAncestors) {
     List<BreadcrumbItem> ret = new ArrayList<>();
 
-    // if (aip != null && representation != null && file != null) {
-    // ret.addAll(getFileBreadcrumbs(aip, representation, file));
-    // } else if (aip != null && representation != null) {
-    // ret.add(getBreadcrumbItem(aip));
-    // ret.add(getBreadcrumbItem(representation));
-    // } else if (aip != null) {
-    // ret.add(getBreadcrumbItem(aip));
-    // }
-
     // DIP
-    ret.add(getBreadcrumbItem(dip, aip, representation, file));
+    ret.add(getBreadcrumbItem(dip));
 
     if (dipFile != null) {
       // DIP File ancestors
       if (dipFileAncestors != null) {
         for (DIPFile dipFileAncestor : dipFileAncestors) {
-          ret.add(getBreadcrumbItem(dipFileAncestor, aip, representation, file));
+          ret.add(getBreadcrumbItem(dipFileAncestor));
         }
       }
 
       // DIP File
-      ret.add(getBreadcrumbItem(dipFile, aip, representation, file));
+      ret.add(getBreadcrumbItem(dipFile));
     }
 
     return ret;
   }
 
-  private static BreadcrumbItem getBreadcrumbItem(final IndexedDIP dip, final IndexedAIP aip,
-    final IndexedRepresentation representation, final IndexedFile file) {
+  private static BreadcrumbItem getBreadcrumbItem(final IndexedDIP dip) {
     SafeHtmlBuilder b = new SafeHtmlBuilder();
     // TODO get icon from config
     b.append(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-play-circle-o'></i>"));
@@ -276,8 +266,7 @@ public class BreadcrumbUtils {
     });
   }
 
-  private static BreadcrumbItem getBreadcrumbItem(final DIPFile dipFile, final IndexedAIP aip,
-    final IndexedRepresentation representation, final IndexedFile file) {
+  private static BreadcrumbItem getBreadcrumbItem(final DIPFile dipFile) {
     SafeHtmlBuilder b = new SafeHtmlBuilder();
     // TODO get icon from config
     b.append(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-play-circle'></i>"));

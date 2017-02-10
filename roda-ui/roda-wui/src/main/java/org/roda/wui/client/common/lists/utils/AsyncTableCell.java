@@ -116,6 +116,8 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
   private Facets facets;
   private boolean selectable;
 
+  private List<String> fieldsToReturn;
+
   private final ClientLogger logger = new ClientLogger(getClass().getName());
 
   private int initialPageSize = 20;
@@ -129,18 +131,18 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
   private Actionable<T> actionable = null;
   private final CalloutPopup actionsPopup = new CalloutPopup();
 
-  public AsyncTableCell(Class<T> classToReturn) {
-    this(classToReturn, null, false, null, null, false, 20, 100, null);
+  public AsyncTableCell(Class<T> classToReturn, List<String> fieldsToReturn) {
+    this(classToReturn, null, false, null, null, false, 20, 100, null, fieldsToReturn);
   }
 
   public AsyncTableCell(Class<T> classToReturn, Filter filter, boolean justActive, Facets facets, String summary,
-    boolean selectable, O object) {
-    this(classToReturn, filter, justActive, facets, summary, selectable, 20, 100, object);
+    boolean selectable, O object, List<String> fieldsToReturn) {
+    this(classToReturn, filter, justActive, facets, summary, selectable, 20, 100, object, fieldsToReturn);
   }
 
   public AsyncTableCell(final Class<T> classToReturn, final Filter filter, final boolean justActive,
     final Facets facets, final String summary, final boolean selectable, final int initialPageSize,
-    final int pageSizeIncrement, final O object) {
+    final int pageSizeIncrement, final O object, List<String> fieldsToReturn) {
     super();
 
     this.classToReturn = classToReturn;
@@ -155,6 +157,8 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     this.facets = facets;
     this.selectable = selectable;
 
+    this.fieldsToReturn = fieldsToReturn;
+
     display = new AccessibleCellTable<T>(getInitialPageSize(),
       (MyCellTableResources) GWT.create(MyCellTableResources.class), getKeyProvider(), summary);
     display.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.DISABLED);
@@ -162,11 +166,12 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
     configure(display);
 
-    this.dataProvider = new MyAsyncDataProvider<T>(display, new IndexResultDataProvider<T>() {
+    this.dataProvider = new MyAsyncDataProvider<T>(display, fieldsToReturn, new IndexResultDataProvider<T>() {
 
       @Override
-      public void getData(Sublist sublist, Sorter sorter, final AsyncCallback<IndexResult<T>> callback) {
-        AsyncTableCell.this.getData(AsyncTableCell.this.getFilter(), sublist, sorter,
+      public void getData(Sublist sublist, Sorter sorter, List<String> fieldsToReturn,
+        final AsyncCallback<IndexResult<T>> callback) {
+        AsyncTableCell.this.getData(AsyncTableCell.this.getFilter(), sublist, sorter, fieldsToReturn,
           new AsyncCallback<IndexResult<T>>() {
 
             @Override
@@ -381,17 +386,19 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     };
   }
 
-  private void getData(Filter filter, Sublist sublist, Sorter sorter, AsyncCallback<IndexResult<T>> callback) {
+  private void getData(Filter filter, Sublist sublist, Sorter sorter, List<String> fieldsToReturn,
+    AsyncCallback<IndexResult<T>> callback) {
     if (filter == null) {
       callback.onSuccess(null);
     } else {
-      getData(sublist, sorter, callback);
+      getData(sublist, sorter, fieldsToReturn, callback);
     }
   }
 
-  protected void getData(Sublist sublist, Sorter sorter, AsyncCallback<IndexResult<T>> callback) {
+  protected void getData(Sublist sublist, Sorter sorter, List<String> fieldsToReturn,
+    AsyncCallback<IndexResult<T>> callback) {
     BrowserService.Util.getInstance().find(getClassToReturn().getName(), getFilter(), sorter, sublist, getFacets(),
-      LocaleInfo.getCurrentLocale().getLocaleName(), getJustActive(), callback);
+      LocaleInfo.getCurrentLocale().getLocaleName(), getJustActive(), fieldsToReturn, callback);
   }
 
   protected abstract Sorter getSorter(ColumnSortList columnSortList);
@@ -425,7 +432,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
   }
 
   public void update() {
-    dataProvider.update();
+    dataProvider.update(fieldsToReturn);
   }
 
   public void autoUpdate(int periodMillis) {
@@ -437,7 +444,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
       @Override
       public void run() {
-        dataProvider.update(new AsyncCallback<Void>() {
+        dataProvider.update(fieldsToReturn, new AsyncCallback<Void>() {
 
           @Override
           public void onFailure(Throwable caught) {

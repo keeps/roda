@@ -10,8 +10,10 @@
  */
 package org.roda.wui.client.planning;
 
+import java.util.Arrays;
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
@@ -86,6 +88,19 @@ public class ShowRisk extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
+  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.RISK_ID,
+    RodaConstants.RISK_NAME, RodaConstants.RISK_DESCRIPTION, RodaConstants.RISK_IDENTIFIED_ON,
+    RodaConstants.RISK_IDENTIFIED_BY, RodaConstants.RISK_CATEGORY, RodaConstants.RISK_NOTES,
+    RodaConstants.RISK_PRE_MITIGATION_PROBABILITY, RodaConstants.RISK_PRE_MITIGATION_IMPACT,
+    RodaConstants.RISK_PRE_MITIGATION_SEVERITY, RodaConstants.RISK_POST_MITIGATION_PROBABILITY,
+    RodaConstants.RISK_POST_MITIGATION_IMPACT, RodaConstants.RISK_POST_MITIGATION_SEVERITY,
+    RodaConstants.RISK_PRE_MITIGATION_NOTES, RodaConstants.RISK_POST_MITIGATION_NOTES,
+    RodaConstants.RISK_MITIGATION_STRATEGY, RodaConstants.RISK_MITIGATION_OWNER,
+    RodaConstants.RISK_MITIGATION_OWNER_TYPE, RodaConstants.RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_TYPE,
+    RodaConstants.RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_VALUE);
+
+  private Risk risk;
+
   @UiField(provided = true)
   RiskShowPanel riskShowPanel;
 
@@ -106,8 +121,6 @@ public class ShowRisk extends Composite {
 
   @UiField
   Button buttonEditIncidence;
-
-  private Risk risk;
 
   /**
    * Create a new panel to view a risk
@@ -155,19 +168,20 @@ public class ShowRisk extends Composite {
   void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 1) {
       String riskId = historyTokens.get(0);
-      BrowserService.Util.getInstance().retrieve(IndexedRisk.class.getName(), riskId, new AsyncCallback<IndexedRisk>() {
+      BrowserService.Util.getInstance().retrieve(IndexedRisk.class.getName(), riskId, fieldsToReturn,
+        new AsyncCallback<IndexedRisk>() {
 
-        @Override
-        public void onFailure(Throwable caught) {
-          callback.onFailure(caught);
-        }
+          @Override
+          public void onFailure(Throwable caught) {
+            callback.onFailure(caught);
+          }
 
-        @Override
-        public void onSuccess(IndexedRisk result) {
-          instance = new ShowRisk(result);
-          callback.onSuccess(instance);
-        }
-      });
+          @Override
+          public void onSuccess(IndexedRisk result) {
+            instance = new ShowRisk(result);
+            callback.onSuccess(instance);
+          }
+        });
     } else {
       HistoryUtils.newHistory(RiskRegister.RESOLVER);
       callback.onSuccess(null);

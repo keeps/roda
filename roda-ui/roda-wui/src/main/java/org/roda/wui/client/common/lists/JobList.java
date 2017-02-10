@@ -7,6 +7,7 @@
  */
 package org.roda.wui.client.common.lists;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -61,16 +62,18 @@ public class JobList extends BasicAsyncTableCell<Job> {
   // private Column<Job, SafeHtml> objectsProcessingCountColumn;
   // private Column<Job, SafeHtml> objectsWaitingCountColumn;
 
+  private static final List<String> fieldsToReturn = new ArrayList<>();
+
   public JobList() {
     this(null, null, null, false);
   }
 
   public JobList(Filter filter, Facets facets, String summary, boolean selectable) {
-    super(Job.class, filter, true, facets, summary, selectable);
+    super(Job.class, filter, true, facets, summary, selectable, fieldsToReturn);
   }
 
   public JobList(Filter filter, Facets facets, String summary, boolean selectable, int pageSize, int incrementPage) {
-    super(Job.class, filter, true, facets, summary, selectable, pageSize, incrementPage);
+    super(Job.class, filter, true, facets, summary, selectable, pageSize, incrementPage, fieldsToReturn);
   }
 
   @Override

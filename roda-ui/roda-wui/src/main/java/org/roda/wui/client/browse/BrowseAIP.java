@@ -142,6 +142,10 @@ public class BrowseAIP extends Composite {
 
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
+  private static final List<String> aipFieldsToReturn = new ArrayList<String>(
+    Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_ID, RodaConstants.AIP_STATE, RodaConstants.AIP_TITLE,
+      RodaConstants.AIP_LEVEL, RodaConstants.INGEST_SIP_IDS, RodaConstants.INGEST_JOB_ID));
+
   private String aipId;
 
   // Focus
@@ -369,7 +373,7 @@ public class BrowseAIP extends Composite {
     } else {
       aipId = id;
       BrowserService.Util.getInstance().retrieveBrowseAIPBundle(id, LocaleInfo.getCurrentLocale().getLocaleName(),
-        new AsyncCallback<BrowseAIPBundle>() {
+        aipFieldsToReturn, new AsyncCallback<BrowseAIPBundle>() {
 
           @Override
           public void onFailure(Throwable caught) {
@@ -482,17 +486,18 @@ public class BrowseAIP extends Composite {
     if (bundle != null) {
       addStyleName(BROWSE_AIP_CSS);
 
-      this.justActive = AIPState.ACTIVE.equals(bundle.getAip().getState());
       IndexedAIP aip = bundle.getAip();
+      AIPState state = aip.getState();
+      this.justActive = AIPState.ACTIVE.equals(state);
 
       // STATUS
-      for (AIPState state : AIPState.values()) {
-        this.removeStyleName(state.toString().toLowerCase());
+      for (AIPState s : AIPState.values()) {
+        this.removeStyleName(s.toString().toLowerCase());
       }
 
-      this.addStyleName(aip.getState().toString().toLowerCase());
-      aipState.setHTML(HtmlSnippetUtils.getAIPStateHTML(aip.getState()));
-      aipState.setVisible(AIPState.ACTIVE != aip.getState());
+      this.addStyleName(state.toString().toLowerCase());
+      aipState.setHTML(HtmlSnippetUtils.getAIPStateHTML(state));
+      aipState.setVisible(!justActive);
 
       // IDENTIFICATION
       updateSectionIdentification(bundle);
@@ -563,8 +568,7 @@ public class BrowseAIP extends Composite {
 
       // Set button visibility
       keyboardFocus.setFocus(true);
-      ListSelectionUtils.bindLayout(bundle.getAip(), searchPrevious, searchNext, keyboardFocus, true, false, false,
-        searchSection);
+      ListSelectionUtils.bindLayout(aip, searchPrevious, searchNext, keyboardFocus, true, false, false, searchSection);
 
     } else {
       viewAction();
@@ -880,7 +884,8 @@ public class BrowseAIP extends Composite {
 
   @UiHandler("searchAIP")
   void searchAIPHandler(ClickEvent e) {
-    HistoryUtils.newHistory(Search.RESOLVER, RodaConstants.SEARCH_REPRESENTATIONS, RodaConstants.AIP_AIP_ID, aipId);
+    HistoryUtils.newHistory(Search.RESOLVER, RodaConstants.SEARCH_REPRESENTATIONS, RodaConstants.REPRESENTATION_AIP_ID,
+      aipId);
   }
 
 }

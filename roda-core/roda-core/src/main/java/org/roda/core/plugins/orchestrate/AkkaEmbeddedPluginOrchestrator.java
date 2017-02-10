@@ -44,6 +44,7 @@ import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
+import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
@@ -166,8 +167,10 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       jobStateInfoActor.tell(new Messages.PluginBeforeAllExecuteIsReady<>(plugin), jobActor);
 
-      Iterator<T1> findAllIterator = index.findAll(classToActOn, filter.setReturnLite(true),
-        new Sorter(new SortParameter(RodaConstants.INDEX_UUID, true))).iterator();
+      List<String> liteFields = SolrUtils.getClassLiteFields(classToActOn);
+      Iterator<T1> findAllIterator = index
+        .findAll(classToActOn, filter, new Sorter(new SortParameter(RodaConstants.INDEX_UUID, true)), liteFields)
+        .iterator();
 
       List<T1> indexObjects = new ArrayList<T1>();
       while (findAllIterator.hasNext()) {
@@ -423,7 +426,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
   private IterableIndexResult<Job> findUnfinishedJobs() {
     Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.JOB_STATE, Job.nonFinalStateList()));
-    return index.findAll(Job.class, filter);
+    return index.findAll(Job.class, filter, new ArrayList<>());
   }
 
   private void cleanUnfinishedJobs(IterableIndexResult<Job> unfinishedJobs) {

@@ -11,6 +11,7 @@
 package org.roda.wui.client.planning;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
@@ -84,6 +85,16 @@ public class ShowRiskIncidence extends Composite {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static ClientMessages messages = GWT.create(ClientMessages.class);
 
+  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
+    RodaConstants.RISK_INCIDENCE_ID, RodaConstants.RISK_INCIDENCE_RISK_ID, RodaConstants.RISK_INCIDENCE_DESCRIPTION,
+    RodaConstants.RISK_INCIDENCE_STATUS, RodaConstants.RISK_INCIDENCE_SEVERITY,
+    RodaConstants.RISK_INCIDENCE_DETECTED_BY, RodaConstants.RISK_INCIDENCE_DETECTED_ON,
+    RodaConstants.RISK_INCIDENCE_MITIGATED_ON, RodaConstants.RISK_INCIDENCE_MITIGATED_BY,
+    RodaConstants.RISK_INCIDENCE_MITIGATED_DESCRIPTION);
+
+  private RiskIncidence incidence;
+  private String relatedObject = "";
+
   @UiField
   Label incidenceId;
 
@@ -125,9 +136,6 @@ public class ShowRiskIncidence extends Composite {
 
   @UiField
   Button buttonCancel;
-
-  private RiskIncidence incidence;
-  private String relatedObject = "";
 
   /**
    * Create a new panel to view a risk incidence
@@ -205,7 +213,7 @@ public class ShowRiskIncidence extends Composite {
   void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 1) {
       String riskIncidenceId = historyTokens.get(0);
-      BrowserService.Util.getInstance().retrieve(RiskIncidence.class.getName(), riskIncidenceId,
+      BrowserService.Util.getInstance().retrieve(RiskIncidence.class.getName(), riskIncidenceId, fieldsToReturn,
         new AsyncCallback<RiskIncidence>() {
 
           @Override

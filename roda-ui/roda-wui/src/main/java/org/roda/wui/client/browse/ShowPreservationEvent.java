@@ -547,10 +547,11 @@ public class ShowPreservationEvent extends Composite {
 
       Label pathLabel = null;
       Label pathValue = null;
-      if (ifile.getPath() != null && !ifile.getPath().isEmpty()) {
+      List<String> filePath = ifile.getPath();
+      if (filePath != null && !filePath.isEmpty()) {
         pathLabel = new Label(messages.filePath());
         pathLabel.addStyleName("label");
-        pathValue = new Label(StringUtils.join(ifile.getPath(), "/"));
+        pathValue = new Label(StringUtils.join(filePath, "/"));
         pathValue.addStyleName("value");
       }
 
@@ -608,7 +609,7 @@ public class ShowPreservationEvent extends Composite {
       layout.add(footer);
 
       Anchor link = new Anchor(messages.inspectFile(), HistoryUtils.createHistoryHashLink(
-        HistoryUtils.getHistoryBrowse(ifile.getAipId(), ifile.getRepresentationId(), ifile.getPath(), ifile.getId())));
+        HistoryUtils.getHistoryBrowse(ifile.getAipId(), ifile.getRepresentationId(), filePath, ifile.getId())));
 
       link.addStyleName("btn");
       footer.add(link);

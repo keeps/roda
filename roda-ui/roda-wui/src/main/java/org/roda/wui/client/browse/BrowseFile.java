@@ -100,7 +100,7 @@ public class BrowseFile extends Composite {
         final String historyFileId = historyTokens.get(historyTokens.size() - 1);
 
         BrowserService.Util.getInstance().retrieveBrowseFileBundle(historyAipId, historyRepresentationId,
-          historyFilePath, historyFileId, LocaleInfo.getCurrentLocale().getLocaleName(),
+          historyFilePath, historyFileId, LocaleInfo.getCurrentLocale().getLocaleName(), fileFieldsToReturn,
           new AsyncCallback<BrowseFileBundle>() {
 
             @Override
@@ -135,7 +135,10 @@ public class BrowseFile extends Composite {
 
   public static final Integer DEFAULT_FILE_INDEX = -1;
 
-  private BrowseFileBundle bundle;
+  private final BrowseFileBundle bundle;
+  private SliderPanel disseminationsSlider;
+
+  private static final List<String> fileFieldsToReturn = new ArrayList<String>();
 
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
@@ -158,10 +161,8 @@ public class BrowseFile extends Composite {
   @UiField
   FlowPanel center;
 
-  private SliderPanel disseminationsSlider;
-
   /**
-   * Create a new panel to view a representation
+   * Create a new panel to view a file
    * 
    * @param viewers
    * @param index

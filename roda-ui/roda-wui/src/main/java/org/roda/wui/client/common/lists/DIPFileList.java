@@ -42,17 +42,20 @@ public class DIPFileList extends BasicAsyncTableCell<DIPFile> {
   private Column<DIPFile, SafeHtml> iconColumn;
   private TextColumn<DIPFile> idColumn;
 
+  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
+    RodaConstants.DIPFILE_IS_DIRECTORY, RodaConstants.DIPFILE_ID, RodaConstants.DIPFILE_DIP_ID);
+
   public DIPFileList() {
     this(null, null, null, false);
   }
 
   public DIPFileList(Filter filter, Facets facets, String summary, boolean selectable) {
-    super(DIPFile.class, filter, facets, summary, selectable);
+    super(DIPFile.class, filter, facets, summary, selectable, fieldsToReturn);
   }
 
   public DIPFileList(Filter filter, Facets facets, String summary, boolean selectable, int initialPageSize,
     int pageSizeIncrement) {
-    super(DIPFile.class, filter, facets, summary, selectable, initialPageSize, pageSizeIncrement);
+    super(DIPFile.class, filter, facets, summary, selectable, initialPageSize, pageSizeIncrement, fieldsToReturn);
   }
 
   @Override

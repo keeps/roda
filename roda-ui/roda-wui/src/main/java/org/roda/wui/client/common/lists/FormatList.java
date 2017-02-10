@@ -45,16 +45,20 @@ public class FormatList extends BasicAsyncTableCell<Format> {
   private TextColumn<Format> mimetypeColumn;
   private TextColumn<Format> pronomColumn;
 
+  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.FORMAT_ID,
+    RodaConstants.FORMAT_NAME, RodaConstants.FORMAT_CATEGORY, RodaConstants.FORMAT_MIMETYPES,
+    RodaConstants.FORMAT_PRONOMS);
+
   public FormatList() {
     this(null, null, null, false);
   }
 
   public FormatList(Filter filter, Facets facets, String summary, boolean selectable) {
-    super(Format.class, filter, facets, summary, selectable);
+    super(Format.class, filter, facets, summary, selectable, fieldsToReturn);
   }
 
   public FormatList(Filter filter, Facets facets, String summary, boolean selectable, int pageSize, int incrementPage) {
-    super(Format.class, filter, facets, summary, selectable, pageSize, incrementPage);
+    super(Format.class, filter, facets, summary, selectable, pageSize, incrementPage, fieldsToReturn);
   }
 
   @Override

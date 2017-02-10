@@ -7,6 +7,7 @@
  */
 package org.roda.core.plugins.orchestrate;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -90,7 +91,8 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
       int offset = 0;
       do {
         // XXX block size could be recommended by plugin
-        find = RodaCoreFactory.getIndexService().find(classToActOn, filter, SORTER, new Sublist(offset, BLOCK_SIZE));
+        find = RodaCoreFactory.getIndexService().find(classToActOn, filter, SORTER, new Sublist(offset, BLOCK_SIZE),
+          new ArrayList<>());
         offset += find.getLimit();
         // submitPlugin(find.getResults(), plugin);
 

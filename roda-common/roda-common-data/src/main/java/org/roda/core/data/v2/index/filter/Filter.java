@@ -27,8 +27,6 @@ public class Filter implements Serializable {
   public static final Filter ALL = new Filter();
   public static final Filter NULL = null;
 
-  private boolean returnLite = false;
-
   private List<FilterParameter> parameters = new ArrayList<FilterParameter>();
 
   /**
@@ -146,15 +144,6 @@ public class Filter implements Serializable {
     if (parameters != null) {
       this.parameters.addAll(parameters);
     }
-  }
-
-  public boolean isReturnLite() {
-    return returnLite;
-  }
-
-  public Filter setReturnLite(boolean returnLite) {
-    this.returnLite = returnLite;
-    return this;
   }
 
 }

@@ -155,29 +155,31 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public BrowseAIPBundle retrieveBrowseAIPBundle(String aipId, String localeString)
+  public BrowseAIPBundle retrieveBrowseAIPBundle(String aipId, String localeString, List<String> aipFieldsToReturn)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Locale locale = ServerTools.parseLocale(localeString);
-    return Browser.retrieveBrowseAipBundle(user, aipId, locale);
+    return Browser.retrieveBrowseAipBundle(user, aipId, locale, aipFieldsToReturn);
   }
 
   @Override
   public BrowseRepresentationBundle retrieveBrowseRepresentationBundle(String aipId, String representationId,
-    String localeString)
+    String localeString, List<String> representationFieldsToReturn)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Locale locale = ServerTools.parseLocale(localeString);
-    return Browser.retrieveBrowseRepresentationBundle(user, aipId, representationId, locale);
+    return Browser.retrieveBrowseRepresentationBundle(user, aipId, representationId, locale,
+      representationFieldsToReturn);
   }
 
   @Override
   public BrowseFileBundle retrieveBrowseFileBundle(String aipId, String representationId, List<String> filePath,
-    String fileId, String localeString)
+    String fileId, String localeString, List<String> fileFieldsToReturn)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Locale locale = ServerTools.parseLocale(localeString);
-    return Browser.retrieveBrowseFileBundle(user, aipId, representationId, filePath, fileId, locale);
+    return Browser.retrieveBrowseFileBundle(user, aipId, representationId, filePath, fileId, locale,
+      fileFieldsToReturn);
   }
 
   @Override
@@ -200,12 +202,13 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   @Override
   public <T extends IsIndexed> IndexResult<T> find(String classNameToReturn, Filter filter, Sorter sorter,
-    Sublist sublist, Facets facets, String localeString, boolean justActive)
+    Sublist sublist, Facets facets, String localeString, boolean justActive, List<String> fieldsToReturn)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException {
     try {
       User user = UserUtility.getUser(getThreadLocalRequest());
       Class<T> classToReturn = SelectedItemsUtils.parseClass(classNameToReturn);
-      IndexResult<T> result = Browser.find(classToReturn, filter, sorter, sublist, facets, user, justActive);
+      IndexResult<T> result = Browser.find(classToReturn, filter, sorter, sublist, facets, user, justActive,
+        fieldsToReturn);
       return I18nUtility.translate(result, classToReturn, localeString);
     } catch (RuntimeException e) {
       LOGGER.error("Unexpected error in find", e);
@@ -226,19 +229,20 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public <T extends IsIndexed> T retrieve(String classNameToReturn, String id)
+  public <T extends IsIndexed> T retrieve(String classNameToReturn, String id, List<String> fieldsToReturn)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Class<T> classToReturn = SelectedItemsUtils.parseClass(classNameToReturn);
-    return Browser.retrieve(user, classToReturn, id);
+    return Browser.retrieve(user, classToReturn, id, fieldsToReturn);
   }
 
   @Override
-  public <T extends IsIndexed> List<T> retrieve(String classNameToReturn, SelectedItems<T> selectedItems)
+  public <T extends IsIndexed> List<T> retrieve(String classNameToReturn, SelectedItems<T> selectedItems,
+    List<String> fieldsToReturn)
     throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Class<T> classToReturn = SelectedItemsUtils.parseClass(classNameToReturn);
-    return Browser.retrieve(user, classToReturn, selectedItems);
+    return Browser.retrieve(user, classToReturn, selectedItems, fieldsToReturn);
   }
 
   @Override
@@ -255,12 +259,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     User user = UserUtility.getUser(getThreadLocalRequest());
     Class<T> classToReturn = SelectedItemsUtils.parseClass(classNameToReturn);
     return Browser.suggest(user, classToReturn, field, query, allowPartial);
-  }
-
-  public List<IndexedAIP> retrieveAncestors(IndexedAIP aip)
-    throws AuthorizationDeniedException, GenericException, NotFoundException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.retrieveAncestors(user, aip);
   }
 
   @Override
@@ -447,10 +445,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public JobBundle retrieveJobBundle(String jobId)
+  public JobBundle retrieveJobBundle(String jobId, List<String> fieldsToReturn)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Job job = Browser.retrieve(user, Job.class, jobId);
+    Job job = Browser.retrieve(user, Job.class, jobId, fieldsToReturn);
 
     List<PluginInfo> pluginsInfo = new ArrayList<>();
 
@@ -752,20 +750,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public IndexedRepresentation retrieveRepresentationById(String representationId)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.retrieveRepresentationById(user, representationId);
-  }
-
-  @Override
-  public IndexedFile retrieveFileById(String fileId)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.retrieveFileById(user, fileId);
-  }
-
-  @Override
   public String renameTransferredResource(String transferredResourceId, String newName)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException,
     IsStillUpdatingException, NotFoundException {
@@ -866,10 +850,9 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public DipBundle getDipBundle(String dipUUID, String dipFileUUID)
+  public DipBundle retrieveDipBundle(String dipUUID, String dipFileUUID)
     throws RequestNotValidException, AuthorizationDeniedException, GenericException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-
     return Browser.retrieveDipBundle(user, dipUUID, dipFileUUID);
   }
 
@@ -886,7 +869,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     User user = UserUtility.getUser(getThreadLocalRequest());
     Class<? extends IsRODAObject> classToReturn = SelectedItemsUtils.parseClass(classNameToReturn);
     Class<T> indexedClassToReturn = IndexUtils.giveRespectiveIndexClass(classToReturn);
-    return Browser.retrieve(user, indexedClassToReturn, id);
+    return Browser.retrieve(user, indexedClassToReturn, id, new ArrayList<>());
   }
 
 }

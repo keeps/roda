@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileAttribute;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -125,7 +126,7 @@ public final class TestsHelper {
 
     Long counter = index.count(IndexedReport.class, filter);
     IndexResult<IndexedReport> indexReports = index.find(IndexedReport.class, filter, Sorter.NONE,
-      new Sublist(0, counter.intValue()));
+      new Sublist(0, counter.intValue()), new ArrayList<>());
 
     List<Report> reports = indexReports.getResults().stream().map(ireport -> (Report) ireport)
       .collect(Collectors.toList());

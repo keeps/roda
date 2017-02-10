@@ -50,17 +50,21 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
   private TextColumn<LogEntry> addressColumn;
   private Column<LogEntry, SafeHtml> stateColumn;
 
+  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.LOG_ID,
+    RodaConstants.LOG_DATETIME, RodaConstants.LOG_ACTION_COMPONENT, RodaConstants.LOG_ACTION_METHOD,
+    RodaConstants.LOG_USERNAME, RodaConstants.LOG_DURATION, RodaConstants.LOG_ADDRESS, RodaConstants.LOG_STATE);
+
   public LogEntryList() {
     this(null, null, null, false);
   }
 
   public LogEntryList(Filter filter, Facets facets, String summary, boolean selectable) {
-    super(LogEntry.class, filter, facets, summary, selectable);
+    super(LogEntry.class, filter, facets, summary, selectable, fieldsToReturn);
   }
 
   public LogEntryList(Filter filter, Facets facets, String summary, boolean selectable, int pageSize,
     int incrementPage) {
-    super(LogEntry.class, filter, facets, summary, selectable, pageSize, incrementPage);
+    super(LogEntry.class, filter, facets, summary, selectable, pageSize, incrementPage, fieldsToReturn);
   }
 
   @Override

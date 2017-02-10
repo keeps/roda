@@ -5,9 +5,6 @@ import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.DIPFile;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.wui.client.common.lists.DIPFileList;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
@@ -27,14 +24,12 @@ public class DipFilePreview extends BitstreamPreview<DIPFile> {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  public DipFilePreview(Viewers viewers, DIPFile dipFile, IndexedAIP refererAIP,
-    IndexedRepresentation refererRepresentation, IndexedFile refererFile) {
+  public DipFilePreview(Viewers viewers, DIPFile dipFile) {
     super(viewers, RestUtils.createDipFileDownloadUri(dipFile.getUUID()), NO_FORMAT, dipFile.getId(), dipFile.getSize(),
       dipFile.isDirectory(), dipFile);
   }
 
-  public DipFilePreview(Viewers viewers, DIPFile dipFile, IndexedAIP refererAIP,
-    IndexedRepresentation refererRepresentation, IndexedFile refererFile, Command onPreviewFailure) {
+  public DipFilePreview(Viewers viewers, DIPFile dipFile, Command onPreviewFailure) {
     super(viewers, RestUtils.createDipFileDownloadUri(dipFile.getUUID()), NO_FORMAT, dipFile.getId(), dipFile.getSize(),
       dipFile.isDirectory(), onPreviewFailure, dipFile);
   }

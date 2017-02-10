@@ -137,7 +137,7 @@ public class IndexServiceTest {
 
   @AfterMethod
   public void cleanUp() throws RODAException {
-    index.execute(IndexedAIP.class, Filter.ALL, new IndexRunnable<IndexedAIP>() {
+    index.execute(IndexedAIP.class, Filter.ALL, new ArrayList<>(), new IndexRunnable<IndexedAIP>() {
       @Override
       public void run(IndexedAIP item) throws GenericException, RequestNotValidException, AuthorizationDeniedException {
         try {
@@ -187,7 +187,7 @@ public class IndexServiceTest {
     index.commitAIPs();
 
     // Retrieve, count and list AIP
-    final IndexedAIP indexedAip = index.retrieve(IndexedAIP.class, aipId);
+    final IndexedAIP indexedAip = index.retrieve(IndexedAIP.class, aipId, new ArrayList<>());
     compareAIPWithIndexedAIP(aip, indexedAip);
 
     final IndexResult<IndexedAIP> indexAips = index.find(IndexedAIP.class, null, null, new Sublist(0, 10), null);
@@ -210,8 +210,8 @@ public class IndexServiceTest {
 
     // Retrieve, count and list SRO
     String rep1Id = aip.getRepresentations().get(0).getId();
-    IndexedRepresentation rep1 = index.retrieve(IndexedRepresentation.class,
-      IdUtils.getRepresentationId(aipId, rep1Id));
+    IndexedRepresentation rep1 = index.retrieve(IndexedRepresentation.class, IdUtils.getRepresentationId(aipId, rep1Id),
+      new ArrayList<>());
     assertEquals(rep1Id, rep1.getId());
 
     Filter filterParentTheAIP = new Filter();
@@ -251,7 +251,7 @@ public class IndexServiceTest {
      */
     model.deleteAIP(aipId);
     try {
-      index.retrieve(IndexedAIP.class, aipId);
+      index.retrieve(IndexedAIP.class, aipId, new ArrayList<>());
       Assert.fail("AIP deleted but yet it was retrieved");
     } catch (NotFoundException e) {
       // do nothing as it was the expected exception
@@ -295,7 +295,7 @@ public class IndexServiceTest {
       CorporaConstants.OTHER_AIP_ID);
     final AIP updatedAIP = model.updateAIP(aipId, corporaService, otherAipPath, aipCreator);
 
-    final IndexedAIP indexedAIP = index.retrieve(IndexedAIP.class, aipId);
+    final IndexedAIP indexedAIP = index.retrieve(IndexedAIP.class, aipId, new ArrayList<>());
 
     compareAIPWithIndexedAIP(updatedAIP, indexedAIP);
 
@@ -362,8 +362,8 @@ public class IndexServiceTest {
 
     index.commitAIPs();
 
-    IndexedAIP aip = index.retrieve(IndexedAIP.class, CorporaConstants.OTHER_AIP_ID);
-    List<IndexedAIP> ancestors = index.retrieveAncestors(aip);
+    IndexedAIP aip = index.retrieve(IndexedAIP.class, CorporaConstants.OTHER_AIP_ID, new ArrayList<>());
+    List<IndexedAIP> ancestors = index.retrieveAncestors(aip, new ArrayList<>());
     MatcherAssert.assertThat(ancestors,
       Matchers.hasItem(Matchers.<IndexedAIP> hasProperty("id", Matchers.equalTo(CorporaConstants.SOURCE_AIP_ID))));
   }
@@ -582,10 +582,11 @@ public class IndexServiceTest {
 
     index.commitAIPs();
 
-    IndexResult<IndexedAIP> find = index.find(IndexedAIP.class, null, null, new Sublist(0, 10));
+    IndexResult<IndexedAIP> find = index.find(IndexedAIP.class, null, null, new Sublist(0, 10), new ArrayList<>());
     assertEquals(1, find.getTotalCount());
 
-    IndexedAIP aip = index.retrieve(IndexedAIP.class, UUID.nameUUIDFromBytes(origAipId.getBytes()).toString());
+    IndexedAIP aip = index.retrieve(IndexedAIP.class, UUID.nameUUIDFromBytes(origAipId.getBytes()).toString(),
+      new ArrayList<>());
     assertNotNull(aip);
 
     // cleanup
@@ -634,10 +635,10 @@ public class IndexServiceTest {
       assertEquals(risk.getId(), risk2.getId());
       assertEquals(risk.getName(), risk2.getName());
 
-      IndexResult<IndexedRisk> find = index.find(IndexedRisk.class, null, null, new Sublist(0, 10));
+      IndexResult<IndexedRisk> find = index.find(IndexedRisk.class, null, null, new Sublist(0, 10), new ArrayList<>());
       assertEquals(1, find.getTotalCount());
 
-      Risk risk3 = index.retrieve(IndexedRisk.class, risk.getId());
+      Risk risk3 = index.retrieve(IndexedRisk.class, risk.getId(), new ArrayList<>());
       assertNotNull(risk3);
       assertEquals(risk.getId(), risk3.getId());
       assertEquals(risk.getName(), risk3.getName());
@@ -647,7 +648,7 @@ public class IndexServiceTest {
       properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATED.toString());
       model.updateRisk(risk3, properties, false);
 
-      Risk risk4 = index.retrieve(IndexedRisk.class, risk.getId());
+      Risk risk4 = index.retrieve(IndexedRisk.class, risk.getId(), new ArrayList<>());
       assertNotNull(risk4);
       assertEquals(risk.getId(), risk4.getId());
       assertEquals(risk4.getName(), "Risk New Name");
@@ -700,10 +701,10 @@ public class IndexServiceTest {
     assertEquals(format.getId(), format2.getId());
     assertEquals(format.getName(), format2.getName());
 
-    IndexResult<Format> find = index.find(Format.class, null, null, new Sublist(0, 10));
+    IndexResult<Format> find = index.find(Format.class, null, null, new Sublist(0, 10), new ArrayList<>());
     assertEquals(1, find.getTotalCount());
 
-    Format format3 = index.retrieve(Format.class, format.getId());
+    Format format3 = index.retrieve(Format.class, format.getId(), new ArrayList<>());
     assertNotNull(format3);
     assertEquals(format.getId(), format3.getId());
     assertEquals(format.getName(), format3.getName());
@@ -711,7 +712,7 @@ public class IndexServiceTest {
     format3.setName("Format New Name");
     model.updateFormat(format3, false);
 
-    Format format4 = index.retrieve(Format.class, format.getId());
+    Format format4 = index.retrieve(Format.class, format.getId(), new ArrayList<>());
     assertNotNull(format4);
     assertEquals(format.getId(), format4.getId());
     assertEquals(format4.getName(), "Format New Name");
@@ -739,10 +740,10 @@ public class IndexServiceTest {
     assertEquals(notification.getId(), message2.getId());
     assertEquals(notification.getSubject(), message2.getSubject());
 
-    IndexResult<Notification> find = index.find(Notification.class, null, null, new Sublist(0, 10));
+    IndexResult<Notification> find = index.find(Notification.class, null, null, new Sublist(0, 10), new ArrayList<>());
     assertEquals(1, find.getTotalCount());
 
-    Notification message3 = index.retrieve(Notification.class, notification.getId());
+    Notification message3 = index.retrieve(Notification.class, notification.getId(), new ArrayList<>());
     assertNotNull(message3);
     assertEquals(notification.getId(), message3.getId());
     assertEquals(message3.getSubject(), message3.getSubject());
@@ -750,7 +751,7 @@ public class IndexServiceTest {
     message3.setSubject("Message New Subject");
     model.updateNotification(message3);
 
-    Notification message4 = index.retrieve(Notification.class, notification.getId());
+    Notification message4 = index.retrieve(Notification.class, notification.getId(), new ArrayList<>());
     assertNotNull(message4);
     assertEquals(notification.getId(), message4.getId());
     assertEquals(message4.getSubject(), "Message New Subject");
@@ -786,7 +787,7 @@ public class IndexServiceTest {
     int blockSize = 100;
     do {
       find = RodaCoreFactory.getIndexService().find(IndexedAIP.class, Filter.ALL, Sorter.NONE,
-        new Sublist(offset, blockSize));
+        new Sublist(offset, blockSize), new ArrayList<>());
       offset += find.getLimit();
 
       // Add all ids to result list

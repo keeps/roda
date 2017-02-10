@@ -11,6 +11,7 @@
 package org.roda.wui.client.browse;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -103,7 +104,8 @@ public class BrowseRepresentation extends Composite {
         final String histortyRepresentationId = historyTokens.get(1);
 
         BrowserService.Util.getInstance().retrieveBrowseRepresentationBundle(historyAipId, histortyRepresentationId,
-          LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<BrowseRepresentationBundle>() {
+          LocaleInfo.getCurrentLocale().getLocaleName(), representationFields,
+          new AsyncCallback<BrowseRepresentationBundle>() {
 
             @Override
             public void onFailure(Throwable caught) {
@@ -145,6 +147,17 @@ public class BrowseRepresentation extends Composite {
 
   interface MyUiBinder extends UiBinder<Widget, BrowseRepresentation> {
   }
+
+  private List<HandlerRegistration> handlers;
+  private IndexedRepresentation representation;
+  private String aipId;
+  private String repId;
+  private String repUUID;
+
+  private static final List<String> representationFields = new ArrayList<String>(Arrays.asList(RodaConstants.INDEX_UUID,
+    RodaConstants.REPRESENTATION_AIP_ID, RodaConstants.REPRESENTATION_ID, RodaConstants.REPRESENTATION_TYPE));
+
+  private static final String ALL_FILTER = SearchFilters.allFilter(IndexedFile.class.getName());
 
   // Focus
   @UiField
@@ -207,14 +220,6 @@ public class BrowseRepresentation extends Composite {
   @UiField
   Button searchPrevious, searchNext;
 
-  private List<HandlerRegistration> handlers;
-  private IndexedRepresentation representation;
-  private String aipId;
-  private String repId;
-  private String repUUID;
-
-  private static final String ALL_FILTER = SearchFilters.allFilter(IndexedFile.class.getName());
-
   public BrowseRepresentation(BrowseRepresentationBundle bundle) {
     this.representation = bundle.getRepresentation();
 
@@ -225,7 +230,8 @@ public class BrowseRepresentation extends Composite {
     handlers = new ArrayList<HandlerRegistration>();
     String summary = messages.representationListOfFiles();
 
-    boolean justActive = AIPState.ACTIVE.equals(bundle.getAip().getState());
+    AIPState state = bundle.getAip().getState();
+    boolean justActive = AIPState.ACTIVE.equals(state);
     boolean selectable = true;
     boolean showFilesPath = false;
 
@@ -255,8 +261,8 @@ public class BrowseRepresentation extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
 
     // STATUS
-    aipState.setHTML(HtmlSnippetUtils.getAIPStateHTML(bundle.getAip().getState()));
-    aipState.setVisible(AIPState.ACTIVE != bundle.getAip().getState());
+    aipState.setHTML(HtmlSnippetUtils.getAIPStateHTML(state));
+    aipState.setVisible(!justActive);
 
     // IDENTIFICATION
 
@@ -343,7 +349,7 @@ public class BrowseRepresentation extends Composite {
     if (bundle.getDipCount() > 0) {
       Filter disseminationsFilter = new Filter(
         new SimpleFilterParameter(RodaConstants.DIP_REPRESENTATION_UUIDS, repUUID));
-      disseminationsList.set(disseminationsFilter, bundle.getAip().getState().equals(AIPState.ACTIVE), Facets.NONE);
+      disseminationsList.set(disseminationsFilter, state.equals(AIPState.ACTIVE), Facets.NONE);
       disseminationsSearch.setDefaultFilter(disseminationsFilter, true);
       disseminationsSearch.clearSearchInputBox();
     }
@@ -370,7 +376,7 @@ public class BrowseRepresentation extends Composite {
     // CSS
     this.addStyleName("browse");
     this.addStyleName("browse-representation");
-    this.addStyleName(bundle.getAip().getState().toString().toLowerCase());
+    this.addStyleName(state.toString().toLowerCase());
 
     Element firstElement = this.getElement().getFirstChildElement();
     if (firstElement.getTagName().equalsIgnoreCase("input")) {

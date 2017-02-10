@@ -53,6 +53,9 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
   // user permissions are valid and the AIP permissions were updated";
   private static final String NO_CREATE_TOP_LEVEL_AIP_PERMISSION = "The user doesn't have CREATE_TOP_LEVEL_AIP_PERMISSION permission";
 
+  private static final List<String> userFieldsToReturn = Arrays.asList(RodaConstants.MEMBERS_GROUPS,
+    RodaConstants.MEMBERS_ID);
+
   private boolean hasFreeAccess = false;
 
   @Override
@@ -144,8 +147,9 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
       String jobCreatorUsername = currentJob.getUsername();
       if (aip.getParentId() != null) {
         try {
-          IndexedAIP parentAIP = index.retrieve(IndexedAIP.class, aip.getParentId());
-          User user = index.retrieve(User.class, jobCreatorUsername);
+          IndexedAIP parentAIP = index.retrieve(IndexedAIP.class, aip.getParentId(),
+            RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+          User user = index.retrieve(User.class, jobCreatorUsername, userFieldsToReturn);
           UserUtility.checkAIPPermissions(user, parentAIP, PermissionType.CREATE);
         } catch (NotFoundException nfe) {
           reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(PARENT_AIP_NOT_FOUND);
@@ -154,7 +158,8 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
           reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(NO_PERMISSION_TO_CREATE_UNDER_AIP);
         }
       } else {
-        RODAMember member = index.retrieve(RODAMember.class, jobCreatorUsername);
+        RODAMember member = index.retrieve(RODAMember.class, jobCreatorUsername,
+          Arrays.asList(RodaConstants.MEMBERS_ROLES_ALL));
         if (member.getAllRoles().contains(RodaConstants.REPOSITORY_PERMISSIONS_AIP_CREATE_TOP)) {
           LOGGER.debug("User have CREATE_TOP_LEVEL_AIP_PERMISSION permission.");
         } else {

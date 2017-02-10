@@ -214,7 +214,7 @@ public final class JobsHelper {
 
   public static List<TransferredResource> getTransferredResources(IndexService index, List<String> uuids)
     throws NotFoundException, GenericException {
-    List<TransferredResource> ret = index.retrieve(TransferredResource.class, uuids);
+    List<TransferredResource> ret = index.retrieve(TransferredResource.class, uuids, new ArrayList<>());
     if (ret.isEmpty()) {
       throw new NotFoundException("Could not retrieve the Transferred Resources");
     }
@@ -245,7 +245,7 @@ public final class JobsHelper {
 
     if (!uuids.isEmpty()) {
       try {
-        List<IndexedRepresentation> retrieve = index.retrieve(IndexedRepresentation.class, uuids);
+        List<IndexedRepresentation> retrieve = index.retrieve(IndexedRepresentation.class, uuids, new ArrayList<>());
 
         List<Representation> representationsToReturn = getRepresentationFromList(model, retrieve);
 
@@ -277,7 +277,7 @@ public final class JobsHelper {
     throws NotFoundException {
     if (!uuids.isEmpty()) {
       try {
-        List<IndexedFile> retrieve = index.retrieve(IndexedFile.class, uuids);
+        List<IndexedFile> retrieve = index.retrieve(IndexedFile.class, uuids, new ArrayList<>());
 
         List<File> filesToReturn = getFilesFromList(model, retrieve);
 
@@ -334,7 +334,7 @@ public final class JobsHelper {
 
   public static <T extends IsRODAObject> List<T> getObjectsFromIndex(IndexService index, Class<T> objectClass,
     List<String> uuids) throws NotFoundException, GenericException {
-    List<T> ret = (List<T>) index.retrieve((Class<IsIndexed>) objectClass, uuids);
+    List<T> ret = (List<T>) index.retrieve((Class<IsIndexed>) objectClass, uuids, new ArrayList<>());
     if (ret.isEmpty()) {
       throw new NotFoundException("Could not retrieve the " + objectClass.getSimpleName());
     }
@@ -386,7 +386,7 @@ public final class JobsHelper {
         filter.add(new OneOfManyFilterParameter(RodaConstants.AIP_STATE,
           Arrays.asList(AIPState.CREATED.toString(), AIPState.INGEST_PROCESSING.toString())));
 
-        doJobCleanup(model, index.findAll(IndexedAIP.class, filter));
+        doJobCleanup(model, index.findAll(IndexedAIP.class, filter, Arrays.asList(RodaConstants.AIP_ID)));
       } catch (GenericException e) {
         LOGGER.error("Error doing Job cleanup", e);
       }

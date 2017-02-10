@@ -324,7 +324,8 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractA
 
     if (!file.isDirectory()) {
       LOGGER.debug("Processing file {}", file);
-      IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
+      IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file),
+        RodaConstants.FILE_FORMAT_FIELDS_TO_RETURN);
       String fileMimetype = ifile.getFileFormat().getMimeType();
       String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1);
 

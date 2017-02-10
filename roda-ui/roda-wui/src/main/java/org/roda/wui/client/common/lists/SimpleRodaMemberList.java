@@ -45,12 +45,15 @@ public class SimpleRodaMemberList extends BasicAsyncTableCell<RODAMember> {
   private TextColumn<RODAMember> idColumn;
   private TextColumn<RODAMember> nameColumn;
 
+  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.MEMBERS_ID,
+    RodaConstants.MEMBERS_IS_USER, RodaConstants.MEMBERS_NAME, RodaConstants.MEMBERS_ID);
+
   public SimpleRodaMemberList() {
     this(null, null, null, false);
   }
 
   public SimpleRodaMemberList(Filter filter, Facets facets, String summary, boolean selectable) {
-    super(RODAMember.class, filter, facets, summary, selectable);
+    super(RODAMember.class, filter, facets, summary, selectable, fieldsToReturn);
   }
 
   @Override

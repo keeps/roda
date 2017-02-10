@@ -7,6 +7,8 @@
  */
 package org.roda.wui.api.v1;
 
+import java.util.ArrayList;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -79,7 +81,7 @@ public class GroupsResource {
     filter.add(new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, Boolean.toString(isUser)));
 
     IndexResult<RODAMember> find = Browser.find(RODAMember.class, filter, Sorter.NONE, Sublist.ALL, Facets.NONE, user,
-      justActive);
+      justActive, new ArrayList<>());
 
     RODAMembers members = new RODAMembers(find.getResults());
     return Response.ok(members, mediaType).build();

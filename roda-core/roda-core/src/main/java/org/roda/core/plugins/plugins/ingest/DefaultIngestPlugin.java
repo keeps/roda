@@ -515,7 +515,8 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     for (Map.Entry<String, String> entry : aipIdToTransferredResourceId.entrySet()) {
       try {
         AIP aip = model.retrieveAIP(entry.getKey());
-        TransferredResource tr = index.retrieve(TransferredResource.class, entry.getValue());
+        TransferredResource tr = index.retrieve(TransferredResource.class, entry.getValue(),
+          Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH));
         boolean notify = true;
         PluginHelper.createPluginEvent(this, aip.getId(), model, index, tr, PluginState.SUCCESS, "", notify, startDate);
       } catch (NotFoundException | RequestNotValidException | GenericException | AuthorizationDeniedException

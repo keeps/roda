@@ -306,7 +306,8 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
     PluginHelper.updatePartialJobReport(this, model, index, fileReport, false, job);
 
     try {
-      final FileFormat fileFormat = index.retrieve(IndexedFile.class, fileId).getFileFormat();
+      final FileFormat fileFormat = index
+        .retrieve(IndexedFile.class, fileId, RodaConstants.FILE_FORMAT_FIELDS_TO_RETURN).getFileFormat();
       final FileFormatResult result;
       if (matchAtLeastOneFormatType()) {
         result = new MatchOneResult(fileFormat, index);
@@ -459,9 +460,8 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
     // new SimpleFilterParameter("filePath", file.getPath())
 
     try {
-      final List<RiskIncidence> results = index
-        .find(RiskIncidence.class, filter, new Sorter(new SortParameter("detectedOn", true)), new Sublist(0, 1))
-        .getResults();
+      final List<RiskIncidence> results = index.find(RiskIncidence.class, filter,
+        new Sorter(new SortParameter("detectedOn", true)), new Sublist(0, 1), new ArrayList<>()).getResults();
       if (results.isEmpty()) {
         throw new NotFoundException("Couldn't find RiskIncidence matching filter " + filter);
       } else {
@@ -724,7 +724,8 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
         final List<AttributeCheck> checks = attributeChecks();
         checks.forEach(check -> filterParams.add(check.getFilterParameter()));
 
-        final Iterator<Format> formats = this.indexService.findAll(Format.class, new Filter(filterParams)).iterator();
+        final Iterator<Format> formats = this.indexService
+          .findAll(Format.class, new Filter(filterParams), new ArrayList<>()).iterator();
         formats.forEachRemaining(format -> this.formatResults.add(new FormatResult(format, checks)));
       }
       return this.formatResults;
@@ -775,7 +776,7 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
         for (AttributeCheck check : attributeChecks(true)) {
           if (!check.isMissingAttribute()) {
             final Iterator<Format> formats = this.indexService
-              .findAll(Format.class, new Filter(check.getFilterParameter())).iterator();
+              .findAll(Format.class, new Filter(check.getFilterParameter()), new ArrayList<>()).iterator();
             formats.forEachRemaining(
               format -> this.formatResults.add(new FormatResult(format, Collections.singletonList(check))));
           }

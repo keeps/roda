@@ -57,6 +57,14 @@ public class IngestJobReportList extends BasicAsyncTableCell<IndexedReport> {
   private Column<IndexedReport, SafeHtml> lastPluginRunStateColumn;
   private TextColumn<IndexedReport> completionStatusColumn;
 
+  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
+    RodaConstants.JOB_REPORT_ID, RodaConstants.JOB_REPORT_JOB_ID, RodaConstants.JOB_REPORT_SOURCE_OBJECT_ORIGINAL_IDS,
+    RodaConstants.JOB_REPORT_SOURCE_OBJECT_ID, RodaConstants.JOB_REPORT_SOURCE_OBJECT_CLASS,
+    RodaConstants.JOB_REPORT_OUTCOME_OBJECT_LABEL, RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID,
+    RodaConstants.JOB_REPORT_DATE_UPDATED, RodaConstants.JOB_REPORT_PLUGIN, RodaConstants.JOB_REPORT_PLUGIN_VERSION,
+    RodaConstants.JOB_REPORT_PLUGIN_STATE, RodaConstants.JOB_REPORT_STEPS_COMPLETED,
+    RodaConstants.JOB_REPORT_TOTAL_STEPS, RodaConstants.JOB_REPORT_COMPLETION_PERCENTAGE);
+
   private final Map<String, PluginInfo> pluginsInfo;
 
   public IngestJobReportList() {
@@ -65,7 +73,7 @@ public class IngestJobReportList extends BasicAsyncTableCell<IndexedReport> {
 
   public IngestJobReportList(Filter filter, Facets facets, String summary, Map<String, PluginInfo> pluginsInfo,
     boolean selectable) {
-    super(IndexedReport.class, filter, facets, summary, selectable);
+    super(IndexedReport.class, filter, facets, summary, selectable, fieldsToReturn);
     this.pluginsInfo = pluginsInfo;
   }
 
@@ -207,7 +215,7 @@ public class IngestJobReportList extends BasicAsyncTableCell<IndexedReport> {
     Map<Column<IndexedReport, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<IndexedReport, ?>, List<String>>();
     columnSortingKeyMap.put(sourceObjectColumn, Arrays.asList(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ID));
     columnSortingKeyMap.put(outcomeObjectColumn, Arrays.asList(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID));
-    columnSortingKeyMap.put(updatedDateColumn, Arrays.asList(RodaConstants.JOB_REPORT_DATE_UPDATE));
+    columnSortingKeyMap.put(updatedDateColumn, Arrays.asList(RodaConstants.JOB_REPORT_DATE_UPDATED));
     columnSortingKeyMap.put(lastPluginRunColumn, Arrays.asList(RodaConstants.JOB_REPORT_PLUGIN));
     columnSortingKeyMap.put(lastPluginRunStateColumn, Arrays.asList(RodaConstants.JOB_REPORT_PLUGIN_STATE));
     return createSorter(columnSortList, columnSortingKeyMap);

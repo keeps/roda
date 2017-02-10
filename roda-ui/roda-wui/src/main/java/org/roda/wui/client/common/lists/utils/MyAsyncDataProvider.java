@@ -8,7 +8,9 @@
 package org.roda.wui.client.common.lists.utils;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.sort.Sorter;
@@ -30,16 +32,19 @@ public abstract class MyAsyncDataProvider<T extends Serializable> extends AsyncD
   private Date date;
   private Sublist sublist;
   private Sorter sorter;
+  private List<String> fieldsToReturn = new ArrayList<>();
 
-  public MyAsyncDataProvider(CellTable<T> display, IndexResultDataProvider<T> dataProvider) {
+  public MyAsyncDataProvider(CellTable<T> display, List<String> fieldsToReturn,
+    IndexResultDataProvider<T> dataProvider) {
     super();
     this.display = display;
     this.dataProvider = dataProvider;
+    this.fieldsToReturn = fieldsToReturn;
   }
 
   @Override
   protected void onRangeChanged(final HasData<T> display) {
-    fetch(display, new AsyncCallback<Void>() {
+    fetch(display, fieldsToReturn, new AsyncCallback<Void>() {
 
       @Override
       public void onFailure(Throwable caught) {
@@ -53,7 +58,7 @@ public abstract class MyAsyncDataProvider<T extends Serializable> extends AsyncD
     });
   }
 
-  private void fetch(final HasData<T> display, final AsyncCallback<Void> callback) {
+  private void fetch(final HasData<T> display, final List<String> fieldsToReturn, final AsyncCallback<Void> callback) {
     // Get the new range.
     final Range range = display.getVisibleRange();
 
@@ -65,7 +70,7 @@ public abstract class MyAsyncDataProvider<T extends Serializable> extends AsyncD
     int length = range.getLength();
     sublist = new Sublist(start, length);
     sorter = dataProvider.getSorter(columnSortList);
-    dataProvider.getData(sublist, sorter, new AsyncCallback<IndexResult<T>>() {
+    dataProvider.getData(sublist, sorter, fieldsToReturn, new AsyncCallback<IndexResult<T>>() {
 
       @Override
       public void onFailure(Throwable caught) {
@@ -91,12 +96,12 @@ public abstract class MyAsyncDataProvider<T extends Serializable> extends AsyncD
 
   protected abstract void fireChangeEvent(IndexResult<T> result);
 
-  public void update(final AsyncCallback<Void> callback) {
-    fetch(display, callback);
+  public void update(List<String> fieldsToReturn, final AsyncCallback<Void> callback) {
+    fetch(display, fieldsToReturn, callback);
   }
 
-  public void update() {
-    update(new AsyncCallback<Void>() {
+  public void update(final List<String> fieldsToReturn) {
+    update(fieldsToReturn, new AsyncCallback<Void>() {
 
       @Override
       public void onFailure(Throwable caught) {

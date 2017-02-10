@@ -138,7 +138,8 @@ public class CleanupFailedIngestAIPsPlugin extends AbstractPlugin<Void> {
       }
     }
     List<String> activeJobsIds = new ArrayList<>();
-    index.findAll(Job.class, activeJobsViaStateFilter).forEach(e -> activeJobsIds.add(e.getId()));
+    index.findAll(Job.class, activeJobsViaStateFilter, Arrays.asList(RodaConstants.JOB_ID))
+      .forEach(e -> activeJobsIds.add(e.getId()));
     return activeJobsIds;
   }
 
@@ -148,7 +149,8 @@ public class CleanupFailedIngestAIPsPlugin extends AbstractPlugin<Void> {
     activeJobsIds.forEach(e -> aipsFilter.add(new NotSimpleFilterParameter(RodaConstants.INGEST_JOB_ID, e)));
     // aip state is INGEST_PROCESSING
     aipsFilter.add(new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.INGEST_PROCESSING.toString()));
-    IterableIndexResult<IndexedAIP> findAipsToDelete = index.findAll(IndexedAIP.class, aipsFilter, false, true);
+    IterableIndexResult<IndexedAIP> findAipsToDelete = index.findAll(IndexedAIP.class, aipsFilter, false, true,
+      Arrays.asList(RodaConstants.AIP_ID));
     return findAipsToDelete;
   }
 

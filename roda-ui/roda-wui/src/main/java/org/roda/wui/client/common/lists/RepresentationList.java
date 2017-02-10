@@ -44,18 +44,23 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
   private TextColumn<IndexedRepresentation> sizeInBytesColumn;
   private TextColumn<IndexedRepresentation> numberOfDataFilesColumn;
 
+  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
+    RodaConstants.REPRESENTATION_ID, RodaConstants.REPRESENTATION_AIP_ID, RodaConstants.REPRESENTATION_ORIGINAL,
+    RodaConstants.REPRESENTATION_TYPE, RodaConstants.REPRESENTATION_SIZE_IN_BYTES,
+    RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES);
+
   public RepresentationList() {
     this(null, false, null, null, false);
   }
 
   public RepresentationList(Filter filter, boolean justActive, Facets facets, String summary, boolean selectable) {
-    super(IndexedRepresentation.class, filter, justActive, facets, summary, selectable);
+    super(IndexedRepresentation.class, filter, justActive, facets, summary, selectable, fieldsToReturn);
   }
 
   public RepresentationList(Filter filter, boolean justActive, Facets facets, String summary, boolean selectable,
     int initialPageSize, int pageSizeIncrement) {
     super(IndexedRepresentation.class, filter, justActive, facets, summary, selectable, initialPageSize,
-      pageSizeIncrement);
+      pageSizeIncrement, fieldsToReturn);
   }
 
   @Override

@@ -71,20 +71,21 @@ public class EditPermissions extends Composite {
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
         final String aipId = historyTokens.get(0);
-        BrowserService.Util.getInstance().retrieve(IndexedAIP.class.getName(), aipId, new AsyncCallback<IndexedAIP>() {
+        BrowserService.Util.getInstance().retrieve(IndexedAIP.class.getName(), aipId,
+          RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN, new AsyncCallback<IndexedAIP>() {
 
-          @Override
-          public void onFailure(Throwable caught) {
-            HistoryUtils.newHistory(BrowseAIP.RESOLVER);
-            callback.onSuccess(null);
-          }
+            @Override
+            public void onFailure(Throwable caught) {
+              HistoryUtils.newHistory(BrowseAIP.RESOLVER);
+              callback.onSuccess(null);
+            }
 
-          @Override
-          public void onSuccess(IndexedAIP aip) {
-            EditPermissions edit = new EditPermissions(aip);
-            callback.onSuccess(edit);
-          }
-        });
+            @Override
+            public void onSuccess(IndexedAIP aip) {
+              EditPermissions edit = new EditPermissions(aip);
+              callback.onSuccess(edit);
+            }
+          });
 
       } else if (historyTokens.isEmpty()) {
         LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
@@ -92,7 +93,7 @@ public class EditPermissions extends Composite {
 
         if (!ClientSelectedItemsUtils.isEmpty(selected)) {
           BrowserService.Util.getInstance().retrieve(IndexedAIP.class.getName(), selected,
-            new AsyncCallback<List<IndexedAIP>>() {
+            RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN, new AsyncCallback<List<IndexedAIP>>() {
 
               @Override
               public void onFailure(Throwable caught) {
@@ -131,7 +132,6 @@ public class EditPermissions extends Composite {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
   private static ClientMessages messages = GWT.create(ClientMessages.class);
 
   @UiField

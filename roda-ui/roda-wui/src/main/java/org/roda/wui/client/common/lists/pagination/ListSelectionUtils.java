@@ -1,5 +1,6 @@
 package org.roda.wui.client.common.lists.pagination;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -108,7 +109,7 @@ public class ListSelectionUtils {
     if (newIndex >= 0) {
       BrowserService.Util.getInstance().find(state.getSelected().getClass().getName(), state.getFilter(),
         state.getSorter(), new Sublist(newIndex, 1), state.getFacets(), LocaleInfo.getCurrentLocale().getLocaleName(),
-        state.getJustActive(), new AsyncCallback<IndexResult<T>>() {
+        state.getJustActive(), new ArrayList<String>(), new AsyncCallback<IndexResult<T>>() {
 
           @Override
           public void onFailure(Throwable caught) {

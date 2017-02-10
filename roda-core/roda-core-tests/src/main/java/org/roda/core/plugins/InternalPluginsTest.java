@@ -142,7 +142,7 @@ public class InternalPluginsTest {
   public void cleanUp() throws RODAException {
 
     // delete all AIPs
-    index.execute(IndexedAIP.class, Filter.ALL, new IndexRunnable<IndexedAIP>() {
+    index.execute(IndexedAIP.class, Filter.ALL, new ArrayList<>(), new IndexRunnable<IndexedAIP>() {
       @Override
       public void run(IndexedAIP item) throws GenericException, RequestNotValidException, AuthorizationDeniedException {
         try {
@@ -154,7 +154,7 @@ public class InternalPluginsTest {
     });
 
     // delete all Transferred Resources
-    index.execute(TransferredResource.class, Filter.ALL, new IndexRunnable<TransferredResource>() {
+    index.execute(TransferredResource.class, Filter.ALL, new ArrayList<>(), new IndexRunnable<TransferredResource>() {
 
       @Override
       public void run(TransferredResource item)
@@ -195,7 +195,7 @@ public class InternalPluginsTest {
     index.commit(TransferredResource.class);
 
     TransferredResource transferredResource = index.retrieve(TransferredResource.class,
-      UUID.nameUUIDFromBytes("test".getBytes()).toString());
+      UUID.nameUUIDFromBytes("test".getBytes()).toString(), new ArrayList<>());
     return transferredResource;
   }
 
@@ -219,7 +219,8 @@ public class InternalPluginsTest {
     index.commitAIPs();
 
     IndexResult<IndexedAIP> find = index.find(IndexedAIP.class,
-      new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 10));
+      new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 10),
+      new ArrayList<>());
 
     AssertJUnit.assertEquals(1L, find.getTotalCount());
     IndexedAIP indexedAIP = find.getResults().get(0);
@@ -294,7 +295,7 @@ public class InternalPluginsTest {
       new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_TYPE, PreservationEventType.VIRUS_CHECK.toString()));
     filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, aip.getId()));
     IndexResult<IndexedPreservationEvent> events = index.find(IndexedPreservationEvent.class, filter, null,
-      new Sublist(0, 10));
+      new Sublist(0, 10), new ArrayList<>());
     AssertJUnit.assertEquals(1, events.getTotalCount());
   }
 
@@ -393,7 +394,7 @@ public class InternalPluginsTest {
     index.commitAIPs();
 
     IndexedFile indFile = index.retrieve(IndexedFile.class, IdUtils.getFileId(aip.getId(),
-      aip.getRepresentations().get(0).getId(), Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT));
+      aip.getRepresentations().get(0).getId(), Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT), new ArrayList<>());
 
     AssertJUnit.assertEquals(mimetype, indFile.getFileFormat().getMimeType());
     AssertJUnit.assertEquals("x-fmt/111", indFile.getFileFormat().getPronom());
@@ -440,7 +441,7 @@ public class InternalPluginsTest {
       PreservationEventType.FORMAT_IDENTIFICATION.toString()));
     filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, aip.getId()));
     IndexResult<IndexedPreservationEvent> events = index.find(IndexedPreservationEvent.class, filter, null,
-      new Sublist(0, 10));
+      new Sublist(0, 10), new ArrayList<>());
     AssertJUnit.assertEquals(1, events.getTotalCount());
 
   }

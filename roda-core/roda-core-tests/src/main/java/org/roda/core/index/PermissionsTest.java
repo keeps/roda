@@ -13,6 +13,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.UUID;
 
 import org.roda.core.CorporaConstants;
@@ -93,40 +94,40 @@ public class PermissionsTest {
 
     User user = null;
     boolean justActive = true;
-    IndexResult<IndexedAIP> find1 = index.find(IndexedAIP.class, null, null, new Sublist(0, 10), null, user,
-      justActive);
+    IndexResult<IndexedAIP> find1 = index.find(IndexedAIP.class, null, null, new Sublist(0, 10), null, user, justActive,
+      new ArrayList<>());
     assertEquals(0, find1.getTotalCount());
 
     justActive = false;
-    IndexResult<IndexedAIP> find2 = index.find(IndexedAIP.class, null, null, new Sublist(0, 10), null, user,
-      justActive);
+    IndexResult<IndexedAIP> find2 = index.find(IndexedAIP.class, null, null, new Sublist(0, 10), null, user, justActive,
+      new ArrayList<>());
     assertEquals(1, find2.getTotalCount());
 
     user = new User("testuser", "User with access", "", false);
     justActive = true;
-    IndexResult<IndexedAIP> find3 = index.find(IndexedAIP.class, null, null, new Sublist(0, 10), null, user,
-      justActive);
+    IndexResult<IndexedAIP> find3 = index.find(IndexedAIP.class, null, null, new Sublist(0, 10), null, user, justActive,
+      new ArrayList<>());
     assertEquals(0, find3.getTotalCount());
 
     justActive = false;
-    IndexResult<IndexedAIP> find4 = index.find(IndexedAIP.class, null, null, new Sublist(0, 10), null, user,
-      justActive);
+    IndexResult<IndexedAIP> find4 = index.find(IndexedAIP.class, null, null, new Sublist(0, 10), null, user, justActive,
+      new ArrayList<>());
     assertEquals(1, find4.getTotalCount());
 
     user = new User("guest", "User with access", "", true);
     justActive = true;
-    IndexResult<IndexedAIP> find5 = index.find(IndexedAIP.class, null, null, new Sublist(0, 10), null, user,
-      justActive);
+    IndexResult<IndexedAIP> find5 = index.find(IndexedAIP.class, null, null, new Sublist(0, 10), null, user, justActive,
+      new ArrayList<>());
     assertEquals(0, find5.getTotalCount());
 
     justActive = false;
-    IndexResult<IndexedAIP> find6 = index.find(IndexedAIP.class, null, null, new Sublist(0, 10), null, user,
-      justActive);
+    IndexResult<IndexedAIP> find6 = index.find(IndexedAIP.class, null, null, new Sublist(0, 10), null, user, justActive,
+      new ArrayList<>());
     assertEquals(0, find6.getTotalCount());
 
     user.addGroup("testgroup");
-    IndexResult<IndexedAIP> find7 = index.find(IndexedAIP.class, null, null, new Sublist(0, 10), null, user,
-      justActive);
+    IndexResult<IndexedAIP> find7 = index.find(IndexedAIP.class, null, null, new Sublist(0, 10), null, user, justActive,
+      new ArrayList<>());
     assertEquals(1, find7.getTotalCount());
 
     model.deleteAIP(aipId);
@@ -148,39 +149,39 @@ public class PermissionsTest {
     User user = null;
     boolean justActive = true;
     IndexResult<IndexedRepresentation> find1 = index.find(IndexedRepresentation.class, null, null, new Sublist(0, 10),
-      null, user, justActive);
+      null, user, justActive, new ArrayList<>());
     assertEquals(0, find1.getTotalCount());
 
     justActive = false;
     IndexResult<IndexedRepresentation> find2 = index.find(IndexedRepresentation.class, null, null, new Sublist(0, 10),
-      null, user, justActive);
+      null, user, justActive, new ArrayList<>());
     assertEquals(2, find2.getTotalCount());
 
     user = new User("testuser", "User with access", "", false);
     justActive = true;
     IndexResult<IndexedRepresentation> find3 = index.find(IndexedRepresentation.class, null, null, new Sublist(0, 10),
-      null, user, justActive);
+      null, user, justActive, new ArrayList<>());
     assertEquals(0, find3.getTotalCount());
 
     justActive = false;
     IndexResult<IndexedRepresentation> find4 = index.find(IndexedRepresentation.class, null, null, new Sublist(0, 10),
-      null, user, justActive);
+      null, user, justActive, new ArrayList<>());
     assertEquals(2, find4.getTotalCount());
 
     user = new User("guest", "User with access", "", true);
     justActive = true;
     IndexResult<IndexedRepresentation> find5 = index.find(IndexedRepresentation.class, null, null, new Sublist(0, 10),
-      null, user, justActive);
+      null, user, justActive, new ArrayList<>());
     assertEquals(0, find5.getTotalCount());
 
     justActive = false;
     IndexResult<IndexedRepresentation> find6 = index.find(IndexedRepresentation.class, null, null, new Sublist(0, 10),
-      null, user, justActive);
+      null, user, justActive, new ArrayList<>());
     assertEquals(0, find6.getTotalCount());
 
     user.addGroup("testgroup");
     IndexResult<IndexedRepresentation> find7 = index.find(IndexedRepresentation.class, null, null, new Sublist(0, 10),
-      null, user, justActive);
+      null, user, justActive, new ArrayList<>());
     assertEquals(2, find7.getTotalCount());
 
     model.deleteAIP(aipId);
@@ -201,39 +202,39 @@ public class PermissionsTest {
     User user = null;
     boolean justActive = true;
     IndexResult<IndexedFile> find1 = index.find(IndexedFile.class, null, null, new Sublist(0, 10), null, user,
-      justActive);
+      justActive, new ArrayList<>());
     assertEquals(0, find1.getTotalCount());
 
     justActive = false;
     IndexResult<IndexedFile> find2 = index.find(IndexedFile.class, null, null, new Sublist(0, 10), null, user,
-      justActive);
+      justActive, new ArrayList<>());
     assertEquals(4, find2.getTotalCount());
 
     user = new User("testuser", "User with access", "", false);
     justActive = true;
     IndexResult<IndexedFile> find3 = index.find(IndexedFile.class, null, null, new Sublist(0, 10), null, user,
-      justActive);
+      justActive, new ArrayList<>());
     assertEquals(0, find3.getTotalCount());
 
     justActive = false;
     IndexResult<IndexedFile> find4 = index.find(IndexedFile.class, null, null, new Sublist(0, 10), null, user,
-      justActive);
+      justActive, new ArrayList<>());
     assertEquals(4, find4.getTotalCount());
 
     user = new User("guest", "User with access", "", true);
     justActive = true;
     IndexResult<IndexedFile> find5 = index.find(IndexedFile.class, null, null, new Sublist(0, 10), null, user,
-      justActive);
+      justActive, new ArrayList<>());
     assertEquals(0, find5.getTotalCount());
 
     justActive = false;
     IndexResult<IndexedFile> find6 = index.find(IndexedFile.class, null, null, new Sublist(0, 10), null, user,
-      justActive);
+      justActive, new ArrayList<>());
     assertEquals(0, find6.getTotalCount());
 
     user.addGroup("testgroup");
     IndexResult<IndexedFile> find7 = index.find(IndexedFile.class, null, null, new Sublist(0, 10), null, user,
-      justActive);
+      justActive, new ArrayList<>());
     assertEquals(4, find7.getTotalCount());
 
     model.deleteAIP(aipId);
@@ -254,39 +255,39 @@ public class PermissionsTest {
     User user = null;
     boolean justActive = true;
     IndexResult<IndexedPreservationEvent> find1 = index.find(IndexedPreservationEvent.class, null, null,
-      new Sublist(0, 10), null, user, justActive);
+      new Sublist(0, 10), null, user, justActive, new ArrayList<>());
     assertEquals(0, find1.getTotalCount());
 
     justActive = false;
     IndexResult<IndexedPreservationEvent> find2 = index.find(IndexedPreservationEvent.class, null, null,
-      new Sublist(0, 10), null, user, justActive);
+      new Sublist(0, 10), null, user, justActive, new ArrayList<>());
     assertEquals(2, find2.getTotalCount());
 
     user = new User("testuser", "User with access", "", false);
     justActive = true;
     IndexResult<IndexedPreservationEvent> find3 = index.find(IndexedPreservationEvent.class, null, null,
-      new Sublist(0, 10), null, user, justActive);
+      new Sublist(0, 10), null, user, justActive, new ArrayList<>());
     assertEquals(0, find3.getTotalCount());
 
     justActive = false;
     IndexResult<IndexedPreservationEvent> find4 = index.find(IndexedPreservationEvent.class, null, null,
-      new Sublist(0, 10), null, user, justActive);
+      new Sublist(0, 10), null, user, justActive, new ArrayList<>());
     assertEquals(2, find4.getTotalCount());
 
     user = new User("guest", "User with access", "", true);
     justActive = true;
     IndexResult<IndexedPreservationEvent> find5 = index.find(IndexedPreservationEvent.class, null, null,
-      new Sublist(0, 10), null, user, justActive);
+      new Sublist(0, 10), null, user, justActive, new ArrayList<>());
     assertEquals(0, find5.getTotalCount());
 
     justActive = false;
     IndexResult<IndexedPreservationEvent> find6 = index.find(IndexedPreservationEvent.class, null, null,
-      new Sublist(0, 10), null, user, justActive);
+      new Sublist(0, 10), null, user, justActive, new ArrayList<>());
     assertEquals(0, find6.getTotalCount());
 
     user.addGroup("testgroup");
     IndexResult<IndexedPreservationEvent> find7 = index.find(IndexedPreservationEvent.class, null, null,
-      new Sublist(0, 10), null, user, justActive);
+      new Sublist(0, 10), null, user, justActive, new ArrayList<>());
     assertEquals(2, find7.getTotalCount());
 
     model.deleteAIP(aipId);

@@ -10,6 +10,7 @@
  */
 package org.roda.wui.client.ingest.process;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
@@ -57,7 +58,7 @@ public class ShowJobReport extends Composite {
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
         String jobReportId = historyTokens.get(0);
-        BrowserService.Util.getInstance().retrieve(IndexedReport.class.getName(), jobReportId,
+        BrowserService.Util.getInstance().retrieve(IndexedReport.class.getName(), jobReportId, fieldsToReturn,
           new AsyncCallback<IndexedReport>() {
 
             @Override
@@ -97,8 +98,10 @@ public class ShowJobReport extends Composite {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
+
+  // empty to get all report information
+  private static final List<String> fieldsToReturn = new ArrayList<>();
 
   private final IndexedReport jobReport;
   // private final Map<String, PluginInfo> pluginsInfo;

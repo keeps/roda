@@ -170,6 +170,9 @@ import org.xml.sax.SAXException;
 public class BrowserHelper {
   private static final String HTML_EXT = ".html";
   private static final Logger LOGGER = LoggerFactory.getLogger(BrowserHelper.class);
+  private static final List<String> aipAncestorsFieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
+    RodaConstants.AIP_ID, RodaConstants.AIP_GHOST, RodaConstants.AIP_LEVEL, RodaConstants.AIP_TITLE,
+    RodaConstants.AIP_PARENT_ID);
 
   protected static BrowseAIPBundle retrieveBrowseAipBundle(IndexedAIP aip, Locale locale)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
@@ -181,7 +184,8 @@ public class BrowserHelper {
 
     // set aip ancestors
     try {
-      bundle.setAIPAncestors(retrieveAncestors(aip));
+      List<IndexedAIP> ancestors = retrieveAncestors(aip, aipAncestorsFieldsToReturn);
+      bundle.setAIPAncestors(ancestors);
     } catch (NotFoundException e) {
       LOGGER.warn("Found an item with invalid ancestors: {}", aip.getId(), e);
     }
@@ -222,7 +226,8 @@ public class BrowserHelper {
 
     // set aip ancestors
     try {
-      bundle.setAipAncestors(retrieveAncestors(aip));
+      List<IndexedAIP> ancestors = retrieveAncestors(aip, aipAncestorsFieldsToReturn);
+      bundle.setAipAncestors(ancestors);
     } catch (NotFoundException e) {
       LOGGER.warn("Found an item with invalid ancestors: {}", aip.getId(), e);
     }
@@ -244,20 +249,18 @@ public class BrowserHelper {
     return bundle;
   }
 
-  public static BrowseFileBundle retrieveBrowseFileBundle(IndexedAIP aip, String representationId,
-    List<String> filePath, String fileId, Locale locale, User user)
-    throws NotFoundException, GenericException, RequestNotValidException {
+  public static BrowseFileBundle retrieveBrowseFileBundle(IndexedAIP aip, IndexedRepresentation representation,
+    IndexedFile file, Locale locale, User user) throws NotFoundException, GenericException, RequestNotValidException {
     BrowseFileBundle bundle = new BrowseFileBundle();
 
     bundle.setAip(aip);
-    bundle.setRepresentation(
-      retrieve(IndexedRepresentation.class, IdUtils.getRepresentationId(aip.getId(), representationId)));
-    String fileUUID = IdUtils.getFileId(aip.getId(), representationId, filePath, fileId);
-    bundle.setFile(retrieve(IndexedFile.class, fileUUID));
+    bundle.setRepresentation(representation);
+    bundle.setFile(file);
 
     // set aip ancestors
     try {
-      bundle.setAipAncestors(retrieveAncestors(aip));
+      List<IndexedAIP> ancestors = retrieveAncestors(aip, aipAncestorsFieldsToReturn);
+      bundle.setAipAncestors(ancestors);
     } catch (NotFoundException e) {
       LOGGER.warn("Found an item with invalid ancestors: {}", aip.getId(), e);
     }
@@ -278,7 +281,7 @@ public class BrowserHelper {
     bundle.setTotalSiblingCount(count(IndexedFile.class, siblingFilter, justActive, user));
 
     // Count DIPs
-    Filter dipsFilter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, fileUUID));
+    Filter dipsFilter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, file.getUUID()));
     Long dipCount = RodaCoreFactory.getIndexService().count(IndexedDIP.class, dipsFilter);
     bundle.setDipCount(dipCount);
 
@@ -471,16 +474,20 @@ public class BrowserHelper {
     throws GenericException, NotFoundException, RequestNotValidException {
     DipBundle bundle = new DipBundle();
 
-    bundle.setDip(retrieve(IndexedDIP.class, dipUUID));
+    bundle.setDip(retrieve(IndexedDIP.class, dipUUID,
+      Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID, RodaConstants.DIP_TITLE)));
+
+    List<String> dipFileFields = new ArrayList<>();
 
     if (dipFileUUID != null) {
-      DIPFile dipFile = retrieve(DIPFile.class, dipFileUUID);
+      DIPFile dipFile = retrieve(DIPFile.class, dipFileUUID, dipFileFields);
       bundle.setDipFile(dipFile);
 
       List<DIPFile> dipFileAncestors = new ArrayList<>();
       for (String dipFileAncestor : dipFile.getAncestorsUUIDs()) {
         try {
-          dipFileAncestors.add(retrieve(DIPFile.class, dipFileAncestor));
+          dipFileAncestors.add(retrieve(DIPFile.class, dipFileAncestor,
+            Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIPFILE_DIP_ID, RodaConstants.DIPFILE_ID)));
         } catch (NotFoundException e) {
           // ignore
         }
@@ -491,44 +498,59 @@ public class BrowserHelper {
       // then select it
       Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIPFILE_DIP_ID, dipUUID));
       Sublist sublist = new Sublist(0, 1);
-      IndexResult<DIPFile> dipFiles = find(DIPFile.class, filter, Sorter.NONE, sublist, Facets.NONE, user, false);
+      IndexResult<DIPFile> dipFiles = find(DIPFile.class, filter, Sorter.NONE, sublist, Facets.NONE, user, false,
+        dipFileFields);
       if (dipFiles.getTotalCount() == 1 && !dipFiles.getResults().get(0).isDirectory()) {
         bundle.setDipFile(dipFiles.getResults().get(0));
       }
     }
 
+    List<String> aipFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_ID, RodaConstants.AIP_TITLE,
+      RodaConstants.AIP_LEVEL, RodaConstants.AIP_DATE_FINAL, RodaConstants.AIP_DATE_INITIAL, RodaConstants.AIP_GHOST);
+    List<String> representationFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.REPRESENTATION_TYPE,
+      RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES, RodaConstants.REPRESENTATION_ORIGINAL,
+      RodaConstants.REPRESENTATION_AIP_ID, RodaConstants.REPRESENTATION_ID);
+    List<String> fileFields = new ArrayList<>();
+
     // infer from DIP
     IndexedDIP dip = bundle.getDip();
     if (!dip.getFileIds().isEmpty()) {
-      IndexedFile file = BrowserHelper.retrieve(IndexedFile.class, IdUtils.getFileId(dip.getFileIds().get(0)));
+      IndexedFile file = BrowserHelper.retrieve(IndexedFile.class, IdUtils.getFileId(dip.getFileIds().get(0)),
+        fileFields);
       bundle.setFile(file);
-      bundle.setRepresentation(BrowserHelper.retrieve(IndexedRepresentation.class, file.getRepresentationUUID()));
-      bundle.setAip(BrowserHelper.retrieve(IndexedAIP.class, file.getAipId()));
+      bundle.setRepresentation(
+        BrowserHelper.retrieve(IndexedRepresentation.class, file.getRepresentationUUID(), representationFields));
+      bundle.setAip(BrowserHelper.retrieve(IndexedAIP.class, file.getAipId(), aipFields));
     } else if (!dip.getRepresentationIds().isEmpty()) {
       IndexedRepresentation representation = BrowserHelper.retrieve(IndexedRepresentation.class,
-        IdUtils.getRepresentationId(dip.getRepresentationIds().get(0)));
+        IdUtils.getRepresentationId(dip.getRepresentationIds().get(0)), representationFields);
       bundle.setRepresentation(representation);
-      bundle.setAip(BrowserHelper.retrieve(IndexedAIP.class, representation.getAipId()));
+      bundle.setAip(BrowserHelper.retrieve(IndexedAIP.class, representation.getAipId(), aipFields));
     } else if (!dip.getAipIds().isEmpty()) {
-      IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, dip.getAipIds().get(0).getAipId());
+      IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, dip.getAipIds().get(0).getAipId(), aipFields);
       bundle.setAip(aip);
     }
 
     return bundle;
   }
 
-  protected static List<IndexedAIP> retrieveAncestors(IndexedAIP aip) throws GenericException, NotFoundException {
-    return RodaCoreFactory.getIndexService().retrieveAncestors(aip);
+  protected static List<IndexedAIP> retrieveAncestors(IndexedAIP aip, List<String> fieldsToReturn)
+    throws GenericException, NotFoundException {
+    return RodaCoreFactory.getIndexService().retrieveAncestors(aip, fieldsToReturn);
   }
 
   protected static <T extends IsIndexed> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter,
-    Sublist sublist, Facets facets, User user, boolean justActive) throws GenericException, RequestNotValidException {
-    return RodaCoreFactory.getIndexService().find(returnClass, filter, sorter, sublist, facets, user, justActive);
+    Sublist sublist, Facets facets, User user, boolean justActive, List<String> fieldsToReturn)
+    throws GenericException, RequestNotValidException {
+    return RodaCoreFactory.getIndexService().find(returnClass, filter, sorter, sublist, facets, user, justActive,
+      fieldsToReturn);
   }
 
   protected static <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
-    final Sorter sorter, final Sublist sublist, final User user, final boolean justActive) {
-    return RodaCoreFactory.getIndexService().findAll(returnClass, filter, sorter, sublist, user, justActive, true);
+    final Sorter sorter, final Sublist sublist, final User user, final boolean justActive,
+    List<String> fieldsToReturn) {
+    return RodaCoreFactory.getIndexService().findAll(returnClass, filter, sorter, sublist, user, justActive, true,
+      fieldsToReturn);
   }
 
   protected static <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter, boolean justActive, User user)
@@ -536,27 +558,28 @@ public class BrowserHelper {
     return RodaCoreFactory.getIndexService().count(returnClass, filter, user, justActive);
   }
 
-  protected static <T extends IsIndexed> T retrieve(Class<T> returnClass, String id)
+  protected static <T extends IsIndexed> T retrieve(Class<T> returnClass, String id, List<String> fieldsToReturn)
     throws GenericException, NotFoundException {
-    return RodaCoreFactory.getIndexService().retrieve(returnClass, id);
+    return RodaCoreFactory.getIndexService().retrieve(returnClass, id, fieldsToReturn);
   }
 
   protected static <T extends IsIndexed> void commit(Class<T> returnClass) throws GenericException, NotFoundException {
     RodaCoreFactory.getIndexService().commit(returnClass);
   }
 
-  protected static <T extends IsIndexed> List<T> retrieve(Class<T> returnClass, SelectedItems<T> selectedItems)
-    throws GenericException, NotFoundException, RequestNotValidException {
+  protected static <T extends IsIndexed> List<T> retrieve(Class<T> returnClass, SelectedItems<T> selectedItems,
+    List<String> fieldsToReturn) throws GenericException, NotFoundException, RequestNotValidException {
     List<T> ret;
 
     if (selectedItems instanceof SelectedItemsList) {
       SelectedItemsList<T> selectedList = (SelectedItemsList<T>) selectedItems;
-      ret = RodaCoreFactory.getIndexService().retrieve(returnClass, selectedList.getIds());
+      ret = RodaCoreFactory.getIndexService().retrieve(returnClass, selectedList.getIds(), fieldsToReturn);
     } else if (selectedItems instanceof SelectedItemsFilter) {
       SelectedItemsFilter<T> selectedFilter = (SelectedItemsFilter<T>) selectedItems;
       int counter = RodaCoreFactory.getIndexService().count(returnClass, selectedFilter.getFilter()).intValue();
       ret = RodaCoreFactory.getIndexService()
-        .find(returnClass, selectedFilter.getFilter(), Sorter.NONE, new Sublist(0, counter)).getResults();
+        .find(returnClass, selectedFilter.getFilter(), Sorter.NONE, new Sublist(0, counter), fieldsToReturn)
+        .getResults();
     } else {
       throw new RequestNotValidException(
         "Unsupported SelectedItems implementation: " + selectedItems.getClass().getName());
@@ -1330,12 +1353,13 @@ public class BrowserHelper {
     String fileId = null;
 
     if (fileUUID != null) {
-      IndexedFile file = index.retrieve(IndexedFile.class, fileUUID);
+      IndexedFile file = index.retrieve(IndexedFile.class, fileUUID, RodaConstants.FILE_FIELDS_TO_RETURN);
       representationId = file.getRepresentationId();
       filePath = file.getPath();
       fileId = file.getId();
     } else if (representationUUID != null) {
-      IndexedRepresentation rep = index.retrieve(IndexedRepresentation.class, representationUUID);
+      IndexedRepresentation rep = index.retrieve(IndexedRepresentation.class, representationUUID,
+        Arrays.asList(RodaConstants.REPRESENTATION_ID));
       representationId = rep.getId();
     }
 
@@ -1547,7 +1571,7 @@ public class BrowserHelper {
     index.commit(IndexedRepresentation.class);
     index.commit(IndexedFile.class);
 
-    return (parentId != null) ? index.retrieve(IndexedAIP.class, parentId) : null;
+    return (parentId != null) ? index.retrieve(IndexedAIP.class, parentId, Arrays.asList(RodaConstants.AIP_ID)) : null;
   }
 
   public static AIP createAIP(User user, String parentAipId, String type, Permissions permissions)
@@ -1562,7 +1586,6 @@ public class BrowserHelper {
   public static AIP updateAIP(User user, AIP aip) throws GenericException, AuthorizationDeniedException,
     RequestNotValidException, NotFoundException, AlreadyExistsException {
     ModelService model = RodaCoreFactory.getModelService();
-
     AIP updatedAIP = model.updateAIP(aip, user.getName());
     return updatedAIP;
   }
@@ -1594,19 +1617,20 @@ public class BrowserHelper {
         deleteAIPEvent(model, user, aipId, details, messages);
 
         Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aip.getId()));
-        RodaCoreFactory.getIndexService().execute(IndexedAIP.class, filter, new IndexRunnable<IndexedAIP>() {
+        RodaCoreFactory.getIndexService().execute(IndexedAIP.class, filter, Arrays.asList(RodaConstants.AIP_ID),
+          new IndexRunnable<IndexedAIP>() {
 
-          @Override
-          public void run(IndexedAIP item)
-            throws GenericException, RequestNotValidException, AuthorizationDeniedException {
-            try {
-              model.deleteAIP(item.getId());
-              deleteAIPEvent(model, user, aipId, details, messages);
-            } catch (NotFoundException e) {
-              // already deleted, ignore
+            @Override
+            public void run(IndexedAIP item)
+              throws GenericException, RequestNotValidException, AuthorizationDeniedException {
+              try {
+                model.deleteAIP(item.getId());
+                deleteAIPEvent(model, user, aipId, details, messages);
+              } catch (NotFoundException e) {
+                // already deleted, ignore
+              }
             }
-          }
-        });
+          });
       } catch (NotFoundException e) {
         // already deleted, ignore
       }
@@ -1648,7 +1672,7 @@ public class BrowserHelper {
     Filter filter = new Filter();
     filter.add(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, representationIds));
     IndexResult<IndexedRepresentation> reps = index.find(IndexedRepresentation.class, filter, Sorter.NONE,
-      new Sublist(0, representationIds.size()));
+      new Sublist(0, representationIds.size()), RodaConstants.REPRESENTATION_FIELDS_TO_RETURN);
 
     for (IndexedRepresentation rep : reps.getResults()) {
       try {
@@ -1694,7 +1718,8 @@ public class BrowserHelper {
 
     Filter filter = new Filter();
     filter.add(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, fileIds));
-    IndexResult<IndexedFile> files = index.find(IndexedFile.class, filter, Sorter.NONE, new Sublist(0, fileIds.size()));
+    IndexResult<IndexedFile> files = index.find(IndexedFile.class, filter, Sorter.NONE, new Sublist(0, fileIds.size()),
+      RodaConstants.FILE_FIELDS_TO_RETURN);
 
     for (IndexedFile file : files.getResults()) {
       List<LinkingIdentifier> sources = new ArrayList<>();
@@ -1739,21 +1764,22 @@ public class BrowserHelper {
 
         Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aipId));
 
-        RodaCoreFactory.getIndexService().execute(IndexedAIP.class, filter, new IndexRunnable<IndexedAIP>() {
+        RodaCoreFactory.getIndexService().execute(IndexedAIP.class, filter,
+          RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN, new IndexRunnable<IndexedAIP>() {
 
-          @Override
-          public void run(IndexedAIP item)
-            throws GenericException, RequestNotValidException, AuthorizationDeniedException {
-            try {
-              UserUtility.checkAIPPermissions(user, item, PermissionType.DELETE);
-              for (Representation rep : aip.getRepresentations()) {
-                RodaCoreFactory.getModelService().deleteRepresentation(aipId, rep.getId());
+            @Override
+            public void run(IndexedAIP item)
+              throws GenericException, RequestNotValidException, AuthorizationDeniedException {
+              try {
+                UserUtility.checkAIPPermissions(user, item, PermissionType.DELETE);
+                for (Representation rep : aip.getRepresentations()) {
+                  RodaCoreFactory.getModelService().deleteRepresentation(aipId, rep.getId());
+                }
+              } catch (NotFoundException e) {
+                // already deleted, ignore
               }
-            } catch (NotFoundException e) {
-              // already deleted, ignore
             }
-          }
-        });
+          });
 
       } catch (NotFoundException e) {
         // already deleted
@@ -1896,10 +1922,9 @@ public class BrowserHelper {
     return file;
   }
 
-  public static EntityResponse retrieveAIPRepresentationFile(String fileUuid, String acceptFormat)
+  public static EntityResponse retrieveAIPRepresentationFile(IndexedFile iFile, String acceptFormat)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
 
-    IndexedFile iFile = RodaCoreFactory.getIndexService().retrieve(IndexedFile.class, fileUuid);
     StoragePath filePath = ModelUtils.getFileStoragePath(iFile.getAipId(), iFile.getRepresentationId(), iFile.getPath(),
       iFile.getId());
 
@@ -2002,7 +2027,7 @@ public class BrowserHelper {
       boolean justActive = selectedItemsFilter.justActive();
       Long count = count(classToReturn, filter, justActive, user);
       IndexResult<T> find = find(classToReturn, filter, Sorter.NONE, new Sublist(0, count.intValue()), Facets.NONE,
-        user, justActive);
+        user, justActive, Arrays.asList(RodaConstants.INDEX_UUID));
       ret = find.getResults().stream().map(i -> i.getUUID()).collect(Collectors.toList());
     } else {
       throw new RequestNotValidException("Class not supported: " + selected.getClass().getName());
@@ -2209,14 +2234,19 @@ public class BrowserHelper {
     Map<String, IndexedRepresentation> representations = new HashMap<String, IndexedRepresentation>();
     Map<String, IndexedFile> files = new HashMap<String, IndexedFile>();
     Map<String, TransferredResource> transferredResources = new HashMap<String, TransferredResource>();
-    IndexedPreservationEvent ipe = RodaCoreFactory.getIndexService().retrieve(IndexedPreservationEvent.class, eventId);
+
+    List<String> eventFields = new ArrayList<>();
+    IndexedPreservationEvent ipe = retrieve(IndexedPreservationEvent.class, eventId, eventFields);
     eventBundle.setEvent(ipe);
     if (ipe.getLinkingAgentIds() != null && !ipe.getLinkingAgentIds().isEmpty()) {
       Map<String, IndexedPreservationAgent> agents = new HashMap<String, IndexedPreservationAgent>();
       for (LinkingIdentifier agentID : ipe.getLinkingAgentIds()) {
         try {
-          IndexedPreservationAgent agent = RodaCoreFactory.getIndexService().retrieve(IndexedPreservationAgent.class,
-            agentID.getValue());
+          List<String> agentFields = Arrays.asList(RodaConstants.PRESERVATION_AGENT_ID,
+            RodaConstants.PRESERVATION_AGENT_NAME, RodaConstants.PRESERVATION_AGENT_TYPE,
+            RodaConstants.PRESERVATION_AGENT_ROLES, RodaConstants.PRESERVATION_AGENT_VERSION,
+            RodaConstants.PRESERVATION_AGENT_NOTE, RodaConstants.PRESERVATION_AGENT_EXTENSION);
+          IndexedPreservationAgent agent = retrieve(IndexedPreservationAgent.class, agentID.getValue(), agentFields);
           agents.put(agentID.getValue(), agent);
         } catch (NotFoundException | GenericException e) {
           LOGGER.error("Error getting agent {}: {}", agentID, e.getMessage());
@@ -2242,19 +2272,29 @@ public class BrowserHelper {
       try {
         if (RODA_TYPE.AIP.equals(linkingType)) {
           String uuid = LinkingObjectUtils.getAipIdFromLinkingId(idValue);
-          IndexedAIP aip = retrieve(IndexedAIP.class, uuid);
+          List<String> aipFields = Arrays.asList(RodaConstants.AIP_TITLE, RodaConstants.AIP_ID);
+          IndexedAIP aip = retrieve(IndexedAIP.class, uuid, aipFields);
           aips.put(idValue, aip);
         } else if (RODA_TYPE.REPRESENTATION.equals(linkingType)) {
           String uuid = LinkingObjectUtils.getRepresentationIdFromLinkingId(idValue);
-          IndexedRepresentation rep = retrieve(IndexedRepresentation.class, uuid);
+          List<String> representationFields = Arrays.asList(RodaConstants.REPRESENTATION_ID,
+            RodaConstants.REPRESENTATION_AIP_ID, RodaConstants.REPRESENTATION_ORIGINAL);
+          IndexedRepresentation rep = retrieve(IndexedRepresentation.class, uuid, representationFields);
           representations.put(idValue, rep);
         } else if (RODA_TYPE.FILE.equals(linkingType)) {
-          IndexedFile file = retrieve(IndexedFile.class, LinkingObjectUtils.getFileIdFromLinkingId(idValue));
+          List<String> fileFields = new ArrayList<>(RodaConstants.FILE_FIELDS_TO_RETURN);
+          fileFields.addAll(RodaConstants.FILE_FORMAT_FIELDS_TO_RETURN);
+          fileFields.addAll(Arrays.asList(RodaConstants.FILE_ORIGINALNAME, RodaConstants.FILE_SIZE,
+            RodaConstants.FILE_FILEFORMAT, RodaConstants.FILE_FORMAT_VERSION));
+          IndexedFile file = retrieve(IndexedFile.class, LinkingObjectUtils.getFileIdFromLinkingId(idValue),
+            fileFields);
           files.put(idValue, file);
         } else if (RODA_TYPE.TRANSFERRED_RESOURCE.equals(linkingType)) {
           String id = LinkingObjectUtils.getTransferredResourceIdFromLinkingId(idValue);
           String uuid = UUID.nameUUIDFromBytes(id.getBytes()).toString();
-          TransferredResource tr = retrieve(TransferredResource.class, uuid);
+          List<String> resourceFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.TRANSFERRED_RESOURCE_NAME,
+            RodaConstants.TRANSFERRED_RESOURCE_FULLPATH);
+          TransferredResource tr = retrieve(TransferredResource.class, uuid, resourceFields);
           transferredResources.put(idValue, tr);
         } else {
           LOGGER.warn("No support for linking object type: {}", linkingType);
@@ -2286,12 +2326,6 @@ public class BrowserHelper {
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     DescriptiveMetadataVersionsBundle bundle = new DescriptiveMetadataVersionsBundle();
 
-    bundle.setAip(retrieve(IndexedAIP.class, aipId));
-    if (representationId != null) {
-      IndexedRepresentation representation = retrieve(IndexedRepresentation.class,
-        IdUtils.getRepresentationId(aipId, representationId));
-      bundle.setRepresentation(representation);
-    }
     DescriptiveMetadataViewBundle descriptiveMetadataBundle = retrieveDescriptiveMetadataBundle(aipId, representationId,
       metadataId, locale);
     bundle.setDescriptiveMetadata(descriptiveMetadataBundle);
@@ -2350,38 +2384,40 @@ public class BrowserHelper {
 
     if (recursive) {
       Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, indexedAIP.getId()));
-      RodaCoreFactory.getIndexService().execute(IndexedAIP.class, filter, new IndexRunnable<IndexedAIP>() {
+      RodaCoreFactory.getIndexService().execute(IndexedAIP.class, filter, Arrays.asList(RodaConstants.AIP_ID),
+        new IndexRunnable<IndexedAIP>() {
 
-        @Override
-        public void run(IndexedAIP idescendant)
-          throws GenericException, RequestNotValidException, AuthorizationDeniedException {
-          AIP descendant;
-          try {
-            descendant = model.retrieveAIP(idescendant.getId());
-            descendant.setPermissions(permissions);
+          @Override
+          public void run(IndexedAIP idescendant)
+            throws GenericException, RequestNotValidException, AuthorizationDeniedException {
+            AIP descendant;
             try {
-              model.updateAIPPermissions(descendant, user.getName());
+              descendant = model.retrieveAIP(idescendant.getId());
+              descendant.setPermissions(permissions);
+              try {
+                model.updateAIPPermissions(descendant, user.getName());
 
-              String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_UPDATE_AIP_SUCCESS,
-                descendant.getId());
-              model.createUpdateAIPEvent(descendant.getId(), null, null, null, PreservationEventType.UPDATE,
-                eventDescription, PluginState.SUCCESS, outcomeText, details, user.getName(), true);
-            } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-              String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_UPDATE_AIP_FAILURE,
-                descendant.getId());
-              model.createUpdateAIPEvent(descendant.getId(), null, null, null, PreservationEventType.UPDATE,
-                eventDescription, PluginState.FAILURE, outcomeText, details, user.getName(), true);
+                String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_UPDATE_AIP_SUCCESS,
+                  descendant.getId());
+                model.createUpdateAIPEvent(descendant.getId(), null, null, null, PreservationEventType.UPDATE,
+                  eventDescription, PluginState.SUCCESS, outcomeText, details, user.getName(), true);
+              } catch (RequestNotValidException | NotFoundException | GenericException
+                | AuthorizationDeniedException e) {
+                String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_UPDATE_AIP_FAILURE,
+                  descendant.getId());
+                model.createUpdateAIPEvent(descendant.getId(), null, null, null, PreservationEventType.UPDATE,
+                  eventDescription, PluginState.FAILURE, outcomeText, details, user.getName(), true);
 
-              throw e;
+                throw e;
+              }
+            } catch (NotFoundException e) {
+              LOGGER.warn("Got an AIP from index which was not found in the model", e);
+            } catch (RuntimeException e) {
+              LOGGER.error("Error applying permissions", e);
             }
-          } catch (NotFoundException e) {
-            LOGGER.warn("Got an AIP from index which was not found in the model", e);
-          } catch (RuntimeException e) {
-            LOGGER.error("Error applying permissions", e);
-          }
 
-        }
-      });
+          }
+        });
     }
 
   }
@@ -2630,12 +2666,14 @@ public class BrowserHelper {
     // get risks incidence count using facets
     IndexService index = RodaCoreFactory.getIndexService();
     IndexResult<RiskIncidence> find = index.find(RiskIncidence.class, Filter.ALL, Sorter.NONE, new Sublist(0, 0),
-      new Facets(new SimpleFacetParameter(RodaConstants.RISK_INCIDENCE_RISK_ID)));
+      new Facets(new SimpleFacetParameter(RodaConstants.RISK_INCIDENCE_RISK_ID)),
+      Arrays.asList(RodaConstants.INDEX_UUID));
 
     Map<String, IndexedRisk> allRisks = new HashMap<String, IndexedRisk>();
 
     // retrieve risks and set default object count to zero
-    for (IndexedRisk indexedRisk : index.findAll(IndexedRisk.class, Filter.ALL)) {
+    IterableIndexResult<IndexedRisk> risks = index.findAll(IndexedRisk.class, Filter.ALL, new ArrayList<>());
+    for (IndexedRisk indexedRisk : risks) {
       indexedRisk.setObjectsSize(0);
       allRisks.put(indexedRisk.getId(), indexedRisk);
     }
@@ -2785,32 +2823,6 @@ public class BrowserHelper {
       IndexedPreservationEvent.class);
   }
 
-  public static IndexedRepresentation retrieveRepresentationById(User user, String representationId)
-    throws GenericException, RequestNotValidException {
-    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_ID, representationId));
-    IndexResult<IndexedRepresentation> reps = RodaCoreFactory.getIndexService().find(IndexedRepresentation.class,
-      filter, Sorter.NONE, new Sublist(0, 1));
-
-    if (reps.getResults().isEmpty()) {
-      return null;
-    } else {
-      return reps.getResults().get(0);
-    }
-  }
-
-  public static IndexedFile retrieveFileById(User user, String fileId)
-    throws GenericException, RequestNotValidException {
-    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_FILE_ID, fileId));
-    IndexResult<IndexedFile> files = RodaCoreFactory.getIndexService().find(IndexedFile.class, filter, Sorter.NONE,
-      new Sublist(0, 1));
-
-    if (files.getResults().isEmpty()) {
-      return null;
-    } else {
-      return files.getResults().get(0);
-    }
-  }
-
   public static String retrieveDescriptiveMetadataPreview(SupportedMetadataTypeBundle bundle) throws GenericException {
     String rawTemplate = bundle.getTemplate();
     String result;
@@ -2841,9 +2853,12 @@ public class BrowserHelper {
 
   public static String renameTransferredResource(String transferredResourceId, String newName) throws GenericException,
     RequestNotValidException, AlreadyExistsException, IsStillUpdatingException, NotFoundException {
+    List<String> resourceFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.TRANSFERRED_RESOURCE_FULLPATH,
+      RodaConstants.TRANSFERRED_RESOURCE_PARENT_UUID);
+
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.INDEX_UUID, transferredResourceId));
     IndexResult<TransferredResource> resources = RodaCoreFactory.getIndexService().find(TransferredResource.class,
-      filter, Sorter.NONE, new Sublist(0, 1));
+      filter, Sorter.NONE, new Sublist(0, 1), resourceFields);
 
     if (!resources.getResults().isEmpty()) {
       TransferredResource resource = resources.getResults().get(0);
@@ -2862,7 +2877,7 @@ public class BrowserHelper {
 
     ModelService model = RodaCoreFactory.getModelService();
     IndexService index = RodaCoreFactory.getIndexService();
-    IndexedFile ifolder = index.retrieve(IndexedFile.class, folderUUID);
+    IndexedFile ifolder = index.retrieve(IndexedFile.class, folderUUID, RodaConstants.FILE_FIELDS_TO_RETURN);
     String oldName = ifolder.getId();
 
     try {
@@ -2878,7 +2893,7 @@ public class BrowserHelper {
 
       index.commitAIPs();
 
-      return index.retrieve(IndexedFile.class, IdUtils.getFileId(newFolder));
+      return index.retrieve(IndexedFile.class, IdUtils.getFileId(newFolder), RodaConstants.FILE_FIELDS_TO_RETURN);
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_RENAME_FOLDER_FAILURE, oldName, newName);
 
@@ -2909,11 +2924,13 @@ public class BrowserHelper {
     if (selectedFiles instanceof SelectedItemsList) {
       SelectedItemsList<IndexedFile> selectedList = (SelectedItemsList<IndexedFile>) selectedFiles;
       Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, selectedList.getIds()));
-      findResult = index.find(IndexedFile.class, filter, Sorter.NONE, new Sublist(0, selectedList.getIds().size()));
+      findResult = index.find(IndexedFile.class, filter, Sorter.NONE, new Sublist(0, selectedList.getIds().size()),
+        RodaConstants.FILE_FIELDS_TO_RETURN);
     } else if (selectedFiles instanceof SelectedItemsFilter) {
       SelectedItemsFilter<IndexedFile> selectedFilter = (SelectedItemsFilter<IndexedFile>) selectedFiles;
       int findCounter = index.count(IndexedFile.class, selectedFilter.getFilter()).intValue();
-      findResult = index.find(IndexedFile.class, selectedFilter.getFilter(), Sorter.NONE, new Sublist(0, findCounter));
+      findResult = index.find(IndexedFile.class, selectedFilter.getFilter(), Sorter.NONE, new Sublist(0, findCounter),
+        RodaConstants.FILE_FIELDS_TO_RETURN);
     }
 
     if (!findResult.getResults().isEmpty()) {
@@ -2984,8 +3001,10 @@ public class BrowserHelper {
       counter = RodaCoreFactory.getIndexService().count(TransferredResource.class, filter).intValue();
     }
 
+    List<String> resourceFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.TRANSFERRED_RESOURCE_FULLPATH,
+      RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH, RodaConstants.TRANSFERRED_RESOURCE_NAME);
     IndexResult<TransferredResource> resources = RodaCoreFactory.getIndexService().find(TransferredResource.class,
-      filter, Sorter.NONE, new Sublist(0, counter));
+      filter, Sorter.NONE, new Sublist(0, counter), resourceFields);
 
     if (transferredResource != null) {
       resourceRelativePath = transferredResource.getRelativePath();
@@ -3014,11 +3033,11 @@ public class BrowserHelper {
     IndexService index = RodaCoreFactory.getIndexService();
     File newFolder;
     IndexedRepresentation irep = index.retrieve(IndexedRepresentation.class,
-      IdUtils.getRepresentationId(aipId, representationId));
+      IdUtils.getRepresentationId(aipId, representationId), RodaConstants.REPRESENTATION_FIELDS_TO_RETURN);
 
     try {
       if (folderUUID != null) {
-        IndexedFile ifolder = index.retrieve(IndexedFile.class, folderUUID);
+        IndexedFile ifolder = index.retrieve(IndexedFile.class, folderUUID, RodaConstants.FILE_FIELDS_TO_RETURN);
         newFolder = model.createFile(ifolder.getAipId(), ifolder.getRepresentationId(), ifolder.getPath(),
           ifolder.getId(), newName, true);
       } else {
@@ -3030,7 +3049,7 @@ public class BrowserHelper {
         PluginState.SUCCESS, outcomeText, details, user.getName(), true);
 
       index.commit(IndexedFile.class);
-      return index.retrieve(IndexedFile.class, IdUtils.getFileId(newFolder));
+      return index.retrieve(IndexedFile.class, IdUtils.getFileId(newFolder), new ArrayList<>());
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_CREATE_FOLDER_FAILURE, newName);
       model.createUpdateAIPEvent(aipId, irep.getId(), null, null, PreservationEventType.CREATION, eventDescription,
@@ -3047,14 +3066,14 @@ public class BrowserHelper {
 
       Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, selectedList.getIds()));
       IndexResult<TransferredResource> iresults = RodaCoreFactory.getIndexService().find(TransferredResource.class,
-        filter, Sorter.NONE, new Sublist(0, selectedList.getIds().size()));
+        filter, Sorter.NONE, new Sublist(0, selectedList.getIds().size()), new ArrayList<>());
       return iresults.getResults();
     } else if (selected instanceof SelectedItemsFilter) {
       SelectedItemsFilter<TransferredResource> selectedFilter = (SelectedItemsFilter<TransferredResource>) selected;
 
       Long counter = RodaCoreFactory.getIndexService().count(TransferredResource.class, selectedFilter.getFilter());
       IndexResult<TransferredResource> iresults = RodaCoreFactory.getIndexService().find(TransferredResource.class,
-        selectedFilter.getFilter(), Sorter.NONE, new Sublist(0, counter.intValue()));
+        selectedFilter.getFilter(), Sorter.NONE, new Sublist(0, counter.intValue()), new ArrayList<>());
       return iresults.getResults();
     } else {
       return new ArrayList<TransferredResource>();
@@ -3067,9 +3086,9 @@ public class BrowserHelper {
 
   protected static Reports listReports(int start, int limit)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    Sorter sorter = new Sorter(new SortParameter(RodaConstants.JOB_REPORT_DATE_UPDATE, true));
+    Sorter sorter = new Sorter(new SortParameter(RodaConstants.JOB_REPORT_DATE_UPDATED, true));
     IndexResult<IndexedReport> indexReports = RodaCoreFactory.getIndexService().find(IndexedReport.class, Filter.ALL,
-      sorter, new Sublist(start, limit));
+      sorter, new Sublist(start, limit), new ArrayList<>());
     List<Report> results = indexReports.getResults().stream().map(ireport -> (Report) ireport)
       .collect(Collectors.toList());
     return new Reports(results);
@@ -3084,9 +3103,9 @@ public class BrowserHelper {
     filter.add(new OneOfManyFilterParameter(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_CLASS,
       Arrays.asList(AIP.class.getName(), IndexedAIP.class.getName())));
 
-    Sorter sorter = new Sorter(new SortParameter(RodaConstants.JOB_REPORT_DATE_UPDATE, true));
+    Sorter sorter = new Sorter(new SortParameter(RodaConstants.JOB_REPORT_DATE_UPDATED, true));
     IndexResult<IndexedReport> reports = RodaCoreFactory.getIndexService().find(IndexedReport.class, filter, sorter,
-      new Sublist(start, limit));
+      new Sublist(start, limit), new ArrayList<>());
     List<Report> results = reports.getResults().stream().map(ireport -> (Report) ireport).collect(Collectors.toList());
     return new Reports(results);
   }
@@ -3098,9 +3117,9 @@ public class BrowserHelper {
       Arrays.asList(AIP.class.getName(), IndexedAIP.class.getName())));
     filter.add(new SimpleFilterParameter(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ORIGINAL_IDS, sipId));
 
-    Sorter sorter = new Sorter(new SortParameter(RodaConstants.JOB_REPORT_DATE_UPDATE, true));
+    Sorter sorter = new Sorter(new SortParameter(RodaConstants.JOB_REPORT_DATE_UPDATED, true));
     IndexResult<IndexedReport> indexReports = RodaCoreFactory.getIndexService().find(IndexedReport.class, filter,
-      sorter, new Sublist(start, limit));
+      sorter, new Sublist(start, limit), new ArrayList<>());
     List<Report> results = indexReports.getResults().stream().map(ireport -> (Report) ireport)
       .collect(Collectors.toList());
     return new Reports(results);
@@ -3141,7 +3160,7 @@ public class BrowserHelper {
 
       int counter = index.count(RiskIncidence.class, filter.getFilter()).intValue();
       IndexResult<RiskIncidence> incidences = index.find(RiskIncidence.class, filter.getFilter(), Sorter.NONE,
-        new Sublist(0, counter));
+        new Sublist(0, counter), new ArrayList<>());
 
       for (RiskIncidence incidence : incidences.getResults()) {
         incidence.setStatus(INCIDENCE_STATUS.valueOf(status));
@@ -3161,7 +3180,7 @@ public class BrowserHelper {
     TransferredResourcesScanner scanner = RodaCoreFactory.getTransferredResourcesScanner();
     scanner.updateTransferredResources(Optional.of(path), true);
     return RodaCoreFactory.getIndexService().retrieve(TransferredResource.class,
-      IdUtils.getTransferredResourceUUID(path));
+      IdUtils.getTransferredResourceUUID(path), new ArrayList<>());
   }
 
   public static DIP createDIP(DIP dip) throws GenericException, AuthorizationDeniedException {
@@ -3199,7 +3218,8 @@ public class BrowserHelper {
   public static EntityResponse retrieveDIPFile(String fileUuid, String acceptFormat)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
 
-    DIPFile iFile = RodaCoreFactory.getIndexService().retrieve(DIPFile.class, fileUuid);
+    DIPFile iFile = RodaCoreFactory.getIndexService().retrieve(DIPFile.class, fileUuid,
+      RodaConstants.DIPFILE_FIELDS_TO_RETURN);
 
     if (!iFile.isDirectory() && RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
       final String filename;
@@ -3262,12 +3282,12 @@ public class BrowserHelper {
     IndexService index = RodaCoreFactory.getIndexService();
 
     if (folderUUID != null) {
-      DIPFile ifolder = index.retrieve(DIPFile.class, folderUUID);
+      DIPFile ifolder = index.retrieve(DIPFile.class, folderUUID, RodaConstants.DIPFILE_FIELDS_TO_RETURN);
       DIPFile newFolder = model.createDIPFile(ifolder.getDipId(), ifolder.getPath(), ifolder.getId(), newName, true);
       index.commit(DIPFile.class);
       return IdUtils.getDIPFileId(newFolder);
     } else {
-      IndexedDIP dip = index.retrieve(IndexedDIP.class, folderUUID);
+      IndexedDIP dip = index.retrieve(IndexedDIP.class, folderUUID, Arrays.asList(RodaConstants.DIP_ID));
       DIPFile newFolder = model.createDIPFile(dip.getId(), null, null, newName, true);
       index.commit(DIPFile.class);
       return IdUtils.getDIPFileId(newFolder);
@@ -3288,7 +3308,7 @@ public class BrowserHelper {
     Filter filter = new Filter();
     filter.add(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, fileIds));
     IndexResult<DIPFile> files = RodaCoreFactory.getIndexService().find(DIPFile.class, filter, Sorter.NONE,
-      new Sublist(0, fileIds.size()));
+      new Sublist(0, fileIds.size()), RodaConstants.DIPFILE_FIELDS_TO_RETURN);
 
     for (DIPFile file : files.getResults()) {
       RodaCoreFactory.getModelService().deleteDIPFile(file.getDipId(), file.getPath(), file.getId(), true);
@@ -3323,7 +3343,8 @@ public class BrowserHelper {
     Filter filter = new Filter();
     filter.add(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, representationIds));
     IndexResult<IndexedRepresentation> reps = index.find(IndexedRepresentation.class, filter, Sorter.NONE,
-      new Sublist(0, representationIds.size()));
+      new Sublist(0, representationIds.size()), Arrays.asList(RodaConstants.REPRESENTATION_ID,
+        RodaConstants.REPRESENTATION_TYPE, RodaConstants.REPRESENTATION_AIP_ID));
 
     for (IndexedRepresentation irep : reps.getResults()) {
       String oldType = irep.getType();

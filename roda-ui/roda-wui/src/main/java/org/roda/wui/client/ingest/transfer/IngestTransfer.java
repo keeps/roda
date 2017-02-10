@@ -124,6 +124,12 @@ public class IngestTransfer extends Composite {
   private static final Filter DEFAULT_FILTER = new Filter(
     new EmptyKeyFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID));
 
+  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
+    RodaConstants.TRANSFERRED_RESOURCE_NAME, RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID,
+    RodaConstants.TRANSFERRED_RESOURCE_PARENT_UUID, RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH,
+    RodaConstants.TRANSFERRED_RESOURCE_SIZE, RodaConstants.TRANSFERRED_RESOURCE_DATE,
+    RodaConstants.TRANSFERRED_RESOURCE_ISFILE);
+
   interface MyUiBinder extends UiBinder<Widget, IngestTransfer> {
   }
 
@@ -339,7 +345,7 @@ public class IngestTransfer extends Composite {
       String transferredResourceUUID = historyTokens.get(0);
       if (transferredResourceUUID != null) {
         BrowserService.Util.getInstance().retrieve(TransferredResource.class.getName(), transferredResourceUUID,
-          new AsyncCallback<TransferredResource>() {
+          fieldsToReturn, new AsyncCallback<TransferredResource>() {
 
             @Override
             public void onFailure(Throwable caught) {

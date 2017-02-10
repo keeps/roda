@@ -204,7 +204,7 @@ public class UserUtility {
 
   public static void checkAIPPermissions(User user, IndexedAIP aip, PermissionType permissionType)
     throws AuthorizationDeniedException {
-    
+
     if (isAdministrator(user)) {
       return;
     }
@@ -220,10 +220,10 @@ public class UserUtility {
         "The user '" + user.getId() + "' does not have permissions to " + permissionType);
     }
   }
-  
+
   public static void checkDIPPermissions(User user, IndexedDIP dip, PermissionType permissionType)
     throws AuthorizationDeniedException {
-    
+
     if (isAdministrator(user)) {
       return;
     }
@@ -231,8 +231,8 @@ public class UserUtility {
     Set<String> users = dip.getPermissions().getUsers().get(permissionType);
     Set<String> groups = dip.getPermissions().getGroups().get(permissionType);
 
-    LOGGER.debug("Checking if user '{}' has permissions to {} dip {} (object read permissions: {} & {})",
-      user.getId(), permissionType, dip.getId(), users, groups);
+    LOGGER.debug("Checking if user '{}' has permissions to {} dip {} (object read permissions: {} & {})", user.getId(),
+      permissionType, dip.getId(), users, groups);
 
     if (!users.contains(user.getId()) && iterativeDisjoint(groups, user.getGroups())) {
       throw new AuthorizationDeniedException(
@@ -253,7 +253,7 @@ public class UserUtility {
 
   private static <T extends IsIndexed> void checkObjectPermissions(User user, T obj, Function<T, String> toAIP,
     PermissionType permissionType) throws AuthorizationDeniedException {
-    
+
     if (isAdministrator(user)) {
       return;
     }
@@ -261,7 +261,8 @@ public class UserUtility {
     String aipId = toAIP.apply(obj);
     IndexedAIP aip;
     try {
-      aip = RodaCoreFactory.getIndexService().retrieve(IndexedAIP.class, aipId);
+      aip = RodaCoreFactory.getIndexService().retrieve(IndexedAIP.class, aipId,
+        RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
     } catch (NotFoundException | GenericException e) {
       throw new AuthorizationDeniedException("Could not check permissions of object " + obj, e);
     }
@@ -303,7 +304,8 @@ public class UserUtility {
     IndexService index = RodaCoreFactory.getIndexService();
     if (selected instanceof SelectedItemsFilter) {
       SelectedItemsFilter<IndexedAIP> selectedItems = (SelectedItemsFilter<IndexedAIP>) selected;
-      IterableIndexResult<IndexedAIP> findAll = index.findAll(IndexedAIP.class, selectedItems.getFilter());
+      IterableIndexResult<IndexedAIP> findAll = index.findAll(IndexedAIP.class, selectedItems.getFilter(),
+        RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
 
       for (IndexedAIP aip : findAll) {
         checkAIPPermissions(user, aip, permission);
@@ -335,7 +337,7 @@ public class UserUtility {
   }
 
   private static <T extends IsIndexed> void checkObjectPermissions(User user, SelectedItems<T> selected,
-    Function<T, String> toAIP, PermissionType permission)
+    Function<T, String> toAIP, PermissionType permission, List<String> fieldsToApply)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException {
 
     if (isAdministrator(user)) {
@@ -346,13 +348,13 @@ public class UserUtility {
     IndexService index = RodaCoreFactory.getIndexService();
     if (selected instanceof SelectedItemsFilter) {
       SelectedItemsFilter<T> selectedItems = (SelectedItemsFilter<T>) selected;
-      IterableIndexResult<T> findAll = index.findAll(classToReturn, selectedItems.getFilter());
+      IterableIndexResult<T> findAll = index.findAll(classToReturn, selectedItems.getFilter(), fieldsToApply);
 
       for (T obj : findAll) {
         String aipId = toAIP.apply(obj);
         IndexedAIP aip;
         try {
-          aip = index.retrieve(IndexedAIP.class, aipId);
+          aip = index.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
           checkAIPPermissions(user, aip, permission);
         } catch (NotFoundException e) {
           // conservative approach
@@ -368,9 +370,9 @@ public class UserUtility {
       for (String uuid : selectedItems.getIds()) {
         T obj;
         try {
-          obj = index.retrieve(classToReturn, uuid);
+          obj = index.retrieve(classToReturn, uuid, fieldsToApply);
           String aipId = toAIP.apply(obj);
-          IndexedAIP aip = index.retrieve(IndexedAIP.class, aipId);
+          IndexedAIP aip = index.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
           aips.add(aip);
         } catch (NotFoundException e) {
           // conservative approach
@@ -391,12 +393,13 @@ public class UserUtility {
 
   public static void checkRepresentationPermissions(User user, SelectedItems<IndexedRepresentation> selected,
     PermissionType permission) throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    checkObjectPermissions(user, selected, rep -> rep.getAipId(), permission);
+    checkObjectPermissions(user, selected, rep -> rep.getAipId(), permission,
+      RodaConstants.REPRESENTATION_FIELDS_TO_RETURN);
   }
 
   public static void checkFilePermissions(User user, SelectedItems<IndexedFile> selected, PermissionType permission)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    checkObjectPermissions(user, selected, file -> file.getAipId(), permission);
+    checkObjectPermissions(user, selected, file -> file.getAipId(), permission, RodaConstants.FILE_FIELDS_TO_RETURN);
   }
 
   public static User resetGroupsAndRoles(User user) {

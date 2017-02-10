@@ -2094,7 +2094,7 @@ public class ModelService extends ModelObservable {
 
   public RiskIncidence updateRiskIncidence(RiskIncidence riskIncidence, boolean commit) throws GenericException {
     try {
-      riskIncidence.setRiskId(riskIncidence.getRiskId().replace("[", "").replace("]", ""));
+      riskIncidence.setRiskId(riskIncidence.getRiskId());
       String riskIncidenceAsJson = JsonUtils.getJsonFromObject(riskIncidence);
       StoragePath riskIncidencePath = ModelUtils.getRiskIncidenceStoragePath(riskIncidence.getId());
       storage.updateBinaryContent(riskIncidencePath, new StringContentPayload(riskIncidenceAsJson), false, true);

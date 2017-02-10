@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -807,7 +808,8 @@ public final class PremisV3Utils {
       String version = "";
 
       try {
-        RODAMember member = index.retrieve(RODAMember.class, username);
+        RODAMember member = index.retrieve(RODAMember.class, username,
+          Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.MEMBERS_FULLNAME, RodaConstants.MEMBERS_EMAIL));
         fullName = member.getFullName();
         if (member instanceof User) {
           User user = (User) member;

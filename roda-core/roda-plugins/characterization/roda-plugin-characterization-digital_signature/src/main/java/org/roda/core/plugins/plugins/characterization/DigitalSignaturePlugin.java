@@ -229,7 +229,8 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
               LOGGER.debug("Processing file {}", file);
 
               if (!file.isDirectory()) {
-                IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
+                IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file),
+                  RodaConstants.FILE_FORMAT_FIELDS_TO_RETURN);
                 String fileMimetype = ifile.getFileFormat().getMimeType();
                 String filePronom = ifile.getFileFormat().getPronom();
                 String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1);
@@ -413,7 +414,8 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
             LOGGER.debug("Processing file {}", file);
 
             if (!file.isDirectory()) {
-              IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
+              IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file),
+                RodaConstants.FILE_FORMAT_FIELDS_TO_RETURN);
               String fileMimetype = ifile.getFileFormat().getMimeType();
               String filePronom = ifile.getFileFormat().getPronom();
               String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1);
@@ -569,7 +571,8 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
 
       try {
         if (!file.isDirectory()) {
-          IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
+          IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file),
+            RodaConstants.FILE_FORMAT_FIELDS_TO_RETURN);
           String fileMimetype = ifile.getFileFormat().getMimeType();
           String filePronom = ifile.getFileFormat().getPronom();
           String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1);

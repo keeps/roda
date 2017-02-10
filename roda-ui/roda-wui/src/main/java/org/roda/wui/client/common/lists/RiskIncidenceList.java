@@ -46,13 +46,21 @@ public class RiskIncidenceList extends BasicAsyncTableCell<RiskIncidence> {
   private TextColumn<RiskIncidence> detectedByColumn;
   private Column<RiskIncidence, SafeHtml> statusColumn;
 
+  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
+    RodaConstants.RISK_INCIDENCE_ID, RodaConstants.RISK_INCIDENCE_AIP_ID,
+    RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, RodaConstants.RISK_INCIDENCE_FILE_ID,
+    RodaConstants.RISK_INCIDENCE_OBJECT_CLASS, RodaConstants.RISK_INCIDENCE_RISK_ID,
+    RodaConstants.RISK_INCIDENCE_DETECTED_ON, RodaConstants.RISK_INCIDENCE_DETECTED_BY,
+    RodaConstants.RISK_INCIDENCE_STATUS);
+
   public RiskIncidenceList(Filter filter, Facets facets, String summary, boolean selectable) {
-    super(RiskIncidence.class, filter, true, facets, summary, selectable);
+    super(RiskIncidence.class, filter, true, facets, summary, selectable, fieldsToReturn);
   }
 
   public RiskIncidenceList(Filter filter, Facets facets, String summary, boolean selectable, int initialPageSize,
     int pageSizeIncrement) {
-    super(RiskIncidence.class, filter, true, facets, summary, selectable, initialPageSize, pageSizeIncrement);
+    super(RiskIncidence.class, filter, true, facets, summary, selectable, initialPageSize, pageSizeIncrement,
+      fieldsToReturn);
   }
 
   @Override

@@ -257,7 +257,8 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
               File file = oFile.get();
               LOGGER.debug("Processing file {}", file);
               if (!file.isDirectory()) {
-                IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
+                IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file),
+                  RodaConstants.FILE_FORMAT_FIELDS_TO_RETURN);
                 String fileMimetype = ifile.getFileFormat().getMimeType();
                 String filePronom = ifile.getFileFormat().getPronom();
                 String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1, ifile.getId().length());
@@ -445,7 +446,8 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
             LOGGER.debug("Processing file {}", file);
 
             if (!file.isDirectory()) {
-              IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
+              IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file),
+                RodaConstants.FILE_FORMAT_FIELDS_TO_RETURN);
               String fileMimetype = ifile.getFileFormat().getMimeType();
               String filePronom = ifile.getFileFormat().getPronom();
               String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1);
@@ -629,7 +631,8 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
         pluginResultState = PluginState.SUCCESS;
 
         if (!file.isDirectory()) {
-          IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
+          IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file),
+            RodaConstants.FILE_FORMAT_FIELDS_TO_RETURN);
           String fileMimetype = ifile.getFileFormat().getMimeType();
           String filePronom = ifile.getFileFormat().getPronom();
           String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1);

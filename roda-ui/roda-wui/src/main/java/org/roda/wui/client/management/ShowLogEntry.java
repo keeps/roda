@@ -10,8 +10,10 @@
  */
 package org.roda.wui.client.management;
 
+import java.util.Arrays;
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryParameter;
 import org.roda.wui.client.browse.BrowserService;
@@ -20,8 +22,8 @@ import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.ListUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -53,19 +55,20 @@ public class ShowLogEntry extends Composite {
       if (historyTokens.size() == 1) {
         String logEntryId = historyTokens.get(0);
 
-        BrowserService.Util.getInstance().retrieve(LogEntry.class.getName(), logEntryId, new AsyncCallback<LogEntry>() {
+        BrowserService.Util.getInstance().retrieve(LogEntry.class.getName(), logEntryId, fieldsToReturn,
+          new AsyncCallback<LogEntry>() {
 
-          @Override
-          public void onFailure(Throwable caught) {
-            callback.onFailure(caught);
-          }
+            @Override
+            public void onFailure(Throwable caught) {
+              callback.onFailure(caught);
+            }
 
-          @Override
-          public void onSuccess(LogEntry result) {
-            ShowLogEntry logEntryPanel = new ShowLogEntry(result);
-            callback.onSuccess(logEntryPanel);
-          }
-        });
+            @Override
+            public void onSuccess(LogEntry result) {
+              ShowLogEntry logEntryPanel = new ShowLogEntry(result);
+              callback.onSuccess(logEntryPanel);
+            }
+          });
 
       } else {
         HistoryUtils.newHistory(UserLog.RESOLVER);
@@ -92,6 +95,11 @@ public class ShowLogEntry extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static ClientMessages messages = GWT.create(ClientMessages.class);
+
+  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.LOG_ID,
+    RodaConstants.LOG_ACTION_COMPONENT, RodaConstants.LOG_ACTION_METHOD, RodaConstants.LOG_ADDRESS,
+    RodaConstants.LOG_DATETIME, RodaConstants.LOG_RELATED_OBJECT_ID, RodaConstants.LOG_USERNAME,
+    RodaConstants.LOG_PARAMETERS, RodaConstants.LOG_STATE);
 
   @UiField
   Label logIdLabel, logIdValue;
@@ -184,7 +192,7 @@ public class ShowLogEntry extends Composite {
     logStateValue.setVisible(logEntry.getState() != null);
 
   }
-  
+
   @Override
   protected void onLoad() {
     super.onLoad();

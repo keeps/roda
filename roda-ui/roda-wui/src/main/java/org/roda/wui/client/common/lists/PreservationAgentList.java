@@ -41,12 +41,22 @@ public class PreservationAgentList extends BasicAsyncTableCell<IndexedPreservati
   private TextColumn<IndexedPreservationAgent> typeColumn;
   private TextColumn<IndexedPreservationAgent> versionColumn;
 
+  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
+    RodaConstants.PRESERVATION_AGENT_ID, RodaConstants.PRESERVATION_AGENT_NAME, RodaConstants.PRESERVATION_AGENT_TYPE,
+    RodaConstants.PRESERVATION_AGENT_VERSION);
+
   public PreservationAgentList() {
     this(null, null, null, false);
   }
 
   public PreservationAgentList(Filter filter, Facets facets, String summary, boolean selectable) {
-    super(IndexedPreservationAgent.class, filter, facets, summary, selectable);
+    super(IndexedPreservationAgent.class, filter, facets, summary, selectable, fieldsToReturn);
+  }
+
+  public PreservationAgentList(Filter filter, Facets facets, String summary, boolean selectable, int initialPageSize,
+    int pageSizeIncrement) {
+    super(IndexedPreservationAgent.class, filter, facets, summary, selectable, initialPageSize, pageSizeIncrement,
+      fieldsToReturn);
   }
 
   @Override

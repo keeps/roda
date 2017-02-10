@@ -7,6 +7,7 @@
  */
 package org.roda.wui.client.management;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -163,7 +164,8 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Lis
     Sorter sorter = new Sorter(new SortParameter(RodaConstants.MEMBERS_FULLNAME, false));
 
     BrowserService.Util.getInstance().find(RODAMember.class.getName(), filter, sorter, Sublist.ALL, Facets.NONE,
-      LocaleInfo.getCurrentLocale().getLocaleName(), justActive, new AsyncCallback<IndexResult<RODAMember>>() {
+      LocaleInfo.getCurrentLocale().getLocaleName(), justActive, new ArrayList<String>(),
+      new AsyncCallback<IndexResult<RODAMember>>() {
 
         @Override
         public void onFailure(Throwable caught) {

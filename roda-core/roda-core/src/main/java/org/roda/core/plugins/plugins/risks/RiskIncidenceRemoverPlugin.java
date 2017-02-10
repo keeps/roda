@@ -114,7 +114,7 @@ public class RiskIncidenceRemoverPlugin<T extends IsRODAObject> extends Abstract
         }
 
         IndexResult<RiskIncidence> incidences = index.find(RiskIncidence.class, filter, Sorter.NONE,
-          new Sublist(0, list.size()));
+          new Sublist(0, list.size()), Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.RISK_INCIDENCE_ID));
 
         for (RiskIncidence incidence : incidences.getResults()) {
           model.deleteRiskIncidence(incidence.getId(), false);

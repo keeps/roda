@@ -97,17 +97,17 @@ public class IndexService {
     model.addModelObserver(observer);
   }
 
-  public IndexedAIP getParent(IndexedAIP aip) throws NotFoundException, GenericException {
-    return SolrUtils.retrieve(getSolrClient(), IndexedAIP.class, aip.getParentID());
+  public IndexedAIP getParent(IndexedAIP aip, List<String> fieldsToReturn) throws NotFoundException, GenericException {
+    return SolrUtils.retrieve(getSolrClient(), IndexedAIP.class, aip.getParentID(), fieldsToReturn);
   }
 
-  public List<IndexedAIP> retrieveAncestors(IndexedAIP aip) throws GenericException {
+  public List<IndexedAIP> retrieveAncestors(IndexedAIP aip, List<String> fieldsToReturn) throws GenericException {
     List<IndexedAIP> ancestors = new ArrayList<IndexedAIP>();
     IndexedAIP parent = null, actual = aip;
 
     while (actual != null && actual.getParentID() != null) {
       try {
-        parent = getParent(actual);
+        parent = getParent(actual, fieldsToReturn);
       } catch (NotFoundException e) {
         parent = null;
         LOGGER.warn("Ancestor not found: {}", actual.getParentID());
@@ -130,52 +130,56 @@ public class IndexService {
     return SolrUtils.count(getSolrClient(), returnClass, filter);
   }
 
-  public <T extends IsIndexed> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter, Sublist sublist)
+  public <T extends IsIndexed> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter, Sublist sublist,
+    final List<String> fieldsToReturn) throws GenericException, RequestNotValidException {
+    return SolrUtils.find(getSolrClient(), returnClass, filter, sorter, sublist, Facets.NONE, fieldsToReturn);
+  }
+
+  public <T extends IsIndexed> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter, Sublist sublist,
+    Facets facets, final List<String> fieldsToReturn) throws GenericException, RequestNotValidException {
+    return SolrUtils.find(getSolrClient(), returnClass, filter, sorter, sublist, facets, fieldsToReturn);
+  }
+
+  public <T extends IsIndexed> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter, Sublist sublist,
+    Facets facets, User user, boolean justActive, final List<String> fieldsToReturn)
     throws GenericException, RequestNotValidException {
-    return SolrUtils.find(getSolrClient(), returnClass, filter, sorter, sublist, Facets.NONE);
-  }
-
-  public <T extends IsIndexed> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter, Sublist sublist,
-    Facets facets) throws GenericException, RequestNotValidException {
-    return SolrUtils.find(getSolrClient(), returnClass, filter, sorter, sublist, facets);
-  }
-
-  public <T extends IsIndexed> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter, Sublist sublist,
-    Facets facets, User user, boolean justActive) throws GenericException, RequestNotValidException {
-    return SolrUtils.find(getSolrClient(), returnClass, filter, sorter, sublist, facets, user, justActive);
-  }
-
-  public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter) {
-    return findAll(returnClass, filter, new Sorter(new SortParameter(RodaConstants.INDEX_UUID, true)), true);
+    return SolrUtils.find(getSolrClient(), returnClass, filter, sorter, sublist, facets, user, justActive,
+      fieldsToReturn);
   }
 
   public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
-    final boolean removeDuplicates) {
-    return findAll(returnClass, filter, new Sorter(new SortParameter(RodaConstants.INDEX_UUID, true)),
-      removeDuplicates);
+    final List<String> fieldsToReturn) {
+    return findAll(returnClass, filter, new Sorter(new SortParameter(RodaConstants.INDEX_UUID, true)), true,
+      fieldsToReturn);
   }
 
   public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
-    final boolean justActive, final boolean removeDuplicates) {
+    final boolean removeDuplicates, final List<String> fieldsToReturn) {
+    return findAll(returnClass, filter, new Sorter(new SortParameter(RodaConstants.INDEX_UUID, true)), removeDuplicates,
+      fieldsToReturn);
+  }
+
+  public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
+    final boolean justActive, final boolean removeDuplicates, final List<String> fieldsToReturn) {
     return findAll(returnClass, filter, new Sorter(new SortParameter(RodaConstants.INDEX_UUID, true)), Sublist.ALL,
-      null, justActive, removeDuplicates);
+      null, justActive, removeDuplicates, fieldsToReturn);
   }
 
   public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
-    final Sorter sorter) {
-    return findAll(returnClass, filter, sorter, true);
+    final Sorter sorter, final List<String> fieldsToReturn) {
+    return findAll(returnClass, filter, sorter, true, fieldsToReturn);
   }
 
   public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
-    final Sorter sorter, final boolean removeDuplicates) {
-    return findAll(returnClass, filter, sorter, Sublist.ALL, null, true, removeDuplicates);
+    final Sorter sorter, final boolean removeDuplicates, final List<String> fieldsToReturn) {
+    return findAll(returnClass, filter, sorter, Sublist.ALL, null, true, removeDuplicates, fieldsToReturn);
   }
 
   public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
     final Sorter sorter, final Sublist sublist, final User user, final boolean justActive,
-    final boolean removeDuplicates) {
+    final boolean removeDuplicates, final List<String> fieldsToReturn) {
     return new IterableIndexResult<>(getSolrClient(), returnClass, filter, sorter, sublist, Facets.NONE, user,
-      justActive, removeDuplicates);
+      justActive, removeDuplicates, fieldsToReturn);
   }
 
   public <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter, User user, boolean justActive)
@@ -183,13 +187,14 @@ public class IndexService {
     return SolrUtils.count(getSolrClient(), returnClass, filter, user, justActive);
   }
 
-  public <T extends IsIndexed> T retrieve(Class<T> returnClass, String id) throws NotFoundException, GenericException {
-    return SolrUtils.retrieve(getSolrClient(), returnClass, id);
+  public <T extends IsIndexed> T retrieve(Class<T> returnClass, String id, List<String> fieldsToReturn)
+    throws NotFoundException, GenericException {
+    return SolrUtils.retrieve(getSolrClient(), returnClass, id, fieldsToReturn);
   }
 
-  public <T extends IsIndexed> List<T> retrieve(Class<T> returnClass, List<String> ids)
+  public <T extends IsIndexed> List<T> retrieve(Class<T> returnClass, List<String> ids, List<String> fieldsToReturn)
     throws NotFoundException, GenericException {
-    return SolrUtils.retrieve(getSolrClient(), returnClass, ids);
+    return SolrUtils.retrieve(getSolrClient(), returnClass, ids, fieldsToReturn);
   }
 
   public void reindexAIPs()
@@ -530,9 +535,9 @@ public class IndexService {
     return SolrUtils.suggest(getSolrClient(), returnClass, field, query, justActive, user, allowPartial);
   }
 
-  public <T extends IsIndexed> void execute(Class<T> classToRetrieve, Filter filter, IndexRunnable<T> indexRunnable)
-    throws GenericException, RequestNotValidException, AuthorizationDeniedException {
-    SolrUtils.execute(getSolrClient(), classToRetrieve, filter, indexRunnable);
+  public <T extends IsIndexed> void execute(Class<T> classToRetrieve, Filter filter, List<String> fieldsToReturn,
+    IndexRunnable<T> indexRunnable) throws GenericException, RequestNotValidException, AuthorizationDeniedException {
+    SolrUtils.execute(getSolrClient(), classToRetrieve, filter, fieldsToReturn, indexRunnable);
   }
 
   public <T extends IsIndexed> void delete(Class<T> classToRetrieve, List<String> ids)
@@ -562,12 +567,13 @@ public class IndexService {
     return solrClient;
   }
 
-  public <T extends IsIndexed> CloseableIterable<OptionalWithCause<T>> list(Class<T> listClass)
+  public <T extends IsIndexed> CloseableIterable<OptionalWithCause<T>> list(Class<T> listClass,
+    List<String> fieldsToReturn)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
     int counter = RodaCoreFactory.getIndexService().count(listClass, Filter.ALL).intValue();
     IndexResult<T> resources = RodaCoreFactory.getIndexService().find(listClass, Filter.ALL, Sorter.NONE,
-      new Sublist(0, counter));
+      new Sublist(0, counter), fieldsToReturn);
     Iterator<T> it = resources.getResults().iterator();
 
     CloseableIterable<OptionalWithCause<T>> resourceIterable = new CloseableIterable<OptionalWithCause<T>>() {

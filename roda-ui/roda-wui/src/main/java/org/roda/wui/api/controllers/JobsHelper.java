@@ -7,6 +7,8 @@
  */
 package org.roda.wui.api.controllers;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -114,14 +116,15 @@ public class JobsHelper {
     return updatedJob;
   }
 
-  public static org.roda.core.data.v2.jobs.Jobs getJobsFromIndexResult(User user, String start, String limit)
-    throws GenericException, AuthorizationDeniedException, RequestNotValidException {
+  public static org.roda.core.data.v2.jobs.Jobs getJobsFromIndexResult(User user, String start, String limit,
+    List<String> fieldsToReturn) throws GenericException, AuthorizationDeniedException, RequestNotValidException {
     org.roda.core.data.v2.jobs.Jobs jobs = new org.roda.core.data.v2.jobs.Jobs();
 
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
     boolean justActive = false;
     IndexResult<Job> listJobsIndexResult = org.roda.wui.api.controllers.Browser.find(Job.class, Filter.ALL, Sorter.NONE,
-      new Sublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())), Facets.NONE, user, justActive);
+      new Sublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())), Facets.NONE, user, justActive,
+      fieldsToReturn);
 
     for (Job job : listJobsIndexResult.getResults()) {
       jobs.addJob(job);
@@ -174,7 +177,8 @@ public class JobsHelper {
 
     for (int i = 0; i < jobReportsCount; i += RodaConstants.DEFAULT_PAGINATION_VALUE) {
       sublist.setFirstElementIndex(i);
-      IndexResult<IndexedReport> jobReports = index.find(IndexedReport.class, filter, null, sublist);
+      IndexResult<IndexedReport> jobReports = index.find(IndexedReport.class, filter, null, sublist,
+        Arrays.asList(RodaConstants.JOB_REPORT_ID, RodaConstants.JOB_REPORT_JOB_ID));
       for (IndexedReport report : jobReports.getResults()) {
         try {
           model.deleteJobReport(report.getJobId(), report.getId());
@@ -187,7 +191,8 @@ public class JobsHelper {
   }
 
   public static Reports getJobReportsFromIndexResult(User user, String jobId, boolean justFailed, String start,
-    String limit) throws GenericException, AuthorizationDeniedException, RequestNotValidException {
+    String limit, List<String> fieldsToReturn)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException {
     Reports reports = new Reports();
 
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
@@ -199,7 +204,8 @@ public class JobsHelper {
     }
     IndexResult<IndexedReport> listJobReportsIndexResult = org.roda.wui.api.controllers.Browser.find(
       IndexedReport.class, filter, Sorter.NONE,
-      new Sublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())), Facets.NONE, user, justActive);
+      new Sublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())), Facets.NONE, user, justActive,
+      fieldsToReturn);
 
     for (IndexedReport report : listJobReportsIndexResult.getResults()) {
       reports.addObject(report);

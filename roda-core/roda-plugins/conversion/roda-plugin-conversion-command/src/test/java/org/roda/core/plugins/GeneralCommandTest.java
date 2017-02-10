@@ -120,8 +120,8 @@ public class GeneralCommandTest {
     f.updateTransferredResources(Optional.empty(), true);
     index.commit(TransferredResource.class);
 
-    resources.add(
-      index.retrieve(TransferredResource.class, UUID.nameUUIDFromBytes(transferredResourceId.getBytes()).toString()));
+    resources.add(index.retrieve(TransferredResource.class,
+      UUID.nameUUIDFromBytes(transferredResourceId.getBytes()).toString(), new ArrayList<>()));
     return resources;
   }
 
@@ -149,7 +149,8 @@ public class GeneralCommandTest {
     index.commitAIPs();
 
     IndexResult<IndexedAIP> find = index.find(IndexedAIP.class,
-      new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 10));
+      new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 10),
+      new ArrayList<>());
 
     AssertJUnit.assertEquals(1L, find.getTotalCount());
     IndexedAIP indexedAIP = find.getResults().get(0);

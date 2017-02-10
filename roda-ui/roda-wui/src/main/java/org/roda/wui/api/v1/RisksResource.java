@@ -7,6 +7,8 @@
  */
 package org.roda.wui.api.v1;
 
+import java.util.ArrayList;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -74,7 +76,7 @@ public class RisksResource {
     boolean justActive = false;
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
     IndexResult<IndexedRisk> result = Browser.find(IndexedRisk.class, Filter.NULL, Sorter.NONE,
-      new Sublist(pagingParams.getFirst(), pagingParams.getSecond()), null, user, justActive);
+      new Sublist(pagingParams.getFirst(), pagingParams.getSecond()), null, user, justActive, new ArrayList<>());
     return Response.ok(ApiUtils.indexedResultToRODAObjectList(IndexedRisk.class, result), mediaType).build();
   }
 
@@ -134,7 +136,7 @@ public class RisksResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    Risk risk = org.roda.wui.api.controllers.Browser.retrieve(user, IndexedRisk.class, riskId);
+    Risk risk = org.roda.wui.api.controllers.Browser.retrieve(user, IndexedRisk.class, riskId, new ArrayList<>());
     return Response.ok(risk, mediaType).build();
   }
 

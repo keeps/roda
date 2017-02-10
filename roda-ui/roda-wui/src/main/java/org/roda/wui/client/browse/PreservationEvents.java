@@ -10,6 +10,7 @@
  */
 package org.roda.wui.client.browse;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -142,7 +143,6 @@ public class PreservationEvents extends Composite {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
   @UiField(provided = true)
@@ -267,8 +267,10 @@ public class PreservationEvents extends Composite {
   }
 
   private void getAIPBreadCrumbs() {
+    List<String> aipFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_ID, RodaConstants.AIP_GHOST,
+      RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL);
     BrowserService.Util.getInstance().retrieveBrowseAIPBundle(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
-      new AsyncCallback<BrowseAIPBundle>() {
+      aipFields, new AsyncCallback<BrowseAIPBundle>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -287,7 +289,7 @@ public class PreservationEvents extends Composite {
 
   private void getRepresentationBreadCrumbs() {
     BrowserService.Util.getInstance().retrieve(IndexedRepresentation.class.getName(), representationUUID,
-      new AsyncCallback<IndexedRepresentation>() {
+      RodaConstants.REPRESENTATION_FIELDS_TO_RETURN, new AsyncCallback<IndexedRepresentation>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -296,8 +298,10 @@ public class PreservationEvents extends Composite {
 
         @Override
         public void onSuccess(IndexedRepresentation representation) {
+          List<String> representationFields = Arrays.asList(RodaConstants.INDEX_UUID,
+            RodaConstants.REPRESENTATION_AIP_ID, RodaConstants.REPRESENTATION_ID, RodaConstants.REPRESENTATION_TYPE);
           BrowserService.Util.getInstance().retrieveBrowseRepresentationBundle(representation.getAipId(),
-            representation.getId(), LocaleInfo.getCurrentLocale().getLocaleName(),
+            representation.getId(), LocaleInfo.getCurrentLocale().getLocaleName(), representationFields,
             new AsyncCallback<BrowseRepresentationBundle>() {
 
               @Override
@@ -316,32 +320,37 @@ public class PreservationEvents extends Composite {
   }
 
   private void getFileBreadCrumbs() {
-    BrowserService.Util.getInstance().retrieve(IndexedFile.class.getName(), fileUUID, new AsyncCallback<IndexedFile>() {
+    BrowserService.Util.getInstance().retrieve(IndexedFile.class.getName(), fileUUID,
+      RodaConstants.FILE_FIELDS_TO_RETURN, new AsyncCallback<IndexedFile>() {
 
-      @Override
-      public void onFailure(Throwable caught) {
-        AsyncCallbackUtils.defaultFailureTreatment(caught);
-      }
+        @Override
+        public void onFailure(Throwable caught) {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
+        }
 
-      @Override
-      public void onSuccess(IndexedFile file) {
-        BrowserService.Util.getInstance().retrieveBrowseFileBundle(file.getAipId(), file.getRepresentationId(),
-          file.getPath(), file.getId(), LocaleInfo.getCurrentLocale().getLocaleName(),
-          new AsyncCallback<BrowseFileBundle>() {
+        @Override
+        public void onSuccess(IndexedFile file) {
+          List<String> fileFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.FILE_PARENT_UUID,
+            RodaConstants.FILE_PATH, RodaConstants.FILE_ANCESTORS_PATH, RodaConstants.FILE_ORIGINALNAME,
+            RodaConstants.FILE_FILE_ID, RodaConstants.FILE_AIP_ID, RodaConstants.FILE_REPRESENTATION_ID,
+            RodaConstants.FILE_ISDIRECTORY);
+          BrowserService.Util.getInstance().retrieveBrowseFileBundle(file.getAipId(), file.getRepresentationId(),
+            file.getPath(), file.getId(), LocaleInfo.getCurrentLocale().getLocaleName(), fileFields,
+            new AsyncCallback<BrowseFileBundle>() {
 
-            @Override
-            public void onFailure(Throwable caught) {
-              AsyncCallbackUtils.defaultFailureTreatment(caught);
-            }
+              @Override
+              public void onFailure(Throwable caught) {
+                AsyncCallbackUtils.defaultFailureTreatment(caught);
+              }
 
-            @Override
-            public void onSuccess(BrowseFileBundle fileBundle) {
-              breadcrumb.updatePath(BreadcrumbUtils.getFileBreadcrumbs(fileBundle));
-              breadcrumb.setVisible(true);
-            }
-          });
-      }
-    });
+              @Override
+              public void onSuccess(BrowseFileBundle fileBundle) {
+                breadcrumb.updatePath(BreadcrumbUtils.getFileBreadcrumbs(fileBundle));
+                breadcrumb.setVisible(true);
+              }
+            });
+        }
+      });
   }
 
   @UiHandler("downloadButton")

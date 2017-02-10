@@ -1337,8 +1337,8 @@ public class RodaCoreFactory {
 
   private static void printIndexMembers(List<String> args, Filter filter, Sorter sorter, Sublist sublist, Facets facets)
     throws GenericException, RequestNotValidException {
-    System.out.println("index list " + args.get(2));
-    IndexResult<RODAMember> users = index.find(RODAMember.class, filter, sorter, sublist, facets);
+    System.out.println("Index list " + args.get(2));
+    IndexResult<RODAMember> users = index.find(RODAMember.class, filter, sorter, sublist, facets, new ArrayList<>());
     for (RODAMember rodaMember : users.getResults()) {
       System.out.println("\t" + rodaMember);
     }
@@ -1365,7 +1365,7 @@ public class RodaCoreFactory {
   private static void printFiles(Sorter sorter, Sublist sublist, Facets facets)
     throws GenericException, RequestNotValidException {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_SEARCH, "OLA-OLÁ-1234-XXXX_K"));
-    IndexResult<IndexedFile> res = index.find(IndexedFile.class, filter, sorter, sublist);
+    IndexResult<IndexedFile> res = index.find(IndexedFile.class, filter, sorter, sublist, new ArrayList<>());
 
     for (IndexedFile sf : res.getResults()) {
       System.out.println(sf.toString());
@@ -1376,7 +1376,8 @@ public class RodaCoreFactory {
     throws GenericException, RequestNotValidException {
     Filter filter = new Filter(
       new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_TYPE, "format identification"));
-    IndexResult<IndexedPreservationEvent> res = index.find(IndexedPreservationEvent.class, filter, sorter, sublist);
+    IndexResult<IndexedPreservationEvent> res = index.find(IndexedPreservationEvent.class, filter, sorter, sublist,
+      new ArrayList<>());
 
     for (IndexedPreservationEvent ipe : res.getResults()) {
       System.out.println(ipe.toString());
@@ -1387,7 +1388,8 @@ public class RodaCoreFactory {
     throws GenericException, RequestNotValidException {
     Filter filter = new Filter(
       new SimpleFilterParameter(RodaConstants.PRESERVATION_AGENT_TYPE, PreservationAgentType.SOFTWARE.toString()));
-    IndexResult<IndexedPreservationAgent> res = index.find(IndexedPreservationAgent.class, filter, sorter, sublist);
+    IndexResult<IndexedPreservationAgent> res = index.find(IndexedPreservationAgent.class, filter, sorter, sublist,
+      new ArrayList<>());
 
     for (IndexedPreservationAgent ipa : res.getResults()) {
       System.out.println(ipa.toString());

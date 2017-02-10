@@ -7,6 +7,8 @@
  */
 package org.roda.wui.api.v1;
 
+import java.util.ArrayList;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -73,7 +75,7 @@ public class FormatsResource {
     boolean justActive = false;
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
     IndexResult<Format> result = Browser.find(Format.class, Filter.NULL, Sorter.NONE,
-      new Sublist(pagingParams.getFirst(), pagingParams.getSecond()), null, user, justActive);
+      new Sublist(pagingParams.getFirst(), pagingParams.getSecond()), null, user, justActive, new ArrayList<>());
     return Response.ok(ApiUtils.indexedResultToRODAObjectList(Format.class, result), mediaType).build();
   }
 
@@ -133,7 +135,7 @@ public class FormatsResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    Format format = org.roda.wui.api.controllers.Browser.retrieve(user, Format.class, formatId);
+    Format format = org.roda.wui.api.controllers.Browser.retrieve(user, Format.class, formatId, new ArrayList<>());
     return Response.ok(format, mediaType).build();
   }
 

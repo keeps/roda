@@ -7,6 +7,7 @@
  */
 package org.roda.core.plugins.risks;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -279,7 +280,8 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
 
     try {
       if (!file.isDirectory()) {
-        result = assessRiskOnFileFormat(index.retrieve(IndexedFile.class, fileUUID).getFileFormat());
+        result = assessRiskOnFileFormat(
+          index.retrieve(IndexedFile.class, fileUUID, RodaConstants.FILE_FORMAT_FIELDS_TO_RETURN).getFileFormat());
       }
 
       if (file.isDirectory() || result.isOk()) {
@@ -423,9 +425,8 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
     // new SimpleFilterParameter("filePath", file.getPath())
 
     try {
-      final List<RiskIncidence> results = index
-        .find(RiskIncidence.class, filter, new Sorter(new SortParameter("detectedOn", true)), new Sublist(0, 1))
-        .getResults();
+      final List<RiskIncidence> results = index.find(RiskIncidence.class, filter,
+        new Sorter(new SortParameter("detectedOn", true)), new Sublist(0, 1), new ArrayList<>()).getResults();
       if (results.isEmpty()) {
         throw new NotFoundException("Couldn't find RiskIncidence matching filter " + filter);
       } else {

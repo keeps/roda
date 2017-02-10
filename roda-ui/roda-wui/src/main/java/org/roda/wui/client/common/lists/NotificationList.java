@@ -49,17 +49,22 @@ public class NotificationList extends BasicAsyncTableCell<Notification> {
   private Column<Notification, SafeHtml> acknowledged;
   private Column<Notification, SafeHtml> state;
 
+  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
+    RodaConstants.NOTIFICATION_ID, RodaConstants.NOTIFICATION_FROM_USER, RodaConstants.NOTIFICATION_RECIPIENT_USERS,
+    RodaConstants.NOTIFICATION_SENT_ON, RodaConstants.NOTIFICATION_SUBJECT, RodaConstants.NOTIFICATION_IS_ACKNOWLEDGED,
+    RodaConstants.NOTIFICATION_STATE);
+
   public NotificationList() {
     this(null, null, null, false);
   }
 
   public NotificationList(Filter filter, Facets facets, String summary, boolean selectable) {
-    super(Notification.class, filter, false, facets, summary, selectable);
+    super(Notification.class, filter, false, facets, summary, selectable, fieldsToReturn);
   }
 
   public NotificationList(Filter filter, Facets facets, String summary, boolean selectable, int pageSize,
     int incrementPage) {
-    super(Notification.class, filter, false, facets, summary, selectable, pageSize, incrementPage);
+    super(Notification.class, filter, false, facets, summary, selectable, pageSize, incrementPage, fieldsToReturn);
   }
 
   @Override

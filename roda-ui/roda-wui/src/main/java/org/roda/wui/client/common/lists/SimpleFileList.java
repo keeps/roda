@@ -41,17 +41,22 @@ public class SimpleFileList extends BasicAsyncTableCell<IndexedFile> {
   private Column<IndexedFile, SafeHtml> iconColumn;
   private TextColumn<IndexedFile> filenameColumn;
 
+  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.FILE_AIP_ID,
+    RodaConstants.FILE_REPRESENTATION_ID, RodaConstants.FILE_PATH, RodaConstants.FILE_ISDIRECTORY,
+    RodaConstants.FILE_ORIGINALNAME, RodaConstants.FILE_FILE_ID);
+
   public SimpleFileList() {
     this(null, false, null, null, false);
   }
 
   public SimpleFileList(Filter filter, boolean justActive, Facets facets, String summary, boolean selectable) {
-    super(IndexedFile.class, filter, justActive, facets, summary, selectable);
+    super(IndexedFile.class, filter, justActive, facets, summary, selectable, fieldsToReturn);
   }
 
   public SimpleFileList(Filter filter, boolean justActive, Facets facets, String summary, boolean selectable,
     int initialPageSize, int pageSizeIncrement) {
-    super(IndexedFile.class, filter, justActive, facets, summary, selectable, initialPageSize, pageSizeIncrement);
+    super(IndexedFile.class, filter, justActive, facets, summary, selectable, initialPageSize, pageSizeIncrement,
+      fieldsToReturn);
   }
 
   @Override

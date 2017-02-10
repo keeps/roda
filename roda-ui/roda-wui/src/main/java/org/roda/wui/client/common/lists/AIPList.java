@@ -49,17 +49,22 @@ public class AIPList extends BasicAsyncTableCell<IndexedAIP> {
   private TextColumn<IndexedAIP> datesColumn;
   private Column<IndexedAIP, SafeHtml> hasRepresentationsColumn;
 
+  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_ID,
+    RodaConstants.AIP_LEVEL, RodaConstants.AIP_TITLE, RodaConstants.AIP_DATE_INITIAL, RodaConstants.AIP_DATE_FINAL,
+    RodaConstants.AIP_HAS_REPRESENTATIONS);
+
   public AIPList() {
     this(null, false, null, null, false);
   }
 
   public AIPList(Filter filter, boolean justActive, Facets facets, String summary, boolean selectable) {
-    super(IndexedAIP.class, filter, justActive, facets, summary, selectable);
+    super(IndexedAIP.class, filter, justActive, facets, summary, selectable, fieldsToReturn);
   }
 
   public AIPList(Filter filter, boolean justActive, Facets facets, String summary, boolean selectable,
     int initialPageSize, int pageSizeIncrement) {
-    super(IndexedAIP.class, filter, justActive, facets, summary, selectable, initialPageSize, pageSizeIncrement);
+    super(IndexedAIP.class, filter, justActive, facets, summary, selectable, initialPageSize, pageSizeIncrement,
+      fieldsToReturn);
   }
 
   @Override

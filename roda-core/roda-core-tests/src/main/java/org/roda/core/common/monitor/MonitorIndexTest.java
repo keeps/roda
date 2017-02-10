@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
@@ -78,7 +79,7 @@ public class MonitorIndexTest {
 
     int folderToIndex = -1;
     IndexResult<TransferredResource> transferredResources = index.find(TransferredResource.class, null, null,
-      new Sublist(0, fileCounter));
+      new Sublist(0, fileCounter), new ArrayList<>());
     int result1 = transferredResources.getResults().size();
     assertTrue(result1 > 0);
 
@@ -98,7 +99,7 @@ public class MonitorIndexTest {
     monitor.updateTransferredResources(Optional.of(resource.getRelativePath()), true);
 
     IndexResult<TransferredResource> transferredResources2 = index.find(TransferredResource.class, null, null,
-      new Sublist(0, fileCounter + 1));
+      new Sublist(0, fileCounter + 1), new ArrayList<>());
     int result2 = transferredResources2.getResults().size();
     assertTrue(result2 == result1 + 1);
   }
@@ -115,7 +116,7 @@ public class MonitorIndexTest {
     int toRemove1 = -1;
     int toRemove2 = -1;
     IndexResult<TransferredResource> transferredResources = index.find(TransferredResource.class, null, null,
-      new Sublist(0, fileCounter));
+      new Sublist(0, fileCounter), new ArrayList<>());
     int resultBeforeRemoves = transferredResources.getResults().size();
 
     for (int i = 0; i < resultBeforeRemoves; i++) {
@@ -142,7 +143,7 @@ public class MonitorIndexTest {
     monitor.updateTransferredResources(Optional.empty(), true);
 
     IndexResult<TransferredResource> transferredResources2 = index.find(TransferredResource.class, null, null,
-      new Sublist(0, fileCounter));
+      new Sublist(0, fileCounter), new ArrayList<>());
     int resultAfterRemoves = transferredResources2.getResults().size();
 
     assertEquals(resultBeforeRemoves, resultAfterRemoves + 2);
@@ -159,7 +160,7 @@ public class MonitorIndexTest {
 
     int toRemove = -1;
     IndexResult<TransferredResource> transferredResources = index.find(TransferredResource.class, null, null,
-      new Sublist(0, fileCounter));
+      new Sublist(0, fileCounter), new ArrayList<>());
     int resultBeforeRemoves = transferredResources.getResults().size();
 
     for (int i = 0; i < resultBeforeRemoves; i++) {
@@ -176,7 +177,7 @@ public class MonitorIndexTest {
     monitor.updateTransferredResources(Optional.empty(), true);
 
     IndexResult<TransferredResource> transferredResources2 = index.find(TransferredResource.class, null, null,
-      new Sublist(0, fileCounter));
+      new Sublist(0, fileCounter), new ArrayList<>());
     int resultAfterRemoves = transferredResources2.getResults().size();
     assertTrue(resultBeforeRemoves > resultAfterRemoves);
   }
@@ -195,7 +196,7 @@ public class MonitorIndexTest {
     String folder = "";
     int folderIndex = -1;
     IndexResult<TransferredResource> transferredResources = index.find(TransferredResource.class, null, null,
-      new Sublist(0, fileCounter));
+      new Sublist(0, fileCounter), new ArrayList<>());
     int resultBeforeRemoves = transferredResources.getResults().size();
 
     for (int i = 0; i < resultBeforeRemoves; i++) {
@@ -224,7 +225,7 @@ public class MonitorIndexTest {
     monitor.updateTransferredResources(Optional.of(transferredResourceFolder.getRelativePath()), true);
 
     IndexResult<TransferredResource> transferredResources2 = index.find(TransferredResource.class, null, null,
-      new Sublist(0, fileCounter));
+      new Sublist(0, fileCounter), new ArrayList<>());
     int resultAfterRemoves = transferredResources2.getResults().size();
 
     assertEquals(resultBeforeRemoves, resultAfterRemoves + 1);

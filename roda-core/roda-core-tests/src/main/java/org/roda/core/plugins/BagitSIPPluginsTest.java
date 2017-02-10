@@ -118,7 +118,7 @@ public class BagitSIPPluginsTest {
     index.commit(TransferredResource.class);
 
     TransferredResource transferredResource = index.retrieve(TransferredResource.class,
-      transferredResourceCreated.getUUID());
+      transferredResourceCreated.getUUID(), new ArrayList<>());
     return transferredResource;
   }
 
@@ -144,7 +144,8 @@ public class BagitSIPPluginsTest {
     index.commitAIPs();
 
     IndexResult<IndexedAIP> find = index.find(IndexedAIP.class,
-      new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 10));
+      new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 10),
+      new ArrayList<>());
 
     AssertJUnit.assertEquals(1L, find.getTotalCount());
     IndexedAIP indexedAIP = find.getResults().get(0);

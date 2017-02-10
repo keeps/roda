@@ -10,8 +10,10 @@
  */
 package org.roda.wui.client.planning;
 
+import java.util.Arrays;
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.wui.client.browse.BrowserService;
@@ -90,6 +92,11 @@ public class ShowPreservationAgent extends Composite {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
+  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
+    RodaConstants.PRESERVATION_AGENT_ID, RodaConstants.PRESERVATION_AGENT_NAME, RodaConstants.PRESERVATION_AGENT_TYPE,
+    RodaConstants.PRESERVATION_AGENT_VERSION, RodaConstants.PRESERVATION_AGENT_NOTE,
+    RodaConstants.PRESERVATION_AGENT_EXTENSION);
+
   @UiField
   SimplePanel itemIcon;
 
@@ -111,7 +118,7 @@ public class ShowPreservationAgent extends Composite {
   public ShowPreservationAgent(final String agentId) {
     initWidget(uiBinder.createAndBindUi(this));
 
-    BrowserService.Util.getInstance().retrieve(IndexedPreservationAgent.class.getName(), agentId,
+    BrowserService.Util.getInstance().retrieve(IndexedPreservationAgent.class.getName(), agentId, fieldsToReturn,
       new AsyncCallback<IndexedPreservationAgent>() {
 
         @Override

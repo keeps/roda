@@ -8,6 +8,7 @@
 package org.roda.wui.api.v1;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import javax.servlet.http.HttpServletRequest;
@@ -94,7 +95,7 @@ public class AipsResource {
     boolean justActive = false;
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
     IndexResult<IndexedAIP> result = Browser.find(IndexedAIP.class, Filter.NULL, Sorter.NONE,
-      new Sublist(pagingParams.getFirst(), pagingParams.getSecond()), null, user, justActive);
+      new Sublist(pagingParams.getFirst(), pagingParams.getSecond()), null, user, justActive, new ArrayList<>());
 
     return Response.ok(ApiUtils.indexedResultToRODAObjectList(IndexedAIP.class, result), mediaType).build();
   }
@@ -116,7 +117,7 @@ public class AipsResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    IndexedAIP indexedAIP = Browser.retrieve(user, IndexedAIP.class, aipId);
+    IndexedAIP indexedAIP = Browser.retrieve(user, IndexedAIP.class, aipId, new ArrayList<>());
     return ApiUtils.okResponse(indexedAIP, acceptFormat, mediaType);
   }
 

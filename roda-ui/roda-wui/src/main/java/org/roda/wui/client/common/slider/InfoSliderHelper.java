@@ -48,7 +48,6 @@ public class InfoSliderHelper {
     infoSliderPanel.addTitle(new Label(messages.viewRepresentationInfoTitle()));
 
     if (aip != null) {
-
       if (StringUtils.isNotBlank(aip.getLevel())) {
         values.put(messages.aipLevel(), DescriptionLevelUtils.getElementLevelIconSafeHtml(aip.getLevel(), true));
       }

@@ -113,7 +113,7 @@ public class EARKSIPPluginsTest {
 
   @AfterMethod
   public void cleanUp() throws RODAException {
-    index.execute(IndexedAIP.class, Filter.ALL, new IndexRunnable<IndexedAIP>() {
+    index.execute(IndexedAIP.class, Filter.ALL, new ArrayList<>(), new IndexRunnable<IndexedAIP>() {
       @Override
       public void run(IndexedAIP item) throws GenericException, RequestNotValidException, AuthorizationDeniedException {
         try {
@@ -137,7 +137,7 @@ public class EARKSIPPluginsTest {
     index.commit(TransferredResource.class);
 
     TransferredResource transferredResource = index.retrieve(TransferredResource.class,
-      UUID.nameUUIDFromBytes(CorporaConstants.EARK_SIP.getBytes()).toString());
+      UUID.nameUUIDFromBytes(CorporaConstants.EARK_SIP.getBytes()).toString(), new ArrayList<>());
     return transferredResource;
   }
 
@@ -163,7 +163,8 @@ public class EARKSIPPluginsTest {
     index.commitAIPs();
 
     IndexResult<IndexedAIP> find = index.find(IndexedAIP.class,
-      new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 10));
+      new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 10),
+      new ArrayList<>());
 
     Assert.assertEquals(find.getTotalCount(), 1L);
     IndexedAIP indexedAIP = find.getResults().get(0);
@@ -246,15 +247,18 @@ public class EARKSIPPluginsTest {
       SelectedItemsAll.create(AIP.class));
     index.commitAIPs();
 
-    IndexResult<IndexedAIP> findAllAIP = index.find(IndexedAIP.class, Filter.ALL, null, new Sublist(0, 12));
+    IndexResult<IndexedAIP> findAllAIP = index.find(IndexedAIP.class, Filter.ALL, null, new Sublist(0, 12),
+      new ArrayList<>());
     Assert.assertEquals(findAllAIP.getTotalCount(), 12L);
 
     IndexResult<IndexedAIP> findRootChildren = index.find(IndexedAIP.class,
-      new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 2));
+      new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 2),
+      new ArrayList<>());
     Assert.assertEquals(findRootChildren.getTotalCount(), 2L);
 
     IndexResult<IndexedAIP> findSpecificAIP = index.find(IndexedAIP.class,
-      new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_IDS, "026106")), null, new Sublist(0, 1));
+      new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_IDS, "026106")), null, new Sublist(0, 1),
+      new ArrayList<>());
     Assert.assertEquals(findSpecificAIP.getTotalCount(), 1L);
     IndexedAIP specificAIP = findSpecificAIP.getResults().get(0);
     Assert.assertEquals(specificAIP.getAncestors().size(), 4);

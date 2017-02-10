@@ -59,7 +59,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  */
 public interface BrowserServiceAsync {
 
-  void retrieveBrowseAIPBundle(String aipId, String localeString, AsyncCallback<BrowseAIPBundle> callback);
+  void retrieveBrowseAIPBundle(String aipId, String localeString, List<String> aipFieldsToReturn,
+    AsyncCallback<BrowseAIPBundle> callback);
 
   void retrieveDescriptiveMetadataEditBundle(String aipId, String representationId, String descId, String type,
     String version, String localeString, AsyncCallback<DescriptiveMetadataEditBundle> callback);
@@ -110,7 +111,7 @@ public interface BrowserServiceAsync {
 
   void retrieveCreateIngestProcessBundle(AsyncCallback<CreateIngestJobBundle> callback);
 
-  void retrieveJobBundle(String jobId, AsyncCallback<JobBundle> callback);
+  void retrieveJobBundle(String jobId, List<String> fieldsToReturn, AsyncCallback<JobBundle> callback);
 
   void retrieveViewersProperties(AsyncCallback<Viewers> callback);
 
@@ -135,15 +136,17 @@ public interface BrowserServiceAsync {
     String versionId, AsyncCallback<Void> callback);
 
   <T extends IsIndexed> void find(String classNameToReturn, Filter filter, Sorter sorter, Sublist sublist,
-    Facets facets, String localeString, boolean justActive, AsyncCallback<IndexResult<T>> callback);
+    Facets facets, String localeString, boolean justActive, List<String> fieldsToReturn,
+    AsyncCallback<IndexResult<T>> callback);
 
   <T extends IsIndexed> void delete(String classNameToReturn, SelectedItems<T> ids, AsyncCallback<Void> callback);
 
   void count(String classNameToReturn, Filter filter, boolean justActive, AsyncCallback<Long> callback);
 
-  <T extends IsIndexed> void retrieve(String classNameToReturn, String id, AsyncCallback<T> callback);
+  <T extends IsIndexed> void retrieve(String classNameToReturn, String id, List<String> fieldsToReturn,
+    AsyncCallback<T> callback);
 
-  <T extends IsIndexed> void retrieve(String classNameToReturn, SelectedItems<T> selectedItems,
+  <T extends IsIndexed> void retrieve(String classNameToReturn, SelectedItems<T> selectedItems, List<String> fieldsToReturn,
     AsyncCallback<List<T>> asyncCallback);
 
   void suggest(String classNameToReturn, String field, String query, boolean allowPartial,
@@ -191,10 +194,6 @@ public interface BrowserServiceAsync {
   void appraisal(SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason, String localeString,
     AsyncCallback<Void> callback);
 
-  void retrieveRepresentationById(String representationId, AsyncCallback<IndexedRepresentation> asyncCallback);
-
-  void retrieveFileById(String fileId, AsyncCallback<IndexedFile> asyncCallback);
-
   void renameTransferredResource(String transferredResourceId, String newName, AsyncCallback<String> asyncCallback);
 
   void moveTransferredResource(SelectedItems<TransferredResource> selected, TransferredResource transferredResource,
@@ -223,15 +222,16 @@ public interface BrowserServiceAsync {
   void changeRepresentationType(SelectedItems<IndexedRepresentation> selectedRepresentation, String newType,
     String details, AsyncCallback<Void> loadingAsyncCallback);
 
-  void getDipBundle(String dipUUID, String dipFileUUID, AsyncCallback<DipBundle> callback);
+  void retrieveDipBundle(String dipUUID, String dipFileUUID, AsyncCallback<DipBundle> callback);
 
   void deleteDIPs(SelectedItems<IndexedDIP> dips, AsyncCallback<Void> async);
 
   void retrieveBrowseRepresentationBundle(String aipId, String representationId, String localeString,
-    AsyncCallback<BrowseRepresentationBundle> callback);
+    List<String> representationFieldsToReturn, AsyncCallback<BrowseRepresentationBundle> callback);
 
   void retrieveBrowseFileBundle(String historyAipId, String historyRepresentationId, List<String> historyFilePath,
-    String historyFileId, String localeName, AsyncCallback<BrowseFileBundle> asyncCallback);
+    String historyFileId, String localeName, List<String> fileFieldsToReturn,
+    AsyncCallback<BrowseFileBundle> asyncCallback);
 
   <T extends IsIndexed> void retrieveFromModel(String objectClass, String objectUUID, AsyncCallback<T> asyncCallback);
 

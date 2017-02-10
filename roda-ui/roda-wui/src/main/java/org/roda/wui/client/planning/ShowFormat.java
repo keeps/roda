@@ -10,8 +10,10 @@
  */
 package org.roda.wui.client.planning;
 
+import java.util.Arrays;
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
@@ -81,6 +83,16 @@ public class ShowFormat extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static ClientMessages messages = GWT.create(ClientMessages.class);
+
+  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.FORMAT_ID,
+    RodaConstants.FORMAT_NAME, RodaConstants.FORMAT_DEFINITION, RodaConstants.FORMAT_CATEGORY,
+    RodaConstants.FORMAT_LATEST_VERSION, RodaConstants.FORMAT_DEVELOPER, RodaConstants.FORMAT_POPULARITY,
+    RodaConstants.FORMAT_INITIAL_RELEASE, RodaConstants.FORMAT_IS_OPEN_FORMAT, RodaConstants.FORMAT_STANDARD,
+    RodaConstants.FORMAT_WEBSITE, RodaConstants.FORMAT_PROVENANCE_INFORMATION, RodaConstants.FORMAT_EXTENSIONS,
+    RodaConstants.FORMAT_MIMETYPES, RodaConstants.FORMAT_PRONOMS, RodaConstants.FORMAT_UTIS,
+    RodaConstants.FORMAT_ALTERNATIVE_DESIGNATIONS, RodaConstants.FORMAT_VERSIONS);
+
+  private Format format;
 
   @UiField
   Label formatId;
@@ -165,8 +177,6 @@ public class ShowFormat extends Composite {
 
   @UiField
   Button buttonCancel;
-
-  private Format format;
 
   /**
    * Create a new panel to view a format
@@ -332,19 +342,20 @@ public class ShowFormat extends Composite {
   void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 1) {
       String formatId = historyTokens.get(0);
-      BrowserService.Util.getInstance().retrieve(Format.class.getName(), formatId, new AsyncCallback<Format>() {
+      BrowserService.Util.getInstance().retrieve(Format.class.getName(), formatId, fieldsToReturn,
+        new AsyncCallback<Format>() {
 
-        @Override
-        public void onFailure(Throwable caught) {
-          callback.onFailure(caught);
-        }
+          @Override
+          public void onFailure(Throwable caught) {
+            callback.onFailure(caught);
+          }
 
-        @Override
-        public void onSuccess(Format result) {
-          ShowFormat formatPanel = new ShowFormat(result);
-          callback.onSuccess(formatPanel);
-        }
-      });
+          @Override
+          public void onSuccess(Format result) {
+            ShowFormat formatPanel = new ShowFormat(result);
+            callback.onSuccess(formatPanel);
+          }
+        });
     } else {
       HistoryUtils.newHistory(FormatRegister.RESOLVER);
       callback.onSuccess(null);

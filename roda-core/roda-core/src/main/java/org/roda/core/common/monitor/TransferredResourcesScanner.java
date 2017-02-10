@@ -52,6 +52,8 @@ import org.slf4j.LoggerFactory;
 
 public class TransferredResourcesScanner {
   private static final Logger LOGGER = LoggerFactory.getLogger(TransferredResourcesScanner.class);
+  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
+    RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH);
 
   private final Path basePath;
   private IndexService index;
@@ -73,7 +75,7 @@ public class TransferredResourcesScanner {
     throws GenericException, RequestNotValidException, NotFoundException {
     Path parentPath;
     if (parentUUID != null) {
-      TransferredResource parent = index.retrieve(TransferredResource.class, parentUUID);
+      TransferredResource parent = index.retrieve(TransferredResource.class, parentUUID, fieldsToReturn);
       parentPath = basePath.resolve(parent.getRelativePath());
     } else {
       parentPath = basePath;
@@ -95,7 +97,7 @@ public class TransferredResourcesScanner {
     throws GenericException, RequestNotValidException, NotFoundException, AlreadyExistsException {
     Path parentPath;
     if (StringUtils.isNotBlank(parentUUID)) {
-      TransferredResource parent = index.retrieve(TransferredResource.class, parentUUID);
+      TransferredResource parent = index.retrieve(TransferredResource.class, parentUUID, fieldsToReturn);
       parentPath = basePath.resolve(parent.getRelativePath());
     } else {
       parentPath = basePath;
@@ -188,7 +190,7 @@ public class TransferredResourcesScanner {
   public void deleteTransferredResource(List<String> ids)
     throws NotFoundException, GenericException, RequestNotValidException {
     for (String uuid : ids) {
-      TransferredResource tr = index.retrieve(TransferredResource.class, uuid);
+      TransferredResource tr = index.retrieve(TransferredResource.class, uuid, fieldsToReturn);
       Path relative = Paths.get(tr.getRelativePath());
       Path fullPath = basePath.resolve(relative);
       if (Files.exists(fullPath)) {
@@ -252,7 +254,8 @@ public class TransferredResourcesScanner {
       if (reindexResources) {
         if (resource.getParentUUID() != null) {
           try {
-            TransferredResource parent = index.retrieve(TransferredResource.class, resource.getParentUUID());
+            TransferredResource parent = index.retrieve(TransferredResource.class, resource.getParentUUID(),
+              fieldsToReturn);
             if (parent != null) {
               updateTransferredResources(Optional.of(parent.getRelativePath()), true);
             } else {
@@ -284,7 +287,9 @@ public class TransferredResourcesScanner {
     throws AlreadyExistsException, GenericException, IsStillUpdatingException, NotFoundException {
     List<TransferredResource> resources = Collections.emptyList();
     try {
-      resources = index.retrieve(TransferredResource.class, resourcesUUIDs);
+      List<String> resourceFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.TRANSFERRED_RESOURCE_FULLPATH,
+        RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH, RodaConstants.TRANSFERRED_RESOURCE_NAME);
+      resources = index.retrieve(TransferredResource.class, resourcesUUIDs, resourceFields);
     } catch (NotFoundException e) {
       // do nothing and pass it an empty list
     }

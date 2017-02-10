@@ -11,6 +11,7 @@
 package org.roda.wui.client.ingest.transfer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
@@ -152,6 +153,9 @@ public class TransferUpload extends Composite {
 
   private boolean isIngest = true;
 
+  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
+    RodaConstants.TRANSFERRED_RESOURCE_ID, RodaConstants.TRANSFERRED_RESOURCE_ISFILE);
+
   @SuppressWarnings("unused")
   private HandlerRegistration handlerRegistration;
 
@@ -215,7 +219,7 @@ public class TransferUpload extends Composite {
       String transferredResourceUUID = historyTokens.get(0);
       if (transferredResourceUUID != null) {
         BrowserService.Util.getInstance().retrieve(TransferredResource.class.getName(), transferredResourceUUID,
-          new AsyncCallback<TransferredResource>() {
+          fieldsToReturn, new AsyncCallback<TransferredResource>() {
 
             @Override
             public void onFailure(Throwable caught) {
@@ -309,7 +313,6 @@ public class TransferUpload extends Composite {
         HistoryUtils.newHistory(IngestTransfer.RESOLVER);
       }
     } else {
-
       if (folderId != null) {
         HistoryUtils.openBrowse(aipId, representationId, folderPath, folderId);
       } else {

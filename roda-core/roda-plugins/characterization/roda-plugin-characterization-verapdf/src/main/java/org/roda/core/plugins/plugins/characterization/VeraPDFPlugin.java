@@ -171,7 +171,8 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractAIPComponents
               File file = oFile.get();
               LOGGER.debug("Processing file: {}", file);
               if (!file.isDirectory()) {
-                IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
+                IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file),
+                  RodaConstants.FILE_FORMAT_FIELDS_TO_RETURN);
                 String fileMimetype = ifile.getFileFormat().getMimeType();
                 String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1, ifile.getId().length());
                 String fileInfoPath = ModelUtils
@@ -296,7 +297,8 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractAIPComponents
               File file = oFile.get();
               LOGGER.debug("Processing file: {}", file);
               if (!file.isDirectory()) {
-                IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
+                IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file),
+                  RodaConstants.FILE_FORMAT_FIELDS_TO_RETURN);
                 String fileMimetype = ifile.getFileFormat().getMimeType();
                 String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1, ifile.getId().length());
                 String fileInfoPath = ModelUtils
@@ -411,7 +413,8 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractAIPComponents
 
         LOGGER.debug("Processing file: {}", file);
         if (!file.isDirectory()) {
-          IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
+          IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file),
+            RodaConstants.FILE_FORMAT_FIELDS_TO_RETURN);
           String fileMimetype = ifile.getFileFormat().getMimeType();
           String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1, ifile.getId().length());
           String fileInfoPath = ModelUtils
