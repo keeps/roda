@@ -386,7 +386,7 @@ public final class JobsHelper {
         filter.add(new OneOfManyFilterParameter(RodaConstants.AIP_STATE,
           Arrays.asList(AIPState.CREATED.toString(), AIPState.INGEST_PROCESSING.toString())));
 
-        doJobCleanup(model, index.findAll(IndexedAIP.class, filter, Arrays.asList(RodaConstants.AIP_ID)));
+        doJobCleanup(model, index.findAll(IndexedAIP.class, filter, Arrays.asList(RodaConstants.INDEX_UUID)));
       } catch (GenericException e) {
         LOGGER.error("Error doing Job cleanup", e);
       }

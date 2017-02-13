@@ -143,8 +143,8 @@ public class BrowseAIP extends Composite {
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
   private static final List<String> aipFieldsToReturn = new ArrayList<String>(
-    Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_ID, RodaConstants.AIP_STATE, RodaConstants.AIP_TITLE,
-      RodaConstants.AIP_LEVEL, RodaConstants.INGEST_SIP_IDS, RodaConstants.INGEST_JOB_ID));
+    Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_STATE, RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL,
+      RodaConstants.INGEST_SIP_IDS, RodaConstants.INGEST_JOB_ID));
 
   private String aipId;
 

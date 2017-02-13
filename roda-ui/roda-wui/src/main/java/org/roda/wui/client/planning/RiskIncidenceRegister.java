@@ -147,8 +147,8 @@ public class RiskIncidenceRegister extends Composite {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  private static final List<String> aipFieldsToReturn = new ArrayList<String>(Arrays.asList(RodaConstants.INDEX_UUID,
-    RodaConstants.AIP_ID, RodaConstants.AIP_GHOST, RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL));
+  private static final List<String> aipFieldsToReturn = new ArrayList<String>(
+    Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_GHOST, RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL));
 
   private static final List<String> representationFieldsToReturn = new ArrayList<String>(
     Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.REPRESENTATION_AIP_ID, RodaConstants.REPRESENTATION_ID,

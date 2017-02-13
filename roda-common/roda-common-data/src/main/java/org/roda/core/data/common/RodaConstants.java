@@ -446,6 +446,10 @@ public final class RodaConstants {
   /*
    * AIP FIELDS
    */
+  /**
+   * 20170213 hsilva: use this field with caution, i.e., is this the field to be
+   * used or should it be RodaConstants.INDEX_UUID???
+   */
   public static final String AIP_ID = "id";
   public static final String AIP_PARENT_ID = "parentId";
   public static final String AIP_ANCESTORS = "ancestors";
@@ -1218,7 +1222,6 @@ public final class RodaConstants {
 
   static {
     AIP_PERMISSIONS_FIELDS_TO_RETURN.add(RodaConstants.INDEX_UUID);
-    AIP_PERMISSIONS_FIELDS_TO_RETURN.add(RodaConstants.AIP_ID);
 
     for (PermissionType type : PermissionType.values()) {
       AIP_PERMISSIONS_FIELDS_TO_RETURN.add(RodaConstants.INDEX_PERMISSION_USERS_PREFIX + type);

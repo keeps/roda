@@ -337,7 +337,7 @@ public class UserUtility {
   }
 
   private static <T extends IsIndexed> void checkObjectPermissions(User user, SelectedItems<T> selected,
-    Function<T, String> toAIP, PermissionType permission, List<String> fieldsToApply)
+    Function<T, String> toAIP, PermissionType permission, List<String> fieldsToRequestIndex)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException {
 
     if (isAdministrator(user)) {
@@ -348,7 +348,7 @@ public class UserUtility {
     IndexService index = RodaCoreFactory.getIndexService();
     if (selected instanceof SelectedItemsFilter) {
       SelectedItemsFilter<T> selectedItems = (SelectedItemsFilter<T>) selected;
-      IterableIndexResult<T> findAll = index.findAll(classToReturn, selectedItems.getFilter(), fieldsToApply);
+      IterableIndexResult<T> findAll = index.findAll(classToReturn, selectedItems.getFilter(), fieldsToRequestIndex);
 
       for (T obj : findAll) {
         String aipId = toAIP.apply(obj);
@@ -370,7 +370,7 @@ public class UserUtility {
       for (String uuid : selectedItems.getIds()) {
         T obj;
         try {
-          obj = index.retrieve(classToReturn, uuid, fieldsToApply);
+          obj = index.retrieve(classToReturn, uuid, fieldsToRequestIndex);
           String aipId = toAIP.apply(obj);
           IndexedAIP aip = index.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
           aips.add(aip);
@@ -406,12 +406,12 @@ public class UserUtility {
     List<Object> defaultRoles = RodaCoreFactory.getRodaConfiguration().getList(REGISTER_DEFAULT_ROLES);
     List<Object> defaultGroups = RodaCoreFactory.getRodaConfiguration().getList(REGISTER_DEFAULT_GROUPS);
 
-    if (defaultRoles != null && defaultRoles.size() > 0) {
+    if (defaultRoles != null && !defaultRoles.isEmpty()) {
       user.setDirectRoles(new HashSet<String>(RodaUtils.copyList(defaultRoles)));
     } else {
       user.setDirectRoles(new HashSet<String>());
     }
-    if (defaultGroups != null && defaultGroups.size() > 0) {
+    if (defaultGroups != null && !defaultGroups.isEmpty()) {
       user.setGroups(new HashSet<String>(RodaUtils.copyList(defaultGroups)));
     } else {
       user.setGroups(new HashSet<String>());

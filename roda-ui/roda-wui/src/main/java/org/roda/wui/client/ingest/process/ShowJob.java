@@ -170,7 +170,7 @@ public class ShowJob extends Composite {
   // empty to get all job information
   private static final List<String> fieldsToReturn = new ArrayList<>();
 
-  private static final List<String> aipFieldsToReturn = Arrays.asList(RodaConstants.AIP_ID, RodaConstants.AIP_LEVEL,
+  private static final List<String> aipFieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_LEVEL,
     RodaConstants.AIP_TITLE);
 
   private Job job;

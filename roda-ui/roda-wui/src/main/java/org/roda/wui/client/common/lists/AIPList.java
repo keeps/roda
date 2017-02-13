@@ -49,8 +49,8 @@ public class AIPList extends BasicAsyncTableCell<IndexedAIP> {
   private TextColumn<IndexedAIP> datesColumn;
   private Column<IndexedAIP, SafeHtml> hasRepresentationsColumn;
 
-  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_ID,
-    RodaConstants.AIP_LEVEL, RodaConstants.AIP_TITLE, RodaConstants.AIP_DATE_INITIAL, RodaConstants.AIP_DATE_FINAL,
+  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_LEVEL,
+    RodaConstants.AIP_TITLE, RodaConstants.AIP_DATE_INITIAL, RodaConstants.AIP_DATE_FINAL,
     RodaConstants.AIP_HAS_REPRESENTATIONS);
 
   public AIPList() {

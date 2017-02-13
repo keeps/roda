@@ -499,7 +499,7 @@ public class IndexModelObserver implements ModelObserver {
 
       LOGGER.debug("Finding descendants of moved aip {}", aip.getId());
       Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aip.getId()));
-      List<String> aipFields = Arrays.asList(RodaConstants.AIP_ID, RodaConstants.AIP_PARENT_ID,
+      List<String> aipFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_PARENT_ID,
         RodaConstants.AIP_HAS_REPRESENTATIONS);
       SolrUtils.execute(index, IndexedAIP.class, filter, aipFields, new IndexRunnable<IndexedAIP>() {
 

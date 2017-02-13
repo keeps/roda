@@ -150,7 +150,7 @@ public class CleanupFailedIngestAIPsPlugin extends AbstractPlugin<Void> {
     // aip state is INGEST_PROCESSING
     aipsFilter.add(new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.INGEST_PROCESSING.toString()));
     IterableIndexResult<IndexedAIP> findAipsToDelete = index.findAll(IndexedAIP.class, aipsFilter, false, true,
-      Arrays.asList(RodaConstants.AIP_ID));
+      Arrays.asList(RodaConstants.INDEX_UUID));
     return findAipsToDelete;
   }
 

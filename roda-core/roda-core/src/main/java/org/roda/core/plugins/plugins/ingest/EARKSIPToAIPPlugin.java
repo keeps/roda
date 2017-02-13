@@ -217,17 +217,17 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
       filter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, searchScopeString));
     }
     IndexResult<IndexedAIP> result = index.find(IndexedAIP.class, filter, Sorter.NONE, new Sublist(0, 1),
-      Arrays.asList(RodaConstants.AIP_ID));
+      Arrays.asList(RodaConstants.INDEX_UUID));
     IndexedAIP indexedAIP = null;
     if (result.getTotalCount() == 1) {
       indexedAIP = result.getResults().get(0);
     } else {
-      filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ID, sip.getId()));
+      filter = new Filter(new SimpleFilterParameter(RodaConstants.INDEX_UUID, sip.getId()));
       if (searchScopeString != null && !forceSearchScope) {
         filter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, searchScopeString));
       }
       result = index.find(IndexedAIP.class, filter, Sorter.NONE, new Sublist(0, 1),
-        Arrays.asList(RodaConstants.AIP_ID));
+        Arrays.asList(RodaConstants.INDEX_UUID));
       if (result.getTotalCount() == 1) {
         indexedAIP = result.getResults().get(0);
       } else {

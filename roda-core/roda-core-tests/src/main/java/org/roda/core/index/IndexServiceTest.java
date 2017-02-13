@@ -19,6 +19,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -190,7 +191,8 @@ public class IndexServiceTest {
     final IndexedAIP indexedAip = index.retrieve(IndexedAIP.class, aipId, new ArrayList<>());
     compareAIPWithIndexedAIP(aip, indexedAip);
 
-    final IndexResult<IndexedAIP> indexAips = index.find(IndexedAIP.class, null, null, new Sublist(0, 10), null);
+    final IndexResult<IndexedAIP> indexAips = index.find(IndexedAIP.class, null, null, new Sublist(0, 10),
+      Collections.emptyList());
     assertEquals(1, indexAips.getTotalCount());
     assertEquals(1, indexAips.getLimit());
     assertEquals(0, indexAips.getOffset());
@@ -217,7 +219,7 @@ public class IndexServiceTest {
     Filter filterParentTheAIP = new Filter();
     filterParentTheAIP.add(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aipId));
     IndexResult<IndexedRepresentation> sros = index.find(IndexedRepresentation.class, filterParentTheAIP, null,
-      new Sublist(0, 10), null);
+      new Sublist(0, 10), Collections.emptyList());
     assertEquals(aip.getRepresentations().size(), sros.getTotalCount());
 
     List<String> sro_IDs = new ArrayList<>();
@@ -271,8 +273,9 @@ public class IndexServiceTest {
     index.commitAIPs();
 
     Filter filter = new Filter();
-    filter.add(new SimpleFilterParameter(RodaConstants.AIP_ID, aipId));
-    IndexedAIP indexedAip = index.find(IndexedAIP.class, filter, null, new Sublist(0, 10), null).getResults().get(0);
+    filter.add(new SimpleFilterParameter(RodaConstants.INDEX_UUID, aipId));
+    IndexedAIP indexedAip = index.find(IndexedAIP.class, filter, null, new Sublist(0, 10), Collections.emptyList())
+      .getResults().get(0);
     Calendar calInitial = Calendar.getInstance();
     calInitial.setTime(indexedAip.getDateInitial());
     assertEquals(calInitial.get(Calendar.YEAR), CorporaConstants.YEAR_1213);
@@ -318,7 +321,8 @@ public class IndexServiceTest {
     long aipCount = index.count(IndexedAIP.class, fondsFilter);
     assertEquals(1, aipCount);
 
-    final IndexResult<IndexedAIP> aips = index.find(IndexedAIP.class, fondsFilter, null, new Sublist(0, 10), null);
+    final IndexResult<IndexedAIP> aips = index.find(IndexedAIP.class, fondsFilter, null, new Sublist(0, 10),
+      Collections.emptyList());
 
     assertEquals(1, aips.getLimit());
     assertEquals(CorporaConstants.SOURCE_AIP_ID, aips.getResults().get(0).getId());
@@ -343,7 +347,8 @@ public class IndexServiceTest {
     long aipCount = index.count(IndexedAIP.class, filter);
     assertEquals(1, aipCount);
 
-    final IndexResult<IndexedAIP> aips = index.find(IndexedAIP.class, filter, null, new Sublist(0, 10), null);
+    final IndexResult<IndexedAIP> aips = index.find(IndexedAIP.class, filter, null, new Sublist(0, 10),
+      Collections.emptyList());
 
     assertEquals(1, aips.getLimit());
     assertEquals(CorporaConstants.OTHER_AIP_ID, aips.getResults().get(0).getId());
@@ -382,7 +387,8 @@ public class IndexServiceTest {
     Filter filter = new Filter();
     filter.add(new SimpleFilterParameter(RodaConstants.AIP_LEVEL, "fonds"));
     filter.add(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID));
-    IndexResult<IndexedAIP> findDescriptiveMetadata = index.find(IndexedAIP.class, filter, null, new Sublist(), null);
+    IndexResult<IndexedAIP> findDescriptiveMetadata = index.find(IndexedAIP.class, filter, null, new Sublist(),
+      Collections.emptyList());
 
     assertNotNull(findDescriptiveMetadata);
     MatcherAssert.assertThat(findDescriptiveMetadata.getResults(), IsCollectionWithSize.hasSize(1));
@@ -448,14 +454,16 @@ public class IndexServiceTest {
     Filter filterDescription = new Filter();
     filterDescription.add(new SimpleFilterParameter(RodaConstants.LOG_ID, "id"));
 
-    IndexResult<LogEntry> entries = index.find(LogEntry.class, filterDescription, null, new Sublist(), null);
+    IndexResult<LogEntry> entries = index.find(LogEntry.class, filterDescription, null, new Sublist(),
+      Collections.emptyList());
     assertEquals(entries.getTotalCount(), 1);
     assertEquals(entries.getResults().get(0).getActionComponent(), RodaConstants.LOG_ACTION_COMPONENT);
 
     Filter filterDescription2 = new Filter();
     filterDescription2.add(new SimpleFilterParameter(RodaConstants.LOG_ID, "id2"));
 
-    IndexResult<LogEntry> entries2 = index.find(LogEntry.class, filterDescription2, null, new Sublist(), null);
+    IndexResult<LogEntry> entries2 = index.find(LogEntry.class, filterDescription2, null, new Sublist(),
+      Collections.emptyList());
     assertEquals(entries2.getTotalCount(), 0);
   }
 
@@ -491,11 +499,11 @@ public class IndexServiceTest {
 
     Filter f1 = new Filter();
     f1.add(new SimpleFilterParameter(RodaConstants.LOG_ACTION_COMPONENT, "ACTION:0"));
-    IndexResult<LogEntry> entries1 = index.find(LogEntry.class, f1, null, new Sublist(0, 10), null);
+    IndexResult<LogEntry> entries1 = index.find(LogEntry.class, f1, null, new Sublist(0, 10), Collections.emptyList());
     MatcherAssert.assertThat(entries1.getTotalCount(), Matchers.is(1L));
     Filter f2 = new Filter();
     f2.add(new SimpleFilterParameter(RodaConstants.LOG_ADDRESS, "ADDRESS"));
-    IndexResult<LogEntry> entries2 = index.find(LogEntry.class, f2, null, new Sublist(0, 10), null);
+    IndexResult<LogEntry> entries2 = index.find(LogEntry.class, f2, null, new Sublist(0, 10), Collections.emptyList());
     MatcherAssert.assertThat(entries2.getTotalCount(), Matchers.is(number));
   }
 
@@ -582,7 +590,8 @@ public class IndexServiceTest {
 
     index.commitAIPs();
 
-    IndexResult<IndexedAIP> find = index.find(IndexedAIP.class, null, null, new Sublist(0, 10), new ArrayList<>());
+    IndexResult<IndexedAIP> find = index.find(IndexedAIP.class, null, null, new Sublist(0, 10),
+      Collections.emptyList());
     assertEquals(1, find.getTotalCount());
 
     IndexedAIP aip = index.retrieve(IndexedAIP.class, UUID.nameUUIDFromBytes(origAipId.getBytes()).toString(),
@@ -635,7 +644,8 @@ public class IndexServiceTest {
       assertEquals(risk.getId(), risk2.getId());
       assertEquals(risk.getName(), risk2.getName());
 
-      IndexResult<IndexedRisk> find = index.find(IndexedRisk.class, null, null, new Sublist(0, 10), new ArrayList<>());
+      IndexResult<IndexedRisk> find = index.find(IndexedRisk.class, null, null, new Sublist(0, 10),
+        Collections.emptyList());
       assertEquals(1, find.getTotalCount());
 
       Risk risk3 = index.retrieve(IndexedRisk.class, risk.getId(), new ArrayList<>());
@@ -701,7 +711,7 @@ public class IndexServiceTest {
     assertEquals(format.getId(), format2.getId());
     assertEquals(format.getName(), format2.getName());
 
-    IndexResult<Format> find = index.find(Format.class, null, null, new Sublist(0, 10), new ArrayList<>());
+    IndexResult<Format> find = index.find(Format.class, null, null, new Sublist(0, 10), Collections.emptyList());
     assertEquals(1, find.getTotalCount());
 
     Format format3 = index.retrieve(Format.class, format.getId(), new ArrayList<>());
@@ -740,7 +750,8 @@ public class IndexServiceTest {
     assertEquals(notification.getId(), message2.getId());
     assertEquals(notification.getSubject(), message2.getSubject());
 
-    IndexResult<Notification> find = index.find(Notification.class, null, null, new Sublist(0, 10), new ArrayList<>());
+    IndexResult<Notification> find = index.find(Notification.class, null, null, new Sublist(0, 10),
+      Collections.emptyList());
     assertEquals(1, find.getTotalCount());
 
     Notification message3 = index.retrieve(Notification.class, notification.getId(), new ArrayList<>());
@@ -787,7 +798,7 @@ public class IndexServiceTest {
     int blockSize = 100;
     do {
       find = RodaCoreFactory.getIndexService().find(IndexedAIP.class, Filter.ALL, Sorter.NONE,
-        new Sublist(offset, blockSize), new ArrayList<>());
+        new Sublist(offset, blockSize), Collections.emptyList());
       offset += find.getLimit();
 
       // Add all ids to result list

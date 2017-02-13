@@ -171,8 +171,7 @@ public class BrowserHelper {
   private static final String HTML_EXT = ".html";
   private static final Logger LOGGER = LoggerFactory.getLogger(BrowserHelper.class);
   private static final List<String> aipAncestorsFieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
-    RodaConstants.AIP_ID, RodaConstants.AIP_GHOST, RodaConstants.AIP_LEVEL, RodaConstants.AIP_TITLE,
-    RodaConstants.AIP_PARENT_ID);
+    RodaConstants.AIP_GHOST, RodaConstants.AIP_LEVEL, RodaConstants.AIP_TITLE, RodaConstants.AIP_PARENT_ID);
 
   protected static BrowseAIPBundle retrieveBrowseAipBundle(IndexedAIP aip, Locale locale)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
@@ -505,8 +504,8 @@ public class BrowserHelper {
       }
     }
 
-    List<String> aipFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_ID, RodaConstants.AIP_TITLE,
-      RodaConstants.AIP_LEVEL, RodaConstants.AIP_DATE_FINAL, RodaConstants.AIP_DATE_INITIAL, RodaConstants.AIP_GHOST);
+    List<String> aipFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL,
+      RodaConstants.AIP_DATE_FINAL, RodaConstants.AIP_DATE_INITIAL, RodaConstants.AIP_GHOST);
     List<String> representationFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.REPRESENTATION_TYPE,
       RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES, RodaConstants.REPRESENTATION_ORIGINAL,
       RodaConstants.REPRESENTATION_AIP_ID, RodaConstants.REPRESENTATION_ID);
@@ -1571,7 +1570,8 @@ public class BrowserHelper {
     index.commit(IndexedRepresentation.class);
     index.commit(IndexedFile.class);
 
-    return (parentId != null) ? index.retrieve(IndexedAIP.class, parentId, Arrays.asList(RodaConstants.AIP_ID)) : null;
+    return (parentId != null) ? index.retrieve(IndexedAIP.class, parentId, Arrays.asList(RodaConstants.INDEX_UUID))
+      : null;
   }
 
   public static AIP createAIP(User user, String parentAipId, String type, Permissions permissions)
@@ -1617,7 +1617,7 @@ public class BrowserHelper {
         deleteAIPEvent(model, user, aipId, details, messages);
 
         Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aip.getId()));
-        RodaCoreFactory.getIndexService().execute(IndexedAIP.class, filter, Arrays.asList(RodaConstants.AIP_ID),
+        RodaCoreFactory.getIndexService().execute(IndexedAIP.class, filter, Arrays.asList(RodaConstants.INDEX_UUID),
           new IndexRunnable<IndexedAIP>() {
 
             @Override
@@ -2272,7 +2272,7 @@ public class BrowserHelper {
       try {
         if (RODA_TYPE.AIP.equals(linkingType)) {
           String uuid = LinkingObjectUtils.getAipIdFromLinkingId(idValue);
-          List<String> aipFields = Arrays.asList(RodaConstants.AIP_TITLE, RodaConstants.AIP_ID);
+          List<String> aipFields = Arrays.asList(RodaConstants.AIP_TITLE, RodaConstants.INDEX_UUID);
           IndexedAIP aip = retrieve(IndexedAIP.class, uuid, aipFields);
           aips.put(idValue, aip);
         } else if (RODA_TYPE.REPRESENTATION.equals(linkingType)) {
@@ -2384,7 +2384,7 @@ public class BrowserHelper {
 
     if (recursive) {
       Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, indexedAIP.getId()));
-      RodaCoreFactory.getIndexService().execute(IndexedAIP.class, filter, Arrays.asList(RodaConstants.AIP_ID),
+      RodaCoreFactory.getIndexService().execute(IndexedAIP.class, filter, Arrays.asList(RodaConstants.INDEX_UUID),
         new IndexRunnable<IndexedAIP>() {
 
           @Override
