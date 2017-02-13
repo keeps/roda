@@ -56,7 +56,7 @@ public class Risks extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    risk = RodaCoreFactory.getModelService().updateRisk(risk, null, false);
+    risk = RodaCoreFactory.getModelService().updateRisk(risk, null, false, 0);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "risk", risk);

@@ -124,7 +124,7 @@ public class ShowPreservationAgent extends Composite {
         @Override
         public void onFailure(Throwable caught) {
           if (caught instanceof NotFoundException) {
-            Toast.showError(messages.notFoundError(), messages.couldNotFindPreservationEvent());
+            Toast.showError(messages.notFoundError(), messages.couldNotFindPreservationAgent());
             HistoryUtils.newHistory(ListUtils.concat(PreservationAgents.RESOLVER.getHistoryPath()));
           } else {
             AsyncCallbackUtils.defaultFailureTreatment(caught);

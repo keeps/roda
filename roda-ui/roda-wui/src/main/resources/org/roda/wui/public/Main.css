@@ -4816,6 +4816,14 @@ td.datePickerMonth, td.datePickerYear {
     margin-left: 10px;
 }
 
+@media only screen and (max-width: 999px)  {
+	.permission {
+		padding-bottom: 40px;
+		background-color: white;
+	}
+}
+
+
 /** Create/Edit User **/
 .wui-user-data .office-input-panel {
     margin-top: 10px;

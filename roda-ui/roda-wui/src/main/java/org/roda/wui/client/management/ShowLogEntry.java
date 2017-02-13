@@ -10,6 +10,7 @@
  */
 package org.roda.wui.client.management;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -17,6 +18,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryParameter;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -205,7 +207,9 @@ public class ShowLogEntry extends Composite {
   }
 
   private void cancel() {
-    HistoryUtils.newHistory(UserLog.RESOLVER);
+    List<String> lastHistory = new ArrayList<>(LastSelectedItemsSingleton.getInstance().getLastHistory());
+    LastSelectedItemsSingleton.getInstance().clearLastHistory();
+    HistoryUtils.newHistory(lastHistory);
   }
 
 }

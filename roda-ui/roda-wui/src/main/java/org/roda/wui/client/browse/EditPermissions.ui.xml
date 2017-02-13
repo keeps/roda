@@ -25,14 +25,14 @@
 				<g:Label styleName="info-empty" ui:field="groupPermissionsEmpty">
 					<ui:text from='{messages.permissionAssignedGroupsEmpty}' />
 				</g:Label>
-				<g:FlowPanel ui:field="groupPermissionsPanel" />
+				<g:FlowPanel ui:field="groupPermissionsPanel" addStyleNames="plugin-category-padding"/>
 				<g:Label styleName="h4">
 					<ui:text from='{messages.permissionAssignedUsers}' />
 				</g:Label>
 				<g:Label styleName="info-empty" ui:field="userPermissionsEmpty">
 					<ui:text from='{messages.permissionAssignedUsersEmpty}' />
 				</g:Label>
-				<g:FlowPanel ui:field="userPermissionsPanel" />
+				<g:FlowPanel ui:field="userPermissionsPanel" addStyleNames="permission-box-padding" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">

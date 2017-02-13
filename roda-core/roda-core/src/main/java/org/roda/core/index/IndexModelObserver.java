@@ -1017,9 +1017,9 @@ public class IndexModelObserver implements ModelObserver {
     index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisEventDocument);
   }
 
-  public ReturnWithExceptions<Void> riskCreatedOrUpdated(Risk risk, boolean commit) {
+  public ReturnWithExceptions<Void> riskCreatedOrUpdated(Risk risk, int incidences, boolean commit) {
     ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
-    SolrInputDocument riskDoc = SolrUtils.riskToSolrDocument(risk);
+    SolrInputDocument riskDoc = SolrUtils.riskToSolrDocument(risk, incidences);
 
     try {
       index.add(RodaConstants.INDEX_RISK, riskDoc);

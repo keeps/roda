@@ -231,9 +231,9 @@ public abstract class ModelObservable {
     }
   }
 
-  public void notifyRiskCreatedOrUpdated(Risk risk, boolean commit) {
+  public void notifyRiskCreatedOrUpdated(Risk risk, int incidences, boolean commit) {
     for (ModelObserver observer : observers) {
-      observer.riskCreatedOrUpdated(risk, commit);
+      observer.riskCreatedOrUpdated(risk, incidences, commit);
     }
   }
 

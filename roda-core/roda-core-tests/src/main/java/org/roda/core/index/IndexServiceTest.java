@@ -646,7 +646,7 @@ public class IndexServiceTest {
       risk3.setName("Risk New Name");
       Map<String, String> properties = new HashMap<String, String>();
       properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATED.toString());
-      model.updateRisk(risk3, properties, false);
+      model.updateRisk(risk3, properties, false, 0);
 
       Risk risk4 = index.retrieve(IndexedRisk.class, risk.getId(), new ArrayList<>());
       assertNotNull(risk4);

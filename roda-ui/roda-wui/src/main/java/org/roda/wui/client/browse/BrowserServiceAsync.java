@@ -146,8 +146,8 @@ public interface BrowserServiceAsync {
   <T extends IsIndexed> void retrieve(String classNameToReturn, String id, List<String> fieldsToReturn,
     AsyncCallback<T> callback);
 
-  <T extends IsIndexed> void retrieve(String classNameToReturn, SelectedItems<T> selectedItems, List<String> fieldsToReturn,
-    AsyncCallback<List<T>> asyncCallback);
+  <T extends IsIndexed> void retrieve(String classNameToReturn, SelectedItems<T> selectedItems,
+    List<String> fieldsToReturn, AsyncCallback<List<T>> asyncCallback);
 
   void suggest(String classNameToReturn, String field, String query, boolean allowPartial,
     AsyncCallback<List<String>> callback);
@@ -157,7 +157,7 @@ public interface BrowserServiceAsync {
 
   void createRisk(Risk risk, AsyncCallback<Risk> asyncCallback);
 
-  void updateRisk(Risk risk, AsyncCallback<Void> asyncCallback);
+  void updateRisk(Risk risk, int incidences, AsyncCallback<Void> asyncCallback);
 
   void createFormat(Format format, AsyncCallback<Format> asyncCallback);
 

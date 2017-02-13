@@ -295,7 +295,7 @@ public class IndexService {
   }
 
   public ReturnWithExceptions<Void> reindexRisk(Risk risk) {
-    return observer.riskCreatedOrUpdated(risk, false);
+    return observer.riskCreatedOrUpdated(risk, 0, false);
   }
 
   public void reindexRisks(StorageService storage) {

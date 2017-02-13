@@ -93,7 +93,7 @@ public interface ModelObserver {
 
   public void transferredResourceDeleted(String transferredResourceID);
 
-  public ReturnWithExceptions<Void> riskCreatedOrUpdated(Risk risk, boolean commit);
+  public ReturnWithExceptions<Void> riskCreatedOrUpdated(Risk risk, int incidences, boolean commit);
 
   public void riskDeleted(String riskId, boolean commit);
 

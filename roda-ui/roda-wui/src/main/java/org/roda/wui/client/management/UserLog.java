@@ -24,6 +24,7 @@ import org.roda.core.data.v2.index.filter.DateRangeFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.log.LogEntry;
+import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.LogEntryList;
 import org.roda.wui.client.common.search.SearchFilters;
@@ -173,6 +174,7 @@ public class UserLog extends Composite {
       public void onSelectionChange(SelectionChangeEvent event) {
         LogEntry selected = logList.getSelectionModel().getSelectedObject();
         if (selected != null) {
+          LastSelectedItemsSingleton.getInstance().setLastHistory(HistoryUtils.getCurrentHistoryPath());
           HistoryUtils.newHistory(ShowLogEntry.RESOLVER, selected.getId());
         }
       }

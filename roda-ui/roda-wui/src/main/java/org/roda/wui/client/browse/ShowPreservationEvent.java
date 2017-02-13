@@ -424,7 +424,7 @@ public class ShowPreservationEvent extends Composite {
     layout.add(footer);
 
     Anchor link = new Anchor(messages.inspectPreservationAgent(),
-      HistoryUtils.createHistoryHashLink(ShowPreservationAgent.RESOLVER, agent.getId(), eventId));
+      HistoryUtils.createHistoryHashLink(ShowPreservationAgent.RESOLVER, eventId, agent.getId()));
 
     link.addStyleName("btn");
     footer.add(link);

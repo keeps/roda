@@ -25,6 +25,7 @@ import java.util.Optional;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.transform.TransformerException;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.ConsumesOutputStream;
 import org.roda.core.common.EntityResponse;
 import org.roda.core.common.IdUtils;
@@ -127,8 +128,9 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    List<String> aipFieldsWithPermissions = Arrays.asList(RodaConstants.AIP_STATE, RodaConstants.INDEX_UUID,
-      RodaConstants.AIP_ID, RodaConstants.AIP_GHOST, RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL);
+    List<String> aipFieldsWithPermissions = new ArrayList<String>(
+      Arrays.asList(RodaConstants.AIP_STATE, RodaConstants.INDEX_UUID, RodaConstants.AIP_ID, RodaConstants.AIP_GHOST,
+        RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL));
     aipFieldsWithPermissions.addAll(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
 
     IndexedRepresentation representation = BrowserHelper.retrieve(IndexedRepresentation.class,
@@ -155,8 +157,9 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    List<String> aipFieldsWithPermissions = Arrays.asList(RodaConstants.AIP_STATE, RodaConstants.INDEX_UUID,
-      RodaConstants.AIP_ID, RodaConstants.AIP_GHOST, RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL);
+    List<String> aipFieldsWithPermissions = new ArrayList<String>(
+      Arrays.asList(RodaConstants.AIP_STATE, RodaConstants.INDEX_UUID, RodaConstants.AIP_ID, RodaConstants.AIP_GHOST,
+        RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL));
     aipFieldsWithPermissions.addAll(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
 
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, aipFieldsWithPermissions);
@@ -188,7 +191,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    List<String> aipFields = new ArrayList<>(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+    List<String> aipFields = new ArrayList<String>(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
     aipFields.addAll(Arrays.asList(RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL, RodaConstants.AIP_PARENT_ID));
 
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, aipFields);
@@ -221,7 +224,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    List<String> aipFields = new ArrayList<>(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+    List<String> aipFields = new ArrayList<String>(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
     aipFields.addAll(Arrays.asList(RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL, RodaConstants.AIP_PARENT_ID));
 
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, aipFields);
@@ -1614,7 +1617,7 @@ public class Browser extends RodaWuiController {
     // check permissions
     controllerAssistant.checkRoles(user);
 
-    List<String> aipFields = new ArrayList<>(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+    List<String> aipFields = new ArrayList<String>(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
     aipFields.addAll(Arrays.asList(RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL, RodaConstants.AIP_PARENT_ID));
 
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, aipFields);
@@ -1733,7 +1736,7 @@ public class Browser extends RodaWuiController {
       RodaConstants.CONTROLLER_PERMISSIONS_PARAM, permissions);
   }
 
-  public static void updateRisk(User user, Risk risk)
+  public static void updateRisk(User user, Risk risk, int incidences)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1744,7 +1747,7 @@ public class Browser extends RodaWuiController {
     Map<String, String> properties = new HashMap<String, String>();
     properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATED.toString());
 
-    BrowserHelper.updateRisk(risk, user, properties, false);
+    BrowserHelper.updateRisk(risk, user, properties, true, incidences);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_RISK_PARAM, risk,
@@ -1759,7 +1762,7 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
 
     // delegate
-    BrowserHelper.updateFormat(format, false);
+    BrowserHelper.updateFormat(format, true);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_FORMAT_PARAM, format);
@@ -1789,7 +1792,7 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
 
     // delegate
-    Format ret = BrowserHelper.createFormat(format, false);
+    Format ret = BrowserHelper.createFormat(format, true);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_FORMAT_PARAM, format);
@@ -1808,7 +1811,17 @@ public class Browser extends RodaWuiController {
     Map<String, String> properties = new HashMap<String, String>();
     properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.REVERTED.toString());
 
-    BrowserHelper.revertRiskVersion(riskId, versionId, properties);
+    int incidences = 0;
+
+    try {
+      IndexedRisk indexedRisk = RodaCoreFactory.getIndexService().retrieve(IndexedRisk.class, riskId,
+        Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.RISK_OBJECTS_SIZE));
+      incidences = indexedRisk.getObjectsSize();
+    } catch (NotFoundException e) {
+      // do nothing
+    }
+
+    BrowserHelper.revertRiskVersion(riskId, versionId, properties, incidences);
 
     // register action
     controllerAssistant.registerAction(user, versionId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_RISK_ID_PARAM,

@@ -360,7 +360,7 @@ public class SolrUtils {
     } else if (resultClass.equals(Job.class)) {
       ret = jobToSolrDocument((Job) object);
     } else if (resultClass.equals(Risk.class) || resultClass.equals(IndexedRisk.class)) {
-      ret = riskToSolrDocument((Risk) object);
+      ret = riskToSolrDocument((Risk) object, 0);
     } else if (resultClass.equals(Format.class)) {
       ret = formatToSolrDocument((Format) object);
     } else if (resultClass.equals(Notification.class)) {
@@ -1947,7 +1947,7 @@ public class SolrUtils {
     return jobReport;
   }
 
-  public static SolrInputDocument riskToSolrDocument(Risk risk) {
+  public static SolrInputDocument riskToSolrDocument(Risk risk, int incidences) {
     SolrInputDocument doc = new SolrInputDocument();
 
     doc.addField(RodaConstants.INDEX_UUID, risk.getId());
@@ -1993,7 +1993,7 @@ public class SolrUtils {
     if (risk instanceof IndexedRisk) {
       doc.addField(RodaConstants.RISK_OBJECTS_SIZE, ((IndexedRisk) risk).getObjectsSize());
     } else {
-      doc.addField(RodaConstants.RISK_OBJECTS_SIZE, 0);
+      doc.addField(RodaConstants.RISK_OBJECTS_SIZE, incidences);
     }
 
     return doc;

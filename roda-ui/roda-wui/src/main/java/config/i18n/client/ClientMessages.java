@@ -276,6 +276,8 @@ public interface ClientMessages extends Messages {
 
   String couldNotFindPreservationEvent();
 
+  String couldNotFindPreservationAgent();
+
   String intellectualEntity();
 
   String inspectIntellectualEntity();

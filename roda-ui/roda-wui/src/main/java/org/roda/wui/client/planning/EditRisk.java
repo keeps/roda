@@ -96,6 +96,7 @@ public class EditRisk extends Composite {
 
   private Risk risk;
   private static ClientMessages messages = GWT.create(ClientMessages.class);
+  private int incidences = 0;
 
   @UiField
   Button buttonApply;
@@ -114,6 +115,7 @@ public class EditRisk extends Composite {
    */
   public EditRisk(IndexedRisk risk) {
     this.risk = risk;
+    this.incidences = risk.getObjectsSize();
     this.riskDataPanel = new RiskDataPanel(true, risk, RodaConstants.RISK_CATEGORY, RodaConstants.RISK_IDENTIFIED_BY,
       RodaConstants.RISK_MITIGATION_OWNER);
     initWidget(uiBinder.createAndBindUi(this));
@@ -131,7 +133,7 @@ public class EditRisk extends Composite {
       final String riskId = risk.getId();
       risk = riskDataPanel.getRisk();
       risk.setId(riskId);
-      BrowserService.Util.getInstance().updateRisk(risk, new AsyncCallback<Void>() {
+      BrowserService.Util.getInstance().updateRisk(risk, incidences, new AsyncCallback<Void>() {
 
         @Override
         public void onFailure(Throwable caught) {

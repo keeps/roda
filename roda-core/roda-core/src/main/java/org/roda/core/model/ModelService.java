@@ -1998,11 +1998,12 @@ public class ModelService extends ModelObservable {
       LOGGER.error("Error creating risk in storage", e);
     }
 
-    notifyRiskCreatedOrUpdated(risk, commit);
+    notifyRiskCreatedOrUpdated(risk, 0, commit);
     return risk;
   }
 
-  public Risk updateRisk(Risk risk, Map<String, String> properties, boolean commit) throws GenericException {
+  public Risk updateRisk(Risk risk, Map<String, String> properties, boolean commit, int incidences)
+    throws GenericException {
     try {
       risk.setUpdatedOn(new Date());
       String riskAsJson = JsonUtils.getJsonFromObject(risk);
@@ -2018,7 +2019,7 @@ public class ModelService extends ModelObservable {
       LOGGER.error("Error updating risk in storage", e);
     }
 
-    notifyRiskCreatedOrUpdated(risk, commit);
+    notifyRiskCreatedOrUpdated(risk, incidences, commit);
     return risk;
   }
 
@@ -2064,14 +2065,14 @@ public class ModelService extends ModelObservable {
   }
 
   public BinaryVersion revertRiskVersion(String riskId, String versionId, Map<String, String> properties,
-    boolean commit) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    boolean commit, int incidences)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     StoragePath binaryPath = ModelUtils.getRiskStoragePath(riskId);
 
     BinaryVersion currentVersion = storage.createBinaryVersion(binaryPath, properties);
     storage.revertBinaryVersion(binaryPath, versionId);
 
-    notifyRiskCreatedOrUpdated(retrieveRisk(riskId), commit);
-
+    notifyRiskCreatedOrUpdated(retrieveRisk(riskId), incidences, commit);
     return currentVersion;
   }
 

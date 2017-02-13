@@ -2426,27 +2426,21 @@ public class BrowserHelper {
     throws GenericException, RequestNotValidException {
     risk.setCreatedBy(user.getName());
     risk.setUpdatedBy(user.getName());
-    Risk createdRisk = RodaCoreFactory.getModelService().createRisk(risk, commit);
-    RodaCoreFactory.getIndexService().commit(IndexedRisk.class);
-    return createdRisk;
+    return RodaCoreFactory.getModelService().createRisk(risk, commit);
   }
 
-  public static void updateRisk(Risk risk, User user, Map<String, String> properties, boolean commit)
+  public static void updateRisk(Risk risk, User user, Map<String, String> properties, boolean commit, int incidences)
     throws GenericException, RequestNotValidException {
     risk.setUpdatedBy(user.getName());
-    RodaCoreFactory.getModelService().updateRisk(risk, properties, commit);
-    RodaCoreFactory.getIndexService().commit(IndexedRisk.class);
+    RodaCoreFactory.getModelService().updateRisk(risk, properties, commit, incidences);
   }
 
   public static Format createFormat(Format format, boolean commit) throws GenericException, RequestNotValidException {
-    Format createdFormat = RodaCoreFactory.getModelService().createFormat(format, commit);
-    RodaCoreFactory.getIndexService().commit(Format.class);
-    return createdFormat;
+    return RodaCoreFactory.getModelService().createFormat(format, commit);
   }
 
   public static void updateFormat(Format format, boolean commit) throws GenericException, RequestNotValidException {
     RodaCoreFactory.getModelService().updateFormat(format, commit);
-    RodaCoreFactory.getIndexService().commit(Format.class);
   }
 
   public static RiskVersionsBundle retrieveRiskVersions(String riskId)
@@ -2486,9 +2480,9 @@ public class BrowserHelper {
     return hasRiskVersion;
   }
 
-  public static void revertRiskVersion(String riskId, String versionId, Map<String, String> properties)
+  public static void revertRiskVersion(String riskId, String versionId, Map<String, String> properties, int incidences)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    RodaCoreFactory.getModelService().revertRiskVersion(riskId, versionId, properties, false);
+    RodaCoreFactory.getModelService().revertRiskVersion(riskId, versionId, properties, false, incidences);
   }
 
   public static void deleteRiskVersion(String riskId, String versionId)
