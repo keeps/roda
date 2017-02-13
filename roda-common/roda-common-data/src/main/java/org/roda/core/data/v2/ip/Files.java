@@ -38,14 +38,17 @@ public class Files implements RODAObjectList<File> {
 
   @JsonProperty(value = "files")
   @XmlElement(name = "file")
+  @Override
   public List<File> getObjects() {
     return files;
   }
 
+  @Override
   public void setObjects(List<File> files) {
     this.files = files;
   }
 
+  @Override
   public void addObject(File file) {
     this.files.add(file);
   }

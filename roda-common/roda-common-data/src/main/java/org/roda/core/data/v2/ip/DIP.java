@@ -26,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class DIP implements IsModelObject {
 
   private static final long serialVersionUID = -7335470043357396783L;
-  public static int VERSION = 1;
+  private static final int VERSION = 1;
 
   private String id;
   private String title;
@@ -89,6 +89,7 @@ public class DIP implements IsModelObject {
     this.id = id;
   }
 
+  @Override
   public String getId() {
     return id;
   }

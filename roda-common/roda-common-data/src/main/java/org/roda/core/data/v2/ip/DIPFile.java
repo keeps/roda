@@ -24,7 +24,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class DIPFile implements IsModelObject, IsIndexed {
 
   private static final long serialVersionUID = 1L;
-  public static int VERSION = 1;
+  private static final int VERSION = 1;
 
   private String uuid;
   private String id;
@@ -61,6 +61,7 @@ public class DIPFile implements IsModelObject, IsIndexed {
     this.isDirectory = isDirectory;
   }
 
+  @Override
   public String getId() {
     return id;
   }

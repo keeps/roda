@@ -38,14 +38,17 @@ public class Representations implements RODAObjectList<Representation> {
 
   @JsonProperty(value = "representations")
   @XmlElement(name = "representation")
+  @Override
   public List<Representation> getObjects() {
     return representations;
   }
 
+  @Override
   public void setObjects(List<Representation> representations) {
     this.representations = representations;
   }
 
+  @Override
   public void addObject(Representation representation) {
     this.representations.add(representation);
   }

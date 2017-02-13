@@ -24,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class AIP implements IsModelObject {
 
   private static final long serialVersionUID = 430629679119752757L;
+  private static final int VERSION = 1;
 
   private String id;
   private String parentId;
@@ -86,12 +87,13 @@ public class AIP implements IsModelObject {
   @JsonIgnore
   @Override
   public int getClassVersion() {
-    return 1;
+    return VERSION;
   }
 
   /**
    * @return the id
    */
+  @Override
   public String getId() {
     return id;
   }

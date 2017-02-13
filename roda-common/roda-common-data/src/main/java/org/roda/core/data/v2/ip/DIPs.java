@@ -38,10 +38,12 @@ public class DIPs implements RODAObjectList<DIP> {
 
   @JsonProperty(value = "dips")
   @XmlElement(name = "dip")
+  @Override
   public List<DIP> getObjects() {
     return dips;
   }
 
+  @Override
   public void setObjects(List<DIP> dips) {
     this.dips = dips;
   }

@@ -123,6 +123,7 @@ public class IndexedFile implements IsIndexed {
     this.path = path;
   }
 
+  @Override
   public String getId() {
     return id;
   }

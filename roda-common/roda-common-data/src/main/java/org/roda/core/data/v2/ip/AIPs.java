@@ -38,10 +38,12 @@ public class AIPs implements RODAObjectList<AIP> {
 
   @JsonProperty(value = "aips")
   @XmlElement(name = "aip")
+  @Override
   public List<AIP> getObjects() {
     return aips;
   }
 
+  @Override
   public void setObjects(List<AIP> aips) {
     this.aips = aips;
   }

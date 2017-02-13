@@ -23,8 +23,10 @@ public interface StoragePath {
 
   // Force re-declaration of #hashCode() and #equals(Object)
 
+  @Override
   public int hashCode();
 
+  @Override
   public boolean equals(Object obj);
 
   public String asString(String separator, String replaceAllRegex, String replaceAllReplacement, boolean skipContainer);

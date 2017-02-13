@@ -38,10 +38,12 @@ public class DIPFiles implements RODAObjectList<DIPFile> {
 
   @JsonProperty(value = "dip_files")
   @XmlElement(name = "dip_file")
+  @Override
   public List<DIPFile> getObjects() {
     return files;
   }
 
+  @Override
   public void setObjects(List<DIPFile> files) {
     this.files = files;
   }

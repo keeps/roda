@@ -61,6 +61,7 @@ public class TransferredResource implements IsModelObject, IsIndexed {
     this.file = file;
   }
 
+  @Override
   public String getId() {
     return id;
   }
