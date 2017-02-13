@@ -234,7 +234,9 @@ public class SolrUtils {
     query.setSorts(parseSorter(sorter));
     query.setStart(sublist.getFirstElementIndex());
     query.setRows(sublist.getMaximumElementCount());
-    query.setFields(fieldsToReturn.toArray(new String[fieldsToReturn.size()]));
+    if (!fieldsToReturn.isEmpty()) {
+      query.setFields(fieldsToReturn.toArray(new String[fieldsToReturn.size()]));
+    }
     parseAndConfigureFacets(facets, query);
 
     try {

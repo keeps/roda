@@ -36,6 +36,8 @@ public interface ClientMessages extends Messages {
 
   String of();
 
+  String ofOver();
+
   /******* TITLES ******************************************/
 
   String genericTitle();
