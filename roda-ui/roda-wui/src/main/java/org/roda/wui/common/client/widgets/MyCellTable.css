@@ -1,5 +1,21 @@
 /* Incremental changes from CellTable.css */ 
 
+@external .cellTableCell;
+@external .cellTableFadeOut;
+@external .cellTableFooter;
+@external .cellTableHeader;
+@external .cellTableHeader,;
+@external .cellTableHoveredRow;
+@external .cellTableHoveredRowCell;
+@external .cellTableKeyboardSelectedCell;
+@external .cellTableKeyboardSelectedRow;
+@external .cellTableOddRow;
+@external .cellTableOddRowCell;
+@external .cellTableSelectedRow;
+@external .cellTableSelectedRowCell;
+@external .cellTableWidget;
+@external .cellTableFadeOut;
+
 .cellTableWidget {
 	border-collapse: initial;
 }
@@ -77,7 +93,7 @@
 	background: #5bbeff;
 }
 
-@external .cellTableFadeOut;
+
 
 .cellTableFadeOut {
     white-space: nowrap;
