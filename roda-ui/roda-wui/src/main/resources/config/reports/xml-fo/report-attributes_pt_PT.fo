@@ -1,5 +1,0 @@
-            <fo:block color="#58595b" font-size="9pt" space-before="15pt" space-after="10pt">
-                <fo:list-block font-size="8pt">
-                    %1$s
-                </fo:list-block>
-            </fo:block>

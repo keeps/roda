@@ -1,8 +1,0 @@
-                    <fo:list-item margin-bottom="1pt">
-                        <fo:list-item-label start-indent="1em" >
-                            <fo:block font-weight="bold">%1$s:</fo:block>
-                        </fo:list-item-label>
-                        <fo:list-item-body start-indent="12em">
-                            <fo:block>%2$s</fo:block>
-                        </fo:list-item-body>
-                    </fo:list-item>
