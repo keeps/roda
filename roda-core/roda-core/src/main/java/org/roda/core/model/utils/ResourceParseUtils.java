@@ -165,8 +165,6 @@ public class ResourceParseUtils {
     } else if (filename.startsWith(URNUtils.getPremisPrefix(PreservationMetadataType.FILE))) {
       type = PreservationMetadataType.FILE;
       fileDirectoryPath = ModelUtils.extractFilePathFromRepresentationPreservationMetadata(resourcePath);
-      // FIXME nvieira 20170207 this file id is wrong, it is using UUID (may
-      // have impact in future)
       fileId = filename.substring(0, filename.length() - RodaConstants.PREMIS_SUFFIX.length());
       id = fileId;
     } else if (filename.startsWith(URNUtils.getPremisPrefix(PreservationMetadataType.OTHER))) {

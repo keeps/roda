@@ -1325,7 +1325,7 @@ public class BrowserHelper {
           fileId, payload, notify);
       } else {
         PreservationMetadataType type = PreservationMetadataType.FILE;
-        String id = IdUtils.getPreservationId(type, aipId, representationId, fileDirectoryPath, fileId);
+        String id = IdUtils.getPreservationFileId(fileId);
         model.updatePreservationMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, payload, notify);
       }
     } catch (IOException e) {

@@ -90,7 +90,7 @@ public final class ModelUtils {
     return ret;
   }
 
-  public static StoragePath getAIPcontainerPath() throws RequestNotValidException {
+  public static StoragePath getAIPContainerPath() throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP);
   }
 
@@ -764,7 +764,7 @@ public final class ModelUtils {
     } else if (clazz.equals(Job.class)) {
       return getJobContainerPath();
     } else if (clazz.equals(AIP.class)) {
-      return getAIPcontainerPath();
+      return getAIPContainerPath();
     } else if (clazz.equals(Report.class)) {
       return getJobReportContainerPath();
     } else if (clazz.equals(RiskIncidence.class)) {

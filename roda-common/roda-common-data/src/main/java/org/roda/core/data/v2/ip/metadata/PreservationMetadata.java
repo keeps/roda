@@ -64,7 +64,7 @@ public class PreservationMetadata implements IsModelObject {
   @JsonIgnore
   @Override
   public int getClassVersion() {
-    return 1;
+    return 2;
   }
 
   /**

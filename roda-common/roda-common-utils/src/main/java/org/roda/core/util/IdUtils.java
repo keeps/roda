@@ -163,6 +163,10 @@ public final class IdUtils {
       IdUtils.createUUID(getFileId(aipId, representationId, fileDirectoryPath, fileId, ID_SEPARATOR)));
   }
 
+  public static String getPreservationFileId(String fileId) {
+    return URNUtils.createRodaPreservationURN(PreservationMetadataType.FILE, fileId);
+  }
+
   public static PreservationMetadataType getPreservationTypeFromId(String id) {
     return URNUtils.getPreservationMetadataTypeFromId(id);
   }
