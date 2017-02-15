@@ -136,6 +136,7 @@ public class RodaCoreFactory {
   private static boolean instantiated = false;
   private static boolean instantiatedWithoutErrors = true;
   private static NodeType nodeType;
+  private static boolean migrationMode = false;
   private static List<Path> toDeleteDuringShutdown = new ArrayList<>();
 
   // Core related objects
@@ -331,7 +332,9 @@ public class RodaCoreFactory {
         LOGGER.error("Error instantiating solr/index model", e);
         instantiatedWithoutErrors = false;
       } catch (GenericException e) {
-        LOGGER.error("Error instantiating storage model", e);
+        if (!migrationMode) {
+          LOGGER.error("Error instantiating storage model", e);
+        }
         instantiatedWithoutErrors = false;
       } catch (Exception e) {
         LOGGER.error("Error instantiating " + RodaCoreFactory.class.getSimpleName(), e);
@@ -339,8 +342,10 @@ public class RodaCoreFactory {
       }
 
       // last log message that state if system was loaded without errors or not
-      LOGGER.info("RODA Core loading completed {}", instantiatedWithoutErrors ? "with success!"
-        : "with some errors!!! See logs because these errors might cause instability in the system.");
+      LOGGER.info("RODA Core loading completed {}",
+        migrationMode ? "(migration mode)"
+          : (instantiatedWithoutErrors ? "with success!"
+            : "with some errors!!! See logs because these errors might cause instability in the system."));
     }
   }
 
@@ -1516,10 +1521,17 @@ public class RodaCoreFactory {
     }
   }
 
+  private static void preInstantiateSteps(List<String> args) {
+    if (!args.isEmpty() && "migrate".equals(args.get(0))) {
+      migrationMode = true;
+    }
+  }
+
   public static void main(final String[] argsArray)
     throws InterruptedException, GenericException, RequestNotValidException {
     final List<String> args = Arrays.asList(argsArray);
 
+    preInstantiateSteps(args);
     instantiate();
     if (getNodeType() == NodeType.MASTER) {
       if (!args.isEmpty()) {
@@ -1535,5 +1547,4 @@ public class RodaCoreFactory {
 
     System.exit(0);
   }
-
 }

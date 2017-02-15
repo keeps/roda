@@ -117,6 +117,7 @@ public class MigrationManager {
         modelInfoFile);
     } else {
       // information exists in file, lets see if any migration is needed
+      Map<String, Integer> newModelClassesVersionsToBeWritten = new HashMap<>();
       for (Entry<String, Integer> classVersionFromCode : modelClassesVersionsFromCode.entrySet()) {
         String classFromCode = classVersionFromCode.getKey();
         int versionFromCode = classVersionFromCode.getValue();
@@ -135,8 +136,19 @@ public class MigrationManager {
         } else {
           // class information does not exists, probably is new & therefore no
           // model migration is needed
-          LOGGER.info("No migration is needed as no previous information about model class '{}' exists");
+          LOGGER.info(
+            "No migration is needed as no previous information about model class '{}' exists. Will write its information as it is new!",
+            classFromCode);
+          newModelClassesVersionsToBeWritten.put(classFromCode, versionFromCode);
         }
+      }
+
+      // write (just) new classes
+      if (!newModelClassesVersionsToBeWritten.isEmpty()) {
+        modelClassesVersionsInstalled.putAll(newModelClassesVersionsToBeWritten);
+        LOGGER.info("Updating model info. with new classes. to file {}", modelInfoFile);
+        JsonUtils.writeObjectToFile(new ModelInfo().setInstalledClassesVersions(modelClassesVersionsInstalled),
+          modelInfoFile);
       }
 
       if (migrationIsNecessary) {
