@@ -87,9 +87,10 @@ public class CasWebAuthFilter implements Filter {
     final String service = httpRequest.getParameter("service");
     final String hash = httpRequest.getParameter("hash");
     final String locale = httpRequest.getParameter("locale");
+    final String contextPath = httpRequest.getContextPath();
 
-    LOGGER.debug("URL: {} ; Request URI: {} ; Service: {} ; Hash: {}, Locale: {}", url, requestURI, service, hash,
-      locale);
+    LOGGER.debug("URL: {} ; Request URI: {} ; Context Path: {}; Service: {} ; Hash: {}; Locale: {}", url, requestURI,
+      contextPath, service, hash, locale);
 
     final Principal principal = httpRequest.getUserPrincipal();
     if (principal != null) {
@@ -99,7 +100,7 @@ public class CasWebAuthFilter implements Filter {
     if (url.endsWith("/login")) {
 
       final StringBuilder b = new StringBuilder();
-      b.append("/");
+      b.append(contextPath + "/");
 
       if (StringUtils.isNotBlank(locale)) {
         b.append("?locale=").append(locale);

@@ -92,9 +92,10 @@
       var onlyActive = $(element).data("source-only-active") || "false";
       var lang = document.locale;
 
+      var pathname = window.location.pathname;
       var url;
       if(noLimits) {
-    	  url = "/api/v1/index?returnClass=" +
+    	  url = pathname + "api/v1/index?returnClass=" +
           returnClass + "&" +
           filterParams + "&" +
           facetParams +
@@ -105,7 +106,7 @@
 	      var limit = $(element).data("source-limit") || 0;
 	      var facetLimit = $(element).data("view-limit") || 100;
 	
-	      url = "/api/v1/index?returnClass=" +
+	      url = pathname + "api/v1/index?returnClass=" +
 	          returnClass + "&" +
 	          filterParams + "&" +
 	          facetParams +

@@ -148,7 +148,9 @@ public class UserLogin {
       hash = UriUtils.encode(hash);
     }
     String locale = LocaleInfo.getCurrentLocale().getLocaleName();
-    Window.open("/login?service=" + currentURL + "&hash=" + hash + "&locale=" + locale, "_self", "");
+    String moduleBaseURL = GWT.getModuleBaseURL();
+    moduleBaseURL = moduleBaseURL.substring(0, moduleBaseURL.length() - 2).substring(0, moduleBaseURL.indexOf("/"));
+    Window.open(moduleBaseURL + "login?service=" + currentURL + "&hash=" + hash + "&locale=" + locale, "_self", "");
   }
 
   public void login(String username, String password, final AsyncCallback<User> callback) {
@@ -174,7 +176,9 @@ public class UserLogin {
   public void logout() {
     String currentURL = Window.Location.getHref().replaceAll("#", "%23");
     String locale = LocaleInfo.getCurrentLocale().getLocaleName();
-    Window.open("/logout?service=" + currentURL + "&locale=" + locale, "_self", "");
+    String moduleBaseURL = GWT.getModuleBaseURL();
+    moduleBaseURL = moduleBaseURL.substring(0, moduleBaseURL.length() - 2).substring(0, moduleBaseURL.indexOf("/"));
+    Window.open(moduleBaseURL + "logout?service=" + currentURL + "&locale=" + locale, "_self", "");
     getUserRequest.clearCache();
   }
 
