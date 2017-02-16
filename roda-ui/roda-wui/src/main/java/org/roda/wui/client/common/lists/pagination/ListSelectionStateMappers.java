@@ -6,6 +6,7 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.jobs.IndexedReport;
 
 import com.github.nmorel.gwtjackson.client.ObjectMapper;
 import com.google.gwt.core.client.GWT;
@@ -13,6 +14,7 @@ import com.google.gwt.core.client.GWT;
 public class ListSelectionStateMappers {
 
   // IndexedAIP
+
   public static interface IndexedAIP_MAPPER extends ObjectMapper<ListSelectionState<IndexedAIP>> {
   }
 
@@ -47,6 +49,13 @@ public class ListSelectionStateMappers {
 
   private static DIPFile_MAPPER DIPFile_MAPPER = GWT.create(DIPFile_MAPPER.class);
 
+  // Job report
+
+  public static interface IndexedReport_MAPPER extends ObjectMapper<ListSelectionState<IndexedReport>> {
+  }
+
+  private static IndexedReport_MAPPER IndexedReport_MAPPER = GWT.create(IndexedReport_MAPPER.class);
+
   private ListSelectionStateMappers() {
 
   }
@@ -64,10 +73,11 @@ public class ListSelectionStateMappers {
       ret = IndexedDIP_MAPPER.write((ListSelectionState<IndexedDIP>) object);
     } else if (DIPFile.class.getName().equals(objectClass)) {
       ret = DIPFile_MAPPER.write((ListSelectionState<DIPFile>) object);
+    } else if (IndexedReport.class.getName().equals(objectClass)) {
+      ret = IndexedReport_MAPPER.write((ListSelectionState<IndexedReport>) object);
     } else {
       ret = null;
     }
-
     return ret;
   }
 
@@ -84,6 +94,8 @@ public class ListSelectionStateMappers {
       state = (ListSelectionState<T>) IndexedDIP_MAPPER.read(json);
     } else if (DIPFile.class.getName().equals(objectClass)) {
       state = (ListSelectionState<T>) DIPFile_MAPPER.read(json);
+    } else if (IndexedReport.class.getName().equals(objectClass)) {
+      state = (ListSelectionState<T>) IndexedReport_MAPPER.read(json);
     } else {
       state = null;
     }

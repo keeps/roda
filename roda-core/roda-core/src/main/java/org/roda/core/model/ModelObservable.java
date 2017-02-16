@@ -225,6 +225,12 @@ public abstract class ModelObservable {
     }
   }
 
+  public void notifyDipPermissionsUpdated(DIP dip) {
+    for (ModelObserver observer : observers) {
+      observer.dipPermissionsUpdated(dip);
+    }
+  }
+
   public void notifyTransferredResourceDeleted(String transferredResourceID) {
     for (ModelObserver observer : observers) {
       observer.transferredResourceDeleted(transferredResourceID);

@@ -13,7 +13,6 @@ import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
-import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
@@ -55,19 +54,18 @@ public class ListSelectionUtils {
     loadClipboardOnStorage();
   }
 
-  private static void loadClipboardOnStorage() {
+  private static <T extends IsIndexed> void loadClipboardOnStorage() {
     if (storage != null) {
       StorageMap storageMap = new StorageMap(storage);
       for (Entry<String, String> entry : storageMap.entrySet()) {
         if (entry.getKey().startsWith(STORAGE_PREFIX)) {
           String className = entry.getKey().substring(STORAGE_PREFIX.length());
           try {
-            ListSelectionState<IndexedAIP> state = ListSelectionStateMappers.getObject(className, entry.getValue());
+            ListSelectionState<T> state = ListSelectionStateMappers.getObject(className, entry.getValue());
             CLIPBOARD.put(className, state);
           } catch (JsonDeserializationException e) {
             GWT.log("Could not load selection state of class: " + className, e);
           }
-
         }
       }
     }
@@ -169,7 +167,6 @@ public class ListSelectionUtils {
     ListSelectionState<T> last = last((Class<T>) object.getClass());
     if (last != null) {
       if (last.getSelected().getUUID().equals(object.getUUID())) {
-
         AsyncCallback<ListSelectionState<T>> callback = new AsyncCallback<ListSelectionState<T>>() {
 
           @Override

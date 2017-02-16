@@ -119,9 +119,9 @@
    <field name="openExternalURL" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="properties" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    
-   <field name="aipUUIDs" type="string" indexed="true" stored="false" required="false" multiValued="true" /> 
-   <field name="representationUUIDs" type="string" indexed="true" stored="false" required="false" multiValued="true" />
-   <field name="fileUUIDs" type="string" indexed="true" stored="false" required="false" multiValued="true" />
+   <field name="aipUUIDs" type="string" indexed="true" stored="true" required="false" multiValued="true" /> 
+   <field name="representationUUIDs" type="string" indexed="true" stored="true" required="false" multiValued="true" />
+   <field name="fileUUIDs" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    
    <field name="allAipUUIDs" type="string" indexed="true" stored="false" required="false" multiValued="true" /> 
    <field name="allRepresentationUUIDs" type="string" indexed="true" stored="false" required="false" multiValued="true" />

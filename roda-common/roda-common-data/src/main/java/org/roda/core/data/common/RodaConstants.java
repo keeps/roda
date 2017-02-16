@@ -274,6 +274,7 @@ public final class RodaConstants {
   public static final String CONTROLLER_VERSION_ID_PARAM = "versionId";
   public static final String CONTROLLER_RESOURCE_ID_PARAM = "resourceId";
   public static final String CONTROLLER_DIP_PARAM = "dip";
+  public static final String CONTROLLER_DIPS_PARAM = "dips";
   public static final String CONTROLLER_DIP_ID_PARAM = "dipId";
   public static final String CONTROLLER_DIP_FILE_PARAM = "dipFile";
   public static final String CONTROLLER_DIP_FILE_ID_PARAM = "dipFileId";
@@ -437,6 +438,7 @@ public final class RodaConstants {
   /*
    * Permissions
    */
+  public static final String ADMIN = "admin";
   public static final String ADMINISTRATORS = "administrators";
   public static final String INDEX_PERMISSION_USERS_PREFIX = "permission_users_";
   public static final String INDEX_PERMISSION_GROUPS_PREFIX = "permission_groups_";

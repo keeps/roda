@@ -51,6 +51,7 @@ import org.roda.wui.client.common.lists.RepresentationList;
 import org.roda.wui.client.common.lists.SimpleFileList;
 import org.roda.wui.client.common.lists.SimpleJobReportList;
 import org.roda.wui.client.common.lists.TransferredResourceList;
+import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
@@ -256,12 +257,14 @@ public class ShowJob extends Composite {
       ingestJobReports = new IngestJobReportList(
         new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getId())), facets,
         messages.reportList(), pluginsInfo, false);
+      ListSelectionUtils.bindBrowseOpener(ingestJobReports);
       simpleJobReports = new SimpleJobReportList();
       isIngest = true;
     } else {
       simpleJobReports = new SimpleJobReportList(
         new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getId())), facets,
         messages.reportList(), pluginsInfo, false);
+      ListSelectionUtils.bindBrowseOpener(simpleJobReports);
       ingestJobReports = new IngestJobReportList();
     }
 

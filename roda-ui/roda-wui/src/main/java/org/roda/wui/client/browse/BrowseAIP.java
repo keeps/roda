@@ -319,7 +319,8 @@ public class BrowseAIP extends Composite {
     if (historyTokens.isEmpty()) {
       viewAction();
       callback.onSuccess(this);
-    } else if (historyTokens.size() == 1 && !historyTokens.get(0).equals(EditPermissions.RESOLVER.getHistoryToken())) {
+    } else if (historyTokens.size() == 1
+      && !historyTokens.get(0).equals(EditPermissions.AIP_RESOLVER.getHistoryToken())) {
       viewAction(historyTokens.get(0));
       callback.onSuccess(this);
     } else if (historyTokens.size() > 1
@@ -338,8 +339,12 @@ public class BrowseAIP extends Composite {
     } else if (historyTokens.size() > 1
       && historyTokens.get(0).equals(DescriptiveMetadataHistory.RESOLVER.getHistoryToken())) {
       DescriptiveMetadataHistory.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
-    } else if (!historyTokens.isEmpty() && historyTokens.get(0).equals(EditPermissions.RESOLVER.getHistoryToken())) {
-      EditPermissions.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+    } else if (!historyTokens.isEmpty()
+      && historyTokens.get(0).equals(EditPermissions.AIP_RESOLVER.getHistoryToken())) {
+      EditPermissions.AIP_RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+    } else if (!historyTokens.isEmpty()
+      && historyTokens.get(0).equals(EditPermissions.DIP_RESOLVER.getHistoryToken())) {
+      EditPermissions.DIP_RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.size() > 1
       && historyTokens.get(0).equals(BrowseRepresentation.RESOLVER.getHistoryToken())) {
       BrowseRepresentation.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);

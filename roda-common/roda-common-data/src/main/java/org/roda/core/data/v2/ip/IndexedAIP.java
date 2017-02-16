@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @author Hélder Silva <hsilva@keep.pt>
  * @author Luis Faria <lfaria@keep.pt>
  */
-public class IndexedAIP implements IsIndexed {
+public class IndexedAIP implements IsIndexed, HasPermissions {
   private static final long serialVersionUID = 38813680938917204L;
 
   private String id;

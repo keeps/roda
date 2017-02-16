@@ -607,6 +607,13 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
+  public void updateDIPPermissions(List<IndexedDIP> dips, Permissions permissions, String details, boolean recursive)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    Browser.updateDIPPermissions(user, dips, permissions, details, recursive);
+  }
+
+  @Override
   public void updateRisk(Risk risk, int incidences)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());

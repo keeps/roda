@@ -17,10 +17,13 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.ip.HasPermissions;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.user.RODAMember;
@@ -31,7 +34,6 @@ import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.MemberSelectDialog;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -65,7 +67,7 @@ import config.i18n.client.ClientMessages;
 
 public class EditPermissions extends Composite {
 
-  public static final HistoryResolver RESOLVER = new HistoryResolver() {
+  public static final HistoryResolver AIP_RESOLVER = new HistoryResolver() {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
@@ -82,7 +84,7 @@ public class EditPermissions extends Composite {
 
             @Override
             public void onSuccess(IndexedAIP aip) {
-              EditPermissions edit = new EditPermissions(aip);
+              EditPermissions edit = new EditPermissions(IndexedAIP.class.getName(), aip);
               callback.onSuccess(edit);
             }
           });
@@ -103,20 +105,21 @@ public class EditPermissions extends Composite {
 
               @Override
               public void onSuccess(List<IndexedAIP> aips) {
-                EditPermissions edit = new EditPermissions(aips);
+                List<? extends HasPermissions> hasPermissionsObjects = (List<? extends HasPermissions>) aips;
+                EditPermissions edit = new EditPermissions(IndexedAIP.class.getName(), hasPermissionsObjects);
                 callback.onSuccess(edit);
               }
             });
         }
       } else {
-        HistoryUtils.newHistory(Search.RESOLVER);
+        HistoryUtils.newHistory(BrowseAIP.RESOLVER);
         callback.onSuccess(null);
       }
     }
 
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRoles(new HistoryResolver[] {EditPermissions.RESOLVER}, false, callback);
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {EditPermissions.AIP_RESOLVER}, false, callback);
     }
 
     public List<String> getHistoryPath() {
@@ -125,6 +128,70 @@ public class EditPermissions extends Composite {
 
     public String getHistoryToken() {
       return "edit_permissions";
+    }
+  };
+
+  public static final HistoryResolver DIP_RESOLVER = new HistoryResolver() {
+
+    @Override
+    public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
+      if (historyTokens.size() == 1) {
+        final String dipId = historyTokens.get(0);
+        BrowserService.Util.getInstance().retrieve(IndexedDIP.class.getName(), dipId,
+          RodaConstants.DIP_PERMISSIONS_FIELDS_TO_RETURN, new AsyncCallback<IndexedDIP>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+              HistoryUtils.newHistory(BrowseDIP.RESOLVER, dipId);
+              callback.onSuccess(null);
+            }
+
+            @Override
+            public void onSuccess(IndexedDIP dip) {
+              EditPermissions edit = new EditPermissions(IndexedDIP.class.getName(), dip);
+              callback.onSuccess(edit);
+            }
+          });
+
+      } else if (historyTokens.isEmpty()) {
+        LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
+        final SelectedItems<IndexedDIP> selected = (SelectedItems<IndexedDIP>) selectedItems.getSelectedItems();
+
+        if (!ClientSelectedItemsUtils.isEmpty(selected)) {
+          BrowserService.Util.getInstance().retrieve(IndexedDIP.class.getName(), selected,
+            RodaConstants.DIP_PERMISSIONS_FIELDS_TO_RETURN, new AsyncCallback<List<IndexedDIP>>() {
+
+              @Override
+              public void onFailure(Throwable caught) {
+                HistoryUtils.newHistory(BrowseAIP.RESOLVER);
+                callback.onSuccess(null);
+              }
+
+              @Override
+              public void onSuccess(List<IndexedDIP> dips) {
+                List<? extends HasPermissions> hasPermissionsObjects = (List<? extends HasPermissions>) dips;
+                EditPermissions edit = new EditPermissions(IndexedDIP.class.getName(), hasPermissionsObjects);
+                callback.onSuccess(edit);
+              }
+            });
+        }
+      } else {
+        HistoryUtils.newHistory(BrowseAIP.RESOLVER);
+        callback.onSuccess(null);
+      }
+    }
+
+    @Override
+    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {EditPermissions.DIP_RESOLVER}, false, callback);
+    }
+
+    public List<String> getHistoryPath() {
+      return ListUtils.concat(BrowseAIP.RESOLVER.getHistoryPath(), getHistoryToken());
+    }
+
+    public String getHistoryToken() {
+      return "edit_dip_permissions";
     }
   };
 
@@ -143,16 +210,19 @@ public class EditPermissions extends Composite {
   @UiField
   FlowPanel userPermissionsPanel, groupPermissionsPanel;
 
-  private List<IndexedAIP> aips = new ArrayList<IndexedAIP>();
+  private List<HasPermissions> objects = new ArrayList<HasPermissions>();
+  private String objectClass = null;
 
-  public EditPermissions(IndexedAIP aip) {
-    this.aips.add(aip);
+  public EditPermissions(String objectClass, HasPermissions object) {
+    this.objects.add(object);
+    this.objectClass = objectClass;
     initWidget(uiBinder.createAndBindUi(this));
     createPermissionPanel();
   }
 
-  public EditPermissions(List<IndexedAIP> aips) {
-    this.aips.addAll(aips);
+  public EditPermissions(String objectClass, List<? extends HasPermissions> list) {
+    this.objects.addAll(list);
+    this.objectClass = objectClass;
     initWidget(uiBinder.createAndBindUi(this));
     editPermissionsDescription.add(new HTMLWidgetWrapper("EditPermissionsDescription.html"));
     createPermissionPanelList();
@@ -164,12 +234,12 @@ public class EditPermissions extends Composite {
     JavascriptUtils.stickSidebar();
   }
 
-  private void createPermissionPanelList() {
+  private <T extends IsIndexed> void createPermissionPanelList() {
     Map<String, Set<PermissionType>> userPermissionsToShow = new HashMap<String, Set<PermissionType>>();
     Map<String, Set<PermissionType>> groupPermissionsToShow = new HashMap<String, Set<PermissionType>>();
 
-    if (!aips.isEmpty()) {
-      Permissions firstAIPPermissions = aips.get(0).getPermissions();
+    if (!objects.isEmpty()) {
+      Permissions firstAIPPermissions = objects.get(0).getPermissions();
 
       for (String userName : firstAIPPermissions.getUsernames()) {
         userPermissionsToShow.put(userName, firstAIPPermissions.getUserPermissions(userName));
@@ -179,8 +249,8 @@ public class EditPermissions extends Composite {
         groupPermissionsToShow.put(groupName, firstAIPPermissions.getGroupPermissions(groupName));
       }
 
-      for (int i = 1; i < aips.size(); i++) {
-        Permissions permissions = aips.get(i).getPermissions();
+      for (int i = 1; i < objects.size(); i++) {
+        Permissions permissions = objects.get(i).getPermissions();
 
         for (Iterator<Entry<String, Set<PermissionType>>> userIterator = userPermissionsToShow.entrySet()
           .iterator(); userIterator.hasNext();) {
@@ -237,11 +307,10 @@ public class EditPermissions extends Composite {
       groupPermissionsPanel.add(permissionPanel);
       bindUpdateEmptyVisibility(permissionPanel);
     }
-
   }
 
-  private void createPermissionPanel() {
-    Permissions permissions = aips.get(0).getPermissions();
+  private <T extends IsIndexed> void createPermissionPanel() {
+    Permissions permissions = objects.get(0).getPermissions();
 
     userPermissionsEmpty.setVisible(permissions.getUsernames().isEmpty());
     groupPermissionsEmpty.setVisible(permissions.getGroupnames().isEmpty());
@@ -378,15 +447,27 @@ public class EditPermissions extends Composite {
 
         @Override
         public void onSuccess(String details) {
-          BrowserService.Util.getInstance().updateAIPPermissions(aips, permissions, details, recursive,
-            new LoadingAsyncCallback<Void>() {
+          if (IndexedAIP.class.getName().equals(objectClass)) {
+            List<IndexedAIP> aips = (List<IndexedAIP>) (Object) objects;
+            BrowserService.Util.getInstance().updateAIPPermissions(aips, permissions, details, recursive,
+              new LoadingAsyncCallback<Void>() {
 
-              @Override
-              public void onSuccessImpl(Void result) {
-                Toast.showInfo(messages.dialogSuccess(), messages.permissionsChanged());
-              }
+                @Override
+                public void onSuccessImpl(Void result) {
+                  Toast.showInfo(messages.dialogSuccess(), messages.permissionsChanged());
+                }
+              });
+          } else if (IndexedDIP.class.getName().equals(objectClass)) {
+            List<IndexedDIP> dips = (List<IndexedDIP>) (Object) objects;
+            BrowserService.Util.getInstance().updateDIPPermissions(dips, permissions, details, recursive,
+              new LoadingAsyncCallback<Void>() {
 
-            });
+                @Override
+                public void onSuccessImpl(Void result) {
+                  Toast.showInfo(messages.dialogSuccess(), messages.permissionsChanged());
+                }
+              });
+          }
         }
       });
   }
@@ -407,11 +488,8 @@ public class EditPermissions extends Composite {
   }
 
   public void close() {
-    if (aips.size() == 1) {
-      HistoryUtils.newHistory(BrowseAIP.RESOLVER, aips.get(0).getId());
-    } else {
-      HistoryUtils.newHistory(BrowseAIP.RESOLVER);
-    }
+    LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
+    HistoryUtils.newHistory(selectedItems.getLastHistory());
   }
 
   public class PermissionPanel extends Composite {

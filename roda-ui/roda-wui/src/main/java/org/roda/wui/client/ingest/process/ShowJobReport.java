@@ -18,6 +18,7 @@ import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
@@ -40,6 +41,7 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
@@ -136,7 +138,9 @@ public class ShowJobReport extends Composite {
   FlowPanel reportItems;
 
   @UiField
-  Button buttonBack;
+  Button searchPrevious, searchNext, buttonBack;
+  @UiField
+  FocusPanel keyboardFocus;
 
   public ShowJobReport(IndexedReport jobReport) {
     this.jobReport = jobReport;
@@ -202,6 +206,8 @@ public class ShowJobReport extends Composite {
     status.setHTML(HtmlSnippetUtils.getPluginStateHTML(jobReport.getPluginState()));
     progress.setText(messages.showJobReportProgress(jobReport.getCompletionPercentage(), jobReport.getStepsCompleted(),
       jobReport.getTotalSteps()));
+
+    ListSelectionUtils.bindLayout(jobReport, searchPrevious, searchNext, keyboardFocus, true, false, false);
 
     for (Report reportItem : jobReport.getReports()) {
       FlowPanel panel = new FlowPanel();

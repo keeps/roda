@@ -7,7 +7,9 @@ import java.util.Set;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedDIP;
+import org.roda.wui.client.browse.BrowseAIP;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.browse.EditPermissions;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.process.CreateSelectedJob;
@@ -33,13 +35,14 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
     Arrays.asList(DisseminationAction.values()));
 
   private static final Set<DisseminationAction> POSSIBLE_ACTIONS_ON_MULTIPLE_DISSEMINATIONS = new HashSet<>(
-    Arrays.asList(DisseminationAction.REMOVE, DisseminationAction.NEW_PROCESS));
+    Arrays.asList(DisseminationAction.REMOVE, DisseminationAction.NEW_PROCESS, DisseminationAction.UPDATE_PERMISSIONS));
 
   private DisseminationActions() {
   }
 
   public enum DisseminationAction implements Actionable.Action<IndexedDIP> {
-    DOWNLOAD, REMOVE, NEW_PROCESS; // UPLOAD_FILES, CREATE_FOLDER;
+    DOWNLOAD, REMOVE, NEW_PROCESS, UPDATE_PERMISSIONS;
+    // UPLOAD_FILES, CREATE_FOLDER;
   }
 
   public static DisseminationActions get() {
@@ -65,6 +68,8 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
       remove(dissemination, callback);
     } else if (DisseminationAction.NEW_PROCESS.equals(action)) {
       newProcess(dissemination, callback);
+    } else if (DisseminationAction.UPDATE_PERMISSIONS.equals(action)) {
+      updatePermissions(dissemination, callback);
     } else {
       callback.onFailure(new RequestNotValidException("Unsupported action in this context: " + action));
     }
@@ -80,6 +85,8 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
       remove(selectedItems, callback);
     } else if (DisseminationAction.NEW_PROCESS.equals(action)) {
       newProcess(selectedItems, callback);
+    } else if (DisseminationAction.UPDATE_PERMISSIONS.equals(action)) {
+      updatePermissions(selectedItems, callback);
     } else {
       callback.onFailure(new RequestNotValidException("Unsupported action in this context: " + action));
     }
@@ -142,6 +149,21 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
     callback.onSuccess(ActionImpact.UPDATED);
   }
 
+  private void updatePermissions(IndexedDIP dip, AsyncCallback<ActionImpact> callback) {
+    LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
+    selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
+    HistoryUtils.newHistory(BrowseAIP.RESOLVER, EditPermissions.DIP_RESOLVER.getHistoryToken(), dip.getId());
+    callback.onSuccess(ActionImpact.UPDATED);
+  }
+
+  private void updatePermissions(SelectedItems<IndexedDIP> dips, AsyncCallback<ActionImpact> callback) {
+    LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
+    selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
+    LastSelectedItemsSingleton.getInstance().setSelectedItems(dips);
+    HistoryUtils.newHistory(BrowseAIP.RESOLVER, EditPermissions.DIP_RESOLVER.getHistoryToken());
+    callback.onSuccess(ActionImpact.UPDATED);
+  }
+
   @Override
   public Widget createActionsLayout(IndexedDIP dissemination, AsyncCallback<ActionImpact> callback) {
     FlowPanel layout = createLayout();
@@ -156,6 +178,9 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
 
     addButton(layout, messages.removeButton(), DisseminationAction.REMOVE, dissemination, ActionImpact.DESTROYED,
       callback, "btn-ban");
+
+    addButton(layout, messages.disseminationPermissions(), DisseminationAction.UPDATE_PERMISSIONS, dissemination,
+      ActionImpact.UPDATED, callback, "btn-edit");
 
     // PRESERVATION
     addTitle(layout, messages.preservationTitle(), dissemination, DisseminationAction.NEW_PROCESS);
@@ -182,6 +207,9 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
 
     addButton(layout, messages.removeButton(), DisseminationAction.REMOVE, disseminations, ActionImpact.DESTROYED,
       callback, "btn-ban");
+
+    addButton(layout, messages.disseminationPermissions(), DisseminationAction.UPDATE_PERMISSIONS, disseminations,
+      ActionImpact.UPDATED, callback, "btn-edit");
 
     // PRESERVATION
     addTitle(layout, messages.preservationTitle(), disseminations, DisseminationAction.NEW_PROCESS);

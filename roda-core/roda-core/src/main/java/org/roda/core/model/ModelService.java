@@ -69,6 +69,7 @@ import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Permissions;
+import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
@@ -209,6 +210,11 @@ public class ModelService extends ModelObservable {
     boolean asReference = false;
     boolean createIfNotExists = true;
     storage.updateBinaryContent(metadataStoragePath, new StringContentPayload(json), asReference, createIfNotExists);
+  }
+
+  private void updateDIPMetadata(DIP dip)
+    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+    updateDIPMetadata(dip, ModelUtils.getDIPStoragePath(dip.getId()));
   }
 
   public CloseableIterable<OptionalWithCause<AIP>> listAIPs()
@@ -1973,6 +1979,13 @@ public class ModelService extends ModelObservable {
     notifyAipPermissionsUpdated(aip);
   }
 
+  public void updateDIPPermissions(DIP dip)
+    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+    dip.setLastModified(new Date());
+    updateDIPMetadata(dip);
+    notifyDipPermissionsUpdated(dip);
+  }
+
   public void deleteTransferredResource(TransferredResource transferredResource) {
     FSUtils.deletePathQuietly(Paths.get(transferredResource.getFullPath()));
     notifyTransferredResourceDeleted(transferredResource.getUUID());
@@ -2906,7 +2919,8 @@ public class ModelService extends ModelObservable {
         try {
           return RodaCoreFactory.getStorageService().countResourcesUnderContainer(storagePath, false).intValue() > 0;
         } catch (NotFoundException e) {
-          // 20160913 hsilva: we want to handle the non-existence of a container
+          // TODO 20160913 hsilva: we want to handle the non-existence of a
+          // container
         }
       }
 
@@ -2914,6 +2928,48 @@ public class ModelService extends ModelObservable {
     } catch (RODAException e) {
       return false;
     }
+  }
+
+  public boolean checkObjectPermission(String username, String permissionType, String objectClass, String id)
+    throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
+    boolean hasPermission = false;
+    Set<String> groups = this.retrieveUser(username).getGroups();
+
+    if (username.equals(RodaConstants.ADMIN)) {
+      return true;
+    }
+
+    try {
+      if (DIP.class.getName().equals(objectClass)) {
+        DIP dip = this.retrieveDIP(id);
+        Permissions permissions = dip.getPermissions();
+        Set<PermissionType> userPermissions = permissions.getUserPermissions(username);
+
+        for (String group : groups) {
+          userPermissions.addAll(permissions.getGroupPermissions(group));
+        }
+
+        PermissionType type = PermissionType.valueOf(permissionType.toUpperCase());
+        hasPermission = userPermissions.contains(type);
+      } else if (AIP.class.getName().equals(objectClass)) {
+        AIP aip = this.retrieveAIP(id);
+        Permissions permissions = aip.getPermissions();
+        Set<PermissionType> userPermissions = permissions.getUserPermissions(username);
+
+        for (String group : groups) {
+          userPermissions.addAll(permissions.getGroupPermissions(group));
+        }
+
+        PermissionType type = PermissionType.valueOf(permissionType.toUpperCase());
+        hasPermission = userPermissions.contains(type);
+      } else {
+        throw new RequestNotValidException(objectClass + " permission verification is not supported");
+      }
+    } catch (IllegalArgumentException e) {
+      throw new RequestNotValidException(e);
+    }
+
+    return hasPermission;
   }
 
 }

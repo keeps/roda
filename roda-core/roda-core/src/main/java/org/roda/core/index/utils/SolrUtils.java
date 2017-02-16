@@ -2407,6 +2407,12 @@ public class SolrUtils {
     return permissionsUpdateToSolrDocument(document, aip.getPermissions());
   }
 
+  public static SolrInputDocument dipPermissionsUpdateToSolrDocument(DIP dip) {
+    SolrInputDocument document = new SolrInputDocument();
+    document.addField(RodaConstants.INDEX_UUID, dip.getId());
+    return permissionsUpdateToSolrDocument(document, dip.getPermissions());
+  }
+
   public static SolrInputDocument representationPermissionsUpdateToSolrDocument(Representation representation,
     Permissions permissions) {
     SolrInputDocument document = new SolrInputDocument();

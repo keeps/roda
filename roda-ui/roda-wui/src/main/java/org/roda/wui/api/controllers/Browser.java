@@ -1734,6 +1734,23 @@ public class Browser extends RodaWuiController {
       RodaConstants.CONTROLLER_PERMISSIONS_PARAM, permissions);
   }
 
+  public static void updateDIPPermissions(User user, List<IndexedDIP> dips, Permissions permissions, String details,
+    boolean recursive)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    for (IndexedDIP dip : dips) {
+      UserUtility.checkDIPPermissions(user, dip, PermissionType.UPDATE);
+      BrowserHelper.updateDIPPermissions(user, dip, permissions, details, recursive);
+    }
+
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_DIPS_PARAM, dips,
+      RodaConstants.CONTROLLER_PERMISSIONS_PARAM, permissions);
+  }
+
   public static void updateRisk(User user, Risk risk, int incidences)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};

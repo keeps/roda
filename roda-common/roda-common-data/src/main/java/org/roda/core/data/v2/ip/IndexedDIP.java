@@ -15,7 +15,7 @@ import org.roda.core.data.v2.index.IsIndexed;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public class IndexedDIP extends DIP implements IsIndexed {
+public class IndexedDIP extends DIP implements IsIndexed, HasPermissions {
 
   private static final long serialVersionUID = 4188689893034771594L;
   private String openExternalURL = "";

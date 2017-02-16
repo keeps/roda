@@ -921,6 +921,17 @@ public class IndexModelObserver implements ModelObserver {
 
   }
 
+  @Override
+  public void dipPermissionsUpdated(DIP dip) {
+    try {
+      // change DIP
+      SolrInputDocument dipDoc = SolrUtils.dipPermissionsUpdateToSolrDocument(dip);
+      index.add(RodaConstants.INDEX_DIP, dipDoc);
+    } catch (SolrServerException | IOException e) {
+      LOGGER.error("Cannot do a partial update", e);
+    }
+  }
+
   private void representationsPermissionsUpdated(final AIP aip) {
     for (Representation representation : aip.getRepresentations()) {
       representationPermissionsUpdated(aip, representation);

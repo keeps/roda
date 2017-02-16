@@ -222,6 +222,9 @@ public interface BrowserService extends RemoteService {
   void updateAIPPermissions(List<IndexedAIP> aips, Permissions permissions, String details, boolean recursive)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
 
+  void updateDIPPermissions(List<IndexedDIP> dips, Permissions permissions, String details, boolean recursive)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
+
   void updateRisk(Risk risk, int incidences)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 

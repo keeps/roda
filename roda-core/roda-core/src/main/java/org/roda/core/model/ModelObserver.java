@@ -91,6 +91,8 @@ public interface ModelObserver {
 
   public void aipPermissionsUpdated(AIP aip);
 
+  public void dipPermissionsUpdated(DIP dip);
+
   public void transferredResourceDeleted(String transferredResourceID);
 
   public ReturnWithExceptions<Void> riskCreatedOrUpdated(Risk risk, int incidences, boolean commit);
