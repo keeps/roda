@@ -2932,12 +2932,12 @@ public class ModelService extends ModelObservable {
 
   public boolean checkObjectPermission(String username, String permissionType, String objectClass, String id)
     throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
-    boolean hasPermission = false;
-    Set<String> groups = this.retrieveUser(username).getGroups();
-
     if (username.equals(RodaConstants.ADMIN)) {
       return true;
     }
+
+    boolean hasPermission = false;
+    Set<String> groups = this.retrieveUser(username).getGroups();
 
     try {
       if (DIP.class.getName().equals(objectClass)) {

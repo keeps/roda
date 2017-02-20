@@ -61,7 +61,7 @@ public class AsyncCallbackUtils {
             if (!authExp.getMissingRoles().isEmpty()) {
               List<String> missingRolesTranslation = new ArrayList<>();
               for (String missingRole : authExp.getMissingRoles()) {
-                missingRolesTranslation.add(messages.role(missingRole));
+                missingRolesTranslation.add("- " + messages.role(missingRole));
               }
               message = messages.authorizationDeniedAlertMessageMissingRoles(missingRolesTranslation);
             }

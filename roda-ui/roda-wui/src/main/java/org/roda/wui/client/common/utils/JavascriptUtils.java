@@ -30,8 +30,6 @@ public class JavascriptUtils {
 			$wnd.hljs.highlightBlock(block);
 		});
   }-*/;
-  
-
 
   public static native void slideToggle(String selector) /*-{
 		$wnd.jQuery(selector).click(function() {
@@ -255,12 +253,12 @@ public class JavascriptUtils {
 			width : 'toggle'
 		}, 100);
   }-*/;
-  
+
   public static native void toggle(JavaScriptObject element) /*-{
-                $wnd.jQuery(element).animate({
-                        width : 'toggle'
-                }, 100);
-}-*/;
+		$wnd.jQuery(element).animate({
+			width : 'toggle'
+		}, 100);
+  }-*/;
 
   public static native void hideRightPanel(String panel) /*-{
 		$wnd.jQuery(panel).hide();
@@ -305,31 +303,29 @@ public class JavascriptUtils {
   public static native void expose(String key, String value) /*-{
 		$doc[key] = value;
   }-*/;
-  
+
   public static native void stickInParent(JavaScriptObject object) /*-{
-    $wnd.jQuery(object).stick_in_parent();
-  }-*/;
-  
-  public static native void stickSidebar() /*-{
-    $wnd.jQuery('.sticky-flow').stick_in_parent();
-    $wnd.jQuery('body').trigger("sticky_kit:recalc");
-  }-*/;
-  
-  public static native void stickRecalc() /*-{
-    $wnd.jQuery('body').trigger("sticky_kit:recalc");
+		$wnd.jQuery(object).stick_in_parent();
   }-*/;
 
-  
+  public static native void stickSidebar() /*-{
+		$wnd.jQuery('.sticky-flow').stick_in_parent();
+		$wnd.jQuery('body').trigger("sticky_kit:recalc");
+  }-*/;
+
+  public static native void stickRecalc() /*-{
+		$wnd.jQuery('body').trigger("sticky_kit:recalc");
+  }-*/;
+
   public static native JavaScriptObject runImageViewerOn(JavaScriptObject imageContainer, String imageURL) /*-{
-    var container = $wnd.jQuery(imageContainer);
-    var viewer = $wnd.ImageViewer(container);
-    viewer.load(imageURL);
-    return viewer;
-}-*/;
-  
+		var container = $wnd.jQuery(imageContainer);
+		var viewer = $wnd.ImageViewer(container);
+		viewer.load(imageURL);
+		return viewer;
+  }-*/;
+
   public static native void stopImageViewer(JavaScriptObject imageViewerObject) /*-{
-    imageViewerObject.destroy();
-}-*/;
-  
+		imageViewerObject.destroy();
+  }-*/;
 
 }

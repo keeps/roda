@@ -195,6 +195,7 @@ public final class RodaConstants {
   public static final String API_PATH_PARAM_PART = "part";
   public static final String API_PATH_PARAM_NAME = "name";
   public static final String API_PATH_PARAM_USERNAME = "username";
+  public static final String API_PATH_PARAM_PASSWORD = "password";
   public static final String API_PATH_PARAM_PERMISSION_TYPE = "permission_type";
   public static final String API_PATH_PARAM_OTHER_METADATA_TYPE = "type";
   public static final String API_PATH_PARAM_OTHER_METADATA_FILE_SUFFIX = "file_suffix";

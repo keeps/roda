@@ -587,7 +587,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     FlowPanel layout = createLayout();
 
     // MANAGEMENT
-    addTitle(layout, messages.intellectualEntity(), aip, AipAction.NEW_CHILD_AIP, AipAction.MOVE_IN_HIERARCHY,
+    addTitle(layout, messages.intellectualEntity(), aip, null, AipAction.NEW_CHILD_AIP, AipAction.MOVE_IN_HIERARCHY,
       AipAction.UPDATE_PERMISSIONS, AipAction.ADD_REPRESENTATION, AipAction.REMOVE, AipAction.DOWNLOAD);
 
     addButton(layout, messages.newArchivalPackage(), AipAction.NEW_CHILD_AIP, aip, ActionImpact.UPDATED, callback,
@@ -607,7 +607,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     addButton(layout, messages.downloadButton(), AipAction.DOWNLOAD, aip, ActionImpact.NONE, callback, "btn-download");
 
     // PRESERVATION
-    addTitle(layout, messages.preservationTitle(), aip, AipAction.NEW_PROCESS, AipAction.SHOW_EVENTS,
+    addTitle(layout, messages.preservationTitle(), aip, null, AipAction.NEW_PROCESS, AipAction.SHOW_EVENTS,
       AipAction.SHOW_RISKS, AipAction.SHOW_LOGS);
 
     addButton(layout, messages.newProcessPreservation(), AipAction.NEW_PROCESS, aip, ActionImpact.UPDATED, callback,
@@ -620,7 +620,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
       "btn-exclamation-triangle");
 
     // APPRAISAL
-    addTitle(layout, messages.appraisalTitle(), aip, AipAction.APPRAISAL_ACCEPT, AipAction.APPRAISAL_REJECT);
+    addTitle(layout, messages.appraisalTitle(), aip, null, AipAction.APPRAISAL_ACCEPT, AipAction.APPRAISAL_REJECT);
 
     addButton(layout, messages.appraisalAccept(), AipAction.APPRAISAL_ACCEPT, aip, ActionImpact.UPDATED, callback,
       "btn-play");
@@ -636,7 +636,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     FlowPanel layout = createLayout();
 
     // MANAGEMENT
-    addTitle(layout, messages.intellectualEntity(), aips, AipAction.NEW_CHILD_AIP, AipAction.MOVE_IN_HIERARCHY,
+    addTitle(layout, messages.intellectualEntity(), aips, null, AipAction.NEW_CHILD_AIP, AipAction.MOVE_IN_HIERARCHY,
       AipAction.UPDATE_PERMISSIONS, AipAction.ADD_REPRESENTATION, AipAction.REMOVE, AipAction.DOWNLOAD);
 
     addButton(layout, messages.moveArchivalPackage(), AipAction.MOVE_IN_HIERARCHY, aips, ActionImpact.UPDATED, callback,
@@ -653,7 +653,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     addButton(layout, messages.downloadButton(), AipAction.DOWNLOAD, aips, ActionImpact.NONE, callback, "btn-download");
 
     // PRESERVATION
-    addTitle(layout, messages.preservationTitle(), aips, AipAction.NEW_PROCESS, AipAction.SHOW_EVENTS,
+    addTitle(layout, messages.preservationTitle(), aips, null, AipAction.NEW_PROCESS, AipAction.SHOW_EVENTS,
       AipAction.SHOW_RISKS, AipAction.SHOW_LOGS);
 
     addButton(layout, messages.newProcessPreservation(), AipAction.NEW_PROCESS, aips, ActionImpact.UPDATED, callback,
@@ -666,7 +666,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
       "btn-exclamation-triangle");
 
     // APPRAISAL
-    addTitle(layout, messages.appraisalTitle(), aips, AipAction.APPRAISAL_ACCEPT, AipAction.APPRAISAL_REJECT);
+    addTitle(layout, messages.appraisalTitle(), aips, null, AipAction.APPRAISAL_ACCEPT, AipAction.APPRAISAL_REJECT);
 
     addButton(layout, messages.appraisalAccept(), AipAction.APPRAISAL_ACCEPT, aips, ActionImpact.UPDATED, callback,
       "btn-play");

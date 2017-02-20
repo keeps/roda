@@ -40,6 +40,8 @@ import org.roda.core.model.utils.ModelUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Sets;
+
 public class UserUtility {
   private static final Logger LOGGER = LoggerFactory.getLogger(UserUtility.class);
   public static final String RODA_USER = "RODA_USER";
@@ -83,7 +85,9 @@ public class UserUtility {
   }
 
   public static void checkRoles(final User rsu, final List<String> rolesToCheck) throws AuthorizationDeniedException {
-    if (!rolesToCheck.isEmpty() && !rsu.getAllRoles().containsAll(rolesToCheck)) {
+    // INFO 20170220 nvieira containsAll changed to set intersection (contain at
+    // least one role)
+    if (!rolesToCheck.isEmpty() && Sets.intersection(rsu.getAllRoles(), new HashSet<>(rolesToCheck)).isEmpty()) {
       final List<String> missingRoles = new ArrayList<String>(rolesToCheck);
       missingRoles.removeAll(rsu.getAllRoles());
 
@@ -116,6 +120,7 @@ public class UserUtility {
     final String configKey = String.format("core.roles.%s.%s%s", method.getDeclaringClass().getName(), method.getName(),
       classParam);
     if (RodaCoreFactory.getRodaConfiguration().containsKey(configKey)) {
+      LOGGER.trace("Testing if user '{}' has permissions to '{}'", user.getName(), configKey);
       final List<String> roles = RodaCoreFactory.getRodaConfigurationAsList(configKey);
       checkRoles(user, roles);
     } else {
@@ -131,7 +136,8 @@ public class UserUtility {
   }
 
   public static void logout(HttpServletRequest servletRequest) {
-    servletRequest.getSession().setAttribute(RODA_USER, getGuest());
+    servletRequest.getSession().removeAttribute(RODA_USER);
+
     // CAS specific clean up
     servletRequest.getSession().removeAttribute("edu.yale.its.tp.cas.client.filter.user");
     servletRequest.getSession().removeAttribute("_const_cas_assertion_");

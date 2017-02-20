@@ -564,4 +564,5 @@ public class AipsResource {
     Browser.deleteOtherMetadata(user, aipId, null, suffix, type);
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Other metadata file deleted"), mediaType).build();
   }
+
 }

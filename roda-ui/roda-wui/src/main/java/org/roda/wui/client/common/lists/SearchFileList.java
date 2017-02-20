@@ -40,7 +40,7 @@ import config.i18n.client.ClientMessages;
 
 public class SearchFileList extends BasicAsyncTableCell<IndexedFile> {
 
-  private final ClientLogger logger = new ClientLogger(getClass().getName());
+  private final ClientLogger LOGGER = new ClientLogger(getClass().getName());
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private Column<IndexedFile, SafeHtml> iconColumn;
@@ -50,9 +50,9 @@ public class SearchFileList extends BasicAsyncTableCell<IndexedFile> {
   private boolean showFilePath;
 
   private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.FILE_AIP_ID,
-    RodaConstants.FILE_REPRESENTATION_ID, RodaConstants.FILE_ISDIRECTORY, RodaConstants.FILE_ORIGINALNAME,
-    RodaConstants.FILE_FILE_ID, RodaConstants.FILE_PATH, RodaConstants.FILE_SIZE, RodaConstants.FILE_FORMAT_VERSION,
-    RodaConstants.FILE_FILEFORMAT);
+    RodaConstants.FILE_REPRESENTATION_ID, RodaConstants.FILE_ISDIRECTORY, RodaConstants.FILE_REPRESENTATION_UUID,
+    RodaConstants.FILE_ORIGINALNAME, RodaConstants.FILE_FILE_ID, RodaConstants.FILE_PATH, RodaConstants.FILE_SIZE,
+    RodaConstants.FILE_FORMAT_VERSION, RodaConstants.FILE_FILEFORMAT);
 
   public SearchFileList(Filter filter, boolean justActive, Facets facets, String summary, boolean selectable,
     boolean showFilePath) {
@@ -73,7 +73,7 @@ public class SearchFileList extends BasicAsyncTableCell<IndexedFile> {
             return SafeHtmlUtils.fromSafeConstant("<i class='fa fa-file-o'></i>");
           }
         } else {
-          logger.error("Trying to display a NULL item");
+          LOGGER.error("Trying to display a NULL item");
         }
         return null;
       }

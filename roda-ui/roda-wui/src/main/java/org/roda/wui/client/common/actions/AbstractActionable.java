@@ -6,6 +6,7 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.common.utils.StringUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -87,21 +88,29 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
   }
 
   @SafeVarargs
-  public final void addTitle(FlowPanel layout, String text, T object, Actionable.Action<T>... actions) {
+  public final void addTitle(FlowPanel layout, String text, T object, String extraCssClass,
+    Actionable.Action<T>... actions) {
 
     if (canAct(object, actions)) {
       Label title = new Label(text);
       title.addStyleName("h4");
+      if (StringUtils.isNotBlank(extraCssClass)) {
+        title.addStyleName(extraCssClass);
+      }
       layout.add(title);
     }
   }
 
   @SafeVarargs
-  public final void addTitle(FlowPanel layout, String text, SelectedItems<T> objects, Actionable.Action<T>... actions) {
+  public final void addTitle(FlowPanel layout, String text, SelectedItems<T> objects, String extraCssClass,
+    Actionable.Action<T>... actions) {
 
     if (canAct(objects, actions)) {
       Label title = new Label(text);
       title.addStyleName("h4");
+      if (StringUtils.isNotBlank(extraCssClass)) {
+        title.addStyleName(extraCssClass);
+      }
       layout.add(title);
     }
   }

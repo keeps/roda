@@ -1,0 +1,25 @@
+.banner, .menu, .footer, .sidebar {
+	display: none;
+}
+
+.browseItemMetadata, .descriptiveMetadataCard, .browseIngestJobId {
+	display: none;
+}
+
+.searchResults .actionsButton {
+	display: none;
+}
+
+.dip-options {
+	display: none;
+}
+
+.fileRenameButton, .fileMoveButton, .fileUploadButton, .fileCreateFolderButton, 
+.fileRemoveButton, .fileNewProcessButton, .fileIdentifyFormatsButton, 
+.fileShowEventsButton, .fileShowRisksButton, .preservationTitleLabel {
+	display: none;
+}
+
+.col_10 {
+	width: 100%;
+}
