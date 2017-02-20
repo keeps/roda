@@ -30,6 +30,7 @@ import javax.xml.transform.TransformerException;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.glassfish.jersey.server.JSONP;
 import org.roda.core.common.EntityResponse;
 import org.roda.core.common.StreamResponse;
 import org.roda.core.common.UserUtility;
@@ -75,7 +76,8 @@ public class AipsResource {
 
   @GET
   @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_JAVASCRIPT})
+  @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
   @ApiOperation(value = "List AIPs", notes = "Gets a list of archival information packages (AIPs).", response = AIPs.class, responseContainer = "List")
   @ApiResponses(value = {
     @ApiResponse(code = 200, message = "Successful response", response = AIPs.class, responseContainer = "List"),
@@ -84,7 +86,8 @@ public class AipsResource {
   public Response listAIPs(
     @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam(RodaConstants.API_QUERY_KEY_START) String start,
     @ApiParam(value = "Maximum number of elements to return", defaultValue = RodaConstants.DEFAULT_PAGINATION_STRING_VALUE) @QueryParam(RodaConstants.API_QUERY_KEY_LIMIT) String limit,
-    @ApiParam(value = "Choose format in which to get the AIP", allowableValues = RodaConstants.API_LIST_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
+    @ApiParam(value = "Choose format in which to get the AIP", allowableValues = RodaConstants.API_LIST_MEDIA_TYPES_2, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+    @ApiParam(value = "JSONP callback name", required = false, allowMultiple = false, defaultValue = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK) @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
