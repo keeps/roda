@@ -13,9 +13,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.roda.core.data.v2.IsModelObject;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public abstract class RodaPrincipal implements Serializable, RODAMember {
+public abstract class RodaPrincipal implements Serializable, RODAMember, IsModelObject {
   private static final long serialVersionUID = 8254886345679485761L;
 
   private String id;

@@ -156,4 +156,10 @@ public class Group extends RodaPrincipal {
     return Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.MEMBERS_NAME);
   }
 
+  @JsonIgnore
+  @Override
+  public int getClassVersion() {
+    return 1;
+  }
+
 }

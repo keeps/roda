@@ -16,6 +16,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.roda.core.data.common.RodaConstants;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
@@ -368,5 +369,11 @@ public class User extends RodaPrincipal {
   @Override
   public List<String> liteFields() {
     return Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.MEMBERS_NAME);
+  }
+
+  @JsonIgnore
+  @Override
+  public int getClassVersion() {
+    return 1;
   }
 }
