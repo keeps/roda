@@ -88,6 +88,11 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
   }
 
   @SafeVarargs
+  public final void addTitle(FlowPanel layout, String text, T object, Actionable.Action<T>... actions) {
+    addTitle(layout, text, object, null, actions);
+  }
+
+  @SafeVarargs
   public final void addTitle(FlowPanel layout, String text, T object, String extraCssClass,
     Actionable.Action<T>... actions) {
 
@@ -99,6 +104,11 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
       }
       layout.add(title);
     }
+  }
+
+  @SafeVarargs
+  public final void addTitle(FlowPanel layout, String text, SelectedItems<T> objects, Actionable.Action<T>... actions) {
+    addTitle(layout, text, objects, null, actions);
   }
 
   @SafeVarargs

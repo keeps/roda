@@ -473,8 +473,8 @@ public class BrowserHelper {
     throws GenericException, NotFoundException, RequestNotValidException {
     DipBundle bundle = new DipBundle();
 
-    bundle.setDip(retrieve(IndexedDIP.class, dipUUID,
-      Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID, RodaConstants.DIP_TITLE)));
+    bundle.setDip(retrieve(IndexedDIP.class, dipUUID, Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID,
+      RodaConstants.DIP_TITLE, RodaConstants.DIP_AIP_IDS, RodaConstants.DIP_AIP_UUIDS, RodaConstants.DIP_FILE_IDS)));
 
     List<String> dipFileFields = new ArrayList<>();
 
@@ -509,7 +509,7 @@ public class BrowserHelper {
     List<String> representationFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.REPRESENTATION_TYPE,
       RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES, RodaConstants.REPRESENTATION_ORIGINAL,
       RodaConstants.REPRESENTATION_AIP_ID, RodaConstants.REPRESENTATION_ID);
-    List<String> fileFields = new ArrayList<>();
+    List<String> fileFields = new ArrayList<String>();
 
     // infer from DIP
     IndexedDIP dip = bundle.getDip();

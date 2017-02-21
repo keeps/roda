@@ -463,7 +463,6 @@ public class FileActions extends AbstractActionable<IndexedFile> {
     history.add(file.getAipId());
     history.add(file.getRepresentationUUID());
     history.add(file.getUUID());
-    GWT.log(history.toString());
     HistoryUtils.newHistory(PreservationEvents.BROWSE_RESOLVER, history);
     callback.onSuccess(ActionImpact.NONE);
   }
@@ -484,8 +483,8 @@ public class FileActions extends AbstractActionable<IndexedFile> {
     FlowPanel layout = createLayout();
 
     // MANAGEMENT
-    addTitle(layout, messages.sidebarFoldersFilesTitle(), file, null, FileAction.DOWNLOAD, FileAction.RENAME,
-      FileAction.MOVE, FileAction.UPLOAD_FILES, FileAction.CREATE_FOLDER, FileAction.REMOVE);
+    addTitle(layout, messages.sidebarFoldersFilesTitle(), file, FileAction.DOWNLOAD, FileAction.RENAME, FileAction.MOVE,
+      FileAction.UPLOAD_FILES, FileAction.CREATE_FOLDER, FileAction.REMOVE);
 
     // DOWNLOAD, RENAME, MOVE, REMOVE, UPLOAD_FILES, CREATE_FOLDER
     addButton(layout, messages.downloadButton(), FileAction.DOWNLOAD, file, ActionImpact.NONE, callback, "btn-download",
@@ -522,7 +521,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
     FlowPanel layout = createLayout();
 
     // MANAGEMENT
-    addTitle(layout, messages.sidebarFoldersFilesTitle(), files, null, FileAction.DOWNLOAD, FileAction.RENAME,
+    addTitle(layout, messages.sidebarFoldersFilesTitle(), files, FileAction.DOWNLOAD, FileAction.RENAME,
       FileAction.MOVE, FileAction.UPLOAD_FILES, FileAction.CREATE_FOLDER, FileAction.REMOVE);
 
     // DOWNLOAD, RENAME, MOVE, REMOVE, UPLOAD_FILES, CREATE_FOLDER

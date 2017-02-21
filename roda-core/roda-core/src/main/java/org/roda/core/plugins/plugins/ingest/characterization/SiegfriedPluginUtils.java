@@ -170,20 +170,23 @@ public class SiegfriedPluginUtils {
           String version = null;
           String pronom = null;
           String mime = null;
+          String[] pluginVersion = plugin.getVersion().split("\\.");
 
-          if (plugin.getVersion().startsWith("1.5") || plugin.getVersion().startsWith("1.6")) {
-            if (match.get("ns").textValue().equalsIgnoreCase("pronom")) {
-              format = match.get("format").textValue();
-              version = match.get("version").textValue();
-              pronom = match.get("id").textValue();
-              mime = match.get("mime").textValue();
-            }
-          } else {
-            if (match.get("id").textValue().equalsIgnoreCase("pronom")) {
-              format = match.get("format").textValue();
-              version = match.get("version").textValue();
-              pronom = match.get("puid").textValue();
-              mime = match.get("mime").textValue();
+          if ("1".equals(pluginVersion[0])) {
+            if (Integer.parseInt(pluginVersion[1]) > 4) {
+              if (match.get("ns").textValue().equalsIgnoreCase("pronom")) {
+                format = match.get("format").textValue();
+                version = match.get("version").textValue();
+                pronom = match.get("id").textValue();
+                mime = match.get("mime").textValue();
+              }
+            } else {
+              if (match.get("id").textValue().equalsIgnoreCase("pronom")) {
+                format = match.get("format").textValue();
+                version = match.get("version").textValue();
+                pronom = match.get("puid").textValue();
+                mime = match.get("mime").textValue();
+              }
             }
           }
 

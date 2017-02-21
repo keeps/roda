@@ -169,8 +169,8 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
     FlowPanel layout = createLayout();
 
     // MANAGEMENT
-    addTitle(layout, messages.viewRepresentationFileDisseminationTitle(), dissemination, null,
-      DisseminationAction.DOWNLOAD, DisseminationAction.REMOVE);
+    addTitle(layout, messages.viewRepresentationFileDisseminationTitle(), dissemination, DisseminationAction.DOWNLOAD,
+      DisseminationAction.REMOVE);
 
     // DOWNLOAD,REMOVE
     addButton(layout, messages.downloadButton(), DisseminationAction.DOWNLOAD, dissemination, ActionImpact.NONE,
@@ -183,7 +183,7 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
       ActionImpact.UPDATED, callback, "btn-edit");
 
     // PRESERVATION
-    addTitle(layout, messages.preservationTitle(), dissemination, null, DisseminationAction.NEW_PROCESS);
+    addTitle(layout, messages.preservationTitle(), dissemination, DisseminationAction.NEW_PROCESS);
 
     // NEW_PROCESS
     addButton(layout, messages.newProcessPreservation(), DisseminationAction.NEW_PROCESS, dissemination,
@@ -197,8 +197,8 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
     FlowPanel layout = createLayout();
 
     // MANAGEMENT
-    addTitle(layout, messages.viewRepresentationFileDisseminationTitle(), disseminations, null,
-      DisseminationAction.DOWNLOAD, DisseminationAction.REMOVE);
+    addTitle(layout, messages.viewRepresentationFileDisseminationTitle(), disseminations, DisseminationAction.DOWNLOAD,
+      DisseminationAction.REMOVE);
 
     // DOWNLOAD,REMOVE
     addButton(layout, messages.downloadButton(), DisseminationAction.DOWNLOAD, disseminations, ActionImpact.NONE,
@@ -211,7 +211,7 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
       ActionImpact.UPDATED, callback, "btn-edit");
 
     // PRESERVATION
-    addTitle(layout, messages.preservationTitle(), disseminations, null, DisseminationAction.NEW_PROCESS);
+    addTitle(layout, messages.preservationTitle(), disseminations, DisseminationAction.NEW_PROCESS);
 
     // NEW_PROCESS
     addButton(layout, messages.newProcessPreservation(), DisseminationAction.NEW_PROCESS, disseminations,

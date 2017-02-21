@@ -237,7 +237,7 @@ public class BrowseDIP extends Composite {
   private static <T extends IsIndexed> void openReferred(final T object, Filter filter) {
     BrowserService.Util.getInstance().find(IndexedDIP.class.getName(), filter, DEFAULT_DIPFILE_SORTER,
       new Sublist(0, 1), Facets.NONE, LocaleInfo.getCurrentLocale().getLocaleName(), true,
-      Arrays.asList(RodaConstants.DIP_ID), new AsyncCallback<IndexResult<IndexedDIP>>() {
+      Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID), new AsyncCallback<IndexResult<IndexedDIP>>() {
 
         @Override
         public void onFailure(Throwable caught) {
