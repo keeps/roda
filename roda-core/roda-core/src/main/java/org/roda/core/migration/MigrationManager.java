@@ -8,6 +8,7 @@
 package org.roda.core.migration;
 
 import java.io.IOException;
+import java.lang.reflect.Modifier;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -168,6 +169,9 @@ public class MigrationManager {
     Reflections reflections = new Reflections("org.roda.core.data.v2");
     Set<Class<? extends IsModelObject>> modelClasses = reflections.getSubTypesOf(IsModelObject.class);
     for (Class<? extends IsModelObject> clazz : modelClasses) {
+      if (Modifier.isAbstract(clazz.getModifiers())) {
+        continue;
+      }
       if (avoidClassesByNamePrefix && clazz.getSimpleName().startsWith(avoidByNamePrefix)) {
         continue;
       }
