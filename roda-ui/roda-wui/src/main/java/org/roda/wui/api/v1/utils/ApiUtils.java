@@ -118,7 +118,8 @@ public class ApiUtils {
     } else if (StringUtils.isNotBlank(acceptHeaders)) {
       if (acceptHeaders.contains(MediaType.APPLICATION_XML)) {
         mediaType = MediaType.APPLICATION_XML;
-      } else if (acceptHeaders.contains(APPLICATION_JS)) {
+      } else if (acceptHeaders.contains(APPLICATION_JS)
+        || acceptHeaders.contains(ExtraMediaType.APPLICATION_JAVASCRIPT)) {
         mediaType = APPLICATION_JS;
       } else if (acceptHeaders.contains(ExtraMediaType.TEXT_CSV)) {
         mediaType = ExtraMediaType.TEXT_CSV;

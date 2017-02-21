@@ -21,17 +21,21 @@ import javax.ws.rs.core.Response;
 import org.glassfish.jersey.server.JSONP;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
+import org.roda.wui.api.v1.utils.ApiUtils;
+import org.roda.wui.api.v1.utils.ExtraMediaType;
 import org.roda.wui.filter.CasClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
@@ -82,29 +86,36 @@ public class AuthResource {
   }
 
   @GET
-  @JSONP(queryParam = "callback")
+  @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
   @Path("/login")
-  @Produces({"application/javascript"})
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_JAVASCRIPT})
   @ApiOperation(value = "GET call to login", notes = "GET call to login", response = User.class)
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = User.class),
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
-  public User loginGet(@QueryParam("callback") String callback) throws RODAException {
+  public Response loginGet(
+    @ApiParam(value = "Choose format in which to get the User", allowableValues = RodaConstants.API_LIST_MEDIA_TYPES_2, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+    @ApiParam(value = "JSONP callback name", required = false, allowMultiple = false, defaultValue = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK) @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
+    throws RODAException {
+    String mediaType = ApiUtils.getMediaType(acceptFormat, request);
     // get user
-    return UserUtility.getApiUser(request);
+    return Response.ok(UserUtility.getApiUser(request), mediaType).build();
   }
 
   @POST
-  @JSONP(queryParam = "callback")
+  @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
   @Path("/login")
-  @Produces({"application/javascript"})
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_JAVASCRIPT})
   @ApiOperation(value = "POST call to login", notes = "POST call to login", response = User.class)
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = User.class),
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
-  public User loginPost(@QueryParam("callback") String callback) throws RODAException {
+  public Response loginPost(
+    @ApiParam(value = "Choose format in which to get the User", allowableValues = RodaConstants.API_LIST_MEDIA_TYPES_2, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+    @ApiParam(value = "JSONP callback name", required = false, allowMultiple = false, defaultValue = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK) @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
+    throws RODAException {
     // get user
-    return UserUtility.getApiUser(request);
+    return loginGet(acceptFormat, jsonpCallbackName);
   }
 
 }
