@@ -23,3 +23,8 @@
 .col_10 {
 	width: 100%;
 }
+
+.card {
+	box-shadow: none !important;
+	padding: 0 !important;
+}
