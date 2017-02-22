@@ -146,16 +146,14 @@ public class UpdateAIPPermissionsPlugin extends AbstractPlugin<AIP> {
           try {
             permissions = JsonUtils.getObjectFromJson(permissionJson, Permissions.class);
           } catch (GenericException e) {
-            report.addPluginDetails("Permission json is not well formed: " + e.getMessage())
-              .setPluginState(PluginState.FAILURE);
+            // do nothing
           }
         } else if (StringUtils.isNotBlank(aipId)) {
           try {
             AIP aip = model.retrieveAIP(aipId);
             permissions = new Permissions(aip.getPermissions());
           } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-            report.addPluginDetails("AIP could not be retrieved: " + e.getMessage())
-              .setPluginState(PluginState.FAILURE);
+            // do nothing
           }
         }
       }
@@ -171,21 +169,21 @@ public class UpdateAIPPermissionsPlugin extends AbstractPlugin<AIP> {
 
   private void processAIP(IndexService index, ModelService model, StorageService storage, Report report,
     SimpleJobPluginInfo jobPluginInfo, Job job, AIP aip) {
-    Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
-    aip.setPermissions(permissions);
     PluginState state = PluginState.SUCCESS;
+    aip.setPermissions(permissions);
 
     try {
       model.updateAIPPermissions(aip, job.getUsername());
     } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
       state = PluginState.FAILURE;
-      reportItem.addPluginDetails("Could not update AIP permissions");
+      Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
+      reportItem.addPluginDetails("Could not update AIP permissions: " + e.getMessage())
+        .setPluginState(PluginState.FAILURE);
+      report.addReport(reportItem);
+      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
     }
 
     jobPluginInfo.incrementObjectsProcessed(state);
-    reportItem.setPluginState(state);
-    report.addReport(reportItem);
-
     model.createUpdateAIPEvent(aip.getId(), null, null, null, PreservationEventType.UPDATE, eventDescription, state,
       outcomeText, details, job.getUsername(), true);
   }
@@ -193,6 +191,21 @@ public class UpdateAIPPermissionsPlugin extends AbstractPlugin<AIP> {
   @Override
   public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
+    if (StringUtils.isNotBlank(permissionJson)) {
+      try {
+        permissions = JsonUtils.getObjectFromJson(permissionJson, Permissions.class);
+      } catch (GenericException e) {
+        throw new PluginException("Permission json is not well formed: " + e.getMessage());
+      }
+    } else if (StringUtils.isNotBlank(aipId)) {
+      try {
+        AIP aip = model.retrieveAIP(aipId);
+        permissions = new Permissions(aip.getPermissions());
+      } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+        throw new PluginException("AIP could not be retrieved: " + e.getMessage());
+      }
+    }
+
     return new Report();
   }
 

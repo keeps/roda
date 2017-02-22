@@ -92,6 +92,7 @@ import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.orchestrate.akka.Messages;
 import org.roda.core.plugins.plugins.base.reindex.ReindexAIPPlugin;
 import org.roda.core.plugins.plugins.base.reindex.ReindexActionLogPlugin;
+import org.roda.core.plugins.plugins.base.reindex.ReindexDIPPlugin;
 import org.roda.core.plugins.plugins.base.reindex.ReindexFormatPlugin;
 import org.roda.core.plugins.plugins.base.reindex.ReindexIncidencePlugin;
 import org.roda.core.plugins.plugins.base.reindex.ReindexJobPlugin;
@@ -1170,6 +1171,8 @@ public final class PluginHelper {
       return ReindexPreservationAgentPlugin.class.getName();
     } else if (reindexClass.equals(IndexedPreservationEvent.class)) {
       return ReindexPreservationRepositoryEventPlugin.class.getName();
+    } else if (reindexClass.equals(DIP.class)) {
+      return ReindexDIPPlugin.class.getName();
     } else {
       throw new NotFoundException("No reindex plugin available");
     }

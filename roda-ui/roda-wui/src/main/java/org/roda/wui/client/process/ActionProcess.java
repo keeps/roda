@@ -104,6 +104,9 @@ public class ActionProcess extends Composite {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
+  private static final Filter filter = new Filter(
+    new NotSimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INGEST.toString()),
+    new NotSimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INTERNAL.toString()));
 
   @UiField
   FlowPanel ingestProcessDescription;
@@ -130,11 +133,6 @@ public class ActionProcess extends Composite {
   Button newJob;
 
   private ActionProcess() {
-
-    Filter filter = new Filter(
-      new NotSimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INGEST.toString()),
-      new NotSimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INTERNAL.toString()));
-
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.JOB_STATE),
       new SimpleFacetParameter(RodaConstants.JOB_USERNAME), new SimpleFacetParameter(RodaConstants.JOB_PLUGIN_TYPE));
 
@@ -206,10 +204,9 @@ public class ActionProcess extends Composite {
     DateRangeFilterParameter filterParameter = new DateRangeFilterParameter(RodaConstants.JOB_START_DATE, dateInitial,
       dateFinal, RodaConstants.DateGranularity.DAY);
 
-    Filter filter = new Filter(filterParameter);
-    filter.add(new NotSimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INGEST.toString()));
-    filter.add(new NotSimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INTERNAL.toString()));
-    jobList.setFilter(filter);
+    Filter newFilter = new Filter(filter);
+    newFilter.add(filterParameter);
+    jobList.setFilter(newFilter);
   }
 
   @UiHandler("newJob")
