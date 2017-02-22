@@ -1718,8 +1718,8 @@ public class Browser extends RodaWuiController {
   }
 
   public static void updateAIPPermissions(User user, List<IndexedAIP> aips, Permissions permissions, String details,
-    boolean recursive)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    boolean recursive) throws AuthorizationDeniedException, GenericException, NotFoundException,
+    RequestNotValidException, JobAlreadyStartedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -1734,8 +1734,7 @@ public class Browser extends RodaWuiController {
       RodaConstants.CONTROLLER_PERMISSIONS_PARAM, permissions);
   }
 
-  public static void updateDIPPermissions(User user, List<IndexedDIP> dips, Permissions permissions, String details,
-    boolean recursive)
+  public static void updateDIPPermissions(User user, List<IndexedDIP> dips, Permissions permissions, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1744,7 +1743,7 @@ public class Browser extends RodaWuiController {
 
     for (IndexedDIP dip : dips) {
       UserUtility.checkDIPPermissions(user, dip, PermissionType.UPDATE);
-      BrowserHelper.updateDIPPermissions(user, dip, permissions, details, recursive);
+      BrowserHelper.updateDIPPermissions(user, dip, permissions, details);
     }
 
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_DIPS_PARAM, dips,

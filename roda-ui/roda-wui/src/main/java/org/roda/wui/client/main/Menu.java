@@ -36,6 +36,7 @@ import org.roda.wui.client.planning.PreservationAgents;
 import org.roda.wui.client.planning.RiskRegister;
 import org.roda.wui.client.process.ActionProcess;
 import org.roda.wui.client.process.IngestProcess;
+import org.roda.wui.client.process.InternalProcess;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.client.welcome.Help;
 import org.roda.wui.client.welcome.Welcome;
@@ -94,6 +95,7 @@ public class Menu extends Composite {
 
   private final AcessibleMenuBar administrationMenu;
   private MenuItem administration_actions;
+  private MenuItem administration_internal_actions;
   private MenuItem administration_user;
   private MenuItem administration_log;
   private MenuItem administration_notifications;
@@ -150,6 +152,9 @@ public class Menu extends Composite {
     administration_actions = administrationMenu.addItem(messages.title("administration_actions"),
       createCommand(ActionProcess.RESOLVER.getHistoryPath()));
     administration_actions.addStyleName("administration_actions_item");
+    administration_internal_actions = administrationMenu.addItem(messages.title("administration_internal_actions"),
+      createCommand(InternalProcess.RESOLVER.getHistoryPath()));
+    administration_internal_actions.addStyleName("administration_internal_actions_item");
     administration_user = administrationMenu.addItem(messages.title("administration_user"),
       createCommand(MemberManagement.RESOLVER.getHistoryPath()));
     administration_user.addStyleName("administration_user_item");
@@ -271,6 +276,7 @@ public class Menu extends Composite {
 
     // Administration
     updateResolverSubItemVisibility(ActionProcess.RESOLVER, administration_actions);
+    updateResolverSubItemVisibility(InternalProcess.RESOLVER, administration_internal_actions);
     updateResolverSubItemVisibility(MemberManagement.RESOLVER, administration_user);
     updateResolverSubItemVisibility(UserLog.RESOLVER, administration_log);
     updateResolverSubItemVisibility(NotificationRegister.RESOLVER, administration_notifications);

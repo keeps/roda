@@ -130,6 +130,7 @@ import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.plugins.PluginHelper;
+import org.roda.core.plugins.plugins.base.UpdateAIPPermissionsPlugin;
 import org.roda.core.plugins.plugins.ingest.AutoAcceptSIPPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.SiegfriedPlugin;
 import org.roda.core.plugins.plugins.risks.RiskIncidenceRemoverPlugin;
@@ -2358,8 +2359,8 @@ public class BrowserHelper {
   }
 
   public static void updateAIPPermissions(User user, IndexedAIP indexedAIP, Permissions permissions, String details,
-    boolean recursive)
-    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+    boolean recursive) throws GenericException, NotFoundException, RequestNotValidException,
+    AuthorizationDeniedException, JobAlreadyStartedException {
     Locale locale = ServerTools.parseLocale(RodaConstants.DEFAULT_EVENT_LOCALE);
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
     final String eventDescription = messages.getTranslation(RodaConstants.EVENT_UPDATE_ON_REPOSITORY);
@@ -2384,46 +2385,33 @@ public class BrowserHelper {
 
     if (recursive) {
       Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, indexedAIP.getId()));
-      RodaCoreFactory.getIndexService().execute(IndexedAIP.class, filter, Arrays.asList(RodaConstants.INDEX_UUID),
-        new IndexRunnable<IndexedAIP>() {
+      SelectedItemsFilter<IndexedAIP> selectedItems = new SelectedItemsFilter<IndexedAIP>(filter,
+        IndexedAIP.class.getName(), Boolean.FALSE);
 
-          @Override
-          public void run(IndexedAIP idescendant)
-            throws GenericException, RequestNotValidException, AuthorizationDeniedException {
-            AIP descendant;
-            try {
-              descendant = model.retrieveAIP(idescendant.getId());
-              descendant.setPermissions(permissions);
-              try {
-                model.updateAIPPermissions(descendant, user.getName());
+      Job job = new Job();
+      job.setId(UUID.randomUUID().toString());
+      job.setName("Update AIP permissions recursively");
+      job.setSourceObjects(selectedItems);
+      job.setPlugin(UpdateAIPPermissionsPlugin.class.getCanonicalName());
+      job.setPluginType(PluginType.INTERNAL);
+      job.setUsername(user.getName());
 
-                String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_UPDATE_AIP_SUCCESS,
-                  descendant.getId());
-                model.createUpdateAIPEvent(descendant.getId(), null, null, null, PreservationEventType.UPDATE,
-                  eventDescription, PluginState.SUCCESS, outcomeText, details, user.getName(), true);
-              } catch (RequestNotValidException | NotFoundException | GenericException
-                | AuthorizationDeniedException e) {
-                String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_UPDATE_AIP_FAILURE,
-                  descendant.getId());
-                model.createUpdateAIPEvent(descendant.getId(), null, null, null, PreservationEventType.UPDATE,
-                  eventDescription, PluginState.FAILURE, outcomeText, details, user.getName(), true);
+      Map<String, String> pluginParameters = new HashMap<>();
+      pluginParameters.put(RodaConstants.PLUGIN_PARAMS_AIP_ID, aip.getId());
+      pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
+      pluginParameters.put(RodaConstants.PLUGIN_PARAMS_EVENT_DESCRIPTION, eventDescription);
+      pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OUTCOME_TEXT,
+        "Parent permissions were updated and all sublevels will be too");
+      job.setPluginParameters(pluginParameters);
 
-                throw e;
-              }
-            } catch (NotFoundException e) {
-              LOGGER.warn("Got an AIP from index which was not found in the model", e);
-            } catch (RuntimeException e) {
-              LOGGER.error("Error applying permissions", e);
-            }
-
-          }
-        });
+      RodaCoreFactory.getModelService().createJob(job);
+      RodaCoreFactory.getPluginOrchestrator().executeJob(job, true);
     }
   }
 
-  public static void updateDIPPermissions(User user, IndexedDIP indexedDIP, Permissions permissions, String details,
-    boolean recursive)
+  public static void updateDIPPermissions(User user, IndexedDIP indexedDIP, Permissions permissions, String details)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+    // TODO 20170222 nvieira it should create an event associated with DIP
     ModelService model = RodaCoreFactory.getModelService();
     DIP dip = model.retrieveDIP(indexedDIP.getId());
     dip.setPermissions(permissions);

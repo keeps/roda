@@ -40,6 +40,11 @@ public class Permissions implements Serializable {
     init(groups);
   }
 
+  public Permissions(Permissions ps) {
+    users = ps.getUsers();
+    groups = ps.getGroups();
+  }
+
   private void init(Map<PermissionType, Set<String>> permissionsMap) {
 
     for (PermissionType type : PermissionType.values()) {

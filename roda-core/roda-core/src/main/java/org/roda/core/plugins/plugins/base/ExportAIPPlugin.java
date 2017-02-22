@@ -102,7 +102,9 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getDescription() {
-    return "Exports selected AIP(s) to a ZIP file or folder on the server file system. To retrieve the results of the export action you must have access to the server file system.\nNOTE: This action can potentially generate a large amount of data. Make sure you select a destination folder that has enough storage space to accommodate the results of the export action.";
+    return "Exports selected AIP(s) to a ZIP file or folder on the server file system. To retrieve the results of the export action you must "
+      + "have access to the server file system.\nNOTE: This action can potentially generate a large amount of data. Make sure you select a destination "
+      + "folder that has enough storage space to accommodate the results of the export action.";
   }
 
   @Override

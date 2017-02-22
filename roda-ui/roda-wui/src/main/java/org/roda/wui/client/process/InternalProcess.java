@@ -20,7 +20,7 @@ import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.core.data.v2.index.filter.DateRangeFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.wui.client.common.UserLogin;
@@ -58,7 +58,7 @@ import config.i18n.client.ClientMessages;
  * @author Luis Faria
  * 
  */
-public class ActionProcess extends Composite {
+public class InternalProcess extends Composite {
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
@@ -74,7 +74,7 @@ public class ActionProcess extends Composite {
 
     @Override
     public String getHistoryToken() {
-      return "process";
+      return "internal";
     }
 
     @Override
@@ -83,22 +83,22 @@ public class ActionProcess extends Composite {
     }
   };
 
-  private static ActionProcess instance = null;
+  private static InternalProcess instance = null;
 
   /**
    * Get the singleton instance
    * 
    * @return the instance
    */
-  public static ActionProcess getInstance() {
+  public static InternalProcess getInstance() {
     if (instance == null) {
-      instance = new ActionProcess();
+      instance = new InternalProcess();
     }
 
     return instance;
   }
 
-  interface MyUiBinder extends UiBinder<Widget, ActionProcess> {
+  interface MyUiBinder extends UiBinder<Widget, InternalProcess> {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
@@ -129,11 +129,10 @@ public class ActionProcess extends Composite {
   @UiField
   Button newJob;
 
-  private ActionProcess() {
+  private InternalProcess() {
 
     Filter filter = new Filter(
-      new NotSimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INGEST.toString()),
-      new NotSimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INTERNAL.toString()));
+      new SimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INTERNAL.toString()));
 
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.JOB_STATE),
       new SimpleFacetParameter(RodaConstants.JOB_USERNAME), new SimpleFacetParameter(RodaConstants.JOB_PLUGIN_TYPE));
@@ -207,8 +206,7 @@ public class ActionProcess extends Composite {
       dateFinal, RodaConstants.DateGranularity.DAY);
 
     Filter filter = new Filter(filterParameter);
-    filter.add(new NotSimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INGEST.toString()));
-    filter.add(new NotSimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INTERNAL.toString()));
+    filter.add(new SimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INTERNAL.toString()));
     jobList.setFilter(filter);
   }
 

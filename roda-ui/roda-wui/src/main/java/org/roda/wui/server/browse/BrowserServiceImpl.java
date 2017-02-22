@@ -601,16 +601,17 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   @Override
   public void updateAIPPermissions(List<IndexedAIP> aips, Permissions permissions, String details, boolean recursive)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
+    JobAlreadyStartedException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Browser.updateAIPPermissions(user, aips, permissions, details, recursive);
   }
 
   @Override
-  public void updateDIPPermissions(List<IndexedDIP> dips, Permissions permissions, String details, boolean recursive)
+  public void updateDIPPermissions(List<IndexedDIP> dips, Permissions permissions, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.updateDIPPermissions(user, dips, permissions, details, recursive);
+    Browser.updateDIPPermissions(user, dips, permissions, details);
   }
 
   @Override

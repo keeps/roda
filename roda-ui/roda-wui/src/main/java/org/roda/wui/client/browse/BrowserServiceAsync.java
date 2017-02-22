@@ -155,7 +155,7 @@ public interface BrowserServiceAsync {
   void updateAIPPermissions(List<IndexedAIP> aips, Permissions permissions, String details, boolean recursive,
     AsyncCallback<Void> callback);
 
-  void updateDIPPermissions(List<IndexedDIP> dips, Permissions permissions, String details, boolean recursive,
+  void updateDIPPermissions(List<IndexedDIP> dips, Permissions permissions, String details,
     AsyncCallback<Void> callback);
 
   void createRisk(Risk risk, AsyncCallback<Risk> asyncCallback);

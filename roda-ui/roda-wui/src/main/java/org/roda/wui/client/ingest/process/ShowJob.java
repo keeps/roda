@@ -61,6 +61,7 @@ import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.process.ActionProcess;
 import org.roda.wui.client.process.IngestProcess;
+import org.roda.wui.client.process.InternalProcess;
 import org.roda.wui.client.process.Process;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.HistoryResolver;
@@ -747,6 +748,8 @@ public class ShowJob extends Composite {
   private void cancel() {
     if (job.getPluginType().equals(PluginType.INGEST)) {
       HistoryUtils.newHistory(IngestProcess.RESOLVER);
+    } else if (job.getPluginType().equals(PluginType.INTERNAL)) {
+      HistoryUtils.newHistory(InternalProcess.RESOLVER);
     } else {
       HistoryUtils.newHistory(ActionProcess.RESOLVER);
     }

@@ -210,6 +210,9 @@ public class EditPermissions extends Composite {
   @UiField
   FlowPanel userPermissionsPanel, groupPermissionsPanel;
 
+  @UiField
+  Button buttonApplyToAll;
+
   private List<HasPermissions> objects = new ArrayList<HasPermissions>();
   private String objectClass = null;
 
@@ -217,6 +220,7 @@ public class EditPermissions extends Composite {
     this.objects.add(object);
     this.objectClass = objectClass;
     initWidget(uiBinder.createAndBindUi(this));
+    buttonApplyToAll.setVisible(IndexedAIP.class.getName().equals(objectClass));
     createPermissionPanel();
   }
 
@@ -224,6 +228,7 @@ public class EditPermissions extends Composite {
     this.objects.addAll(list);
     this.objectClass = objectClass;
     initWidget(uiBinder.createAndBindUi(this));
+    buttonApplyToAll.setVisible(IndexedAIP.class.getName().equals(objectClass));
     editPermissionsDescription.add(new HTMLWidgetWrapper("EditPermissionsDescription.html"));
     createPermissionPanelList();
   }
@@ -459,7 +464,7 @@ public class EditPermissions extends Composite {
               });
           } else if (IndexedDIP.class.getName().equals(objectClass)) {
             List<IndexedDIP> dips = (List<IndexedDIP>) (Object) objects;
-            BrowserService.Util.getInstance().updateDIPPermissions(dips, permissions, details, recursive,
+            BrowserService.Util.getInstance().updateDIPPermissions(dips, permissions, details,
               new LoadingAsyncCallback<Void>() {
 
                 @Override
