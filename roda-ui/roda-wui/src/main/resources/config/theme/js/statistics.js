@@ -376,6 +376,11 @@
 
   $(window).ready(
     function() {
+    	
+	  $(document).on('DOMNodeInserted', ".chartjs-hidden-iframe", function(e) {
+		elem = e.target;
+		$(elem).attr("title", "statistic_frame");
+      });
 
       function recreateScriptTags(element) {
         var scriptNodes = element.getElementsByTagName('script');

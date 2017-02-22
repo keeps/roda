@@ -491,6 +491,11 @@ public class BrowseAIP extends Composite {
     if (bundle != null) {
       addStyleName(BROWSE_AIP_CSS);
 
+      Element firstElement = this.getElement().getFirstChildElement();
+      if (firstElement.getTagName().equalsIgnoreCase("input")) {
+        firstElement.setAttribute("title", "browse input");
+      }
+
       IndexedAIP aip = bundle.getAip();
       AIPState state = aip.getState();
       this.justActive = AIPState.ACTIVE.equals(state);
