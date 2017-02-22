@@ -8,6 +8,7 @@
 package org.roda.core.plugins.orchestrate.akka;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -227,7 +228,9 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
       // java.lang.NoSuchMethodError)
       errorDuringBeforeAll = true;
       getPluginOrchestrator().setJobInError(PluginHelper.getJobId(plugin));
-      getSelf().tell(new Messages.JobStateUpdated(plugin, JOB_STATE.FAILED_TO_COMPLETE), getSelf());
+      getSelf().tell(
+        new Messages.JobStateUpdated(plugin, JOB_STATE.FAILED_TO_COMPLETE, Optional.ofNullable(e.getMessage())),
+        getSelf());
 
     }
     markMessageProcessingAsEnded(message);
