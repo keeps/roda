@@ -109,7 +109,7 @@ public class ActionProcess extends Composite {
     new NotSimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INTERNAL.toString()));
 
   @UiField
-  FlowPanel ingestProcessDescription;
+  FlowPanel preservationProcessDescription;
 
   @UiField(provided = true)
   JobList jobList;
@@ -149,7 +149,7 @@ public class ActionProcess extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
 
-    ingestProcessDescription.add(new HTMLWidgetWrapper("IngestProcessDescription.html"));
+    preservationProcessDescription.add(new HTMLWidgetWrapper("PreservationProcessDescription.html"));
 
     DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
     ValueChangeHandler<Date> valueChangeHandler = new ValueChangeHandler<Date>() {

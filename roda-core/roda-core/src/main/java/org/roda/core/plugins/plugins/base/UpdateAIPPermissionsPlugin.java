@@ -58,7 +58,7 @@ public class UpdateAIPPermissionsPlugin extends AbstractPlugin<AIP> {
         PluginParameterType.STRING, "", false, false, "Permission object in JSON."));
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_AIP_ID,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_AIP_ID, "Parent AIP identifier", PluginParameterType.STRING, "",
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_AIP_ID, "Parent AIP identifier", PluginParameterType.AIP_ID, "",
         false, false, "Parent AIP identifier where to copy permissions"));
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, new PluginParameter(RodaConstants.PLUGIN_PARAMS_DETAILS,
@@ -177,8 +177,7 @@ public class UpdateAIPPermissionsPlugin extends AbstractPlugin<AIP> {
     } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
       state = PluginState.FAILURE;
       Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
-      reportItem.addPluginDetails("Could not update AIP permissions: " + e.getMessage())
-        .setPluginState(PluginState.FAILURE);
+      reportItem.addPluginDetails("Could not update AIP permissions: " + e.getMessage()).setPluginState(state);
       report.addReport(reportItem);
       PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
     }

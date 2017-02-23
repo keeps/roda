@@ -459,7 +459,11 @@ public class EditPermissions extends Composite {
 
                 @Override
                 public void onSuccessImpl(Void result) {
-                  Toast.showInfo(messages.dialogSuccess(), messages.permissionsChanged());
+                  if (recursive) {
+                    Toast.showInfo(messages.dialogSuccess(), messages.permissionsWillBeChanged());
+                  } else {
+                    Toast.showInfo(messages.dialogSuccess(), messages.permissionsChanged());
+                  }
                 }
               });
           } else if (IndexedDIP.class.getName().equals(objectClass)) {

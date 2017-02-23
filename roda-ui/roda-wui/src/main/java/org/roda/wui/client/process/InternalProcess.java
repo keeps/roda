@@ -35,15 +35,12 @@ import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -106,7 +103,7 @@ public class InternalProcess extends Composite {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   @UiField
-  FlowPanel ingestProcessDescription;
+  FlowPanel internalProcessDescription;
 
   @UiField(provided = true)
   JobList jobList;
@@ -125,9 +122,6 @@ public class InternalProcess extends Composite {
 
   @UiField
   DateBox inputDateFinal;
-
-  @UiField
-  Button newJob;
 
   private InternalProcess() {
 
@@ -150,7 +144,7 @@ public class InternalProcess extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
 
-    ingestProcessDescription.add(new HTMLWidgetWrapper("IngestProcessDescription.html"));
+    internalProcessDescription.add(new HTMLWidgetWrapper("InternalProcessDescription.html"));
 
     DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
     ValueChangeHandler<Date> valueChangeHandler = new ValueChangeHandler<Date>() {
@@ -208,11 +202,6 @@ public class InternalProcess extends Composite {
     Filter filter = new Filter(filterParameter);
     filter.add(new SimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INTERNAL.toString()));
     jobList.setFilter(filter);
-  }
-
-  @UiHandler("newJob")
-  void handleNewJobAction(ClickEvent e) {
-    HistoryUtils.newHistory(CreateDefaultJob.RESOLVER);
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {

@@ -26,7 +26,7 @@
 				<g:Label styleName="h1" ui:field="ingestProcessTitle">
 					<ui:text from='{messages.preservationActionsTitle}' />
 				</g:Label>
-				<g:FlowPanel addStyleNames="page-description" ui:field="ingestProcessDescription">
+				<g:FlowPanel addStyleNames="page-description" ui:field="internalProcessDescription">
 				</g:FlowPanel>
 				<lists:JobList ui:field="jobList" />
 			</g:FlowPanel>
@@ -65,14 +65,14 @@
 								addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
 								ui:field="inputDateFinal" />
 						</g:FlowPanel>
-						<g:FlowPanel>
-							<g:Label addStyleNames="h4">
-								<ui:text from='{messages.sidebarActionsTitle}' />
-							</g:Label>
-							<g:Button addStyleNames="btn btn-block btn-plus" ui:field="newJob">
-								<ui:text from='{messages.newProcessPreservation}' />
-							</g:Button>
-						</g:FlowPanel>
+						<!-- <g:FlowPanel> -->
+						<!-- <g:Label addStyleNames="h4"> -->
+						<!-- <ui:text from='{messages.sidebarActionsTitle}' /> -->
+						<!-- </g:Label> -->
+						<!-- <g:Button addStyleNames="btn btn-block btn-plus" ui:field="newJob"> -->
+						<!-- <ui:text from='{messages.newProcessPreservation}' /> -->
+						<!-- </g:Button> -->
+						<!-- </g:FlowPanel> -->
 					</g:FlowPanel>
 				</g:FlowPanel>
 			</g:FlowPanel>

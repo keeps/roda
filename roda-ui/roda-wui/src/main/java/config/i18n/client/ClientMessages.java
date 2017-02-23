@@ -275,6 +275,8 @@ public interface ClientMessages extends Messages {
   String selectUserOrGroupToAdd();
 
   String permissionsChanged();
+  
+  String permissionsWillBeChanged();
 
   String couldNotFindPreservationEvent();
 
