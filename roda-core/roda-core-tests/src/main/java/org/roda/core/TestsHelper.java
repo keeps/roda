@@ -28,9 +28,11 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.jobs.IndexedReport;
@@ -98,7 +100,7 @@ public final class TestsHelper {
     job.setPluginParameters(pluginParameters);
     job.setPluginType(pluginType);
     job.setSourceObjects(selectedItems);
-    job.setUsername("admin");
+    job.setUsername(RodaConstants.ADMIN);
     try {
       RodaCoreFactory.getModelService().createJob(job);
       RodaCoreFactory.getPluginOrchestrator().executeJob(job, false);
@@ -110,6 +112,36 @@ public final class TestsHelper {
     MatcherAssert.assertThat(jobUpdated.getStateDetails(), jobUpdated.getState(), Is.is(expectedJobState));
     return jobUpdated;
 
+  }
+
+  public static <T extends IsIndexed, T1 extends Plugin<? extends IsRODAObject>> Job executeJob(Class<T1> plugin,
+    Map<String, String> pluginParameters, PluginType pluginType, SelectedItemsFilter<T> selectedItems)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    return executeJob(plugin, pluginParameters, pluginType, selectedItems, JOB_STATE.COMPLETED);
+  }
+
+  public static <T extends IsIndexed, T1 extends Plugin<? extends IsRODAObject>> Job executeJob(Class<T1> plugin,
+    Map<String, String> pluginParameters, PluginType pluginType, SelectedItemsFilter<T> selectedItems,
+    JOB_STATE expectedJobState)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    Job job = new Job();
+    job.setId(UUID.randomUUID().toString());
+    job.setName(plugin.getName());
+    job.setPlugin(plugin.getName());
+    job.setPluginParameters(pluginParameters);
+    job.setPluginType(pluginType);
+    job.setSourceObjects(selectedItems);
+    job.setUsername(RodaConstants.ADMIN);
+    try {
+      RodaCoreFactory.getModelService().createJob(job);
+      RodaCoreFactory.getPluginOrchestrator().executeJob(job, false);
+    } catch (Exception e) {
+      AssertJUnit.fail("Unable to execute job in test mode: [" + e.getClass().getName() + "] " + e.getMessage());
+    }
+
+    Job jobUpdated = RodaCoreFactory.getModelService().retrieveJob(job.getId());
+    MatcherAssert.assertThat(jobUpdated.getStateDetails(), jobUpdated.getState(), Is.is(expectedJobState));
+    return jobUpdated;
   }
 
   public static List<Report> getJobReports(IndexService index, Job job)

@@ -184,7 +184,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
 
   @Override
   public List<PluginParameter> getParameters() {
-    return orderParameters(pluginParameters);
+    return orderParameters(getDefaultParameters());
   }
 
   @Override

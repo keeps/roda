@@ -35,6 +35,7 @@ public abstract class CommandConvertPlugin<T extends IsRODAObject> extends Abstr
     commandArguments = "";
   }
 
+  @Override
   protected Map<String, PluginParameter> getDefaultParameters() {
     Map<String, PluginParameter> defaultParameters = super.getDefaultParameters();
     defaultParameters.putAll(pluginParameters.entrySet().stream()
@@ -42,6 +43,7 @@ public abstract class CommandConvertPlugin<T extends IsRODAObject> extends Abstr
     return defaultParameters;
   }
 
+  @Override
   protected List<PluginParameter> orderParameters(Map<String, PluginParameter> params) {
     List<PluginParameter> orderedList = super.orderParameters(params);
     orderedList.add(params.get(RodaConstants.PLUGIN_PARAMS_COMMAND_ARGUMENTS));
@@ -58,8 +60,7 @@ public abstract class CommandConvertPlugin<T extends IsRODAObject> extends Abstr
 
   @Override
   public List<PluginParameter> getParameters() {
-    Map<String, PluginParameter> parameters = getDefaultParameters();
-    return orderParameters(parameters);
+    return this.orderParameters(this.getDefaultParameters());
   }
 
   @Override
