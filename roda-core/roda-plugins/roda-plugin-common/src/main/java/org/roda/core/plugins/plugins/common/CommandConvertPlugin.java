@@ -10,6 +10,7 @@ package org.roda.core.plugins.plugins.common;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.InvalidParameterException;
@@ -36,7 +37,8 @@ public abstract class CommandConvertPlugin<T extends IsRODAObject> extends Abstr
 
   protected Map<String, PluginParameter> getDefaultParameters() {
     Map<String, PluginParameter> defaultParameters = super.getDefaultParameters();
-    defaultParameters.putAll(new HashMap<String, PluginParameter>(pluginParameters));
+    defaultParameters.putAll(pluginParameters.entrySet().stream()
+      .collect(Collectors.toMap(e -> e.getKey(), e -> new PluginParameter(e.getValue()))));
     return defaultParameters;
   }
 

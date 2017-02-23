@@ -147,7 +147,8 @@ public class PluginParameter implements Serializable {
    */
   public PluginParameter(PluginParameter parameter) {
     this(parameter.getId(), parameter.getName(), parameter.getType(), parameter.getDefaultValue(),
-      parameter.getPossibleValues(), parameter.isMandatory(), parameter.isReadonly(), parameter.getDescription());
+      new ArrayList<>(parameter.getPossibleValues()), parameter.isMandatory(), parameter.isReadonly(),
+      parameter.getDescription());
   }
 
   /**

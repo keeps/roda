@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.xmlbeans.XmlException;
@@ -121,7 +122,8 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
   }
 
   protected Map<String, PluginParameter> getDefaultParameters() {
-    return new HashMap<String, PluginParameter>(pluginParameters);
+    return pluginParameters.entrySet().stream()
+      .collect(Collectors.toMap(e -> e.getKey(), e -> new PluginParameter(e.getValue())));
   }
 
   protected List<PluginParameter> orderParameters(Map<String, PluginParameter> params) {
