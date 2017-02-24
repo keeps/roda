@@ -24,7 +24,7 @@
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
 				<g:Label styleName="h1" ui:field="ingestProcessTitle">
-					<ui:text from='{messages.preservationActionsTitle}' />
+					<ui:text from='{messages.internalProcessTitle}' />
 				</g:Label>
 				<g:FlowPanel addStyleNames="page-description" ui:field="internalProcessDescription">
 				</g:FlowPanel>

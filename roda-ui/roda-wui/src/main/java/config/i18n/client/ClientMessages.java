@@ -101,6 +101,8 @@ public interface ClientMessages extends Messages {
   String preservationActionsTitle();
 
   String ingestProcessTitle();
+  
+  String internalProcessTitle();
 
   String loginTitle();
 
