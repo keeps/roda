@@ -45,7 +45,7 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
   public static final PluginParameter PARAMETER_VALIDATE_DESCRIPTIVE_METADATA = new PluginParameter(
     "parameter.validate_descriptive_metadata", "Validate descriptive metadata", PluginParameterType.BOOLEAN, "true",
     true, false,
-    "If true, the action will check if the the descriptive metadata is valid according to the schemas installed in the repository.");
+    "If true, the action will check if the descriptive metadata is valid according to the schemas installed in the repository.");
 
   public static final PluginParameter PARAMETER_METADATA_TYPE = new PluginParameter("parameter.metadata_type",
     "Descriptive metadata format", PluginParameterType.METADATA_TYPE, null, false, false,

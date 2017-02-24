@@ -14,7 +14,12 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+
+import javax.xml.validation.Schema;
 
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
@@ -26,12 +31,19 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
+import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.validation.ValidationException;
+import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexServiceTest;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.ModelServiceTest;
+import org.roda.core.plugins.plugins.base.DescriptiveMetadataValidationPlugin;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
@@ -46,6 +58,7 @@ import org.testng.annotations.Test;
 public class ValidationUtilsTest {
   private static Path basePath;
   private static ModelService model;
+  private static IndexService index;
 
   private static Path corporaPath;
   private static StorageService corporaService;
@@ -57,17 +70,17 @@ public class ValidationUtilsTest {
   public static void setUp() throws IOException, URISyntaxException, GenericException {
     basePath = TestsHelper.createBaseTempDir(ValidationUtilsTest.class, true);
 
-    boolean deploySolr = false;
+    boolean deploySolr = true;
     boolean deployLdap = false;
     boolean deployFolderMonitor = false;
-    boolean deployOrchestrator = false;
-    boolean deployPluginManager = false;
+    boolean deployOrchestrator = true;
+    boolean deployPluginManager = true;
     boolean deployDefaultResources = false;
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
       deployPluginManager, deployDefaultResources);
 
-    StorageService storage = new FileStorageService(basePath);
-    model = new ModelService(storage);
+    model = RodaCoreFactory.getModelService();
+    index = RodaCoreFactory.getIndexService();
 
     // Configure Solr
     // URL solrConfigURL =
@@ -152,5 +165,34 @@ public class ValidationUtilsTest {
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_BUGGY_ID),
       aipCreator);
     assertEquals(ValidationUtils.isAIPDescriptiveMetadataValid(model, aip.getId(), true), false);
+  }
+
+  @Test
+  public void testValidationOfDescriptiveMetadata() throws ValidationException, RequestNotValidException,
+    GenericException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException, IOException {
+    // AIP 1 (wrong one)
+    final AIP aip = model.createAIP(UUID.randomUUID().toString(), corporaService, DefaultStoragePath
+      .parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_WITH_INVALID_METADATA), aipCreator);
+
+    DefaultStoragePath path = DefaultStoragePath.parse(CorporaConstants.SOURCE_PRESERVATION_CONTAINER,
+      CorporaConstants.SOURCE_INVALID_FOLDER, "ead.xml");
+    model.createDescriptiveMetadata(aip.getId(), "ead", corporaService.getBinary(path).getContent(), "ead", "2002");
+
+    Optional<Schema> xmlSchema = RodaCoreFactory.getRodaSchema("ead", "2002");
+    assertEquals(xmlSchema.isPresent(), true);
+
+    // AIP 2 (correct one)
+    final AIP aip2 = model.createAIP(UUID.randomUUID().toString(), corporaService,
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), aipCreator);
+
+    Job job = TestsHelper.executeJob(DescriptiveMetadataValidationPlugin.class, PluginType.AIP_TO_AIP,
+      SelectedItemsList.create(AIP.class, Arrays.asList(aip.getId())));
+
+    List<Report> jobReports = TestsHelper.getJobReports(index, job, false);
+    assertEquals(jobReports.get(0).getPluginState(), PluginState.FAILURE);
+
+    Job job2 = TestsHelper.executeJob(DescriptiveMetadataValidationPlugin.class, PluginType.AIP_TO_AIP,
+      SelectedItemsList.create(AIP.class, Arrays.asList(aip2.getId())));
+    TestsHelper.getJobReports(index, job2, true);
   }
 }
