@@ -115,7 +115,8 @@ public class ValidationUtilsTest {
   }
 
   @AfterClass
-  public static void tearDown() throws NotFoundException, GenericException {
+  public static void tearDown() throws Exception {
+    RodaCoreFactory.shutdown();
     FSUtils.deletePath(basePath);
   }
 
