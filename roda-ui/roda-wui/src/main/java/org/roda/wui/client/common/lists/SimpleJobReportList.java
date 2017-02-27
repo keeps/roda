@@ -60,11 +60,11 @@ public class SimpleJobReportList extends BasicAsyncTableCell<IndexedReport> {
   private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
     RodaConstants.JOB_REPORT_ID, RodaConstants.JOB_REPORT_JOB_ID, RodaConstants.JOB_REPORT_SOURCE_OBJECT_ORIGINAL_IDS,
     RodaConstants.JOB_REPORT_SOURCE_OBJECT_ID, RodaConstants.JOB_REPORT_SOURCE_OBJECT_CLASS,
-    RodaConstants.JOB_REPORT_SOURCE_OBJECT_ORIGINAL_NAME, RodaConstants.JOB_REPORT_OUTCOME_OBJECT_LABEL,
-    RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID, RodaConstants.JOB_REPORT_DATE_UPDATED, RodaConstants.JOB_REPORT_PLUGIN,
-    RodaConstants.JOB_REPORT_PLUGIN_VERSION, RodaConstants.JOB_REPORT_PLUGIN_STATE,
-    RodaConstants.JOB_REPORT_STEPS_COMPLETED, RodaConstants.JOB_REPORT_TOTAL_STEPS,
-    RodaConstants.JOB_REPORT_COMPLETION_PERCENTAGE);
+    RodaConstants.JOB_REPORT_SOURCE_OBJECT_LABEL, RodaConstants.JOB_REPORT_SOURCE_OBJECT_ORIGINAL_NAME,
+    RodaConstants.JOB_REPORT_OUTCOME_OBJECT_LABEL, RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID,
+    RodaConstants.JOB_REPORT_DATE_UPDATED, RodaConstants.JOB_REPORT_PLUGIN, RodaConstants.JOB_REPORT_PLUGIN_VERSION,
+    RodaConstants.JOB_REPORT_PLUGIN_STATE, RodaConstants.JOB_REPORT_STEPS_COMPLETED,
+    RodaConstants.JOB_REPORT_TOTAL_STEPS, RodaConstants.JOB_REPORT_COMPLETION_PERCENTAGE);
 
   private final Map<String, PluginInfo> pluginsInfo;
   @SuppressWarnings("unused")
