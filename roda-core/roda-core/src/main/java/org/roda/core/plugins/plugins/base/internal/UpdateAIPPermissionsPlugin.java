@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.plugins.plugins.base;
+package org.roda.core.plugins.plugins.base.internal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -230,22 +230,22 @@ public class UpdateAIPPermissionsPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public PreservationEventType getPreservationEventType() {
-    return PreservationEventType.MIGRATION;
+    return PreservationEventType.UPDATE;
   }
 
   @Override
   public String getPreservationEventDescription() {
-    return "Exports AIPS to a local folder";
+    return "Updates AIP permissions recursively";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "The AIPs were successfully exported";
+    return "AIP permissions updatewas successful";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "The AIPs were not exported";
+    return "AIP permissions update failed";
   }
 
   @Override

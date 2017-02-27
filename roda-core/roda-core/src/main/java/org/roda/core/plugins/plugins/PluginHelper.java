@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -1238,5 +1239,24 @@ public final class PluginHelper {
     }
 
     return finalObjects;
+  }
+
+  public static Locale parseLocale(String localeString) {
+    Locale locale = null;
+    if (StringUtils.isNotBlank(localeString)) {
+      String[] localeArgs = localeString.split("_");
+
+      if (localeArgs.length == 1) {
+        locale = new Locale(localeArgs[0]);
+      } else if (localeArgs.length == 2) {
+        locale = new Locale(localeArgs[0], localeArgs[1]);
+      } else if (localeArgs.length == 3) {
+        locale = new Locale(localeArgs[0], localeArgs[1], localeArgs[2]);
+      }
+    } else {
+      locale = Locale.ENGLISH;
+    }
+
+    return locale;
   }
 }

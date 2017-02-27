@@ -130,7 +130,8 @@ import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.plugins.PluginHelper;
-import org.roda.core.plugins.plugins.base.UpdateAIPPermissionsPlugin;
+import org.roda.core.plugins.plugins.base.internal.MovePlugin;
+import org.roda.core.plugins.plugins.base.internal.UpdateAIPPermissionsPlugin;
 import org.roda.core.plugins.plugins.ingest.AutoAcceptSIPPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.SiegfriedPlugin;
 import org.roda.core.plugins.plugins.risks.RiskIncidenceRemoverPlugin;
@@ -1540,30 +1541,25 @@ public class BrowserHelper {
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
     String eventDescription = messages.getTranslation(RodaConstants.EVENT_UPDATE_ON_REPOSITORY);
 
-    List<String> aipIds = consolidate(user, IndexedAIP.class, selected);
-    ModelService model = RodaCoreFactory.getModelService();
+    Job job = new Job();
+    job.setId(UUID.randomUUID().toString());
+    job.setName("Move AIP in hierarchy");
+    job.setSourceObjects(selected);
+    job.setPlugin(MovePlugin.class.getCanonicalName());
+    job.setPluginType(PluginType.INTERNAL);
+    job.setUsername(user.getName());
 
-    for (String aipId : aipIds) {
-      // XXX this method could be improved by moving all at once in the model
-      if (!aipId.equals(parentId)) {
-        // laxing check of ancestry so a big list can be moved to one of the
-        // siblings
-        LOGGER.debug("Moving AIP {} under {}", aipId, parentId);
+    Map<String, String> pluginParameters = new HashMap<>();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_AIP_ID, parentId);
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_EVENT_DESCRIPTION, eventDescription);
+    job.setPluginParameters(pluginParameters);
 
-        try {
-          model.moveAIP(aipId, parentId);
-
-          String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_MOVE_AIP_SUCCESS, aipId);
-          model.createUpdateAIPEvent(aipId, null, null, null, PreservationEventType.UPDATE, eventDescription,
-            PluginState.SUCCESS, outcomeText, details, user.getName(), true);
-        } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
-          String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_MOVE_AIP_FAILURE, aipId);
-          model.createUpdateAIPEvent(aipId, null, null, null, PreservationEventType.UPDATE, eventDescription,
-            PluginState.FAILURE, outcomeText, details, user.getName(), true);
-
-          throw e;
-        }
-      }
+    RodaCoreFactory.getModelService().createJob(job);
+    try {
+      RodaCoreFactory.getPluginOrchestrator().executeJob(job, true);
+    } catch (JobAlreadyStartedException e) {
+      LOGGER.error("Could not execute move job", e);
     }
 
     IndexService index = RodaCoreFactory.getIndexService();
@@ -2902,114 +2898,66 @@ public class BrowserHelper {
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
     String eventDescription = messages.getTranslation(RodaConstants.EVENT_UPDATE_ON_REPOSITORY);
 
-    ModelService model = RodaCoreFactory.getModelService();
-    IndexService index = RodaCoreFactory.getIndexService();
-    IndexResult<IndexedFile> findResult = new IndexResult<IndexedFile>();
-
     if (toFolder != null
       && (!toFolder.getAipId().equals(aipId) || !toFolder.getRepresentationId().equals(representationId))) {
       throw new RequestNotValidException("Cannot move to a file outside defined representation");
     }
 
-    if (selectedFiles instanceof SelectedItemsList) {
-      SelectedItemsList<IndexedFile> selectedList = (SelectedItemsList<IndexedFile>) selectedFiles;
-      Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, selectedList.getIds()));
-      findResult = index.find(IndexedFile.class, filter, Sorter.NONE, new Sublist(0, selectedList.getIds().size()),
-        RodaConstants.FILE_FIELDS_TO_RETURN);
-    } else if (selectedFiles instanceof SelectedItemsFilter) {
-      SelectedItemsFilter<IndexedFile> selectedFilter = (SelectedItemsFilter<IndexedFile>) selectedFiles;
-      int findCounter = index.count(IndexedFile.class, selectedFilter.getFilter()).intValue();
-      findResult = index.find(IndexedFile.class, selectedFilter.getFilter(), Sorter.NONE, new Sublist(0, findCounter),
-        RodaConstants.FILE_FIELDS_TO_RETURN);
+    Job job = new Job();
+    job.setId(UUID.randomUUID().toString());
+    job.setName("Move files");
+    job.setSourceObjects(selectedFiles);
+    job.setPlugin(MovePlugin.class.getCanonicalName());
+    job.setPluginType(PluginType.INTERNAL);
+    job.setUsername(user.getName());
+
+    Map<String, String> pluginParameters = new HashMap<>();
+    if (toFolder != null) {
+      pluginParameters.put(RodaConstants.PLUGIN_PARAMS_ID, toFolder.getUUID());
     }
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_EVENT_DESCRIPTION, eventDescription);
+    job.setPluginParameters(pluginParameters);
 
-    if (!findResult.getResults().isEmpty()) {
-      StringBuilder outcomeText = new StringBuilder();
-
-      for (IndexedFile ifile : findResult.getResults()) {
-        if (ifile != null && !ifile.getAipId().equals(aipId) || !ifile.getRepresentationId().equals(representationId)) {
-          throw new RequestNotValidException("Cannot move from a file outside defined representation");
-        }
-
-        File file = model.retrieveFile(ifile.getAipId(), ifile.getRepresentationId(), ifile.getPath(), ifile.getId());
-        try {
-          String toAIP = toFolder == null ? aipId : toFolder.getAipId();
-          String toRepresentation = toFolder == null ? representationId : toFolder.getRepresentationId();
-          List<String> toDirectoryPath = null;
-          if (toFolder != null) {
-            toDirectoryPath = new ArrayList<>(toFolder.getPath());
-            toDirectoryPath.add(toFolder.getId());
-          }
-          String toId = file.getId();
-
-          File newFile = model.moveFile(file, toAIP, toRepresentation, toDirectoryPath, toId, true, true);
-
-          String pathText = file.getPath().toString().replace("[", "").replace("]", "").replaceAll(",\\s*", "/");
-          String newPathText = "";
-          if (newFile.getPath() != null) {
-            newPathText = newFile.getPath().toString().replace("[", "").replace("]", "").replaceAll(",\\s*", "/");
-          }
-
-          outcomeText.append(messages.getTranslationWithArgs(RodaConstants.EVENT_MOVE_FILE_SUCCESS, pathText,
-            file.getId(), newPathText, newFile.getId()));
-
-        } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-          outcomeText.append(messages.getTranslationWithArgs(RodaConstants.EVENT_MOVE_FILE_FAILURE, file.getId(),
-            e.getClass().getSimpleName(), e.getMessage()));
-
-          model.createUpdateAIPEvent(aipId, representationId, null, null, PreservationEventType.UPDATE,
-            eventDescription, PluginState.FAILURE, outcomeText.toString(), details, user.getName(), true);
-
-          index.commitAIPs();
-          throw e;
-        }
-      }
-
-      // success
-      model.createUpdateAIPEvent(aipId, representationId, null, null, PreservationEventType.UPDATE, eventDescription,
-        PluginState.SUCCESS, outcomeText.toString(), details, user.getName(), true);
-
-      index.commitAIPs();
+    try {
+      RodaCoreFactory.getModelService().createJob(job);
+      RodaCoreFactory.getPluginOrchestrator().executeJob(job, true);
+    } catch (JobAlreadyStartedException e) {
+      LOGGER.error("Could not execute move job", e);
     }
   }
 
-  public static String moveTransferredResource(SelectedItems<TransferredResource> selected,
+  public static String moveTransferredResource(User user, SelectedItems<TransferredResource> selected,
     TransferredResource transferredResource) throws GenericException, RequestNotValidException, AlreadyExistsException,
     IsStillUpdatingException, NotFoundException {
 
     String resourceRelativePath = "";
-    Filter filter = new Filter();
-    int counter = 1;
-
-    if (selected instanceof SelectedItemsList) {
-      SelectedItemsList<TransferredResource> selectedList = (SelectedItemsList<TransferredResource>) selected;
-      filter.add(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, selectedList.getIds()));
-      counter = selectedList.getIds().size();
-    } else if (selected instanceof SelectedItemsFilter) {
-      SelectedItemsFilter<TransferredResource> selectedFilter = (SelectedItemsFilter<TransferredResource>) selected;
-      filter = selectedFilter.getFilter();
-      counter = RodaCoreFactory.getIndexService().count(TransferredResource.class, filter).intValue();
-    }
-
-    List<String> resourceFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.TRANSFERRED_RESOURCE_FULLPATH,
-      RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH, RodaConstants.TRANSFERRED_RESOURCE_NAME);
-    IndexResult<TransferredResource> resources = RodaCoreFactory.getIndexService().find(TransferredResource.class,
-      filter, Sorter.NONE, new Sublist(0, counter), resourceFields);
-
+    String uuid = null;
     if (transferredResource != null) {
       resourceRelativePath = transferredResource.getRelativePath();
+      uuid = transferredResource.getUUID();
     }
 
-    Map<String, String> moveMap = RodaCoreFactory.getTransferredResourcesScanner()
-      .moveTransferredResource(resources.getResults(), resourceRelativePath, true, true, true);
+    Job job = new Job();
+    job.setId(UUID.randomUUID().toString());
+    job.setName("Move transferred resources");
+    job.setSourceObjects(selected);
+    job.setPlugin(MovePlugin.class.getCanonicalName());
+    job.setPluginType(PluginType.INTERNAL);
+    job.setUsername(user.getName());
 
-    if (!moveMap.isEmpty()) {
-      List<String> values = new ArrayList<String>(moveMap.values());
-      return values.get(0);
-    } else {
-      return transferredResource.getUUID();
+    Map<String, String> pluginParameters = new HashMap<>();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_ID, resourceRelativePath);
+    job.setPluginParameters(pluginParameters);
+
+    try {
+      RodaCoreFactory.getModelService().createJob(job);
+      RodaCoreFactory.getPluginOrchestrator().executeJob(job, true);
+    } catch (JobAlreadyStartedException | AuthorizationDeniedException e) {
+      LOGGER.error("Could not execute move job", e);
     }
 
+    return uuid;
   }
 
   public static IndexedFile createFolder(User user, String aipId, String representationId, String folderUUID,

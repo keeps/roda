@@ -706,11 +706,11 @@ public class IngestTransfer extends Composite {
 
             @Override
             public void onSuccess(String result) {
-              Toast.showInfo(messages.dialogSuccess(), messages.moveSIPSuccessful());
-              if (resource != null && resource.isFile()) {
+              Toast.showInfo(messages.dialogSuccess(), messages.movingSIP());
+              if (result != null) {
                 HistoryUtils.newHistory(IngestTransfer.RESOLVER, result);
               } else {
-                transferredResourceList.refresh();
+                HistoryUtils.newHistory(IngestTransfer.RESOLVER);
               }
             }
           });

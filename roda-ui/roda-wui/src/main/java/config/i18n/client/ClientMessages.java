@@ -242,7 +242,7 @@ public interface ClientMessages extends Messages {
 
   String moveSIPFailed();
 
-  String moveSIPSuccessful();
+  String movingSIP();
 
   String changeTypeSuccessful();
 
@@ -277,7 +277,7 @@ public interface ClientMessages extends Messages {
   String selectUserOrGroupToAdd();
 
   String permissionsChanged();
-  
+
   String permissionsWillBeChanged();
 
   String couldNotFindPreservationEvent();

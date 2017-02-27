@@ -10,6 +10,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -276,6 +277,9 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
             filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, id));
           }
         }
+      }
+      if (selected instanceof SelectedItemsFilter) {
+        filter = ((SelectedItemsFilter<IndexedAIP>) selected).getFilter();
       } else {
         filter = Filter.ALL;
       }

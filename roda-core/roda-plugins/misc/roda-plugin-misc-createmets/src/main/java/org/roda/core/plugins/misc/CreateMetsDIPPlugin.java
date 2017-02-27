@@ -269,7 +269,7 @@ public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public List<String> getCategories() {
-    return Collections.singletonList(RodaConstants.PLUGIN_CATEGORY_MISC);
+    return Collections.singletonList(RodaConstants.PLUGIN_CATEGORY_DISSEMINATION);
   }
 
   @Override
@@ -346,6 +346,7 @@ public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
         // delete aip.json
         storage.deleteResource(DefaultStoragePath.parse(aipOnDIPPath, RodaConstants.STORAGE_AIP_METADATA_FILENAME));
 
+        model.updateDIP(dip);
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
         reportItem.setPluginState(PluginState.SUCCESS);
 

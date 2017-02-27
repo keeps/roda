@@ -53,7 +53,7 @@ public class TransferredResourceList extends BasicAsyncTableCell<TransferredReso
   private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
     RodaConstants.TRANSFERRED_RESOURCE_ID, RodaConstants.TRANSFERRED_RESOURCE_ISFILE,
     RodaConstants.TRANSFERRED_RESOURCE_NAME, RodaConstants.TRANSFERRED_RESOURCE_SIZE,
-    RodaConstants.TRANSFERRED_RESOURCE_DATE);
+    RodaConstants.TRANSFERRED_RESOURCE_DATE, RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH);
 
   public TransferredResourceList() {
     this(null, null, null, false);

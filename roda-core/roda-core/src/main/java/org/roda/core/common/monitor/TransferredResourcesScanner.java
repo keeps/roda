@@ -276,12 +276,6 @@ public class TransferredResourcesScanner {
     }
   }
 
-  public Map<String, String> moveTransferredResource(List<TransferredResource> resources, String newRelativePath,
-    boolean replaceExisting, boolean reindexResources)
-    throws AlreadyExistsException, GenericException, IsStillUpdatingException, NotFoundException {
-    return moveTransferredResource(resources, newRelativePath, replaceExisting, reindexResources, false);
-  }
-
   public Map<String, String> moveTransferredResource(String newRelativePath, List<String> resourcesUUIDs,
     boolean replaceExisting)
     throws AlreadyExistsException, GenericException, IsStillUpdatingException, NotFoundException {
@@ -333,7 +327,15 @@ public class TransferredResourcesScanner {
 
         // create & index transferred resource in the new location
         TransferredResource newResource = instantiateTransferredResource(newResourcePath, basePath);
-        newResource.setCreationDate(resource.getCreationDate());
+        Date creationDate = resource.getCreationDate();
+        try {
+          BasicFileAttributes attr = Files.readAttributes(newResourcePath, BasicFileAttributes.class);
+          creationDate = new Date(attr.creationTime().toMillis());
+        } catch (IOException e) {
+          creationDate = new Date();
+        }
+
+        newResource.setCreationDate(creationDate);
         newResource.setSize(resource.getSize());
         newResource.setLastScanDate(new Date());
         try {

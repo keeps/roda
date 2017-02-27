@@ -386,6 +386,7 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
 
       if (selectedPlugin.getParameters().size() == 0) {
         workflowPanel.setVisible(false);
+        workflowOptions.setPluginInfo(null);
       } else {
         workflowPanel.setVisible(true);
         workflowOptions.setPluginInfo(selectedPlugin);

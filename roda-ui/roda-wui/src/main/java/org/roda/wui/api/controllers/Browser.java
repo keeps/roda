@@ -2167,7 +2167,7 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
 
     // delegate
-    String ret = BrowserHelper.moveTransferredResource(selected, transferredResource);
+    String ret = BrowserHelper.moveTransferredResource(user, selected, transferredResource);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_SELECTED_PARAM, selected,

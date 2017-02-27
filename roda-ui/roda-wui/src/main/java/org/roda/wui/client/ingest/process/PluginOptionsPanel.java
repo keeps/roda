@@ -23,9 +23,9 @@ public class PluginOptionsPanel extends Composite {
   private PluginInfo pluginInfo = null;
   private List<PluginInfo> plugins = new ArrayList<>();
 
-  private final List<PluginParameterPanel> panels;
+  private List<PluginParameterPanel> panels;
 
-  private final FlowPanel layout;
+  private FlowPanel layout;
 
   public PluginOptionsPanel() {
     super();
