@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
@@ -236,8 +237,7 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
     }
 
     try {
-      RodaCoreFactory.getTransferredResourcesScanner().moveTransferredResource(resources, destinationId, true, true,
-        true);
+      RodaCoreFactory.getTransferredResourcesScanner().moveTransferredResource(resources, destinationId, false, true);
       jobPluginInfo.incrementObjectsProcessedWithSuccess(resources.size());
     } catch (AlreadyExistsException | GenericException | IsStillUpdatingException | NotFoundException e) {
       LOGGER.error("Could not move transferred resource list");
@@ -253,6 +253,19 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
 
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+    try {
+      Job job = PluginHelper.getJob(this, index);
+      if (TransferredResource.class.getName().equals(job.getSourceObjects().getSelectedClass())) {
+        String relativePath = "";
+        if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_ID)) {
+          relativePath = getParameterValues().get(RodaConstants.PLUGIN_PARAMS_ID);
+        }
+
+        RodaCoreFactory.getTransferredResourcesScanner().updateTransferredResources(Optional.of(relativePath), true);
+      }
+    } catch (NotFoundException | GenericException | IsStillUpdatingException e) {
+      LOGGER.error("Could not update new resource parent folder");
+    }
     return new Report();
   }
 

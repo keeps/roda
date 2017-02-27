@@ -287,19 +287,17 @@ public class TransferredResourcesScanner {
     } catch (NotFoundException e) {
       // do nothing and pass it an empty list
     }
-    return moveTransferredResource(resources, newRelativePath, replaceExisting, false, false, true);
+    return moveTransferredResource(resources, newRelativePath, replaceExisting, false, true);
   }
 
   public Map<String, String> moveTransferredResource(List<TransferredResource> resources, String newRelativePath,
-    boolean replaceExisting, boolean reindexResources, boolean areResourcesFromSameFolder)
+    boolean replaceExisting, boolean reindexResources)
     throws AlreadyExistsException, GenericException, IsStillUpdatingException, NotFoundException {
-    return moveTransferredResource(resources, newRelativePath, replaceExisting, reindexResources,
-      areResourcesFromSameFolder, false);
+    return moveTransferredResource(resources, newRelativePath, replaceExisting, reindexResources, false);
   }
 
   public Map<String, String> moveTransferredResource(List<TransferredResource> resources, String newRelativePath,
-    boolean replaceExisting, boolean reindexResources, boolean areResourcesFromSameFolder,
-    boolean addOldRelativePathToNewRelativePath)
+    boolean replaceExisting, boolean reindexResources, boolean addOldRelativePathToNewRelativePath)
     throws AlreadyExistsException, GenericException, IsStillUpdatingException, NotFoundException {
 
     Map<String, String> oldToNewTransferredResourceIds = new HashMap<String, String>();
@@ -354,7 +352,7 @@ public class TransferredResourcesScanner {
     if (reindexResources) {
       updateTransferredResources(Optional.of(newRelativePath), true);
     }
-    reindexOldResourcesParentsAfterMove(resourcesToIndex, areResourcesFromSameFolder);
+    reindexOldResourcesParentsAfterMove(resourcesToIndex);
 
     // doing the throw after the moving process to reindex the moved ones
     if (notFoundResources) {
@@ -364,8 +362,8 @@ public class TransferredResourcesScanner {
     return oldToNewTransferredResourceIds;
   }
 
-  public void reindexOldResourcesParentsAfterMove(List<TransferredResource> resources,
-    boolean areResourcesFromSameFolder) throws IsStillUpdatingException, GenericException {
+  public void reindexOldResourcesParentsAfterMove(List<TransferredResource> resources)
+    throws IsStillUpdatingException, GenericException {
 
     try {
       List<String> resourceUUIDs = resources.stream().map(tr -> tr.getUUID()).collect(Collectors.toList());
