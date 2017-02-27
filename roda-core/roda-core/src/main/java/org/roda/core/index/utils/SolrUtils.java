@@ -244,6 +244,10 @@ public class SolrUtils {
       ret = queryResponseToIndexResult(response, classToRetrieve, facets, fieldsToReturn);
     } catch (SolrServerException | IOException e) {
       throw new GenericException("Could not query index", e);
+    } catch (SolrException e) {
+      throw new RequestNotValidException(e.getMessage());
+    } catch (RuntimeException e) {
+      throw new GenericException("Unexpected exception while querying index", e);
     }
 
     return ret;
@@ -2694,9 +2698,12 @@ public class SolrUtils {
     try {
       QueryResponse response = index.query(getIndexName(classToRetrieve).get(0), query);
       response.getFacetField(field).getValues().forEach(count -> suggestions.add(count.getName()));
-    } catch (SolrServerException | IOException e) {
+    } catch (SolrServerException | IOException | SolrException e) {
       throw new GenericException("Could not get suggestions", e);
+    } catch (RuntimeException e) {
+      throw new GenericException("Unexpected exception while querying index", e);
     }
+
     return suggestions;
   }
 
