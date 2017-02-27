@@ -1997,9 +1997,12 @@ public class SolrUtils {
     doc.addField(RodaConstants.RISK_UPDATED_BY, risk.getUpdatedBy());
 
     if (risk instanceof IndexedRisk) {
-      doc.addField(RodaConstants.RISK_OBJECTS_SIZE, ((IndexedRisk) risk).getObjectsSize());
+      doc.addField(RodaConstants.RISK_INCIDENCES_COUNT, ((IndexedRisk) risk).getIncidencesCount());
+      doc.addField(RodaConstants.RISK_UNMITIGATED_INCIDENCES_COUNT,
+        ((IndexedRisk) risk).getUnmitigatedIncidencesCount());
     } else {
-      doc.addField(RodaConstants.RISK_OBJECTS_SIZE, incidences);
+      doc.addField(RodaConstants.RISK_INCIDENCES_COUNT, incidences);
+      doc.addField(RodaConstants.RISK_UNMITIGATED_INCIDENCES_COUNT, incidences);
     }
 
     return doc;
@@ -2047,7 +2050,8 @@ public class SolrUtils {
     risk.setUpdatedOn(objectToDate(doc.get(RodaConstants.RISK_UPDATED_ON)));
     risk.setUpdatedBy(objectToString(doc.get(RodaConstants.RISK_UPDATED_BY), null));
 
-    risk.setObjectsSize(objectToInteger(doc.get(RodaConstants.RISK_OBJECTS_SIZE), 0));
+    risk.setIncidencesCount(objectToInteger(doc.get(RodaConstants.RISK_INCIDENCES_COUNT), 0));
+    risk.setUnmitigatedIncidencesCount(objectToInteger(doc.get(RodaConstants.RISK_UNMITIGATED_INCIDENCES_COUNT), 0));
     return risk;
   }
 

@@ -1213,6 +1213,8 @@ public interface ClientMessages extends Messages {
 
   String riskIncidences();
 
+  String riskNotMitigatedIncidences();
+
   String riskIncidenceObjectId();
 
   String riskIncidenceObjectType();

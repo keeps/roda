@@ -16,7 +16,8 @@ import org.roda.core.data.v2.index.IsIndexed;
 public class IndexedRisk extends Risk implements IsIndexed {
 
   private static final long serialVersionUID = 2864416437668370485L;
-  private int objectsSize = 0;
+  private int incidencesCount = 0;
+  private int unmitigatedIncidencesCount = 0;
 
   public IndexedRisk() {
     super();
@@ -24,15 +25,23 @@ public class IndexedRisk extends Risk implements IsIndexed {
 
   public IndexedRisk(IndexedRisk risk) {
     super(risk);
-    this.objectsSize = risk.getObjectsSize();
+    this.incidencesCount = risk.getIncidencesCount();
   }
 
-  public int getObjectsSize() {
-    return objectsSize;
+  public int getIncidencesCount() {
+    return incidencesCount;
   }
 
-  public void setObjectsSize(int objectsSize) {
-    this.objectsSize = objectsSize;
+  public void setIncidencesCount(int incidencesCount) {
+    this.incidencesCount = incidencesCount;
+  }
+
+  public int getUnmitigatedIncidencesCount() {
+    return unmitigatedIncidencesCount;
+  }
+
+  public void setUnmitigatedIncidencesCount(int unmitigatedIncidencesCount) {
+    this.unmitigatedIncidencesCount = unmitigatedIncidencesCount;
   }
 
   @Override
@@ -42,7 +51,8 @@ public class IndexedRisk extends Risk implements IsIndexed {
 
   @Override
   public String toString() {
-    return "IndexedRisk [super=" + super.toString() + ", objectsSize=" + objectsSize + "]";
+    return "IndexedRisk [super=" + super.toString() + ", incidencesCount=" + incidencesCount
+      + ", unmitigatedIncidencesCount=" + unmitigatedIncidencesCount + "]";
   }
 
   public List<String> toCsvHeaders() {
@@ -50,7 +60,8 @@ public class IndexedRisk extends Risk implements IsIndexed {
       "preMitigationProbability", "preMitigationImpact", "preMitigationSeverity", "preMitigationNotes",
       "posMitigationProbability", "posMitigationImpact", "posMitigationSeverity", "posMitigationNotes",
       "mitigationStrategy", "mitigationOwnerType", "mitigationOwner", "mitigationRelatedEventIdentifierType",
-      "mitigationRelatedEventIdentifierValue", "createdOn", "createdBy", "updatedOn", "updatedBy", "objectsSize");
+      "mitigationRelatedEventIdentifierValue", "createdOn", "createdBy", "updatedOn", "updatedBy", "incidencesCount",
+      "unmitigatedIncidencesCount");
   }
 
   public List<Object> toCsvValues() {
@@ -59,7 +70,7 @@ public class IndexedRisk extends Risk implements IsIndexed {
       getPreMitigationNotes(), getPostMitigationProbability(), getPostMitigationImpact(), getPostMitigationSeverity(),
       getPreMitigationNotes(), getMitigationStrategy(), getMitigationOwnerType(), getMitigationOwner(),
       getMitigationRelatedEventIdentifierType(), getMitigationRelatedEventIdentifierValue(), getCreatedOn(),
-      getCreatedBy(), getUpdatedOn(), getUpdatedBy(), objectsSize});
+      getCreatedBy(), getUpdatedOn(), getUpdatedBy(), getIncidencesCount(), getUnmitigatedIncidencesCount()});
   }
 
   @Override

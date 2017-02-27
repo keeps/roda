@@ -115,7 +115,7 @@ public class EditRisk extends Composite {
    */
   public EditRisk(IndexedRisk risk) {
     this.risk = risk;
-    this.incidences = risk.getObjectsSize();
+    this.incidences = risk.getIncidencesCount();
     this.riskDataPanel = new RiskDataPanel(true, risk, RodaConstants.RISK_CATEGORY, RodaConstants.RISK_IDENTIFIED_BY,
       RodaConstants.RISK_MITIGATION_OWNER);
     initWidget(uiBinder.createAndBindUi(this));

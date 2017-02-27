@@ -2651,8 +2651,14 @@ public class BrowserHelper {
 
     // get risks incidence count using facets
     IndexService index = RodaCoreFactory.getIndexService();
-    IndexResult<RiskIncidence> find = index.find(RiskIncidence.class, Filter.ALL, Sorter.NONE, new Sublist(0, 0),
-      new Facets(new SimpleFacetParameter(RodaConstants.RISK_INCIDENCE_RISK_ID)),
+    IndexResult<RiskIncidence> findAllRiskIncidences = index.find(RiskIncidence.class, Filter.ALL, Sorter.NONE,
+      new Sublist(0, 0), new Facets(new SimpleFacetParameter(RodaConstants.RISK_INCIDENCE_RISK_ID)),
+      Arrays.asList(RodaConstants.INDEX_UUID));
+
+    Filter filter = new Filter(
+      new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_STATUS, INCIDENCE_STATUS.UNMITIGATED.toString()));
+    IndexResult<RiskIncidence> findNotMitigatedRiskIncidences = index.find(RiskIncidence.class, filter, Sorter.NONE,
+      new Sublist(0, 0), new Facets(new SimpleFacetParameter(RodaConstants.RISK_INCIDENCE_RISK_ID)),
       Arrays.asList(RodaConstants.INDEX_UUID));
 
     Map<String, IndexedRisk> allRisks = new HashMap<String, IndexedRisk>();
@@ -2660,19 +2666,35 @@ public class BrowserHelper {
     // retrieve risks and set default object count to zero
     IterableIndexResult<IndexedRisk> risks = index.findAll(IndexedRisk.class, Filter.ALL, new ArrayList<>());
     for (IndexedRisk indexedRisk : risks) {
-      indexedRisk.setObjectsSize(0);
+      indexedRisk.setIncidencesCount(0);
+      indexedRisk.setUnmitigatedIncidencesCount(0);
       allRisks.put(indexedRisk.getId(), indexedRisk);
     }
 
     // update risks from facets
-    for (FacetFieldResult fieldResult : find.getFacetResults()) {
+    for (FacetFieldResult fieldResult : findAllRiskIncidences.getFacetResults()) {
       for (FacetValue facetValue : fieldResult.getValues()) {
         String riskId = facetValue.getValue();
         long counter = facetValue.getCount();
 
         IndexedRisk risk = allRisks.get(riskId);
         if (risk != null) {
-          risk.setObjectsSize((int) counter);
+          risk.setIncidencesCount((int) counter);
+        } else {
+          LOGGER.warn("Updating risk counters found incidences pointing to non-existing risk: {}", riskId);
+        }
+      }
+    }
+
+    // update risks from facets
+    for (FacetFieldResult fieldResult : findNotMitigatedRiskIncidences.getFacetResults()) {
+      for (FacetValue facetValue : fieldResult.getValues()) {
+        String riskId = facetValue.getValue();
+        long counter = facetValue.getCount();
+
+        IndexedRisk risk = allRisks.get(riskId);
+        if (risk != null) {
+          risk.setUnmitigatedIncidencesCount((int) counter);
         } else {
           LOGGER.warn("Updating risk counters found incidences pointing to non-existing risk: {}", riskId);
         }

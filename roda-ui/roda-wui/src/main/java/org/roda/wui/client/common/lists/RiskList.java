@@ -53,11 +53,13 @@ public class RiskList extends BasicAsyncTableCell<IndexedRisk> {
   private TextColumn<IndexedRisk> ownerColumn;
   private Column<IndexedRisk, SafeHtml> severityColumn;
   private TextColumn<IndexedRisk> incidenceCounterColumn;
+  private TextColumn<IndexedRisk> notMitigatedIncidenceCounterColumn;
 
   private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.RISK_ID,
     RodaConstants.RISK_NAME, RodaConstants.RISK_IDENTIFIED_ON, RodaConstants.RISK_CATEGORY,
-    RodaConstants.RISK_MITIGATION_OWNER, RodaConstants.RISK_CURRENT_SEVERITY_LEVEL, RodaConstants.RISK_OBJECTS_SIZE,
-    RodaConstants.RISK_POST_MITIGATION_SEVERITY_LEVEL, RodaConstants.RISK_PRE_MITIGATION_SEVERITY_LEVEL);
+    RodaConstants.RISK_MITIGATION_OWNER, RodaConstants.RISK_CURRENT_SEVERITY_LEVEL, RodaConstants.RISK_INCIDENCES_COUNT,
+    RodaConstants.RISK_UNMITIGATED_INCIDENCES_COUNT, RodaConstants.RISK_POST_MITIGATION_SEVERITY_LEVEL,
+    RodaConstants.RISK_PRE_MITIGATION_SEVERITY_LEVEL);
 
   public RiskList() {
     this(null, null, null, false);
@@ -123,7 +125,14 @@ public class RiskList extends BasicAsyncTableCell<IndexedRisk> {
     incidenceCounterColumn = new TextColumn<IndexedRisk>() {
       @Override
       public String getValue(IndexedRisk risk) {
-        return Integer.toString(risk.getObjectsSize());
+        return Integer.toString(risk.getIncidencesCount());
+      }
+    };
+
+    notMitigatedIncidenceCounterColumn = new TextColumn<IndexedRisk>() {
+      @Override
+      public String getValue(IndexedRisk risk) {
+        return Integer.toString(risk.getUnmitigatedIncidencesCount());
       }
     };
 
@@ -133,6 +142,7 @@ public class RiskList extends BasicAsyncTableCell<IndexedRisk> {
     ownerColumn.setSortable(true);
     severityColumn.setSortable(true);
     incidenceCounterColumn.setSortable(true);
+    notMitigatedIncidenceCounterColumn.setSortable(true);
 
     addColumn(nameColumn, messages.riskName(), false, false);
     addColumn(categoryColumn, messages.riskCategory(), false, false);
@@ -140,6 +150,7 @@ public class RiskList extends BasicAsyncTableCell<IndexedRisk> {
     addColumn(identifiedOnColumn, messages.riskIdentifiedOn(), false, false, 8);
     addColumn(severityColumn, messages.riskPostMitigationSeverity(), false, false, 7);
     addColumn(incidenceCounterColumn, messages.riskIncidences(), false, false, 6);
+    addColumn(notMitigatedIncidenceCounterColumn, messages.riskNotMitigatedIncidences(), false, false, 6);
 
     // default sorting
     display.getColumnSortList().push(new ColumnSortInfo(severityColumn, false));
@@ -153,7 +164,9 @@ public class RiskList extends BasicAsyncTableCell<IndexedRisk> {
     columnSortingKeyMap.put(categoryColumn, Arrays.asList(RodaConstants.RISK_CATEGORY));
     columnSortingKeyMap.put(ownerColumn, Arrays.asList(RodaConstants.RISK_MITIGATION_OWNER));
     columnSortingKeyMap.put(severityColumn, Arrays.asList(RodaConstants.RISK_CURRENT_SEVERITY_LEVEL));
-    columnSortingKeyMap.put(incidenceCounterColumn, Arrays.asList(RodaConstants.RISK_OBJECTS_SIZE));
+    columnSortingKeyMap.put(incidenceCounterColumn, Arrays.asList(RodaConstants.RISK_INCIDENCES_COUNT));
+    columnSortingKeyMap.put(notMitigatedIncidenceCounterColumn,
+      Arrays.asList(RodaConstants.RISK_UNMITIGATED_INCIDENCES_COUNT));
     return createSorter(columnSortList, columnSortingKeyMap);
   }
 

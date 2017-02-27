@@ -1829,8 +1829,8 @@ public class Browser extends RodaWuiController {
 
     try {
       IndexedRisk indexedRisk = RodaCoreFactory.getIndexService().retrieve(IndexedRisk.class, riskId,
-        Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.RISK_OBJECTS_SIZE));
-      incidences = indexedRisk.getObjectsSize();
+        Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.RISK_INCIDENCES_COUNT));
+      incidences = indexedRisk.getIncidencesCount();
     } catch (NotFoundException e) {
       // do nothing
     }

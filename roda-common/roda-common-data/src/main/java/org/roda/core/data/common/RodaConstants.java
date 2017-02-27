@@ -822,7 +822,8 @@ public final class RodaConstants {
   public static final String RISK_MITIGATION_OWNER = "mitigationOwner";
   public static final String RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_TYPE = "mitigationRelatedEventIdentifierType";
   public static final String RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_VALUE = "mitigationRelatedEventIdentifierValue";
-  public static final String RISK_OBJECTS_SIZE = "objectsSize";
+  public static final String RISK_INCIDENCES_COUNT = "incidencesCount";
+  public static final String RISK_UNMITIGATED_INCIDENCES_COUNT = "unmitigatedIncidencesCount";
 
   public static final String RISK_CREATED_ON = "createdOn";
   public static final String RISK_CREATED_BY = "createdBy";
