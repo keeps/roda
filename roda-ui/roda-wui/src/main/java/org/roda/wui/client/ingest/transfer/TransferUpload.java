@@ -124,6 +124,9 @@ public class TransferUpload extends Composite {
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
   @UiField
+  Label uploadTitle;
+
+  @UiField
   SimplePanel itemIcon;
 
   @UiField
@@ -175,6 +178,7 @@ public class TransferUpload extends Composite {
     String ret = null;
 
     if (isIngest) {
+      uploadTitle.setText(messages.ingestTransferUploadTitle());
       if (resource == null) {
         // upload to root
         ret = RestUtils.createTransferredResourceUploadUri(null, LocaleInfo.getCurrentLocale().getLocaleName());
@@ -183,6 +187,7 @@ public class TransferUpload extends Composite {
           LocaleInfo.getCurrentLocale().getLocaleName());
       }
     } else {
+      uploadTitle.setText(messages.fileUploadTitle());
       LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
       String details = selectedItems.getDetailsMessage();
 

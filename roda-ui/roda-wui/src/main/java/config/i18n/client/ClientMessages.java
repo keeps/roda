@@ -101,7 +101,7 @@ public interface ClientMessages extends Messages {
   String preservationActionsTitle();
 
   String ingestProcessTitle();
-  
+
   String internalProcessTitle();
 
   String loginTitle();
@@ -417,6 +417,8 @@ public interface ClientMessages extends Messages {
   /****** INGEST TRANSFER UPLOAD *********/
 
   String ingestTransferUploadTitle();
+
+  String fileUploadTitle();
 
   String ingestTransferUploadDropHere();
 

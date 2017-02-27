@@ -15,9 +15,8 @@
 		addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<g:Label styleName="h1">
-					<ui:text from='{messages.ingestTransferUploadTitle}' />
-				</g:Label>
+				<g:Label styleName="h1" ui:field="uploadTitle"/>
+				
 				<g:FlowPanel styleName="browseItemPanel">
 					<g:SimplePanel styleName="browseItemIcon" ui:field="itemIcon" />
 					<g:FlowPanel styleName="browseItemPanelText">
