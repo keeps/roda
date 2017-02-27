@@ -18,6 +18,7 @@ import org.roda.wui.common.client.tools.RestUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeUri;
+import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -124,6 +125,7 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
 
               @Override
               public void onSuccess(Void result) {
+                History.fireCurrentHistoryState();
                 callback.onSuccess(ActionImpact.DESTROYED);
               }
             });
