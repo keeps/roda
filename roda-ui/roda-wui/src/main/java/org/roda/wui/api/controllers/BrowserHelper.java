@@ -1550,7 +1550,7 @@ public class BrowserHelper {
     job.setUsername(user.getName());
 
     Map<String, String> pluginParameters = new HashMap<>();
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_AIP_ID, parentId);
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_ID, parentId);
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_EVENT_DESCRIPTION, eventDescription);
     job.setPluginParameters(pluginParameters);

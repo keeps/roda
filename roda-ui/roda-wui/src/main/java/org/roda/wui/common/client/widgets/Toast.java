@@ -139,6 +139,9 @@ public class Toast extends PopupPanel {
             slotOffset += slots[i].getOffsetHeight() + PADDING;
           }
         }
+
+        // scrollTo - go to the top of the page when showing toast
+        Window.scrollTo(Window.getScrollLeft(), 0);
         Toast.this.setPopupPosition(Window.getClientWidth() - offsetWidth - PADDING,
           Window.getScrollTop() + PADDING + slotOffset);
       }

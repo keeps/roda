@@ -156,7 +156,7 @@ public class RiskIncidenceRemoverPlugin<T extends IsRODAObject> extends Abstract
 
   @Override
   public PluginType getType() {
-    return PluginType.MISC;
+    return PluginType.INTERNAL;
   }
 
   @Override

@@ -240,7 +240,7 @@ public class UpdateAIPPermissionsPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "AIP permissions updatewas successful";
+    return "AIP permissions update was successful";
   }
 
   @Override
