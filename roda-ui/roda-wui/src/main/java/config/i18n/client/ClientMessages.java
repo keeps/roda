@@ -640,6 +640,10 @@ public interface ClientMessages extends Messages {
 
   String removeAllSelectedConfirmDialogMessage();
 
+  String removingSuccessTitle();
+
+  String removingSuccessMessage(Long size);
+
   /************* Browse ****************/
   String browseLoading();
 

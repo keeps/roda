@@ -345,10 +345,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public String deleteAIP(SelectedItems<IndexedAIP> aips, String details)
+  public void deleteAIP(SelectedItems<IndexedAIP> aips, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.deleteAIP(user, aips, details);
+    Browser.deleteAIP(user, aips, details);
   }
 
   @Override
@@ -472,8 +472,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     }
 
     // FIXME nvieira 20170208 it could possibly, in the future, be necessary to
-    // add more plugin types
-    // adding all AIP to AIP plugins for job report list
+    // add more plugin types adding all AIP to AIP plugins for job report list
     List<PluginInfo> aipToAipPlugins = RodaCoreFactory.getPluginManager().getPluginsInfo(PluginType.AIP_TO_AIP);
     if (aipToAipPlugins != null) {
       pluginsInfo.addAll(aipToAipPlugins);

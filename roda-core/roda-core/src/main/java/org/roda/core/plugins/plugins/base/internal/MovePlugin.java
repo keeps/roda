@@ -100,7 +100,7 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
 
   @Override
   public List<PluginParameter> getParameters() {
-    ArrayList<PluginParameter> parameters = new ArrayList<PluginParameter>();
+    ArrayList<PluginParameter> parameters = new ArrayList<>();
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_ID));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_EVENT_DESCRIPTION));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DETAILS));
@@ -134,23 +134,22 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
         if (!objects.isEmpty()) {
           if (objects.get(0) instanceof AIP) {
             for (T object : objects) {
-              processAIP(index, model, storage, report, jobPluginInfo, cachedJob, (AIP) object);
+              processAIP(index, model, report, jobPluginInfo, cachedJob, (AIP) object);
             }
           } else if (objects.get(0) instanceof File) {
             for (T object : objects) {
-              processFile(index, model, storage, report, jobPluginInfo, cachedJob, (File) object);
+              processFile(index, model, report, jobPluginInfo, cachedJob, (File) object);
             }
           } else if (objects.get(0) instanceof TransferredResource) {
-            processTransferredResource(index, model, storage, report, jobPluginInfo, cachedJob,
-              (List<TransferredResource>) objects);
+            processTransferredResource(jobPluginInfo, (List<TransferredResource>) objects);
           }
         }
       }
     }, index, model, storage, liteList);
   }
 
-  private void processAIP(IndexService index, ModelService model, StorageService storage, Report report,
-    SimpleJobPluginInfo jobPluginInfo, Job job, AIP aip) {
+  private void processAIP(IndexService index, ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo,
+    Job job, AIP aip) {
     Locale locale = PluginHelper.parseLocale(RodaConstants.DEFAULT_EVENT_LOCALE);
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
     PluginState state = PluginState.SUCCESS;
@@ -179,16 +178,16 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
       outcomeText, details, job.getUsername(), true);
   }
 
-  private void processFile(IndexService index, ModelService model, StorageService storage, Report report,
-    SimpleJobPluginInfo jobPluginInfo, Job job, File file) {
+  private void processFile(IndexService index, ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo,
+    Job job, File file) {
     Locale locale = PluginHelper.parseLocale(RodaConstants.DEFAULT_EVENT_LOCALE);
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
     PluginState state = PluginState.SUCCESS;
     String outcomeText = "";
 
     try {
-      String toAIP = null;
-      String toRepresentation = null;
+      String toAIP;
+      String toRepresentation;
       List<String> toPath = null;
 
       if (StringUtils.isNotBlank(destinationId)) {
@@ -200,10 +199,11 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
 
         toAIP = toFolder.getAipId();
         toRepresentation = toFolder.getRepresentationId();
-        if (toFolder != null) {
-          toPath = new ArrayList<>(toFolder.getPath());
-          toPath.add(toFolder.getId());
+        toPath = new ArrayList<>();
+        if (toFolder.getPath() != null) {
+          toPath.addAll(toFolder.getPath());
         }
+        toPath.add(toFolder.getId());
       } else {
         toAIP = file.getAipId();
         toRepresentation = file.getRepresentationId();
@@ -230,8 +230,7 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
       eventDescription, state, outcomeText, details, job.getUsername(), true);
   }
 
-  private void processTransferredResource(IndexService index, ModelService model, StorageService storage, Report report,
-    SimpleJobPluginInfo jobPluginInfo, Job job, List<TransferredResource> resources) {
+  private void processTransferredResource(SimpleJobPluginInfo jobPluginInfo, List<TransferredResource> resources) {
     if (destinationId == null) {
       destinationId = "";
     }
@@ -271,7 +270,7 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
 
   @Override
   public Plugin<T> cloneMe() {
-    return new MovePlugin<T>();
+    return new MovePlugin<>();
   }
 
   @Override

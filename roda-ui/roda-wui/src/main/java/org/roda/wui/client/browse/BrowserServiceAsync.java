@@ -77,7 +77,7 @@ public interface BrowserServiceAsync {
 
   void createRepresentation(String aipId, String details, AsyncCallback<String> callback);
 
-  void deleteAIP(SelectedItems<IndexedAIP> aips, String details, AsyncCallback<String> callback);
+  void deleteAIP(SelectedItems<IndexedAIP> aips, String details, AsyncCallback<Void> callback);
 
   void deleteRepresentation(SelectedItems<IndexedRepresentation> representations, String details,
     AsyncCallback<Void> callback);

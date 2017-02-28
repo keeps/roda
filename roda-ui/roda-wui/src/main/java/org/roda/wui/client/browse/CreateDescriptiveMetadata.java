@@ -23,6 +23,7 @@ import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationIssue;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
+import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
@@ -66,7 +67,6 @@ public class CreateDescriptiveMetadata extends Composite {
 
   public static final String AIP = "aip";
   public static final String REPRESENTATION = "representation";
-
   public static final String NEW = "new";
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
@@ -79,16 +79,16 @@ public class CreateDescriptiveMetadata extends Composite {
       if ((isAIP && (historyTokens.size() == 2 || historyTokens.size() == 3))
         || (historyTokens.get(0).equals(REPRESENTATION) && (historyTokens.size() == 3 || historyTokens.size() == 4))) {
         final String aipId = historyTokens.get(1);
-        boolean isNew;
+        boolean newAIP;
         CreateDescriptiveMetadata create;
 
         if (isAIP) {
-          isNew = historyTokens.size() == 3 && historyTokens.get(2).equals(NEW);
-          create = new CreateDescriptiveMetadata(aipId, null, isNew);
+          newAIP = historyTokens.size() == 3 && historyTokens.get(2).equals(NEW);
+          create = new CreateDescriptiveMetadata(aipId, null, newAIP);
         } else {
           final String representationId = historyTokens.get(2);
-          isNew = historyTokens.size() == 4 && historyTokens.get(3).equals(NEW);
-          create = new CreateDescriptiveMetadata(aipId, representationId, isNew);
+          newAIP = historyTokens.size() == 4 && historyTokens.get(3).equals(NEW);
+          create = new CreateDescriptiveMetadata(aipId, representationId, newAIP);
         }
 
         callback.onSuccess(create);
@@ -404,9 +404,9 @@ public class CreateDescriptiveMetadata extends Composite {
   private void cancel() {
     if (isNew) {
       if (representationId == null) {
-        SelectedItemsList<IndexedAIP> selected = new SelectedItemsList<IndexedAIP>(Arrays.asList(aipId),
+        SelectedItemsList<IndexedAIP> selected = new SelectedItemsList<>(Arrays.asList(aipId),
           IndexedAIP.class.getName());
-        BrowserService.Util.getInstance().deleteAIP(selected, null, new AsyncCallback<String>() {
+        BrowserService.Util.getInstance().deleteAIP(selected, null, new AsyncCallback<Void>() {
 
           @Override
           public void onFailure(Throwable caught) {
@@ -414,12 +414,8 @@ public class CreateDescriptiveMetadata extends Composite {
           }
 
           @Override
-          public void onSuccess(String parentId) {
-            if (parentId != null) {
-              HistoryUtils.newHistory(BrowseAIP.RESOLVER, parentId);
-            } else {
-              HistoryUtils.newHistory(BrowseAIP.RESOLVER);
-            }
+          public void onSuccess(Void result) {
+            HistoryUtils.newHistory(LastSelectedItemsSingleton.getInstance().getLastHistory());
           }
         });
       } else {

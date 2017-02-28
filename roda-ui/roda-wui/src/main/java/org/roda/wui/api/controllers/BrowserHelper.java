@@ -71,7 +71,6 @@ import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
 import org.roda.core.data.v2.index.facet.FacetValue;
@@ -97,7 +96,6 @@ import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
-import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
@@ -130,6 +128,7 @@ import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.plugins.PluginHelper;
+import org.roda.core.plugins.plugins.base.internal.DeleteRODAObjectPlugin;
 import org.roda.core.plugins.plugins.base.internal.MovePlugin;
 import org.roda.core.plugins.plugins.base.internal.UpdateAIPPermissionsPlugin;
 import org.roda.core.plugins.plugins.ingest.AutoAcceptSIPPlugin;
@@ -1575,216 +1574,79 @@ public class BrowserHelper {
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
     AlreadyExistsException {
     ModelService model = RodaCoreFactory.getModelService();
-
-    AIP aip = model.createAIP(parentAipId, type, permissions, user.getName());
-    return aip;
+    return model.createAIP(parentAipId, type, permissions, user.getName());
   }
 
   public static AIP updateAIP(User user, AIP aip) throws GenericException, AuthorizationDeniedException,
     RequestNotValidException, NotFoundException, AlreadyExistsException {
     ModelService model = RodaCoreFactory.getModelService();
-    AIP updatedAIP = model.updateAIP(aip, user.getName());
-    return updatedAIP;
+    return model.updateAIP(aip, user.getName());
   }
 
-  public static String deleteAIP(User user, SelectedItems<IndexedAIP> selected, String details)
+  public static void deleteAIP(User user, SelectedItems<IndexedAIP> selected, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    Locale locale = ServerTools.parseLocale(RodaConstants.DEFAULT_EVENT_LOCALE);
-    Messages messages = RodaCoreFactory.getI18NMessages(locale);
+    Job job = new Job();
+    job.setId(UUID.randomUUID().toString());
+    job.setName("Delete AIP");
+    job.setSourceObjects(selected);
+    job.setPlugin(DeleteRODAObjectPlugin.class.getCanonicalName());
+    job.setPluginType(PluginType.INTERNAL);
+    job.setUsername(user.getName());
 
-    List<String> aipIds = consolidate(user, IndexedAIP.class, selected);
-    ModelService model = RodaCoreFactory.getModelService();
-    String parentId = null;
+    Map<String, String> pluginParameters = new HashMap<>();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
+    job.setPluginParameters(pluginParameters);
 
     try {
-      Job job = new Job();
-      job.setName(RiskIncidenceRemoverPlugin.class.getSimpleName() + " " + job.getStartDate());
-      job.setPlugin(RiskIncidenceRemoverPlugin.class.getName());
-      job.setSourceObjects(SelectedItemsList.create(AIP.class, aipIds));
-      Jobs.createJob(user, job, false);
+      RodaCoreFactory.getModelService().createJob(job);
+      RodaCoreFactory.getPluginOrchestrator().executeJob(job, true);
     } catch (JobAlreadyStartedException e) {
-      LOGGER.error("Could not delete AIP associated incidences");
-    }
-
-    for (String aipId : aipIds) {
-      try {
-        AIP aip = model.retrieveAIP(aipId);
-        parentId = aip.getParentId();
-        model.deleteAIP(aip.getId());
-        deleteAIPEvent(model, user, aipId, details, messages);
-
-        Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aip.getId()));
-        RodaCoreFactory.getIndexService().execute(IndexedAIP.class, filter, Arrays.asList(RodaConstants.INDEX_UUID),
-          new IndexRunnable<IndexedAIP>() {
-
-            @Override
-            public void run(IndexedAIP item)
-              throws GenericException, RequestNotValidException, AuthorizationDeniedException {
-              try {
-                model.deleteAIP(item.getId());
-                deleteAIPEvent(model, user, aipId, details, messages);
-              } catch (NotFoundException e) {
-                // already deleted, ignore
-              }
-            }
-          });
-      } catch (NotFoundException e) {
-        // already deleted, ignore
-      }
-    }
-
-    RodaCoreFactory.getIndexService().commitAIPs();
-    return parentId;
-  }
-
-  private static void deleteAIPEvent(ModelService model, User user, String aipId, String details, Messages messages) {
-    if (details != null) {
-      String eventDescription = messages.getTranslation(RodaConstants.EVENT_DELETE_ON_REPOSITORY);
-      String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_DELETE_AIP_SUCCESS, aipId);
-      model.createRepositoryEvent(PreservationEventType.DELETION, eventDescription, PluginState.SUCCESS, outcomeText,
-        details, user.getName(), true);
+      LOGGER.error("Could not execute AIP delete action", e);
     }
   }
 
   public static void deleteRepresentation(User user, SelectedItems<IndexedRepresentation> selected, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    Locale locale = ServerTools.parseLocale(RodaConstants.DEFAULT_EVENT_LOCALE);
-    Messages messages = RodaCoreFactory.getI18NMessages(locale);
-    String eventDescription = messages.getTranslation(RodaConstants.EVENT_DELETE_ON_REPOSITORY);
+    Job job = new Job();
+    job.setId(UUID.randomUUID().toString());
+    job.setName("Delete representations");
+    job.setSourceObjects(selected);
+    job.setPlugin(DeleteRODAObjectPlugin.class.getCanonicalName());
+    job.setPluginType(PluginType.INTERNAL);
+    job.setUsername(user.getName());
 
-    List<String> representationIds = consolidate(user, IndexedRepresentation.class, selected);
-    ModelService model = RodaCoreFactory.getModelService();
-    IndexService index = RodaCoreFactory.getIndexService();
+    Map<String, String> pluginParameters = new HashMap<>();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
+    job.setPluginParameters(pluginParameters);
 
     try {
-      Job job = new Job();
-      job.setName(RiskIncidenceRemoverPlugin.class.getSimpleName() + " " + job.getStartDate());
-      job.setPlugin(RiskIncidenceRemoverPlugin.class.getName());
-      job.setSourceObjects(SelectedItemsList.create(IndexedRepresentation.class, representationIds));
-      Jobs.createJob(user, job, false);
+      RodaCoreFactory.getModelService().createJob(job);
+      RodaCoreFactory.getPluginOrchestrator().executeJob(job, true);
     } catch (JobAlreadyStartedException e) {
-      LOGGER.error("Could not delete representation associated incidences");
+      LOGGER.error("Could not execute representations delete action", e);
     }
-
-    Filter filter = new Filter();
-    filter.add(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, representationIds));
-    IndexResult<IndexedRepresentation> reps = index.find(IndexedRepresentation.class, filter, Sorter.NONE,
-      new Sublist(0, representationIds.size()), RodaConstants.REPRESENTATION_FIELDS_TO_RETURN);
-
-    for (IndexedRepresentation rep : reps.getResults()) {
-      try {
-        model.deleteRepresentation(rep.getAipId(), rep.getId());
-
-        String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_DELETE_REPRESENTATION_SUCCESS,
-          rep.getId());
-        model.createUpdateAIPEvent(rep.getAipId(), null, null, null, PreservationEventType.DELETION, eventDescription,
-          PluginState.SUCCESS, outcomeText, details, user.getName(), true);
-
-      } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-        String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_DELETE_REPRESENTATION_FAILURE,
-          rep.getId());
-        model.createUpdateAIPEvent(rep.getAipId(), null, null, null, PreservationEventType.DELETION, eventDescription,
-          PluginState.FAILURE, outcomeText, details, user.getName(), true);
-
-        throw e;
-      }
-    }
-
-    index.commit(IndexedRepresentation.class);
   }
 
   public static void deleteFile(User user, SelectedItems<IndexedFile> selected, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    Locale locale = ServerTools.parseLocale(RodaConstants.DEFAULT_EVENT_LOCALE);
-    Messages messages = RodaCoreFactory.getI18NMessages(locale);
-    String eventDescription = messages.getTranslation(RodaConstants.EVENT_DELETE_ON_REPOSITORY);
+    Job job = new Job();
+    job.setId(UUID.randomUUID().toString());
+    job.setName("Delete files");
+    job.setSourceObjects(selected);
+    job.setPlugin(DeleteRODAObjectPlugin.class.getCanonicalName());
+    job.setPluginType(PluginType.INTERNAL);
+    job.setUsername(user.getName());
 
-    List<String> fileIds = consolidate(user, IndexedFile.class, selected);
-    ModelService model = RodaCoreFactory.getModelService();
-    IndexService index = RodaCoreFactory.getIndexService();
+    Map<String, String> pluginParameters = new HashMap<>();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
+    job.setPluginParameters(pluginParameters);
 
     try {
-      Job job = new Job();
-      job.setName(RiskIncidenceRemoverPlugin.class.getSimpleName() + " " + job.getStartDate());
-      job.setPlugin(RiskIncidenceRemoverPlugin.class.getName());
-      job.setSourceObjects(selected);
-      Jobs.createJob(user, job, false);
+      RodaCoreFactory.getModelService().createJob(job);
+      RodaCoreFactory.getPluginOrchestrator().executeJob(job, true);
     } catch (JobAlreadyStartedException e) {
-      LOGGER.error("Could not delete file associated incidences");
+      LOGGER.error("Could not execute file delete action", e);
     }
-
-    Filter filter = new Filter();
-    filter.add(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, fileIds));
-    IndexResult<IndexedFile> files = index.find(IndexedFile.class, filter, Sorter.NONE, new Sublist(0, fileIds.size()),
-      RodaConstants.FILE_FIELDS_TO_RETURN);
-
-    for (IndexedFile file : files.getResults()) {
-      List<LinkingIdentifier> sources = new ArrayList<>();
-      try {
-        model.deleteFile(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(), true);
-
-        sources.add(PluginHelper.getLinkingIdentifier(file.getAipId(), file.getRepresentationId(),
-          RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
-
-        String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_DELETE_FILE_SUCCESS, file.getId());
-        model.createEvent(file.getAipId(), file.getRepresentationId(), null, null, PreservationEventType.DELETION,
-          eventDescription, sources, null, PluginState.SUCCESS, outcomeText, details, user.getName(), true);
-      } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-        sources.add(PluginHelper.getLinkingIdentifier(file.getAipId(), file.getRepresentationId(), file.getPath(),
-          file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
-
-        String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_DELETE_FILE_FAILURE, file.getId());
-        model.createEvent(file.getAipId(), file.getRepresentationId(), null, null, PreservationEventType.DELETION,
-          eventDescription, sources, null, PluginState.FAILURE, outcomeText, details, user.getName(), true);
-
-        throw e;
-      }
-    }
-
-    index.commit(IndexedFile.class);
-  }
-
-  public static String deleteAIPRepresentations(SelectedItems<IndexedAIP> selected, User user)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    List<String> aipIds = consolidate(user, IndexedAIP.class, selected);
-
-    String parentId = null;
-
-    for (final String aipId : aipIds) {
-      try {
-        AIP aip = RodaCoreFactory.getModelService().retrieveAIP(aipId);
-        parentId = aip.getParentId();
-
-        for (Representation rep : aip.getRepresentations()) {
-          RodaCoreFactory.getModelService().deleteRepresentation(aipId, rep.getId());
-        }
-
-        Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aipId));
-
-        RodaCoreFactory.getIndexService().execute(IndexedAIP.class, filter,
-          RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN, new IndexRunnable<IndexedAIP>() {
-
-            @Override
-            public void run(IndexedAIP item)
-              throws GenericException, RequestNotValidException, AuthorizationDeniedException {
-              try {
-                UserUtility.checkAIPPermissions(user, item, PermissionType.DELETE);
-                for (Representation rep : aip.getRepresentations()) {
-                  RodaCoreFactory.getModelService().deleteRepresentation(aipId, rep.getId());
-                }
-              } catch (NotFoundException e) {
-                // already deleted, ignore
-              }
-            }
-          });
-
-      } catch (NotFoundException e) {
-        // already deleted
-      }
-    }
-
-    RodaCoreFactory.getIndexService().commitAIPs();
-    return parentId;
   }
 
   public static DescriptiveMetadata createDescriptiveMetadataFile(String aipId, String descriptiveMetadataId,

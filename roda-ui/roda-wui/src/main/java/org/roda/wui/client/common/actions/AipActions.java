@@ -185,6 +185,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
       @Override
       public void onSuccess(String itemAIPId) {
+        LastSelectedItemsSingleton.getInstance().setLastHistory(HistoryUtils.getCurrentHistoryPath());
         HistoryUtils.newHistory(CreateDescriptiveMetadata.RESOLVER, "aip", itemAIPId, CreateDescriptiveMetadata.NEW);
         callback.onSuccess(ActionImpact.UPDATED);
       }
@@ -397,8 +398,10 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
                 @Override
                 public void onSuccess(final String details) {
+                  final String parentId = aip.getParentID();
+
                   BrowserService.Util.getInstance().deleteAIP(objectToSelectedItems(aip), details,
-                    new AsyncCallback<String>() {
+                    new AsyncCallback<Void>() {
 
                       @Override
                       public void onFailure(Throwable caught) {
@@ -406,7 +409,8 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
                       }
 
                       @Override
-                      public void onSuccess(String parentId) {
+                      public void onSuccess(Void result) {
+                        Toast.showInfo(messages.removingSuccessTitle(), messages.removingSuccessMessage(1L));
                         if (parentId != null) {
                           HistoryUtils.newHistory(BrowseAIP.RESOLVER, parentId);
                         } else {
@@ -423,7 +427,6 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   }
 
   private void remove(final SelectedItems<IndexedAIP> selected, final AsyncCallback<ActionImpact> callback) {
-
     ClientSelectedItemsUtils.size(IndexedAIP.class, selected, new AsyncCallback<Long>() {
 
       @Override
@@ -450,20 +453,19 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
                     @Override
                     public void onSuccess(final String details) {
-                      BrowserService.Util.getInstance().deleteAIP(selected, details,
-                        new LoadingAsyncCallback<String>() {
+                      BrowserService.Util.getInstance().deleteAIP(selected, details, new LoadingAsyncCallback<Void>() {
 
-                          @Override
-                          public void onFailureImpl(Throwable caught) {
-                            callback.onFailure(caught);
-                          }
+                        @Override
+                        public void onFailureImpl(Throwable caught) {
+                          callback.onFailure(caught);
+                        }
 
-                          @Override
-                          public void onSuccessImpl(String parentId) {
-                            Toast.showInfo(messages.removeSuccessTitle(), messages.removeSuccessMessage(size));
-                            callback.onSuccess(ActionImpact.DESTROYED);
-                          }
-                        });
+                        @Override
+                        public void onSuccessImpl(Void result) {
+                          Toast.showInfo(messages.removingSuccessTitle(), messages.removingSuccessMessage(size));
+                          callback.onSuccess(ActionImpact.DESTROYED);
+                        }
+                      });
                     }
                   });
               }
@@ -475,7 +477,6 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
             }
           });
       }
-
     });
   }
 
