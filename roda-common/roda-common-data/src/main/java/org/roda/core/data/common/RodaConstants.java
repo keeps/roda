@@ -1026,11 +1026,21 @@ public final class RodaConstants {
     WELLFORMEDNESS_CHECK("wellformedness check"), UNPACKING("unpacking"), METADATA_EXTRACTION("metadata extraction"),
     ACCESSION("accession"), AUTHORIZATION_CHECK("authorization check"), FORMAT_IDENTIFICATION("format identification"),
     FORMAT_VALIDATION("format validation"), INGEST_START("ingest start"), INGEST_END("ingest end"),
-    RISK_MANAGEMENT("risk management"), NONE("none");
+    RISK_MANAGEMENT("risk management"), NONE("none"), DIP_CREATION("dip creation");
 
-    private final String text;
+    private String originalText;
+    private String text;
 
     private PreservationEventType(final String text) {
+      this.text = text;
+      this.originalText = text;
+    }
+
+    public String getOriginalText() {
+      return originalText;
+    }
+
+    public void setText(final String text) {
       this.text = text;
     }
 

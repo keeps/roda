@@ -69,6 +69,7 @@ import org.roda.core.common.monitor.TransferredResourcesScanner;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.NodeType;
 import org.roda.core.data.common.RodaConstants.PreservationAgentType;
+import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.common.RodaConstants.SolrType;
 import org.roda.core.data.common.RodaConstants.StorageType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -753,6 +754,8 @@ public class RodaCoreFactory {
     startApacheDS();
 
     instantiateTransferredResourcesScanner();
+
+    processPreservationEventTypeProperties();
   }
 
   private static void instantiateWorkerNodeSpecificObjects() {
@@ -1173,7 +1176,22 @@ public class RodaCoreFactory {
     rodaPropertiesCache.clear();
     RODA_SCHEMAS_CACHE.invalidateAll();
     I18N_CACHE.invalidateAll();
+    processPreservationEventTypeProperties();
+
     LOGGER.info("Reloaded roda configurations after file change!");
+  }
+
+  private static void processPreservationEventTypeProperties() {
+    String prefix = "core.preservation_event_type";
+
+    for (PreservationEventType preservationEventType : PreservationEventType.values()) {
+      String value = getRodaConfigurationAsString(prefix, preservationEventType.name());
+      if (StringUtils.isNotBlank(value)) {
+        preservationEventType.setText(value);
+      } else {
+        preservationEventType.setText(preservationEventType.getOriginalText());
+      }
+    }
   }
 
   public static Optional<Schema> getRodaSchema(String metadataType, String metadataVersion) {
