@@ -188,8 +188,12 @@ public class PluginReportContentTest {
     AssertJUnit.assertEquals(1, jobReports.size());
 
     for (Report report : jobReports) {
-      AssertJUnit.assertEquals(5, report.getReports().size());
+      AssertJUnit.assertEquals(MinimalIngestPlugin.TOTAL_STEPS, report.getReports().size());
+      Report first = report.getReports().get(0);
+      Report last = report.getReports().get(MinimalIngestPlugin.TOTAL_STEPS - 1);
       AssertJUnit.assertEquals(false, report.getDateCreated().equals(report.getDateUpdated()));
+      AssertJUnit.assertEquals(true, report.getDateCreated().equals(first.getDateCreated()));
+      AssertJUnit.assertEquals(true, report.getDateUpdated().equals(last.getDateUpdated()));
     }
   }
 
@@ -219,8 +223,11 @@ public class PluginReportContentTest {
     AssertJUnit.assertEquals(1, jobReports.size());
 
     Report report = jobReports.get(0);
-    AssertJUnit.assertEquals(0, report.getReports().size());
+    AssertJUnit.assertEquals(1, report.getReports().size());
+    Report innerReport = report.getReports().get(0);
     AssertJUnit.assertEquals(false, report.getDateCreated().equals(report.getDateUpdated()));
+    AssertJUnit.assertEquals(true, report.getDateCreated().equals(innerReport.getDateCreated()));
+    AssertJUnit.assertEquals(true, report.getDateUpdated().equals(innerReport.getDateUpdated()));
   }
 
   @Test
@@ -252,8 +259,11 @@ public class PluginReportContentTest {
     AssertJUnit.assertEquals(1, jobReports.size());
 
     Report report = jobReports.get(0);
-    AssertJUnit.assertEquals(0, report.getReports().size());
+    AssertJUnit.assertEquals(1, report.getReports().size());
+    Report innerReport = report.getReports().get(0);
     AssertJUnit.assertEquals(false, report.getDateCreated().equals(report.getDateUpdated()));
+    AssertJUnit.assertEquals(true, report.getDateCreated().equals(innerReport.getDateCreated()));
+    AssertJUnit.assertEquals(true, report.getDateUpdated().equals(innerReport.getDateUpdated()));
   }
 
   @Test
@@ -285,7 +295,10 @@ public class PluginReportContentTest {
     AssertJUnit.assertEquals(1, jobReports.size());
 
     Report report = jobReports.get(0);
-    AssertJUnit.assertEquals(0, report.getReports().size());
+    AssertJUnit.assertEquals(1, report.getReports().size());
+    Report innerReport = report.getReports().get(0);
     AssertJUnit.assertEquals(false, report.getDateCreated().equals(report.getDateUpdated()));
+    AssertJUnit.assertEquals(true, report.getDateCreated().equals(innerReport.getDateCreated()));
+    AssertJUnit.assertEquals(true, report.getDateUpdated().equals(innerReport.getDateUpdated()));
   }
 }

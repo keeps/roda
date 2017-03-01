@@ -26,6 +26,8 @@ import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugi
 
 public class MinimalIngestPlugin extends DefaultIngestPlugin {
 
+  public static final int TOTAL_STEPS = 5;
+
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_SIP_TO_AIP_CLASS,
@@ -109,7 +111,7 @@ public class MinimalIngestPlugin extends DefaultIngestPlugin {
 
   @Override
   public void setTotalSteps() {
-    this.totalSteps = 5;
+    this.totalSteps = TOTAL_STEPS;
   }
 
   @Override

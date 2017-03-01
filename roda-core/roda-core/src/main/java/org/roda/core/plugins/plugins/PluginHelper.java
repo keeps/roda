@@ -356,7 +356,8 @@ public final class PluginHelper {
           .setSourceObjectClass(reportItem.getSourceObjectClass())
           .setOutcomeObjectClass(reportItem.getOutcomeObjectClass());
 
-        jobReport.setId(reportItem.getOutcomeObjectId());
+        jobReport.setId(reportItem.getId());
+        jobReport.setDateCreated(reportItem.getDateCreated());
         jobReport.addReport(reportItem);
         retrieved = false;
       }
