@@ -76,6 +76,10 @@ public class PermissionsRecursiveTest {
   @Test
   public void testUpdatePermissionsRecursively() throws RODAException, ParseException {
     // INFO this test may fail if the default objects change
+    String parentAIPId = "8faeaf8c-9a1f-49cc-a239-f3410d8bc13b";
+    String firstAIPChild = "ee1b2aa0-d336-418b-ad1d-1aa659fb97a8";
+    String otherAIPChild = "d743a569-945a-49d9-844f-39af67992f05";
+
     User user = new User();
     user.setName("rodauser");
     user.setFullName("Roda User");
@@ -83,14 +87,14 @@ public class PermissionsRecursiveTest {
     model.registerUser(user, "rodapassword", false);
 
     // change parent permissions
-    AIP parent = model.retrieveAIP("8faeaf8c-9a1f-49cc-a239-f3410d8bc13b");
+    AIP parent = model.retrieveAIP(parentAIPId);
     Set<PermissionType> userPermissions = new HashSet<>();
     userPermissions.add(PermissionType.READ);
     parent.getPermissions().setUserPermissions(user.getName(), userPermissions);
     model.updateAIPPermissions(parent, RodaConstants.ADMIN);
 
     // change a child permissions as well
-    AIP child = model.retrieveAIP("ee1b2aa0-d336-418b-ad1d-1aa659fb97a8");
+    AIP child = model.retrieveAIP(firstAIPChild);
     child.getPermissions().setUserPermissions(user.getName(), userPermissions);
     model.updateAIPPermissions(child, RodaConstants.ADMIN);
     index.commitAIPs();
@@ -112,7 +116,7 @@ public class PermissionsRecursiveTest {
       selectedItems);
     assertEquals(6, job.getJobStats().getSourceObjectsCount());
 
-    Set<PermissionType> permissions = model.retrieveAIP("d743a569-945a-49d9-844f-39af67992f05").getPermissions()
+    Set<PermissionType> permissions = model.retrieveAIP(otherAIPChild).getPermissions()
       .getUserPermissions(user.getName());
     assertEquals(permissions.contains(PermissionType.READ), true);
   }

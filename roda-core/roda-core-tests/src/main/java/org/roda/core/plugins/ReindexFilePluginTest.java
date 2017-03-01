@@ -72,9 +72,7 @@ public class ReindexFilePluginTest {
     AlreadyExistsException, AuthorizationDeniedException {
     AIP aip = model.createAIP(null, "", new Permissions(), aipCreator);
     model.createRepresentation(aip.getId(), UUID.randomUUID().toString(), true, "", true);
-
     Job job = TestsHelper.executeJob(ReindexFilePlugin.class, PluginType.MISC, SelectedItemsAll.create(File.class));
-
     TestsHelper.getJobReports(index, job, true);
   }
 

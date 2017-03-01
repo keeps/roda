@@ -314,7 +314,6 @@ public class Report implements IsModelObject {
     setOutcomeObjectState(report.getOutcomeObjectState());
 
     reports.add(report);
-
     return this;
   }
 

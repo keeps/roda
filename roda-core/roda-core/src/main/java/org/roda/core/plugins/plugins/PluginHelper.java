@@ -298,7 +298,6 @@ public final class PluginHelper {
     reportItem.setPluginName(plugin.getName());
     reportItem.setPluginVersion(plugin.getVersion());
     reportItem.setTotalSteps(getTotalStepsFromParameters(plugin));
-    reportItem.setDateCreated(new Date());
 
     return reportItem;
   }
@@ -346,7 +345,6 @@ public final class PluginHelper {
 
   public static <T extends IsRODAObject> void updatePartialJobReport(Plugin<T> plugin, ModelService model,
     IndexService index, Report reportItem, boolean replaceLastReportItemIfTheSame, Job cachedJob) {
-    reportItem.setDateUpdated(new Date());
     String jobId = getJobId(plugin);
     boolean retrieved = true;
     try {

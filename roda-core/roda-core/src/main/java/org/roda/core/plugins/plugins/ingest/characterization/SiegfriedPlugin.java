@@ -95,7 +95,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
         PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
 
         LOGGER.debug("Processing AIP {}", aip.getId());
-        List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
+        List<LinkingIdentifier> sources = new ArrayList<>();
         try {
 
           for (Representation representation : aip.getRepresentations()) {
