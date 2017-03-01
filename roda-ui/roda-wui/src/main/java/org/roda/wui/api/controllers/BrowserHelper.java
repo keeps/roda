@@ -1774,11 +1774,10 @@ public class BrowserHelper {
     }
   }
 
-  public static File updateFile(User user, File file, ContentPayload contentPayload, boolean createIfNotExists,
-    boolean notify) throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
+  public static File updateFile(File file, ContentPayload contentPayload, boolean createIfNotExists, boolean notify)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
     AlreadyExistsException {
-    RodaCoreFactory.getModelService().updateFile(file, contentPayload, createIfNotExists, notify);
-    return file;
+    return RodaCoreFactory.getModelService().updateFile(file, contentPayload, createIfNotExists, notify);
   }
 
   public static EntityResponse retrieveAIPRepresentationFile(IndexedFile iFile, String acceptFormat)
@@ -2488,29 +2487,41 @@ public class BrowserHelper {
   public static void deleteRisk(User user, SelectedItems<IndexedRisk> selected)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
     InvalidParameterException, JobAlreadyStartedException {
-    List<String> idList = consolidate(user, IndexedRisk.class, selected);
-
     Job job = new Job();
-    job.setName(RiskIncidenceRemoverPlugin.class.getSimpleName() + " " + job.getStartDate());
-    job.setPlugin(RiskIncidenceRemoverPlugin.class.getName());
-    job.setSourceObjects(SelectedItemsList.create(Risk.class, idList));
-    Jobs.createJob(user, job, false);
+    job.setId(UUID.randomUUID().toString());
+    job.setName("Delete risks");
+    job.setSourceObjects(selected);
+    job.setPlugin(DeleteRODAObjectPlugin.class.getCanonicalName());
+    job.setPluginType(PluginType.INTERNAL);
+    job.setUsername(user.getName());
 
-    for (String riskId : idList) {
-      RodaCoreFactory.getModelService().deleteRisk(riskId, true);
+    try {
+      RodaCoreFactory.getModelService().createJob(job);
+      RodaCoreFactory.getPluginOrchestrator().executeJob(job, true);
+    } catch (JobAlreadyStartedException e) {
+      LOGGER.error("Could not execute risk delete action", e);
     }
   }
 
   public static void deleteFormat(User user, SelectedItems<Format> selected)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
-    List<String> idList = consolidate(user, Format.class, selected);
-    for (String formatId : idList) {
-      RodaCoreFactory.getModelService().deleteFormat(formatId, true);
+    Job job = new Job();
+    job.setId(UUID.randomUUID().toString());
+    job.setName("Delete formats");
+    job.setSourceObjects(selected);
+    job.setPlugin(DeleteRODAObjectPlugin.class.getCanonicalName());
+    job.setPluginType(PluginType.INTERNAL);
+    job.setUsername(user.getName());
+
+    try {
+      RodaCoreFactory.getModelService().createJob(job);
+      RodaCoreFactory.getPluginOrchestrator().executeJob(job, true);
+    } catch (JobAlreadyStartedException e) {
+      LOGGER.error("Could not execute format delete action", e);
     }
   }
 
   public static void updateRiskCounters() throws GenericException, RequestNotValidException, NotFoundException {
-
     // get risks incidence count using facets
     IndexService index = RodaCoreFactory.getIndexService();
     IndexResult<RiskIncidence> findAllRiskIncidences = index.find(RiskIncidence.class, Filter.ALL, Sorter.NONE,
@@ -2533,7 +2544,7 @@ public class BrowserHelper {
       allRisks.put(indexedRisk.getId(), indexedRisk);
     }
 
-    // update risks from facets
+    // update risks from facets (all incidences)
     for (FacetFieldResult fieldResult : findAllRiskIncidences.getFacetResults()) {
       for (FacetValue facetValue : fieldResult.getValues()) {
         String riskId = facetValue.getValue();
@@ -2548,7 +2559,7 @@ public class BrowserHelper {
       }
     }
 
-    // update risks from facets
+    // update risks from facets (not mitigated incidences)
     for (FacetFieldResult fieldResult : findNotMitigatedRiskIncidences.getFacetResults()) {
       for (FacetValue facetValue : fieldResult.getValues()) {
         String riskId = facetValue.getValue();
@@ -3109,8 +3120,7 @@ public class BrowserHelper {
       index.commit(DIPFile.class);
       return IdUtils.getDIPFileId(newFolder);
     } else {
-      IndexedDIP dip = index.retrieve(IndexedDIP.class, folderUUID, Arrays.asList(RodaConstants.DIP_ID));
-      DIPFile newFolder = model.createDIPFile(dip.getId(), null, null, newName, true);
+      DIPFile newFolder = model.createDIPFile(dipId, null, null, newName, true);
       index.commit(DIPFile.class);
       return IdUtils.getDIPFileId(newFolder);
     }
@@ -3195,7 +3205,7 @@ public class BrowserHelper {
     index.commit(IndexedRepresentation.class);
   }
 
-  public static ObjectPermissionResult verifyPermissions(User user, String username, String permissionType,
+  public static ObjectPermissionResult verifyPermissions(String username, String permissionType,
     MultivaluedMap<String, String> queryParams)
     throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
     ObjectPermissionResult result = new ObjectPermissionResult();

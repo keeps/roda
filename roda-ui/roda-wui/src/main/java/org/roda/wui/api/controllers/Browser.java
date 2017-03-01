@@ -933,12 +933,13 @@ public class Browser extends RodaWuiController {
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
     UserUtility.checkAIPPermissions(user, aip, PermissionType.UPDATE);
 
-    if (fileName.contains(".")) {
-      fileName = fileName.substring(fileName.lastIndexOf('.'));
+    String name = fileName;
+    if (name.contains(".")) {
+      name = name.substring(name.lastIndexOf('.'));
     }
 
     // delegate
-    BrowserHelper.createOrUpdateOtherMetadataFile(aipId, representationId, null, null, type, fileName, is);
+    BrowserHelper.createOrUpdateOtherMetadataFile(aipId, representationId, null, null, type, name, is);
 
     // register action
     controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_AIP_ID_PARAM,
@@ -958,13 +959,14 @@ public class Browser extends RodaWuiController {
       RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
     UserUtility.checkAIPPermissions(user, aip, PermissionType.UPDATE);
 
-    if (fileName.contains(".")) {
-      fileName = fileName.substring(fileName.lastIndexOf('.'));
+    String name = fileName;
+    if (name.contains(".")) {
+      name = name.substring(name.lastIndexOf('.'));
     }
 
     // delegate
     BrowserHelper.createOrUpdateOtherMetadataFile(file.getAipId(), file.getRepresentationId(), file.getPath(),
-      file.getId(), type, fileName, is);
+      file.getId(), type, name, is);
 
     // register action
     controllerAssistant.registerAction(user, file.getAipId(), LOG_ENTRY_STATE.SUCCESS,
@@ -2231,7 +2233,7 @@ public class Browser extends RodaWuiController {
     Path temp = Files.createTempFile("descriptive", ".tmp");
     Files.copy(is, temp, StandardCopyOption.REPLACE_EXISTING);
     ContentPayload payload = new FSPathContentPayload(temp);
-    File updatedFile = BrowserHelper.updateFile(user, file, payload, createIfNotExists, notify);
+    File updatedFile = BrowserHelper.updateFile(file, payload, createIfNotExists, notify);
 
     // register action
     controllerAssistant.registerAction(user, file.getAipId(), LOG_ENTRY_STATE.SUCCESS,
@@ -2293,9 +2295,11 @@ public class Browser extends RodaWuiController {
         reportList = BrowserHelper.listTransferredResourcesReportsWithSIP(id, start, limit);
       } else {
         if (RodaConstants.CONTROLLER_ID_OBJECT_RESOURCE_PATH.equals(resourceOrSip)) {
-          id = IdUtils.getTransferredResourceUUID(id);
+          reportList = BrowserHelper.listTransferredResourcesReports(IdUtils.getTransferredResourceUUID(id), start,
+            limit);
+        } else {
+          reportList = BrowserHelper.listTransferredResourcesReports(id, start, limit);
         }
-        reportList = BrowserHelper.listTransferredResourcesReports(id, start, limit);
       }
     }
 
@@ -2327,9 +2331,10 @@ public class Browser extends RodaWuiController {
         reportList = BrowserHelper.listTransferredResourcesReportsWithSIP(id, 0, 1);
       } else {
         if (RodaConstants.CONTROLLER_ID_OBJECT_RESOURCE_PATH.equals(resourceOrSip)) {
-          id = IdUtils.getTransferredResourceUUID(id);
+          reportList = BrowserHelper.listTransferredResourcesReports(IdUtils.getTransferredResourceUUID(id), 0, 1);
+        } else {
+          reportList = BrowserHelper.listTransferredResourcesReports(id, 0, 1);
         }
-        reportList = BrowserHelper.listTransferredResourcesReports(id, 0, 1);
       }
     }
 
@@ -2378,7 +2383,7 @@ public class Browser extends RodaWuiController {
       selected);
   }
 
-  public static DIP createDIP(User user, DIP dip) throws AuthorizationDeniedException, GenericException {
+  public static DIP createDIP(User user, DIP dip) throws GenericException, AuthorizationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -2601,7 +2606,7 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
 
     // delegate
-    ObjectPermissionResult result = BrowserHelper.verifyPermissions(user, username, permissionType, queryParams);
+    ObjectPermissionResult result = BrowserHelper.verifyPermissions(username, permissionType, queryParams);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_USERNAME_PARAM, username,

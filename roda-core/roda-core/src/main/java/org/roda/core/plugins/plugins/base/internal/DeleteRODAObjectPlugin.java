@@ -26,6 +26,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
+import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -38,13 +39,13 @@ import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -120,6 +121,10 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
           processFile(index, model, report, jobPluginInfo, cachedJob, (File) object);
         } else if (object instanceof Representation) {
           processRepresentation(index, model, report, jobPluginInfo, cachedJob, (Representation) object);
+        } else if (object instanceof Risk) {
+          processRisk(index, model, report, jobPluginInfo, cachedJob, (Risk) object);
+        } else if (object instanceof Format) {
+          processFormat(index, model, report, jobPluginInfo, cachedJob, (Format) object);
         }
       }
     }, index, model, storage, liteList);
@@ -263,6 +268,47 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
       job.getUsername(), true);
   }
 
+  private void processRisk(IndexService index, ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo,
+    Job job, Risk risk) {
+    Report reportItem = PluginHelper.initPluginReportItem(this, risk.getId(), Risk.class);
+    PluginState state = PluginState.SUCCESS;
+
+    try {
+      Filter incidenceFilter = new Filter(
+        new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISK_ID, risk.getId()));
+      deleteRelatedIncidences(model, index, incidenceFilter);
+    } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
+      reportItem.addPluginDetails("Could not delete representation related incidences: " + e.getMessage());
+      state = PluginState.FAILURE;
+    }
+
+    try {
+      model.deleteRisk(risk.getId(), true);
+    } catch (GenericException | NotFoundException | AuthorizationDeniedException | RequestNotValidException e) {
+      state = PluginState.FAILURE;
+    }
+
+    report.addReport(reportItem.setPluginState(state));
+    PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+    jobPluginInfo.incrementObjectsProcessed(state);
+  }
+
+  private void processFormat(IndexService index, ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo,
+    Job job, Format format) {
+    Report reportItem = PluginHelper.initPluginReportItem(this, format.getId(), Format.class);
+    PluginState state = PluginState.SUCCESS;
+
+    try {
+      model.deleteFormat(format.getId(), true);
+    } catch (GenericException | NotFoundException | AuthorizationDeniedException | RequestNotValidException e) {
+      state = PluginState.FAILURE;
+    }
+
+    report.addReport(reportItem.setPluginState(state));
+    PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+    jobPluginInfo.incrementObjectsProcessed(state);
+  }
+
   private void deleteRelatedIncidences(ModelService model, IndexService index, Filter incidenceFilter)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     Long incidenceCounter = index.count(RiskIncidence.class, incidenceFilter);
@@ -333,7 +379,8 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     list.add(AIP.class);
     list.add(Representation.class);
     list.add(File.class);
-    list.add(TransferredResource.class);
+    list.add(Risk.class);
+    list.add(Format.class);
     return (List) list;
   }
 }
