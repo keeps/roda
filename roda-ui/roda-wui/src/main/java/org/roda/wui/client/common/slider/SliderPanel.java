@@ -14,6 +14,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -23,20 +24,22 @@ public class SliderPanel extends Composite implements HasChangeHandlers {
   private static SliderPanel OPEN_SLIDER = null;
 
   private final SimplePanel wrapper;
-  private final FlowPanel layout;
+  private final ScrollPanel layout;
+  private FlowPanel contentLayout;
 
   private FocusPanel toggleButton = null;
 
   public SliderPanel() {
     super();
-    this.layout = new FlowPanel();
-    this.wrapper = new SimplePanel(this.layout);
+    this.contentLayout = new FlowPanel();
+    this.layout = new ScrollPanel();
+    this.layout.add(contentLayout);
 
+    this.wrapper = new SimplePanel(this.layout);
     initWidget(wrapper);
 
     layout.addStyleName("slider-layout");
     this.addStyleName("slider");
-
   }
 
   public void setToggleButton(FocusPanel toggleButton) {
@@ -88,17 +91,17 @@ public class SliderPanel extends Composite implements HasChangeHandlers {
 
   @UiChild(tagname = "title")
   public void addTitle(Label title) {
-    layout.add(title);
+    contentLayout.add(title);
     title.addStyleName("slider-title");
   }
 
   @UiChild(tagname = "content")
   public void addContent(Widget widget) {
-    layout.add(widget);
+    contentLayout.add(widget);
   }
 
   public void clear() {
-    layout.clear();
+    contentLayout.clear();
   }
 
   private void setActive(boolean active) {

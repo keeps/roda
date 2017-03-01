@@ -369,16 +369,25 @@ div.inline {
     margin: 1.2rem 0;
 }
 
+.slider-title {
+	margin-top: 20px;
+}
+
 .slider .slider-layout {
-	margin: 25px;
 	opacity: 0;
 	transition: opacity 0.25s ease-in-out;
+	overflow-y: auto;
+    position: relative;
+    zoom: 1;
+    height: 100%;
+    overflow-x: hidden;
+    padding-left: 25px;
+    padding-right: 25px;
 }
 
 .slider-active .slider-layout {
 	opacity: 1;
 }
-
 
 /**********************************************
 				SKELETON
