@@ -11,10 +11,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@XmlRootElement(name = "file")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class IndexedFile implements IsIndexed {
 
   private static final long serialVersionUID = 3303019735787641534L;

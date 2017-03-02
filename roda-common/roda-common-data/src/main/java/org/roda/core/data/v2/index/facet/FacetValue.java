@@ -9,6 +9,9 @@ package org.roda.core.data.v2.index.facet;
 
 import java.io.Serializable;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement(name = "facet_value")
 public class FacetValue implements Serializable {
   private static final long serialVersionUID = 8898599554012120196L;
 

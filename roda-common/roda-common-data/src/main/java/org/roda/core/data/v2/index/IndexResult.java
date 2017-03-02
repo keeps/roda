@@ -11,8 +11,17 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@XmlRootElement(name = "index_result")
+@JsonInclude(JsonInclude.Include.ALWAYS)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class IndexResult<T extends Serializable> implements Serializable {
 
   private static final long serialVersionUID = -7896294396414765557L;
@@ -35,7 +44,7 @@ public class IndexResult<T extends Serializable> implements Serializable {
     this.limit = limit;
     this.totalCount = totalCount;
     this.results = results;
-    this.setFacetResults(facetResults);
+    this.facetResults = facetResults;
     date = new Date();
   }
 
@@ -63,6 +72,7 @@ public class IndexResult<T extends Serializable> implements Serializable {
   /**
    * @return the results
    */
+  @XmlElement(name = "results")
   public List<T> getResults() {
     return results;
   }

@@ -10,9 +10,15 @@ package org.roda.core.data.v2.risks;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@XmlRootElement(name = "risk")
+@JsonInclude(JsonInclude.Include.ALWAYS)
 public class IndexedRisk extends Risk implements IsIndexed {
 
   private static final long serialVersionUID = 2864416437668370485L;

@@ -2437,6 +2437,9 @@ public class Browser extends RodaWuiController {
 
     // check user permissions
     controllerAssistant.checkRoles(user);
+    IndexedDIP dip = RodaCoreFactory.getIndexService().retrieve(IndexedDIP.class, dipId,
+      RodaConstants.DIP_PERMISSIONS_FIELDS_TO_RETURN);
+    UserUtility.checkDIPPermissions(user, dip, PermissionType.READ);
 
     // delegate
     EntityResponse dipResponse = BrowserHelper.retrieveDIP(dipId, acceptFormat);
@@ -2455,6 +2458,9 @@ public class Browser extends RodaWuiController {
 
     // check user permissions
     controllerAssistant.checkRoles(user);
+    DIPFile file = RodaCoreFactory.getIndexService().retrieve(DIPFile.class, fileUUID,
+      Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIPFILE_ID, RodaConstants.DIPFILE_DIP_ID));
+    UserUtility.checkDIPFilePermissions(user, file, PermissionType.READ);
 
     // delegate
     EntityResponse aipRepresentationFile = BrowserHelper.retrieveDIPFile(fileUUID, acceptFormat);

@@ -21,8 +21,8 @@ import org.roda.core.data.v2.IsModelObject;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @XmlRootElement(name = "dip")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class DIP implements IsModelObject {
 
   private static final long serialVersionUID = -7335470043357396783L;

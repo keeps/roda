@@ -11,11 +11,14 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.descriptionLevels.DescriptionLevel;
 import org.roda.core.data.v2.index.IsIndexed;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * This class contains the indexed information about an AIP.
@@ -23,6 +26,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @author Hélder Silva <hsilva@keep.pt>
  * @author Luis Faria <lfaria@keep.pt>
  */
+@XmlRootElement(name = "aip")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class IndexedAIP implements IsIndexed, HasPermissions {
   private static final long serialVersionUID = 38813680938917204L;
 

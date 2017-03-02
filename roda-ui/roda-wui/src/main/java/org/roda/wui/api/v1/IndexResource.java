@@ -141,7 +141,7 @@ public class IndexResource {
    *           if some error occurs.
    */
   @GET
-  @Produces({MediaType.APPLICATION_JSON, ExtraMediaType.TEXT_CSV})
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.TEXT_CSV})
   @ApiOperation(value = "Find indexed resources", notes = "Find indexed resources.", response = IndexResult.class, responseContainer = "List")
   public <T extends IsIndexed> Response list(
     @ApiParam(value = "Class of resources to return", required = true, example = "org.roda.core.data.v2.ip.IndexedFile") @QueryParam(RodaConstants.API_QUERY_KEY_RETURN_CLASS) final String returnClass,
@@ -207,6 +207,7 @@ public class IndexResource {
       IndexResult<T> indexResult = Browser.find(classToReturn, findRequest.filter, findRequest.sorter,
         findRequest.sublist, findRequest.facets, user, findRequest.onlyActive, new ArrayList<>());
       indexResult = I18nUtility.translate(indexResult, classToReturn, localeString);
+
       response = Response.ok(indexResult, mediaType).build();
     }
     return response;
@@ -226,7 +227,7 @@ public class IndexResource {
   @POST
   @Path("/find")
   @Consumes({MediaType.APPLICATION_JSON})
-  @Produces({MediaType.APPLICATION_JSON, ExtraMediaType.TEXT_CSV})
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.TEXT_CSV})
   @ApiOperation(value = "Find indexed resources", notes = "Find indexed resources.", response = IsIndexed.class, responseContainer = "List")
   public <T extends IsIndexed> Response find(@ApiParam(value = "Find parameters") final FindRequest findRequest)
     throws RODAException {
@@ -284,7 +285,7 @@ public class IndexResource {
   @POST
   @Path("/count")
   @Consumes({MediaType.APPLICATION_JSON})
-  @Produces({MediaType.APPLICATION_JSON})
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @ApiOperation(value = "Count indexed resources", notes = "Count indexed resources.", response = Long.class)
   public Response count(@ApiParam(value = "Count parameters") final CountRequest countRequest) throws RODAException {
     final String mediaType = ApiUtils.getMediaType(null, request);

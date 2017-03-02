@@ -27,6 +27,7 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
+import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -204,8 +205,12 @@ public class UserUtility {
     // }
   }
 
+  public static boolean isAdministrator(String username) {
+    return username.equals(RodaConstants.ADMIN);
+  }
+
   public static boolean isAdministrator(User user) {
-    return user.getGroups().contains(RodaConstants.ADMINISTRATORS);
+    return user.getName().equals(RodaConstants.ADMIN);
   }
 
   public static void checkAIPPermissions(User user, IndexedAIP aip, PermissionType permissionType)
@@ -254,10 +259,14 @@ public class UserUtility {
       checkRepresentationPermissions(user, (IndexedRepresentation) obj, permissionType);
     } else if (obj instanceof IndexedFile) {
       checkFilePermissions(user, (IndexedFile) obj, permissionType);
+    } else if (obj instanceof IndexedDIP) {
+      checkDIPPermissions(user, (IndexedDIP) obj, permissionType);
+    } else if (obj instanceof DIPFile) {
+      checkDIPFilePermissions(user, (DIPFile) obj, permissionType);
     }
   }
 
-  private static <T extends IsIndexed> void checkObjectPermissions(User user, T obj, Function<T, String> toAIP,
+  private static <T extends IsIndexed> void checkAIPObjectPermissions(User user, T obj, Function<T, String> toAIP,
     PermissionType permissionType) throws AuthorizationDeniedException {
 
     if (isAdministrator(user)) {
@@ -285,19 +294,52 @@ public class UserUtility {
     }
   }
 
+  private static <T extends IsIndexed> void checkDIPObjectPermissions(User user, T obj, Function<T, String> toDIP,
+    PermissionType permissionType) throws AuthorizationDeniedException {
+
+    if (isAdministrator(user)) {
+      return;
+    }
+
+    String dipId = toDIP.apply(obj);
+    IndexedDIP dip;
+    try {
+      dip = RodaCoreFactory.getIndexService().retrieve(IndexedDIP.class, dipId,
+        RodaConstants.DIP_PERMISSIONS_FIELDS_TO_RETURN);
+    } catch (NotFoundException | GenericException e) {
+      throw new AuthorizationDeniedException("Could not check permissions of object " + obj, e);
+    }
+
+    Set<String> users = dip.getPermissions().getUsers().get(permissionType);
+    Set<String> groups = dip.getPermissions().getGroups().get(permissionType);
+
+    LOGGER.debug("Checking if user '{}' has permissions to {} object {} (object read permissions: {} & {})",
+      user.getId(), permissionType, dip.getId(), users, groups);
+
+    if (!users.contains(user.getId()) && iterativeDisjoint(groups, user.getGroups())) {
+      throw new AuthorizationDeniedException(
+        "The user '" + user.getId() + "' does not have permissions to " + permissionType);
+    }
+  }
+
   public static void checkRepresentationPermissions(User user, IndexedRepresentation rep, PermissionType permissionType)
     throws AuthorizationDeniedException {
-    checkObjectPermissions(user, rep, r -> r.getAipId(), permissionType);
+    checkAIPObjectPermissions(user, rep, r -> r.getAipId(), permissionType);
   }
 
   public static void checkFilePermissions(User user, IndexedFile file, PermissionType permissionType)
     throws AuthorizationDeniedException {
-    checkObjectPermissions(user, file, f -> f.getAipId(), permissionType);
+    checkAIPObjectPermissions(user, file, f -> f.getAipId(), permissionType);
+  }
+
+  public static void checkDIPFilePermissions(User user, DIPFile file, PermissionType permissionType)
+    throws AuthorizationDeniedException {
+    checkDIPObjectPermissions(user, file, f -> f.getDipId(), permissionType);
   }
 
   public static void checkPreservationEventPermissions(User user, IndexedPreservationEvent event,
     PermissionType permissionType) throws AuthorizationDeniedException {
-    checkObjectPermissions(user, event, f -> f.getAipID(), permissionType);
+    checkAIPObjectPermissions(user, event, f -> f.getAipID(), permissionType);
   }
 
   public static void checkAIPPermissions(User user, SelectedItems<IndexedAIP> selected, PermissionType permission)

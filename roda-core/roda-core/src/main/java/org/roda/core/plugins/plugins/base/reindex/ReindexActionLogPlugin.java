@@ -32,6 +32,7 @@ import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
@@ -183,6 +184,12 @@ public class ReindexActionLogPlugin extends AbstractPlugin<Void> {
             LOGGER.error("Error while trying to reindex action log '" + resource.getStoragePath() + "' from storage",
               e);
           }
+
+          try {
+            PluginHelper.updateJobInformation(this, jobPluginInfo);
+          } catch (JobException e) {
+            LOGGER.error("Could not update job information");
+          }
         }
       }
     } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
@@ -213,6 +220,12 @@ public class ReindexActionLogPlugin extends AbstractPlugin<Void> {
           LOGGER.error("Error reindexing action log", e);
         } finally {
           IOUtils.closeQuietly(br);
+        }
+
+        try {
+          PluginHelper.updateJobInformation(this, jobPluginInfo);
+        } catch (JobException e) {
+          LOGGER.error("Could not update job information");
         }
       }
     } catch (IOException e) {

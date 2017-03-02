@@ -2782,7 +2782,7 @@ public class ModelService extends ModelObservable {
 
   public boolean checkObjectPermission(String username, String permissionType, String objectClass, String id)
     throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
-    if (username.equals(RodaConstants.ADMIN)) {
+    if (UserUtility.isAdministrator(username)) {
       return true;
     }
 

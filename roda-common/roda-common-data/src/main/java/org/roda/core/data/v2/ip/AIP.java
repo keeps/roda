@@ -19,8 +19,8 @@ import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @XmlRootElement(name = "aip")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class AIP implements IsModelObject {
 
   private static final long serialVersionUID = 430629679119752757L;

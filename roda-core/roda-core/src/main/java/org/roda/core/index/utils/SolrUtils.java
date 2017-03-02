@@ -283,7 +283,7 @@ public class SolrUtils {
     query.setFields(fieldsToReturn.toArray(new String[fieldsToReturn.size()]));
     parseAndConfigureFacets(facets, query);
     if (hasPermissionFilters(classToRetrieve)) {
-      query.addFilterQuery(getFilterQueries(user, justActive));
+      query.addFilterQuery(getFilterQueries(user, justActive, classToRetrieve));
     }
 
     try {
@@ -376,9 +376,7 @@ public class SolrUtils {
       ret = riskIncidenceToSolrDocument((RiskIncidence) object);
     } else if (resultClass.equals(DIP.class) || resultClass.equals(IndexedDIP.class)) {
       ret = dipToSolrDocument((DIP) object);
-    } else if (resultClass.equals(DIPFile.class)) {
-      ret = dipFileToSolrDocument((DIPFile) object);
-    } else if (resultClass.equals(IndexedFile.class)) {
+    } else if (resultClass.equals(IndexedFile.class) || resultClass.equals(DIPFile.class)) {
       throw new NotSupportedException();
     } else if (resultClass.equals(IndexedPreservationEvent.class)) {
       throw new NotSupportedException();
@@ -393,7 +391,7 @@ public class SolrUtils {
   public static <T extends Serializable> List<String> getIndexName(Class<T> resultClass) throws GenericException {
     List<String> indexNames = new ArrayList<>();
 
-    // 201608 nvieira: the first index name must be the "main" one
+    // INFO 201608 nvieira: the first index name must be the "main" one
     if (resultClass.equals(AIP.class) || resultClass.equals(IndexedAIP.class)) {
       indexNames.add(RodaConstants.INDEX_AIP);
       indexNames.add(RodaConstants.INDEX_REPRESENTATION);
@@ -409,11 +407,8 @@ public class SolrUtils {
       indexNames.add(RodaConstants.INDEX_ACTION_LOG);
     } else if (resultClass.equals(Report.class) || resultClass.equals(IndexedReport.class)) {
       indexNames.add(RodaConstants.INDEX_JOB_REPORT);
-    } else if (resultClass.equals(User.class)) {
-      indexNames.add(RodaConstants.INDEX_MEMBERS);
-    } else if (resultClass.equals(Group.class)) {
-      indexNames.add(RodaConstants.INDEX_MEMBERS);
-    } else if (resultClass.equals(RODAMember.class)) {
+    } else if (resultClass.equals(User.class) || resultClass.equals(Group.class)
+      || resultClass.equals(RODAMember.class)) {
       indexNames.add(RodaConstants.INDEX_MEMBERS);
     } else if (resultClass.equals(TransferredResource.class)) {
       indexNames.add(RodaConstants.INDEX_TRANSFERRED_RESOURCE);
@@ -443,9 +438,9 @@ public class SolrUtils {
   }
 
   private static <T> boolean hasPermissionFilters(Class<T> resultClass) throws GenericException {
-    return resultClass.equals(AIP.class) || resultClass.equals(IndexedAIP.class)
-      || resultClass.equals(Representation.class) || resultClass.equals(IndexedRepresentation.class)
-      || resultClass.equals(IndexedFile.class) || resultClass.equals(IndexedPreservationEvent.class);
+    return resultClass.equals(IndexedAIP.class) || resultClass.equals(IndexedRepresentation.class)
+      || resultClass.equals(IndexedFile.class) || resultClass.equals(IndexedPreservationEvent.class)
+      || resultClass.equals(IndexedDIP.class) || resultClass.equals(DIPFile.class);
   }
 
   /**
@@ -1073,7 +1068,8 @@ public class SolrUtils {
    * Roda user > Apache Solr filter query
    * ____________________________________________________________________________________________________________________
    */
-  private static String getFilterQueries(User user, boolean justActive) {
+  private static <T extends IsIndexed> String getFilterQueries(User user, boolean justActive,
+    Class<T> classToRetrieve) {
 
     StringBuilder fq = new StringBuilder();
 
@@ -1089,7 +1085,7 @@ public class SolrUtils {
       fq.append(")");
     }
 
-    if (justActive) {
+    if (justActive && !IndexedDIP.class.equals(classToRetrieve) && !DIPFile.class.equals(classToRetrieve)) {
       appendExactMatch(fq, RodaConstants.STATE, AIPState.ACTIVE.toString(), true, true);
     }
 
@@ -2318,7 +2314,7 @@ public class SolrUtils {
     return dip;
   }
 
-  public static SolrInputDocument dipFileToSolrDocument(DIPFile file) {
+  public static SolrInputDocument dipFileToSolrDocument(DIP dip, DIPFile file) {
     SolrInputDocument doc = new SolrInputDocument();
     doc.addField(RodaConstants.INDEX_UUID, IdUtils.getDIPFileId(file));
     List<String> path = file.getPath();
@@ -2346,6 +2342,7 @@ public class SolrUtils {
       LOGGER.warn("Could not index DIP file storage path", e);
     }
 
+    setPermissions(dip.getPermissions(), doc);
     return doc;
   }
 
@@ -2545,6 +2542,7 @@ public class SolrUtils {
 
       ret.addField(key, value);
     }
+
     for (Entry<PermissionType, Set<String>> entry : permissions.getGroups().entrySet()) {
       String key = RodaConstants.INDEX_PERMISSION_GROUPS_PREFIX + entry.getKey();
       List<String> value = new ArrayList<>(entry.getValue());
@@ -2699,7 +2697,7 @@ public class SolrUtils {
     query.setParam("q.op", DEFAULT_QUERY_PARSER_OPERATOR);
     query.setQuery(queryBuilder.toString());
     if (hasPermissionFilters(classToRetrieve)) {
-      query.addFilterQuery(getFilterQueries(user, justActive));
+      query.addFilterQuery(getFilterQueries(user, justActive, classToRetrieve));
     }
     parseAndConfigureFacets(new Facets(new SimpleFacetParameter(field)), query);
     List<String> suggestions = new ArrayList<>();

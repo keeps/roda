@@ -10,9 +10,15 @@ package org.roda.core.data.v2.ip;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@XmlRootElement(name = "representation")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class IndexedRepresentation extends Representation implements IsIndexed {
 
   private static final long serialVersionUID = -950545608880793468L;

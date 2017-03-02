@@ -647,7 +647,7 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public ReturnWithExceptions<Void> fileCreated(File file) {
-    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<>();
     boolean recursive = true;
     try {
       AIP aip = model.retrieveAIP(file.getAipId());
@@ -1173,7 +1173,7 @@ public class IndexModelObserver implements ModelObserver {
       for (OptionalWithCause<DIPFile> file : allFiles) {
         if (file.isPresent()) {
           boolean recursiveIndexFile = false;
-          ReturnWithExceptions<Void> subExceptions = indexDIPFile(file.get(), recursiveIndexFile);
+          ReturnWithExceptions<Void> subExceptions = indexDIPFile(dip, file.get(), recursiveIndexFile);
           exceptions.addExceptions(subExceptions.getExceptions());
         } else {
           LOGGER.error("Cannot index DIP file", file.getCause());
@@ -1218,9 +1218,9 @@ public class IndexModelObserver implements ModelObserver {
     }
   }
 
-  private ReturnWithExceptions<Void> indexDIPFile(DIPFile file, boolean recursive) {
+  private ReturnWithExceptions<Void> indexDIPFile(DIP dip, DIPFile file, boolean recursive) {
     ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
-    SolrInputDocument fileDocument = SolrUtils.dipFileToSolrDocument(file);
+    SolrInputDocument fileDocument = SolrUtils.dipFileToSolrDocument(dip, file);
 
     try {
       index.add(RodaConstants.INDEX_DIP_FILE, fileDocument);
@@ -1234,7 +1234,7 @@ public class IndexModelObserver implements ModelObserver {
         CloseableIterable<OptionalWithCause<DIPFile>> allFiles = model.listDIPFilesUnder(file, true);
         for (OptionalWithCause<DIPFile> subfile : allFiles) {
           if (subfile.isPresent()) {
-            ReturnWithExceptions<Void> subExceptions = indexDIPFile(subfile.get(), false);
+            ReturnWithExceptions<Void> subExceptions = indexDIPFile(dip, subfile.get(), false);
             exceptions.addExceptions(subExceptions.getExceptions());
           } else {
             LOGGER.error("Cannot index DIP file", subfile.getCause());
@@ -1254,8 +1254,17 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public ReturnWithExceptions<Void> dipFileCreated(DIPFile file) {
-    boolean recursive = true;
-    return indexDIPFile(file, recursive);
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<>();
+    try {
+      boolean recursive = true;
+      DIP dip = model.retrieveDIP(file.getDipId());
+      ReturnWithExceptions<Void> ex = indexDIPFile(dip, file, recursive);
+      exceptions.addExceptions(ex.getExceptions());
+    } catch (NotFoundException | GenericException | AuthorizationDeniedException e) {
+      LOGGER.error("Error indexing DIP file: {}", file, e);
+    }
+
+    return exceptions;
   }
 
   @Override
