@@ -2466,4 +2466,8 @@ public interface ClientMessages extends Messages {
 
   String jobReportOutcome(@Select String outcomeObjectClass);
 
+  /* Threshold exceed warning */
+
+  String thresholdExceeded(Integer threshold, int size);
+
 }

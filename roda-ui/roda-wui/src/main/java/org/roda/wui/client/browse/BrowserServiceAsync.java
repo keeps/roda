@@ -238,4 +238,6 @@ public interface BrowserServiceAsync {
 
   <T extends IsIndexed> void retrieveFromModel(String objectClass, String objectUUID, AsyncCallback<T> asyncCallback);
 
+  void getListThreshold(AsyncCallback<Integer> asyncCallback);
+
 }

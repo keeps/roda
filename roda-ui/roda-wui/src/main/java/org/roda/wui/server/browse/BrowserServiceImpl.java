@@ -879,4 +879,9 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     return Browser.retrieve(user, indexedClassToReturn, id, new ArrayList<>());
   }
 
+  @Override
+  public int getListThreshold() {
+    return RodaCoreFactory.getRodaConfiguration().getInt("ui.list.threshold");
+  }
+
 }

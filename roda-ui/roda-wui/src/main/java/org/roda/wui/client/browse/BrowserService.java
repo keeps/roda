@@ -328,4 +328,6 @@ public interface BrowserService extends RemoteService {
 
   <T extends IsIndexed> T retrieveFromModel(String classNameToReturn, String id)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
+
+  int getListThreshold();
 }

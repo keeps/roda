@@ -1026,7 +1026,7 @@ public final class RodaConstants {
     WELLFORMEDNESS_CHECK("wellformedness check"), UNPACKING("unpacking"), METADATA_EXTRACTION("metadata extraction"),
     ACCESSION("accession"), AUTHORIZATION_CHECK("authorization check"), FORMAT_IDENTIFICATION("format identification"),
     FORMAT_VALIDATION("format validation"), INGEST_START("ingest start"), INGEST_END("ingest end"),
-    RISK_MANAGEMENT("risk management"), NONE("none"), DIP_CREATION("dip creation");
+    RISK_MANAGEMENT("risk management"), NONE("none"), DISSEMINATION("dissemination");
 
     private String originalText;
     private String text;

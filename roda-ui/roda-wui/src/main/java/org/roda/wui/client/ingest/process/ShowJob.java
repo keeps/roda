@@ -417,7 +417,7 @@ public class ShowJob extends Composite {
     return job != null && job.isInFinalState();
   }
 
-  private void showIngestSourceObjects(SelectedItems<?> selected) {
+  private void showIngestSourceObjects(final SelectedItems<?> selected) {
     if (selected != null) {
       selectedList.clear();
       selectedListPanel.setVisible(true);
@@ -425,11 +425,27 @@ public class ShowJob extends Composite {
       if (ClientSelectedItemsUtils.isEmpty(selected) && isJobInFinalState()) {
         selectedListPanel.setVisible(false);
       } else if (selected instanceof SelectedItemsList) {
-        List<String> ids = ((SelectedItemsList<?>) selected).getIds();
-        Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, ids));
-        TransferredResourceList list = new TransferredResourceList(filter, null, messages.transferredResourcesTitle(),
-          false, 10, 10);
-        selectedList.add(list);
+        BrowserService.Util.getInstance().getListThreshold(new AsyncCallback<Integer>() {
+
+          @Override
+          public void onFailure(Throwable caught) {
+            AsyncCallbackUtils.defaultFailureTreatment(caught);
+          }
+
+          @Override
+          public void onSuccess(Integer threshold) {
+            List<String> ids = ((SelectedItemsList<?>) selected).getIds();
+            if (ids.size() > threshold) {
+              Label thresholdLabel = new Label(messages.thresholdExceeded(ids.size(), threshold));
+              selectedList.add(thresholdLabel);
+            } else {
+              Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, ids));
+              TransferredResourceList list = new TransferredResourceList(filter, null,
+                messages.transferredResourcesTitle(), false, 10, 10);
+              selectedList.add(list);
+            }
+          }
+        });
       } else if (selected instanceof SelectedItemsFilter) {
         Filter filter = ((SelectedItemsFilter<?>) selected).getFilter();
         TransferredResourceList list = new TransferredResourceList(filter, null, messages.transferredResourcesTitle(),
@@ -441,31 +457,46 @@ public class ShowJob extends Composite {
     }
   }
 
-  private void showActionSourceObjects(SelectedItems<?> selected) {
+  private void showActionSourceObjects(final SelectedItems<?> selected) {
     if (selected != null) {
-      boolean selectable = false;
-      boolean justActive = true;
+      final boolean selectable = false;
+      final boolean justActive = true;
       selectedList.clear();
 
       if (selected instanceof SelectedItemsList) {
-        List<String> ids = ((SelectedItemsList<?>) selected).getIds();
+        BrowserService.Util.getInstance().getListThreshold(new AsyncCallback<Integer>() {
 
-        if (ids.size() == 0) {
-          selectedListPanel.setVisible(false);
-        }
+          @Override
+          public void onFailure(Throwable caught) {
+            AsyncCallbackUtils.defaultFailureTreatment(caught);
+          }
 
-        Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, ids));
-        if (IndexedAIP.class.getName().equals(selected.getSelectedClass())) {
-          AIPList list = new AIPList(filter, justActive, null, messages.aipsTitle(), selectable, 10, 10);
-          selectedList.add(list);
-        } else if (IndexedRepresentation.class.getName().equals(selected.getSelectedClass())) {
-          RepresentationList list = new RepresentationList(filter, justActive, null, messages.representationsTitle(),
-            selectable, 10, 10);
-          selectedList.add(list);
-        } else if (IndexedFile.class.getName().equals(selected.getSelectedClass())) {
-          SimpleFileList list = new SimpleFileList(filter, justActive, null, messages.filesTitle(), selectable, 10, 10);
-          selectedList.add(list);
-        }
+          @Override
+          public void onSuccess(Integer threshold) {
+            List<String> ids = ((SelectedItemsList<?>) selected).getIds();
+
+            if (ids.isEmpty()) {
+              selectedListPanel.setVisible(false);
+            } else if (ids.size() > threshold) {
+              Label thresholdLabel = new Label(messages.thresholdExceeded(ids.size(), threshold));
+              selectedList.add(thresholdLabel);
+            } else {
+              Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, ids));
+              if (IndexedAIP.class.getName().equals(selected.getSelectedClass())) {
+                AIPList list = new AIPList(filter, justActive, null, messages.aipsTitle(), selectable, 10, 10);
+                selectedList.add(list);
+              } else if (IndexedRepresentation.class.getName().equals(selected.getSelectedClass())) {
+                RepresentationList list = new RepresentationList(filter, justActive, null,
+                  messages.representationsTitle(), selectable, 10, 10);
+                selectedList.add(list);
+              } else if (IndexedFile.class.getName().equals(selected.getSelectedClass())) {
+                SimpleFileList list = new SimpleFileList(filter, justActive, null, messages.filesTitle(), selectable,
+                  10, 10);
+                selectedList.add(list);
+              }
+            }
+          }
+        });
 
       } else if (selected instanceof SelectedItemsFilter) {
         Filter filter = ((SelectedItemsFilter<?>) selected).getFilter();
