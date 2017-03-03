@@ -53,7 +53,7 @@ import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
-import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPluginUtils;
+import org.roda.core.plugins.plugins.characterization.PremisSkeletonPluginUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.util.FileUtility;
@@ -149,7 +149,7 @@ public final class PremisV3Utils {
     List<SAXParseException> errors;
 
     public RodaErrorHandler() {
-      errors = new ArrayList<SAXParseException>();
+      errors = new ArrayList<>();
     }
 
     @Override
@@ -410,10 +410,10 @@ public final class PremisV3Utils {
     if (binary.getContentDigest() != null && !binary.getContentDigest().isEmpty()) {
       // use binary content digest information
       for (Entry<String, String> entry : binary.getContentDigest().entrySet()) {
-        FixityComplexType premis_fixity = occt.addNewFixity();
-        premis_fixity.setMessageDigest(entry.getKey());
-        premis_fixity.setMessageDigestAlgorithm(getStringPlusAuthority(entry.getValue()));
-        premis_fixity.setMessageDigestOriginator(getStringPlusAuthority(FIXITY_ORIGINATOR));
+        FixityComplexType premisFixity = occt.addNewFixity();
+        premisFixity.setMessageDigest(entry.getKey());
+        premisFixity.setMessageDigestAlgorithm(getStringPlusAuthority(entry.getValue()));
+        premisFixity.setMessageDigestOriginator(getStringPlusAuthority(FIXITY_ORIGINATOR));
       }
     } else {
       // if binary does not contain digest, create a new one
@@ -421,10 +421,10 @@ public final class PremisV3Utils {
         List<Fixity> fixities = calculateFixities(binary, fixityAlgorithms, FIXITY_ORIGINATOR);
 
         for (Fixity fixity : fixities) {
-          FixityComplexType premis_fixity = occt.addNewFixity();
-          premis_fixity.setMessageDigest(fixity.getMessageDigest());
-          premis_fixity.setMessageDigestAlgorithm(getStringPlusAuthority(fixity.getMessageDigestAlgorithm()));
-          premis_fixity.setMessageDigestOriginator(getStringPlusAuthority(fixity.getMessageDigestOriginator()));
+          FixityComplexType premisFixity = occt.addNewFixity();
+          premisFixity.setMessageDigest(fixity.getMessageDigest());
+          premisFixity.setMessageDigestAlgorithm(getStringPlusAuthority(fixity.getMessageDigestAlgorithm()));
+          premisFixity.setMessageDigestOriginator(getStringPlusAuthority(fixity.getMessageDigestOriginator()));
         }
       } catch (IOException | NoSuchAlgorithmException e) {
         LOGGER.warn("Could not calculate fixity for file " + originalFile);
@@ -445,7 +445,7 @@ public final class PremisV3Utils {
   }
 
   public static List<Fixity> extractFixities(Binary premisFile) throws GenericException, XmlException, IOException {
-    List<Fixity> fixities = new ArrayList<Fixity>();
+    List<Fixity> fixities = new ArrayList<>();
     InputStream inputStream = premisFile.getContent().createInputStream();
     gov.loc.premis.v3.File f = binaryToFile(inputStream);
     if (f.getObjectCharacteristicsArray() != null && f.getObjectCharacteristicsArray().length > 0) {
@@ -675,17 +675,13 @@ public final class PremisV3Utils {
 
           FormatRegistryComplexType pronomRegistry = getFormatRegistry(premisFile,
             RodaConstants.PRESERVATION_REGISTRY_PRONOM);
-          if (pronomRegistry != null) {
-            if (pronomRegistry.getFormatRegistryKey() != null) {
-              doc.addField(RodaConstants.FILE_PRONOM, pronomRegistry.getFormatRegistryKey().getStringValue());
-            }
+          if (pronomRegistry != null && pronomRegistry.getFormatRegistryKey() != null) {
+            doc.addField(RodaConstants.FILE_PRONOM, pronomRegistry.getFormatRegistryKey().getStringValue());
           }
           FormatRegistryComplexType mimeRegistry = getFormatRegistry(premisFile,
             RodaConstants.PRESERVATION_REGISTRY_MIME);
-          if (mimeRegistry != null) {
-            if (mimeRegistry.getFormatRegistryKey() != null) {
-              doc.addField(RodaConstants.FILE_FORMAT_MIMETYPE, mimeRegistry.getFormatRegistryKey().getStringValue());
-            }
+          if (mimeRegistry != null && mimeRegistry.getFormatRegistryKey() != null) {
+            doc.addField(RodaConstants.FILE_FORMAT_MIMETYPE, mimeRegistry.getFormatRegistryKey().getStringValue());
           }
           // TODO extension
         }
@@ -747,7 +743,7 @@ public final class PremisV3Utils {
 
   public static List<LinkingIdentifier> extractObjectFromEvent(Binary binary)
     throws ValidationException, GenericException {
-    List<LinkingIdentifier> identifiers = new ArrayList<LinkingIdentifier>();
+    List<LinkingIdentifier> identifiers = new ArrayList<>();
     EventComplexType event = PremisV3Utils.binaryToEvent(binary.getContent(), true);
     if (event.getLinkingObjectIdentifierArray() != null && event.getLinkingObjectIdentifierArray().length > 0) {
       for (LinkingObjectIdentifierComplexType loict : event.getLinkingObjectIdentifierArray()) {
@@ -775,7 +771,7 @@ public final class PremisV3Utils {
   }
 
   public static StringPlusAuthority[] getStringPlusAuthorityArray(List<String> values) {
-    List<StringPlusAuthority> l = new ArrayList<StringPlusAuthority>();
+    List<StringPlusAuthority> l = new ArrayList<>();
     if (values != null && !values.isEmpty()) {
       for (String value : values) {
         l.add(getStringPlusAuthority(value));
@@ -785,7 +781,7 @@ public final class PremisV3Utils {
   }
 
   private static List<String> stringplusArrayToStringList(StringPlusAuthority[] source) {
-    List<String> dst = new ArrayList<String>();
+    List<String> dst = new ArrayList<>();
     if (source != null && source.length > 0) {
       for (StringPlusAuthority spa : source) {
         dst.add(spa.getStringValue());

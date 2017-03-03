@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.plugins.plugins.base.reindex;
+package org.roda.core.plugins.plugins.reindex;
 
 import java.io.BufferedReader;
 import java.io.IOException;

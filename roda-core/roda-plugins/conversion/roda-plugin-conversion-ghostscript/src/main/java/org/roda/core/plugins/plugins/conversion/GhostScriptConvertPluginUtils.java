@@ -22,7 +22,7 @@ public class GhostScriptConvertPluginUtils {
     throws GhostscriptException, IOException, UnsupportedOperationException {
 
     String command = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "ghostscriptconvert", "commandLine");
-    // command = command.replace("{input_file}", input.toString());
+    command = command.replace("{input_file}", input.toString());
     command = command.replace("{output_file}", output.toString());
 
     if (commandArguments.length() > 0) {
@@ -33,13 +33,6 @@ public class GhostScriptConvertPluginUtils {
 
     // GhostScript transformation command
     String[] gsArgs = command.split("\\s+");
-
-    for (int i = 0; i < gsArgs.length; i++) {
-      if (gsArgs[i].equals("{input_file}")) {
-        gsArgs[i] = input.toString();
-      }
-    }
-
     Ghostscript gs = Ghostscript.getInstance();
 
     try {

@@ -5,13 +5,16 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.plugins.plugins.ingest.characterization;
+package org.roda.core.plugins.plugins.characterization;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.xmlbeans.XmlException;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
@@ -20,13 +23,13 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -43,13 +46,11 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponentsPlugin<T> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(SiegfriedPlugin.class);
-  public static final String FILE_SUFFIX = ".json";
+public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPComponentsPlugin<T> {
+  private static final Logger LOGGER = LoggerFactory.getLogger(PremisSkeletonPlugin.class);
 
   @Override
   public void init() throws PluginException {
-    // do nothing
   }
 
   @Override
@@ -58,7 +59,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
   }
 
   public static String getStaticName() {
-    return "File format identification (Siegfried)";
+    return "Fixity information computation";
   }
 
   @Override
@@ -67,9 +68,10 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
   }
 
   public static String getStaticDescription() {
-    return "Identifies the file format and version of data files included in Information Packages using the Siegfried tool (a signature-based file format "
-      + "identification tool that supports PRONOM identifiers and Mimetypes).\nThe task updates PREMIS objects metadata in the Information Package to store "
-      + "the results of format identification. A PREMIS event is also recorded after the task is run.";
+    return "Computes file fixity information (also known as checksum) for all data files within an AIP, representation or file and stores this information in PREMIS objects "
+      + "within the corresponding entity. This task uses SHA-256 as the default checksum algorithm, however, other algorithms can be configured in “roda-core.properties”."
+      + "\nFile fixity is the property of a digital file being fixed, or unchanged. “AIP corruption risk assessment” is the process of validating that a file has not changed or been "
+      + "altered from a previous state. In order to validate the fixity of an AIP or file, fixity information has to be generated beforehand.";
   }
 
   @Override
@@ -79,7 +81,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
 
   @Override
   public String getVersionImpl() {
-    return SiegfriedPluginUtils.getVersion();
+    return "1.0";
   }
 
   @Override
@@ -89,37 +91,34 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
 
   public Report executeOnAIP(IndexService index, ModelService model, StorageService storage, Report report,
     SimpleJobPluginInfo jobPluginInfo, List<AIP> list, Job job) throws PluginException {
+
     try {
       for (AIP aip : list) {
+        LOGGER.debug("Processing AIP {}", aip.getId());
         Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
         PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
 
-        LOGGER.debug("Processing AIP {}", aip.getId());
-        List<LinkingIdentifier> sources = new ArrayList<>();
         try {
-
           for (Representation representation : aip.getRepresentations()) {
-            LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
-            sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(this, model, representation));
+            LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());
+            List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
+            PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aip.getId(), representation.getId(),
+              algorithms);
             model.notifyRepresentationUpdated(representation);
           }
 
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
           reportItem.setPluginState(PluginState.SUCCESS);
-        } catch (PluginException | NotFoundException | GenericException | RequestNotValidException
-          | AuthorizationDeniedException | AlreadyExistsException e) {
-          LOGGER.error("Error running Siegfried {}: {}", aip.getId(), e.getMessage(), e);
+        } catch (RODAException | XmlException | IOException e) {
+          LOGGER.error("Error processing AIP {}", aip.getId(), e);
 
           jobPluginInfo.incrementObjectsProcessedWithFailure();
-          reportItem.setPluginState(PluginState.FAILURE)
-            .setPluginDetails("Error running Siegfried " + aip.getId() + ": " + e.getMessage());
+          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
         }
 
         try {
-          List<LinkingIdentifier> outcomes = null;
           boolean notify = true;
-          PluginHelper.createPluginEvent(this, aip.getId(), model, index, sources, outcomes,
-            reportItem.getPluginState(), "", notify);
+          PluginHelper.createPluginEvent(this, aip.getId(), model, index, reportItem.getPluginState(), "", notify);
         } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
           | AuthorizationDeniedException | AlreadyExistsException e) {
           LOGGER.error("Error creating event: {}", e.getMessage(), e);
@@ -140,31 +139,28 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
     SimpleJobPluginInfo jobPluginInfo, List<Representation> list, Job job) throws PluginException {
 
     for (Representation representation : list) {
-      List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
-
+      LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), representation.getAipId());
       Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getRepresentationId(representation),
-        Representation.class);
+        Representation.class, AIPState.ACTIVE);
       PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
-      LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), representation.getAipId());
-      try {
-        sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(this, model, representation));
-        jobPluginInfo.incrementObjectsProcessedWithSuccess();
-        reportItem.setPluginState(PluginState.SUCCESS);
-        model.notifyRepresentationUpdated(representation);
-      } catch (PluginException | NotFoundException | GenericException | RequestNotValidException
-        | AuthorizationDeniedException | AlreadyExistsException e) {
-        LOGGER.error("Error running Siegfried {}: {}", representation.getAipId(), e.getMessage(), e);
+      reportItem.setPluginState(PluginState.SUCCESS);
 
+      try {
+        List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
+        PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, representation.getAipId(),
+          representation.getId(), algorithms);
+        model.notifyRepresentationUpdated(representation);
+        jobPluginInfo.incrementObjectsProcessedWithSuccess();
+      } catch (RODAException | XmlException | IOException e) {
+        LOGGER.error("Error processing representation {}", representation.getId(), e);
         jobPluginInfo.incrementObjectsProcessedWithFailure();
-        reportItem.setPluginState(PluginState.FAILURE)
-          .setPluginDetails("Error running Siegfried " + representation.getAipId() + ": " + e.getMessage());
+        reportItem.setPluginState(PluginState.FAILURE).addPluginDetails(e.getMessage() + "\n");
       }
 
       try {
-        List<LinkingIdentifier> outcomes = null;
         boolean notify = true;
-        PluginHelper.createPluginEvent(this, representation.getAipId(), representation.getId(), model, index, sources,
-          outcomes, reportItem.getPluginState(), "", notify);
+        PluginHelper.createPluginEvent(this, representation.getAipId(), representation.getId(), model, index, null,
+          null, reportItem.getPluginState(), "", notify);
       } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
         | AuthorizationDeniedException | AlreadyExistsException e) {
         LOGGER.error("Error creating event: {}", e.getMessage(), e);
@@ -181,31 +177,26 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
     SimpleJobPluginInfo jobPluginInfo, List<File> list, Job job) throws PluginException {
 
     for (File file : list) {
-      List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
-
-      Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getFileId(file), File.class);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
-      LOGGER.debug("Processing file {} from representation {} of AIP {}", file.getId(), file.getRepresentationId(),
+      LOGGER.debug("Processing file {} from representation {} from AIP {}", file.getId(), file.getRepresentationId(),
         file.getAipId());
+      Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getFileId(file), File.class, AIPState.ACTIVE);
+      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
+      reportItem.setPluginState(PluginState.SUCCESS);
 
       try {
-        sources.addAll(SiegfriedPluginUtils.runSiegfriedOnFile(this, model, file));
+        List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
+        PremisSkeletonPluginUtils.createPremisSkeletonOnFile(model, file, algorithms);
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
-        reportItem.setPluginState(PluginState.SUCCESS);
-      } catch (PluginException | NotFoundException | GenericException | RequestNotValidException
-        | AuthorizationDeniedException | AlreadyExistsException e) {
-        LOGGER.error("Error running Siegfried on file {}: {}", file.getId(), e.getMessage(), e);
-
+      } catch (RODAException | XmlException | IOException e) {
+        LOGGER.error("Error processing file {}", file.getId(), e);
         jobPluginInfo.incrementObjectsProcessedWithFailure();
-        reportItem.setPluginState(PluginState.FAILURE)
-          .setPluginDetails("Error running Siegfried on file " + file.getId() + ": " + e.getMessage());
+        reportItem.setPluginState(PluginState.FAILURE).addPluginDetails(e.getMessage() + "\n");
       }
 
       try {
-        List<LinkingIdentifier> outcomes = null;
         boolean notify = true;
         PluginHelper.createPluginEvent(this, file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
-          model, index, sources, outcomes, reportItem.getPluginState(), "", notify);
+          model, index, null, null, reportItem.getPluginState(), "", notify);
       } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
         | AuthorizationDeniedException | AlreadyExistsException e) {
         LOGGER.error("Error creating event: {}", e.getMessage(), e);
@@ -220,13 +211,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
 
   @Override
   public Plugin<T> cloneMe() {
-    SiegfriedPlugin<T> siegfriedPlugin = new SiegfriedPlugin<T>();
-    try {
-      siegfriedPlugin.init();
-    } catch (PluginException e) {
-      LOGGER.error("Error doing {} init", SiegfriedPlugin.class.getName(), e);
-    }
-    return siegfriedPlugin;
+    return new PremisSkeletonPlugin<T>();
   }
 
   @Override
@@ -241,22 +226,22 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
 
   @Override
   public PreservationEventType getPreservationEventType() {
-    return PreservationEventType.FORMAT_IDENTIFICATION;
+    return PreservationEventType.MESSAGE_DIGEST_CALCULATION;
   }
 
   @Override
   public String getPreservationEventDescription() {
-    return "Identified the object's file formats and versions using Siegfried.";
+    return "Created base PREMIS objects with file original name and file fixity information (SHA-256).";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "File formats were identified and recorded in PREMIS objects.";
+    return "PREMIS objects were successfully created.";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Failed to identify file formats in the package.";
+    return "Failed to create PREMIS objects from files.";
   }
 
   @Override

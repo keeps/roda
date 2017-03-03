@@ -5,22 +5,22 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.plugins.plugins.base.reindex;
+package org.roda.core.plugins.plugins.reindex;
 
 import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.index.IndexService;
 import org.roda.core.plugins.Plugin;
 
-public class ReindexJobPlugin extends ReindexRodaEntityPlugin<Job> {
+public class ReindexDIPFilePlugin extends ReindexRodaEntityPlugin<DIPFile> {
 
   @Override
   public String getName() {
-    return "Rebuild job index";
+    return "Rebuild DIP file index";
   }
 
   @Override
@@ -29,13 +29,13 @@ public class ReindexJobPlugin extends ReindexRodaEntityPlugin<Job> {
   }
 
   @Override
-  public Plugin<Job> cloneMe() {
-    return new ReindexJobPlugin();
+  public Plugin<DIPFile> cloneMe() {
+    return new ReindexDIPFilePlugin();
   }
 
   @Override
-  public List<Class<Job>> getObjectClasses() {
-    return Arrays.asList(Job.class);
+  public List<Class<DIPFile>> getObjectClasses() {
+    return Arrays.asList(DIPFile.class);
   }
 
   @Override

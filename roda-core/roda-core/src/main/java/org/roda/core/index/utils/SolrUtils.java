@@ -99,6 +99,7 @@ import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.FileLink;
+import org.roda.core.data.v2.ip.HasPermissionFilters;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -350,7 +351,7 @@ public class SolrUtils {
   private static <T> SolrInputDocument toSolrDocument(Class<T> resultClass, T object)
     throws GenericException, NotSupportedException {
 
-    SolrInputDocument ret = null;
+    SolrInputDocument ret;
     if (resultClass.equals(IndexedAIP.class)) {
       throw new NotSupportedException();
     } else if (resultClass.equals(IndexedRepresentation.class) || resultClass.equals(Representation.class)) {
@@ -438,9 +439,7 @@ public class SolrUtils {
   }
 
   private static <T> boolean hasPermissionFilters(Class<T> resultClass) throws GenericException {
-    return resultClass.equals(IndexedAIP.class) || resultClass.equals(IndexedRepresentation.class)
-      || resultClass.equals(IndexedFile.class) || resultClass.equals(IndexedPreservationEvent.class)
-      || resultClass.equals(IndexedDIP.class) || resultClass.equals(DIPFile.class);
+    return HasPermissionFilters.class.isAssignableFrom(resultClass);
   }
 
   /**
@@ -462,20 +461,20 @@ public class SolrUtils {
   private static List<String> objectToListString(Object object) {
     List<String> ret;
     if (object == null) {
-      ret = new ArrayList<String>();
+      ret = new ArrayList<>();
     } else if (object instanceof String) {
-      List<String> l = new ArrayList<String>();
+      List<String> l = new ArrayList<>();
       l.add((String) object);
       return l;
     } else if (object instanceof List<?>) {
       List<?> l = (List<?>) object;
-      ret = new ArrayList<String>();
+      ret = new ArrayList<>();
       for (Object o : l) {
         ret.add(o.toString());
       }
     } else {
       LOGGER.error("Could not convert Solr object to List<String> ({})", object.getClass().getName());
-      ret = new ArrayList<String>();
+      ret = new ArrayList<>();
     }
     return ret;
   }
@@ -839,7 +838,6 @@ public class SolrUtils {
     }
   }
 
-  @SuppressWarnings("unused")
   private static void appendKeyValue(StringBuilder ret, String key, String value) {
     ret.append(key).append(":").append("(").append(value).append(")");
   }
@@ -1074,7 +1072,7 @@ public class SolrUtils {
     StringBuilder fq = new StringBuilder();
 
     // TODO find a better way to define admin super powers
-    if (user != null && !user.getName().equals("admin")) {
+    if (user != null && !user.getName().equals(RodaConstants.ADMIN)) {
       fq.append("(");
       String usersKey = RodaConstants.INDEX_PERMISSION_USERS_PREFIX + PermissionType.READ;
       appendExactMatch(fq, usersKey, user.getId(), true, false);
@@ -1376,8 +1374,8 @@ public class SolrUtils {
   }
 
   private static List<String> getFileAncestorsPath(String aipId, String representationId, List<String> path) {
-    List<String> parentFileDirectoryPath = new ArrayList<String>();
-    List<String> ancestorsPath = new ArrayList<String>();
+    List<String> parentFileDirectoryPath = new ArrayList<>();
+    List<String> ancestorsPath = new ArrayList<>();
 
     parentFileDirectoryPath.addAll(path);
 
@@ -1426,7 +1424,7 @@ public class SolrUtils {
     final List<String> ancestors = objectToListString(doc.get(RodaConstants.AIP_ANCESTORS));
 
     // handle other properties
-    Map<String, List<String>> otherProperties = new HashMap<String, List<String>>();
+    Map<String, List<String>> otherProperties = new HashMap<>();
     for (String fieldName : doc.getFieldNames()) {
       if (fieldName.endsWith("_txt")) {
         List<String> otherProperty = objectToListString(doc.get(fieldName));
@@ -1566,11 +1564,10 @@ public class SolrUtils {
     final String fullName = objectToString(doc.get(RodaConstants.MEMBERS_FULLNAME), null);
 
     final String email = objectToString(doc.get(RodaConstants.MEMBERS_EMAIL), null);
-    final Set<String> groups = new HashSet<String>(objectToListString(doc.get(RodaConstants.MEMBERS_GROUPS)));
-    final Set<String> users = new HashSet<String>(objectToListString(doc.get(RodaConstants.MEMBERS_USERS)));
-    final Set<String> directRoles = new HashSet<String>(
-      objectToListString(doc.get(RodaConstants.MEMBERS_ROLES_DIRECT)));
-    final Set<String> allRoles = new HashSet<String>(objectToListString(doc.get(RodaConstants.MEMBERS_ROLES_ALL)));
+    final Set<String> groups = new HashSet<>(objectToListString(doc.get(RodaConstants.MEMBERS_GROUPS)));
+    final Set<String> users = new HashSet<>(objectToListString(doc.get(RodaConstants.MEMBERS_USERS)));
+    final Set<String> directRoles = new HashSet<>(objectToListString(doc.get(RodaConstants.MEMBERS_ROLES_DIRECT)));
+    final Set<String> allRoles = new HashSet<>(objectToListString(doc.get(RodaConstants.MEMBERS_ROLES_ALL)));
     if (isUser) {
       User user = new User();
       user.setId(id);
@@ -1637,7 +1634,7 @@ public class SolrUtils {
     ipe.setEventOutcome(eventOutcome);
 
     try {
-      List<LinkingIdentifier> ids = new ArrayList<LinkingIdentifier>();
+      List<LinkingIdentifier> ids = new ArrayList<>();
       for (String source : sources) {
         ids.add(JsonUtils.getObjectFromJson(source, LinkingIdentifier.class));
       }
@@ -1646,7 +1643,7 @@ public class SolrUtils {
       LOGGER.error("Error setting event linking source", e);
     }
     try {
-      List<LinkingIdentifier> ids = new ArrayList<LinkingIdentifier>();
+      List<LinkingIdentifier> ids = new ArrayList<>();
       for (String outcome : outcomes) {
         ids.add(JsonUtils.getObjectFromJson(outcome, LinkingIdentifier.class));
       }
@@ -1655,7 +1652,7 @@ public class SolrUtils {
       LOGGER.error("Error setting event linking outcome", e);
     }
     try {
-      List<LinkingIdentifier> ids = new ArrayList<LinkingIdentifier>();
+      List<LinkingIdentifier> ids = new ArrayList<>();
       for (String agent : agents) {
         ids.add(JsonUtils.getObjectFromJson(agent, LinkingIdentifier.class));
       }
@@ -2221,17 +2218,17 @@ public class SolrUtils {
     doc.addField(RodaConstants.DIP_REPRESENTATION_IDS, JsonUtils.getJsonFromObject(dip.getRepresentationIds()));
     doc.addField(RodaConstants.DIP_FILE_IDS, JsonUtils.getJsonFromObject(dip.getFileIds()));
 
-    List<String> allAipUUIDs = new ArrayList<String>();
-    List<String> allRepresentationUUIDs = new ArrayList<String>();
+    List<String> allAipUUIDs = new ArrayList<>();
+    List<String> allRepresentationUUIDs = new ArrayList<>();
 
-    List<String> aipUUIDs = new ArrayList<String>();
+    List<String> aipUUIDs = new ArrayList<>();
     for (AIPLink aip : dip.getAipIds()) {
       aipUUIDs.add(aip.getAipId());
     }
 
     allAipUUIDs.addAll(aipUUIDs);
 
-    List<String> representationUUIDs = new ArrayList<String>();
+    List<String> representationUUIDs = new ArrayList<>();
     for (RepresentationLink rep : dip.getRepresentationIds()) {
       representationUUIDs.add(IdUtils.getRepresentationId(rep));
       if (!allAipUUIDs.contains(rep.getAipId())) {
@@ -2241,7 +2238,7 @@ public class SolrUtils {
 
     allRepresentationUUIDs.addAll(representationUUIDs);
 
-    List<String> fileUUIDs = new ArrayList<String>();
+    List<String> fileUUIDs = new ArrayList<>();
     for (FileLink file : dip.getFileIds()) {
       fileUUIDs.add(IdUtils.getFileId(file));
       if (!allAipUUIDs.contains(file.getAipId())) {
@@ -2347,8 +2344,8 @@ public class SolrUtils {
   }
 
   private static List<String> getDIPFileAncestorsPath(String dipId, List<String> path) {
-    List<String> parentFileDirectoryPath = new ArrayList<String>();
-    List<String> ancestorsPath = new ArrayList<String>();
+    List<String> parentFileDirectoryPath = new ArrayList<>();
+    List<String> ancestorsPath = new ArrayList<>();
     parentFileDirectoryPath.addAll(path);
 
     while (!parentFileDirectoryPath.isEmpty()) {
@@ -2632,11 +2629,8 @@ public class SolrUtils {
         if (event == XMLStreamConstants.END_DOCUMENT) {
           parser.close();
           parsing = false;
-        } else if (event == XMLStreamConstants.START_ELEMENT) {
-          String currTag = parser.getLocalName();
-          if ("doc".equals(currTag)) {
-            doc = loader.readDoc(parser);
-          }
+        } else if (event == XMLStreamConstants.START_ELEMENT && "doc".equals(parser.getLocalName())) {
+          doc = loader.readDoc(parser);
         }
 
       }
@@ -2647,7 +2641,7 @@ public class SolrUtils {
       IOUtils.closeQuietly(reader);
     }
 
-    if (preservationMetadataType == PreservationMetadataType.EVENT) {
+    if (preservationMetadataType == PreservationMetadataType.EVENT && doc != null) {
       try {
         List<LinkingIdentifier> agents = PremisV3Utils.extractAgentsFromEvent(binary);
         for (LinkingIdentifier id : agents) {

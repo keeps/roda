@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.plugins.plugins.ingest.characterization;
+package org.roda.core.plugins.plugins.characterization;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

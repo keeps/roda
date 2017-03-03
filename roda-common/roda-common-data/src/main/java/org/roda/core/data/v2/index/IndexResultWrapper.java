@@ -11,10 +11,9 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.v2.common.RODAObjectList;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -23,30 +22,31 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @XmlRootElement(name = "index_result")
 @JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class IndexResult<T extends Serializable> implements Serializable {
+public class IndexResultWrapper implements Serializable {
 
   private static final long serialVersionUID = -7896294396414765557L;
 
   private long offset;
   private long limit;
   private long totalCount;
-  private List<T> results;
+  private RODAObjectList<?> results;
   private List<FacetFieldResult> facetResults;
   private Date date;
 
-  public IndexResult() {
+  public IndexResultWrapper() {
     super();
     date = new Date();
   }
 
-  public IndexResult(long offset, long limit, long totalCount, List<T> results, List<FacetFieldResult> facetResults) {
+  public IndexResultWrapper(long offset, long limit, long totalCount, RODAObjectList<?> results,
+    List<FacetFieldResult> facetResults, Date date) {
     super();
     this.offset = offset;
     this.limit = limit;
     this.totalCount = totalCount;
     this.results = results;
     this.facetResults = facetResults;
-    date = new Date();
+    this.date = date;
   }
 
   /**
@@ -73,9 +73,7 @@ public class IndexResult<T extends Serializable> implements Serializable {
   /**
    * @return the results
    */
-  @XmlElementWrapper(name = "results")
-  @XmlElement(name = "result")
-  public List<T> getResults() {
+  public RODAObjectList<?> getResults() {
     return results;
   }
 
@@ -91,7 +89,7 @@ public class IndexResult<T extends Serializable> implements Serializable {
     this.totalCount = totalCount;
   }
 
-  public void setResults(List<T> results) {
+  public void setResults(RODAObjectList<?> results) {
     this.results = results;
   }
 

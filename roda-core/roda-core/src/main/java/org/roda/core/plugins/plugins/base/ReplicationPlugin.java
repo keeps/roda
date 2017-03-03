@@ -32,7 +32,7 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
-import org.roda.core.plugins.plugins.base.reindex.ReindexAIPPlugin;
+import org.roda.core.plugins.plugins.reindex.ReindexAIPPlugin;
 import org.roda.core.storage.StorageService;
 import org.roda.core.util.CommandException;
 import org.roda.core.util.RESTClientUtility;

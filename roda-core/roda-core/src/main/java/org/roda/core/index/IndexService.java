@@ -102,8 +102,9 @@ public class IndexService {
   }
 
   public List<IndexedAIP> retrieveAncestors(IndexedAIP aip, List<String> fieldsToReturn) throws GenericException {
-    List<IndexedAIP> ancestors = new ArrayList<IndexedAIP>();
-    IndexedAIP parent = null, actual = aip;
+    List<IndexedAIP> ancestors = new ArrayList<>();
+    IndexedAIP parent;
+    IndexedAIP actual = aip;
 
     while (actual != null && actual.getParentID() != null) {
       try {
@@ -340,8 +341,8 @@ public class IndexService {
       for (Resource resource : actionLogs) {
         if (resource instanceof Binary) {
           Binary b = (Binary) resource;
-          BufferedReader br = new BufferedReader(new InputStreamReader(b.getContent().createInputStream()));
-          reindexActionLog(br);
+          InputStreamReader reader = new InputStreamReader(b.getContent().createInputStream());
+          reindexActionLog(reader);
         }
       }
     } catch (IOException e) {
@@ -351,8 +352,9 @@ public class IndexService {
     }
   }
 
-  public void reindexActionLog(BufferedReader br) throws GenericException {
+  public void reindexActionLog(InputStreamReader reader) throws GenericException {
     String line;
+    BufferedReader br = new BufferedReader(reader);
     try {
       while ((line = br.readLine()) != null) {
         LogEntry entry = JsonUtils.getObjectFromJson(line, LogEntry.class);
@@ -361,6 +363,7 @@ public class IndexService {
         }
       }
       br.close();
+      reader.close();
     } catch (IOException e) {
       throw new GenericException("Error reading log", e);
     }
@@ -439,7 +442,6 @@ public class IndexService {
 
   public <T extends Serializable> ReturnWithExceptions<Void> reindex(T object) {
     Class<T> objectClass = (Class<T>) object.getClass();
-
     if (AIP.class.equals(objectClass) || IndexedAIP.class.equals(objectClass)) {
       return reindexAIP(AIP.class.cast(object));
     } else if (Format.class.equals(objectClass)) {
@@ -464,7 +466,7 @@ public class IndexService {
       return reindexDIPFile(DIPFile.class.cast(object));
     } else {
       LOGGER.error("Error trying to reindex an unconfigured object class: {}", objectClass.getName());
-      ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
+      ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<>();
       exceptions.addException(
         new RODAException("Error trying to reindex an unconfigured object class: " + objectClass.getName()));
       return exceptions;
@@ -576,7 +578,7 @@ public class IndexService {
       new Sublist(0, counter), fieldsToReturn);
     Iterator<T> it = resources.getResults().iterator();
 
-    CloseableIterable<OptionalWithCause<T>> resourceIterable = new CloseableIterable<OptionalWithCause<T>>() {
+    return new CloseableIterable<OptionalWithCause<T>>() {
       @Override
       public Iterator<OptionalWithCause<T>> iterator() {
         return new Iterator<OptionalWithCause<T>>() {
@@ -595,9 +597,8 @@ public class IndexService {
 
       @Override
       public void close() throws IOException {
+        // do nothing
       }
     };
-
-    return resourceIterable;
   }
 }

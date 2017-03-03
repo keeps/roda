@@ -5,22 +5,22 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.plugins.plugins.base.reindex;
+package org.roda.core.plugins.plugins.reindex;
 
 import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.index.IndexService;
 import org.roda.core.plugins.Plugin;
 
-public class ReindexNotificationPlugin extends ReindexRodaEntityPlugin<Notification> {
+public class ReindexIncidencePlugin extends ReindexRodaEntityPlugin<RiskIncidence> {
 
   @Override
   public String getName() {
-    return "Rebuild notification index";
+    return "Rebuild incidence index";
   }
 
   @Override
@@ -29,13 +29,13 @@ public class ReindexNotificationPlugin extends ReindexRodaEntityPlugin<Notificat
   }
 
   @Override
-  public Plugin<Notification> cloneMe() {
-    return new ReindexNotificationPlugin();
+  public Plugin<RiskIncidence> cloneMe() {
+    return new ReindexIncidencePlugin();
   }
 
   @Override
-  public List<Class<Notification>> getObjectClasses() {
-    return Arrays.asList(Notification.class);
+  public List<Class<RiskIncidence>> getObjectClasses() {
+    return Arrays.asList(RiskIncidence.class);
   }
 
   @Override

@@ -1,6 +1,6 @@
 package org.roda.core.data.v2.ip;
 
-public interface HasPermissions {
+public interface HasPermissions extends HasPermissionFilters {
 
   public Permissions getPermissions();
 

@@ -5,22 +5,22 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.plugins.plugins.base.reindex;
+package org.roda.core.plugins.plugins.reindex;
 
 import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.formats.Format;
+import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.index.IndexService;
 import org.roda.core.plugins.Plugin;
 
-public class ReindexFormatPlugin extends ReindexRodaEntityPlugin<Format> {
+public class ReindexNotificationPlugin extends ReindexRodaEntityPlugin<Notification> {
 
   @Override
   public String getName() {
-    return "Rebuild format index";
+    return "Rebuild notification index";
   }
 
   @Override
@@ -29,13 +29,13 @@ public class ReindexFormatPlugin extends ReindexRodaEntityPlugin<Format> {
   }
 
   @Override
-  public Plugin<Format> cloneMe() {
-    return new ReindexFormatPlugin();
+  public Plugin<Notification> cloneMe() {
+    return new ReindexNotificationPlugin();
   }
 
   @Override
-  public List<Class<Format>> getObjectClasses() {
-    return Arrays.asList(Format.class);
+  public List<Class<Notification>> getObjectClasses() {
+    return Arrays.asList(Notification.class);
   }
 
   @Override

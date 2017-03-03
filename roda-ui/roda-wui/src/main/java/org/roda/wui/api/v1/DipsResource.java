@@ -127,8 +127,8 @@ public class DipsResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    dip = Browser.createDIP(user, dip);
-    return Response.ok(dip, mediaType).build();
+    DIP createdDip = Browser.createDIP(user, dip);
+    return Response.ok(createdDip, mediaType).build();
   }
 
   @PUT

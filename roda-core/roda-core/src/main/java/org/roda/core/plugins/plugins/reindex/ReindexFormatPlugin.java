@@ -5,22 +5,22 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.plugins.plugins.base.reindex;
+package org.roda.core.plugins.plugins.reindex;
 
 import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.data.v2.formats.Format;
 import org.roda.core.index.IndexService;
 import org.roda.core.plugins.Plugin;
 
-public class ReindexRiskPlugin extends ReindexRodaEntityPlugin<Risk> {
+public class ReindexFormatPlugin extends ReindexRodaEntityPlugin<Format> {
 
   @Override
   public String getName() {
-    return "Rebuild risk index";
+    return "Rebuild format index";
   }
 
   @Override
@@ -29,13 +29,13 @@ public class ReindexRiskPlugin extends ReindexRodaEntityPlugin<Risk> {
   }
 
   @Override
-  public Plugin<Risk> cloneMe() {
-    return new ReindexRiskPlugin();
+  public Plugin<Format> cloneMe() {
+    return new ReindexFormatPlugin();
   }
 
   @Override
-  public List<Class<Risk>> getObjectClasses() {
-    return Arrays.asList(Risk.class);
+  public List<Class<Format>> getObjectClasses() {
+    return Arrays.asList(Format.class);
   }
 
   @Override

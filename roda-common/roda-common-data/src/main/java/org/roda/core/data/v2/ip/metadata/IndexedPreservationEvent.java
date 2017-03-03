@@ -13,11 +13,12 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.ip.HasPermissionFilters;
 
-public class IndexedPreservationEvent implements IsIndexed {
+public class IndexedPreservationEvent implements IsIndexed, HasPermissionFilters {
   private static final long serialVersionUID = 7328069950706217131L;
 
-  public static enum PreservationMetadataEventClass {
+  public enum PreservationMetadataEventClass {
     REPOSITORY, AIP, REPRESENTATION, FILE;
   }
 

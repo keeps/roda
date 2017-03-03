@@ -5,27 +5,27 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.plugins.plugins.base.reindex;
+package org.roda.core.plugins.plugins.reindex;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
-import org.roda.core.RodaCoreFactory;
+import org.apache.commons.io.IOUtils;
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.exceptions.IsStillUpdatingException;
+import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
-import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.common.OptionalWithCause;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -36,20 +36,17 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ReindexTransferredResourcePlugin extends AbstractPlugin<Void> {
+public class ReindexPreservationRepositoryEventPlugin extends AbstractPlugin<Void> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ReindexTransferredResourcePlugin.class);
-
+  private static final Logger LOGGER = LoggerFactory.getLogger(ReindexPreservationRepositoryEventPlugin.class);
   private boolean clearIndexes = false;
   private boolean optimizeIndexes = true;
-  private int resourceCounter = 0;
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
@@ -74,14 +71,14 @@ public class ReindexTransferredResourcePlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getName() {
-    return "Rebuild transferred resource index";
+    return "Rebuild preservation repository event index";
   }
 
   @Override
   public String getDescription() {
-    return "Clears the index and recreates it from actual physical data that exists on the storage. This task aims to fix inconsistencies between what is "
-      + "shown in the graphical user interface of the repository and what is actually kept at the storage layer. Such inconsistencies may occur for "
-      + "various reasons, e.g. index corruption, ungraceful shutdown of the repository, etc.";
+    return "Clears the index and recreates it from actual physical data that exists on the storage. This task aims to fix inconsistencies "
+      + "between what is shown in the graphical user interface of the repository and what is actually kept at the storage layer. Such "
+      + "inconsistencies may occur for various reasons, e.g. index corruption, ungraceful shutdown of the repository, etc.";
   }
 
   @Override
@@ -113,46 +110,49 @@ public class ReindexTransferredResourcePlugin extends AbstractPlugin<Void> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> list) throws PluginException {
-    return PluginHelper.processVoids(this, new RODAProcessingLogic<Void>() {
-      @Override
-      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-        SimpleJobPluginInfo jobPluginInfo, Plugin<Void> plugin) {
-        reindexTransferredResources(report, jobPluginInfo);
-      }
-    }, index, model, storage);
-  }
+    Report pluginReport = PluginHelper.initPluginReport(this);
 
-  private void reindexTransferredResources(Report report, SimpleJobPluginInfo jobPluginInfo) {
-    report.setPluginState(PluginState.SUCCESS);
-    jobPluginInfo.setSourceObjectsCount(resourceCounter);
     try {
-      RodaCoreFactory.getTransferredResourcesScanner().updateTransferredResources(Optional.empty(), true);
-      // FIXME 20170116 hsilva: it makes no sense relying on a count made
-      // before the indexing start to set counters
-      jobPluginInfo.incrementObjectsProcessedWithSuccess(resourceCounter);
-    } catch (IsStillUpdatingException | GenericException e) {
-      LOGGER.error("Error updating transferred resources");
-      // FIXME 20170116 hsilva: it makes no sense relying on a count made
-      // before the indexing start to set counters
-      jobPluginInfo.incrementObjectsProcessedWithFailure(resourceCounter);
-      report.setPluginState(PluginState.FAILURE);
+      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
+      jobPluginInfo.setSourceObjectsCount(0);
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+      pluginReport.setPluginState(PluginState.SUCCESS);
+
+      CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable = model.listPreservationRepositoryEvents();
+      int eventCounter = 0;
+
+      for (OptionalWithCause<PreservationMetadata> opm : iterable) {
+        if (opm.isPresent()) {
+          model.notifyPreservationMetadataCreated(opm.get());
+          jobPluginInfo.incrementObjectsProcessedWithSuccess();
+        } else {
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
+          pluginReport.setPluginState(PluginState.FAILURE)
+            .addPluginDetails("Could not add preservation repository event: " + opm.getCause());
+        }
+        eventCounter++;
+      }
+      IOUtils.closeQuietly(iterable);
+      jobPluginInfo.setSourceObjectsCount(eventCounter);
+
+      jobPluginInfo.finalizeInfo();
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+    } catch (JobException | RequestNotValidException | GenericException | AuthorizationDeniedException e) {
+      LOGGER.error("Error reindexing RODA entity", e);
+      pluginReport.setPluginState(PluginState.FAILURE)
+        .setPluginDetails("Could not list preservation repository events");
     }
+
+    return pluginReport;
   }
 
   @Override
   public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
-
-    try {
-      resourceCounter = index.count(TransferredResource.class, Filter.ALL).intValue();
-    } catch (GenericException | RequestNotValidException e) {
-      // do nothing
-    }
-
     if (clearIndexes) {
       LOGGER.debug("Clearing indexes");
       try {
-        index.clearIndex(RodaConstants.INDEX_TRANSFERRED_RESOURCE);
+        index.clearRepositoryEventIndex();
       } catch (GenericException e) {
         throw new PluginException("Error clearing index", e);
       }
@@ -168,7 +168,7 @@ public class ReindexTransferredResourcePlugin extends AbstractPlugin<Void> {
     if (optimizeIndexes) {
       LOGGER.debug("Optimizing indexes");
       try {
-        index.optimizeIndex(RodaConstants.INDEX_TRANSFERRED_RESOURCE);
+        index.optimizeIndex(RodaConstants.INDEX_PRESERVATION_EVENTS);
       } catch (GenericException e) {
         throw new PluginException("Error optimizing index", e);
       }
@@ -179,7 +179,7 @@ public class ReindexTransferredResourcePlugin extends AbstractPlugin<Void> {
 
   @Override
   public Plugin<Void> cloneMe() {
-    return new ReindexTransferredResourcePlugin();
+    return new ReindexPreservationRepositoryEventPlugin();
   }
 
   @Override

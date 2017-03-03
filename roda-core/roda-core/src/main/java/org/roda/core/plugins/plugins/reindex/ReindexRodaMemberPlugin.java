@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.plugins.plugins.base.reindex;
+package org.roda.core.plugins.plugins.reindex;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,24 +13,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
-import org.roda.core.common.iterables.CloseableIterable;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
-import org.roda.core.data.v2.common.OptionalWithCause;
-import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.core.data.v2.user.Group;
+import org.roda.core.data.v2.user.User;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
@@ -43,9 +40,9 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ReindexPreservationAgentPlugin extends AbstractPlugin<Void> {
+public class ReindexRodaMemberPlugin extends AbstractPlugin<Void> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ReindexPreservationAgentPlugin.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ReindexRodaMemberPlugin.class);
   private boolean clearIndexes = false;
   private boolean optimizeIndexes = true;
 
@@ -72,14 +69,14 @@ public class ReindexPreservationAgentPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getName() {
-    return "Rebuild preservation agent index";
+    return "Rebuild users and groups index";
   }
 
   @Override
   public String getDescription() {
-    return "Clears the index and recreates it from actual physical data that exists on the storage. This task aims to fix inconsistencies "
-      + "between what is shown in the graphical user interface of the repository and what is actually kept at the storage layer. Such "
-      + "inconsistencies may occur for various reasons, e.g. index corruption, ungraceful shutdown of the repository, etc.";
+    return "Clears the index and recreates it from actual physical data that exists on the storage. This task aims to fix inconsistencies between what "
+      + "is shown in the graphical user interface of the repository and what is actually kept at the storage layer. Such inconsistencies may occur for "
+      + "various reasons, e.g. index corruption, ungraceful shutdown of the repository, etc.";
   }
 
   @Override
@@ -115,36 +112,35 @@ public class ReindexPreservationAgentPlugin extends AbstractPlugin<Void> {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
         SimpleJobPluginInfo jobPluginInfo, Plugin<Void> plugin) {
-        reindexPreservationAgents(model, report, jobPluginInfo);
+        reindexRodaMembers(model, report, jobPluginInfo);
       }
     }, index, model, storage);
   }
 
-  private void reindexPreservationAgents(ModelService model, Report pluginReport, SimpleJobPluginInfo jobPluginInfo) {
+  private void reindexRodaMembers(ModelService model, Report pluginReport, SimpleJobPluginInfo jobPluginInfo) {
     pluginReport.setPluginState(PluginState.SUCCESS);
 
-    CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable = null;
     try {
-      iterable = model.listPreservationAgents();
-      int agentCounter = 0;
+      List<User> users = model.listUsers();
+      List<Group> groups = model.listGroups();
 
-      for (OptionalWithCause<PreservationMetadata> opm : iterable) {
-        if (opm.isPresent()) {
-          model.notifyPreservationMetadataCreated(opm.get());
-          jobPluginInfo.incrementObjectsProcessedWithSuccess();
-        } else {
-          jobPluginInfo.incrementObjectsProcessedWithFailure();
-          pluginReport.setPluginState(PluginState.FAILURE)
-            .addPluginDetails("Could not add preservation agent: " + opm.getCause());
-        }
-        agentCounter++;
+      jobPluginInfo.setSourceObjectsCount(users.size() + groups.size());
+
+      for (User ldapUser : users) {
+        LOGGER.debug("User to be indexed: {}", ldapUser);
+        RodaCoreFactory.getModelService().notifyUserUpdated(ldapUser);
+        jobPluginInfo.incrementObjectsProcessedWithSuccess();
       }
-      jobPluginInfo.setSourceObjectsCount(agentCounter);
-    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
-      LOGGER.error("Error getting preservation agents to be reindexed", e);
+
+      for (Group ldapGroup : groups) {
+        LOGGER.debug("Group to be indexed: {}", ldapGroup);
+        RodaCoreFactory.getModelService().notifyGroupUpdated(ldapGroup);
+        jobPluginInfo.incrementObjectsProcessedWithSuccess();
+      }
+
+    } catch (GenericException e) {
+      LOGGER.error("Error retrieving users/groups for reindexing", e);
       pluginReport.setPluginState(PluginState.FAILURE);
-    } finally {
-      IOUtils.closeQuietly(iterable);
     }
   }
 
@@ -154,7 +150,7 @@ public class ReindexPreservationAgentPlugin extends AbstractPlugin<Void> {
     if (clearIndexes) {
       LOGGER.debug("Clearing indexes");
       try {
-        index.clearIndex(RodaConstants.INDEX_PRESERVATION_AGENTS);
+        index.clearIndex(RodaConstants.INDEX_MEMBERS);
       } catch (GenericException e) {
         throw new PluginException("Error clearing index", e);
       }
@@ -170,7 +166,7 @@ public class ReindexPreservationAgentPlugin extends AbstractPlugin<Void> {
     if (optimizeIndexes) {
       LOGGER.debug("Optimizing indexes");
       try {
-        index.optimizeIndex(RodaConstants.INDEX_PRESERVATION_AGENTS);
+        index.optimizeIndex(RodaConstants.INDEX_MEMBERS);
       } catch (GenericException e) {
         throw new PluginException("Error optimizing index", e);
       }
@@ -181,7 +177,7 @@ public class ReindexPreservationAgentPlugin extends AbstractPlugin<Void> {
 
   @Override
   public Plugin<Void> cloneMe() {
-    return new ReindexPreservationAgentPlugin();
+    return new ReindexRodaMemberPlugin();
   }
 
   @Override
@@ -201,17 +197,17 @@ public class ReindexPreservationAgentPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Reindex Roda entity";
+    return "Reindexed action logs";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "All entities were reindexed with success";
+    return "Reindexed action logs successfully";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "An error occured while reindexing all entities";
+    return "Reindex of action logs failed";
   }
 
   @Override

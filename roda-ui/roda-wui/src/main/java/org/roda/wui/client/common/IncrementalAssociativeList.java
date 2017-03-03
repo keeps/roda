@@ -63,8 +63,8 @@ public class IncrementalAssociativeList extends Composite implements HasHandlers
 
   public <T extends IsIndexed> IncrementalAssociativeList(Class<T> specificClass, String id, String search,
     String dialogName) {
-    textBoxes = new ArrayList<RemovableAssociativeTextBox>();
-    excludedIds = new ArrayList<String>();
+    textBoxes = new ArrayList<>();
+    excludedIds = new ArrayList<>();
 
     setIdAttribute(id);
     setSearchAttribute(search);
@@ -75,7 +75,7 @@ public class IncrementalAssociativeList extends Composite implements HasHandlers
   }
 
   public List<String> getTextBoxesValue() {
-    ArrayList<String> listValues = new ArrayList<String>();
+    ArrayList<String> listValues = new ArrayList<>();
     for (RemovableAssociativeTextBox textBox : textBoxes) {
       if (StringUtils.isNotBlank(textBox.getHiddenTextBoxValue())) {
         listValues.add(textBox.getHiddenTextBoxValue());
@@ -112,7 +112,7 @@ public class IncrementalAssociativeList extends Composite implements HasHandlers
 
   public void clearTextBoxes() {
     textBoxPanel.clear();
-    textBoxes = new ArrayList<RemovableAssociativeTextBox>();
+    textBoxes = new ArrayList<>();
   }
 
   @UiHandler("addDynamicTextBoxButton")

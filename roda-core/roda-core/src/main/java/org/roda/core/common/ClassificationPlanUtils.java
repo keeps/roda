@@ -66,7 +66,7 @@ public class ClassificationPlanUtils {
       }
 
       root.set("dos", array);
-      ConsumesOutputStream stream = new ConsumesOutputStream() {
+      return new ConsumesOutputStream() {
 
         @Override
         public void consumeOutputStream(OutputStream out) throws IOException {
@@ -91,7 +91,6 @@ public class ClassificationPlanUtils {
         }
 
       };
-      return stream;
     } catch (IOException e) {
       throw new GenericException(e);
     }

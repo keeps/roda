@@ -44,7 +44,7 @@ import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.plugins.plugins.base.ActionLogCleanerPlugin;
-import org.roda.core.plugins.plugins.base.reindex.ReindexAllRodaEntitiesPlugin;
+import org.roda.core.plugins.plugins.reindex.ReindexAllRodaEntitiesPlugin;
 import org.roda.wui.api.controllers.Jobs;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.common.ControllerAssistant;

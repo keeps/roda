@@ -25,8 +25,8 @@ import org.roda.core.plugins.PluginManager;
 import org.roda.core.plugins.plugins.antivirus.AntivirusPlugin;
 import org.roda.core.plugins.plugins.base.DescriptiveMetadataValidationPlugin;
 import org.roda.core.plugins.plugins.base.ReplicationPlugin;
-import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugin;
-import org.roda.core.plugins.plugins.ingest.characterization.SiegfriedPlugin;
+import org.roda.core.plugins.plugins.characterization.PremisSkeletonPlugin;
+import org.roda.core.plugins.plugins.characterization.SiegfriedPlugin;
 
 public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
 

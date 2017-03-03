@@ -22,7 +22,7 @@ import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.plugins.base.DescriptiveMetadataValidationPlugin;
 import org.roda.core.plugins.plugins.base.ReplicationPlugin;
-import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugin;
+import org.roda.core.plugins.plugins.characterization.PremisSkeletonPlugin;
 
 public class MinimalIngestPlugin extends DefaultIngestPlugin {
 

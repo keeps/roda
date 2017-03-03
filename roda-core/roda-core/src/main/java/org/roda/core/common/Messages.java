@@ -34,7 +34,7 @@ public class Messages {
 
   public Messages(Locale locale, Path folder) {
     this.resourceBundle = ResourceBundle.getBundle(MESSAGES_BUNDLE, locale, new FolderBasedUTF8Control(folder));
-    this.translationsCache = new HashMap<String, Map<String, Object>>();
+    this.translationsCache = new HashMap<>();
   }
 
   /**
@@ -72,7 +72,7 @@ public class Messages {
       return (Map<String, T>) translationsCache.get(prefix);
     }
 
-    Map<String, T> map = new HashMap<String, T>();
+    Map<String, T> map = new HashMap<>();
     Enumeration<String> keys = resourceBundle.getKeys();
     String fullPrefix = prefix + ".";
     while (keys.hasMoreElements()) {
@@ -102,6 +102,7 @@ public class Messages {
       return TTL_DONT_CACHE;
     }
 
+    @Override
     public Locale getFallbackLocale(String baseName, Locale locale) {
       if (baseName == null) {
         throw new NullPointerException();

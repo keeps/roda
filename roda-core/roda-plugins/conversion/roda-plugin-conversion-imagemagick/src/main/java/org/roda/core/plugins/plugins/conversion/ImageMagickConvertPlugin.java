@@ -73,12 +73,12 @@ public class ImageMagickConvertPlugin<T extends IsRODAObject> extends CommandCon
 
   @Override
   public Plugin<T> cloneMe() {
-    return new ImageMagickConvertPlugin<T>();
+    return new ImageMagickConvertPlugin<>();
   }
 
   @Override
   public String executePlugin(Path inputPath, Path outputPath, String fileFormat)
-    throws UnsupportedOperationException, IOException, CommandException {
+    throws IOException, CommandException, UnsupportedOperationException {
 
     return ImageMagickConvertPluginUtils.executeImageMagick(inputPath, outputPath, super.getOutputFormat(),
       super.getCommandArguments());
@@ -109,13 +109,13 @@ public class ImageMagickConvertPlugin<T extends IsRODAObject> extends CommandCon
   public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
     // do nothing
-    return null;
+    return new Report();
   }
 
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     // do nothing
-    return null;
+    return new Report();
   }
 
 }

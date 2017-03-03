@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @XmlRootElement(name = "representation")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class IndexedRepresentation extends Representation implements IsIndexed {
+public class IndexedRepresentation extends Representation implements IsIndexed, HasPermissionFilters {
 
   private static final long serialVersionUID = -950545608880793468L;
 
@@ -113,6 +113,8 @@ public class IndexedRepresentation extends Representation implements IsIndexed {
   public boolean equals(Object obj) {
     if (this == obj)
       return true;
+    if (obj == null)
+      return false;
     if (!super.equals(obj))
       return false;
     if (getClass() != obj.getClass())

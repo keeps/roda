@@ -22,19 +22,13 @@ public class AvconvConvertPluginUtils {
     throws CommandException, IOException, UnsupportedOperationException {
 
     String command = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "avconvconvert", "commandLine");
-    // command = command.replace("{input_file}", input.toString());
+    command = command.replace("{input_file}", input.toString());
     command = command.replace("{output_file}", output.toString());
     command = command.replace("{arguments}", commandArguments);
     command = command.replace("{output_arguments}", outputArguments);
 
     // filling a list of the command line arguments
     List<String> commandList = Arrays.asList(command.split("\\s+"));
-
-    for (int i = 0; i < commandList.size(); i++) {
-      if (commandList.get(i).equals("{input_file}")) {
-        commandList.set(i, input.toString());
-      }
-    }
 
     // running the command
     return CommandUtility.execute(commandList);

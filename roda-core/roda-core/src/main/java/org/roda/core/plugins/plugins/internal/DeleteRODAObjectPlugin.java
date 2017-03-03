@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.plugins.plugins.base.internal;
+package org.roda.core.plugins.plugins.internal;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -26,11 +26,11 @@ public class SelectedItemsList<T extends IsRODAObject> implements SelectedItems<
   }
 
   public static <T extends IsRODAObject> SelectedItemsList<T> create(Class<T> classToCreate, String... ids) {
-    return new SelectedItemsList<T>(Arrays.asList(ids), classToCreate.getName());
+    return new SelectedItemsList<>(Arrays.asList(ids), classToCreate.getName());
   }
 
   public static <T extends IsRODAObject> SelectedItemsList<T> create(String classNameToCreate, String... ids) {
-    return new SelectedItemsList<T>(Arrays.asList(ids), classNameToCreate);
+    return new SelectedItemsList<>(Arrays.asList(ids), classNameToCreate);
   }
 
   private List<String> ids;
@@ -38,7 +38,7 @@ public class SelectedItemsList<T extends IsRODAObject> implements SelectedItems<
 
   public SelectedItemsList() {
     super();
-    ids = new ArrayList<String>();
+    ids = new ArrayList<>();
   }
 
   public SelectedItemsList(List<String> ids, String selectedClass) {

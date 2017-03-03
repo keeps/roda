@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @XmlRootElement(name = "file")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class IndexedFile implements IsIndexed {
+public class IndexedFile implements IsIndexed, HasPermissionFilters {
 
   private static final long serialVersionUID = 3303019735787641534L;
 

@@ -19,7 +19,7 @@ public class LastSelectedItemsSingleton {
   private static LastSelectedItemsSingleton singleton = null;
   private SelectedItems<? extends IsIndexed> selected = null;
   private String detailsMessage = "";
-  private List<String> lastHistory = new ArrayList<String>();
+  private List<String> lastHistory = new ArrayList<>();
   private IsIndexed lastObject = null;
   private ListSelectionState<? extends IsIndexed> lastListSelectionState = null;
 
@@ -58,7 +58,7 @@ public class LastSelectedItemsSingleton {
   }
 
   public void clearLastHistory() {
-    this.lastHistory = new ArrayList<String>();
+    this.lastHistory = new ArrayList<>();
   }
 
   public <T extends IsIndexed> T getLastObject() {

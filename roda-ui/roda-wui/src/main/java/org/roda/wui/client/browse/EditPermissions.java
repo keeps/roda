@@ -213,7 +213,7 @@ public class EditPermissions extends Composite {
   @UiField
   Button buttonApplyToAll;
 
-  private List<HasPermissions> objects = new ArrayList<HasPermissions>();
+  private List<HasPermissions> objects = new ArrayList<>();
   private String objectClass = null;
 
   public EditPermissions(String objectClass, HasPermissions object) {
@@ -240,8 +240,8 @@ public class EditPermissions extends Composite {
   }
 
   private <T extends IsIndexed> void createPermissionPanelList() {
-    Map<String, Set<PermissionType>> userPermissionsToShow = new HashMap<String, Set<PermissionType>>();
-    Map<String, Set<PermissionType>> groupPermissionsToShow = new HashMap<String, Set<PermissionType>>();
+    Map<String, Set<PermissionType>> userPermissionsToShow = new HashMap<>();
+    Map<String, Set<PermissionType>> groupPermissionsToShow = new HashMap<>();
 
     if (!objects.isEmpty()) {
       Permissions firstAIPPermissions = objects.get(0).getPermissions();
@@ -390,7 +390,7 @@ public class EditPermissions extends Composite {
   }
 
   public List<String> getAssignedUserNames() {
-    List<String> ret = new ArrayList<String>();
+    List<String> ret = new ArrayList<>();
     for (int i = 0; i < userPermissionsPanel.getWidgetCount(); i++) {
       PermissionPanel permissionPanel = (PermissionPanel) userPermissionsPanel.getWidget(i);
 
@@ -402,7 +402,7 @@ public class EditPermissions extends Composite {
   }
 
   public List<String> getAssignedGroupNames() {
-    List<String> ret = new ArrayList<String>();
+    List<String> ret = new ArrayList<>();
     for (int i = 0; i < groupPermissionsPanel.getWidgetCount(); i++) {
       PermissionPanel permissionPanel = (PermissionPanel) groupPermissionsPanel.getWidget(i);
 

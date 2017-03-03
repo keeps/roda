@@ -16,6 +16,7 @@ import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 
 public class IndexUtils {
+  @SuppressWarnings("unchecked")
   public static <T extends IsIndexed> Class<T> giveRespectiveIndexClass(Class<? extends IsRODAObject> inputClass) {
     if (AIP.class.equals(inputClass)) {
       return (Class<T>) IndexedAIP.class;
