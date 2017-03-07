@@ -82,7 +82,9 @@ public class Theme extends RodaWuiController {
 
       @Override
       public void consumeOutputStream(OutputStream out) throws IOException {
-        IOUtils.copy(themeResourceInputstream.getSecond(), out);
+        try (InputStream in = themeResourceInputstream.getSecond()) {
+          IOUtils.copy(in, out);
+        }
       }
     };
 

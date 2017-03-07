@@ -73,9 +73,8 @@ import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.google.common.collect.Iterables;
@@ -120,7 +119,8 @@ public class ModelServiceTest {
     LOGGER.debug("Running model test under storage: " + basePath);
   }
 
-  @BeforeMethod
+  // @BeforeMethod
+  @BeforeClass
   public void init() throws IOException, GenericException {
     basePath = TestsHelper.createBaseTempDir(getClass(), true);
 
@@ -138,7 +138,8 @@ public class ModelServiceTest {
     model = RodaCoreFactory.getModelService();
   }
 
-  @AfterMethod
+  // @AfterMethod
+  @AfterClass
   public void cleanup() throws NotFoundException, GenericException, IOException {
     RodaCoreFactory.shutdown();
     FSUtils.deletePath(basePath);
@@ -288,6 +289,9 @@ public class ModelServiceTest {
     assertEquals(CorporaConstants.INGESTION, event_premis.getEventType().getStringValue());
     assertEquals(CorporaConstants.SUCCESS,
       event_premis.getEventOutcomeInformationArray(0).getEventOutcome().getStringValue());
+
+    // cleanup
+    model.deleteAIP(aipId);
   }
 
   @Test
@@ -331,6 +335,9 @@ public class ModelServiceTest {
     assertTrue(descMetadataBinary.getSizeInBytes() > 0);
     assertEquals(descMetadataBinary.getSizeInBytes().intValue(),
       IOUtils.toByteArray(descMetadataBinary.getContent().createInputStream()).length);
+
+    // cleanup
+    model.deleteAIP(aipId);
   }
 
   @Test
@@ -374,6 +381,9 @@ public class ModelServiceTest {
     assertTrue(descMetadataBinary.getSizeInBytes() > 0);
     assertEquals(descMetadataBinary.getSizeInBytes().intValue(),
       IOUtils.toByteArray(descMetadataBinary.getContent().createInputStream()).length);
+
+    // cleanup
+    model.deleteAIP(aipId);
   }
 
   @Test
@@ -410,6 +420,9 @@ public class ModelServiceTest {
       CorporaConstants.REPRESENTATION_1_ID, Arrays.asList("folder"), false)));
 
     // assertThat(allFiles, containsInAnyOrder());
+
+    // cleanup
+    model.deleteAIP(aipId);
   }
 
   @Test
@@ -485,6 +498,11 @@ public class ModelServiceTest {
 
     assertThat(reusableList, containsInAnyOrder(aip1, aip2, aip3));
 
+    // cleanup
+    model.deleteAIP(aip1Id);
+    model.deleteAIP(aip2Id);
+    model.deleteAIP(aip3Id);
+
   }
 
   @Test
@@ -499,9 +517,13 @@ public class ModelServiceTest {
       model.createAIP(aipId, corporaService,
         DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), aipCreator);
       Assert.fail("AIP shouldn't have been created and yet it was.");
+
     } catch (AlreadyExistsException e) {
       // do nothing as it was expected
     }
+
+    // cleanup
+    model.deleteAIP(aipId);
   }
 
   @Test
@@ -522,6 +544,9 @@ public class ModelServiceTest {
     // check content is correct
     StorageTestUtils.testEntityEqualRecursively(corporaService, otherAipPath, storage,
       ModelUtils.getAIPStoragePath(aipId));
+
+    // cleanup
+    model.deleteAIP(aipId);
   }
 
   @Test
@@ -536,6 +561,9 @@ public class ModelServiceTest {
       CorporaConstants.DESCRIPTIVE_METADATA_ID);
 
     assertThat(list, containsInAnyOrder(descriptiveMetadata1));
+
+    // cleanup
+    model.deleteAIP(aipId);
   }
 
   @Test
@@ -563,6 +591,9 @@ public class ModelServiceTest {
       .getBinary(ModelUtils.getDescriptiveMetadataStoragePath(newDescriptiveMetadata));
     assertTrue(IOUtils.contentEquals(binary.getContent().createInputStream(),
       newDescriptiveMetadataBinary.getContent().createInputStream()));
+
+    // cleanup
+    model.deleteAIP(aipId);
 
   }
 
@@ -609,6 +640,9 @@ public class ModelServiceTest {
       properties);
 
     assertEquals(4, Iterables.size(storage.listBinaryVersions(storagePath)));
+
+    // cleanup
+    model.deleteAIP(aipId);
   }
 
   @Test
@@ -627,6 +661,9 @@ public class ModelServiceTest {
     } catch (NotFoundException e) {
       // do nothing as it was expected
     }
+
+    // cleanup
+    model.deleteAIP(aipId);
   }
 
   @Test
@@ -644,6 +681,9 @@ public class ModelServiceTest {
 
     CloseableIterable<OptionalWithCause<Representation>> list2 = model.list(Representation.class);
     assertThat(Iterables.transform(list2, i -> i.get()), containsInAnyOrder(representation1, representation2));
+
+    // cleanup
+    model.deleteAIP(aipId);
 
   }
 
@@ -669,6 +709,9 @@ public class ModelServiceTest {
     // check content
     StorageTestUtils.testEntityEqualRecursively(corporaService, corporaRepresentationPath, storage,
       ModelUtils.getRepresentationStoragePath(aipId, newRepresentationId));
+
+    // cleanup
+    model.deleteAIP(aipId);
   }
 
   @Test
@@ -691,6 +734,9 @@ public class ModelServiceTest {
     // check content
     StorageTestUtils.testEntityEqualRecursively(corporaService, corporaRepresentationPath, storage,
       ModelUtils.getRepresentationStoragePath(aipId, CorporaConstants.REPRESENTATION_1_ID));
+
+    // cleanup
+    model.deleteAIP(aipId);
   }
 
   @Test
@@ -718,6 +764,9 @@ public class ModelServiceTest {
     } catch (NotFoundException e) {
       // do nothing as it was expected
     }
+
+    // cleanup
+    model.deleteAIP(aipId);
   }
 
   @Test
@@ -744,6 +793,9 @@ public class ModelServiceTest {
     Binary createdFileBinary = storage.getBinary(ModelUtils.getFileStoragePath(createdFile));
     assertTrue(IOUtils.contentEquals(binary.getContent().createInputStream(),
       createdFileBinary.getContent().createInputStream()));
+
+    // cleanup
+    model.deleteAIP(aipId);
   }
 
   @Test
@@ -771,6 +823,9 @@ public class ModelServiceTest {
     Binary createdFileBinary = storage.getBinary(ModelUtils.getFileStoragePath(createdFile));
     assertTrue(IOUtils.contentEquals(binary.getContent().createInputStream(),
       createdFileBinary.getContent().createInputStream()));
+
+    // cleanup
+    model.deleteAIP(aipId);
   }
 
   @Test
@@ -791,6 +846,9 @@ public class ModelServiceTest {
     } catch (NotFoundException e) {
       // do nothing
     }
+
+    // cleanup
+    model.deleteAIP(aipId);
   }
 
   @Test
@@ -823,6 +881,9 @@ public class ModelServiceTest {
     ObjectCharacteristicsComplexType file_characteristics = file.getObjectCharacteristicsArray(0);
     assertEquals(2, file_characteristics.getFixityArray().length);
     assertEquals(CorporaConstants.METS_XML, file.getOriginalName().getStringValue());
+
+    // cleanup
+    model.deleteAIP(aipId);
   }
 
   @Test
@@ -840,6 +901,9 @@ public class ModelServiceTest {
 
     assertEquals(representation.getPreservationLevelArray(0).getPreservationLevelValue().getStringValue(),
       CorporaConstants.PRESERVATION_LEVEL_FULL);
+
+    // cleanup
+    model.deleteAIP(aipId);
   }
 
   @Test

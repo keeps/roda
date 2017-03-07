@@ -32,6 +32,7 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.IOUtils;
 import org.reflections.Reflections;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
@@ -499,7 +500,8 @@ public class PluginManager {
     Plugin<?> plugin = null;
 
     try {
-      jar = new JarFile(jarFile.toFile());
+      java.io.File file = jarFile.toFile();
+      jar = new JarFile(file);
 
       Manifest manifest = jar.getManifest();
 
@@ -543,14 +545,7 @@ public class PluginManager {
       LOGGER.error("Error loading plugin from {}", jarFile.getFileName(), e);
 
     } finally {
-
-      if (jar != null) {
-        try {
-          jar.close();
-        } catch (IOException e) {
-          LOGGER.debug("Error closing jar {}", jarFile.getFileName(), e);
-        }
-      }
+      IOUtils.closeQuietly(jar);
     }
 
     return ret;
