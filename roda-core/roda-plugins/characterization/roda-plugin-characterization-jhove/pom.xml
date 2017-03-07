@@ -64,7 +64,7 @@
 			</snapshots>
 			<id>opf-dev-mvn</id>
 			<name>opf-dev (jhove)</name>
-			<url>http://artifactory.opf-labs.org/artifactory/opf-dev</url>
+			<url>http://artifactory.opf-labs.org/artifactory/opf-dev-local</url>
 		</repository>
 	</repositories>
 	<dependencies>

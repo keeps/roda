@@ -227,17 +227,21 @@ public class EARKSIPPluginsTest {
     List<String> transferredResourcesIDs = createCorporaAncestors();
     Assert.assertNotNull(transferredResourcesIDs);
 
-    Job job = TestsHelper.executeJob(EARKSIPToAIPPlugin.class, parameters, PluginType.SIP_TO_AIP,
+    Job ingestJob = TestsHelper.executeJob(EARKSIPToAIPPlugin.class, parameters, PluginType.SIP_TO_AIP,
       SelectedItemsList.create(TransferredResource.class, transferredResourcesIDs));
+    
+    TestsHelper.getJobReports(index, ingestJob, true);
+    
     index.commitAIPs();
 
     Map<String, String> fixAncestorsParameters = new HashMap<>();
     fixAncestorsParameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());
-    fixAncestorsParameters.put(RodaConstants.PLUGIN_PARAMS_OTHER_JOB_ID, job.getId());
-    TestsHelper.executeJob(FixAncestorsPlugin.class, fixAncestorsParameters, PluginType.MISC,
+    fixAncestorsParameters.put(RodaConstants.PLUGIN_PARAMS_OTHER_JOB_ID, ingestJob.getId());
+    
+    Job fixAncestorsJob = TestsHelper.executeJob(FixAncestorsPlugin.class, fixAncestorsParameters, PluginType.MISC,
       new SelectedItemsNone<>());
 
-    TestsHelper.getJobReports(index, job, true);
+    TestsHelper.getJobReports(index, fixAncestorsJob, true);
 
     index.commitAIPs();
 
