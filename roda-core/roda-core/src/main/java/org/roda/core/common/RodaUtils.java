@@ -261,7 +261,6 @@ public class RodaUtils {
       return new CharArrayReader(transformerResult.toCharArray());
 
     } catch (IOException | SAXException | ExecutionException | SaxonApiException e) {
-      LOGGER.error(e.getMessage(), e);
       throw new GenericException("Could not process descriptive metadata binary " + binary.getStoragePath()
         + " metadata type " + metadataType + " and version " + metadataVersion, e);
     } finally {

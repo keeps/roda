@@ -14,7 +14,7 @@
 	<!-- </logger> -->
 
 	<logger name="org.roda" additivity="false">
-		<level value="INFO" />
+		<level value="WARN" />
 		<appender-ref ref="STDOUT" />
 	</logger>
 
