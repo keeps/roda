@@ -173,7 +173,7 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
 
       // FIXME 20160516 hsilva: put "SIP" inside the AIP???
 
-      model.notifyAIPCreated(aip.getId());
+      model.notifyAipCreated(aip.getId());
 
       reportItem.setOutcomeObjectId(aip.getId()).setPluginState(PluginState.SUCCESS);
 

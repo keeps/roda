@@ -84,7 +84,7 @@ public class BagitToAIPPluginUtils {
 
     // FIXME 20160516 hsilva: put SIP inside the AIP
 
-    model.notifyAIPCreated(aip.getId());
+    model.notifyAipCreated(aip.getId());
 
     return model.retrieveAIP(aip.getId());
 

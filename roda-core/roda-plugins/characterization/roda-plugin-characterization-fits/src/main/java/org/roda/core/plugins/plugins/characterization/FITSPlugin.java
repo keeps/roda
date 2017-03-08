@@ -164,7 +164,7 @@ public class FITSPlugin extends AbstractPlugin<AIP> {
     }
 
     try {
-      model.notifyAIPUpdated(aip.getId());
+      model.notifyAipUpdated(aip.getId());
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
       LOGGER.error("Error notifying of AIP update", e);
     }

@@ -14,6 +14,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -245,7 +246,7 @@ public class SolrUtils {
     } catch (SolrServerException | IOException e) {
       throw new GenericException("Could not query index", e);
     } catch (SolrException e) {
-      throw new RequestNotValidException(e.getMessage());
+      throw new RequestNotValidException(e);
     } catch (RuntimeException e) {
       throw new GenericException("Unexpected exception while querying index", e);
     }
@@ -2512,7 +2513,7 @@ public class SolrUtils {
 
     Permissions permissions = new Permissions();
 
-    Map<PermissionType, Set<String>> userPermissions = new HashMap<>();
+    EnumMap<PermissionType, Set<String>> userPermissions = new EnumMap<>(PermissionType.class);
 
     for (PermissionType type : PermissionType.values()) {
       String key = RodaConstants.INDEX_PERMISSION_USERS_PREFIX + type;
@@ -2521,7 +2522,7 @@ public class SolrUtils {
       userPermissions.put(type, users);
     }
 
-    Map<PermissionType, Set<String>> groupPermissions = new HashMap<>();
+    Map<PermissionType, Set<String>> groupPermissions = new EnumMap<>(PermissionType.class);
 
     for (PermissionType type : PermissionType.values()) {
       String key = RodaConstants.INDEX_PERMISSION_GROUPS_PREFIX + type;
@@ -2595,7 +2596,7 @@ public class SolrUtils {
     String representationUUID, String fileUUID, Binary binary) throws GenericException {
     SolrInputDocument doc;
 
-    Map<String, String> stylesheetOpt = new HashMap<String, String>();
+    Map<String, String> stylesheetOpt = new HashMap<>();
     stylesheetOpt.put(RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS,
       PreservationMetadataEventClass.REPOSITORY.toString());
 
@@ -2616,8 +2617,10 @@ public class SolrUtils {
       }
     }
 
+    Reader reader = null;
+
     try {
-      Reader reader = RodaUtils.applyMetadataStylesheet(binary, RodaConstants.CORE_CROSSWALKS_INGEST_OTHER,
+      reader = RodaUtils.applyMetadataStylesheet(binary, RodaConstants.CORE_CROSSWALKS_INGEST_OTHER,
         RodaConstants.PREMIS_METADATA_TYPE, RodaConstants.PREMIS_METADATA_VERSION, stylesheetOpt);
 
       XMLLoader loader = new XMLLoader();
@@ -2639,10 +2642,11 @@ public class SolrUtils {
         }
 
       }
-      IOUtils.closeQuietly(reader);
 
     } catch (XMLStreamException | FactoryConfigurationError e) {
       throw new GenericException("Could not process PREMIS " + binary.getStoragePath(), e);
+    } finally {
+      IOUtils.closeQuietly(reader);
     }
 
     if (preservationMetadataType == PreservationMetadataType.EVENT) {

@@ -399,7 +399,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
         boolean notifyEvent = false;
         createEvent(model, index, aip.getId(), null, null, null, outputFormat, reportState, alteredFiles, newFiles,
           notifyEvent);
-        model.notifyAIPUpdated(aip.getId());
+        model.notifyAipUpdated(aip.getId());
         jobPluginInfo.incrementObjectsProcessed(reportState);
       } catch (Exception e) {
         LOGGER.debug("Error on update AIP notify");
@@ -598,7 +598,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
     }
 
     try {
-      model.notifyAIPUpdated(aipId);
+      model.notifyAipUpdated(aipId);
     } catch (RODAException e) {
       LOGGER.error("Error running creating agent for AbstractConvertPlugin", e);
     }

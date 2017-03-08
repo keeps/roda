@@ -65,7 +65,7 @@ public class EARKSIPToAIPPluginUtils {
       processIPRepresentationInformation(model, representation, aip.getId(), storage, notify, false);
     }
 
-    model.notifyAIPCreated(aip.getId());
+    model.notifyAipCreated(aip.getId());
 
     AIP createdAIP = model.retrieveAIP(aip.getId());
 

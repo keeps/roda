@@ -16,7 +16,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 
 import org.roda.core.TestsHelper;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.storage.AbstractStorageServiceTest;
 import org.roda.core.storage.StorageService;
@@ -44,13 +43,13 @@ public class FileStorageServiceTest extends AbstractStorageServiceTest<FileStora
   private static FileStorageService storage;
 
   @BeforeMethod
-  public static void setUp() throws IOException, GenericException {
+  public static void setUp() throws Exception {
     basePath = TestsHelper.createBaseTempDir(FileStorageServiceTest.class, true);
     storage = new FileStorageService(basePath);
   }
 
   @AfterMethod
-  public static void tearDown() throws NotFoundException, GenericException {
+  public static void tearDown() throws RODAException {
     FSUtils.deletePath(basePath);
     FSUtils.deletePath(basePath.getParent().resolve(basePath.getFileName() + FileStorageService.HISTORY_SUFFIX));
   }

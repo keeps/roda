@@ -7,10 +7,8 @@
  */
 package org.roda.core.model;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
@@ -91,6 +89,8 @@ import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationReport;
+import org.roda.core.model.utils.LogEntryFileSystemIterable;
+import org.roda.core.model.utils.LogEntryStorageIterable;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.model.utils.ResourceListUtils;
 import org.roda.core.model.utils.ResourceParseUtils;
@@ -119,6 +119,7 @@ import org.slf4j.LoggerFactory;
  * @author Hélder Silva <hsilva@keep.pt>
  */
 public class ModelService extends ModelObservable {
+
   private static final Logger LOGGER = LoggerFactory.getLogger(ModelService.class);
 
   private final StorageService storage;
@@ -363,23 +364,18 @@ public class ModelService extends ModelObservable {
     return createAIP(aipId, sourceStorage, sourcePath, true, createdBy);
   }
 
-  public AIP notifyAIPCreated(String aipId)
+  public AIP notifyAipCreated(String aipId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
     notifyAipCreated(aip);
     return aip;
   }
 
-  public AIP notifyAIPUpdated(String aipId)
+  public AIP notifyAipUpdated(String aipId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
     notifyAipUpdated(aip);
     return aip;
-  }
-
-  public void notifyAIPDeleted(String aipId)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    notifyAipDeleted(aipId);
   }
 
   private Permissions addParentPermissions(Permissions permissions, String parentId)
@@ -1104,7 +1100,7 @@ public class ModelService extends ModelObservable {
       FSUtils.move(fullPath, fullPath.getParent().resolve(newName), replaceExisting);
 
       if (reindexResources) {
-        notifyAIPUpdated(folder.getAipId());
+        notifyAipUpdated(folder.getAipId());
       }
 
       return retrieveFile(folder.getAipId(), folder.getRepresentationId(), folder.getPath(), newName);
@@ -1662,8 +1658,7 @@ public class ModelService extends ModelObservable {
 
   public synchronized void findOldLogsAndMoveThemToStorage(Path logDirectory, Path currentLogFile)
     throws RequestNotValidException, AuthorizationDeniedException, NotFoundException {
-    try {
-      final DirectoryStream<Path> directoryStream = Files.newDirectoryStream(logDirectory);
+    try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(logDirectory)) {
 
       for (Path path : directoryStream) {
         if (!path.equals(currentLogFile)) {
@@ -1676,8 +1671,6 @@ public class ModelService extends ModelObservable {
           }
         }
       }
-
-      directoryStream.close();
     } catch (IOException e) {
       LOGGER.error("Error listing directory for log files", e);
     }
@@ -2752,156 +2745,13 @@ public class ModelService extends ModelObservable {
       final CloseableIterable<Resource> actionLogs = getStorage()
         .listResourcesUnderContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG), recursive);
 
-      inStorage = new CloseableIterable<OptionalWithCause<LogEntry>>() {
-        @Override
-        public void close() throws IOException {
-          actionLogs.close();
-        }
-
-        @Override
-        public Iterator<OptionalWithCause<LogEntry>> iterator() {
-          Iterator<Resource> resources = actionLogs.iterator();
-
-          return new Iterator<OptionalWithCause<LogEntry>>() {
-            LogEntry nextLogEntry = null;
-            BufferedReader br = null;
-
-            @Override
-            public boolean hasNext() {
-              if (nextLogEntry == null) {
-                while (resources.hasNext()) {
-                  try {
-                    Resource resource = resources.next();
-                    if (resource instanceof Binary) {
-                      Binary b = (Binary) resource;
-                      br = new BufferedReader(new InputStreamReader(b.getContent().createInputStream()));
-                      String nextLine = null;
-                      if ((nextLine = br.readLine()) != null) {
-                        nextLogEntry = JsonUtils.getObjectFromJson(nextLine, LogEntry.class);
-                        break;
-                      }
-                    }
-                  } catch (GenericException | IOException e) {
-                    // do nothing
-                  }
-                }
-              }
-
-              return nextLogEntry != null;
-            }
-
-            @Override
-            public OptionalWithCause<LogEntry> next() {
-              OptionalWithCause<LogEntry> entry = OptionalWithCause.of(nextLogEntry);
-
-              try {
-                String nextLine = null;
-
-                if ((nextLine = br.readLine()) == null) {
-                  IOUtils.closeQuietly(br);
-                  while (resources.hasNext()) {
-                    try {
-                      Resource resource = resources.next();
-                      if (resource instanceof Binary) {
-                        Binary b = (Binary) resource;
-                        br = new BufferedReader(new InputStreamReader(b.getContent().createInputStream()));
-                        if ((nextLine = br.readLine()) != null) {
-                          nextLogEntry = JsonUtils.getObjectFromJson(nextLine, LogEntry.class);
-                          break;
-                        }
-                      }
-                    } catch (GenericException | IOException e) {
-                      // do nothing
-                    }
-                  }
-                } else {
-                  nextLogEntry = JsonUtils.getObjectFromJson(nextLine, LogEntry.class);
-                }
-              } catch (GenericException | IOException e) {
-                nextLogEntry = null;
-              }
-
-              return entry;
-            }
-          };
-        }
-      };
+      inStorage = new LogEntryStorageIterable(actionLogs);
     } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
       LOGGER.error("Error getting action log from storage", e);
     }
 
     try {
-      DirectoryStream<Path> directoryStream = Files.newDirectoryStream(RodaCoreFactory.getLogPath());
-
-      notStorage = new CloseableIterable<OptionalWithCause<LogEntry>>() {
-
-        @Override
-        public void close() throws IOException {
-          directoryStream.close();
-        }
-
-        @Override
-        public Iterator<OptionalWithCause<LogEntry>> iterator() {
-          Iterator<Path> paths = directoryStream.iterator();
-
-          return new Iterator<OptionalWithCause<LogEntry>>() {
-            LogEntry nextLogEntry = null;
-            BufferedReader br = null;
-
-            @Override
-            public boolean hasNext() {
-              if (nextLogEntry == null) {
-                while (paths.hasNext()) {
-                  try {
-                    Path logFile = paths.next();
-                    br = new BufferedReader(new InputStreamReader(Files.newInputStream(logFile)));
-                    String nextLine = null;
-                    if ((nextLine = br.readLine()) != null) {
-                      nextLogEntry = JsonUtils.getObjectFromJson(nextLine, LogEntry.class);
-                      break;
-                    }
-                  } catch (GenericException | IOException e) {
-                    // do nothing
-                  }
-                }
-              }
-
-              return nextLogEntry != null;
-            }
-
-            @Override
-            public OptionalWithCause<LogEntry> next() {
-              OptionalWithCause<LogEntry> entry = OptionalWithCause.of(nextLogEntry);
-
-              try {
-                String nextLine = null;
-
-                if ((nextLine = br.readLine()) == null) {
-                  IOUtils.closeQuietly(br);
-                  while (paths.hasNext()) {
-                    try {
-                      Path logFile = paths.next();
-                      br = new BufferedReader(new InputStreamReader(Files.newInputStream(logFile)));
-                      if ((nextLine = br.readLine()) != null) {
-                        nextLogEntry = JsonUtils.getObjectFromJson(nextLine, LogEntry.class);
-                        break;
-                      }
-                    } catch (GenericException | IOException e) {
-                      // do nothing
-                    }
-                  }
-                } else {
-                  nextLogEntry = JsonUtils.getObjectFromJson(nextLine, LogEntry.class);
-                }
-              } catch (GenericException | IOException e) {
-                nextLogEntry = null;
-              }
-
-              return entry;
-            }
-          };
-        }
-      };
+      notStorage = new LogEntryFileSystemIterable(RodaCoreFactory.getLogPath());
     } catch (IOException e) {
       LOGGER.error("Error getting action log from storage", e);
     }
