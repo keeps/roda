@@ -64,7 +64,7 @@
 			</snapshots>
 			<id>opf-dev-mvn</id>
 			<name>opf-dev (jhove)</name>
-			<url>http://artifactory.opf-labs.org/artifactory/opf-dev-local</url>
+			<url>http://artifactory.opf-labs.org/artifactory/opf-dev</url>
 		</repository>
 	</repositories>
 	<dependencies>
@@ -81,12 +81,12 @@
 		<dependency>
 			<groupId>org.openpreservation.jhove</groupId>
 			<artifactId>jhove-core</artifactId>
-			<version>1.12.28</version>
+			<version>1.14.6</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openpreservation.jhove</groupId>
 			<artifactId>jhove-modules</artifactId>
-			<version>1.12.28</version>
+			<version>1.14.6</version>
 		</dependency>
 	</dependencies>
 </project>
