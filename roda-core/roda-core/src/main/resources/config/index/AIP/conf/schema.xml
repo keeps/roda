@@ -29,7 +29,7 @@
  http://wiki.apache.org/solr/SchemaXml
 -->
 
-<schema name="schema-version-2" version="1.5">
+<schema name="schema-version-3" version="1.5">
   <!--
     2 - removed field 'state' default value (it was leftovers from previous field definition);
   -->
@@ -124,6 +124,7 @@
    
    <field name="ingestSIPIds" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    <field name="ingestJobId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="ingestUpdateJobIds" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    
    <field name="level" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="title" type="text_general" indexed="true" stored="true" required="false" multiValued="false" />

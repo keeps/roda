@@ -38,6 +38,7 @@ public class AIP implements IsModelObject {
 
   private List<String> ingestSIPIds;
   private String ingestJobId = "";
+  private List<String> ingestUpdateJobIds = new ArrayList<>();
 
   private Boolean ghost = null;
 
@@ -200,6 +201,20 @@ public class AIP implements IsModelObject {
     return this;
   }
 
+  public List<String> getIngestUpdateJobIds() {
+    return ingestUpdateJobIds;
+  }
+
+  public AIP setIngestUpdateJobIds(List<String> ingestUpdateJobIds) {
+    this.ingestUpdateJobIds = ingestUpdateJobIds;
+    return this;
+  }
+
+  public AIP addIngestUpdateJobId(String ingestUpdateJobId) {
+    this.ingestUpdateJobIds.add(ingestUpdateJobId);
+    return this;
+  }
+
   public void addDescriptiveMetadata(DescriptiveMetadata descriptiveMetadata) {
     if (descriptiveMetadata.isFromAIP()) {
       this.descriptiveMetadata.add(descriptiveMetadata);
@@ -235,7 +250,7 @@ public class AIP implements IsModelObject {
 
   public void addRelationship(Relationship relationship) {
     if (relationships == null) {
-      relationships = new ArrayList<Relationship>();
+      relationships = new ArrayList<>();
     }
 
     relationships.add(relationship);
@@ -324,9 +339,10 @@ public class AIP implements IsModelObject {
   public String toString() {
     return "AIP{" + "id='" + id + '\'' + ", parentId='" + parentId + '\'' + ", type='" + type + '\'' + ", state="
       + state + ", permissions=" + permissions + ", descriptiveMetadata=" + descriptiveMetadata + ", representations="
-      + representations + ", ingestSIPId='" + ingestSIPIds + '\'' + ", ingestJobId='" + ingestJobId + '\'' + ", ghost="
-      + ghost + ", format=" + format + ", relationships=" + relationships + ", createdOn=" + createdOn + ", createdBy="
-      + createdBy + ", updatedOn=" + updatedOn + ", updatedBy=" + updatedBy + '}';
+      + representations + ", ingestSIPId='" + ingestSIPIds + '\'' + ", ingestJobId='" + ingestJobId + '\''
+      + ", ingestJobIds='" + ingestUpdateJobIds + '\'' + ", ghost=" + ghost + ", format=" + format + ", relationships="
+      + relationships + ", createdOn=" + createdOn + ", createdBy=" + createdBy + ", updatedOn=" + updatedOn
+      + ", updatedBy=" + updatedBy + '}';
   }
 
 }

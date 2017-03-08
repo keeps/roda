@@ -13,6 +13,7 @@ package org.roda.wui.client.browse;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -142,9 +143,9 @@ public class BrowseAIP extends Composite {
 
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
-  private static final List<String> aipFieldsToReturn = new ArrayList<String>(
+  private static final List<String> aipFieldsToReturn = new ArrayList<>(
     Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_STATE, RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL,
-      RodaConstants.INGEST_SIP_IDS, RodaConstants.INGEST_JOB_ID));
+      RodaConstants.INGEST_SIP_IDS, RodaConstants.INGEST_JOB_ID, RodaConstants.INGEST_UPDATE_JOB_IDS));
 
   private String aipId;
 
@@ -177,7 +178,7 @@ public class BrowseAIP extends Composite {
   Label browseItemHeader, itemTitle, itemId, sipId;
 
   @UiField
-  FlowPanel ingestJobId;
+  FlowPanel ingestJobId, ingestUpdateJobIds;
 
   // DESCRIPTIVE METADATA
 
@@ -248,7 +249,7 @@ public class BrowseAIP extends Composite {
   boolean justActive = true;
 
   private BrowseAIP() {
-    handlers = new ArrayList<HandlerRegistration>();
+    handlers = new ArrayList<>();
     boolean selectable = true;
 
     // REPRESENTATIONS
@@ -280,7 +281,7 @@ public class BrowseAIP extends Composite {
     facetDescriptionLevels = new FlowPanel();
     facetHasRepresentations = new FlowPanel();
 
-    Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
+    Map<String, FlowPanel> facetPanels = new HashMap<>();
     facetPanels.put(RodaConstants.AIP_LEVEL, facetDescriptionLevels);
     facetPanels.put(RodaConstants.AIP_HAS_REPRESENTATIONS, facetHasRepresentations);
 
@@ -417,6 +418,8 @@ public class BrowseAIP extends Composite {
     sipId.removeStyleName("browseSipId");
     ingestJobId.clear();
     ingestJobId.removeStyleName("browseIngestJobId");
+    ingestUpdateJobIds.clear();
+    ingestUpdateJobIds.removeStyleName("browseIngestJobId");
 
     breadcrumb.setVisible(false);
 
@@ -695,6 +698,30 @@ public class BrowseAIP extends Composite {
       ingestJobId.add(anchor);
       ingestJobId.addStyleName("browseIngestJobId");
     }
+
+    if (!aip.getIngestUpdateJobIds().isEmpty()) {
+      final String id = aip.getId();
+
+      InlineHTML html = new InlineHTML();
+      html.setText(messages.updateProcessId());
+      ingestUpdateJobIds.add(html);
+      ingestUpdateJobIds.addStyleName("browseIngestJobId");
+      Iterator<String> jobIterator = aip.getIngestUpdateJobIds().iterator();
+
+      while (jobIterator.hasNext()) {
+        String updateJobId = jobIterator.next();
+
+        Anchor anchor = new Anchor();
+        anchor.setText(updateJobId);
+        anchor.setHref(HistoryUtils.createHistoryHashLink(ShowJobReport.RESOLVER, updateJobId + '-' + id));
+        ingestUpdateJobIds.add(anchor);
+
+        if (jobIterator.hasNext()) {
+          ingestUpdateJobIds.add(new InlineHTML(", "));
+        }
+      }
+    }
+
   }
 
   protected void viewAction() {
@@ -705,7 +732,7 @@ public class BrowseAIP extends Composite {
     addStyleName(BROWSE_TOP_CSS);
 
     Element firstElement = this.getElement().getFirstChildElement();
-    if (firstElement.getTagName().equalsIgnoreCase("input")) {
+    if ("input".equalsIgnoreCase(firstElement.getTagName())) {
       firstElement.setAttribute("title", "browse input");
     }
 

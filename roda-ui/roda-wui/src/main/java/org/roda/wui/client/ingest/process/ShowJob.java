@@ -282,7 +282,7 @@ public class ShowJob extends Composite {
     jobReportStatus = new FlowPanel();
     jobReportLastAction = new FlowPanel();
 
-    Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
+    Map<String, FlowPanel> facetPanels = new HashMap<>();
     facetPanels.put(RodaConstants.JOB_REPORT_PLUGIN_STATE, jobReportStatus);
     facetPanels.put(RodaConstants.JOB_REPORT_PLUGIN_NAME, jobReportLastAction);
 
@@ -596,9 +596,6 @@ public class ShowJob extends Composite {
 
     buttonAppraisal
       .setText(messages.appraisalTitle() + " (" + job.getJobStats().getOutcomeObjectsWithManualIntervention() + ")");
-
-    // set button visibility
-    // buttonStop.setVisible(isJobRunning());
     buttonAppraisal.setVisible(job.getJobStats().getOutcomeObjectsWithManualIntervention() > 0);
 
     scheduleUpdateStatus();

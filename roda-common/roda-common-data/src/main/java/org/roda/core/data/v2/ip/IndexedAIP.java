@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.ip;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -54,6 +55,7 @@ public class IndexedAIP implements IsIndexed, HasPermissions {
 
   private List<String> ingestSIPIds;
   private String ingestJobId;
+  private List<String> ingestUpdateJobIds = new ArrayList<>();
 
   /**
    * Constructs an empty (<strong>invalid</strong>) {@link IndexedAIP}.
@@ -282,6 +284,20 @@ public class IndexedAIP implements IsIndexed, HasPermissions {
     return this;
   }
 
+  public List<String> getIngestUpdateJobIds() {
+    return ingestUpdateJobIds;
+  }
+
+  public IndexedAIP setIngestUpdateJobIds(List<String> ingestUpdateJobIds) {
+    this.ingestUpdateJobIds = ingestUpdateJobIds;
+    return this;
+  }
+
+  public IndexedAIP addIngestUpdateJobId(String ingestUpdateJobId) {
+    this.ingestUpdateJobIds.add(ingestUpdateJobId);
+    return this;
+  }
+
   public Boolean getHasRepresentations() {
     return hasRepresentations;
   }
@@ -376,22 +392,22 @@ public class IndexedAIP implements IsIndexed, HasPermissions {
       + ", parentID='" + parentID + '\'' + ", ancestors=" + ancestors + ", permissions=" + permissions
       + ", numberOfSubmissionFiles=" + numberOfSubmissionFiles + ", numberOfDocumentationFiles="
       + numberOfDocumentationFiles + ", numberOfSchemaFiles=" + numberOfSchemaFiles + ", hasRepresentations="
-      + hasRepresentations + ", ghost=" + ghost + ", ingestSIPId='" + ingestSIPIds + '\'' + ", ingestJobId='"
-      + ingestJobId + '\'' + '}';
+      + hasRepresentations + ", ghost=" + ghost + ", ingestSIPId='" + ingestSIPIds + '\'' + ", ingestJobId="
+      + ingestJobId + ", ingestUpdateJobIds='" + ingestUpdateJobIds + '\'' + '}';
   }
 
   @Override
   public List<String> toCsvHeaders() {
     return Arrays.asList("id", "state", "level", "title", "dateInitial", "dateFinal", "description", "parentID",
       "ancestors", "permissions", "numberOfSubmissionFiles", "numberOfDocumentationFiles", "numberOfSchemaFiles",
-      "hasRepresentations", "ghost", "ingestSIPId", "ingestJobId");
+      "hasRepresentations", "ghost", "ingestSIPId", "ingestJobId", "ingestUpdateJobIds");
   }
 
   @Override
   public List<Object> toCsvValues() {
     return Arrays.asList(id, state, level, title, dateInitial, dateFinal, description, parentID, ancestors, permissions,
       numberOfSubmissionFiles, numberOfDocumentationFiles, numberOfSchemaFiles, hasRepresentations, ghost, ingestSIPIds,
-      ingestJobId);
+      ingestJobId, ingestUpdateJobIds);
   }
 
   @JsonIgnore

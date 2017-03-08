@@ -382,6 +382,7 @@ public final class JobsHelper {
         // find all AIPs that should be removed
         Filter filter = new Filter();
         // FIXME 20161128 hsilva: perhaps we should avoid ghosts???
+        // FIXME 20170308 nvieira: it should rollback if job is update
         filter.add(new SimpleFilterParameter(RodaConstants.INGEST_JOB_ID, job.getId()));
         filter.add(new OneOfManyFilterParameter(RodaConstants.AIP_STATE,
           Arrays.asList(AIPState.CREATED.toString(), AIPState.INGEST_PROCESSING.toString())));

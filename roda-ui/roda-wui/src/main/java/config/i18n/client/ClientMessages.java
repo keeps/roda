@@ -653,6 +653,8 @@ public interface ClientMessages extends Messages {
 
   String processId();
 
+  String updateProcessId();
+
   String itemIdMin(String itemId);
 
   String sipIdMin(String sipId);

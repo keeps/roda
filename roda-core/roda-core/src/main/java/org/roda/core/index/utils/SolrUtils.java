@@ -1169,6 +1169,7 @@ public class SolrUtils {
     final String parentId = objectToString(doc.get(RodaConstants.AIP_PARENT_ID), null);
     final List<String> ingestSIPIds = objectToListString(doc.get(RodaConstants.INGEST_SIP_IDS));
     final String ingestJobId = objectToString(doc.get(RodaConstants.INGEST_JOB_ID), "");
+    final List<String> ingestUpdateJobIds = objectToListString(doc.get(RodaConstants.INGEST_UPDATE_JOB_IDS));
     final List<String> ancestors = objectToListString(doc.get(RodaConstants.AIP_ANCESTORS));
     final List<String> levels = objectToListString(doc.get(RodaConstants.AIP_LEVEL));
     final List<String> titles = objectToListString(doc.get(RodaConstants.AIP_TITLE));
@@ -1194,7 +1195,7 @@ public class SolrUtils {
 
     return new IndexedAIP(id, state, level, title, dateInitial, dateFinal, description, parentId, ancestors,
       permissions, numberOfSubmissionFiles, numberOfDocumentationFiles, numberOfSchemaFiles, hasRepresentations, ghost)
-        .setIngestSIPIds(ingestSIPIds).setIngestJobId(ingestJobId);
+        .setIngestSIPIds(ingestSIPIds).setIngestJobId(ingestJobId).setIngestUpdateJobIds(ingestUpdateJobIds);
   }
 
   public static SolrInputDocument aipToSolrInputDocument(AIP aip, List<String> ancestors, ModelService model,
@@ -1209,6 +1210,7 @@ public class SolrUtils {
 
     ret.addField(RodaConstants.INGEST_SIP_IDS, aip.getIngestSIPIds());
     ret.addField(RodaConstants.INGEST_JOB_ID, aip.getIngestJobId());
+    ret.addField(RodaConstants.INGEST_UPDATE_JOB_IDS, aip.getIngestUpdateJobIds());
 
     // set ancestors
     // List<String> ancestors = getAncestors(aip.getParentId(), model);
@@ -1324,6 +1326,7 @@ public class SolrUtils {
     doc.addField(RodaConstants.STATE, aip.getState().toString());
     doc.addField(RodaConstants.INGEST_SIP_IDS, aip.getIngestSIPIds());
     doc.addField(RodaConstants.INGEST_JOB_ID, aip.getIngestJobId());
+    doc.addField(RodaConstants.INGEST_UPDATE_JOB_IDS, aip.getIngestUpdateJobIds());
     doc.addField(RodaConstants.REPRESENTATION_ANCESTORS, ancestors);
     setPermissions(aip.getPermissions(), doc);
 
@@ -1367,6 +1370,7 @@ public class SolrUtils {
     doc.addField(RodaConstants.STATE, aip.getState().toString());
     doc.addField(RodaConstants.INGEST_SIP_IDS, aip.getIngestSIPIds());
     doc.addField(RodaConstants.INGEST_JOB_ID, aip.getIngestJobId());
+    doc.addField(RodaConstants.INGEST_UPDATE_JOB_IDS, aip.getIngestUpdateJobIds());
     doc.addField(RodaConstants.FILE_ANCESTORS, ancestors);
     setPermissions(aip.getPermissions(), doc);
 

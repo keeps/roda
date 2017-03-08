@@ -109,9 +109,9 @@ public class Search extends Composite {
     facetMimetypes = new FlowPanel();
 
     // Define facets and facets panels
-    Map<FacetParameter, FlowPanel> itemsFacetsMap = new HashMap<FacetParameter, FlowPanel>();
-    Map<FacetParameter, FlowPanel> representationsFacetsMap = new HashMap<FacetParameter, FlowPanel>();
-    Map<FacetParameter, FlowPanel> filesFacetsMap = new HashMap<FacetParameter, FlowPanel>();
+    Map<FacetParameter, FlowPanel> itemsFacetsMap = new HashMap<>();
+    Map<FacetParameter, FlowPanel> representationsFacetsMap = new HashMap<>();
+    Map<FacetParameter, FlowPanel> filesFacetsMap = new HashMap<>();
 
     itemsFacetsMap.put(new SimpleFacetParameter(RodaConstants.AIP_LEVEL), facetDescriptionLevels);
     itemsFacetsMap.put(new SimpleFacetParameter(RodaConstants.AIP_HAS_REPRESENTATIONS), facetHasRepresentations);

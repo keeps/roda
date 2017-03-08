@@ -19,6 +19,7 @@ import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
+import org.roda.core.data.v2.index.filter.OrFiltersParameters;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
@@ -337,7 +338,14 @@ public class MainSearch extends Composite {
         String key = historyTokens.get(i);
         String value = historyTokens.get(i + 1);
 
-        params.add(new SimpleFilterParameter(key, value));
+        if (RodaConstants.INGEST_JOB_ID.equals(key)) {
+          List<FilterParameter> orParameter = new ArrayList<>();
+          orParameter.add(new SimpleFilterParameter(key, value));
+          orParameter.add(new SimpleFilterParameter(RodaConstants.INGEST_UPDATE_JOB_IDS, value));
+          params.add(new OrFiltersParameters(orParameter));
+        } else {
+          params.add(new SimpleFilterParameter(key, value));
+        }
       }
 
       if (!params.isEmpty()) {

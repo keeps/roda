@@ -81,14 +81,14 @@ public class EARKSIPToAIPPluginUtils {
   }
 
   public static AIP earkSIPToAIPUpdate(SIP sip, IndexedAIP indexedAIP, ModelService model, StorageService storage,
-    String username) throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
-    AuthorizationDeniedException, ValidationException {
-    return earkSIPToAIPUpdate(sip, indexedAIP, model, storage, username, Optional.empty());
+    String username, String ingestJobId) throws RequestNotValidException, NotFoundException, GenericException,
+    AlreadyExistsException, AuthorizationDeniedException, ValidationException {
+    return earkSIPToAIPUpdate(sip, indexedAIP, model, storage, username, Optional.empty(), ingestJobId);
   }
 
   public static AIP earkSIPToAIPUpdate(SIP sip, IndexedAIP indexedAIP, ModelService model, StorageService storage,
-    String username, Optional<String> searchScope) throws RequestNotValidException, NotFoundException, GenericException,
-    AlreadyExistsException, AuthorizationDeniedException, ValidationException {
+    String username, Optional<String> searchScope, String ingestJobId) throws RequestNotValidException,
+    NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException, ValidationException {
     boolean notify = false;
 
     // process IP information
@@ -104,6 +104,7 @@ public class EARKSIPToAIPPluginUtils {
     if (searchScope.isPresent()) {
       aip.setParentId(searchScope.get());
     }
+    aip.addIngestUpdateJobId(ingestJobId);
     model.updateAIP(aip, username);
 
     return aip;
@@ -162,8 +163,8 @@ public class EARKSIPToAIPPluginUtils {
       IPFile file = pm.getMetadata();
       ContentPayload fileContentPayload = new FSPathContentPayload(file.getPath());
 
-      model.createOrUpdateOtherMetadata(aipId, representationId.orElse(null), file.getRelativeFolders(), file.getFileName(), "",
-        pm.getMetadataType().asString(), fileContentPayload, notify);
+      model.createOrUpdateOtherMetadata(aipId, representationId.orElse(null), file.getRelativeFolders(),
+        file.getFileName(), "", pm.getMetadataType().asString(), fileContentPayload, notify);
     }
 
   }

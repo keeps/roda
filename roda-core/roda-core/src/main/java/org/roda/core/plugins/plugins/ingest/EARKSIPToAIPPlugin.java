@@ -82,7 +82,6 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
 
   @Override
   public String getDescription() {
-    // return "E-ARK SIP as a zip file (with support for Update SIPs).";
     return "E-ARK SIP as a zip file.";
   }
 
@@ -238,8 +237,10 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
     }
     if (indexedAIP != null) {
       String jobUsername = PluginHelper.getJobUsername(this, index);
+      String jobId = PluginHelper.getJobId(this);
       // Update the AIP
-      aip = EARKSIPToAIPPluginUtils.earkSIPToAIPUpdate(sip, indexedAIP, model, storage, jobUsername, searchScope);
+      aip = EARKSIPToAIPPluginUtils.earkSIPToAIPUpdate(sip, indexedAIP, model, storage, jobUsername, searchScope,
+        jobId);
     }
     return aip;
   }
