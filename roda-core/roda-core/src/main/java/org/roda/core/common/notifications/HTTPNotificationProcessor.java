@@ -17,10 +17,10 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
@@ -83,7 +83,7 @@ public class HTTPNotificationProcessor implements NotificationProcessor {
     RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(timeout).setConnectTimeout(timeout)
       .setConnectionRequestTimeout(timeout).build();
 
-    HttpClient httpclient = HttpClients.createDefault();
+    CloseableHttpClient httpclient = HttpClients.createDefault();
     HttpPost httppost = new HttpPost(endpoint);
     httppost.setConfig(requestConfig);
     try {
@@ -100,6 +100,8 @@ public class HTTPNotificationProcessor implements NotificationProcessor {
     } catch (IOException e) {
       LOGGER.debug("HTTP POST error: {}", e.getMessage());
       success = false;
+    } finally {
+      IOUtils.closeQuietly(httpclient);
     }
     return success;
 
