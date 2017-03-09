@@ -369,33 +369,9 @@ public class IndexService {
     }
   }
 
-  public SimpleJobPluginInfo reindexActionLog(BufferedReader br, SimpleJobPluginInfo jobPluginInfo)
-    throws GenericException {
-    String line;
-    try {
-      while ((line = br.readLine()) != null) {
-        jobPluginInfo.incrementObjectsCount();
+  
 
-        try {
-          LogEntry entry = JsonUtils.getObjectFromJson(line, LogEntry.class);
-          if (entry != null) {
-            reindexActionLog(entry);
-            jobPluginInfo.incrementObjectsProcessedWithSuccess();
-          }
-
-        } catch (GenericException e) {
-          jobPluginInfo.incrementObjectsProcessedWithFailure();
-        }
-      }
-      br.close();
-    } catch (IOException e) {
-      throw new GenericException("Error reading log", e);
-    }
-
-    return jobPluginInfo;
-  }
-
-  private ReturnWithExceptions<Void> reindexActionLog(LogEntry entry) {
+  public ReturnWithExceptions<Void> reindexActionLog(LogEntry entry) {
     return observer.logEntryCreated(entry);
   }
 

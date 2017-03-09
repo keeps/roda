@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,6 +31,9 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.PremisV3Utils;
@@ -121,6 +125,8 @@ import org.slf4j.LoggerFactory;
 public class ModelService extends ModelObservable {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ModelService.class);
+  
+  private static final DateTimeFormatter LOG_NAME_DATE_FORMAT = DateTimeFormat.forPattern("yyyy-MM-dd");
 
   private final StorageService storage;
   private Path logFile;
@@ -2736,7 +2742,11 @@ public class ModelService extends ModelObservable {
     return CloseableIterables.fromList(members);
   }
 
-  private CloseableIterable<OptionalWithCause<LogEntry>> listLogEntries() {
+  public CloseableIterable<OptionalWithCause<LogEntry>> listLogEntries() {
+    return listLogEntries(0);
+  }
+
+  public CloseableIterable<OptionalWithCause<LogEntry>> listLogEntries(int daysToIndex) {
     boolean recursive = false;
     CloseableIterable<OptionalWithCause<LogEntry>> inStorage = null;
     CloseableIterable<OptionalWithCause<LogEntry>> notStorage = null;
@@ -2745,18 +2755,48 @@ public class ModelService extends ModelObservable {
       final CloseableIterable<Resource> actionLogs = getStorage()
         .listResourcesUnderContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG), recursive);
 
-      inStorage = new LogEntryStorageIterable(actionLogs);
+      if (daysToIndex > 0) {
+        inStorage = new LogEntryStorageIterable(
+          CloseableIterables.filter(actionLogs, r -> isToIndex(r.getStoragePath().getName(), daysToIndex)));
+      } else {
+        inStorage = new LogEntryStorageIterable(actionLogs);
+      }
     } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
       LOGGER.error("Error getting action log from storage", e);
     }
 
     try {
-      notStorage = new LogEntryFileSystemIterable(RodaCoreFactory.getLogPath());
+      if (daysToIndex > 0) {
+        notStorage = new LogEntryFileSystemIterable(RodaCoreFactory.getLogPath(),
+          p -> isToIndex(p.getFileName().toString(), daysToIndex));
+      } else {
+        notStorage = new LogEntryFileSystemIterable(RodaCoreFactory.getLogPath());
+      }
+
     } catch (IOException e) {
       LOGGER.error("Error getting action log from storage", e);
     }
 
     return CloseableIterables.concat(inStorage, notStorage);
+  }
+
+  
+
+  private boolean isToIndex(String fileName, int daysToIndex) {
+    boolean isToIndex = false;
+    String fileNameWithoutExtension = fileName.replaceFirst(".log$", "");
+
+    try {
+      DateTime dt = LOG_NAME_DATE_FORMAT.parseDateTime(fileNameWithoutExtension);
+
+      if (dt.plusDays(daysToIndex + 1).isAfterNow()) {
+        isToIndex = true;
+      }
+
+    } catch (IllegalArgumentException | UnsupportedOperationException e) {
+      LOGGER.error("Could not parse log file name", e);
+    }
+    return isToIndex;
   }
 
   public boolean hasObjects(Class<? extends IsRODAObject> objectClass) {
