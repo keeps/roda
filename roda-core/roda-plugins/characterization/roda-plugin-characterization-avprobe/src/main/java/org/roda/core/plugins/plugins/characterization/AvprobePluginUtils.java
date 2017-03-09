@@ -47,9 +47,9 @@ public class AvprobePluginUtils {
     Path avprobeHome = rodaHome
       .resolve(RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "avprobe", "path"));
 
-    File AVPROBE_DIRECTORY = avprobeHome.toFile();
-    List<String> command = new ArrayList<String>(
-      Arrays.asList(AVPROBE_DIRECTORY.getAbsolutePath() + File.separator + "avprobe", "-show_format", "-show_streams",
+    File avprobeDirectory = avprobeHome.toFile();
+    List<String> command = new ArrayList<>(
+      Arrays.asList(avprobeDirectory.getAbsolutePath() + File.separator + "avprobe", "-show_format", "-show_streams",
         "-show_packets", "-of", AvprobePluginUtils.AVPROBE_METADATA_FORMAT, "-v", "quiet"));
 
     return command;

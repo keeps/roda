@@ -53,8 +53,9 @@ public class PdfToPdfaPluginUtils {
         .createProcessor(ProcessorFactory.fromValues(validatorConfig, featureConfig, pluginConfig, fixerConfig, tasks));
 
       ProcessorResult result = processor.process(fixed.toFile());
-
       RepairStatus fixStatus = result.getFixerResult().getRepairStatus();
+      processor.close();
+
       if (fixStatus.equals(RepairStatus.WONT_FIX) || fixStatus.equals(RepairStatus.FIX_ERROR)) {
         throw new CommandException(
           "There were some metadata fixing errors detected by VeraPDF on: " + input.toString());

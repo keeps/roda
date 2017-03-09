@@ -506,7 +506,7 @@ public class ResourceListUtils {
                 }
               }
 
-              if (metadataIterator != null && metadataIterator.hasNext()) {
+              if (metadataIterator.hasNext()) {
                 nextResource = metadataIterator.next();
               } else {
                 outerloop: while (aipIteratorSub.hasNext()) {

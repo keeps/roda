@@ -110,7 +110,7 @@ public class ReindexActionLogPlugin extends AbstractPlugin<Void> {
 
   @Override
   public List<PluginParameter> getParameters() {
-    ArrayList<PluginParameter> parameters = new ArrayList<PluginParameter>();
+    ArrayList<PluginParameter> parameters = new ArrayList<>();
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_INT_VALUE));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES));
@@ -207,13 +207,11 @@ public class ReindexActionLogPlugin extends AbstractPlugin<Void> {
     Path logFilesDirectory = RodaCoreFactory.getLogPath();
     DirectoryStream.Filter<Path> logFilesFilter = getLogFilesFilter(firstDayToIndex, dontReindexOlderThanXDays);
 
-    try {
+    try (DirectoryStream<Path> pathStream = Files.newDirectoryStream(logFilesDirectory, logFilesFilter)) {
       BufferedReader br = null;
-      InputStream logFileInputStream;
-      for (Path logFile : Files.newDirectoryStream(logFilesDirectory, logFilesFilter)) {
+      for (Path logFile : pathStream) {
         LOGGER.debug("Going to reindex '{}'", logFile);
-        try {
-          logFileInputStream = Files.newInputStream(logFile);
+        try (InputStream logFileInputStream = Files.newInputStream(logFile)) {
           br = new BufferedReader(new InputStreamReader(logFileInputStream));
           jobPluginInfo = index.reindexActionLog(br, jobPluginInfo);
         } catch (IOException | GenericException e) {
@@ -239,12 +237,12 @@ public class ReindexActionLogPlugin extends AbstractPlugin<Void> {
   private Date calculateFirstDayToIndex(int dontReindexOlderThanXDays) {
     Calendar cal = Calendar.getInstance();
     cal.add(Calendar.DAY_OF_YEAR, -1 * dontReindexOlderThanXDays);
-    Date firstDayToIndex = cal.getTime();
-    return firstDayToIndex;
+    return cal.getTime();
   }
 
   private DirectoryStream.Filter<Path> getLogFilesFilter(Date firstDayToIndex, int dontReindexOlderThanXDays) {
     return new DirectoryStream.Filter<Path>() {
+      @Override
       public boolean accept(Path file) throws IOException {
         return isToIndex(file.getFileName().toString(), firstDayToIndex, dontReindexOlderThanXDays);
       }

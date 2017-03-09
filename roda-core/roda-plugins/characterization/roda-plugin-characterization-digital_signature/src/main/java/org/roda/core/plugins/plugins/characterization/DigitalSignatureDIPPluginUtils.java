@@ -60,6 +60,7 @@ public class DigitalSignatureDIPPluginUtils {
     if (KEYSTORE_PATH != null) {
       InputStream is = new FileInputStream(KEYSTORE_PATH);
       signatureUtility.loadKeyStore(is, KEYSTORE_PASSWORD.toCharArray());
+      IOUtils.closeQuietly(is);
     }
     signatureUtility.initSign(KEYSTORE_ALIAS, KEYSTORE_PASSWORD.toCharArray());
 
@@ -107,6 +108,7 @@ public class DigitalSignatureDIPPluginUtils {
       if (KEYSTORE_PATH != null) {
         InputStream is = new FileInputStream(KEYSTORE_PATH);
         signatureUtility.loadKeyStore(is, KEYSTORE_PASSWORD.toCharArray());
+        IOUtils.closeQuietly(is);
       }
       signatureUtility.initSign(KEYSTORE_ALIAS, KEYSTORE_PASSWORD.toCharArray());
 

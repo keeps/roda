@@ -123,7 +123,7 @@ public class MediaInfoPlugin extends AbstractPlugin<AIP> {
     PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
     PluginState reportState = PluginState.SUCCESS;
     ValidationReport validationReport = new ValidationReport();
-    List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
+    List<LinkingIdentifier> sources = new ArrayList<>();
 
     for (Representation representation : aip.getRepresentations()) {
       LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());
@@ -206,6 +206,7 @@ public class MediaInfoPlugin extends AbstractPlugin<AIP> {
       String[] tokens = fileName.split("/");
       fileName = tokens[tokens.length - 1];
       parsed.put(fileName, nodeResult);
+      IOUtils.closeQuietly(fw);
     }
     return parsed;
   }

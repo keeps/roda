@@ -203,7 +203,8 @@ public final class ZipUtility {
 
     List<File> contentAbsoluteFiles = FileUtility.listFilesRecursively(contentsDir);
 
-    JarOutputStream jarOutputStream = new JarOutputStream(new BufferedOutputStream(new FileOutputStream(newZipFile)));
+    FileOutputStream zipStream = new FileOutputStream(newZipFile);
+    JarOutputStream jarOutputStream = new JarOutputStream(new BufferedOutputStream(zipStream));
     // ZipOutputStream zipOutputStream = new ZipOutputStream(
     // new BufferedOutputStream(new FileOutputStream(newZipFile)));
 
@@ -215,7 +216,8 @@ public final class ZipUtility {
       File absoluteFile = iterator.next();
       String relativeFile = getFilePathRelativeTo(absoluteFile, contentsDir);
 
-      BufferedInputStream in = new BufferedInputStream(new FileInputStream(absoluteFile));
+      FileInputStream inputStream = new FileInputStream(absoluteFile);
+      BufferedInputStream in = new BufferedInputStream(inputStream);
 
       // Add ZIP entry to output stream.
       // zipOutputStream.putNextEntry(new
@@ -234,11 +236,13 @@ public final class ZipUtility {
       // zipOutputStream.closeEntry();
       jarOutputStream.closeEntry();
       in.close();
+      inputStream.close();
     }
 
     // Complete the ZIP file
     // zipOutputStream.close();
     jarOutputStream.close();
+    zipStream.close();
 
     return newZipFile;
   }

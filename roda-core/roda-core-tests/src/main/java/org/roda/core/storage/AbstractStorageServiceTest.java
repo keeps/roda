@@ -14,6 +14,7 @@ import static org.testng.AssertJUnit.assertNotNull;
 import static org.testng.AssertJUnit.assertTrue;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -558,7 +559,10 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     final ContentPayload newPayload = new RandomMockContentPayload();
     final Binary binaryUpdated = getStorage().updateBinaryContent(binaryStoragePath, newPayload, false, false);
     assertNotNull(binaryUpdated);
-    assertFalse(IOUtils.contentEquals(Files.newInputStream(original), binaryUpdated.getContent().createInputStream()));
+
+    InputStream stream = Files.newInputStream(original);
+    assertFalse(IOUtils.contentEquals(stream, binaryUpdated.getContent().createInputStream()));
+    stream.close();
 
     testBinaryContent(binaryUpdated, newPayload);
 

@@ -153,7 +153,7 @@ public final class ODFSignatureUtils {
   }
 
   public static List<Path> runDigitalSignatureExtract(Path input) throws SignatureException, IOException {
-    List<Path> paths = new ArrayList<Path>();
+    List<Path> paths = new ArrayList<>();
 
     ZipFile zipFile = new ZipFile(input.toString());
     Enumeration<?> enumeration;
@@ -222,7 +222,7 @@ public final class ODFSignatureUtils {
 
     ByteArrayInputStream bais = createSignature(input.toString(), certificate, key);
     File file = output.toFile();
-    if (file != null) {
+    if (file != null && bais != null) {
       byte[] buffer = new byte[2048];
       int length = 0;
       FileOutputStream fos = new FileOutputStream(file);
@@ -236,9 +236,7 @@ public final class ODFSignatureUtils {
   }
 
   public static ByteArrayInputStream createSignature(String inputPath, X509Certificate certificate, Key key) {
-    try {
-      ZipFile zipFile = new ZipFile(new File(inputPath));
-
+    try (ZipFile zipFile = new ZipFile(new File(inputPath))) {
       DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
       documentBuilderFactory.setNamespaceAware(true);
       DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
@@ -288,7 +286,6 @@ public final class ODFSignatureUtils {
       LOGGER.debug("ODF signature creation went wrong.");
       return null;
     }
-
   }
 
   private static void writeXML(OutputStream outStream, Node node, boolean indent)

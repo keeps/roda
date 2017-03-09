@@ -62,8 +62,7 @@ public final class OOXMLSignatureUtils {
 
   public static String runDigitalSignatureVerify(Path input) throws IOException, GeneralSecurityException {
     boolean isValid = true;
-    try {
-      OPCPackage pkg = OPCPackage.open(input.toString(), PackageAccess.READ);
+    try (OPCPackage pkg = OPCPackage.open(input.toString(), PackageAccess.READ)) {
       SignatureConfig sic = new SignatureConfig();
       sic.setOpcPackage(pkg);
 
@@ -74,8 +73,8 @@ public final class OOXMLSignatureUtils {
         for (SignaturePart sp : it) {
           isValid = isValid && sp.validate();
 
-          Set<Certificate> trustedRootCerts = new HashSet<Certificate>();
-          Set<Certificate> intermediateCerts = new HashSet<Certificate>();
+          Set<Certificate> trustedRootCerts = new HashSet<>();
+          Set<Certificate> intermediateCerts = new HashSet<>();
           List<X509Certificate> certChain = sp.getCertChain();
 
           for (X509Certificate c : certChain) {
@@ -90,8 +89,6 @@ public final class OOXMLSignatureUtils {
           SignatureUtils.verifyCertificateChain(trustedRootCerts, intermediateCerts, certChain.get(0));
         }
       }
-
-      pkg.close();
     } catch (InvalidFormatException e) {
       return "Error opening a document file";
     } catch (CertificateExpiredException e) {

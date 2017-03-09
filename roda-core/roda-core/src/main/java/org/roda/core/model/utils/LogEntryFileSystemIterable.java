@@ -40,10 +40,10 @@ public class LogEntryFileSystemIterable implements CloseableIterable<OptionalWit
       public boolean hasNext() {
         if (nextLogEntry == null) {
           while (paths.hasNext()) {
+            Path logFile = paths.next();
             try {
-              Path logFile = paths.next();
               br = new BufferedReader(new InputStreamReader(Files.newInputStream(logFile)));
-              String nextLine = null;
+              String nextLine;
               if ((nextLine = br.readLine()) != null) {
                 nextLogEntry = JsonUtils.getObjectFromJson(nextLine, LogEntry.class);
                 break;
@@ -62,13 +62,13 @@ public class LogEntryFileSystemIterable implements CloseableIterable<OptionalWit
         OptionalWithCause<LogEntry> entry = OptionalWithCause.of(nextLogEntry);
 
         try {
-          String nextLine = null;
+          String nextLine;
 
           if ((nextLine = br.readLine()) == null) {
             IOUtils.closeQuietly(br);
             while (paths.hasNext()) {
+              Path logFile = paths.next();
               try {
-                Path logFile = paths.next();
                 br = new BufferedReader(new InputStreamReader(Files.newInputStream(logFile)));
                 if ((nextLine = br.readLine()) != null) {
                   nextLogEntry = JsonUtils.getObjectFromJson(nextLine, LogEntry.class);

@@ -451,7 +451,7 @@ public class ResourceParseUtils {
       filtered = CloseableIterables.filter(iterable, p -> !p.isDirectory());
     }
 
-    CloseableIterable<OptionalWithCause<R>> it = null;
+    CloseableIterable<OptionalWithCause<R>> it;
 
     final Iterator<Resource> iterator = filtered.iterator();
     it = new CloseableIterable<OptionalWithCause<R>>() {

@@ -225,8 +225,7 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
     Path csvTempFile = jobCSVTempFolder.resolve(UUID.randomUUID().toString() + ".csv");
 
     CSVFormat csvFileFormat = CSVFormat.DEFAULT.withRecordSeparator("\n");
-    try {
-      BufferedWriter fileWriter = Files.newBufferedWriter(csvTempFile);
+    try (BufferedWriter fileWriter = Files.newBufferedWriter(csvTempFile)) {
       return new CSVPrinter(fileWriter, csvFileFormat);
     } catch (IOException e) {
       LOGGER.error("Unable to instantiate CSVPrinter", e);
