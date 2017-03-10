@@ -29,23 +29,23 @@ public class Format extends NamedIndexedModel implements IsModelObject, IsIndexe
   private static final long serialVersionUID = 7178184202935641440L;
 
   private String definition = null;
-  private final List<String> categories = new ArrayList<>();
+  private List<String> categories = null;
   private String latestVersion = null;
   private Integer popularity;
   private String developer = null;
   private Date initialRelease = null;
   private String standard = null;
   private boolean isOpenFormat = true;
-  private final List<String> websites = new ArrayList<>();
+  private List<String> websites = null;
   private String provenanceInformation = null;
 
-  private final List<String> extensions = new ArrayList<>();
-  private final List<String> mimetypes = new ArrayList<>();
-  private final List<String> pronoms = new ArrayList<>();
-  private final List<String> utis = new ArrayList<>();
+  private List<String> extensions = new ArrayList<String>();
+  private List<String> mimetypes = new ArrayList<String>();
+  private List<String> pronoms = new ArrayList<String>();
+  private List<String> utis = new ArrayList<String>();
 
-  private final List<String> alternativeDesignations = new ArrayList<>();
-  private final List<String> versions = new ArrayList<>();
+  private List<String> alternativeDesignations = new ArrayList<String>();
+  private List<String> versions = new ArrayList<String>();
 
   public Format() {
     super();
@@ -54,23 +54,22 @@ public class Format extends NamedIndexedModel implements IsModelObject, IsIndexe
   public Format(Format format) {
     super(format.getId(), format.getName());
     this.definition = format.getDefinition();
-    setCategories(format.getCategories());
+    this.categories = format.getCategories();
     this.latestVersion = format.getLatestVersion();
     this.popularity = format.getPopularity();
     this.developer = format.getDeveloper();
     this.initialRelease = format.getInitialRelease();
     this.standard = format.getStandard();
     this.isOpenFormat = format.isOpenFormat();
-    setWebsites(format.getWebsites());
+    this.websites = format.getWebsites();
     this.provenanceInformation = format.getProvenanceInformation();
 
-    setExtensions(format.getExtensions());
-    setMimetypes(format.getMimetypes());
-    setPronoms(format.getPronoms());
-    setUtis(format.getUtis());
-    setAlternativeDesignations(format.getAlternativeDesignations());
-    setVersions(format.getVersions());
-
+    this.extensions = new ArrayList<String>(format.getExtensions());
+    this.mimetypes = new ArrayList<String>(format.getMimetypes());
+    this.pronoms = new ArrayList<String>(format.getPronoms());
+    this.utis = new ArrayList<String>(format.getUtis());
+    this.alternativeDesignations = new ArrayList<String>(format.getAlternativeDesignations());
+    this.versions = new ArrayList<String>(format.getVersions());
   }
 
   @JsonIgnore
@@ -148,8 +147,7 @@ public class Format extends NamedIndexedModel implements IsModelObject, IsIndexe
   }
 
   public void setCategories(List<String> categories) {
-    this.categories.clear();
-    this.categories.addAll(categories);
+    this.categories = categories;
   }
 
   public List<String> getWebsites() {
@@ -157,8 +155,7 @@ public class Format extends NamedIndexedModel implements IsModelObject, IsIndexe
   }
 
   public void setWebsites(List<String> websites) {
-    this.websites.clear();
-    this.websites.addAll(websites);
+    this.websites = websites;
   }
 
   public List<String> getExtensions() {
@@ -166,8 +163,7 @@ public class Format extends NamedIndexedModel implements IsModelObject, IsIndexe
   }
 
   public void setExtensions(List<String> extensions) {
-    this.extensions.clear();
-    this.extensions.addAll(extensions);
+    this.extensions = extensions;
   }
 
   public List<String> getMimetypes() {
@@ -175,9 +171,7 @@ public class Format extends NamedIndexedModel implements IsModelObject, IsIndexe
   }
 
   public void setMimetypes(List<String> mimetypes) {
-    this.mimetypes.clear();
-    this.mimetypes.addAll(mimetypes);
-
+    this.mimetypes = mimetypes;
   }
 
   public List<String> getPronoms() {
@@ -185,8 +179,7 @@ public class Format extends NamedIndexedModel implements IsModelObject, IsIndexe
   }
 
   public void setPronoms(List<String> pronoms) {
-    this.pronoms.clear();
-    this.pronoms.addAll(pronoms);
+    this.pronoms = pronoms;
   }
 
   public List<String> getUtis() {
@@ -194,8 +187,7 @@ public class Format extends NamedIndexedModel implements IsModelObject, IsIndexe
   }
 
   public void setUtis(List<String> utis) {
-    this.utis.clear();
-    this.utis.addAll(utis);
+    this.utis = utis;
   }
 
   public List<String> getAlternativeDesignations() {
@@ -203,8 +195,7 @@ public class Format extends NamedIndexedModel implements IsModelObject, IsIndexe
   }
 
   public void setAlternativeDesignations(List<String> alternativeDesignations) {
-    this.alternativeDesignations.clear();
-    this.alternativeDesignations.addAll(alternativeDesignations);
+    this.alternativeDesignations = alternativeDesignations;
   }
 
   public List<String> getVersions() {
@@ -212,8 +203,7 @@ public class Format extends NamedIndexedModel implements IsModelObject, IsIndexe
   }
 
   public void setVersions(List<String> versions) {
-    this.versions.clear();
-    this.versions.addAll(versions);
+    this.versions = versions;
   }
 
   @Override
