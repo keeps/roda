@@ -114,20 +114,28 @@ public final class ODFSignatureUtils {
 
   public static String runDigitalSignatureVerify(Path input) throws IOException, GeneralSecurityException {
     String result = "Passed";
-    ZipFile zipFile = new ZipFile(input.toString());
-    Enumeration<?> enumeration;
-    for (enumeration = zipFile.entries(); enumeration.hasMoreElements();) {
-      ZipEntry entry = (ZipEntry) enumeration.nextElement();
-      String entryName = entry.getName();
-      if (META_INF_DOCUMENTSIGNATURES_XML.equalsIgnoreCase(entryName)) {
-        InputStream zipStream = zipFile.getInputStream(entry);
-        InputSource inputSource = new InputSource(zipStream);
-        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-        documentBuilderFactory.setNamespaceAware(true);
-        try {
+    try (ZipFile zipFile = new ZipFile(input.toString())) {
+      ZipEntry documentSignatureEntry = null;
+      Enumeration<?> enumeration;
+
+      for (enumeration = zipFile.entries(); enumeration.hasMoreElements();) {
+        ZipEntry entry = (ZipEntry) enumeration.nextElement();
+        String entryName = entry.getName();
+        if (META_INF_DOCUMENTSIGNATURES_XML.equalsIgnoreCase(entryName)) {
+          documentSignatureEntry = entry;
+          break;
+        }
+      }
+
+      if (documentSignatureEntry != null) {
+        try (InputStream zipStream = zipFile.getInputStream(documentSignatureEntry)) {
+          InputSource inputSource = new InputSource(zipStream);
+          DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+          documentBuilderFactory.setNamespaceAware(true);
           DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
           Document document = documentBuilder.parse(inputSource);
           NodeList signatureNodeList = document.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
+          
           for (int i = 0; i < signatureNodeList.getLength(); i++) {
             Node signatureNode = signatureNodeList.item(i);
             verifyCertificates(input, signatureNode);
@@ -143,13 +151,14 @@ public final class ODFSignatureUtils {
         } catch (MarshalException | XMLSignatureException e) {
           result = "Digital signatures are not valid";
         }
-
-        IOUtils.closeQuietly(zipStream);
+      } else {
+        result = "Could not find " + META_INF_DOCUMENTSIGNATURES_XML;
       }
+
     }
 
-    zipFile.close();
     return result;
+
   }
 
   public static List<Path> runDigitalSignatureExtract(Path input) throws SignatureException, IOException {
