@@ -24,7 +24,7 @@ import java.util.Iterator;
  */
 public class DirDeleter extends Thread {
 
-  private ArrayList<File> dirList = new ArrayList<File>();
+  private ArrayList<File> dirList = new ArrayList<>();
 
   /**
    * @param dir

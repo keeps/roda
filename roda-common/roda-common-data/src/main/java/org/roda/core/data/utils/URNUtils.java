@@ -89,14 +89,15 @@ public final class URNUtils {
   }
 
   public static String getLinkingObjectPath(String value) {
+    String newValue = value;
     for (RODA_TYPE type : RODA_TYPE.values()) {
       String prefix = getRodaPrefix(type);
       if (value.toLowerCase().startsWith(prefix)) {
-        value = value.replace(prefix, "");
+        newValue = newValue.replace(prefix, "");
         break;
       }
     }
-    return value;
+    return newValue;
   }
 
 }

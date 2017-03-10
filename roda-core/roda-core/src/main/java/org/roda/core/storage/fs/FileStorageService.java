@@ -96,14 +96,14 @@ public class FileStorageService implements StorageService {
   }
 
   private void initialize(Path path) throws GenericException {
-    if (!Files.exists(path)) {
+    if (!path.toFile().exists()) {
       try {
         Files.createDirectories(path);
       } catch (IOException e) {
         throw new GenericException("Could not create path " + path, e);
 
       }
-    } else if (!Files.isDirectory(path)) {
+    } else if (!path.toFile().isDirectory()) {
       throw new GenericException("Path is not a directory " + path);
     } else if (!Files.isReadable(path)) {
       throw new GenericException("Cannot read from path " + path);
@@ -472,16 +472,14 @@ public class FileStorageService implements StorageService {
 
   @Override
   public DirectResourceAccess getDirectAccess(final StoragePath storagePath) {
-
-    DirectResourceAccess ret = new DirectResourceAccess() {
+    return new DirectResourceAccess() {
 
       @Override
       public Path getPath() {
-        Path resourcePath = FSUtils.getEntityPath(basePath, storagePath);
         // TODO disable write access to resource
         // for UNIX programs using user with read-only permissions
         // for Java programs using SecurityManager and Policy
-        return resourcePath;
+        return FSUtils.getEntityPath(basePath, storagePath);
       }
 
       @Override
@@ -489,7 +487,6 @@ public class FileStorageService implements StorageService {
         // nothing to do
       }
     };
-    return ret;
   }
 
   @Override

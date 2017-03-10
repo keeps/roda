@@ -43,12 +43,10 @@ public final class JsonUtils {
   }
 
   public static <T> T readObjectFromFile(Path jsonFile, Class<T> objectClass) throws GenericException {
-    InputStream stream;
     try {
-      stream = Files.newInputStream(jsonFile);
-      T obj = getObjectFromJson(stream, objectClass);
-      IOUtils.closeQuietly(stream);
-      return obj;
+      try (InputStream stream = Files.newInputStream(jsonFile)) {
+        return getObjectFromJson(stream, objectClass);
+      }
     } catch (IOException e) {
       throw new GenericException(e);
     }
@@ -57,7 +55,9 @@ public final class JsonUtils {
   public static void writeObjectToFile(Object object, Path file) throws GenericException {
     try {
       String json = getJsonFromObject(object);
-      Files.write(file, json.getBytes(), StandardOpenOption.CREATE);
+      if (json != null) {
+        Files.write(file, json.getBytes(), StandardOpenOption.CREATE);
+      }
     } catch (IOException e) {
       throw new GenericException("Error writing object, as json, to file", e);
     }
@@ -73,7 +73,7 @@ public final class JsonUtils {
   }
 
   public static Map<String, String> getMapFromJson(String json) {
-    Map<String, String> ret = new HashMap<String, String>();
+    Map<String, String> ret = new HashMap<>();
     try {
       ObjectMapper mapper = new ObjectMapper(new JsonFactory());
       ret = mapper.readValue(json, new TypeReference<Map<String, String>>() {});
@@ -97,7 +97,7 @@ public final class JsonUtils {
 
   private static ObjectMapper addMixinsToMapper(ObjectMapper mapper, Object object) {
     if (!(object instanceof DescriptiveMetadata)) {
-      if ((object instanceof List<?>)) {
+      if (object instanceof List<?>) {
         List<?> objectList = (List<?>) object;
         if (!objectList.isEmpty() && !(objectList.get(0) instanceof DescriptiveMetadata)) {
           mapper.addMixIn(DescriptiveMetadata.class, DescriptiveMetadataMixIn.class);

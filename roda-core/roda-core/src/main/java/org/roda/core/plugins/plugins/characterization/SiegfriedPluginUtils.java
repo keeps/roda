@@ -7,7 +7,6 @@
  */
 package org.roda.core.plugins.plugins.characterization;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -53,8 +52,8 @@ public class SiegfriedPluginUtils {
   private static List<String> getBatchCommand(Path sourceDirectory) {
     List<String> command;
     String siegfriedPath = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "siegfried", "binary");
-    command = new ArrayList<String>(
-      Arrays.asList(siegfriedPath.toString(), "-json=true", "-z=false", sourceDirectory.toFile().getAbsolutePath()));
+    command = new ArrayList<>(
+      Arrays.asList(siegfriedPath, "-json=true", "-z=false", sourceDirectory.toFile().getAbsolutePath()));
     return command;
   }
 
@@ -67,7 +66,7 @@ public class SiegfriedPluginUtils {
   public static String runSiegfriedOnPath(Path sourceDirectory) throws PluginException {
     try {
       String siegfriedMode = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "siegfried", "mode");
-      if (siegfriedMode != null && siegfriedMode.equalsIgnoreCase("server")) {
+      if (siegfriedMode != null && "server".equalsIgnoreCase(siegfriedMode)) {
         LOGGER.debug("Running Siegfried on server mode");
         String endpoint = getSiegfriedServerEndpoint(sourceDirectory);
         return HTTPUtility.doGet(endpoint);
@@ -85,7 +84,7 @@ public class SiegfriedPluginUtils {
     String version = null;
     try {
       String siegfriedPath = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "siegfried", "binary");
-      List<String> command = new ArrayList<String>(Arrays.asList(siegfriedPath.toString(), "--version"));
+      List<String> command = new ArrayList<>(Arrays.asList(siegfriedPath, "--version"));
       String siegfriedOutput = CommandUtility.execute(command);
       if (siegfriedOutput.contains("\n")) {
         return siegfriedOutput.split("\\n")[0].split(" ")[1];
@@ -132,9 +131,9 @@ public class SiegfriedPluginUtils {
     ModelService model, String aipId, String representationId, List<String> fileDirectoryPath, String fileId, Path path)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
     PluginException {
-    List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
+    List<LinkingIdentifier> sources = new ArrayList<>();
 
-    if (Files.exists(path)) {
+    if (path.toFile().exists()) {
       String siegfriedOutput = SiegfriedPluginUtils.runSiegfriedOnPath(path);
 
       final JsonNode jsonObject = JsonUtils.parseJson(siegfriedOutput);
@@ -174,14 +173,14 @@ public class SiegfriedPluginUtils {
 
           if ("1".equals(pluginVersion[0])) {
             if (Integer.parseInt(pluginVersion[1]) > 4) {
-              if (match.get("ns").textValue().equalsIgnoreCase("pronom")) {
+              if ("pronom".equalsIgnoreCase(match.get("ns").textValue())) {
                 format = match.get("format").textValue();
                 version = match.get("version").textValue();
                 pronom = match.get("id").textValue();
                 mime = match.get("mime").textValue();
               }
             } else {
-              if (match.get("id").textValue().equalsIgnoreCase("pronom")) {
+              if ("pronom".equalsIgnoreCase(match.get("id").textValue())) {
                 format = match.get("format").textValue();
                 version = match.get("version").textValue();
                 pronom = match.get("puid").textValue();

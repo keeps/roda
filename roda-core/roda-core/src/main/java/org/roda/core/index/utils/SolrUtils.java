@@ -659,7 +659,7 @@ public class SolrUtils {
     String metadataVersion) throws GenericException {
     SolrInputDocument doc;
 
-    Map<String, String> parameters = new HashMap<String, String>();
+    Map<String, String> parameters = new HashMap<>();
     parameters.put("prefix", RodaConstants.INDEX_OTHER_DESCRIPTIVE_DATA_PREFIX);
     Reader transformationResult = RodaUtils.applyMetadataStylesheet(binary, RodaConstants.CORE_CROSSWALKS_INGEST,
       metadataType, metadataVersion, parameters);
@@ -689,7 +689,8 @@ public class SolrUtils {
     } finally {
       IOUtils.closeQuietly(transformationResult);
     }
-    return validateDescriptiveMetadataFields(doc);
+
+    return doc == null ? doc : validateDescriptiveMetadataFields(doc);
   }
 
   private static SolrInputDocument validateDescriptiveMetadataFields(SolrInputDocument doc) {
@@ -1238,14 +1239,16 @@ public class SolrUtils {
         Binary binary = model.getStorage().getBinary(storagePath);
         try {
           SolrInputDocument fields = getDescriptiveMetadataFields(binary, metadata.getType(), metadata.getVersion());
-          for (SolrInputField field : fields) {
-            if (NON_REPEATABLE_FIELDS.contains(field.getName())) {
-              boolean added = usedNonRepeatableFields.add(field.getName());
-              if (added) {
+          if (fields != null) {
+            for (SolrInputField field : fields) {
+              if (NON_REPEATABLE_FIELDS.contains(field.getName())) {
+                boolean added = usedNonRepeatableFields.add(field.getName());
+                if (added) {
+                  ret.addField(field.getName(), field.getValue(), field.getBoost());
+                }
+              } else {
                 ret.addField(field.getName(), field.getValue(), field.getBoost());
               }
-            } else {
-              ret.addField(field.getName(), field.getValue(), field.getBoost());
             }
           }
         } catch (Exception e) {
@@ -2683,7 +2686,10 @@ public class SolrUtils {
     }
 
     // set uuid from id defined in xslt
-    doc.addField(RodaConstants.INDEX_UUID, doc.getFieldValue(RodaConstants.PRESERVATION_EVENT_ID));
+    if (doc != null) {
+      doc.addField(RodaConstants.INDEX_UUID, doc.getFieldValue(RodaConstants.PRESERVATION_EVENT_ID));
+    }
+
     return doc;
   }
 
@@ -2718,7 +2724,7 @@ public class SolrUtils {
     Sorter sorter = null;
     int offset = 0;
     int pagesize = RodaConstants.DEFAULT_PAGINATION_VALUE;
-    boolean done = false;
+    boolean done;
 
     do {
       Sublist sublist = new Sublist(offset, pagesize);

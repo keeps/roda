@@ -129,10 +129,11 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractAIPCompo
     try {
       for (AIP aip : list) {
         Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
+        reportItem.setPluginState(PluginState.SUCCESS);
         PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
         LOGGER.debug("Processing AIP {}", aip.getId());
         String outcomeDetailExtension = "";
-        List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
+        List<LinkingIdentifier> sources = new ArrayList<>();
 
         try {
           for (Representation representation : aip.getRepresentations()) {
@@ -157,7 +158,6 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractAIPCompo
           }
 
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
-          reportItem.setPluginState(PluginState.SUCCESS);
         } catch (Exception e) {
           outcomeDetailExtension = e.getMessage();
           LOGGER.error("Error running Tika on AIP {}", aip.getId(), e);
@@ -168,8 +168,6 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractAIPCompo
             }
             details += e.getMessage();
             reportItem.setPluginDetails(details).setPluginState(PluginState.FAILURE);
-          } else {
-            LOGGER.error("Error running Apache Tika", e);
           }
 
           jobPluginInfo.incrementObjectsProcessedWithFailure();
@@ -204,8 +202,9 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractAIPCompo
         LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), representation.getAipId());
         Report reportItem = PluginHelper.initPluginReportItem(this, representation.getId(), Representation.class,
           AIPState.INGEST_PROCESSING);
+        reportItem.setPluginState(PluginState.SUCCESS);
         PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
-        List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
+        List<LinkingIdentifier> sources = new ArrayList<>();
         String outcomeDetailExtension = "";
 
         try {
@@ -226,7 +225,6 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractAIPCompo
 
           model.notifyRepresentationUpdated(representation);
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
-          reportItem.setPluginState(PluginState.SUCCESS);
         } catch (Exception e) {
           outcomeDetailExtension = e.getMessage();
           LOGGER.error("Error running Tika on Representation {}: {}", representation.getId(), e.getMessage());
@@ -237,8 +235,6 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractAIPCompo
             }
             details += e.getMessage();
             reportItem.setPluginDetails(details).setPluginState(PluginState.FAILURE);
-          } else {
-            LOGGER.error("Error running Apache Tika", e);
           }
 
           jobPluginInfo.incrementObjectsProcessedWithFailure();
@@ -269,14 +265,15 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractAIPCompo
   public Report executeOnFile(IndexService index, ModelService model, StorageService storage, Report report,
     SimpleJobPluginInfo jobPluginInfo, List<File> list, Job job) throws PluginException {
 
-    List<RepresentationLink> representationsToUpdate = new ArrayList<RepresentationLink>();
+    List<RepresentationLink> representationsToUpdate = new ArrayList<>();
 
     for (File file : list) {
       LOGGER.debug("Processing file {} of representation {} of AIP {}", file.getId(), file.getRepresentationId(),
         file.getAipId());
       Report reportItem = PluginHelper.initPluginReportItem(this, file.getId(), File.class, AIPState.INGEST_PROCESSING);
+      reportItem.setPluginState(PluginState.SUCCESS);
       PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
-      List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
+      List<LinkingIdentifier> sources = new ArrayList<>();
       String outcomeDetailExtension = "";
 
       try {
@@ -288,9 +285,8 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractAIPCompo
         if (!representationsToUpdate.contains(link)) {
           representationsToUpdate.add(link);
         }
-        jobPluginInfo.incrementObjectsProcessedWithSuccess();
-        reportItem.setPluginState(PluginState.SUCCESS);
 
+        jobPluginInfo.incrementObjectsProcessedWithSuccess();
       } catch (Exception e) {
         outcomeDetailExtension = e.getMessage();
         LOGGER.error("Error running Tika on File {}: {}", file.getId(), e.getMessage());
@@ -301,8 +297,6 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractAIPCompo
           }
           details += e.getMessage();
           reportItem.setPluginDetails(details).setPluginState(PluginState.FAILURE);
-        } else {
-          LOGGER.error("Error running Apache Tika", e);
         }
 
         jobPluginInfo.incrementObjectsProcessedWithFailure();

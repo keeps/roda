@@ -57,6 +57,7 @@ public class JHOVEPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public void init() throws PluginException {
+    // do nothing
   }
 
   @Override
@@ -104,7 +105,7 @@ public class JHOVEPlugin extends AbstractPlugin<AIP> {
     PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
     PluginState reportState = PluginState.SUCCESS;
     ValidationReport validationReport = new ValidationReport();
-    List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
+    List<LinkingIdentifier> sources = new ArrayList<>();
 
     try {
       for (Representation representation : aip.getRepresentations()) {
@@ -120,7 +121,7 @@ public class JHOVEPlugin extends AbstractPlugin<AIP> {
               StoragePath storagePath = ModelUtils.getFileStoragePath(file);
               Binary binary = storage.getBinary(storagePath);
 
-              Path jhoveResults = JHOVEPluginUtils.runJhove(binary, getParameterValues());
+              Path jhoveResults = JHOVEPluginUtils.runJhove(binary);
               ContentPayload payload = new FSPathContentPayload(jhoveResults);
               model.createOrUpdateOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(),
                 ".xml", RodaConstants.OTHER_METADATA_TYPE_JHOVE, payload, inotify);

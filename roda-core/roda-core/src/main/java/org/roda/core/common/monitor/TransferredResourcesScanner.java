@@ -128,9 +128,9 @@ public class TransferredResourcesScanner {
   public InputStream retrieveFile(String path) throws NotFoundException, RequestNotValidException, GenericException {
     InputStream ret;
     Path p = basePath.resolve(path);
-    if (!Files.exists(p)) {
+    if (!p.toFile().exists()) {
       throw new NotFoundException("File not found: " + path);
-    } else if (!Files.isRegularFile(p)) {
+    } else if (!p.toFile().isFile()) {
       throw new RequestNotValidException("Requested file is not a regular file: " + path);
     } else {
       try {
@@ -158,7 +158,7 @@ public class TransferredResourcesScanner {
     Path relativeToBase = basePath.relativize(resourcePath);
     TransferredResource tr = new TransferredResource();
 
-    tr.setFile(!Files.isDirectory(resourcePath));
+    tr.setFile(!resourcePath.toFile().isDirectory());
     tr.setFullPath(resourcePath.toString());
     String id = relativeToBase.toString();
     tr.setId(id);
@@ -172,7 +172,7 @@ public class TransferredResourcesScanner {
       tr.setParentUUID(UUID.nameUUIDFromBytes(parentId.getBytes()).toString());
     }
 
-    List<String> ancestors = new ArrayList<String>();
+    List<String> ancestors = new ArrayList<>();
 
     StringBuilder temp = new StringBuilder();
     Iterator<Path> pathIterator = relativeToBase.iterator();
@@ -193,7 +193,7 @@ public class TransferredResourcesScanner {
       TransferredResource tr = index.retrieve(TransferredResource.class, uuid, fieldsToReturn);
       Path relative = Paths.get(tr.getRelativePath());
       Path fullPath = basePath.resolve(relative);
-      if (Files.exists(fullPath)) {
+      if (fullPath.toFile().exists()) {
         FSUtils.deletePath(fullPath);
 
         Filter filter = new Filter(
@@ -246,7 +246,7 @@ public class TransferredResourcesScanner {
     boolean reindexResources)
     throws AlreadyExistsException, GenericException, IsStillUpdatingException, NotFoundException {
 
-    if (Files.exists(Paths.get(resource.getFullPath()))) {
+    if (Paths.get(resource.getFullPath()).toFile().exists()) {
       Path resourcePath = Paths.get(resource.getFullPath());
       Path newPath = resourcePath.getParent().resolve(newName);
       FSUtils.move(resourcePath, newPath, replaceExisting);
@@ -300,8 +300,8 @@ public class TransferredResourcesScanner {
     boolean replaceExisting, boolean reindexResources, boolean addOldRelativePathToNewRelativePath)
     throws AlreadyExistsException, GenericException, IsStillUpdatingException, NotFoundException {
 
-    Map<String, String> oldToNewTransferredResourceIds = new HashMap<String, String>();
-    List<TransferredResource> resourcesToIndex = new ArrayList<TransferredResource>();
+    Map<String, String> oldToNewTransferredResourceIds = new HashMap<>();
+    List<TransferredResource> resourcesToIndex = new ArrayList<>();
     boolean notFoundResources = false;
 
     String baseFolder = RodaCoreFactory.getRodaConfiguration().getString("core.ingest.processed.base_folder",
@@ -312,7 +312,7 @@ public class TransferredResourcesScanner {
       .getString("core.ingest.processed.unsuccessfully_ingested", "UNSUCCESSFULLY_INGESTED");
 
     for (TransferredResource resource : resources) {
-      if (Files.exists(Paths.get(resource.getFullPath()))) {
+      if (Paths.get(resource.getFullPath()).toFile().exists()) {
         Path newResourcePath = basePath.resolve(newRelativePath);
         if (addOldRelativePathToNewRelativePath) {
           newResourcePath = newResourcePath.resolve(resource.getRelativePath()
@@ -368,8 +368,6 @@ public class TransferredResourcesScanner {
     try {
       List<String> resourceUUIDs = resources.stream().map(tr -> tr.getUUID()).collect(Collectors.toList());
       index.delete(TransferredResource.class, resourceUUIDs);
-      // 20170209 hsilva: we must avoid doing commit at all cost
-      // index.commit(TransferredResource.class);
     } catch (RequestNotValidException e) {
       LOGGER.error("Could not delete old transferred resources");
     }

@@ -34,7 +34,7 @@ public class StorageRecursiveListingUtils {
     final CloseableIterable<Resource> iterable) {
     final Iterator<Resource> directlyUnder = iterable.iterator();
 
-    CloseableIterable<Resource> ret = new CloseableIterable<Resource>() {
+    return new CloseableIterable<Resource>() {
 
       @Override
       public Iterator<Resource> iterator() {
@@ -72,7 +72,7 @@ public class StorageRecursiveListingUtils {
 
           @Override
           public Resource next() {
-            Resource resource = null;
+            Resource resource;
             if (itStack.isEmpty()) {
               resource = directlyUnder.next();
             } else {
@@ -99,8 +99,6 @@ public class StorageRecursiveListingUtils {
         iterable.close();
       }
     };
-
-    return ret;
   }
 
   /**
@@ -116,7 +114,7 @@ public class StorageRecursiveListingUtils {
    */
   public static CloseableIterable<Resource> listAllUnderDirectory(final StorageService storage,
     final StoragePath storagePath)
-      throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
 
     final CloseableIterable<Resource> iterable = storage.listResourcesUnderDirectory(storagePath, false);
     return recursiveListing(storage, iterable);

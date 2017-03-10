@@ -13,19 +13,19 @@ import java.util.Optional;
 public class LiteOptionalWithCause implements Serializable {
   private static final long serialVersionUID = 2354151020405129417L;
 
-  private Optional<LiteRODAObject> lite;
+  private SerializableOptional<LiteRODAObject> lite;
   private String exceptionClass;
   private String exceptionMessage;
 
   private LiteOptionalWithCause(Optional<LiteRODAObject> lite, String exceptionClass, String exceptionMessage) {
     super();
-    this.lite = lite;
+    this.lite = SerializableOptional.setOptional(lite);
     this.exceptionClass = exceptionClass;
     this.exceptionMessage = exceptionMessage;
   }
 
   public Optional<LiteRODAObject> getLite() {
-    return lite;
+    return lite.getOptional();
   }
 
   public String getExceptionClass() {
@@ -37,7 +37,7 @@ public class LiteOptionalWithCause implements Serializable {
   }
 
   public void setLite(Optional<LiteRODAObject> lite) {
-    this.lite = lite;
+    this.lite = SerializableOptional.setOptional(lite);
   }
 
   public void setExpressionClass(String exceptionClass) {
@@ -48,19 +48,15 @@ public class LiteOptionalWithCause implements Serializable {
     this.exceptionMessage = exceptionMessage;
   }
 
-  public boolean isPresent() {
-    return lite.isPresent();
-  }
-
-  public static <T> LiteOptionalWithCause empty(Exception cause) {
+  public static LiteOptionalWithCause empty(Exception cause) {
     return new LiteOptionalWithCause(Optional.empty(), cause.getClass().getName(), cause.getMessage());
   }
 
-  public static <T> LiteOptionalWithCause empty(String exceptionClass, String exceptionMessage) {
+  public static LiteOptionalWithCause empty(String exceptionClass, String exceptionMessage) {
     return new LiteOptionalWithCause(Optional.empty(), exceptionClass, exceptionMessage);
   }
 
-  public static <T> LiteOptionalWithCause of(LiteRODAObject value) {
+  public static LiteOptionalWithCause of(LiteRODAObject value) {
     return new LiteOptionalWithCause(Optional.ofNullable(value), null, null);
   }
 
@@ -70,7 +66,7 @@ public class LiteOptionalWithCause implements Serializable {
     int result = 1;
     result = prime * result + ((exceptionClass == null) ? 0 : exceptionClass.hashCode());
     result = prime * result + ((exceptionMessage == null) ? 0 : exceptionMessage.hashCode());
-    result = prime * result + ((lite == null) ? 0 : lite.hashCode());
+    result = prime * result + lite.hashCode();
     return result;
   }
 
@@ -93,8 +89,8 @@ public class LiteOptionalWithCause implements Serializable {
         return false;
     } else if (!exceptionMessage.equals(other.exceptionMessage))
       return false;
-    if (lite == null) {
-      if (other.lite != null)
+    if (lite.getOptional().isPresent()) {
+      if (!lite.getOptional().isPresent())
         return false;
     } else if (!lite.equals(other.lite))
       return false;

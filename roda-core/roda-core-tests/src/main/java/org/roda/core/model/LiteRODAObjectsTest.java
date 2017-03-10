@@ -38,7 +38,10 @@ public class LiteRODAObjectsTest {
     aip.setId(id1);
     Optional<LiteRODAObject> lite = LiteRODAObjectFactory.get(aip);
     assertTrue(lite.isPresent());
-    assertEquals(getExpected(AIP.class, id1), lite.get().getInfo());
+
+    if (lite.isPresent()) {
+      assertEquals(getExpected(AIP.class, id1), lite.get().getInfo());
+    }
 
     // DIP
     DIP dip = new DIP();

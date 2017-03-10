@@ -90,7 +90,7 @@ public class MigrationManager {
 
   public boolean isNecessaryToPerformMigration(final SolrClient solrClient, final Optional<Path> tempIndexConfigsPath)
     throws GenericException {
-    boolean migrationIsNecessary = false;
+    boolean migrationIsNecessary;
 
     // check if model migration is necessary
     migrationIsNecessary = isModelMigrationNecessary();
@@ -106,7 +106,7 @@ public class MigrationManager {
     Map<String, Integer> modelClassesVersionsFromCode = getModelClassesVersionsFromCode(true, "Indexed");
     Map<String, Integer> modelClassesVersionsInstalled = new HashMap<>();
 
-    if (Files.exists(modelInfoFile)) {
+    if (modelInfoFile.toFile().exists()) {
       modelClassesVersionsInstalled = JsonUtils.getObjectFromJson(modelInfoFile, ModelInfo.class)
         .getInstalledClassesVersions();
     }
@@ -160,6 +160,7 @@ public class MigrationManager {
           System.lineSeparator());
       }
     }
+
     return migrationIsNecessary;
   }
 
@@ -281,7 +282,7 @@ public class MigrationManager {
     List<String> solrCollections = new ArrayList<>();
     try (DirectoryStream<Path> stream = Files.newDirectoryStream(indexConfigsFolder)) {
       stream.forEach(e -> {
-        if (Files.isDirectory(e)) {
+        if (e.toFile().isDirectory()) {
           solrCollections.add(e.getFileName().toString());
         }
       });

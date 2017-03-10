@@ -52,16 +52,21 @@ public class PdfToPdfaPluginUtils {
       ItemProcessor processor = ProcessorFactory
         .createProcessor(ProcessorFactory.fromValues(validatorConfig, featureConfig, pluginConfig, fixerConfig, tasks));
 
-      ProcessorResult result = processor.process(fixed.toFile());
-      RepairStatus fixStatus = result.getFixerResult().getRepairStatus();
-      processor.close();
+      try {
+        ProcessorResult result = processor.process(fixed.toFile());
+        RepairStatus fixStatus = result.getFixerResult().getRepairStatus();
 
-      if (fixStatus.equals(RepairStatus.WONT_FIX) || fixStatus.equals(RepairStatus.FIX_ERROR)) {
-        throw new CommandException(
-          "There were some metadata fixing errors detected by VeraPDF on: " + input.toString());
+        if (fixStatus.equals(RepairStatus.WONT_FIX) || fixStatus.equals(RepairStatus.FIX_ERROR)) {
+          throw new CommandException(
+            "There were some metadata fixing errors detected by VeraPDF on: " + input.toString());
+        }
+      } catch (VeraPDFException e) {
+        return e.getMessage();
+      } finally {
+        processor.close();
       }
 
-    } catch (GhostscriptException | VeraPDFException e) {
+    } catch (GhostscriptException e) {
       return e.getMessage();
     }
 

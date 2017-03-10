@@ -650,10 +650,10 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       Plugin<TransferredResource> plugin = RodaCoreFactory.getPluginManager().getPlugin(sipToAipClass,
         TransferredResource.class);
       if (plugin == null || plugin.getType() != PluginType.SIP_TO_AIP) {
-        areValid = areValid && false;
+        areValid = false;
       }
     } else {
-      areValid = areValid && false;
+      areValid = false;
     }
 
     return areValid;

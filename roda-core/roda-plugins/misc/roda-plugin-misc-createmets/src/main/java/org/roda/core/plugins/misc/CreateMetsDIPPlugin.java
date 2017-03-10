@@ -475,8 +475,7 @@ public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
     String versionType = dm.getType() + RodaConstants.METADATA_VERSION_SEPARATOR + dm.getVersion();
     String dmId = dm.getId();
 
-    if (!includeSelectedDescriptiveMetadata
-      || (includeSelectedDescriptiveMetadata && metadataTypes.contains(versionType.toLowerCase()))) {
+    if (!includeSelectedDescriptiveMetadata || metadataTypes.contains(versionType.toLowerCase())) {
       StoragePath oldMetadataPath = DefaultStoragePath.parse(sourcePath, RodaConstants.STORAGE_DIRECTORY_METADATA,
         RodaConstants.STORAGE_DIRECTORY_DESCRIPTIVE, dmId);
 

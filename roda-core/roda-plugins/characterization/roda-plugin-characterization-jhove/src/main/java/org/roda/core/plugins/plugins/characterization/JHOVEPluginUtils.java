@@ -13,7 +13,6 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Calendar;
-import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
@@ -70,14 +69,14 @@ public class JHOVEPluginUtils {
     return outputFile.toPath();
   }
 
-  public static Path runJhove(Binary binary, Map<String, String> parameterValues) throws Exception {
+  public static Path runJhove(Binary binary) throws Exception {
     // FIXME temp file that doesn't get deleted afterwards
     java.io.File f = File.createTempFile("temp", ".temp");
-    FileOutputStream fos = new FileOutputStream(f);
-    InputStream inputStream = binary.getContent().createInputStream();
-    IOUtils.copy(inputStream, fos);
-    IOUtils.closeQuietly(inputStream);
-    fos.close();
+    try (FileOutputStream fos = new FileOutputStream(f)) {
+      InputStream inputStream = binary.getContent().createInputStream();
+      IOUtils.copy(inputStream, fos);
+      IOUtils.closeQuietly(inputStream);
+    }
     return inspect(f);
   }
 

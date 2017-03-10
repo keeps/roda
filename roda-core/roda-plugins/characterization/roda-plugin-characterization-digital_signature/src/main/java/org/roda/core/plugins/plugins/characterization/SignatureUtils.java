@@ -53,7 +53,7 @@ public final class SignatureUtils {
       if (!trustedRootCerts.isEmpty()) {
         X509CertSelector selector = new X509CertSelector();
         selector.setCertificate(cert);
-        Set<TrustAnchor> trustAnchors = new HashSet<TrustAnchor>();
+        Set<TrustAnchor> trustAnchors = new HashSet<>();
         for (Certificate trustedRootCert : trustedRootCerts) {
           trustAnchors.add(new TrustAnchor((X509Certificate) trustedRootCert, null));
         }

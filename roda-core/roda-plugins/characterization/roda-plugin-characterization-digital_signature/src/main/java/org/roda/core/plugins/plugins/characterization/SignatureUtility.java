@@ -115,9 +115,7 @@ public class SignatureUtility {
     NoSuchProviderException, CertStoreException, CMSException {
     java.security.cert.Certificate[] certificateChain = ks.getCertificateChain(alias);
     if (certificateChain != null) {
-      List<java.security.cert.Certificate> certList = new ArrayList<java.security.cert.Certificate>(
-        Arrays.asList(certificateChain));
-
+      List<java.security.cert.Certificate> certList = new ArrayList<>(Arrays.asList(certificateChain));
       CertStore certs = CertStore.getInstance("Collection", new CollectionCertStoreParameters(certList), provider);
       signGenerator.addCertificatesAndCRLs(certs);
     } else {
@@ -160,11 +158,10 @@ public class SignatureUtility {
       signature.delete();
     }
     signature.createNewFile();
-    FileOutputStream out = new FileOutputStream(signature);
-    byte[] signatureArray = sign(file);
-    out.write(signatureArray);
-    out.close();
-
+    try (FileOutputStream out = new FileOutputStream(signature)) {
+      byte[] signatureArray = sign(file);
+      out.write(signatureArray);
+    }
   }
 
   /**

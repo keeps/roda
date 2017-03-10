@@ -139,7 +139,10 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getDescription() {
-    return "Creates a report in CSV format that includes a listing of all AIP and its inner files (data and metadata) which also includes some of their technical properties (e.g. sipId, aipId, representationId, filePath, SHA-256, MD5, SHA-1). The report will be stored in a folder on the server side as defined by the user. To obtain the report, one needs access to the storage layer of the repository server.\nThis report may be used to validate the completeness and correctness of an ingest process.";
+    return "Creates a report in CSV format that includes a listing of all AIP and its inner files (data and metadata) which also includes some of "
+      + "their technical properties (e.g. sipId, aipId, representationId, filePath, SHA-256, MD5, SHA-1). The report will be stored in a folder on "
+      + "the server side as defined by the user. To obtain the report, one needs access to the storage layer of the repository server.\nThis report"
+      + " may be used to validate the completeness and correctness of an ingest process.";
   }
 
   @Override
@@ -149,7 +152,7 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public List<PluginParameter> getParameters() {
-    ArrayList<PluginParameter> parameters = new ArrayList<PluginParameter>();
+    ArrayList<PluginParameter> parameters = new ArrayList<>();
     parameters.add(pluginParameters.get(CSV_FILE_FIELDS));
     PluginParameter outputPluginParameter = pluginParameters.get(CSV_FILE_OUTPUT);
     SimpleDateFormat df = new SimpleDateFormat(RodaConstants.DEFAULT_DATETIME_FORMAT);
@@ -168,8 +171,8 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
     super.setParameterValues(parameters);
     if (parameters.containsKey(CSV_FILE_FIELDS)) {
       String fieldsSTR = parameters.get(CSV_FILE_FIELDS);
-      if (fieldsSTR != null && !fieldsSTR.trim().equalsIgnoreCase("")) {
-        fields = new ArrayList<String>();
+      if (fieldsSTR != null && !"".equals(fieldsSTR.trim())) {
+        fields = new ArrayList<>();
         fields.addAll(Arrays.asList(fieldsSTR.split(",")));
       }
     }
@@ -194,7 +197,7 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
     if (parameters.containsKey(CSV_FILE_OTHER_METADATA_TYPES)) {
       String otherMetadataSTR = parameters.get(CSV_FILE_OTHER_METADATA_TYPES);
       if (otherMetadataSTR != null && !otherMetadataSTR.trim().equalsIgnoreCase("")) {
-        otherMetadataTypes = new ArrayList<String>();
+        otherMetadataTypes = new ArrayList<>();
         otherMetadataTypes.addAll(Arrays.asList(otherMetadataSTR.split(",")));
       }
     }
@@ -257,9 +260,6 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
           csvFilePrinter.printRecords(otherMetadataInformation);
         }
       }
-      // if(outputOtherMetadataInformation && aip.getOtherMetadata()!=null){
-      //
-      // }
       jobPluginInfo.incrementObjectsProcessedWithSuccess();
     } catch (IOException e) {
       jobPluginInfo.incrementObjectsProcessedWithFailure();
@@ -277,7 +277,7 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
     }
     try {
       Path reportsFolder = RodaCoreFactory.getRodaHomePath().resolve(RodaConstants.CORE_REPORT_FOLDER);
-      if (Files.exists(reportsFolder)) {
+      if (reportsFolder.toFile().exists()) {
         Files.createDirectories(reportsFolder);
       }
     } catch (IOException e) {
@@ -289,8 +289,7 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
   private Path getJobCSVTempFolder() {
     Path wd = RodaCoreFactory.getWorkingDirectory();
     Path csvExportTempFolder = wd.resolve(InventoryReportPlugin.EXPORT_CSV_TEMP_FOLDER);
-    Path jobCSVTempFolder = csvExportTempFolder.resolve(PluginHelper.getJobId(this));
-    return jobCSVTempFolder;
+    return csvExportTempFolder.resolve(PluginHelper.getJobId(this));
   }
 
   @Override
@@ -299,7 +298,7 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
     Path csvTempFolder = getJobCSVTempFolder();
 
     if (csvTempFolder != null) {
-      List<Path> partials = new ArrayList<Path>();
+      List<Path> partials = new ArrayList<>();
       try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(csvTempFolder);
         FileWriter fileWriter = new FileWriter(output.toFile());
         CSVPrinter csvFilePrinter = new CSVPrinter(fileWriter, csvFileFormat);) {

@@ -60,6 +60,7 @@ public class AvprobePlugin extends AbstractPlugin<AIP> {
 
   @Override
   public void init() throws PluginException {
+    // do nothing
   }
 
   @Override
@@ -105,7 +106,7 @@ public class AvprobePlugin extends AbstractPlugin<AIP> {
     PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
     PluginState reportState = PluginState.SUCCESS;
     ValidationReport validationReport = new ValidationReport();
-    List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
+    List<LinkingIdentifier> sources = new ArrayList<>();
 
     for (Representation representation : aip.getRepresentations()) {
       LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());
@@ -127,7 +128,7 @@ public class AvprobePlugin extends AbstractPlugin<AIP> {
                 StoragePath storagePath = ModelUtils.getFileStoragePath(file);
                 Binary binary = storage.getBinary(storagePath);
 
-                String probeResults = AvprobePluginUtils.runAvprobe(storage, binary, fileFormat, getParameterValues());
+                String probeResults = AvprobePluginUtils.runAvprobe(storage, binary);
                 ContentPayload payload = new StringContentPayload(probeResults);
                 model.createOrUpdateOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(),
                   "." + AvprobePluginUtils.AVPROBE_METADATA_FORMAT, RodaConstants.OTHER_METADATA_TYPE_AVPROBE, payload,

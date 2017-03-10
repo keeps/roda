@@ -8,7 +8,6 @@
 package org.roda.core.plugins.plugins.characterization;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,7 +31,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.io.IOUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,8 +80,8 @@ public final class PDFSignatureUtils {
 
         if (!SignatureUtils.isCertificateSelfSigned(certificate)) {
 
-          Set<Certificate> trustedRootCerts = new HashSet<Certificate>();
-          Set<Certificate> intermediateCerts = new HashSet<Certificate>();
+          Set<Certificate> trustedRootCerts = new HashSet<>();
+          Set<Certificate> intermediateCerts = new HashSet<>();
 
           for (Certificate c : pk.getSignCertificateChain()) {
             X509Certificate cert = (X509Certificate) c;
@@ -120,7 +118,7 @@ public final class PDFSignatureUtils {
   public static List<Path> runDigitalSignatureExtract(Path input) throws SignatureException, IOException {
     Security.addProvider(new BouncyCastleProvider());
 
-    List<Path> paths = new ArrayList<Path>();
+    List<Path> paths = new ArrayList<>();
     Path output = Files.createTempFile("extraction", ".xml");
     Path outputContents = Files.createTempFile("contents", ".pkcs7");
     PdfReader reader = new PdfReader(input.toString());
@@ -136,16 +134,13 @@ public final class PDFSignatureUtils {
 
     FileOutputStream fos = new FileOutputStream(output.toString());
     OutputStreamWriter osw = new OutputStreamWriter(fos);
-    PrintWriter out = new PrintWriter(osw, true);
+    try (PrintWriter out = new PrintWriter(osw, true)) {
+      out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+      out.println("<signatures>");
+      out.println(sb.toString());
+      out.println("</signatures>");
+    }
 
-    out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-    out.println("<signatures>");
-    out.println(sb.toString());
-    out.println("</signatures>");
-
-    IOUtils.closeQuietly(out);
-    IOUtils.closeQuietly(osw);
-    IOUtils.closeQuietly(fos);
     reader.close();
 
     paths.add(output);
@@ -162,41 +157,39 @@ public final class PDFSignatureUtils {
   }
 
   public static Path runDigitalSignatureSign(Path input, String keystore, String alias, String password, String reason,
-    String location, String contact)
-    throws IOException, GeneralSecurityException, DocumentException, FileNotFoundException {
+    String location, String contact) throws IOException, GeneralSecurityException, DocumentException {
 
     Security.addProvider(new BouncyCastleProvider());
     Path signedPDF = Files.createTempFile("signed", ".pdf");
 
     KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
 
-    InputStream is = new FileInputStream(keystore);
-    ks.load(is, password.toCharArray());
-    IOUtils.closeQuietly(is);
+    try (InputStream is = new FileInputStream(keystore)) {
+      ks.load(is, password.toCharArray());
 
-    PrivateKey pk = (PrivateKey) ks.getKey(alias, password.toCharArray());
-    Certificate[] chain = ks.getCertificateChain(alias);
+      PrivateKey pk = (PrivateKey) ks.getKey(alias, password.toCharArray());
+      Certificate[] chain = ks.getCertificateChain(alias);
 
-    PdfReader reader = new PdfReader(input.toString());
-    FileOutputStream os = new FileOutputStream(signedPDF.toFile());
-    PdfStamper stamper = PdfStamper.createSignature(reader, os, '\0');
-    PdfSignatureAppearance appearance = stamper.getSignatureAppearance();
-    appearance.setReason(reason);
-    appearance.setLocation(location);
-    appearance.setContact(contact);
-    appearance.setVisibleSignature(new Rectangle(36, 748, 144, 780), 1, "RODASignature");
-    ExternalDigest digest = new BouncyCastleDigest();
-    ExternalSignature signature = new PrivateKeySignature(pk, DigestAlgorithms.SHA256, "BC");
-    MakeSignature.signDetached(appearance, digest, signature, chain, null, null, null, 0, null);
-    IOUtils.closeQuietly(os);
-    reader.close();
+      try (FileOutputStream os = new FileOutputStream(signedPDF.toFile())) {
+        PdfReader reader = new PdfReader(input.toString());
+        PdfStamper stamper = PdfStamper.createSignature(reader, os, '\0');
+        PdfSignatureAppearance appearance = stamper.getSignatureAppearance();
+        appearance.setReason(reason);
+        appearance.setLocation(location);
+        appearance.setContact(contact);
+        appearance.setVisibleSignature(new Rectangle(36, 748, 144, 780), 1, "RODASignature");
+        ExternalDigest digest = new BouncyCastleDigest();
+        ExternalSignature signature = new PrivateKeySignature(pk, DigestAlgorithms.SHA256, "BC");
+        MakeSignature.signDetached(appearance, digest, signature, chain, null, null, null, 0, null);
+        reader.close();
+      }
+    }
 
     return signedPDF;
   }
 
   private static StringBuilder getExtractionInformation(AcroFields fields, ArrayList<?> names, Path outputContents,
     String filename) throws IOException {
-
     StringBuilder sb = new StringBuilder();
 
     for (int i = 0; i < names.size(); i++) {

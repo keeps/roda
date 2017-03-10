@@ -560,9 +560,9 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     final Binary binaryUpdated = getStorage().updateBinaryContent(binaryStoragePath, newPayload, false, false);
     assertNotNull(binaryUpdated);
 
-    InputStream stream = Files.newInputStream(original);
-    assertFalse(IOUtils.contentEquals(stream, binaryUpdated.getContent().createInputStream()));
-    stream.close();
+    try (InputStream stream = Files.newInputStream(original)) {
+      assertFalse(IOUtils.contentEquals(stream, binaryUpdated.getContent().createInputStream()));
+    }
 
     testBinaryContent(binaryUpdated, newPayload);
 

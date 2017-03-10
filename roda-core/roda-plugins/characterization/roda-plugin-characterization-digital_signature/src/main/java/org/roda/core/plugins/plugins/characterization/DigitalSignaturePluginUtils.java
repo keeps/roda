@@ -34,17 +34,20 @@ import com.itextpdf.text.DocumentException;
 public class DigitalSignaturePluginUtils {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalSignaturePluginUtils.class);
+  protected static final String PDF_FORMAT = "pdf";
+  protected static final String OOXML_FORMAT = "ooxml";
+  protected static final String ODF_FORMAT = "odf";
 
   public static String runDigitalSignatureVerify(Path input, String fileFormat, String mimetype) {
 
     String generalFileFormat = SignatureUtils.canHaveEmbeddedSignature(fileFormat, mimetype);
 
     try {
-      if (generalFileFormat.equals("pdf")) {
+      if (PDF_FORMAT.equals(generalFileFormat)) {
         return PDFSignatureUtils.runDigitalSignatureVerify(input);
-      } else if (generalFileFormat.equals("ooxml")) {
+      } else if (OOXML_FORMAT.equals(generalFileFormat)) {
         return OOXMLSignatureUtils.runDigitalSignatureVerify(input);
-      } else if (generalFileFormat.equals("odf")) {
+      } else if (ODF_FORMAT.equals(generalFileFormat)) {
         return ODFSignatureUtils.runDigitalSignatureVerify(input);
       }
     } catch (IOException | GeneralSecurityException e) {
@@ -56,11 +59,11 @@ public class DigitalSignaturePluginUtils {
 
   public static int runDigitalSignatureExtraction(ModelService model, File file, Path input, String fileFormat,
     String mimetype) {
-    List<Path> extractResult = new ArrayList<Path>();
+    List<Path> extractResult = new ArrayList<>();
 
     try {
       String generalFileFormat = SignatureUtils.canHaveEmbeddedSignature(fileFormat, mimetype);
-      if (generalFileFormat.equals("pdf")) {
+      if (PDF_FORMAT.equals(generalFileFormat)) {
         extractResult = PDFSignatureUtils.runDigitalSignatureExtract(input);
 
         if (!extractResult.isEmpty()) {
@@ -77,9 +80,9 @@ public class DigitalSignaturePluginUtils {
               RodaConstants.OTHER_METADATA_TYPE_DIGITAL_SIGNATURE, contentsPayload, true);
           }
         }
-      } else if (generalFileFormat.equals("ooxml")) {
+      } else if (OOXML_FORMAT.equals(generalFileFormat)) {
         Map<Path, String> extractMap = OOXMLSignatureUtils.runDigitalSignatureExtract(input);
-        extractResult = new ArrayList<Path>(extractMap.keySet());
+        extractResult = new ArrayList<>(extractMap.keySet());
 
         for (Path p : extractResult) {
           ContentPayload mainPayload = new FSPathContentPayload(p);
@@ -87,7 +90,7 @@ public class DigitalSignaturePluginUtils {
             file.getId().substring(0, file.getId().lastIndexOf('.')) + "_" + extractMap.get(p), ".xml",
             RodaConstants.OTHER_METADATA_TYPE_DIGITAL_SIGNATURE, mainPayload, true);
         }
-      } else if (generalFileFormat.equals("odf")) {
+      } else if (ODF_FORMAT.equals(generalFileFormat)) {
         extractResult = ODFSignatureUtils.runDigitalSignatureExtract(input);
 
         if (!extractResult.isEmpty()) {
@@ -108,13 +111,13 @@ public class DigitalSignaturePluginUtils {
   public static Path runDigitalSignatureStrip(Path input, String fileFormat, String mimetype) {
     try {
       Path output = Files.createTempFile("stripped", "." + fileFormat);
-
       String generalFileFormat = SignatureUtils.canHaveEmbeddedSignature(fileFormat, mimetype);
-      if (generalFileFormat.equals("pdf")) {
+
+      if (PDF_FORMAT.equals(generalFileFormat)) {
         PDFSignatureUtils.runDigitalSignatureStrip(input, output);
-      } else if (generalFileFormat.equals("ooxml")) {
+      } else if (OOXML_FORMAT.equals(generalFileFormat)) {
         OOXMLSignatureUtils.runDigitalSignatureStrip(input, output);
-      } else if (generalFileFormat.equals("odf")) {
+      } else if (ODF_FORMAT.equals(generalFileFormat)) {
         ODFSignatureUtils.runDigitalSignatureStrip(input, output);
       }
 

@@ -480,7 +480,7 @@ public final class LiteRODAObjectFactory {
 
   public static <T extends IsRODAObject> CloseableIterable<OptionalWithCause<LiteRODAObject>> transformIntoLite(
     final CloseableIterable<OptionalWithCause<T>> list) {
-    CloseableIterable<OptionalWithCause<LiteRODAObject>> it = null;
+    CloseableIterable<OptionalWithCause<LiteRODAObject>> it;
 
     final Iterator<OptionalWithCause<T>> iterator = list.iterator();
     it = new CloseableIterable<OptionalWithCause<LiteRODAObject>>() {
@@ -525,7 +525,7 @@ public final class LiteRODAObjectFactory {
 
   public static <T extends IsRODAObject> CloseableIterable<OptionalWithCause<T>> transformFromLite(ModelService model,
     IndexService index, final CloseableIterable<OptionalWithCause<LiteRODAObject>> list) {
-    CloseableIterable<OptionalWithCause<T>> it = null;
+    CloseableIterable<OptionalWithCause<T>> it;
 
     final Iterator<OptionalWithCause<LiteRODAObject>> iterator = list.iterator();
     it = new CloseableIterable<OptionalWithCause<T>>() {

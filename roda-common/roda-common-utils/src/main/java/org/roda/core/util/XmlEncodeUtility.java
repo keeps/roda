@@ -24,8 +24,7 @@ public final class XmlEncodeUtility {
    * @return the encoded string
    */
   public static String encode(String s) {
-
-    StringBuffer ret = new StringBuffer();
+    StringBuilder ret = new StringBuilder();
 
     for (int i = 0; i < s.length(); i++) {
       char ch = s.charAt(i);
@@ -60,7 +59,7 @@ public final class XmlEncodeUtility {
    * @return the escaped text.
    */
   public static String escapeInvalidXmlChars(String text) {
-    StringBuffer ret = new StringBuffer();
+    StringBuilder ret = new StringBuilder();
 
     for (int i = 0; i < text.length(); i++) {
       ret.append(escapeChar(text.charAt(i)));
@@ -70,15 +69,11 @@ public final class XmlEncodeUtility {
   }
 
   private static char escapeChar(char c) {
-    if (c >= 0x20)
+    if (c >= 0x20 || c == '\n' || c == '\r' || c == '\t') {
       return c;
-    else if (c == '\n')
-      return c;
-    else if (c == '\r')
-      return c;
-    else if (c == '\t')
-      return c;
-    return '\uFFFD';
+    } else {
+      return '\uFFFD';
+    }
   }
 
 }

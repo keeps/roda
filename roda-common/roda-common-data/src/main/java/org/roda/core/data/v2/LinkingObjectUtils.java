@@ -39,7 +39,7 @@ public final class LinkingObjectUtils {
 
   public static String getLinkingObjectPath(String path) {
     if (path.contains(":")) {
-      return path.substring(path.lastIndexOf(":") + 1);
+      return path.substring(path.lastIndexOf(':') + 1);
     } else {
       return null;
     }
@@ -51,12 +51,20 @@ public final class LinkingObjectUtils {
 
   public static String getFileIdFromLinkingId(String linkingId) {
     String path = getLinkingObjectPath(linkingId);
-    return path.replaceAll(LINKING_ID_SEPARATOR, ID_SEPARATOR);
+    if (path != null) {
+      return path.replaceAll(LINKING_ID_SEPARATOR, ID_SEPARATOR);
+    } else {
+      return null;
+    }
   }
 
   public static String getRepresentationIdFromLinkingId(String linkingId) {
     String path = getLinkingObjectPath(linkingId);
-    return path.replaceAll(LINKING_ID_SEPARATOR, ID_SEPARATOR);
+    if (path != null) {
+      return path.replaceAll(LINKING_ID_SEPARATOR, ID_SEPARATOR);
+    } else {
+      return null;
+    }
   }
 
   public static String getAipIdFromLinkingId(String linkingId) {

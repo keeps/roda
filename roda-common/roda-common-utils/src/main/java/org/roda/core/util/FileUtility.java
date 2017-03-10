@@ -93,9 +93,7 @@ public class FileUtility {
     }
     is.close();
 
-    byte[] digest = digestor.digest();
-
-    return digest;
+    return digestor.digest();
   }
 
   public static Map<String, String> checksums(InputStream is, Collection<String> algorithms)
@@ -205,7 +203,7 @@ public class FileUtility {
    */
   public static List<File> listFilesRecursively(File dir) {
 
-    ArrayList<File> files = new ArrayList<File>();
+    ArrayList<File> files = new ArrayList<>();
 
     File[] list = dir.listFiles();
 

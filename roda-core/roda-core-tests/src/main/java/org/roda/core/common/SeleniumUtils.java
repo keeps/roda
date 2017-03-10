@@ -18,6 +18,7 @@ import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,7 +41,7 @@ public class SeleniumUtils {
   private static WebDriver driver;
   private static String url;
   private static String driverPath; // "/path/to/chromedriver"
-  private static Map<String, String> locations = new HashMap<String, String>();
+  private static Map<String, String> locations = new HashMap<>();
 
   public static void main(String[] args) throws InterruptedException, IOException {
     if (args.length != 2) {
@@ -74,7 +75,8 @@ public class SeleniumUtils {
     driver.quit();
     service.stop();
 
-    for (String location : locations.keySet()) {
+    for (Entry<String, String> entry : locations.entrySet()) {
+      String location = entry.getKey();
       String html = getHTMLSource(location);
       Pattern expression = Pattern.compile("<div id=\"webaxscore\".*?<span>(.*?)</span>");
       Matcher matcher = expression.matcher(html);
@@ -215,12 +217,6 @@ public class SeleniumUtils {
       WebElement newProcess = driver.findElement(By.className("btn-plus"));
       newProcess.click();
       saveHTML();
-
-      // risk association plugin new process page
-      // WebElement riskAssociationButton = driver
-      // .findElement(By.xpath("//data-id[@value='org.roda.core.plugins.plugins.risks.RiskAssociationPlugin']"));
-      // riskAssociationButton.click();
-      // saveHTML();
 
       goBack();
 

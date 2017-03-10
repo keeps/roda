@@ -8,7 +8,6 @@
 package org.roda.core.plugins.plugins.characterization;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.CopyOption;
@@ -38,7 +37,6 @@ import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.dsig.XMLSignatureException;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackageAccess;
@@ -47,8 +45,6 @@ import org.apache.poi.openxml4j.opc.PackageRelationship;
 import org.apache.poi.poifs.crypt.dsig.SignatureConfig;
 import org.apache.poi.poifs.crypt.dsig.SignatureInfo;
 import org.apache.poi.poifs.crypt.dsig.SignatureInfo.SignaturePart;
-
-import com.itextpdf.text.DocumentException;
 
 public final class OOXMLSignatureUtils {
 
@@ -80,10 +76,11 @@ public final class OOXMLSignatureUtils {
           for (X509Certificate c : certChain) {
             c.checkValidity();
 
-            if (SignatureUtils.isCertificateSelfSigned(c))
+            if (SignatureUtils.isCertificateSelfSigned(c)) {
               trustedRootCerts.add(c);
-            else
+            } else {
               intermediateCerts.add(c);
+            }
           }
 
           SignatureUtils.verifyCertificateChain(trustedRootCerts, intermediateCerts, certChain.get(0));
@@ -101,23 +98,30 @@ public final class OOXMLSignatureUtils {
   }
 
   public static Map<Path, String> runDigitalSignatureExtract(Path input) throws SignatureException, IOException {
-    Map<Path, String> paths = new HashMap<Path, String>();
+    Map<Path, String> paths = new HashMap<>();
 
-    ZipFile zipFile = new ZipFile(input.toString());
-    Enumeration<?> enumeration;
-    for (enumeration = zipFile.entries(); enumeration.hasMoreElements();) {
-      ZipEntry entry = (ZipEntry) enumeration.nextElement();
-      String entryName = entry.getName();
-      if (entryName.startsWith("_xmlsignatures") && entryName.endsWith(".xml")) {
-        Path extractedSignature = Files.createTempFile("extraction", ".xml");
-        InputStream zipStream = zipFile.getInputStream(entry);
-        FileUtils.copyInputStreamToFile(zipStream, extractedSignature.toFile());
-        paths.put(extractedSignature, entryName.substring(entryName.lastIndexOf('/') + 1, entryName.lastIndexOf('.')));
-        IOUtils.closeQuietly(zipStream);
+    try (ZipFile zipFile = new ZipFile(input.toString())) {
+      Enumeration<?> enumeration;
+      ZipEntry documentSignatureEntry = null;
+
+      for (enumeration = zipFile.entries(); enumeration.hasMoreElements();) {
+        ZipEntry entry = (ZipEntry) enumeration.nextElement();
+        if (entry.getName().startsWith("_xmlsignatures") && entry.getName().endsWith(".xml")) {
+          documentSignatureEntry = entry;
+          break;
+        }
+      }
+
+      if (documentSignatureEntry != null) {
+        try (InputStream zipStream = zipFile.getInputStream(documentSignatureEntry)) {
+          Path extractedSignature = Files.createTempFile("extraction", ".xml");
+          String entryName = documentSignatureEntry.getName();
+          FileUtils.copyInputStreamToFile(zipStream, extractedSignature.toFile());
+          paths.put(extractedSignature,
+            entryName.substring(entryName.lastIndexOf('/') + 1, entryName.lastIndexOf('.')));
+        }
       }
     }
-
-    zipFile.close();
     return paths;
   }
 
@@ -125,30 +129,29 @@ public final class OOXMLSignatureUtils {
 
     CopyOption[] copyOptions = new CopyOption[] {StandardCopyOption.REPLACE_EXISTING};
     Files.copy(input, output, copyOptions);
-    OPCPackage pkg = OPCPackage.open(output.toString(), PackageAccess.READ_WRITE);
+    try (OPCPackage pkg = OPCPackage.open(output.toString(), PackageAccess.READ_WRITE)) {
 
-    ArrayList<PackagePart> pps = pkg.getPartsByContentType(SIGN_CONTENT_TYPE_OOXML);
-    for (PackagePart pp : pps) {
-      pkg.removePart(pp);
-    }
+      ArrayList<PackagePart> pps = pkg.getPartsByContentType(SIGN_CONTENT_TYPE_OOXML);
+      for (PackagePart pp : pps) {
+        pkg.removePart(pp);
+      }
 
-    ArrayList<PackagePart> ppct = pkg.getPartsByRelationshipType(SIGN_REL_TYPE_OOXML);
-    for (PackagePart pp : ppct) {
-      pkg.removePart(pp);
-    }
+      ArrayList<PackagePart> ppct = pkg.getPartsByRelationshipType(SIGN_REL_TYPE_OOXML);
+      for (PackagePart pp : ppct) {
+        pkg.removePart(pp);
+      }
 
-    for (PackageRelationship r : pkg.getRelationships()) {
-      if (r.getRelationshipType().equals(SIGN_REL_TYPE_OOXML)) {
-        pkg.removeRelationship(r.getId());
+      for (PackageRelationship r : pkg.getRelationships()) {
+        if (r.getRelationshipType().equals(SIGN_REL_TYPE_OOXML)) {
+          pkg.removeRelationship(r.getId());
+        }
       }
     }
-
-    pkg.close();
   }
 
   public static Path runDigitalSignatureSign(Path input, String keystore, String alias, String password,
-    String fileFormat) throws IOException, GeneralSecurityException, DocumentException, InvalidFormatException,
-    XMLSignatureException, MarshalException, FileNotFoundException {
+    String fileFormat)
+    throws IOException, GeneralSecurityException, InvalidFormatException, XMLSignatureException, MarshalException {
 
     Path output = Files.createTempFile("signed", "." + fileFormat);
     CopyOption[] copyOptions = new CopyOption[] {StandardCopyOption.REPLACE_EXISTING};
@@ -156,25 +159,26 @@ public final class OOXMLSignatureUtils {
 
     KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
 
-    InputStream is = new FileInputStream(keystore);
-    ks.load(is, password.toCharArray());
-    IOUtils.closeQuietly(is);
+    try (InputStream is = new FileInputStream(keystore)) {
+      ks.load(is, password.toCharArray());
 
-    PrivateKey pk = (PrivateKey) ks.getKey(alias, password.toCharArray());
-    X509Certificate x509 = (X509Certificate) ks.getCertificate(alias);
+      PrivateKey pk = (PrivateKey) ks.getKey(alias, password.toCharArray());
+      X509Certificate x509 = (X509Certificate) ks.getCertificate(alias);
 
-    SignatureConfig signatureConfig = new SignatureConfig();
-    signatureConfig.setKey(pk);
-    signatureConfig.setSigningCertificateChain(Collections.singletonList(x509));
-    OPCPackage pkg = OPCPackage.open(output.toString(), PackageAccess.READ_WRITE);
-    signatureConfig.setOpcPackage(pkg);
+      SignatureConfig signatureConfig = new SignatureConfig();
+      signatureConfig.setKey(pk);
+      signatureConfig.setSigningCertificateChain(Collections.singletonList(x509));
 
-    SignatureInfo si = new SignatureInfo();
-    si.setSignatureConfig(signatureConfig);
-    si.confirmSignature();
+      try (OPCPackage pkg = OPCPackage.open(output.toString(), PackageAccess.READ_WRITE)) {
+        signatureConfig.setOpcPackage(pkg);
 
-    // boolean b = si.verifySignature();
-    pkg.close();
+        SignatureInfo si = new SignatureInfo();
+        si.setSignatureConfig(signatureConfig);
+        si.confirmSignature();
+
+        // boolean b = si.verifySignature();
+      }
+    }
     return output;
   }
 }

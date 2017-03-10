@@ -389,7 +389,7 @@ public class RodaCoreFactory {
       // last attempt (using user home and hidden directory called .roda)
       String userHome = System.getProperty("user.home");
       rodaHomePath = Paths.get(userHome, ".roda");
-      if (!Files.exists(rodaHomePath)) {
+      if (!rodaHomePath.toFile().exists()) {
         try {
           Files.createDirectories(rodaHomePath);
         } catch (IOException e) {
@@ -443,7 +443,7 @@ public class RodaCoreFactory {
 
     for (Path path : essentialDirectories) {
       try {
-        if (!Files.exists(path)) {
+        if (!path.toFile().exists()) {
           Files.createDirectories(path);
         }
       } catch (IOException e) {
@@ -637,7 +637,7 @@ public class RodaCoreFactory {
     if (nodeType == NodeType.MASTER) {
       tempIndexConfigsPath = Optional.empty();
       Path solrHome = configPath.resolve(RodaConstants.CORE_INDEX_FOLDER);
-      if (!Files.exists(solrHome) || FEATURE_OVERRIDE_INDEX_CONFIGS) {
+      if (!solrHome.toFile().exists() || FEATURE_OVERRIDE_INDEX_CONFIGS) {
         try {
           Path tempConfig = Files.createTempDirectory(getWorkingDirectory(), RodaConstants.CORE_INDEX_FOLDER);
           toDeleteDuringShutdown.add(tempConfig);
@@ -867,7 +867,7 @@ public class RodaCoreFactory {
 
       UserUtility.setLdapUtility(ldapUtility);
 
-      if (!Files.exists(rodaApacheDSDataDirectory)) {
+      if (!rodaApacheDSDataDirectory.toFile().exists()) {
         Files.createDirectories(rodaApacheDSDataDirectory);
         final List<String> ldifFileNames = Arrays.asList("users.ldif", "groups.ldif", "roles.ldif");
         final List<String> ldifs = new ArrayList<>();
@@ -947,7 +947,7 @@ public class RodaCoreFactory {
       String transferredResourcesFolder = getRodaConfiguration().getString("transferredResources.folder",
         RodaConstants.CORE_TRANSFERREDRESOURCE_FOLDER);
       Path transferredResourcesFolderPath = dataPath.resolve(transferredResourcesFolder);
-      if (!Files.exists(transferredResourcesFolderPath)) {
+      if (!transferredResourcesFolderPath.toFile().exists()) {
         Files.createDirectories(transferredResourcesFolderPath);
       }
 
@@ -1066,7 +1066,7 @@ public class RodaCoreFactory {
     propertiesConfiguration.setDelimiterParsingDisabled(true);
     propertiesConfiguration.setEncoding(RodaConstants.DEFAULT_ENCODING);
 
-    if (Files.exists(config)) {
+    if (config.toFile().exists()) {
       LOGGER.trace("Loading configuration from file {}", config);
       propertiesConfiguration.load(config.toFile());
       RodaPropertiesReloadStrategy rodaPropertiesReloadStrategy = new RodaPropertiesReloadStrategy();
@@ -1089,7 +1089,7 @@ public class RodaCoreFactory {
   public static URL getConfigurationFile(String configurationFile) {
     Path config = RodaCoreFactory.getConfigPath().resolve(configurationFile);
     URL configUri;
-    if (Files.exists(config) && !Files.isDirectory(config)
+    if (config.toFile().exists() && !config.toFile().isDirectory()
       && config.toAbsolutePath().startsWith(getConfigPath().toAbsolutePath().toString())) {
       try {
         configUri = config.toUri().toURL();
@@ -1115,7 +1115,7 @@ public class RodaCoreFactory {
     Path config = getConfigPath().resolve(configurationFile);
     InputStream inputStream = null;
     try {
-      if (Files.exists(config) && !Files.isDirectory(config)
+      if (config.toFile().exists() && !config.toFile().isDirectory()
         && config.toAbsolutePath().startsWith(getConfigPath().toAbsolutePath().toString())) {
         inputStream = Files.newInputStream(config);
         LOGGER.trace("Loading configuration from file {}", config);
@@ -1143,7 +1143,7 @@ public class RodaCoreFactory {
     Path defaultPath = getDefaultPath().resolve(defaultFile);
     InputStream inputStream = null;
     try {
-      if (Files.exists(defaultPath) && !Files.isDirectory(defaultPath)
+      if (defaultPath.toFile().exists() && !defaultPath.toFile().isDirectory()
         && defaultPath.toAbsolutePath().startsWith(getDefaultPath().toAbsolutePath().toString())) {
         inputStream = Files.newInputStream(defaultPath);
         LOGGER.debug("Trying to load default from file {}", defaultPath);

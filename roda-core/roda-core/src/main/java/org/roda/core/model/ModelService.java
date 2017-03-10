@@ -93,8 +93,8 @@ import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationReport;
-import org.roda.core.model.utils.LogEntryFileSystemIterable;
-import org.roda.core.model.utils.LogEntryStorageIterable;
+import org.roda.core.model.iterables.LogEntryFileSystemIterable;
+import org.roda.core.model.iterables.LogEntryStorageIterable;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.model.utils.ResourceListUtils;
 import org.roda.core.model.utils.ResourceParseUtils;
@@ -604,7 +604,7 @@ public class ModelService extends ModelObservable {
     String descriptiveMetadataId, ContentPayload descriptiveMetadataPayload, String descriptiveMetadataType,
     String descriptiveMetadataVersion, Map<String, String> properties) throws RequestNotValidException,
     GenericException, NotFoundException, AuthorizationDeniedException, ValidationException {
-    DescriptiveMetadata ret = null;
+    DescriptiveMetadata ret;
 
     StoragePath binaryPath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, representationId,
       descriptiveMetadataId);
@@ -1061,7 +1061,7 @@ public class ModelService extends ModelObservable {
   public File updateFile(String aipId, String representationId, List<String> directoryPath, String fileId,
     ContentPayload contentPayload, boolean createIfNotExists, boolean notify)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    File file = null;
+    File file;
     boolean asReference = false;
 
     StoragePath filePath = ModelUtils.getFileStoragePath(aipId, representationId, directoryPath, fileId);
@@ -1102,7 +1102,7 @@ public class ModelService extends ModelObservable {
     StoragePath fileStoragePath = ModelUtils.getFileStoragePath(folder);
     Path fullPath = basePath.resolve(FSUtils.getStoragePathAsString(fileStoragePath, false));
 
-    if (Files.exists(fullPath)) {
+    if (fullPath.toFile().exists()) {
       FSUtils.move(fullPath, fullPath.getParent().resolve(newName), replaceExisting);
 
       if (reindexResources) {
@@ -1124,7 +1124,7 @@ public class ModelService extends ModelObservable {
     StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
     Path fullPath = basePath.resolve(FSUtils.getStoragePathAsString(fileStoragePath, false));
 
-    if (!Files.exists(fullPath)) {
+    if (!fullPath.toFile().exists()) {
       throw new NotFoundException("Some files/folders were moved or do not exist");
     }
 
@@ -1518,7 +1518,7 @@ public class ModelService extends ModelObservable {
   public OtherMetadata createOrUpdateOtherMetadata(String aipId, String representationId,
     List<String> fileDirectoryPath, String fileId, String fileSuffix, String type, ContentPayload payload,
     boolean notify) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    OtherMetadata om = null;
+    OtherMetadata om;
 
     StoragePath binaryPath = ModelUtils.getOtherMetadataStoragePath(aipId, representationId, fileDirectoryPath, fileId,
       fileSuffix, type);
@@ -1636,7 +1636,7 @@ public class ModelService extends ModelObservable {
 
       // verify if file exists and if not, if older files exist (in that case,
       // move them to storage)
-      if (!Files.exists(logFile)) {
+      if (!logFile.toFile().exists()) {
         findOldLogsAndMoveThemToStorage(logDirectory, logFile);
         try {
           Files.createFile(logFile);
@@ -2461,7 +2461,7 @@ public class ModelService extends ModelObservable {
   public DIPFile updateDIPFile(String dipId, List<String> directoryPath, String oldFileId, String fileId, long size,
     ContentPayload contentPayload, boolean createIfNotExists, boolean notify) throws RequestNotValidException,
     GenericException, NotFoundException, AuthorizationDeniedException, AlreadyExistsException {
-    DIPFile file = null;
+    DIPFile file;
     boolean asReference = false;
 
     StoragePath oldFilePath = ModelUtils.getDIPFileStoragePath(dipId, directoryPath, oldFileId);

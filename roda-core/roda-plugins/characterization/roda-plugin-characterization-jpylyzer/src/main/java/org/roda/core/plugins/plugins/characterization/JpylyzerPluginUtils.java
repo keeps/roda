@@ -16,7 +16,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
@@ -50,25 +49,22 @@ public class JpylyzerPluginUtils {
     String osName = System.getProperty("os.name");
     List<String> command;
     if (osName.startsWith("Windows")) {
-      command = new ArrayList<String>(
-        Arrays.asList(jpylyzerDirectory.getAbsolutePath() + File.separator + "jpylyzer.exe"));
+      command = new ArrayList<>(Arrays.asList(jpylyzerDirectory.getAbsolutePath() + File.separator + "jpylyzer.exe"));
     } else {
-      command = new ArrayList<String>(Arrays.asList(jpylyzerDirectory.getAbsolutePath() + File.separator + "jpylyzer"));
+      command = new ArrayList<>(Arrays.asList(jpylyzerDirectory.getAbsolutePath() + File.separator + "jpylyzer"));
     }
     return command;
   }
 
-  public static String runJpylyzer(StorageService storage, Binary binary, Map<String, String> parameterValues)
-    throws IOException, RODAException {
+  public static String runJpylyzer(StorageService storage, Binary binary) throws IOException, RODAException {
     DirectResourceAccess directAccess = storage.getDirectAccess(binary.getStoragePath());
     InputStream inputStream = Files.newInputStream(directAccess.getPath());
 
     Path newPath = Files.createTempFile("temp", ".temp");
-    OutputStream fos = Files.newOutputStream(newPath);
-    IOUtils.copy(inputStream, fos);
-
-    IOUtils.closeQuietly(inputStream);
-    fos.close();
+    try (OutputStream fos = Files.newOutputStream(newPath)) {
+      IOUtils.copy(inputStream, fos);
+      IOUtils.closeQuietly(inputStream);
+    }
 
     String inspectString = inspect(newPath);
     FSUtils.deletePathQuietly(newPath);

@@ -111,7 +111,7 @@ public class ValidationUtilsTest {
     corporaPath = Paths.get(corporaURL.toURI());
     corporaService = new FileStorageService(corporaPath);
 
-    logger.debug("Running model test under storage: " + basePath);
+    logger.debug("Running model test under storage: {}", basePath);
   }
 
   @AfterClass

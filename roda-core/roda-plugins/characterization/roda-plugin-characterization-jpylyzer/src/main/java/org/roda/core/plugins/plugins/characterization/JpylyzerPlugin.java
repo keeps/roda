@@ -58,6 +58,7 @@ public class JpylyzerPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public void init() throws PluginException {
+    // do nothing
   }
 
   @Override
@@ -122,7 +123,7 @@ public class JpylyzerPlugin extends AbstractPlugin<AIP> {
                 StoragePath storagePath = ModelUtils.getFileStoragePath(file);
                 Binary binary = storage.getBinary(storagePath);
 
-                String jpylyzerResults = JpylyzerPluginUtils.runJpylyzer(storage, binary, getParameterValues());
+                String jpylyzerResults = JpylyzerPluginUtils.runJpylyzer(storage, binary);
                 ContentPayload payload = new StringContentPayload(jpylyzerResults);
                 model.createOrUpdateOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(),
                   ".xml", "jpylyzer", payload, inotify);

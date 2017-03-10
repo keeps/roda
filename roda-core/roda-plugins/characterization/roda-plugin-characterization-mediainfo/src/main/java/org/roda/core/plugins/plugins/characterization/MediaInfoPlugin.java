@@ -199,14 +199,14 @@ public class MediaInfoPlugin extends AbstractPlugin<AIP> {
     for (int i = 0; i < nodes.getLength(); i++) {
       Node node = nodes.item(i);
       Path nodeResult = Files.createTempFile("mediaInfo", ".xml");
-      FileWriter fw = new FileWriter(nodeResult.toFile());
-      Transformer transformer = TransformerFactory.newInstance().newTransformer();
-      transformer.transform(new DOMSource(node), new StreamResult(fw));
-      String fileName = extractFileName(nodeResult);
-      String[] tokens = fileName.split("/");
-      fileName = tokens[tokens.length - 1];
-      parsed.put(fileName, nodeResult);
-      IOUtils.closeQuietly(fw);
+      try (FileWriter fw = new FileWriter(nodeResult.toFile())) {
+        Transformer transformer = TransformerFactory.newInstance().newTransformer();
+        transformer.transform(new DOMSource(node), new StreamResult(fw));
+        String fileName = extractFileName(nodeResult);
+        String[] tokens = fileName.split("/");
+        fileName = tokens[tokens.length - 1];
+        parsed.put(fileName, nodeResult);
+      }
     }
     return parsed;
   }

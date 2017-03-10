@@ -20,7 +20,7 @@ public class ValidationReport implements Serializable {
 
   public ValidationReport() {
     this.valid = true;
-    this.issues = new ArrayList<ValidationIssue>();
+    this.issues = new ArrayList<>();
   }
 
   public List<ValidationIssue> getIssues() {
@@ -49,7 +49,7 @@ public class ValidationReport implements Serializable {
 
   public void addIssue(ValidationIssue issue) {
     if (issues == null) {
-      issues = new ArrayList<ValidationIssue>();
+      issues = new ArrayList<>();
     }
     issues.add(issue);
   }

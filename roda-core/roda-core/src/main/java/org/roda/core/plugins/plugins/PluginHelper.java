@@ -8,7 +8,6 @@
 package org.roda.core.plugins.plugins;
 
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -683,7 +682,7 @@ public final class PluginHelper {
     throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException {
     if (createSubmission) {
-      if (Files.isDirectory(submissionPath)) {
+      if (submissionPath.toFile().isDirectory()) {
         StorageService submissionStorage = new FileStorageService(submissionPath);
         StoragePath submissionStoragePath = DefaultStoragePath.empty();
         model.createSubmission(submissionStorage, submissionStoragePath, aipId);
@@ -1186,11 +1185,12 @@ public final class PluginHelper {
 
     for (LiteOptionalWithCause lite : lites) {
       String failureMessage = "";
+      Optional<LiteRODAObject> optionalLite = lite.getLite();
 
-      if (lite.isPresent() && StringUtils.isNotBlank(lite.getLite().get().getInfo())) {
+      if (optionalLite.isPresent() && StringUtils.isNotBlank(lite.getLite().get().getInfo())) {
         boolean objectMatchPluginKnownObjectsClass = false;
 
-        String liteString = lite.getLite().get().getInfo();
+        String liteString = optionalLite.get().getInfo();
         for (Class<T> pluginClass : plugin.getObjectClasses()) {
           if (liteString.startsWith(pluginClass.getName())) {
             objectMatchPluginKnownObjectsClass = true;
@@ -1200,7 +1200,7 @@ public final class PluginHelper {
 
         if (objectMatchPluginKnownObjectsClass) {
           OptionalWithCause<T> retrievedObject = (OptionalWithCause<T>) model
-            .retrieveObjectFromLite(lite.getLite().get());
+            .retrieveObjectFromLite(optionalLite.get());
           if (retrievedObject.isPresent()) {
             finalObjects.add(retrievedObject.get());
           } else {
@@ -1213,7 +1213,8 @@ public final class PluginHelper {
             }
           }
         } else {
-          failureMessage = "RODA object conversion from lite has failed because lite object class does not match any of the plugin known object classes (which might be caused by blank lite)";
+          failureMessage = "RODA object conversion from lite has failed because lite object class does not match any of the plugin known object classes "
+            + "(which might be caused by blank lite)";
         }
       } else {
         failureMessage = "Lite object has an error: [" + lite.getExceptionClass() + "] " + lite.getExceptionMessage();
@@ -1226,8 +1227,8 @@ public final class PluginHelper {
 
         if (report != null) {
           String id = lite.toString();
-          if (lite.getLite().isPresent()) {
-            String[] split = lite.getLite().get().getInfo().split(LiteRODAObjectFactory.SEPARATOR_REGEX);
+          if (optionalLite.isPresent()) {
+            String[] split = optionalLite.get().getInfo().split(LiteRODAObjectFactory.SEPARATOR_REGEX);
             id = split[1];
           }
 

@@ -159,7 +159,7 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
       Path outputPath = Paths.get(outputFolder);
       String error = null;
       try {
-        if (!Files.exists(outputPath)) {
+        if (!outputPath.toFile().exists()) {
           Files.createDirectories(outputPath);
         }
         if (!Files.isWritable(outputPath)) {
@@ -247,9 +247,9 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
       String error = null;
       try {
         Path zip = outputPath.resolve(aip.getId() + ".zip");
-        if (Files.exists(zip) && removeIfAlreadyExists) {
+        if (zip.toFile().exists() && removeIfAlreadyExists) {
           Files.delete(zip);
-        } else if (Files.exists(zip) && !removeIfAlreadyExists) {
+        } else if (zip.toFile().exists() && !removeIfAlreadyExists) {
           error = "File " + zip.toString() + " already exists";
         }
         if (error == null) {

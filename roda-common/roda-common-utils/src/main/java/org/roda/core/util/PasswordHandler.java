@@ -14,8 +14,8 @@ import java.util.Random;
 /**
  * <p>
  * See <a href=
- * "http://www.ldapguru.net/modules/newbb/viewtopic.php?topic_id=1479&forum=6"
- * ></a>
+ * "http://www.ldapguru.net/modules/newbb/viewtopic.php?topic_id=1479&forum=6" >
+ * </a>
  * </p>
  * 
  * @author Rohan Pinto <rohan@rohanpinto.com>
@@ -47,33 +47,34 @@ public class PasswordHandler {
    */
   public boolean verify(String digest, String password) throws NoSuchAlgorithmException {
 
+    String changedDigest = digest;
     String alg = null;
     int size = 0;
 
-    if (digest.regionMatches(true, 0, "{CRYPT}", 0, 7)) {
-      digest = digest.substring(7);
-      return UnixCrypt.matches(digest, password);
-    } else if (digest.regionMatches(true, 0, "{SHA}", 0, 5)) {
-      digest = digest.substring(5); // ignore the label
+    if (changedDigest.regionMatches(true, 0, "{CRYPT}", 0, 7)) {
+      changedDigest = changedDigest.substring(7);
+      return UnixCrypt.matches(changedDigest, password);
+    } else if (changedDigest.regionMatches(true, 0, "{SHA}", 0, 5)) {
+      changedDigest = changedDigest.substring(5); // ignore the label
       alg = "SHA-1";
       size = 20;
-    } else if (digest.regionMatches(true, 0, "{SSHA}", 0, 6)) {
-      digest = digest.substring(6); // ignore the label
+    } else if (changedDigest.regionMatches(true, 0, "{SSHA}", 0, 6)) {
+      changedDigest = changedDigest.substring(6); // ignore the label
       alg = "SHA-1";
       size = 20;
-    } else if (digest.regionMatches(true, 0, "{MD5}", 0, 5)) {
-      digest = digest.substring(5); // ignore the label
+    } else if (changedDigest.regionMatches(true, 0, "{MD5}", 0, 5)) {
+      changedDigest = changedDigest.substring(5); // ignore the label
       alg = "MD5";
       size = 16;
-    } else if (digest.regionMatches(true, 0, "{SMD5}", 0, 6)) {
-      digest = digest.substring(6); // ignore the label
+    } else if (changedDigest.regionMatches(true, 0, "{SMD5}", 0, 6)) {
+      changedDigest = changedDigest.substring(6); // ignore the label
       alg = "MD5";
       size = 16;
     }
 
     MessageDigest msgDigest = MessageDigest.getInstance(alg);
 
-    byte[][] hs = split(Base64.decode(digest.toCharArray()), size);
+    byte[][] hs = split(Base64.decode(changedDigest.toCharArray()), size);
     byte[] hash = hs[0];
     byte[] salt = hs[1];
 
@@ -82,7 +83,6 @@ public class PasswordHandler {
     msgDigest.update(salt);
 
     byte[] pwhash = msgDigest.digest();
-
     return MessageDigest.isEqual(hash, pwhash);
   }
 
@@ -96,11 +96,11 @@ public class PasswordHandler {
    */
   public String generateDigest(String password, String saltHex, String algorithm) throws NoSuchAlgorithmException {
 
-    if (algorithm.equalsIgnoreCase("crypt")) {
+    if ("crypt".equalsIgnoreCase(algorithm)) {
       return "{CRYPT}" + UnixCrypt.crypt(password);
-    } else if (algorithm.equalsIgnoreCase("sha")) {
+    } else if ("sha".equalsIgnoreCase(algorithm)) {
       algorithm = "SHA-1";
-    } else if (algorithm.equalsIgnoreCase("md5")) {
+    } else if ("md5".equalsIgnoreCase(algorithm)) {
       algorithm = "MD5";
     }
 
@@ -113,9 +113,9 @@ public class PasswordHandler {
 
     String label = null;
 
-    if (algorithm.startsWith("SHA")) {
+    if ("SHA".startsWith(algorithm)) {
       label = (salt.length > 0) ? "{SSHA}" : "{SHA}";
-    } else if (algorithm.startsWith("MD5")) {
+    } else if ("MD5".startsWith(algorithm)) {
       label = (salt.length > 0) ? "{SMD5}" : "{MD5}";
     }
 
@@ -125,9 +125,8 @@ public class PasswordHandler {
 
     byte[] pwhash = msgDigest.digest();
 
-    StringBuffer digest = new StringBuffer(label);
+    StringBuilder digest = new StringBuilder(label);
     digest.append(Base64.encode(concatenate(pwhash, salt)));
-
     return digest.toString();
   }
 
@@ -157,7 +156,7 @@ public class PasswordHandler {
 
   @SuppressWarnings("unused")
   private static String toHex(byte[] block) {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     for (int i = 0; i < block.length; ++i) {
       buf.append(hexits.charAt((block[i] >>> 4) & 0xf));
       buf.append(hexits.charAt(block[i] & 0xf));
@@ -194,11 +193,11 @@ public class PasswordHandler {
   }
 
   public static String generateRandomPassword(int length) {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     Random random = new Random();
-    char[] chars = new char[] {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
-      'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-      'N', 'O', 'P', 'Q', 'R', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+    char[] chars = new char[] {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
+      's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
+      'P', 'Q', 'R', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
     for (int i = 0; i < length; i++) {
       buffer.append(chars[random.nextInt(chars.length)]);

@@ -231,7 +231,11 @@ public class ResourceParseUtils {
     String aipId = ModelUtils.extractAipId(resourcePath);
     AIP aip = RodaCoreFactory.getModelService().retrieveAIP(aipId);
     Optional<Representation> rep = aip.getRepresentations().stream().filter(r -> r.getId().equals(id)).findFirst();
-    return rep.get();
+    if (rep.isPresent()) {
+      return rep.get();
+    } else {
+      return null;
+    }
   }
 
   public static <T extends Serializable> T convertResourceToObject(Resource resource, Class<T> objectClass)

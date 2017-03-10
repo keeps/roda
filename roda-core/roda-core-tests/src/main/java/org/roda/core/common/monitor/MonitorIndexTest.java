@@ -242,7 +242,7 @@ public class MonitorIndexTest {
     Random randomno) throws IOException {
     currentLevel++;
     for (int i = 0; i < numberOfItemsByLevel; i++) {
-      Path p = null;
+      Path p;
       if (i % 2 == 0) {
         if (currentLevel > 1) {
           p = Files.createFile(path.resolve(UUID.randomUUID().toString() + ".txt"));

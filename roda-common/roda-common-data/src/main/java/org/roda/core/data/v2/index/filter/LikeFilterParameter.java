@@ -60,11 +60,11 @@ public class LikeFilterParameter extends FilterParameter {
 
   @Override
   public boolean equals(Object obj) {
-    boolean equal = true;
+    boolean equal;
 
     if (obj != null && obj instanceof LikeFilterParameter) {
       LikeFilterParameter other = (LikeFilterParameter) obj;
-      equal = equal && super.equals(other);
+      equal = super.equals(other);
       equal = equal && (getExpression() == other.getExpression() || getExpression().equals(other.getExpression()));
     } else {
       equal = false;

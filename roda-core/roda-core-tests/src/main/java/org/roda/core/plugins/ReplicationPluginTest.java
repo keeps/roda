@@ -232,8 +232,10 @@ public class ReplicationPluginTest {
     while (iterator2.hasNext()) {
       OptionalWithCause<File> next = iterator2.next();
       File file = next.get();
-      model.updateFile(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(), binary.getContent(),
-        true, true);
+      if (binary != null) {
+        model.updateFile(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(), binary.getContent(),
+          true, true);
+      }
     }
 
     executeJobWithReplicationPlugin(Arrays.asList(aip2.getId()));

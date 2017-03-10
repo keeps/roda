@@ -183,7 +183,7 @@ public class CreateMetsPlugin extends AbstractPlugin<AIP> {
     try {
       final Path aipPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(),
         ModelUtils.getAIPStoragePath(aip.getId()));
-      LOGGER.debug(String.format("aipPath=%s", aipPath));
+      LOGGER.debug("aipPath = {}", aipPath);
 
       new EARKAIP(RodaFolderAIP.parse(aipPath)).build(aipPath.getParent(), true);
 

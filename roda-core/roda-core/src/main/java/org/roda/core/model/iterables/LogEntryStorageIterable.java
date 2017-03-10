@@ -1,4 +1,4 @@
-package org.roda.core.model.utils;
+package org.roda.core.model.iterables;
 
 import java.io.BufferedReader;
 import java.io.IOException;

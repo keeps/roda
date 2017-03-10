@@ -16,7 +16,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
@@ -48,24 +47,20 @@ public class AvprobePluginUtils {
       .resolve(RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "avprobe", "path"));
 
     File avprobeDirectory = avprobeHome.toFile();
-    List<String> command = new ArrayList<>(
+    return new ArrayList<>(
       Arrays.asList(avprobeDirectory.getAbsolutePath() + File.separator + "avprobe", "-show_format", "-show_streams",
         "-show_packets", "-of", AvprobePluginUtils.AVPROBE_METADATA_FORMAT, "-v", "quiet"));
-
-    return command;
   }
 
-  public static String runAvprobe(StorageService storage, Binary binary, String fileFormat,
-    Map<String, String> parameterValues) throws IOException, RODAException {
+  public static String runAvprobe(StorageService storage, Binary binary) throws IOException, RODAException {
     DirectResourceAccess directAccess = storage.getDirectAccess(binary.getStoragePath());
-    InputStream inputStream = Files.newInputStream(directAccess.getPath());
 
     Path newPath = Files.createTempFile("temp", ".temp");
-    OutputStream fos = Files.newOutputStream(newPath);
-    IOUtils.copy(inputStream, fos);
 
-    IOUtils.closeQuietly(inputStream);
-    fos.close();
+    try (InputStream inputStream = Files.newInputStream(directAccess.getPath());
+      OutputStream fos = Files.newOutputStream(newPath)) {
+      IOUtils.copy(inputStream, fos);
+    }
 
     String inspectString = inspect(newPath);
     FSUtils.deletePathQuietly(newPath);

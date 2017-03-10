@@ -15,6 +15,7 @@ import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -734,8 +735,14 @@ public class FedoraStorageService implements StorageService {
       if (!isDatastream(ds)) {
         throw new RequestNotValidException("The resource obtained as being a datastream isn't really a datastream");
       }
-      String propertiesString = fullVersionID.replace(version, "");
-      Map<String, String> properties = decodeProperties(propertiesString);
+
+      Map<String, String> properties;
+      if (fullVersionID != null) {
+        String propertiesString = fullVersionID.replace(version, "");
+        properties = decodeProperties(propertiesString);
+      } else {
+        properties = new HashMap<>();
+      }
       return FedoraConversionUtils.convertDataStreamToBinaryVersion(ds, version, properties);
     } catch (ForbiddenException e) {
       throw new NotFoundException(e.getMessage(), e);

@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
@@ -158,7 +159,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
 
   @Override
   public List<PluginParameter> getParameters() {
-    ArrayList<PluginParameter> parameters = new ArrayList<PluginParameter>();
+    ArrayList<PluginParameter> parameters = new ArrayList<>();
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_SIGNATURE_VERIFY));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_SIGNATURE_EXTRACT));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_SIGNATURE_STRIP));
@@ -198,7 +199,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
 
   public Report executeOnAIP(IndexService index, ModelService model, StorageService storage, Report report,
     SimpleJobPluginInfo jobPluginInfo, List<AIP> list, Job job) throws PluginException {
-    List<String> newRepresentations = new ArrayList<String>();
+    List<String> newRepresentations = new ArrayList<>();
 
     for (AIP aip : list) {
       Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
@@ -206,14 +207,14 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
       PluginState reportState = PluginState.SUCCESS;
       ValidationReport validationReport = new ValidationReport();
       boolean hasNonPdfFiles = false;
-      Map<String, String> verifiedFiles = new HashMap<String, String>();
-      List<File> alteredFiles = new ArrayList<File>();
-      List<File> extractedFiles = new ArrayList<File>();
-      List<File> newFiles = new ArrayList<File>();
+      Map<String, String> verifiedFiles = new HashMap<>();
+      List<File> alteredFiles = new ArrayList<>();
+      List<File> extractedFiles = new ArrayList<>();
+      List<File> newFiles = new ArrayList<>();
 
       try {
         for (Representation representation : aip.getRepresentations()) {
-          List<File> unchangedFiles = new ArrayList<File>();
+          List<File> unchangedFiles = new ArrayList<>();
           String newRepresentationID = UUID.randomUUID().toString();
           String verification = null;
           boolean notify = true;
@@ -382,15 +383,15 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
 
   public Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage, Report report,
     SimpleJobPluginInfo jobPluginInfo, List<Representation> list, Job job) throws PluginException {
-    List<String> newRepresentations = new ArrayList<String>();
+    List<String> newRepresentations = new ArrayList<>();
 
     for (Representation representation : list) {
       String newRepresentationID = UUID.randomUUID().toString();
-      List<File> unchangedFiles = new ArrayList<File>();
-      List<File> alteredFiles = new ArrayList<File>();
-      List<File> extractedFiles = new ArrayList<File>();
-      List<File> newFiles = new ArrayList<File>();
-      Map<String, String> verifiedFiles = new HashMap<String, String>();
+      List<File> unchangedFiles = new ArrayList<>();
+      List<File> alteredFiles = new ArrayList<>();
+      List<File> extractedFiles = new ArrayList<>();
+      List<File> newFiles = new ArrayList<>();
+      Map<String, String> verifiedFiles = new HashMap<>();
       String aipId = representation.getAipId();
       String verification = null;
       boolean notify = true;
@@ -439,7 +440,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
                     fileFormat, fileMimetype);
                   verifiedFiles.put(file.getId(), verification);
 
-                  if (!verification.equals("Passed") && verificationAffectsOnOutcome) {
+                  if (!"Passed".equals(verification) && verificationAffectsOnOutcome) {
                     reportState = PluginState.FAILURE;
                     reportItem.addPluginDetails(" Signature validation failed on " + fileInfoPath + ".");
                   }
@@ -551,14 +552,14 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
 
   public Report executeOnFile(IndexService index, ModelService model, StorageService storage, Report report,
     SimpleJobPluginInfo jobPluginInfo, List<File> list, Job job) throws PluginException {
-    List<String> newRepresentations = new ArrayList<String>();
+    List<String> newRepresentations = new ArrayList<>();
 
     String newRepresentationID = UUID.randomUUID().toString();
-    List<File> unchangedFiles = new ArrayList<File>();
-    List<File> alteredFiles = new ArrayList<File>();
-    List<File> extractedFiles = new ArrayList<File>();
-    List<File> newFiles = new ArrayList<File>();
-    Map<String, String> verifiedFiles = new HashMap<String, String>();
+    List<File> unchangedFiles = new ArrayList<>();
+    List<File> alteredFiles = new ArrayList<>();
+    List<File> extractedFiles = new ArrayList<>();
+    List<File> newFiles = new ArrayList<>();
+    Map<String, String> verifiedFiles = new HashMap<>();
 
     String verification = null;
     boolean notify = true;
@@ -593,7 +594,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
                 fileMimetype);
               verifiedFiles.put(file.getId(), verification);
 
-              if (!verification.equals("Passed") && verificationAffectsOnOutcome) {
+              if (!"Passed".equals(verification) && verificationAffectsOnOutcome) {
                 reportState = PluginState.FAILURE;
                 reportItem.addPluginDetails("Signature validation failed on " + file.getId() + ".");
               }
@@ -698,8 +699,8 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
     List<File> extractedFiles, List<File> newFiles, Map<String, String> verifiedFiles, boolean notify)
     throws PluginException {
 
-    List<LinkingIdentifier> premisSourceFilesIdentifiers = new ArrayList<LinkingIdentifier>();
-    List<LinkingIdentifier> premisTargetFilesIdentifiers = new ArrayList<LinkingIdentifier>();
+    List<LinkingIdentifier> premisSourceFilesIdentifiers = new ArrayList<>();
+    List<LinkingIdentifier> premisTargetFilesIdentifiers = new ArrayList<>();
 
     // building the detail for the plugin event
     StringBuilder stringBuilder = new StringBuilder();
@@ -707,25 +708,28 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
     if (doVerify) {
       if (!verifiedFiles.isEmpty()) {
         stringBuilder.append("The DS verification ran on: ");
-        String verifies = "";
-        for (String file : verifiedFiles.keySet()) {
-          verifies += file + " (" + verifiedFiles.get(file) + "), ";
+        StringBuilder verifies = new StringBuilder();
+        for (Entry<String, String> fileEntry : verifiedFiles.entrySet()) {
+          verifies.append(fileEntry.getKey()).append(" (").append(fileEntry.getValue()).append("), ");
         }
-        stringBuilder.append(verifies.substring(0, verifies.lastIndexOf(',')) + ". ");
+
+        String verifiesString = verifies.toString();
+        stringBuilder.append(verifiesString.substring(0, verifiesString.lastIndexOf(',')) + ". ");
       }
     }
 
     if (doExtract) {
       if (!extractedFiles.isEmpty()) {
         stringBuilder.append("The following files DS information were extracted: ");
-        String extracts = "";
+        StringBuilder extracts = new StringBuilder();
 
         for (File file : extractedFiles) {
-          extracts += file.getId() + ", ";
+          extracts.append(file.getId()).append(", ");
         }
 
         if (extracts.length() > 0) {
-          stringBuilder.append(extracts.substring(0, extracts.lastIndexOf(',')) + ". ");
+          String extractString = extracts.toString();
+          stringBuilder.append(extractString.substring(0, extractString.lastIndexOf(',')) + ". ");
         }
       }
     }
@@ -755,16 +759,17 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
   }
 
   private String getNewFileFormat(String fileFormat, String filePronom, String fileMimetype) {
+    String changedFileFormat = fileFormat;
     if (!applicableTo.isEmpty()) {
       if (StringUtils.isNotBlank(filePronom) && pronomToExtension.get(filePronom) != null
         && !pronomToExtension.get(filePronom).contains(fileFormat)) {
-        fileFormat = pronomToExtension.get(filePronom).get(0);
+        changedFileFormat = pronomToExtension.get(filePronom).get(0);
       } else if (StringUtils.isNotBlank(fileMimetype) && mimetypeToExtension.get(fileMimetype) != null
         && !mimetypeToExtension.get(fileMimetype).contains(fileFormat)) {
-        fileFormat = mimetypeToExtension.get(fileMimetype).get(0);
+        changedFileFormat = mimetypeToExtension.get(fileMimetype).get(0);
       }
     }
-    return fileFormat;
+    return changedFileFormat;
   }
 
   @Override
@@ -774,7 +779,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
 
   @Override
   public Plugin<T> cloneMe() {
-    return new DigitalSignaturePlugin<T>();
+    return new DigitalSignaturePlugin<>();
   }
 
   @Override

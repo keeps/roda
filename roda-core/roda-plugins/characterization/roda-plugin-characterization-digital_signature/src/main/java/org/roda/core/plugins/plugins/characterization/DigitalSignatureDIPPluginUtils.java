@@ -9,7 +9,6 @@ package org.roda.core.plugins.plugins.characterization;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,13 +53,12 @@ public class DigitalSignatureDIPPluginUtils {
     KEYSTORE_PATH = path;
   }
 
-  public static void addDetachedSignature(Path input)
-    throws IOException, GeneralSecurityException, DocumentException, CMSException, FileNotFoundException {
+  public static void addDetachedSignature(Path input) throws IOException, GeneralSecurityException, CMSException {
     SignatureUtility signatureUtility = new SignatureUtility();
     if (KEYSTORE_PATH != null) {
-      InputStream is = new FileInputStream(KEYSTORE_PATH);
-      signatureUtility.loadKeyStore(is, KEYSTORE_PASSWORD.toCharArray());
-      IOUtils.closeQuietly(is);
+      try (InputStream is = new FileInputStream(KEYSTORE_PATH)) {
+        signatureUtility.loadKeyStore(is, KEYSTORE_PASSWORD.toCharArray());
+      }
     }
     signatureUtility.initSign(KEYSTORE_ALIAS, KEYSTORE_PASSWORD.toCharArray());
 
@@ -68,20 +66,19 @@ public class DigitalSignatureDIPPluginUtils {
     signatureUtility.sign(inputFile, input.getParent().resolve(inputFile.getName() + ".p7s").toFile());
   }
 
-  public static Path addEmbeddedSignature(Path input, String fileFormat, String mimetype)
-    throws IOException, GeneralSecurityException, DocumentException, InvalidFormatException, XMLSignatureException,
-    MarshalException, FileNotFoundException {
+  public static Path addEmbeddedSignature(Path input, String fileFormat, String mimetype) throws IOException,
+    GeneralSecurityException, InvalidFormatException, XMLSignatureException, MarshalException, DocumentException {
     String generalFileFormat = SignatureUtils.canHaveEmbeddedSignature(fileFormat, mimetype);
-    if (generalFileFormat.equals("pdf")) {
+    if (DigitalSignaturePluginUtils.PDF_FORMAT.equals(generalFileFormat)) {
       String reason = RodaCoreFactory.getRodaConfigurationAsString("core", "signature", "reason");
       String location = RodaCoreFactory.getRodaConfigurationAsString("core", "signature", "location");
       String contact = RodaCoreFactory.getRodaConfigurationAsString("core", "signature", "contact");
       return PDFSignatureUtils.runDigitalSignatureSign(input, KEYSTORE_PATH, KEYSTORE_ALIAS, KEYSTORE_PASSWORD, reason,
         location, contact);
-    } else if (generalFileFormat.equals("ooxml")) {
+    } else if (DigitalSignaturePluginUtils.OOXML_FORMAT.equals(generalFileFormat)) {
       return OOXMLSignatureUtils.runDigitalSignatureSign(input, KEYSTORE_PATH, KEYSTORE_ALIAS, KEYSTORE_PASSWORD,
         fileFormat);
-    } else if (generalFileFormat.equals("odf")) {
+    } else if (DigitalSignaturePluginUtils.ODF_FORMAT.equals(generalFileFormat)) {
       return ODFSignatureUtils.runDigitalSignatureSign(input, KEYSTORE_PATH, KEYSTORE_ALIAS, KEYSTORE_PASSWORD,
         fileFormat);
     }
@@ -93,12 +90,12 @@ public class DigitalSignatureDIPPluginUtils {
 
   public static void addElementToRepresentationZip(ZipOutputStream zout, Path file, String name) throws IOException {
     ZipEntry entry = new ZipEntry(name);
-    InputStream in = new FileInputStream(file.toString());
-    zout.putNextEntry(entry);
-    byte[] data = IOUtils.toByteArray(in);
-    zout.write(data);
-    zout.closeEntry();
-    IOUtils.closeQuietly(in);
+    try (InputStream in = new FileInputStream(file.toString())) {
+      zout.putNextEntry(entry);
+      byte[] data = IOUtils.toByteArray(in);
+      zout.write(data);
+      zout.closeEntry();
+    }
   }
 
   public static Path runZipDigitalSigner(Path input) {
@@ -106,9 +103,9 @@ public class DigitalSignatureDIPPluginUtils {
     try {
       SignatureUtility signatureUtility = new SignatureUtility();
       if (KEYSTORE_PATH != null) {
-        InputStream is = new FileInputStream(KEYSTORE_PATH);
-        signatureUtility.loadKeyStore(is, KEYSTORE_PASSWORD.toCharArray());
-        IOUtils.closeQuietly(is);
+        try (InputStream is = new FileInputStream(KEYSTORE_PATH)) {
+          signatureUtility.loadKeyStore(is, KEYSTORE_PASSWORD.toCharArray());
+        }
       }
       signatureUtility.initSign(KEYSTORE_ALIAS, KEYSTORE_PASSWORD.toCharArray());
 
@@ -117,34 +114,32 @@ public class DigitalSignatureDIPPluginUtils {
 
       Path zipResult = Files.createTempFile("signed_", ".zip");
       OutputStream os = new FileOutputStream(zipResult.toString());
-      ZipOutputStream zout = new ZipOutputStream(os);
+      try (ZipOutputStream zout = new ZipOutputStream(os)) {
 
-      // add representation zip
-      ZipEntry zipEntry = new ZipEntry(input.toFile().getName());
-      InputStream in = new FileInputStream(input.toString());
-      zout.putNextEntry(zipEntry);
-      byte[] data = IOUtils.toByteArray(in);
-      zout.write(data);
-      zout.closeEntry();
-      IOUtils.closeQuietly(in);
+        // add representation zip
+        ZipEntry zipEntry = new ZipEntry(input.toFile().getName());
+        try (InputStream in = new FileInputStream(input.toString())) {
+          zout.putNextEntry(zipEntry);
+          byte[] data = IOUtils.toByteArray(in);
+          zout.write(data);
+          zout.closeEntry();
+        }
 
-      // add signature
-      ZipEntry zipEntry2 = new ZipEntry(signatureTempFile.toFile().getName());
-      InputStream in2 = new FileInputStream(signatureTempFile.toString());
-      zout.putNextEntry(zipEntry2);
-      byte[] data2 = IOUtils.toByteArray(in2);
-      zout.write(data2);
-      zout.closeEntry();
-      IOUtils.closeQuietly(in2);
+        // add signature
+        ZipEntry zipEntry2 = new ZipEntry(signatureTempFile.toFile().getName());
+        try (InputStream in2 = new FileInputStream(signatureTempFile.toString())) {
+          zout.putNextEntry(zipEntry2);
+          byte[] data2 = IOUtils.toByteArray(in2);
+          zout.write(data2);
+          zout.closeEntry();
+        }
 
-      zout.finish();
-      IOUtils.closeQuietly(zout);
-      IOUtils.closeQuietly(os);
+        zout.finish();
+      }
+
       input.toFile().delete();
       signatureTempFile.toFile().delete();
-
       return zipResult;
-
     } catch (CertificateException | IOException e) {
       LOGGER.error("Cannot load keystore " + KEYSTORE_PATH, e);
     } catch (KeyStoreException | NoSuchAlgorithmException | NoSuchProviderException e) {

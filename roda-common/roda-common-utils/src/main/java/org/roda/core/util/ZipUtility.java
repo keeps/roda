@@ -108,33 +108,19 @@ public final class ZipUtility {
   private static List<File> extractFilesFromInputStream(InputStream inputStream, File outputDir,
     boolean filesWithAbsolutePath) throws IOException {
     ZipInputStream zipInputStream = new ZipInputStream(inputStream);
-    // JarInputStream jarInputStream = new JarInputStream(new
-    // FileInputStream(
-    // zipFilename));
-
     ZipEntry zipEntry = zipInputStream.getNextEntry();
-    // JarEntry jarEntry = jarInputStream.getNextJarEntry();
 
     if (zipEntry == null) {
-      // if (jarEntry == null) {
-      // No entries in ZIP
-
       zipInputStream.close();
-      // jarInputStream.close();
-
       throw new IOException("No files inside ZIP");
-
     } else {
 
-      List<File> extractedFiles = new ArrayList<File>();
+      List<File> extractedFiles = new ArrayList<>();
 
       while (zipEntry != null) {
-        // while (jarEntry != null) {
 
         // for each entry to be extracted
         String entryName = zipEntry.getName();
-        // String entryName = jarEntry.getName();
-
         LOGGER.debug("Extracting {}", entryName);
 
         File newFile = new File(outputDir, entryName);
@@ -146,10 +132,7 @@ public final class ZipUtility {
         }
 
         if (zipEntry.isDirectory()) {
-          // if (jarEntry.isDirectory()) {
-
           newFile.mkdirs();
-
         } else {
 
           if (newFile.getParentFile() != null && (!newFile.getParentFile().exists())) {
@@ -158,31 +141,17 @@ public final class ZipUtility {
 
           FileOutputStream newFileOutputStream = new FileOutputStream(newFile);
 
-          // IOUtils.copy(zipInputStream, newFileOutputStream);
           // copyLarge returns a long instead of int
           IOUtils.copyLarge(zipInputStream, newFileOutputStream);
-          // IOUtils.copyLarge(jarInputStream, newFileOutputStream);
-
-          // int n;
-          // while ((n = zipInputStream.read(buf, 0, BUFFER_SIZE)) >
-          // -1) {
-          // newFileOutputStream.write(buf, 0, n);
-          // }
 
           newFileOutputStream.close();
           zipInputStream.closeEntry();
-          // jarInputStream.closeEntry();
-
         }
 
         zipEntry = zipInputStream.getNextEntry();
-        // jarEntry = jarInputStream.getNextJarEntry();
-
-      } // end while
+      }
 
       zipInputStream.close();
-      // jarInputStream.close();
-
       return extractedFiles;
     }
   }
@@ -205,8 +174,6 @@ public final class ZipUtility {
 
     FileOutputStream zipStream = new FileOutputStream(newZipFile);
     JarOutputStream jarOutputStream = new JarOutputStream(new BufferedOutputStream(zipStream));
-    // ZipOutputStream zipOutputStream = new ZipOutputStream(
-    // new BufferedOutputStream(new FileOutputStream(newZipFile)));
 
     // Create a buffer for reading the files
     byte[] buffer = new byte[BUFFER_SIZE];
@@ -220,27 +187,22 @@ public final class ZipUtility {
       BufferedInputStream in = new BufferedInputStream(inputStream);
 
       // Add ZIP entry to output stream.
-      // zipOutputStream.putNextEntry(new
-      // ZipEntry(relativeFile.toString()));
       jarOutputStream.putNextEntry(new JarEntry(relativeFile));
 
       LOGGER.trace("Adding {}", relativeFile);
 
       int length;
       while ((length = in.read(buffer)) > 0) {
-        // zipOutputStream.write(buffer, 0, length);
         jarOutputStream.write(buffer, 0, length);
       }
 
       // Complete the entry
-      // zipOutputStream.closeEntry();
       jarOutputStream.closeEntry();
       in.close();
       inputStream.close();
     }
 
     // Complete the ZIP file
-    // zipOutputStream.close();
     jarOutputStream.close();
     zipStream.close();
 
@@ -276,15 +238,14 @@ public final class ZipUtility {
       try {
         // create byte buffer
         byte[] buffer = new byte[1024];
-        FileInputStream fis = new FileInputStream(files[i]);
-        zos.putNextEntry(new ZipEntry(files[i].getName()));
-        int length;
-        while ((length = fis.read(buffer)) > 0) {
-          zos.write(buffer, 0, length);
+        try (FileInputStream fis = new FileInputStream(files[i])) {
+          zos.putNextEntry(new ZipEntry(files[i].getName()));
+          int length;
+          while ((length = fis.read(buffer)) > 0) {
+            zos.write(buffer, 0, length);
+          }
+          zos.closeEntry();
         }
-        zos.closeEntry();
-        // close the InputStream
-        fis.close();
       } catch (IOException e) {
         LOGGER.error("Error adding file/folder to zip", e);
       }
@@ -293,7 +254,7 @@ public final class ZipUtility {
 
   public static void zip(File directory, ZipOutputStream zout) throws IOException {
     URI base = directory.toURI();
-    Deque<File> queue = new LinkedList<File>();
+    Deque<File> queue = new LinkedList<>();
     queue.push(directory);
     try {
       while (!queue.isEmpty()) {

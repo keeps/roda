@@ -169,7 +169,7 @@ public class SolrUtilsTest {
     try {
       filter = new Filter();
       filter.add(new LikeFilterParameter());
-      stringFilter = SolrUtils.parseFilter(filter);
+      SolrUtils.parseFilter(filter);
       Assert.fail("An exception should have been thrown but it wasn't!");
     } catch (RequestNotValidException e) {
       // do nothing as it was expected
@@ -190,7 +190,7 @@ public class SolrUtilsTest {
     try {
       filter = new Filter();
       filter.add(new RegexFilterParameter());
-      stringFilter = SolrUtils.parseFilter(filter);
+      SolrUtils.parseFilter(filter);
       Assert.fail("An exception should have been thrown but it wasn't!");
     } catch (RequestNotValidException e) {
       // do nothing as it was expected
@@ -258,7 +258,7 @@ public class SolrUtilsTest {
   @Test
   public void testParseSorter() {
     Sorter sorter = null;
-    List<SortClause> sortList = null;
+    List<SortClause> sortList;
     String field1 = "field1", field2 = "field2";
     boolean descending = true;
     boolean ascending = false;

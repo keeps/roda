@@ -128,7 +128,7 @@ public final class FSUtils {
     throws AlreadyExistsException, GenericException, NotFoundException {
 
     // check if we can replace existing
-    if (!replaceExisting && Files.exists(targetPath)) {
+    if (!replaceExisting && targetPath.toFile().exists()) {
       throw new AlreadyExistsException("Cannot copy because target path already exists: " + targetPath);
     }
 
@@ -144,7 +144,7 @@ public final class FSUtils {
     CopyOption[] copyOptions = replaceExisting ? new CopyOption[] {StandardCopyOption.REPLACE_EXISTING}
       : new CopyOption[] {};
 
-    if (Files.isDirectory(sourcePath)) {
+    if (sourcePath.toFile().isDirectory()) {
       try {
         Files.move(sourcePath, targetPath, copyOptions);
       } catch (DirectoryNotEmptyException e) {
@@ -223,7 +223,7 @@ public final class FSUtils {
     throws AlreadyExistsException, GenericException {
 
     // check if we can replace existing
-    if (!replaceExisting && Files.exists(targetPath)) {
+    if (!replaceExisting && targetPath.toFile().exists()) {
       throw new AlreadyExistsException("Cannot copy because target path already exists: " + targetPath);
     }
 
@@ -234,7 +234,7 @@ public final class FSUtils {
       throw new GenericException("Error while creating target directory parent folder", e);
     }
 
-    if (Files.isDirectory(sourcePath)) {
+    if (sourcePath.toFile().isDirectory()) {
       try {
         Files.walkFileTree(sourcePath, new SimpleFileVisitor<Path>() {
           @Override
@@ -615,7 +615,7 @@ public final class FSUtils {
 
     // TODO support binary reference
 
-    if (!Files.exists(path)) {
+    if (!path.toFile().exists()) {
       throw new NotFoundException("Cannot find file or directory at " + path);
     }
 
@@ -623,7 +623,7 @@ public final class FSUtils {
     StoragePath storagePath = FSUtils.getStoragePath(basePath, path);
 
     // construct
-    if (Files.isDirectory(path)) {
+    if (path.toFile().isDirectory()) {
       resource = new DefaultDirectory(storagePath);
     } else {
       ContentPayload content = new FSPathContentPayload(path);
@@ -642,15 +642,14 @@ public final class FSUtils {
   public static Path getBinaryHistoryMetadataPath(Path historyDataPath, Path historyMetadataPath, Path path) {
     Path relativePath = historyDataPath.relativize(path);
     String fileName = relativePath.getFileName().toString();
-    Path metadataPath = historyMetadataPath.resolve(relativePath.getParent().resolve(fileName + METADATA_SUFFIX));
-    return metadataPath;
+    return historyMetadataPath.resolve(relativePath.getParent().resolve(fileName + METADATA_SUFFIX));
   }
 
   public static BinaryVersion convertPathToBinaryVersion(Path historyDataPath, Path historyMetadataPath, Path path)
     throws RequestNotValidException, NotFoundException, GenericException {
-    DefaultBinaryVersion ret = null;
+    DefaultBinaryVersion ret;
 
-    if (!Files.exists(path)) {
+    if (!path.toFile().exists()) {
       throw new NotFoundException("Cannot find file version at " + path);
     }
 
@@ -678,12 +677,12 @@ public final class FSUtils {
       Map<String, String> contentDigest = null;
       Binary binary = new DefaultBinary(storagePath, content, sizeInBytes, false, contentDigest);
 
-      if (Files.exists(metadataPath)) {
+      if (metadataPath.toFile().exists()) {
         ret = JsonUtils.readObjectFromFile(metadataPath, DefaultBinaryVersion.class);
         ret.setBinary(binary);
       } else {
         Date createdDate = new Date(Files.readAttributes(path, BasicFileAttributes.class).creationTime().toMillis());
-        Map<String, String> defaultProperties = new HashMap<String, String>();
+        Map<String, String> defaultProperties = new HashMap<>();
         ret = new DefaultBinaryVersion(binary, id, createdDate, defaultProperties);
       }
 

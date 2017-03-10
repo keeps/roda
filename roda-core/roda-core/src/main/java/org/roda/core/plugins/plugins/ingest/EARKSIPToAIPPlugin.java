@@ -143,11 +143,9 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
     AIP aip;
     try {
       sip = EARKSIP.parse(earkSIPPath, FSUtils.createRandomDirectory(jobWorkingDirectory));
-
       reportItem.setSourceObjectOriginalIds(sip.getIds());
 
       if (sip.getValidationReport().isValid()) {
-
         Optional<String> parentId = Optional.empty();
 
         if (IPEnums.IPStatus.NEW == sip.getStatus()) {
@@ -160,17 +158,19 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
           throw new GenericException("Unknown IP Status: " + sip.getStatus());
         }
 
-        // put SIP inside the created AIP (if it is supposed to do so)
-        PluginHelper.createSubmission(model, createSubmission, earkSIPPath, aip.getId());
+        if (aip != null) {
+          // put SIP inside the created AIP (if it is supposed to do so)
+          PluginHelper.createSubmission(model, createSubmission, earkSIPPath, aip.getId());
 
-        createUnpackingEventSuccess(model, index, transferredResource, aip, UNPACK_DESCRIPTION);
-        reportItem.setOutcomeObjectId(aip.getId()).setPluginState(PluginState.SUCCESS);
+          createUnpackingEventSuccess(model, index, transferredResource, aip, UNPACK_DESCRIPTION);
+          reportItem.setOutcomeObjectId(aip.getId()).setPluginState(PluginState.SUCCESS);
 
-        if (sip.getAncestors() != null && !sip.getAncestors().isEmpty() && aip.getParentId() == null) {
-          reportItem.setPluginDetails(String.format("Parent with id '%s' not found", parentId));
+          if (sip.getAncestors() != null && !sip.getAncestors().isEmpty() && aip.getParentId() == null) {
+            reportItem.setPluginDetails(String.format("Parent with id '%s' not found", parentId));
+          }
+          createWellformedEventSuccess(model, index, transferredResource, aip);
+          LOGGER.debug("Done with converting {} to AIP {}", earkSIPPath, aip.getId());
         }
-        createWellformedEventSuccess(model, index, transferredResource, aip);
-        LOGGER.debug("Done with converting {} to AIP {}", earkSIPPath, aip.getId());
       } else {
         reportItem.setPluginState(PluginState.FAILURE).setHtmlPluginDetails(true)
           .setPluginDetails(sip.getValidationReport().toHtml(true, true, true, false, false));
@@ -217,7 +217,8 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
     }
     IndexResult<IndexedAIP> result = index.find(IndexedAIP.class, filter, Sorter.NONE, new Sublist(0, 1),
       Arrays.asList(RodaConstants.INDEX_UUID));
-    IndexedAIP indexedAIP = null;
+    IndexedAIP indexedAIP;
+
     if (result.getTotalCount() == 1) {
       indexedAIP = result.getResults().get(0);
     } else {

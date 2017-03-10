@@ -72,7 +72,7 @@ public final class XsltUtility {
    * @return a {@link Map} of parameters with a single parameter.
    */
   public static Map<String, Object> createParameters(String paramName, Object value) {
-    HashMap<String, Object> parameters = new HashMap<String, Object>();
+    HashMap<String, Object> parameters = new HashMap<>();
     parameters.put(paramName, value);
     return parameters;
   }

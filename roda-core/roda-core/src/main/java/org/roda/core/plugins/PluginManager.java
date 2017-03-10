@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -72,12 +73,12 @@ public class PluginManager {
   private static String RODA_PLUGIN_MANIFEST_KEY = "RODA-Plugin";
 
   private Timer loadPluginsTimer = null;
-  private Map<Path, JarPlugins> jarPluginCache = new HashMap<Path, JarPlugins>();
-  private Map<String, Plugin<? extends IsRODAObject>> internalPluginChache = new HashMap<String, Plugin<?>>();
-  private Map<String, Plugin<? extends IsRODAObject>> externalPluginChache = new HashMap<String, Plugin<?>>();
-  private Map<PluginType, List<PluginInfo>> pluginInfoPerType = new HashMap<PluginType, List<PluginInfo>>();
-  private Map<String, Set<Class>> pluginObjectClasses = new HashMap<String, Set<Class>>();
-  private Map<Class, List<PluginInfo>> pluginInfoPerObjectClass = new HashMap<Class, List<PluginInfo>>();
+  private Map<Path, JarPlugins> jarPluginCache = new HashMap<>();
+  private Map<String, Plugin<? extends IsRODAObject>> internalPluginChache = new HashMap<>();
+  private Map<String, Plugin<? extends IsRODAObject>> externalPluginChache = new HashMap<>();
+  private Map<PluginType, List<PluginInfo>> pluginInfoPerType = new HashMap<>();
+  private Map<String, Set<Class>> pluginObjectClasses = new HashMap<>();
+  private Map<Class, List<PluginInfo>> pluginInfoPerObjectClass = new HashMap<>();
   private boolean internalPluginStarted = false;
   private List<String> blacklistedPlugins;
 
@@ -287,7 +288,7 @@ public class PluginManager {
     blacklistedPlugins = RodaCoreFactory.getRodaConfigurationAsList("core", "plugins", "blacklist");
 
     // load "external" RODA plugins, i.e., those available in the plugins folder
-    if (Files.exists(RODA_PLUGINS_PATH) && Files.isDirectory(RODA_PLUGINS_PATH)) {
+    if (RODA_PLUGINS_PATH.toFile().exists() && RODA_PLUGINS_PATH.toFile().isDirectory()) {
       loadExternalPlugins();
     }
 
@@ -562,8 +563,9 @@ public class PluginManager {
       if (LOGGER.isDebugEnabled()) {
         LOGGER.debug("Search complete - {} jar files", jarPluginCache.size());
 
-        for (Path jarFile : jarPluginCache.keySet()) {
-          List<Plugin<?>> plugins = jarPluginCache.get(jarFile).plugins;
+        for (Entry<Path, JarPlugins> jarEntry : jarPluginCache.entrySet()) {
+          Path jarFile = jarEntry.getKey();
+          List<Plugin<?>> plugins = jarEntry.getValue().plugins;
           if (!plugins.isEmpty()) {
             for (Plugin<?> plugin : plugins) {
               LOGGER.debug("- {}", jarFile.getFileName());

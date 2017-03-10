@@ -181,7 +181,7 @@ public final class ModelUtils {
 
   public static List<String> getOtherMetadataStoragePath(String aipId, String representationId, List<String> filePath,
     String fileId, String type) throws RequestNotValidException {
-    List<String> path = null;
+    List<String> path;
     if (type == null) {
       path = getRepresentationOtherMetadataFolderPath(aipId, representationId);
     } else {
@@ -543,7 +543,7 @@ public final class ModelUtils {
 
   public static StoragePath getPreservationMetadataStoragePath(String id, PreservationMetadataType type, String aipId,
     String representationId, List<String> fileDirectoryPath, String fileId) throws RequestNotValidException {
-    List<String> path = null;
+    List<String> path;
     if (type != null) {
       if (type.equals(PreservationMetadataType.AGENT)) {
         path = Arrays.asList(RodaConstants.STORAGE_CONTAINER_PRESERVATION, RodaConstants.STORAGE_DIRECTORY_AGENTS,
@@ -734,9 +734,7 @@ public final class ModelUtils {
     if (aipId != null && representationId != null && directoryPath != null && fileName != null) {
       // other metadata pertaining to a file
       path = getRepresentationOtherMetadataPath(aipId, representationId, type);
-      if (directoryPath != null) {
-        path.addAll(directoryPath);
-      }
+      path.addAll(directoryPath);
       path.add(fileName + fileSuffix);
     } else if (aipId != null && representationId != null) {
       // other metadata pertaining to a representation
@@ -873,7 +871,6 @@ public final class ModelUtils {
       }
       IOUtils.closeQuietly(allFiles);
 
-      recursive = false;
       CloseableIterable<OptionalWithCause<org.roda.core.data.v2.ip.metadata.OtherMetadata>> allOtherMetadata = model
         .listOtherMetadata(aip.getId(), rep.getId(), null, null, null);
       for (OptionalWithCause<org.roda.core.data.v2.ip.metadata.OtherMetadata> otherMetadata : allOtherMetadata) {

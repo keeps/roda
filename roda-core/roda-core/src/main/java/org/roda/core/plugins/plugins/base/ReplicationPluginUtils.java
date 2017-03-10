@@ -1,6 +1,5 @@
 package org.roda.core.plugins.plugins.base;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +31,7 @@ public class ReplicationPluginUtils {
 
     StringBuilder ret = new StringBuilder();
 
-    if (Files.exists(sourceAipPath)) {
+    if (sourceAipPath.toFile().exists()) {
       rsyncCommand.add(sourceAipPath + "/");
       rsyncCommand.add(targetAipPath);
 
@@ -51,7 +50,7 @@ public class ReplicationPluginUtils {
       + RodaConstants.STORAGE_HISTORY_CONTAINER_DATA + "/" + RodaConstants.STORAGE_CONTAINER_AIP + "/" + aip.getId()
       + "/";
 
-    if (Files.exists(sourceAipHistoryDataPath)) {
+    if (sourceAipHistoryDataPath.toFile().exists()) {
       List<String> rsyncHistoryDataCommand = addInitialCommandPart(hasCompression);
       rsyncHistoryDataCommand.add(sourceAipHistoryDataPath + "/");
       rsyncHistoryDataCommand.add(targetAipHistoryDataPath);
@@ -75,7 +74,7 @@ public class ReplicationPluginUtils {
       + RodaConstants.STORAGE_HISTORY_CONTAINER_METADATA + "/" + RodaConstants.STORAGE_CONTAINER_AIP + "/" + aip.getId()
       + "/";
 
-    if (Files.exists(sourceAipHistoryMetadataPath)) {
+    if (sourceAipHistoryMetadataPath.toFile().exists()) {
       List<String> rsyncHistoryMetadataCommand = addInitialCommandPart(hasCompression);
       rsyncHistoryMetadataCommand.add(sourceAipHistoryMetadataPath + "/");
       rsyncHistoryMetadataCommand.add(targetAipHistoryMetadataPath);
@@ -111,7 +110,7 @@ public class ReplicationPluginUtils {
       + RodaConstants.STORAGE_DIRECTORY_PRESERVATION + "/" + pm.getId() + RodaConstants.PREMIS_SUFFIX;
 
     StringBuilder ret = new StringBuilder();
-    if (Files.exists(sourceEventPath)) {
+    if (sourceEventPath.toFile().exists()) {
 
       rsyncCommand.add(sourceEventPath.toString());
       rsyncCommand.add(targetEventPath);
@@ -144,7 +143,7 @@ public class ReplicationPluginUtils {
       + RodaConstants.STORAGE_CONTAINER_PRESERVATION + "/" + RodaConstants.STORAGE_CONTAINER_PRESERVATION_AGENTS + "/";
 
     StringBuilder ret = new StringBuilder();
-    if (Files.exists(sourceAgentPath)) {
+    if (sourceAgentPath.toFile().exists()) {
       rsyncCommand.add(sourceAgentPath + "/");
       rsyncCommand.add(targetAgentPath);
 
@@ -160,7 +159,7 @@ public class ReplicationPluginUtils {
   }
 
   private static List<String> addInitialCommandPart(boolean hasCompression) {
-    List<String> command = new ArrayList<String>();
+    List<String> command = new ArrayList<>();
     command.add("rsync");
 
     if (hasCompression) {

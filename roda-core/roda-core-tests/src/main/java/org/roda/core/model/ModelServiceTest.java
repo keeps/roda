@@ -121,7 +121,7 @@ public class ModelServiceTest {
     corporaPath = Paths.get(corporaURL.toURI());
     corporaService = new FileStorageService(corporaPath);
 
-    LOGGER.debug("Running model test under storage: " + basePath);
+    LOGGER.debug("Running model test under storage: {}", basePath);
   }
 
   // @BeforeMethod
@@ -1030,6 +1030,10 @@ public class ModelServiceTest {
     AIP aip = model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), aipCreator);
     Optional<LiteRODAObject> lightAIP = model.retrieveLiteFromObject(aip);
+
+    // cleanup
+    model.deleteAIP(aipId);
+
     if (lightAIP.isPresent()) {
       LiteOptionalWithCause test = LiteOptionalWithCause.of(lightAIP.get());
       Path tempFile = Files.createTempFile(basePath, "test", ".tmp");
@@ -1038,18 +1042,13 @@ public class ModelServiceTest {
         oos.writeObject(test);
       }
 
-      try (ObjectInputStream iis = new ObjectInputStream(Files.newInputStream(tempFile))) {
-        LiteOptionalWithCause test2 = (LiteOptionalWithCause) iis.readObject();
-
+      try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(tempFile))) {
+        LiteOptionalWithCause test2 = (LiteOptionalWithCause) ois.readObject();
         assertEquals(test, test2);
       }
     } else {
       fail("Should be present");
     }
-    
-    // cleanup
-    model.deleteAIP(aipId);
-
   }
 
   private static void populate(Path basePath) throws IOException {
@@ -1063,7 +1062,7 @@ public class ModelServiceTest {
     Random randomno) throws IOException {
     currentLevel++;
     for (int i = 0; i < numberOfItemsByLevel; i++) {
-      Path p = null;
+      Path p;
       if (i % 2 == 0) {
         if (currentLevel > 1) {
           p = Files.createFile(path.resolve(UUID.randomUUID().toString() + ".txt"));

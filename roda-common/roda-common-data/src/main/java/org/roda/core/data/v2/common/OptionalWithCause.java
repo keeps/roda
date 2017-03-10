@@ -37,7 +37,11 @@ public class OptionalWithCause<T> {
   }
 
   public T get() {
-    return optional.get();
+    if (optional.isPresent()) {
+      return optional.get();
+    } else {
+      return null;
+    }
   }
 
   public boolean isPresent() {

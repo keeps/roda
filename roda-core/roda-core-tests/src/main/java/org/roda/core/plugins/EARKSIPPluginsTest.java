@@ -196,7 +196,7 @@ public class EARKSIPPluginsTest {
 
     Path sipFolder = corporaPath.resolve(CorporaConstants.SIP_FOLDER).resolve(CorporaConstants.ANCESTOR_SIP_FOLDER);
     Files.walk(sipFolder).forEach(filePath -> {
-      if (Files.isRegularFile(filePath)) {
+      if (filePath.toFile().isFile()) {
         try {
           TransferredResource tr = f.createFile(null, filePath.getFileName().toString(),
             Files.newInputStream(filePath));
@@ -229,15 +229,15 @@ public class EARKSIPPluginsTest {
 
     Job ingestJob = TestsHelper.executeJob(EARKSIPToAIPPlugin.class, parameters, PluginType.SIP_TO_AIP,
       SelectedItemsList.create(TransferredResource.class, transferredResourcesIDs));
-    
+
     TestsHelper.getJobReports(index, ingestJob, true);
-    
+
     index.commitAIPs();
 
     Map<String, String> fixAncestorsParameters = new HashMap<>();
     fixAncestorsParameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());
     fixAncestorsParameters.put(RodaConstants.PLUGIN_PARAMS_OTHER_JOB_ID, ingestJob.getId());
-    
+
     Job fixAncestorsJob = TestsHelper.executeJob(FixAncestorsPlugin.class, fixAncestorsParameters, PluginType.MISC,
       new SelectedItemsNone<>());
 

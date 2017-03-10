@@ -101,7 +101,7 @@ public class CommandUtility {
       }
 
       if (exitValue == 0) {
-        return output.toString();
+        return output;
       } else {
         throw new CommandException("Command " + Arrays.toString(args) + " terminated with error code " + exitValue,
           exitValue, output);
@@ -147,7 +147,7 @@ class CaptureOutputThread extends Thread {
 
   public void run() {
 
-    StringBuffer outputBuffer = new StringBuffer();
+    StringBuilder outputBuffer = new StringBuilder();
 
     try {
 

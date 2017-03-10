@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -131,7 +130,7 @@ public class Messages {
         File file = folder.resolve(bundleName).toFile();
 
         // Also checks for file existence
-        if (Files.exists(folder.resolve(bundleName))) {
+        if (folder.resolve(bundleName).toFile().exists()) {
           is = new FileInputStream(file);
         } else {
           is = this.getClass().getResourceAsStream(CONFIG_I18N_PATH + bundleName);

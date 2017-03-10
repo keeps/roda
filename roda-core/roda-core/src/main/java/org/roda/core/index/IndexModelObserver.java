@@ -567,7 +567,7 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public ReturnWithExceptions<Void> descriptiveMetadataCreated(DescriptiveMetadata descriptiveMetadata) {
-    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<>();
     if (descriptiveMetadata.isFromAIP()) {
       try {
         AIP aip = model.retrieveAIP(descriptiveMetadata.getAipId());
@@ -609,7 +609,7 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public ReturnWithExceptions<Void> representationCreated(Representation representation) {
-    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<>();
     try {
       AIP aip = model.retrieveAIP(representation.getAipId());
       List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
@@ -680,7 +680,7 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public ReturnWithExceptions<Void> logEntryCreated(LogEntry entry) {
-    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<>();
     SolrInputDocument logDoc = SolrUtils.logEntryToSolrDocument(entry);
 
     try {
@@ -712,25 +712,22 @@ public class IndexModelObserver implements ModelObserver {
   @Override
   public void groupCreated(Group group) {
     addDocumentToIndex(RODAMember.class, group);
-    // reindexAllMembers();
   }
 
   @Override
   public void groupUpdated(Group group) {
     deleteDocumentFromIndex(RODAMember.class, group.getId());
     addDocumentToIndex(RODAMember.class, group);
-    // reindexAllMembers();
   }
 
   @Override
   public void groupDeleted(String groupID) {
     deleteDocumentFromIndex(RODAMember.class, groupID);
-    // reindexAllMembers();
   }
 
   @Override
   public ReturnWithExceptions<Void> preservationMetadataCreated(PreservationMetadata pm) {
-    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<>();
     try {
       StoragePath storagePath = ModelUtils.getPreservationMetadataStoragePath(pm);
       Binary binary = model.getStorage().getBinary(storagePath);
@@ -739,10 +736,10 @@ public class IndexModelObserver implements ModelObserver {
       String fileUUID = null;
 
       if (pm.getRepresentationId() != null) {
-        representationUUID = IdUtils.getRepresentationId(aip.getId(), pm.getRepresentationId());
+        representationUUID = IdUtils.getRepresentationId(pm.getAipId(), pm.getRepresentationId());
 
         if (pm.getFileId() != null) {
-          fileUUID = IdUtils.getFileId(aip.getId(), pm.getRepresentationId(), pm.getFileDirectoryPath(),
+          fileUUID = IdUtils.getFileId(pm.getAipId(), pm.getRepresentationId(), pm.getFileDirectoryPath(),
             pm.getFileId());
         }
       }
@@ -798,7 +795,7 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public ReturnWithExceptions<Void> jobCreatedOrUpdated(Job job, boolean reindexJobReports) {
-    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<>();
     SolrInputDocument jobDoc = SolrUtils.jobToSolrDocument(job);
 
     try {
@@ -817,7 +814,7 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   private ReturnWithExceptions<Void> indexJobReports(Job job) {
-    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<>();
     StorageService storage = RodaCoreFactory.getStorageService();
     CloseableIterable<Resource> listResourcesUnderDirectory = null;
     try {
@@ -886,7 +883,7 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public ReturnWithExceptions<Void> jobReportCreatedOrUpdated(Report jobReport, Job job) {
-    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<>();
     SolrInputDocument jobReportDoc = SolrUtils.jobReportToSolrDocument(jobReport, job, index);
 
     try {
@@ -1029,7 +1026,7 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   public ReturnWithExceptions<Void> riskCreatedOrUpdated(Risk risk, int incidences, boolean commit) {
-    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<>();
     SolrInputDocument riskDoc = SolrUtils.riskToSolrDocument(risk, incidences);
 
     try {
@@ -1064,7 +1061,7 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   public ReturnWithExceptions<Void> riskIncidenceCreatedOrUpdated(RiskIncidence riskIncidence, boolean commit) {
-    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<>();
     SolrInputDocument incidenceDoc = SolrUtils.riskIncidenceToSolrDocument(riskIncidence);
 
     try {
@@ -1099,7 +1096,7 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   public ReturnWithExceptions<Void> formatCreatedOrUpdated(Format format, boolean commit) {
-    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<>();
     SolrInputDocument formatDoc = SolrUtils.formatToSolrDocument(format);
 
     try {
@@ -1139,7 +1136,7 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   public ReturnWithExceptions<Void> notificationCreatedOrUpdated(Notification notification) {
-    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<>();
     SolrInputDocument notificationDoc = SolrUtils.notificationToSolrDocument(notification);
 
     try {
@@ -1219,7 +1216,7 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   private ReturnWithExceptions<Void> indexDIPFile(DIP dip, DIPFile file, boolean recursive) {
-    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<>();
     SolrInputDocument fileDocument = SolrUtils.dipFileToSolrDocument(dip, file);
 
     try {
