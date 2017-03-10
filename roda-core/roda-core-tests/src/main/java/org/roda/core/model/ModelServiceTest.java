@@ -9,12 +9,15 @@ package org.roda.core.model;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
+import static org.testng.Assert.fail;
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertNotNull;
 import static org.testng.AssertJUnit.assertNull;
 import static org.testng.AssertJUnit.assertTrue;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -28,6 +31,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -48,6 +52,7 @@ import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
@@ -1017,6 +1022,34 @@ public class ModelServiceTest {
     CloseableIterable<OptionalWithCause<LiteRODAObject>> list = model.listLite(TransferredResource.class);
     int size = CloseableIterables.size(list);
     assertEquals(fileCounter, size);
+  }
+
+  @Test
+  public void testLiteOptionalWithCauseSerialization() throws RODAException, IOException, ClassNotFoundException {
+    final String aipId = CorporaConstants.SOURCE_AIP_ID;
+    AIP aip = model.createAIP(aipId, corporaService,
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), aipCreator);
+    Optional<LiteRODAObject> lightAIP = model.retrieveLiteFromObject(aip);
+    if (lightAIP.isPresent()) {
+      LiteOptionalWithCause test = LiteOptionalWithCause.of(lightAIP.get());
+      Path tempFile = Files.createTempFile(basePath, "test", ".tmp");
+
+      try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(tempFile))) {
+        oos.writeObject(test);
+      }
+
+      try (ObjectInputStream iis = new ObjectInputStream(Files.newInputStream(tempFile))) {
+        LiteOptionalWithCause test2 = (LiteOptionalWithCause) iis.readObject();
+
+        assertEquals(test, test2);
+      }
+    } else {
+      fail("Should be present");
+    }
+    
+    // cleanup
+    model.deleteAIP(aipId);
+
   }
 
   private static void populate(Path basePath) throws IOException {
