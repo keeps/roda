@@ -9,9 +9,10 @@ package org.roda.core.data.v2.user;
 
 import java.util.Set;
 
+import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.index.IsIndexed;
 
-public interface RODAMember extends IsIndexed {
+public interface RODAMember extends IsIndexed, IsModelObject {
 
   boolean isActive();
 

@@ -284,8 +284,7 @@ public class ApiUtils {
     } else if (objectClass.equals(RiskIncidence.class)) {
       ret = new org.roda.core.data.v2.risks.RiskIncidences((List<RiskIncidence>) result.getResults());
     } else if (objectClass.equals(RODAMember.class)) {
-      ret = (RODAObjectList<? extends IsModelObject>) new org.roda.core.data.v2.user.RODAMembers(
-        (List<RODAMember>) result.getResults());
+      ret = new org.roda.core.data.v2.user.RODAMembers((List<RODAMember>) result.getResults());
     } else if (objectClass.equals(IndexedDIP.class)) {
       List<DIP> dips = result.getResults().stream().map(dip -> (DIP) dip).collect(Collectors.toList());
       ret = new org.roda.core.data.v2.ip.DIPs(dips);

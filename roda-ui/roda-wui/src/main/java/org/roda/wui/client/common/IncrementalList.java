@@ -54,7 +54,7 @@ public class IncrementalList extends Composite implements HasHandlers {
   }
 
   public List<String> getTextBoxesValue() {
-    ArrayList<String> listValues = new ArrayList<String>();
+    ArrayList<String> listValues = new ArrayList<>();
     for (RemovableTextBox textBox : textBoxes) {
       listValues.add(textBox.getTextBoxValue());
     }
