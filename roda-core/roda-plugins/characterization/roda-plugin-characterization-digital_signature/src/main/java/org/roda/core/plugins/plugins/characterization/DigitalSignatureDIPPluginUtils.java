@@ -40,6 +40,10 @@ import com.itextpdf.text.DocumentException;
 
 public class DigitalSignatureDIPPluginUtils {
 
+  private DigitalSignatureDIPPluginUtils() {
+
+  }
+
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalSignatureDIPPluginUtils.class);
 
   private static String KEYSTORE_PATH = RodaCoreFactory.getRodaHomePath()

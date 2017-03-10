@@ -27,12 +27,13 @@ public class Filter implements Serializable {
   public static final Filter ALL = new Filter();
   public static final Filter NULL = null;
 
-  private List<FilterParameter> parameters = new ArrayList<FilterParameter>();
+  private List<FilterParameter> parameters = new ArrayList<>();
 
   /**
    * Constructs an empty {@link Filter}.
    */
   public Filter() {
+    super();
   }
 
   /**
@@ -55,7 +56,7 @@ public class Filter implements Serializable {
   }
 
   public Filter(FilterParameter... parameters) {
-    List<FilterParameter> parameterList = new ArrayList<FilterParameter>();
+    List<FilterParameter> parameterList = new ArrayList<>();
     for (FilterParameter parameter : parameters) {
       parameterList.add(parameter);
     }

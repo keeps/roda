@@ -7,11 +7,12 @@
  */
 package org.roda.core.data.v2.common;
 
+import java.io.Serializable;
 import java.util.List;
 
 import org.roda.core.data.v2.IsRODAObject;
 
-public interface RODAObjectList<T extends IsRODAObject> {
+public interface RODAObjectList<T extends IsRODAObject> extends Serializable {
 
   public List<T> getObjects();
 

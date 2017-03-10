@@ -245,7 +245,7 @@ public class ApiUtils {
     Class<T> objectClass, IndexResult<T> result)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
 
-    RODAObjectList<?> ret;
+    RODAObjectList<? extends IsModelObject> ret;
 
     if (objectClass.equals(IndexedAIP.class)) {
       AIPs aips = new AIPs();
@@ -284,7 +284,8 @@ public class ApiUtils {
     } else if (objectClass.equals(RiskIncidence.class)) {
       ret = new org.roda.core.data.v2.risks.RiskIncidences((List<RiskIncidence>) result.getResults());
     } else if (objectClass.equals(RODAMember.class)) {
-      ret = new org.roda.core.data.v2.user.RODAMembers((List<RODAMember>) result.getResults());
+      ret = (RODAObjectList<? extends IsModelObject>) new org.roda.core.data.v2.user.RODAMembers(
+        (List<RODAMember>) result.getResults());
     } else if (objectClass.equals(IndexedDIP.class)) {
       List<DIP> dips = result.getResults().stream().map(dip -> (DIP) dip).collect(Collectors.toList());
       ret = new org.roda.core.data.v2.ip.DIPs(dips);

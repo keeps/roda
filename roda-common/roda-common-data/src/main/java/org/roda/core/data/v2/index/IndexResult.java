@@ -13,9 +13,28 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
+import org.roda.core.data.v2.ip.DIPFile;
+import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.core.data.v2.jobs.IndexedReport;
+import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.risks.IndexedRisk;
+import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.core.data.v2.user.Group;
+import org.roda.core.data.v2.user.User;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -30,6 +49,7 @@ public class IndexResult<T extends Serializable> implements Serializable {
   private long offset;
   private long limit;
   private long totalCount;
+
   private List<T> results;
   private List<FacetFieldResult> facetResults;
   private Date date;
@@ -74,7 +94,31 @@ public class IndexResult<T extends Serializable> implements Serializable {
    * @return the results
    */
   @XmlElementWrapper(name = "results")
-  @XmlElement(name = "result")
+  @XmlElements({
+
+    @XmlElement(name = RodaConstants.CONTROLLER_AIP_PARAM, type = IndexedAIP.class),
+    @XmlElement(name = RodaConstants.CONTROLLER_REPRESENTATION_PARAM, type = IndexedRepresentation.class),
+    @XmlElement(name = RodaConstants.CONTROLLER_FILE_PARAM, type = IndexedFile.class),
+
+    @XmlElement(name = RodaConstants.CONTROLLER_DIP_PARAM, type = IndexedDIP.class),
+    @XmlElement(name = RodaConstants.CONTROLLER_DIP_FILE_PARAM, type = DIPFile.class),
+
+    @XmlElement(name = "preservationAgent", type = IndexedPreservationAgent.class),
+    @XmlElement(name = "preservationEvent", type = IndexedPreservationEvent.class),
+
+    @XmlElement(name = "job", type = Job.class), @XmlElement(name = "report", type = IndexedReport.class),
+    @XmlElement(name = "log", type = LogEntry.class), @XmlElement(name = "notification", type = Notification.class),
+
+    @XmlElement(name = "risk", type = IndexedRisk.class), @XmlElement(name = "incidence", type = RiskIncidence.class),
+
+    @XmlElement(name = "format", type = Format.class),
+
+    @XmlElement(name = "transferredResource", type = TransferredResource.class),
+    @XmlElement(name = "user", type = User.class), @XmlElement(name = "group", type = Group.class),
+
+    @XmlElement(name = "result", type = Object.class)
+
+  })
   public List<T> getResults() {
     return results;
   }

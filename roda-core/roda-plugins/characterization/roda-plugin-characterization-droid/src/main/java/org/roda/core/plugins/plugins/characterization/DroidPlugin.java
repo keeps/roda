@@ -61,6 +61,7 @@ public class DroidPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public void init() throws PluginException {
+    // do nothing
   }
 
   @Override
@@ -87,7 +88,7 @@ public class DroidPlugin extends AbstractPlugin<AIP> {
   public String getVersionImpl() {
     String signatureFile = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "droid", "signatureFile");
     if (StringUtils.isNotBlank(signatureFile)) {
-      return signatureFile.substring(signatureFile.lastIndexOf("/")).replaceAll(".*DROID_SignatureFile_(V[0-9]+).*",
+      return signatureFile.substring(signatureFile.lastIndexOf('/')).replaceAll(".*DROID_SignatureFile_(V[0-9]+).*",
         "$1");
     }
 
@@ -97,13 +98,14 @@ public class DroidPlugin extends AbstractPlugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> liteList) throws PluginException {
-    return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<AIP>() {
+    RODAObjectProcessingLogic<AIP> perObjectLogic = new RODAObjectProcessingLogic<AIP>() {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
         SimpleJobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {
         processAIP(index, model, storage, report, jobPluginInfo, cachedJob, object);
       }
-    }, index, model, storage, liteList);
+    };
+    return PluginHelper.processObjects(this, perObjectLogic, index, model, storage, liteList);
   }
 
   private void processAIP(IndexService index, ModelService model, StorageService storage, Report report,
@@ -114,7 +116,7 @@ public class DroidPlugin extends AbstractPlugin<AIP> {
     PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
     PluginState reportState = PluginState.SUCCESS;
     ValidationReport validationReport = new ValidationReport();
-    List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
+    List<LinkingIdentifier> sources = new ArrayList<>();
 
     for (Representation representation : aip.getRepresentations()) {
       LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
@@ -134,7 +136,7 @@ public class DroidPlugin extends AbstractPlugin<AIP> {
           String droidOutput = DroidPluginUtils.runDROIDOnPath(directAccess.getPath());
 
           for (String outputLine : droidOutput.split("\n")) {
-            int splitterPosition = outputLine.lastIndexOf(",");
+            int splitterPosition = outputLine.lastIndexOf(',');
             // TODO get file directory path
             List<String> fileDirectoryPath = new ArrayList<>();
             String fileId = outputLine.substring(0, splitterPosition);

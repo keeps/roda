@@ -38,7 +38,6 @@ import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.index.CountRequest;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.index.IndexResultWrapper;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.FacetParameter;
 import org.roda.core.data.v2.index.facet.FacetParameter.SORT;
@@ -209,14 +208,7 @@ public class IndexResource {
         findRequest.sublist, findRequest.facets, user, findRequest.onlyActive, new ArrayList<>());
       indexResult = I18nUtility.translate(indexResult, classToReturn, localeString);
 
-      if (MediaType.APPLICATION_XML.equals(mediaType)) {
-        IndexResultWrapper wrapper = new IndexResultWrapper(indexResult.getOffset(), indexResult.getLimit(),
-          indexResult.getTotalCount(), ApiUtils.indexedResultToRODAObjectList(classToReturn, indexResult),
-          indexResult.getFacetResults(), indexResult.getDate());
-        response = Response.ok(wrapper, mediaType).build();
-      } else {
-        response = Response.ok(indexResult, mediaType).build();
-      }
+      response = Response.ok(indexResult, mediaType).build();
     }
 
     return response;
