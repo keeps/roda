@@ -289,23 +289,21 @@ public class ResourceParseUtils {
     StoragePath storagePath = resource.getStoragePath();
     String fileName = resource.getStoragePath().getName();
 
-    if (classToReturn.equals(AIP.class)) {
+    if (classToReturn.equals(AIP.class) || classToReturn.equals(DIP.class)) {
       ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, fileName));
     } else if (classToReturn.equals(Representation.class)) {
       String aipId = ModelUtils.extractAipId(storagePath);
       String repId = ModelUtils.extractRepresentationId(storagePath);
       ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, aipId, repId));
     } else if (classToReturn.equals(File.class)) {
-      List<String> ids = new ArrayList<String>();
+      List<String> ids = new ArrayList<>();
       ids.add(ModelUtils.extractAipId(storagePath));
       ids.add(ModelUtils.extractRepresentationId(storagePath));
       ids.addAll(ModelUtils.extractFilePathFromRepresentationData(storagePath));
       ids.add(fileName);
       ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, ids));
-    } else if (classToReturn.equals(DIP.class)) {
-      ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, fileName));
     } else if (classToReturn.equals(DIPFile.class)) {
-      List<String> ids = new ArrayList<String>();
+      List<String> ids = new ArrayList<>();
       ids.add(ModelUtils.extractDipId(storagePath));
       ids.addAll(ModelUtils.extractFilePathFromDIPData(storagePath));
       ids.add(fileName);
@@ -323,7 +321,7 @@ public class ResourceParseUtils {
     } else if (classToReturn.equals(Report.class)) {
       ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, ModelUtils.getJobAndReportIds(storagePath)));
     } else if (classToReturn.equals(DescriptiveMetadata.class)) {
-      List<String> ids = new ArrayList<String>();
+      List<String> ids = new ArrayList<>();
       ids.add(ModelUtils.extractAipId(storagePath));
       String representationId = ModelUtils.extractRepresentationId(storagePath);
       if (representationId != null) {
@@ -332,7 +330,7 @@ public class ResourceParseUtils {
       ids.add(fileName);
       ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, ids));
     } else if (classToReturn.equals(PreservationMetadata.class)) {
-      List<String> ids = new ArrayList<String>();
+      List<String> ids = new ArrayList<>();
       String aipId = ModelUtils.extractAipId(storagePath);
       if (aipId != null) {
         ids.add(aipId);

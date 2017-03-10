@@ -18,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class LogEntryStorageIterable implements CloseableIterable<OptionalWithCause<LogEntry>> {
-
   private static final Logger LOGGER = LoggerFactory.getLogger(LogEntryStorageIterable.class);
 
   private final class LogEntryIterator implements Iterator<OptionalWithCause<LogEntry>> {
