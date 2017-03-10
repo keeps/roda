@@ -233,14 +233,14 @@ public class ListSelectionUtils {
               Integer lastIndex = last.getIndex();
               Boolean hasPrevious = lastIndex > 0;
               Boolean hasNext = lastIndex < totalCount - 1;
-              callback.onSuccess(Pair.create(hasPrevious, hasNext));
+              callback.onSuccess(Pair.of(hasPrevious, hasNext));
             }
           });
       } else {
-        callback.onSuccess(Pair.create(Boolean.FALSE, Boolean.FALSE));
+        callback.onSuccess(Pair.of(Boolean.FALSE, Boolean.FALSE));
       }
     } else {
-      callback.onSuccess(Pair.create(Boolean.FALSE, Boolean.FALSE));
+      callback.onSuccess(Pair.of(Boolean.FALSE, Boolean.FALSE));
     }
   }
 

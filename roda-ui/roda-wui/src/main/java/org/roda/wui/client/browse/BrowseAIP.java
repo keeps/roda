@@ -599,7 +599,7 @@ public class BrowseAIP extends Composite {
         HTML container = new HTML();
         container.addStyleName("metadataContent");
         descriptiveMetadata.add(container, title);
-        descriptiveMetadataContainers.add(Pair.create(descMetadatum.getId(), container));
+        descriptiveMetadataContainers.add(Pair.of(descMetadatum.getId(), container));
         bundles.put(descMetadatum.getId(), descMetadatum);
       }
     }

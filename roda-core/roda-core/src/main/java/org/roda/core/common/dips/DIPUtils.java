@@ -56,7 +56,7 @@ public class DIPUtils {
     Optional<String> username = getDIPProperty(dip, "dip", dip.getType(), "credentials", "username");
     Optional<String> password = getDIPProperty(dip, "dip", dip.getType(), "credentials", "password");
     if (username.isPresent() && password.isPresent()) {
-      credentials = Optional.of(new Pair<>(username.get(), password.get()));
+      credentials = Optional.of(Pair.of(username.get(), password.get()));
     }
     return credentials;
   }

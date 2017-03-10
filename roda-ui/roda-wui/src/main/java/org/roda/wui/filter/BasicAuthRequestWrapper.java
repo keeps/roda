@@ -51,7 +51,7 @@ public class BasicAuthRequestWrapper extends HttpServletRequestWrapper {
         Charset.forName(RodaConstants.DEFAULT_ENCODING));
       final String[] values = credentials.split(":", 2);
       if (values[0] != null && values[1] != null) {
-        ret = new Pair<>(values[0], values[1]);
+        ret = Pair.of(values[0], values[1]);
       }
     }
     return ret;

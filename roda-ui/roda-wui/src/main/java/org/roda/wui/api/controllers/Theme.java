@@ -47,7 +47,7 @@ public class Theme extends RodaWuiController {
         .getConfigurationFileAsStream(RodaConstants.CORE_THEME_FOLDER + "/" + fallbackResourceId);
       resourceId = fallbackResourceId;
     }
-    return new Pair<>(resourceId, themeResourceInputstream);
+    return Pair.of(resourceId, themeResourceInputstream);
   }
 
   public static StreamResponse getThemeResourceStreamResponse(final Pair<String, InputStream> themeResourceInputstream)

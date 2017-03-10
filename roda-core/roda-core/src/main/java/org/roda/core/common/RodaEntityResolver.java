@@ -66,7 +66,7 @@ public class RodaEntityResolver implements EntityResolver {
   @Override
   public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
     try {
-      byte[] in = cache.get(Pair.create(publicId, systemId));
+      byte[] in = cache.get(Pair.of(publicId, systemId));
       return new InputSource(new ByteArrayInputStream(in));
     } catch (ExecutionException e) {
       if (systemId.endsWith(".dtd")) {

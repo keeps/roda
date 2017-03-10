@@ -154,7 +154,7 @@ public class ApiUtils {
       limitInteger = 100;
     }
 
-    return new Pair<Integer, Integer>(startInteger, limitInteger);
+    return Pair.of(startInteger, limitInteger);
   }
 
   public static Response okResponse(StreamResponse streamResponse, CacheControl cacheControl, Date lastModifiedDate) {

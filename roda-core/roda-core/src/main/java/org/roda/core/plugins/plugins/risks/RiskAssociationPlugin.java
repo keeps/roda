@@ -226,7 +226,7 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
       }
     }
 
-    return new Pair<SimpleJobPluginInfo, Report>(jobPluginInfo, pluginReport);
+    return Pair.of(jobPluginInfo, pluginReport);
   }
 
   private Pair<SimpleJobPluginInfo, Report> addIncidenceToRepresentationList(ModelService model, IndexService index,
@@ -269,7 +269,7 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
       }
     }
 
-    return new Pair<SimpleJobPluginInfo, Report>(jobPluginInfo, pluginReport);
+    return Pair.of(jobPluginInfo, pluginReport);
   }
 
   private Pair<SimpleJobPluginInfo, Report> addIncidenceToFileList(ModelService model, IndexService index,
@@ -314,7 +314,7 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
 
     }
 
-    return new Pair<SimpleJobPluginInfo, Report>(jobPluginInfo, pluginReport);
+    return Pair.of(jobPluginInfo, pluginReport);
   }
 
   @Override

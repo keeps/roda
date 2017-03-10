@@ -85,7 +85,7 @@ public class VeraPDFPluginUtils {
     ByteArrayOutputStream htmlOutput = new ByteArrayOutputStream();
     ByteArrayInputStream xmlInput = null;
     try {
-      ItemProcessor processor = PROCESSOR_CACHE.get(Pair.create(profile, hasFeatures));
+      ItemProcessor processor = PROCESSOR_CACHE.get(Pair.of(profile, hasFeatures));
       ProcessorResult result = processor.process(input.toFile());
 
       boolean prettyPrint = true;
@@ -99,7 +99,7 @@ public class VeraPDFPluginUtils {
         htmlOutput, arguments);
 
       StringContentPayload s = new StringContentPayload(htmlOutput.toString(RodaConstants.DEFAULT_ENCODING));
-      return Pair.create(s, result.getValidationResult().isCompliant());
+      return Pair.of(s, result.getValidationResult().isCompliant());
     } catch (ExecutionException | VeraPDFException | JAXBException | UnsupportedEncodingException
       | TransformerException e) {
       throw new GenericException("Could not run VeraPDF: [" + e.getClass().getSimpleName() + "] " + e.getMessage(), e);

@@ -513,7 +513,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
     for (Object o : classes) {
       Class c = (Class) o;
-      Pair<String, String> names = new Pair<String, String>(c.getSimpleName(), c.getName());
+      Pair<String, String> names = Pair.of(c.getSimpleName(), c.getName());
       classNames.add(names);
     }
 

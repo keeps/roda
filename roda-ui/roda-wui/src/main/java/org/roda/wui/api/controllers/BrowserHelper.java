@@ -2660,9 +2660,9 @@ public class BrowserHelper {
       // save job state
       Pair<Integer, Integer> pair = jobState.get(jobId);
       if (pair == null) {
-        jobState.put(jobId, Pair.create(1, accept ? 1 : 0));
+        jobState.put(jobId, Pair.of(1, accept ? 1 : 0));
       } else {
-        jobState.put(jobId, Pair.create(pair.getFirst() + 1, pair.getSecond() + (accept ? 1 : 0)));
+        jobState.put(jobId, Pair.of(pair.getFirst() + 1, pair.getSecond() + (accept ? 1 : 0)));
       }
 
     }

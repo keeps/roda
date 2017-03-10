@@ -340,7 +340,7 @@ public class MigrationManager {
     public void addMigration(int toVersion, Class<? extends MigrationAction> migrationActionClazz) {
       if (lastToVersion < toVersion) {
         lastToVersion = toVersion;
-        migrations.add(new Pair<Integer, Class<? extends MigrationAction>>(toVersion, migrationActionClazz));
+        migrations.add(Pair.of(toVersion, migrationActionClazz));
       } else {
         LOGGER.error(
           "Error trying to add a migration action class out of order (last toVersion added: {}; toVersion to be added: {})",

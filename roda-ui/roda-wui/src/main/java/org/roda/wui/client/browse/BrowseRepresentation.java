@@ -285,7 +285,7 @@ public class BrowseRepresentation extends Composite {
       HTML container = new HTML();
       container.addStyleName("metadataContent");
       itemMetadata.add(container, title);
-      descriptiveMetadataContainers.add(Pair.create(descMetadataBundle.getId(), container));
+      descriptiveMetadataContainers.add(Pair.of(descMetadataBundle.getId(), container));
       bundles.put(descMetadataBundle.getId(), descMetadataBundle);
     }
 
