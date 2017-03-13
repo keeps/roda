@@ -254,7 +254,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
                       fileFormat, fileMimetype);
                     verifiedFiles.put(file.getId(), verification);
 
-                    if (!verification.equals("Passed") && verificationAffectsOnOutcome) {
+                    if (!"Passed".equals(verification) && verificationAffectsOnOutcome) {
                       reportState = PluginState.FAILURE;
                       reportItem.addPluginDetails(" Signature validation failed on " + fileInfoPath + ".\n");
                     }
@@ -282,7 +282,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
                       if (createDIP) {
                         FileLink fileLink = new FileLink(representation.getAipId(), representation.getId(),
                           file.getPath(), file.getId());
-                        List<FileLink> links = new ArrayList<FileLink>();
+                        List<FileLink> links = new ArrayList<>();
                         links.add(fileLink);
 
                         DIP dip = new DIP();
@@ -353,7 +353,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
         reportItem.setPluginState(reportState);
 
         if (!reportState.equals(PluginState.FAILURE)) {
-          if (ignoreFiles && validationReport.getIssues().size() > 0) {
+          if (ignoreFiles && !validationReport.getIssues().isEmpty()) {
             reportItem.setHtmlPluginDetails(true)
               .setPluginDetails(validationReport.toHtml(false, false, false, "Ignored files"));
           }

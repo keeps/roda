@@ -40,9 +40,9 @@ public class I18nUtility {
   public static <T extends Serializable> IndexResult<T> translate(IndexResult<T> input, Class<T> resultClass,
     Locale locale) {
     IndexResult<T> output = input;
-    if (output != null && output.getFacetResults() != null && output.getFacetResults().size() > 0) {
+    if (output != null && output.getFacetResults() != null && !output.getFacetResults().isEmpty()) {
       for (FacetFieldResult ffr : output.getFacetResults()) {
-        if (ffr != null && ffr.getValues() != null && ffr.getValues().size() > 0) {
+        if (ffr != null && ffr.getValues() != null && !ffr.getValues().isEmpty()) {
           String field = ffr.getField();
           for (FacetValue fv : ffr.getValues()) {
             fv.setLabel(getFacetTranslation(field, fv.getValue(), locale, resultClass));
@@ -55,13 +55,14 @@ public class I18nUtility {
 
   private static <T extends Serializable> String getFacetTranslation(String facetField, String facetValue,
     Locale locale, Class<T> resultClass) {
-    String bundleKey = RodaConstants.I18N_UI_FACETS_PREFIX + resultClass.getSimpleName() + "." + facetField
-      + (facetValue != null && facetValue.trim().length() == 0 ? "" : "." + facetValue.trim());
     String ret;
 
-    if (resultClass.equals(LogEntry.class) && facetField.equals(RodaConstants.LOG_ACTION_METHOD)) {
+    if (resultClass.equals(LogEntry.class) && facetField.equals(RodaConstants.LOG_ACTION_METHOD)
+      && facetValue != null) {
       ret = StringUtils.getPrettifiedActionMethod(facetValue);
     } else {
+      String bundleKey = RodaConstants.I18N_UI_FACETS_PREFIX + resultClass.getSimpleName() + "." + facetField
+        + (facetValue == null || facetValue.trim().length() == 0 ? "" : "." + facetValue.trim());
       try {
         ret = RodaCoreFactory.getI18NMessages(locale).getTranslation(bundleKey);
       } catch (MissingResourceException e) {

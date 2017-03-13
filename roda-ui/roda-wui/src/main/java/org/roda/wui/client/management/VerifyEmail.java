@@ -56,7 +56,7 @@ public class VerifyEmail extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-      if (historyTokens.size() == 0) {
+      if (historyTokens.isEmpty()) {
         VerifyEmail recoverLogin = new VerifyEmail();
         callback.onSuccess(recoverLogin);
       } else if (historyTokens.size() == 2) {

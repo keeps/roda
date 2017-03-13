@@ -301,14 +301,14 @@ public class EditPermissions extends Composite {
     userPermissionsEmpty.setVisible(userPermissionsToShow.isEmpty());
     groupPermissionsEmpty.setVisible(groupPermissionsToShow.isEmpty());
 
-    for (String username : userPermissionsToShow.keySet()) {
-      PermissionPanel permissionPanel = new PermissionPanel(username, true, userPermissionsToShow.get(username));
+    for (Entry<String, Set<PermissionType>> entry : userPermissionsToShow.entrySet()) {
+      PermissionPanel permissionPanel = new PermissionPanel(entry.getKey(), true, entry.getValue());
       userPermissionsPanel.add(permissionPanel);
       bindUpdateEmptyVisibility(permissionPanel);
     }
 
-    for (String groupname : groupPermissionsToShow.keySet()) {
-      PermissionPanel permissionPanel = new PermissionPanel(groupname, false, groupPermissionsToShow.get(groupname));
+    for (Entry<String, Set<PermissionType>> entry : groupPermissionsToShow.entrySet()) {
+      PermissionPanel permissionPanel = new PermissionPanel(entry.getKey(), false, entry.getValue());
       groupPermissionsPanel.add(permissionPanel);
       bindUpdateEmptyVisibility(permissionPanel);
     }

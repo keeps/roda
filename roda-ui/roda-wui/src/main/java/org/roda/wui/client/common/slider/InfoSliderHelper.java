@@ -1,6 +1,7 @@
 package org.roda.wui.client.common.slider;
 
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -42,7 +43,7 @@ public class InfoSliderHelper {
   }
 
   private static void updateInfoSliderPanel(IndexedAIP aip, SliderPanel infoSliderPanel) {
-    HashMap<String, SafeHtml> values = new HashMap<String, SafeHtml>();
+    HashMap<String, SafeHtml> values = new HashMap<>();
 
     infoSliderPanel.clear();
     infoSliderPanel.addTitle(new Label(messages.viewRepresentationInfoTitle()));
@@ -66,7 +67,7 @@ public class InfoSliderHelper {
   }
 
   private static void updateInfoSliderPanel(IndexedRepresentation representation, SliderPanel infoSliderPanel) {
-    HashMap<String, SafeHtml> values = new HashMap<String, SafeHtml>();
+    HashMap<String, SafeHtml> values = new HashMap<>();
 
     infoSliderPanel.clear();
     infoSliderPanel.addTitle(new Label(messages.viewRepresentationInfoTitle()));
@@ -96,7 +97,7 @@ public class InfoSliderHelper {
   }
 
   private static void updateInfoSliderPanel(IndexedFile file, SliderPanel infoSliderPanel) {
-    HashMap<String, SafeHtml> values = new HashMap<String, SafeHtml>();
+    HashMap<String, SafeHtml> values = new HashMap<>();
 
     infoSliderPanel.clear();
     infoSliderPanel.addTitle(new Label(messages.viewRepresentationInfoTitle()));
@@ -178,20 +179,20 @@ public class InfoSliderHelper {
   }
 
   private static void populate(SliderPanel infoSliderPanel, HashMap<String, SafeHtml> values) {
-    for (String key : values.keySet()) {
-      FlowPanel entry = new FlowPanel();
+    for (Entry<String, SafeHtml> entry : values.entrySet()) {
+      FlowPanel entryPanel = new FlowPanel();
 
-      Label keyLabel = new Label(key);
-      HTML valueLabel = new HTML(values.get(key));
+      Label keyLabel = new Label(entry.getKey());
+      HTML valueLabel = new HTML(entry.getValue());
 
-      entry.add(keyLabel);
-      entry.add(valueLabel);
+      entryPanel.add(keyLabel);
+      entryPanel.add(valueLabel);
 
-      infoSliderPanel.addContent(entry);
+      infoSliderPanel.addContent(entryPanel);
 
       keyLabel.addStyleName("infoFileEntryKey");
       valueLabel.addStyleName("infoFileEntryValue");
-      entry.addStyleName("infoFileEntry");
+      entryPanel.addStyleName("infoFileEntry");
     }
   }
 }

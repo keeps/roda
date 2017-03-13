@@ -13,6 +13,7 @@ package org.roda.wui.client.main;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.BrowseAIP;
@@ -110,14 +111,13 @@ public class Menu extends Composite {
   private MenuItem planning_agent;
 
   private final MenuItem help;
-
   private final AcessibleMenuBar userMenu;
-
   private final AcessibleMenuBar languagesMenu;
 
   // private final MenuBar settingsMenu;
 
   private String selectedLanguage;
+  private int leftMenuItemCount = 0;
 
   /**
    * Main menu constructor
@@ -333,7 +333,7 @@ public class Menu extends Composite {
     if (label != null)
       b.append(SafeHtmlUtils.fromSafeConstant(label));
 
-    MenuItem menuItem = null;
+    MenuItem menuItem;
     if (subMenu != null) {
       menuItem = new MenuItem(b.toSafeHtml(), subMenu);
     } else if (command != null) {
@@ -375,8 +375,6 @@ public class Menu extends Composite {
     });
   }
 
-  private int leftMenuItemCount = 0;
-
   private void insertIntoLeftMenu(MenuItem item, int index) {
     int indexToInsert = index <= leftMenuItemCount ? index : leftMenuItemCount;
     leftMenu.insertItem(item, indexToInsert);
@@ -387,7 +385,7 @@ public class Menu extends Composite {
     String locale = LocaleInfo.getCurrentLocale().getLocaleName();
 
     // Getting supported languages and their display name
-    Map<String, String> supportedLanguages = new HashMap<String, String>();
+    Map<String, String> supportedLanguages = new HashMap<>();
 
     for (String localeName : LocaleInfo.getAvailableLocaleNames()) {
       if (!"default".equals(localeName)) {
@@ -397,28 +395,30 @@ public class Menu extends Composite {
 
     languagesMenu.clearItems();
 
-    for (final String key : supportedLanguages.keySet()) {
+    for (final Entry<String, String> entry : supportedLanguages.entrySet()) {
+      final String key = entry.getKey();
+      final String value = entry.getValue();
+
       if (key.equals(locale)) {
         SafeHtmlBuilder b = new SafeHtmlBuilder();
         String iconHTML = "<i class='fa fa-check'></i>";
 
-        b.append(SafeHtmlUtils.fromSafeConstant(supportedLanguages.get(key)));
+        b.append(SafeHtmlUtils.fromSafeConstant(value));
         b.append(SafeHtmlUtils.fromSafeConstant(iconHTML));
 
         MenuItem languageMenuItem = new MenuItem(b.toSafeHtml());
         languageMenuItem.addStyleName("menu-item-language-selected");
         languageMenuItem.addStyleName("menu-item-language");
         languagesMenu.addItem(languageMenuItem);
-        selectedLanguage = supportedLanguages.get(key);
+        selectedLanguage = value;
       } else {
-        MenuItem languageMenuItem = new MenuItem(SafeHtmlUtils.fromSafeConstant(supportedLanguages.get(key)),
-          new ScheduledCommand() {
+        MenuItem languageMenuItem = new MenuItem(SafeHtmlUtils.fromSafeConstant(value), new ScheduledCommand() {
 
-            @Override
-            public void execute() {
-              JavascriptUtils.changeLocale(key);
-            }
-          });
+          @Override
+          public void execute() {
+            JavascriptUtils.changeLocale(key);
+          }
+        });
         languagesMenu.addItem(languageMenuItem);
         languageMenuItem.addStyleName("menu-item-language");
       }

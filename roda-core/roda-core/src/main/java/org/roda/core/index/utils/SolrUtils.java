@@ -2066,7 +2066,7 @@ public class SolrUtils {
     doc.addField(RodaConstants.FORMAT_DEFINITION, format.getDefinition());
     doc.addField(RodaConstants.FORMAT_CATEGORY, format.getCategories());
     doc.addField(RodaConstants.FORMAT_CATEGORY_SORT,
-      (format.getCategories() != null && format.getCategories().size() > 0) ? format.getCategories().get(0) : null);
+      (format.getCategories() != null && !format.getCategories().isEmpty()) ? format.getCategories().get(0) : null);
     doc.addField(RodaConstants.FORMAT_LATEST_VERSION, format.getLatestVersion());
     if (format.getPopularity() != null) {
       doc.addField(RodaConstants.FORMAT_POPULARITY, format.getPopularity());

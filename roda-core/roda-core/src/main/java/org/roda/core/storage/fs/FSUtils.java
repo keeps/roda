@@ -711,7 +711,7 @@ public final class FSUtils {
     StoragePath storagePath = FSUtils.getStoragePath(basePath, path);
 
     // construct
-    if (Files.isDirectory(path)) {
+    if (path.toFile().isDirectory()) {
       resource = new DefaultContainer(storagePath);
     } else {
       throw new GenericException("A file is not a container!");

@@ -196,7 +196,7 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
     }
     if (parameters.containsKey(CSV_FILE_OTHER_METADATA_TYPES)) {
       String otherMetadataSTR = parameters.get(CSV_FILE_OTHER_METADATA_TYPES);
-      if (otherMetadataSTR != null && !otherMetadataSTR.trim().equalsIgnoreCase("")) {
+      if (otherMetadataSTR != null && !"".trim().equalsIgnoreCase(otherMetadataSTR)) {
         otherMetadataTypes = new ArrayList<>();
         otherMetadataTypes.addAll(Arrays.asList(otherMetadataSTR.split(",")));
       }

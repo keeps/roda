@@ -13,7 +13,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
@@ -43,7 +42,7 @@ public class FileUtility {
     InputStream ret;
     Path staticConfig = configPath.resolve(relativePath);
 
-    if (Files.exists(staticConfig)) {
+    if (staticConfig.toFile().exists()) {
       try {
         ret = new FileInputStream(staticConfig.toFile());
         LOGGER.debug("Using static configuration");
@@ -166,9 +165,9 @@ public class FileUtility {
       return null;
     }
 
-    String pseudo[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"};
+    String[] pseudo = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"};
 
-    StringBuffer out = new StringBuffer(in.length * 2);
+    StringBuilder out = new StringBuilder(in.length * 2);
 
     while (i < in.length) {
 

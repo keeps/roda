@@ -10,7 +10,6 @@ package org.roda.wui.common.client.widgets;
 import java.util.ArrayList;
 
 import com.google.gwt.dom.client.Element;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -43,7 +42,7 @@ import com.google.gwt.user.client.ui.TextBox;
 public class MaskedTextBox extends TextBox {
   private String baseContent = "";
   private String content = "";
-  private ArrayList<String> expression = new ArrayList<String>();
+  private ArrayList<String> expression = new ArrayList<>();
   private String mask = "";
   private String validContent = "";
 
@@ -176,26 +175,26 @@ public class MaskedTextBox extends TextBox {
   }
 
   private native String getPastedText(Event event) /*-{
-                                                   var clipboard = event.clipboardData | $wnd.clipboardData;
+		var clipboard = event.clipboardData | $wnd.clipboardData;
 
-                                                   try {
-                                                   return clipboard.getData("Text");
-                                                   } catch (e) {
-                                                   return "";
-                                                   }
-                                                   }-*/;
+		try {
+			return clipboard.getData("Text");
+		} catch (e) {
+			return "";
+		}
+  }-*/;
 
   private native void setCaretPosition(Element elem, Integer pos) /*-{
-                                                                  if (elem.setSelectionRange) {
-                                                                  elem.setSelectionRange(pos, pos);
-                                                                  } else if (elem.createTextRange) {
-                                                                  var range = elem.createTextRange();
-                                                                  range.collapse = true;
-                                                                  range.moveStart('character', pos);
-                                                                  range.moveEnd('character', pos);
-                                                                  range.select();
-                                                                  }
-                                                                  }-*/;
+		if (elem.setSelectionRange) {
+			elem.setSelectionRange(pos, pos);
+		} else if (elem.createTextRange) {
+			var range = elem.createTextRange();
+			range.collapse = true;
+			range.moveStart('character', pos);
+			range.moveEnd('character', pos);
+			range.select();
+		}
+  }-*/;
 
   private void transformMask() {
     for (Integer i = 0; i < this.mask.toCharArray().length; i++) {

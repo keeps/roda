@@ -10,6 +10,7 @@ package org.roda.wui.client.browse;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.MissingResourceException;
 
 /**
@@ -89,8 +90,8 @@ public class MetadataValue implements Comparable, Serializable {
 
   protected MetadataValue clone() {
     HashMap<String, String> newOptions = new HashMap<>();
-    for (String key : options.keySet()) {
-      newOptions.put(key, options.get(key));
+    for (Entry<String, String> entry : options.entrySet()) {
+      newOptions.put(entry.getKey(), entry.getValue());
     }
     return new MetadataValue(this.id, newOptions);
   }
@@ -118,8 +119,8 @@ public class MetadataValue implements Comparable, Serializable {
         return 1;
       }
       // Compare the labels as a fallback
-      String selfLabel = (String) get("label");
-      String mvLabel = (String) mv.get("label");
+      String selfLabel = get("label");
+      String mvLabel = mv.get("label");
       if (selfLabel != null) {
         return selfLabel.compareTo(mvLabel);
       }

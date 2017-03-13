@@ -122,7 +122,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
    *
    */
   public BrowserServiceImpl() {
-
+    // do nothing
   }
 
   @Override
@@ -263,7 +263,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   @Override
   public List<SearchField> retrieveSearchFields(String className, String localeString) throws GenericException {
-    List<SearchField> searchFields = new ArrayList<SearchField>();
+    List<SearchField> searchFields = new ArrayList<>();
     List<String> fields = RodaUtils.copyList(RodaCoreFactory.getRodaConfiguration()
       .getList(RodaCoreFactory.getConfigurationKey(RodaConstants.SEARCH_FIELD_PREFIX, className)));
     Locale locale = ServerTools.parseLocale(localeString);
@@ -283,9 +283,9 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
       String suggestField = RodaCoreFactory.getRodaConfigurationAsString(RodaConstants.SEARCH_FIELD_PREFIX, className,
         field, RodaConstants.SEARCH_FIELD_TYPE_SUGGEST_FIELD);
 
-      boolean fieldFixed = Boolean.valueOf(RodaCoreFactory.getRodaConfigurationAsString(
+      boolean fieldFixed = Boolean.parseBoolean(RodaCoreFactory.getRodaConfigurationAsString(
         RodaConstants.SEARCH_FIELD_PREFIX, className, field, RodaConstants.SEARCH_FIELD_FIXED));
-      boolean suggestPartial = Boolean.valueOf(RodaCoreFactory.getRodaConfigurationAsString(
+      boolean suggestPartial = Boolean.parseBoolean(RodaCoreFactory.getRodaConfigurationAsString(
         RodaConstants.SEARCH_FIELD_PREFIX, className, field, RodaConstants.SEARCH_FIELD_TYPE_SUGGEST_PARTIAL));
 
       if (fieldsNames != null && fieldType != null && fieldLabelI18N != null) {
@@ -303,8 +303,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
         if (fieldsValues != null) {
           Map<String, String> labels = messages.getTranslations(fieldI18NPrefix, String.class, false);
-          Tree<String> terms = new Tree<String>(field, field);
-          // terms.addChild("", "");
+          Tree<String> terms = new Tree<>(field, field);
           for (String value : fieldsValues) {
             terms.addChild(labels.get(fieldI18NPrefix + "." + value), value);
           }

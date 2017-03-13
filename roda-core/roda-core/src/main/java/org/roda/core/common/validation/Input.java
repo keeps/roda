@@ -54,8 +54,8 @@ public class Input implements LSInput {
       if (inputStream != null) {
         try {
           byte[] input = new byte[inputStream.available()];
-          inputStream.read(input);
-          return new String(input);
+          int read = inputStream.read(input);
+          return read > 0 ? new String(input) : "";
         } catch (IOException e) {
           return null;
         } finally {

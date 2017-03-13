@@ -213,7 +213,7 @@ public class FormatRegister extends Composite {
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-    if (historyTokens.size() == 0) {
+    if (historyTokens.isEmpty()) {
       formatList.refresh();
       formatList.setFilter(Filter.ALL);
       callback.onSuccess(this);
@@ -286,6 +286,6 @@ public class FormatRegister extends Composite {
     LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
     selectedItems.setSelectedItems(formatList.getSelected());
     selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
-    HistoryUtils.newHistory(CreateSelectedJob.RESOLVER, "action");
+    HistoryUtils.newHistory(CreateSelectedJob.RESOLVER, RodaConstants.JOB_PROCESS_ACTION);
   }
 }

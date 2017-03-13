@@ -585,19 +585,19 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
 
     @Override
     public String toString() {
-      String str = "";
+      StringBuilder str = new StringBuilder();
       if (isMissingAttributes()) {
-        str = "File does not have required information (Format designation, MIME type, PRONOM or Extension), "
-          + "to be able to find Format representation information.";
+        str.append("File does not have required information (Format designation, MIME type, PRONOM or Extension), "
+          + "to be able to find Format representation information.");
       } else if (formatResults().isEmpty()) {
-        str += getPreservationEventFailureMessage();
+        str.append(getPreservationEventFailureMessage());
       } else {
-        str += String.format("%s%n%n", getPreservationEventSuccessMessage());
+        str.append(String.format("%s%n%n", getPreservationEventSuccessMessage()));
         for (FormatResult result : this.formatResults()) {
-          str += String.format("%s%n", result);
+          str.append(String.format("%s%n", result));
         }
       }
-      return str;
+      return str.toString();
     }
 
     /**
@@ -849,11 +849,12 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
 
     @Override
     public String toString() {
-      String str = String.format("Format \"%s\" (%s)%n", this.format.getName(), this.format.getId());
+      StringBuilder str = new StringBuilder(
+        String.format("Format \"%s\" (%s)%n", this.format.getName(), this.format.getId()));
       for (Map.Entry<String, AttributeCheck> entry : this.checks.entrySet()) {
-        str += String.format("\t%s%n", entry.getValue());
+        str.append(String.format("\t%s%n", entry.getValue()));
       }
-      return str;
+      return str.toString();
     }
 
     /**

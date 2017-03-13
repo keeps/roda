@@ -182,7 +182,7 @@ public class TransferUpload extends Composite {
       if (resource == null) {
         // upload to root
         ret = RestUtils.createTransferredResourceUploadUri(null, LocaleInfo.getCurrentLocale().getLocaleName());
-      } else if (resource != null && !resource.isFile()) {
+      } else if (!resource.isFile()) {
         ret = RestUtils.createTransferredResourceUploadUri(resource.getUUID(),
           LocaleInfo.getCurrentLocale().getLocaleName());
       }
@@ -191,7 +191,7 @@ public class TransferUpload extends Composite {
       LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
       String details = selectedItems.getDetailsMessage();
 
-      List<String> directory = new ArrayList<String>();
+      List<String> directory = new ArrayList<>();
       if (folderPath != null) {
         directory.addAll(folderPath);
       }
@@ -214,7 +214,7 @@ public class TransferUpload extends Composite {
   protected void resolve(final List<String> historyTokens, final AsyncCallback<Widget> callback) {
     isIngest = true;
 
-    if (historyTokens.size() == 0) {
+    if (historyTokens.isEmpty()) {
       // Upload to root
       resource = null;
       callback.onSuccess(TransferUpload.this);

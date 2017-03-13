@@ -48,7 +48,7 @@ public class Metrics extends RodaWuiController {
         return metricsToObtain.contains(metricName);
       }
     });
-    counters.forEach((a, b) -> metrics.addMetric(a, b.getCount() + ""));
+    counters.forEach((a, b) -> metrics.addMetric(a, Long.toString(b.getCount())));
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);

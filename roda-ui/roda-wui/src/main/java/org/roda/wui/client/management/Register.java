@@ -53,7 +53,7 @@ public class Register extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      if (historyTokens.size() == 0) {
+      if (historyTokens.isEmpty()) {
         Register register = new Register();
         callback.onSuccess(register);
       } else {
@@ -98,9 +98,7 @@ public class Register extends Composite {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
   private boolean recaptchaActive = true;
-
   private RecaptchaWidget recaptchaWidget;
-
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
   @SuppressWarnings("unused")
@@ -196,31 +194,31 @@ public class Register extends Composite {
                 messages.registerSuccessDialogMessageActive(), messages.registerSuccessDialogButton(),
                 new AsyncCallback<Void>() {
 
-                @Override
-                public void onSuccess(Void result) {
-                  HistoryUtils.newHistory(Login.RESOLVER);
-                }
+                  @Override
+                  public void onSuccess(Void result) {
+                    HistoryUtils.newHistory(Login.RESOLVER);
+                  }
 
-                @Override
-                public void onFailure(Throwable caught) {
-                  HistoryUtils.newHistory(Login.RESOLVER);
-                }
-              });
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    HistoryUtils.newHistory(Login.RESOLVER);
+                  }
+                });
             } else {
               Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
                 messages.registerSuccessDialogMessage(), messages.registerSuccessDialogButton(),
                 new AsyncCallback<Void>() {
 
-                @Override
-                public void onSuccess(Void result) {
-                  HistoryUtils.newHistory(Login.RESOLVER);
-                }
+                  @Override
+                  public void onSuccess(Void result) {
+                    HistoryUtils.newHistory(Login.RESOLVER);
+                  }
 
-                @Override
-                public void onFailure(Throwable caught) {
-                  HistoryUtils.newHistory(Login.RESOLVER);
-                }
-              });
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    HistoryUtils.newHistory(Login.RESOLVER);
+                  }
+                });
             }
           }
         });

@@ -7,7 +7,6 @@
  */
 package org.roda.wui.common.client.tools;
 
-import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
@@ -67,6 +66,7 @@ public class DescriptionLevelUtils {
       logger.error("Requiring a description level while their are not yet loaded");
       return null;
     }
+
     DescriptionLevel level = new DescriptionLevel();
     if (levelString == null) {
       level.setIconClass(LEVELS_CONFIGURATION.getDefaultClass());
@@ -85,11 +85,13 @@ public class DescriptionLevelUtils {
         level.setIconClass(LEVELS_CONFIGURATION.getDefaultClass());
       }
     }
+
     Map<String, String> translations = LEVELS_CONFIGURATION.getTranslations();
     String label = translations.get(levelString);
     if (label == null) {
       label = levelString;
     }
+
     level.setLabel(label);
     return level;
   }
@@ -110,12 +112,15 @@ public class DescriptionLevelUtils {
     SafeHtml ret = null;
 
     DescriptionLevel level = getDescriptionLevel(levelString);
-    StringBuilder b = new StringBuilder();
-    b.append("<i class='");
-    b.append(level.getIconClass());
-    b.append("'></i>");
-    appendLevel(b, showText, level.getLabel());
-    ret = SafeHtmlUtils.fromSafeConstant(b.toString());
+    if (level != null) {
+      StringBuilder b = new StringBuilder();
+      b.append("<i class='");
+      b.append(level.getIconClass());
+      b.append("'></i>");
+      appendLevel(b, showText, level.getLabel());
+      ret = SafeHtmlUtils.fromSafeConstant(b.toString());
+    }
+
     return ret;
   }
 
@@ -126,16 +131,12 @@ public class DescriptionLevelUtils {
     }
   }
 
-  public static List<DescriptionLevel> getAllButRepresentationsDescriptionLevels() {
-    return null;
-  }
-
   public static SafeHtml getRepresentationTypeIcon(String representationType, boolean showText) {
     if (LEVELS_CONFIGURATION == null) {
       logger.error("Requiring a description level while their are not yet loaded");
       return null;
     }
-    SafeHtml ret = null;
+
     String representationTypeKey = representationType.toLowerCase();
     String icon;
     if (LEVELS_CONFIGURATION.getRepresentationTypesIcons().containsKey(representationTypeKey)) {
@@ -152,9 +153,9 @@ public class DescriptionLevelUtils {
     if (icon != null) {
       b.append(icon);
     }
+
     b.append("'></i>");
     appendLevel(b, showText, representationType);
-    ret = SafeHtmlUtils.fromSafeConstant(b.toString());
-    return ret;
+    return SafeHtmlUtils.fromSafeConstant(b.toString());
   }
 }

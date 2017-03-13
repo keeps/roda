@@ -157,7 +157,7 @@ public class DateTimePicker {
   @SuppressWarnings("deprecation")
   public void setDate(Date date) {
     datePicker.setDate(date);
-    hourPicker.setText("" + date.getHours());
-    minutePicker.setText("" + date.getMinutes());
+    hourPicker.setText(Integer.toString(date.getHours()));
+    minutePicker.setText(Integer.toString(date.getMinutes()));
   }
 }

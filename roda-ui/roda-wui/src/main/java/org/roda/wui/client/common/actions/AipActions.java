@@ -193,7 +193,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   }
 
   private void download(IndexedAIP aip, AsyncCallback<ActionImpact> callback) {
-    SafeUri downloadUri = null;
+    SafeUri downloadUri;
     downloadUri = RestUtils.createAIPDownloadUri(aip.getId());
     Window.Location.assign(downloadUri.asString());
     callback.onSuccess(ActionImpact.NONE);
@@ -215,7 +215,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
       public void onValueChange(ValueChangeEvent<IndexedAIP> event) {
         final IndexedAIP parentAIP = event.getValue();
         final String parentId = (parentAIP != null) ? parentAIP.getId() : null;
-        final SelectedItemsList<IndexedAIP> selected = new SelectedItemsList<IndexedAIP>(Arrays.asList(aipId),
+        final SelectedItemsList<IndexedAIP> selected = new SelectedItemsList<>(Arrays.asList(aipId),
           IndexedAIP.class.getName());
 
         Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
@@ -483,14 +483,14 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   private void newProcess(IndexedAIP aip, AsyncCallback<ActionImpact> callback) {
     LastSelectedItemsSingleton.getInstance().setSelectedItems(objectToSelectedItems(aip));
     LastSelectedItemsSingleton.getInstance().setLastHistory(HistoryUtils.getCurrentHistoryPath());
-    HistoryUtils.newHistory(CreateSelectedJob.RESOLVER, "action");
+    HistoryUtils.newHistory(CreateSelectedJob.RESOLVER, RodaConstants.JOB_PROCESS_ACTION);
     callback.onSuccess(ActionImpact.UPDATED);
   }
 
   private void newProcess(SelectedItems<IndexedAIP> aips, AsyncCallback<ActionImpact> callback) {
     LastSelectedItemsSingleton.getInstance().setSelectedItems(aips);
     LastSelectedItemsSingleton.getInstance().setLastHistory(HistoryUtils.getCurrentHistoryPath());
-    HistoryUtils.newHistory(CreateSelectedJob.RESOLVER, "action");
+    HistoryUtils.newHistory(CreateSelectedJob.RESOLVER, RodaConstants.JOB_PROCESS_ACTION);
     callback.onSuccess(ActionImpact.UPDATED);
   }
 

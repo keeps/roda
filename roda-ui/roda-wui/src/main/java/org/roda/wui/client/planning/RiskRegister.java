@@ -172,7 +172,7 @@ public class RiskRegister extends Composite {
     facetSeverities = new FlowPanel();
     facetOwner = new FlowPanel();
 
-    Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
+    Map<String, FlowPanel> facetPanels = new HashMap<>();
     facetPanels.put(RodaConstants.RISK_CATEGORY, facetCategories);
     facetPanels.put(RodaConstants.RISK_CURRENT_SEVERITY_LEVEL, facetSeverities);
     facetPanels.put(RodaConstants.RISK_MITIGATION_OWNER, facetOwner);
@@ -247,7 +247,7 @@ public class RiskRegister extends Composite {
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-    if (historyTokens.size() == 0) {
+    if (historyTokens.isEmpty()) {
       riskList.setFilter(Filter.ALL);
       riskList.refresh();
       callback.onSuccess(this);
@@ -342,7 +342,7 @@ public class RiskRegister extends Composite {
     LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
     selectedItems.setSelectedItems(riskList.getSelected());
     selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
-    HistoryUtils.newHistory(CreateSelectedJob.RESOLVER, "action");
+    HistoryUtils.newHistory(CreateSelectedJob.RESOLVER, RodaConstants.JOB_PROCESS_ACTION);
   }
 
 }

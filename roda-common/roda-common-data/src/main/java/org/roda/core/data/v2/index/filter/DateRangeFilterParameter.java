@@ -45,4 +45,14 @@ public class DateRangeFilterParameter extends RangeFilterParameter<Date> {
     this.granularity = granularity;
   }
 
+  @Override
+  public int hashCode() {
+    return super.hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return super.equals(obj);
+  }
+
 }

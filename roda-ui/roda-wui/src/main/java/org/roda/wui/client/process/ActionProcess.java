@@ -141,7 +141,7 @@ public class ActionProcess extends Composite {
     stateFacets = new FlowPanel();
     jobTypeFacets = new FlowPanel();
 
-    Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
+    Map<String, FlowPanel> facetPanels = new HashMap<>();
     facetPanels.put(RodaConstants.JOB_STATE, stateFacets);
     facetPanels.put(RodaConstants.JOB_USERNAME, producerFacets);
     facetPanels.put(RodaConstants.JOB_PLUGIN_TYPE, jobTypeFacets);
@@ -215,7 +215,7 @@ public class ActionProcess extends Composite {
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-    if (historyTokens.size() == 0) {
+    if (historyTokens.isEmpty()) {
       jobList.refresh();
       callback.onSuccess(this);
     } else if (historyTokens.size() > 1 && historyTokens.get(0).equals(ShowJob.RESOLVER.getHistoryToken())) {

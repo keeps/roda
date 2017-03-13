@@ -23,14 +23,15 @@ public class WCAGUtilities {
   private static WCAGUtilities instance = null;
 
   public void makeAccessible(Element element) {
+    String alignAttribute = element.getAttribute("align");
 
-    if (element.getAttribute("align") != null) {
-      String className = "";
-      if (element.getAttribute("align").equals("right")) {
+    if (alignAttribute != null) {
+      String className;
+      if ("right".equals(alignAttribute)) {
         className = "alignRight";
-      } else if (element.getAttribute("align").equals("left")) {
+      } else if ("left".equals(alignAttribute)) {
         className = "alignLeft";
-      } else if (element.getAttribute("align").equals("center")) {
+      } else if ("center".equals(alignAttribute)) {
         className = "alignCenter";
       } else {
         className = "alignJustify";
@@ -40,7 +41,7 @@ public class WCAGUtilities {
     }
 
     if (INPUT_TAGNAMES.contains(element.getTagName())) {
-      addAttributeIfNonExistent(element, "title", "t_" + Random.nextInt(1000), true);
+      addAttributeIfNonExistent(element, "title", "t_" + Random.nextInt(1000));
     }
 
     if (IMG_TAGNAME.equalsIgnoreCase(element.getTagName())) {
@@ -65,16 +66,7 @@ public class WCAGUtilities {
   }
 
   public static void addAttributeIfNonExistent(Element element, String attributeName, String attributeValue) {
-    addAttributeIfNonExistent(element, attributeName, attributeValue, false);
-  }
-
-  public static void addAttributeIfNonExistent(Element element, String attributeName, String attributeValue,
-    boolean warn) {
-    if (element.getAttribute(attributeName) == null || element.getAttribute(attributeName).equalsIgnoreCase("")) {
-      if (warn) {
-        // GWT.log("Setting of " + element.getTagName() + " attribute " +
-        // attributeName + " to " + attributeValue);
-      }
+    if (element.getAttribute(attributeName) == null || "".equals(element.getAttribute(attributeName))) {
       element.setAttribute(attributeName, attributeValue);
     }
   }

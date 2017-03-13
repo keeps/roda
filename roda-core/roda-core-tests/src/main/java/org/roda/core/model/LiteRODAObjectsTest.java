@@ -48,7 +48,10 @@ public class LiteRODAObjectsTest {
     dip.setId(id1);
     lite = LiteRODAObjectFactory.get(dip);
     assertTrue(lite.isPresent());
-    assertEquals(getExpected(DIP.class, id1), lite.get().getInfo());
+
+    if (lite.isPresent()) {
+      assertEquals(getExpected(DIP.class, id1), lite.get().getInfo());
+    }
 
     // Format
     Format format = new Format();

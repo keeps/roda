@@ -162,12 +162,14 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractAIPCompo
           outcomeDetailExtension = e.getMessage();
           LOGGER.error("Error running Tika on AIP {}", aip.getId(), e);
           if (reportItem != null) {
-            String details = reportItem.getPluginDetails();
-            if (details == null) {
-              details = "";
+            StringBuilder details;
+            if (reportItem.getPluginDetails() == null) {
+              details = new StringBuilder();
+            } else {
+              details = new StringBuilder(reportItem.getPluginDetails());
             }
-            details += e.getMessage();
-            reportItem.setPluginDetails(details).setPluginState(PluginState.FAILURE);
+            details.append(e.getMessage());
+            reportItem.setPluginDetails(details.toString()).setPluginState(PluginState.FAILURE);
           }
 
           jobPluginInfo.incrementObjectsProcessedWithFailure();
@@ -229,12 +231,14 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractAIPCompo
           outcomeDetailExtension = e.getMessage();
           LOGGER.error("Error running Tika on Representation {}: {}", representation.getId(), e.getMessage());
           if (reportItem != null) {
-            String details = reportItem.getPluginDetails();
-            if (details == null) {
-              details = "";
+            StringBuilder details;
+            if (reportItem.getPluginDetails() == null) {
+              details = new StringBuilder();
+            } else {
+              details = new StringBuilder(reportItem.getPluginDetails());
             }
-            details += e.getMessage();
-            reportItem.setPluginDetails(details).setPluginState(PluginState.FAILURE);
+            details.append(e.getMessage());
+            reportItem.setPluginDetails(details.toString()).setPluginState(PluginState.FAILURE);
           }
 
           jobPluginInfo.incrementObjectsProcessedWithFailure();
@@ -291,12 +295,14 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractAIPCompo
         outcomeDetailExtension = e.getMessage();
         LOGGER.error("Error running Tika on File {}: {}", file.getId(), e.getMessage());
         if (reportItem != null) {
-          String details = reportItem.getPluginDetails();
-          if (details == null) {
-            details = "";
+          StringBuilder details;
+          if (reportItem.getPluginDetails() == null) {
+            details = new StringBuilder();
+          } else {
+            details = new StringBuilder(reportItem.getPluginDetails());
           }
-          details += e.getMessage();
-          reportItem.setPluginDetails(details).setPluginState(PluginState.FAILURE);
+          details.append(e.getMessage());
+          reportItem.setPluginDetails(details.toString()).setPluginState(PluginState.FAILURE);
         }
 
         jobPluginInfo.incrementObjectsProcessedWithFailure();

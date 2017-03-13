@@ -52,11 +52,27 @@ public class SearchSuggest implements Suggestion, Serializable, Comparable<Searc
     this.order = order;
   }
 
+  @Override
   public int compareTo(SearchSuggest o) {
     return getReplacementString().compareTo(o.getReplacementString());
   }
 
-  public boolean equals(SearchSuggest o) {
-    return getReplacementString().equals(o.getReplacementString());
+  @Override
+  public int hashCode() {
+    return super.hashCode();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o != null) {
+      if (o instanceof SearchSuggest) {
+        SearchSuggest suggest = (SearchSuggest) o;
+        return getReplacementString().equals(suggest.getReplacementString());
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
   }
 }

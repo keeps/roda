@@ -85,7 +85,7 @@ public class CreateDefaultJob extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      if (historyTokens.size() == 0) {
+      if (historyTokens.isEmpty()) {
         CreateDefaultJob createDefaultJob = new CreateDefaultJob();
         callback.onSuccess(createDefaultJob);
       } else {
@@ -114,7 +114,6 @@ public class CreateDefaultJob extends Composite {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  // private SelectedItems selected;
   @SuppressWarnings("rawtypes")
   private BasicAsyncTableCell list = null;
   private List<PluginInfo> plugins = null;
@@ -197,7 +196,7 @@ public class CreateDefaultJob extends Composite {
   }
 
   public void configurePlugins() {
-    List<String> categoriesOnListBox = new ArrayList<String>();
+    List<String> categoriesOnListBox = new ArrayList<>();
 
     if (plugins != null) {
       PluginUtils.sortByName(plugins);
@@ -226,7 +225,7 @@ public class CreateDefaultJob extends Composite {
 
                     if (plugins != null) {
                       PluginUtils.sortByName(plugins);
-                      List<String> pluginsAdded = new ArrayList<String>();
+                      List<String> pluginsAdded = new ArrayList<>();
 
                       for (int p = 0; p < plugins.size(); p++) {
                         PluginInfo pluginInfo = plugins.get(p);
@@ -411,7 +410,7 @@ public class CreateDefaultJob extends Composite {
   }
 
   private List<String> getPluginNames(Set<String> objectClasses) {
-    List<String> objectList = new ArrayList<String>();
+    List<String> objectList = new ArrayList<>();
     for (String objectClass : objectClasses) {
       if (IndexedAIP.class.getName().equals(objectClass)) {
         objectList = addIfNotExists(objectList, AIP.class.getName());
@@ -456,21 +455,21 @@ public class CreateDefaultJob extends Composite {
   private void defineTargetInformation(String objectClassName) {
     ListFactory listFactory = new ListFactory();
     isListEmpty = true;
-    BasicAsyncTableCell<?> list = listFactory.getList(objectClassName, "", Filter.ALL, true, 10, 50);
+    BasicAsyncTableCell<?> tableList = listFactory.getList(objectClassName, "", Filter.ALL, true, 10, 50);
 
-    if (list == null) {
+    if (tableList == null) {
       targetListPanel.setVisible(false);
       return;
     }
 
     SearchPanel searchPanel = new SearchPanel(SearchFilters.defaultFilter(objectClassName),
       SearchFilters.allFilter(objectClassName), true, "", false, false, true);
-    searchPanel.setList(list);
+    searchPanel.setList(tableList);
     targetListPanel.add(searchPanel);
-    targetListPanel.add(list);
+    targetListPanel.add(tableList);
     targetListPanel.setVisible(true);
-    list.addStyleName("searchResults");
-    this.list = list;
+    tableList.addStyleName("searchResults");
+    this.list = tableList;
 
     this.list.addCheckboxSelectionListener(new CheckboxSelectionListener() {
       @Override

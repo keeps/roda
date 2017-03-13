@@ -46,11 +46,8 @@ public class UserLogin {
   private static final ClientLogger logger = new ClientLogger(UserLogin.class.getName());
 
   private static UserLoginServiceAsync userLoginService;
-
   private static UserLogin instance = null;
-
   private static Map<String, String> rodaProperties;
-
   private static boolean initialized = false;
 
   private static void init(final AsyncCallback<Map<String, String>> callback) {
@@ -107,7 +104,7 @@ public class UserLogin {
   // private AuthenticatedUser user = null;
 
   private UserLogin() {
-    listeners = new Vector<LoginStatusListener>();
+    listeners = new Vector<>();
   }
 
   private final CachedAsynRequest<User> getUserRequest = new CachedAsynRequest<User>() {
@@ -149,7 +146,7 @@ public class UserLogin {
     }
     String locale = LocaleInfo.getCurrentLocale().getLocaleName();
     String moduleBaseURL = GWT.getModuleBaseURL();
-    moduleBaseURL = moduleBaseURL.substring(0, moduleBaseURL.length() - 2).substring(0, moduleBaseURL.indexOf("/"));
+    moduleBaseURL = moduleBaseURL.substring(0, moduleBaseURL.length() - 2).substring(0, moduleBaseURL.indexOf('/'));
     Window.open(moduleBaseURL + "login?service=" + currentURL + "&hash=" + hash + "&locale=" + locale, "_self", "");
   }
 
@@ -177,7 +174,7 @@ public class UserLogin {
     String currentURL = Window.Location.getHref().replaceAll("#", "%23");
     String locale = LocaleInfo.getCurrentLocale().getLocaleName();
     String moduleBaseURL = GWT.getModuleBaseURL();
-    moduleBaseURL = moduleBaseURL.substring(0, moduleBaseURL.length() - 2).substring(0, moduleBaseURL.indexOf("/"));
+    moduleBaseURL = moduleBaseURL.substring(0, moduleBaseURL.length() - 2).substring(0, moduleBaseURL.indexOf('/'));
     Window.open(moduleBaseURL + "logout?service=" + currentURL + "&locale=" + locale, "_self", "");
     getUserRequest.clearCache();
   }

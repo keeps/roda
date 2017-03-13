@@ -29,6 +29,10 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class Process {
 
+  private Process() {
+    // do nothing
+  }
+
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
@@ -65,11 +69,8 @@ public class Process {
     return instance;
   }
 
-  private Process() {
-  }
-
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-    if (historyTokens.size() == 0) {
+    if (historyTokens.isEmpty()) {
       callback.onSuccess(page);
     } else if (historyTokens.get(0).equals(CreateSelectedJob.RESOLVER.getHistoryToken())) {
       CreateSelectedJob.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);

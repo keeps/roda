@@ -46,7 +46,6 @@ import config.i18n.client.ClientMessages;
  */
 public class SimpleJobReportList extends BasicAsyncTableCell<IndexedReport> {
 
-  // private final ClientLogger logger = new ClientLogger(getClass().getName());
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   // private Column<Report, SafeHtml> objectIdColumn;
@@ -108,9 +107,8 @@ public class SimpleJobReportList extends BasicAsyncTableCell<IndexedReport> {
         if (report != null) {
           value = report.getSourceObjectOriginalIds().isEmpty() ? report.getSourceObjectId()
             : StringUtils.prettyPrint(report.getSourceObjectOriginalIds());
+          sourceClass = report.getSourceObjectClass();
         }
-
-        sourceClass = report.getSourceObjectClass();
         return value;
       }
     };
@@ -226,7 +224,7 @@ public class SimpleJobReportList extends BasicAsyncTableCell<IndexedReport> {
 
   @Override
   protected Sorter getSorter(ColumnSortList columnSortList) {
-    Map<Column<IndexedReport, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<IndexedReport, ?>, List<String>>();
+    Map<Column<IndexedReport, ?>, List<String>> columnSortingKeyMap = new HashMap<>();
     columnSortingKeyMap.put(sourceColumn, Arrays.asList(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ID));
     columnSortingKeyMap.put(outcomeColumn, Arrays.asList(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID));
     columnSortingKeyMap.put(updatedDateColumn, Arrays.asList(RodaConstants.JOB_REPORT_DATE_UPDATED));

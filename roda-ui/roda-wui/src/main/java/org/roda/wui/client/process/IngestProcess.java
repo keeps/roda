@@ -138,7 +138,7 @@ public class IngestProcess extends Composite {
     producerFacets = new FlowPanel();
     stateFacets = new FlowPanel();
 
-    Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
+    Map<String, FlowPanel> facetPanels = new HashMap<>();
     facetPanels.put(RodaConstants.JOB_STATE, stateFacets);
     facetPanels.put(RodaConstants.JOB_USERNAME, producerFacets);
     FacetUtils.bindFacets(jobList, facetPanels);
@@ -211,7 +211,7 @@ public class IngestProcess extends Composite {
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-    if (historyTokens.size() == 0) {
+    if (historyTokens.isEmpty()) {
       jobList.refresh();
       callback.onSuccess(this);
     } else if (historyTokens.size() == 1 && historyTokens.get(0).equals(CreateIngestJob.RESOLVER.getHistoryToken())) {

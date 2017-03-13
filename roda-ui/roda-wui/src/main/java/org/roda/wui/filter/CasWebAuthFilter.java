@@ -136,13 +136,11 @@ public class CasWebAuthFilter implements Filter {
   private User getOrCreateUser(final String name) {
     User user;
     try {
-
       user = RodaCoreFactory.getModelService().retrieveUserByName(name);
-      LOGGER.debug("User principal and user exist (" + name + ")");
-
+      LOGGER.debug(String.format("User principal and user exist (%s)", name));
     } catch (final GenericException e) {
-      LOGGER.debug("Error getting user '" + name + "' - " + e.getMessage(), e);
-      LOGGER.debug("User principal exist but user doesn't (" + name + ")");
+      LOGGER.debug(String.format("Error getting user '%s' - %s", name, e.getMessage()), e);
+      LOGGER.debug(String.format("User principal exist but user doesn't (%s)", name));
 
       user = new User(name);
       LOGGER.debug("Adding user to ldap/index: " + user);

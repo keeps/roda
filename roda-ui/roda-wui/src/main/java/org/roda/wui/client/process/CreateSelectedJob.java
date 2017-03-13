@@ -64,10 +64,10 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
-        if (historyTokens.get(0).equals("ingest")) {
+        if (RodaConstants.JOB_PROCESS_INGEST.equals(historyTokens.get(0))) {
           CreateIngestJob createIngestJob = new CreateIngestJob();
           callback.onSuccess(createIngestJob);
-        } else if (historyTokens.get(0).equals("action")) {
+        } else if (RodaConstants.JOB_PROCESS_ACTION.equals(historyTokens.get(0))) {
           CreateActionJob createActionJob = new CreateActionJob();
           callback.onSuccess(createActionJob);
         } else {
@@ -187,7 +187,7 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
   public abstract boolean updateObjectList();
 
   public void configurePlugins(final String selectedClass) {
-    List<String> categoriesOnListBox = new ArrayList<String>();
+    List<String> categoriesOnListBox = new ArrayList<>();
 
     if (plugins != null) {
       PluginUtils.sortByName(plugins);
@@ -477,7 +477,7 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
 
   public boolean isSelectedEmpty() {
     if (selected instanceof SelectedItemsList) {
-      return (((SelectedItemsList<?>) selected).getIds().isEmpty());
+      return ((SelectedItemsList<?>) selected).getIds().isEmpty();
     }
     return false;
   }

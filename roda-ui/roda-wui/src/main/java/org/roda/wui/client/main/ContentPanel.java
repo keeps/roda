@@ -69,7 +69,7 @@ public class ContentPanel extends SimplePanel {
     return instance;
   }
 
-  private static final Set<HistoryResolver> resolvers = new HashSet<HistoryResolver>();
+  private static final Set<HistoryResolver> resolvers = new HashSet<>();
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
   private Widget currWidget;
@@ -212,7 +212,7 @@ public class ContentPanel extends SimplePanel {
     boolean resolved = false;
     List<String> tokens = historyTokens;
 
-    while (!resolved && tokens.size() > 0) {
+    while (!resolved && !tokens.isEmpty()) {
       String token = StringUtils.join(tokens, "_");
       tokenI18N = messages.title(token).toUpperCase();
 
@@ -237,7 +237,6 @@ public class ContentPanel extends SimplePanel {
 
       // upper-case
       lastToken = lastToken.toUpperCase();
-
       tokenI18N = lastToken;
     }
 

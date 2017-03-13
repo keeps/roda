@@ -154,7 +154,7 @@ public class BrowseRepresentation extends Composite {
   private String repId;
   private String repUUID;
 
-  private static final List<String> representationFields = new ArrayList<String>(Arrays.asList(RodaConstants.INDEX_UUID,
+  private static final List<String> representationFields = new ArrayList<>(Arrays.asList(RodaConstants.INDEX_UUID,
     RodaConstants.REPRESENTATION_AIP_ID, RodaConstants.REPRESENTATION_ID, RodaConstants.REPRESENTATION_TYPE));
 
   private static final String ALL_FILTER = SearchFilters.allFilter(IndexedFile.class.getName());
@@ -227,7 +227,7 @@ public class BrowseRepresentation extends Composite {
     this.repId = representation.getId();
     this.repUUID = representation.getUUID();
 
-    handlers = new ArrayList<HandlerRegistration>();
+    handlers = new ArrayList<>();
     String summary = messages.representationListOfFiles();
 
     AIPState state = bundle.getAip().getState();
@@ -278,7 +278,7 @@ public class BrowseRepresentation extends Composite {
 
     // DESCRIPTIVE METADATA
 
-    final List<Pair<String, HTML>> descriptiveMetadataContainers = new ArrayList<Pair<String, HTML>>();
+    final List<Pair<String, HTML>> descriptiveMetadataContainers = new ArrayList<>();
     final Map<String, DescriptiveMetadataViewBundle> bundles = new HashMap<>();
     for (DescriptiveMetadataViewBundle descMetadataBundle : bundle.getRepresentationDescriptiveMetadata()) {
       String title = descMetadataBundle.getLabel() != null ? descMetadataBundle.getLabel() : descMetadataBundle.getId();
@@ -379,7 +379,7 @@ public class BrowseRepresentation extends Composite {
     this.addStyleName(state.toString().toLowerCase());
 
     Element firstElement = this.getElement().getFirstChildElement();
-    if (firstElement.getTagName().equalsIgnoreCase("input")) {
+    if ("input".equalsIgnoreCase(firstElement.getTagName())) {
       firstElement.setAttribute("title", "browse input");
     }
 

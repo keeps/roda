@@ -323,7 +323,7 @@ public class ShowPreservationEvent extends Composite {
     FlowPanel layout = new FlowPanel();
     layout.addStyleName("panel");
 
-    if (object.getType().equalsIgnoreCase("URN")) {
+    if ("URN".equalsIgnoreCase(object.getType())) {
       String idValue = object.getValue();
       RODA_TYPE type = LinkingObjectUtils.getLinkingIdentifierType(idValue);
 
@@ -469,11 +469,11 @@ public class ShowPreservationEvent extends Composite {
       Label idLabel = new Label(messages.identifierNotFound());
       idLabel.addStyleName("label");
       String path = LinkingObjectUtils.getLinkingObjectPath(idValue);
-      Label id_Value = new Label(path);
-      id_Value.addStyleName("value");
+      Label identValue = new Label(path);
+      identValue.addStyleName("value");
 
       body.add(idLabel);
-      body.add(id_Value);
+      body.add(identValue);
     }
   }
 
@@ -515,11 +515,11 @@ public class ShowPreservationEvent extends Composite {
     } else {
       Label idLabel = new Label(messages.identifierNotFound());
       idLabel.addStyleName("label");
-      Label id_Value = new Label(idValue);
-      id_Value.addStyleName("value");
+      Label identValue = new Label(idValue);
+      identValue.addStyleName("value");
 
       body.add(idLabel);
-      body.add(id_Value);
+      body.add(identValue);
     }
   }
 
@@ -618,11 +618,11 @@ public class ShowPreservationEvent extends Composite {
       Label idLabel = new Label(messages.identifierNotFound());
       idLabel.addStyleName("label");
       String path = LinkingObjectUtils.getLinkingObjectPath(idValue);
-      Label id_Value = new Label(path);
-      id_Value.addStyleName("value");
+      Label identValue = new Label(path);
+      identValue.addStyleName("value");
 
       body.add(idLabel);
-      body.add(id_Value);
+      body.add(identValue);
     }
   }
 
@@ -671,11 +671,11 @@ public class ShowPreservationEvent extends Composite {
       Label idLabel = new Label(messages.identifierNotFound());
       idLabel.addStyleName("label");
       String path = LinkingObjectUtils.getLinkingObjectPath(idValue);
-      Label id_Value = new Label(path);
-      id_Value.addStyleName("value");
+      Label identValue = new Label(path);
+      identValue.addStyleName("value");
 
       body.add(idLabel);
-      body.add(id_Value);
+      body.add(identValue);
     }
   }
 

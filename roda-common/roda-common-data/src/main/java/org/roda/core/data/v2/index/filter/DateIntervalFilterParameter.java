@@ -40,8 +40,8 @@ public class DateIntervalFilterParameter extends RangeFilterParameter<Date> {
 
   public DateIntervalFilterParameter(DateIntervalFilterParameter dateIntervalFilterParameter) {
     this(dateIntervalFilterParameter.getFromName(), dateIntervalFilterParameter.getToName(),
-      dateIntervalFilterParameter.getFromValue(), dateIntervalFilterParameter.getToValue(), dateIntervalFilterParameter
-        .getGranularity());
+      dateIntervalFilterParameter.getFromValue(), dateIntervalFilterParameter.getToValue(),
+      dateIntervalFilterParameter.getGranularity());
   }
 
   public DateGranularity getGranularity() {
@@ -85,6 +85,16 @@ public class DateIntervalFilterParameter extends RangeFilterParameter<Date> {
 
   public void setToName(String toName) {
     this.toName = toName;
+  }
+
+  @Override
+  public int hashCode() {
+    return super.hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return super.equals(obj);
   }
 
   @Override

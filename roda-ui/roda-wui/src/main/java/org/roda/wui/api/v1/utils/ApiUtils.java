@@ -101,26 +101,26 @@ public class ApiUtils {
    * @return media type
    */
   public static String getMediaType(final String acceptFormat, final String acceptHeaders) {
-    final String APPLICATION_JS = "application/javascript; charset=UTF-8";
+    final String applicationJs = "application/javascript; charset=UTF-8";
 
     String mediaType = MediaType.APPLICATION_JSON + "; charset=UTF-8";
 
     if (StringUtils.isNotBlank(acceptFormat)) {
-      if (acceptFormat.equalsIgnoreCase("XML")) {
+      if ("XML".equalsIgnoreCase(acceptFormat)) {
         mediaType = MediaType.APPLICATION_XML;
-      } else if (acceptFormat.equalsIgnoreCase("JSONP")) {
-        mediaType = APPLICATION_JS;
-      } else if (acceptFormat.equalsIgnoreCase("bin")) {
+      } else if ("JSONP".equalsIgnoreCase(acceptFormat)) {
+        mediaType = applicationJs;
+      } else if ("bin".equalsIgnoreCase(acceptFormat)) {
         mediaType = MediaType.APPLICATION_OCTET_STREAM;
-      } else if (acceptFormat.equalsIgnoreCase("html")) {
+      } else if ("html".equalsIgnoreCase(acceptFormat)) {
         mediaType = MediaType.TEXT_HTML;
       }
     } else if (StringUtils.isNotBlank(acceptHeaders)) {
       if (acceptHeaders.contains(MediaType.APPLICATION_XML)) {
         mediaType = MediaType.APPLICATION_XML;
-      } else if (acceptHeaders.contains(APPLICATION_JS)
+      } else if (acceptHeaders.contains(applicationJs)
         || acceptHeaders.contains(ExtraMediaType.APPLICATION_JAVASCRIPT)) {
-        mediaType = APPLICATION_JS;
+        mediaType = applicationJs;
       } else if (acceptHeaders.contains(ExtraMediaType.TEXT_CSV)) {
         mediaType = ExtraMediaType.TEXT_CSV;
       }
@@ -136,7 +136,8 @@ public class ApiUtils {
    * invalid values are provided.
    */
   public static Pair<Integer, Integer> processPagingParams(String start, String limit) {
-    Integer startInteger, limitInteger;
+    Integer startInteger;
+    Integer limitInteger;
     try {
       startInteger = Integer.parseInt(start);
       if (startInteger < 0) {

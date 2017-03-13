@@ -138,10 +138,10 @@ public class PluginParameterPanel extends Composite {
       }
 
       private String getValuesString(List<String> values) {
-        String builder = "";
+        StringBuilder builder = new StringBuilder();
 
-        for (String value : values) {
-          builder += value + ",";
+        for (String stringValue : values) {
+          builder.append(stringValue).append(",");
         }
 
         return builder.substring(0, builder.length() - 1);

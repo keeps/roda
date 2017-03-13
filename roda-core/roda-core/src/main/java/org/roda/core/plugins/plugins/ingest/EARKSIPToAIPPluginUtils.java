@@ -134,7 +134,7 @@ public class EARKSIPToAIPPluginUtils {
     List<IPDescriptiveMetadata> descriptiveMetadata, boolean notify, boolean update) throws RequestNotValidException,
     GenericException, AlreadyExistsException, AuthorizationDeniedException, NotFoundException, ValidationException {
     for (IPDescriptiveMetadata dm : descriptiveMetadata) {
-      String descriptiveMetadataId = dm.getMetadata().getFileName().toString();
+      String descriptiveMetadataId = dm.getMetadata().getFileName();
       ContentPayload payload = new FSPathContentPayload(dm.getMetadata().getPath());
       String metadataType = IngestHelper.getMetadataType(dm);
       String metadataVersion = dm.getMetadataVersion();
@@ -143,7 +143,7 @@ public class EARKSIPToAIPPluginUtils {
           metadataVersion, notify);
       } catch (AlreadyExistsException e) {
         if (update) {
-          Map<String, String> properties = new HashMap<String, String>();
+          Map<String, String> properties = new HashMap<>();
           properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATE_FROM_SIP.toString());
 
           model.updateDescriptiveMetadata(aipId, descriptiveMetadataId, payload, metadataType, metadataVersion,
@@ -166,7 +166,6 @@ public class EARKSIPToAIPPluginUtils {
       model.createOrUpdateOtherMetadata(aipId, representationId.orElse(null), file.getRelativeFolders(),
         file.getFileName(), "", pm.getMetadataType().asString(), fileContentPayload, notify);
     }
-
   }
 
   private static void processPreservationMetadata(ModelService model, List<IPMetadata> preservationMetadata,

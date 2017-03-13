@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.validation.ValidationException;
@@ -120,7 +121,6 @@ public class EditDescriptiveMetadata extends Composite {
   private TextArea metadataXML;
   private String metadataTextFromForm = null;
 
-  // private ClientLogger logger = new ClientLogger(getClass().getName());
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   @UiField
@@ -171,7 +171,7 @@ public class EditDescriptiveMetadata extends Composite {
     // Create new Set of MetadataValues so we can keep the original
     HashSet<MetadataValue> newValues = null;
     if (bundle.getValues() != null) {
-      newValues = new HashSet<MetadataValue>();
+      newValues = new HashSet<>();
       for (MetadataValue mv : bundle.getValues())
         newValues.add(mv.clone());
     }
@@ -188,7 +188,8 @@ public class EditDescriptiveMetadata extends Composite {
     type.addChangeHandler(new ChangeHandler() {
       @Override
       public void onChange(ChangeEvent changeEvent) {
-        String typeString = null, version = "";
+        String typeString = null;
+        String version = "";
         String value = type.getSelectedValue();
         if (value.contains(RodaConstants.METADATA_VERSION_SEPARATOR) && bundle.getVersion() != null) {
           typeString = value.substring(0, value.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR));
@@ -212,7 +213,7 @@ public class EditDescriptiveMetadata extends Composite {
               // Create new Set of MetadataValues so we can keep the original
               HashSet<MetadataValue> newValues = null;
               if (bundle.getValues() != null) {
-                newValues = new HashSet<MetadataValue>();
+                newValues = new HashSet<>();
                 for (MetadataValue mv : bundle.getValues())
                   newValues.add(mv.clone());
               }
@@ -237,7 +238,7 @@ public class EditDescriptiveMetadata extends Composite {
           // TODO sort by alphabetic order of value
           int selected = -1;
           int index = 0;
-          Map<String, Integer> types = new HashMap<String, Integer>();
+          Map<String, Integer> types = new HashMap<>();
           for (SupportedMetadataTypeBundle b : metadataTypes) {
             if (b.getVersion() != null) {
               type.addItem(b.getLabel(), b.getType() + RodaConstants.METADATA_VERSION_SEPARATOR + b.getVersion());
@@ -246,7 +247,7 @@ public class EditDescriptiveMetadata extends Composite {
             }
 
             String lowerCaseType = bundle.getType() != null ? bundle.getType().toLowerCase() : null;
-            if (b.getType().toLowerCase().equals(lowerCaseType)) {
+            if (b.getType().equalsIgnoreCase(lowerCaseType)) {
               String lowerCaseVersion = bundle.getVersion() != null ? bundle.getVersion().toLowerCase() : null;
               if (b.getVersion() != null && lowerCaseVersion != null) {
                 if (lowerCaseVersion != null && b.getVersion().equalsIgnoreCase(lowerCaseVersion)) {
@@ -284,7 +285,7 @@ public class EditDescriptiveMetadata extends Composite {
       });
 
     Element firstElement = showXml.getElement().getFirstChildElement();
-    if (firstElement.getTagName().equalsIgnoreCase("input")) {
+    if ("input".equalsIgnoreCase(firstElement.getTagName())) {
       firstElement.setAttribute("title", "browse input");
     }
   }
@@ -377,9 +378,10 @@ public class EditDescriptiveMetadata extends Composite {
     for (MetadataValue mv : bundle.getValues()) {
       bundleMap.put(mv.getId(), mv);
     }
-    for (String key : formMap.keySet()) {
-      MetadataValue mvForm = formMap.get(key);
-      String formValue = mvForm != null ? formMap.get(key).get("value") : "";
+    for (Entry<String, MetadataValue> entry : formMap.entrySet()) {
+      String key = entry.getKey();
+      MetadataValue mvForm = entry.getValue();
+      String formValue = mvForm != null ? mvForm.get("value") : "";
       MetadataValue mvBundle = bundleMap.get(key);
       String bundleValue = mvBundle != null ? bundleMap.get(key).get("value") : "";
 

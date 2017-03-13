@@ -96,7 +96,7 @@ public class BrowseFile extends Composite {
       if (historyTokens.size() > 2) {
         final String historyAipId = historyTokens.get(0);
         final String historyRepresentationId = historyTokens.get(1);
-        final List<String> historyFilePath = new ArrayList<String>(historyTokens.subList(2, historyTokens.size() - 1));
+        final List<String> historyFilePath = new ArrayList<>(historyTokens.subList(2, historyTokens.size() - 1));
         final String historyFileId = historyTokens.get(historyTokens.size() - 1);
 
         BrowserService.Util.getInstance().retrieveBrowseFileBundle(historyAipId, historyRepresentationId,
@@ -119,7 +119,6 @@ public class BrowseFile extends Composite {
     }
 
     private void errorRedirect(AsyncCallback<Widget> callback) {
-      // HistoryUtils.newHistory(Browse.RESOLVER);
       callback.onSuccess(null);
     }
   };
@@ -132,13 +131,12 @@ public class BrowseFile extends Composite {
   static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   public static final Sorter DEFAULT_FILE_SORTER = new Sorter(new SortParameter(RodaConstants.FILE_FILE_ID, false));
-
   public static final Integer DEFAULT_FILE_INDEX = -1;
 
   private final BrowseFileBundle bundle;
   private SliderPanel disseminationsSlider;
 
-  private static final List<String> fileFieldsToReturn = new ArrayList<String>();
+  private static final List<String> fileFieldsToReturn = new ArrayList<>();
 
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
@@ -240,7 +238,7 @@ public class BrowseFile extends Composite {
     this.addStyleName("browse-file");
 
     Element firstElement = this.getElement().getFirstChildElement();
-    if (firstElement.getTagName().equalsIgnoreCase("input")) {
+    if ("input".equalsIgnoreCase(firstElement.getTagName())) {
       firstElement.setAttribute("title", "browse input");
     }
 

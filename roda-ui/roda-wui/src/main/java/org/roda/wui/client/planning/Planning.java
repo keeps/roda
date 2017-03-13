@@ -80,7 +80,7 @@ public class Planning {
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-    if (historyTokens.size() == 0) {
+    if (historyTokens.isEmpty()) {
       init();
       callback.onSuccess(page);
     } else if (historyTokens.get(0).equals(FormatRegister.RESOLVER.getHistoryToken())) {

@@ -117,7 +117,6 @@ public class DescriptiveMetadataHistory extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  // private ClientLogger logger = new ClientLogger(getClass().getName());
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private final String aipId;
@@ -176,7 +175,7 @@ public class DescriptiveMetadataHistory extends Composite {
     });
 
     Element firstElement = showXml.getElement().getFirstChildElement();
-    if (firstElement.getTagName().equalsIgnoreCase("input")) {
+    if ("input".equalsIgnoreCase(firstElement.getTagName())) {
       firstElement.setAttribute("title", "browse input");
     }
   }
@@ -213,7 +212,7 @@ public class DescriptiveMetadataHistory extends Composite {
 
     descriptiveMetadataType.setText(bundle.getDescriptiveMetadata().getLabel());
 
-    if (versionList.size() > 0) {
+    if (!versionList.isEmpty()) {
       list.setSelectedIndex(0);
       selectedVersion = versionList.get(0).getId();
       updatePreview();

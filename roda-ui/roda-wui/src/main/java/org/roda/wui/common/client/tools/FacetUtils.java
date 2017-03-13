@@ -69,7 +69,7 @@ public class FacetUtils {
           boolean selected = facetResult.getSelectedValues().contains(value);
           StringBuilder checkboxLabel = new StringBuilder();
           checkboxLabel.append(label);
-          if (count > 0 || facetResult.getSelectedValues().size() == 0 || selected) {
+          if (count > 0 || facetResult.getSelectedValues().isEmpty() || selected) {
             checkboxLabel.append(" (").append(count).append(")");
           }
 
@@ -78,13 +78,13 @@ public class FacetUtils {
           facetValuePanel.addStyleName("sidebar-facet-label");
           facetValuePanel.addStyleName("fade-out");
 
-          boolean enabled = count > 0 || facetResult.getSelectedValues().size() > 0;
+          boolean enabled = count > 0 || !facetResult.getSelectedValues().isEmpty();
           facetValuePanel.setEnabled(enabled);
           if (hideDisabled) {
             facetValuePanel.setVisible(enabled);
           }
-          facetPanel.add(facetValuePanel);
 
+          facetPanel.add(facetValuePanel);
           facetValuePanel.setValue(selected);
 
           facetValuePanel.addValueChangeHandler(new ValueChangeHandler<Boolean>() {

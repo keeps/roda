@@ -717,7 +717,7 @@ public class BrowserHelper {
     int counter = 0;
 
     if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP.equals(acceptFormat)) {
-      List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
+      List<ZipEntryInfo> zipEntries = new ArrayList<>();
       for (DescriptiveMetadata dm : metadata) {
         if (counter >= startInt && (counter <= limitInt || limitInt == -1)) {
           StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, dm.getId());
@@ -774,7 +774,7 @@ public class BrowserHelper {
     final String filename;
     final String mediaType;
     final ConsumesOutputStream stream;
-    StreamResponse ret = null;
+    StreamResponse ret;
     ModelService model = RodaCoreFactory.getModelService();
 
     if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
@@ -1107,8 +1107,8 @@ public class BrowserHelper {
       CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationFiles = RodaCoreFactory.getModelService()
         .listPreservationMetadata(aipId, true);
       StorageService storage = RodaCoreFactory.getStorageService();
-      List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
-      Map<String, ZipEntryInfo> agents = new HashMap<String, ZipEntryInfo>();
+      List<ZipEntryInfo> zipEntries = new ArrayList<>();
+      Map<String, ZipEntryInfo> agents = new HashMap<>();
 
       for (OptionalWithCause<PreservationMetadata> oPreservationFile : preservationFiles) {
         if (oPreservationFile.isPresent()) {
@@ -1197,7 +1197,7 @@ public class BrowserHelper {
     Pair<Integer, Integer> pagingParamsFile = ApiUtils.processPagingParams(startFile, limitFile);
     int counterFile = 0;
 
-    List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
+    List<ZipEntryInfo> zipEntries = new ArrayList<>();
     PreservationMetadataList pms = new PreservationMetadataList();
 
     for (OptionalWithCause<PreservationMetadata> oPreservationFile : preservationFiles) {
@@ -1256,7 +1256,7 @@ public class BrowserHelper {
     if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP.equals(acceptFormat)
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
-      CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationFiles = null;
+      CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationFiles;
       preservationFiles = RodaCoreFactory.getModelService().listPreservationMetadata(aipId, representationId);
       return getAIPRepresentationPreservationMetadataEntityResponse(aipId, representationId, startAgent, limitAgent,
         startEvent, limitEvent, startFile, limitFile, acceptFormat, preservationFiles);
@@ -1327,7 +1327,7 @@ public class BrowserHelper {
     } catch (IOException e) {
       throw new GenericException("Error creating or updating AIP representation preservation metadata file", e);
     } finally {
-      if (file != null && Files.exists(file)) {
+      if (file != null && file.toFile().exists()) {
         try {
           Files.delete(file);
         } catch (IOException e) {
@@ -1431,7 +1431,7 @@ public class BrowserHelper {
 
     if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP.equals(acceptFormat)) {
       StorageService storage = RodaCoreFactory.getStorageService();
-      List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
+      List<ZipEntryInfo> zipEntries = new ArrayList<>();
 
       for (OptionalWithCause<OtherMetadata> oFile : otherFiles) {
         if (oFile.isPresent()) {
@@ -1712,7 +1712,7 @@ public class BrowserHelper {
     try {
       Representation representation = model.createRepresentation(aipId, representationId, true, type, true);
 
-      List<LinkingIdentifier> targets = new ArrayList<LinkingIdentifier>();
+      List<LinkingIdentifier> targets = new ArrayList<>();
       targets.add(PluginHelper.getLinkingIdentifier(aipId, representation.getId(),
         RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
 
@@ -1755,7 +1755,7 @@ public class BrowserHelper {
     try {
       File file = model.createFile(aipId, representationId, directoryPath, fileId, content);
 
-      List<LinkingIdentifier> targets = new ArrayList<LinkingIdentifier>();
+      List<LinkingIdentifier> targets = new ArrayList<>();
       targets.add(PluginHelper.getLinkingIdentifier(aipId, file.getRepresentationId(), file.getPath(), file.getId(),
         RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
 
@@ -1979,9 +1979,9 @@ public class BrowserHelper {
             for (MetadataValue mv : values) {
               String generator = mv.get("auto-generate");
               if (generator != null && generator.length() > 0) {
-                String value = null;
+                String value;
                 if (representation != null) {
-                  value = ServerTools.autoGenerateRepresentationValue(representation, user, generator);
+                  value = ServerTools.autoGenerateRepresentationValue(representation, generator);
                 } else {
                   value = ServerTools.autoGenerateAIPValue(aip, user, generator);
                 }
@@ -2012,14 +2012,14 @@ public class BrowserHelper {
                     List<String> optionsList = JsonUtils.getListFromJson(options, String.class);
 
                     if (optionsList != null) {
-                      Map<String, Map<String, String>> i18nMap = new HashMap<String, Map<String, String>>();
+                      Map<String, Map<String, String>> i18nMap = new HashMap<>();
                       for (int i = 0; i < optionsList.size(); i++) {
                         String value = optionsList.get(i);
                         String translation = terms.get(i18nPrefix + "." + value);
                         if (translation == null) {
                           translation = value;
                         }
-                        Map<String, String> term = new HashMap<String, String>();
+                        Map<String, String> term = new HashMap<>();
                         term.put(locale.toString(), translation);
                         i18nMap.put(value, term);
                       }
@@ -2088,16 +2088,16 @@ public class BrowserHelper {
   public static PreservationEventViewBundle retrievePreservationEventViewBundle(String eventId)
     throws NotFoundException, GenericException {
     PreservationEventViewBundle eventBundle = new PreservationEventViewBundle();
-    Map<String, IndexedAIP> aips = new HashMap<String, IndexedAIP>();
-    Map<String, IndexedRepresentation> representations = new HashMap<String, IndexedRepresentation>();
-    Map<String, IndexedFile> files = new HashMap<String, IndexedFile>();
-    Map<String, TransferredResource> transferredResources = new HashMap<String, TransferredResource>();
+    Map<String, IndexedAIP> aips = new HashMap<>();
+    Map<String, IndexedRepresentation> representations = new HashMap<>();
+    Map<String, IndexedFile> files = new HashMap<>();
+    Map<String, TransferredResource> transferredResources = new HashMap<>();
 
     List<String> eventFields = new ArrayList<>();
     IndexedPreservationEvent ipe = retrieve(IndexedPreservationEvent.class, eventId, eventFields);
     eventBundle.setEvent(ipe);
     if (ipe.getLinkingAgentIds() != null && !ipe.getLinkingAgentIds().isEmpty()) {
-      Map<String, IndexedPreservationAgent> agents = new HashMap<String, IndexedPreservationAgent>();
+      Map<String, IndexedPreservationAgent> agents = new HashMap<>();
       for (LinkingIdentifier agentID : ipe.getLinkingAgentIds()) {
         try {
           List<String> agentFields = Arrays.asList(RodaConstants.PRESERVATION_AGENT_ID,
@@ -2242,8 +2242,8 @@ public class BrowserHelper {
 
     if (recursive) {
       Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, indexedAIP.getId()));
-      SelectedItemsFilter<IndexedAIP> selectedItems = new SelectedItemsFilter<IndexedAIP>(filter,
-        IndexedAIP.class.getName(), Boolean.FALSE);
+      SelectedItemsFilter<IndexedAIP> selectedItems = new SelectedItemsFilter<>(filter, IndexedAIP.class.getName(),
+        Boolean.FALSE);
 
       Job job = new Job();
       job.setId(UUID.randomUUID().toString());
@@ -2300,7 +2300,7 @@ public class BrowserHelper {
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException, IOException {
     StoragePath storagePath = ModelUtils.getRiskStoragePath(riskId);
     CloseableIterable<BinaryVersion> iterable = RodaCoreFactory.getStorageService().listBinaryVersions(storagePath);
-    List<BinaryVersionBundle> versionList = new ArrayList<BinaryVersionBundle>();
+    List<BinaryVersionBundle> versionList = new ArrayList<>();
     boolean versionFlag = false;
     Date newestDate = new Date();
     Binary lastRiskBinary = null;
@@ -2319,9 +2319,13 @@ public class BrowserHelper {
     }
 
     iterable.close();
-    Risk lastRisk = JsonUtils.getObjectFromJson(lastRiskBinary.getContent().createInputStream(), Risk.class);
-    RiskVersionsBundle riskBundle = new RiskVersionsBundle(lastRisk, versionList);
-    return riskBundle;
+
+    if (lastRiskBinary != null) {
+      Risk lastRisk = JsonUtils.getObjectFromJson(lastRiskBinary.getContent().createInputStream(), Risk.class);
+      return new RiskVersionsBundle(lastRisk, versionList);
+    } else {
+      return new RiskVersionsBundle();
+    }
   }
 
   public static boolean hasRiskVersions(String id)
@@ -2347,8 +2351,7 @@ public class BrowserHelper {
   public static Risk retrieveRiskVersion(String riskId, String selectedVersion)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException, IOException {
     BinaryVersion bv = RodaCoreFactory.getModelService().retrieveVersion(riskId, selectedVersion);
-    Risk oldRisk = JsonUtils.getObjectFromJson(bv.getBinary().getContent().createInputStream(), Risk.class);
-    return oldRisk;
+    return JsonUtils.getObjectFromJson(bv.getBinary().getContent().createInputStream(), Risk.class);
   }
 
   public static void validateExportAIPParams(String acceptFormat) throws RequestNotValidException {
@@ -2411,7 +2414,7 @@ public class BrowserHelper {
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException, IOException {
     IndexService index = RodaCoreFactory.getIndexService();
     if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
-      List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
+      List<ZipEntryInfo> zipEntries = new ArrayList<>();
       if (selected instanceof SelectedItemsFilter) {
         SelectedItemsFilter<IndexedAIP> selectedItems = (SelectedItemsFilter<IndexedAIP>) selected;
         long count = index.count(IndexedAIP.class, selectedItems.getFilter());
@@ -2447,13 +2450,11 @@ public class BrowserHelper {
     String posImpact = RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationImpact",
       Integer.toString(posMitigationImpact));
 
-    RiskMitigationBundle terms = new RiskMitigationBundle(lowLimit, highLimit, preProbability, preImpact,
-      posProbability, posImpact);
-    return terms;
+    return new RiskMitigationBundle(lowLimit, highLimit, preProbability, preImpact, posProbability, posImpact);
   }
 
   public static List<String> retrieveShowMitigationTerms() {
-    List<String> terms = new ArrayList<String>();
+    List<String> terms = new ArrayList<>();
     terms.add(RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationSeverity", "lowLimit"));
     terms.add(RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationSeverity", "highLimit"));
     return terms;
@@ -2467,21 +2468,20 @@ public class BrowserHelper {
     int impactLimit = RodaCoreFactory.getRodaConfigurationAsInt("ui", "risk", "mitigationImpact", "limit");
 
     // second list contains probability content
-    List<String> probabilities = new ArrayList<String>();
+    List<String> probabilities = new ArrayList<>();
     for (int i = 0; i <= probabilityLimit; i++) {
       String value = Integer.toString(i);
       probabilities.add(RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationProbability", value));
     }
 
     // third list contains impact content
-    List<String> impacts = new ArrayList<String>();
+    List<String> impacts = new ArrayList<>();
     for (int i = 0; i <= impactLimit; i++) {
       String value = Integer.toString(i);
       impacts.add(RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationImpact", value));
     }
 
-    MitigationPropertiesBundle properties = new MitigationPropertiesBundle(lowLimit, highLimit, probabilities, impacts);
-    return properties;
+    return new MitigationPropertiesBundle(lowLimit, highLimit, probabilities, impacts);
   }
 
   public static void deleteRisk(User user, SelectedItems<IndexedRisk> selected)
@@ -2534,7 +2534,7 @@ public class BrowserHelper {
       new Sublist(0, 0), new Facets(new SimpleFacetParameter(RodaConstants.RISK_INCIDENCE_RISK_ID)),
       Arrays.asList(RodaConstants.INDEX_UUID));
 
-    Map<String, IndexedRisk> allRisks = new HashMap<String, IndexedRisk>();
+    Map<String, IndexedRisk> allRisks = new HashMap<>();
 
     // retrieve risks and set default object count to zero
     IterableIndexResult<IndexedRisk> risks = index.findAll(IndexedRisk.class, Filter.ALL, new ArrayList<>());
@@ -2909,7 +2909,7 @@ public class BrowserHelper {
         selectedFilter.getFilter(), Sorter.NONE, new Sublist(0, counter.intValue()), new ArrayList<>());
       return iresults.getResults();
     } else {
-      return new ArrayList<TransferredResource>();
+      return new ArrayList<>();
     }
   }
 
@@ -3209,10 +3209,11 @@ public class BrowserHelper {
     MultivaluedMap<String, String> queryParams)
     throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
     ObjectPermissionResult result = new ObjectPermissionResult();
-    for (String queryKey : queryParams.keySet()) {
+    for (Entry<String, List<String>> entry : queryParams.entrySet()) {
+      String queryKey = entry.getKey();
       try {
         Class.forName(queryKey);
-        for (String queryValues : queryParams.get(queryKey)) {
+        for (String queryValues : entry.getValue()) {
           boolean hasPermission = RodaCoreFactory.getModelService().checkObjectPermission(username, permissionType,
             queryKey, queryValues);
           result.addObject(new ObjectPermission(queryKey, queryValues, hasPermission));

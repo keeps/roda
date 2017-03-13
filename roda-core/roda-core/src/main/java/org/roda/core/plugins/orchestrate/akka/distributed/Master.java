@@ -52,7 +52,7 @@ public class Master extends UntypedPersistentActor {
   private final LoggingAdapter log = Logging.getLogger(getContext().system(), this);
   private final Cancellable cleanupTask;
 
-  private HashMap<String, WorkerState> workers = new HashMap<String, WorkerState>();
+  private HashMap<String, WorkerState> workers = new HashMap<>();
   private WorkState workState = new WorkState();
 
   public Master(FiniteDuration workTimeout) {
@@ -82,7 +82,7 @@ public class Master extends UntypedPersistentActor {
 
     private boolean isBusy() {
       return !isIdle();
-    };
+    }
 
     protected abstract String getWorkId();
 

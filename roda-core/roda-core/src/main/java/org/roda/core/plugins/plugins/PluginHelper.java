@@ -911,7 +911,7 @@ public final class PluginHelper {
    *             removed soon
    */
   public static List<LinkingIdentifier> getLinkingRepresentations(AIP aip, String role) {
-    List<LinkingIdentifier> identifiers = new ArrayList<LinkingIdentifier>();
+    List<LinkingIdentifier> identifiers = new ArrayList<>();
     if (aip.getRepresentations() != null && !aip.getRepresentations().isEmpty()) {
       for (Representation representation : aip.getRepresentations()) {
         identifiers.add(getLinkingIdentifier(aip.getId(), representation.getId(), role));
@@ -925,7 +925,7 @@ public final class PluginHelper {
    *             removed soon
    */
   public static List<LinkingIdentifier> getLinkingIdentifiers(List<TransferredResource> resources, String role) {
-    List<LinkingIdentifier> identifiers = new ArrayList<LinkingIdentifier>();
+    List<LinkingIdentifier> identifiers = new ArrayList<>();
     if (resources != null && !resources.isEmpty()) {
       for (TransferredResource tr : resources) {
         identifiers.add(getLinkingIdentifier(tr, role));
@@ -1044,8 +1044,8 @@ public final class PluginHelper {
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
 
     // collect all ghost ids
-    Map<String, List<String>> aipIdToGhost = new HashMap<String, List<String>>();
-    Map<String, List<String>> sipIdToGhost = new HashMap<String, List<String>>();
+    Map<String, List<String>> aipIdToGhost = new HashMap<>();
+    Map<String, List<String>> sipIdToGhost = new HashMap<>();
 
     Filter ghostsFilter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.TRUE.toString()));
     jobId.ifPresent(id -> ghostsFilter.add(new SimpleFilterParameter(RodaConstants.INGEST_JOB_ID, id)));
@@ -1053,15 +1053,15 @@ public final class PluginHelper {
       Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.INGEST_SIP_IDS));
 
     for (IndexedAIP aip : ghosts) {
-      if (aip.getIngestSIPIds() != null && aip.getIngestSIPIds().size() > 0) {
-        List<String> temp = new ArrayList<String>();
+      if (aip.getIngestSIPIds() != null && !aip.getIngestSIPIds().isEmpty()) {
+        List<String> temp = new ArrayList<>();
         if (sipIdToGhost.containsKey(aip.getIngestSIPIds().get(0))) {
           temp = sipIdToGhost.get(aip.getIngestSIPIds().get(0));
         }
         temp.add(aip.getId());
         sipIdToGhost.put(aip.getIngestSIPIds().get(0), temp);
       } else {
-        List<String> temp = new ArrayList<String>();
+        List<String> temp = new ArrayList<>();
         if (aipIdToGhost.containsKey(aip.getId())) {
           temp = aipIdToGhost.get(aip.getId());
         }
@@ -1187,7 +1187,7 @@ public final class PluginHelper {
       String failureMessage = "";
       Optional<LiteRODAObject> optionalLite = lite.getLite();
 
-      if (optionalLite.isPresent() && StringUtils.isNotBlank(lite.getLite().get().getInfo())) {
+      if (optionalLite.isPresent() && StringUtils.isNotBlank(optionalLite.get().getInfo())) {
         boolean objectMatchPluginKnownObjectsClass = false;
 
         String liteString = optionalLite.get().getInfo();

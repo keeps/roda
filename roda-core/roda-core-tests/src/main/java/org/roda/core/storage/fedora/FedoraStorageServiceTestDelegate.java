@@ -51,7 +51,7 @@ public class FedoraStorageServiceTestDelegate extends AbstractStorageServiceTest
     } catch (IOException e) {
       openDoor = defaultDoor;
     }
-    System.setProperty("fcrepo.dynamic.test.port", openDoor + "");
+    System.setProperty("fcrepo.dynamic.test.port", Integer.toString(openDoor));
     return openDoor;
   }
 

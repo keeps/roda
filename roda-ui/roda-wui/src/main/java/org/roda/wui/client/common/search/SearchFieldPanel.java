@@ -260,7 +260,7 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
     String type = searchField.getType();
     List<String> searchFields = searchField.getSearchFields();
 
-    if (searchFields != null && searchFields.size() >= 1) {
+    if (searchFields != null && !searchFields.isEmpty()) {
       String field = searchFields.get(0);
 
       if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_DATE) && dateValid(inputDateBox)) {
@@ -315,7 +315,7 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
   }
 
   public void simpleSearchField(String field, String label, String type, Tree<String> terms) {
-    List<String> searchFields = new ArrayList<String>();
+    List<String> searchFields = new ArrayList<>();
     searchFields.add(field);
     setSearchField(new SearchField(field, searchFields, label, type, terms));
 
@@ -366,29 +366,31 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
   }
 
   private boolean dateIntervalValid(DateBox inputFrom, DateBox inputTo) {
-    boolean valid = false;
-
     if (inputFrom.getValue() != null && inputTo.getValue() != null) {
-      valid = true;
-    } else if (inputFrom.getValue() != null && inputTo.getTextBox().getText().isEmpty()) {
-      valid = true;
-    } else if (inputFrom.getTextBox().getText().isEmpty() && inputTo.getValue() != null) {
-      valid = true;
+      return true;
     }
 
-    return valid;
+    if (inputFrom.getValue() != null && inputTo.getTextBox().getText().isEmpty()) {
+      return true;
+    }
+
+    if (inputFrom.getTextBox().getText().isEmpty() && inputTo.getValue() != null) {
+      return true;
+    }
+
+    return false;
   }
 
   private boolean dateValid(DateBox input) {
-    return (input.getValue() != null);
+    return input.getValue() != null;
   }
 
   private boolean valid(TextBox input) {
-    return (!input.getValue().isEmpty());
+    return !input.getValue().isEmpty();
   }
 
   private boolean valid(SearchSuggestBox<?> input) {
-    return (!input.getValue().isEmpty());
+    return !input.getValue().isEmpty();
   }
 
   private boolean valid(CheckBox input) {
@@ -396,25 +398,18 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
   }
 
   private boolean intervalValid(TextBox inputFrom, TextBox inputTo) {
-    boolean valid = false;
-
     try {
       if (!inputFrom.getValue().isEmpty() && !inputTo.getValue().isEmpty()) {
-        Double.parseDouble(inputFrom.getValue());
-        Double.parseDouble(inputTo.getValue());
-        valid = true;
-      } else if (!inputFrom.getValue().isEmpty()) {
-        Double.parseDouble(inputFrom.getValue());
-        valid = true;
-      } else if (!inputTo.getValue().isEmpty()) {
-        Double.parseDouble(inputTo.getValue());
-        valid = true;
+        return true;
+      }
+      if (!inputFrom.getValue().isEmpty() || !inputTo.getValue().isEmpty()) {
+        return true;
       }
     } catch (Exception e) {
-      valid = false;
+      // do nothing
     }
 
-    return valid;
+    return false;
   }
 
   @Override

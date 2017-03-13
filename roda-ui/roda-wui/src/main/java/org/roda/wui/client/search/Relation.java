@@ -72,7 +72,7 @@ public class Relation {
   }
 
   public void resolve(final List<String> historyTokens, final AsyncCallback<Widget> callback) {
-    if (historyTokens.size() == 0) {
+    if (historyTokens.isEmpty()) {
       HistoryUtils.newHistory(Search.RESOLVER);
     } else {
       // #relation/TYPE/key/value/key/value

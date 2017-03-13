@@ -42,8 +42,6 @@ public class MonthPicker extends ListBox {
 
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
-  // private GWTLogger logger = new GWTLogger(GWT.getTypeName(this));
-
   /**
    * Create a new month picker
    */
@@ -85,7 +83,7 @@ public class MonthPicker extends ListBox {
    */
   public String getSelected() {
     int month = getSelectedInt();
-    return month < 10 ? "0" + month : "" + month;
+    return month < 10 ? "0" + month : Integer.toString(month);
   }
 
   /**

@@ -68,7 +68,6 @@ public class PreIngest {
   }
 
   private VerticalPanel layout;
-
   private HTMLWidgetWrapper html;
 
   private PreIngest() {
@@ -80,7 +79,7 @@ public class PreIngest {
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-    if (historyTokens.size() == 0) {
+    if (historyTokens.isEmpty()) {
       callback.onSuccess(layout);
     } else {
       HistoryUtils.newHistory(RESOLVER);

@@ -740,6 +740,9 @@ public final class RodaConstants {
 
   public static final String PLUGIN_SELECT_ALL_RODA_OBJECTS = "All";
 
+  public static final String JOB_PROCESS_ACTION = "action";
+  public static final String JOB_PROCESS_INGEST = "ingest";
+
   /* Job Report */
   public static final String JOB_REPORT_ID = "id";
   public static final String JOB_REPORT_JOB_ID = "jobId";

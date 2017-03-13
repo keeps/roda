@@ -299,7 +299,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
       @Override
       public void onSuccess(Boolean result) {
-        Set<String> indirectRoles = new HashSet<String>(allRoles);
+        Set<String> indirectRoles = new HashSet<>(allRoles);
         indirectRoles.removeAll(directRoles);
 
         permissionsPanel.checkPermissions(directRoles, false);
@@ -368,7 +368,6 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
         @Override
         public void onFailure(Throwable caught) {
-          // Tools.newHistory(MemberManagement.RESOLVER);
           AsyncCallbackUtils.defaultFailureTreatment(caught);
         }
       });
@@ -408,7 +407,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
    * @return true if valid
    */
   public boolean isValid() {
-    List<String> errorList = new ArrayList<String>();
+    List<String> errorList = new ArrayList<>();
     if (username.getText().length() == 0) {
       username.addStyleName("isWrong");
       usernameError.setText(messages.mandatoryField());
@@ -434,7 +433,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
       fullnameError.setVisible(false);
     }
 
-    if (email.getText() == null || email.getText().trim().equalsIgnoreCase("")) {
+    if (email.getText() == null || "".equals(email.getText().trim())) {
       email.addStyleName("isWrong");
       emailError.setText(messages.mandatoryField());
       emailError.setVisible(true);
@@ -451,24 +450,21 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     }
 
     List<String> extraErrors = FormUtilities.validate(userExtraBundle.getValues(), extra);
-
     errorList.addAll(extraErrors);
-
     checked = true;
 
-    GWT.log("ERRORS: " + errorList.size());
-    if (errorList.size() > 0) {
+    if (!errorList.isEmpty()) {
       errors.setVisible(true);
-      String errorString = "";
+      StringBuilder errorString = new StringBuilder();
       for (String error : errorList) {
-        errorString += "<span class='error'>" + error + "</span>";
-        errorString += "<br/>";
+        errorString.append("<span class='error'>").append(error).append("</span>");
+        errorString.append("<br/>");
       }
-      errors.setHTML(errorString);
+      errors.setHTML(errorString.toString());
     } else {
       errors.setVisible(false);
     }
-    return errorList.size() == 0 ? true : false;
+    return errorList.isEmpty() ? true : false;
   }
 
   /**

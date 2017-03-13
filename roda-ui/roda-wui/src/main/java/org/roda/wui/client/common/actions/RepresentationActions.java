@@ -237,7 +237,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
     LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
     selectedItems.setSelectedItems(selected);
     selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
-    HistoryUtils.newHistory(CreateSelectedJob.RESOLVER, "action");
+    HistoryUtils.newHistory(CreateSelectedJob.RESOLVER, RodaConstants.JOB_PROCESS_ACTION);
     callback.onSuccess(ActionImpact.UPDATED);
   }
 

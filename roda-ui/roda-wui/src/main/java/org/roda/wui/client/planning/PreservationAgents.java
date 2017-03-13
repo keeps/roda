@@ -52,10 +52,10 @@ public class PreservationAgents extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      if (historyTokens.size() == 0) {
+      if (historyTokens.isEmpty()) {
         PreservationAgents preservationAgents = new PreservationAgents();
         callback.onSuccess(preservationAgents);
-      } else if (historyTokens.size() >= 1
+      } else if (!historyTokens.isEmpty()
         && historyTokens.get(0).equals(ShowPreservationAgent.RESOLVER.getHistoryToken())) {
         ShowPreservationAgent.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else {
@@ -104,7 +104,7 @@ public class PreservationAgents extends Composite {
     agentList = new PreservationAgentList(Filter.ALL, facets, messages.preservationAgentsTitle(), false);
 
     facetClasses = new FlowPanel();
-    Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
+    Map<String, FlowPanel> facetPanels = new HashMap<>();
     facetPanels.put(RodaConstants.PRESERVATION_AGENT_TYPE, facetClasses);
     FacetUtils.bindFacets(agentList, facetPanels);
 

@@ -335,10 +335,10 @@ public class IngestTransfer extends Composite {
   }
 
   public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-    if (historyTokens.size() == 0) {
+    if (historyTokens.isEmpty()) {
       view();
       callback.onSuccess(this);
-    } else if (historyTokens.size() >= 1
+    } else if (!historyTokens.isEmpty()
       && historyTokens.get(0).equals(TransferUpload.INGEST_RESOLVER.getHistoryToken())) {
       TransferUpload.INGEST_RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else {
@@ -402,7 +402,6 @@ public class IngestTransfer extends Composite {
     String relativePath = resource != null ? resource.getRelativePath() : null;
     refresh.setEnabled(false);
 
-    // Toast.showInfo(messages.dialogRefresh(), messages.updateIsBeginning());
     BrowserService.Util.getInstance().transferScanRequestUpdate(relativePath, new AsyncCallback<Void>() {
 
       @Override
@@ -486,8 +485,8 @@ public class IngestTransfer extends Composite {
             @Override
             public void onSuccess(Boolean confirmed) {
               if (confirmed) {
-                SelectedItems<TransferredResource> s = new SelectedItemsList<TransferredResource>(
-                  Arrays.asList(resource.getUUID()), TransferredResource.class.getName());
+                SelectedItems<TransferredResource> s = new SelectedItemsList<>(Arrays.asList(resource.getUUID()),
+                  TransferredResource.class.getName());
                 BrowserService.Util.getInstance().deleteTransferredResources(s, new AsyncCallback<Void>() {
 
                   @Override
@@ -562,15 +561,14 @@ public class IngestTransfer extends Composite {
     LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
     selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
     selectedItems.setSelectedItems(getSelected());
-    HistoryUtils.newHistory(CreateSelectedJob.RESOLVER, "ingest");
+    HistoryUtils.newHistory(CreateSelectedJob.RESOLVER, RodaConstants.JOB_PROCESS_INGEST);
   }
 
   public SelectedItems<TransferredResource> getSelected() {
     SelectedItems<TransferredResource> selected = transferredResourceList.getSelected();
 
     if (ClientSelectedItemsUtils.isEmpty(selected) && resource != null) {
-      selected = new SelectedItemsList<TransferredResource>(Arrays.asList(resource.getUUID()),
-        TransferredResource.class.getName());
+      selected = new SelectedItemsList<>(Arrays.asList(resource.getUUID()), TransferredResource.class.getName());
     }
 
     return selected;

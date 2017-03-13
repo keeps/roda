@@ -26,7 +26,7 @@ public class StringUtils {
     method = method.replaceAll("([A-Z])", " $1").trim();
     return method.replaceAll("A I P", "AIP");
   }
-  
+
   /**
    * Join all tokens dividing by a separator
    * 
@@ -37,27 +37,27 @@ public class StringUtils {
    * @return a string will all tokens separated by the defined separator
    */
   public static String join(String[] tokens, String separator) {
-    String history = "";
+    StringBuilder history = new StringBuilder();
     if (tokens.length > 0) {
-      history = tokens[0];
+      history.append(tokens[0]);
     }
     for (int i = 1; i < tokens.length; i++) {
-      history += separator + tokens[i];
+      history.append(separator).append(tokens[i]);
     }
-    return history;
+    return history.toString();
   }
 
   public static String join(List<String> tokens, String separator) {
-    String history = "";
-    if (tokens.size() > 0) {
-      history = tokens.get(0);
+    StringBuilder history = new StringBuilder();
+    if (!tokens.isEmpty()) {
+      history.append(tokens.get(0));
     }
     for (int i = 1; i < tokens.size(); i++) {
-      history += separator + tokens.get(i);
+      history.append(separator).append(tokens.get(i));
     }
-    return history;
+    return history.toString();
   }
-  
+
   /**
    * remove leading whitespace
    * 

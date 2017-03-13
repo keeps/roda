@@ -30,15 +30,10 @@ import com.google.gwt.user.client.ui.Widget;
 public class DatePicker extends HorizontalPanel implements SourcesChangeEvents {
 
   private YearPicker year;
-
   private MonthPicker month;
-
   private DayPicker day;
-
   private boolean initial;
-
   private boolean firstEdit;
-
   private final List<ChangeListener> listeners;
 
   /**
@@ -61,7 +56,7 @@ public class DatePicker extends HorizontalPanel implements SourcesChangeEvents {
     year = new YearPicker();
     month = new MonthPicker();
     day = new DayPicker(initial);
-    listeners = new Vector<ChangeListener>();
+    listeners = new Vector<>();
 
     add(year);
     add(month);
@@ -116,11 +111,11 @@ public class DatePicker extends HorizontalPanel implements SourcesChangeEvents {
    * @return
    */
   public String getISODate() {
-    String year = this.year.getString();
+    StringBuilder year = new StringBuilder(this.year.getString());
     String month = null;
     String day = null;
 
-    String ret = null;
+    StringBuilder ret = new StringBuilder();
 
     if (year.length() > 0) {
       try {
@@ -131,19 +126,19 @@ public class DatePicker extends HorizontalPanel implements SourcesChangeEvents {
       }
 
       while (year.length() < 4) {
-        year = "0" + year;
+        year.append("0").append(year);
       }
 
-      ret = year;
+      ret.append(year.toString());
       if (month != null) {
-        ret += "-" + month;
+        ret.append("-").append(month);
       }
       if (day != null) {
-        ret += "-" + day;
+        ret.append("-").append(day);
       }
     }
 
-    return ret;
+    return ret.toString();
   }
 
   /**

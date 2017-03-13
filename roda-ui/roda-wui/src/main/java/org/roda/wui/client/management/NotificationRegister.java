@@ -141,7 +141,7 @@ public class NotificationRegister extends Composite {
     facetAcknowledged = new FlowPanel();
     facetState = new FlowPanel();
 
-    Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
+    Map<String, FlowPanel> facetPanels = new HashMap<>();
     facetPanels.put(RodaConstants.NOTIFICATION_STATE, facetState);
     facetPanels.put(RodaConstants.NOTIFICATION_IS_ACKNOWLEDGED, facetAcknowledged);
     facetPanels.put(RodaConstants.NOTIFICATION_RECIPIENT_USERS, facetRecipientUsers);
@@ -203,7 +203,7 @@ public class NotificationRegister extends Composite {
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-    if (historyTokens.size() == 0) {
+    if (historyTokens.isEmpty()) {
       notificationList.refresh();
       notificationList.setFilter(Filter.ALL);
       callback.onSuccess(this);

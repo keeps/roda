@@ -23,7 +23,7 @@ public class YearPicker extends TextBox {
    * Year type
    * 
    */
-  public static enum YearType {
+  public enum YearType {
 
     /**
      * 366 days year
@@ -63,7 +63,7 @@ public class YearPicker extends TextBox {
    */
   public boolean isValid() {
     // year must be between 0000 - 2999 (EAD schema limitation)
-    return this.getText().matches("\\d{1,4}") && Integer.valueOf(getText()).intValue() < 3000;
+    return this.getText().matches("\\d{1,4}") && getInt() < 3000;
   }
 
   /**
@@ -72,7 +72,7 @@ public class YearPicker extends TextBox {
    * @return
    */
   public int getInt() {
-    return Integer.valueOf(getText()).intValue();
+    return Integer.parseInt(getText());
   }
 
   /**
@@ -112,6 +112,6 @@ public class YearPicker extends TextBox {
    * @param year
    */
   public void set(int year) {
-    this.setText(year + "");
+    this.setText(Integer.toString(year));
   }
 }

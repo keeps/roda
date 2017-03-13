@@ -160,7 +160,7 @@ public class UserLog extends Composite {
     facetUsers = new FlowPanel();
     facetStates = new FlowPanel();
 
-    Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
+    Map<String, FlowPanel> facetPanels = new HashMap<>();
     facetPanels.put(RodaConstants.LOG_ACTION_COMPONENT, facetComponents);
     facetPanels.put(RodaConstants.LOG_ACTION_METHOD, facetMethods);
     facetPanels.put(RodaConstants.LOG_USERNAME, facetUsers);
@@ -227,7 +227,7 @@ public class UserLog extends Composite {
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-    if (historyTokens.size() == 0) {
+    if (historyTokens.isEmpty()) {
       logList.setFilter(Filter.ALL);
       logList.refresh();
       callback.onSuccess(this);

@@ -10,6 +10,7 @@ package org.roda.wui.client.common;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.NamedIndexedModel;
@@ -85,8 +86,8 @@ public class IncrementalAssociativeList extends Composite implements HasHandlers
   }
 
   public void setTextBoxList(Map<String, String> map) {
-    for (String element : map.keySet()) {
-      addTextBox(element, map.get(element));
+    for (Entry<String, String> entry : map.entrySet()) {
+      addTextBox(entry.getKey(), entry.getValue());
     }
   }
 

@@ -33,7 +33,7 @@ public class Theme extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-      if (historyTokens.size() >= 1) {
+      if (!historyTokens.isEmpty()) {
         StringBuilder sb = new StringBuilder();
         boolean first = true;
         for (String token : historyTokens) {

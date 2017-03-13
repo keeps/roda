@@ -33,12 +33,12 @@ public class ClientLoggerImpl extends RemoteServiceServlet implements ClientLogg
 
   public void debug(String classname, String object) {
     Logger logger = LoggerFactory.getLogger(classname);
-    logger.debug(getUserInfo() + object);
+    logger.debug(constructMessage(getUserInfo(), object));
   }
 
   public void debug(String classname, String object, Throwable error) {
     Logger logger = LoggerFactory.getLogger(classname);
-    logger.debug(getUserInfo() + object, error);
+    logger.debug(constructMessage(getUserInfo(), object), error);
   }
 
   public void error(String classname, String object) {
@@ -68,32 +68,36 @@ public class ClientLoggerImpl extends RemoteServiceServlet implements ClientLogg
 
   public void info(String classname, String object) {
     Logger logger = LoggerFactory.getLogger(classname);
-    logger.info(getUserInfo() + object);
+    logger.info(constructMessage(getUserInfo(), object));
   }
 
   public void info(String classname, String object, Throwable error) {
     Logger logger = LoggerFactory.getLogger(classname);
-    logger.info(getUserInfo() + object, error);
+    logger.info(constructMessage(getUserInfo(), object), error);
   }
 
   public void trace(String classname, String object) {
     Logger logger = LoggerFactory.getLogger(classname);
-    logger.trace(getUserInfo() + object);
+    logger.trace(constructMessage(getUserInfo(), object));
   }
 
   public void trace(String classname, String object, Throwable error) {
     Logger logger = LoggerFactory.getLogger(classname);
-    logger.trace(getUserInfo() + object, error);
+    logger.trace(constructMessage(getUserInfo(), object), error);
   }
 
   public void warn(String classname, String object) {
     Logger logger = LoggerFactory.getLogger(classname);
-    logger.warn(getUserInfo() + object);
+    logger.warn(constructMessage(getUserInfo(), object));
   }
 
   public void warn(String classname, String object, Throwable error) {
     Logger logger = LoggerFactory.getLogger(classname);
-    logger.warn(getUserInfo() + object, error);
+    logger.warn(constructMessage(getUserInfo(), object), error);
+  }
+
+  private String constructMessage(String userInfo, String object) {
+    return String.format("%s%s", userInfo, object);
   }
 
   public void pagehit(String pagename) {

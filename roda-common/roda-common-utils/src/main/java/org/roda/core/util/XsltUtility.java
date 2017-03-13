@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -87,8 +88,8 @@ public final class XsltUtility {
     Transformer transformer = tfactory.newTransformer(xsltSource);
 
     if (xsltParameters != null) {
-      for (String paramName : xsltParameters.keySet()) {
-        transformer.setParameter(paramName, xsltParameters.get(paramName));
+      for (Entry<String, Object> entry : xsltParameters.entrySet()) {
+        transformer.setParameter(entry.getKey(), entry.getValue());
       }
     }
 

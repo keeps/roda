@@ -37,13 +37,9 @@ import config.i18n.client.ClientMessages;
 public class BitstreamPreview<T extends IsIndexed> extends Composite {
 
   private static final String VIEWER_TYPE_VIDEO = "video";
-
   private static final String VIEWER_TYPE_AUDIO = "audio";
-
   private static final String VIEWER_TYPE_TEXT = "text";
-
   private static final String VIEWER_TYPE_PDF = "pdf";
-
   private static final String VIEWER_TYPE_IMAGE = "image";
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
@@ -162,7 +158,7 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
       }
     }
 
-    if (type == null && filename.lastIndexOf(".") != -1) {
+    if (type == null && filename.lastIndexOf('.') != -1) {
       String extension = getFileNameExtension();
       type = viewers.getExtensions().get(extension);
     }
@@ -171,7 +167,7 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
   }
 
   private String getFileNameExtension() {
-    return filename.substring(filename.lastIndexOf(".")).toLowerCase();
+    return filename.substring(filename.lastIndexOf('.')).toLowerCase();
   }
 
   private void imagePreview() {
@@ -290,16 +286,15 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
         ret = mimetype;
       }
     } else {
-
       String extension = getFileNameExtension();
 
       if (".mp4".equals(extension)) {
         ret = "video/mp4";
       } else if (".ogg".equals(extension)) {
         ret = "video/ogg";
+      } else {
+        ret = "video/mp4";
       }
-
-      ret = "video/mp4";
     }
 
     // TODO video player might not support provided file format
@@ -319,9 +314,9 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
         ret = "audio/mpeg";
       } else if (".ogg".equals(extension)) {
         ret = "audio/ogg";
+      } else {
+        ret = "audio/mpeg";
       }
-
-      ret = "audio/mpeg";
     }
 
     // TODO audio player might not support provided file format

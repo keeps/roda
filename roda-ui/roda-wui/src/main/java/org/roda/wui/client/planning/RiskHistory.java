@@ -182,7 +182,7 @@ public class RiskHistory extends Composite {
       list.addItem(messages.riskHistoryLabel(message, createdDate), versionKey);
     }
 
-    if (versionList.size() > 0) {
+    if (!versionList.isEmpty()) {
       list.setSelectedIndex(0);
       selectedVersion = versionList.get(0).getId();
     }

@@ -45,9 +45,7 @@ public class Humanize {
   protected static final NumberFormat NUMBER_FORMAT = NumberFormat.getFormat("#");
 
   public static final DateTimeFormat DATE_FORMAT = DateTimeFormat.getFormat("yyyy-MM-dd");
-
   public static final DateTimeFormat DATE_TIME_FORMAT = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss");
-
   public static final DateTimeFormat DATE_TIME_MS_FORMAT = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
   public static Long parseFileSize(String size, String unit) {
@@ -88,7 +86,7 @@ public class Humanize {
       ret = extendedDate ? messages.titleDatesEmpty() : messages.simpleDatesEmpty();
     } else if (dateInitial != null && dateFinal == null) {
       ret = extendedDate ? messages.titleDatesNoFinal(dateInitial) : messages.simpleDatesNoFinal(dateInitial);
-    } else if (dateInitial == null && dateFinal != null) {
+    } else if (dateInitial == null) {
       ret = extendedDate ? messages.titleDatesNoInitial(dateFinal) : messages.simpleDatesNoInitial(dateFinal);
     } else {
       ret = extendedDate ? messages.titleDates(dateInitial, dateFinal) : messages.simpleDates(dateInitial, dateFinal);
@@ -153,8 +151,8 @@ public class Humanize {
   }
 
   /**
-   * converts time (in milliseconds) to human-readable format "<w> days, <x>
-   * hours, <y> minutes and (z) seconds"
+   * converts time (in milliseconds) to human-readable format "<w> days,
+   * <x> hours, <y> minutes and (z) seconds"
    */
   public static String durationMillisToLongDHMS(long duration) {
     duration /= ONE_SECOND;

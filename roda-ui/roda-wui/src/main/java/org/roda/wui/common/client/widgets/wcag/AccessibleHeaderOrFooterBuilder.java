@@ -11,7 +11,6 @@ import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.AbstractCellTable;
 import com.google.gwt.user.cellview.client.AbstractCellTable.Style;
 import com.google.gwt.user.cellview.client.AbstractHeaderOrFooterBuilder;
@@ -19,7 +18,6 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.Header;
-import com.google.gwt.user.client.ui.AbstractImagePrototype;
 
 public class AccessibleHeaderOrFooterBuilder<T> extends AbstractHeaderOrFooterBuilder<T> {
 
@@ -77,7 +75,7 @@ public class AccessibleHeaderOrFooterBuilder<T> extends AbstractHeaderOrFooterBu
         break;
       }
     }
-    if (hasHeader == false) {
+    if (!hasHeader) {
       return false;
     }
 
@@ -219,7 +217,7 @@ public class AccessibleHeaderOrFooterBuilder<T> extends AbstractHeaderOrFooterBu
       }
 
       style.endStyle();
-      imageHolder.html(getSortIcon(isSortAscending));
+      imageHolder.html(getSortingIcon(isSortAscending));
       imageHolder.endDiv();
 
       // Create the header wrapper.
@@ -236,29 +234,18 @@ public class AccessibleHeaderOrFooterBuilder<T> extends AbstractHeaderOrFooterBu
     }
   }
 
-  private SafeHtml getSortIcon(boolean isAscending) {
-    SafeHtml sortAscIconHtml = null;
-    SafeHtml sortDescIconHtml = null;
+  private SafeHtml getSortingIcon(boolean isAscending) {
     AbstractCellTable<T> table = getTable();
-    if (isAscending) {
-      if (sortAscIconHtml == null) {
-        AbstractImagePrototype proto = AbstractImagePrototype.create(table.getResources().sortAscending());
-        sortAscIconHtml = SafeHtmlUtils.fromTrustedString(proto.getHTML());
-      }
-      // return sortAscIconHtml;
-    } else {
-      if (sortDescIconHtml == null) {
-        AbstractImagePrototype proto = AbstractImagePrototype.create(table.getResources().sortDescending());
-        sortDescIconHtml = SafeHtmlUtils.fromTrustedString(proto.getHTML());
-      }
-      // return sortDescIconHtml;
-    }
     SafeHtmlBuilder shb = new SafeHtmlBuilder();
+
     if (isAscending) {
+      table.getResources().sortAscending();
       shb.appendEscaped("A");
     } else {
+      table.getResources().sortDescending();
       shb.appendEscaped("D");
     }
+
     return shb.toSafeHtml();
   }
 

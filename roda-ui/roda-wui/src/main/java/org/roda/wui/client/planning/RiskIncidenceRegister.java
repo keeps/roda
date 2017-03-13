@@ -82,7 +82,7 @@ public class RiskIncidenceRegister extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-      if (historyTokens.size() == 0) {
+      if (historyTokens.isEmpty()) {
         RiskIncidenceRegister riskIncidences = new RiskIncidenceRegister(null, null, null, null, Filter.ALL);
         callback.onSuccess(riskIncidences);
       } else if (historyTokens.size() == 2
@@ -218,7 +218,7 @@ public class RiskIncidenceRegister extends Composite {
     facetDetectedBy = new FlowPanel();
     facetStatus = new FlowPanel();
 
-    Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
+    Map<String, FlowPanel> facetPanels = new HashMap<>();
     facetPanels.put(RodaConstants.RISK_INCIDENCE_DETECTED_BY, facetDetectedBy);
     facetPanels.put(RodaConstants.RISK_INCIDENCE_STATUS, facetStatus);
     FacetUtils.bindFacets(riskIncidenceList, facetPanels);

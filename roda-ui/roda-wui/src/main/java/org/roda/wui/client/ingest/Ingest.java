@@ -17,6 +17,7 @@ import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.ingest.preingest.PreIngest;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.client.process.IngestProcess;
+import org.roda.wui.client.welcome.Help;
 import org.roda.wui.common.client.BadHistoryTokenException;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -92,7 +93,7 @@ public class Ingest {
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-    if (historyTokens.size() == 0) {
+    if (historyTokens.isEmpty()) {
       init();
       callback.onSuccess(layout);
     } else {
@@ -104,7 +105,7 @@ public class Ingest {
         IngestProcess.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(IngestAppraisal.RESOLVER.getHistoryToken())) {
         IngestAppraisal.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
-      } else if (historyTokens.get(0).equals("help")) {
+      } else if (historyTokens.get(0).equals(Help.RESOLVER.getHistoryToken())) {
         callback.onSuccess(getHelp());
       } else {
         callback.onFailure(new BadHistoryTokenException(historyTokens.get(0)));
@@ -144,7 +145,6 @@ public class Ingest {
               url += "?os=" + os;
             }
             Window.open(url, "_blank", "");
-
           }
 
         });

@@ -128,15 +128,13 @@ public class MemberManagement extends Composite {
     facetIsUser = new FlowPanel();
     facetGroups = new FlowPanel();
 
-    Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
+    Map<String, FlowPanel> facetPanels = new HashMap<>();
     facetPanels.put(RodaConstants.MEMBERS_IS_ACTIVE, facetIsActive);
     facetPanels.put(RodaConstants.MEMBERS_IS_USER, facetIsUser);
     facetPanels.put(RodaConstants.MEMBERS_GROUPS, facetGroups);
 
     FacetUtils.bindFacets(list, facetPanels);
-
     initWidget(uiBinder.createAndBindUi(this));
-
     memberManagementDescription.add(new HTMLWidgetWrapper("MemberManagementDescription.html"));
 
     list.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
@@ -163,7 +161,7 @@ public class MemberManagement extends Composite {
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-    if (historyTokens.size() == 0) {
+    if (historyTokens.isEmpty()) {
       callback.onSuccess(this);
     } else if (historyTokens.size() == 1) {
       if (historyTokens.get(0).equals(CreateUser.RESOLVER.getHistoryToken())) {

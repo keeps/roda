@@ -159,9 +159,9 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
   public RiskDataPanel(final boolean editmode, final IndexedRisk risk, final String categoryField,
     final String identifiedByField, final String ownerField) {
 
-    category = new SearchSuggestBox<IndexedRisk>(IndexedRisk.class, categoryField, false);
-    identifiedBy = new SearchSuggestBox<IndexedRisk>(IndexedRisk.class, identifiedByField, false);
-    mitigationOwner = new SearchSuggestBox<IndexedRisk>(IndexedRisk.class, ownerField, false);
+    category = new SearchSuggestBox<>(IndexedRisk.class, categoryField, false);
+    identifiedBy = new SearchSuggestBox<>(IndexedRisk.class, identifiedByField, false);
+    mitigationOwner = new SearchSuggestBox<>(IndexedRisk.class, ownerField, false);
 
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -415,7 +415,7 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
 
   public Risk getRisk() {
     Risk risk = new Risk();
-    if (idBox.isVisible() && idBox.getText() != null && !idBox.getText().equals("")) {
+    if (idBox.isVisible() && idBox.getText() != null && !"".equals(idBox.getText())) {
       risk.setId(idBox.getText());
     }
     risk.setName(name.getText());
@@ -464,7 +464,6 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
       risk.setCreatedBy(createdBy);
     }
 
-    // risk.setObjectsSize(this.riskCounter);
     return risk;
   }
 

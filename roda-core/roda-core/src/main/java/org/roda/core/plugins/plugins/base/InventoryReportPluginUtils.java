@@ -61,7 +61,7 @@ public class InventoryReportPluginUtils {
 
   public static List<List<String>> getDataInformation(List<String> fields, AIP aip, ModelService model,
     StorageService storage) {
-    List<List<String>> dataInformation = new ArrayList<List<String>>();
+    List<List<String>> dataInformation = new ArrayList<>();
     for (Representation representation : aip.getRepresentations()) {
       boolean recursive = true;
       try {
@@ -85,12 +85,12 @@ public class InventoryReportPluginUtils {
 
   public static List<List<String>> getDescriptiveMetadataInformation(List<String> fields, AIP aip, ModelService model,
     StorageService storage) {
-    List<List<String>> descriptiveMetadataInformation = new ArrayList<List<String>>();
+    List<List<String>> descriptiveMetadataInformation = new ArrayList<>();
     for (DescriptiveMetadata dm : aip.getDescriptiveMetadata()) {
       descriptiveMetadataInformation.add(retrieveDescriptiveMetadataInfo(fields, aip, dm, model, storage));
     }
-    if(aip.getRepresentations()!=null){
-      for(Representation r : aip.getRepresentations()){
+    if (aip.getRepresentations() != null) {
+      for (Representation r : aip.getRepresentations()) {
         for (DescriptiveMetadata dm : r.getDescriptiveMetadata()) {
           descriptiveMetadataInformation.add(retrieveDescriptiveMetadataInfo(fields, aip, dm, model, storage));
         }
@@ -102,7 +102,7 @@ public class InventoryReportPluginUtils {
 
   private static List<String> retrieveDescriptiveMetadataInfo(List<String> fields, AIP aip, DescriptiveMetadata dm,
     ModelService model, StorageService storage) {
-    List<String> fileInfo = new ArrayList<String>();
+    List<String> fileInfo = new ArrayList<>();
     Map<String, String> fixities = null;
     for (String fieldName : fields) {
       if (fieldName.equalsIgnoreCase(InventoryReportPlugin.CSV_FIELD_SIP_ID)) {
@@ -148,7 +148,7 @@ public class InventoryReportPluginUtils {
   public static List<String> retrieveFileInfo(List<String> fields, File file, AIP aip, Representation representation,
     ModelService model, StorageService storage) {
 
-    List<String> fileInfo = new ArrayList<String>();
+    List<String> fileInfo = new ArrayList<>();
     List<Fixity> fixities = null;
     for (String fieldName : fields) {
       if (fieldName.equalsIgnoreCase(InventoryReportPlugin.CSV_FIELD_SIP_ID)) {
@@ -191,7 +191,7 @@ public class InventoryReportPluginUtils {
   private static String getFixity(String fixityAlgorithm, List<Fixity> fixities, File file, ModelService model,
     StorageService storage) {
     String fixity = "";
-    if (fixities != null && fixities.size() > 0) {
+    if (fixities != null && !fixities.isEmpty()) {
       for (Fixity f : fixities) {
         if (f.getMessageDigestAlgorithm() != null && f.getMessageDigestAlgorithm().equalsIgnoreCase(fixityAlgorithm)) {
           fixity = f.getMessageDigest();
@@ -213,7 +213,7 @@ public class InventoryReportPluginUtils {
 
   public static List<List<String>> getOtherMetadataInformation(List<String> fields, String otherMetadataType, AIP aip,
     ModelService model, StorageService storage) {
-    List<List<String>> otherMetadataInformation = new ArrayList<List<String>>();
+    List<List<String>> otherMetadataInformation = new ArrayList<>();
     try {
       CloseableIterable<OptionalWithCause<OtherMetadata>> otherMetadatas = model.listOtherMetadata(aip.getId(),
         otherMetadataType, true);
@@ -233,7 +233,7 @@ public class InventoryReportPluginUtils {
 
   private static List<String> retrieveOtherMetadataInfo(List<String> fields, OtherMetadata otherMetadata, AIP aip,
     ModelService model, StorageService storage) {
-    List<String> fileInfo = new ArrayList<String>();
+    List<String> fileInfo = new ArrayList<>();
     Map<String, String> fixities = null;
     for (String fieldName : fields) {
       if (fieldName.equalsIgnoreCase(InventoryReportPlugin.CSV_FIELD_SIP_ID)) {
@@ -245,7 +245,8 @@ public class InventoryReportPluginUtils {
       } else if (fieldName.equalsIgnoreCase(InventoryReportPlugin.CSV_FIELD_FILE_PATH)) {
         fileInfo.add(FSUtils.asString(otherMetadata.getFileDirectoryPath()));
       } else if (fieldName.equalsIgnoreCase(InventoryReportPlugin.CSV_FIELD_FILE_ID)) {
-        fileInfo.add(otherMetadata.getFileId()+(otherMetadata.getFileSuffix()!=null?otherMetadata.getFileSuffix():""));
+        fileInfo.add(
+          otherMetadata.getFileId() + (otherMetadata.getFileSuffix() != null ? otherMetadata.getFileSuffix() : ""));
       } else if (fieldName.equalsIgnoreCase(InventoryReportPlugin.CSV_FIELD_ISDIRECTORY)) {
         fileInfo.add("false");
       } else if (InventoryReportPlugin.CHECKSUM_ALGORITHMS.contains(fieldName.toUpperCase())) {

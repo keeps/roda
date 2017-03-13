@@ -81,7 +81,6 @@ import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
@@ -495,7 +494,7 @@ public class BrowseAIP extends Composite {
       addStyleName(BROWSE_AIP_CSS);
 
       Element firstElement = this.getElement().getFirstChildElement();
-      if (firstElement.getTagName().equalsIgnoreCase("input")) {
+      if ("input".equalsIgnoreCase(firstElement.getTagName())) {
         firstElement.setAttribute("title", "browse input");
       }
 
@@ -589,7 +588,7 @@ public class BrowseAIP extends Composite {
   }
 
   private void updateSectionDescriptiveMetadata(BrowseAIPBundle bundle) {
-    final List<Pair<String, HTML>> descriptiveMetadataContainers = new ArrayList<Pair<String, HTML>>();
+    final List<Pair<String, HTML>> descriptiveMetadataContainers = new ArrayList<>();
     final Map<String, DescriptiveMetadataViewBundle> bundles = new HashMap<>();
 
     List<DescriptiveMetadataViewBundle> descMetadata = bundle.getDescriptiveMetadata();
@@ -893,7 +892,7 @@ public class BrowseAIP extends Composite {
       path = ListUtils.concat(BrowseAIP.RESOLVER.getHistoryPath(), id);
     }
 
-    if (path.equals(History.getToken())) {
+    if (path.equals(HistoryUtils.getCurrentHistoryPath())) {
       historyUpdated = false;
     } else {
       HistoryUtils.newHistory(path);

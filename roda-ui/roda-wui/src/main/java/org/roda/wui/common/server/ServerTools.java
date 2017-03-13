@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -79,31 +80,31 @@ public class ServerTools {
    * @return the encoded string
    */
   public static String encodeXML(String s) {
-    String ret;
     if (s != null) {
-      ret = "";
+      StringBuilder ret = new StringBuilder();
       for (int i = 0; i < s.length(); i++) {
         char ch = s.charAt(i);
         if (ch == '<') {
-          ret += "&lt;";
+          ret.append("&lt;");
         } else if (ch == '>') {
-          ret += "&gt;";
+          ret.append("&gt;");
         } else if (ch == '"') {
-          ret += "&quot;";
+          ret.append("&quot;");
         } else if (ch == '\'') {
-          ret += "&apos;";
+          ret.append("&apos;");
         } else if (ch == '&') {
-          ret += "&amp;";
+          ret.append("&amp;");
         } else if (ch < 0x20 && ch != 0x9 && ch != 0xD && ch != 0xA) {
-          ret += (ch <= 0xf ? "\\u000" : "\\u00") + Integer.toHexString(ch).toUpperCase();
+          ret.append(ch <= 0xf ? "\\u000" : "\\u00").append(Integer.toHexString(ch).toUpperCase());
         } else {
-          ret += ch;
+          ret.append(ch);
         }
       }
+
+      return ret.toString();
     } else {
-      ret = null;
+      return null;
     }
-    return ret;
   }
 
   /**
@@ -114,9 +115,7 @@ public class ServerTools {
    * @return the encoded CSV value
    */
   public static String encodeCSV(String s) {
-    String ret = new String(s);
-    ret.replaceAll("\"", "\"\"");
-    return "\"" + ret + "\"";
+    return "\"" + s.replaceAll("\"", "\"\"") + "\"";
   }
 
   /**
@@ -151,9 +150,8 @@ public class ServerTools {
           String tagID = (String) options.hash.get("name");
           if (context != null && !addedTags.contains(tagID)) {
             HashMap<String, String> newHash = new HashMap<>();
-            for (String hashKey : options.hash.keySet()) {
-              String hashValue = options.hash.get(hashKey).toString();
-              newHash.put(hashKey, hashValue);
+            for (Entry<String, Object> hashEntry : options.hash.entrySet()) {
+              newHash.put(hashEntry.getKey(), hashEntry.getValue().toString());
             }
             values.add(new MetadataValue(tagID, new HashMap<>(newHash)));
             addedTags.add(tagID);
@@ -198,14 +196,14 @@ public class ServerTools {
         break;
       case "email":
         result = user.getEmail();
+        break;
       default:
         break;
     }
     return result;
   }
 
-  public static String autoGenerateRepresentationValue(IndexedRepresentation representation, User user,
-    String generator) {
+  public static String autoGenerateRepresentationValue(IndexedRepresentation representation, String generator) {
     String result = null;
     switch (generator) {
       case "now":
@@ -213,6 +211,7 @@ public class ServerTools {
         break;
       case "id":
         result = representation.getId();
+        break;
       default:
         break;
     }

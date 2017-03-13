@@ -176,7 +176,7 @@ public class ShowLogEntry extends Composite {
 
     List<LogEntryParameter> parameters = logEntry.getParameters();
 
-    if (parameters != null && parameters.size() > 0) {
+    if (parameters != null && !parameters.isEmpty()) {
       for (LogEntryParameter par : parameters) {
         HTML parPanel = new HTML();
         parPanel.setHTML(messages.logParameter(par.getName(), par.getValue()));

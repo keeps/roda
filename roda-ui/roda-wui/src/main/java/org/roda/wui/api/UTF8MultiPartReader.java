@@ -115,7 +115,7 @@ public class UTF8MultiPartReader implements MessageBodyReader<MultiPart> {
 
   protected MultiPart readMultiPart(final Class<MultiPart> type, final Type genericType, final Annotation[] annotations,
     MediaType mediaType, final MultivaluedMap<String, String> headers, final InputStream stream)
-      throws IOException, MIMEParsingException {
+    throws IOException, MIMEParsingException {
     mediaType = unquoteMediaTypeParameters(mediaType, "boundary");
 
     final MIMEMessage mimeMessage = new MIMEMessage(stream, mediaType.getParameters().get("boundary"), mimeConfig);
@@ -182,7 +182,7 @@ public class UTF8MultiPartReader implements MessageBodyReader<MultiPart> {
   private String getFixedHeaderValue(Header h) {
     String result = h.getValue();
 
-    if (h.getName().equals("Content-Disposition") && (result.indexOf("filename=") != -1)) {
+    if ("Content-Disposition".equals(h.getName()) && (result.indexOf("filename=") != -1)) {
       try {
         result = new String(result.getBytes("ISO-8859-1"), "UTF-8");
       } catch (UnsupportedEncodingException e) {

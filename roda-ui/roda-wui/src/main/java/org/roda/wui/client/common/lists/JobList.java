@@ -47,7 +47,6 @@ import config.i18n.client.ClientMessages;
  */
 public class JobList extends BasicAsyncTableCell<Job> {
 
-  // private final ClientLogger logger = new ClientLogger(getClass().getName());
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private TooltipTextColumn<Job> nameColumn;
@@ -129,7 +128,7 @@ public class JobList extends BasicAsyncTableCell<Job> {
         String ret = "";
         if (job != null) {
           if (job.getJobStats().getSourceObjectsCount() > 0) {
-            ret = job.getJobStats().getSourceObjectsCount() + "";
+            ret = Integer.toString(job.getJobStats().getSourceObjectsCount());
           }
         }
         return ret;
@@ -245,7 +244,7 @@ public class JobList extends BasicAsyncTableCell<Job> {
 
   @Override
   protected Sorter getSorter(ColumnSortList columnSortList) {
-    Map<Column<Job, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<Job, ?>, List<String>>();
+    Map<Column<Job, ?>, List<String>> columnSortingKeyMap = new HashMap<>();
     columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.JOB_NAME));
     columnSortingKeyMap.put(startDateColumn, Arrays.asList(RodaConstants.JOB_START_DATE));
     columnSortingKeyMap.put(statusColumn, Arrays.asList(RodaConstants.JOB_STATE));

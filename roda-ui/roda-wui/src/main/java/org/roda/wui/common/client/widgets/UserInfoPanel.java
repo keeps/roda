@@ -32,17 +32,11 @@ public class UserInfoPanel {
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
   private final User user;
-
   private final DockPanel layout;
-
   private final Label username;
-
   private final VerticalPanel centerLayout;
-
   private final HTMLTable infoLayout;
-
   private final DisclosurePanel detailsDisclosure;
-
   private final HTMLTable detailsLayout;
 
   /**
@@ -92,7 +86,7 @@ public class UserInfoPanel {
       layout.setWidget(rows, 1, fullNameValue);
       fullNameLabel.addStyleName("info-label");
       fullNameValue.addStyleName("info-value");
-      rows++;
+      // rows++;
     }
 
     // if (user.getBusinessCategory() != null) {

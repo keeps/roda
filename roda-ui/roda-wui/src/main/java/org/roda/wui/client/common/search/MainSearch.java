@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -241,14 +242,13 @@ public class MainSearch extends Composite {
     Facets facets = new Facets(itemsFacetsMap.keySet());
     itemsSearchResultPanel = new AIPList(filterAips, justActive, facets, messages.searchResults(), itemsSelectable);
 
-    Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
-    for (FacetParameter facetParameter : itemsFacetsMap.keySet()) {
-      facetPanels.put(facetParameter.getName(), itemsFacetsMap.get(facetParameter));
+    Map<String, FlowPanel> facetPanels = new HashMap<>();
+    for (Entry<FacetParameter, FlowPanel> entry : itemsFacetsMap.entrySet()) {
+      facetPanels.put(entry.getKey().getName(), entry.getValue());
     }
+
     FacetUtils.bindFacets(itemsSearchResultPanel, facetPanels);
-
     ListSelectionUtils.bindBrowseOpener(itemsSearchResultPanel);
-
     itemsSearchResultPanel.setActionable(AipActions.get(parentAipId, parentAipState));
   }
 
@@ -257,14 +257,13 @@ public class MainSearch extends Composite {
     representationsSearchResultPanel = new RepresentationList(filterRepresentations, justActive, facets,
       messages.searchResults(), representationsSelectable);
 
-    Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
-    for (FacetParameter facetParameter : representationsFacetsMap.keySet()) {
-      facetPanels.put(facetParameter.getName(), representationsFacetsMap.get(facetParameter));
+    Map<String, FlowPanel> facetPanels = new HashMap<>();
+    for (Entry<FacetParameter, FlowPanel> entry : representationsFacetsMap.entrySet()) {
+      facetPanels.put(entry.getKey().getName(), entry.getValue());
     }
+
     FacetUtils.bindFacets(representationsSearchResultPanel, facetPanels);
-
     ListSelectionUtils.bindBrowseOpener(representationsSearchResultPanel);
-
     representationsSearchResultPanel.setActionable(RepresentationActions.get());
   }
 
@@ -274,9 +273,9 @@ public class MainSearch extends Composite {
     filesSearchResultPanel = new SearchFileList(filterFiles, justActive, facets, messages.searchResults(),
       filesSelectable, showFilesPath);
 
-    Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
-    for (FacetParameter facetParameter : filesFacetsMap.keySet()) {
-      facetPanels.put(facetParameter.getName(), filesFacetsMap.get(facetParameter));
+    Map<String, FlowPanel> facetPanels = new HashMap<>();
+    for (Entry<FacetParameter, FlowPanel> entry : filesFacetsMap.entrySet()) {
+      facetPanels.put(entry.getKey().getName(), entry.getValue());
     }
 
     FacetUtils.bindFacets(filesSearchResultPanel, facetPanels);

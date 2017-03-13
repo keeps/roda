@@ -71,6 +71,7 @@ public final class CloseableIterables {
         };
       }
     };
+
     return concat(iterable);
   }
 

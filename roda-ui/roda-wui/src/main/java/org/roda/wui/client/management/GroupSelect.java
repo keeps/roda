@@ -53,11 +53,8 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Lis
     implements HasValueChangeHandlers<Group>, Comparable<GroupCheckbox> {
 
     private final String sortingkeyword;
-
     private final Group group;
-
     private final CheckBox checkbox;
-
     private final Label descriptionLabel;
 
     public GroupCheckbox(Group group, String description, String sortingkeyword) {
@@ -130,11 +127,8 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Lis
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
   private final List<String> blacklist;
-
   private final List<GroupCheckbox> groups;
-
   private HashMap<String, Group> userSelections;
-
   private boolean enabled;
 
   /**
@@ -144,15 +138,14 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Lis
    *          start as visible or wait until its initialized
    */
   public GroupSelect(boolean visible) {
-    this.groups = new Vector<GroupCheckbox>();
-    this.blacklist = new Vector<String>();
-    this.userSelections = new HashMap<String, Group>();
+    this.groups = new Vector<>();
+    this.blacklist = new Vector<>();
+    this.userSelections = new HashMap<>();
     enabled = true;
     this.addStyleName("groups");
   }
 
   public void init(final AsyncCallback<Boolean> callback) {
-
     // TODO use RodaMemberList instead of a list of checkboxes
 
     boolean isUser = false;
@@ -228,7 +221,7 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Lis
   }
 
   public Set<String> getMemberGroups() {
-    Set<String> memberGroups = new HashSet<String>();
+    Set<String> memberGroups = new HashSet<>();
     for (GroupCheckbox g : groups) {
       if (g.isChecked()) {
         memberGroups.add(g.getGroup().getId());
@@ -251,6 +244,6 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Lis
   }
 
   public List<Group> getValue() {
-    return new Vector<Group>(getUserSelections().values());
+    return new Vector<>(getUserSelections().values());
   }
 }

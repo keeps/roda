@@ -74,7 +74,7 @@ public class BreadcrumbUtils {
         if (ancestor != null) {
           SafeHtml breadcrumbLabel = getBreadcrumbLabel(ancestor);
           String breadcrumbTitle = getBreadcrumbTitle(ancestor);
-          List<String> historyTokens = new ArrayList<String>();
+          List<String> historyTokens;
 
           if (events) {
             historyTokens = getViewItemEventsHistoryToken(ancestor.getId());
@@ -202,7 +202,7 @@ public class BreadcrumbUtils {
   }
 
   public static List<BreadcrumbItem> getTransferredResourceBreadcrumbs(TransferredResource r) {
-    List<BreadcrumbItem> ret = new ArrayList<BreadcrumbItem>();
+    List<BreadcrumbItem> ret = new ArrayList<>();
 
     ret.add(
       new BreadcrumbItem(DescriptionLevelUtils.getTopIconSafeHtml(), "", IngestTransfer.RESOLVER.getHistoryPath()));
@@ -210,7 +210,7 @@ public class BreadcrumbUtils {
 
       // add parent
       if (r.getParentUUID() != null) {
-        List<String> path = new ArrayList<String>();
+        List<String> path = new ArrayList<>();
         path.addAll(IngestTransfer.RESOLVER.getHistoryPath());
         path.add(r.getParentUUID());
         SafeHtml breadcrumbLabel = SafeHtmlUtils.fromString(r.getParentId());
@@ -218,7 +218,7 @@ public class BreadcrumbUtils {
       }
 
       // add self
-      List<String> path = new ArrayList<String>();
+      List<String> path = new ArrayList<>();
       path.addAll(IngestTransfer.RESOLVER.getHistoryPath());
       path.add(r.getUUID());
       SafeHtml breadcrumbLabel = SafeHtmlUtils.fromString(r.getName());
@@ -286,8 +286,7 @@ public class BreadcrumbUtils {
     SafeHtml elementLevelIconSafeHtml = DescriptionLevelUtils.getElementLevelIconSafeHtml(level, false);
     SafeHtmlBuilder builder = new SafeHtmlBuilder();
     builder.append(elementLevelIconSafeHtml).append(SafeHtmlUtils.fromString(label));
-    SafeHtml breadcrumbLabel = builder.toSafeHtml();
-    return breadcrumbLabel;
+    return builder.toSafeHtml();
   }
 
   private static SafeHtml getBreadcrumbLabel(IndexedAIP aip) {

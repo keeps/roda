@@ -10,11 +10,13 @@
  */
 package org.roda.wui.client.management;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.MissingResourceException;
 import java.util.Set;
 import java.util.Vector;
@@ -47,15 +49,10 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
   private class Permission extends HorizontalPanel implements HasValueChangeHandlers<String>, Comparable<Permission> {
 
     private final String sortingkeyword;
-
     private final String role;
-
     private boolean locked;
-
     private boolean enabled;
-
     private final CheckBox checkbox;
-
     private final Label descriptionLabel;
 
     public Permission(String role, String description, String sortingkeyword) {
@@ -171,8 +168,8 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
    *
    */
   public PermissionsPanel() {
-    this.permissions = new Vector<Permission>();
-    this.userSelections = new Vector<String>();
+    this.permissions = new Vector<>();
+    this.userSelections = new Vector<>();
 
     loading = new LoadingPopup(this);
     loading.show();
@@ -191,9 +188,10 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
       }
 
       public void onSuccess(Map<String, String> rodaProperties) {
-        for (String key : rodaProperties.keySet()) {
+        for (Entry<String, String> entry : rodaProperties.entrySet()) {
+          String key = entry.getKey();
           if (key.startsWith("ui.role.")) {
-            String role = (String) rodaProperties.get(key);
+            String role = entry.getValue();
             String description;
             try {
               description = messages.role(role);
@@ -201,7 +199,7 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
               description = role + " (needs translation)";
             }
 
-            Permission permission = new Permission(role, description, (String) key);
+            Permission permission = new Permission(role, description, key);
             permissions.add(permission);
           }
         }
@@ -223,6 +221,7 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
             }
           });
         }
+
         loading.hide();
         callback.onSuccess(true);
       }
@@ -276,7 +275,7 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
   }
 
   public void updateLockedPermissions(Set<String> memberGroups) {
-    if (memberGroups.size() > 0) {
+    if (!memberGroups.isEmpty()) {
       this.setEnabled(false);
       loading.show();
     }
@@ -288,16 +287,18 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
    * @return
    */
   public Set<String> getDirectRoles() {
-    List<Permission> checkedPermissions = new Vector<Permission>();
+    List<Permission> checkedPermissions = new ArrayList<>();
     for (Permission p : permissions) {
       if (p.isChecked() && !p.isLocked()) {
         checkedPermissions.add(p);
       }
     }
-    Set<String> specialRoles = new HashSet<String>();
+
+    Set<String> specialRoles = new HashSet<>();
     for (int i = 0; i < checkedPermissions.size(); i++) {
-      specialRoles.add(((Permission) checkedPermissions.get(i)).getRole());
+      specialRoles.add(checkedPermissions.get(i).getRole());
     }
+
     return specialRoles;
   }
 

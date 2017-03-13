@@ -126,7 +126,7 @@ public class CreateDescriptiveMetadata extends Composite {
 
   private boolean inXML = false;
 
-  private List<SupportedMetadataTypeBundle> metadataTypes = new ArrayList<SupportedMetadataTypeBundle>();
+  private List<SupportedMetadataTypeBundle> metadataTypes = new ArrayList<>();
   private SupportedMetadataTypeBundle selectedBundle = null;
   private TextArea metadataXML;
   private String metadataTextFromForm = null;
@@ -233,7 +233,7 @@ public class CreateDescriptiveMetadata extends Composite {
       });
 
     Element firstElement = showXml.getElement().getFirstChildElement();
-    if (firstElement.getTagName().equalsIgnoreCase("input")) {
+    if ("input".equalsIgnoreCase(firstElement.getTagName())) {
       firstElement.setAttribute("title", "browse input");
     }
   }

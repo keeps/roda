@@ -102,7 +102,7 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public ReturnWithExceptions<Void> aipCreated(final AIP aip) {
-    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<>();
     try {
       List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
       ReturnWithExceptions<Void> aipExceptions = indexAIP(aip, ancestors);
@@ -129,7 +129,7 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   private ReturnWithExceptions<Void> indexAIP(final AIP aip, final List<String> ancestors, boolean safemode) {
-    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<>();
     try {
       SolrInputDocument aipDoc = SolrUtils.aipToSolrInputDocument(aip, ancestors, model, safemode);
       index.add(RodaConstants.INDEX_AIP, aipDoc);
@@ -154,7 +154,7 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   public ReturnWithExceptions<Void> indexPreservationsEvents(final String aipId, final String representationId) {
-    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<>();
     CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationMetadata = null;
     try {
       if (representationId == null) {
@@ -212,7 +212,7 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   private ReturnWithExceptions<Void> indexRepresentations(final AIP aip, final List<String> ancestors) {
-    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<>();
     for (Representation representation : aip.getRepresentations()) {
       ReturnWithExceptions<Void> repExceptions = indexRepresentation(aip, representation, ancestors);
       exceptions.addExceptions(repExceptions.getExceptions());
@@ -222,7 +222,7 @@ public class IndexModelObserver implements ModelObserver {
 
   private ReturnWithExceptions<Void> indexRepresentation(final AIP aip, final Representation representation,
     final List<String> ancestors) {
-    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<>();
     CloseableIterable<OptionalWithCause<File>> allFiles = null;
     try {
       Long sizeInBytes = 0L;
@@ -279,7 +279,7 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   private ReturnWithExceptions<Long> indexFile(AIP aip, File file, List<String> ancestors, boolean recursive) {
-    ReturnWithExceptions<Long> exceptions = new ReturnWithExceptions<Long>();
+    ReturnWithExceptions<Long> exceptions = new ReturnWithExceptions<>();
     Long sizeInBytes = 0L;
     SolrInputDocument fileDocument = SolrUtils.fileToSolrDocument(aip, file, ancestors);
 
@@ -1154,7 +1154,7 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   public ReturnWithExceptions<Void> dipCreated(DIP dip, boolean commit) {
-    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<Void>();
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<>();
     SolrInputDocument dipDocument = SolrUtils.dipToSolrDocument(dip);
     try {
       index.add(RodaConstants.INDEX_DIP, dipDocument);

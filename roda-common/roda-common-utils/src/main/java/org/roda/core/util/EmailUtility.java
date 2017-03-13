@@ -86,12 +86,11 @@ public class EmailUtility {
     }
     msg.setRecipients(Message.RecipientType.TO, addressTo);
 
-    // Optional : You can also set your custom headers in the Email if you
-    // want
+    // INFO You can also set custom headers in the Email if you want
     // msg.addHeader("MyHeaderName", "myHeaderValue");
 
     String htmlMessage = String.format(
-      "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "<html><body><pre>%s</pre></body></html>",
+      "<?xml version=\"1.0\" encoding=\"UTF-8\"?><html><body><pre>%s</pre></body></html>",
       StringEscapeUtils.escapeHtml4(message));
 
     MimeMultipart mimeMultipart = new MimeMultipart();

@@ -50,7 +50,6 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
   private static final String FILTER_ICON = "<i class='fa fa-filter' aria-hidden='true'></i>";
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
   private static final Binder binder = GWT.create(Binder.class);
 
   interface Binder extends UiBinder<Widget, SearchPanel> {
@@ -209,8 +208,8 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
 
   private Filter buildSearchFilter(String basicQuery, Filter defaultFilter, String allFilter, FlowPanel fieldsPanel,
     boolean defaultFilterIncremental) {
-    List<FilterParameter> parameters = new ArrayList<FilterParameter>();
-    Map<String, FilterParameter> advancedSearchFilters = new HashMap<String, FilterParameter>();
+    List<FilterParameter> parameters = new ArrayList<>();
+    Map<String, FilterParameter> advancedSearchFilters = new HashMap<>();
 
     if (basicQuery != null && basicQuery.trim().length() > 0) {
       parameters.add(new BasicSearchFilterParameter(allFilter, basicQuery));
@@ -231,7 +230,7 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
               ((OrFiltersParameters) oldFilterParameter).setValues(filterParameters);
               advancedSearchFilters.put(searchFieldId, oldFilterParameter);
             } else {
-              List<FilterParameter> filterParameters = new ArrayList<FilterParameter>();
+              List<FilterParameter> filterParameters = new ArrayList<>();
               filterParameters.add(oldFilterParameter);
               filterParameters.add(filterParameter);
               advancedSearchFilters.put(searchFieldId, new OrFiltersParameters(filterParameters));
@@ -242,8 +241,8 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
         }
       }
 
-      for (String key : advancedSearchFilters.keySet()) {
-        parameters.add(advancedSearchFilters.get(key));
+      for (FilterParameter value : advancedSearchFilters.values()) {
+        parameters.add(value);
       }
     }
 

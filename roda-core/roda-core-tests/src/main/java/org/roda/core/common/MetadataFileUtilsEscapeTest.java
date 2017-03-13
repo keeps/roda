@@ -30,14 +30,14 @@ public class MetadataFileUtilsEscapeTest {
   @Test
   public void testEscape() throws GenericException {
     int total = (int) Math.pow(2, 20);
-    String temp = "";
+    StringBuilder temp = new StringBuilder();
     Map<String, String> values = new HashMap<String, String>();
     for (int i = 0; i < total; i++) {
       char c = (char) i;
-      temp += c;
+      temp.append(c);
       if (i % 100 == 0) {
-        values.put(temp, temp);
-        temp = "";
+        values.put(temp.toString(), temp.toString());
+        temp = new StringBuilder();
       }
     }
 

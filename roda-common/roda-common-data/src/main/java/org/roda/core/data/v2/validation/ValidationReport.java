@@ -134,10 +134,11 @@ public class ValidationReport implements Serializable {
 
     if (addIssueValues) {
       // line number
-      getValidationEntryAttribute(sb, "line_number", "Line number", validationEntry.getLineNumber() + "");
+      getValidationEntryAttribute(sb, "line_number", "Line number", Integer.toString(validationEntry.getLineNumber()));
 
       // column number
-      getValidationEntryAttribute(sb, "column_number", "Column number", validationEntry.getColumnNumber() + "");
+      getValidationEntryAttribute(sb, "column_number", "Column number",
+        Integer.toString(validationEntry.getColumnNumber()));
     }
 
     sb.append(getDivEnding());

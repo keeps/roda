@@ -24,30 +24,31 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @XmlRootElement(name = "risks")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Risks implements RODAObjectList<Risk> {
-  private List<Risk> risks;
+  private static final long serialVersionUID = 1430901222528933545L;
+  private List<Risk> riskList;
 
   public Risks() {
     super();
-    risks = new ArrayList<Risk>();
+    riskList = new ArrayList<>();
   }
 
   public Risks(List<Risk> risks) {
     super();
-    this.risks = risks;
+    this.riskList = risks;
   }
 
   @JsonProperty(value = "risks")
   @XmlElement(name = "risk")
   public List<Risk> getObjects() {
-    return risks;
+    return riskList;
   }
 
   public void setObjects(List<Risk> risks) {
-    this.risks = risks;
+    this.riskList = risks;
   }
 
   public void addObject(Risk risk) {
-    this.risks.add(risk);
+    this.riskList.add(risk);
   }
 
 }

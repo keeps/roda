@@ -65,7 +65,6 @@ public class Help {
   }
 
   private boolean initialized;
-
   private HTMLWidgetWrapper layout;
 
   private Help() {
@@ -81,7 +80,7 @@ public class Help {
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-    if (historyTokens.size() == 0) {
+    if (historyTokens.isEmpty()) {
       init();
       callback.onSuccess(layout);
     } else {

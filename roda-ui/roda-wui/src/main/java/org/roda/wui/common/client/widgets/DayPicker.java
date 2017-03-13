@@ -89,7 +89,7 @@ public class DayPicker extends ListBox {
       this.type = type;
       this.clear();
       for (int i = 1; i <= days(); i++) {
-        this.addItem(i < 10 ? "0" + i : "" + i);
+        this.addItem(i < 10 ? "0" + i : Integer.toString(i));
       }
       setEnabled(true);
       if (initial) {
@@ -123,7 +123,6 @@ public class DayPicker extends ListBox {
   public String getSelected() {
     int selectedIndex = getSelectedIndex();
     if (selectedIndex == -1) {
-      // throw new NoSuchElementException("No item selected");
       selectedIndex = 0;
     }
     return getItemText(selectedIndex);
@@ -135,7 +134,7 @@ public class DayPicker extends ListBox {
    * @return
    */
   public int getSelectedInt() {
-    return Integer.valueOf(getSelected()).intValue();
+    return Integer.parseInt(getSelected());
   }
 
   /**

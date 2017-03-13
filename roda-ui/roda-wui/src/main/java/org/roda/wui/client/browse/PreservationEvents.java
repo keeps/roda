@@ -113,7 +113,7 @@ public class PreservationEvents extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      if (historyTokens.size() == 0) {
+      if (historyTokens.isEmpty()) {
         PreservationEvents preservationEvents = new PreservationEvents();
         callback.onSuccess(preservationEvents);
       } else {
@@ -146,14 +146,14 @@ public class PreservationEvents extends Composite {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
-  private static final List<String> aipFieldsToReturn = new ArrayList<String>(
+  private static final List<String> aipFieldsToReturn = new ArrayList<>(
     Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_GHOST, RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL));
 
-  private static final List<String> representationFieldsToReturn = new ArrayList<String>(
+  private static final List<String> representationFieldsToReturn = new ArrayList<>(
     Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.REPRESENTATION_AIP_ID, RodaConstants.REPRESENTATION_ID,
       RodaConstants.REPRESENTATION_TYPE));
 
-  private static final List<String> fileFieldsToReturn = new ArrayList<String>(
+  private static final List<String> fileFieldsToReturn = new ArrayList<>(
     Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.FILE_PARENT_UUID, RodaConstants.FILE_PATH,
       RodaConstants.FILE_ANCESTORS_PATH, RodaConstants.FILE_ORIGINALNAME, RodaConstants.FILE_FILE_ID,
       RodaConstants.FILE_AIP_ID, RodaConstants.FILE_REPRESENTATION_ID, RodaConstants.FILE_ISDIRECTORY));
@@ -230,7 +230,7 @@ public class PreservationEvents extends Composite {
     eventList = new PreservationEventList(filter, facets, messages.preservationEventsTitle(), false);
 
     facetClasses = new FlowPanel();
-    Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
+    Map<String, FlowPanel> facetPanels = new HashMap<>();
     facetPanels.put(RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS, facetClasses);
     FacetUtils.bindFacets(eventList, facetPanels);
 

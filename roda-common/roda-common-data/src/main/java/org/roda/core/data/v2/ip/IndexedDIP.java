@@ -49,6 +49,16 @@ public class IndexedDIP extends DIP implements IsIndexed, HasPermissions {
   }
 
   @Override
+  public int hashCode() {
+    return super.hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return super.equals(obj);
+  }
+
+  @Override
   public String toString() {
     return "IndexedDIP [super=" + super.toString() + ", openExternalURL=" + openExternalURL + "]";
   }

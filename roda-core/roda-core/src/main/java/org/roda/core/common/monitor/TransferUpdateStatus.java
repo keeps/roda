@@ -58,7 +58,6 @@ public class TransferUpdateStatus {
   }
 
   public void setUpdatingStatus(Optional<String> folderRelativePath, boolean isUpdatingStatus) {
-
     if (folderRelativePath.isPresent()) {
       if (isUpdatingStatus) {
         isUpdatingFolderStatus.add(folderRelativePath.get());
@@ -68,7 +67,6 @@ public class TransferUpdateStatus {
     } else {
       TransferUpdateStatus.isUpdatingBaseStatus = isUpdatingStatus;
     }
-
-  };
+  }
 
 }

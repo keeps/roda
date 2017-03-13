@@ -16,7 +16,7 @@ public class AcessibleMenuBar extends MenuBar {
 
   private void makeAccessible() {
     Element firstChildElement = this.getElement().getFirstChildElement();
-    if (firstChildElement.getTagName().equalsIgnoreCase("input")) {
+    if ("input".equalsIgnoreCase(firstChildElement.getTagName())) {
       firstChildElement.setTitle("input_title");
     }
   }
