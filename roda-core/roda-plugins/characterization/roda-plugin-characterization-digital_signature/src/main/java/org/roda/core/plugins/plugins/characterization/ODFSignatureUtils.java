@@ -86,7 +86,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.poi.poifs.crypt.dsig.KeyInfoKeySelector;
 import org.apache.xml.security.Init;
+import org.apache.xml.security.c14n.CanonicalizationException;
 import org.apache.xml.security.c14n.Canonicalizer;
+import org.apache.xml.security.c14n.InvalidCanonicalizerException;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.roda.core.data.common.RodaConstants;
 import org.w3c.dom.Document;
@@ -439,7 +441,9 @@ public final class ODFSignatureUtils {
   }
 
   private static List<Reference> getReferenceList(ZipFile zipFile, DocumentBuilder documentBuilder,
-    XMLSignatureFactory factory, NodeList listFileEntry, DigestMethod digestMethod) throws Exception {
+    XMLSignatureFactory factory, NodeList listFileEntry, DigestMethod digestMethod)
+    throws IOException, SAXException, NoSuchAlgorithmException, InvalidAlgorithmParameterException,
+    CanonicalizationException, InvalidCanonicalizerException {
 
     Transform transform = factory.newTransform(Canonicalizer.ALGO_ID_C14N_OMIT_COMMENTS, (TransformParameterSpec) null);
     List<Transform> transformList = new ArrayList<>();
@@ -455,7 +459,6 @@ public final class ODFSignatureUtils {
       if (!fullPath.endsWith("/") && !fullPath.equals(META_INF_DOCUMENTSIGNATURES_XML)) {
         if ("content.xml".equals(fullPath) || "meta.xml".equals(fullPath) || "styles.xml".equals(fullPath)
           || "settings.xml".equals(fullPath)) {
-
           try (InputStream xmlFile = zipFile.getInputStream(zipFile.getEntry(fullPath))) {
             Element root = documentBuilder.parse(xmlFile).getDocumentElement();
             Canonicalizer canonicalizer = Canonicalizer.getInstance(Canonicalizer.ALGO_ID_C14N_OMIT_COMMENTS);

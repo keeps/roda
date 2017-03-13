@@ -152,13 +152,14 @@ public class Humanize {
    * <x> hours, <y> minutes and (z) seconds"
    */
   public static String durationMillisToLongDHMS(long duration) {
-    duration /= ONE_SECOND;
-    int seconds = (int) (duration % SECONDS);
-    duration /= SECONDS;
-    int minutes = (int) (duration % MINUTES);
-    duration /= MINUTES;
-    int hours = (int) (duration % HOURS);
-    int days = (int) (duration / HOURS);
+    long d = duration;
+    d /= ONE_SECOND;
+    int seconds = (int) (d % SECONDS);
+    d /= SECONDS;
+    int minutes = (int) (d % MINUTES);
+    d /= MINUTES;
+    int hours = (int) (d % HOURS);
+    int days = (int) (d / HOURS);
 
     String ret;
 

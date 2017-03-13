@@ -114,9 +114,7 @@ public class PasswordPanel extends SimplePanel implements HasValueChangeHandlers
     boolean valid = true;
     if (buttonMode) {
       valid = true;
-    } else if (!editPassword.getValue().equals(editPasswordRepeat.getValue())) {
-      valid = false;
-    } else if (editPassword.getValue().length() < 6) {
+    } else if (!editPassword.getValue().equals(editPasswordRepeat.getValue()) || editPassword.getValue().length() < 6) {
       valid = false;
     }
 

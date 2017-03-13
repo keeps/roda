@@ -218,7 +218,7 @@ public final class UnixCrypt extends Object {
   private static final int byteToUnsigned(byte b) {
     int value = (int) b;
 
-    return (value >= 0 ? value : value + 256);
+    return value >= 0 ? value : value + 256;
   }
 
   private static int fourBytesToInt(byte b[], int offset) {
@@ -227,19 +227,19 @@ public final class UnixCrypt extends Object {
     value = byteToUnsigned(b[offset++]);
     value |= (byteToUnsigned(b[offset++]) << 8);
     value |= (byteToUnsigned(b[offset++]) << 16);
-    value |= (byteToUnsigned(b[offset++]) << 24);
+    value |= (byteToUnsigned(b[offset]) << 24);
 
-    return (value);
+    return value;
   }
 
-  private static final void intToFourBytes(int iValue, byte b[], int offset) {
+  private static final void intToFourBytes(int iValue, byte[] b, int offset) {
     b[offset++] = (byte) ((iValue) & 0xff);
     b[offset++] = (byte) ((iValue >>> 8) & 0xff);
     b[offset++] = (byte) ((iValue >>> 16) & 0xff);
-    b[offset++] = (byte) ((iValue >>> 24) & 0xff);
+    b[offset] = (byte) ((iValue >>> 24) & 0xff);
   }
 
-  private static final void PERM_OP(int a, int b, int n, int m, int results[]) {
+  private static final void PERM_OP(int a, int b, int n, int m, int[] results) {
     int t;
 
     t = ((a >>> n) ^ b) & m;
@@ -337,15 +337,15 @@ public final class UnixCrypt extends Object {
     return (L);
   }
 
-  private static final int[] body(int schedule[], int Eswap0, int Eswap1) {
+  private static final int[] body(int[] schedule, int eswap0, int eswap1) {
     int left = 0;
     int right = 0;
-    int t = 0;
+    int t;
 
     for (int j = 0; j < 25; j++) {
       for (int i = 0; i < ITERATIONS * 2; i += 4) {
-        left = D_ENCRYPT(left, right, i, Eswap0, Eswap1, schedule);
-        right = D_ENCRYPT(right, left, i + 2, Eswap0, Eswap1, schedule);
+        left = D_ENCRYPT(left, right, i, eswap0, eswap1, schedule);
+        right = D_ENCRYPT(right, left, i + 2, eswap0, eswap1, schedule);
       }
       t = left;
       left = right;
@@ -360,7 +360,7 @@ public final class UnixCrypt extends Object {
     left &= 0xffffffff;
     right &= 0xffffffff;
 
-    int results[] = new int[2];
+    int[] results = new int[2];
 
     PERM_OP(right, left, 1, 0x55555555, results);
     right = results[0];
@@ -408,7 +408,7 @@ public final class UnixCrypt extends Object {
     while (salt.length() < 2)
       salt += "A";
 
-    StringBuffer buffer = new StringBuffer("             ");
+    StringBuilder buffer = new StringBuilder("             ");
 
     char charZero = salt.charAt(0);
     char charOne = salt.charAt(1);
@@ -496,7 +496,6 @@ public final class UnixCrypt extends Object {
   public static final boolean matches(String encryptedPassword, String enteredPassword) {
     String salt = encryptedPassword.substring(0, 3);
     String newCrypt = crypt(salt, enteredPassword);
-
     return newCrypt.equals(encryptedPassword);
   }
 }

@@ -58,7 +58,7 @@ public class TransferredResourcesScanner {
   private final Path basePath;
   private IndexService index;
 
-  public TransferredResourcesScanner(Path basePath, IndexService index) throws Exception {
+  public TransferredResourcesScanner(Path basePath, IndexService index) {
     this.basePath = basePath;
     this.index = index;
   }

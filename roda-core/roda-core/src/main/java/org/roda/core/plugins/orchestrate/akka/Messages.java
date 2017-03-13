@@ -15,6 +15,7 @@ import java.util.UUID;
 
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
+import org.roda.core.data.v2.SerializableOptional;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
@@ -150,7 +151,7 @@ public class Messages {
 
     private Plugin<?> plugin;
     private JOB_STATE state;
-    private Optional<String> stateDatails;
+    private SerializableOptional<String> stateDatails;
 
     public JobStateUpdated(Plugin<?> plugin, JOB_STATE state) {
       this(plugin, state, Optional.empty());
@@ -160,7 +161,7 @@ public class Messages {
       super();
       this.plugin = plugin;
       this.state = state;
-      this.stateDatails = stateDatails;
+      this.stateDatails = SerializableOptional.setOptional(stateDatails);
     }
 
     public JobStateUpdated(Plugin<?> plugin, JOB_STATE state, Throwable throwable) {
@@ -176,7 +177,7 @@ public class Messages {
     }
 
     public Optional<String> getStateDatails() {
-      return stateDatails;
+      return stateDatails.getOptional();
     }
 
     @Override

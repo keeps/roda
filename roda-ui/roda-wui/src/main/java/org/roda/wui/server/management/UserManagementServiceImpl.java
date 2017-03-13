@@ -45,7 +45,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   private static final long serialVersionUID = 1L;
 
   @SuppressWarnings("unused")
-  private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
+  private final transient Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
   private static String RECAPTCHA_CODE_SECRET_PROPERTY = "ui.google.recaptcha.code.secret";
 

@@ -73,7 +73,6 @@ import org.roda.core.data.v2.index.facet.FacetFieldResult;
 import org.roda.core.data.v2.index.facet.FacetParameter;
 import org.roda.core.data.v2.index.facet.FacetParameter.SORT;
 import org.roda.core.data.v2.index.facet.Facets;
-import org.roda.core.data.v2.index.facet.RangeFacetParameter;
 import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.core.data.v2.index.filter.AndFiltersParameters;
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
@@ -1030,8 +1029,6 @@ public class SolrUtils {
           setQueryFacetParameter(query, (SimpleFacetParameter) facetParameter);
           appendValuesUsingOROperator(filterQuery, facetParameter.getName(),
             ((SimpleFacetParameter) facetParameter).getValues(), true);
-        } else if (facetParameter instanceof RangeFacetParameter) {
-          LOGGER.error("Unsupported facet parameter class: {}", facetParameter.getClass().getName());
         } else {
           LOGGER.error("Unsupported facet parameter class: {}", facetParameter.getClass().getName());
         }

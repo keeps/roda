@@ -179,14 +179,14 @@ public class UTF8MultiPartReader implements MessageBodyReader<MultiPart> {
     return multiPart;
   }
 
-  private String getFixedHeaderValue(Header h) {
+  private String getFixedHeaderValue(Header h) throws UnsupportedEncodingException {
     String result = h.getValue();
 
     if ("Content-Disposition".equals(h.getName()) && (result.indexOf("filename=") != -1)) {
       try {
         result = new String(result.getBytes("ISO-8859-1"), "UTF-8");
       } catch (UnsupportedEncodingException e) {
-        throw new RuntimeException("Can't convert header \"Content-Disposition\" to UTF8 format.");
+        throw new UnsupportedEncodingException("Can't convert header \"Content-Disposition\" to UTF8 format.");
       }
     }
 

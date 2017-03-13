@@ -108,8 +108,8 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
   private CheckBox selectAllCheckBox;
 
   private Column<T, Boolean> selectColumn;
-  private Set<T> selected = new HashSet<T>();
-  private final List<CheckboxSelectionListener<T>> listeners = new ArrayList<AsyncTableCell.CheckboxSelectionListener<T>>();
+  private Set<T> selected = new HashSet<>();
+  private final List<CheckboxSelectionListener<T>> listeners = new ArrayList<>();
 
   private Filter filter;
   private boolean justActive;
@@ -159,7 +159,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
     this.fieldsToReturn = fieldsToReturn;
 
-    display = new AccessibleCellTable<T>(getInitialPageSize(),
+    display = new AccessibleCellTable<>(getInitialPageSize(),
       (MyCellTableResources) GWT.create(MyCellTableResources.class), getKeyProvider(), summary);
     display.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.DISABLED);
     display.setLoadingIndicator(new HTML(HtmlSnippetUtils.LOADING));
@@ -263,7 +263,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     addValueChangeHandler(new ValueChangeHandler<IndexResult<T>>() {
       @Override
       public void onValueChange(ValueChangeEvent<IndexResult<T>> event) {
-        selected = new HashSet<T>();
+        selected = new HashSet<>();
         hideSelectAllPanel();
       }
     });
@@ -424,7 +424,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
   }
 
   public void refresh() {
-    selected = new HashSet<T>();
+    selected = new HashSet<>();
     hideSelectAllPanel();
     display.setVisibleRangeAndClearData(new Range(0, getInitialPageSize()), true);
     getSelectionModel().clear();
@@ -648,7 +648,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
         }
       }
 
-      ret = new SelectedItemsFilter<T>(filterPlusFacets, getClassToReturn().getName(), getJustActive());
+      ret = new SelectedItemsFilter<>(filterPlusFacets, getClassToReturn().getName(), getJustActive());
     } else {
       List<String> ids = new ArrayList<>();
 
@@ -656,7 +656,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
         ids.add(item.getUUID());
       }
 
-      ret = new SelectedItemsList<T>(ids, getClassToReturn().getName());
+      ret = new SelectedItemsList<>(ids, getClassToReturn().getName());
     }
 
     return ret;

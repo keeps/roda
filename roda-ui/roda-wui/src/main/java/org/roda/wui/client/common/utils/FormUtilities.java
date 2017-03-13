@@ -326,8 +326,9 @@ public class FormUtilities {
         mv.set("value", mvList.getSelectedValue());
         if (mandatory && (mvList.getSelectedValue() != null && !"".equals(mvList.getSelectedValue().trim()))) {
           mvList.removeStyleName("isWrong");
-        } else if (mandatory
-          && (mvList.getSelectedValue() == null || "".equalsIgnoreCase(mvList.getSelectedValue().trim()))) {
+        }
+
+        if (mandatory && (mvList.getSelectedValue() == null || "".equalsIgnoreCase(mvList.getSelectedValue().trim()))) {
           mvList.removeStyleName("isWrong");
         }
       }

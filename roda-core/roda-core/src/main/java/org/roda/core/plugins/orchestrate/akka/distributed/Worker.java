@@ -77,9 +77,7 @@ public class Worker extends UntypedActor {
     return new OneForOneStrategy(-1, Duration.Inf(), new Function<Throwable, Directive>() {
       @Override
       public Directive apply(Throwable t) {
-        if (t instanceof ActorInitializationException) {
-          return stop();
-        } else if (t instanceof DeathPactException) {
+        if (t instanceof ActorInitializationException || t instanceof DeathPactException) {
           return stop();
         } else if (t instanceof Exception) {
           if (currentWorkId != null) {

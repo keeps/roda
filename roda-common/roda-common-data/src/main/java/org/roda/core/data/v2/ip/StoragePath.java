@@ -7,9 +7,10 @@
  */
 package org.roda.core.data.v2.ip;
 
+import java.io.Serializable;
 import java.util.List;
 
-public interface StoragePath {
+public interface StoragePath extends Serializable {
 
   public String getContainerName();
 

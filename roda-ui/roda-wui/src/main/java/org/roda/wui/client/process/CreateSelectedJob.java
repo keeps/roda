@@ -384,7 +384,7 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
         workflowListDescriptionCategories.setVisible(false);
       }
 
-      if (selectedPlugin.getParameters().size() == 0) {
+      if (selectedPlugin.getParameters().isEmpty()) {
         workflowPanel.setVisible(false);
         workflowOptions.setPluginInfo(null);
       } else {

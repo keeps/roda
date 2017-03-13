@@ -43,10 +43,8 @@ public final class JsonUtils {
   }
 
   public static <T> T readObjectFromFile(Path jsonFile, Class<T> objectClass) throws GenericException {
-    try {
-      try (InputStream stream = Files.newInputStream(jsonFile)) {
-        return getObjectFromJson(stream, objectClass);
-      }
+    try (InputStream stream = Files.newInputStream(jsonFile)) {
+      return getObjectFromJson(stream, objectClass);
     } catch (IOException e) {
       throw new GenericException(e);
     }

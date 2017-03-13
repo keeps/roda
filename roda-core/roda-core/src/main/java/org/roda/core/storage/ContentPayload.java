@@ -40,6 +40,6 @@ public interface ContentPayload {
    * Retrieves an URI for the file (e.g. 'file:', 'http:', etc.)
    * 
    * @return
-   * */
+   */
   public URI getURI() throws IOException, UnsupportedOperationException;
 }

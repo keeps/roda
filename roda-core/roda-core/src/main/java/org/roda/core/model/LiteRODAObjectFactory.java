@@ -211,9 +211,7 @@ public final class LiteRODAObjectFactory {
       }
     } else if (objectClass == Report.class || objectClass == Representation.class) {
       ret = create(objectClass, 2, ids);
-    } else if (objectClass == TransferredResource.class) {
-      ret = create(objectClass, ids.size(), ids);
-    } else if (objectClass == PreservationMetadata.class) {
+    } else if (objectClass == TransferredResource.class || objectClass == PreservationMetadata.class) {
       ret = create(objectClass, ids.size(), ids);
     }
 

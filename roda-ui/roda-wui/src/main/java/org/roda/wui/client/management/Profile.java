@@ -68,7 +68,7 @@ public class Profile extends Composite {
         }
 
         public void onSuccess(User user) {
-          callback.onSuccess(new Boolean(!user.isGuest()));
+          callback.onSuccess(!user.isGuest());
         }
       });
     }
@@ -116,7 +116,7 @@ public class Profile extends Composite {
 
     userDataPanel.setUsernameReadOnly(true);
   }
-  
+
   @Override
   protected void onLoad() {
     super.onLoad();
