@@ -95,16 +95,17 @@ public class PasswordHandler {
    * @throws NoSuchAlgorithmException
    */
   public String generateDigest(String password, String saltHex, String algorithm) throws NoSuchAlgorithmException {
+    String alg = algorithm;
 
     if ("crypt".equalsIgnoreCase(algorithm)) {
       return "{CRYPT}" + UnixCrypt.crypt(password);
     } else if ("sha".equalsIgnoreCase(algorithm)) {
-      algorithm = "SHA-1";
+      alg = "SHA-1";
     } else if ("md5".equalsIgnoreCase(algorithm)) {
-      algorithm = "MD5";
+      alg = "MD5";
     }
 
-    MessageDigest msgDigest = MessageDigest.getInstance(algorithm);
+    MessageDigest msgDigest = MessageDigest.getInstance(alg);
 
     byte[] salt = {};
     if (saltHex != null) {
@@ -113,9 +114,9 @@ public class PasswordHandler {
 
     String label = null;
 
-    if ("SHA".startsWith(algorithm)) {
+    if ("SHA".startsWith(alg)) {
       label = (salt.length > 0) ? "{SSHA}" : "{SHA}";
-    } else if ("MD5".startsWith(algorithm)) {
+    } else if ("MD5".startsWith(alg)) {
       label = (salt.length > 0) ? "{SMD5}" : "{MD5}";
     }
 
@@ -138,7 +139,8 @@ public class PasswordHandler {
   }
 
   private static byte[][] split(byte[] src, int n) {
-    byte[] l, r;
+    byte[] l;
+    byte[] r;
     if (src.length <= n) {
       l = src;
       r = new byte[0];
@@ -165,13 +167,13 @@ public class PasswordHandler {
   }
 
   private static byte[] fromHex(String s) {
-    s = s.toLowerCase();
-    byte[] b = new byte[(s.length() + 1) / 2];
+    String ls = s.toLowerCase();
+    byte[] b = new byte[(ls.length() + 1) / 2];
     int j = 0;
     int h;
     int nybble = -1;
-    for (int i = 0; i < s.length(); ++i) {
-      h = hexits.indexOf(s.charAt(i));
+    for (int i = 0; i < ls.length(); ++i) {
+      h = hexits.indexOf(ls.charAt(i));
       if (h >= 0) {
         if (nybble < 0) {
           nybble = h;

@@ -221,7 +221,9 @@ public class UserLogin {
         User authUser = user;
         if (member instanceof User && member.getName().equals(authUser.getName())) {
           onLoginStatusChanged(authUser);
-        } else if (member instanceof Group && Arrays.asList(authUser.getGroups()).contains(member.getName())) {
+        }
+
+        if (member instanceof Group && Arrays.asList(authUser.getGroups()).contains(member.getName())) {
           onLoginStatusChanged(authUser);
         }
       }
@@ -310,6 +312,7 @@ public class UserLogin {
         if (role == null) {
           GWT.log("Could not find role for path " + res.getHistoryPath());
         }
+
         getAuthenticatedUser(new AsyncCallback<User>() {
 
           public void onFailure(Throwable caught) {
@@ -317,7 +320,7 @@ public class UserLogin {
           }
 
           public void onSuccess(User authUser) {
-            callback.onSuccess(new Boolean(authUser.hasRole(role)));
+            callback.onSuccess(authUser.hasRole(role));
           }
 
         });
@@ -353,19 +356,20 @@ public class UserLogin {
               lastOne = false;
             }
           }
+
           if (lastOne) {
             if (exclusive) {
               boolean ret = true;
               for (int i = 0; i < results.length; i++) {
                 ret = results[i].booleanValue() ? ret : false;
               }
-              callback.onSuccess(new Boolean(ret));
+              callback.onSuccess(ret);
             } else {
               boolean ret = false;
               for (int i = 0; i < results.length; i++) {
                 ret = results[i].booleanValue() ? true : ret;
               }
-              callback.onSuccess(new Boolean(ret));
+              callback.onSuccess(ret);
             }
           }
         }

@@ -15,7 +15,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -125,7 +124,7 @@ import org.slf4j.LoggerFactory;
 public class ModelService extends ModelObservable {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ModelService.class);
-  
+
   private static final DateTimeFormatter LOG_NAME_DATE_FORMAT = DateTimeFormat.forPattern("yyyy-MM-dd");
 
   private final StorageService storage;
@@ -2779,8 +2778,6 @@ public class ModelService extends ModelObservable {
 
     return CloseableIterables.concat(inStorage, notStorage);
   }
-
-  
 
   private boolean isToIndex(String fileName, int daysToIndex) {
     boolean isToIndex = false;

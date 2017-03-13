@@ -76,7 +76,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
 
     // 1) list of containers
     CloseableIterable<Container> iterable = getStorage().listContainers();
-    Iterator<Container> iterator = iterable.iterator();
+    // Iterator<Container> iterator = iterable.iterator();
     // assertThat("Storage starts with empty list of containers",
     // !iterator.hasNext());
 
@@ -87,7 +87,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
     getStorage().createContainer(containerStoragePath);
 
-    iterator = getStorage().listContainers().iterator();
+    Iterator<Container> iterator = getStorage().listContainers().iterator();
     assertTrue(iterator.hasNext());
     Container next = iterator.next();
     assertNotNull(next);

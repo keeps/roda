@@ -197,39 +197,35 @@ public class MaskedTextBox extends TextBox {
   }-*/;
 
   private void transformMask() {
+    StringBuilder contentBuilder = new StringBuilder(this.content);
+
     for (Integer i = 0; i < this.mask.toCharArray().length; i++) {
       Character ch = this.mask.toCharArray()[i];
       switch (ch) {
         case '#':
           this.expression.add("[0-9]{1}");
-          this.content += "_";
+          contentBuilder.append("_");
           break;
-
         case '9':
           this.expression.add("[\\s0-9]{1}");
-          this.content += "_";
+          contentBuilder.append("_");
           break;
-
         case 'A':
           this.expression.add("[A-Z]{1}");
-          this.content += "_";
+          contentBuilder.append("_");
           break;
-
         case 'a':
           this.expression.add("[a-z]{1}");
-          this.content += "_";
+          contentBuilder.append("_");
           break;
-
         case 'B':
           this.expression.add("[A-Za-z]{1}");
-          this.content += "_";
+          contentBuilder.append("_");
           break;
-
         case 'C':
           this.expression.add("[A-Za-z0-9]{1}");
-          this.content += "_";
+          contentBuilder.append("_");
           break;
-
         case '/':
         case ',':
         case '*':
@@ -243,11 +239,14 @@ public class MaskedTextBox extends TextBox {
         case '=':
         case '+':
         case ' ':
-          this.content += ch;
+          contentBuilder.append(ch);
+          break;
+        default:
           break;
       }
     }
 
+    this.content = contentBuilder.toString();
     this.baseContent = this.content;
     super.setText(this.content);
   }

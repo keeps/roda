@@ -14,15 +14,18 @@ import com.google.gwt.user.client.ui.TextBox;
 public class AccessibleTextBox extends TextBox {
   public AccessibleTextBox(Label label) {
     super();
+
     if (this.getElement().getId() == null) {
       this.getElement().setId("id_" + Random.nextInt(99999));
     }
-    if (label == null) {
-      label = new Label("label");
-      label.setVisible(false);
+
+    Label textLabel = label;
+    if (textLabel == null) {
+      textLabel = new Label("label");
+      textLabel.setVisible(false);
     }
 
-    label.getElement().setAttribute("for", this.getElement().getId());
-    this.getParent().getParent().getElement().appendChild(label.getElement());
+    textLabel.getElement().setAttribute("for", this.getElement().getId());
+    this.getParent().getParent().getElement().appendChild(textLabel.getElement());
   }
 }

@@ -39,23 +39,25 @@ public class Theme extends RodaWuiController {
     super();
   }
 
-  public static Pair<String, InputStream> getThemeResource(String resourceId, String fallbackResourceId) {
+  public static Pair<String, InputStream> getThemeResource(String id, String fallbackResourceId) {
+    String resourceId = id;
     InputStream themeResourceInputstream = RodaCoreFactory
       .getConfigurationFileAsStream(RodaConstants.CORE_THEME_FOLDER + "/" + resourceId);
+
     if (themeResourceInputstream == null) {
       themeResourceInputstream = RodaCoreFactory
         .getConfigurationFileAsStream(RodaConstants.CORE_THEME_FOLDER + "/" + fallbackResourceId);
       resourceId = fallbackResourceId;
     }
+
     return Pair.of(resourceId, themeResourceInputstream);
   }
 
   public static StreamResponse getThemeResourceStreamResponse(final Pair<String, InputStream> themeResourceInputstream)
     throws IOException, NotFoundException {
-    StreamResponse streamResponse = null;
-
     String resourceId = themeResourceInputstream.getFirst();
     String mimeType;
+
     if (resourceId.endsWith(".html")) {
       mimeType = RodaConstants.MEDIA_TYPE_TEXT_HTML;
     } else if (resourceId.endsWith(".css")) {
@@ -88,9 +90,7 @@ public class Theme extends RodaWuiController {
       }
     };
 
-    streamResponse = new StreamResponse(resourceId, mimeType, stream);
-
-    return streamResponse;
+    return new StreamResponse(resourceId, mimeType, stream);
   }
 
   public static Date getLastModifiedDate(String resourceId) throws IOException {

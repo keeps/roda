@@ -25,79 +25,71 @@ public class ClientLoggerImpl extends RemoteServiceServlet implements ClientLogg
   private static final long serialVersionUID = 3694771724613537482L;
 
   private String getUserInfo() {
-    String ret;
-    String address = this.getThreadLocalRequest().getRemoteAddr();
-    ret = "[" + address + "] ";
-    return ret;
+    return "[" + this.getThreadLocalRequest().getRemoteAddr() + "] ";
   }
 
   public void debug(String classname, String object) {
     Logger logger = LoggerFactory.getLogger(classname);
-    logger.debug(constructMessage(getUserInfo(), object));
+    logger.debug(String.format("%s%s", getUserInfo(), object));
   }
 
   public void debug(String classname, String object, Throwable error) {
     Logger logger = LoggerFactory.getLogger(classname);
-    logger.debug(constructMessage(getUserInfo(), object), error);
+    logger.debug(String.format("%s%s", getUserInfo(), object), error);
   }
 
   public void error(String classname, String object) {
     Logger logger = LoggerFactory.getLogger(classname);
-    logger.error(getUserInfo() + object);
+    logger.error(String.format("%s%s", getUserInfo(), object));
     sendError(classname, object, null);
-
   }
 
   public void error(String classname, String object, Throwable error) {
     Logger logger = LoggerFactory.getLogger(classname);
-    logger.error(getUserInfo() + object, error);
+    logger.error(String.format("%s%s", getUserInfo(), object), error);
     sendError(classname, object, error);
   }
 
   public void fatal(String classname, String object) {
     Logger logger = LoggerFactory.getLogger(classname);
-    logger.error(getUserInfo() + object);
+    logger.error(String.format("%s%s", getUserInfo(), object));
     sendError(classname, object, null);
   }
 
   public void fatal(String classname, String object, Throwable error) {
     Logger logger = LoggerFactory.getLogger(classname);
-    logger.error(getUserInfo() + object, error);
+    logger.error(String.format("%s%s", getUserInfo(), object), error);
     sendError(classname, object, error);
   }
 
   public void info(String classname, String object) {
     Logger logger = LoggerFactory.getLogger(classname);
-    logger.info(constructMessage(getUserInfo(), object));
+    logger.info(String.format("%s%s", getUserInfo(), object));
   }
 
   public void info(String classname, String object, Throwable error) {
     Logger logger = LoggerFactory.getLogger(classname);
-    logger.info(constructMessage(getUserInfo(), object), error);
+    logger.info(String.format("%s%s", getUserInfo(), object), error);
   }
 
   public void trace(String classname, String object) {
     Logger logger = LoggerFactory.getLogger(classname);
-    logger.trace(constructMessage(getUserInfo(), object));
+    logger.trace(String.format("%s%s", getUserInfo(), object));
   }
 
   public void trace(String classname, String object, Throwable error) {
     Logger logger = LoggerFactory.getLogger(classname);
-    logger.trace(constructMessage(getUserInfo(), object), error);
+    logger.trace(String.format("%s%s", getUserInfo(), object), error);
   }
 
   public void warn(String classname, String object) {
     Logger logger = LoggerFactory.getLogger(classname);
-    logger.warn(constructMessage(getUserInfo(), object));
+    logger.warn(String.format("%s%s", getUserInfo(), object));
   }
 
   public void warn(String classname, String object, Throwable error) {
     Logger logger = LoggerFactory.getLogger(classname);
-    logger.warn(constructMessage(getUserInfo(), object), error);
-  }
-
-  private String constructMessage(String userInfo, String object) {
-    return String.format("%s%s", userInfo, object);
+    logger.warn(String.format("%s%s", getUserInfo(), object), error);
   }
 
   public void pagehit(String pagename) {

@@ -41,12 +41,11 @@ public class Risks extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    risk = RodaCoreFactory.getModelService().createRisk(risk, false);
+    Risk createdRisk = RodaCoreFactory.getModelService().createRisk(risk, false);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "risk", risk);
-
-    return risk;
+    return createdRisk;
   }
 
   public static Risk updateRisk(User user, Risk risk)
@@ -56,12 +55,11 @@ public class Risks extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    risk = RodaCoreFactory.getModelService().updateRisk(risk, null, false, 0);
+    Risk updatedRisk = RodaCoreFactory.getModelService().updateRisk(risk, null, false, 0);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "risk", risk);
-
-    return risk;
+    return updatedRisk;
   }
 
   public static void deleteRisk(User user, String riskId)
@@ -85,12 +83,11 @@ public class Risks extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    incidence = RodaCoreFactory.getModelService().createRiskIncidence(incidence, false);
+    RiskIncidence createdIncidence = RodaCoreFactory.getModelService().createRiskIncidence(incidence, false);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "incidence", incidence);
-
-    return incidence;
+    return createdIncidence;
   }
 
   public static RiskIncidence updateRiskIncidence(User user, RiskIncidence incidence)
@@ -100,12 +97,11 @@ public class Risks extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    incidence = RodaCoreFactory.getModelService().updateRiskIncidence(incidence, false);
+    RiskIncidence updatedIncidence = RodaCoreFactory.getModelService().updateRiskIncidence(incidence, false);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "incidence", incidence);
-
-    return incidence;
+    return updatedIncidence;
   }
 
   public static void deleteRiskIncidence(User user, String incidenceId)

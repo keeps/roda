@@ -196,10 +196,10 @@ public class FilesResource {
 
     // get user
     User user = UserUtility.getApiUser(request);
-    details = details == null ? "" : details;
+    String eventDetails = details == null ? "" : details;
 
     // delegate action to controller
-    Browser.deleteFile(user, fileUUID, details);
+    Browser.deleteFile(user, fileUUID, eventDetails);
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "File deleted"), mediaType).build();
   }
 
@@ -298,13 +298,14 @@ public class FilesResource {
 
     // get user
     User user = UserUtility.getApiUser(request);
+    String fileSuffix = suffix;
 
-    if (!suffix.startsWith(".")) {
-      suffix = '.' + suffix;
+    if (!fileSuffix.startsWith(".")) {
+      fileSuffix = '.' + fileSuffix;
     }
 
     // delegate action to controller
-    EntityResponse otherMetadata = Browser.retrieveOtherMetadata(user, fileUUID, type, suffix, acceptFormat);
+    EntityResponse otherMetadata = Browser.retrieveOtherMetadata(user, fileUUID, type, fileSuffix, acceptFormat);
 
     if (otherMetadata instanceof ObjectResponse) {
       ObjectResponse<OtherMetadata> om = (ObjectResponse<OtherMetadata>) otherMetadata;
@@ -380,12 +381,13 @@ public class FilesResource {
 
     // get user
     User user = UserUtility.getApiUser(request);
+    String fileSuffix = suffix;
 
-    if (!suffix.startsWith(".")) {
-      suffix = '.' + suffix;
+    if (!fileSuffix.startsWith(".")) {
+      fileSuffix = '.' + fileSuffix;
     }
 
-    Browser.deleteOtherMetadata(user, fileUUID, suffix, type);
+    Browser.deleteOtherMetadata(user, fileUUID, fileSuffix, type);
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Other metadata file deleted"), mediaType).build();
   }
 

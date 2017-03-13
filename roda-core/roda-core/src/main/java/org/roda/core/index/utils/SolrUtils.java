@@ -2500,9 +2500,10 @@ public class SolrUtils {
     // 20160511 this workaround fixes solr wrong behaviour with partial update
     // of empty lists
     if (value instanceof List && ((List<?>) value).isEmpty()) {
-      value = null;
+      fieldModifier.put("set", null);
+    } else {
+      fieldModifier.put("set", value);
     }
-    fieldModifier.put("set", value);
     return fieldModifier;
   }
 

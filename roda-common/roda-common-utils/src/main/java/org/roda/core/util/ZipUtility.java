@@ -258,8 +258,8 @@ public final class ZipUtility {
     queue.push(directory);
     try {
       while (!queue.isEmpty()) {
-        directory = queue.pop();
-        for (File kid : directory.listFiles()) {
+        File dir = queue.pop();
+        for (File kid : dir.listFiles()) {
           String name = base.relativize(kid.toURI()).getPath();
           if (kid.isDirectory()) {
             queue.push(kid);
@@ -299,6 +299,5 @@ public final class ZipUtility {
 
   public static List<File> extractFilesFromInputStream(InputStream inputStream, Path outputDir) throws IOException {
     return extractFilesFromInputStream(inputStream, outputDir.toFile(), false);
-
   }
 }

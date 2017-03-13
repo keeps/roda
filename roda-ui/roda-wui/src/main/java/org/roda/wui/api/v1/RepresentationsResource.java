@@ -496,13 +496,14 @@ public class RepresentationsResource {
 
     // get user
     User user = UserUtility.getApiUser(request);
+    String fileSuffix = suffix;
 
-    if (!suffix.startsWith(".")) {
-      suffix = '.' + suffix;
+    if (!fileSuffix.startsWith(".")) {
+      fileSuffix = '.' + fileSuffix;
     }
 
     // delegate action to controller
-    EntityResponse otherMetadata = Browser.retrieveOtherMetadata(user, aipId, representationId, type, suffix,
+    EntityResponse otherMetadata = Browser.retrieveOtherMetadata(user, aipId, representationId, type, fileSuffix,
       acceptFormat);
 
     if (otherMetadata instanceof ObjectResponse) {
@@ -582,12 +583,13 @@ public class RepresentationsResource {
 
     // get user
     User user = UserUtility.getApiUser(request);
+    String fileSuffix = suffix;
 
-    if (!suffix.startsWith(".")) {
-      suffix = '.' + suffix;
+    if (!fileSuffix.startsWith(".")) {
+      fileSuffix = '.' + fileSuffix;
     }
 
-    Browser.deleteOtherMetadata(user, aipId, representationId, suffix, type);
+    Browser.deleteOtherMetadata(user, aipId, representationId, fileSuffix, type);
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Other metadata file deleted"), mediaType).build();
   }
 

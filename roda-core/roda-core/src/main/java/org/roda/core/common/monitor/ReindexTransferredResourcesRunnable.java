@@ -15,10 +15,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayDeque;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.Optional;
-import java.util.Stack;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
@@ -64,8 +64,8 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
       LOGGER.info("Start indexing transferred resources {}", path);
       Files.walkFileTree(path, opts, Integer.MAX_VALUE, new FileVisitor<Path>() {
 
-        Stack<BasicFileAttributes> actualDirectoryAttributesStack = new Stack<BasicFileAttributes>();
-        Stack<Long> fileSizeStack = new Stack<Long>();
+        ArrayDeque<BasicFileAttributes> actualDirectoryAttributesStack = new ArrayDeque<>();
+        ArrayDeque<Long> fileSizeStack = new ArrayDeque<>();
 
         @Override
         public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {

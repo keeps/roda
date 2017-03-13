@@ -35,9 +35,10 @@ public class Notifications extends RodaWuiController {
    * ---------------- REST related methods - start -----------------------------
    * ---------------------------------------------------------------------------
    */
-  public static Notification createNotification(User user, Notification notification, String template)
+  public static Notification createNotification(User user, Notification notification, String t)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    String template = t;
 
     // check user permissions
     controllerAssistant.checkRoles(user);
@@ -46,13 +47,12 @@ public class Notifications extends RodaWuiController {
       template = RodaConstants.API_NOTIFICATION_DEFAULT_TEMPLATE;
     }
 
-    notification = RodaCoreFactory.getModelService().createNotification(notification,
+    Notification createdNotification = RodaCoreFactory.getModelService().createNotification(notification,
       new EmailNotificationProcessor(template));
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "notification", notification);
-
-    return notification;
+    return createdNotification;
   }
 
   public static Notification updateNotification(User user, Notification notification)
@@ -62,12 +62,11 @@ public class Notifications extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    notification = RodaCoreFactory.getModelService().updateNotification(notification);
+    Notification updatedNotification = RodaCoreFactory.getModelService().updateNotification(notification);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "notification", notification);
-
-    return notification;
+    return updatedNotification;
   }
 
   public static void deleteNotification(User user, String notificationId)

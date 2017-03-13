@@ -40,12 +40,11 @@ public class Formats extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    format = RodaCoreFactory.getModelService().createFormat(format, false);
+    Format createdFormat = RodaCoreFactory.getModelService().createFormat(format, false);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "format", format);
-
-    return format;
+    return createdFormat;
   }
 
   public static Format updateFormat(User user, Format format)
@@ -55,12 +54,11 @@ public class Formats extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    format = RodaCoreFactory.getModelService().updateFormat(format, false);
+    Format updatedFormat = RodaCoreFactory.getModelService().updateFormat(format, false);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "format", format);
-
-    return format;
+    return updatedFormat;
   }
 
   public static void deleteFormat(User user, String formatId)

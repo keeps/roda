@@ -15,6 +15,7 @@ import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -122,7 +123,7 @@ public class JobsTest {
     List<String> aips = new ArrayList<>();
     try {
       for (int i = 0; i < 30; i++) {
-        aips.add(modelService.createAIP(null, "MIXED", new Permissions(), "admin").getId());
+        aips.add(modelService.createAIP(null, "MIXED", new Permissions(), RodaConstants.ADMIN).getId());
       }
     } catch (AlreadyExistsException e) {
       // do nothing

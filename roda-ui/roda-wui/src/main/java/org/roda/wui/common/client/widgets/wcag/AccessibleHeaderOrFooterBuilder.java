@@ -187,8 +187,8 @@ public class AccessibleHeaderOrFooterBuilder<T> extends AbstractHeaderOrFooterBu
     ElementBuilderBase<?> headerContainer = out;
 
     // Wrap the header in a sort icon if sorted.
-    isSorted = isSorted && !footer;
-    if (isSorted) {
+    boolean isSortedAndNotFooter = isSorted && !footer;
+    if (isSortedAndNotFooter) {
       // Determine the position of the sort icon.
       boolean posRight = LocaleInfo.getCurrentLocale().isRTL() ? isSortIconStartOfLine() : !isSortIconStartOfLine();
 
@@ -228,7 +228,7 @@ public class AccessibleHeaderOrFooterBuilder<T> extends AbstractHeaderOrFooterBu
     renderHeader(headerContainer, context, header);
 
     // Close the elements used for the sort icon.
-    if (isSorted) {
+    if (isSortedAndNotFooter) {
       headerContainer.endDiv(); // headerContainer.
       headerContainer.endDiv(); // outerDiv
     }

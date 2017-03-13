@@ -49,7 +49,7 @@ public class GhostScriptConvertPluginUtils {
     String command = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "ghostscriptconvert",
       "versionCommand");
     String version = CommandUtility.execute(command.split("\\s+"));
-    if (version.indexOf('\n') > 0) {
+    if (version.indexOf('\n') >= 1) {
       version = version.substring(0, version.indexOf('\n'));
     }
     return version.trim();

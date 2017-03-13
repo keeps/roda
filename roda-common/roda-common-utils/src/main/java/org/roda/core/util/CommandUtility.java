@@ -145,16 +145,15 @@ class CaptureOutputThread extends Thread {
     this.is = is;
   }
 
+  @Override
   public void run() {
-
     StringBuilder outputBuffer = new StringBuilder();
 
     try {
-
       // output = StreamUtility.inputStreamToString(is);
       BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 
-      String line = null;
+      String line;
 
       while ((line = reader.readLine()) != null) {
         outputBuffer.append(line + System.lineSeparator());

@@ -124,8 +124,7 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   private ReturnWithExceptions<Void> indexAIP(final AIP aip, final List<String> ancestors) {
-    boolean safemode = false;
-    return indexAIP(aip, ancestors, safemode);
+    return indexAIP(aip, ancestors, false);
   }
 
   private ReturnWithExceptions<Void> indexAIP(final AIP aip, final List<String> ancestors, boolean safemode) {
@@ -139,8 +138,7 @@ public class IndexModelObserver implements ModelObserver {
       exceptions.addException(e);
       if (!safemode) {
         LOGGER.error("Error indexing AIP, trying safe mode", e);
-        safemode = true;
-        indexAIP(aip, ancestors, safemode);
+        indexAIP(aip, ancestors, true);
       } else {
         LOGGER.error("Cannot index created AIP", e);
       }

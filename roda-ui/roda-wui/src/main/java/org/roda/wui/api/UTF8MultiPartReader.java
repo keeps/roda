@@ -116,11 +116,11 @@ public class UTF8MultiPartReader implements MessageBodyReader<MultiPart> {
   protected MultiPart readMultiPart(final Class<MultiPart> type, final Type genericType, final Annotation[] annotations,
     MediaType mediaType, final MultivaluedMap<String, String> headers, final InputStream stream)
     throws IOException, MIMEParsingException {
-    mediaType = unquoteMediaTypeParameters(mediaType, "boundary");
+    MediaType media = unquoteMediaTypeParameters(mediaType, "boundary");
 
-    final MIMEMessage mimeMessage = new MIMEMessage(stream, mediaType.getParameters().get("boundary"), mimeConfig);
+    final MIMEMessage mimeMessage = new MIMEMessage(stream, media.getParameters().get("boundary"), mimeConfig);
 
-    final boolean formData = MediaTypes.typeEqual(mediaType, MediaType.MULTIPART_FORM_DATA_TYPE);
+    final boolean formData = MediaTypes.typeEqual(media, MediaType.MULTIPART_FORM_DATA_TYPE);
     final MultiPart multiPart = formData ? new FormDataMultiPart() : new MultiPart();
 
     multiPart.setProviders(providers);
@@ -136,7 +136,7 @@ public class UTF8MultiPartReader implements MessageBodyReader<MultiPart> {
 
     final boolean fileNameFix;
     if (!formData) {
-      multiPart.setMediaType(mediaType);
+      multiPart.setMediaType(media);
       fileNameFix = false;
     } else {
       // see if the User-Agent header corresponds to some version of MS Internet
@@ -198,7 +198,6 @@ public class UTF8MultiPartReader implements MessageBodyReader<MultiPart> {
       return message.getAttachments();
     } catch (final MIMEParsingException obtainPartsError) {
       LOGGER.error(LocalizationMessages.PARSING_ERROR(), obtainPartsError);
-
       message.close();
 
       // Re-throw the exception.

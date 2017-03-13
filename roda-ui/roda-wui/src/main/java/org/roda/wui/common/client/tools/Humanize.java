@@ -51,21 +51,21 @@ public class Humanize {
   public static Long parseFileSize(String size, String unit) {
     Long ret = null;
     if (size != null && !size.isEmpty()) {
-      size = size.trim();
+      String trimmedSize = size.trim();
       if (unit.equals(PETABYTES)) {
-        ret = Math.round(Double.parseDouble(size) * BYTES_IN_PETABYTES);
+        ret = Math.round(Double.parseDouble(trimmedSize) * BYTES_IN_PETABYTES);
       } else if (unit.equals(TERABYTES)) {
-        ret = Math.round(Double.parseDouble(size) * BYTES_IN_TERABYTES);
+        ret = Math.round(Double.parseDouble(trimmedSize) * BYTES_IN_TERABYTES);
       } else if (unit.equals(GIGABYTES)) {
-        ret = Math.round(Double.parseDouble(size) * BYTES_IN_GIGABYTES);
+        ret = Math.round(Double.parseDouble(trimmedSize) * BYTES_IN_GIGABYTES);
       } else if (unit.equals(MEGABYTES)) {
-        ret = Math.round(Double.parseDouble(size) * BYTES_IN_MEGABYTES);
+        ret = Math.round(Double.parseDouble(trimmedSize) * BYTES_IN_MEGABYTES);
       } else if (unit.equals(KILOBYTES)) {
-        ret = Math.round(Double.parseDouble(size) * BYTES_IN_KILOBYTES);
+        ret = Math.round(Double.parseDouble(trimmedSize) * BYTES_IN_KILOBYTES);
       } else if (unit.equals(BYTES)) {
-        ret = Long.parseLong(size);
+        ret = Long.parseLong(trimmedSize);
       } else {
-        throw new IllegalArgumentException(size);
+        throw new IllegalArgumentException(trimmedSize);
       }
     }
     return ret;
@@ -100,11 +100,8 @@ public class Humanize {
   }
 
   public static String durationInDHMS(Date start, Date end, DHMSFormat format) {
-    if (end == null) {
-      end = new Date();
-    }
-    long duration = end.getTime() - start.getTime();
-
+    Date endDate = end == null ? new Date() : end;
+    long duration = endDate.getTime() - start.getTime();
     return DHMSFormat.LONG.equals(format) ? durationMillisToLongDHMS(duration) : durationMillisToShortDHMS(duration);
   }
 
@@ -123,14 +120,15 @@ public class Humanize {
    * converts time (in milliseconds) to human-readable format "<dd:>hh:mm:ss"
    */
   public static String durationMillisToShortDHMS(long duration) {
-    int millis = (int) (duration % ONE_SECOND);
-    duration /= ONE_SECOND;
-    int seconds = (int) (duration % SECONDS);
-    duration /= SECONDS;
-    int minutes = (int) (duration % MINUTES);
-    duration /= MINUTES;
-    int hours = (int) (duration % HOURS);
-    int days = (int) (duration / HOURS);
+    long d = duration;
+    int millis = (int) (d % ONE_SECOND);
+    d /= ONE_SECOND;
+    int seconds = (int) (d % SECONDS);
+    d /= SECONDS;
+    int minutes = (int) (d % MINUTES);
+    d /= MINUTES;
+    int hours = (int) (d % HOURS);
+    int days = (int) (d / HOURS);
 
     String ret;
 
@@ -147,7 +145,6 @@ public class Humanize {
     }
 
     return ret;
-
   }
 
   /**

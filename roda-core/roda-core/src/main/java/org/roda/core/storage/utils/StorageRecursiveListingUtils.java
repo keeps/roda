@@ -8,8 +8,8 @@
 package org.roda.core.storage.utils;
 
 import java.io.IOException;
+import java.util.ArrayDeque;
 import java.util.Iterator;
-import java.util.Stack;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -40,7 +40,7 @@ public class StorageRecursiveListingUtils {
       public Iterator<Resource> iterator() {
         return new Iterator<Resource>() {
 
-          Stack<CloseableIterable<Resource>> itStack = new Stack<CloseableIterable<Resource>>();
+          ArrayDeque<CloseableIterable<Resource>> itStack = new ArrayDeque<>();
 
           @Override
           public boolean hasNext() {

@@ -142,7 +142,7 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractA
 
               FileLink fileLink = new FileLink(representation.getAipId(), representation.getId(), file.getPath(),
                 file.getId());
-              List<FileLink> links = new ArrayList<FileLink>();
+              List<FileLink> links = new ArrayList<>();
               links.add(fileLink);
 
               DIP dip = new DIP();
@@ -164,7 +164,7 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractA
 
           IOUtils.closeQuietly(allFiles);
 
-        } catch (Throwable e) {
+        } catch (Exception | LinkageError e) {
           LOGGER.error("Error processing Representation " + representation.getId() + ": " + e.getMessage(), e);
           reportItem.setPluginDetails(e.getMessage());
           pluginState = PluginState.FAILURE;
@@ -216,7 +216,7 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractA
 
             FileLink fileLink = new FileLink(representation.getAipId(), representation.getId(), file.getPath(),
               file.getId());
-            List<FileLink> links = new ArrayList<FileLink>();
+            List<FileLink> links = new ArrayList<>();
             links.add(fileLink);
 
             DIP dip = new DIP();
@@ -318,7 +318,7 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractA
   private void manageFileSigning(ModelService model, IndexService index, StorageService storage, File file,
     String dipId) throws NotFoundException, GenericException, InvalidFormatException, RequestNotValidException,
     AuthorizationDeniedException, IOException, GeneralSecurityException, DocumentException, XMLSignatureException,
-    MarshalException, AlreadyExistsException, CMSException, FileNotFoundException {
+    MarshalException, AlreadyExistsException, CMSException {
     StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
     DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
 
@@ -331,7 +331,7 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractA
 
       LOGGER.debug("Running DigitalSignaturePluginDIP on {}", file.getId());
 
-      if (doEmbeddedSignature == true) {
+      if (doEmbeddedSignature) {
         Path embeddedFile = DigitalSignatureDIPPluginUtils.addEmbeddedSignature(directAccess.getPath(), fileFormat,
           fileMimetype);
         if (embeddedFile != null) {
@@ -369,7 +369,7 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractA
 
   @Override
   public Plugin<T> cloneMe() {
-    return new DigitalSignatureDIPPlugin<T>();
+    return new DigitalSignatureDIPPlugin<>();
   }
 
   @Override

@@ -130,7 +130,7 @@ public class PluginManager {
    * @return a {@link List} of {@link Plugin}s.
    */
   public List<Plugin<? extends IsRODAObject>> getPlugins() {
-    List<Plugin<? extends IsRODAObject>> plugins = new ArrayList<Plugin<?>>();
+    List<Plugin<? extends IsRODAObject>> plugins = new ArrayList<>();
 
     plugins.addAll(internalPluginChache.values());
 
@@ -153,7 +153,7 @@ public class PluginManager {
   }
 
   public List<PluginInfo> getPluginsInfo(List<PluginType> pluginTypes) {
-    List<PluginInfo> pluginsInfo = new ArrayList<PluginInfo>();
+    List<PluginInfo> pluginsInfo = new ArrayList<>();
 
     for (PluginType pluginType : pluginTypes) {
       pluginsInfo.addAll(pluginInfoPerType.getOrDefault(pluginType, Collections.emptyList()));
@@ -554,6 +554,7 @@ public class PluginManager {
 
   protected class SearchPluginsTask extends TimerTask {
 
+    @Override
     public void run() {
 
       LOGGER.debug("Searching for plugins...");

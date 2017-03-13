@@ -111,8 +111,9 @@ public class MetadataValue implements Comparable, Serializable {
           int selfInt = selfOrder instanceof String ? Integer.parseInt((String) selfOrder) : (Integer) selfOrder;
           int mvInt = mvOrder instanceof String ? Integer.parseInt((String) mvOrder) : (Integer) mvOrder;
           int result = Integer.compare(selfInt, mvInt);
-          if (result != 0)
+          if (result != 0) {
             return result;
+          }
         }
         return -1;
       } else if (mvOrder != null) {

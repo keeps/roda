@@ -9,6 +9,7 @@ package org.roda.core.storage;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import org.roda.core.common.iterables.CloseableIterable;
 
@@ -30,7 +31,7 @@ public class EmptyClosableIterable<T> implements CloseableIterable<T> {
 
       @Override
       public T next() {
-        return null;
+        throw new NoSuchElementException();
       }
     };
   }

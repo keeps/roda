@@ -288,9 +288,7 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
     } else {
       String extension = getFileNameExtension();
 
-      if (".mp4".equals(extension)) {
-        ret = "video/mp4";
-      } else if (".ogg".equals(extension)) {
+      if (".ogg".equals(extension)) {
         ret = "video/ogg";
       } else {
         ret = "video/mp4";
@@ -310,9 +308,7 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
     } else {
       String extension = getFileNameExtension();
 
-      if (".mp3".equals(extension)) {
-        ret = "audio/mpeg";
-      } else if (".ogg".equals(extension)) {
+      if (".ogg".equals(extension)) {
         ret = "audio/ogg";
       } else {
         ret = "audio/mpeg";

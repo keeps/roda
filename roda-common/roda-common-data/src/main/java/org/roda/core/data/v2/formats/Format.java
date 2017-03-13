@@ -39,13 +39,13 @@ public class Format extends NamedIndexedModel implements IsModelObject, IsIndexe
   private List<String> websites = null;
   private String provenanceInformation = null;
 
-  private List<String> extensions = new ArrayList<String>();
-  private List<String> mimetypes = new ArrayList<String>();
-  private List<String> pronoms = new ArrayList<String>();
-  private List<String> utis = new ArrayList<String>();
+  private List<String> extensions = new ArrayList<>();
+  private List<String> mimetypes = new ArrayList<>();
+  private List<String> pronoms = new ArrayList<>();
+  private List<String> utis = new ArrayList<>();
 
-  private List<String> alternativeDesignations = new ArrayList<String>();
-  private List<String> versions = new ArrayList<String>();
+  private List<String> alternativeDesignations = new ArrayList<>();
+  private List<String> versions = new ArrayList<>();
 
   public Format() {
     super();
@@ -64,12 +64,12 @@ public class Format extends NamedIndexedModel implements IsModelObject, IsIndexe
     this.websites = format.getWebsites();
     this.provenanceInformation = format.getProvenanceInformation();
 
-    this.extensions = new ArrayList<String>(format.getExtensions());
-    this.mimetypes = new ArrayList<String>(format.getMimetypes());
-    this.pronoms = new ArrayList<String>(format.getPronoms());
-    this.utis = new ArrayList<String>(format.getUtis());
-    this.alternativeDesignations = new ArrayList<String>(format.getAlternativeDesignations());
-    this.versions = new ArrayList<String>(format.getVersions());
+    this.extensions = new ArrayList<>(format.getExtensions());
+    this.mimetypes = new ArrayList<>(format.getMimetypes());
+    this.pronoms = new ArrayList<>(format.getPronoms());
+    this.utis = new ArrayList<>(format.getUtis());
+    this.alternativeDesignations = new ArrayList<>(format.getAlternativeDesignations());
+    this.versions = new ArrayList<>(format.getVersions());
   }
 
   @JsonIgnore

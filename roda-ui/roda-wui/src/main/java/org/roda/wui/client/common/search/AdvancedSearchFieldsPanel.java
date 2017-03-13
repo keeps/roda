@@ -36,7 +36,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class AdvancedSearchFieldsPanel extends FlowPanel implements HasValueChangeHandlers<Integer> {
   private String className;
-  private final Map<String, SearchField> searchFields = new HashMap<String, SearchField>();
+  private final Map<String, SearchField> searchFields = new HashMap<>();
   private ListBox searchAdvancedFieldOptions;
 
   public AdvancedSearchFieldsPanel(String className) {
@@ -76,8 +76,9 @@ public class AdvancedSearchFieldsPanel extends FlowPanel implements HasValueChan
     addSearchFieldPanel(null);
   }
 
-  public void addSearchFieldPanel(String selectedField) {
+  public void addSearchFieldPanel(String field) {
     final SearchFieldPanel searchFieldPanel = new SearchFieldPanel();
+    String selectedField = field;
 
     searchFieldPanel.setSearchAdvancedFields(searchAdvancedFieldOptions);
     searchFieldPanel.setSearchFields(searchFields);
@@ -128,7 +129,7 @@ public class AdvancedSearchFieldsPanel extends FlowPanel implements HasValueChan
   }
 
   private void addWarningToDuplicateFields() {
-    List<String> activeFields = new ArrayList<String>();
+    List<String> activeFields = new ArrayList<>();
     for (int i = 0; i < getWidgetCount(); i++) {
       Widget widget = getWidget(i);
 

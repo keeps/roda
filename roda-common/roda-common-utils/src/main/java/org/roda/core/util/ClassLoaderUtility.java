@@ -158,13 +158,12 @@ public class ClassLoaderUtility {
     }
 
     ClassLoaderUtility.addFile(filePath);
-    filePath = "jar:file://" + filePath + "!/";
-    URL url = new File(filePath).toURL();
+    String path = "jar:file://" + filePath + "!/";
+    URL url = new File(path).toURL();
 
     URLClassLoader clazzLoader = new URLClassLoader(new URL[] {url}, CLASS_LOADER);
 
     LOGGER.trace("Loading class {} with ClassLoader {}", className, CLASS_LOADER.getClass().getSimpleName());
-
     return clazzLoader.loadClass(className).newInstance();
   }
 

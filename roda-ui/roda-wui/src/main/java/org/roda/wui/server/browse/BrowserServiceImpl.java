@@ -329,7 +329,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     try {
       User user = UserUtility.getUser(getThreadLocalRequest());
       return Browser.moveAIPInHierarchy(user, selected, parentId, details);
-    } catch (Throwable e) {
+    } catch (Exception e) {
       LOGGER.error("Unexpected error", e);
       throw e;
     }
@@ -713,20 +713,20 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public <T extends IsIndexed> Job createProcess(String jobName, SelectedItems<T> selected, String id,
     Map<String, String> value, String selectedClass) throws AuthorizationDeniedException, RequestNotValidException,
     NotFoundException, GenericException, JobAlreadyStartedException {
-
+    SelectedItems<T> selectedItems = selected;
     User user = UserUtility.getUser(getThreadLocalRequest());
 
-    if (selected instanceof SelectedItemsList) {
-      SelectedItemsList<T> items = (SelectedItemsList<T>) selected;
+    if (selectedItems instanceof SelectedItemsList) {
+      SelectedItemsList<T> items = (SelectedItemsList<T>) selectedItems;
 
       if (items.getIds().isEmpty()) {
-        selected = getAllItemsByClass(selectedClass);
+        selectedItems = getAllItemsByClass(selectedClass);
       }
     }
 
     Job job = new Job();
     job.setName(jobName);
-    job.setSourceObjects(selected);
+    job.setSourceObjects(selectedItems);
     job.setPlugin(id);
     job.setPluginParameters(value);
 

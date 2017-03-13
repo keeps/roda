@@ -10,8 +10,8 @@
  */
 package org.roda.wui.client.main;
 
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Stack;
 
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
@@ -32,8 +32,7 @@ import com.google.gwt.user.client.ui.Widget;
 public class BreadcrumbPanel extends FlowPanel {
 
   private List<BreadcrumbItem> currentpath;
-
-  private final Stack<Breadcrumb> breadcrumbs;
+  private final LinkedList<Breadcrumb> breadcrumbs;
 
   /**
    * Create a new Breadcrumb panel
@@ -43,8 +42,7 @@ public class BreadcrumbPanel extends FlowPanel {
    */
   public BreadcrumbPanel() {
     super();
-    this.breadcrumbs = new Stack<Breadcrumb>();
-
+    this.breadcrumbs = new LinkedList<>();
     this.currentpath = null;
 
     UserLogin.getInstance().addLoginStatusListener(new LoginStatusListener() {
@@ -102,7 +100,7 @@ public class BreadcrumbPanel extends FlowPanel {
       if (i > 0) {
         add(createSeparator());
       }
-      Breadcrumb breadcrumb = (Breadcrumb) breadcrumbs.get(i);
+      Breadcrumb breadcrumb = breadcrumbs.get(i);
       breadcrumb.setLast(i == breadcrumbs.size() - 1);
       add(breadcrumb);
     }
@@ -174,15 +172,6 @@ public class BreadcrumbPanel extends FlowPanel {
     }
 
     /**
-     * Get the last token on the history path defined by this breadcrumb
-     * 
-     * @return the last history token
-     */
-    // public String getLastToken() {
-    // return path[path.length - 1];
-    // }
-
-    /**
      * Set if this breadcrumb is the last one. The last breadcrumb will be
      * disabled and has a different style.
      * 
@@ -190,7 +179,6 @@ public class BreadcrumbPanel extends FlowPanel {
      */
     public void setLast(boolean last) {
       this.last = last;
-      // this.setEnabled(!last);
       if (last) {
         this.addStyleName("breadcrumb-last");
       } else {

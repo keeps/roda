@@ -13,8 +13,8 @@ package org.roda.wui.common.client.widgets;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.wui.client.main.Theme;
 import org.roda.wui.common.client.ClientLogger;
-import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.RestUtils;
 
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
@@ -49,13 +49,14 @@ public class HTMLWidgetWrapper extends HTML {
   }
 
   public HTMLWidgetWrapper(String resourceId, final AsyncCallback<Void> callback) {
-    if (resourceId.endsWith(".html")) {
-      resourceId = resourceId.substring(0, resourceId.length() - 5);
+    String id = resourceId;
+    if (id.endsWith(".html")) {
+      id = id.substring(0, id.length() - 5);
     }
 
     String locale = LocaleInfo.getCurrentLocale().getLocaleName();
-    String localizedResourceId = resourceId + "_" + locale + ".html";
-    String defaultResourceId = resourceId + ".html";
+    String localizedResourceId = id + "_" + locale + ".html";
+    String defaultResourceId = id + ".html";
 
     RequestBuilder request = new RequestBuilder(RequestBuilder.GET,
       RestUtils.createThemeResourceUri(localizedResourceId, defaultResourceId, false).asString());

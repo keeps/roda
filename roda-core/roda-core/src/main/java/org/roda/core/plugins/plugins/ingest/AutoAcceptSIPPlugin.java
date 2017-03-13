@@ -65,7 +65,8 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticDescription() {
-    return "Adds information package to the inventory without any human appraisal. After this point, the responsibility for the digital content’s preservation is passed on to the repository.";
+    return "Adds information package to the inventory without any human appraisal. After this point, the responsibility for the digital content’s "
+      + "preservation is passed on to the repository.";
   }
 
   @Override
@@ -99,7 +100,7 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
       LOGGER.debug("Auto accepting AIP {}", aip.getId());
 
       aip.setState(AIPState.ACTIVE);
-      aip = model.updateAIPState(aip, job.getUsername());
+      model.updateAIPState(aip, job.getUsername());
       reportItem.setPluginState(PluginState.SUCCESS).setOutcomeObjectState(AIPState.ACTIVE);
       LOGGER.debug("Done with auto accepting AIP {}", aip.getId());
     } catch (RODAException e) {

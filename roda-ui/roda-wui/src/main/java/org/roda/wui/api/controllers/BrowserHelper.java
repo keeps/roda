@@ -851,7 +851,7 @@ public class BrowserHelper {
     final String filename;
     final String mediaType;
     final ConsumesOutputStream stream;
-    StreamResponse ret = null;
+    StreamResponse ret;
     ModelService model = RodaCoreFactory.getModelService();
 
     if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {

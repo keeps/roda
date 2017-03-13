@@ -60,17 +60,18 @@ public class UserManagementHelper {
 
   public static User registerUser(User user, String password, UserExtraBundle extra, String localeString,
     String servletPath) throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException {
-    user.setExtra(getUserExtra(user, extra));
-    user = UserUtility.resetGroupsAndRoles(user);
+    user.setExtra(getUserExtra(extra));
+    User updatedUser = UserUtility.resetGroupsAndRoles(user);
 
-    User registeredUser = RodaCoreFactory.getModelService().registerUser(user, password, true);
+    User registeredUser = RodaCoreFactory.getModelService().registerUser(updatedUser, password, true);
     RodaCoreFactory.getIndexService().commit(RODAMember.class);
 
     if (!user.isActive()) {
       try {
         boolean generateNewToken = false;
-        Notification notification = UserManagement.sendEmailVerification(servletPath, user.getName(), generateNewToken,
-          localeString);
+        Notification notification = UserManagement.sendEmailVerification(servletPath, updatedUser.getName(),
+          generateNewToken, localeString);
+
         if (notification.getState() == NOTIFICATION_STATE.FAILED) {
           registeredUser.setActive(true);
           boolean notify = true;
@@ -81,12 +82,13 @@ public class UserManagementHelper {
         throw new GenericException(e);
       }
     }
+
     return registeredUser;
   }
 
   public static User createUser(User user, String password, UserExtraBundle extra) throws GenericException,
     EmailAlreadyExistsException, UserAlreadyExistsException, IllegalOperationException, NotFoundException {
-    user.setExtra(getUserExtra(user, extra));
+    user.setExtra(getUserExtra(extra));
     User addedUser = RodaCoreFactory.getModelService().createUser(user, password, true);
     RodaCoreFactory.getIndexService().commit(RODAMember.class);
     return addedUser;
@@ -94,7 +96,7 @@ public class UserManagementHelper {
 
   public static User updateUser(User user, String password, UserExtraBundle extra)
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
-    user.setExtra(getUserExtra(user, extra));
+    user.setExtra(getUserExtra(extra));
     User modifiedUser = RodaCoreFactory.getModelService().updateUser(user, password, true);
     RodaCoreFactory.getIndexService().commit(RODAMember.class);
     return modifiedUser;
@@ -102,12 +104,12 @@ public class UserManagementHelper {
 
   public static User updateMyUser(User user, String password, UserExtraBundle extra)
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
-    user.setExtra(getUserExtra(user, extra));
+    user.setExtra(getUserExtra(extra));
 
     User currentUser = RodaCoreFactory.getModelService().retrieveUserByName(user.getName());
-    user = resetUser(user, currentUser);
+    User resetUser = resetUser(user, currentUser);
 
-    User modifiedUser = RodaCoreFactory.getModelService().updateMyUser(user, password, true);
+    User modifiedUser = RodaCoreFactory.getModelService().updateMyUser(resetUser, password, true);
     RodaCoreFactory.getIndexService().commit(RODAMember.class);
     return modifiedUser;
   }
@@ -120,7 +122,7 @@ public class UserManagementHelper {
     return newUser;
   }
 
-  private static String getUserExtra(User user, UserExtraBundle extra) throws GenericException {
+  private static String getUserExtra(UserExtraBundle extra) throws GenericException {
     Handlebars handlebars = new Handlebars();
     Map<String, String> data = new HashMap<>();
     handlebars.registerHelper("field", (o, options) -> {
@@ -128,7 +130,7 @@ public class UserManagementHelper {
     });
 
     InputStream templateStream = RodaCoreFactory
-      .getConfigurationFileAsStream(RodaConstants.USERS_TEMPLATE_FOLDER + "/user_extra.xml.hbs");
+      .getConfigurationFileAsStream(RodaConstants.USERS_TEMPLATE_FOLDER + "/" + RodaConstants.USER_EXTRA_METADATA_FILE);
     try {
       String rawTemplate = IOUtils.toString(templateStream, RodaConstants.DEFAULT_ENCODING);
       Template tmpl = handlebars.compileInline(rawTemplate);
@@ -197,8 +199,8 @@ public class UserManagementHelper {
     if (!RodaConstants.SYSTEM_USERS.contains(name)) {
       String template = null;
 
-      InputStream templateStream = RodaCoreFactory
-        .getConfigurationFileAsStream(RodaConstants.USERS_TEMPLATE_FOLDER + "/user_extra.xml.hbs");
+      InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(
+        RodaConstants.USERS_TEMPLATE_FOLDER + "/" + RodaConstants.USER_EXTRA_METADATA_FILE);
       try {
         template = IOUtils.toString(templateStream, RodaConstants.DEFAULT_ENCODING);
       } catch (IOException e) {
@@ -253,7 +255,7 @@ public class UserManagementHelper {
     String template = null;
 
     InputStream templateStream = RodaCoreFactory
-      .getConfigurationFileAsStream(RodaConstants.USERS_TEMPLATE_FOLDER + "/user_extra.xml.hbs");
+      .getConfigurationFileAsStream(RodaConstants.USERS_TEMPLATE_FOLDER + "/" + RodaConstants.USER_EXTRA_METADATA_FILE);
     try {
       template = IOUtils.toString(templateStream, RodaConstants.DEFAULT_ENCODING);
     } catch (IOException e) {

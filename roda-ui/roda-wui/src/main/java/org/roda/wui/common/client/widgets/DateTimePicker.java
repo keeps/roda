@@ -144,8 +144,8 @@ public class DateTimePicker {
    */
   public Date getDate() {
     long date = datePicker.getDate().getTime();
-    long hours = Integer.valueOf(hourPicker.getText()) * 3600000;
-    long minutes = Integer.valueOf(minutePicker.getText()) * 60000;
+    long hours = Long.parseLong(hourPicker.getText()) * 3600000;
+    long minutes = Long.parseLong(minutePicker.getText()) * 60000;
     return new Date(date + hours + minutes);
   }
 
