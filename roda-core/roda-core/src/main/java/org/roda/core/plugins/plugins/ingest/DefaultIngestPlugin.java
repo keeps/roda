@@ -71,17 +71,14 @@ import com.google.common.base.CaseFormat;
 public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultIngestPlugin.class);
 
-  public static String START_SUCCESS = "The ingest process has started.";
-  public static String START_FAILURE = "The ingest process has started.";
-  public static String START_PARTIAL = "The ingest process has started.";
-  public static String START_DESCRIPTION = "The ingest process has started.";
-  public static PreservationEventType START_TYPE = PreservationEventType.INGEST_START;
+  public static final String START_MESSAGE = "The ingest process has started.";
+  public static final PreservationEventType START_TYPE = PreservationEventType.INGEST_START;
 
-  public static String END_SUCCESS = "The ingest process has successfully ended.";
-  public static String END_FAILURE = "Failed to conclude the ingest process.";
-  public static String END_PARTIAL = "The ingest process ended, however, some of the SIPs could not be successfully ingested.";
-  public static String END_DESCRIPTION = "The ingest process has ended.";
-  public static PreservationEventType END_TYPE = PreservationEventType.INGEST_END;
+  public static final String END_SUCCESS = "The ingest process has successfully ended.";
+  public static final String END_FAILURE = "Failed to conclude the ingest process.";
+  public static final String END_PARTIAL = "The ingest process ended, however, some of the SIPs could not be successfully ingested.";
+  public static final String END_DESCRIPTION = "The ingest process has ended.";
+  public static final PreservationEventType END_TYPE = PreservationEventType.INGEST_END;
 
   protected int totalSteps = 11;
 
@@ -509,9 +506,9 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     Date startDate) {
     Map<String, String> aipIdToTransferredResourceId = jobPluginInfo.getAipIdToTransferredResourceId();
     setPreservationEventType(START_TYPE);
-    setPreservationSuccessMessage(START_SUCCESS);
-    setPreservationFailureMessage(START_FAILURE);
-    setPreservationEventDescription(START_DESCRIPTION);
+    setPreservationSuccessMessage(START_MESSAGE);
+    setPreservationFailureMessage(START_MESSAGE);
+    setPreservationEventDescription(START_MESSAGE);
     for (Map.Entry<String, String> entry : aipIdToTransferredResourceId.entrySet()) {
       try {
         AIP aip = model.retrieveAIP(entry.getKey());

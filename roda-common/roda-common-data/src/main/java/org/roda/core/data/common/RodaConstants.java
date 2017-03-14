@@ -684,7 +684,6 @@ public final class RodaConstants {
   /* Plugins related parameters */
   public static final String PLUGIN_PARAMS_JOB_ID = "job.id";
   public static final String PLUGIN_PARAMS_OTHER_JOB_ID = "other_job.id";
-
   public static final String PLUGIN_PARAMS_DO_FULLTEXT_EXTRACTION = "parameter.do_fulltext_extraction";
   public static final String PLUGIN_PARAMS_TOTAL_STEPS = "parameter.total_steps";
   public static final String PLUGIN_PARAMS_INT_VALUE = "parameter.int_value";
@@ -758,7 +757,6 @@ public final class RodaConstants {
   public static final String PLUGIN_CLASS_TIKA_FULLTEXT = "org.roda.core.plugins.plugins.characterization.TikaFullTextPlugin";
 
   public static final Map<String, String> PLUGIN_PARAMETER_TO_CLASS = new HashMap<>();
-
   static {
     PLUGIN_PARAMETER_TO_CLASS.put(PLUGIN_PARAMS_DO_DIGITAL_SIGNATURE_VALIDATION, PLUGIN_CLASS_DIGITAL_SIGNATURE);
     PLUGIN_PARAMETER_TO_CLASS.put(PLUGIN_PARAMS_DO_VERAPDF_CHECK, PLUGIN_CLASS_VERAPDF);
@@ -1273,7 +1271,6 @@ public final class RodaConstants {
   /* Common performance improvements fields to return */
 
   public static final List<String> AIP_PERMISSIONS_FIELDS_TO_RETURN = new ArrayList<>();
-
   static {
     AIP_PERMISSIONS_FIELDS_TO_RETURN.add(RodaConstants.INDEX_UUID);
 
@@ -1294,7 +1291,6 @@ public final class RodaConstants {
     RodaConstants.FILE_FILE_ID, RodaConstants.FILE_FORMAT_MIMETYPE, RodaConstants.FILE_PRONOM);
 
   public static final List<String> DIP_PERMISSIONS_FIELDS_TO_RETURN = new ArrayList<>();
-
   static {
     DIP_PERMISSIONS_FIELDS_TO_RETURN.add(RodaConstants.INDEX_UUID);
     DIP_PERMISSIONS_FIELDS_TO_RETURN.add(RodaConstants.DIP_ID);

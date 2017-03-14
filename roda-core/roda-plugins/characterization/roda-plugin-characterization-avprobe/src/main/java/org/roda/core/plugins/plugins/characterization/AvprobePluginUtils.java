@@ -29,7 +29,7 @@ import org.roda.core.util.CommandUtility;
 
 public class AvprobePluginUtils {
 
-  public static String AVPROBE_METADATA_FORMAT = "json";
+  public static final String AVPROBE_METADATA_FORMAT = "json";
 
   public static String inspect(Path path) throws RODAException {
     try {

@@ -36,7 +36,7 @@ public class HTTPNotificationProcessor implements NotificationProcessor {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HTTPNotificationProcessor.class);
 
-  public static String JOB_KEY = "job";
+  public static final String JOB_KEY = "job";
 
   private String endpoint;
   private Map<String, Object> scope;

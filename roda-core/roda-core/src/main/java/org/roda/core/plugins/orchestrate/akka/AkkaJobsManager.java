@@ -56,12 +56,9 @@ public class AkkaJobsManager extends AkkaBaseActor {
     initMetrics(maxNumberOfJobsInParallel);
 
     getContext().system().scheduler().schedule(Duration.create(0, TimeUnit.MILLISECONDS),
-      Duration.create(2, TimeUnit.SECONDS), new Runnable() {
-        @Override
-        public void run() {
-          if (jobsWaitingToBeExecuted.getCount() > 0) {
-            sendTick();
-          }
+      Duration.create(2, TimeUnit.SECONDS), () -> {
+        if (jobsWaitingToBeExecuted.getCount() > 0) {
+          sendTick();
         }
       }, getContext().system().dispatcher());
   }

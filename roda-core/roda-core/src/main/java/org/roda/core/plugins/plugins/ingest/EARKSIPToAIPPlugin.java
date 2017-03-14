@@ -58,7 +58,7 @@ import org.slf4j.LoggerFactory;
 public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
   private static final Logger LOGGER = LoggerFactory.getLogger(EARKSIPToAIPPlugin.class);
 
-  public static String UNPACK_DESCRIPTION = "Extracted objects from package in E-ARK SIP format.";
+  public static final String UNPACK_DESCRIPTION = "Extracted objects from package in E-ARK SIP format.";
 
   private boolean createSubmission = false;
 
@@ -68,6 +68,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
 
   @Override
   public void init() throws PluginException {
+    // do nothing
   }
 
   @Override

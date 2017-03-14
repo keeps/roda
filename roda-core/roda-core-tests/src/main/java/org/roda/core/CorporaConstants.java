@@ -91,8 +91,6 @@ public final class CorporaConstants {
   public static final String SOURCE_DESC_METADATA_CONTAINER = "DescriptiveMetadata";
   public static final String STRANGE_DESC_METADATA_FILE = "strange.xml";
 
-  @Deprecated
-  public static final String F0_PREMIS_XML = "F0";
   public static final String TEXT_XML = "text/xml";
   public static final String REPRESENTATION_1_PREMIS_EVENT_ID = "urn:roda:premis:event:roda_398";
   public static final String INGESTION = "ingestion";
@@ -135,11 +133,11 @@ public final class CorporaConstants {
   public static final String DESCRIPTIVE_METADATA_TYPE_EAD_VERSION3 = "3";
   public static final String DESCRIPTIVE_METADATA_TYPE_EAD_VERSIONUNKNOWN = "unknown";
 
-  public static String SIP_FOLDER = "SIPs";
-  public static String EARK_SIP = "eark_sip.zip";
-  public static String BAGIT_SIP = "bagit.zip";
-  public static String TRANSFERRED_RESOURCE = "transferredresource";
-  public static String ANCESTOR_SIP_FOLDER = "ancestorsFolder";
+  public static final String SIP_FOLDER = "SIPs";
+  public static final String EARK_SIP = "eark_sip.zip";
+  public static final String BAGIT_SIP = "bagit.zip";
+  public static final String TRANSFERRED_RESOURCE = "transferredresource";
+  public static final String ANCESTOR_SIP_FOLDER = "ancestorsFolder";
 
   /** Private empty constructor */
   private CorporaConstants() {

@@ -28,16 +28,16 @@ import org.slf4j.LoggerFactory;
 public abstract class SIPToAIPPlugin extends AbstractPlugin<TransferredResource> {
   private static final Logger LOGGER = LoggerFactory.getLogger(SIPToAIPPlugin.class);
 
-  public static String UNPACK_SUCCESS_MESSAGE = "The SIP has been successfully unpacked.";
-  public static String UNPACK_FAILURE_MESSAGE = "The ingest process failed to unpack the SIP.";
-  public static String UNPACK_PARTIAL_MESSAGE = null;
-  public static PreservationEventType UNPACK_EVENT_TYPE = PreservationEventType.UNPACKING;
+  public static final String UNPACK_SUCCESS_MESSAGE = "The SIP has been successfully unpacked.";
+  public static final String UNPACK_FAILURE_MESSAGE = "The ingest process failed to unpack the SIP.";
+  public static final String UNPACK_PARTIAL_MESSAGE = null;
+  public static final PreservationEventType UNPACK_EVENT_TYPE = PreservationEventType.UNPACKING;
 
-  public static String WELLFORMED_DESCRIPTION = "Checked that the received SIP is well formed, complete and that no unexpected files were included.";
-  public static String WELLFORMED_SUCCESS_MESSAGE = "The SIP was well formed and complete.";
-  public static String WELLFORMED_FAILURE_MESSAGE = "The SIP was not well formed or some files were missing.";
-  public static String WELLFORMED_PARTIAL_MESSAGE = null;
-  public static PreservationEventType WELLFORMED_EVENT_TYPE = PreservationEventType.WELLFORMEDNESS_CHECK;
+  public static final String WELLFORMED_DESCRIPTION = "Checked that the received SIP is well formed, complete and that no unexpected files were included.";
+  public static final String WELLFORMED_SUCCESS_MESSAGE = "The SIP was well formed and complete.";
+  public static final String WELLFORMED_FAILURE_MESSAGE = "The SIP was not well formed or some files were missing.";
+  public static final String WELLFORMED_PARTIAL_MESSAGE = null;
+  public static final PreservationEventType WELLFORMED_EVENT_TYPE = PreservationEventType.WELLFORMEDNESS_CHECK;
 
   private String successMessage;
   private String failureMessage;

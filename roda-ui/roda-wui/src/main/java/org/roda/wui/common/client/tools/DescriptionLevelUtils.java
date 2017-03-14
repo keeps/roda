@@ -30,7 +30,6 @@ public class DescriptionLevelUtils {
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
   private static final String TOP_ICON = "<span class='roda-logo'></span>";
-
   private static ClientLogger logger = new ClientLogger(DescriptionLevelUtils.class.getName());
 
   private DescriptionLevelUtils() {
@@ -75,11 +74,11 @@ public class DescriptionLevelUtils {
         level.setIconClass(LEVELS_CONFIGURATION.getLevelIcons().get(levelString));
       } else if (levelString.equalsIgnoreCase(RodaConstants.AIP_GHOST)) {
         level.setIconClass(LEVELS_CONFIGURATION.getGhostClass());
-      } else if ((levelString.equalsIgnoreCase(RodaConstants.VIEW_REPRESENTATION_REPRESENTATION))) {
+      } else if (levelString.equalsIgnoreCase(RodaConstants.VIEW_REPRESENTATION_REPRESENTATION)) {
         level.setIconClass(LEVELS_CONFIGURATION.getRepresentationClass());
-      } else if ((levelString.equalsIgnoreCase(RodaConstants.VIEW_REPRESENTATION_FOLDER))) {
+      } else if (levelString.equalsIgnoreCase(RodaConstants.VIEW_REPRESENTATION_FOLDER)) {
         level.setIconClass(LEVELS_CONFIGURATION.getRepresentationFolderClass());
-      } else if ((levelString.equalsIgnoreCase(RodaConstants.VIEW_REPRESENTATION_FILE))) {
+      } else if (levelString.equalsIgnoreCase(RodaConstants.VIEW_REPRESENTATION_FILE)) {
         level.setIconClass(LEVELS_CONFIGURATION.getRepresentationFileClass());
       } else {
         level.setIconClass(LEVELS_CONFIGURATION.getDefaultClass());
