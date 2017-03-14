@@ -96,14 +96,14 @@ public class FileStorageService implements StorageService {
   }
 
   private void initialize(Path path) throws GenericException {
-    if (!path.toFile().exists()) {
+    if (!FSUtils.exists(path)) {
       try {
         Files.createDirectories(path);
       } catch (IOException e) {
         throw new GenericException("Could not create path " + path, e);
 
       }
-    } else if (!path.toFile().isDirectory()) {
+    } else if (!FSUtils.isDirectory(path)) {
       throw new GenericException("Path is not a directory " + path);
     } else if (!Files.isReadable(path)) {
       throw new GenericException("Cannot read from path " + path);
@@ -156,7 +156,7 @@ public class FileStorageService implements StorageService {
 
     Path containerPath = FSUtils.getEntityPath(basePath, storagePath);
     Container container;
-    if (containerPath.toFile().exists()) {
+    if (FSUtils.exists(containerPath)) {
       container = new DefaultContainer(storagePath);
     } else {
       throw new NotFoundException("Container not found: " + storagePath);
@@ -219,7 +219,7 @@ public class FileStorageService implements StorageService {
     Path dirPath = FSUtils.getEntityPath(basePath, storagePath);
     Path directory = null;
 
-    if (dirPath.toFile().exists()) {
+    if (FSUtils.exists(dirPath)) {
       throw new AlreadyExistsException("Could not create directory at " + dirPath);
     }
 
@@ -307,14 +307,14 @@ public class FileStorageService implements StorageService {
       throw new GenericException("Method not yet implemented");
     } else {
       Path binPath = FSUtils.getEntityPath(basePath, storagePath);
-      if (binPath.toFile().exists()) {
+      if (FSUtils.exists(binPath)) {
         throw new AlreadyExistsException("Binary already exists: " + binPath);
       } else {
 
         try {
           // ensuring parent exists
           Path parent = binPath.getParent();
-          if (!parent.toFile().exists()) {
+          if (!FSUtils.exists(parent)) {
             Files.createDirectories(parent);
           }
 
@@ -344,7 +344,7 @@ public class FileStorageService implements StorageService {
       Path parent = FSUtils.getEntityPath(basePath, parentStoragePath);
       try {
         // ensure parent exists
-        if (!parent.toFile().exists()) {
+        if (!FSUtils.exists(parent)) {
           Files.createDirectories(parent);
         }
 
@@ -374,11 +374,11 @@ public class FileStorageService implements StorageService {
     } else {
 
       Path binaryPath = FSUtils.getEntityPath(basePath, storagePath);
-      boolean fileExists = binaryPath.toFile().exists();
+      boolean fileExists = FSUtils.exists(binaryPath);
 
       if (!fileExists && !createIfNotExists) {
         throw new NotFoundException("Binary does not exist: " + binaryPath);
-      } else if (fileExists && !binaryPath.toFile().isFile()) {
+      } else if (fileExists && !FSUtils.isFile(binaryPath)) {
         throw new GenericException("Looking for a binary but found something else");
       } else {
         try {
@@ -455,8 +455,8 @@ public class FileStorageService implements StorageService {
   @Override
   public Class<? extends Entity> getEntity(StoragePath storagePath) throws NotFoundException {
     Path entity = FSUtils.getEntityPath(basePath, storagePath);
-    if (entity.toFile().exists()) {
-      if (entity.toFile().isDirectory()) {
+    if (FSUtils.exists(entity)) {
+      if (FSUtils.isDirectory(entity)) {
         if (storagePath.isFromAContainer()) {
           return DefaultContainer.class;
         } else {
@@ -498,7 +498,7 @@ public class FileStorageService implements StorageService {
 
     CloseableIterable<BinaryVersion> iterable;
 
-    if (!parent.toFile().exists()) {
+    if (!FSUtils.exists(parent)) {
       return new EmptyClosableIterable<>();
     }
 
@@ -572,22 +572,22 @@ public class FileStorageService implements StorageService {
     Path dataPath = FSUtils.getEntityPath(historyDataPath, storagePath, id);
     Path metadataPath = FSUtils.getBinaryHistoryMetadataPath(historyDataPath, historyMetadataPath, dataPath);
 
-    if (!binPath.toFile().exists()) {
+    if (!FSUtils.exists(binPath)) {
       throw new NotFoundException("Binary does not exist: " + binPath);
     }
 
-    if (!binPath.toFile().isFile()) {
+    if (!FSUtils.isFile(binPath)) {
       throw new RequestNotValidException("Not a regular file: " + binPath);
     }
 
-    if (dataPath.toFile().exists()) {
+    if (FSUtils.exists(dataPath)) {
       throw new GenericException("Binary version id collided: " + dataPath);
     }
 
     try {
       // ensuring parent exists
       Path parent = dataPath.getParent();
-      if (!parent.toFile().exists()) {
+      if (!FSUtils.exists(parent)) {
         Files.createDirectories(parent);
       }
 
@@ -615,15 +615,15 @@ public class FileStorageService implements StorageService {
     Path binPath = FSUtils.getEntityPath(basePath, storagePath);
     Path binVersionPath = FSUtils.getEntityPath(historyDataPath, storagePath, version);
 
-    if (!binPath.toFile().exists()) {
+    if (!FSUtils.exists(binPath)) {
       throw new NotFoundException("Binary does not exist: " + binPath);
     }
 
-    if (!binPath.toFile().isFile()) {
+    if (!FSUtils.isFile(binPath)) {
       throw new RequestNotValidException("Not a regular file: " + binPath);
     }
 
-    if (!binVersionPath.toFile().exists()) {
+    if (!FSUtils.exists(binVersionPath)) {
       throw new NotFoundException("Binary version does not exist: " + binVersionPath);
     }
 
@@ -656,7 +656,7 @@ public class FileStorageService implements StorageService {
     Path relativePath = basePath.relativize(resourcePath);
     Path resourceHistoryDataPath = historyDataPath.resolve(relativePath);
 
-    if (resourceHistoryDataPath.toFile().isDirectory()) {
+    if (FSUtils.isDirectory(resourceHistoryDataPath)) {
       try {
         Path resourceHistoryMetadataPath = historyMetadataPath
           .resolve(historyDataPath.relativize(resourceHistoryDataPath));
@@ -673,7 +673,7 @@ public class FileStorageService implements StorageService {
       Path parent = resourceHistoryDataPath.getParent();
       final String baseName = resourceHistoryDataPath.getFileName().toString();
 
-      if (parent.toFile().exists()) {
+      if (FSUtils.exists(parent)) {
         DirectoryStream<Path> directoryStream = null;
         try {
           directoryStream = Files.newDirectoryStream(parent, new DirectoryStream.Filter<Path>() {

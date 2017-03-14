@@ -54,6 +54,7 @@ import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Directory;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -159,7 +160,7 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
       Path outputPath = Paths.get(outputFolder);
       String error = null;
       try {
-        if (!outputPath.toFile().exists()) {
+        if (!FSUtils.exists(outputPath)) {
           Files.createDirectories(outputPath);
         }
         if (!Files.isWritable(outputPath)) {
@@ -247,9 +248,9 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
       String error = null;
       try {
         Path zip = outputPath.resolve(aip.getId() + ".zip");
-        if (zip.toFile().exists() && removeIfAlreadyExists) {
+        if (FSUtils.exists(zip) && removeIfAlreadyExists) {
           Files.delete(zip);
-        } else if (zip.toFile().exists() && !removeIfAlreadyExists) {
+        } else if (FSUtils.exists(zip) && !removeIfAlreadyExists) {
           error = "File " + zip.toString() + " already exists";
         }
         if (error == null) {

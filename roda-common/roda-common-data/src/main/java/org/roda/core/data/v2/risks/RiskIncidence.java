@@ -22,20 +22,19 @@ import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@XmlRootElement(name = "riskincidence")
+@XmlRootElement(name = RodaConstants.RODA_OBJECT_INCIDENCE)
 @JsonInclude(JsonInclude.Include.ALWAYS)
 public class RiskIncidence implements IsModelObject, IsIndexed {
-
   private static final long serialVersionUID = -1089167070045254627L;
 
-  public static enum INCIDENCE_STATUS {
+  public enum INCIDENCE_STATUS {
     UNMITIGATED, MITIGATED, ACCEPT_RISK, FALSE_POSITIVE;
   }
 
   private String id = null;
   private String aipId = null;
   private String representationId = null;
-  private List<String> filePath = new ArrayList<String>();
+  private List<String> filePath = new ArrayList<>();
   private String fileId = null;
   private String objectClass = null;
   private String riskId;

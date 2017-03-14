@@ -23,7 +23,7 @@ public class JobStats implements Serializable {
   private int outcomeObjectsWithManualIntervention = 0;
 
   public JobStats() {
-
+    // do nothing
   }
 
   public int getCompletionPercentage() {

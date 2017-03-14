@@ -636,7 +636,7 @@ public class SolrUtils {
   }
 
   private static List<FacetFieldResult> processFacetFields(Facets facets, List<FacetField> facetFields) {
-    List<FacetFieldResult> ret = new ArrayList<FacetFieldResult>();
+    List<FacetFieldResult> ret = new ArrayList<>();
     FacetFieldResult facetResult;
     if (facetFields != null) {
       for (FacetField facet : facetFields) {
@@ -1001,7 +1001,7 @@ public class SolrUtils {
    * ____________________________________________________________________________________________________________________
    */
   public static List<SortClause> parseSorter(Sorter sorter) {
-    List<SortClause> ret = new ArrayList<SortClause>();
+    List<SortClause> ret = new ArrayList<>();
     if (sorter != null) {
       for (SortParameter sortParameter : sorter.getParameters()) {
         ret.add(new SortClause(sortParameter.getName(), sortParameter.isDescending() ? ORDER.desc : ORDER.asc));
@@ -1210,8 +1210,6 @@ public class SolrUtils {
     ret.addField(RodaConstants.INGEST_JOB_ID, aip.getIngestJobId());
     ret.addField(RodaConstants.INGEST_UPDATE_JOB_IDS, aip.getIngestUpdateJobIds());
 
-    // set ancestors
-    // List<String> ancestors = getAncestors(aip.getParentId(), model);
     ret.addField(RodaConstants.AIP_ANCESTORS, ancestors);
 
     List<String> descriptiveMetadataIds = aip.getDescriptiveMetadata().stream().map(dm -> dm.getId())

@@ -21,12 +21,13 @@ public class Sorter implements Serializable {
 
   public static final Sorter NONE = new Sorter();
 
-  private List<SortParameter> parameters = new ArrayList<SortParameter>();
+  private List<SortParameter> parameters = new ArrayList<>();
 
   /**
    * Constructs an empty {@link Sorter}.
    */
   public Sorter() {
+    // do nothing
   }
 
   /**
@@ -86,6 +87,7 @@ public class Sorter implements Serializable {
   /**
    * @see Object#toString()
    */
+  @Override
   public String toString() {
     if (getParameters() != null) {
       return "Sorter (" + Arrays.asList(getParameters()) + ")";

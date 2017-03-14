@@ -15,7 +15,7 @@ public final class URNUtils {
 
   /** Private empty constructor */
   private URNUtils() {
-
+    // do nothing
   }
 
   public static String createRodaURN(RODA_TYPE type, String id) {
@@ -37,20 +37,6 @@ public final class URNUtils {
     return sb.toString();
   }
 
-  public static String createOtherURN(String type, String id) {
-    StringBuilder sb = new StringBuilder();
-    sb.append(RodaConstants.URN_BASE);
-    sb.append(RodaConstants.URN_SEPARATOR);
-    sb.append(RodaConstants.URN_RODA);
-    sb.append(RodaConstants.URN_SEPARATOR);
-    sb.append(RodaConstants.URN_OTHER);
-    sb.append(RodaConstants.URN_SEPARATOR);
-    sb.append(type);
-    sb.append(RodaConstants.URN_SEPARATOR);
-    sb.append(id);
-    return sb.toString().toLowerCase();
-  }
-
   public static String getPremisPrefix(PreservationMetadataType type) {
     StringBuilder sb = new StringBuilder();
     sb.append(RodaConstants.URN_BASE);
@@ -68,36 +54,4 @@ public final class URNUtils {
     String[] fields = id.split(RodaConstants.URN_SEPARATOR);
     return PreservationMetadataType.valueOf(fields[3].toUpperCase());
   }
-
-  public static RODA_TYPE getRodaType(String value) {
-    if (value.contains(RodaConstants.URN_SEPARATOR) && value.split(RodaConstants.URN_SEPARATOR).length > 3) {
-      return RODA_TYPE.valueOf(value.split(RodaConstants.URN_SEPARATOR)[2].toUpperCase());
-    } else {
-      return null;
-    }
-  }
-
-  public static String getRodaPrefix(RODA_TYPE type) {
-    StringBuilder sb = new StringBuilder();
-    sb.append(RodaConstants.URN_BASE);
-    sb.append(RodaConstants.URN_SEPARATOR);
-    sb.append(RodaConstants.URN_RODA);
-    sb.append(RodaConstants.URN_SEPARATOR);
-    sb.append(type);
-    sb.append(RodaConstants.URN_SEPARATOR);
-    return sb.toString().toLowerCase();
-  }
-
-  public static String getLinkingObjectPath(String value) {
-    String newValue = value;
-    for (RODA_TYPE type : RODA_TYPE.values()) {
-      String prefix = getRodaPrefix(type);
-      if (value.toLowerCase().startsWith(prefix)) {
-        newValue = newValue.replace(prefix, "");
-        break;
-      }
-    }
-    return newValue;
-  }
-
 }

@@ -9,10 +9,16 @@ package org.roda.core.data.v2.ip.metadata;
 
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsRODAObject;
 
-public class OtherMetadata implements IsRODAObject {
+import com.fasterxml.jackson.annotation.JsonInclude;
 
+@XmlRootElement(name = RodaConstants.RODA_OBJECT_OTHER_METADATA)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class OtherMetadata implements IsRODAObject {
   private static final long serialVersionUID = 7643339238489130326L;
 
   private String id;

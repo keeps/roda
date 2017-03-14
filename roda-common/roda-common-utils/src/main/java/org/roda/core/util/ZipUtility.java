@@ -235,17 +235,15 @@ public final class ZipUtility {
         addDirToArchive(zos, files[i]);
         continue;
       }
-      try {
+      try (FileInputStream fis = new FileInputStream(files[i])) {
         // create byte buffer
         byte[] buffer = new byte[1024];
-        try (FileInputStream fis = new FileInputStream(files[i])) {
-          zos.putNextEntry(new ZipEntry(files[i].getName()));
-          int length;
-          while ((length = fis.read(buffer)) > 0) {
-            zos.write(buffer, 0, length);
-          }
-          zos.closeEntry();
+        zos.putNextEntry(new ZipEntry(files[i].getName()));
+        int length;
+        while ((length = fis.read(buffer)) > 0) {
+          zos.write(buffer, 0, length);
         }
+        zos.closeEntry();
       } catch (IOException e) {
         LOGGER.error("Error adding file/folder to zip", e);
       }

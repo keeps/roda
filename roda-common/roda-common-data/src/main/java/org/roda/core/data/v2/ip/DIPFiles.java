@@ -13,6 +13,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.RODAObjectList;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -21,14 +22,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * @author Hélder Silva <hsilva@keep.pt>
  */
-@XmlRootElement(name = "dip_files")
+@XmlRootElement(name = RodaConstants.RODA_OBJECT_DIPFILES)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DIPFiles implements RODAObjectList<DIPFile> {
+  private static final long serialVersionUID = 1740460866608268089L;
   private List<DIPFile> files;
 
   public DIPFiles() {
     super();
-    files = new ArrayList<DIPFile>();
+    files = new ArrayList<>();
   }
 
   public DIPFiles(List<DIPFile> files) {
@@ -36,8 +38,8 @@ public class DIPFiles implements RODAObjectList<DIPFile> {
     this.files = files;
   }
 
-  @JsonProperty(value = "dip_files")
-  @XmlElement(name = "dip_file")
+  @JsonProperty(value = RodaConstants.RODA_OBJECT_DIPFILES)
+  @XmlElement(name = RodaConstants.RODA_OBJECT_DIPFILE)
   @Override
   public List<DIPFile> getObjects() {
     return files;

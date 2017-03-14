@@ -277,7 +277,7 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
     }
     try {
       Path reportsFolder = RodaCoreFactory.getRodaHomePath().resolve(RodaConstants.CORE_REPORT_FOLDER);
-      if (reportsFolder.toFile().exists()) {
+      if (FSUtils.exists(reportsFolder)) {
         Files.createDirectories(reportsFolder);
       }
     } catch (IOException e) {

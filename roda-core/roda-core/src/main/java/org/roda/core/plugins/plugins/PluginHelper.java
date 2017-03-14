@@ -105,6 +105,7 @@ import org.roda.core.plugins.plugins.reindex.ReindexTransferredResourcePlugin;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -682,7 +683,7 @@ public final class PluginHelper {
     throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException {
     if (createSubmission) {
-      if (submissionPath.toFile().isDirectory()) {
+      if (FSUtils.isDirectory(submissionPath)) {
         StorageService submissionStorage = new FileStorageService(submissionPath);
         StoragePath submissionStoragePath = DefaultStoragePath.empty();
         model.createSubmission(submissionStorage, submissionStoragePath, aipId);

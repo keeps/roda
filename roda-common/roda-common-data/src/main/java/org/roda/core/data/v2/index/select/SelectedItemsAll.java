@@ -13,14 +13,6 @@ public class SelectedItemsAll<T extends IsRODAObject> implements SelectedItems<T
 
   private static final long serialVersionUID = -5364779540199737165L;
 
-  public static <T extends IsRODAObject> SelectedItemsAll<T> create(Class<T> classToCreate) {
-    return new SelectedItemsAll<>(classToCreate.getName());
-  }
-
-  public static <T extends IsRODAObject> SelectedItemsAll<T> create(String classToCreate) {
-    return new SelectedItemsAll<>(classToCreate);
-  }
-
   private String selectedClass;
 
   public SelectedItemsAll() {
@@ -39,6 +31,14 @@ public class SelectedItemsAll<T extends IsRODAObject> implements SelectedItems<T
 
   public void setSelectedClass(String selectedClass) {
     this.selectedClass = selectedClass;
+  }
+
+  public static <T extends IsRODAObject> SelectedItemsAll<T> create(Class<T> classToCreate) {
+    return new SelectedItemsAll<>(classToCreate.getName());
+  }
+
+  public static <T extends IsRODAObject> SelectedItemsAll<T> create(String classToCreate) {
+    return new SelectedItemsAll<>(classToCreate);
   }
 
   @Override

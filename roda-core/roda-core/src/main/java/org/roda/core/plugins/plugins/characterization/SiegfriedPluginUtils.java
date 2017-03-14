@@ -37,6 +37,7 @@ import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.StringContentPayload;
+import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.Base64;
 import org.roda.core.util.CommandException;
 import org.roda.core.util.CommandUtility;
@@ -133,7 +134,7 @@ public class SiegfriedPluginUtils {
     PluginException {
     List<LinkingIdentifier> sources = new ArrayList<>();
 
-    if (path.toFile().exists()) {
+    if (FSUtils.exists(path)) {
       String siegfriedOutput = SiegfriedPluginUtils.runSiegfriedOnPath(path);
 
       final JsonNode jsonObject = JsonUtils.parseJson(siegfriedOutput);

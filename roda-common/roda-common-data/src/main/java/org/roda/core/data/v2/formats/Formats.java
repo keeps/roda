@@ -13,6 +13,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.RODAObjectList;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -21,33 +22,34 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * @author Hélder Silva <hsilva@keep.pt>
  */
-@XmlRootElement(name = "formats")
+@XmlRootElement(name = RodaConstants.RODA_OBJECT_FORMATS)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Formats implements RODAObjectList<Format> {
-  private List<Format> formats;
+  private static final long serialVersionUID = -1500757245278990237L;
+  private List<Format> formatList;
 
   public Formats() {
     super();
-    formats = new ArrayList<Format>();
+    formatList = new ArrayList<>();
   }
 
   public Formats(List<Format> formats) {
     super();
-    this.formats = formats;
+    this.formatList = formats;
   }
 
-  @JsonProperty(value = "formats")
-  @XmlElement(name = "format")
+  @JsonProperty(value = RodaConstants.RODA_OBJECT_FORMATS)
+  @XmlElement(name = RodaConstants.RODA_OBJECT_FORMAT)
   public List<Format> getObjects() {
-    return formats;
+    return formatList;
   }
 
   public void setObjects(List<Format> formats) {
-    this.formats = formats;
+    this.formatList = formats;
   }
 
   public void addObject(Format format) {
-    this.formats.add(format);
+    this.formatList.add(format);
   }
 
 }

@@ -9,6 +9,7 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
+import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.CommandException;
 import org.roda.core.util.CommandUtility;
 
@@ -31,7 +32,7 @@ public class ReplicationPluginUtils {
 
     StringBuilder ret = new StringBuilder();
 
-    if (sourceAipPath.toFile().exists()) {
+    if (FSUtils.exists(sourceAipPath)) {
       rsyncCommand.add(sourceAipPath + "/");
       rsyncCommand.add(targetAipPath);
 
@@ -50,7 +51,7 @@ public class ReplicationPluginUtils {
       + RodaConstants.STORAGE_HISTORY_CONTAINER_DATA + "/" + RodaConstants.STORAGE_CONTAINER_AIP + "/" + aip.getId()
       + "/";
 
-    if (sourceAipHistoryDataPath.toFile().exists()) {
+    if (FSUtils.exists(sourceAipHistoryDataPath)) {
       List<String> rsyncHistoryDataCommand = addInitialCommandPart(hasCompression);
       rsyncHistoryDataCommand.add(sourceAipHistoryDataPath + "/");
       rsyncHistoryDataCommand.add(targetAipHistoryDataPath);
@@ -74,7 +75,7 @@ public class ReplicationPluginUtils {
       + RodaConstants.STORAGE_HISTORY_CONTAINER_METADATA + "/" + RodaConstants.STORAGE_CONTAINER_AIP + "/" + aip.getId()
       + "/";
 
-    if (sourceAipHistoryMetadataPath.toFile().exists()) {
+    if (FSUtils.exists(sourceAipHistoryMetadataPath)) {
       List<String> rsyncHistoryMetadataCommand = addInitialCommandPart(hasCompression);
       rsyncHistoryMetadataCommand.add(sourceAipHistoryMetadataPath + "/");
       rsyncHistoryMetadataCommand.add(targetAipHistoryMetadataPath);
@@ -110,7 +111,7 @@ public class ReplicationPluginUtils {
       + RodaConstants.STORAGE_DIRECTORY_PRESERVATION + "/" + pm.getId() + RodaConstants.PREMIS_SUFFIX;
 
     StringBuilder ret = new StringBuilder();
-    if (sourceEventPath.toFile().exists()) {
+    if (FSUtils.exists(sourceEventPath)) {
 
       rsyncCommand.add(sourceEventPath.toString());
       rsyncCommand.add(targetEventPath);
@@ -143,7 +144,7 @@ public class ReplicationPluginUtils {
       + RodaConstants.STORAGE_CONTAINER_PRESERVATION + "/" + RodaConstants.STORAGE_CONTAINER_PRESERVATION_AGENTS + "/";
 
     StringBuilder ret = new StringBuilder();
-    if (sourceAgentPath.toFile().exists()) {
+    if (FSUtils.exists(sourceAgentPath)) {
       rsyncCommand.add(sourceAgentPath + "/");
       rsyncCommand.add(targetAgentPath);
 

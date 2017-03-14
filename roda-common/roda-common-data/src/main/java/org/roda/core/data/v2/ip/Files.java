@@ -13,6 +13,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.RODAObjectList;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -21,36 +22,37 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * @author Hélder Silva <hsilva@keep.pt>
  */
-@XmlRootElement(name = "files")
+@XmlRootElement(name = RodaConstants.RODA_OBJECT_FILES)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Files implements RODAObjectList<File> {
-  private List<File> files;
+  private static final long serialVersionUID = 7748588920265041356L;
+  private List<File> fileList;
 
   public Files() {
     super();
-    files = new ArrayList<File>();
+    fileList = new ArrayList<>();
   }
 
   public Files(List<File> files) {
     super();
-    this.files = files;
+    this.fileList = files;
   }
 
-  @JsonProperty(value = "files")
-  @XmlElement(name = "file")
+  @JsonProperty(value = RodaConstants.RODA_OBJECT_FILES)
+  @XmlElement(name = RodaConstants.RODA_OBJECT_FILE)
   @Override
   public List<File> getObjects() {
-    return files;
+    return fileList;
   }
 
   @Override
   public void setObjects(List<File> files) {
-    this.files = files;
+    this.fileList = files;
   }
 
   @Override
   public void addObject(File file) {
-    this.files.add(file);
+    this.fileList.add(file);
   }
 
 }

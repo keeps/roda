@@ -128,7 +128,7 @@ public final class FSUtils {
     throws AlreadyExistsException, GenericException, NotFoundException {
 
     // check if we can replace existing
-    if (!replaceExisting && targetPath.toFile().exists()) {
+    if (!replaceExisting && FSUtils.exists(targetPath)) {
       throw new AlreadyExistsException("Cannot copy because target path already exists: " + targetPath);
     }
 
@@ -144,7 +144,7 @@ public final class FSUtils {
     CopyOption[] copyOptions = replaceExisting ? new CopyOption[] {StandardCopyOption.REPLACE_EXISTING}
       : new CopyOption[] {};
 
-    if (sourcePath.toFile().isDirectory()) {
+    if (FSUtils.isDirectory(sourcePath)) {
       try {
         Files.move(sourcePath, targetPath, copyOptions);
       } catch (DirectoryNotEmptyException e) {
@@ -223,7 +223,7 @@ public final class FSUtils {
     throws AlreadyExistsException, GenericException {
 
     // check if we can replace existing
-    if (!replaceExisting && targetPath.toFile().exists()) {
+    if (!replaceExisting && FSUtils.exists(targetPath)) {
       throw new AlreadyExistsException("Cannot copy because target path already exists: " + targetPath);
     }
 
@@ -234,7 +234,7 @@ public final class FSUtils {
       throw new GenericException("Error while creating target directory parent folder", e);
     }
 
-    if (sourcePath.toFile().isDirectory()) {
+    if (FSUtils.isDirectory(sourcePath)) {
       try {
         Files.walkFileTree(sourcePath, new SimpleFileVisitor<Path>() {
           @Override
@@ -615,7 +615,7 @@ public final class FSUtils {
 
     // TODO support binary reference
 
-    if (!path.toFile().exists()) {
+    if (!FSUtils.exists(path)) {
       throw new NotFoundException("Cannot find file or directory at " + path);
     }
 
@@ -623,7 +623,7 @@ public final class FSUtils {
     StoragePath storagePath = FSUtils.getStoragePath(basePath, path);
 
     // construct
-    if (path.toFile().isDirectory()) {
+    if (FSUtils.isDirectory(path)) {
       resource = new DefaultDirectory(storagePath);
     } else {
       ContentPayload content = new FSPathContentPayload(path);
@@ -649,7 +649,7 @@ public final class FSUtils {
     throws RequestNotValidException, NotFoundException, GenericException {
     DefaultBinaryVersion ret;
 
-    if (!path.toFile().exists()) {
+    if (!FSUtils.exists(path)) {
       throw new NotFoundException("Cannot find file version at " + path);
     }
 
@@ -677,7 +677,7 @@ public final class FSUtils {
       Map<String, String> contentDigest = null;
       Binary binary = new DefaultBinary(storagePath, content, sizeInBytes, false, contentDigest);
 
-      if (metadataPath.toFile().exists()) {
+      if (FSUtils.exists(metadataPath)) {
         ret = JsonUtils.readObjectFromFile(metadataPath, DefaultBinaryVersion.class);
         ret.setBinary(binary);
       } else {
@@ -711,7 +711,7 @@ public final class FSUtils {
     StoragePath storagePath = FSUtils.getStoragePath(basePath, path);
 
     // construct
-    if (path.toFile().isDirectory()) {
+    if (FSUtils.isDirectory(path)) {
       resource = new DefaultContainer(storagePath);
     } else {
       throw new GenericException("A file is not a container!");
@@ -888,5 +888,17 @@ public final class FSUtils {
 
   public static String asString(List<String> path) {
     return StringUtils.join(path, SEPARATOR);
+  }
+
+  public static boolean exists(Path file) {
+    return file.toFile().exists();
+  }
+
+  public static boolean isDirectory(Path file) {
+    return file.toFile().isDirectory();
+  }
+
+  public static boolean isFile(Path file) {
+    return file.toFile().isFile();
   }
 }

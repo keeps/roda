@@ -40,6 +40,7 @@ import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.migration.model.FormatToVersion2;
 import org.roda.core.migration.model.RiskToVersion2;
+import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,7 +107,7 @@ public class MigrationManager {
     Map<String, Integer> modelClassesVersionsFromCode = getModelClassesVersionsFromCode(true, "Indexed");
     Map<String, Integer> modelClassesVersionsInstalled = new HashMap<>();
 
-    if (modelInfoFile.toFile().exists()) {
+    if (FSUtils.exists(modelInfoFile)) {
       modelClassesVersionsInstalled = JsonUtils.getObjectFromJson(modelInfoFile, ModelInfo.class)
         .getInstalledClassesVersions();
     }
@@ -282,7 +283,7 @@ public class MigrationManager {
     List<String> solrCollections = new ArrayList<>();
     try (DirectoryStream<Path> stream = Files.newDirectoryStream(indexConfigsFolder)) {
       stream.forEach(e -> {
-        if (e.toFile().isDirectory()) {
+        if (FSUtils.isDirectory(e)) {
           solrCollections.add(e.getFileName().toString());
         }
       });

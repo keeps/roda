@@ -13,39 +13,41 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.common.RodaConstants;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Hélder Silva <hsilva@keep.pt>
  */
-@XmlRootElement(name = "jobs")
+@XmlRootElement(name = RodaConstants.RODA_OBJECT_JOBS)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Jobs {
-  private List<Job> jobs;
+  private List<Job> jobList;
 
   public Jobs() {
     super();
-    jobs = new ArrayList<Job>();
+    jobList = new ArrayList<>();
   }
 
   public Jobs(List<Job> jobs) {
     super();
-    this.jobs = jobs;
+    this.jobList = jobs;
   }
 
-  @JsonProperty(value = "jobs")
-  @XmlElement(name = "job")
+  @JsonProperty(value = RodaConstants.RODA_OBJECT_JOBS)
+  @XmlElement(name = RodaConstants.RODA_OBJECT_JOB)
   public List<Job> getJobs() {
-    return jobs;
+    return jobList;
   }
 
   public void setJobs(List<Job> jobs) {
-    this.jobs = jobs;
+    this.jobList = jobs;
   }
 
   public void addJob(Job job) {
-    this.jobs.add(job);
+    this.jobList.add(job);
   }
 
 }

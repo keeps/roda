@@ -11,19 +11,20 @@ import java.util.Date;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.NamedIndexedModel;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@XmlRootElement(name = "risk")
+@XmlRootElement(name = RodaConstants.RODA_OBJECT_RISK)
 @JsonInclude(JsonInclude.Include.ALWAYS)
 public class Risk extends NamedIndexedModel implements IsModelObject {
 
   private static final long serialVersionUID = -585753367605901060L;
 
-  public static enum SEVERITY_LEVEL {
+  public enum SEVERITY_LEVEL {
     LOW, MODERATE, HIGH;
   }
 

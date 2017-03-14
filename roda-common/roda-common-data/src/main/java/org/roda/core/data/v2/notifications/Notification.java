@@ -22,13 +22,13 @@ import org.roda.core.data.v2.index.IsIndexed;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@XmlRootElement(name = "notification")
+@XmlRootElement(name = RodaConstants.RODA_OBJECT_NOTIFICATION)
 @JsonInclude(JsonInclude.Include.ALWAYS)
 public class Notification implements IsModelObject, IsIndexed {
 
   private static final long serialVersionUID = -585753367605901060L;
 
-  public static enum NOTIFICATION_STATE {
+  public enum NOTIFICATION_STATE {
     CREATED, COMPLETED, FAILED;
   }
 
@@ -46,7 +46,7 @@ public class Notification implements IsModelObject, IsIndexed {
   public Notification() {
     super();
     this.sentOn = new Date();
-    this.acknowledgedUsers = new HashMap<String, String>();
+    this.acknowledgedUsers = new HashMap<>();
     this.state = NOTIFICATION_STATE.CREATED;
   }
 

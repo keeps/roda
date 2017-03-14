@@ -26,8 +26,8 @@ public abstract class RodaPrincipal implements Serializable, RODAMember, IsModel
 
   private boolean active = true;
 
-  private Set<String> allRoles = new HashSet<String>();
-  private Set<String> directRoles = new HashSet<String>();
+  private Set<String> allRoles = new HashSet<>();
+  private Set<String> directRoles = new HashSet<>();
 
   public RodaPrincipal() {
     this(null, null);
@@ -176,7 +176,7 @@ public abstract class RodaPrincipal implements Serializable, RODAMember, IsModel
 
   public void addDirectRole(String role) {
     if (directRoles == null) {
-      directRoles = new HashSet<String>();
+      directRoles = new HashSet<>();
     }
     directRoles.add(role);
   }

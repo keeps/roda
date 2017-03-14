@@ -22,7 +22,7 @@ import org.roda.core.data.v2.index.IsIndexed;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@XmlRootElement(name = "format")
+@XmlRootElement(name = RodaConstants.RODA_OBJECT_FORMAT)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Format extends NamedIndexedModel implements IsModelObject, IsIndexed {
 

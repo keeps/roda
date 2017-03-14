@@ -17,22 +17,6 @@ public class SelectedItemsList<T extends IsRODAObject> implements SelectedItems<
 
   private static final long serialVersionUID = -5364779540199737165L;
 
-  public static <T extends IsRODAObject> SelectedItemsList<T> create(Class<T> classToCreate, List<String> ids) {
-    return new SelectedItemsList<>(ids, classToCreate.getName());
-  }
-
-  public static <T extends IsRODAObject> SelectedItemsList<T> create(String classNameToCreate, List<String> ids) {
-    return new SelectedItemsList<>(ids, classNameToCreate);
-  }
-
-  public static <T extends IsRODAObject> SelectedItemsList<T> create(Class<T> classToCreate, String... ids) {
-    return new SelectedItemsList<>(Arrays.asList(ids), classToCreate.getName());
-  }
-
-  public static <T extends IsRODAObject> SelectedItemsList<T> create(String classNameToCreate, String... ids) {
-    return new SelectedItemsList<>(Arrays.asList(ids), classNameToCreate);
-  }
-
   private List<String> ids;
   private String selectedClass;
 
@@ -62,6 +46,22 @@ public class SelectedItemsList<T extends IsRODAObject> implements SelectedItems<
 
   public void setSelectedClass(String selectedClass) {
     this.selectedClass = selectedClass;
+  }
+
+  public static <T extends IsRODAObject> SelectedItemsList<T> create(Class<T> classToCreate, List<String> ids) {
+    return new SelectedItemsList<>(ids, classToCreate.getName());
+  }
+
+  public static <T extends IsRODAObject> SelectedItemsList<T> create(String classNameToCreate, List<String> ids) {
+    return new SelectedItemsList<>(ids, classNameToCreate);
+  }
+
+  public static <T extends IsRODAObject> SelectedItemsList<T> create(Class<T> classToCreate, String... ids) {
+    return new SelectedItemsList<>(Arrays.asList(ids), classToCreate.getName());
+  }
+
+  public static <T extends IsRODAObject> SelectedItemsList<T> create(String classNameToCreate, String... ids) {
+    return new SelectedItemsList<>(Arrays.asList(ids), classNameToCreate);
   }
 
   @Override

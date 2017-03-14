@@ -114,9 +114,9 @@ public class PasswordHandler {
 
     String label = null;
 
-    if ("SHA".startsWith(alg)) {
+    if (alg.startsWith("SHA")) {
       label = (salt.length > 0) ? "{SSHA}" : "{SHA}";
-    } else if ("MD5".startsWith(alg)) {
+    } else if (alg.startsWith("MD5")) {
       label = (salt.length > 0) ? "{SMD5}" : "{MD5}";
     }
 

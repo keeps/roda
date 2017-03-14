@@ -510,7 +510,7 @@ public class BrowserHelper {
     List<String> representationFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.REPRESENTATION_TYPE,
       RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES, RodaConstants.REPRESENTATION_ORIGINAL,
       RodaConstants.REPRESENTATION_AIP_ID, RodaConstants.REPRESENTATION_ID);
-    List<String> fileFields = new ArrayList<String>();
+    List<String> fileFields = new ArrayList<>();
 
     // infer from DIP
     IndexedDIP dip = bundle.getDip();
@@ -1327,7 +1327,7 @@ public class BrowserHelper {
     } catch (IOException e) {
       throw new GenericException("Error creating or updating AIP representation preservation metadata file", e);
     } finally {
-      if (file != null && file.toFile().exists()) {
+      if (file != null && FSUtils.exists(file)) {
         try {
           Files.delete(file);
         } catch (IOException e) {
@@ -2149,11 +2149,13 @@ public class BrowserHelper {
           files.put(idValue, file);
         } else if (RODA_TYPE.TRANSFERRED_RESOURCE.equals(linkingType)) {
           String id = LinkingObjectUtils.getTransferredResourceIdFromLinkingId(idValue);
-          String uuid = UUID.nameUUIDFromBytes(id.getBytes()).toString();
-          List<String> resourceFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.TRANSFERRED_RESOURCE_NAME,
-            RodaConstants.TRANSFERRED_RESOURCE_FULLPATH);
-          TransferredResource tr = retrieve(TransferredResource.class, uuid, resourceFields);
-          transferredResources.put(idValue, tr);
+          if (id != null) {
+            String uuid = UUID.nameUUIDFromBytes(id.getBytes()).toString();
+            List<String> resourceFields = Arrays.asList(RodaConstants.INDEX_UUID,
+              RodaConstants.TRANSFERRED_RESOURCE_NAME, RodaConstants.TRANSFERRED_RESOURCE_FULLPATH);
+            TransferredResource tr = retrieve(TransferredResource.class, uuid, resourceFields);
+            transferredResources.put(idValue, tr);
+          }
         } else {
           LOGGER.warn("No support for linking object type: {}", linkingType);
         }
@@ -2266,7 +2268,7 @@ public class BrowserHelper {
     }
   }
 
-  public static void updateDIPPermissions(User user, IndexedDIP indexedDIP, Permissions permissions, String details)
+  public static void updateDIPPermissions(IndexedDIP indexedDIP, Permissions permissions, String details)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
     // TODO 20170222 nvieira it should create an event associated with DIP
     ModelService model = RodaCoreFactory.getModelService();
@@ -2522,8 +2524,8 @@ public class BrowserHelper {
   }
 
   public static void updateRiskCounters() throws GenericException, RequestNotValidException, NotFoundException {
-    // get risks incidence count using facets
     IndexService index = RodaCoreFactory.getIndexService();
+
     IndexResult<RiskIncidence> findAllRiskIncidences = index.find(RiskIncidence.class, Filter.ALL, Sorter.NONE,
       new Sublist(0, 0), new Facets(new SimpleFacetParameter(RodaConstants.RISK_INCIDENCE_RISK_ID)),
       Arrays.asList(RodaConstants.INDEX_UUID));

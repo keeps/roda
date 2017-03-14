@@ -23,6 +23,7 @@ public class Fixity implements Serializable {
    * Constructs a new {@link Fixity}.
    */
   public Fixity() {
+    // do nothing
   }
 
   /**

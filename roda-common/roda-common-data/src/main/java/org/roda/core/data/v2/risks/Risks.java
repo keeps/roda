@@ -13,6 +13,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.RODAObjectList;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -21,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * @author Hélder Silva <hsilva@keep.pt>
  */
-@XmlRootElement(name = "risks")
+@XmlRootElement(name = RodaConstants.RODA_OBJECT_RISKS)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Risks implements RODAObjectList<Risk> {
   private static final long serialVersionUID = 1430901222528933545L;
@@ -37,8 +38,8 @@ public class Risks implements RODAObjectList<Risk> {
     this.riskList = risks;
   }
 
-  @JsonProperty(value = "risks")
-  @XmlElement(name = "risk")
+  @JsonProperty(value = RodaConstants.RODA_OBJECT_RISKS)
+  @XmlElement(name = RodaConstants.RODA_OBJECT_RISK)
   public List<Risk> getObjects() {
     return riskList;
   }

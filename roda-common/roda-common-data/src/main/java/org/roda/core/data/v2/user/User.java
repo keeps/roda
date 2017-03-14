@@ -25,13 +25,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * @author Rui Castro
  * @author Luis Faria <lfaria@keep.pt>
  */
-@XmlRootElement(name = "user")
+@XmlRootElement(name = RodaConstants.RODA_OBJECT_USER)
 @JsonInclude(JsonInclude.Include.ALWAYS)
 public class User extends RodaPrincipal {
   private static final long serialVersionUID = 6514790636010895870L;
 
   /** Groups this user belongs to. */
-  private Set<String> groups = new HashSet<String>();
+  private Set<String> groups = new HashSet<>();
 
   /** Email address. */
   private String email;
@@ -233,7 +233,7 @@ public class User extends RodaPrincipal {
 
   public void addGroup(final String group) {
     if (groups == null) {
-      groups = new HashSet<String>();
+      groups = new HashSet<>();
     }
     groups.add(group);
   }
@@ -268,6 +268,9 @@ public class User extends RodaPrincipal {
       return true;
     if (!super.equals(obj))
       return false;
+    if (obj == null) {
+      return false;
+    }
     if (getClass() != obj.getClass())
       return false;
     final User other = (User) obj;

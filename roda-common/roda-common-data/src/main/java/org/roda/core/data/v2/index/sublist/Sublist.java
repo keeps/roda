@@ -24,6 +24,7 @@ public class Sublist implements Serializable {
    * Constructs an empty {@link Sublist}.
    */
   public Sublist() {
+    // do nothing
   }
 
   /**
@@ -50,6 +51,7 @@ public class Sublist implements Serializable {
   /**
    * @see Object#toString()
    */
+  @Override
   public String toString() {
     return "Sublist(firstElementIndex=" + getFirstElementIndex() + ", maximumElementCount=" + getMaximumElementCount()
       + ")";

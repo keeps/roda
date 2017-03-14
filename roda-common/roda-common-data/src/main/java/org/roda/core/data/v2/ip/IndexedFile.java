@@ -19,10 +19,9 @@ import org.roda.core.data.v2.ip.metadata.FileFormat;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@XmlRootElement(name = "file")
+@XmlRootElement(name = RodaConstants.RODA_OBJECT_FILE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class IndexedFile implements IsIndexed, HasPermissionFilters {
-
   private static final long serialVersionUID = 3303019735787641534L;
 
   private String uuid;

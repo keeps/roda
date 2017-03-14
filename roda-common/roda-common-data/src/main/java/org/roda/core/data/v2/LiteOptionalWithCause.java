@@ -13,6 +13,9 @@ import java.util.Optional;
 public class LiteOptionalWithCause implements Serializable {
   private static final long serialVersionUID = 2354151020405129417L;
 
+  private static final String DEFAULT_EXCEPTION_CLASS = "Exception class not defined";
+  private static final String DEFAULT_EXCEPTION_MESSAGE = "Exception message not defined";
+
   private SerializableOptional<LiteRODAObject> lite;
   private String exceptionClass;
   private String exceptionMessage;
@@ -57,7 +60,7 @@ public class LiteOptionalWithCause implements Serializable {
   }
 
   public static LiteOptionalWithCause of(LiteRODAObject value) {
-    return new LiteOptionalWithCause(Optional.ofNullable(value), null, null);
+    return new LiteOptionalWithCause(Optional.ofNullable(value), DEFAULT_EXCEPTION_CLASS, DEFAULT_EXCEPTION_MESSAGE);
   }
 
   @Override

@@ -747,7 +747,7 @@ public class ModelService extends ModelObservable {
           // check if AIP exists
           storage.getDirectory(ModelUtils.getAIPStoragePath(aip.getId()));
           // if no exception was sent by above method, return empty list
-          aipDescriptiveMetadata = new EmptyClosableIterable<OptionalWithCause<DescriptiveMetadata>>();
+          aipDescriptiveMetadata = new EmptyClosableIterable<>();
         }
 
         list.add(aipDescriptiveMetadata);
@@ -778,7 +778,7 @@ public class ModelService extends ModelObservable {
       // check if AIP exists
       storage.getDirectory(ModelUtils.getAIPStoragePath(aipId));
       // if no exception was sent by above method, return empty list
-      aipDescriptiveMetadata = new EmptyClosableIterable<OptionalWithCause<DescriptiveMetadata>>();
+      aipDescriptiveMetadata = new EmptyClosableIterable<>();
     }
 
     if (includeRepresentations) {
@@ -813,7 +813,7 @@ public class ModelService extends ModelObservable {
       // check if Representation exists
       storage.getDirectory(ModelUtils.getRepresentationStoragePath(aipId, representationId));
       // if no exception was sent by above method, return empty list
-      ret = new EmptyClosableIterable<OptionalWithCause<DescriptiveMetadata>>();
+      ret = new EmptyClosableIterable<>();
     }
 
     return ret;
@@ -973,7 +973,7 @@ public class ModelService extends ModelObservable {
       // check if AIP exists
       storage.getDirectory(ModelUtils.getAIPStoragePath(aipId));
       // if no exception was sent by above method, return empty list
-      ret = new EmptyClosableIterable<OptionalWithCause<File>>();
+      ret = new EmptyClosableIterable<>();
     }
 
     return ret;
@@ -981,6 +981,7 @@ public class ModelService extends ModelObservable {
   }
 
   private ValidationReport isRepresentationValid(Directory directory) {
+    // FIXME test if representation is valid
     return new ValidationReport();
   }
 
@@ -1101,7 +1102,7 @@ public class ModelService extends ModelObservable {
     StoragePath fileStoragePath = ModelUtils.getFileStoragePath(folder);
     Path fullPath = basePath.resolve(FSUtils.getStoragePathAsString(fileStoragePath, false));
 
-    if (fullPath.toFile().exists()) {
+    if (FSUtils.exists(fullPath)) {
       FSUtils.move(fullPath, fullPath.getParent().resolve(newName), replaceExisting);
 
       if (reindexResources) {
@@ -1123,7 +1124,7 @@ public class ModelService extends ModelObservable {
     StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
     Path fullPath = basePath.resolve(FSUtils.getStoragePathAsString(fileStoragePath, false));
 
-    if (!fullPath.toFile().exists()) {
+    if (!FSUtils.exists(fullPath)) {
       throw new NotFoundException("Some files/folders were moved or do not exist");
     }
 
@@ -1383,7 +1384,7 @@ public class ModelService extends ModelObservable {
           // check if AIP exists
           storage.getDirectory(ModelUtils.getAIPStoragePath(aip.getId()));
           // if no exception was sent by above method, return empty list
-          aipPreservationMetadata = new EmptyClosableIterable<OptionalWithCause<PreservationMetadata>>();
+          aipPreservationMetadata = new EmptyClosableIterable<>();
         }
 
         list.add(aipPreservationMetadata);
@@ -1414,7 +1415,7 @@ public class ModelService extends ModelObservable {
       // check if AIP exists
       storage.getDirectory(ModelUtils.getAIPStoragePath(aipId));
       // if no exception was sent by above method, return empty list
-      aipPreservationMetadata = new EmptyClosableIterable<OptionalWithCause<PreservationMetadata>>();
+      aipPreservationMetadata = new EmptyClosableIterable<>();
     }
 
     if (includeRepresentations) {
@@ -1447,7 +1448,7 @@ public class ModelService extends ModelObservable {
       // check if Representation exists
       storage.getDirectory(ModelUtils.getRepresentationStoragePath(aipId, representationId));
       // if no exception was sent by above method, return empty list
-      ret = new EmptyClosableIterable<OptionalWithCause<PreservationMetadata>>();
+      ret = new EmptyClosableIterable<>();
     }
 
     return ret;
@@ -1462,7 +1463,7 @@ public class ModelService extends ModelObservable {
       CloseableIterable<Resource> resources = storage.listResourcesUnderDirectory(storagePath, false);
       ret = ResourceParseUtils.convert(getStorage(), resources, PreservationMetadata.class);
     } catch (NotFoundException e) {
-      ret = new EmptyClosableIterable<OptionalWithCause<PreservationMetadata>>();
+      ret = new EmptyClosableIterable<>();
     }
 
     return ret;
@@ -1477,7 +1478,7 @@ public class ModelService extends ModelObservable {
       CloseableIterable<Resource> resources = storage.listResourcesUnderDirectory(storagePath, false);
       ret = ResourceParseUtils.convert(getStorage(), resources, PreservationMetadata.class);
     } catch (NotFoundException e) {
-      ret = new EmptyClosableIterable<OptionalWithCause<PreservationMetadata>>();
+      ret = new EmptyClosableIterable<>();
     }
 
     return ret;
@@ -1561,7 +1562,7 @@ public class ModelService extends ModelObservable {
       // check if AIP exists
       storage.getDirectory(ModelUtils.getAIPStoragePath(aipId));
       // if no exception was sent by above method, return empty list
-      aipOtherMetadata = new EmptyClosableIterable<OptionalWithCause<OtherMetadata>>();
+      aipOtherMetadata = new EmptyClosableIterable<>();
     }
 
     if (includeRepresentations) {
@@ -1594,7 +1595,7 @@ public class ModelService extends ModelObservable {
       // check if Representation exists
       storage.getDirectory(ModelUtils.getRepresentationStoragePath(aipId, representationId));
       // if no exception was sent by above method, return empty list
-      ret = new EmptyClosableIterable<OptionalWithCause<OtherMetadata>>();
+      ret = new EmptyClosableIterable<>();
     }
     return ret;
   }
@@ -1618,7 +1619,7 @@ public class ModelService extends ModelObservable {
         storage.getDirectory(ModelUtils.getAIPStoragePath(aipId));
       }
       // if no exception was sent by above method, return empty list
-      ret = new EmptyClosableIterable<OptionalWithCause<OtherMetadata>>();
+      ret = new EmptyClosableIterable<>();
     }
 
     return ret;
@@ -1635,7 +1636,7 @@ public class ModelService extends ModelObservable {
 
       // verify if file exists and if not, if older files exist (in that case,
       // move them to storage)
-      if (!logFile.toFile().exists()) {
+      if (!FSUtils.exists(logFile)) {
         findOldLogsAndMoveThemToStorage(logDirectory, logFile);
         try {
           Files.createFile(logFile);
@@ -2315,7 +2316,7 @@ public class ModelService extends ModelObservable {
       // check if AIP exists
       storage.getDirectory(ModelUtils.getDIPStoragePath(dipId));
       // if no exception was sent by above method, return empty list
-      ret = new EmptyClosableIterable<OptionalWithCause<DIPFile>>();
+      ret = new EmptyClosableIterable<>();
     }
 
     return ret;
@@ -2570,15 +2571,10 @@ public class ModelService extends ModelObservable {
   public File createSchema(String aipId, String representationId, List<String> directoryPath, String fileId,
     ContentPayload contentPayload) throws RequestNotValidException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException, NotFoundException {
-    File file;
     boolean asReference = false;
-
     StoragePath filePath = ModelUtils.getSchemaStoragePath(aipId, representationId, directoryPath, fileId);
-
     final Binary createdBinary = storage.createBinary(filePath, contentPayload, asReference);
-    file = ResourceParseUtils.convertResourceToFile(createdBinary);
-
-    return file;
+    return ResourceParseUtils.convertResourceToFile(createdBinary);
   }
 
   private CloseableIterable<OptionalWithCause<Representation>> listRepresentations()

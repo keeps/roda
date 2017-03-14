@@ -13,5 +13,4 @@ public enum AIPState {
   public static AIPState getDefault() {
     return CREATED;
   }
-
 }

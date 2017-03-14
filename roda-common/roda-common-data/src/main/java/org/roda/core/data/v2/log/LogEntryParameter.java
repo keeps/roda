@@ -24,6 +24,7 @@ public class LogEntryParameter implements Serializable {
    * Constructs an empty {@link LogEntryParameter}.
    */
   public LogEntryParameter() {
+    // do nothing
   }
 
   /**
@@ -91,6 +92,7 @@ public class LogEntryParameter implements Serializable {
   /**
    * @see Object#toString()
    */
+  @Override
   public String toString() {
     return "LogEntryParameter (" + getName() + ", " + getValue() + ")";
   }

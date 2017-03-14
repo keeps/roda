@@ -17,10 +17,9 @@ import org.roda.core.data.v2.index.IsIndexed;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@XmlRootElement(name = "representation")
+@XmlRootElement(name = RodaConstants.RODA_OBJECT_REPRESENTATION)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class IndexedRepresentation extends Representation implements IsIndexed, HasPermissionFilters {
-
   private static final long serialVersionUID = -950545608880793468L;
 
   private String uuid;

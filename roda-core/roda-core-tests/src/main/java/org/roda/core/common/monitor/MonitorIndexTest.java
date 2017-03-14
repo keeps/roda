@@ -22,6 +22,7 @@ import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.TestsHelper;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.sublist.Sublist;
@@ -44,9 +45,7 @@ public class MonitorIndexTest {
 
   @BeforeClass
   public static void setUp() throws Exception {
-
-    basePath = Files.createTempDirectory("indexTests");
-    System.setProperty("roda.home", basePath.toString());
+    basePath = TestsHelper.createBaseTempDir(MonitorIndexTest.class, true);
 
     boolean deploySolr = true;
     boolean deployLdap = false;
@@ -56,6 +55,7 @@ public class MonitorIndexTest {
     boolean deployDefaultResources = false;
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
       deployPluginManager, deployDefaultResources);
+
     index = RodaCoreFactory.getIndexService();
     fileCounter = 0;
 

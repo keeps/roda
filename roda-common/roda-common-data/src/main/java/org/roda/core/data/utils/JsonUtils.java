@@ -36,6 +36,7 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 public final class JsonUtils {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(JsonUtils.class);
+  private static final String JSON_ERROR_MESSAGE = "Error while parsing JSON";
 
   /** Private empty constructor */
   private JsonUtils() {
@@ -116,7 +117,7 @@ public final class JsonUtils {
       String jsonString = IOUtils.toString(stream, RodaConstants.DEFAULT_ENCODING);
       ret = getObjectFromJson(jsonString, objectClass);
     } catch (IOException e) {
-      throw new GenericException("Error while parsing json file", e);
+      throw new GenericException(JSON_ERROR_MESSAGE, e);
     } finally {
       IOUtils.closeQuietly(stream);
     }
@@ -141,7 +142,7 @@ public final class JsonUtils {
       ObjectMapper mapper = new ObjectMapper(new JsonFactory());
       return mapper.readValue(json, objectClass);
     } catch (IOException e) {
-      throw new GenericException("Error while parsing JSON", e);
+      throw new GenericException(JSON_ERROR_MESSAGE, e);
     }
   }
 
@@ -151,7 +152,7 @@ public final class JsonUtils {
       TypeFactory t = TypeFactory.defaultInstance();
       return mapper.readValue(json, t.constructCollectionType(ArrayList.class, objectClass));
     } catch (IOException e) {
-      throw new GenericException("Error while parsing JSON", e);
+      throw new GenericException(JSON_ERROR_MESSAGE, e);
     }
   }
 
@@ -160,7 +161,7 @@ public final class JsonUtils {
       ObjectMapper mapper = new ObjectMapper(new JsonFactory());
       return mapper.readTree(json);
     } catch (IOException e) {
-      throw new GenericException("Error while parsing JSON", e);
+      throw new GenericException(JSON_ERROR_MESSAGE, e);
     }
   }
 
@@ -169,7 +170,7 @@ public final class JsonUtils {
       ObjectMapper mapper = new ObjectMapper(new JsonFactory());
       return mapper.readTree(json);
     } catch (IOException e) {
-      throw new GenericException("Error while parsing JSON", e);
+      throw new GenericException(JSON_ERROR_MESSAGE, e);
     } finally {
       IOUtils.closeQuietly(json);
     }

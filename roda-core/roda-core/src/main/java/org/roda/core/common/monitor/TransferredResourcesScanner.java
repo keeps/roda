@@ -128,9 +128,9 @@ public class TransferredResourcesScanner {
   public InputStream retrieveFile(String path) throws NotFoundException, RequestNotValidException, GenericException {
     InputStream ret;
     Path p = basePath.resolve(path);
-    if (!p.toFile().exists()) {
+    if (!FSUtils.exists(p)) {
       throw new NotFoundException("File not found: " + path);
-    } else if (!p.toFile().isFile()) {
+    } else if (!FSUtils.isFile(p)) {
       throw new RequestNotValidException("Requested file is not a regular file: " + path);
     } else {
       try {
@@ -158,7 +158,7 @@ public class TransferredResourcesScanner {
     Path relativeToBase = basePath.relativize(resourcePath);
     TransferredResource tr = new TransferredResource();
 
-    tr.setFile(!resourcePath.toFile().isDirectory());
+    tr.setFile(!FSUtils.isDirectory(resourcePath));
     tr.setFullPath(resourcePath.toString());
     String id = relativeToBase.toString();
     tr.setId(id);
@@ -193,7 +193,7 @@ public class TransferredResourcesScanner {
       TransferredResource tr = index.retrieve(TransferredResource.class, uuid, fieldsToReturn);
       Path relative = Paths.get(tr.getRelativePath());
       Path fullPath = basePath.resolve(relative);
-      if (fullPath.toFile().exists()) {
+      if (FSUtils.exists(fullPath)) {
         FSUtils.deletePath(fullPath);
 
         Filter filter = new Filter(
@@ -246,7 +246,7 @@ public class TransferredResourcesScanner {
     boolean reindexResources)
     throws AlreadyExistsException, GenericException, IsStillUpdatingException, NotFoundException {
 
-    if (Paths.get(resource.getFullPath()).toFile().exists()) {
+    if (FSUtils.exists(Paths.get(resource.getFullPath()))) {
       Path resourcePath = Paths.get(resource.getFullPath());
       Path newPath = resourcePath.getParent().resolve(newName);
       FSUtils.move(resourcePath, newPath, replaceExisting);
@@ -312,7 +312,7 @@ public class TransferredResourcesScanner {
       .getString("core.ingest.processed.unsuccessfully_ingested", "UNSUCCESSFULLY_INGESTED");
 
     for (TransferredResource resource : resources) {
-      if (Paths.get(resource.getFullPath()).toFile().exists()) {
+      if (FSUtils.exists(Paths.get(resource.getFullPath()))) {
         Path newResourcePath = basePath.resolve(newRelativePath);
         if (addOldRelativePathToNewRelativePath) {
           newResourcePath = newResourcePath.resolve(resource.getRelativePath()

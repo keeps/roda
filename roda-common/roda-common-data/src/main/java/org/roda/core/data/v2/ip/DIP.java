@@ -16,12 +16,13 @@ import java.util.UUID;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@XmlRootElement(name = "dip")
+@XmlRootElement(name = RodaConstants.RODA_OBJECT_DIP)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DIP implements IsModelObject {
 
@@ -52,12 +53,12 @@ public class DIP implements IsModelObject {
     this.title = "";
     this.description = "";
     this.type = "";
-    this.properties = new HashMap<String, String>();
+    this.properties = new HashMap<>();
     this.dateCreated = new Date();
     this.lastModified = new Date();
-    this.aipIds = new ArrayList<AIPLink>();
-    this.representationIds = new ArrayList<RepresentationLink>();
-    this.fileIds = new ArrayList<FileLink>();
+    this.aipIds = new ArrayList<>();
+    this.representationIds = new ArrayList<>();
+    this.fileIds = new ArrayList<>();
   }
 
   public DIP(DIP other) {

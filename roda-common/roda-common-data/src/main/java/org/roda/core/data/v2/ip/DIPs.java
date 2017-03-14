@@ -13,6 +13,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.RODAObjectList;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -21,36 +22,37 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * @author Hélder Silva <hsilva@keep.pt>
  */
-@XmlRootElement(name = "dips")
+@XmlRootElement(name = RodaConstants.RODA_OBJECT_DIPS)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DIPs implements RODAObjectList<DIP> {
-  private List<DIP> dips;
+  private static final long serialVersionUID = -820307643991063686L;
+  private List<DIP> dipList;
 
   public DIPs() {
     super();
-    dips = new ArrayList<DIP>();
+    dipList = new ArrayList<>();
   }
 
   public DIPs(List<DIP> dips) {
     super();
-    this.dips = dips;
+    this.dipList = dips;
   }
 
-  @JsonProperty(value = "dips")
-  @XmlElement(name = "dip")
+  @JsonProperty(value = RodaConstants.RODA_OBJECT_DIPS)
+  @XmlElement(name = RodaConstants.RODA_OBJECT_DIP)
   @Override
   public List<DIP> getObjects() {
-    return dips;
+    return dipList;
   }
 
   @Override
   public void setObjects(List<DIP> dips) {
-    this.dips = dips;
+    this.dipList = dips;
   }
 
   @Override
   public void addObject(DIP dip) {
-    this.dips.add(dip);
+    this.dipList.add(dip);
   }
 
 }

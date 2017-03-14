@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.HandlebarsUtility;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.common.Pair;
@@ -12,9 +13,13 @@ import org.roda.core.data.v2.ip.DIP;
 
 public class DIPUtils {
 
+  private DIPUtils() {
+    // do nothing
+  }
+
   public static OptionalWithCause<String> getCompleteOpenExternalURL(DIP dip) {
     OptionalWithCause<String> ret;
-    Optional<String> dipProperty = getDIPProperty(dip, "dip", dip.getType(), "openExternalURL");
+    Optional<String> dipProperty = getDIPProperty(dip, RodaConstants.RODA_OBJECT_DIP, dip.getType(), "openExternalURL");
     if (dipProperty.isPresent()) {
       try {
         String externalUrl = HandlebarsUtility.executeHandlebars(dipProperty.get(), dip.getProperties());
@@ -31,7 +36,8 @@ public class DIPUtils {
 
   public static OptionalWithCause<String> getCompleteDeleteExternalURL(DIP dip) {
     OptionalWithCause<String> ret;
-    Optional<String> dipProperty = getDIPProperty(dip, "dip", dip.getType(), "deleteExternalURL");
+    Optional<String> dipProperty = getDIPProperty(dip, RodaConstants.RODA_OBJECT_DIP, dip.getType(),
+      "deleteExternalURL");
     if (dipProperty.isPresent()) {
       try {
         String externalUrl = HandlebarsUtility.executeHandlebars(dipProperty.get(), dip.getProperties());
@@ -47,14 +53,16 @@ public class DIPUtils {
   }
 
   public static Optional<String> getDeleteMethod(DIP dip) {
-    return getDIPProperty(dip, "dip", dip.getType(), "deleteExternalURL", "method");
+    return getDIPProperty(dip, RodaConstants.RODA_OBJECT_DIP, dip.getType(), "deleteExternalURL", "method");
   }
 
   public static Optional<Pair<String, String>> getDeleteCredentials(DIP dip) {
     Optional<Pair<String, String>> credentials = Optional.empty();
 
-    Optional<String> username = getDIPProperty(dip, "dip", dip.getType(), "credentials", "username");
-    Optional<String> password = getDIPProperty(dip, "dip", dip.getType(), "credentials", "password");
+    Optional<String> username = getDIPProperty(dip, RodaConstants.RODA_OBJECT_DIP, dip.getType(), "credentials",
+      "username");
+    Optional<String> password = getDIPProperty(dip, RodaConstants.RODA_OBJECT_DIP, dip.getType(), "credentials",
+      "password");
     if (username.isPresent() && password.isPresent()) {
       credentials = Optional.of(Pair.of(username.get(), password.get()));
     }

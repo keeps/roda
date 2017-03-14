@@ -13,13 +13,14 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@XmlRootElement(name = "aip")
+@XmlRootElement(name = RodaConstants.RODA_OBJECT_AIP)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AIP implements IsModelObject {
 

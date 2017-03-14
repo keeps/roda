@@ -71,16 +71,11 @@ public class PluginParameter implements Serializable {
     RODA_OBJECT;
   }
 
-  /**
-   * Datetime
-   */
-  // public static final String TYPE_DATETIME = "datetime";
-
   private String id = null;
   private String name = null;
   private PluginParameterType type = null;
   private String defaultValue = null;
-  private List<String> possibleValues = new ArrayList<String>();
+  private List<String> possibleValues = new ArrayList<>();
   private boolean mandatory = true;
   private boolean readonly = false;
   private String description = null;
@@ -89,6 +84,7 @@ public class PluginParameter implements Serializable {
    * Constructs an empty {@link PluginParameter}.
    */
   public PluginParameter() {
+    // do nothing
   }
 
   /**

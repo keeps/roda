@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@XmlRootElement(name = "dip_file")
+@XmlRootElement(name = RodaConstants.RODA_OBJECT_DIPFILE)
 public class DIPFile implements IsModelObject, IsIndexed, HasPermissionFilters {
 
   private static final long serialVersionUID = 1L;

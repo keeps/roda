@@ -52,6 +52,7 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.ClassLoaderUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -288,7 +289,7 @@ public class PluginManager {
     blacklistedPlugins = RodaCoreFactory.getRodaConfigurationAsList("core", "plugins", "blacklist");
 
     // load "external" RODA plugins, i.e., those available in the plugins folder
-    if (RODA_PLUGINS_PATH.toFile().exists() && RODA_PLUGINS_PATH.toFile().isDirectory()) {
+    if (FSUtils.exists(RODA_PLUGINS_PATH) && FSUtils.isDirectory(RODA_PLUGINS_PATH)) {
       loadExternalPlugins();
     }
 

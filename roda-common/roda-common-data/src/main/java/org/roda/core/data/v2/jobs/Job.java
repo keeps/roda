@@ -31,13 +31,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 /**
  * @author Hélder Silva <hsilva@keep.pt>
  */
-@XmlRootElement(name = "job")
+@XmlRootElement(name = RodaConstants.RODA_OBJECT_JOB)
 @JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Job implements IsModelObject, IsIndexed {
   private static final long serialVersionUID = 615993757726175203L;
 
-  public static enum JOB_STATE {
+  public enum JOB_STATE {
     CREATED, STARTED, COMPLETED, FAILED_DURING_CREATION, FAILED_TO_COMPLETE, STOPPED, STOPPING;
   }
 
@@ -64,7 +64,7 @@ public class Job implements IsModelObject, IsIndexed {
   // plugin type (e.g. ingest, maintenance, misc, etc.)
   private PluginType pluginType = null;
   // plugin parameters
-  private Map<String, String> pluginParameters = new HashMap<String, String>();
+  private Map<String, String> pluginParameters = new HashMap<>();
 
   // objects to act upon (All, None, List, Filter, etc.)
   private SelectedItems<? extends IsRODAObject> sourceObjects = null;
@@ -83,7 +83,7 @@ public class Job implements IsModelObject, IsIndexed {
     this.username = job.getUsername();
     this.pluginType = job.getPluginType();
     this.plugin = job.getPlugin();
-    this.pluginParameters = new HashMap<String, String>(job.getPluginParameters());
+    this.pluginParameters = new HashMap<>(job.getPluginParameters());
     this.sourceObjects = job.getSourceObjects();
     if (sourceObjects instanceof SelectedItemsList) {
       jobStats.setSourceObjectsCount(((SelectedItemsList<?>) sourceObjects).getIds().size());
@@ -222,7 +222,7 @@ public class Job implements IsModelObject, IsIndexed {
   }
 
   public static List<String> nonFinalStateList() {
-    List<String> nonFinalStates = new ArrayList<String>();
+    List<String> nonFinalStates = new ArrayList<>();
 
     for (JOB_STATE state : JOB_STATE.values()) {
       if (!isFinalState(state)) {

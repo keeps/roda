@@ -94,31 +94,24 @@ public class IndexResult<T extends Serializable> implements Serializable {
    * @return the results
    */
   @XmlElementWrapper(name = "results")
-  @XmlElements({
-
-    @XmlElement(name = RodaConstants.CONTROLLER_AIP_PARAM, type = IndexedAIP.class),
-    @XmlElement(name = RodaConstants.CONTROLLER_REPRESENTATION_PARAM, type = IndexedRepresentation.class),
-    @XmlElement(name = RodaConstants.CONTROLLER_FILE_PARAM, type = IndexedFile.class),
-
-    @XmlElement(name = RodaConstants.CONTROLLER_DIP_PARAM, type = IndexedDIP.class),
-    @XmlElement(name = RodaConstants.CONTROLLER_DIP_FILE_PARAM, type = DIPFile.class),
-
-    @XmlElement(name = "preservationAgent", type = IndexedPreservationAgent.class),
-    @XmlElement(name = "preservationEvent", type = IndexedPreservationEvent.class),
-
-    @XmlElement(name = "job", type = Job.class), @XmlElement(name = "report", type = IndexedReport.class),
-    @XmlElement(name = "log", type = LogEntry.class), @XmlElement(name = "notification", type = Notification.class),
-
-    @XmlElement(name = "risk", type = IndexedRisk.class), @XmlElement(name = "incidence", type = RiskIncidence.class),
-
-    @XmlElement(name = "format", type = Format.class),
-
-    @XmlElement(name = "transferredResource", type = TransferredResource.class),
-    @XmlElement(name = "user", type = User.class), @XmlElement(name = "group", type = Group.class),
-
-    @XmlElement(name = "result", type = Object.class)
-
-  })
+  @XmlElements({@XmlElement(name = RodaConstants.RODA_OBJECT_AIP, type = IndexedAIP.class),
+    @XmlElement(name = RodaConstants.RODA_OBJECT_REPRESENTATION, type = IndexedRepresentation.class),
+    @XmlElement(name = RodaConstants.RODA_OBJECT_FILE, type = IndexedFile.class),
+    @XmlElement(name = RodaConstants.RODA_OBJECT_DIP, type = IndexedDIP.class),
+    @XmlElement(name = RodaConstants.RODA_OBJECT_DIPFILE, type = DIPFile.class),
+    @XmlElement(name = RodaConstants.RODA_OBJECT_PRESERVATION_AGENT, type = IndexedPreservationAgent.class),
+    @XmlElement(name = RodaConstants.RODA_OBJECT_PRESERVATION_EVENT, type = IndexedPreservationEvent.class),
+    @XmlElement(name = RodaConstants.RODA_OBJECT_JOB, type = Job.class),
+    @XmlElement(name = RodaConstants.RODA_OBJECT_REPORT, type = IndexedReport.class),
+    @XmlElement(name = RodaConstants.RODA_OBJECT_LOG, type = LogEntry.class),
+    @XmlElement(name = RodaConstants.RODA_OBJECT_NOTIFICATION, type = Notification.class),
+    @XmlElement(name = RodaConstants.RODA_OBJECT_RISK, type = IndexedRisk.class),
+    @XmlElement(name = RodaConstants.RODA_OBJECT_INCIDENCE, type = RiskIncidence.class),
+    @XmlElement(name = RodaConstants.RODA_OBJECT_FORMAT, type = Format.class),
+    @XmlElement(name = RodaConstants.RODA_OBJECT_TRANSFERRED_RESOURCE, type = TransferredResource.class),
+    @XmlElement(name = RodaConstants.RODA_OBJECT_USER, type = User.class),
+    @XmlElement(name = RodaConstants.RODA_OBJECT_GROUP, type = Group.class),
+    @XmlElement(name = RodaConstants.RODA_OBJECT_OTHER, type = Object.class)})
   public List<T> getResults() {
     return results;
   }

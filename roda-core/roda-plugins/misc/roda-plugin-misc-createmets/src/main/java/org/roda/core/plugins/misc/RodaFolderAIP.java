@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.FilenameUtils;
+import org.roda.core.storage.fs.FSUtils;
 import org.roda_project.commons_ip.model.AIP;
 import org.roda_project.commons_ip.model.IPContentType;
 import org.roda_project.commons_ip.model.IPDescriptiveMetadata;
@@ -276,16 +277,16 @@ final class RodaFolderAIP extends AIPWrap {
    *           if some other error occurs.
    */
   private void findAndAddOtherMDs(final Path omdPath, final IPMetadataSetter mdSetter) throws IOException, IPException {
-    if (omdPath.toFile().isDirectory()) {
+    if (FSUtils.isDirectory(omdPath)) {
       final Iterator<Path> paths = Files.list(omdPath).iterator();
       while (paths.hasNext()) {
         final Path mdPath = paths.next();
-        if (mdPath.toFile().isDirectory()) {
+        if (FSUtils.isDirectory(mdPath)) {
           for (IPMetadata md : findMDs(mdPath, MetadataType.OTHER().setOtherType(mdPath.getFileName().toString()))) {
             mdSetter.addMetadata(md);
           }
         }
-        if (mdPath.toFile().isFile()) {
+        if (FSUtils.isFile(mdPath)) {
           for (IPMetadata md : findMDs(mdPath, MetadataType.OTHER())) {
             mdSetter.addMetadata(md);
           }
@@ -305,10 +306,10 @@ final class RodaFolderAIP extends AIPWrap {
    */
   private List<IPDescriptiveMetadata> findDescriptiveMDs(final Path dmdPath) throws IOException {
     final List<IPDescriptiveMetadata> list = new ArrayList<>();
-    if (dmdPath.toFile().isDirectory()) {
+    if (FSUtils.isDirectory(dmdPath)) {
       try (Stream<Path> paths = Files.walk(dmdPath)) {
         paths.forEach(filePath -> {
-          if (filePath.toFile().isFile()) {
+          if (FSUtils.isFile(filePath)) {
             list.add(new IPDescriptiveMetadata(FilenameUtils.removeExtension(filePath.getFileName().toString()),
               new IPFile(filePath), MetadataType.OTHER(), null));
           }
@@ -344,10 +345,10 @@ final class RodaFolderAIP extends AIPWrap {
    */
   private List<IPMetadata> findMDs(final Path mdPath, final MetadataType mdType) throws IOException {
     final List<IPMetadata> list = new ArrayList<>();
-    if (mdPath.toFile().isDirectory()) {
+    if (FSUtils.isDirectory(mdPath)) {
       try (Stream<Path> paths = Files.walk(mdPath)) {
         paths.forEach(filePath -> {
-          if (filePath.toFile().isFile()) {
+          if (FSUtils.isFile(filePath)) {
             list.add(new IPMetadata(FilenameUtils.removeExtension(filePath.getFileName().toString()),
               new IPFile(filePath), mdType));
           }
@@ -368,10 +369,10 @@ final class RodaFolderAIP extends AIPWrap {
    */
   private List<IPFile> findIPFiles(final Path filesPath) throws IOException {
     final List<IPFile> list = new ArrayList<>();
-    if (filesPath.toFile().isDirectory()) {
+    if (FSUtils.isDirectory(filesPath)) {
       try (Stream<Path> paths = Files.walk(filesPath)) {
         paths.forEach(filePath -> {
-          if (filePath.toFile().isFile()) {
+          if (FSUtils.isFile(filePath)) {
             list.add(new IPFile(filePath));
           }
         });

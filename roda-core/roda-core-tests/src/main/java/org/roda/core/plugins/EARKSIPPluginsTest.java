@@ -196,7 +196,7 @@ public class EARKSIPPluginsTest {
 
     Path sipFolder = corporaPath.resolve(CorporaConstants.SIP_FOLDER).resolve(CorporaConstants.ANCESTOR_SIP_FOLDER);
     Files.walk(sipFolder).forEach(filePath -> {
-      if (filePath.toFile().isFile()) {
+      if (FSUtils.isFile(filePath)) {
         try {
           TransferredResource tr = f.createFile(null, filePath.getFileName().toString(),
             Files.newInputStream(filePath));

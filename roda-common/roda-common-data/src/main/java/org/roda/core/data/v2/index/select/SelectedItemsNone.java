@@ -15,10 +15,6 @@ public class SelectedItemsNone<T extends IsRODAObject> implements SelectedItems<
 
   private static SelectedItemsNone selectedItemsNone = new SelectedItemsNone<>();
 
-  public static <T extends IsRODAObject> SelectedItemsNone<T> create() {
-    return selectedItemsNone;
-  }
-
   public SelectedItemsNone() {
     super();
   }
@@ -26,6 +22,10 @@ public class SelectedItemsNone<T extends IsRODAObject> implements SelectedItems<
   @Override
   public String getSelectedClass() {
     return "";
+  }
+
+  public static <T extends IsRODAObject> SelectedItemsNone<T> create() {
+    return selectedItemsNone;
   }
 
 }

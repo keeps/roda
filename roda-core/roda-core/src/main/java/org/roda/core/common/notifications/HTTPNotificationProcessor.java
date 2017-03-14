@@ -83,10 +83,9 @@ public class HTTPNotificationProcessor implements NotificationProcessor {
     RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(timeout).setConnectTimeout(timeout)
       .setConnectionRequestTimeout(timeout).build();
 
-    CloseableHttpClient httpclient = HttpClients.createDefault();
-    HttpPost httppost = new HttpPost(endpoint);
-    httppost.setConfig(requestConfig);
-    try {
+    try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
+      HttpPost httppost = new HttpPost(endpoint);
+      httppost.setConfig(requestConfig);
       httppost.setEntity(new StringEntity(content));
 
       HttpResponse response = httpclient.execute(httppost);
@@ -100,11 +99,9 @@ public class HTTPNotificationProcessor implements NotificationProcessor {
     } catch (IOException e) {
       LOGGER.debug("HTTP POST error: {}", e.getMessage());
       success = false;
-    } finally {
-      IOUtils.closeQuietly(httpclient);
     }
-    return success;
 
+    return success;
   }
 
   // FIXME 20160905 hsilva: is this method really needed? and, is this the best

@@ -69,6 +69,51 @@ public final class RodaConstants {
   public static final String I18N_UI_APPRAISAL = "ui.appraisal";
 
   /*
+   * RODA objects
+   */
+
+  public static final String RODA_OBJECT_AIP = "aip";
+  public static final String RODA_OBJECT_REPRESENTATION = "representation";
+  public static final String RODA_OBJECT_FILE = "file";
+  public static final String RODA_OBJECT_DIP = "dip";
+  public static final String RODA_OBJECT_DIPFILE = "dip_file";
+  public static final String RODA_OBJECT_PRESERVATION_AGENT = "preservation_agent";
+  public static final String RODA_OBJECT_PRESERVATION_EVENT = "preservation_event";
+  public static final String RODA_OBJECT_JOB = "job";
+  public static final String RODA_OBJECT_REPORT = "report";
+  public static final String RODA_OBJECT_LOG = "log";
+  public static final String RODA_OBJECT_NOTIFICATION = "notification";
+  public static final String RODA_OBJECT_RISK = "risk";
+  public static final String RODA_OBJECT_INCIDENCE = "incidence";
+  public static final String RODA_OBJECT_FORMAT = "format";
+  public static final String RODA_OBJECT_TRANSFERRED_RESOURCE = "transferred_resource";
+  public static final String RODA_OBJECT_USER = "user";
+  public static final String RODA_OBJECT_GROUP = "group";
+  public static final String RODA_OBJECT_DESCRIPTIVE_METADATA = "descriptive_metadata";
+  public static final String RODA_OBJECT_PRESERVATION_METADATA = "preservation_metadata";
+  public static final String RODA_OBJECT_OTHER_METADATA = "other_metadata";
+  public static final String RODA_OBJECT_MEMBER = "member";
+
+  public static final String RODA_OBJECT_MEMBERS = "members";
+  public static final String RODA_OBJECT_RISKS = "risks";
+  public static final String RODA_OBJECT_INCIDENCES = "incidences";
+  public static final String RODA_OBJECT_NOTIFICATIONS = "notifications";
+  public static final String RODA_OBJECT_LOGS = "logs";
+  public static final String RODA_OBJECT_JOBS = "jobs";
+  public static final String RODA_OBJECT_REPORTS = "reports";
+  public static final String RODA_OBJECT_DESCRIPTIVE_METADATA_LIST = "descriptive_metadata_list";
+  public static final String RODA_OBJECT_OTHER_METADATA_LIST = "other_metadata_list";
+  public static final String RODA_OBJECT_PRESERVATION_METADATA_LIST = "preservation_metadata_list";
+  public static final String RODA_OBJECT_AIPS = "aips";
+  public static final String RODA_OBJECT_REPRESENTATIONS = "representations";
+  public static final String RODA_OBJECT_FILES = "files";
+  public static final String RODA_OBJECT_DIPS = "dips";
+  public static final String RODA_OBJECT_DIPFILES = "dip_files";
+  public static final String RODA_OBJECT_TRANSFERRED_RESOURCES = "transferred_resources";
+  public static final String RODA_OBJECT_FORMATS = "formats";
+  public static final String RODA_OBJECT_OTHER = "result";
+
+  /*
    * Installation (and most probably classpath as well) related variables
    */
   public static final String CORE_DESCRIPTION_LEVELS_FILE = "roda-description-levels-hierarchy.properties";
@@ -141,9 +186,9 @@ public final class RodaConstants {
   // sub-resources strings
   public static final String API_DATA = "data";
   public static final Object API_FILE = "file";
-  public static final String API_DESCRIPTIVE_METADATA = "descriptive_metadata";
-  public static final String API_PRESERVATION_METADATA = "preservation_metadata";
-  public static final String API_OTHER_METADATA = "other_metadata";
+  public static final String API_DESCRIPTIVE_METADATA = RODA_OBJECT_DESCRIPTIVE_METADATA;
+  public static final String API_PRESERVATION_METADATA = RODA_OBJECT_PRESERVATION_METADATA;
+  public static final String API_OTHER_METADATA = RODA_OBJECT_OTHER_METADATA;
   public static final String API_FIND = "find";
   // "http query string" related strings
   public static final String API_QUERY_START = "?";
@@ -259,25 +304,25 @@ public final class RodaConstants {
    * Controllers related
    */
   public static final String CONTROLLER_ID_PARAM = "id";
-  public static final String CONTROLLER_AIP_PARAM = "aip";
-  public static final String CONTROLLER_AIPS_PARAM = "aips";
+  public static final String CONTROLLER_AIP_PARAM = RODA_OBJECT_AIP;
+  public static final String CONTROLLER_AIPS_PARAM = RODA_OBJECT_AIPS;
   public static final String CONTROLLER_AIP_ID_PARAM = "aipId";
-  public static final String CONTROLLER_REPRESENTATION_PARAM = "representation";
+  public static final String CONTROLLER_REPRESENTATION_PARAM = RODA_OBJECT_REPRESENTATION;
   public static final String CONTROLLER_REPRESENTATION_ID_PARAM = "representationId";
   public static final String CONTROLLER_REPRESENTATION_UUID_PARAM = "representationUUID";
-  public static final String CONTROLLER_TRANSFERRED_RESOURCE_PARAM = "transferredResource";
+  public static final String CONTROLLER_TRANSFERRED_RESOURCE_PARAM = RODA_OBJECT_TRANSFERRED_RESOURCE;
   public static final String CONTROLLER_TRANSFERRED_RESOURCE_ID_PARAM = "transferredResourceId";
-  public static final String CONTROLLER_FILE_PARAM = "file";
+  public static final String CONTROLLER_FILE_PARAM = RODA_OBJECT_FILE;
   public static final String CONTROLLER_FILE_ID_PARAM = "fileId";
   public static final String CONTROLLER_FILE_UUID_PARAM = "fileUUID";
   public static final String CONTROLLER_METADATA_ID_PARAM = "metadataId";
   public static final String CONTROLLER_INDEX_PRESERVATION_EVENT_ID_PARAM = "indexedPreservationEventId";
   public static final String CONTROLLER_VERSION_ID_PARAM = "versionId";
   public static final String CONTROLLER_RESOURCE_ID_PARAM = "resourceId";
-  public static final String CONTROLLER_DIP_PARAM = "dip";
-  public static final String CONTROLLER_DIPS_PARAM = "dips";
+  public static final String CONTROLLER_DIP_PARAM = RODA_OBJECT_DIP;
+  public static final String CONTROLLER_DIPS_PARAM = RODA_OBJECT_DIPS;
   public static final String CONTROLLER_DIP_ID_PARAM = "dipId";
-  public static final String CONTROLLER_DIP_FILE_PARAM = "dipFile";
+  public static final String CONTROLLER_DIP_FILE_PARAM = RODA_OBJECT_DIPFILE;
   public static final String CONTROLLER_DIP_FILE_ID_PARAM = "dipFileId";
   public static final String CONTROLLER_DIP_FILE_UUID_PARAM = "dipFileUUID";
 
@@ -286,11 +331,11 @@ public final class RodaConstants {
   public static final String CONTROLLER_ID_OBJECT_RESOURCE_PATH = "transferred_resource_path";
 
   public static final String CONTROLLER_PERMISSIONS_PARAM = "permissions";
-  public static final String CONTROLLER_RISK_PARAM = "risk";
+  public static final String CONTROLLER_RISK_PARAM = RODA_OBJECT_RISK;
   public static final String CONTROLLER_RISK_ID_PARAM = "riskId";
-  public static final String CONTROLLER_FORMAT_PARAM = "format";
+  public static final String CONTROLLER_FORMAT_PARAM = RODA_OBJECT_FORMAT;
   public static final String CONTROLLER_MESSAGE_PARAM = "message";
-  public static final String CONTROLLER_INCIDENCE_PARAM = "incidence";
+  public static final String CONTROLLER_INCIDENCE_PARAM = RODA_OBJECT_INCIDENCE;
   public static final String CONTROLLER_TEMPLATE_PARAM = "template";
 
   public static final String CONTROLLER_PRE_MITIGATION_PROBABILITY_PARAM = "preMitigationProbability";
@@ -472,11 +517,6 @@ public final class RodaConstants {
   public static final String AIP_DESCRIPTIVE_METADATA = "descriptiveMetadata";
   public static final String AIP_REPRESENTATIONS = "representations";
 
-  // public static final String AIP_PRESERVATION_OBJECTS_ID =
-  // "preservationObjectsId";
-  // public static final String AIP_PRESERVATION_EVENTS_ID =
-  // "preservationEventsId";
-
   public static final String AIP_NUMBER_OF_SUBMISSION_FILES = "numberOfSubmissionFiles";
   public static final String AIP_NUMBER_OF_DOCUMENTATION_FILES = "numberOfDocumentationFiles";
   public static final String AIP_NUMBER_OF_SCHEMA_FILES = "numberOfSchemaFiles";
@@ -517,10 +557,10 @@ public final class RodaConstants {
 
   // Representation types
   public static final String REPRESENTATION_TYPE_MIXED = "MIXED";
+
   /*
    * OTHER FIELDS
    */
-
   public static final String OBJECT_PERMISSIONS_PRODUCERS_USERS = "producersUsers";
   public static final String OBJECT_PERMISSIONS_PRODUCERS_GROUPS = "producersGroups";
   public static final String OBJECT_PERMISSIONS_MODIFY_USERS = "modifyUsers";
@@ -1176,36 +1216,21 @@ public final class RodaConstants {
 
   /* Dialog filter limit */
   public static final int DIALOG_FILTER_LIMIT_NUMBER = 120;
-
   public static final String INDEX_SEARCH_SUFFIX = "_txt";
-
   public static final String MEDIA_TYPE_WILDCARD = "*/*";
-
-  public final static String MEDIA_TYPE_APPLICATION_XML = "application/xml";
-
-  public final static String MEDIA_TYPE_APPLICATION_ATOM_XML = "application/atom+xml";
-
-  public final static String MEDIA_TYPE_APPLICATION_XHTML_XML = "application/xhtml+xml";
-
-  public final static String MEDIA_TYPE_APPLICATION_SVG_XML = "application/svg+xml";
-
-  public final static String MEDIA_TYPE_APPLICATION_JSON = "application/json";
-
-  public final static String MEDIA_TYPE_APPLICATION_FORM_URLENCODED = "application/x-www-form-urlencoded";
-
-  public final static String MEDIA_TYPE_MULTIPART_FORM_DATA = "multipart/form-data";
-
-  public final static String MEDIA_TYPE_APPLICATION_OCTET_STREAM = "application/octet-stream";
-
-  public final static String MEDIA_TYPE_TEXT_PLAIN = "text/plain";
-
-  public final static String MEDIA_TYPE_TEXT_XML = "text/xml";
-
-  public final static String MEDIA_TYPE_TEXT_HTML = "text/html";
-
-  public final static String HTTP_HEADERS_WWW_AUTHENTICATE = "WWW-Authenticate";
-
-  public final static int STATUS_OK = 200;
+  public static final String MEDIA_TYPE_APPLICATION_XML = "application/xml";
+  public static final String MEDIA_TYPE_APPLICATION_ATOM_XML = "application/atom+xml";
+  public static final String MEDIA_TYPE_APPLICATION_XHTML_XML = "application/xhtml+xml";
+  public static final String MEDIA_TYPE_APPLICATION_SVG_XML = "application/svg+xml";
+  public static final String MEDIA_TYPE_APPLICATION_JSON = "application/json";
+  public static final String MEDIA_TYPE_APPLICATION_FORM_URLENCODED = "application/x-www-form-urlencoded";
+  public static final String MEDIA_TYPE_MULTIPART_FORM_DATA = "multipart/form-data";
+  public static final String MEDIA_TYPE_APPLICATION_OCTET_STREAM = "application/octet-stream";
+  public static final String MEDIA_TYPE_TEXT_PLAIN = "text/plain";
+  public static final String MEDIA_TYPE_TEXT_XML = "text/xml";
+  public static final String MEDIA_TYPE_TEXT_HTML = "text/html";
+  public static final String HTTP_HEADERS_WWW_AUTHENTICATE = "WWW-Authenticate";
+  public static final int STATUS_OK = 200;
 
   /* DIP types */
 
@@ -1286,6 +1311,6 @@ public final class RodaConstants {
 
   /** Private empty constructor */
   private RodaConstants() {
-
+    // do nothing
   }
 }

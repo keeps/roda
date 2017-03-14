@@ -24,7 +24,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * @author Rui Castro
  * 
  */
-@XmlRootElement(name = "log_entry")
+@XmlRootElement(name = RodaConstants.RODA_OBJECT_LOG)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class LogEntry implements IsModelObject, IsIndexed {
   private static final long serialVersionUID = -178083792639806983L;

@@ -29,6 +29,9 @@ public final class LinkingObjectUtils {
     return getLinkingIdentifierId(RODA_TYPE.TRANSFERRED_RESOURCE, transferredResource.getRelativePath());
   }
 
+  /**
+   * @return RODA_TYPE or null
+   */
   public static RODA_TYPE getLinkingIdentifierType(String value) {
     if (value.contains(RodaConstants.URN_SEPARATOR) && value.split(RodaConstants.URN_SEPARATOR).length > 2) {
       return RODA_TYPE.valueOf(value.split(RodaConstants.URN_SEPARATOR)[2].toUpperCase());
@@ -37,6 +40,9 @@ public final class LinkingObjectUtils {
     }
   }
 
+  /**
+   * @return String or null
+   */
   public static String getLinkingObjectPath(String path) {
     if (path.contains(":")) {
       return path.substring(path.lastIndexOf(':') + 1);
@@ -49,6 +55,9 @@ public final class LinkingObjectUtils {
     return id.split(LINKING_ID_SEPARATOR);
   }
 
+  /**
+   * @return String or null
+   */
   public static String getFileIdFromLinkingId(String linkingId) {
     String path = getLinkingObjectPath(linkingId);
     if (path != null) {
@@ -58,6 +67,9 @@ public final class LinkingObjectUtils {
     }
   }
 
+  /**
+   * @return String or null
+   */
   public static String getRepresentationIdFromLinkingId(String linkingId) {
     String path = getLinkingObjectPath(linkingId);
     if (path != null) {

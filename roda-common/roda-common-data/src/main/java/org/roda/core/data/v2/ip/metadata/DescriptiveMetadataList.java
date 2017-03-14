@@ -7,13 +7,13 @@
  */
 package org.roda.core.data.v2.ip.metadata;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.RODAObjectList;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -22,36 +22,35 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * @author Hélder Silva <hsilva@keep.pt>
  */
-@XmlRootElement(name = "descriptive_metadata_list")
+@XmlRootElement(name = RodaConstants.RODA_OBJECT_DESCRIPTIVE_METADATA_LIST)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class DescriptiveMetadataList implements RODAObjectList<DescriptiveMetadata>, Serializable {
+public class DescriptiveMetadataList implements RODAObjectList<DescriptiveMetadata> {
   private static final long serialVersionUID = -2795788423413555545L;
-
-  private List<DescriptiveMetadata> descriptiveMetadataList;
+  private List<DescriptiveMetadata> metadataList;
 
   public DescriptiveMetadataList() {
     super();
-    descriptiveMetadataList = new ArrayList<DescriptiveMetadata>();
+    metadataList = new ArrayList<>();
   }
 
   public DescriptiveMetadataList(List<DescriptiveMetadata> descriptiveMetadataList) {
     super();
-    this.descriptiveMetadataList = descriptiveMetadataList;
+    this.metadataList = descriptiveMetadataList;
   }
 
-  @JsonProperty(value = "descriptive_metadata_list")
-  @XmlElement(name = "descriptive_metadata")
+  @JsonProperty(value = RodaConstants.RODA_OBJECT_DESCRIPTIVE_METADATA_LIST)
+  @XmlElement(name = RodaConstants.RODA_OBJECT_DESCRIPTIVE_METADATA)
   public List<DescriptiveMetadata> getObjects() {
-    return descriptiveMetadataList;
+    return metadataList;
   }
 
   public void setObjects(List<DescriptiveMetadata> descriptiveMetadataList) {
-    this.descriptiveMetadataList = descriptiveMetadataList;
+    this.metadataList = descriptiveMetadataList;
   }
 
   @Override
   public void addObject(DescriptiveMetadata descriptiveMetadata) {
-    this.descriptiveMetadataList.add(descriptiveMetadata);
+    this.metadataList.add(descriptiveMetadata);
   }
 
 }

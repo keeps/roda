@@ -25,6 +25,7 @@ import java.util.ResourceBundle.Control;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.storage.fs.FSUtils;
 
 public class Messages {
   private static final String MESSAGES_BUNDLE = "ServerMessages";
@@ -130,7 +131,7 @@ public class Messages {
         File file = folder.resolve(bundleName).toFile();
 
         // Also checks for file existence
-        if (folder.resolve(bundleName).toFile().exists()) {
+        if (FSUtils.exists(folder.resolve(bundleName))) {
           is = new FileInputStream(file);
         } else {
           is = this.getClass().getResourceAsStream(CONFIG_I18N_PATH + bundleName);

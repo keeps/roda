@@ -11,7 +11,6 @@ import java.io.Serializable;
 import java.util.Map;
 
 public class FileFormat implements Serializable {
-  
   private static final long serialVersionUID = -6855712550409310949L;
 
   private String formatDesignationName;
@@ -21,7 +20,7 @@ public class FileFormat implements Serializable {
   private String pronom;
   private String extension;
   private Map<String, String> formatRegistries;
-  
+
   public FileFormat() {
     super();
   }

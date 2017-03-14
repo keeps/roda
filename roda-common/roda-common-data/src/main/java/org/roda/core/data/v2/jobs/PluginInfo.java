@@ -25,25 +25,19 @@ public class PluginInfo implements Serializable {
    * The ID is the plugin classname.
    */
   private String id = null;
-
   private String name = null;
-
   private String version = null;
-
   private String description = null;
-
   private PluginType type = PluginType.MISC;
-
   private List<String> categories = null;
-
-  private List<PluginParameter> parameters = new ArrayList<PluginParameter>();
-
+  private List<PluginParameter> parameters = new ArrayList<>();
   private Set<String> objectClasses = new HashSet<>();
 
   /**
    * Constructs a new {@link PluginInfo}.
    */
   public PluginInfo() {
+    // do nothing
   }
 
   /**

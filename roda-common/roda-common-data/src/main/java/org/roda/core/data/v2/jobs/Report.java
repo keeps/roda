@@ -13,6 +13,7 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.ip.AIPState;
 
@@ -20,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@XmlRootElement(name = "report")
+@XmlRootElement(name = RodaConstants.RODA_OBJECT_REPORT)
 @JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Report implements IsModelObject {
@@ -53,7 +54,7 @@ public class Report implements IsModelObject {
   private String pluginDetails = "";
   private boolean htmlPluginDetails = false;
 
-  private List<Report> reports = new ArrayList<Report>();
+  private List<Report> reports = new ArrayList<>();
 
   private String lineSeparator = "";
 
@@ -89,7 +90,7 @@ public class Report implements IsModelObject {
     this.pluginState = report.getPluginState();
     this.pluginDetails = report.getPluginDetails();
     this.htmlPluginDetails = report.isHtmlPluginDetails();
-    this.reports = new ArrayList<Report>();
+    this.reports = new ArrayList<>();
   }
 
   @JsonIgnore

@@ -13,6 +13,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.RODAObjectList;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -21,33 +22,34 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * @author Hélder Silva <hsilva@keep.pt>
  */
-@XmlRootElement(name = "notifications")
+@XmlRootElement(name = RodaConstants.RODA_OBJECT_NOTIFICATIONS)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Notifications implements RODAObjectList<Notification> {
-  private List<Notification> notifications;
+  private static final long serialVersionUID = -6470632839283128013L;
+  private List<Notification> notificationList;
 
   public Notifications() {
     super();
-    notifications = new ArrayList<Notification>();
+    notificationList = new ArrayList<>();
   }
 
   public Notifications(List<Notification> notifications) {
     super();
-    this.notifications = notifications;
+    this.notificationList = notifications;
   }
 
-  @JsonProperty(value = "notifications")
-  @XmlElement(name = "notification")
+  @JsonProperty(value = RodaConstants.RODA_OBJECT_NOTIFICATIONS)
+  @XmlElement(name = RodaConstants.RODA_OBJECT_NOTIFICATION)
   public List<Notification> getObjects() {
-    return notifications;
+    return notificationList;
   }
 
   public void setObjects(List<Notification> notifications) {
-    this.notifications = notifications;
+    this.notificationList = notifications;
   }
 
   public void addObject(Notification notification) {
-    this.notifications.add(notification);
+    this.notificationList.add(notification);
   }
 
 }

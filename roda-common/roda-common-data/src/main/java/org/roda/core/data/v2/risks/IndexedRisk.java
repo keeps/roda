@@ -17,10 +17,9 @@ import org.roda.core.data.v2.index.IsIndexed;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@XmlRootElement(name = "risk")
+@XmlRootElement(name = RodaConstants.RODA_OBJECT_RISK)
 @JsonInclude(JsonInclude.Include.ALWAYS)
 public class IndexedRisk extends Risk implements IsIndexed {
-
   private static final long serialVersionUID = 2864416437668370485L;
   private int incidencesCount = 0;
   private int unmitigatedIncidencesCount = 0;

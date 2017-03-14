@@ -20,6 +20,7 @@ public class BasicSearchFilterParameter extends FilterParameter {
    * Constructs an empty {@link BasicSearchFilterParameter}.
    */
   public BasicSearchFilterParameter() {
+    // do nothing
   }
 
   /**

@@ -276,8 +276,8 @@ public class RodaCoreFactory {
 
         // load core configurations
         rodaConfiguration = new CompositeConfiguration();
-        configurationFiles = new ArrayList<String>();
-        rodaPropertiesCache = new HashMap<String, Map<String, String>>();
+        configurationFiles = new ArrayList<>();
+        rodaPropertiesCache = new HashMap<>();
         addConfiguration("roda-core.properties");
         addConfiguration("roda-core-formats.properties");
         LOGGER.debug("Finished loading roda-core.properties & roda-core-formats.properties");
@@ -389,7 +389,7 @@ public class RodaCoreFactory {
       // last attempt (using user home and hidden directory called .roda)
       String userHome = System.getProperty("user.home");
       rodaHomePath = Paths.get(userHome, ".roda");
-      if (!rodaHomePath.toFile().exists()) {
+      if (!FSUtils.exists(rodaHomePath)) {
         try {
           Files.createDirectories(rodaHomePath);
         } catch (IOException e) {
@@ -432,7 +432,7 @@ public class RodaCoreFactory {
   }
 
   private static void instantiateEssentialDirectories(NodeType nodeType) {
-    List<Path> essentialDirectories = new ArrayList<Path>();
+    List<Path> essentialDirectories = new ArrayList<>();
     essentialDirectories.add(configPath);
     essentialDirectories.add(rodaHomePath.resolve(RodaConstants.CORE_LOG_FOLDER));
     essentialDirectories.add(dataPath);
@@ -443,7 +443,7 @@ public class RodaCoreFactory {
 
     for (Path path : essentialDirectories) {
       try {
-        if (!path.toFile().exists()) {
+        if (!FSUtils.exists(path)) {
           Files.createDirectories(path);
         }
       } catch (IOException e) {
@@ -515,7 +515,7 @@ public class RodaCoreFactory {
   private static void copyFilesFromClasspath(String classpathPrefix, Path destinationDirectory,
     boolean removeClasspathPrefixFromFinalPath, List<String> excludePaths) {
 
-    List<ClassLoader> classLoadersList = new LinkedList<ClassLoader>();
+    List<ClassLoader> classLoadersList = new LinkedList<>();
     classLoadersList.add(ClasspathHelper.contextClassLoader());
 
     Reflections reflections = new Reflections(
@@ -637,7 +637,7 @@ public class RodaCoreFactory {
     if (nodeType == NodeType.MASTER) {
       tempIndexConfigsPath = Optional.empty();
       Path solrHome = configPath.resolve(RodaConstants.CORE_INDEX_FOLDER);
-      if (!solrHome.toFile().exists() || FEATURE_OVERRIDE_INDEX_CONFIGS) {
+      if (!FSUtils.exists(solrHome) || FEATURE_OVERRIDE_INDEX_CONFIGS) {
         try {
           Path tempConfig = Files.createTempDirectory(getWorkingDirectory(), RodaConstants.CORE_INDEX_FOLDER);
           toDeleteDuringShutdown.add(tempConfig);
@@ -867,7 +867,7 @@ public class RodaCoreFactory {
 
       UserUtility.setLdapUtility(ldapUtility);
 
-      if (!rodaApacheDSDataDirectory.toFile().exists()) {
+      if (!FSUtils.exists(rodaApacheDSDataDirectory)) {
         Files.createDirectories(rodaApacheDSDataDirectory);
         final List<String> ldifFileNames = Arrays.asList("users.ldif", "groups.ldif", "roles.ldif");
         final List<String> ldifs = new ArrayList<>();
@@ -947,7 +947,7 @@ public class RodaCoreFactory {
       String transferredResourcesFolder = getRodaConfiguration().getString("transferredResources.folder",
         RodaConstants.CORE_TRANSFERREDRESOURCE_FOLDER);
       Path transferredResourcesFolderPath = dataPath.resolve(transferredResourcesFolder);
-      if (!transferredResourcesFolderPath.toFile().exists()) {
+      if (!FSUtils.exists(transferredResourcesFolderPath)) {
         Files.createDirectories(transferredResourcesFolderPath);
       }
 
@@ -1066,7 +1066,7 @@ public class RodaCoreFactory {
     propertiesConfiguration.setDelimiterParsingDisabled(true);
     propertiesConfiguration.setEncoding(RodaConstants.DEFAULT_ENCODING);
 
-    if (config.toFile().exists()) {
+    if (FSUtils.exists(config)) {
       LOGGER.trace("Loading configuration from file {}", config);
       propertiesConfiguration.load(config.toFile());
       RodaPropertiesReloadStrategy rodaPropertiesReloadStrategy = new RodaPropertiesReloadStrategy();
@@ -1089,7 +1089,7 @@ public class RodaCoreFactory {
   public static URL getConfigurationFile(String configurationFile) {
     Path config = RodaCoreFactory.getConfigPath().resolve(configurationFile);
     URL configUri;
-    if (config.toFile().exists() && !config.toFile().isDirectory()
+    if (FSUtils.exists(config) && !FSUtils.isDirectory(config)
       && config.toAbsolutePath().startsWith(getConfigPath().toAbsolutePath().toString())) {
       try {
         configUri = config.toUri().toURL();
@@ -1115,7 +1115,7 @@ public class RodaCoreFactory {
     Path config = getConfigPath().resolve(configurationFile);
     InputStream inputStream = null;
     try {
-      if (config.toFile().exists() && !config.toFile().isDirectory()
+      if (FSUtils.exists(config) && !FSUtils.isDirectory(config)
         && config.toAbsolutePath().startsWith(getConfigPath().toAbsolutePath().toString())) {
         inputStream = Files.newInputStream(config);
         LOGGER.trace("Loading configuration from file {}", config);
@@ -1143,7 +1143,7 @@ public class RodaCoreFactory {
     Path defaultPath = getDefaultPath().resolve(defaultFile);
     InputStream inputStream = null;
     try {
-      if (defaultPath.toFile().exists() && !defaultPath.toFile().isDirectory()
+      if (FSUtils.exists(defaultPath) && !FSUtils.isDirectory(defaultPath)
         && defaultPath.toAbsolutePath().startsWith(getDefaultPath().toAbsolutePath().toString())) {
         inputStream = Files.newInputStream(defaultPath);
         LOGGER.debug("Trying to load default from file {}", defaultPath);
@@ -1255,7 +1255,7 @@ public class RodaCoreFactory {
     Set<String> fileNames = new HashSet<>();
 
     // get from external config
-    Set<String> externalFileNames = new HashSet<String>();
+    Set<String> externalFileNames = new HashSet<>();
     Path configPath = RodaCoreFactory.getConfigPath().resolve(folder);
     Files.walkFileTree(configPath, new SimpleFileVisitor<Path>() {
       @Override
@@ -1268,7 +1268,7 @@ public class RodaCoreFactory {
     fileNames.addAll(externalFileNames);
 
     // get from internal config
-    List<ClassLoader> classLoadersList = new LinkedList<ClassLoader>();
+    List<ClassLoader> classLoadersList = new LinkedList<>();
     classLoadersList.add(ClasspathHelper.contextClassLoader());
     Set<String> internalFilesPath = new Reflections(new ConfigurationBuilder()
       .filterInputsBy(
@@ -1292,7 +1292,7 @@ public class RodaCoreFactory {
 
   private static void fillInPropertiesToCache(String cacheName, List<String> prefixesToCache) {
     if (rodaPropertiesCache.get(cacheName) == null) {
-      HashMap<String, String> newCacheEntry = new HashMap<String, String>();
+      HashMap<String, String> newCacheEntry = new HashMap<>();
 
       Configuration configuration = RodaCoreFactory.getRodaConfiguration();
       Iterator<String> keys = configuration.getKeys();
@@ -1385,8 +1385,7 @@ public class RodaCoreFactory {
     System.out.println("Total number of SIPs: " + countSIP);
   }
 
-  private static void printFiles(Sorter sorter, Sublist sublist, Facets facets)
-    throws GenericException, RequestNotValidException {
+  private static void printFiles(Sorter sorter, Sublist sublist) throws GenericException, RequestNotValidException {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_SEARCH, "OLA-OLÁ-1234-XXXX_K"));
     IndexResult<IndexedFile> res = index.find(IndexedFile.class, filter, sorter, sublist, new ArrayList<>());
 
@@ -1395,8 +1394,7 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void printEvents(Sorter sorter, Sublist sublist, Facets facets)
-    throws GenericException, RequestNotValidException {
+  private static void printEvents(Sorter sorter, Sublist sublist) throws GenericException, RequestNotValidException {
     Filter filter = new Filter(
       new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_TYPE, "format identification"));
     IndexResult<IndexedPreservationEvent> res = index.find(IndexedPreservationEvent.class, filter, sorter, sublist,
@@ -1407,8 +1405,7 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void printAgents(Sorter sorter, Sublist sublist, Facets facets)
-    throws GenericException, RequestNotValidException {
+  private static void printAgents(Sorter sorter, Sublist sublist) throws GenericException, RequestNotValidException {
     Filter filter = new Filter(
       new SimpleFilterParameter(RodaConstants.PRESERVATION_AGENT_TYPE, PreservationAgentType.SOFTWARE.toString()));
     IndexResult<IndexedPreservationAgent> res = index.find(IndexedPreservationAgent.class, filter, sorter, sublist,
@@ -1496,11 +1493,11 @@ public class RodaCoreFactory {
       } else if ("list".equals(args.get(1)) && ("sips".equals(args.get(2)))) {
         printCountSips(null, new Sublist(0, 10000), null);
       } else if ("list".equals(args.get(1)) && ("file".equals(args.get(2)))) {
-        printFiles(null, new Sublist(0, 10000), null);
+        printFiles(null, new Sublist(0, 10000));
       } else if ("list".equals(args.get(1)) && ("event".equals(args.get(2)))) {
-        printEvents(null, new Sublist(0, 10000), null);
+        printEvents(null, new Sublist(0, 10000));
       } else if ("list".equals(args.get(1)) && ("agent".equals(args.get(2)))) {
-        printAgents(null, new Sublist(0, 10000), null);
+        printAgents(null, new Sublist(0, 10000));
       } else if ("query".equals(args.get(1)) && args.size() == 4 && StringUtils.isNotBlank(args.get(2))
         && StringUtils.isNotBlank(args.get(3))) {
         runSolrQuery(args);

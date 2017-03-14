@@ -13,6 +13,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.RODAObjectList;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -21,33 +22,34 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * @author Hélder Silva <hsilva@keep.pt>
  */
-@XmlRootElement(name = "logentries")
+@XmlRootElement(name = RodaConstants.RODA_OBJECT_LOGS)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class LogEntries implements RODAObjectList<LogEntry> {
-  private List<LogEntry> logEntries;
+  private static final long serialVersionUID = 5324915190817055434L;
+  private List<LogEntry> logList;
 
   public LogEntries() {
     super();
-    logEntries = new ArrayList<LogEntry>();
+    logList = new ArrayList<>();
   }
 
   public LogEntries(List<LogEntry> logEntries) {
     super();
-    this.logEntries = logEntries;
+    this.logList = logEntries;
   }
 
-  @JsonProperty(value = "logentries")
-  @XmlElement(name = "logentry")
+  @JsonProperty(value = RodaConstants.RODA_OBJECT_LOGS)
+  @XmlElement(name = RodaConstants.RODA_OBJECT_LOG)
   public List<LogEntry> getObjects() {
-    return logEntries;
+    return logList;
   }
 
   public void setObjects(List<LogEntry> logEntries) {
-    this.logEntries = logEntries;
+    this.logList = logEntries;
   }
 
   public void addObject(LogEntry logEntry) {
-    this.logEntries.add(logEntry);
+    this.logList.add(logEntry);
   }
 
 }

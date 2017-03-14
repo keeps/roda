@@ -22,6 +22,7 @@ public class SortParameter implements Serializable {
    * Constructs an empty {@link SortParameter}.
    */
   public SortParameter() {
+    // do nothing
   }
 
   /**
@@ -51,6 +52,7 @@ public class SortParameter implements Serializable {
   /**
    * @see Object#toString()
    */
+  @Override
   public String toString() {
     return "SortParameter(name=" + getName() + ", descending=" + isDescending() + ")";
   }

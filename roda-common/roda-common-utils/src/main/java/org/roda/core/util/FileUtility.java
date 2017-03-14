@@ -38,6 +38,10 @@ public class FileUtility {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FileUtility.class);
 
+  private FileUtility() {
+    // do nothing
+  }
+
   public static InputStream getConfigurationFile(Path configPath, String relativePath) {
     InputStream ret;
     Path staticConfig = configPath.resolve(relativePath);

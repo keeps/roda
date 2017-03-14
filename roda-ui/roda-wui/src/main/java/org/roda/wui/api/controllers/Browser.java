@@ -156,7 +156,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    List<String> aipFieldsWithPermissions = new ArrayList<String>(Arrays.asList(RodaConstants.AIP_STATE,
+    List<String> aipFieldsWithPermissions = new ArrayList<>(Arrays.asList(RodaConstants.AIP_STATE,
       RodaConstants.INDEX_UUID, RodaConstants.AIP_GHOST, RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL));
     aipFieldsWithPermissions.addAll(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
 
@@ -189,7 +189,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    List<String> aipFields = new ArrayList<String>(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+    List<String> aipFields = new ArrayList<>(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
     aipFields.addAll(Arrays.asList(RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL, RodaConstants.AIP_PARENT_ID));
 
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, aipFields);
@@ -222,7 +222,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    List<String> aipFields = new ArrayList<String>(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+    List<String> aipFields = new ArrayList<>(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
     aipFields.addAll(Arrays.asList(RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL, RodaConstants.AIP_PARENT_ID));
 
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, aipFields);
@@ -1212,7 +1212,7 @@ public class Browser extends RodaWuiController {
     UserUtility.checkAIPPermissions(user, aip, PermissionType.UPDATE);
 
     // delegate
-    Map<String, String> properties = new HashMap<String, String>();
+    Map<String, String> properties = new HashMap<>();
     properties.put(RodaConstants.VERSION_USER, user.getId());
     properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATED.toString());
 
@@ -1380,7 +1380,7 @@ public class Browser extends RodaWuiController {
     UserUtility.checkAIPPermissions(user, aip, PermissionType.UPDATE);
 
     // delegate
-    Map<String, String> properties = new HashMap<String, String>();
+    Map<String, String> properties = new HashMap<>();
     properties.put(RodaConstants.VERSION_USER, user.getId());
     properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATED.toString());
 
@@ -1406,7 +1406,7 @@ public class Browser extends RodaWuiController {
     UserUtility.checkRepresentationPermissions(user, representation, PermissionType.UPDATE);
 
     // delegate
-    Map<String, String> properties = new HashMap<String, String>();
+    Map<String, String> properties = new HashMap<>();
     properties.put(RodaConstants.VERSION_USER, user.getId());
     properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATED.toString());
 
@@ -1431,7 +1431,7 @@ public class Browser extends RodaWuiController {
     UserUtility.checkAIPPermissions(user, aip, PermissionType.UPDATE);
 
     // delegate
-    Map<String, String> properties = new HashMap<String, String>();
+    Map<String, String> properties = new HashMap<>();
     properties.put(RodaConstants.VERSION_USER, user.getId());
     properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.CREATED.toString());
 
@@ -1457,7 +1457,7 @@ public class Browser extends RodaWuiController {
     UserUtility.checkRepresentationPermissions(user, representation, PermissionType.UPDATE);
 
     // delegate
-    Map<String, String> properties = new HashMap<String, String>();
+    Map<String, String> properties = new HashMap<>();
     properties.put(RodaConstants.VERSION_USER, user.getId());
     properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.CREATED.toString());
 
@@ -1615,7 +1615,7 @@ public class Browser extends RodaWuiController {
     // check permissions
     controllerAssistant.checkRoles(user);
 
-    List<String> aipFields = new ArrayList<String>(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+    List<String> aipFields = new ArrayList<>(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
     aipFields.addAll(Arrays.asList(RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL, RodaConstants.AIP_PARENT_ID));
 
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, aipFields);
@@ -1685,7 +1685,7 @@ public class Browser extends RodaWuiController {
     UserUtility.checkAIPPermissions(user, aip, PermissionType.UPDATE);
 
     // delegate
-    Map<String, String> properties = new HashMap<String, String>();
+    Map<String, String> properties = new HashMap<>();
     properties.put(RodaConstants.VERSION_USER, user.getId());
     properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.REVERTED.toString());
 
@@ -1743,7 +1743,7 @@ public class Browser extends RodaWuiController {
 
     for (IndexedDIP dip : dips) {
       UserUtility.checkDIPPermissions(user, dip, PermissionType.UPDATE);
-      BrowserHelper.updateDIPPermissions(user, dip, permissions, details);
+      BrowserHelper.updateDIPPermissions(dip, permissions, details);
     }
 
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_DIPS_PARAM, dips,
@@ -1758,7 +1758,7 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
 
     // delegate
-    Map<String, String> properties = new HashMap<String, String>();
+    Map<String, String> properties = new HashMap<>();
     properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATED.toString());
 
     BrowserHelper.updateRisk(risk, user, properties, true, incidences);
@@ -1822,7 +1822,7 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
 
     // delegate
-    Map<String, String> properties = new HashMap<String, String>();
+    Map<String, String> properties = new HashMap<>();
     properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.REVERTED.toString());
 
     int incidences = 0;
