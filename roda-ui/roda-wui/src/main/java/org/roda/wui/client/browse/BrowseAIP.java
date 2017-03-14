@@ -909,7 +909,7 @@ public class BrowseAIP extends Composite {
   private void newDescriptiveMetadataRedirect() {
     if (aipId != null) {
       HistoryUtils.newHistory(RESOLVER, CreateDescriptiveMetadata.RESOLVER.getHistoryToken(),
-        CreateDescriptiveMetadata.AIP, aipId);
+        RodaConstants.RODA_OBJECT_AIP, aipId);
     }
   }
 

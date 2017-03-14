@@ -489,7 +489,7 @@ public class BrowseRepresentation extends Composite {
   }
 
   private void newRepresentationDescriptiveMetadata() {
-    HistoryUtils.newHistory(CreateDescriptiveMetadata.RESOLVER, CreateDescriptiveMetadata.REPRESENTATION, aipId, repId);
+    HistoryUtils.newHistory(CreateDescriptiveMetadata.RESOLVER, RodaConstants.RODA_OBJECT_REPRESENTATION, aipId, repId);
   }
 
   @UiHandler("newDescriptiveMetadata")

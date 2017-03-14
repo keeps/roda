@@ -64,9 +64,6 @@ import config.i18n.client.ClientMessages;
  * 
  */
 public class CreateDescriptiveMetadata extends Composite {
-
-  public static final String AIP = "aip";
-  public static final String REPRESENTATION = "representation";
   public static final String NEW = "new";
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
@@ -74,10 +71,11 @@ public class CreateDescriptiveMetadata extends Composite {
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       GWT.log(historyTokens.toString());
-      boolean isAIP = historyTokens.get(0).equals(AIP);
+      boolean isAIP = historyTokens.get(0).equals(RodaConstants.RODA_OBJECT_AIP);
 
       if ((isAIP && (historyTokens.size() == 2 || historyTokens.size() == 3))
-        || (historyTokens.get(0).equals(REPRESENTATION) && (historyTokens.size() == 3 || historyTokens.size() == 4))) {
+        || (historyTokens.get(0).equals(RodaConstants.RODA_OBJECT_REPRESENTATION)
+          && (historyTokens.size() == 3 || historyTokens.size() == 4))) {
         final String aipId = historyTokens.get(1);
         boolean newAIP;
         CreateDescriptiveMetadata create;
@@ -191,7 +189,7 @@ public class CreateDescriptiveMetadata extends Composite {
             }
           }
 
-          id.setText(value + ".xml");
+          id.setText(value + RodaConstants.PREMIS_SUFFIX);
         } else {
           id.setText("");
         }
@@ -224,9 +222,9 @@ public class CreateDescriptiveMetadata extends Composite {
           selectedBundle = metadataTypes.get(0);
           if (selectedBundle.getVersion() != null) {
             id.setText(selectedBundle.getType() + RodaConstants.METADATA_VERSION_SEPARATOR + selectedBundle.getVersion()
-              + ".xml");
+              + RodaConstants.PREMIS_SUFFIX);
           } else {
-            id.setText(selectedBundle.getType() + ".xml");
+            id.setText(selectedBundle.getType() + RodaConstants.PREMIS_SUFFIX);
           }
           updateFormOrXML();
         }

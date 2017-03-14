@@ -244,6 +244,8 @@ public interface ClientMessages extends Messages {
 
   String movingSIP();
 
+  String movingAIP();
+
   String changeTypeSuccessful();
 
   String allItemsWereAccepted();

@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE file at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/keeps/roda
+ */
 package org.roda.wui.client.common.actions;
 
 import java.util.Arrays;
@@ -186,7 +193,8 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
       @Override
       public void onSuccess(String itemAIPId) {
         LastSelectedItemsSingleton.getInstance().setLastHistory(HistoryUtils.getCurrentHistoryPath());
-        HistoryUtils.newHistory(CreateDescriptiveMetadata.RESOLVER, "aip", itemAIPId, CreateDescriptiveMetadata.NEW);
+        HistoryUtils.newHistory(CreateDescriptiveMetadata.RESOLVER, RodaConstants.RODA_OBJECT_AIP, itemAIPId,
+          CreateDescriptiveMetadata.NEW);
         callback.onSuccess(ActionImpact.UPDATED);
       }
     });
@@ -233,12 +241,13 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
                   @Override
                   public void onSuccess(IndexedAIP result) {
+                    Toast.showInfo(messages.moveItemTitle(), messages.movingAIP());
+
                     if (result != null) {
                       HistoryUtils.newHistory(BrowseAIP.RESOLVER, result.getId());
                     } else {
                       HistoryUtils.newHistory(BrowseAIP.RESOLVER);
                     }
-                    callback.onSuccess(ActionImpact.UPDATED);
                   }
 
                   @Override
