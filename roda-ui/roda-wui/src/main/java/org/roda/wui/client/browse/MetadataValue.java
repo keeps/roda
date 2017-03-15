@@ -11,7 +11,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.MissingResourceException;
 
 /**
  * @author Andre Pereira apereira@keep.pt
@@ -43,7 +42,7 @@ public class MetadataValue implements Comparable, Serializable {
     }
 
     if (!this.options.containsKey("label")) {
-      this.options.put("label", getTitle(id));
+      this.options.put("label", id);
     }
   }
 
@@ -77,19 +76,7 @@ public class MetadataValue implements Comparable, Serializable {
     return options;
   }
 
-  private static String getTitle(String var) {
-    String result = var;
-    try {
-      // result = I18n.t("metadata." + var);
-    } catch (MissingResourceException e) {
-      // we will use the name of the variable if there's no available title
-      // no need to log the exception or rethrow it
-    }
-    return result;
-  }
-
-  @Override
-  protected MetadataValue clone() {
+  protected MetadataValue copy() {
     HashMap<String, String> newOptions = new HashMap<>();
     for (Entry<String, String> entry : options.entrySet()) {
       newOptions.put(entry.getKey(), entry.getValue());
@@ -128,5 +115,36 @@ public class MetadataValue implements Comparable, Serializable {
       }
     }
     return 0;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((id == null) ? 0 : id.hashCode());
+    result = prime * result + ((options == null) ? 0 : options.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    MetadataValue other = (MetadataValue) obj;
+    if (id == null) {
+      if (other.id != null)
+        return false;
+    } else if (!id.equals(other.id))
+      return false;
+    if (options == null) {
+      if (other.options != null)
+        return false;
+    } else if (!options.equals(other.options))
+      return false;
+    return true;
   }
 }

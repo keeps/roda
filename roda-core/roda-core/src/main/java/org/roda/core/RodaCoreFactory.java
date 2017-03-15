@@ -1354,7 +1354,7 @@ public class RodaCoreFactory {
         System.out.println(">" + solrDocument);
       }
     } catch (SolrServerException | IOException e) {
-      e.printStackTrace();
+      e.printStackTrace(System.err);
     }
   }
 

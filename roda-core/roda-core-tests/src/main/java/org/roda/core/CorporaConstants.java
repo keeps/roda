@@ -141,7 +141,7 @@ public final class CorporaConstants {
 
   /** Private empty constructor */
   private CorporaConstants() {
-
+    // do nothing
   }
 
 }

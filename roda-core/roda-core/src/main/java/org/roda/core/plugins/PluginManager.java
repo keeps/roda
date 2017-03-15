@@ -19,6 +19,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -75,7 +76,7 @@ public class PluginManager {
   private Map<Path, JarPlugins> jarPluginCache = new HashMap<>();
   private Map<String, Plugin<? extends IsRODAObject>> internalPluginChache = new HashMap<>();
   private Map<String, Plugin<? extends IsRODAObject>> externalPluginChache = new HashMap<>();
-  private Map<PluginType, List<PluginInfo>> pluginInfoPerType = new HashMap<>();
+  private EnumMap<PluginType, List<PluginInfo>> pluginInfoPerType = new EnumMap<>(PluginType.class);
   private Map<String, Set<Class>> pluginObjectClasses = new HashMap<>();
   private Map<Class, List<PluginInfo>> pluginInfoPerObjectClass = new HashMap<>();
   private boolean internalPluginStarted = false;

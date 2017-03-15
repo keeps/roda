@@ -8,7 +8,7 @@
 package org.roda.core.data.v2.ip;
 
 import java.io.Serializable;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -27,15 +27,15 @@ public class Permissions implements Serializable {
     CREATE, READ, UPDATE, DELETE, GRANT;
   }
 
-  private Map<PermissionType, Set<String>> users;
-  private Map<PermissionType, Set<String>> groups;
+  private EnumMap<PermissionType, Set<String>> users;
+  private EnumMap<PermissionType, Set<String>> groups;
 
   /**
    * Constructs an empty {@link Permissions}.
    */
   public Permissions() {
-    users = new HashMap<>();
-    groups = new HashMap<>();
+    users = new EnumMap<>(PermissionType.class);
+    groups = new EnumMap<>(PermissionType.class);
     init(users);
     init(groups);
   }
@@ -52,7 +52,7 @@ public class Permissions implements Serializable {
     }
   }
 
-  public Map<PermissionType, Set<String>> getUsers() {
+  public EnumMap<PermissionType, Set<String>> getUsers() {
     return users;
   }
 
@@ -67,11 +67,11 @@ public class Permissions implements Serializable {
     return usernames;
   }
 
-  public void setUsers(Map<PermissionType, Set<String>> users) {
+  public void setUsers(EnumMap<PermissionType, Set<String>> users) {
     this.users = users;
   }
 
-  public Map<PermissionType, Set<String>> getGroups() {
+  public EnumMap<PermissionType, Set<String>> getGroups() {
     return groups;
   }
 
@@ -86,7 +86,7 @@ public class Permissions implements Serializable {
     return groupnames;
   }
 
-  public void setGroups(Map<PermissionType, Set<String>> groups) {
+  public void setGroups(EnumMap<PermissionType, Set<String>> groups) {
     this.groups = groups;
   }
 

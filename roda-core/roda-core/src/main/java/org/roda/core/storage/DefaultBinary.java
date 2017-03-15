@@ -120,7 +120,10 @@ public class DefaultBinary extends AbstractResource implements Binary {
     if (this == obj) {
       return true;
     }
-    if (!super.equals(obj) || obj == null || getClass() != obj.getClass()) {
+    if (obj == null) {
+      return false;
+    }
+    if (!super.equals(obj) || getClass() != obj.getClass()) {
       return false;
     }
     DefaultBinary other = (DefaultBinary) obj;

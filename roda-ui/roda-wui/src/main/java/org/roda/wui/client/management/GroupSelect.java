@@ -104,6 +104,42 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Lis
       return sortingkeyword.compareTo(groupCheckbox.sortingkeyword);
     }
 
+    @Override
+    public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + getOuterType().hashCode();
+      result = prime * result + ((checkbox == null) ? 0 : checkbox.hashCode());
+      result = prime * result + ((descriptionLabel == null) ? 0 : descriptionLabel.hashCode());
+      result = prime * result + ((group == null) ? 0 : group.hashCode());
+      result = prime * result + ((sortingkeyword == null) ? 0 : sortingkeyword.hashCode());
+      return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj)
+        return true;
+      if (obj == null)
+        return false;
+      if (getClass() != obj.getClass())
+        return false;
+      GroupCheckbox other = (GroupCheckbox) obj;
+      if (!getOuterType().equals(other.getOuterType()))
+        return false;
+      if (group == null) {
+        if (other.group != null)
+          return false;
+      } else if (!group.equals(other.group))
+        return false;
+      if (sortingkeyword == null) {
+        if (other.sortingkeyword != null)
+          return false;
+      } else if (!sortingkeyword.equals(other.sortingkeyword))
+        return false;
+      return true;
+    }
+
     @SuppressWarnings("unused")
     public String getSortingkeyword() {
       return sortingkeyword;
@@ -120,6 +156,10 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Lis
 
     public Group getValue() {
       return getGroup();
+    }
+
+    private GroupSelect getOuterType() {
+      return GroupSelect.this;
     }
   }
 

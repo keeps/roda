@@ -676,7 +676,7 @@ public class IndexServiceTest {
       model.deleteRisk(risk.getId(), false);
 
     } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
-      e.printStackTrace();
+      e.printStackTrace(System.err);
       assertTrue(false);
     }
   }

@@ -133,6 +133,48 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
       return sortingkeyword.compareTo(permission.sortingkeyword);
     }
 
+    @Override
+    public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + getOuterType().hashCode();
+      result = prime * result + ((checkbox == null) ? 0 : checkbox.hashCode());
+      result = prime * result + ((descriptionLabel == null) ? 0 : descriptionLabel.hashCode());
+      result = prime * result + (enabled ? 1231 : 1237);
+      result = prime * result + (locked ? 1231 : 1237);
+      result = prime * result + ((role == null) ? 0 : role.hashCode());
+      result = prime * result + ((sortingkeyword == null) ? 0 : sortingkeyword.hashCode());
+      return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj)
+        return true;
+      if (obj == null)
+        return false;
+      if (getClass() != obj.getClass())
+        return false;
+      Permission other = (Permission) obj;
+      if (!getOuterType().equals(other.getOuterType()))
+        return false;
+      if (enabled != other.enabled)
+        return false;
+      if (locked != other.locked)
+        return false;
+      if (role == null) {
+        if (other.role != null)
+          return false;
+      } else if (!role.equals(other.role))
+        return false;
+      if (sortingkeyword == null) {
+        if (other.sortingkeyword != null)
+          return false;
+      } else if (!sortingkeyword.equals(other.sortingkeyword))
+        return false;
+      return true;
+    }
+
     @SuppressWarnings("unused")
     public String getSortingkeyword() {
       return sortingkeyword;
@@ -149,6 +191,10 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
 
     public String getValue() {
       return getRole();
+    }
+
+    private PermissionsPanel getOuterType() {
+      return PermissionsPanel.this;
     }
   }
 

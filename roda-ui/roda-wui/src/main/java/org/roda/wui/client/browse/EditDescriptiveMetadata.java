@@ -175,7 +175,7 @@ public class EditDescriptiveMetadata extends Composite {
     if (bundle.getValues() != null) {
       newValues = new HashSet<>();
       for (MetadataValue mv : bundle.getValues())
-        newValues.add(mv.clone());
+        newValues.add(mv.copy());
     }
     supportedBundle = new SupportedMetadataTypeBundle(bundle.getId(), bundle.getType(), bundle.getVersion(),
       bundle.getId(), bundle.getRawTemplate(), newValues);
@@ -217,7 +217,7 @@ public class EditDescriptiveMetadata extends Composite {
               if (bundle.getValues() != null) {
                 newValues = new HashSet<>();
                 for (MetadataValue mv : bundle.getValues())
-                  newValues.add(mv.clone());
+                  newValues.add(mv.copy());
               }
               supportedBundle = new SupportedMetadataTypeBundle(bundle.getId(), bundle.getType(), bundle.getVersion(),
                 bundle.getId(), bundle.getRawTemplate(), newValues);

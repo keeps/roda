@@ -260,7 +260,7 @@ public class SolrUtils {
       ret = liteFieldsForEachClass.get(classToRetrieve.getName());
     } else {
       try {
-        ret = ((T) classToRetrieve.newInstance()).liteFields();
+        ret = classToRetrieve.newInstance().liteFields();
         liteFieldsForEachClass.put(classToRetrieve.getName(), ret);
       } catch (InstantiationException | IllegalAccessException e) {
         LOGGER.error("Error instantiating object of type {}", classToRetrieve.getName(), e);
@@ -605,6 +605,7 @@ public class SolrUtils {
   /**
    * @deprecated use {@link #objectToString(Object, String)} instead
    */
+  @Deprecated
   private static String objectToString(Object object) {
     String ret;
     if (object == null) {
@@ -2519,7 +2520,7 @@ public class SolrUtils {
       userPermissions.put(type, users);
     }
 
-    Map<PermissionType, Set<String>> groupPermissions = new EnumMap<>(PermissionType.class);
+    EnumMap<PermissionType, Set<String>> groupPermissions = new EnumMap<>(PermissionType.class);
 
     for (PermissionType type : PermissionType.values()) {
       String key = RodaConstants.INDEX_PERMISSION_GROUPS_PREFIX + type;
@@ -2530,7 +2531,6 @@ public class SolrUtils {
 
     permissions.setUsers(userPermissions);
     permissions.setGroups(groupPermissions);
-
     return permissions;
   }
 
