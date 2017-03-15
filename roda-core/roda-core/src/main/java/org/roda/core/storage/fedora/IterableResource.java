@@ -35,22 +35,25 @@ import org.roda.core.storage.fedora.utils.FedoraUtils;
  * @author Hélder Silva <hsilva@keep.pt>
  */
 public class IterableResource implements CloseableIterable<Resource> {
+  private static final String ITERATION_ERROR = "Could not iterate through resource";
   private FedoraRepository repository;
   private Iterator<FedoraResource> fedoraResources;
 
   public IterableResource(FedoraRepository repository, StoragePath storagePath)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+
     this.repository = repository;
     try {
-      fedoraResources = repository.getObject(FedoraUtils.storagePathToFedoraPath(storagePath)).getChildren(null).iterator();
+      fedoraResources = repository.getObject(FedoraUtils.storagePathToFedoraPath(storagePath)).getChildren(null)
+        .iterator();
     } catch (ForbiddenException e) {
-      throw new AuthorizationDeniedException("Could not iterate through resource", e);
+      throw new AuthorizationDeniedException(ITERATION_ERROR, e);
     } catch (BadRequestException e) {
-      throw new RequestNotValidException("Could not iterate through resource", e);
+      throw new RequestNotValidException(ITERATION_ERROR, e);
     } catch (org.fcrepo.client.NotFoundException e) {
-      throw new NotFoundException("Could not iterate through resource", e);
+      throw new NotFoundException(ITERATION_ERROR, e);
     } catch (FedoraException e) {
-      throw new GenericException("Could not iterate through resource", e);
+      throw new GenericException(ITERATION_ERROR, e);
     }
   }
 
@@ -91,6 +94,7 @@ public class IterableResource implements CloseableIterable<Resource> {
 
     @Override
     public void remove() {
+      // do nothing
     }
 
   }

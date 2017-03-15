@@ -38,16 +38,19 @@ public class Formats implements RODAObjectList<Format> {
     this.formatList = formats;
   }
 
+  @Override
   @JsonProperty(value = RodaConstants.RODA_OBJECT_FORMATS)
   @XmlElement(name = RodaConstants.RODA_OBJECT_FORMAT)
   public List<Format> getObjects() {
     return formatList;
   }
 
+  @Override
   public void setObjects(List<Format> formats) {
     this.formatList = formats;
   }
 
+  @Override
   public void addObject(Format format) {
     this.formatList.add(format);
   }

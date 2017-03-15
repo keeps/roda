@@ -105,7 +105,7 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public List<PluginParameter> getParameters() {
-    ArrayList<PluginParameter> pluginParameters = new ArrayList<PluginParameter>();
+    ArrayList<PluginParameter> pluginParameters = new ArrayList<>();
     pluginParameters.add(PARAMETER_VALIDATE_DESCRIPTIVE_METADATA);
     pluginParameters.add(PARAMETER_METADATA_TYPE);
     pluginParameters.add(PARAMETER_METADATA_VERSION);

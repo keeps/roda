@@ -10,6 +10,7 @@ package org.roda.core.common.notifications;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.model.ModelService;
 
+@FunctionalInterface
 public interface NotificationProcessor {
   public Notification processNotification(ModelService model, Notification notification);
 }

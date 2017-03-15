@@ -61,11 +61,8 @@ public class HistoryUtils {
   }
 
   public static final String HISTORY_SEP = "/";
-
   public static final String HISTORY_SEP_REGEX = "/";
-
   public static final String HISTORY_SEP_ESCAPE = "%2F";
-
   public static final String HISTORY_PERMISSION_SEP = ".";
 
   public static <T> List<T> tail(List<T> list) {
@@ -100,7 +97,7 @@ public class HistoryUtils {
     }
 
     List<String> splitted = Arrays.asList(hash.split(HISTORY_SEP_REGEX));
-    List<String> tokens = new ArrayList<String>();
+    List<String> tokens = new ArrayList<>();
     for (String item : splitted) {
       tokens.add(URL.decodeQueryString(item));
     }

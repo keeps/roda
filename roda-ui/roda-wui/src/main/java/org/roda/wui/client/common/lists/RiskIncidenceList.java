@@ -149,7 +149,7 @@ public class RiskIncidenceList extends BasicAsyncTableCell<RiskIncidence> {
 
   @Override
   protected Sorter getSorter(ColumnSortList columnSortList) {
-    Map<Column<RiskIncidence, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<RiskIncidence, ?>, List<String>>();
+    Map<Column<RiskIncidence, ?>, List<String>> columnSortingKeyMap = new HashMap<>();
     columnSortingKeyMap.put(objectColumn, Arrays.asList(RodaConstants.RISK_INCIDENCE_AIP_ID,
       RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, RodaConstants.RISK_INCIDENCE_FILE_ID));
     columnSortingKeyMap.put(riskColumn, Arrays.asList(RodaConstants.RISK_INCIDENCE_RISK_ID));
@@ -157,7 +157,6 @@ public class RiskIncidenceList extends BasicAsyncTableCell<RiskIncidence> {
     columnSortingKeyMap.put(detectedByColumn, Arrays.asList(RodaConstants.RISK_INCIDENCE_DETECTED_BY));
     columnSortingKeyMap.put(statusColumn, Arrays.asList(RodaConstants.RISK_INCIDENCE_STATUS));
     columnSortingKeyMap.put(objectTypeColumn, Arrays.asList(RodaConstants.RISK_INCIDENCE_OBJECT_CLASS));
-
     return createSorter(columnSortList, columnSortingKeyMap);
   }
 

@@ -61,10 +61,12 @@ public class ShowRiskIncidence extends Composite {
       UserLogin.getInstance().checkRoles(new HistoryResolver[] {MemberManagement.RESOLVER}, false, callback);
     }
 
+    @Override
     public List<String> getHistoryPath() {
       return ListUtils.concat(RiskIncidenceRegister.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
+    @Override
     public String getHistoryToken() {
       return "riskincidence";
     }

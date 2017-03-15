@@ -38,12 +38,14 @@ public class DescriptiveMetadataList implements RODAObjectList<DescriptiveMetada
     this.metadataList = descriptiveMetadataList;
   }
 
+  @Override
   @JsonProperty(value = RodaConstants.RODA_OBJECT_DESCRIPTIVE_METADATA_LIST)
   @XmlElement(name = RodaConstants.RODA_OBJECT_DESCRIPTIVE_METADATA)
   public List<DescriptiveMetadata> getObjects() {
     return metadataList;
   }
 
+  @Override
   public void setObjects(List<DescriptiveMetadata> descriptiveMetadataList) {
     this.metadataList = descriptiveMetadataList;
   }

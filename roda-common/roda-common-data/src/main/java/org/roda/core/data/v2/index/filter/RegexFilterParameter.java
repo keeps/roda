@@ -19,6 +19,7 @@ public class RegexFilterParameter extends FilterParameter {
    * Constructs an empty {@link RegexFilterParameter}.
    */
   public RegexFilterParameter() {
+    // do nothing
   }
 
   /**
@@ -46,6 +47,7 @@ public class RegexFilterParameter extends FilterParameter {
   /**
    * @see Object#toString()
    */
+  @Override
   public String toString() {
     return "RegexFilterParameter(name=" + getName() + ", regex=" + getRegex() + ")";
   }

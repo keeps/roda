@@ -170,7 +170,7 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
 
       @Override
       public void onSuccess(Boolean result) {
-        Set<String> indirectRoles = new HashSet<String>(allRoles);
+        Set<String> indirectRoles = new HashSet<>(allRoles);
         indirectRoles.removeAll(directRoles);
 
         permissionsPanel.checkPermissions(directRoles, false);

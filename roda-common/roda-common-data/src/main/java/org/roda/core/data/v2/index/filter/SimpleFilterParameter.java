@@ -20,6 +20,7 @@ public class SimpleFilterParameter extends FilterParameter {
    * Constructs an empty {@link SimpleFilterParameter}.
    */
   public SimpleFilterParameter() {
+    // do nothing
   }
 
   /**
@@ -47,6 +48,7 @@ public class SimpleFilterParameter extends FilterParameter {
   /**
    * @see Object#toString()
    */
+  @Override
   public String toString() {
     return "SimpleFilterParameter(name=" + getName() + ", value=" + getValue() + ")";
   }

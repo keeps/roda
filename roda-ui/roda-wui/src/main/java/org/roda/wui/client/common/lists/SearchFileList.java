@@ -164,14 +164,12 @@ public class SearchFileList extends BasicAsyncTableCell<IndexedFile> {
 
     // define default sorting
     display.getColumnSortList().push(new ColumnSortInfo(pathColumn, true));
-
     addStyleName("my-files-table");
-
   }
 
   @Override
   protected Sorter getSorter(ColumnSortList columnSortList) {
-    Map<Column<IndexedFile, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<IndexedFile, ?>, List<String>>();
+    Map<Column<IndexedFile, ?>, List<String>> columnSortingKeyMap = new HashMap<>();
     columnSortingKeyMap.put(iconColumn, Arrays.asList(RodaConstants.FILE_ISDIRECTORY));
     columnSortingKeyMap.put(pathColumn, Arrays.asList(RodaConstants.FILE_ORIGINALNAME, RodaConstants.FILE_FILE_ID));
     columnSortingKeyMap.put(sizeColumn, Arrays.asList(RodaConstants.FILE_SIZE));

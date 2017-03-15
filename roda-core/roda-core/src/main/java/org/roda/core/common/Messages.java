@@ -8,11 +8,11 @@
 package org.roda.core.common;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -132,7 +132,7 @@ public class Messages {
 
         // Also checks for file existence
         if (FSUtils.exists(folder.resolve(bundleName))) {
-          is = new FileInputStream(file);
+          is = Files.newInputStream(file.toPath());
         } else {
           is = this.getClass().getResourceAsStream(CONFIG_I18N_PATH + bundleName);
         }

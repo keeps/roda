@@ -90,6 +90,7 @@ public class AVGAntiVirus implements AntiVirus {
    *           if some problem prevented the virus check from run a normal test.
    * @see AntiVirus
    */
+  @Override
   public VirusCheckResult checkForVirus(Path path) throws RuntimeException {
 
     VirusCheckResult result = new VirusCheckResult();
@@ -126,7 +127,7 @@ public class AVGAntiVirus implements AntiVirus {
   public String getVersion() {
     String avgGetVersion = RodaCoreFactory.getRodaConfiguration()
       .getString("core.plugins.internal.virus_check.avg.get_version", "/usr/bin/avgscan --version");
-    List<String> command = new ArrayList<String>(Arrays.asList(avgGetVersion.split(" ")));
+    List<String> command = new ArrayList<>(Arrays.asList(avgGetVersion.split(" ")));
     try {
       return CommandUtility.execute(command);
     } catch (CommandException e) {

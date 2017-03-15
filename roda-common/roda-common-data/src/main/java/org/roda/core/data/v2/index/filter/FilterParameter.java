@@ -41,6 +41,7 @@ public abstract class FilterParameter implements Serializable {
    * Constructs an empty {@link FilterParameter}.
    */
   public FilterParameter() {
+    // do nothing
   }
 
   @Override

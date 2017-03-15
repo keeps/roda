@@ -152,7 +152,7 @@ public final class MetadataUtils {
 
     // Create an XmlOptions instance and set the error listener.
     XmlOptions validateOptions = new XmlOptions();
-    List<XmlValidationError> errorList = new ArrayList<XmlValidationError>();
+    List<XmlValidationError> errorList = new ArrayList<>();
     validateOptions.setErrorListener(errorList);
 
     // Validate the XML.
@@ -185,7 +185,7 @@ public final class MetadataUtils {
 
     // Create an XmlOptions instance and set the error listener.
     XmlOptions validateOptions = new XmlOptions();
-    List<XmlValidationError> errorList = new ArrayList<XmlValidationError>();
+    List<XmlValidationError> errorList = new ArrayList<>();
     validateOptions.setErrorListener(errorList);
 
     // Validate the XML.

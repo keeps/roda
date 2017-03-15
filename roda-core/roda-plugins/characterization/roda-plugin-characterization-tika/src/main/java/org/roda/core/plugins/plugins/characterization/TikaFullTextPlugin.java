@@ -104,7 +104,7 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractAIPCompo
 
   @Override
   public List<PluginParameter> getParameters() {
-    ArrayList<PluginParameter> parameters = new ArrayList<PluginParameter>();
+    ArrayList<PluginParameter> parameters = new ArrayList<>();
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DO_FULLTEXT_EXTRACTION));
     return parameters;
@@ -123,6 +123,7 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractAIPCompo
     }
   }
 
+  @Override
   public Report executeOnAIP(IndexService index, ModelService model, StorageService storage, Report report,
     SimpleJobPluginInfo jobPluginInfo, List<AIP> list, Job job) throws PluginException {
 
@@ -196,6 +197,7 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractAIPCompo
     return report;
   }
 
+  @Override
   public Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage, Report report,
     SimpleJobPluginInfo jobPluginInfo, List<Representation> list, Job job) throws PluginException {
 
@@ -266,6 +268,7 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractAIPCompo
     return report;
   }
 
+  @Override
   public Report executeOnFile(IndexService index, ModelService model, StorageService storage, Report report,
     SimpleJobPluginInfo jobPluginInfo, List<File> list, Job job) throws PluginException {
 
@@ -336,7 +339,7 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractAIPCompo
 
   @Override
   public Plugin<T> cloneMe() {
-    TikaFullTextPlugin<T> tikaPlugin = new TikaFullTextPlugin<T>();
+    TikaFullTextPlugin<T> tikaPlugin = new TikaFullTextPlugin<>();
     try {
       tikaPlugin.init();
     } catch (PluginException e) {

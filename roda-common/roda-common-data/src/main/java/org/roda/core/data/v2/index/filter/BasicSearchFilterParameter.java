@@ -48,6 +48,7 @@ public class BasicSearchFilterParameter extends FilterParameter {
   /**
    * @see Object#toString()
    */
+  @Override
   public String toString() {
     return "BasicSearchFilterParameter(name=" + getName() + ", value=" + getValue() + ")";
   }

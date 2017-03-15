@@ -22,7 +22,8 @@ import config.i18n.client.ClientMessages;
 /**
  * A simple pager that controls the page size.
  * 
- * NOTE: GWT 2.7 PageSizePager doesn't have the ShowMore and ShowLess button localized.
+ * NOTE: GWT 2.7 PageSizePager doesn't have the ShowMore and ShowLess button
+ * localized.
  */
 public class RodaPageSizePager extends AbstractPager {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
@@ -43,7 +44,8 @@ public class RodaPageSizePager extends AbstractPager {
   /**
    * Construct a PageSizePager with a given increment.
    * 
-   * @param increment the amount by which to increase the page size
+   * @param increment
+   *          the amount by which to increase the page size
    */
   @UiConstructor
   public RodaPageSizePager(final int increment) {
@@ -56,19 +58,20 @@ public class RodaPageSizePager extends AbstractPager {
 
     // Show more button.
     showMoreButton.addClickHandler(new ClickHandler() {
+      @Override
       public void onClick(ClickEvent event) {
         // Display should be non-null, but we check defensively.
         HasRows display = getDisplay();
         if (display != null) {
           Range range = display.getVisibleRange();
           int pageSize = Math.min(range.getLength() + increment,
-              display.getRowCount()
-                  + (display.isRowCountExact() ? 0 : increment));
+            display.getRowCount() + (display.isRowCountExact() ? 0 : increment));
           display.setVisibleRange(range.getStart(), pageSize);
         }
       }
     });
     showLessButton.addClickHandler(new ClickHandler() {
+      @Override
       public void onClick(ClickEvent event) {
         // Display should be non-null, but we check defensively.
         HasRows display = getDisplay();
@@ -111,8 +114,7 @@ public class RodaPageSizePager extends AbstractPager {
     HasRows display = getDisplay();
     int pageSize = display.getVisibleRange().getLength();
     boolean hasLess = pageSize > increment;
-    boolean hasMore = !display.isRowCountExact()
-        || pageSize < display.getRowCount();
+    boolean hasMore = !display.isRowCountExact() || pageSize < display.getRowCount();
     showLessButton.setVisible(hasLess);
     showMoreButton.setVisible(hasMore);
     layout.setText(0, 1, (hasLess && hasMore) ? " | " : "");

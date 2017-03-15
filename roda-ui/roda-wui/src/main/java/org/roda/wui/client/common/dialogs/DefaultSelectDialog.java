@@ -76,6 +76,7 @@ public class DefaultSelectDialog<T extends IsIndexed, O> extends DialogBox imple
     emptyParentButton.setVisible(false);
   }
 
+  @Override
   public void showAndCenter() {
     if (Window.getClientWidth() < 800) {
       this.setWidth(Window.getClientWidth() + "px");

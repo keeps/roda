@@ -133,12 +133,11 @@ public class PreservationEventList extends BasicAsyncTableCell<IndexedPreservati
 
   @Override
   protected Sorter getSorter(ColumnSortList columnSortList) {
-    Map<Column<IndexedPreservationEvent, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<IndexedPreservationEvent, ?>, List<String>>();
+    Map<Column<IndexedPreservationEvent, ?>, List<String>> columnSortingKeyMap = new HashMap<>();
     columnSortingKeyMap.put(eventDateTimeColumn, Arrays.asList(RodaConstants.PRESERVATION_EVENT_DATETIME));
     columnSortingKeyMap.put(eventTypeColumn, Arrays.asList(RodaConstants.PRESERVATION_EVENT_TYPE));
     columnSortingKeyMap.put(eventDetailColumn, Arrays.asList(RodaConstants.PRESERVATION_EVENT_DETAIL));
     columnSortingKeyMap.put(eventOutcomeColumn, Arrays.asList(RodaConstants.PRESERVATION_EVENT_OUTCOME));
-
     return createSorter(columnSortList, columnSortingKeyMap);
   }
 

@@ -29,6 +29,10 @@ import org.roda.core.util.CommandUtility;
 
 public class JpylyzerPluginUtils {
 
+  private JpylyzerPluginUtils() {
+    // do nothing
+  }
+
   public static String inspect(Path path) throws RODAException {
     try {
       List<String> command = getCommand();

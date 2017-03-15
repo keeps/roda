@@ -25,8 +25,6 @@ import org.roda.core.plugins.orchestrate.akka.distributed.AkkaDistributedPlugin;
 import org.roda.core.plugins.orchestrate.akka.distributed.Frontend;
 import org.roda.core.plugins.orchestrate.akka.distributed.Master;
 import org.roda.core.storage.StorageService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
@@ -58,8 +56,6 @@ import scala.concurrent.duration.FiniteDuration;
  * > https://github.com/typesafehub/activator-akka-distributed-workers-java 
  * */
 public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin implements PluginOrchestrator {
-  private static final Logger LOGGER = LoggerFactory.getLogger(AkkaDistributedPluginOrchestrator.class);
-
   private final IndexService index;
   private final ModelService model;
   private final StorageService storage;
@@ -120,6 +116,7 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
     }, system.dispatcher());
 
     f.onFailure(new OnFailure() {
+      @Override
       public void onFailure(Throwable ex) throws Throwable {
         system.log().error(ex, "Lookup of shared journal at {} timed out", path);
       }
@@ -132,57 +129,70 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
 
   @Override
   public void setup() {
+    // do nothing
   }
 
   @Override
   public void shutdown() {
+    // do nothing
   }
 
   @Override
   public <T extends IsRODAObject, T1 extends IsIndexed> void runPluginFromIndex(Object context, Class<T1> classToActOn,
     Filter filter, Plugin<T> plugin) {
+    // do nothing
   }
 
   @Override
   public <T extends IsRODAObject> void runPlugin(Object context, Plugin<T> plugin) {
+    // do nothing
   }
 
   @Override
   public void executeJob(Job job, boolean async) throws JobAlreadyStartedException {
+    // do nothing
   }
 
   @Override
   public void stopJob(Job job) {
+    // do nothing
   }
 
   @Override
   public void cleanUnfinishedJobs() {
+    // do nothing
   }
 
   @Override
   public void setJobContextInformation(String jobId, Object object) {
+    // do nothing
   }
 
   @Override
   public <T extends IsRODAObject> void updateJobInformation(Plugin<T> plugin, JobPluginInfo jobPluginInfo)
     throws JobException {
+    // do nothing
   }
 
   @Override
   public <T extends IsRODAObject> void updateJob(Plugin<T> plugin, JobPartialUpdate partialUpdate) {
+    // do nothing
   }
 
   @Override
   public <T extends IsRODAObject> void runPluginOnAllObjects(Object context, Plugin<T> plugin, Class<T> objectClass) {
+    // do nothing
   }
 
   @Override
   public <T extends IsRODAObject> void runPluginOnObjects(Object context, Plugin<T> plugin, Class<T> objectClass,
     List<String> uuids) {
+    // do nothing
   }
 
   @Override
   public void setJobInError(String jobId) {
+    // do nothing
   }
 
 }

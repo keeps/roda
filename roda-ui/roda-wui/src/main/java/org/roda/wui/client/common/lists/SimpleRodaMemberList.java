@@ -96,7 +96,7 @@ public class SimpleRodaMemberList extends BasicAsyncTableCell<RODAMember> {
 
   @Override
   protected Sorter getSorter(ColumnSortList columnSortList) {
-    Map<Column<RODAMember, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<RODAMember, ?>, List<String>>();
+    Map<Column<RODAMember, ?>, List<String>> columnSortingKeyMap = new HashMap<>();
     columnSortingKeyMap.put(typeColumn, Arrays.asList(RodaConstants.MEMBERS_IS_USER));
     columnSortingKeyMap.put(idColumn, Arrays.asList(RodaConstants.MEMBERS_ID));
     columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.MEMBERS_NAME));

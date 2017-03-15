@@ -18,6 +18,7 @@ public class EmptyKeyFilterParameter extends FilterParameter {
    * Constructs an empty {@link BasicSearchFilterParameter}.
    */
   public EmptyKeyFilterParameter() {
+    // do nothing
   }
 
   public EmptyKeyFilterParameter(EmptyKeyFilterParameter emptyKeyFilterParameter) {

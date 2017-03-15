@@ -20,18 +20,19 @@ import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.testng.AssertJUnit;
 import org.testng.annotations.Test;
 
-@Test(groups = {"all", "travis"})
+@Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_TRAVIS})
 public class MetadataFileUtilsEscapeTest {
 
   @Test
   public void testEscape() throws GenericException {
     int total = (int) Math.pow(2, 20);
     StringBuilder temp = new StringBuilder();
-    Map<String, String> values = new HashMap<String, String>();
+    Map<String, String> values = new HashMap<>();
     for (int i = 0; i < total; i++) {
       char c = (char) i;
       temp.append(c);

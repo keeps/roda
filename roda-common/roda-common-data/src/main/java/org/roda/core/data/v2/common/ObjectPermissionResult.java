@@ -26,7 +26,7 @@ public class ObjectPermissionResult {
 
   public ObjectPermissionResult() {
     super();
-    objectPermissions = new ArrayList<ObjectPermission>();
+    objectPermissions = new ArrayList<>();
   }
 
   public ObjectPermissionResult(List<ObjectPermission> objectPermissions) {

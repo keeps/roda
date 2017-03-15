@@ -94,7 +94,7 @@ public class DigitalSignatureDIPPluginUtils {
 
   public static void addElementToRepresentationZip(ZipOutputStream zout, Path file, String name) throws IOException {
     ZipEntry entry = new ZipEntry(name);
-    try (InputStream in = new FileInputStream(file.toString())) {
+    try (InputStream in = Files.newInputStream(file)) {
       zout.putNextEntry(entry);
       byte[] data = IOUtils.toByteArray(in);
       zout.write(data);
@@ -122,7 +122,7 @@ public class DigitalSignatureDIPPluginUtils {
 
         // add representation zip
         ZipEntry zipEntry = new ZipEntry(input.toFile().getName());
-        try (InputStream in = new FileInputStream(input.toString())) {
+        try (InputStream in = Files.newInputStream(input)) {
           zout.putNextEntry(zipEntry);
           byte[] data = IOUtils.toByteArray(in);
           zout.write(data);
@@ -131,7 +131,7 @@ public class DigitalSignatureDIPPluginUtils {
 
         // add signature
         ZipEntry zipEntry2 = new ZipEntry(signatureTempFile.toFile().getName());
-        try (InputStream in2 = new FileInputStream(signatureTempFile.toString())) {
+        try (InputStream in2 = Files.newInputStream(signatureTempFile)) {
           zout.putNextEntry(zipEntry2);
           byte[] data2 = IOUtils.toByteArray(in2);
           zout.write(data2);

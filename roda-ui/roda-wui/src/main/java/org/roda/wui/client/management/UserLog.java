@@ -71,10 +71,12 @@ public class UserLog extends Composite {
       UserLogin.getInstance().checkRoles(new HistoryResolver[] {UserLog.RESOLVER}, false, callback);
     }
 
+    @Override
     public List<String> getHistoryPath() {
       return ListUtils.concat(Management.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
+    @Override
     public String getHistoryToken() {
       return "log";
     }

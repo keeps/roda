@@ -99,7 +99,6 @@ public class DIPList extends BasicAsyncTableCell<IndexedDIP> {
     // define default sorting
     display.getColumnSortList().push(new ColumnSortInfo(titleColumn, true));
 
-    // display.setColumnWidth(titleColumn, 7.0, Unit.EM);
     display.setColumnWidth(dateCreated, 13.0, Unit.EM);
     display.setColumnWidth(lastModified, 13.0, Unit.EM);
 
@@ -112,7 +111,7 @@ public class DIPList extends BasicAsyncTableCell<IndexedDIP> {
 
   @Override
   protected Sorter getSorter(ColumnSortList columnSortList) {
-    Map<Column<IndexedDIP, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<IndexedDIP, ?>, List<String>>();
+    Map<Column<IndexedDIP, ?>, List<String>> columnSortingKeyMap = new HashMap<>();
     // setting secondary sorter to title
     columnSortingKeyMap.put(titleColumn, Arrays.asList(RodaConstants.DIP_TITLE));
     columnSortingKeyMap.put(dateCreated, Arrays.asList(RodaConstants.DIP_DATE_CREATED));

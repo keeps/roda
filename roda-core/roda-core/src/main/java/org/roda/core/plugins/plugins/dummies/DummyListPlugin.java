@@ -82,7 +82,7 @@ public class DummyListPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
 
   @Override
   public Plugin<T> cloneMe() {
-    return new DummyListPlugin<T>();
+    return new DummyListPlugin<>();
   }
 
   @Override
@@ -147,7 +147,6 @@ public class DummyListPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
     list.add(Format.class);
     list.add(RiskIncidence.class);
     list.add(RODAMember.class);
-    // list.add(LogEntry.class);
     list.add(PreservationMetadata.class);
     list.add(DescriptiveMetadata.class);
     list.add(DIP.class);

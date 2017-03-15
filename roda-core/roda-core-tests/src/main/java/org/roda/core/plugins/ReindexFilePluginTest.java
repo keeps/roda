@@ -12,6 +12,7 @@ import java.util.UUID;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -41,8 +42,6 @@ public class ReindexFilePluginTest {
   private static ModelService model;
   private static IndexService index;
 
-  private static String aipCreator = "admin";
-
   @BeforeClass
   public void setUp() throws Exception {
     basePath = TestsHelper.createBaseTempDir(getClass(), true);
@@ -70,7 +69,7 @@ public class ReindexFilePluginTest {
   @Test
   public void testReindexWithEmptyRepresentation() throws RequestNotValidException, NotFoundException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException {
-    AIP aip = model.createAIP(null, "", new Permissions(), aipCreator);
+    AIP aip = model.createAIP(null, "", new Permissions(), RodaConstants.ADMIN);
     model.createRepresentation(aip.getId(), UUID.randomUUID().toString(), true, "", true);
     Job job = TestsHelper.executeJob(ReindexFilePlugin.class, PluginType.MISC, SelectedItemsAll.create(File.class));
     TestsHelper.getJobReports(index, job, true);

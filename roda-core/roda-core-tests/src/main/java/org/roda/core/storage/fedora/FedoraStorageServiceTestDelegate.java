@@ -42,6 +42,20 @@ import org.testng.annotations.Test;
 @Test(enabled = false)
 public class FedoraStorageServiceTestDelegate extends AbstractStorageServiceTest<FedoraStorageService> {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(FedoraStorageServiceTest.class);
+
+  private static final String PROTOCOL = "http";
+  private static final String HOSTNAME = "localhost";
+  private static final int SERVER_PORT = determineOpenDoorAndSetFedoraProperty(9999);
+  private static final String SERVER_ADDRESS = PROTOCOL + "://" + HOSTNAME + ":" + SERVER_PORT + "/";
+
+  private final FedoraStorageService storage = new FedoraStorageService(SERVER_ADDRESS);
+
+  @Override
+  protected FedoraStorageService getStorage() {
+    return storage;
+  }
+
   public static int determineOpenDoorAndSetFedoraProperty(int defaultDoor) {
     int openDoor = defaultDoor;
     try {
@@ -53,20 +67,6 @@ public class FedoraStorageServiceTestDelegate extends AbstractStorageServiceTest
     }
     System.setProperty("fcrepo.dynamic.test.port", Integer.toString(openDoor));
     return openDoor;
-  }
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(FedoraStorageServiceTest.class);
-
-  private static final String PROTOCOL = "http";
-  private static final String HOSTNAME = "localhost";
-  private static final int SERVER_PORT = determineOpenDoorAndSetFedoraProperty(9999);
-  private static final String serverAddress = PROTOCOL + "://" + HOSTNAME + ":" + SERVER_PORT + "/";
-
-  private final FedoraStorageService storage = new FedoraStorageService(serverAddress);
-
-  @Override
-  protected FedoraStorageService getStorage() {
-    return storage;
   }
 
   @Override
@@ -84,7 +84,7 @@ public class FedoraStorageServiceTestDelegate extends AbstractStorageServiceTest
   public void testClassInstantiation() throws RODAException {
     final HttpClient client = HttpClientBuilder.create().setMaxConnPerRoute(Integer.MAX_VALUE)
       .setMaxConnTotal(Integer.MAX_VALUE).build();
-    final HttpGet request = new HttpGet(serverAddress);
+    final HttpGet request = new HttpGet(SERVER_ADDRESS);
     HttpResponse response;
     try {
       response = client.execute(request);
@@ -94,66 +94,79 @@ public class FedoraStorageServiceTestDelegate extends AbstractStorageServiceTest
     }
   }
 
+  @Override
   @Test(enabled = false)
   public void testListContainer() throws RODAException {
     super.testListContainer();
   }
 
+  @Override
   @Test(enabled = false)
   public void testCreateGetDeleteContainer() throws RODAException {
     super.testCreateGetDeleteContainer();
   }
 
+  @Override
   @Test(enabled = false)
   public void testGetContainerThatDoesntExist() throws RODAException {
     super.testGetContainerThatDoesntExist();
   }
 
+  @Override
   @Test(enabled = false)
   public void testGetContainerThatIsActuallyADirectory() throws RODAException {
     super.testGetContainerThatIsActuallyADirectory();
   }
 
+  @Override
   @Test(enabled = false)
   public void testGetContainerThatIsActuallyABinary() throws RODAException {
     super.testGetContainerThatIsActuallyABinary();
   }
 
+  @Override
   @Test(enabled = false)
   public void testDeleteContainerThatDoesntExist() throws RODAException {
     super.testDeleteContainerThatDoesntExist();
   }
 
+  @Override
   @Test(enabled = false)
   public void testDeleteNonEmptyContainer() throws RODAException {
     super.testDeleteNonEmptyContainer();
   }
 
+  @Override
   @Test(enabled = false)
   public void testListResourcesUnderContainer() throws RODAException {
     super.testListResourcesUnderContainer();
   }
 
+  @Override
   @Test(enabled = false)
   public void testCreateGetDeleteDirectory() throws RODAException {
     super.testCreateGetDeleteDirectory();
   }
 
+  @Override
   @Test(enabled = false)
   public void testGetDirectoryThatDoesntExist() throws RODAException {
     super.testGetDirectoryThatDoesntExist();
   }
 
+  @Override
   @Test(enabled = false)
   public void testGetDirectoryThatIsActuallyABinary() throws RODAException {
     super.testGetDirectoryThatIsActuallyABinary();
   }
 
+  @Override
   @Test(enabled = false)
   public void testGetDirectoryThatIsActuallyAContainer() throws RODAException {
     super.testGetDirectoryThatIsActuallyAContainer();
   }
 
+  @Override
   @Test(enabled = false)
   public void testListResourcesUnderDirectory() throws RODAException, IOException {
     super.testListResourcesUnderDirectory();
@@ -186,8 +199,7 @@ public class FedoraStorageServiceTestDelegate extends AbstractStorageServiceTest
     try {
       getStorage().createBinary(binaryStoragePath, payload, false);
       // fail("An exception should have been thrown while creating a binary
-      // that
-      // already exists but it didn't happened!");
+      // that already exists but it didn't happened!");
     } catch (AlreadyExistsException e) {
       // do nothing
       Assert.fail("Fedora did not support this, change this test when it starts to support it");
@@ -206,7 +218,7 @@ public class FedoraStorageServiceTestDelegate extends AbstractStorageServiceTest
     }
 
     // 6) Versionning
-    Map<String, String> properties = new HashMap<String, String>();
+    Map<String, String> properties = new HashMap<>();
     properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATED.toString());
 
     final StoragePath binaryStoragePathVersionning = StorageTestUtils
@@ -240,71 +252,85 @@ public class FedoraStorageServiceTestDelegate extends AbstractStorageServiceTest
     getStorage().deleteContainer(containerStoragePath);
   }
 
+  @Override
   @Test(enabled = false)
   public void testCreateGetDeleteBinaryAsReference() throws RODAException, IOException {
     super.testCreateGetDeleteBinaryAsReference();
   }
 
+  @Override
   @Test(enabled = false)
   public void testUpdateBinaryContent() throws RODAException, IOException {
     super.testUpdateBinaryContent();
   }
 
+  @Override
   @Test(enabled = false)
   public void testUpdateBinaryThatDoesntExist() throws RODAException, IOException {
     super.testUpdateBinaryThatDoesntExist();
   }
 
+  @Override
   @Test(enabled = false)
   public void testGetBinaryThatDoesntExist() throws RODAException {
     super.testGetBinaryThatDoesntExist();
   }
 
+  @Override
   @Test(enabled = false)
   public void testGetBinaryThatIsActuallyADirectory() throws RODAException {
     super.testGetBinaryThatIsActuallyADirectory();
   }
 
+  @Override
   @Test(enabled = false)
   public void testGetBinaryThatIsActuallyAContainer() throws RODAException {
     super.testGetBinaryThatIsActuallyAContainer();
   }
 
+  @Override
   @Test(enabled = false)
   public void testDeleteNonEmptyDirectory() throws RODAException {
     super.testDeleteNonEmptyDirectory();
   }
 
+  @Override
   @Test(enabled = false)
   public void testCopyContainerToSameStorage() throws RODAException, IOException {
     super.testCopyContainerToSameStorage();
   }
 
+  @Override
   @Test(enabled = false)
   public void testCopyDirectoryToSameStorage() throws RODAException, IOException {
     super.testCopyDirectoryToSameStorage();
   }
 
+  @Override
   @Test(enabled = false)
   public void testCopyBinaryToSameStorage() throws RODAException, IOException {
     super.testCopyBinaryToSameStorage();
   }
 
+  @Override
   @Test(enabled = false)
   public void testMoveContainerToSameStorage() throws RODAException, IOException {
     super.testMoveContainerToSameStorage();
   }
 
+  @Override
   @Test(enabled = false)
   public void testMoveDirectoryToSameStorage() throws RODAException, IOException {
     super.testMoveDirectoryToSameStorage();
   }
 
+  @Override
   @Test(enabled = false)
   public void testMoveBinaryToSameStorage() throws RODAException, IOException {
     super.testMoveBinaryToSameStorage();
   }
 
+  @Override
   @Test(enabled = false)
   public void testBinaryVersions() throws RODAException, IOException {
     super.testBinaryVersions();

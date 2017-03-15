@@ -50,9 +50,9 @@ import config.i18n.client.ClientMessages;
 public class Main extends Composite implements EntryPoint {
 
   private ClientLogger logger = new ClientLogger(getClass().getName());
-
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
+  @Override
   public void onModuleLoad() {
 
     // Set uncaught exception handler
@@ -76,6 +76,7 @@ public class Main extends Composite implements EntryPoint {
     // deferred call to init
     Scheduler.get().scheduleDeferred(new Command() {
 
+      @Override
       public void execute() {
         DescriptionLevelUtils.load(new AsyncCallback<Void>() {
 
@@ -157,6 +158,7 @@ public class Main extends Composite implements EntryPoint {
 
     homeLinkArea.addClickHandler(new ClickHandler() {
 
+      @Override
       public void onClick(ClickEvent event) {
         HistoryUtils.newHistory(Welcome.RESOLVER);
       }

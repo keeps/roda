@@ -43,10 +43,6 @@ public class Master extends UntypedPersistentActor {
 
   public static final String RESULTS_TOPIC = "results";
 
-  public static Props props(FiniteDuration workTimeout) {
-    return Props.create(Master.class, workTimeout);
-  }
-
   private final FiniteDuration workTimeout;
   private final ActorRef mediator = DistributedPubSub.get(getContext().system()).mediator();
   private final LoggingAdapter log = Logging.getLogger(getContext().system(), this);
@@ -60,6 +56,10 @@ public class Master extends UntypedPersistentActor {
     ClusterClientReceptionist.get(getContext().system()).registerService(getSelf());
     this.cleanupTask = getContext().system().scheduler().schedule(workTimeout.div(2), workTimeout.div(2), getSelf(),
       CleanupTick, getContext().dispatcher(), getSelf());
+  }
+
+  public static Props props(FiniteDuration workTimeout) {
+    return Props.create(Master.class, workTimeout);
   }
 
   @Override
@@ -287,6 +287,7 @@ public class Master extends UntypedPersistentActor {
         if (state != null && state.status.isIdle()) {
           final Work work = workState.nextWork();
           persist(new WorkState.WorkStarted(work.workId), new Procedure<WorkState.WorkStarted>() {
+            @Override
             public void apply(WorkStarted event) throws Exception {
               workState = workState.updated(event);
               log.info("Giving worker {} some work {}", workerId, event.workId);
@@ -309,6 +310,7 @@ public class Master extends UntypedPersistentActor {
         changeWorkerToIdle(workerId, workId);
         persist(new WorkState.WorkCompleted(workId, ((WorkIsDone) cmd).result),
           new Procedure<WorkState.WorkCompleted>() {
+            @Override
             public void apply(WorkCompleted event) throws Exception {
               workState = workState.updated(event);
               mediator.tell(
@@ -325,6 +327,7 @@ public class Master extends UntypedPersistentActor {
         log.info("Work {} failed by worker {}", workId, workerId);
         changeWorkerToIdle(workerId, workId);
         persist(new WorkState.WorkerFailed(workId), new Procedure<WorkState.WorkerFailed>() {
+          @Override
           public void apply(WorkerFailed event) throws Exception {
             workState = workState.updated(event);
             notifyWorkers();
@@ -339,6 +342,7 @@ public class Master extends UntypedPersistentActor {
       } else {
         log.info("Accepted work: {}", workId);
         persist(new WorkState.WorkAccepted((Work) cmd), new Procedure<WorkState.WorkAccepted>() {
+          @Override
           public void apply(WorkAccepted event) throws Exception {
             // Ack back to original sender
             getSender().tell(new Ack(event.work.workId), getSelf());
@@ -358,6 +362,7 @@ public class Master extends UntypedPersistentActor {
             log.info("Work timed out: {}", state.status.getWorkId());
             workers.remove(workerId);
             persist(new WorkState.WorkerTimedOut(state.status.getWorkId()), new Procedure<WorkState.WorkerTimedOut>() {
+              @Override
               public void apply(WorkerTimedOut event) throws Exception {
                 workState = workState.updated(event);
                 notifyWorkers();

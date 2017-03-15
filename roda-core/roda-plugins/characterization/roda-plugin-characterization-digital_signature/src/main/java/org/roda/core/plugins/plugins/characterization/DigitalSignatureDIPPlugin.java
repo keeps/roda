@@ -66,7 +66,7 @@ import com.itextpdf.text.DocumentException;
 
 public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractAIPComponentsPlugin<T> {
 
-  private static Logger LOGGER = LoggerFactory.getLogger(DigitalSignatureDIPPlugin.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DigitalSignatureDIPPlugin.class);
   private boolean doEmbeddedSignature;
 
   public DigitalSignatureDIPPlugin() {
@@ -119,6 +119,7 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractA
     return "Digital signed dissemination of a file, possibly embedded";
   }
 
+  @Override
   public Report executeOnAIP(IndexService index, ModelService model, StorageService storage, Report report,
     SimpleJobPluginInfo jobPluginInfo, List<AIP> list, Job job) throws PluginException {
 
@@ -193,6 +194,7 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractA
     return report;
   }
 
+  @Override
   public Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage, Report report,
     SimpleJobPluginInfo jobPluginInfo, List<Representation> list, Job job) throws PluginException {
 
@@ -258,6 +260,7 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractA
     return report;
   }
 
+  @Override
   public Report executeOnFile(IndexService index, ModelService model, StorageService storage, Report report,
     SimpleJobPluginInfo jobPluginInfo, List<File> list, Job job) throws PluginException {
 

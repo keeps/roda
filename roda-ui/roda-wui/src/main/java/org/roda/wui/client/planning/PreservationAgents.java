@@ -69,10 +69,12 @@ public class PreservationAgents extends Composite {
       UserLogin.getInstance().checkRole(this, callback);
     }
 
+    @Override
     public List<String> getHistoryPath() {
       return ListUtils.concat(Planning.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
+    @Override
     public String getHistoryToken() {
       return "agents";
     }

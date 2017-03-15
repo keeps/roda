@@ -24,5 +24,4 @@ public class LongRangeFilterParameter extends RangeFilterParameter<Long> {
   public LongRangeFilterParameter(String name, Long fromValue, Long toValue) {
     super(name, fromValue, toValue);
   }
-
 }

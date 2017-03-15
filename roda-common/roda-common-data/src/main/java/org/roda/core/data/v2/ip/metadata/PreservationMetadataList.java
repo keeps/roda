@@ -43,12 +43,14 @@ public class PreservationMetadataList implements RODAObjectList<PreservationMeta
     this.metadataList = preservationMetadataList;
   }
 
+  @Override
   @JsonProperty(value = RodaConstants.RODA_OBJECT_PRESERVATION_METADATA_LIST)
   @XmlElement(name = RodaConstants.RODA_OBJECT_PRESERVATION_METADATA)
   public List<PreservationMetadata> getObjects() {
     return metadataList;
   }
 
+  @Override
   public void setObjects(List<PreservationMetadata> preservationMetadataList) {
     this.metadataList = preservationMetadataList;
   }

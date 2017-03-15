@@ -32,7 +32,7 @@ public class PluginThatFailsDuringXMethod extends AbstractPlugin<Void> {
   private static final Logger LOGGER = LoggerFactory.getLogger(PluginThatFailsDuringXMethod.class);
 
   public static final String BEFORE_ALL_EXECUTE = "beforeAllExecute";
-  public static final String EXECUTE = "execute";
+  public static final String ON_EXECUTE = "execute";
   public static final String AFTER_ALL_EXECUTE = "afterAllExecute";
 
   @Override
@@ -111,7 +111,7 @@ public class PluginThatFailsDuringXMethod extends AbstractPlugin<Void> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> list) throws PluginException {
-    if (getParameterValues().get(EXECUTE) != null) {
+    if (getParameterValues().get(ON_EXECUTE) != null) {
       // 20170123 hsilva: must test an exception that extend Throwable (besides
       // the ones that extend RuntimeException)
       throw new Error();

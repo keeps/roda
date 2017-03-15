@@ -54,7 +54,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-@Test(groups = {"all", "travis"})
+@Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_TRAVIS})
 public class SolrUtilsTest {
 
   private static StorageService corporaService;
@@ -104,9 +104,12 @@ public class SolrUtilsTest {
   public void testParseFilter() {
     Filter filter = null;
     String stringFilter = null;
-    String fonds = "fonds", series = "series", fondsOrSeries = fonds + " " + series;
+    String fonds = "fonds";
+    String series = "series";
+    String fondsOrSeries = fonds + " " + series;
     List<String> oneOfManyValues = Arrays.asList(fonds, series);
-    Long from = 1L, to = 5L;
+    Long from = 1L;
+    Long to = 5L;
 
     // 1) null filter
     try {
@@ -259,7 +262,8 @@ public class SolrUtilsTest {
   public void testParseSorter() {
     Sorter sorter = null;
     List<SortClause> sortList;
-    String field1 = "field1", field2 = "field2";
+    String field1 = "field1";
+    String field2 = "field2";
     boolean descending = true;
     boolean ascending = false;
 

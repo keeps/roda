@@ -20,8 +20,8 @@ import org.roda.core.plugins.orchestrate.JobPluginInfo;
 
 public abstract class AbstractPlugin<T extends IsRODAObject> implements Plugin<T> {
 
-  private List<PluginParameter> parameters = new ArrayList<PluginParameter>();
-  private Map<String, String> parameterValues = new HashMap<String, String>();
+  private List<PluginParameter> parameters = new ArrayList<>();
+  private Map<String, String> parameterValues = new HashMap<>();
   private String version = null;
   private JobPluginInfo jobPluginInfo;
 

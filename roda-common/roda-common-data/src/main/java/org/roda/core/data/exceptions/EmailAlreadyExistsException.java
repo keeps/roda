@@ -19,6 +19,7 @@ public class EmailAlreadyExistsException extends AlreadyExistsException {
    * Constructs a new {@link EmailAlreadyExistsException}.
    */
   public EmailAlreadyExistsException() {
+    // do nothing
   }
 
   /**

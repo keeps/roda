@@ -65,7 +65,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-@Test(groups = {"all", "travis"})
+@Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_TRAVIS})
 public class ReplicationPluginTest {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ReplicationPluginTest.class);

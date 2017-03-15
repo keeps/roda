@@ -51,6 +51,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
 
   @Override
   public void init() throws PluginException {
+    // do nothing
   }
 
   @Override
@@ -89,6 +90,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
     super.setParameterValues(parameters);
   }
 
+  @Override
   public Report executeOnAIP(IndexService index, ModelService model, StorageService storage, Report report,
     SimpleJobPluginInfo jobPluginInfo, List<AIP> list, Job job) throws PluginException {
 
@@ -135,6 +137,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
     return report;
   }
 
+  @Override
   public Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage, Report report,
     SimpleJobPluginInfo jobPluginInfo, List<Representation> list, Job job) throws PluginException {
 
@@ -173,6 +176,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
     return report;
   }
 
+  @Override
   public Report executeOnFile(IndexService index, ModelService model, StorageService storage, Report report,
     SimpleJobPluginInfo jobPluginInfo, List<File> list, Job job) throws PluginException {
 
@@ -211,7 +215,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
 
   @Override
   public Plugin<T> cloneMe() {
-    return new PremisSkeletonPlugin<T>();
+    return new PremisSkeletonPlugin<>();
   }
 
   @Override

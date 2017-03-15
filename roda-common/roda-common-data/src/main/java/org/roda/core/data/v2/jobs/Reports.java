@@ -38,6 +38,7 @@ public class Reports implements RODAObjectList<Report> {
     this.reportList = reports;
   }
 
+  @Override
   @JsonProperty(value = RodaConstants.RODA_OBJECT_REPORTS)
   @XmlElement(name = RodaConstants.RODA_OBJECT_REPORT)
   public List<Report> getObjects() {

@@ -18,8 +18,8 @@ import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -44,8 +44,7 @@ public class CreateUser extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      User user = new User();
-      CreateUser createUser = new CreateUser(user);
+      CreateUser createUser = new CreateUser(new User());
       callback.onSuccess(createUser);
     }
 
@@ -54,10 +53,12 @@ public class CreateUser extends Composite {
       UserLogin.getInstance().checkRoles(new HistoryResolver[] {MemberManagement.RESOLVER}, false, callback);
     }
 
+    @Override
     public List<String> getHistoryPath() {
       return ListUtils.concat(MemberManagement.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
+    @Override
     public String getHistoryToken() {
       return "create_user";
     }
@@ -95,7 +96,7 @@ public class CreateUser extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
   }
-  
+
   @Override
   protected void onLoad() {
     super.onLoad();
@@ -111,10 +112,12 @@ public class CreateUser extends Composite {
       UserManagementService.Util.getInstance().createUser(user, password, userDataPanel.getExtra(),
         new AsyncCallback<User>() {
 
+          @Override
           public void onFailure(Throwable caught) {
             errorMessage(caught);
           }
 
+          @Override
           public void onSuccess(User createdUser) {
             HistoryUtils.newHistory(MemberManagement.RESOLVER);
           }

@@ -200,6 +200,7 @@ public class LogEntry implements IsModelObject, IsIndexed {
   /**
    * @return the id
    */
+  @Override
   public String getId() {
     return id;
   }

@@ -123,17 +123,15 @@ public class TransferredResourceList extends BasicAsyncTableCell<TransferredReso
     addColumn(creationDateColumn, messages.transferredResourceDateCreated(), true, true, 11);
 
     addStyleName("my-list-transferredResource");
-
   }
 
   @Override
   protected Sorter getSorter(ColumnSortList columnSortList) {
-    Map<Column<TransferredResource, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<TransferredResource, ?>, List<String>>();
+    Map<Column<TransferredResource, ?>, List<String>> columnSortingKeyMap = new HashMap<>();
     columnSortingKeyMap.put(isFileColumn, Arrays.asList(RodaConstants.TRANSFERRED_RESOURCE_ISFILE));
     columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.TRANSFERRED_RESOURCE_NAME));
     columnSortingKeyMap.put(sizeColumn, Arrays.asList(RodaConstants.TRANSFERRED_RESOURCE_SIZE));
     columnSortingKeyMap.put(creationDateColumn, Arrays.asList(RodaConstants.TRANSFERRED_RESOURCE_DATE));
-
     return createSorter(columnSortList, columnSortingKeyMap);
   }
 

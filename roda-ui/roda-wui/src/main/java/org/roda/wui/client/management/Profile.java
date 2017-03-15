@@ -47,10 +47,12 @@ public class Profile extends Composite {
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<User>() {
 
+        @Override
         public void onFailure(Throwable caught) {
           callback.onFailure(caught);
         }
 
+        @Override
         public void onSuccess(User user) {
           Profile preferences = new Profile(new User(user));
           callback.onSuccess(preferences);
@@ -63,20 +65,24 @@ public class Profile extends Composite {
     public void isCurrentUserPermitted(final AsyncCallback<Boolean> callback) {
       UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<User>() {
 
+        @Override
         public void onFailure(Throwable caught) {
           callback.onFailure(caught);
         }
 
+        @Override
         public void onSuccess(User user) {
           callback.onSuccess(!user.isGuest());
         }
       });
     }
 
+    @Override
     public List<String> getHistoryPath() {
       return Arrays.asList(getHistoryToken());
     }
 
+    @Override
     public String getHistoryToken() {
       return "profile";
     }
@@ -133,10 +139,12 @@ public class Profile extends Composite {
         UserManagementService.Util.getInstance().updateMyUser(user, password, userDataPanel.getExtra(),
           new AsyncCallback<Void>() {
 
+            @Override
             public void onFailure(Throwable caught) {
               errorMessage(caught);
             }
 
+            @Override
             public void onSuccess(Void result) {
               UserLogin.getInstance().updateLoggedUser(user);
               HistoryUtils.newHistory(Welcome.RESOLVER);

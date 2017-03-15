@@ -102,6 +102,7 @@ public class CasApiAuthFilter implements Filter {
 
   @Override
   public void destroy() {
+    // do nothing
   }
 
   private void doFilterWithTGT(final HttpServletRequest request, final HttpServletResponse response,

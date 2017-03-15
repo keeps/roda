@@ -154,7 +154,7 @@ public class RodaUtils {
       return null;
     }
     Map<?, ?> map = (Map<?, ?>) object;
-    Map<String, Object> temp = new HashMap<String, Object>();
+    Map<String, Object> temp = new HashMap<>();
     for (Map.Entry<?, ?> entry : map.entrySet()) {
       if (entry.getKey() instanceof String) {
         temp.put((String) entry.getKey(), entry.getValue());
@@ -167,17 +167,17 @@ public class RodaUtils {
 
   public static List<String> copyList(Object object) {
     if (!(object instanceof List)) {
-      return new ArrayList<String>();
+      return new ArrayList<>();
     }
     List<?> list = (List<?>) object;
-    List<String> temp = new ArrayList<String>();
+    List<String> temp = new ArrayList<>();
     for (Object ob : list) {
       if (ob instanceof String) {
         temp.add((String) ob);
       } else if (ob == null) {
         temp.add(null);
       } else {
-        return new ArrayList<String>();
+        return new ArrayList<>();
       }
     }
     return temp;

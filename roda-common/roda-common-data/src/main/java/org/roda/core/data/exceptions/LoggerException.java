@@ -19,6 +19,7 @@ public class LoggerException extends RODAException {
    * Constructs a new {@link LoggerException}.
    */
   public LoggerException() {
+    // do nothing
   }
 
   /**

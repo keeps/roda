@@ -16,8 +16,8 @@ import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.ListUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -35,8 +35,7 @@ public class CreateFormat extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      Format format = new Format();
-      CreateFormat createFormat = new CreateFormat(format);
+      CreateFormat createFormat = new CreateFormat(new Format());
       callback.onSuccess(createFormat);
     }
 
@@ -45,10 +44,12 @@ public class CreateFormat extends Composite {
       UserLogin.getInstance().checkRoles(new HistoryResolver[] {MemberManagement.RESOLVER}, false, callback);
     }
 
+    @Override
     public List<String> getHistoryPath() {
       return ListUtils.concat(FormatRegister.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
+    @Override
     public String getHistoryToken() {
       return "create_format";
     }
@@ -80,7 +81,7 @@ public class CreateFormat extends Composite {
     this.formatDataPanel = new FormatDataPanel(true, false, format);
     initWidget(uiBinder.createAndBindUi(this));
   }
-  
+
   @Override
   protected void onLoad() {
     super.onLoad();
@@ -93,6 +94,7 @@ public class CreateFormat extends Composite {
       format = formatDataPanel.getFormat();
       BrowserService.Util.getInstance().createFormat(format, new AsyncCallback<Format>() {
 
+        @Override
         public void onFailure(Throwable caught) {
           AsyncCallbackUtils.defaultFailureTreatment(caught);
         }

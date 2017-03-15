@@ -122,10 +122,7 @@ public class Group extends RodaPrincipal {
     if (this == obj) {
       return true;
     }
-    if (!super.equals(obj)) {
-      return false;
-    }
-    if (obj == null) {
+    if (obj == null || !super.equals(obj)) {
       return false;
     }
     if (getClass() != obj.getClass()) {

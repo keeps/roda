@@ -18,7 +18,13 @@ import org.roda.core.data.v2.ip.StoragePath;
 
 public class DefaultStoragePath implements StoragePath {
 
+  private static final long serialVersionUID = 2199265942023315218L;
   private final List<String> path;
+
+  private DefaultStoragePath(List<String> path) {
+    super();
+    this.path = path;
+  }
 
   public static DefaultStoragePath parse(String... pathPartials) throws RequestNotValidException {
     return parse(Arrays.asList(pathPartials));
@@ -48,11 +54,6 @@ public class DefaultStoragePath implements StoragePath {
     return path != null && !path.isEmpty();
   }
 
-  private DefaultStoragePath(List<String> path) {
-    super();
-    this.path = path;
-  }
-
   @Override
   public String getContainerName() {
     return path.get(0);
@@ -60,12 +61,12 @@ public class DefaultStoragePath implements StoragePath {
 
   @Override
   public List<String> getDirectoryPath() {
-    List<String> directoryPath = new ArrayList<String>(path);
+    List<String> directoryPath = new ArrayList<>(path);
     if (directoryPath.size() > 2) {
       directoryPath = directoryPath.subList(1, directoryPath.size() - 1);
       return directoryPath;
     } else {
-      return new ArrayList<String>();
+      return new ArrayList<>();
     }
   }
 

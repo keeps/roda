@@ -90,10 +90,12 @@ public class VerifyEmail extends Composite {
       });
     }
 
+    @Override
     public List<String> getHistoryPath() {
       return Arrays.asList(getHistoryToken());
     }
 
+    @Override
     public String getHistoryToken() {
       return "verifyemail";
     }

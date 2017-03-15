@@ -28,6 +28,7 @@ public class Frontend extends UntypedActor {
   private ActorRef masterProxy = getContext().actorOf(ClusterSingletonProxy.props("/user/master",
     ClusterSingletonProxySettings.create(getContext().system()).withRole("backend")), "masterProxy");
 
+  @Override
   public void onReceive(Object message) {
 
     Timeout timeout = new Timeout(5, TimeUnit.SECONDS);

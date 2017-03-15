@@ -123,7 +123,7 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractAIPComponents
 
   @Override
   public List<PluginParameter> getParameters() {
-    ArrayList<PluginParameter> parameters = new ArrayList<PluginParameter>();
+    ArrayList<PluginParameter> parameters = new ArrayList<>();
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_PDF_PROFILE));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES));
     return parameters;
@@ -142,6 +142,7 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractAIPComponents
     }
   }
 
+  @Override
   public Report executeOnAIP(IndexService index, ModelService model, StorageService storage, Report report,
     SimpleJobPluginInfo jobPluginInfo, List<AIP> list, Job job) throws PluginException {
 
@@ -155,8 +156,8 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractAIPComponents
       ValidationReport validationReport = new ValidationReport();
       ValidationReport metadataReport = new ValidationReport();
       boolean hasNonPdfFiles = false;
-      List<File> failedList = new ArrayList<File>();
-      List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
+      List<File> failedList = new ArrayList<>();
+      List<LinkingIdentifier> sources = new ArrayList<>();
 
       for (Representation representation : aip.getRepresentations()) {
         try {
@@ -266,13 +267,14 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractAIPComponents
     return report;
   }
 
+  @Override
   public Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage, Report report,
     SimpleJobPluginInfo jobPluginInfo, List<Representation> list, Job job) throws PluginException {
 
     try {
       for (Representation representation : list) {
-        List<File> failedList = new ArrayList<File>();
-        List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
+        List<File> failedList = new ArrayList<>();
+        List<LinkingIdentifier> sources = new ArrayList<>();
 
         Report reportItem = PluginHelper
           .initPluginReportItem(this, IdUtils.getRepresentationId(representation), Representation.class)
@@ -395,6 +397,7 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractAIPComponents
     return report;
   }
 
+  @Override
   public Report executeOnFile(IndexService index, ModelService model, StorageService storage, Report report,
     SimpleJobPluginInfo jobPluginInfo, List<File> list, Job job) throws PluginException {
 
@@ -407,7 +410,7 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractAIPComponents
       ValidationReport metadataReport = new ValidationReport();
 
       try {
-        List<File> failedList = new ArrayList<File>();
+        List<File> failedList = new ArrayList<>();
         PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
         PluginState pluginResultState = PluginState.SUCCESS;
 
@@ -544,7 +547,7 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractAIPComponents
 
   @Override
   public Plugin<T> cloneMe() {
-    return new VeraPDFPlugin<T>();
+    return new VeraPDFPlugin<>();
   }
 
   @Override

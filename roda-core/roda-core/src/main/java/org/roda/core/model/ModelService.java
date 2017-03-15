@@ -1027,14 +1027,11 @@ public class ModelService extends ModelObservable {
   public File createFile(String aipId, String representationId, List<String> directoryPath, String fileId,
     ContentPayload contentPayload, boolean notify) throws RequestNotValidException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
-    File file;
-
     boolean asReference = false;
-
     StoragePath filePath = ModelUtils.getFileStoragePath(aipId, representationId, directoryPath, fileId);
 
     final Binary createdBinary = storage.createBinary(filePath, contentPayload, asReference);
-    file = ResourceParseUtils.convertResourceToFile(createdBinary);
+    File file = ResourceParseUtils.convertResourceToFile(createdBinary);
 
     if (notify) {
       notifyFileCreated(file);
@@ -1061,14 +1058,12 @@ public class ModelService extends ModelObservable {
   public File updateFile(String aipId, String representationId, List<String> directoryPath, String fileId,
     ContentPayload contentPayload, boolean createIfNotExists, boolean notify)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    File file;
     boolean asReference = false;
-
     StoragePath filePath = ModelUtils.getFileStoragePath(aipId, representationId, directoryPath, fileId);
 
     storage.updateBinaryContent(filePath, contentPayload, asReference, createIfNotExists);
     Binary binaryUpdated = storage.getBinary(filePath);
-    file = ResourceParseUtils.convertResourceToFile(binaryUpdated);
+    File file = ResourceParseUtils.convertResourceToFile(binaryUpdated);
 
     if (notify) {
       notifyFileUpdated(file);
@@ -1518,12 +1513,11 @@ public class ModelService extends ModelObservable {
   public OtherMetadata createOrUpdateOtherMetadata(String aipId, String representationId,
     List<String> fileDirectoryPath, String fileId, String fileSuffix, String type, ContentPayload payload,
     boolean notify) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    OtherMetadata om;
-
     StoragePath binaryPath = ModelUtils.getOtherMetadataStoragePath(aipId, representationId, fileDirectoryPath, fileId,
       fileSuffix, type);
     boolean asReference = false;
     boolean createIfNotExists = true;
+
     try {
       storage.createBinary(binaryPath, payload, asReference);
     } catch (AlreadyExistsException e) {
@@ -1531,7 +1525,7 @@ public class ModelService extends ModelObservable {
     }
 
     String id = IdUtils.getOtherMetadataId(type, aipId, representationId, fileDirectoryPath, fileId);
-    om = new OtherMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, fileSuffix);
+    OtherMetadata om = new OtherMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, fileSuffix);
 
     if (notify) {
       notifyOtherMetadataCreated(om);

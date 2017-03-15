@@ -128,7 +128,7 @@ public class ShowJob extends Composite {
 
             @Override
             public void onSuccess(JobBundle jobBundle) {
-              Map<String, PluginInfo> pluginsInfo = new HashMap<String, PluginInfo>();
+              Map<String, PluginInfo> pluginsInfo = new HashMap<>();
               for (PluginInfo pluginInfo : jobBundle.getPluginsInfo()) {
                 pluginsInfo.put(pluginInfo.getId(), pluginInfo);
               }

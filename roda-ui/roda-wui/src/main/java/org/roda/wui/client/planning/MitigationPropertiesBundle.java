@@ -22,8 +22,8 @@ public class MitigationPropertiesBundle implements Serializable {
   private int severityHighLimit;
 
   public MitigationPropertiesBundle() {
-    probabilities = new ArrayList<String>();
-    impacts = new ArrayList<String>();
+    probabilities = new ArrayList<>();
+    impacts = new ArrayList<>();
     severityLowLimit = 5;
     severityHighLimit = 15;
   }

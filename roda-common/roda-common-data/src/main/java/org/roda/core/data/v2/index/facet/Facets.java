@@ -17,7 +17,7 @@ public class Facets implements Serializable {
 
   public static final Facets NONE = new Facets();
 
-  private Map<String, FacetParameter> parameters = new HashMap<String, FacetParameter>();
+  private Map<String, FacetParameter> parameters = new HashMap<>();
   private String query = "";
 
   // TODO facet.sort (count or index)? NOTE: can be defined per
@@ -36,7 +36,7 @@ public class Facets implements Serializable {
       this.parameters.put(parameter.getName(), parameter);
     }
   }
-  
+
   public Facets(Set<FacetParameter> parameters) {
     super();
     for (FacetParameter parameter : parameters) {
@@ -78,6 +78,7 @@ public class Facets implements Serializable {
     this.query = query;
   }
 
+  @Override
   public String toString() {
     return "Facets [query=" + this.query + ", parameters=" + this.parameters + "]";
   }

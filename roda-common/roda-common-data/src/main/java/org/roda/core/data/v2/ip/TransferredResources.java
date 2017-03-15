@@ -38,16 +38,19 @@ public class TransferredResources implements RODAObjectList<TransferredResource>
     this.resources = resources;
   }
 
+  @Override
   @JsonProperty(value = RodaConstants.RODA_OBJECT_TRANSFERRED_RESOURCES)
   @XmlElement(name = RodaConstants.RODA_OBJECT_TRANSFERRED_RESOURCE)
   public List<TransferredResource> getObjects() {
     return resources;
   }
 
+  @Override
   public void setObjects(List<TransferredResource> resources) {
     this.resources = resources;
   }
 
+  @Override
   public void addObject(TransferredResource resource) {
     this.resources.add(resource);
   }

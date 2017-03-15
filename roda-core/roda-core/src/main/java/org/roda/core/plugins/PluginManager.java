@@ -33,7 +33,6 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.IOUtils;
 import org.reflections.Reflections;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
@@ -70,7 +69,6 @@ public class PluginManager {
   private static Path RODA_CONFIG_PATH = null;
   private static Path RODA_PLUGINS_PATH = null;
   private static Path RODA_PLUGINS_SHARED_PATH = null;
-
   private static String RODA_PLUGIN_MANIFEST_KEY = "RODA-Plugin";
 
   private Timer loadPluginsTimer = null;
@@ -89,13 +87,22 @@ public class PluginManager {
   private static PluginManager defaultPluginManager = null;
 
   /**
+   * Constructs a new {@link PluginManager}.
+   * 
+   * @throws PluginManagerException
+   */
+  private PluginManager() throws PluginManagerException {
+    // do nothing
+  }
+
+  /**
    * Gets the default {@link PluginManager}.
    * 
    * @return the default {@link PluginManager}.
    * 
    * @throws PluginManagerException
    */
-  public synchronized static PluginManager instantiatePluginManager(Path rodaConfigPath, Path rodaPluginsPath)
+  public static synchronized PluginManager instantiatePluginManager(Path rodaConfigPath, Path rodaPluginsPath)
     throws PluginManagerException {
     if (defaultPluginManager == null) {
       RODA_CONFIG_PATH = rodaConfigPath;
@@ -132,11 +139,8 @@ public class PluginManager {
    */
   public List<Plugin<? extends IsRODAObject>> getPlugins() {
     List<Plugin<? extends IsRODAObject>> plugins = new ArrayList<>();
-
     plugins.addAll(internalPluginChache.values());
-
     plugins.addAll(externalPluginChache.values());
-
     return plugins;
   }
 
@@ -257,15 +261,6 @@ public class PluginManager {
     }
   }
 
-  /**
-   * Constructs a new {@link PluginManager}.
-   * 
-   * @throws PluginManagerException
-   */
-  private PluginManager() throws PluginManagerException {
-    // do nothing
-  }
-
   private void init() {
     // load, for the first time, all the plugins (internal & external)
     loadPlugins();
@@ -309,7 +304,9 @@ public class PluginManager {
         Iterator<Path> iterator = stream.iterator();
         if (iterator.hasNext()) {
           LOGGER.error(
-            "'{}' has jars that will not be loaded as they are expected inside a folder (don't use folder '{}' to put them if you're not 100% sure that they should be used when loading each plugin. Instead, consider putting them inside folder '{}' to remove this error)! And the jars are:",
+            "'{}' has jars that will not be loaded as they are expected inside a folder (don't use folder '{}' to put them if you're not "
+              + "100% sure that they should be used when loading each plugin. Instead, consider putting them inside folder '{}' to remove "
+              + "this error)! And the jars are:",
             RODA_PLUGINS_PATH, RodaConstants.CORE_PLUGINS_SHARED_FOLDER, RodaConstants.CORE_PLUGINS_DISABLED_FOLDER);
           iterator.forEachRemaining(path -> LOGGER.error("   {}", path));
         }
@@ -365,9 +362,7 @@ public class PluginManager {
 
     if (jarPluginCache.containsKey(jarFile)
       && attrs.lastModifiedTime().toMillis() == jarPluginCache.get(jarFile).lastModified) {
-
       LOGGER.debug("{} is already loaded", jarFile.getFileName());
-
     } else {
       // The plugin doesn't exist or the modification date is
       // different. Let's load the Plugin
@@ -380,16 +375,12 @@ public class PluginManager {
       for (Plugin<? extends IsRODAObject> plugin : plugins) {
         try {
           if (plugin != null && !blacklistedPlugins.contains(plugin.getClass().getName())) {
-
             plugin.init();
             externalPluginChache.put(plugin.getClass().getName(), plugin);
             processAndCachePluginInformation(plugin);
             LOGGER.info("Plugin started '{}' (version {})", plugin.getName(), plugin.getVersion());
-
           } else {
-
             LOGGER.trace("'{}' is not a Plugin", jarFile.getFileName());
-
           }
 
           synchronized (jarPluginCache) {
@@ -496,15 +487,10 @@ public class PluginManager {
   }
 
   private List<Plugin<?>> loadPlugin(Path jarFile, URL[] jars) {
-
-    JarFile jar = null;
     List<Plugin<?>> ret = new ArrayList<>();
     Plugin<?> plugin = null;
 
-    try {
-      java.io.File file = jarFile.toFile();
-      jar = new JarFile(file);
-
+    try (JarFile jar = new JarFile(jarFile.toFile())) {
       Manifest manifest = jar.getManifest();
 
       if (manifest == null) {
@@ -512,7 +498,6 @@ public class PluginManager {
       } else {
 
         Attributes mainAttributes = manifest.getMainAttributes();
-
         String pluginClassNames = mainAttributes.getValue(RODA_PLUGIN_MANIFEST_KEY);
 
         if (pluginClassNames != null) {
@@ -525,29 +510,20 @@ public class PluginManager {
             Object object = ClassLoaderUtility.createObject(jars, pluginClassName);
 
             if (Plugin.class.isAssignableFrom(object.getClass())) {
-
               plugin = (Plugin<?>) object;
               ret.add(plugin);
-
             } else {
               LOGGER.error("{} is not a valid Plugin", pluginClassNames);
             }
           }
-
         } else {
           LOGGER.trace("{} MANIFEST file doesn't have a '{}' attribute", jarFile.getFileName(),
             RODA_PLUGIN_MANIFEST_KEY);
         }
-
       }
-
     } catch (IOException | ClassNotFoundException | NoClassDefFoundError | InstantiationException
       | IllegalAccessException | RuntimeException e) {
-
       LOGGER.error("Error loading plugin from {}", jarFile.getFileName(), e);
-
-    } finally {
-      IOUtils.closeQuietly(jar);
     }
 
     return ret;
@@ -580,7 +556,6 @@ public class PluginManager {
   }
 
   protected class JarPlugins {
-
     protected List<Plugin<?>> plugins = new ArrayList<>();
     private long lastModified = 0;
 

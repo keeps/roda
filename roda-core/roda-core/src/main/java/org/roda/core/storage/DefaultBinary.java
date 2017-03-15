@@ -43,6 +43,7 @@ public class DefaultBinary extends AbstractResource implements Binary {
   /**
    * @return the content
    */
+  @Override
   public ContentPayload getContent() {
     return content;
   }
@@ -58,6 +59,7 @@ public class DefaultBinary extends AbstractResource implements Binary {
   /**
    * @return the sizeInBytes
    */
+  @Override
   public Long getSizeInBytes() {
     return sizeInBytes;
   }
@@ -73,6 +75,7 @@ public class DefaultBinary extends AbstractResource implements Binary {
   /**
    * @return the reference
    */
+  @Override
   public boolean isReference() {
     return reference;
   }
@@ -88,6 +91,7 @@ public class DefaultBinary extends AbstractResource implements Binary {
   /**
    * @return the contentDigest
    */
+  @Override
   public Map<String, String> getContentDigest() {
     return contentDigest;
   }
@@ -116,10 +120,7 @@ public class DefaultBinary extends AbstractResource implements Binary {
     if (this == obj) {
       return true;
     }
-    if (!super.equals(obj)) {
-      return false;
-    }
-    if (getClass() != obj.getClass()) {
+    if (!super.equals(obj) || obj == null || getClass() != obj.getClass()) {
       return false;
     }
     DefaultBinary other = (DefaultBinary) obj;

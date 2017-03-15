@@ -49,7 +49,7 @@ public class GeneralCommandConvertPlugin<T extends IsRODAObject> extends Command
 
   @Override
   public Plugin<T> cloneMe() {
-    return new GeneralCommandConvertPlugin<T>();
+    return new GeneralCommandConvertPlugin<>();
   }
 
   @Override
@@ -60,22 +60,22 @@ public class GeneralCommandConvertPlugin<T extends IsRODAObject> extends Command
 
   @Override
   public List<String> getApplicableTo() {
-    return new ArrayList<String>();
+    return new ArrayList<>();
   }
 
   @Override
   public List<String> getConvertableTo() {
-    return new ArrayList<String>();
+    return new ArrayList<>();
   }
 
   @Override
   public Map<String, List<String>> getPronomToExtension() {
-    return new HashMap<String, List<String>>();
+    return new HashMap<>();
   }
 
   @Override
   public Map<String, List<String>> getMimetypeToExtension() {
-    return new HashMap<String, List<String>>();
+    return new HashMap<>();
   }
 
   @Override

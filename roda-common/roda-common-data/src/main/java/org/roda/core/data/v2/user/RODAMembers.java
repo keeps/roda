@@ -38,16 +38,19 @@ public class RODAMembers implements RODAObjectList<RODAMember> {
     this.members = members;
   }
 
+  @Override
   @JsonProperty(value = RodaConstants.RODA_OBJECT_MEMBERS)
   @XmlElement(name = RodaConstants.RODA_OBJECT_MEMBER)
   public List<RODAMember> getObjects() {
     return members;
   }
 
+  @Override
   public void setObjects(List<RODAMember> members) {
     this.members = members;
   }
 
+  @Override
   public void addObject(RODAMember member) {
     this.members.add(member);
   }

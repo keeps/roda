@@ -54,6 +54,7 @@ public class FileStorageServiceTest extends AbstractStorageServiceTest<FileStora
     FSUtils.deletePath(basePath.getParent().resolve(basePath.getFileName() + FileStorageService.HISTORY_SUFFIX));
   }
 
+  @Override
   @Test
   public void testClassInstantiation() throws RODAException {
 

@@ -130,17 +130,15 @@ public class IngestJobReportList extends BasicAsyncTableCell<IndexedReport> {
       @Override
       public String getValue(IndexedReport job) {
         String value = null;
-        if (job != null) {
-          if (job.getPlugin() != null) {
-            PluginInfo pluginInfo = pluginsInfo.get(job.getPlugin());
-            String pluginName;
-            if (pluginInfo != null) {
-              pluginName = pluginInfo.getName();
-            } else {
-              pluginName = job.getPlugin();
-            }
-            value = messages.pluginLabel(pluginName, job.getPluginVersion());
+        if (job != null && job.getPlugin() != null) {
+          PluginInfo pluginInfo = pluginsInfo.get(job.getPlugin());
+          String pluginName;
+          if (pluginInfo != null) {
+            pluginName = pluginInfo.getName();
+          } else {
+            pluginName = job.getPlugin();
           }
+          value = messages.pluginLabel(pluginName, job.getPluginVersion());
         }
 
         return value;
@@ -152,7 +150,6 @@ public class IngestJobReportList extends BasicAsyncTableCell<IndexedReport> {
       public SafeHtml getValue(IndexedReport report) {
         SafeHtml ret = null;
         if (report != null) {
-
           switch (report.getPluginState()) {
             case SUCCESS:
               ret = SafeHtmlUtils.fromSafeConstant(
@@ -201,8 +198,6 @@ public class IngestJobReportList extends BasicAsyncTableCell<IndexedReport> {
     addColumn(lastPluginRunStateColumn, messages.reportStatus(), true, false, 8);
     addColumn(completionStatusColumn, messages.reportProgress(), true, false, 8);
 
-    // display.setColumnWidth(sourceObjectColumn, "100%");
-
     Label emptyInfo = new Label(messages.noItemsToDisplay());
     display.setEmptyTableWidget(emptyInfo);
 
@@ -213,7 +208,7 @@ public class IngestJobReportList extends BasicAsyncTableCell<IndexedReport> {
 
   @Override
   protected Sorter getSorter(ColumnSortList columnSortList) {
-    Map<Column<IndexedReport, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<IndexedReport, ?>, List<String>>();
+    Map<Column<IndexedReport, ?>, List<String>> columnSortingKeyMap = new HashMap<>();
     columnSortingKeyMap.put(sourceObjectColumn, Arrays.asList(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ID));
     columnSortingKeyMap.put(outcomeObjectColumn, Arrays.asList(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID));
     columnSortingKeyMap.put(updatedDateColumn, Arrays.asList(RodaConstants.JOB_REPORT_DATE_UPDATED));

@@ -69,9 +69,7 @@ import config.i18n.client.ClientMessages;
 public class Menu extends Composite {
 
   private ClientLogger logger = new ClientLogger(getClass().getName());
-
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
-
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
   interface MyUiBinder extends UiBinder<Widget, Menu> {
@@ -210,10 +208,12 @@ public class Menu extends Composite {
 
     UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<User>() {
 
+      @Override
       public void onFailure(Throwable caught) {
         logger.fatal("Error getting Authenticated user", caught);
       }
 
+      @Override
       public void onSuccess(User user) {
         updateVisibles(user);
       }
@@ -222,6 +222,7 @@ public class Menu extends Composite {
 
     UserLogin.getInstance().addLoginStatusListener(new LoginStatusListener() {
 
+      @Override
       public void onLoginStatusChanged(User user) {
         updateVisibles(user);
       }
@@ -350,10 +351,12 @@ public class Menu extends Composite {
   private void updateResolverTopItemVisibility(final HistoryResolver resolver, final MenuItem item, final int index) {
     resolver.isCurrentUserPermitted(new AsyncCallback<Boolean>() {
 
+      @Override
       public void onFailure(Throwable caught) {
         logger.error("Error getting role", caught);
       }
 
+      @Override
       public void onSuccess(Boolean asRole) {
         if (asRole) {
           insertIntoLeftMenu(item, index);
@@ -365,10 +368,12 @@ public class Menu extends Composite {
   private void updateResolverSubItemVisibility(final HistoryResolver resolver, final MenuItem item) {
     resolver.isCurrentUserPermitted(new AsyncCallback<Boolean>() {
 
+      @Override
       public void onFailure(Throwable caught) {
         logger.error("Error getting role", caught);
       }
 
+      @Override
       public void onSuccess(Boolean asRole) {
         item.setVisible(asRole);
       }

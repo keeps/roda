@@ -46,15 +46,13 @@ public class BreadcrumbPanel extends FlowPanel {
     this.currentpath = null;
 
     UserLogin.getInstance().addLoginStatusListener(new LoginStatusListener() {
-
+      @Override
       public void onLoginStatusChanged(User user) {
         updatePath(currentpath);
       }
-
     });
 
     addStyleName("wui-breadcrumbPanel");
-
   }
 
   protected Widget createSeparator() {
@@ -89,6 +87,7 @@ public class BreadcrumbPanel extends FlowPanel {
     currentpath = path;
   }
 
+  @Override
   public void clear() {
     breadcrumbs.clear();
     updateLayout();
@@ -186,6 +185,7 @@ public class BreadcrumbPanel extends FlowPanel {
       }
     }
 
+    @Override
     public void onBrowserEvent(final Event event) {
       if (enabled) {
         super.onBrowserEvent(event);

@@ -21,6 +21,7 @@ public class InvalidParameterException extends RODAException {
    * Constructs a new {@link InvalidParameterException}.
    */
   public InvalidParameterException() {
+    // do nothing
   }
 
   /**

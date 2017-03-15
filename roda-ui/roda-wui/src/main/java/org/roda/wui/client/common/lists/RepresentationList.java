@@ -119,8 +119,6 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
     Label emptyInfo = new Label(messages.noItemsToDisplay());
     display.setEmptyTableWidget(emptyInfo);
 
-    // display.setColumnWidth(idColumn, "100%");
-
     originalColumn.setCellStyleNames("nowrap");
     typeColumn.setCellStyleNames("nowrap");
     sizeInBytesColumn.setCellStyleNames("nowrap");
@@ -136,7 +134,7 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
 
   @Override
   protected Sorter getSorter(ColumnSortList columnSortList) {
-    Map<Column<IndexedRepresentation, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<IndexedRepresentation, ?>, List<String>>();
+    Map<Column<IndexedRepresentation, ?>, List<String>> columnSortingKeyMap = new HashMap<>();
     columnSortingKeyMap.put(originalColumn, Arrays.asList(RodaConstants.REPRESENTATION_ORIGINAL));
     columnSortingKeyMap.put(typeColumn, Arrays.asList(RodaConstants.REPRESENTATION_TYPE));
     columnSortingKeyMap.put(sizeInBytesColumn, Arrays.asList(RodaConstants.REPRESENTATION_SIZE_IN_BYTES));

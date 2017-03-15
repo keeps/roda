@@ -21,6 +21,7 @@ public class PluginManagerException extends RODAException {
    * Constructs a new {@link PluginManagerException}.
    */
   public PluginManagerException() {
+    // do nothing
   }
 
   /**

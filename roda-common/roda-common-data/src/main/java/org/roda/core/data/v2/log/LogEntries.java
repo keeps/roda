@@ -38,16 +38,19 @@ public class LogEntries implements RODAObjectList<LogEntry> {
     this.logList = logEntries;
   }
 
+  @Override
   @JsonProperty(value = RodaConstants.RODA_OBJECT_LOGS)
   @XmlElement(name = RodaConstants.RODA_OBJECT_LOG)
   public List<LogEntry> getObjects() {
     return logList;
   }
 
+  @Override
   public void setObjects(List<LogEntry> logEntries) {
     this.logList = logEntries;
   }
 
+  @Override
   public void addObject(LogEntry logEntry) {
     this.logList.add(logEntry);
   }

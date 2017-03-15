@@ -69,6 +69,7 @@ public class Notification implements IsModelObject, IsIndexed {
     return 1;
   }
 
+  @Override
   public String getId() {
     return id;
   }

@@ -73,7 +73,7 @@ public class UnoconvConvertPlugin<T extends IsRODAObject> extends CommandConvert
 
   @Override
   public Plugin<T> cloneMe() {
-    return new UnoconvConvertPlugin<T>();
+    return new UnoconvConvertPlugin<>();
   }
 
   @Override

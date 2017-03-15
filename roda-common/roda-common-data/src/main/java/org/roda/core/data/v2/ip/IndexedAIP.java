@@ -258,10 +258,12 @@ public class IndexedAIP implements IsIndexed, HasPermissions {
     this.ancestors = ancestors;
   }
 
+  @Override
   public Permissions getPermissions() {
     return permissions;
   }
 
+  @Override
   public void setPermissions(Permissions permissions) {
     this.permissions = permissions;
   }

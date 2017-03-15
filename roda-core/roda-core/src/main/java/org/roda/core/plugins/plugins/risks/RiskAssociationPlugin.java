@@ -113,7 +113,7 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
 
   @Override
   public List<PluginParameter> getParameters() {
-    ArrayList<PluginParameter> parameters = new ArrayList<PluginParameter>();
+    ArrayList<PluginParameter> parameters = new ArrayList<>();
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_RISK_ID));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_DESCRIPTION));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_SEVERITY));
@@ -153,7 +153,7 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
 
       if (!list.isEmpty() && riskIds != null) {
         List<String> risks = Arrays.asList(riskIds.split(","));
-        Pair<SimpleJobPluginInfo, Report> jobInfo = new Pair<SimpleJobPluginInfo, Report>();
+        Pair<SimpleJobPluginInfo, Report> jobInfo = new Pair<>();
 
         if (list.get(0) instanceof AIP) {
           jobInfo = addIncidenceToAIPList(model, index, (List<AIP>) list, risks, jobPluginInfo, pluginReport, job);
@@ -329,7 +329,7 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
 
   @Override
   public Plugin<T> cloneMe() {
-    return new RiskAssociationPlugin<T>();
+    return new RiskAssociationPlugin<>();
   }
 
   @Override

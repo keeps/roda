@@ -23,6 +23,7 @@ public class OneOfManyFilterParameter extends FilterParameter {
    * Constructs an empty {@link OneOfManyFilterParameter}.
    */
   public OneOfManyFilterParameter() {
+    // do nothing
   }
 
   /**
@@ -52,6 +53,7 @@ public class OneOfManyFilterParameter extends FilterParameter {
   /**
    * @see Object#toString()
    */
+  @Override
   public String toString() {
     return "OneOfManyFilterParameter(name=" + getName() + ", values=" + getValues() + ")";
   }

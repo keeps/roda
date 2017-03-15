@@ -26,19 +26,16 @@ public class DisseminationInfo implements Serializable {
     "disseminator", "id");
 
   private String id;
-
   private String url;
-
   private String windowName;
-
   private String windowFeatures;
-
   private String iconURL;
 
   /**
    * Create a new dissemination info
    */
   public DisseminationInfo() {
+    // do nothing
 
   }
 
@@ -49,20 +46,20 @@ public class DisseminationInfo implements Serializable {
    *          the dissemination id
    * @param url
    *          the dissemination URL
-   * @param window_name
+   * @param windowName
    *          the name where to open the window (e.g. "_self", "_top" or
    *          "_blank")
-   * @param window_features
+   * @param windowFeatures
    *          the window features (e.g. "fullscreen=yes, menubar=no,
    *          scrollbars=yes")
    * @param iconURL
    *          the URL of the dissemination icon, null for none
    */
-  public DisseminationInfo(String id, String url, String window_name, String window_features, String iconURL) {
+  public DisseminationInfo(String id, String url, String windowName, String windowFeatures, String iconURL) {
     this.id = id;
     this.url = url;
-    this.windowName = window_name;
-    this.windowFeatures = window_features;
+    this.windowName = windowName;
+    this.windowFeatures = windowFeatures;
     this.iconURL = iconURL;
   }
 

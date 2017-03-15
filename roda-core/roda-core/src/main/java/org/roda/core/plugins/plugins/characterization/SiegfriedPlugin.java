@@ -87,6 +87,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
     super.setParameterValues(parameters);
   }
 
+  @Override
   public Report executeOnAIP(IndexService index, ModelService model, StorageService storage, Report report,
     SimpleJobPluginInfo jobPluginInfo, List<AIP> list, Job job) throws PluginException {
     try {
@@ -136,11 +137,12 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
     return report;
   }
 
+  @Override
   public Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage, Report report,
     SimpleJobPluginInfo jobPluginInfo, List<Representation> list, Job job) throws PluginException {
 
     for (Representation representation : list) {
-      List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
+      List<LinkingIdentifier> sources = new ArrayList<>();
 
       Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getRepresentationId(representation),
         Representation.class);
@@ -177,11 +179,12 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
     return report;
   }
 
+  @Override
   public Report executeOnFile(IndexService index, ModelService model, StorageService storage, Report report,
     SimpleJobPluginInfo jobPluginInfo, List<File> list, Job job) throws PluginException {
 
     for (File file : list) {
-      List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
+      List<LinkingIdentifier> sources = new ArrayList<>();
 
       Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getFileId(file), File.class);
       PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
@@ -220,7 +223,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
 
   @Override
   public Plugin<T> cloneMe() {
-    SiegfriedPlugin<T> siegfriedPlugin = new SiegfriedPlugin<T>();
+    SiegfriedPlugin<T> siegfriedPlugin = new SiegfriedPlugin<>();
     try {
       siegfriedPlugin.init();
     } catch (PluginException e) {

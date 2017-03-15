@@ -24,6 +24,7 @@ public class PluginException extends RODAException {
    * Constructs a new {@link PluginException}.
    */
   public PluginException() {
+    // do nothing
   }
 
   /**

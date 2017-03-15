@@ -19,9 +19,9 @@ public class Viewers implements Serializable {
   private String textLimit;
 
   public Viewers() {
-    this.pronoms = new HashMap<String, String>();
-    this.mimetypes = new HashMap<String, String>();
-    this.extensions = new HashMap<String, String>();
+    this.pronoms = new HashMap<>();
+    this.mimetypes = new HashMap<>();
+    this.extensions = new HashMap<>();
     this.textLimit = "";
   }
 

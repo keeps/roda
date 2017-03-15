@@ -130,7 +130,6 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
     dateColumn.setSortable(true);
     actionComponentColumn.setSortable(true);
     actionMethodColumn.setSortable(true);
-    // relatedObjectColumn.setSortable(true);
     usernameColumn.setSortable(true);
     durationColumn.setSortable(true);
     addressColumn.setSortable(true);
@@ -146,13 +145,12 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
 
     // default sorting
     display.getColumnSortList().push(new ColumnSortInfo(dateColumn, false));
-
     addStyleName("my-collections-table");
   }
 
   @Override
   protected Sorter getSorter(ColumnSortList columnSortList) {
-    Map<Column<LogEntry, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<LogEntry, ?>, List<String>>();
+    Map<Column<LogEntry, ?>, List<String>> columnSortingKeyMap = new HashMap<>();
     columnSortingKeyMap.put(dateColumn, Arrays.asList(RodaConstants.LOG_DATETIME));
     columnSortingKeyMap.put(actionComponentColumn, Arrays.asList(RodaConstants.LOG_ACTION_COMPONENT));
     columnSortingKeyMap.put(actionMethodColumn, Arrays.asList(RodaConstants.LOG_ACTION_METHOD));

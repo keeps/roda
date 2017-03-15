@@ -32,17 +32,11 @@ public class PasswordPanel extends SimplePanel implements HasValueChangeHandlers
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
   private DockPanel editLayout;
-
   private PasswordTextBox editPassword;
-
   private PasswordTextBox editPasswordRepeat;
-
   private Label editPasswordNote;
-
   private Button editButton;
-
   private boolean buttonMode;
-
   private boolean changed;
 
   @SuppressWarnings("unused")
@@ -144,6 +138,7 @@ public class PasswordPanel extends SimplePanel implements HasValueChangeHandlers
     return changed && isValid() ? editPassword.getText() : null;
   }
 
+  @Override
   public void clear() {
     editPassword.setText("");
     editPasswordRepeat.setText("");

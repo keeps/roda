@@ -37,7 +37,7 @@ public class DescriptionLevelServiceImpl extends RemoteServiceServlet implements
       RodaUtils.copyList(RodaCoreFactory.getRodaConfiguration().getList(RodaConstants.LEVELS_CLASSIFICATION_PLAN)));
     dlc.setDefaultClass(RodaCoreFactory.getRodaConfiguration().getString(RodaConstants.LEVELS_ICONS_DEFAULT));
     dlc.setGhostClass(RodaCoreFactory.getRodaConfiguration().getString(RodaConstants.LEVELS_ICONS_GHOST));
-    Map<String, String> icons = new HashMap<String, String>();
+    Map<String, String> icons = new HashMap<>();
     Iterator<String> iconKeys = RodaCoreFactory.getRodaConfiguration().getKeys(RodaConstants.LEVELS_ICONS_PREFIX);
     if (iconKeys != null) {
       while (iconKeys.hasNext()) {
@@ -54,7 +54,7 @@ public class DescriptionLevelServiceImpl extends RemoteServiceServlet implements
     dlc.setRepresentationFolderClass(
       RodaCoreFactory.getRodaConfiguration().getString(RodaConstants.LEVELS_ICONS_REPRESENTATION_FOLDER));
 
-    Map<String, String> representationTypesIcons = new HashMap<String, String>();
+    Map<String, String> representationTypesIcons = new HashMap<>();
     Iterator<String> representationTypesIconKeys = RodaCoreFactory.getRodaConfiguration()
       .getKeys(RodaConstants.LEVELS_ICONS_REPRESENTATION_TYPES_PREFIX);
     if (representationTypesIconKeys != null) {
@@ -68,7 +68,7 @@ public class DescriptionLevelServiceImpl extends RemoteServiceServlet implements
 
     Messages messages = RodaCoreFactory.getI18NMessages(ServerTools.parseLocale(localeString));
     Map<String, String> translations = messages.getTranslations(RodaConstants.LEVEL_I18N_PREFIX, String.class, false);
-    Map<String, String> levelsLabels = new HashMap<String, String>();
+    Map<String, String> levelsLabels = new HashMap<>();
     for (Map.Entry<String, String> entry : translations.entrySet()) {
       levelsLabels.put(entry.getKey().replace(RodaConstants.LEVEL_I18N_PREFIX + ".", ""), entry.getValue());
     }

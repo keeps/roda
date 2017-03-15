@@ -110,6 +110,7 @@ public abstract class RodaPrincipal implements Serializable, RODAMember, IsModel
       + ", allRoles=" + allRoles + ", directRoles=" + directRoles + "]";
   }
 
+  @Override
   public String getId() {
     return id;
   }
@@ -118,6 +119,7 @@ public abstract class RodaPrincipal implements Serializable, RODAMember, IsModel
     this.id = id;
   }
 
+  @Override
   public String getName() {
     return name;
   }
@@ -126,6 +128,7 @@ public abstract class RodaPrincipal implements Serializable, RODAMember, IsModel
     this.name = name;
   }
 
+  @Override
   public String getFullName() {
     return fullName;
   }
@@ -134,6 +137,7 @@ public abstract class RodaPrincipal implements Serializable, RODAMember, IsModel
     this.fullName = fullName;
   }
 
+  @Override
   public boolean isActive() {
     return active;
   }
@@ -142,6 +146,7 @@ public abstract class RodaPrincipal implements Serializable, RODAMember, IsModel
     this.active = active;
   }
 
+  @Override
   public Set<String> getAllRoles() {
     return allRoles;
   }
@@ -150,6 +155,7 @@ public abstract class RodaPrincipal implements Serializable, RODAMember, IsModel
     this.allRoles = allRoles;
   }
 
+  @Override
   public Set<String> getDirectRoles() {
     return directRoles;
   }
@@ -165,6 +171,7 @@ public abstract class RodaPrincipal implements Serializable, RODAMember, IsModel
   }
 
   // TODO: implement validation...
+  @Override
   @JsonIgnore
   public boolean isNameValid() {
     return true;

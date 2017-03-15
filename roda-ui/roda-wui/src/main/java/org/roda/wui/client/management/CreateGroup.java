@@ -17,8 +17,8 @@ import org.roda.core.data.v2.user.Group;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -43,8 +43,7 @@ public class CreateGroup extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      Group group = new Group();
-      CreateGroup createGroup = new CreateGroup(group);
+      CreateGroup createGroup = new CreateGroup(new Group());
       callback.onSuccess(createGroup);
     }
 
@@ -53,10 +52,12 @@ public class CreateGroup extends Composite {
       UserLogin.getInstance().checkRoles(new HistoryResolver[] {MemberManagement.RESOLVER}, false, callback);
     }
 
+    @Override
     public List<String> getHistoryPath() {
       return ListUtils.concat(MemberManagement.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
+    @Override
     public String getHistoryToken() {
       return "create_group";
     }
@@ -94,7 +95,7 @@ public class CreateGroup extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
   }
-  
+
   @Override
   protected void onLoad() {
     super.onLoad();
@@ -108,10 +109,12 @@ public class CreateGroup extends Composite {
 
       UserManagementService.Util.getInstance().createGroup(group, new AsyncCallback<Void>() {
 
+        @Override
         public void onSuccess(Void result) {
           HistoryUtils.newHistory(MemberManagement.RESOLVER);
         }
 
+        @Override
         public void onFailure(Throwable caught) {
           errorMessage(caught);
         }

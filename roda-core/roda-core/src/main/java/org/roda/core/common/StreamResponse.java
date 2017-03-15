@@ -27,10 +27,12 @@ public class StreamResponse implements EntityResponse {
     this.filename = filename;
   }
 
+  @Override
   public String getMediaType() {
     return mediaType;
   }
 
+  @Override
   public void setMediaType(String mediaType) {
     this.mediaType = mediaType;
   }

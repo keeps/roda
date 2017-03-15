@@ -63,13 +63,17 @@ public class DatePicker extends HorizontalPanel implements SourcesChangeEvents {
     add(day);
 
     year.addKeyboardListener(new KeyboardListener() {
-
+      @Override
       public void onKeyDown(Widget sender, char keyCode, int modifiers) {
+        // do nothing
       }
 
+      @Override
       public void onKeyPress(Widget sender, char keyCode, int modifiers) {
+        // do nothing
       }
 
+      @Override
       public void onKeyUp(Widget sender, char keyCode, int modifiers) {
         if (year.isValid()) {
           day.update(year.getYearType(), month.getSelectedMonthType());
@@ -82,11 +86,11 @@ public class DatePicker extends HorizontalPanel implements SourcesChangeEvents {
         }
         DatePicker.this.onChange(year);
       }
-
     });
 
     month.addClickListener(new ClickListener() {
 
+      @Override
       public void onClick(Widget sender) {
         day.update(year.getYearType(), month.getSelectedMonthType());
       }
@@ -95,6 +99,7 @@ public class DatePicker extends HorizontalPanel implements SourcesChangeEvents {
 
     ChangeListener changeListener = new ChangeListener() {
 
+      @Override
       public void onChange(Widget sender) {
         DatePicker.this.onChange(sender);
       }
@@ -246,10 +251,12 @@ public class DatePicker extends HorizontalPanel implements SourcesChangeEvents {
 
   }
 
+  @Override
   public void addChangeListener(ChangeListener listener) {
     listeners.add(listener);
   }
 
+  @Override
   public void removeChangeListener(ChangeListener listener) {
     listeners.remove(listener);
   }

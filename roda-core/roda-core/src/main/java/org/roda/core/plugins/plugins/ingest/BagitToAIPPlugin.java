@@ -42,17 +42,16 @@ import gov.loc.repository.bagit.utilities.SimpleResult;
 
 public class BagitToAIPPlugin extends SIPToAIPPlugin {
   private static final Logger LOGGER = LoggerFactory.getLogger(BagitToAIPPlugin.class);
-
-  private static String UNPACK_DESCRIPTION = "Extracted objects from package in Bagit format.";
+  private static final String UNPACK_DESCRIPTION = "Extracted objects from package in Bagit format.";
 
   private boolean createSubmission = false;
 
   private Optional<String> computedSearchScope;
   private boolean forceSearchScope;
-  private Path jobWorkingDirectory;
 
   @Override
   public void init() throws PluginException {
+    // do nothing
   }
 
   @Override
@@ -96,7 +95,6 @@ public class BagitToAIPPlugin extends SIPToAIPPlugin {
     List<LiteOptionalWithCause> liteList) throws PluginException {
     computedSearchScope = PluginHelper.getSearchScopeFromParameters(this, model);
     forceSearchScope = PluginHelper.getForceParentIdFromParameters(this);
-    jobWorkingDirectory = PluginHelper.getJobWorkingDirectory(this);
 
     return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<TransferredResource>() {
       @Override

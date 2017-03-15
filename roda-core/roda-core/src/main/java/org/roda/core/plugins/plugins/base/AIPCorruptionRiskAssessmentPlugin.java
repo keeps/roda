@@ -68,7 +68,7 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
 
   private static List<String> risks;
   static {
-    risks = new ArrayList<String>();
+    risks = new ArrayList<>();
     risks.add("urn:fixityplugin:r1");
   }
 
@@ -118,8 +118,8 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
   private void processAIP(IndexService index, ModelService model, StorageService storage, Report report,
     SimpleJobPluginInfo jobPluginInfo, Job job, AIP aip) {
     boolean aipFailed = false;
-    List<String> passedFiles = new ArrayList<String>();
-    List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
+    List<String> passedFiles = new ArrayList<>();
+    List<LinkingIdentifier> sources = new ArrayList<>();
     ValidationReport validationReport = new ValidationReport();
 
     for (Representation r : aip.getRepresentations()) {

@@ -48,7 +48,6 @@ public class SimpleJobReportList extends BasicAsyncTableCell<IndexedReport> {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  // private Column<Report, SafeHtml> objectIdColumn;
   private TooltipTextColumn<IndexedReport> sourceColumn;
   private TooltipTextColumn<IndexedReport> outcomeColumn;
   private Column<IndexedReport, Date> updatedDateColumn;
@@ -219,7 +218,6 @@ public class SimpleJobReportList extends BasicAsyncTableCell<IndexedReport> {
 
     // default sorting
     display.getColumnSortList().push(new ColumnSortInfo(updatedDateColumn, false));
-
   }
 
   @Override
@@ -230,7 +228,6 @@ public class SimpleJobReportList extends BasicAsyncTableCell<IndexedReport> {
     columnSortingKeyMap.put(updatedDateColumn, Arrays.asList(RodaConstants.JOB_REPORT_DATE_UPDATED));
     columnSortingKeyMap.put(lastPluginRunColumn, Arrays.asList(RodaConstants.JOB_REPORT_PLUGIN));
     columnSortingKeyMap.put(lastPluginRunStateColumn, Arrays.asList(RodaConstants.JOB_REPORT_PLUGIN_STATE));
-
     return createSorter(columnSortList, columnSortingKeyMap);
   }
 }

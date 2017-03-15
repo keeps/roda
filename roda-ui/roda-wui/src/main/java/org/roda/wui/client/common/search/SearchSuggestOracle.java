@@ -41,7 +41,7 @@ public class SearchSuggestOracle<T extends IsIndexed> extends SuggestOracle {
 
         @Override
         public void onSuccess(List<String> suggestionList) {
-          List<SearchSuggest> suggestions = new ArrayList<SearchSuggest>();
+          List<SearchSuggest> suggestions = new ArrayList<>();
           for (String suggestion : suggestionList) {
             suggestions.add(new SearchSuggest(suggestion, suggestion, suggestions.size()));
           }

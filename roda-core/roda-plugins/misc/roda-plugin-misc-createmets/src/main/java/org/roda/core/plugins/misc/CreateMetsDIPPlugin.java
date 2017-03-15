@@ -170,7 +170,7 @@ public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public List<PluginParameter> getParameters() {
-    ArrayList<PluginParameter> parameters = new ArrayList<PluginParameter>();
+    ArrayList<PluginParameter> parameters = new ArrayList<>();
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_INCLUDE_SELECTED_DESCRIPTIVE_METADATA));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_SELECTED_DESCRIPTIVE_METADATA));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_INCLUDE_ALL_PRESERVATION_METADATA));
@@ -318,7 +318,7 @@ public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
     if (storage instanceof FileStorageService) {
       try {
         AIPLink aipLink = new AIPLink(aip.getId());
-        List<AIPLink> links = new ArrayList<AIPLink>();
+        List<AIPLink> links = new ArrayList<>();
         links.add(aipLink);
 
         DIP dip = new DIP();
@@ -402,7 +402,7 @@ public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
     StoragePath aipOnDIPPath) throws RequestNotValidException, AlreadyExistsException, GenericException,
     NotFoundException, AuthorizationDeniedException {
     List<String> representationTypes = Arrays.asList(selectedRepresentations.toLowerCase().split(",\\s*"));
-    List<String> representationIds = new ArrayList<String>();
+    List<String> representationIds = new ArrayList<>();
 
     for (Representation representation : aip.getRepresentations()) {
       String representationId = representation.getId();
@@ -456,7 +456,7 @@ public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
   private List<String> copyAIPDescriptiveMetadata(StorageService storage, AIP aip, StoragePath aipPath,
     StoragePath aipOnDIPPath) throws RequestNotValidException, AlreadyExistsException, GenericException,
     NotFoundException, AuthorizationDeniedException {
-    List<String> descriptiveMetadataIds = new ArrayList<String>();
+    List<String> descriptiveMetadataIds = new ArrayList<>();
 
     for (DescriptiveMetadata dm : aip.getDescriptiveMetadata()) {
       String dmId = copyDescriptiveMetadata(storage, dm, aipPath, aipOnDIPPath);

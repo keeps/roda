@@ -45,10 +45,12 @@ public class Process {
       UserLogin.getInstance().checkRoles(new HistoryResolver[] {Process.RESOLVER}, false, callback);
     }
 
+    @Override
     public List<String> getHistoryPath() {
       return Arrays.asList(getHistoryToken());
     }
 
+    @Override
     public String getHistoryToken() {
       return "process";
     }

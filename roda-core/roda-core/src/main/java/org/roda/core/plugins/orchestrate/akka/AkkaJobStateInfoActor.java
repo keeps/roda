@@ -138,7 +138,7 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
       SelectedItems<?> sourceObjects = job.getSourceObjects();
       if (sourceObjects instanceof SelectedItemsList) {
         SelectedItemsList<T> items = (SelectedItemsList<T>) sourceObjects;
-        ArrayList<String> newIds = new ArrayList<String>();
+        ArrayList<String> newIds = new ArrayList<>();
         for (String oldId : items.getIds()) {
           if (message.getOldToNewIds().get(oldId) != null) {
             newIds.add(message.getOldToNewIds().get(oldId));

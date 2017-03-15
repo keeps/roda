@@ -20,6 +20,10 @@ import org.roda.core.util.CommandUtility;
 
 public class DroidPluginUtils {
 
+  private DroidPluginUtils() {
+    // do nothing
+  }
+
   private static List<String> getBatchCommand(Path sourceDirectory) {
     Path rodaHome = RodaCoreFactory.getRodaHomePath();
     Path droidHome = rodaHome.resolve(RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "droid", "home"));
@@ -28,17 +32,17 @@ public class DroidPluginUtils {
     Path containerSignature = rodaHome
       .resolve(RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "droid", "containerSignatureFile"));
 
-    File DROID_DIRECTORY = droidHome.toFile();
+    File droidDirectory = droidHome.toFile();
 
     String osName = System.getProperty("os.name");
     List<String> command;
     if (osName.startsWith("Windows")) {
-      command = new ArrayList<String>(Arrays.asList(DROID_DIRECTORY.getAbsolutePath() + File.separator + "droid.bat",
-        "-Ns", signature.toFile().getAbsolutePath(), "-Nc", containerSignature.toFile().getAbsolutePath(), "-q", "-Nr",
+      command = new ArrayList<>(Arrays.asList(droidDirectory.getAbsolutePath() + File.separator + "droid.bat", "-Ns",
+        signature.toFile().getAbsolutePath(), "-Nc", containerSignature.toFile().getAbsolutePath(), "-q", "-Nr",
         sourceDirectory.toFile().getAbsolutePath()));
     } else {
-      command = new ArrayList<String>(Arrays.asList(DROID_DIRECTORY.getAbsolutePath() + File.separator + "droid.sh",
-        "-Ns", signature.toFile().getAbsolutePath(), "-Nc", containerSignature.toFile().getAbsolutePath(), "-q", "-Nr",
+      command = new ArrayList<>(Arrays.asList(droidDirectory.getAbsolutePath() + File.separator + "droid.sh", "-Ns",
+        signature.toFile().getAbsolutePath(), "-Nc", containerSignature.toFile().getAbsolutePath(), "-q", "-Nr",
         sourceDirectory.toFile().getAbsolutePath()));
     }
     return command;
@@ -47,8 +51,7 @@ public class DroidPluginUtils {
   public static String runDROIDOnPath(Path sourceDirectory) throws RODAException {
     try {
       List<String> command = getBatchCommand(sourceDirectory);
-      String droidOutput = CommandUtility.execute(command);
-      return droidOutput;
+      return CommandUtility.execute(command);
     } catch (CommandException e) {
       throw new RODAException("Error while executing DROID command", e.getCause());
     }

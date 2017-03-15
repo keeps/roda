@@ -40,25 +40,15 @@ public class LazyScroll extends ScrollPanel {
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
   private boolean refreshing = false;
-
   private final Widget element;
-
   private final Loader loader;
-
   private final int blockSize;
-
   private final int maxSize;
-
   private int offset;
-
   private int windowOffset;
-
   private boolean initialized;
-
   private boolean working;
-
   private final List<LoadListener> loadListeners;
-
   private final List<LazyScrollListener> lazyScrollListeners;
 
   /**
@@ -109,6 +99,7 @@ public class LazyScroll extends ScrollPanel {
     public void update(int widgetOffset, int count, AsyncCallback<Integer> updatedOffset);
   }
 
+  @FunctionalInterface
   private interface LoadListener {
     /**
      * add a command to call when worker is idle
@@ -174,8 +165,8 @@ public class LazyScroll extends ScrollPanel {
     this.loader = loader;
     this.blockSize = blockSize;
     this.maxSize = maxSize;
-    this.loadListeners = new ArrayList<LoadListener>();
-    this.lazyScrollListeners = new ArrayList<LazyScrollListener>();
+    this.loadListeners = new ArrayList<>();
+    this.lazyScrollListeners = new ArrayList<>();
     offset = 0;
     windowOffset = 0;
 
@@ -185,6 +176,7 @@ public class LazyScroll extends ScrollPanel {
     initialized = false;
   }
 
+  @Override
   protected void onLoad() {
     super.onLoad();
     init();
@@ -195,10 +187,8 @@ public class LazyScroll extends ScrollPanel {
    * 
    */
   protected void init() {
-    // if (!initialized) {
     initialized = true;
     fill();
-    // }
   }
 
   /**
@@ -206,10 +196,12 @@ public class LazyScroll extends ScrollPanel {
    */
   public void fill() {
     fill(new AsyncCallback<Integer>() {
+      @Override
       public void onFailure(Throwable caught) {
         // nothing to do
       }
 
+      @Override
       public void onSuccess(Integer result) {
         // nothing to do
       }
@@ -227,8 +219,8 @@ public class LazyScroll extends ScrollPanel {
    *          loaded
    */
   public void fill(AsyncCallback<Integer> callback) {
-    // logger.debug("Filling scroll");
-    if (this.isAttached() && this.isVisible() && element.isVisible() && element.getOffsetHeight() <= getOffsetHeight()) {
+    if (this.isAttached() && this.isVisible() && element.isVisible()
+      && element.getOffsetHeight() <= getOffsetHeight()) {
       refreshing = true;
       load(blockSize, callback);
     } else {
@@ -247,6 +239,7 @@ public class LazyScroll extends ScrollPanel {
   public void reset(final Command cleanInnerPanel, final AsyncCallback<Integer> callback) {
     addLoadListener(new LoadListener() {
 
+      @Override
       public void onIdle(Command done) {
         onResetStart();
         offset = 0;
@@ -270,21 +263,23 @@ public class LazyScroll extends ScrollPanel {
    * @param callback
    */
   public void ensureLoaded(final int index, final int limit, final AsyncCallback<Integer> callback) {
-    // logger.debug("ensuring " + index + " is loaded");
     addLoadListener(new LoadListener() {
 
+      @Override
       public void onIdle(final Command done) {
         if (index < windowOffset) {
           logger.debug("ensure loading of " + index + " requires moving window to " + index);
           refreshing = true;
           moveWindow(index, new AsyncCallback<Integer>() {
 
+            @Override
             public void onFailure(Throwable caught) {
               refreshing = false;
               callback.onFailure(caught);
               done.execute();
             }
 
+            @Override
             public void onSuccess(Integer result) {
               refreshing = false;
               callback.onSuccess(result);
@@ -325,41 +320,44 @@ public class LazyScroll extends ScrollPanel {
    * @param e
    */
   private native void ensureVisible(Element scroll, Element e)/*-{
-                                                              if (!e)
-                                                              return;
-                                                              
-                                                              var item = e;
-                                                              var realOffset = 0;
-                                                              while (item && (item != scroll && item != scroll.offsetParent)) {
-                                                              realOffset += item.offsetTop;
-                                                              item = item.offsetParent;
-                                                              }
-                                                              
-                                                              scroll.scrollTop = realOffset - scroll.offsetTop; 
-                                                              }-*/;
+		if (!e)
+			return;
 
+		var item = e;
+		var realOffset = 0;
+		while (item && (item != scroll && item != scroll.offsetParent)) {
+			realOffset += item.offsetTop;
+			item = item.offsetParent;
+		}
+
+		scroll.scrollTop = realOffset - scroll.offsetTop;
+  }-*/;
+
+  @Override
   public void onBrowserEvent(Event e) {
     if (DOM.eventGetType(e) == Event.ONSCROLL) {
       if (initialized && !refreshing
         && element.getOffsetHeight() - getScrollPosition() - SCROLL_THRESHOLD < getOffsetHeight()) {
-        // logger.debug("Scroll event");
         load(blockSize, null);
 
       } else if (initialized && !refreshing && getScrollPosition() < SCROLL_THRESHOLD && windowOffset > 0) {
 
         addLoadListener(new LoadListener() {
 
+          @Override
           public void onIdle(final Command done) {
             refreshing = true;
 
             moveWindow(windowOffset - blockSize, new AsyncCallback<Integer>() {
 
+              @Override
               public void onFailure(Throwable caught) {
                 logger.error("error moving window", caught);
                 refreshing = false;
                 done.execute();
               }
 
+              @Override
               public void onSuccess(Integer result) {
                 refreshing = false;
                 done.execute();
@@ -397,33 +395,41 @@ public class LazyScroll extends ScrollPanel {
   private void load(final int howMany, AsyncCallback<Integer> done) {
     final AsyncCallback<Integer> callback = (done != null) ? done : new AsyncCallback<Integer>() {
 
+      @Override
       public void onFailure(Throwable caught) {
+        // do nothing
       }
 
+      @Override
       public void onSuccess(Integer result) {
+        // do nothing
       }
 
     };
     refreshing = true;
     addLoadListener(new LoadListener() {
 
+      @Override
       public void onIdle(final Command done) {
         onLoadStart();
         loader.load(offset, windowOffset, howMany, new AsyncCallback<Integer>() {
 
+          @Override
           public void onFailure(Throwable caught) {
             refreshing = false;
             callback.onFailure(caught);
             done.execute();
           }
 
+          @Override
           public void onSuccess(Integer result) {
-            int loaded = ((Integer) result).intValue();
+            int loaded = result.intValue();
             offset += loaded;
             if (offset + howMany > windowOffset + maxSize) {
               int newWindowOffset = offset + howMany - maxSize;
               moveWindow(newWindowOffset, new AsyncCallback<Integer>() {
 
+                @Override
                 public void onFailure(Throwable caught) {
                   logger.error("Error moving window", caught);
                   callback.onFailure(caught);
@@ -431,6 +437,7 @@ public class LazyScroll extends ScrollPanel {
 
                 }
 
+                @Override
                 public void onSuccess(Integer result) {
                   refreshing = false;
                   callback.onSuccess(result);
@@ -448,6 +455,7 @@ public class LazyScroll extends ScrollPanel {
             if (loaded > 0) {
               addLoadListener(new LoadListener() {
 
+                @Override
                 public void onIdle(Command done) {
                   fill();
                   done.execute();
@@ -478,10 +486,12 @@ public class LazyScroll extends ScrollPanel {
     if (offset > windowOffset) {
       loader.remove(windowOffset, windowOffset, offset - windowOffset, new AsyncCallback<Integer>() {
 
+        @Override
         public void onFailure(Throwable caught) {
           callback.onFailure(caught);
         }
 
+        @Override
         public void onSuccess(Integer loaded) {
           windowOffset -= loaded;
           int finalHeight = element.getOffsetHeight();
@@ -500,18 +510,22 @@ public class LazyScroll extends ScrollPanel {
       windowOffset = offset;
       loader.load(offset, 0, windowBlockSize, new AsyncCallback<Integer>() {
 
+        @Override
         public void onFailure(Throwable caught) {
           callback.onFailure(caught);
         }
 
+        @Override
         public void onSuccess(Integer loaded) {
           if (LazyScroll.this.offset > maxOffset) {
             loader.remove(maxOffset, windowOffset, LazyScroll.this.offset - maxOffset, new AsyncCallback<Integer>() {
 
+              @Override
               public void onFailure(Throwable caught) {
                 callback.onFailure(caught);
               }
 
+              @Override
               public void onSuccess(Integer removed) {
                 LazyScroll.this.offset -= removed;
                 logger.debug("scroll offset=" + offset);
@@ -552,8 +566,9 @@ public class LazyScroll extends ScrollPanel {
 
     if (!working && !loadListeners.isEmpty()) {
       working = true;
-      LoadListener listener = (LoadListener) loadListeners.remove(0);
+      LoadListener listener = loadListeners.remove(0);
       listener.onIdle(new Command() {
+        @Override
         public void execute() {
           working = false;
           work();
@@ -575,17 +590,20 @@ public class LazyScroll extends ScrollPanel {
   public void update(final AsyncCallback<Integer> callback) {
     addLoadListener(new LoadListener() {
 
+      @Override
       public void onIdle(final Command done) {
         onUpdateStart();
         refreshing = true;
         loader.update(windowOffset, offset - windowOffset, new AsyncCallback<Integer>() {
 
+          @Override
           public void onFailure(Throwable caught) {
             callback.onFailure(caught);
             done.execute();
 
           }
 
+          @Override
           public void onSuccess(Integer loaded) {
             offset = loaded;
             callback.onSuccess(loaded);

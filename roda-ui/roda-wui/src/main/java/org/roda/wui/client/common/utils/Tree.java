@@ -11,14 +11,13 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Tree<T> implements Serializable{
+public class Tree<T> implements Serializable {
   private static final long serialVersionUID = 5586782882694784478L;
   private T label;
   private T value;
   private Tree<T> parent;
   private List<Tree<T>> children;
 
-  
   public Tree() {
     super();
   }
@@ -26,11 +25,11 @@ public class Tree<T> implements Serializable{
   public Tree(T label, T value) {
     this.label = label;
     this.value = value;
-    this.children = new LinkedList<Tree<T>>();
+    this.children = new LinkedList<>();
   }
 
   public Tree<T> addChild(T label, T value) {
-    Tree<T> childNode = new Tree<T>(label, value);
+    Tree<T> childNode = new Tree<>(label, value);
     childNode.parent = this;
     this.children.add(childNode);
     return childNode;

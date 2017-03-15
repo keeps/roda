@@ -77,6 +77,7 @@ public class MediaInfoPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public void init() throws PluginException {
+    // do nothing
   }
 
   @Override
@@ -188,7 +189,7 @@ public class MediaInfoPlugin extends AbstractPlugin<AIP> {
 
   private Map<String, Path> parseMediaInfoOutput(String mediaInfoOutput) throws ParserConfigurationException,
     SAXException, IOException, TransformerFactoryConfigurationError, TransformerException, XPathExpressionException {
-    Map<String, Path> parsed = new HashMap<String, Path>();
+    Map<String, Path> parsed = new HashMap<>();
     DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
     DocumentBuilder db = dbf.newDocumentBuilder();
     InputSource is = new InputSource();

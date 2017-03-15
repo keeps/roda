@@ -353,7 +353,7 @@ public class RestUtils {
   public static String createFileUploadUri(IndexedFile folder, String details) {
     // api/v1/files?aipId={aipId}&representationId={representationdId}&folder={folder[0]}&folder={folder[1]}&details={details}
 
-    List<String> directory = new ArrayList<String>(folder.getPath());
+    List<String> directory = new ArrayList<>(folder.getPath());
     directory.add(folder.getId());
     return createFileUploadUri(folder.getAipId(), folder.getRepresentationId(), directory, details);
   }

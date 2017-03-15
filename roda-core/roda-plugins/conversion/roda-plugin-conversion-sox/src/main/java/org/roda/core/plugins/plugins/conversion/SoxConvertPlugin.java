@@ -70,7 +70,7 @@ public class SoxConvertPlugin<T extends IsRODAObject> extends CommandConvertPlug
 
   @Override
   public Plugin<T> cloneMe() {
-    return new SoxConvertPlugin<T>();
+    return new SoxConvertPlugin<>();
   }
 
   @Override

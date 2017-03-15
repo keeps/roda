@@ -18,8 +18,8 @@ import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -70,10 +70,12 @@ public class EditUser extends Composite {
       UserLogin.getInstance().checkRoles(new HistoryResolver[] {MemberManagement.RESOLVER}, false, callback);
     }
 
+    @Override
     public List<String> getHistoryPath() {
       return ListUtils.concat(MemberManagement.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
+    @Override
     public String getHistoryToken() {
       return "edit_user";
     }
@@ -124,7 +126,7 @@ public class EditUser extends Composite {
       buttonDeActivate.setText(messages.editUserDeactivate());
     }
   }
-  
+
   @Override
   protected void onLoad() {
     super.onLoad();
@@ -141,10 +143,12 @@ public class EditUser extends Composite {
         UserManagementService.Util.getInstance().updateUser(user, password, userDataPanel.getExtra(),
           new AsyncCallback<Void>() {
 
+            @Override
             public void onFailure(Throwable caught) {
               errorMessage(caught, user);
             }
 
+            @Override
             public void onSuccess(Void result) {
               HistoryUtils.newHistory(MemberManagement.RESOLVER);
             }

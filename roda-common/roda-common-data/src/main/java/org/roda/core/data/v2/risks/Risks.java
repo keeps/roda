@@ -38,16 +38,19 @@ public class Risks implements RODAObjectList<Risk> {
     this.riskList = risks;
   }
 
+  @Override
   @JsonProperty(value = RodaConstants.RODA_OBJECT_RISKS)
   @XmlElement(name = RodaConstants.RODA_OBJECT_RISK)
   public List<Risk> getObjects() {
     return riskList;
   }
 
+  @Override
   public void setObjects(List<Risk> risks) {
     this.riskList = risks;
   }
 
+  @Override
   public void addObject(Risk risk) {
     this.riskList.add(risk);
   }

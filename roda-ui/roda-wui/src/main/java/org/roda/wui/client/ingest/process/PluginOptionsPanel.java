@@ -31,7 +31,7 @@ public class PluginOptionsPanel extends Composite {
     super();
     layout = new FlowPanel();
     initWidget(layout);
-    panels = new ArrayList<PluginParameterPanel>();
+    panels = new ArrayList<>();
     layout.addStyleName("plugin-options");
   }
 
@@ -58,7 +58,7 @@ public class PluginOptionsPanel extends Composite {
   }
 
   public Map<String, String> getValue() {
-    Map<String, String> ret = new HashMap<String, String>();
+    Map<String, String> ret = new HashMap<>();
 
     for (PluginParameterPanel panel : panels) {
       String key = panel.getParameter().getId();

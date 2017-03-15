@@ -54,7 +54,7 @@ import jersey.repackaged.com.google.common.collect.Iterables;
  * 
  */
 
-@Test(groups = {"all", "travis"})
+@Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_TRAVIS})
 public abstract class AbstractStorageServiceTest<T extends StorageService> {
 
   /**
@@ -893,7 +893,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   // TODO test move from different storage
 
   public void testBinaryVersions() throws RODAException, IOException {
-    Map<String, String> properties = new HashMap<String, String>();
+    Map<String, String> properties = new HashMap<>();
     properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATED.toString());
 
     // create container

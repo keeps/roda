@@ -67,6 +67,7 @@ public class DefaultBinaryVersion implements BinaryVersion {
       + properties + "]";
   }
 
+  @Override
   public Map<String, String> getProperties() {
     return properties;
   }

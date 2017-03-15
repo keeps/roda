@@ -18,6 +18,7 @@ public class AuthenticationDeniedException extends RODAException {
    * Constructs a new {@link AuthenticationDeniedException}.
    */
   public AuthenticationDeniedException() {
+    // do nothing
   }
 
   /**

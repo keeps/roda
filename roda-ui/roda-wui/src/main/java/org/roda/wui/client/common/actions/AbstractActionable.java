@@ -41,7 +41,7 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
   }
 
   protected SelectedItemsList<T> objectToSelectedItems(T object) {
-    return new SelectedItemsList<T>(Arrays.asList(object.getUUID()), object.getClass().getName());
+    return new SelectedItemsList<>(Arrays.asList(object.getUUID()), object.getClass().getName());
   }
 
   @Override

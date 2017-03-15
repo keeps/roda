@@ -42,8 +42,8 @@ public class Dropdown extends Composite implements HasValueChangeHandlers<String
     selectedLabel = new Label();
     popup = new PopupPanel(true);
     popupPanel = new VerticalPanel();
-    popupValues = new HashMap<String, String>();
-    
+    popupValues = new HashMap<>();
+
     panel.add(selectedLabel);
     focusPanel.add(panel);
 
@@ -54,12 +54,12 @@ public class Dropdown extends Composite implements HasValueChangeHandlers<String
         popup();
       }
     });
-    
+
     popup.addCloseHandler(new CloseHandler<PopupPanel>() {
-      
+
       @Override
       public void onClose(CloseEvent<PopupPanel> event) {
-       panel.removeStyleName("open"); 
+        panel.removeStyleName("open");
       }
     });
 
@@ -87,7 +87,7 @@ public class Dropdown extends Composite implements HasValueChangeHandlers<String
       }
     });
 
-    popup.setWidget(popupPanel);  
+    popup.setWidget(popupPanel);
     setPanelWidth();
   }
 
@@ -118,17 +118,17 @@ public class Dropdown extends Composite implements HasValueChangeHandlers<String
   public String getSelectedValue() {
     return popupValues.get(selectedLabel.getText());
   }
-  
+
   public boolean setSelectedValue(String value, boolean fire) {
     String label = null;
     for (Entry<String, String> entry : popupValues.entrySet()) {
-      if(entry.getValue().equals(value)) {
+      if (entry.getValue().equals(value)) {
         label = entry.getKey();
         break;
       }
     }
-    
-    if(label != null) {
+
+    if (label != null) {
       selectedLabel.setText(label);
       if (fire) {
         onChange();
@@ -145,7 +145,7 @@ public class Dropdown extends Composite implements HasValueChangeHandlers<String
     focusPanel.getElement().setAttribute("min-width", popup.getOffsetWidth() + "px");
     popup.setVisible(visible);
   }
-  
+
   public void addPopupStyleName(String styleName) {
     popup.addStyleName(styleName);
   }

@@ -23,6 +23,7 @@ public class GroupAlreadyExistsException extends AlreadyExistsException {
    * Constructs a new GroupAlreadyExistsException.
    */
   public GroupAlreadyExistsException() {
+    // do nothing
   }
 
   /**

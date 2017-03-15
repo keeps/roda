@@ -28,6 +28,7 @@ public class SearchSuggest implements Suggestion, Serializable, Comparable<Searc
     this.order = order;
   }
 
+  @Override
   public String getDisplayString() {
     return displayString;
   }
@@ -36,6 +37,7 @@ public class SearchSuggest implements Suggestion, Serializable, Comparable<Searc
     this.displayString = displayString;
   }
 
+  @Override
   public String getReplacementString() {
     return replacementString;
   }

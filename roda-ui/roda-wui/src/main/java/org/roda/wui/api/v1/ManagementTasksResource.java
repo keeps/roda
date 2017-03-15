@@ -150,7 +150,6 @@ public class ManagementTasksResource {
     ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
     Job job = new Job().setName("Management Task | Reindex 'All RODA Objects' job")
       .setSourceObjects(SelectedItemsNone.create()).setPlugin(ReindexAllRodaEntitiesPlugin.class.getName());
-
     createJobAndRegisterAction(user, controllerAssistant, response, job, "params", job.getPluginParameters());
     return response;
   }
@@ -165,10 +164,10 @@ public class ManagementTasksResource {
       | JobAlreadyStartedException e) {
       LOGGER.error("Error creating {}", job.getName(), e);
       success = false;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, success ? LOG_ENTRY_STATE.SUCCESS : LOG_ENTRY_STATE.FAILURE, params);
     }
-
-    // register action
-    controllerAssistant.registerAction(user, success ? LOG_ENTRY_STATE.SUCCESS : LOG_ENTRY_STATE.FAILURE, params);
   }
 
   private ApiResponseMessage createJobForRunningActionlogCleaner(User user, String daysToKeep,
@@ -178,13 +177,12 @@ public class ManagementTasksResource {
     job.setName("Management Task | Log cleaner job").setSourceObjects(SelectedItemsNone.create())
       .setPlugin(ActionLogCleanerPlugin.class.getName());
     if (!daysToKeep.isEmpty()) {
-      Map<String, String> pluginParameters = new HashMap<String, String>();
+      Map<String, String> pluginParameters = new HashMap<>();
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INT_VALUE, daysToKeep);
       job.setPluginParameters(pluginParameters);
     }
 
     createJobAndRegisterAction(user, controllerAssistant, response, job, "params", job.getPluginParameters());
-
     return response;
   }
 }

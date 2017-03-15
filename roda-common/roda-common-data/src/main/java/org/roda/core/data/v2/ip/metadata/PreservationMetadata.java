@@ -70,6 +70,7 @@ public class PreservationMetadata implements IsModelObject {
   /**
    * @return the id
    */
+  @Override
   public String getId() {
     return id;
   }

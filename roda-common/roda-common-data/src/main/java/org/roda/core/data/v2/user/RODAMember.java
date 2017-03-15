@@ -18,6 +18,7 @@ public interface RODAMember extends IsIndexed, IsModelObject {
 
   boolean isUser();
 
+  @Override
   String getId();
 
   String getName();

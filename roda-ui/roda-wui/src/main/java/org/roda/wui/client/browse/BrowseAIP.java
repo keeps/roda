@@ -137,7 +137,7 @@ public class BrowseAIP extends Composite {
   private static BrowseAIP instance = null;
 
   private static final Filter COLLECTIONS_FILTER = new Filter(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID));
-  private static Facets FACETS = new Facets(new SimpleFacetParameter(RodaConstants.AIP_LEVEL),
+  private static Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.AIP_LEVEL),
     new SimpleFacetParameter(RodaConstants.AIP_HAS_REPRESENTATIONS));
 
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
@@ -270,7 +270,7 @@ public class BrowseAIP extends Composite {
     disseminationsSearch.setList(disseminationsList);
 
     // AIP CHILDREN
-    aipChildrenList = new AIPList(Filter.NULL, justActive, FACETS, messages.listOfAIPs(), selectable);
+    aipChildrenList = new AIPList(Filter.NULL, justActive, facets, messages.listOfAIPs(), selectable);
     ListSelectionUtils.bindBrowseOpener(aipChildrenList);
 
     aipChildrenSearch = new SearchPanel(COLLECTIONS_FILTER, RodaConstants.AIP_SEARCH, true,
@@ -458,7 +458,7 @@ public class BrowseAIP extends Composite {
       this.removeStyleName(state.toString().toLowerCase());
     }
 
-    FACETS = new Facets(new SimpleFacetParameter(RodaConstants.AIP_LEVEL),
+    facets = new Facets(new SimpleFacetParameter(RodaConstants.AIP_LEVEL),
       new SimpleFacetParameter(RodaConstants.AIP_HAS_REPRESENTATIONS));
   }
 
@@ -549,7 +549,7 @@ public class BrowseAIP extends Composite {
         Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aip.getId()));
         aipChildrenSearch.setDefaultFilter(filter, true);
         aipChildrenSearch.clearSearchInputBox();
-        aipChildrenList.set(filter, justActive, FACETS);
+        aipChildrenList.set(filter, justActive, facets);
         aipChildrenList.setActionable(AipActions.get(aip.getId(), aip.getState()));
       }
 
@@ -746,7 +746,7 @@ public class BrowseAIP extends Composite {
     itemIcon.getParent().addStyleName("browseTitle-allCollections-wrapper");
 
     aipChildrenSearch.setDefaultFilter(COLLECTIONS_FILTER, true);
-    aipChildrenList.set(COLLECTIONS_FILTER, justActive, FACETS);
+    aipChildrenList.set(COLLECTIONS_FILTER, justActive, facets);
     aipChildrenList.setActionable(AipActions.get());
 
     aipChildrenSearch.setVisible(true);

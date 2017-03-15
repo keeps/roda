@@ -32,6 +32,7 @@ import org.roda.core.storage.fedora.utils.FedoraConversionUtils;
  * @author Hélder Silva <hsilva@keep.pt>
  */
 public class IterableContainer implements CloseableIterable<Container> {
+  private static final String ITERATION_ERROR = "Error iterating though containers";
   private Iterator<FedoraResource> fedoraResources;
 
   public IterableContainer(FedoraRepository repository)
@@ -39,13 +40,13 @@ public class IterableContainer implements CloseableIterable<Container> {
     try {
       fedoraResources = repository.getObject("").getChildren(null).iterator();
     } catch (ForbiddenException e) {
-      throw new AuthorizationDeniedException("Error iterating though containers", e);
+      throw new AuthorizationDeniedException(ITERATION_ERROR, e);
     } catch (BadRequestException e) {
-      throw new RequestNotValidException("Error iterating though containers", e);
+      throw new RequestNotValidException(ITERATION_ERROR, e);
     } catch (org.fcrepo.client.NotFoundException e) {
-      throw new NotFoundException("Error iterating though containers", e);
+      throw new NotFoundException(ITERATION_ERROR, e);
     } catch (FedoraException e) {
-      throw new GenericException("Error iterating though containers", e);
+      throw new GenericException(ITERATION_ERROR, e);
     }
   }
 
@@ -82,6 +83,7 @@ public class IterableContainer implements CloseableIterable<Container> {
 
     @Override
     public void remove() {
+      // do nothing
     }
 
   }

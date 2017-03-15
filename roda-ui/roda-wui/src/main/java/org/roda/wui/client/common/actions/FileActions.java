@@ -86,6 +86,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
     return new FileActions(aipId, representationId);
   }
 
+  @Override
   public boolean canAct(Actionable.Action<IndexedFile> action, IndexedFile file) {
     boolean ret;
     if (file.isDirectory()) {

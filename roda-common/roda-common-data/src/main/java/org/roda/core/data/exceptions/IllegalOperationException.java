@@ -19,6 +19,7 @@ public class IllegalOperationException extends RODAServiceException {
    * Constructs a new IllegalOperationException.
    */
   public IllegalOperationException() {
+    // do nothing
   }
 
   /**

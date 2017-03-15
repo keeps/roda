@@ -106,7 +106,7 @@ public class PreservationAgentList extends BasicAsyncTableCell<IndexedPreservati
 
   @Override
   protected Sorter getSorter(ColumnSortList columnSortList) {
-    Map<Column<IndexedPreservationAgent, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<IndexedPreservationAgent, ?>, List<String>>();
+    Map<Column<IndexedPreservationAgent, ?>, List<String>> columnSortingKeyMap = new HashMap<>();
     columnSortingKeyMap.put(idColumn, Arrays.asList(RodaConstants.PRESERVATION_AGENT_ID));
     columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.PRESERVATION_AGENT_NAME));
     columnSortingKeyMap.put(typeColumn, Arrays.asList(RodaConstants.PRESERVATION_AGENT_TYPE));

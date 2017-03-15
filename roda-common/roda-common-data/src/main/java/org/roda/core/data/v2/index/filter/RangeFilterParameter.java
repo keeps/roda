@@ -23,6 +23,7 @@ public abstract class RangeFilterParameter<T extends Serializable> extends Filte
    * Constructs an empty {@link RangeFilterParameter}.
    */
   public RangeFilterParameter() {
+    // do nothing
   }
 
   /**
@@ -52,6 +53,7 @@ public abstract class RangeFilterParameter<T extends Serializable> extends Filte
   /**
    * @see Object#toString()
    */
+  @Override
   public String toString() {
     return "RangeFilterParameter(name=" + getName() + ", fromValue=" + getFromValue() + ", toValue=" + getToValue()
       + ")";

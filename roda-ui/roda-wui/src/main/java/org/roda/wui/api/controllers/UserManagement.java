@@ -318,7 +318,7 @@ public class UserManagement extends RodaWuiController {
       String verificationCompleteURL = verificationURL + "/"
         + URLEncoder.encode(username, RodaConstants.DEFAULT_ENCODING) + "/" + token;
 
-      Map<String, Object> scopes = new HashMap<String, Object>();
+      Map<String, Object> scopes = new HashMap<>();
       scopes.put("username", username);
       scopes.put("token", token);
       scopes.put("verificationURL", verificationURL);
@@ -347,7 +347,7 @@ public class UserManagement extends RodaWuiController {
       String recoverLoginCompleteURL = recoverLoginURL + "/"
         + URLEncoder.encode(username, RodaConstants.DEFAULT_ENCODING) + "/" + token;
 
-      Map<String, Object> scopes = new HashMap<String, Object>();
+      Map<String, Object> scopes = new HashMap<>();
       scopes.put("username", username);
       scopes.put("token", token);
       scopes.put("recoverLoginURL", recoverLoginURL);

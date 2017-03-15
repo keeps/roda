@@ -62,7 +62,7 @@ import com.google.common.collect.Iterables;
 
 import jersey.repackaged.com.google.common.collect.Lists;
 
-@Test(groups = {"all", "travis"})
+@Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_TRAVIS})
 public class BagitSIPPluginsTest {
 
   private static final int CORPORA_FILES_COUNT = 4;
@@ -73,7 +73,6 @@ public class BagitSIPPluginsTest {
   private static IndexService index;
 
   private static Path corporaPath;
-  private static String aipCreator = "admin";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ModelServiceTest.class);
 
@@ -128,7 +127,7 @@ public class BagitSIPPluginsTest {
     String parentId = null;
     String aipType = RodaConstants.AIP_TYPE_MIXED;
 
-    AIP root = model.createAIP(parentId, aipType, new Permissions(), aipCreator);
+    AIP root = model.createAIP(parentId, aipType, new Permissions(), RodaConstants.ADMIN);
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());

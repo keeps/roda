@@ -193,7 +193,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       // 6) Format validation - PDF/A format validator (using VeraPDF)
       if (!aips.isEmpty() && PluginHelper.verifyIfStepShouldBePerformed(this,
         getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_VERAPDF_CHECK))) {
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("profile", "1b");
         pluginReport = doVeraPDFCheck(index, model, storage, aips, params);
         mergeReports(jobPluginInfo, pluginReport);
@@ -207,7 +207,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
         getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION))
         || PluginHelper.verifyIfStepShouldBePerformed(this,
           getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FULL_TEXT_EXTRACTION)))) {
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION, PluginHelper.verifyIfStepShouldBePerformed(this,
           getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION)) ? "true" : "false");
         params.put(RodaConstants.PLUGIN_PARAMS_DO_FULLTEXT_EXTRACTION, PluginHelper.verifyIfStepShouldBePerformed(this,
@@ -361,7 +361,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       getPluginParameter(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION));
 
     if (StringUtils.isNotBlank(emails)) {
-      List<String> emailList = new ArrayList<String>(Arrays.asList(emails.split("\\s*,\\s*")));
+      List<String> emailList = new ArrayList<>(Arrays.asList(emails.split("\\s*,\\s*")));
       Notification notification = new Notification();
       String outcome = PluginState.SUCCESS.toString();
 
@@ -380,7 +380,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       notification.setFromUser(this.getClass().getSimpleName());
       notification.setRecipientUsers(emailList);
 
-      Map<String, Object> scopes = new HashMap<String, Object>();
+      Map<String, Object> scopes = new HashMap<>();
       scopes.put("outcome", outcome);
       scopes.put("type", CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, job.getPluginType().toString()));
       scopes.put("sips", jobStats.getSourceObjectsCount());
@@ -411,7 +411,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       notification.setSubject("RODA ingest process finished - " + outcome);
       notification.setFromUser(this.getClass().getSimpleName());
       notification.setRecipientUsers(Arrays.asList(httpNotifications));
-      Map<String, Object> scope = new HashMap<String, Object>();
+      Map<String, Object> scope = new HashMap<>();
       scope.put(HTTPNotificationProcessor.JOB_KEY, job);
       model.createNotification(notification, new HTTPNotificationProcessor(httpNotifications, scope));
     }
@@ -473,7 +473,9 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION, RodaConstants.PLUGIN_PARAMS_DO_FULL_TEXT_EXTRACTION,
       RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT);
     int effectiveTotalSteps = getTotalSteps();
-    boolean tikaParameters = false, dontDoFeatureExtraction = false, dontDoFulltext = false;
+    boolean tikaParameters = false;
+    boolean dontDoFeatureExtraction = false;
+    boolean dontDoFulltext = false;
 
     for (PluginParameter pluginParameter : getParameters()) {
       if (pluginParameter.getType() == PluginParameterType.BOOLEAN
@@ -595,9 +597,8 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
   private Report executePlugin(IndexService index, ModelService model, StorageService storage, List<AIP> aips,
     String pluginClassName, Map<String, String> params) {
-    Report report = null;
     Plugin<AIP> plugin = RodaCoreFactory.getPluginManager().getPlugin(pluginClassName, AIP.class);
-    Map<String, String> mergedParams = new HashMap<String, String>(getParameterValues());
+    Map<String, String> mergedParams = new HashMap<>(getParameterValues());
     if (params != null) {
       mergedParams.putAll(params);
     }
@@ -605,12 +606,12 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     try {
       plugin.setParameterValues(mergedParams);
       List<LiteOptionalWithCause> lites = LiteRODAObjectFactory.transformIntoLiteWithCause(model, aips);
-      report = plugin.execute(index, model, storage, lites);
+      return plugin.execute(index, model, storage, lites);
     } catch (InvalidParameterException | PluginException | RuntimeException e) {
       LOGGER.error("Error executing plugin", e);
     }
 
-    return report;
+    return null;
   }
 
   private void updateAIPsToBeAppraised(ModelService model, List<AIP> aips, IngestJobPluginInfo jobPluginInfo) {
@@ -700,6 +701,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
   public abstract Optional<? extends AfterExecute> getAfterExecute();
 
+  @FunctionalInterface
   public interface AfterExecute {
     void execute(IngestJobPluginInfo jobPluginInfo, List<AIP> aips);
   }

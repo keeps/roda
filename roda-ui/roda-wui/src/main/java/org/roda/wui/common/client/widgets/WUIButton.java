@@ -45,7 +45,7 @@ public class WUIButton extends AccessibleFocusPanel implements HasText {
    * The type of the left part of the button
    * 
    */
-  public static enum Left {
+  public enum Left {
     /**
      * Square button left part
      */
@@ -60,7 +60,7 @@ public class WUIButton extends AccessibleFocusPanel implements HasText {
    * The type of the right part of the button
    * 
    */
-  public static enum Right {
+  public enum Right {
     /**
      * button right part with a cross
      */
@@ -144,22 +144,28 @@ public class WUIButton extends AccessibleFocusPanel implements HasText {
 
     this.addMouseListener(new MouseListener() {
 
+      @Override
       public void onMouseDown(Widget sender, int x, int y) {
         addStyleDependentName("pressed");
 
       }
 
+      @Override
       public void onMouseEnter(Widget sender) {
         addStyleDependentName("hover");
       }
 
+      @Override
       public void onMouseLeave(Widget sender) {
         removeStyleDependentName("hover");
       }
 
+      @Override
       public void onMouseMove(Widget sender, int x, int y) {
+        // do nothing
       }
 
+      @Override
       public void onMouseUp(Widget sender, int x, int y) {
         removeStyleDependentName("pressed");
       }
@@ -173,7 +179,7 @@ public class WUIButton extends AccessibleFocusPanel implements HasText {
     this.layout.getCellFormatter().addStyleName(0, 1, "wui-button-text-container");
     this.label.setWordWrap(false);
     this.enabled = true;
-    this.clickListeners = new Vector<ClickListener>();
+    this.clickListeners = new Vector<>();
   }
 
   /**
@@ -188,10 +194,12 @@ public class WUIButton extends AccessibleFocusPanel implements HasText {
     setText(text);
   }
 
+  @Override
   public void setText(String text) {
     this.label.setText(text.toUpperCase());
   }
 
+  @Override
   public String getText() {
     return this.getText();
   }
@@ -358,6 +366,7 @@ public class WUIButton extends AccessibleFocusPanel implements HasText {
     }
   }
 
+  @Override
   public void addClickListener(ClickListener listener) {
     clickListeners.add(listener);
     if (this.enabled) {
@@ -365,6 +374,7 @@ public class WUIButton extends AccessibleFocusPanel implements HasText {
     }
   }
 
+  @Override
   public void removeClickListener(ClickListener listener) {
     clickListeners.remove(listener);
     if (this.enabled) {

@@ -84,6 +84,7 @@ public class IngestJobPluginInfo extends JobPluginInfo {
     this.setOutcomeObjectsWithManualIntervention(ingestJobPluginInfo.getOutcomeObjectsWithManualIntervention());
   }
 
+  @Override
   public <T extends IsRODAObject> JobPluginInfo processJobPluginInformation(Plugin<T> plugin, JobInfo jobInfo) {
     int taskObjectsCount = jobInfo.getObjectsCount();
     Map<Integer, JobPluginInfo> jobInfos = jobInfo.getJobInfo();
@@ -195,6 +196,7 @@ public class IngestJobPluginInfo extends JobPluginInfo {
     setSourceObjectsProcessedWithFailure(getSourceObjectsCount() - beingProcessed);
   }
 
+  @Override
   public void finalizeInfo() {
     super.finalizeInfo();
     // INFO 20160601 hsilva: the following line is needed because we only mark,

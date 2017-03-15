@@ -56,7 +56,7 @@ public class GhostScriptConvertPlugin<T extends IsRODAObject> extends CommandCon
 
   @Override
   public Plugin<T> cloneMe() {
-    return new GhostScriptConvertPlugin<T>();
+    return new GhostScriptConvertPlugin<>();
   }
 
   @Override

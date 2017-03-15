@@ -15,6 +15,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.storage.StorageService;
 
+@FunctionalInterface
 public interface RODAProcessingLogic<T extends IsRODAObject> {
   public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
     SimpleJobPluginInfo jobPluginInfo, Plugin<T> plugin);

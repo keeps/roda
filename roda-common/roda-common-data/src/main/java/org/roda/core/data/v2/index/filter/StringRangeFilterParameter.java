@@ -24,5 +24,4 @@ public class StringRangeFilterParameter extends RangeFilterParameter<String> {
   public StringRangeFilterParameter(String name, String fromValue, String toValue) {
     super(name, fromValue, toValue);
   }
-
 }

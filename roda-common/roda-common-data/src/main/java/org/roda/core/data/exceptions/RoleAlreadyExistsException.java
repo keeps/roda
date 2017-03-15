@@ -21,6 +21,7 @@ public class RoleAlreadyExistsException extends AlreadyExistsException {
    * Constructs a new {@link RoleAlreadyExistsException}.
    */
   public RoleAlreadyExistsException() {
+    // do nothing
   }
 
   /**

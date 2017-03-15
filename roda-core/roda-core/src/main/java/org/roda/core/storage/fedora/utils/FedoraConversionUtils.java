@@ -50,7 +50,7 @@ public final class FedoraConversionUtils {
    * Private empty constructor
    */
   private FedoraConversionUtils() {
-
+    // do nothing
   }
 
   /**
@@ -116,7 +116,7 @@ public final class FedoraConversionUtils {
       try {
         sizeInBytes = datastream.getContentSize();
       } catch (NullPointerException npe) {
-
+        // do nothing
       }
       URI contentDigest = datastream.getContentDigest();
 
@@ -127,7 +127,7 @@ public final class FedoraConversionUtils {
   }
 
   private static Map<String, String> extractContentDigest(URI contentDigest) {
-    Map<String, String> ret = new HashMap<String, String>();
+    Map<String, String> ret = new HashMap<>();
     if (contentDigest != null) {
       final String[] values = contentDigest.getSchemeSpecificPart().split(":");
       if (values.length == 2) {
@@ -156,7 +156,7 @@ public final class FedoraConversionUtils {
    *          triple iterator to be converted
    */
   public static Map<String, Set<String>> tripleIteratorToMap(Iterator<Triple> iterator) {
-    Map<String, Set<String>> map = new HashMap<String, Set<String>>();
+    Map<String, Set<String>> map = new HashMap<>();
     while (iterator.hasNext()) {
 
       Triple t = iterator.next();
@@ -167,7 +167,7 @@ public final class FedoraConversionUtils {
           oldList.add(t.getMatchObject().getLiteral().getValue().toString());
           map.put(t.getMatchPredicate().getLocalName(), oldList);
         } else {
-          Set<String> values = new HashSet<String>();
+          Set<String> values = new HashSet<>();
           values.add(t.getMatchObject().getLiteral().getValue().toString());
           map.put(t.getMatchPredicate().getLocalName(), values);
         }
@@ -189,7 +189,7 @@ public final class FedoraConversionUtils {
    */
   public static Map<String, Set<String>> tripleIteratorToMap(String fedoraRepositoryURL, Iterator<Triple> iterator,
     Node subject) {
-    Map<String, Set<String>> map = new HashMap<String, Set<String>>();
+    Map<String, Set<String>> map = new HashMap<>();
     while (iterator.hasNext()) {
 
       Triple t = iterator.next();
@@ -201,7 +201,7 @@ public final class FedoraConversionUtils {
           oldList.add(t.getMatchObject().getLiteral().getValue().toString());
           map.put(t.getMatchPredicate().getLocalName(), oldList);
         } else {
-          Set<String> values = new HashSet<String>();
+          Set<String> values = new HashSet<>();
           values.add(t.getMatchObject().getLiteral().getValue().toString());
           map.put(t.getMatchPredicate().getLocalName(), values);
         }

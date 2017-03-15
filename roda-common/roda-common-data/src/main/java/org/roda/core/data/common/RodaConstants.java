@@ -1230,6 +1230,14 @@ public final class RodaConstants {
   public static final String HTTP_HEADERS_WWW_AUTHENTICATE = "WWW-Authenticate";
   public static final int STATUS_OK = 200;
 
+  /* Test groups */
+  public static final String TEST_GROUP_ALL = "all";
+  public static final String TEST_GROUP_TRAVIS = "travis";
+  public static final String TEST_GROUP_PLUGIN = "plugin";
+
+  /* List threshold */
+  public static final int DEFAULT_LIST_THRESHOLD = 100;
+
   /* DIP types */
 
   public static final String DIP_TYPE_CONVERSION = "conversion";

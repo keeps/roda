@@ -44,12 +44,12 @@ public class IncrementalList extends Composite implements HasHandlers {
 
   public IncrementalList() {
     initWidget(uiBinder.createAndBindUi(this));
-    textBoxes = new ArrayList<RemovableTextBox>();
+    textBoxes = new ArrayList<>();
   }
 
   public IncrementalList(List<String> list, String label) {
     initWidget(uiBinder.createAndBindUi(this));
-    textBoxes = new ArrayList<RemovableTextBox>();
+    textBoxes = new ArrayList<>();
     this.setTextBoxList(list);
   }
 
@@ -69,7 +69,7 @@ public class IncrementalList extends Composite implements HasHandlers {
 
   public void clearTextBoxes() {
     textBoxPanel.clear();
-    textBoxes = new ArrayList<RemovableTextBox>();
+    textBoxes = new ArrayList<>();
   }
 
   @UiHandler("addDynamicTextBoxButton")

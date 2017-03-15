@@ -21,10 +21,12 @@ public class ObjectResponse<T extends Serializable> implements EntityResponse {
     this.object = object;
   }
 
+  @Override
   public String getMediaType() {
     return mediaType;
   }
 
+  @Override
   public void setMediaType(String mediaType) {
     this.mediaType = mediaType;
   }

@@ -33,7 +33,7 @@ public abstract class ModelObservable {
 
   public ModelObservable() {
     super();
-    this.observers = new ArrayList<ModelObserver>();
+    this.observers = new ArrayList<>();
   }
 
   public void addModelObserver(ModelObserver observer) {

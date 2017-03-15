@@ -67,7 +67,7 @@ import com.google.common.collect.Iterables;
 
 import jersey.repackaged.com.google.common.collect.Lists;
 
-@Test(groups = {"all", "travis"})
+@Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_TRAVIS})
 public class ImageMagickTest {
   private static final Logger LOGGER = LoggerFactory.getLogger(ImageMagickTest.class);
 
@@ -76,7 +76,6 @@ public class ImageMagickTest {
   private static IndexService index;
   private static int numberOfConvertableFiles = 17;
   private static Path corporaPath;
-  private static String aipCreator = "admin";
 
   @BeforeMethod
   public void setUp() throws Exception {
@@ -131,7 +130,7 @@ public class ImageMagickTest {
     FileAlreadyExistsException, SolrServerException, IsStillUpdatingException {
     String parentId = null;
     String aipType = RodaConstants.AIP_TYPE_MIXED;
-    AIP root = model.createAIP(parentId, aipType, new Permissions(), aipCreator);
+    AIP root = model.createAIP(parentId, aipType, new Permissions(), RodaConstants.ADMIN);
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());

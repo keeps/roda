@@ -47,14 +47,14 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   @SuppressWarnings("unused")
   private final transient Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
-  private static String RECAPTCHA_CODE_SECRET_PROPERTY = "ui.google.recaptcha.code.secret";
+  private static final String RECAPTCHA_CODE_SECRET_PROPERTY = "ui.google.recaptcha.code.secret";
 
   /**
    * User Management Service implementation constructor
    *
    */
   public UserManagementServiceImpl() {
-
+    // do nothing
   }
 
   @Override

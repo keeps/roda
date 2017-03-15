@@ -46,8 +46,11 @@ import org.slf4j.LoggerFactory;
 
 public class TikaFullTextPluginUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(TikaFullTextPluginUtils.class);
-
   private static final Tika tika = new Tika();
+
+  private TikaFullTextPluginUtils() {
+    // do nothing
+  }
 
   public static LinkingIdentifier runTikaFullTextOnFile(IndexService index, ModelService model, StorageService storage,
     File file, boolean doFeatureExtraction, boolean doFulltextExtraction) throws NotFoundException, GenericException,

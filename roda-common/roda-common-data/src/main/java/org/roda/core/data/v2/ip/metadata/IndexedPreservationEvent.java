@@ -35,6 +35,7 @@ public class IndexedPreservationEvent implements IsIndexed, HasPermissionFilters
   private List<LinkingIdentifier> outcomeObjectIds;
   private List<LinkingIdentifier> sourcesObjectIds;
 
+  @Override
   public String getId() {
     return id;
   }

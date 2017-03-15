@@ -144,6 +144,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     LOGGER.info("Going to shutdown actor system (which will be done asynchronously)");
     Future<Terminated> terminate = jobsSystem.terminate();
     terminate.onComplete(new OnComplete<Terminated>() {
+      @Override
       public void onComplete(Throwable failure, Terminated result) {
         if (failure != null) {
           LOGGER.error("Error while shutting down actor system", failure);
@@ -172,13 +173,13 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
         .findAll(classToActOn, filter, new Sorter(new SortParameter(RodaConstants.INDEX_UUID, true)), liteFields)
         .iterator();
 
-      List<T1> indexObjects = new ArrayList<T1>();
+      List<T1> indexObjects = new ArrayList<>();
       while (findAllIterator.hasNext()) {
         if (indexObjects.size() == blockSize) {
           innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, modelClassToActOn, blockSize, jobActor);
           jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin,
             LiteRODAObjectFactory.transformIntoLiteWithCause(model, indexObjects)), jobActor);
-          indexObjects = new ArrayList<T1>();
+          indexObjects = new ArrayList<>();
         }
         indexObjects.add(findAllIterator.next());
       }
@@ -215,7 +216,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       jobStateInfoActor.tell(new Messages.PluginBeforeAllExecuteIsReady<>(plugin), jobActor);
 
-      List<T> block = new ArrayList<T>();
+      List<T> block = new ArrayList<>();
       while (iter.hasNext()) {
         if (block.size() == blockSize) {
           innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, objectClass, blockSize, jobActor);

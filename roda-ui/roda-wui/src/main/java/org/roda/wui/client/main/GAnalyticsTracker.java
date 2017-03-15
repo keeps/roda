@@ -14,29 +14,32 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class GAnalyticsTracker {
 
+  private static String accountId = null;
+
   /**
    * constructor - nothing to do
    */
   public GAnalyticsTracker() {
+    // do nothing
   }
 
-  private static String ACCOUNT_ID = null;
-
   private static void getAccountId(final AsyncCallback<String> callback) {
-    if (ACCOUNT_ID == null) {
+    if (accountId == null) {
       BrowserService.Util.getInstance().retrieveGoogleAnalyticsAccount(new AsyncCallback<String>() {
 
+        @Override
         public void onFailure(Throwable caught) {
           callback.onFailure(caught);
         }
 
+        @Override
         public void onSuccess(String result) {
-          ACCOUNT_ID = result;
-          callback.onSuccess(ACCOUNT_ID);
+          accountId = result;
+          callback.onSuccess(accountId);
         }
       });
     } else {
-      callback.onSuccess(ACCOUNT_ID);
+      callback.onSuccess(accountId);
     }
   }
 
@@ -46,7 +49,6 @@ public class GAnalyticsTracker {
    * @param historyToken
    */
   public static void track(String historyToken) {
-
     String baseURL = GWT.getHostPageBaseURL();
 
     String urlPath = baseURL.substring(baseURL.indexOf('/', "https://".length() + 1));
@@ -54,10 +56,12 @@ public class GAnalyticsTracker {
 
     getAccountId(new AsyncCallback<String>() {
 
+      @Override
       public void onFailure(Throwable caught) {
         // do nothing
       }
 
+      @Override
       public void onSuccess(String accountId) {
         if (!"".equals(accountId)) {
           trackGoogleAnalytics(page, accountId);

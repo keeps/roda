@@ -19,6 +19,7 @@ public class LikeFilterParameter extends FilterParameter {
    * Constructs an empty {@link LikeFilterParameter}.
    */
   public LikeFilterParameter() {
+    // do nothing
   }
 
   /**
@@ -46,6 +47,7 @@ public class LikeFilterParameter extends FilterParameter {
   /**
    * @see Object#toString()
    */
+  @Override
   public String toString() {
     return "LikeFilterParameter(name=" + getName() + ", expression=" + getExpression() + ")";
   }

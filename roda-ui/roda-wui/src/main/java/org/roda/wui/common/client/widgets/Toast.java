@@ -29,11 +29,8 @@ import config.i18n.client.ClientMessages;
  */
 public class Toast extends PopupPanel {
   private static final int PADDING = 10;
-
   private static final int SLOTS_NUMBER = 7;
-
   private static final Toast[] slots = new Toast[SLOTS_NUMBER];
-
   private static int currentSlot = 0;
 
   private static int getNextSlot(Toast next) {
@@ -52,7 +49,7 @@ public class Toast extends PopupPanel {
   /**
    * The type of message
    */
-  public static enum MessagePopupType {
+  public enum MessagePopupType {
     /**
      * An error message
      */
@@ -111,6 +108,7 @@ public class Toast extends PopupPanel {
     });
 
     hideTimer = new Timer() {
+      @Override
       public void run() {
         hide();
       }
@@ -121,6 +119,7 @@ public class Toast extends PopupPanel {
     messageLabel.addStyleName("toast-message");
   }
 
+  @Override
   public void hide() {
     super.hide();
     slots[slotNumber] = null;
@@ -132,6 +131,7 @@ public class Toast extends PopupPanel {
   public void start() {
     setPopupPositionAndShow(new PositionCallback() {
 
+      @Override
       public void setPosition(int offsetWidth, int offsetHeight) {
         int slotOffset = 0;
         for (int i = 0; i < slotNumber; i++) {

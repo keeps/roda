@@ -14,6 +14,7 @@ public class RecaptchaException extends Exception {
    * Constructs a new {@link RecaptchaException}.
    */
   public RecaptchaException() {
+    // do nothing
   }
 
   /**

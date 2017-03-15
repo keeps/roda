@@ -60,11 +60,10 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
   private boolean createSubmission = false;
 
   private Optional<String> computedSearchScope;
-  private boolean forceSearchScope;
-  private Path jobWorkingDirectory;
 
   @Override
   public void init() throws PluginException {
+    // do nothing
   }
 
   @Override
@@ -107,8 +106,6 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> liteList) throws PluginException {
     computedSearchScope = PluginHelper.getSearchScopeFromParameters(this, model);
-    forceSearchScope = PluginHelper.getForceParentIdFromParameters(this);
-    jobWorkingDirectory = PluginHelper.getJobWorkingDirectory(this);
 
     return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<TransferredResource>() {
       @Override
@@ -176,7 +173,6 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
       model.notifyAipCreated(aip.getId());
 
       reportItem.setOutcomeObjectId(aip.getId()).setPluginState(PluginState.SUCCESS);
-
       createWellformedEventSuccess(model, index, transferredResource, aip);
       LOGGER.debug("Done with converting {} to AIP {}", transferredResourcePath, aip.getId());
     } catch (RODAException | IOException | RuntimeException e) {

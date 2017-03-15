@@ -40,7 +40,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-@Test(groups = {"all", "travis"})
+@Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_TRAVIS})
 public class JobsTest {
   private static final Logger LOGGER = LoggerFactory.getLogger(JobsTest.class);
 
@@ -101,7 +101,7 @@ public class JobsTest {
   public void testJobExecutingPluginThatFailsDuringExecute()
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     Map<String, String> parameters = new HashMap<>();
-    parameters.put(PluginThatFailsDuringXMethod.EXECUTE, "");
+    parameters.put(PluginThatFailsDuringXMethod.ON_EXECUTE, "");
     TestsHelper.executeJob(PluginThatFailsDuringXMethod.class, parameters, PluginType.MISC, SelectedItemsNone.create(),
       JOB_STATE.COMPLETED);
   }
@@ -123,7 +123,8 @@ public class JobsTest {
     List<String> aips = new ArrayList<>();
     try {
       for (int i = 0; i < 30; i++) {
-        aips.add(modelService.createAIP(null, "MIXED", new Permissions(), RodaConstants.ADMIN).getId());
+        aips.add(modelService
+          .createAIP(null, RodaConstants.REPRESENTATION_TYPE_MIXED, new Permissions(), RodaConstants.ADMIN).getId());
       }
     } catch (AlreadyExistsException e) {
       // do nothing
@@ -160,7 +161,6 @@ public class JobsTest {
     TestsHelper.executeJob(DummyPlugin.class, PluginType.MISC, SelectedItemsNone.create(), JOB_STATE.COMPLETED);
 
     JobsHelper.setSyncTimeout(originalSyncTimeout);
-
   }
 
 }

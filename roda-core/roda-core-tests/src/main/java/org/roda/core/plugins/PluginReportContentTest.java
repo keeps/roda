@@ -9,7 +9,6 @@ package org.roda.core.plugins;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
@@ -64,7 +63,7 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-@Test(groups = {"all", "travis"})
+@Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_TRAVIS})
 public class PluginReportContentTest {
 
   private static Path basePath;
@@ -77,7 +76,7 @@ public class PluginReportContentTest {
   private static final String CORPORA_TEST1 = "test1";
   private static final String CORPORA_TEST1_TXT = "test1.txt";
   private static final int GENERATED_FILE_SIZE = 100;
-  private static final String aipCreator = "admin";
+  private static final String AIP_CREATOR = "admin";
 
   @BeforeClass
   public static void setUp() throws Exception {
@@ -137,8 +136,8 @@ public class PluginReportContentTest {
     return new ByteArrayInputStream(RandomStringUtils.randomAscii(GENERATED_FILE_SIZE).getBytes());
   }
 
-  private TransferredResource createCorpora() throws InterruptedException, IOException, FileAlreadyExistsException,
-    NotFoundException, GenericException, RequestNotValidException, AlreadyExistsException {
+  private TransferredResource createCorpora() throws InterruptedException, IOException, NotFoundException,
+    GenericException, RequestNotValidException, AlreadyExistsException {
     TransferredResourcesScanner f = RodaCoreFactory.getTransferredResourcesScanner();
 
     String parentUUID = f.createFolder(null, "test").getUUID();
@@ -163,16 +162,15 @@ public class PluginReportContentTest {
 
     index.commit(TransferredResource.class);
 
-    TransferredResource transferredResource = index.retrieve(TransferredResource.class,
-      UUID.nameUUIDFromBytes("test".getBytes()).toString(), new ArrayList<>());
-    return transferredResource;
+    return index.retrieve(TransferredResource.class, UUID.nameUUIDFromBytes("test".getBytes()).toString(),
+      new ArrayList<>());
   }
 
   @Test
-  private void ingestCorporaTest() throws RequestNotValidException, NotFoundException, GenericException,
-    AlreadyExistsException, AuthorizationDeniedException, InvalidParameterException, InterruptedException, IOException,
-    FileAlreadyExistsException, SolrServerException {
-    AIP root = model.createAIP(null, RodaConstants.AIP_TYPE_MIXED, new Permissions(), aipCreator);
+  private void ingestCorporaTest()
+    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException, InvalidParameterException, InterruptedException, IOException, SolrServerException {
+    AIP root = model.createAIP(null, RodaConstants.AIP_TYPE_MIXED, new Permissions(), AIP_CREATOR);
 
     TransferredResource transferredResource = createCorpora();
     AssertJUnit.assertEquals(transferredResource == null, false);
@@ -198,9 +196,8 @@ public class PluginReportContentTest {
   }
 
   @Test
-  public void siegfriedCorporaTestAIP()
-    throws RODAException, ParseException, FileAlreadyExistsException, InterruptedException, IOException {
-    AIP root = model.createAIP(null, RodaConstants.AIP_TYPE_MIXED, new Permissions(), aipCreator);
+  public void siegfriedCorporaTestAIP() throws RODAException, ParseException, InterruptedException, IOException {
+    AIP root = model.createAIP(null, RodaConstants.AIP_TYPE_MIXED, new Permissions(), AIP_CREATOR);
 
     TransferredResource transferredResource = createCorpora();
     AssertJUnit.assertEquals(transferredResource == null, false);
@@ -232,8 +229,8 @@ public class PluginReportContentTest {
 
   @Test
   public void siegfriedCorporaTestRepresentation()
-    throws RODAException, ParseException, FileAlreadyExistsException, InterruptedException, IOException {
-    AIP root = model.createAIP(null, RodaConstants.AIP_TYPE_MIXED, new Permissions(), aipCreator);
+    throws RODAException, ParseException, InterruptedException, IOException {
+    AIP root = model.createAIP(null, RodaConstants.AIP_TYPE_MIXED, new Permissions(), AIP_CREATOR);
 
     TransferredResource transferredResource = createCorpora();
     AssertJUnit.assertEquals(transferredResource == null, false);
@@ -267,9 +264,8 @@ public class PluginReportContentTest {
   }
 
   @Test
-  public void siegfriedCorporaTestFile()
-    throws RODAException, ParseException, FileAlreadyExistsException, InterruptedException, IOException {
-    AIP root = model.createAIP(null, RodaConstants.AIP_TYPE_MIXED, new Permissions(), aipCreator);
+  public void siegfriedCorporaTestFile() throws RODAException, ParseException, InterruptedException, IOException {
+    AIP root = model.createAIP(null, RodaConstants.AIP_TYPE_MIXED, new Permissions(), AIP_CREATOR);
 
     TransferredResource transferredResource = createCorpora();
     AssertJUnit.assertEquals(transferredResource == null, false);

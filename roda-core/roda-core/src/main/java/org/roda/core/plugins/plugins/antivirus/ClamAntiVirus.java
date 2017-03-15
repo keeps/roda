@@ -127,6 +127,7 @@ public class ClamAntiVirus implements AntiVirus {
    *           if some problem prevented the virus check from run a normal test.
    * @see AntiVirus
    */
+  @Override
   public VirusCheckResult checkForVirus(Path path) throws RuntimeException {
 
     VirusCheckResult result = new VirusCheckResult();
@@ -163,7 +164,7 @@ public class ClamAntiVirus implements AntiVirus {
   public String getVersion() {
     String clamavGetVersion = RodaCoreFactory.getRodaConfiguration()
       .getString("core.plugins.internal.virus_check.clamav.get_version", "clamscan --version");
-    List<String> command = new ArrayList<String>(Arrays.asList(clamavGetVersion.split(" ")));
+    List<String> command = new ArrayList<>(Arrays.asList(clamavGetVersion.split(" ")));
     try {
       String executeOutput = CommandUtility.execute(command);
       if (executeOutput.contains("\n")) {

@@ -10,6 +10,7 @@ package org.roda.core.common;
 import java.util.Arrays;
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.jobs.Report;
@@ -17,7 +18,7 @@ import org.testng.Assert;
 import org.testng.AssertJUnit;
 import org.testng.annotations.Test;
 
-@Test(groups = {"all", "travis"})
+@Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_TRAVIS})
 public class JsonUtilsTest {
 
   @Test

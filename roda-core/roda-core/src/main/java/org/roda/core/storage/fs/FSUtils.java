@@ -77,7 +77,7 @@ public final class FSUtils {
    * Private empty constructor
    */
   private FSUtils() {
-
+    // do nothing
   }
 
   /**
@@ -763,7 +763,7 @@ public final class FSUtils {
    * @throws GenericException
    */
   public static Map<String, String> generateContentDigest(Path path, String... algorithms) throws GenericException {
-    Map<String, String> digests = new HashMap<String, String>();
+    Map<String, String> digests = new HashMap<>();
 
     for (String algorithm : algorithms) {
       String digest = computeContentDigest(path, algorithm);

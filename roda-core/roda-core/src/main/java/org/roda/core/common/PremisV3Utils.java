@@ -727,7 +727,7 @@ public final class PremisV3Utils {
   }
 
   public static List<LinkingIdentifier> extractAgentsFromEvent(Binary b) throws ValidationException, GenericException {
-    List<LinkingIdentifier> identifiers = new ArrayList<LinkingIdentifier>();
+    List<LinkingIdentifier> identifiers = new ArrayList<>();
     EventComplexType event = PremisV3Utils.binaryToEvent(b.getContent(), true);
     if (event.getLinkingAgentIdentifierArray() != null && event.getLinkingAgentIdentifierArray().length > 0) {
       for (LinkingAgentIdentifierComplexType laict : event.getLinkingAgentIdentifierArray()) {

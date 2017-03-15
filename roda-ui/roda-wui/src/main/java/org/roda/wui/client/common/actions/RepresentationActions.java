@@ -198,8 +198,8 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
 
   public void changeType(final SelectedItems<IndexedRepresentation> representations,
     final AsyncCallback<ActionImpact> callback) {
-    SearchSuggestBox<IndexedRepresentation> suggestBox = new SearchSuggestBox<IndexedRepresentation>(
-      IndexedRepresentation.class, RodaConstants.REPRESENTATION_TYPE, true);
+    SearchSuggestBox<IndexedRepresentation> suggestBox = new SearchSuggestBox<>(IndexedRepresentation.class,
+      RodaConstants.REPRESENTATION_TYPE, true);
 
     Dialogs.showPromptDialogSuggest(messages.changeTypeTitle(), null, messages.changeTypePlaceHolder(),
       messages.cancelButton(), messages.confirmButton(), suggestBox, new AsyncCallback<String>() {

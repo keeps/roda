@@ -29,6 +29,7 @@ public class VirusCheckResult {
    * Constructs an empty {@link VirusCheckResult}.
    */
   public VirusCheckResult() {
+    // do nothing
   }
 
   /**

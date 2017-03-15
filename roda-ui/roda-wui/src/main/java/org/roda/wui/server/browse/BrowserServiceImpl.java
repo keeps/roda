@@ -108,14 +108,12 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   static final String FONDLIST_PAGESIZE = "10";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(BrowserServiceImpl.class);
-
-  private static String COOKIES_ACTIVE_PROPERTY = "ui.cookies.active";
+  private static final String COOKIES_ACTIVE_PROPERTY = "ui.cookies.active";
+  private static final String GANALYTICS_CODE_PROPERTY = "ui.google.analytics.code";
+  private static final String GRECAPTCHA_CODE_PROPERTY = "ui.google.recaptcha.code";
 
   private static String GANALYTICS_ACCOUNT_CODE = null;
   private static String GRECAPTCHA_ACCOUNT_CODE = null;
-
-  private static String GANALYTICS_CODE_PROPERTY = "ui.google.analytics.code";
-  private static String GRECAPTCHA_CODE_PROPERTY = "ui.google.recaptcha.code";
 
   /**
    * Create a new BrowserService Implementation instance
@@ -411,12 +409,14 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   }
 
+  @Override
   public void deleteDescriptiveMetadataFile(String aipId, String representationId, String descriptiveMetadataId)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Browser.deleteDescriptiveMetadataFile(user, aipId, representationId, descriptiveMetadataId);
   }
 
+  @Override
   public String createTransferredResourcesFolder(String parent, String folderName)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
@@ -528,6 +528,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     return bundle;
   }
 
+  @Override
   public Viewers retrieveViewersProperties() {
     Viewers viewers = new Viewers();
     Configuration rodaConfig = RodaCoreFactory.getRodaConfiguration();
@@ -880,7 +881,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   @Override
   public int getListThreshold() {
-    return RodaCoreFactory.getRodaConfiguration().getInt("ui.list.threshold");
+    return RodaCoreFactory.getRodaConfiguration().getInt("ui.list.threshold", RodaConstants.DEFAULT_LIST_THRESHOLD);
   }
 
 }

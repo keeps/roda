@@ -22,6 +22,7 @@ import java.util.Iterator;
  *             removed soon
  * 
  */
+@Deprecated
 public class DirDeleter extends Thread {
 
   private ArrayList<File> dirList = new ArrayList<>();
@@ -33,6 +34,7 @@ public class DirDeleter extends Thread {
     dirList.add(dir);
   }
 
+  @Override
   public void run() {
     synchronized (this) {
       Iterator<File> iterator = dirList.iterator();

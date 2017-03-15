@@ -9,6 +9,7 @@ package org.roda.core.data.v2;
 
 import java.io.Serializable;
 
+@FunctionalInterface
 public interface IsRODAObject extends Serializable {
   public String getId();
 }

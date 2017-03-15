@@ -25,6 +25,7 @@ import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
 import org.roda.core.common.validation.ValidationUtils;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -54,7 +55,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-@Test(groups = {"all", "travis"})
+@Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_TRAVIS})
 public class ValidationUtilsTest {
   private static Path basePath;
   private static ModelService model;
@@ -62,7 +63,6 @@ public class ValidationUtilsTest {
 
   private static Path corporaPath;
   private static StorageService corporaService;
-  private static String aipCreator = "admin";
 
   private static final Logger logger = LoggerFactory.getLogger(ModelServiceTest.class);
 
@@ -100,7 +100,8 @@ public class ValidationUtilsTest {
     AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
     final String aipId = UUID.randomUUID().toString();
     model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), aipCreator);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
+      RodaConstants.ADMIN);
     final DescriptiveMetadata descMetadata = model.retrieveDescriptiveMetadata(aipId,
       CorporaConstants.DESCRIPTIVE_METADATA_ID);
     assertEquals(ValidationUtils.isDescriptiveMetadataValid(model, descMetadata, true).isValid(), true);
@@ -113,7 +114,7 @@ public class ValidationUtilsTest {
     try {
       model.createAIP(aipId, corporaService,
         DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_BUGGY_ID),
-        aipCreator);
+        RodaConstants.ADMIN);
       final DescriptiveMetadata descMetadata = model.retrieveDescriptiveMetadata(aipId,
         CorporaConstants.DESCRIPTIVE_METADATA_ID);
       assertEquals(ValidationUtils.isDescriptiveMetadataValid(model, descMetadata, true), false);
@@ -127,7 +128,8 @@ public class ValidationUtilsTest {
     AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
     final String aipId = UUID.randomUUID().toString();
     final AIP aip = model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), aipCreator);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
+      RodaConstants.ADMIN);
     assertEquals(ValidationUtils.isAIPDescriptiveMetadataValid(model, aip.getId(), true).isValid(), true);
   }
 
@@ -139,7 +141,7 @@ public class ValidationUtilsTest {
     final String aipId = UUID.randomUUID().toString();
     final AIP aip = model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_BUGGY_ID),
-      aipCreator);
+      RodaConstants.ADMIN);
     assertEquals(ValidationUtils.isAIPDescriptiveMetadataValid(model, aip.getId(), true), false);
   }
 
@@ -147,8 +149,8 @@ public class ValidationUtilsTest {
   public void testValidationOfDescriptiveMetadata() throws ValidationException, RequestNotValidException,
     GenericException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException, IOException {
     // AIP 1 (wrong one)
-    final AIP aip = model.createAIP(UUID.randomUUID().toString(), corporaService, DefaultStoragePath
-      .parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_WITH_INVALID_METADATA), aipCreator);
+    final AIP aip = model.createAIP(UUID.randomUUID().toString(), corporaService, DefaultStoragePath.parse(
+      CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_WITH_INVALID_METADATA), RodaConstants.ADMIN);
 
     DefaultStoragePath path = DefaultStoragePath.parse(CorporaConstants.SOURCE_PRESERVATION_CONTAINER,
       CorporaConstants.SOURCE_INVALID_FOLDER, "ead.xml");
@@ -159,7 +161,8 @@ public class ValidationUtilsTest {
 
     // AIP 2 (correct one)
     final AIP aip2 = model.createAIP(UUID.randomUUID().toString(), corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), aipCreator);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
+      RodaConstants.ADMIN);
 
     Job job = TestsHelper.executeJob(DescriptiveMetadataValidationPlugin.class, PluginType.AIP_TO_AIP,
       SelectedItemsList.create(AIP.class, Arrays.asList(aip.getId())));

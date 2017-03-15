@@ -14,26 +14,19 @@ import java.util.Map;
 public class DescriptionLevelConfiguration implements Serializable {
 
   private static final long serialVersionUID = 3476633742750492225L;
-  
-  private Map<String,String> translations;
 
+  private Map<String, String> translations;
   private List<String> classificationPlanLevels;
-
   private String ghostClass;
-
   private String defaultClass;
-
   private String representationClass;
-
   private String representationFolderClass;
-
   private String representationFileClass;
-  
   private Map<String, String> representationTypesIcons;
-
   private Map<String, String> levelIcons;
 
   public DescriptionLevelConfiguration() {
+    // do nothing
   }
 
   public List<String> getClassificationPlanLevels() {

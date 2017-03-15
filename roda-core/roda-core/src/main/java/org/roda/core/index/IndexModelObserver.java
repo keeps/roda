@@ -114,7 +114,6 @@ public class IndexModelObserver implements ModelObserver {
       ReturnWithExceptions<Void> eventExceptions = indexPreservationsEvents(aip.getId(), null);
       exceptions.addExceptions(eventExceptions.getExceptions());
 
-      // indexOtherMetadata(aip);
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error getting ancestors when creating AIP");
       exceptions.addException(e);
@@ -1023,6 +1022,7 @@ public class IndexModelObserver implements ModelObserver {
     index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisEventDocument);
   }
 
+  @Override
   public ReturnWithExceptions<Void> riskCreatedOrUpdated(Risk risk, int incidences, boolean commit) {
     ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<>();
     SolrInputDocument riskDoc = SolrUtils.riskToSolrDocument(risk, incidences);
@@ -1046,6 +1046,7 @@ public class IndexModelObserver implements ModelObserver {
     return exceptions;
   }
 
+  @Override
   public void riskDeleted(String riskId, boolean commit) {
     deleteDocumentFromIndex(IndexedRisk.class, riskId);
 
@@ -1058,6 +1059,7 @@ public class IndexModelObserver implements ModelObserver {
     }
   }
 
+  @Override
   public ReturnWithExceptions<Void> riskIncidenceCreatedOrUpdated(RiskIncidence riskIncidence, boolean commit) {
     ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<>();
     SolrInputDocument incidenceDoc = SolrUtils.riskIncidenceToSolrDocument(riskIncidence);
@@ -1081,6 +1083,7 @@ public class IndexModelObserver implements ModelObserver {
     return exceptions;
   }
 
+  @Override
   public void riskIncidenceDeleted(String riskIncidenceId, boolean commit) {
     deleteDocumentFromIndex(RiskIncidence.class, riskIncidenceId);
 
@@ -1093,6 +1096,7 @@ public class IndexModelObserver implements ModelObserver {
     }
   }
 
+  @Override
   public ReturnWithExceptions<Void> formatCreatedOrUpdated(Format format, boolean commit) {
     ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<>();
     SolrInputDocument formatDoc = SolrUtils.formatToSolrDocument(format);
@@ -1116,6 +1120,7 @@ public class IndexModelObserver implements ModelObserver {
     return exceptions;
   }
 
+  @Override
   public void formatDeleted(String formatId, boolean commit) {
     deleteDocumentFromIndex(Format.class, formatId);
 
@@ -1133,6 +1138,7 @@ public class IndexModelObserver implements ModelObserver {
     deleteDocumentFromIndex(TransferredResource.class, transferredResourceID);
   }
 
+  @Override
   public ReturnWithExceptions<Void> notificationCreatedOrUpdated(Notification notification) {
     ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<>();
     SolrInputDocument notificationDoc = SolrUtils.notificationToSolrDocument(notification);
@@ -1147,10 +1153,12 @@ public class IndexModelObserver implements ModelObserver {
     return exceptions;
   }
 
+  @Override
   public void notificationDeleted(String notificationId) {
     deleteDocumentFromIndex(Notification.class, notificationId);
   }
 
+  @Override
   public ReturnWithExceptions<Void> dipCreated(DIP dip, boolean commit) {
     ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<>();
     SolrInputDocument dipDocument = SolrUtils.dipToSolrDocument(dip);
@@ -1194,11 +1202,13 @@ public class IndexModelObserver implements ModelObserver {
     return exceptions;
   }
 
+  @Override
   public void dipUpdated(DIP dip, boolean commit) {
     dipDeleted(dip.getId(), commit);
     dipCreated(dip, commit);
   }
 
+  @Override
   public void dipDeleted(String dipId, boolean commit) {
     deleteDocumentFromIndex(IndexedDIP.class, dipId);
     deleteDocumentsFromIndex(DIPFile.class, RodaConstants.DIPFILE_DIP_ID, dipId);

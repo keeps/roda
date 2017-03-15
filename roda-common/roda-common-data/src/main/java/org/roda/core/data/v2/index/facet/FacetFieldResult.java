@@ -31,15 +31,15 @@ public class FacetFieldResult implements Serializable {
     super();
     this.field = field;
     this.totalCount = totalCount;
-    this.values = new ArrayList<FacetValue>();
-    this.selectedValues = new ArrayList<String>();
+    this.values = new ArrayList<>();
+    this.selectedValues = new ArrayList<>();
   }
 
   public FacetFieldResult(String field, long totalCount, List<String> selectedValues) {
     super();
     this.field = field;
     this.totalCount = totalCount;
-    this.values = new ArrayList<FacetValue>();
+    this.values = new ArrayList<>();
     this.selectedValues = selectedValues;
   }
 

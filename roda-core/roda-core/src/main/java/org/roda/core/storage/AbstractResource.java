@@ -22,6 +22,7 @@ public class AbstractResource extends AbstractEntity implements Resource {
   /**
    * @return the directory
    */
+  @Override
   public boolean isDirectory() {
     return directory;
   }

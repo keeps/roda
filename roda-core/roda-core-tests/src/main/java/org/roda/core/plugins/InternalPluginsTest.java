@@ -92,7 +92,7 @@ import gov.loc.premis.v3.ObjectCharacteristicsComplexType;
 import gov.loc.premis.v3.Representation;
 import jersey.repackaged.com.google.common.collect.Lists;
 
-@Test(groups = {"all", "travis"})
+@Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_TRAVIS})
 public class InternalPluginsTest {
   private static final String FAKE_REPORTING_CLASS = "NONE";
 
@@ -109,7 +109,6 @@ public class InternalPluginsTest {
 
   private static ModelService model;
   private static IndexService index;
-  private static String aipCreator = "admin";
 
   @BeforeClass
   public void setUp() throws Exception {
@@ -204,7 +203,7 @@ public class InternalPluginsTest {
     FileAlreadyExistsException, SolrServerException {
     String parentId = null;
     String aipType = RodaConstants.AIP_TYPE_MIXED;
-    AIP root = model.createAIP(parentId, aipType, new Permissions(), aipCreator);
+    AIP root = model.createAIP(parentId, aipType, new Permissions(), RodaConstants.ADMIN);
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());

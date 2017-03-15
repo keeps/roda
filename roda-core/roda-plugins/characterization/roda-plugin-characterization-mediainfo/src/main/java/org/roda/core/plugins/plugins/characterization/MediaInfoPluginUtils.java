@@ -20,21 +20,23 @@ import org.roda.core.util.CommandUtility;
 
 public class MediaInfoPluginUtils {
 
+  private MediaInfoPluginUtils() {
+    // do nothing
+  }
+
   private static List<String> getBatchCommand(Path sourceDirectory) {
     Path mediaInfoHome = Paths.get(RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "mediainfo", "path"));
 
-    File MEDIAINFO_DIRECTORY = mediaInfoHome.toFile();
+    File mediainfoDirectory = mediaInfoHome.toFile();
 
     String osName = System.getProperty("os.name");
     List<String> command;
     if (osName.startsWith("Windows")) {
-      command = new ArrayList<String>(
-        Arrays.asList(MEDIAINFO_DIRECTORY.getAbsolutePath() + File.separator + "mediainfo.exe", "--Output=XML",
-          sourceDirectory.toFile().getAbsolutePath()));
+      command = new ArrayList<>(Arrays.asList(mediainfoDirectory.getAbsolutePath() + File.separator + "mediainfo.exe",
+        "--Output=XML", sourceDirectory.toFile().getAbsolutePath()));
     } else {
-      command = new ArrayList<String>(
-        Arrays.asList(MEDIAINFO_DIRECTORY.getAbsolutePath() + File.separator + "mediainfo", "--Output=XML",
-          sourceDirectory.toFile().getAbsolutePath()));
+      command = new ArrayList<>(Arrays.asList(mediainfoDirectory.getAbsolutePath() + File.separator + "mediainfo",
+        "--Output=XML", sourceDirectory.toFile().getAbsolutePath()));
     }
     return command;
   }

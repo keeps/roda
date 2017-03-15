@@ -92,7 +92,7 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-@Test(groups = {"all", "travis"})
+@Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_TRAVIS})
 public class IndexServiceTest {
 
   private static Path basePath;
@@ -102,7 +102,6 @@ public class IndexServiceTest {
 
   private static Path corporaPath;
   private static StorageService corporaService;
-  private static String aipCreator = "admin";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IndexServiceTest.class);
 
@@ -183,7 +182,8 @@ public class IndexServiceTest {
 
     // Create AIP
     final AIP aip = model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), aipCreator);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
+      RodaConstants.ADMIN);
 
     index.commitAIPs();
 
@@ -268,7 +268,8 @@ public class IndexServiceTest {
     final String aipId = UUID.randomUUID().toString();
 
     model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID_3), aipCreator);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID_3),
+      RodaConstants.ADMIN);
 
     index.commitAIPs();
 
@@ -292,11 +293,12 @@ public class IndexServiceTest {
 
     // testing AIP
     model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), aipCreator);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
+      RodaConstants.ADMIN);
 
     final StoragePath otherAipPath = DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER,
       CorporaConstants.OTHER_AIP_ID);
-    final AIP updatedAIP = model.updateAIP(aipId, corporaService, otherAipPath, aipCreator);
+    final AIP updatedAIP = model.updateAIP(aipId, corporaService, otherAipPath, RodaConstants.ADMIN);
 
     final IndexedAIP indexedAIP = index.retrieve(IndexedAIP.class, aipId, new ArrayList<>());
 
@@ -309,9 +311,11 @@ public class IndexServiceTest {
   public void testListCollections() throws RODAException {
     // set up
     model.createAIP(CorporaConstants.SOURCE_AIP_ID, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), aipCreator);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
+      RodaConstants.ADMIN);
     model.createAIP(CorporaConstants.OTHER_AIP_ID, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.OTHER_AIP_ID), aipCreator);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.OTHER_AIP_ID),
+      RodaConstants.ADMIN);
 
     index.commitAIPs();
 
@@ -335,9 +339,11 @@ public class IndexServiceTest {
   public void testSubElements() throws RODAException {
     // set up
     model.createAIP(CorporaConstants.SOURCE_AIP_ID, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), aipCreator);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
+      RodaConstants.ADMIN);
     model.createAIP(CorporaConstants.OTHER_AIP_ID, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.OTHER_AIP_ID), aipCreator);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.OTHER_AIP_ID),
+      RodaConstants.ADMIN);
 
     index.commitAIPs();
 
@@ -361,9 +367,11 @@ public class IndexServiceTest {
   public void testGetAncestors() throws RODAException {
     // set up
     model.createAIP(CorporaConstants.SOURCE_AIP_ID, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), aipCreator);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
+      RodaConstants.ADMIN);
     model.createAIP(CorporaConstants.OTHER_AIP_ID, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.OTHER_AIP_ID), aipCreator);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.OTHER_AIP_ID),
+      RodaConstants.ADMIN);
 
     index.commitAIPs();
 
@@ -380,7 +388,8 @@ public class IndexServiceTest {
 
     // Create AIP
     model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), aipCreator);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
+      RodaConstants.ADMIN);
 
     index.commitAIPs();
 
@@ -413,7 +422,7 @@ public class IndexServiceTest {
     entry.setRelatedObjectID("Related");
     entry.setUsername("Username");
     entry.setState(LOG_ENTRY_STATE.SUCCESS);
-    List<LogEntryParameter> parameters = new ArrayList<LogEntryParameter>();
+    List<LogEntryParameter> parameters = new ArrayList<>();
     parameters.add(new LogEntryParameter("NAME1", "VALUE1"));
     parameters.add(new LogEntryParameter("NAME2", "VALUE2"));
     entry.setParameters(parameters);
@@ -443,7 +452,7 @@ public class IndexServiceTest {
     entry.setRelatedObjectID("related");
     entry.setUsername("username");
     entry.setState(LOG_ENTRY_STATE.SUCCESS);
-    List<LogEntryParameter> parameters = new ArrayList<LogEntryParameter>();
+    List<LogEntryParameter> parameters = new ArrayList<>();
     parameters.add(new LogEntryParameter("NAME1", "VALUE1"));
     parameters.add(new LogEntryParameter("NAME2", "VALUE2"));
     entry.setParameters(parameters);
@@ -483,7 +492,7 @@ public class IndexServiceTest {
       entry.setRelatedObjectID("RELATED:" + i);
       entry.setUsername("USER:" + i);
       entry.setState(LOG_ENTRY_STATE.SUCCESS);
-      List<LogEntryParameter> parameters = new ArrayList<LogEntryParameter>();
+      List<LogEntryParameter> parameters = new ArrayList<>();
       parameters.add(new LogEntryParameter("NAME1", "VALUE1"));
       parameters.add(new LogEntryParameter("NAME2", "VALUE2"));
       entry.setParameters(parameters);
@@ -516,7 +525,7 @@ public class IndexServiceTest {
       final String aipId = UUID.randomUUID().toString();
       model.createAIP(aipId, corporaService,
         DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), false,
-        aipCreator);
+        RodaConstants.ADMIN);
     }
 
     index.reindexAIPs();
@@ -528,12 +537,12 @@ public class IndexServiceTest {
   @Test
   public void indexMembers() throws AlreadyExistsException, GenericException, RequestNotValidException,
     EmailAlreadyExistsException, UserAlreadyExistsException, IllegalOperationException, NotFoundException {
-    Set<String> groups = new HashSet<String>();
+    Set<String> groups = new HashSet<>();
     groups.add("administrators");
 
-    Set<String> users = new HashSet<String>();
+    Set<String> users = new HashSet<>();
     users.add("admin");
-    Set<String> roles = new HashSet<String>();
+    Set<String> roles = new HashSet<>();
     roles.add(RodaConstants.REPOSITORY_PERMISSIONS_DESCRIPTIVE_METADATA_UPDATE);
 
     for (int i = 0; i < 5; i++) {
@@ -586,7 +595,8 @@ public class IndexServiceTest {
 
     // Create AIP
     model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), aipCreator);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
+      RodaConstants.ADMIN);
 
     index.commitAIPs();
 
@@ -654,7 +664,7 @@ public class IndexServiceTest {
       assertEquals(risk.getName(), risk3.getName());
 
       risk3.setName("Risk New Name");
-      Map<String, String> properties = new HashMap<String, String>();
+      Map<String, String> properties = new HashMap<>();
       properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATED.toString());
       model.updateRisk(risk3, properties, false, 0);
 
@@ -686,19 +696,19 @@ public class IndexServiceTest {
     format.setWebsites(Arrays.asList("https://www.adobe.com/devnet/pdf/pdf_reference_archive.html"));
     format.setProvenanceInformation("https://en.wikipedia.org/wiki/Portable_Document_Format");
 
-    List<String> extensions = new ArrayList<String>();
+    List<String> extensions = new ArrayList<>();
     extensions.add(".pdf");
     format.setExtensions(extensions);
 
-    List<String> mimetypes = new ArrayList<String>();
+    List<String> mimetypes = new ArrayList<>();
     mimetypes.add("application/pdf");
     format.setMimetypes(mimetypes);
 
-    List<String> pronoms = new ArrayList<String>();
+    List<String> pronoms = new ArrayList<>();
     pronoms.add("fmt/100");
     format.setPronoms(pronoms);
 
-    List<String> utis = new ArrayList<String>();
+    List<String> utis = new ArrayList<>();
     utis.add("com.adobe.pdf");
     format.setUtis(utis);
 

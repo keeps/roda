@@ -158,7 +158,7 @@ public class RiskList extends BasicAsyncTableCell<IndexedRisk> {
 
   @Override
   protected Sorter getSorter(ColumnSortList columnSortList) {
-    Map<Column<IndexedRisk, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<IndexedRisk, ?>, List<String>>();
+    Map<Column<IndexedRisk, ?>, List<String>> columnSortingKeyMap = new HashMap<>();
     columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.RISK_NAME));
     columnSortingKeyMap.put(identifiedOnColumn, Arrays.asList(RodaConstants.RISK_IDENTIFIED_ON));
     columnSortingKeyMap.put(categoryColumn, Arrays.asList(RodaConstants.RISK_CATEGORY));

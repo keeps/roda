@@ -62,6 +62,7 @@ public class ExifToolPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public void init() throws PluginException {
+    // do nothing
   }
 
   @Override
@@ -110,7 +111,7 @@ public class ExifToolPlugin extends AbstractPlugin<AIP> {
     PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
     PluginState reportState = PluginState.SUCCESS;
     ValidationReport validationReport = new ValidationReport();
-    List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
+    List<LinkingIdentifier> sources = new ArrayList<>();
 
     for (Representation representation : aip.getRepresentations()) {
       LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());

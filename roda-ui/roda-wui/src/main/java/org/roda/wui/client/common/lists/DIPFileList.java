@@ -97,10 +97,7 @@ public class DIPFileList extends BasicAsyncTableCell<DIPFile> {
 
     // define default sorting
     display.getColumnSortList().push(new ColumnSortInfo(idColumn, true));
-
     display.setColumnWidth(iconColumn, 2.5, Unit.EM);
-
-    // sizeColumn.setCellStyleNames("nowrap");
 
     addStyleName("my-collections-table");
     emptyInfo.addStyleName("my-collections-empty-info");
@@ -108,7 +105,7 @@ public class DIPFileList extends BasicAsyncTableCell<DIPFile> {
 
   @Override
   protected Sorter getSorter(ColumnSortList columnSortList) {
-    Map<Column<DIPFile, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<DIPFile, ?>, List<String>>();
+    Map<Column<DIPFile, ?>, List<String>> columnSortingKeyMap = new HashMap<>();
     // setting secondary sorter to title
     columnSortingKeyMap.put(iconColumn, Arrays.asList(RodaConstants.DIPFILE_IS_DIRECTORY));
     columnSortingKeyMap.put(idColumn, Arrays.asList(RodaConstants.DIPFILE_ID));

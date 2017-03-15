@@ -23,20 +23,12 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class LoadingPopup extends PopupPanel {
 
-  // private GWTLogger logger = new GWTLogger(GWT.getTypeName(this));
-
-  private static int UPDATE_TIME_MILISEC = 1000;
-
-  private static int MAX_TIME_MILISEC = 30000;
-
+  private static final int UPDATE_TIME_MILISEC = 1000;
+  private static final int MAX_TIME_MILISEC = 30000;
   private final HTML loading;
-
   private Widget widgetCenter;
-
   private boolean show;
-
   private Timer updateTimer;
-
   private Timer maxTimeout;
 
   /**
@@ -52,26 +44,24 @@ public class LoadingPopup extends PopupPanel {
     this.show = false;
 
     this.updateTimer = new Timer() {
-
+      @Override
       public void run() {
         update();
       }
-
     };
 
     this.maxTimeout = new Timer() {
-
+      @Override
       public void run() {
         hide();
       }
-
     };
 
     loading.addStyleName("loadingImage");
   }
 
+  @Override
   public void show() {
-    // logger.debug("Showing loading " + id);
     centerAndShow();
     updateTimer.cancel();
     updateTimer.scheduleRepeating(UPDATE_TIME_MILISEC);
@@ -79,8 +69,8 @@ public class LoadingPopup extends PopupPanel {
     maxTimeout.schedule(MAX_TIME_MILISEC);
   }
 
+  @Override
   public void hide() {
-    // logger.debug("Hiding loading " + id);
     updateTimer.cancel();
     maxTimeout.cancel();
     show = false;
@@ -98,12 +88,11 @@ public class LoadingPopup extends PopupPanel {
   }
 
   protected void center(int offsetWidth, int offsetHeight) {
+    int left = Math
+      .round(widgetCenter.getAbsoluteLeft() + (float) widgetCenter.getOffsetWidth() / 2 - (float) offsetWidth / 2);
 
-    int left = Math.round(widgetCenter.getAbsoluteLeft() + (float) widgetCenter.getOffsetWidth() / 2
-      - (float) offsetWidth / 2);
-
-    int top = Math.round(widgetCenter.getAbsoluteTop() + (float) widgetCenter.getOffsetHeight() / 2
-      - (float) offsetHeight / 2);
+    int top = Math
+      .round(widgetCenter.getAbsoluteTop() + (float) widgetCenter.getOffsetHeight() / 2 - (float) offsetHeight / 2);
 
     this.setPopupPosition(left, top);
   }

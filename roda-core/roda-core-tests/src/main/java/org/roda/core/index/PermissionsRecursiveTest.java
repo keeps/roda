@@ -39,7 +39,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-@Test(groups = {"all", "travis"})
+@Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_TRAVIS})
 public class PermissionsRecursiveTest {
 
   private static Path basePath;
@@ -101,8 +101,8 @@ public class PermissionsRecursiveTest {
 
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, parent.getId()),
       new NotSimpleFilterParameter("permission_users_READ", user.getName()));
-    SelectedItemsFilter<IndexedAIP> selectedItems = new SelectedItemsFilter<IndexedAIP>(filter,
-      IndexedAIP.class.getName(), Boolean.FALSE);
+    SelectedItemsFilter<IndexedAIP> selectedItems = new SelectedItemsFilter<>(filter, IndexedAIP.class.getName(),
+      Boolean.FALSE);
 
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_AIP_ID, parent.getId());

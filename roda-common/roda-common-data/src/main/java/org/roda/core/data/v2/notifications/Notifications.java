@@ -38,16 +38,19 @@ public class Notifications implements RODAObjectList<Notification> {
     this.notificationList = notifications;
   }
 
+  @Override
   @JsonProperty(value = RodaConstants.RODA_OBJECT_NOTIFICATIONS)
   @XmlElement(name = RodaConstants.RODA_OBJECT_NOTIFICATION)
   public List<Notification> getObjects() {
     return notificationList;
   }
 
+  @Override
   public void setObjects(List<Notification> notifications) {
     this.notificationList = notifications;
   }
 
+  @Override
   public void addObject(Notification notification) {
     this.notificationList.add(notification);
   }

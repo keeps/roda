@@ -18,8 +18,9 @@ import javax.servlet.http.HttpServletResponse;
 
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JaxRSServerCodegen", date = "2015-09-03T11:38:49.275+01:00")
 public class ApiOriginFilter implements javax.servlet.Filter {
-  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
-    ServletException {
+  @Override
+  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+    throws IOException, ServletException {
     HttpServletResponse res = (HttpServletResponse) response;
     res.addHeader("Access-Control-Allow-Origin", "*");
     res.addHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT");
@@ -27,9 +28,13 @@ public class ApiOriginFilter implements javax.servlet.Filter {
     chain.doFilter(request, response);
   }
 
+  @Override
   public void destroy() {
+    // do nothing
   }
 
+  @Override
   public void init(FilterConfig filterConfig) throws ServletException {
+    // do nothing
   }
 }

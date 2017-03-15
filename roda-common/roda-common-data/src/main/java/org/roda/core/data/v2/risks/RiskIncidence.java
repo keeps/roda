@@ -69,6 +69,7 @@ public class RiskIncidence implements IsModelObject, IsIndexed {
     return 1;
   }
 
+  @Override
   public String getId() {
     return this.id;
   }

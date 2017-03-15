@@ -37,7 +37,6 @@ import config.i18n.client.ClientMessages;
  */
 public class FormatList extends BasicAsyncTableCell<Format> {
 
-  // private final ClientLogger logger = new ClientLogger(getClass().getName());
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private TextColumn<Format> nameColumn;
@@ -111,7 +110,7 @@ public class FormatList extends BasicAsyncTableCell<Format> {
 
   @Override
   protected Sorter getSorter(ColumnSortList columnSortList) {
-    Map<Column<Format, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<Format, ?>, List<String>>();
+    Map<Column<Format, ?>, List<String>> columnSortingKeyMap = new HashMap<>();
     columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.FORMAT_NAME_SORT));
     columnSortingKeyMap.put(categoryColumn, Arrays.asList(RodaConstants.FORMAT_CATEGORY));
     columnSortingKeyMap.put(mimetypeColumn, Arrays.asList(RodaConstants.FORMAT_MIMETYPES));

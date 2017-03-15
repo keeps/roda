@@ -39,7 +39,7 @@ public class EmailNotificationProcessor implements NotificationProcessor {
   private String localeString;
 
   public EmailNotificationProcessor(String templateName) {
-    this.scope = new HashMap<String, Object>();
+    this.scope = new HashMap<>();
     this.templateName = templateName;
   }
 

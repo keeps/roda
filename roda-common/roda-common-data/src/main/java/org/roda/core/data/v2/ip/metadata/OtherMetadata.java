@@ -51,6 +51,7 @@ public class OtherMetadata implements IsRODAObject {
     this(id, type, aipId, representationId, null, null, null);
   }
 
+  @Override
   public String getId() {
     return id;
   }

@@ -57,10 +57,12 @@ public class MemberManagement extends Composite {
       UserLogin.getInstance().checkRole(this, callback);
     }
 
+    @Override
     public List<String> getHistoryPath() {
       return ListUtils.concat(Management.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
+    @Override
     public String getHistoryToken() {
       return "user";
     }

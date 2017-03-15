@@ -56,11 +56,13 @@ public class UserLogin {
       userLoginService = UserLoginService.Util.getInstance();
       userLoginService.getRodaProperties(new AsyncCallback<Map<String, String>>() {
 
+        @Override
         public void onFailure(Throwable caught) {
           logger.fatal("Error getting role mapping", caught);
           callback.onFailure(caught);
         }
 
+        @Override
         public void onSuccess(Map<String, String> properties) {
           rodaProperties = properties;
           initialized = true;
@@ -76,10 +78,12 @@ public class UserLogin {
   static {
     init(new AsyncCallback<Map<String, String>>() {
 
+      @Override
       public void onFailure(Throwable caught) {
         logger.error("Error initializing", caught);
       }
 
+      @Override
       public void onSuccess(Map<String, String> properties) {
         // nothing to do
       }
@@ -213,10 +217,12 @@ public class UserLogin {
   public void permissionsChanged(final RODAMember member) {
     getAuthenticatedUser(new AsyncCallback<User>() {
 
+      @Override
       public void onFailure(Throwable caught) {
         // do nothing
       }
 
+      @Override
       public void onSuccess(User user) {
         User authUser = user;
         if (member instanceof User && member.getName().equals(authUser.getName())) {
@@ -262,10 +268,12 @@ public class UserLogin {
   public static void getRodaProperties(final AsyncCallback<Map<String, String>> callback) {
     init(new AsyncCallback<Map<String, String>>() {
 
+      @Override
       public void onFailure(Throwable caught) {
         callback.onFailure(caught);
       }
 
+      @Override
       public void onSuccess(Map<String, String> properties) {
         callback.onSuccess(properties);
 
@@ -282,10 +290,12 @@ public class UserLogin {
   public static void getRodaProperty(final String key, final AsyncCallback<String> callback) {
     init(new AsyncCallback<Map<String, String>>() {
 
+      @Override
       public void onFailure(Throwable caught) {
         callback.onFailure(caught);
       }
 
+      @Override
       public void onSuccess(Map<String, String> properties) {
         callback.onSuccess(properties.get(key));
       }
@@ -304,10 +314,12 @@ public class UserLogin {
     String propertyName = "ui.menu." + historyKey + ".role";
     UserLogin.getRodaProperty(propertyName, new AsyncCallback<String>() {
 
+      @Override
       public void onFailure(Throwable caught) {
         callback.onFailure(caught);
       }
 
+      @Override
       public void onSuccess(final String role) {
         if (role == null) {
           GWT.log("Could not find role for path " + res.getHistoryPath());
@@ -315,10 +327,12 @@ public class UserLogin {
 
         getAuthenticatedUser(new AsyncCallback<User>() {
 
+          @Override
           public void onFailure(Throwable caught) {
             callback.onFailure(caught);
           }
 
+          @Override
           public void onSuccess(User authUser) {
             callback.onSuccess(authUser.hasRole(role));
           }
@@ -344,10 +358,12 @@ public class UserLogin {
       final int index = i;
       checkRole(res[i], new AsyncCallback<Boolean>() {
 
+        @Override
         public void onFailure(Throwable caught) {
           callback.onFailure(caught);
         }
 
+        @Override
         public void onSuccess(Boolean rolePermitted) {
           results[index] = rolePermitted;
           boolean lastOne = true;

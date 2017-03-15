@@ -206,6 +206,7 @@ public class TransferUpload extends Composite {
     return ret;
   }
 
+  @Override
   protected void onAttach() {
     verified = false;
     super.onAttach();

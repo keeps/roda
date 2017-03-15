@@ -70,7 +70,7 @@ public class PdfToPdfaPlugin<T extends IsRODAObject> extends AbstractConvertPlug
 
   @Override
   public List<PluginParameter> getParameters() {
-    List<PluginParameter> parameters = new ArrayList<PluginParameter>();
+    List<PluginParameter> parameters = new ArrayList<>();
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_VERAPDF_VALIDATION));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP));
@@ -122,7 +122,7 @@ public class PdfToPdfaPlugin<T extends IsRODAObject> extends AbstractConvertPlug
 
   @Override
   public Plugin<T> cloneMe() {
-    return new PdfToPdfaPlugin<T>();
+    return new PdfToPdfaPlugin<>();
   }
 
   @Override
@@ -148,7 +148,7 @@ public class PdfToPdfaPlugin<T extends IsRODAObject> extends AbstractConvertPlug
 
   @Override
   public Map<String, List<String>> getMimetypeToExtension() {
-    Map<String, List<String>> map = new HashMap<String, List<String>>();
+    Map<String, List<String>> map = new HashMap<>();
     map.put("application/pdf", Arrays.asList("pdf"));
     return map;
   }

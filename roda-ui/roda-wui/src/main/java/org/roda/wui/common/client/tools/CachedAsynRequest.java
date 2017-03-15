@@ -15,7 +15,7 @@ public abstract class CachedAsynRequest<T> {
 
   private T cached = null;
   private boolean loadingFromServer = false;
-  private final LinkedList<AsyncCallback<T>> waitQueue = new LinkedList<AsyncCallback<T>>();
+  private final LinkedList<AsyncCallback<T>> waitQueue = new LinkedList<>();
 
   public abstract void getFromServer(AsyncCallback<T> callback);
 

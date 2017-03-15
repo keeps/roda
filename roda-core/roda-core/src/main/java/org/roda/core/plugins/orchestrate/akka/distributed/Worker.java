@@ -43,14 +43,6 @@ import scala.concurrent.duration.FiniteDuration;
 
 public class Worker extends UntypedActor {
 
-  public static Props props(ActorRef clusterClient, Props workExecutorProps, FiniteDuration registerInterval) {
-    return Props.create(Worker.class, clusterClient, workExecutorProps, registerInterval);
-  }
-
-  public static Props props(ActorRef clusterClient, Props workExecutorProps) {
-    return props(clusterClient, workExecutorProps, Duration.create(10, "seconds"));
-  }
-
   private final ActorRef clusterClient;
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
   private final String workerId = UUID.randomUUID().toString();
@@ -63,6 +55,14 @@ public class Worker extends UntypedActor {
     this.workExecutor = getContext().watch(getContext().actorOf(workExecutorProps, "exec"));
     this.registerTask = getContext().system().scheduler().schedule(Duration.Zero(), registerInterval, clusterClient,
       new SendToAll("/user/master/singleton", new RegisterWorker(workerId)), getContext().dispatcher(), getSelf());
+  }
+
+  public static Props props(ActorRef clusterClient, Props workExecutorProps, FiniteDuration registerInterval) {
+    return Props.create(Worker.class, clusterClient, workExecutorProps, registerInterval);
+  }
+
+  public static Props props(ActorRef clusterClient, Props workExecutorProps) {
+    return props(clusterClient, workExecutorProps, Duration.create(10, "seconds"));
   }
 
   private String workId() {
@@ -97,11 +97,13 @@ public class Worker extends UntypedActor {
     registerTask.cancel();
   }
 
+  @Override
   public void onReceive(Object message) {
     unhandled(message);
   }
 
   private final Procedure<Object> idle = new Procedure<Object>() {
+    @Override
     public void apply(Object message) {
       if (message instanceof MasterWorkerProtocol.WorkIsReady) {
         sendToMaster(new MasterWorkerProtocol.WorkerRequestsWork(workerId));
@@ -118,6 +120,7 @@ public class Worker extends UntypedActor {
   };
 
   private final Procedure<Object> working = new Procedure<Object>() {
+    @Override
     public void apply(Object message) {
       if (message instanceof WorkComplete) {
         Object result = ((WorkComplete) message).result;
@@ -135,6 +138,7 @@ public class Worker extends UntypedActor {
 
   private Procedure<Object> waitForWorkIsDoneAck(final Object result) {
     return new Procedure<Object>() {
+      @Override
       public void apply(Object message) {
         if (message instanceof Ack && ((Ack) message).workId.equals(workId())) {
           sendToMaster(new WorkerRequestsWork(workerId));

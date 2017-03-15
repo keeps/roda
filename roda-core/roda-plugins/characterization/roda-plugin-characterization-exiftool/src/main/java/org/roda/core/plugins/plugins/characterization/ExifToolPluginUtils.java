@@ -19,22 +19,26 @@ import org.roda.core.util.CommandUtility;
 
 public class ExifToolPluginUtils {
 
+  private ExifToolPluginUtils() {
+    // do nothing
+  }
+
   private static List<String> getBatchCommand(Path sourceDirectory, Path exifToolOutputDirectory) {
     Path rodaHome = RodaCoreFactory.getRodaHomePath();
     Path exifToolHome = rodaHome
       .resolve(RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "exiftool", "home"));
 
-    File EXIFTOOL_DIRECTORY = exifToolHome.toFile();
+    File exiftoolDirectory = exifToolHome.toFile();
 
     String osName = System.getProperty("os.name");
     List<String> command;
     if (osName.startsWith("Windows")) {
-      command = new ArrayList<String>(Arrays.asList(
-        EXIFTOOL_DIRECTORY.getAbsolutePath() + File.separator + "exiftool.exe", "-X", "-w",
-        exifToolOutputDirectory.toFile().getAbsolutePath() + "/%f.%e.xml", sourceDirectory.toFile().getAbsolutePath()));
-    } else {
-      command = new ArrayList<String>(Arrays.asList(EXIFTOOL_DIRECTORY.getAbsolutePath() + File.separator + "exiftool",
+      command = new ArrayList<>(Arrays.asList(exiftoolDirectory.getAbsolutePath() + File.separator + "exiftool.exe",
         "-X", "-w", exifToolOutputDirectory.toFile().getAbsolutePath() + "/%f.%e.xml",
+        sourceDirectory.toFile().getAbsolutePath()));
+    } else {
+      command = new ArrayList<>(Arrays.asList(exiftoolDirectory.getAbsolutePath() + File.separator + "exiftool", "-X",
+        "-w", exifToolOutputDirectory.toFile().getAbsolutePath() + "/%f.%e.xml",
         sourceDirectory.toFile().getAbsolutePath()));
     }
     return command;
@@ -42,8 +46,7 @@ public class ExifToolPluginUtils {
 
   public static String runExifToolOnPath(Path sourceDirectory, Path exifToolOutputDirectory) throws CommandException {
     List<String> command = getBatchCommand(sourceDirectory, exifToolOutputDirectory);
-    String exifToolOutput = CommandUtility.execute(command);
-    return exifToolOutput;
+    return CommandUtility.execute(command);
   }
 
 }

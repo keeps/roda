@@ -31,7 +31,7 @@ import org.roda.core.plugins.plugins.characterization.SiegfriedPlugin;
 public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
 
   private Map<String, PluginParameter> pluginParameters = new HashMap<>();
-  private List<String> deactivatedPlugins = new ArrayList<String>();
+  private List<String> deactivatedPlugins = new ArrayList<>();
 
   @Override
   public String getName() {
@@ -52,7 +52,7 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
   public List<PluginParameter> getParameters() {
     loadMap();
 
-    ArrayList<PluginParameter> pluginParameters = new ArrayList<PluginParameter>();
+    ArrayList<PluginParameter> pluginParameters = new ArrayList<>();
     pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_SIP_TO_AIP_CLASS));
     pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_PARENT_ID));
     pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID));
@@ -83,7 +83,7 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
 
   private void loadMap() {
     if (pluginParameters.isEmpty()) {
-      deactivatedPlugins = new ArrayList<String>();
+      deactivatedPlugins = new ArrayList<>();
 
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_SIP_TO_AIP_CLASS,
         new PluginParameter(RodaConstants.PLUGIN_PARAMS_SIP_TO_AIP_CLASS,

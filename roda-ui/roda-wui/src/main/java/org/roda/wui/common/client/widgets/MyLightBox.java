@@ -26,11 +26,8 @@ import com.google.gwt.user.client.ui.PopupPanel.PositionCallback;
  */
 public class MyLightBox implements PopupListener {
   private PNGImage png;
-
   private PopupPanel child;
-
   private PopupPanel background;
-
   private WindowResizeListener windowResizeListener;
 
   /**
@@ -42,6 +39,7 @@ public class MyLightBox implements PopupListener {
     background = new PopupPanel();
 
     windowResizeListener = new WindowResizeListener() {
+      @Override
       public void onWindowResized(int width, int height) {
         background.setWidth(Integer.toString(width));
         background.setHeight(Integer.toString(height));
@@ -65,12 +63,9 @@ public class MyLightBox implements PopupListener {
 		}
   }-*/;
 
+  @Override
   public void onPopupClosed(PopupPanel sender, boolean autoClosed) {
-    // if (GWT.isScript() && png != null) {
-    // this.hide();
-    // } else {
     this.hide();
-    // }
   }
 
   /**
@@ -82,11 +77,6 @@ public class MyLightBox implements PopupListener {
 
     background.setWidth(Integer.toString(w));
     background.setHeight(Integer.toString(h));
-    // if (GWT.isScript()) {
-    // background.setWidget(png = new
-    // PNGImage("org.roda.wui.main.Main/images/lightbox.png", w,
-    // h));
-    // }
     background.setPopupPosition(0, 0);
     hideSelects();
 
@@ -100,6 +90,7 @@ public class MyLightBox implements PopupListener {
      */
     child.setPopupPositionAndShow(new PositionCallback() {
 
+      @Override
       public void setPosition(int offsetWidth, int offsetHeight) {
         center(offsetWidth, offsetHeight);
       }
@@ -116,12 +107,6 @@ public class MyLightBox implements PopupListener {
     int offsetHeight = child.getOffsetHeight();
     center(offsetWidth, offsetHeight);
   }
-
-  // protected void center(int offsetWidth, int offsetHeight) {
-  // int left = (getWidth() - offsetWidth) / 2;
-  // int top = (getHeight() - offsetHeight) / 2;
-  // child.setPopupPosition(left, top);
-  // }
 
   protected void center(int offsetWidth, int offsetHeight) {
     int width = Window.getClientWidth();

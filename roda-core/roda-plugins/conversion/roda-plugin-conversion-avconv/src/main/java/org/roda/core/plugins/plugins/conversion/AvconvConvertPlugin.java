@@ -96,7 +96,7 @@ public class AvconvConvertPlugin<T extends IsRODAObject> extends CommandConvertP
 
   @Override
   public Plugin<T> cloneMe() {
-    return new AvconvConvertPlugin<T>();
+    return new AvconvConvertPlugin<>();
   }
 
   @Override

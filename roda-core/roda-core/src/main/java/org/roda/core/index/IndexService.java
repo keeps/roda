@@ -72,7 +72,6 @@ import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
-import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Resource;
@@ -331,12 +330,9 @@ public class IndexService {
 
   public void reindexActionLogs()
     throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
-    CloseableIterable<Resource> actionLogs = null;
 
-    try {
-      boolean recursive = false;
-      actionLogs = model.getStorage()
-        .listResourcesUnderContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG), recursive);
+    try (CloseableIterable<Resource> actionLogs = model.getStorage()
+      .listResourcesUnderContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG), false)) {
 
       for (Resource resource : actionLogs) {
         if (resource instanceof Binary) {
@@ -347,8 +343,6 @@ public class IndexService {
       }
     } catch (IOException e) {
       throw new GenericException("Error retrieving/processing logs from storage", e);
-    } finally {
-      IOUtils.closeQuietly(actionLogs);
     }
   }
 
@@ -368,8 +362,6 @@ public class IndexService {
       throw new GenericException("Error reading log", e);
     }
   }
-
-  
 
   public ReturnWithExceptions<Void> reindexActionLog(LogEntry entry) {
     return observer.logEntryCreated(entry);

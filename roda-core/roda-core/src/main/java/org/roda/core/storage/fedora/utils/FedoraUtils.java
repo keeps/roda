@@ -41,7 +41,7 @@ public final class FedoraUtils {
    * Private empty constructor
    */
   private FedoraUtils() {
-
+    // do nothing
   }
 
   /**
@@ -176,7 +176,7 @@ public final class FedoraUtils {
 
   public static StoragePath doubleURLDecode(StoragePath storagePath) {
     try {
-      List<String> encodedPath = new ArrayList<String>();
+      List<String> encodedPath = new ArrayList<>();
       encodedPath.add(doubleURLDecode(storagePath.getContainerName()));
       if (!storagePath.isFromAContainer()) {
         for (String s : storagePath.getDirectoryPath()) {

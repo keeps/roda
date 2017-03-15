@@ -70,7 +70,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPComponentsPlugin<T> {
-  private static Logger LOGGER = LoggerFactory.getLogger(DigitalSignaturePlugin.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DigitalSignaturePlugin.class);
 
   private boolean doVerify;
   private boolean doExtract;
@@ -197,6 +197,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
 
   }
 
+  @Override
   public Report executeOnAIP(IndexService index, ModelService model, StorageService storage, Report report,
     SimpleJobPluginInfo jobPluginInfo, List<AIP> list, Job job) throws PluginException {
     List<String> newRepresentations = new ArrayList<>();
@@ -381,6 +382,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
     return report;
   }
 
+  @Override
   public Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage, Report report,
     SimpleJobPluginInfo jobPluginInfo, List<Representation> list, Job job) throws PluginException {
     List<String> newRepresentations = new ArrayList<>();
@@ -550,6 +552,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
     return report;
   }
 
+  @Override
   public Report executeOnFile(IndexService index, ModelService model, StorageService storage, Report report,
     SimpleJobPluginInfo jobPluginInfo, List<File> list, Job job) throws PluginException {
     List<String> newRepresentations = new ArrayList<>();

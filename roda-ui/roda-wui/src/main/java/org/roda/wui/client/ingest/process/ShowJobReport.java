@@ -30,6 +30,7 @@ import org.roda.wui.common.client.tools.Humanize.DHMSFormat;
 import org.roda.wui.common.client.tools.ListUtils;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -87,10 +88,12 @@ public class ShowJobReport extends Composite {
       UserLogin.getInstance().checkRoles(new HistoryResolver[] {IngestProcess.RESOLVER}, false, callback);
     }
 
+    @Override
     public List<String> getHistoryPath() {
       return ListUtils.concat(ShowJob.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
+    @Override
     public String getHistoryToken() {
       return "report";
     }
@@ -106,7 +109,6 @@ public class ShowJobReport extends Composite {
   private static final List<String> fieldsToReturn = new ArrayList<>();
 
   private final IndexedReport jobReport;
-  // private final Map<String, PluginInfo> pluginsInfo;
 
   @UiField
   Anchor job;
@@ -265,6 +267,11 @@ public class ShowJobReport extends Composite {
         attributeValue.addStyleName("code-pre");
         panelBody.add(attributeValue);
       }
+    }
+
+    Element firstElement = this.getElement().getFirstChildElement();
+    if ("input".equalsIgnoreCase(firstElement.getTagName())) {
+      firstElement.removeFromParent();
     }
   }
 

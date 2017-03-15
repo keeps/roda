@@ -132,10 +132,12 @@ public class RiskIncidenceRegister extends Composite {
       UserLogin.getInstance().checkRoles(new HistoryResolver[] {RiskIncidenceRegister.RESOLVER}, false, callback);
     }
 
+    @Override
     public List<String> getHistoryPath() {
       return ListUtils.concat(Planning.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
+    @Override
     public String getHistoryToken() {
       return "riskincidenceregister";
     }
@@ -147,14 +149,14 @@ public class RiskIncidenceRegister extends Composite {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  private static final List<String> aipFieldsToReturn = new ArrayList<String>(
+  private static final List<String> aipFieldsToReturn = new ArrayList<>(
     Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_GHOST, RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL));
 
-  private static final List<String> representationFieldsToReturn = new ArrayList<String>(
+  private static final List<String> representationFieldsToReturn = new ArrayList<>(
     Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.REPRESENTATION_AIP_ID, RodaConstants.REPRESENTATION_ID,
       RodaConstants.REPRESENTATION_TYPE));
 
-  private static final List<String> fileFieldsToReturn = new ArrayList<String>(
+  private static final List<String> fileFieldsToReturn = new ArrayList<>(
     Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.FILE_PARENT_UUID, RodaConstants.FILE_PATH,
       RodaConstants.FILE_ANCESTORS_PATH, RodaConstants.FILE_ORIGINALNAME, RodaConstants.FILE_FILE_ID,
       RodaConstants.FILE_AIP_ID, RodaConstants.FILE_REPRESENTATION_ID, RodaConstants.FILE_ISDIRECTORY));

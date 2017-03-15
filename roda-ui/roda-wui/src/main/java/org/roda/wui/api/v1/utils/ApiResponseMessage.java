@@ -23,6 +23,7 @@ public class ApiResponseMessage {
   private String message;
 
   public ApiResponseMessage() {
+    // do nothing
   }
 
   public ApiResponseMessage(int code, String message) {

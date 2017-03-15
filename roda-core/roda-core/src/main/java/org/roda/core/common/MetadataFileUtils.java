@@ -93,7 +93,7 @@ public class MetadataFileUtils {
 
   public static Map<String, List<String>> parseBinary(Binary binary)
     throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
-    Map<String, List<String>> otherProperties = new HashMap<String, List<String>>();
+    Map<String, List<String>> otherProperties = new HashMap<>();
     DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
     domFactory.setNamespaceAware(true);
     DocumentBuilder builder = domFactory.newDocumentBuilder();
@@ -105,7 +105,7 @@ public class MetadataFileUtils {
     for (int i = 0; i < nodes.getLength(); i++) {
       String name = nodes.item(i).getAttributes().getNamedItem("name").getNodeValue() + "_txt";
       String value = nodes.item(i).getTextContent();
-      List<String> values = new ArrayList<String>();
+      List<String> values = new ArrayList<>();
       if (otherProperties.containsKey(name)) {
         values = otherProperties.get(name);
       }

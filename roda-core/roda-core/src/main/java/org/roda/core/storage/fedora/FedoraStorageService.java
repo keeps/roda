@@ -596,7 +596,7 @@ public class FedoraStorageService implements StorageService {
 
   @Override
   public DirectResourceAccess getDirectAccess(final StoragePath storagePath) {
-    DirectResourceAccess ret = new DirectResourceAccess() {
+    return new DirectResourceAccess() {
       Path temp = null;
 
       @Override
@@ -631,13 +631,11 @@ public class FedoraStorageService implements StorageService {
           temp = null;
         }
       }
-
     };
-    return ret;
   }
 
   private static FileAttribute<Set<PosixFilePermission>> getTempDirFilePermissions() {
-    Set<PosixFilePermission> perms = new HashSet<PosixFilePermission>();
+    Set<PosixFilePermission> perms = new HashSet<>();
     // add owners permission
     perms.add(PosixFilePermission.OWNER_READ);
     perms.add(PosixFilePermission.OWNER_WRITE);
@@ -649,8 +647,7 @@ public class FedoraStorageService implements StorageService {
     // add others permissions
     perms.add(PosixFilePermission.OTHERS_READ);
     perms.add(PosixFilePermission.OTHERS_EXECUTE);
-    FileAttribute<Set<PosixFilePermission>> asFileAttribute = PosixFilePermissions.asFileAttribute(perms);
-    return asFileAttribute;
+    return PosixFilePermissions.asFileAttribute(perms);
   }
 
   class ListBinaryVersionsIterable implements CloseableIterable<BinaryVersion> {
@@ -744,17 +741,11 @@ public class FedoraStorageService implements StorageService {
         properties = new HashMap<>();
       }
       return FedoraConversionUtils.convertDataStreamToBinaryVersion(ds, version, properties);
-    } catch (ForbiddenException e) {
+    } catch (ForbiddenException | org.fcrepo.client.NotFoundException e) {
       throw new NotFoundException(e.getMessage(), e);
     } catch (BadRequestException e) {
       throw new RequestNotValidException(e.getMessage(), e);
-    } catch (org.fcrepo.client.NotFoundException e) {
-      throw new NotFoundException(e.getMessage(), e);
-    } catch (FedoraException e) {
-      throw new GenericException(e.getMessage(), e);
-    } catch (GenericException e) {
-      throw new GenericException(e.getMessage(), e);
-    } catch (RequestNotValidException e) {
+    } catch (FedoraException | GenericException | RequestNotValidException e) {
       throw new GenericException(e.getMessage(), e);
     }
   }
@@ -780,10 +771,6 @@ public class FedoraStorageService implements StorageService {
       String versionID = id + encodeProperties(properties);
       binary.createVersionSnapshot(versionID);
       return FedoraConversionUtils.convertDataStreamToBinaryVersion(binary, id, properties);
-    } catch (ForbiddenException e) {
-      throw new GenericException(e.getMessage(), e);
-    } catch (org.fcrepo.client.NotFoundException e) {
-      throw new GenericException(e.getMessage(), e);
     } catch (FedoraException e) {
       throw new GenericException(e.getMessage(), e);
     }
@@ -796,10 +783,6 @@ public class FedoraStorageService implements StorageService {
       FedoraDatastream binary = fedoraRepository.getDatastream(FedoraUtils.storagePathToFedoraPath(storagePath));
       String fullVersionID = getFullVersionID(binary, version);
       binary.revertToVersion(fullVersionID);
-    } catch (ForbiddenException e) {
-      throw new GenericException(e.getMessage(), e);
-    } catch (org.fcrepo.client.NotFoundException e) {
-      throw new GenericException(e.getMessage(), e);
     } catch (FedoraException e) {
       throw new GenericException(e.getMessage(), e);
     }
@@ -812,10 +795,6 @@ public class FedoraStorageService implements StorageService {
       FedoraDatastream binary = fedoraRepository.getDatastream(FedoraUtils.storagePathToFedoraPath(storagePath));
       String fullVersionID = getFullVersionID(binary, version);
       binary.deleteVersion(fullVersionID);
-    } catch (ForbiddenException e) {
-      throw new GenericException(e.getMessage(), e);
-    } catch (org.fcrepo.client.NotFoundException e) {
-      throw new GenericException(e.getMessage(), e);
     } catch (FedoraException e) {
       throw new GenericException(e.getMessage(), e);
     }

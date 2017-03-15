@@ -485,6 +485,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     username.setReadOnly(readonly);
   }
 
+  @Override
   public void setVisible(boolean visible) {
     super.setVisible(visible);
     if (enableGroupSelect) {

@@ -103,17 +103,14 @@ public class SimpleFileList extends BasicAsyncTableCell<IndexedFile> {
 
     // define default sorting
     display.getColumnSortList().push(new ColumnSortInfo(filenameColumn, false));
-
     addStyleName("my-files-table");
-
   }
 
   @Override
   protected Sorter getSorter(ColumnSortList columnSortList) {
-    Map<Column<IndexedFile, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<IndexedFile, ?>, List<String>>();
+    Map<Column<IndexedFile, ?>, List<String>> columnSortingKeyMap = new HashMap<>();
     columnSortingKeyMap.put(iconColumn, Arrays.asList(RodaConstants.FILE_ISDIRECTORY));
     columnSortingKeyMap.put(filenameColumn, Arrays.asList(RodaConstants.FILE_ORIGINALNAME));
-
     return createSorter(columnSortList, columnSortingKeyMap);
   }
 

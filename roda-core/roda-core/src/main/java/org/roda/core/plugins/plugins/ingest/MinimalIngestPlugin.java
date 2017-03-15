@@ -77,7 +77,7 @@ public class MinimalIngestPlugin extends DefaultIngestPlugin {
 
   @Override
   public List<PluginParameter> getParameters() {
-    ArrayList<PluginParameter> pluginParameters = new ArrayList<PluginParameter>();
+    ArrayList<PluginParameter> pluginParameters = new ArrayList<>();
     pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_SIP_TO_AIP_CLASS));
     pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_PARENT_ID));
     pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID));

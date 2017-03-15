@@ -43,18 +43,21 @@ public class UserLoginServiceImpl extends RemoteServiceServlet implements UserLo
     return new UserLoginServiceImpl();
   }
 
+  @Override
   public User getAuthenticatedUser() throws RODAException {
     User user = UserUtility.getUser(this.getThreadLocalRequest());
     logger.debug("Serving user {}", user);
     return user;
   }
 
+  @Override
   public User login(String username, String password) throws AuthenticationDeniedException, GenericException {
     User user = UserLogin.login(username, password, this.getThreadLocalRequest());
     logger.debug("Logged user {}", user);
     return user;
   }
 
+  @Override
   public Map<String, String> getRodaProperties() {
     return RodaCoreFactory.getPropertiesFromCache(WUI_LOGIN_CACHE, WUI_LOGIN_CACHE_PREFIXES);
 

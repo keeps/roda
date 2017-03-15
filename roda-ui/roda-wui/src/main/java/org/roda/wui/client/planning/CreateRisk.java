@@ -17,8 +17,8 @@ import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.ListUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -45,10 +45,12 @@ public class CreateRisk extends Composite {
       UserLogin.getInstance().checkRoles(new HistoryResolver[] {MemberManagement.RESOLVER}, false, callback);
     }
 
+    @Override
     public List<String> getHistoryPath() {
       return ListUtils.concat(RiskRegister.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
+    @Override
     public String getHistoryToken() {
       return "create_risk";
     }
@@ -79,7 +81,7 @@ public class CreateRisk extends Composite {
       RodaConstants.RISK_MITIGATION_OWNER);
     initWidget(uiBinder.createAndBindUi(this));
   }
-  
+
   @Override
   protected void onLoad() {
     super.onLoad();
@@ -92,6 +94,7 @@ public class CreateRisk extends Composite {
       Risk risk = riskDataPanel.getRisk();
       BrowserService.Util.getInstance().createRisk(risk, new AsyncCallback<Risk>() {
 
+        @Override
         public void onFailure(Throwable caught) {
           AsyncCallbackUtils.defaultFailureTreatment(caught);
         }

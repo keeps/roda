@@ -49,6 +49,7 @@ public class DescriptiveMetadata implements IsModelObject {
     return 1;
   }
 
+  @Override
   public String getId() {
     return id;
   }

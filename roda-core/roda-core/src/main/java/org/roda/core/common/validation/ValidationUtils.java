@@ -92,7 +92,7 @@ public class ValidationUtils {
           consolidateReports(report, dmReport);
         }
         // XXX review why should a validation method update data
-        Map<String, String> properties = new HashMap<String, String>();
+        Map<String, String> properties = new HashMap<>();
         properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.METADATA_TYPE_FORCED.toString());
 
         model.updateDescriptiveMetadata(aipId, dm.getId(), binary.getContent(), fallbackMetadataType,
@@ -129,7 +129,6 @@ public class ValidationUtils {
   }
 
   public static ValidationReport isXMLValid(ContentPayload xmlPayload) {
-    InputStream inputStream = null;
     ValidationReport ret = new ValidationReport();
 
     SAXParserFactory factory = SAXParserFactory.newInstance();
@@ -138,10 +137,7 @@ public class ValidationUtils {
 
     RodaErrorHandler errorHandler = new RodaErrorHandler();
 
-    try {
-      inputStream = xmlPayload.createInputStream();
-      Reader reader = new InputStreamReader(new BOMInputStream(inputStream));
-
+    try (Reader reader = new InputStreamReader(new BOMInputStream(xmlPayload.createInputStream()))) {
       XMLReader xmlReader = XMLReaderFactory.createXMLReader();
       xmlReader.setEntityResolver(new RodaEntityResolver());
       InputSource inputSource = new InputSource(reader);
@@ -160,8 +156,6 @@ public class ValidationUtils {
     } catch (IOException e) {
       ret.setValid(false);
       ret.setMessage(e.getMessage());
-    } finally {
-      IOUtils.closeQuietly(inputStream);
     }
     return ret;
   }
@@ -282,13 +276,11 @@ public class ValidationUtils {
     Optional<Schema> xmlSchema = RodaCoreFactory.getRodaSchema(descriptiveMetadataType, descriptiveMetadataVersion);
     try {
       if (xmlSchema.isPresent()) {
-
-        InputStreamReader inputStreamReader = new InputStreamReader(
-          new BOMInputStream(descriptiveMetadataPayload.createInputStream()));
-
         RodaErrorHandler errorHandler = new RodaErrorHandler();
 
-        try {
+        try (InputStreamReader inputStreamReader = new InputStreamReader(
+          new BOMInputStream(descriptiveMetadataPayload.createInputStream()))) {
+
           XMLReader xmlReader = XMLReaderFactory.createXMLReader();
           xmlReader.setEntityResolver(new RodaEntityResolver());
           InputSource inputSource = new InputSource(inputStreamReader);
@@ -389,7 +381,7 @@ public class ValidationUtils {
     List<SAXParseException> errors;
 
     public RodaErrorHandler() {
-      errors = new ArrayList<SAXParseException>();
+      errors = new ArrayList<>();
     }
 
     @Override

@@ -18,6 +18,7 @@ public abstract class FiltersParameters extends FilterParameter {
    * Constructs an empty {@link FiltersParameters}.
    */
   public FiltersParameters() {
+    // do nothing
   }
 
   /**

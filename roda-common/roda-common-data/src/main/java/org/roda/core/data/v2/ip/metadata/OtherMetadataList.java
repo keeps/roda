@@ -43,12 +43,14 @@ public class OtherMetadataList implements RODAObjectList<OtherMetadata> {
     this.metadataList = otherMetadataList;
   }
 
+  @Override
   @JsonProperty(value = RodaConstants.RODA_OBJECT_OTHER_METADATA_LIST)
   @XmlElement(name = RodaConstants.RODA_OBJECT_OTHER_METADATA)
   public List<OtherMetadata> getObjects() {
     return metadataList;
   }
 
+  @Override
   public void setObjects(List<OtherMetadata> otherMetadataList) {
     this.metadataList = otherMetadataList;
   }

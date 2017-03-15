@@ -89,7 +89,7 @@ public class UserUtility {
     // INFO 20170220 nvieira containsAll changed to set intersection (contain at
     // least one role)
     if (!rolesToCheck.isEmpty() && Sets.intersection(rsu.getAllRoles(), new HashSet<>(rolesToCheck)).isEmpty()) {
-      final List<String> missingRoles = new ArrayList<String>(rolesToCheck);
+      final List<String> missingRoles = new ArrayList<>(rolesToCheck);
       missingRoles.removeAll(rsu.getAllRoles());
 
       throw new AuthorizationDeniedException("The user '" + rsu.getId() + "' does not have all needed permissions",

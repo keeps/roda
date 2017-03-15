@@ -21,6 +21,7 @@ public class UserAlreadyExistsException extends AlreadyExistsException {
    * Constructs a new UserAlreadyExistsException.
    */
   public UserAlreadyExistsException() {
+    // do nothing
   }
 
   /**

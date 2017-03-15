@@ -208,7 +208,7 @@ public class TransferredResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    SelectedItemsList<org.roda.core.data.v2.ip.TransferredResource> selected = new SelectedItemsList<org.roda.core.data.v2.ip.TransferredResource>(
+    SelectedItemsList<org.roda.core.data.v2.ip.TransferredResource> selected = new SelectedItemsList<>(
       Arrays.asList(path), org.roda.core.data.v2.ip.TransferredResource.class.getName());
     Browser.deleteTransferredResources(user, selected);
 
@@ -231,8 +231,8 @@ public class TransferredResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    SelectedItemsList<org.roda.core.data.v2.ip.TransferredResource> selected = new SelectedItemsList<org.roda.core.data.v2.ip.TransferredResource>(
-      paths, org.roda.core.data.v2.ip.TransferredResource.class.getName());
+    SelectedItemsList<org.roda.core.data.v2.ip.TransferredResource> selected = new SelectedItemsList<>(paths,
+      org.roda.core.data.v2.ip.TransferredResource.class.getName());
     Browser.deleteTransferredResources(user, selected);
 
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Transferred resources deleted"), mediaType)

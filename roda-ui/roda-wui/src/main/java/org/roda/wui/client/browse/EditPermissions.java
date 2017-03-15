@@ -105,7 +105,7 @@ public class EditPermissions extends Composite {
 
               @Override
               public void onSuccess(List<IndexedAIP> aips) {
-                List<? extends HasPermissions> hasPermissionsObjects = (List<? extends HasPermissions>) aips;
+                List<? extends HasPermissions> hasPermissionsObjects = aips;
                 EditPermissions edit = new EditPermissions(IndexedAIP.class.getName(), hasPermissionsObjects);
                 callback.onSuccess(edit);
               }
@@ -122,10 +122,12 @@ public class EditPermissions extends Composite {
       UserLogin.getInstance().checkRoles(new HistoryResolver[] {EditPermissions.AIP_RESOLVER}, false, callback);
     }
 
+    @Override
     public List<String> getHistoryPath() {
       return ListUtils.concat(BrowseAIP.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
+    @Override
     public String getHistoryToken() {
       return "edit_permissions";
     }
@@ -169,7 +171,7 @@ public class EditPermissions extends Composite {
 
               @Override
               public void onSuccess(List<IndexedDIP> dips) {
-                List<? extends HasPermissions> hasPermissionsObjects = (List<? extends HasPermissions>) dips;
+                List<? extends HasPermissions> hasPermissionsObjects = dips;
                 EditPermissions edit = new EditPermissions(IndexedDIP.class.getName(), hasPermissionsObjects);
                 callback.onSuccess(edit);
               }
@@ -186,10 +188,12 @@ public class EditPermissions extends Composite {
       UserLogin.getInstance().checkRoles(new HistoryResolver[] {EditPermissions.DIP_RESOLVER}, false, callback);
     }
 
+    @Override
     public List<String> getHistoryPath() {
       return ListUtils.concat(BrowseAIP.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
+    @Override
     public String getHistoryToken() {
       return "edit_dip_permissions";
     }
@@ -352,6 +356,7 @@ public class EditPermissions extends Composite {
       public void onAttachOrDetach(AttachEvent event) {
         // running later to let attach/detach take effect
         Scheduler.get().scheduleDeferred(new Command() {
+          @Override
           public void execute() {
             userPermissionsEmpty.setVisible(userPermissionsPanel.getWidgetCount() == 0);
             groupPermissionsEmpty.setVisible(groupPermissionsPanel.getWidgetCount() == 0);

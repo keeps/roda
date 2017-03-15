@@ -47,10 +47,12 @@ public class Ingest {
         IngestProcess.RESOLVER, IngestAppraisal.RESOLVER}, false, callback);
     }
 
+    @Override
     public List<String> getHistoryPath() {
       return Arrays.asList(getHistoryToken());
     }
 
+    @Override
     public String getHistoryToken() {
       return "ingest";
     }
@@ -127,17 +129,21 @@ public class Ingest {
   public static void downloadRodaIn(final User targetUser, final String os) {
     UserLogin.getRodaProperty("roda.in.installer.url", new AsyncCallback<String>() {
 
+      @Override
       public void onFailure(Throwable caught) {
         AsyncCallbackUtils.defaultFailureTreatment(caught);
       }
 
+      @Override
       public void onSuccess(final String rodaInUrl) {
         UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<User>() {
 
+          @Override
           public void onFailure(Throwable caught) {
             AsyncCallbackUtils.defaultFailureTreatment(caught);
           }
 
+          @Override
           public void onSuccess(User user) {
             User target = targetUser == null ? user : targetUser;
             String url = rodaInUrl.replaceAll("$USERNAME", user.getName()) + "/" + target.getName();

@@ -100,7 +100,7 @@ public class UpdateAIPPermissionsPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public List<PluginParameter> getParameters() {
-    ArrayList<PluginParameter> parameters = new ArrayList<PluginParameter>();
+    ArrayList<PluginParameter> parameters = new ArrayList<>();
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_PERMISSIONS_JSON));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_AIP_ID));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_EVENT_DESCRIPTION));

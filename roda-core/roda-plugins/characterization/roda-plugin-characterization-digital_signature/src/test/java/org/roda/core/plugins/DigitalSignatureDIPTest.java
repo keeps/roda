@@ -82,7 +82,6 @@ public class DigitalSignatureDIPTest {
   private static ModelService model;
   private static IndexService index;
   private static Path corporaPath;
-  private static String aipCreator = "admin";
 
   @BeforeMethod
   public void setUp() throws Exception {
@@ -137,7 +136,7 @@ public class DigitalSignatureDIPTest {
     FileAlreadyExistsException, SolrServerException, IsStillUpdatingException {
     String parentId = null;
     String aipType = RodaConstants.AIP_TYPE_MIXED;
-    AIP root = model.createAIP(parentId, aipType, new Permissions(), aipCreator);
+    AIP root = model.createAIP(parentId, aipType, new Permissions(), RodaConstants.ADMIN);
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());

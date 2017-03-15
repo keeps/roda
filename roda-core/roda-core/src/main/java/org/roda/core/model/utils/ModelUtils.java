@@ -820,7 +820,7 @@ public final class ModelUtils {
   @Deprecated
   public static List<ZipEntryInfo> zipIndexedAIP(List<IndexedAIP> aips)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
+    List<ZipEntryInfo> zipEntries = new ArrayList<>();
     ModelService model = RodaCoreFactory.getModelService();
     for (IndexedAIP aip : aips) {
       AIP fullAIP = model.retrieveAIP(aip.getId());
@@ -835,7 +835,7 @@ public final class ModelUtils {
   @Deprecated
   public static List<ZipEntryInfo> aipToZipEntry(AIP aip)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
+    List<ZipEntryInfo> zipEntries = new ArrayList<>();
     StorageService storage = RodaCoreFactory.getStorageService();
     ModelService model = RodaCoreFactory.getModelService();
 
@@ -891,7 +891,7 @@ public final class ModelUtils {
 
   public static List<IndexedAIP> getIndexedAIPsFromObjectIds(SelectedItems<IndexedAIP> selectedItems)
     throws GenericException, RequestNotValidException {
-    List<IndexedAIP> res = new ArrayList<IndexedAIP>();
+    List<IndexedAIP> res = new ArrayList<>();
     if (selectedItems instanceof SelectedItemsList) {
       SelectedItemsList<IndexedAIP> list = (SelectedItemsList<IndexedAIP>) selectedItems;
       for (String objectId : list.getIds()) {
@@ -916,7 +916,7 @@ public final class ModelUtils {
 
   public static List<ZipEntryInfo> zipAIP(List<AIP> aips, SimpleJobPluginInfo jobPluginInfo)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
+    List<ZipEntryInfo> zipEntries = new ArrayList<>();
     for (AIP aip : aips) {
       zipEntries.addAll(aipToZipEntry(aip));
       jobPluginInfo.incrementObjectsProcessedWithSuccess();

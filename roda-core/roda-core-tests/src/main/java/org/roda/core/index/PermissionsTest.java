@@ -19,6 +19,7 @@ import java.util.UUID;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.sublist.Sublist;
@@ -38,7 +39,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-@Test(groups = {"all", "travis"})
+@Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_TRAVIS})
 public class PermissionsTest {
 
   private static Path basePath;
@@ -47,7 +48,6 @@ public class PermissionsTest {
 
   private static Path corporaPath;
   private static StorageService corporaService;
-  private static String aipCreator = "admin";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PermissionsTest.class);
 
@@ -88,7 +88,7 @@ public class PermissionsTest {
     // Create AIP
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_PERMISSIONS),
-      aipCreator);
+      RodaConstants.ADMIN);
 
     index.commitAIPs();
 
@@ -142,7 +142,7 @@ public class PermissionsTest {
     // Create AIP
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_PERMISSIONS),
-      aipCreator);
+      RodaConstants.ADMIN);
 
     index.commitAIPs();
 
@@ -195,7 +195,7 @@ public class PermissionsTest {
     // Create AIP
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_PERMISSIONS),
-      aipCreator);
+      RodaConstants.ADMIN);
 
     index.commitAIPs();
 
@@ -248,7 +248,7 @@ public class PermissionsTest {
     // Create AIP
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_PERMISSIONS),
-      aipCreator);
+      RodaConstants.ADMIN);
 
     index.commitAIPs();
 

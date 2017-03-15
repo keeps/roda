@@ -70,7 +70,6 @@ public class NotificationList extends BasicAsyncTableCell<Notification> {
   @Override
   protected void configureDisplay(CellTable<Notification> display) {
     fromUser = new TextColumn<Notification>() {
-
       @Override
       public String getValue(Notification notification) {
         return notification != null ? notification.getFromUser() : null;
@@ -78,7 +77,6 @@ public class NotificationList extends BasicAsyncTableCell<Notification> {
     };
 
     recipientUsers = new TextColumn<Notification>() {
-
       @Override
       public String getValue(Notification notification) {
         return notification != null ? StringUtils.prettyPrint(notification.getRecipientUsers()) : null;
@@ -93,7 +91,6 @@ public class NotificationList extends BasicAsyncTableCell<Notification> {
     };
 
     subject = new TextColumn<Notification>() {
-
       @Override
       public String getValue(Notification notification) {
         return notification != null ? notification.getSubject() : null;
@@ -151,14 +148,13 @@ public class NotificationList extends BasicAsyncTableCell<Notification> {
 
   @Override
   protected Sorter getSorter(ColumnSortList columnSortList) {
-    Map<Column<Notification, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<Notification, ?>, List<String>>();
+    Map<Column<Notification, ?>, List<String>> columnSortingKeyMap = new HashMap<>();
     columnSortingKeyMap.put(fromUser, Arrays.asList(RodaConstants.NOTIFICATION_FROM_USER));
     columnSortingKeyMap.put(recipientUsers, Arrays.asList(RodaConstants.NOTIFICATION_RECIPIENT_USERS));
     columnSortingKeyMap.put(sentOn, Arrays.asList(RodaConstants.NOTIFICATION_SENT_ON));
     columnSortingKeyMap.put(subject, Arrays.asList(RodaConstants.NOTIFICATION_SUBJECT));
     columnSortingKeyMap.put(acknowledged, Arrays.asList(RodaConstants.NOTIFICATION_IS_ACKNOWLEDGED));
     columnSortingKeyMap.put(state, Arrays.asList(RodaConstants.NOTIFICATION_STATE));
-
     return createSorter(columnSortList, columnSortingKeyMap);
   }
 

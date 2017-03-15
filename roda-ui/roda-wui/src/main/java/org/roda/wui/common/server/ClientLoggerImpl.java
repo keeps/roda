@@ -28,70 +28,83 @@ public class ClientLoggerImpl extends RemoteServiceServlet implements ClientLogg
     return "[" + this.getThreadLocalRequest().getRemoteAddr() + "] ";
   }
 
+  @Override
   public void debug(String classname, String object) {
     Logger logger = LoggerFactory.getLogger(classname);
     logger.debug(String.format("%s%s", getUserInfo(), object));
   }
 
+  @Override
   public void debug(String classname, String object, Throwable error) {
     Logger logger = LoggerFactory.getLogger(classname);
     logger.debug(String.format("%s%s", getUserInfo(), object), error);
   }
 
+  @Override
   public void error(String classname, String object) {
     Logger logger = LoggerFactory.getLogger(classname);
     logger.error(String.format("%s%s", getUserInfo(), object));
     sendError(classname, object, null);
   }
 
+  @Override
   public void error(String classname, String object, Throwable error) {
     Logger logger = LoggerFactory.getLogger(classname);
     logger.error(String.format("%s%s", getUserInfo(), object), error);
     sendError(classname, object, error);
   }
 
+  @Override
   public void fatal(String classname, String object) {
     Logger logger = LoggerFactory.getLogger(classname);
     logger.error(String.format("%s%s", getUserInfo(), object));
     sendError(classname, object, null);
   }
 
+  @Override
   public void fatal(String classname, String object, Throwable error) {
     Logger logger = LoggerFactory.getLogger(classname);
     logger.error(String.format("%s%s", getUserInfo(), object), error);
     sendError(classname, object, error);
   }
 
+  @Override
   public void info(String classname, String object) {
     Logger logger = LoggerFactory.getLogger(classname);
     logger.info(String.format("%s%s", getUserInfo(), object));
   }
 
+  @Override
   public void info(String classname, String object, Throwable error) {
     Logger logger = LoggerFactory.getLogger(classname);
     logger.info(String.format("%s%s", getUserInfo(), object), error);
   }
 
+  @Override
   public void trace(String classname, String object) {
     Logger logger = LoggerFactory.getLogger(classname);
     logger.trace(String.format("%s%s", getUserInfo(), object));
   }
 
+  @Override
   public void trace(String classname, String object, Throwable error) {
     Logger logger = LoggerFactory.getLogger(classname);
     logger.trace(String.format("%s%s", getUserInfo(), object), error);
   }
 
+  @Override
   public void warn(String classname, String object) {
     Logger logger = LoggerFactory.getLogger(classname);
     logger.warn(String.format("%s%s", getUserInfo(), object));
   }
 
+  @Override
   public void warn(String classname, String object, Throwable error) {
     Logger logger = LoggerFactory.getLogger(classname);
     logger.warn(String.format("%s%s", getUserInfo(), object), error);
   }
 
+  @Override
   public void pagehit(String pagename) {
     // try {
     // RODAClient rodaClient = RodaClientFactory.getRodaWuiClient();
@@ -123,6 +136,7 @@ public class ClientLoggerImpl extends RemoteServiceServlet implements ClientLogg
     // }
   }
 
+  @Override
   public void destroy() {
     super.destroy();
     LogManager.shutdown();

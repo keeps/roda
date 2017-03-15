@@ -21,6 +21,7 @@ public class InvalidTokenException extends RODAException {
    * Constructs a new {@link InvalidTokenException}.
    */
   public InvalidTokenException() {
+    // do nothing
   }
 
   /**

@@ -38,16 +38,19 @@ public class RiskIncidences implements RODAObjectList<RiskIncidence> {
     this.incidences = incidences;
   }
 
+  @Override
   @JsonProperty(value = RodaConstants.RODA_OBJECT_INCIDENCES)
   @XmlElement(name = RodaConstants.RODA_OBJECT_INCIDENCE)
   public List<RiskIncidence> getObjects() {
     return incidences;
   }
 
+  @Override
   public void setObjects(List<RiskIncidence> incidences) {
     this.incidences = incidences;
   }
 
+  @Override
   public void addObject(RiskIncidence incidence) {
     this.incidences.add(incidence);
   }

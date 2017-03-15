@@ -58,8 +58,6 @@ public class JobList extends BasicAsyncTableCell<Job> {
   private TextColumn<Job> objectsTotalCountColumn;
   private Column<Job, SafeHtml> objectsSuccessCountColumn;
   private Column<Job, SafeHtml> objectsFailureCountColumn;
-  // private Column<Job, SafeHtml> objectsProcessingCountColumn;
-  // private Column<Job, SafeHtml> objectsWaitingCountColumn;
 
   private static final List<String> fieldsToReturn = new ArrayList<>();
 
@@ -126,16 +124,15 @@ public class JobList extends BasicAsyncTableCell<Job> {
       @Override
       public String getValue(Job job) {
         String ret = "";
-        if (job != null) {
-          if (job.getJobStats().getSourceObjectsCount() > 0) {
-            ret = Integer.toString(job.getJobStats().getSourceObjectsCount());
-          }
+        if (job != null && job.getJobStats().getSourceObjectsCount() > 0) {
+          ret = Integer.toString(job.getJobStats().getSourceObjectsCount());
         }
         return ret;
       }
     };
 
     objectsSuccessCountColumn = new Column<Job, SafeHtml>(new SafeHtmlCell()) {
+
       @Override
       public SafeHtml getValue(Job job) {
         SafeHtmlBuilder b = new SafeHtmlBuilder();
@@ -169,43 +166,7 @@ public class JobList extends BasicAsyncTableCell<Job> {
       }
     };
 
-    // objectsWaitingCountColumn = new Column<Job, SafeHtml>(new SafeHtmlCell())
-    // {
-    // @Override
-    // public SafeHtml getValue(Job job) {
-    // SafeHtmlBuilder b = new SafeHtmlBuilder();
-    // if (job != null) {
-    // b.append(
-    // job.getJobStats().getSourceObjectsWaitingToBeProcessed() > 0 ?
-    // SafeHtmlUtils.fromSafeConstant("<span>")
-    // : SafeHtmlUtils.fromSafeConstant("<span
-    // class='ingest-process-counter-0'>"));
-    // b.append(job.getJobStats().getSourceObjectsWaitingToBeProcessed());
-    // b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
-    // }
-    // return b.toSafeHtml();
-    // }
-    // };
-    //
-    // objectsProcessingCountColumn = new Column<Job, SafeHtml>(new
-    // SafeHtmlCell()) {
-    // @Override
-    // public SafeHtml getValue(Job job) {
-    // SafeHtmlBuilder b = new SafeHtmlBuilder();
-    // if (job != null) {
-    // b.append(job.getJobStats().getSourceObjectsBeingProcessed() > 0 ?
-    // SafeHtmlUtils.fromSafeConstant("<span>")
-    // : SafeHtmlUtils.fromSafeConstant("<span
-    // class='ingest-process-counter-0'>"));
-    // b.append(job.getJobStats().getSourceObjectsBeingProcessed());
-    // b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
-    // }
-    // return b.toSafeHtml();
-    // }
-    // };
-
     progressColumn = new TextColumn<Job>() {
-
       @Override
       public String getValue(Job job) {
         return job != null ? job.getJobStats().getCompletionPercentage() + "%" : null;
@@ -219,8 +180,6 @@ public class JobList extends BasicAsyncTableCell<Job> {
     objectsTotalCountColumn.setSortable(true);
     objectsSuccessCountColumn.setSortable(true);
     objectsFailureCountColumn.setSortable(true);
-    // objectsWaitingCountColumn.setSortable(true);
-    // objectsProcessingCountColumn.setSortable(true);
     progressColumn.setSortable(true);
 
     addColumn(nameColumn, messages.jobName(), true, false);
@@ -232,10 +191,6 @@ public class JobList extends BasicAsyncTableCell<Job> {
     addColumn(objectsTotalCountColumn, messages.jobTotalCountMessage(), true, true, 5);
     addColumn(objectsSuccessCountColumn, messages.jobSuccessCountMessage(), true, true, 6);
     addColumn(objectsFailureCountColumn, messages.jobFailureCountMessage(), true, true, 5);
-    // addColumn(objectsProcessingCountColumn,
-    // messages.jobProcessingCountMessage(), true, true, 6);
-    // addColumn(objectsWaitingCountColumn, messages.jobWaitingCountMessage(),
-    // true, true, 5);
 
     // default sorting
     display.getColumnSortList().push(new ColumnSortInfo(startDateColumn, false));
@@ -254,10 +209,6 @@ public class JobList extends BasicAsyncTableCell<Job> {
       Arrays.asList(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_SUCCESS));
     columnSortingKeyMap.put(objectsFailureCountColumn,
       Arrays.asList(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_FAILURE));
-    // columnSortingKeyMap.put(objectsProcessingCountColumn,
-    // Arrays.asList(RodaConstants.JOB_SOURCE_OBJECTS_BEING_PROCESSED));
-    // columnSortingKeyMap.put(objectsWaitingCountColumn,
-    // Arrays.asList(RodaConstants.JOB_SOURCE_OBJECTS_WAITING_TO_BE_PROCESSED));
     columnSortingKeyMap.put(usernameColumn, Arrays.asList(RodaConstants.JOB_USERNAME));
     return createSorter(columnSortList, columnSortingKeyMap);
   }

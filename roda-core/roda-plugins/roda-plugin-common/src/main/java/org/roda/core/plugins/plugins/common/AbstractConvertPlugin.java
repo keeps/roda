@@ -72,7 +72,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends AbstractAIPComponentsPlugin<T> {
-  private static Logger LOGGER = LoggerFactory.getLogger(AbstractConvertPlugin.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractConvertPlugin.class);
 
   private String inputFormat;
   private String outputFormat;
@@ -137,10 +137,12 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
     return orderedList;
   }
 
+  @Override
   public void init() throws PluginException {
     // do nothing
   }
 
+  @Override
   public void shutdown() {
     // do nothing
   }
@@ -174,10 +176,12 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
     this.outputFormat = format;
   }
 
+  @Override
   public PluginType getType() {
     return PluginType.AIP_TO_AIP;
   }
 
+  @Override
   public boolean areParameterValuesValid() {
     return true;
   }

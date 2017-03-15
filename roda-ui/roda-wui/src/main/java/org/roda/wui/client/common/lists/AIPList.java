@@ -84,7 +84,6 @@ public class AIPList extends BasicAsyncTableCell<IndexedAIP> {
     };
 
     titleColumn = new TextColumn<IndexedAIP>() {
-
       @Override
       public String getValue(IndexedAIP aip) {
         return aip != null ? aip.getTitle() : null;
@@ -92,7 +91,6 @@ public class AIPList extends BasicAsyncTableCell<IndexedAIP> {
     };
 
     datesColumn = new TextColumn<IndexedAIP>() {
-
       @Override
       public String getValue(IndexedAIP aip) {
         return Humanize.getDatesText(aip.getDateInitial(), aip.getDateFinal(), false);
@@ -146,7 +144,7 @@ public class AIPList extends BasicAsyncTableCell<IndexedAIP> {
 
   @Override
   protected Sorter getSorter(ColumnSortList columnSortList) {
-    Map<Column<IndexedAIP, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<IndexedAIP, ?>, List<String>>();
+    Map<Column<IndexedAIP, ?>, List<String>> columnSortingKeyMap = new HashMap<>();
     // setting secondary sorter to title
     columnSortingKeyMap.put(levelColumn, Arrays.asList(RodaConstants.AIP_LEVEL, RodaConstants.AIP_TITLE_SORT));
     columnSortingKeyMap.put(titleColumn, Arrays.asList(RodaConstants.AIP_TITLE_SORT));

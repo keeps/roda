@@ -24,16 +24,20 @@ import org.slf4j.LoggerFactory;
 public final class ControllerAssistantUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(ControllerAssistantUtils.class);
 
-  protected static void registerAction(User user, String actionComponent, String actionMethod,
-    String relatedObjectId, long duration, LOG_ENTRY_STATE state, Object... parameters) {
+  private ControllerAssistantUtils() {
+    // do nothing
+  }
+
+  protected static void registerAction(User user, String actionComponent, String actionMethod, String relatedObjectId,
+    long duration, LOG_ENTRY_STATE state, Object... parameters) {
     LogEntry logEntry = createLogEntry(user, actionComponent, actionMethod, relatedObjectId, duration, state,
       parameters);
     registerAction(logEntry);
   }
 
-  private static LogEntry createLogEntry(User user, String actionComponent, String actionMethod,
-    String relatedObjectId, long duration, LOG_ENTRY_STATE state, Object... parameters) {
-    List<LogEntryParameter> logParameters = new ArrayList<LogEntryParameter>();
+  private static LogEntry createLogEntry(User user, String actionComponent, String actionMethod, String relatedObjectId,
+    long duration, LOG_ENTRY_STATE state, Object... parameters) {
+    List<LogEntryParameter> logParameters = new ArrayList<>();
     if (parameters != null && parameters.length > 0) {
       if ((parameters.length % 2) != 0) {
         LOGGER.warn(
@@ -51,9 +55,8 @@ public final class ControllerAssistantUtils {
     return createLogEntry(user, actionComponent, actionMethod, relatedObjectId, duration, state, logParameters);
   }
 
-  private static LogEntry createLogEntry(User user, String actionComponent, String actionMethod,
-    String relatedObjectId, long duration, LOG_ENTRY_STATE state, List<LogEntryParameter> parameters) {
-
+  private static LogEntry createLogEntry(User user, String actionComponent, String actionMethod, String relatedObjectId,
+    long duration, LOG_ENTRY_STATE state, List<LogEntryParameter> parameters) {
     LogEntry logEntry = new LogEntry();
     logEntry.setId(UUID.randomUUID().toString());
     logEntry.setAddress(user.getIpAddress());
@@ -65,7 +68,6 @@ public final class ControllerAssistantUtils {
     logEntry.setDatetime(new Date());
     logEntry.setRelatedObjectID(relatedObjectId);
     logEntry.setState(state);
-
     return logEntry;
   }
 

@@ -70,7 +70,7 @@ import com.google.common.collect.Iterables;
 
 import jersey.repackaged.com.google.common.collect.Lists;
 
-@Test(groups = {"all", "travis"})
+@Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_TRAVIS})
 public class EARKSIPPluginsTest {
   private static final Logger LOGGER = LoggerFactory.getLogger(EARKSIPPluginsTest.class);
 
@@ -82,7 +82,6 @@ public class EARKSIPPluginsTest {
   private static IndexService index;
 
   private static Path corporaPath;
-  private static String aipCreator = "admin";
 
   @BeforeClass
   public void setUp() throws Exception {
@@ -146,7 +145,7 @@ public class EARKSIPPluginsTest {
     FileAlreadyExistsException, SolrServerException, IsStillUpdatingException {
     String parentId = null;
     String aipType = RodaConstants.AIP_TYPE_MIXED;
-    AIP root = model.createAIP(parentId, aipType, new Permissions(), aipCreator);
+    AIP root = model.createAIP(parentId, aipType, new Permissions(), RodaConstants.ADMIN);
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());
@@ -219,7 +218,7 @@ public class EARKSIPPluginsTest {
     SolrServerException, IsStillUpdatingException {
     String parentId = null;
     String aipType = RodaConstants.AIP_TYPE_MIXED;
-    AIP root = model.createAIP(parentId, aipType, new Permissions(), aipCreator);
+    AIP root = model.createAIP(parentId, aipType, new Permissions(), RodaConstants.ADMIN);
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());

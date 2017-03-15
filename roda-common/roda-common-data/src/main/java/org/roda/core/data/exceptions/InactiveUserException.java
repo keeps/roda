@@ -7,6 +7,8 @@
  */
 package org.roda.core.data.exceptions;
 
+import org.roda.core.data.v2.user.User;
+
 /**
  * Thrown to indicate that was not possible to authenticate {@link User} because
  * it is not active.
@@ -20,6 +22,7 @@ public class InactiveUserException extends AuthenticationDeniedException {
    * Constructs a new {@link InactiveUserException}.
    */
   public InactiveUserException() {
+    // do nothing
   }
 
   /**

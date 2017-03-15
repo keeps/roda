@@ -20,6 +20,7 @@ public class RODAServiceException extends RODAException {
    * Constructs a new RODAServiceException.
    */
   public RODAServiceException() {
+    // do nothing
   }
 
   /**

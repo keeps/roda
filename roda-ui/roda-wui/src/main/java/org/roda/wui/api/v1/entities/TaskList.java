@@ -20,7 +20,7 @@ public class TaskList {
   private List<String> tasks;
 
   public TaskList() {
-
+    // do nothing
   }
 
   public TaskList(String... values) {

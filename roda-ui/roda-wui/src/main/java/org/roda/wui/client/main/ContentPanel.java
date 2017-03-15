@@ -57,6 +57,17 @@ public class ContentPanel extends SimplePanel {
   @SuppressWarnings("unused")
   private static ClientLogger logger = new ClientLogger(ContentPanel.class.getName());
 
+  private static final Set<HistoryResolver> resolvers = new HashSet<>();
+  private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
+
+  private Widget currWidget;
+
+  private ContentPanel() {
+    super();
+    this.addStyleName("contentPanel");
+    this.currWidget = null;
+  }
+
   /**
    * Get the singleton instance
    * 
@@ -67,17 +78,6 @@ public class ContentPanel extends SimplePanel {
       instance = new ContentPanel();
     }
     return instance;
-  }
-
-  private static final Set<HistoryResolver> resolvers = new HashSet<>();
-  private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
-
-  private Widget currWidget;
-
-  private ContentPanel() {
-    super();
-    this.addStyleName("contentPanel");
-    this.currWidget = null;
   }
 
   public void init() {
@@ -138,14 +138,14 @@ public class ContentPanel extends SimplePanel {
   private void update(final List<String> historyTokens, final HistoryResolver resolver) {
     resolver.isCurrentUserPermitted(new AsyncCallback<Boolean>() {
 
+      @Override
       public void onFailure(Throwable caught) {
         AsyncCallbackUtils.defaultFailureTreatment(caught);
       }
 
+      @Override
       public void onSuccess(Boolean permitted) {
         if (!permitted.booleanValue()) {
-          // UserLogin.getInstance().showSuggestLoginDialog();
-
           UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<User>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -176,20 +176,16 @@ public class ContentPanel extends SimplePanel {
         } else {
           resolver.resolve(HistoryUtils.tail(historyTokens), new AsyncCallback<Widget>() {
 
+            @Override
             public void onFailure(Throwable caught) {
               if (caught instanceof BadHistoryTokenException) {
-                // Dialogs.showInformationDialog(messages.notFoundError(),
-                // messages.pageNotFound(caught.getMessage()),
-                // messages.dialogOk());
-                // if (currWidget == null) {
-                // Tools.newHistory(Welcome.RESOLVER);
-                // }
                 HistoryUtils.newHistory(Theme.RESOLVER, "Error404.html");
               } else {
                 AsyncCallbackUtils.defaultFailureTreatment(caught);
               }
             }
 
+            @Override
             public void onSuccess(Widget widget) {
               if (widget != null) {
                 if (widget != currWidget) {

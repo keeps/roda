@@ -136,7 +136,7 @@ public class InternalProcess extends Composite {
     stateFacets = new FlowPanel();
     jobTypeFacets = new FlowPanel();
 
-    Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
+    Map<String, FlowPanel> facetPanels = new HashMap<>();
     facetPanels.put(RodaConstants.JOB_STATE, stateFacets);
     facetPanels.put(RodaConstants.JOB_USERNAME, producerFacets);
     facetPanels.put(RodaConstants.JOB_PLUGIN_TYPE, jobTypeFacets);

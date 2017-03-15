@@ -128,6 +128,7 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
       }
     }
 
+    @Override
     public int compareTo(Permission permission) {
       return sortingkeyword.compareTo(permission.sortingkeyword);
     }
@@ -182,11 +183,13 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
   public void init(final AsyncCallback<Boolean> callback) {
     UserLogin.getRodaProperties(new AsyncCallback<Map<String, String>>() {
 
+      @Override
       public void onFailure(Throwable caught) {
         loading.hide();
         callback.onFailure(caught);
       }
 
+      @Override
       public void onSuccess(Map<String, String> rodaProperties) {
         for (Entry<String, String> entry : rodaProperties.entrySet()) {
           String key = entry.getKey();
@@ -257,6 +260,7 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
     }
   }
 
+  @Override
   public void clear() {
     for (Permission p : permissions) {
       p.setChecked(false);

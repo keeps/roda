@@ -203,7 +203,7 @@ public final class JobsHelper {
   }
 
   public static <T extends IsRODAObject> void setPluginParameters(Plugin<T> plugin, Job job) {
-    Map<String, String> parameters = new HashMap<String, String>(job.getPluginParameters());
+    Map<String, String> parameters = new HashMap<>(job.getPluginParameters());
     parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, job.getId());
     try {
       plugin.setParameterValues(parameters);
@@ -246,7 +246,6 @@ public final class JobsHelper {
     if (!uuids.isEmpty()) {
       try {
         List<IndexedRepresentation> retrieve = index.retrieve(IndexedRepresentation.class, uuids, new ArrayList<>());
-
         List<Representation> representationsToReturn = getRepresentationFromList(model, retrieve);
 
         if (representationsToReturn.isEmpty()) {
@@ -278,7 +277,6 @@ public final class JobsHelper {
     if (!uuids.isEmpty()) {
       try {
         List<IndexedFile> retrieve = index.retrieve(IndexedFile.class, uuids, new ArrayList<>());
-
         List<File> filesToReturn = getFilesFromList(model, retrieve);
 
         if (filesToReturn.isEmpty()) {
