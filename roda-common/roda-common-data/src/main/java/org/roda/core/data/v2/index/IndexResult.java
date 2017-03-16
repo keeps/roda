@@ -39,7 +39,7 @@ import org.roda.core.data.v2.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@XmlRootElement(name = "index_result")
+@XmlRootElement(name = RodaConstants.RODA_OBJECT_INDEX_RESULT)
 @JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class IndexResult<T extends Serializable> implements Serializable {

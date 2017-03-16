@@ -13,13 +13,15 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.common.RodaConstants;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Hélder Silva <hsilva@keep.pt>
  */
-@XmlRootElement(name = "results")
+@XmlRootElement(name = RodaConstants.RODA_OBJECT_OTHERS)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ObjectPermissionResult {
   private List<ObjectPermission> objectPermissions;
@@ -34,8 +36,8 @@ public class ObjectPermissionResult {
     this.objectPermissions = objectPermissions;
   }
 
-  @JsonProperty(value = "result")
-  @XmlElement(name = "permission")
+  @JsonProperty(value = RodaConstants.RODA_OBJECT_OTHER)
+  @XmlElement(name = RodaConstants.RODA_OBJECT_PERMISSION)
   public List<ObjectPermission> getObjects() {
     return objectPermissions;
   }

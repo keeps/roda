@@ -76,7 +76,7 @@ public class PluginManager {
   private Map<Path, JarPlugins> jarPluginCache = new HashMap<>();
   private Map<String, Plugin<? extends IsRODAObject>> internalPluginChache = new HashMap<>();
   private Map<String, Plugin<? extends IsRODAObject>> externalPluginChache = new HashMap<>();
-  private EnumMap<PluginType, List<PluginInfo>> pluginInfoPerType = new EnumMap<>(PluginType.class);
+  private Map<PluginType, List<PluginInfo>> pluginInfoPerType = new EnumMap<>(PluginType.class);
   private Map<String, Set<Class>> pluginObjectClasses = new HashMap<>();
   private Map<Class, List<PluginInfo>> pluginInfoPerObjectClass = new HashMap<>();
   private boolean internalPluginStarted = false;

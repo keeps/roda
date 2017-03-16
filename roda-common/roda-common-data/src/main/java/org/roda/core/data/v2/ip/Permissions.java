@@ -27,8 +27,8 @@ public class Permissions implements Serializable {
     CREATE, READ, UPDATE, DELETE, GRANT;
   }
 
-  private EnumMap<PermissionType, Set<String>> users;
-  private EnumMap<PermissionType, Set<String>> groups;
+  private Map<PermissionType, Set<String>> users;
+  private Map<PermissionType, Set<String>> groups;
 
   /**
    * Constructs an empty {@link Permissions}.
@@ -52,7 +52,7 @@ public class Permissions implements Serializable {
     }
   }
 
-  public EnumMap<PermissionType, Set<String>> getUsers() {
+  public Map<PermissionType, Set<String>> getUsers() {
     return users;
   }
 
@@ -67,11 +67,11 @@ public class Permissions implements Serializable {
     return usernames;
   }
 
-  public void setUsers(EnumMap<PermissionType, Set<String>> users) {
+  public void setUsers(Map<PermissionType, Set<String>> users) {
     this.users = users;
   }
 
-  public EnumMap<PermissionType, Set<String>> getGroups() {
+  public Map<PermissionType, Set<String>> getGroups() {
     return groups;
   }
 
@@ -86,7 +86,7 @@ public class Permissions implements Serializable {
     return groupnames;
   }
 
-  public void setGroups(EnumMap<PermissionType, Set<String>> groups) {
+  public void setGroups(Map<PermissionType, Set<String>> groups) {
     this.groups = groups;
   }
 

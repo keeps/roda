@@ -111,6 +111,12 @@ public final class RodaConstants {
   public static final String RODA_OBJECT_DIPFILES = "dip_files";
   public static final String RODA_OBJECT_TRANSFERRED_RESOURCES = "transferred_resources";
   public static final String RODA_OBJECT_FORMATS = "formats";
+
+  public static final String RODA_OBJECT_PERMISSION = "permission";
+  public static final String RODA_OBJECT_INDEX_RESULT = "index_result";
+  public static final String RODA_OBJECT_FACET_FIELD_VALUE = "facet_field_value";
+  public static final String RODA_OBJECT_FACET_VALUE = "facet_value";
+  public static final String RODA_OBJECT_OTHERS = "results";
   public static final String RODA_OBJECT_OTHER = "result";
 
   /*
