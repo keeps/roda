@@ -84,10 +84,6 @@ public class ShowPreservationAgent extends Composite {
     }
   };
 
-  public static final List<String> getViewItemHistoryToken(String id) {
-    return ListUtils.concat(RESOLVER.getHistoryPath(), id);
-  }
-
   interface MyUiBinder extends UiBinder<Widget, ShowPreservationAgent> {
   }
 
@@ -117,6 +113,11 @@ public class ShowPreservationAgent extends Composite {
   private IndexedPreservationAgent agent = null;
   private String eventId = null;
 
+  public ShowPreservationAgent(final String eventId, final String agentId) {
+    this(agentId);
+    this.eventId = eventId;
+  }
+
   public ShowPreservationAgent(final String agentId) {
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -141,9 +142,8 @@ public class ShowPreservationAgent extends Composite {
       });
   }
 
-  public ShowPreservationAgent(final String eventId, final String agentId) {
-    this(agentId);
-    this.eventId = eventId;
+  public static final List<String> getViewItemHistoryToken(String id) {
+    return ListUtils.concat(RESOLVER.getHistoryPath(), id);
   }
 
   @Override

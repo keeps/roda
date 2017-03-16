@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -45,13 +44,16 @@ import com.github.jknack.handlebars.Template;
 public class UserManagementHelper {
   private static final Logger LOGGER = LoggerFactory.getLogger(UserManagementHelper.class);
 
+  private UserManagementHelper() {
+    // do nothing
+  }
+
   protected static User retrieveUser(String username) throws GenericException {
     return RodaCoreFactory.getModelService().retrieveUserByName(username);
   }
 
   protected static Group retrieveGroup(String groupname) throws GenericException, NotFoundException {
     return RodaCoreFactory.getModelService().retrieveGroup(groupname);
-
   }
 
   protected static List<Group> listAllGroups() throws GenericException {
@@ -129,9 +131,8 @@ public class UserManagementHelper {
       return options.fn();
     });
 
-    InputStream templateStream = RodaCoreFactory
-      .getConfigurationFileAsStream(RodaConstants.USERS_TEMPLATE_FOLDER + "/" + RodaConstants.USER_EXTRA_METADATA_FILE);
-    try {
+    try (InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(
+      RodaConstants.USERS_TEMPLATE_FOLDER + "/" + RodaConstants.USER_EXTRA_METADATA_FILE)) {
       String rawTemplate = IOUtils.toString(templateStream, RodaConstants.DEFAULT_ENCODING);
       Template tmpl = handlebars.compileInline(rawTemplate);
 
@@ -150,10 +151,9 @@ public class UserManagementHelper {
         }
       }
 
-      String result = tmpl.apply(data);
       // result = RodaUtils.indentXML(result);
-      return result;
-    } catch (IOException e1) {
+      return tmpl.apply(data);
+    } catch (IOException e) {
       LOGGER.error("Error getting template from stream");
     }
 
@@ -199,24 +199,20 @@ public class UserManagementHelper {
     if (!RodaConstants.SYSTEM_USERS.contains(name)) {
       String template = null;
 
-      InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(
-        RodaConstants.USERS_TEMPLATE_FOLDER + "/" + RodaConstants.USER_EXTRA_METADATA_FILE);
-      try {
+      try (InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(
+        RodaConstants.USERS_TEMPLATE_FOLDER + "/" + RodaConstants.USER_EXTRA_METADATA_FILE)) {
         template = IOUtils.toString(templateStream, RodaConstants.DEFAULT_ENCODING);
       } catch (IOException e) {
         LOGGER.error("Error getting template from stream", e);
       }
 
-      Set<MetadataValue> values = new HashSet<>();
-      if (template != null) {
-        values = ServerTools.transform(template);
-      }
+      Set<MetadataValue> values = ServerTools.transform(template);
 
       try {
         User user = RodaCoreFactory.getModelService().retrieveUserByName(name);
         String userExtra = user.getExtra();
 
-        if (values != null && userExtra != null) {
+        if (userExtra != null && !values.isEmpty()) {
           for (MetadataValue mv : values) {
             // clear the auto-generated values
             // mv.set("value", null);
@@ -247,25 +243,20 @@ public class UserManagementHelper {
 
       return new UserExtraBundle(name, values);
     } else {
-      return new UserExtraBundle(name, new HashSet<>());
+      return new UserExtraBundle(name);
     }
   }
 
   public static UserExtraBundle retrieveDefaultExtraBundle() {
     String template = null;
 
-    InputStream templateStream = RodaCoreFactory
-      .getConfigurationFileAsStream(RodaConstants.USERS_TEMPLATE_FOLDER + "/" + RodaConstants.USER_EXTRA_METADATA_FILE);
-    try {
+    try (InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(
+      RodaConstants.USERS_TEMPLATE_FOLDER + "/" + RodaConstants.USER_EXTRA_METADATA_FILE)) {
       template = IOUtils.toString(templateStream, RodaConstants.DEFAULT_ENCODING);
     } catch (IOException e) {
       LOGGER.error("Error getting template from stream", e);
     }
 
-    Set<MetadataValue> values = new HashSet<>();
-    if (template != null) {
-      values = ServerTools.transform(template);
-    }
-    return new UserExtraBundle("", values);
+    return new UserExtraBundle("", ServerTools.transform(template));
   }
 }

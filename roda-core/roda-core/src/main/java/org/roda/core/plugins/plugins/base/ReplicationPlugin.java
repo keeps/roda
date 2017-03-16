@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.roda.core.RodaCoreFactory;
@@ -20,6 +19,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
@@ -129,7 +129,7 @@ public class ReplicationPlugin extends AbstractPlugin<AIP> {
     try {
       for (AIP aip : objects) {
         Report reportItem = PluginHelper.initPluginReportItem(plugin, aip.getId(), AIP.class, aip.getState());
-        PluginHelper.updatePartialJobReport(plugin, model, index, reportItem, false, cachedJob);
+        PluginHelper.updatePartialJobReport(plugin, model, reportItem, false, cachedJob);
         reports.put(aip.getId(), reportItem);
 
         String rsyncResult = ReplicationPluginUtils.executeRsyncAIP(aip, hasCompression);
@@ -162,7 +162,7 @@ public class ReplicationPlugin extends AbstractPlugin<AIP> {
         reportItem.addPluginDetails("\n" + rsyncAgentsResult);
 
         report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(plugin, model, index, reportItem, true, cachedJob);
+        PluginHelper.updatePartialJobReport(plugin, model, reportItem, true, cachedJob);
         jobPluginInfo.incrementObjectsProcessed(pluginState);
       }
 
@@ -181,7 +181,7 @@ public class ReplicationPlugin extends AbstractPlugin<AIP> {
         }
         reportItem.setPluginState(pluginState).setPluginDetails(outcomeDetailExtension);
         report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(plugin, model, index, reportItem, true, cachedJob);
+        PluginHelper.updatePartialJobReport(plugin, model, reportItem, true, cachedJob);
         jobPluginInfo.incrementObjectsProcessed(pluginState);
       }
     }
@@ -195,7 +195,7 @@ public class ReplicationPlugin extends AbstractPlugin<AIP> {
 
     if (targetApi != null && targetResource != null && username != null) {
       Job job = new Job();
-      job.setId(UUID.randomUUID().toString());
+      job.setId(IdUtils.createUUID());
       job.setName(getName());
       job.setSourceObjects(SelectedItemsList.create(AIP.class, aipIds));
       job.setPlugin(ReindexAIPPlugin.class.getCanonicalName());
@@ -214,7 +214,7 @@ public class ReplicationPlugin extends AbstractPlugin<AIP> {
         Report reportItem = PluginHelper.initPluginReport(this);
         reportItem.setPluginState(PluginState.FAILURE)
           .setPluginDetails("Error sending post request to reindex AIPs after replication");
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
         LOGGER.error("Error sending post request to reindex AIPs", e);
       }
     } else {

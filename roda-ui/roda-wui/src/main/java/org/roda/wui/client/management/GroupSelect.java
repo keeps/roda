@@ -177,7 +177,7 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Lis
    * @param visible
    *          start as visible or wait until its initialized
    */
-  public GroupSelect(boolean visible) {
+  public GroupSelect() {
     this.groups = new Vector<>();
     this.blacklist = new Vector<>();
     this.userSelections = new HashMap<>();

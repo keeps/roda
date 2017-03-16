@@ -24,13 +24,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.IdUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -38,6 +36,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -169,7 +168,7 @@ public class TransferredResourcesScanner {
     if (relativeToBase.getParent() != null) {
       String parentId = relativeToBase.getParent().toString();
       tr.setParentId(parentId);
-      tr.setParentUUID(UUID.nameUUIDFromBytes(parentId.getBytes()).toString());
+      tr.setParentUUID(IdUtils.createUUID(parentId));
     }
 
     List<String> ancestors = new ArrayList<>();
@@ -270,7 +269,7 @@ public class TransferredResourcesScanner {
       }
 
       Path relativeToBase = basePath.relativize(resourcePath.getParent().resolve(newName));
-      return UUID.nameUUIDFromBytes(relativeToBase.toString().getBytes()).toString();
+      return IdUtils.createUUID(relativeToBase.toString());
     } else {
       throw new NotFoundException("Transferred resource was moved or does not exist");
     }

@@ -133,8 +133,8 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
 
       index.delete(TransferredResource.class, filter);
       index.commit(TransferredResource.class);
-      LOGGER.info("End indexing Transferred Resources");
-      LOGGER.info("Time elapsed: {} seconds", (System.currentTimeMillis() - start) / 1000);
+      LOGGER.info("End indexing Transferred Resources. Time elapsed: {} seconds",
+        (System.currentTimeMillis() - start) / 1000);
       RodaCoreFactory.setTransferredResourcesScannerUpdateStatus(folderRelativePath, false);
     } catch (IOException | GenericException | RequestNotValidException | RuntimeException e) {
       LOGGER.error("Error reindexing Transferred Resources", e);

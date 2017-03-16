@@ -7,7 +7,6 @@
  */
 package org.roda.core.common;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -128,11 +127,11 @@ public class Messages {
       InputStreamReader reader = null;
       InputStream is = null;
       try {
-        File file = folder.resolve(bundleName).toFile();
+        Path bundlePath = folder.resolve(bundleName);
 
         // Also checks for file existence
-        if (FSUtils.exists(folder.resolve(bundleName))) {
-          is = Files.newInputStream(file.toPath());
+        if (FSUtils.exists(bundlePath)) {
+          is = Files.newInputStream(bundlePath);
         } else {
           is = this.getClass().getResourceAsStream(CONFIG_I18N_PATH + bundleName);
         }

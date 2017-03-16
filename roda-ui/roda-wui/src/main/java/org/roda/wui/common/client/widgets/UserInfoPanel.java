@@ -49,14 +49,12 @@ public class UserInfoPanel {
 
     layout = new DockPanel();
     username = new Label(user.getName());
-
     centerLayout = new VerticalPanel();
 
     infoLayout = createInfo();
     centerLayout.add(infoLayout);
 
     detailsDisclosure = new DisclosurePanel(messages.userInfoDetails());
-
     detailsLayout = createDetails();
 
     if (detailsLayout != null) {
@@ -76,108 +74,35 @@ public class UserInfoPanel {
   }
 
   private HTMLTable createInfo() {
-    FlexTable layout = new FlexTable();
-    int rows = 0;
+    FlexTable tableLayout = new FlexTable();
 
     if (user.getFullName() != null) {
       Label fullNameLabel = new Label(messages.userInfoFullname() + ":");
       Label fullNameValue = new Label(user.getFullName());
-      layout.setWidget(rows, 0, fullNameLabel);
-      layout.setWidget(rows, 1, fullNameValue);
+      tableLayout.setWidget(0, 0, fullNameLabel);
+      tableLayout.setWidget(0, 1, fullNameValue);
       fullNameLabel.addStyleName("info-label");
       fullNameValue.addStyleName("info-value");
-      // rows++;
     }
 
-    // if (user.getBusinessCategory() != null) {
-    // Label titleLabel = new Label(messages.userInfoBusinessCategory()+":");
-    // Label titleValue = new Label(user.getBusinessCategory());
-    // layout.setWidget(rows, 0, titleLabel);
-    // layout.setWidget(rows, 1, titleValue);
-    // titleLabel.addStyleName("info-label");
-    // titleValue.addStyleName("info-value");
-    // rows++;
-    // }
-
-    return layout;
+    return tableLayout;
   }
 
   private HTMLTable createDetails() {
-    FlexTable layout = new FlexTable();
+    FlexTable tableLayout = new FlexTable();
     int rows = 0;
 
     if (user.getEmail() != null) {
       Label emailLabel = new Label(messages.userInfoEmail() + ":");
       Label emailValue = new Label(user.getEmail());
-      layout.setWidget(rows, 0, emailLabel);
-      layout.setWidget(rows, 1, emailValue);
+      tableLayout.setWidget(rows, 0, emailLabel);
+      tableLayout.setWidget(rows, 1, emailValue);
       emailLabel.addStyleName("info-label");
       emailValue.addStyleName("info-value");
       rows++;
     }
 
-    // if (user.getTelephoneNumber() != null) {
-    // Label phoneNumberLabel = new Label(messages.userInfoTelephoneNumber() +
-    // ":");
-    // Label phoneNumberValue = new Label(user.getTelephoneNumber());
-    // layout.setWidget(rows, 0, phoneNumberLabel);
-    // layout.setWidget(rows, 1, phoneNumberValue);
-    // phoneNumberLabel.addStyleName("info-label");
-    // phoneNumberValue.addStyleName("info-value");
-    // rows++;
-    // }
-    //
-    // if (user.getFax() != null) {
-    // Label faxLabel = new Label(messages.userInfoFax() + ":");
-    // Label faxValue = new Label(user.getFax());
-    // layout.setWidget(rows, 0, faxLabel);
-    // layout.setWidget(rows, 1, faxValue);
-    // faxLabel.addStyleName("info-label");
-    // faxValue.addStyleName("info-value");
-    // rows++;
-    // }
-    //
-    // if (user.getPostalAddress() != null) {
-    // Label addressLabel = new Label(messages.userInfoPostalAddress() + ":");
-    // Label addressValue = new Label(user.getPostalAddress());
-    // layout.setWidget(rows, 0, addressLabel);
-    // layout.setWidget(rows, 1, addressValue);
-    // addressLabel.addStyleName("info-label");
-    // addressValue.addStyleName("info-value");
-    // rows++;
-    // }
-    //
-    // if (user.getPostalCode() != null) {
-    // Label postalCodeLabel = new Label(messages.userInfoPostalCode() + ":");
-    // Label postalCodeValue = new Label(user.getPostalCode());
-    // layout.setWidget(rows, 0, postalCodeLabel);
-    // layout.setWidget(rows, 1, postalCodeValue);
-    // postalCodeLabel.addStyleName("info-label");
-    // postalCodeValue.addStyleName("info-value");
-    // rows++;
-    // }
-    //
-    // if (user.getLocalityName() != null) {
-    // Label localityLabel = new Label(messages.userInfoLocality() + ":");
-    // Label localityValue = new Label(user.getLocalityName());
-    // layout.setWidget(rows, 0, localityLabel);
-    // layout.setWidget(rows, 1, localityValue);
-    // localityLabel.addStyleName("info-label");
-    // localityValue.addStyleName("info-value");
-    // rows++;
-    // }
-    //
-    // if (user.getCountryName() != null) {
-    // Label countryLabel = new Label(messages.userInfoCountry() + ":");
-    // Label countryValue = new Label(user.getCountryName());
-    // layout.setWidget(rows, 0, countryLabel);
-    // layout.setWidget(rows, 1, countryValue);
-    // countryLabel.addStyleName("info-label");
-    // countryValue.addStyleName("info-value");
-    // rows++;
-    // }
-
-    return rows == 0 ? null : layout;
+    return rows == 0 ? null : tableLayout;
   }
 
   /**

@@ -9,7 +9,6 @@ package org.roda.core.plugins;
 
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -18,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.solr.client.solrj.SolrServerException;
@@ -36,6 +34,7 @@ import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexRunnable;
@@ -124,8 +123,8 @@ public class EARKSIPPluginsTest {
     });
   }
 
-  private TransferredResource createCorpora() throws InterruptedException, IOException, FileAlreadyExistsException,
-    NotFoundException, GenericException, RequestNotValidException, IsStillUpdatingException, AlreadyExistsException {
+  private TransferredResource createCorpora() throws InterruptedException, IOException, NotFoundException,
+    GenericException, RequestNotValidException, IsStillUpdatingException, AlreadyExistsException {
     TransferredResourcesScanner f = RodaCoreFactory.getTransferredResourcesScanner();
 
     Path sip = corporaPath.resolve(CorporaConstants.SIP_FOLDER).resolve(CorporaConstants.EARK_SIP);
@@ -136,13 +135,13 @@ public class EARKSIPPluginsTest {
     index.commit(TransferredResource.class);
 
     TransferredResource transferredResource = index.retrieve(TransferredResource.class,
-      UUID.nameUUIDFromBytes(CorporaConstants.EARK_SIP.getBytes()).toString(), new ArrayList<>());
+      IdUtils.createUUID(CorporaConstants.EARK_SIP), new ArrayList<>());
     return transferredResource;
   }
 
   private AIP ingestCorpora() throws RequestNotValidException, NotFoundException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, InvalidParameterException, InterruptedException, IOException,
-    FileAlreadyExistsException, SolrServerException, IsStillUpdatingException {
+    SolrServerException, IsStillUpdatingException {
     String parentId = null;
     String aipType = RodaConstants.AIP_TYPE_MIXED;
     AIP root = model.createAIP(parentId, aipType, new Permissions(), RodaConstants.ADMIN);
@@ -173,8 +172,7 @@ public class EARKSIPPluginsTest {
   }
 
   @Test
-  public void testIngestEARKSIP()
-    throws IOException, InterruptedException, RODAException, SolrServerException, IsStillUpdatingException {
+  public void testIngestEARKSIP() throws IOException, InterruptedException, RODAException, SolrServerException {
     AIP aip = ingestCorpora();
     Assert.assertEquals(aip.getRepresentations().size(), 1);
 

@@ -28,7 +28,6 @@ import javax.xml.transform.TransformerException;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.ConsumesOutputStream;
 import org.roda.core.common.EntityResponse;
-import org.roda.core.common.IdUtils;
 import org.roda.core.common.StreamResponse;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
@@ -40,6 +39,7 @@ import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.common.ObjectPermissionResult;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
@@ -150,7 +150,7 @@ public class Browser extends RodaWuiController {
   }
 
   public static BrowseFileBundle retrieveBrowseFileBundle(User user, String aipId, String representationId,
-    List<String> filePath, String fileId, Locale locale, List<String> fileFieldsToReturn)
+    List<String> filePath, String fileId, List<String> fileFieldsToReturn)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     // check user permissions
@@ -172,7 +172,7 @@ public class Browser extends RodaWuiController {
     IndexedFile file = BrowserHelper.retrieve(IndexedFile.class, fileUUID, fileFieldsToReturn);
 
     // delegate
-    BrowseFileBundle browseFileBundle = BrowserHelper.retrieveBrowseFileBundle(aip, representation, file, locale, user);
+    BrowseFileBundle browseFileBundle = BrowserHelper.retrieveBrowseFileBundle(aip, representation, file, user);
 
     // register action
     controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_AIP_ID_PARAM,
@@ -1316,7 +1316,7 @@ public class Browser extends RodaWuiController {
     UserUtility.checkAIPPermissions(user, aip, PermissionType.UPDATE);
 
     // delegate
-    Representation updatedRep = BrowserHelper.updateRepresentation(user, representation);
+    Representation updatedRep = BrowserHelper.updateRepresentation(representation);
 
     // register action
     controllerAssistant.registerAction(user, representation.getAipId(), LOG_ENTRY_STATE.SUCCESS,
@@ -2375,8 +2375,7 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
 
     // delegate
-    BrowserHelper.updateMultipleIncidences(user, selected, status, severity, mitigatedOn, mitigatedBy,
-      mitigatedDescription);
+    BrowserHelper.updateMultipleIncidences(selected, status, severity, mitigatedOn, mitigatedBy, mitigatedDescription);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_SELECTED_PARAM,

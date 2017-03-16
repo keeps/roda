@@ -18,8 +18,8 @@ public interface Actionable<T extends IsIndexed> {
   static interface Action<T> {
 
   }
-  
-  static enum ActionImpact {
+
+  public enum ActionImpact {
     NONE, UPDATED, DESTROYED;
   }
 

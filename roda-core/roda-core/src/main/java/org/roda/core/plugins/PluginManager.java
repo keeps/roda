@@ -9,7 +9,6 @@ package org.roda.core.plugins;
 
 import java.io.IOException;
 import java.lang.reflect.Modifier;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.DirectoryStream;
@@ -172,7 +171,7 @@ public class PluginManager {
     return pluginObjectClasses;
   }
 
-  public <T extends IsRODAObject> Set<Class> getPluginObjectClasses(String pluginID) {
+  public Set<Class> getPluginObjectClasses(String pluginID) {
     return pluginObjectClasses.get(pluginID);
   }
 
@@ -346,7 +345,7 @@ public class PluginManager {
     }
   }
 
-  private List<URL> getSharedJarURLs(Path folder) throws MalformedURLException, IOException {
+  private List<URL> getSharedJarURLs(Path folder) throws IOException {
     List<URL> sharedJarURLs = new ArrayList<>();
     try (DirectoryStream<Path> sharedStream = Files.newDirectoryStream(folder, "*.jar")) {
       for (Path jarFile : sharedStream) {
@@ -402,7 +401,7 @@ public class PluginManager {
   }
 
   @SuppressWarnings("rawtypes")
-  private <T extends IsRODAObject> void loadInternalPlugins() {
+  private void loadInternalPlugins() {
     Reflections reflections = new Reflections(
       RodaCoreFactory.getRodaConfigurationAsString("core", "plugins", "internal", "package"));
     Set<Class<? extends AbstractPlugin>> plugins = reflections.getSubTypesOf(AbstractPlugin.class);

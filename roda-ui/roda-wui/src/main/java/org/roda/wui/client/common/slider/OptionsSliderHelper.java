@@ -21,7 +21,7 @@ import org.roda.wui.client.common.actions.RepresentationActions;
 public class OptionsSliderHelper {
 
   private OptionsSliderHelper() {
-
+    // do nothing
   }
 
   static <T extends IsIndexed> void updateOptionsObjectSliderPanel(T object, SliderPanel slider) {
@@ -42,7 +42,7 @@ public class OptionsSliderHelper {
 
   private static void updateOptionsSliderPanel(IndexedAIP aip, SliderPanel slider) {
     slider.clear();
-    // TODO slider.addContent(FileActions.get().createActionsLayout(file));
+    // TODO slider.addContent(AipActions.get().createActionsLayout(aip));
   }
 
   private static void updateOptionsSliderPanel(IndexedRepresentation representation, SliderPanel slider) {

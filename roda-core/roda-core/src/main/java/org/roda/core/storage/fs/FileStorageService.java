@@ -17,7 +17,6 @@ import java.nio.file.StandardCopyOption;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -27,6 +26,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.storage.Binary;
@@ -180,7 +180,7 @@ public class FileStorageService implements StorageService {
       LOGGER.debug("Moving to trash: {} to {}", fromPath, toPath);
       FSUtils.move(fromPath, toPath, true);
     } catch (AlreadyExistsException e) {
-      String unique = UUID.randomUUID().toString();
+      String unique = IdUtils.createUUID();
       Path uniqueToPath = trashPath.resolve(unique).resolve(rodaDataPath.relativize(fromPath));
       try {
         LOGGER.debug("Re-trying to move to trash: {} to {}", fromPath, uniqueToPath);
@@ -568,7 +568,7 @@ public class FileStorageService implements StorageService {
     throws RequestNotValidException, NotFoundException, GenericException {
     Path binPath = FSUtils.getEntityPath(basePath, storagePath);
 
-    String id = UUID.randomUUID().toString();
+    String id = IdUtils.createUUID();
     Path dataPath = FSUtils.getEntityPath(historyDataPath, storagePath, id);
     Path metadataPath = FSUtils.getBinaryHistoryMetadataPath(historyDataPath, historyMetadataPath, dataPath);
 

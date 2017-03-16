@@ -74,13 +74,11 @@ import org.roda.core.data.common.RodaConstants.SolrType;
 import org.roda.core.data.common.RodaConstants.StorageType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.RoleAlreadyExistsException;
-import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.facet.Facets;
@@ -930,8 +928,8 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void indexUsersAndGroupsFromLDAP() throws GenericException, EmailAlreadyExistsException,
-    UserAlreadyExistsException, IllegalOperationException, NotFoundException, AlreadyExistsException {
+  private static void indexUsersAndGroupsFromLDAP()
+    throws GenericException, IllegalOperationException, NotFoundException, AlreadyExistsException {
     for (User user : model.listUsers()) {
       LOGGER.debug("User to be indexed: {}", user);
       model.notifyUserUpdated(user);

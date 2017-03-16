@@ -40,10 +40,6 @@ import com.itextpdf.text.DocumentException;
 
 public class DigitalSignatureDIPPluginUtils {
 
-  private DigitalSignatureDIPPluginUtils() {
-
-  }
-
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalSignatureDIPPluginUtils.class);
 
   private static String KEYSTORE_PATH = RodaCoreFactory.getRodaHomePath()
@@ -52,6 +48,10 @@ public class DigitalSignatureDIPPluginUtils {
     "keystore", "password");
   private static final String KEYSTORE_ALIAS = RodaCoreFactory.getRodaConfigurationAsString("core", "signature",
     "keystore", "alias");
+
+  private DigitalSignatureDIPPluginUtils() {
+    // do nothing
+  }
 
   public static void setKeystorePath(String path) {
     KEYSTORE_PATH = path;
@@ -64,7 +64,7 @@ public class DigitalSignatureDIPPluginUtils {
         signatureUtility.loadKeyStore(is, KEYSTORE_PASSWORD.toCharArray());
       }
     }
-    signatureUtility.initSign(KEYSTORE_ALIAS, KEYSTORE_PASSWORD.toCharArray());
+    signatureUtility.initSign(KEYSTORE_ALIAS);
 
     File inputFile = input.toFile();
     signatureUtility.sign(inputFile, input.getParent().resolve(inputFile.getName() + ".p7s").toFile());
@@ -111,7 +111,7 @@ public class DigitalSignatureDIPPluginUtils {
           signatureUtility.loadKeyStore(is, KEYSTORE_PASSWORD.toCharArray());
         }
       }
-      signatureUtility.initSign(KEYSTORE_ALIAS, KEYSTORE_PASSWORD.toCharArray());
+      signatureUtility.initSign(KEYSTORE_ALIAS);
 
       Path signatureTempFile = Files.createTempFile("signature_", ".p7s");
       signatureUtility.sign(input.toFile(), signatureTempFile.toFile());

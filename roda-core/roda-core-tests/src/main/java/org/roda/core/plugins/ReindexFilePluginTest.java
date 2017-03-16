@@ -8,7 +8,6 @@
 package org.roda.core.plugins;
 
 import java.nio.file.Path;
-import java.util.UUID;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
@@ -18,6 +17,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.index.select.SelectedItemsAll;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
@@ -70,7 +70,7 @@ public class ReindexFilePluginTest {
   public void testReindexWithEmptyRepresentation() throws RequestNotValidException, NotFoundException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException {
     AIP aip = model.createAIP(null, "", new Permissions(), RodaConstants.ADMIN);
-    model.createRepresentation(aip.getId(), UUID.randomUUID().toString(), true, "", true);
+    model.createRepresentation(aip.getId(), IdUtils.createUUID(), true, "", true);
     Job job = TestsHelper.executeJob(ReindexFilePlugin.class, PluginType.MISC, SelectedItemsAll.create(File.class));
     TestsHelper.getJobReports(index, job, true);
   }

@@ -11,13 +11,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
@@ -99,7 +99,7 @@ public class ReindexAllRodaEntitiesPlugin extends AbstractPlugin<Void> {
       Report reportItem = reindexRODAObject(model, reindexClass, jobPluginInfo);
       if (reportItem != null) {
         pluginReport.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
       }
     }
 
@@ -112,7 +112,7 @@ public class ReindexAllRodaEntitiesPlugin extends AbstractPlugin<Void> {
     Report report = null;
 
     if (model.hasObjects(reindexClass)) {
-      String jobId = UUID.randomUUID().toString();
+      String jobId = IdUtils.createUUID();
       String jobName = ReindexRodaEntityPlugin.class.getSimpleName() + " (" + reindexClass.getSimpleName() + ")";
       report = PluginHelper.initPluginReportItem(this, jobId, Job.class);
 

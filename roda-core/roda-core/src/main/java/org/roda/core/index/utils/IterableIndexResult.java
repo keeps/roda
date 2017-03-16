@@ -39,7 +39,6 @@ import org.slf4j.LoggerFactory;
 
 public class IterableIndexResult<T extends IsIndexed> implements Iterable<T> {
   private static final Logger LOGGER = LoggerFactory.getLogger(IterableIndexResult.class);
-
   private static final int PAGE_SIZE = RodaConstants.DEFAULT_PAGINATION_VALUE;
 
   private SolrClient solrClient;
@@ -79,7 +78,6 @@ public class IterableIndexResult<T extends IsIndexed> implements Iterable<T> {
     this.justActive = justActive;
     this.removeDuplicates = removeDuplicates;
     this.fieldsToReturn = fieldsToReturn;
-
     getResults(this.sublist);
   }
 
@@ -144,7 +142,8 @@ public class IterableIndexResult<T extends IsIndexed> implements Iterable<T> {
           return t;
         } catch (IndexOutOfBoundsException e) {
           LOGGER.error(
-            "Error while processing next element. filter='{}'; sorter='{}'; sublist='{}'; justActive='{}'; removeDuplicates='{}'; currentObjectInPartialList='{}'; currentObject='{}'; totalObjects='{}'",
+            "Error while processing next element. filter='{}'; sorter='{}'; sublist='{}'; justActive='{}'; removeDuplicates='{}'; "
+              + "currentObjectInPartialList='{}'; currentObject='{}'; totalObjects='{}'",
             filter, sorter, sublist, justActive, removeDuplicates, currentObjectInPartialList, currentObject,
             totalObjects, e);
           throw new NoSuchElementException("Error while processing next element");

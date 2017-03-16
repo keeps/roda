@@ -13,7 +13,6 @@ import static org.testng.AssertJUnit.assertTrue;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -21,19 +20,20 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.testng.Assert;
 
 public class StorageTestUtils {
 
   public static StoragePath generateRandomContainerStoragePath() throws RequestNotValidException {
-    return DefaultStoragePath.parse(UUID.randomUUID().toString());
+    return DefaultStoragePath.parse(IdUtils.createUUID());
   }
 
   public static StoragePath generateRandomResourceStoragePathUnder(StoragePath basePath)
     throws RequestNotValidException {
     List<String> path = new ArrayList<>(basePath.asList());
-    path.add(UUID.randomUUID().toString());
+    path.add(IdUtils.createUUID());
 
     return DefaultStoragePath.parse(path);
   }

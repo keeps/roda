@@ -311,7 +311,7 @@ public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
     LOGGER.debug("Processing AIP {}", aip.getId());
 
     final Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
-    PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
 
     // FIXME 20170118 nvieira condition should be removed when build is not
     // depending on FS
@@ -363,7 +363,7 @@ public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
     }
 
     report.addReport(reportItem);
-    PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
   }
 
   private void copyAndFilterAIP(StorageService storage, AIP aip, StoragePath aipPath, StoragePath aipOnDIPPath)
@@ -372,13 +372,10 @@ public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
     LOGGER.info("Copying AIP to a new DIP");
 
     copyAIPBaseFiles(storage, aipPath, aipOnDIPPath);
-
     List<String> representationIds = copyRepresentationsAndItsMetadata(storage, aip, aipPath, aipOnDIPPath);
-    List<String> descriptiveMetadataIds = copyAIPDescriptiveMetadata(storage, aip, aipPath, aipOnDIPPath);
     copyPreservationMetadata(storage, aipPath, aipOnDIPPath);
     copyOtherMetadata(storage, aipPath, aipOnDIPPath);
-
-    copyAndUpdateAIPJson(storage, aip, aipOnDIPPath, representationIds, descriptiveMetadataIds);
+    copyAndUpdateAIPJson(storage, aip, aipOnDIPPath, representationIds);
   }
 
   private void copyAIPBaseFiles(StorageService storage, StoragePath aipPath, StoragePath aipOnDIPPath)
@@ -546,14 +543,14 @@ public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
   }
 
   private void copyAndUpdateAIPJson(StorageService storage, AIP aip, StoragePath aipOnDIPPath,
-    List<String> representationIds, List<String> descriptiveMetadataIds) throws GenericException,
-    RequestNotValidException, AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
+    List<String> representationIds) throws GenericException, RequestNotValidException, AlreadyExistsException,
+    AuthorizationDeniedException, NotFoundException {
     String json = JsonUtils.getJsonFromObject(aip);
     JsonNode parseJson = JsonUtils.parseJson(json);
 
     JsonNode representationList = parseJson.get(RodaConstants.AIP_REPRESENTATIONS);
     for (Iterator<JsonNode> representationIt = representationList.elements(); representationIt.hasNext();) {
-      JsonNode representation = (JsonNode) representationIt.next();
+      JsonNode representation = representationIt.next();
       if (!representationIds.contains(representation.get("id").asText())) {
         representationIt.remove();
       }
@@ -561,7 +558,7 @@ public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
 
     JsonNode metadataList = parseJson.get(RodaConstants.AIP_DESCRIPTIVE_METADATA);
     for (Iterator<JsonNode> descriptiveMetadataIt = metadataList.elements(); descriptiveMetadataIt.hasNext();) {
-      JsonNode descriptiveMetadata = (JsonNode) descriptiveMetadataIt.next();
+      JsonNode descriptiveMetadata = descriptiveMetadataIt.next();
       if (!representationIds.contains(descriptiveMetadata.get("id").asText())) {
         descriptiveMetadataIt.remove();
       }

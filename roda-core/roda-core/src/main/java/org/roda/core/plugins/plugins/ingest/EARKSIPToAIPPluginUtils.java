@@ -44,7 +44,7 @@ public class EARKSIPToAIPPluginUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(EARKSIPToAIPPluginUtils.class);
 
   public static AIP earkSIPToAIP(SIP sip, String username, Permissions fullPermissions, ModelService model,
-    StorageService storage, List<String> ingestSIPIds, String ingestJobId, Optional<String> parentId)
+    List<String> ingestSIPIds, String ingestJobId, Optional<String> parentId)
     throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException, ValidationException, IOException {
 
@@ -62,7 +62,7 @@ public class EARKSIPToAIPPluginUtils {
 
     // process IPRepresentation information
     for (IPRepresentation representation : sip.getRepresentations()) {
-      processIPRepresentationInformation(model, representation, aip.getId(), storage, notify, false);
+      processIPRepresentationInformation(model, representation, aip.getId(), notify, false);
     }
 
     model.notifyAipCreated(aip.getId());
@@ -77,7 +77,6 @@ public class EARKSIPToAIPPluginUtils {
     model.updateAIP(createdAIP, username);
 
     return model.retrieveAIP(aip.getId());
-
   }
 
   public static AIP earkSIPToAIPUpdate(SIP sip, IndexedAIP indexedAIP, ModelService model, StorageService storage,
@@ -96,7 +95,7 @@ public class EARKSIPToAIPPluginUtils {
 
     // process IPRepresentation information
     for (IPRepresentation representation : sip.getRepresentations()) {
-      processIPRepresentationInformation(model, representation, indexedAIP.getId(), storage, notify, true);
+      processIPRepresentationInformation(model, representation, indexedAIP.getId(), notify, true);
     }
 
     AIP aip = model.retrieveAIP(indexedAIP.getId());
@@ -117,16 +116,16 @@ public class EARKSIPToAIPPluginUtils {
     processDescriptiveMetadata(model, aipId, null, sip.getDescriptiveMetadata(), notify, update);
 
     // process other metadata
-    processOtherMetadata(model, sip.getOtherMetadata(), aipId, Optional.empty(), notify, update);
+    processOtherMetadata(model, sip.getOtherMetadata(), aipId, Optional.empty(), notify);
 
     // process preservation metadata
     processPreservationMetadata(model, sip.getPreservationMetadata(), aipId, Optional.empty(), notify);
 
     // process documentation
-    processDocumentation(model, sip.getDocumentation(), aipId, null, notify, update);
+    processDocumentation(model, sip.getDocumentation(), aipId, null, update);
 
     // process schemas
-    processSchemas(model, sip.getSchemas(), aipId, null, notify, update);
+    processSchemas(model, sip.getSchemas(), aipId, null, update);
 
   }
 
@@ -156,7 +155,7 @@ public class EARKSIPToAIPPluginUtils {
   }
 
   private static void processOtherMetadata(ModelService model, List<IPMetadata> otherMetadata, String aipId,
-    Optional<String> representationId, boolean notify, boolean update) throws GenericException, NotFoundException,
+    Optional<String> representationId, boolean notify) throws GenericException, NotFoundException,
     RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
 
     for (IPMetadata pm : otherMetadata) {
@@ -186,8 +185,8 @@ public class EARKSIPToAIPPluginUtils {
   }
 
   private static void processDocumentation(ModelService model, List<IPFile> documentation, String aipId,
-    String representationId, boolean notify, boolean update) throws RequestNotValidException, GenericException,
-    AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
+    String representationId, boolean update) throws RequestNotValidException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException, NotFoundException {
     for (IPFile doc : documentation) {
       List<String> directoryPath = doc.getRelativeFolders();
       String fileId = doc.getFileName();
@@ -203,7 +202,7 @@ public class EARKSIPToAIPPluginUtils {
   }
 
   private static void processSchemas(ModelService model, List<IPFile> schemas, String aipId, String representationId,
-    boolean notify, boolean update) throws RequestNotValidException, GenericException, AlreadyExistsException,
+    boolean update) throws RequestNotValidException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException, NotFoundException {
     for (IPFile schema : schemas) {
       List<String> directoryPath = schema.getRelativeFolders();
@@ -221,8 +220,8 @@ public class EARKSIPToAIPPluginUtils {
   }
 
   private static void processIPRepresentationInformation(ModelService model, IPRepresentation sr, String aipId,
-    StorageService storage, boolean notify, boolean update) throws RequestNotValidException, GenericException,
-    AlreadyExistsException, AuthorizationDeniedException, NotFoundException, ValidationException {
+    boolean notify, boolean update) throws RequestNotValidException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException, NotFoundException, ValidationException {
     String representationType = IngestHelper.getType(sr);
     boolean isOriginal = RepresentationStatus.getORIGINAL().equals(sr.getStatus());
 
@@ -241,8 +240,7 @@ public class EARKSIPToAIPPluginUtils {
     processDescriptiveMetadata(model, aipId, representation.getId(), sr.getDescriptiveMetadata(), notify, update);
 
     // process other metadata
-    processOtherMetadata(model, sr.getOtherMetadata(), aipId, Optional.ofNullable(representation.getId()), notify,
-      update);
+    processOtherMetadata(model, sr.getOtherMetadata(), aipId, Optional.ofNullable(representation.getId()), notify);
 
     // process representation preservation metadata
     processPreservationMetadata(model, sr.getPreservationMetadata(), aipId, Optional.ofNullable(representation.getId()),
@@ -264,9 +262,9 @@ public class EARKSIPToAIPPluginUtils {
     }
 
     // process representation documentation
-    processDocumentation(model, sr.getDocumentation(), aipId, representation.getId(), notify, false);
+    processDocumentation(model, sr.getDocumentation(), aipId, representation.getId(), false);
 
     // process representation schemas
-    processSchemas(model, sr.getSchemas(), aipId, representation.getId(), notify, false);
+    processSchemas(model, sr.getSchemas(), aipId, representation.getId(), false);
   }
 }

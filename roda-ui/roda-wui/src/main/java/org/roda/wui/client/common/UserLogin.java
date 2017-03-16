@@ -44,6 +44,7 @@ import config.i18n.client.ClientMessages;
 public class UserLogin {
 
   private static final ClientLogger logger = new ClientLogger(UserLogin.class.getName());
+  private static final ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
   private static UserLoginServiceAsync userLoginService;
   private static UserLogin instance = null;
@@ -104,8 +105,6 @@ public class UserLogin {
   }
 
   private final List<LoginStatusListener> listeners;
-
-  // private AuthenticatedUser user = null;
 
   private UserLogin() {
     listeners = new Vector<>();
@@ -236,29 +235,6 @@ public class UserLogin {
 
     });
   }
-
-  /**
-   * If any evidence is found that the login was reset, call this method to
-   * update login and alert all listeners
-   */
-  // public void checkForLoginReset() {
-  // final User currentUser = user;
-  // user = null;
-  // getAuthenticatedUser(new AsyncCallback<AuthenticatedUser>() {
-  //
-  // public void onFailure(Throwable caught) {
-  // logger.error("Error getting current authenticated user", caught);
-  // }
-  //
-  // public void onSuccess(AuthenticatedUser user) {
-  // if (!user.equals(currentUser)) {
-  // onLoginStatusChanged(user);
-  // }
-  //
-  // }
-  //
-  // });
-  // }
 
   /**
    * Get RODA properties
@@ -393,8 +369,6 @@ public class UserLogin {
       });
     }
   }
-
-  private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
   public void showSuggestLoginDialog() {
     Dialogs.showConfirmDialog(messages.loginDialogTitle(), messages.casForwardWarning(), messages.loginDialogCancel(),

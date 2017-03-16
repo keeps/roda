@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 
 import org.apache.commons.configuration.Configuration;
 import org.roda.core.RodaCoreFactory;
@@ -35,6 +34,7 @@ import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.common.Pair;
@@ -172,12 +172,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   @Override
   public BrowseFileBundle retrieveBrowseFileBundle(String aipId, String representationId, List<String> filePath,
-    String fileId, String localeString, List<String> fileFieldsToReturn)
+    String fileId, List<String> fileFieldsToReturn)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Locale locale = ServerTools.parseLocale(localeString);
-    return Browser.retrieveBrowseFileBundle(user, aipId, representationId, filePath, fileId, locale,
-      fileFieldsToReturn);
+    return Browser.retrieveBrowseFileBundle(user, aipId, representationId, filePath, fileId, fileFieldsToReturn);
   }
 
   @Override
@@ -836,7 +834,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public String createRepresentation(String aipId, String details) throws AuthorizationDeniedException,
     GenericException, NotFoundException, RequestNotValidException, AlreadyExistsException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    String representationId = UUID.randomUUID().toString();
+    String representationId = IdUtils.createUUID();
     Browser.createRepresentation(user, aipId, representationId, RepresentationContentType.getMIXED().asString(),
       details);
     return representationId;

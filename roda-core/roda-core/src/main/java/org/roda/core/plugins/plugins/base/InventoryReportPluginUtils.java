@@ -69,7 +69,7 @@ public class InventoryReportPluginUtils {
           representation.getId(), recursive);
         for (OptionalWithCause<File> subfile : representationFiles) {
           if (subfile.isPresent()) {
-            dataInformation.add(retrieveFileInfo(fields, subfile.get(), aip, representation, model, storage));
+            dataInformation.add(retrieveFileInfo(fields, subfile.get(), aip, model, storage));
           } else {
             LOGGER.error("Cannot retrieve file information", subfile.getCause());
           }
@@ -87,12 +87,12 @@ public class InventoryReportPluginUtils {
     StorageService storage) {
     List<List<String>> descriptiveMetadataInformation = new ArrayList<>();
     for (DescriptiveMetadata dm : aip.getDescriptiveMetadata()) {
-      descriptiveMetadataInformation.add(retrieveDescriptiveMetadataInfo(fields, aip, dm, model, storage));
+      descriptiveMetadataInformation.add(retrieveDescriptiveMetadataInfo(fields, aip, dm, storage));
     }
     if (aip.getRepresentations() != null) {
       for (Representation r : aip.getRepresentations()) {
         for (DescriptiveMetadata dm : r.getDescriptiveMetadata()) {
-          descriptiveMetadataInformation.add(retrieveDescriptiveMetadataInfo(fields, aip, dm, model, storage));
+          descriptiveMetadataInformation.add(retrieveDescriptiveMetadataInfo(fields, aip, dm, storage));
         }
       }
     }
@@ -101,7 +101,7 @@ public class InventoryReportPluginUtils {
   }
 
   private static List<String> retrieveDescriptiveMetadataInfo(List<String> fields, AIP aip, DescriptiveMetadata dm,
-    ModelService model, StorageService storage) {
+    StorageService storage) {
     List<String> fileInfo = new ArrayList<>();
     Map<String, String> fixities = null;
     for (String fieldName : fields) {
@@ -145,11 +145,12 @@ public class InventoryReportPluginUtils {
     return fileInfo;
   }
 
-  public static List<String> retrieveFileInfo(List<String> fields, File file, AIP aip, Representation representation,
-    ModelService model, StorageService storage) {
+  public static List<String> retrieveFileInfo(List<String> fields, File file, AIP aip, ModelService model,
+    StorageService storage) {
 
     List<String> fileInfo = new ArrayList<>();
     List<Fixity> fixities = null;
+
     for (String fieldName : fields) {
       if (fieldName.equalsIgnoreCase(InventoryReportPlugin.CSV_FIELD_SIP_ID)) {
         fileInfo.add(FSUtils.asString(aip.getIngestSIPIds()));
@@ -173,8 +174,9 @@ public class InventoryReportPluginUtils {
               LOGGER.error("Error extracting fixities from premis file.", e);
             }
           }
+
           if (fixities != null) {
-            fileInfo.add(getFixity(fieldName, fixities, file, model, storage));
+            fileInfo.add(getFixity(fieldName, fixities, file, storage));
           } else {
             fileInfo.add("");
           }
@@ -185,11 +187,11 @@ public class InventoryReportPluginUtils {
         fileInfo.add("");
       }
     }
+
     return fileInfo;
   }
 
-  private static String getFixity(String fixityAlgorithm, List<Fixity> fixities, File file, ModelService model,
-    StorageService storage) {
+  private static String getFixity(String fixityAlgorithm, List<Fixity> fixities, File file, StorageService storage) {
     String fixity = "";
     if (fixities != null && !fixities.isEmpty()) {
       for (Fixity f : fixities) {
@@ -219,7 +221,7 @@ public class InventoryReportPluginUtils {
         otherMetadataType, true);
       for (OptionalWithCause<OtherMetadata> otherMetadata : otherMetadatas) {
         if (otherMetadata.isPresent()) {
-          otherMetadataInformation.add(retrieveOtherMetadataInfo(fields, otherMetadata.get(), aip, model, storage));
+          otherMetadataInformation.add(retrieveOtherMetadataInfo(fields, otherMetadata.get(), aip, storage));
         } else {
           LOGGER.error("Cannot retrieve other metadata information", otherMetadata.getCause());
         }
@@ -232,7 +234,7 @@ public class InventoryReportPluginUtils {
   }
 
   private static List<String> retrieveOtherMetadataInfo(List<String> fields, OtherMetadata otherMetadata, AIP aip,
-    ModelService model, StorageService storage) {
+    StorageService storage) {
     List<String> fileInfo = new ArrayList<>();
     Map<String, String> fixities = null;
     for (String fieldName : fields) {

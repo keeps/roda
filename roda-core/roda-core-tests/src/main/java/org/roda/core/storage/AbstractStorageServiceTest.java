@@ -76,9 +76,6 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
 
     // 1) list of containers
     CloseableIterable<Container> iterable = getStorage().listContainers();
-    // Iterator<Container> iterator = iterable.iterator();
-    // assertThat("Storage starts with empty list of containers",
-    // !iterator.hasNext());
 
     assertThat(iterable, Matchers.iterableWithSize(0));
 
@@ -257,11 +254,6 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
 
     resources = getStorage().listResourcesUnderContainer(containerStoragePath, false);
     assertNotNull(resources);
-    // Resource r1 = new DefaultDirectory(directoryStoragePath1,
-    // directoryMetadata1);
-    // Resource r2 = new DefaultDirectory(directoryStoragePath2,
-    // directoryMetadata2);
-    // assertThat(resources, containsInAnyOrder(r1, r2));
     assertThat(resources, Matchers.<Resource> iterableWithSize(2));
 
     // TODO test recursive listing
@@ -404,12 +396,6 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
 
     resources = getStorage().listResourcesUnderDirectory(directoryStoragePath, false);
     assertNotNull(resources);
-
-    // Resource r1 = new DefaultDirectory(subDirectoryStoragePath1,
-    // subDirectoryMetadata1);
-    // Resource r2 = new DefaultDirectory(subDirectoryStoragePath2,
-    // subDirectoryMetadata2);
-    // assertThat(resources, containsInAnyOrder(r1, r2));
     assertThat(resources, Matchers.<Resource> iterableWithSize(2));
 
     // TODO test recursive listing
@@ -968,7 +954,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     }
 
     // cleanup
-    // getStorage().deleteContainer(containerStoragePath);
+    getStorage().deleteContainer(containerStoragePath);
   }
 
 }

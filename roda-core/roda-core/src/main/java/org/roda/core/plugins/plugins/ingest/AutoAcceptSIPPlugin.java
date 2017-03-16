@@ -93,7 +93,7 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
 
   private void processAIP(IndexService index, ModelService model, Report report, Job job, AIP aip) {
     Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
-    PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
 
     String outcomeDetail = "";
     try {
@@ -120,7 +120,7 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
     }
 
     report.addReport(reportItem);
-    PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
   }
 
   @Override

@@ -116,7 +116,7 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
   private void processAIP(IndexService index, ModelService model, StorageService storage, Report report,
     SimpleJobPluginInfo jobPluginInfo, Job job, AIP aip) {
     Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
-    PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
     PluginState reportState = PluginState.SUCCESS;
 
     VirusCheckResult virusCheckResult = null;
@@ -146,7 +146,7 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
       try {
         createEvent(virusCheckResult, exception, reportItem.getPluginState(), aip, model, index, true);
         report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
       } catch (PluginException e) {
         LOGGER.error("Error updating event and job", e);
       }

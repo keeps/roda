@@ -184,7 +184,7 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     }
 
     report.addReport(reportItem.setPluginState(state));
-    PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
     jobPluginInfo.incrementObjectsProcessed(state);
 
     String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_DELETE_AIP_SUCCESS, aip.getId());
@@ -223,7 +223,7 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     }
 
     report.addReport(reportItem.setPluginState(state));
-    PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
     jobPluginInfo.incrementObjectsProcessed(state);
 
     String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_DELETE_FILE_SUCCESS, file.getId());
@@ -259,7 +259,7 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     }
 
     report.addReport(reportItem.setPluginState(state));
-    PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
     jobPluginInfo.incrementObjectsProcessed(state);
 
     String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_DELETE_REPRESENTATION_SUCCESS,
@@ -289,7 +289,7 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     }
 
     report.addReport(reportItem.setPluginState(state));
-    PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
     jobPluginInfo.incrementObjectsProcessed(state);
   }
 
@@ -305,7 +305,7 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     }
 
     report.addReport(reportItem.setPluginState(state));
-    PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
     jobPluginInfo.incrementObjectsProcessed(state);
   }
 

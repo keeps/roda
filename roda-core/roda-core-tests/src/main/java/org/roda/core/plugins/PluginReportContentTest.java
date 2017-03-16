@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -34,6 +33,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -162,8 +162,7 @@ public class PluginReportContentTest {
 
     index.commit(TransferredResource.class);
 
-    return index.retrieve(TransferredResource.class, UUID.nameUUIDFromBytes("test".getBytes()).toString(),
-      new ArrayList<>());
+    return index.retrieve(TransferredResource.class, IdUtils.createUUID("test"), new ArrayList<>());
   }
 
   @Test

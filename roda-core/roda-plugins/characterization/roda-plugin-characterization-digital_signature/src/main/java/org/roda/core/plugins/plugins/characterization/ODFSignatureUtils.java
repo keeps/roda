@@ -44,7 +44,6 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
-import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
@@ -91,6 +90,7 @@ import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.c14n.InvalidCanonicalizerException;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.utils.IdUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -110,7 +110,7 @@ public final class ODFSignatureUtils {
 
   /** Private empty constructor */
   private ODFSignatureUtils() {
-
+    // do nothing
   }
 
   public static String runDigitalSignatureVerify(Path input) throws IOException {
@@ -138,7 +138,7 @@ public final class ODFSignatureUtils {
 
           for (int i = 0; i < signatureNodeList.getLength(); i++) {
             Node signatureNode = signatureNodeList.item(i);
-            verifyCertificates(input, signatureNode);
+            verifyCertificates(signatureNode);
           }
         } catch (ParserConfigurationException | SAXException e) {
           result = "Signatures document can not be parsed";
@@ -320,7 +320,7 @@ public final class ODFSignatureUtils {
     }
   }
 
-  private static void verifyCertificates(Path input, Node signatureNode) throws MarshalException, XMLSignatureException,
+  private static void verifyCertificates(Node signatureNode) throws MarshalException, XMLSignatureException,
     NoSuchAlgorithmException, CertificateException, IOException, KeyStoreException {
 
     XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory.getInstance("DOM");
@@ -486,8 +486,8 @@ public final class ODFSignatureUtils {
     X509Certificate certificate, Document docSignatures, Element rootSignatures, Key key)
     throws MarshalException, XMLSignatureException, NoSuchAlgorithmException, InvalidAlgorithmParameterException {
 
-    String signatureId = UUID.randomUUID().toString();
-    String signaturePropertyId = UUID.randomUUID().toString();
+    String signatureId = IdUtils.createUUID();
+    String signaturePropertyId = IdUtils.createUUID();
     CanonicalizationMethod canMethod = factory.newCanonicalizationMethod(CanonicalizationMethod.INCLUSIVE,
       (C14NMethodParameterSpec) null);
     SignatureMethod signMethod = factory.newSignatureMethod(SignatureMethod.RSA_SHA1, null);

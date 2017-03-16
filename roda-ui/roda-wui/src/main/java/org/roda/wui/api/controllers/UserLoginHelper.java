@@ -23,6 +23,10 @@ import org.roda.wui.client.common.utils.StringUtils;
  */
 public class UserLoginHelper {
 
+  private UserLoginHelper() {
+    // do nothing
+  }
+
   /**
    * Login the specified user.
    * 

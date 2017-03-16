@@ -10,7 +10,6 @@ package org.roda.wui.api.controllers;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
@@ -21,6 +20,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
@@ -50,7 +50,7 @@ public class JobsHelper {
     validateJobPluginInformation(job);
 
     // always set a new UUID (even if job already brings one)
-    job.setId(UUID.randomUUID().toString());
+    job.setId(IdUtils.createUUID());
 
     // set "missing" information whenever it is not impeditive for job creation
     if (StringUtils.isBlank(job.getName())) {

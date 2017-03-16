@@ -25,7 +25,6 @@ import java.util.Optional;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.IdUtils;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.RODA_TYPE;
@@ -38,6 +37,7 @@ import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LinkingObjectUtils;
@@ -114,6 +114,7 @@ public final class PluginHelper {
   private static final Logger LOGGER = LoggerFactory.getLogger(PluginHelper.class);
 
   private PluginHelper() {
+    // do nothing
   }
 
   public static <T extends IsRODAObject> Report processObjects(Plugin<T> plugin,
@@ -126,7 +127,7 @@ public final class PluginHelper {
       PluginHelper.updateJobInformation(plugin, jobPluginInfo);
 
       Job job = PluginHelper.getJob(plugin, model);
-      List<T> list = PluginHelper.transformLitesIntoObjects(model, index, plugin, report, jobPluginInfo, liteList, job);
+      List<T> list = PluginHelper.transformLitesIntoObjects(model, plugin, report, jobPluginInfo, liteList, job);
 
       try {
         objectsLogic.process(index, model, storage, report, job, jobPluginInfo, plugin, list);
@@ -154,7 +155,7 @@ public final class PluginHelper {
       PluginHelper.updateJobInformation(plugin, jobPluginInfo);
 
       Job job = PluginHelper.getJob(plugin, model);
-      List<T> list = PluginHelper.transformLitesIntoObjects(model, index, plugin, report, jobPluginInfo, liteList, job);
+      List<T> list = PluginHelper.transformLitesIntoObjects(model, plugin, report, jobPluginInfo, liteList, job);
 
       if (beforeLogic != null) {
         try {
@@ -344,7 +345,7 @@ public final class PluginHelper {
   }
 
   public static <T extends IsRODAObject> void updatePartialJobReport(Plugin<T> plugin, ModelService model,
-    IndexService index, Report reportItem, boolean replaceLastReportItemIfTheSame, Job cachedJob) {
+    Report reportItem, boolean replaceLastReportItemIfTheSame, Job cachedJob) {
     String jobId = getJobId(plugin);
     boolean retrieved = true;
     try {
@@ -382,7 +383,7 @@ public final class PluginHelper {
     }
   }
 
-  private static <T extends IsRODAObject> void updateJobReport(ModelService model, Report report) {
+  private static void updateJobReport(ModelService model, Report report) {
     try {
       Job job = model.retrieveJob(report.getJobId());
       model.createOrUpdateJobReport(report, job);
@@ -418,7 +419,7 @@ public final class PluginHelper {
     return getJob(jobId, model);
   }
 
-  public static <T extends IsRODAObject> Job getJob(String jobId, ModelService model)
+  public static Job getJob(String jobId, ModelService model)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
     if (jobId != null) {
       return model.retrieveJob(jobId);
@@ -427,7 +428,7 @@ public final class PluginHelper {
     }
   }
 
-  public static <T extends IsRODAObject> String getJobUsername(String jobId, IndexService index)
+  public static String getJobUsername(String jobId, IndexService index)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
     if (jobId != null) {
       Job job = index.retrieve(Job.class, jobId, Arrays.asList(RodaConstants.JOB_USERNAME));
@@ -679,6 +680,10 @@ public final class PluginHelper {
 
   /***************** Plugin related *****************/
   /**************************************************/
+  public static <T extends IsRODAObject> String getPluginAgentId(Plugin<T> plugin) {
+    return IdUtils.getPluginAgentId(plugin.getClass().getName(), plugin.getVersion());
+  }
+
   public static void createSubmission(ModelService model, boolean createSubmission, Path submissionPath, String aipId)
     throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException {
@@ -693,17 +698,17 @@ public final class PluginHelper {
     }
   }
 
-  public static Risk createRiskIfNotExists(ModelService model, int riskIndex, String riskId,
-    ClassLoader pluginClassLoader) throws RequestNotValidException, GenericException, AuthorizationDeniedException,
-    AlreadyExistsException, NotFoundException {
+  public static Risk createRiskIfNotExists(ModelService model, String riskId, ClassLoader pluginClassLoader)
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException, AlreadyExistsException,
+    NotFoundException {
     try {
       return model.retrieveRisk(riskId);
     } catch (NotFoundException e) {
-      return createDefaultRisk(model, riskIndex, riskId, pluginClassLoader);
+      return createDefaultRisk(model, riskId, pluginClassLoader);
     }
   }
 
-  private static Risk createDefaultRisk(ModelService model, int riskIndex, String riskId, ClassLoader pluginClassLoader)
+  private static Risk createDefaultRisk(ModelService model, String riskId, ClassLoader pluginClassLoader)
     throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException {
 
@@ -911,6 +916,7 @@ public final class PluginHelper {
    * @deprecated 20160824 hsilva: not seeing any method using it, so it will be
    *             removed soon
    */
+  @Deprecated
   public static List<LinkingIdentifier> getLinkingRepresentations(AIP aip, String role) {
     List<LinkingIdentifier> identifiers = new ArrayList<>();
     if (aip.getRepresentations() != null && !aip.getRepresentations().isEmpty()) {
@@ -925,6 +931,7 @@ public final class PluginHelper {
    * @deprecated 20160824 hsilva: not seeing any method using it, so it will be
    *             removed soon
    */
+  @Deprecated
   public static List<LinkingIdentifier> getLinkingIdentifiers(List<TransferredResource> resources, String role) {
     List<LinkingIdentifier> identifiers = new ArrayList<>();
     if (resources != null && !resources.isEmpty()) {
@@ -1040,7 +1047,7 @@ public final class PluginHelper {
     }
   }
 
-  public static <T extends IsRODAObject> void fixParents(IndexService index, ModelService model, Optional<String> jobId,
+  public static void fixParents(IndexService index, ModelService model, Optional<String> jobId,
     Optional<String> computedSearchScope)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
 
@@ -1103,9 +1110,8 @@ public final class PluginHelper {
     }
   }
 
-  private static <T extends IsRODAObject> void updateParent(IndexService index, ModelService model, String aipId,
-    String newParentId, Optional<String> searchScope)
-    throws GenericException, AuthorizationDeniedException, RequestNotValidException {
+  private static void updateParent(IndexService index, ModelService model, String aipId, String newParentId,
+    Optional<String> searchScope) throws GenericException, AuthorizationDeniedException, RequestNotValidException {
     Filter parentFilter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aipId));
     searchScope.ifPresent(id -> parentFilter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, id)));
     index.execute(IndexedAIP.class, parentFilter, Arrays.asList(RodaConstants.INDEX_UUID), child -> {
@@ -1124,8 +1130,8 @@ public final class PluginHelper {
     }
   }
 
-  private static <T extends IsRODAObject> void moveChildrenAIPsAndDelete(IndexService index, ModelService model,
-    String aipId, String newParentId, Optional<String> searchScope)
+  private static void moveChildrenAIPsAndDelete(IndexService index, ModelService model, String aipId,
+    String newParentId, Optional<String> searchScope)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException {
     Filter parentFilter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aipId));
     searchScope.ifPresent(id -> parentFilter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, id)));
@@ -1180,8 +1186,8 @@ public final class PluginHelper {
     }
   }
 
-  public static <T extends IsRODAObject> List<T> transformLitesIntoObjects(ModelService model, IndexService index,
-    Plugin<T> plugin, Report report, JobPluginInfo pluginInfo, List<LiteOptionalWithCause> lites, Job job) {
+  public static <T extends IsRODAObject> List<T> transformLitesIntoObjects(ModelService model, Plugin<T> plugin,
+    Report report, JobPluginInfo pluginInfo, List<LiteOptionalWithCause> lites, Job job) {
     List<T> finalObjects = new ArrayList<>();
 
     for (LiteOptionalWithCause lite : lites) {
@@ -1236,7 +1242,7 @@ public final class PluginHelper {
           Report reportItem = PluginHelper.initPluginReportItem(plugin, id, LiteRODAObject.class);
           reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(failureMessage);
           report.addReport(reportItem);
-          PluginHelper.updatePartialJobReport(plugin, model, index, reportItem, true, job);
+          PluginHelper.updatePartialJobReport(plugin, model, reportItem, true, job);
         }
       }
     }

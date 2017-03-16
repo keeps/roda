@@ -17,7 +17,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
@@ -243,7 +242,7 @@ public class EditPermissions extends Composite {
     JavascriptUtils.stickSidebar();
   }
 
-  private <T extends IsIndexed> void createPermissionPanelList() {
+  private void createPermissionPanelList() {
     Map<String, Set<PermissionType>> userPermissionsToShow = new HashMap<>();
     Map<String, Set<PermissionType>> groupPermissionsToShow = new HashMap<>();
 
@@ -318,7 +317,7 @@ public class EditPermissions extends Composite {
     }
   }
 
-  private <T extends IsIndexed> void createPermissionPanel() {
+  private void createPermissionPanel() {
     Permissions permissions = objects.get(0).getPermissions();
 
     userPermissionsEmpty.setVisible(permissions.getUsernames().isEmpty());

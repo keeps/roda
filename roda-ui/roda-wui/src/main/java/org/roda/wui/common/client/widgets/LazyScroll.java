@@ -262,7 +262,7 @@ public class LazyScroll extends ScrollPanel {
    * @param limit
    * @param callback
    */
-  public void ensureLoaded(final int index, final int limit, final AsyncCallback<Integer> callback) {
+  public void ensureLoaded(final int index, final AsyncCallback<Integer> callback) {
     addLoadListener(new LoadListener() {
 
       @Override

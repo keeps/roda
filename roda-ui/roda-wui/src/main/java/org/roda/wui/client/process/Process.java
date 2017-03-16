@@ -28,6 +28,8 @@ import com.google.gwt.user.client.ui.Widget;
  * 
  */
 public class Process {
+  private static Process instance = null;
+  private HTMLWidgetWrapper page;
 
   private Process() {
     // do nothing
@@ -55,9 +57,6 @@ public class Process {
       return "process";
     }
   };
-
-  private static Process instance = null;
-  private HTMLWidgetWrapper page;
 
   /**
    * Get the singleton instance

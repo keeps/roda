@@ -46,10 +46,8 @@ import config.i18n.client.ClientMessages;
  */
 public class IngestJobReportList extends BasicAsyncTableCell<IndexedReport> {
 
-  // private final ClientLogger logger = new ClientLogger(getClass().getName());
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  // private Column<Report, SafeHtml> objectIdColumn;
   private TooltipTextColumn<IndexedReport> sourceObjectColumn;
   private TooltipTextColumn<IndexedReport> outcomeObjectColumn;
   private Column<IndexedReport, Date> updatedDateColumn;
@@ -203,7 +201,6 @@ public class IngestJobReportList extends BasicAsyncTableCell<IndexedReport> {
 
     // default sorting
     display.getColumnSortList().push(new ColumnSortInfo(updatedDateColumn, false));
-
   }
 
   @Override

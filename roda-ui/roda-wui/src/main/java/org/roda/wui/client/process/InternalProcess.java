@@ -82,19 +82,6 @@ public class InternalProcess extends Composite {
 
   private static InternalProcess instance = null;
 
-  /**
-   * Get the singleton instance
-   * 
-   * @return the instance
-   */
-  public static InternalProcess getInstance() {
-    if (instance == null) {
-      instance = new InternalProcess();
-    }
-
-    return instance;
-  }
-
   interface MyUiBinder extends UiBinder<Widget, InternalProcess> {
   }
 
@@ -184,6 +171,19 @@ public class InternalProcess extends Composite {
 
     jobList.autoUpdate(10000);
 
+  }
+
+  /**
+   * Get the singleton instance
+   * 
+   * @return the instance
+   */
+  public static InternalProcess getInstance() {
+    if (instance == null) {
+      instance = new InternalProcess();
+    }
+
+    return instance;
   }
 
   @Override

@@ -47,10 +47,6 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
 
   private static final String NO_PERMISSION_TO_CREATE_UNDER_AIP = "The user doesn't have permission to create under AIP";
   private static final String PARENT_AIP_NOT_FOUND = "The parent of the AIP was not found";
-  // private static final String NO_AIP_PERMISSION = "The user doesn't have
-  // access to the parent AIP";
-  // private static final String AIP_PERMISSIONS_SUCCESSFULLY_VERIFIED = "The
-  // user permissions are valid and the AIP permissions were updated";
   private static final String NO_CREATE_TOP_LEVEL_AIP_PERMISSION = "The user doesn't have CREATE_TOP_LEVEL_AIP_PERMISSION permission";
 
   private static final List<String> userFieldsToReturn = Arrays.asList(RodaConstants.MEMBERS_GROUPS,
@@ -108,13 +104,13 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
     LOGGER.debug("Checking producer authorization for AIPingest.submitP {}", aip.getId());
 
     Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
-    PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, currentJob);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, false, currentJob);
 
     reportItem.setPluginState(PluginState.SUCCESS)
       .setPluginDetails(String.format("Done with checking producer authorization for AIP %s", aip.getId()));
 
     if (currentJob != null) {
-      processAIPPermissions(index, model, currentJob, aip, reportItem);
+      processAIPPermissions(index, currentJob, aip, reportItem);
     } else {
       reportItem.setPluginState(PluginState.FAILURE).setPluginDetails("Unable to determine Job.");
     }
@@ -138,11 +134,10 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
     LOGGER.debug("Done with checking producer authorization for AIP {}", aip.getId());
 
     report.addReport(reportItem);
-    PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, currentJob);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, true, currentJob);
   }
 
-  private void processAIPPermissions(IndexService index, ModelService model, Job currentJob, AIP aip,
-    Report reportItem) {
+  private void processAIPPermissions(IndexService index, Job currentJob, AIP aip, Report reportItem) {
     try {
       String jobCreatorUsername = currentJob.getUsername();
       if (aip.getParentId() != null) {
@@ -194,7 +189,8 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    String description = "Producer permissions have been checked to ensure that he has sufficient authorization to store the AIP under the desired node of the classification scheme.";
+    String description = "Producer permissions have been checked to ensure that he has sufficient authorization to store the AIP under the desired "
+      + "node of the classification scheme.";
 
     if (hasFreeAccess) {
       description += " It was given READ permission to the users group as indicated on the descriptive metadata";

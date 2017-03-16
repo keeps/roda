@@ -136,10 +136,12 @@ public class ServerTools {
   }
 
   public static Set<MetadataValue> transform(String content) {
-    if (content == null)
-      return null;
-
     Set<MetadataValue> values = new TreeSet<>();
+
+    if (content == null) {
+      return values;
+    }
+
     Set<String> addedTags = new HashSet<>();
     Handlebars handlebars = new Handlebars();
 

@@ -83,8 +83,7 @@ public class RiskIncidenceRemoverPlugin<T extends IsRODAObject> extends Abstract
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
       Job job = PluginHelper.getJob(this, model);
-      List<T> list = PluginHelper.transformLitesIntoObjects(model, index, this, pluginReport, jobPluginInfo, liteList,
-        job);
+      List<T> list = PluginHelper.transformLitesIntoObjects(model, this, pluginReport, jobPluginInfo, liteList, job);
 
       try {
         Filter filter = new Filter();

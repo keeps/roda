@@ -32,7 +32,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.UUID;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
@@ -43,6 +42,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.storage.Binary;
@@ -777,7 +777,7 @@ public final class FSUtils {
     Path directory;
     do {
       try {
-        directory = Files.createDirectory(parent.resolve(UUID.randomUUID().toString()));
+        directory = Files.createDirectory(parent.resolve(IdUtils.createUUID()));
       } catch (FileAlreadyExistsException e) {
         LOGGER.warn("Got colision when creating random directory", e);
         directory = null;
@@ -791,7 +791,7 @@ public final class FSUtils {
     Path file;
     do {
       try {
-        file = Files.createFile(parent.resolve(UUID.randomUUID().toString()));
+        file = Files.createFile(parent.resolve(IdUtils.createUUID()));
       } catch (FileAlreadyExistsException e) {
         LOGGER.warn("Got colision when creating random directory", e);
         file = null;
@@ -890,15 +890,33 @@ public final class FSUtils {
     return StringUtils.join(path, SEPARATOR);
   }
 
+  /**
+   * We are using java.io because sonar has suggested as a performance update
+   * https://sonarqube.com/coding_rules#rule_key=squid%3AS3725
+   * 
+   * @since 2017-03-16
+   */
   public static boolean exists(Path file) {
-    return file.toFile().exists();
+    return file != null && file.toFile().exists();
   }
 
+  /**
+   * We are using java.io because sonar has suggested as a performance update
+   * https://sonarqube.com/coding_rules#rule_key=squid%3AS3725
+   * 
+   * @since 2017-03-16
+   */
   public static boolean isDirectory(Path file) {
-    return file.toFile().isDirectory();
+    return file != null && file.toFile().isDirectory();
   }
 
+  /**
+   * We are using java.io because sonar has suggested as a performance update
+   * https://sonarqube.com/coding_rules#rule_key=squid%3AS3725
+   * 
+   * @since 2017-03-16
+   */
   public static boolean isFile(Path file) {
-    return file.toFile().isFile();
+    return file != null && file.toFile().isFile();
   }
 }

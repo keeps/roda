@@ -12,8 +12,8 @@ import static akka.actor.SupervisorStrategy.restart;
 import static akka.actor.SupervisorStrategy.stop;
 
 import java.io.Serializable;
-import java.util.UUID;
 
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.plugins.orchestrate.akka.distributed.Master.Ack;
 import org.roda.core.plugins.orchestrate.akka.distributed.Master.Work;
 import org.roda.core.plugins.orchestrate.akka.distributed.MasterWorkerProtocol.RegisterWorker;
@@ -45,7 +45,7 @@ public class Worker extends UntypedActor {
 
   private final ActorRef clusterClient;
   private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
-  private final String workerId = UUID.randomUUID().toString();
+  private final String workerId = IdUtils.createUUID();
   private final ActorRef workExecutor;
   private final Cancellable registerTask;
   private String currentWorkId = null;

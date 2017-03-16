@@ -102,7 +102,7 @@ public class RemoveAIPPlugin extends AbstractPlugin<AIP> {
       jobPluginInfo.incrementObjectsProcessedWithSuccess();
     }
     report.addReport(reportItem);
-    PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
   }
 
   @Override

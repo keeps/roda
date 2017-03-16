@@ -162,13 +162,13 @@ public class UpdateAIPPermissionsPlugin extends AbstractPlugin<AIP> {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
         SimpleJobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {
-        processAIP(index, model, storage, report, jobPluginInfo, cachedJob, object);
+        processAIP(index, model, report, jobPluginInfo, cachedJob, object);
       }
     }, index, model, storage, liteList);
   }
 
-  private void processAIP(IndexService index, ModelService model, StorageService storage, Report report,
-    SimpleJobPluginInfo jobPluginInfo, Job job, AIP aip) {
+  private void processAIP(IndexService index, ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo,
+    Job job, AIP aip) {
     PluginState state = PluginState.SUCCESS;
     aip.setPermissions(permissions);
 
@@ -179,7 +179,7 @@ public class UpdateAIPPermissionsPlugin extends AbstractPlugin<AIP> {
       Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
       reportItem.addPluginDetails("Could not update AIP permissions: " + e.getMessage()).setPluginState(state);
       report.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
     }
 
     jobPluginInfo.incrementObjectsProcessed(state);

@@ -83,24 +83,6 @@ public class ActionProcess extends Composite {
     }
   };
 
-  private static ActionProcess instance = null;
-
-  /**
-   * Get the singleton instance
-   * 
-   * @return the instance
-   */
-  public static ActionProcess getInstance() {
-    if (instance == null) {
-      instance = new ActionProcess();
-    }
-
-    return instance;
-  }
-
-  interface MyUiBinder extends UiBinder<Widget, ActionProcess> {
-  }
-
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
@@ -131,6 +113,8 @@ public class ActionProcess extends Composite {
 
   @UiField
   Button newJob;
+
+  private static ActionProcess instance = null;
 
   private ActionProcess() {
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.JOB_STATE),
@@ -189,6 +173,22 @@ public class ActionProcess extends Composite {
 
     jobList.autoUpdate(10000);
 
+  }
+
+  /**
+   * Get the singleton instance
+   * 
+   * @return the instance
+   */
+  public static ActionProcess getInstance() {
+    if (instance == null) {
+      instance = new ActionProcess();
+    }
+
+    return instance;
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, ActionProcess> {
   }
 
   @Override

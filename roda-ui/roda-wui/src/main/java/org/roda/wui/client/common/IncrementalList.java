@@ -47,12 +47,6 @@ public class IncrementalList extends Composite implements HasHandlers {
     textBoxes = new ArrayList<>();
   }
 
-  public IncrementalList(List<String> list, String label) {
-    initWidget(uiBinder.createAndBindUi(this));
-    textBoxes = new ArrayList<>();
-    this.setTextBoxList(list);
-  }
-
   public List<String> getTextBoxesValue() {
     ArrayList<String> listValues = new ArrayList<>();
     for (RemovableTextBox textBox : textBoxes) {

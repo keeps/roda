@@ -111,13 +111,13 @@ public class ReindexPreservationAIPEventPlugin extends AbstractPlugin<AIP> {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
         SimpleJobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {
-        processAIP(index, model, storage, report, jobPluginInfo, cachedJob, object);
+        processAIP(index, storage, report, jobPluginInfo, cachedJob, object);
       }
     }, index, model, storage, liteList);
   }
 
-  public Report processAIP(IndexService index, ModelService model, StorageService storage, Report report,
-    SimpleJobPluginInfo jobPluginInfo, Job job, AIP aip) {
+  public Report processAIP(IndexService index, StorageService storage, Report report, SimpleJobPluginInfo jobPluginInfo,
+    Job job, AIP aip) {
     report.setPluginState(PluginState.SUCCESS);
 
     try {

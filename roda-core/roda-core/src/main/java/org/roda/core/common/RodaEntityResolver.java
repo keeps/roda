@@ -36,7 +36,6 @@ public class RodaEntityResolver implements EntityResolver {
 
     @Override
     public byte[] load(Pair<String, String> pair) throws Exception {
-      String publicId = pair.getFirst();
       String systemId = pair.getSecond();
 
       String filename = Paths.get(URI.create(systemId)).getFileName().toString();
@@ -60,6 +59,7 @@ public class RodaEntityResolver implements EntityResolver {
     }
 
   };
+
   private static LoadingCache<Pair<String, String>, byte[]> cache = CacheBuilder.newBuilder()
     .expireAfterWrite(1, TimeUnit.MINUTES).build(loader);
 

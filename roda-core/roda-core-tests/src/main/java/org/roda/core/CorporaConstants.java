@@ -76,7 +76,6 @@ public final class CorporaConstants {
   public static final String REPRESENTATION_2_FILE_2_FORMAT_MIMETYPE = "application/xml";
   public static final String REPRESENTATION_2_FILE_2_FORMAT_VERSION = "1.0";
 
-  // public static final String OTHER_AIP_PATH = "AIP/AIP_2";
   public static final String OTHER_AIP_ID = "AIP_2";
   public static final List<String> OTHER_DESCRIPTIVE_METADATA_STORAGEPATH = Arrays.asList(SOURCE_AIP_CONTAINER, "AIP_2",
     "metadata", "descriptive", "dc.xml");

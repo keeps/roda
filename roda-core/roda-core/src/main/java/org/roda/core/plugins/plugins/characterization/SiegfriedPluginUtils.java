@@ -50,6 +50,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class SiegfriedPluginUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(SiegfriedPluginUtils.class);
 
+  private SiegfriedPluginUtils() {
+    // do nothing
+  }
+
   private static List<String> getBatchCommand(Path sourceDirectory) {
     List<String> command;
     String siegfriedPath = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "siegfried", "binary");
@@ -67,7 +71,7 @@ public class SiegfriedPluginUtils {
   public static String runSiegfriedOnPath(Path sourceDirectory) throws PluginException {
     try {
       String siegfriedMode = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "siegfried", "mode");
-      if (siegfriedMode != null && "server".equalsIgnoreCase(siegfriedMode)) {
+      if ("server".equalsIgnoreCase(siegfriedMode)) {
         LOGGER.debug("Running Siegfried on server mode");
         String endpoint = getSiegfriedServerEndpoint(sourceDirectory);
         return HTTPUtility.doGet(endpoint);

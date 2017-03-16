@@ -18,12 +18,12 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Random;
-import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.TransferredResource;
@@ -93,7 +93,7 @@ public class MonitorIndexTest {
 
     TransferredResource resource = transferredResources.getResults().get(folderToIndex);
     Path parent = Paths.get(resource.getFullPath());
-    Path p = Files.createFile(parent.resolve(UUID.randomUUID().toString() + ".txt"));
+    Path p = Files.createFile(parent.resolve(IdUtils.createUUID() + ".txt"));
     Files.write(p, "NUNCAMAISACABA".getBytes());
 
     monitor.updateTransferredResources(Optional.of(resource.getRelativePath()), true);
@@ -245,19 +245,19 @@ public class MonitorIndexTest {
       Path p;
       if (i % 2 == 0) {
         if (currentLevel > 1) {
-          p = Files.createFile(path.resolve(UUID.randomUUID().toString() + ".txt"));
+          p = Files.createFile(path.resolve(IdUtils.createUUID() + ".txt"));
           Files.write(p, "NUNCAMAISACABA".getBytes());
           fileCounter++;
         }
       } else {
-        p = Files.createDirectory(path.resolve(UUID.randomUUID().toString()));
+        p = Files.createDirectory(path.resolve(IdUtils.createUUID()));
         fileCounter++;
         if (currentLevel <= numberOfLevels) {
           populate(p, numberOfItemsByLevel, numberOfLevels, currentLevel, randomno);
         } else {
           if (currentLevel > 1) {
             for (int j = 0; j < numberOfItemsByLevel; j++) {
-              Path temp = Files.createFile(p.resolve(UUID.randomUUID().toString() + ".txt"));
+              Path temp = Files.createFile(p.resolve(IdUtils.createUUID() + ".txt"));
               Files.write(temp, "NUNCAMAISACABA".getBytes());
               fileCounter++;
             }

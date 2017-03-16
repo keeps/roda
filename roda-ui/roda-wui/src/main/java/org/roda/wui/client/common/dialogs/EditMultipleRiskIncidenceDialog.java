@@ -37,7 +37,7 @@ import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
 
 import config.i18n.client.ClientMessages;
 
-public class EditMultipleRiskIncidenceDialog<T extends IsIndexed, O> extends DialogBox implements SelectDialog<T> {
+public class EditMultipleRiskIncidenceDialog<T extends IsIndexed> extends DialogBox implements SelectDialog<T> {
   private static final Binder binder = GWT.create(Binder.class);
 
   @SuppressWarnings("rawtypes")
@@ -104,6 +104,7 @@ public class EditMultipleRiskIncidenceDialog<T extends IsIndexed, O> extends Dia
     setText(messages.editIncidencesTitle());
   }
 
+  @Override
   public void showAndCenter() {
     if (Window.getClientWidth() < 800) {
       this.setWidth(Window.getClientWidth() + "px");

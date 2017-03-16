@@ -109,18 +109,6 @@ public class IngestTransfer extends Composite {
 
   private static IngestTransfer instance = null;
 
-  /**
-   * Get the singleton instance
-   * 
-   * @return the instance
-   */
-  public static IngestTransfer getInstance() {
-    if (instance == null) {
-      instance = new IngestTransfer();
-    }
-    return instance;
-  }
-
   private static final Filter DEFAULT_FILTER = new Filter(
     new EmptyKeyFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID));
 
@@ -251,6 +239,18 @@ public class IngestTransfer extends Composite {
 
     rename.setEnabled(resource != null);
     move.setEnabled(false);
+  }
+
+  /**
+   * Get the singleton instance
+   * 
+   * @return the instance
+   */
+  public static IngestTransfer getInstance() {
+    if (instance == null) {
+      instance = new IngestTransfer();
+    }
+    return instance;
   }
 
   @Override
@@ -600,7 +600,7 @@ public class IngestTransfer extends Composite {
     } else {
       if (getSelected() instanceof SelectedItemsList) {
         SelectedItemsList<TransferredResource> resourceList = (SelectedItemsList<TransferredResource>) getSelected();
-        transferredResourceId = (String) resourceList.getIds().get(0);
+        transferredResourceId = resourceList.getIds().get(0);
       } else {
         return;
       }

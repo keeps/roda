@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.roda.core.common.IdUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -24,6 +23,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.common.Pair;
@@ -148,8 +148,7 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
       Job job = PluginHelper.getJob(this, model);
-      List<T> list = PluginHelper.transformLitesIntoObjects(model, index, this, pluginReport, jobPluginInfo, liteList,
-        job);
+      List<T> list = PluginHelper.transformLitesIntoObjects(model, this, pluginReport, jobPluginInfo, liteList, job);
 
       if (!list.isEmpty() && riskIds != null) {
         List<String> risks = Arrays.asList(riskIds.split(","));
@@ -216,7 +215,7 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
       Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
       reportItem.setPluginState(state).setPluginDetails("Risk job plugin ran on an AIP");
       pluginReport.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
 
       try {
         PluginHelper.createPluginEvent(this, aip.getId(), model, index, state, "", true);
@@ -258,7 +257,7 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
         Representation.class);
       reportItem.setPluginState(state).setPluginDetails("Risk job plugin ran on a representation");
       pluginReport.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
 
       try {
         PluginHelper.createPluginEvent(this, representation.getAipId(), representation.getId(), model, index, null,
@@ -302,7 +301,7 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
       Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getFileId(file), File.class);
       reportItem.setPluginState(state).setPluginDetails("Risk job plugin ran on a file");
       pluginReport.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
 
       try {
         PluginHelper.createPluginEvent(this, file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),

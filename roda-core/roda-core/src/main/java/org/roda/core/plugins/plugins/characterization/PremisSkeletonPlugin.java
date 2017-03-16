@@ -15,7 +15,6 @@ import java.util.Map;
 
 import org.apache.xmlbeans.XmlException;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.IdUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -25,6 +24,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
@@ -98,7 +98,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
       for (AIP aip : list) {
         LOGGER.debug("Processing AIP {}", aip.getId());
         Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
 
         try {
           for (Representation representation : aip.getRepresentations()) {
@@ -127,7 +127,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
         }
 
         report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
       }
     } catch (ClassCastException e) {
       LOGGER.error("Trying to execute an AIP-only plugin with other objects");
@@ -145,7 +145,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
       LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), representation.getAipId());
       Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getRepresentationId(representation),
         Representation.class, AIPState.ACTIVE);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
       reportItem.setPluginState(PluginState.SUCCESS);
 
       try {
@@ -170,7 +170,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
       }
 
       report.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
     }
 
     return report;
@@ -184,7 +184,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
       LOGGER.debug("Processing file {} from representation {} from AIP {}", file.getId(), file.getRepresentationId(),
         file.getAipId());
       Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getFileId(file), File.class, AIPState.ACTIVE);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
       reportItem.setPluginState(PluginState.SUCCESS);
 
       try {
@@ -207,7 +207,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
       }
 
       report.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
     }
 
     return report;

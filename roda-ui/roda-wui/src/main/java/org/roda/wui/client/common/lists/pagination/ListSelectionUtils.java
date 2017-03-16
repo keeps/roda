@@ -51,14 +51,16 @@ import config.i18n.client.ClientMessages;
 public class ListSelectionUtils {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
   private static final String STORAGE_PREFIX = "ListSelectionState.Clipboard.";
-
-  private static Map<String, ListSelectionState<?>> CLIPBOARD = new HashMap<>();
   private static final Storage storage = Storage.getLocalStorageIfSupported();
 
+  private static Map<String, ListSelectionState<?>> clipboard = new HashMap<>();
   static {
     loadClipboardOnStorage();
+  }
+
+  private ListSelectionUtils() {
+    super();
   }
 
   private static <T extends IsIndexed> void loadClipboardOnStorage() {
@@ -69,7 +71,7 @@ public class ListSelectionUtils {
           String className = entry.getKey().substring(STORAGE_PREFIX.length());
           try {
             ListSelectionState<T> state = ListSelectionStateMappers.getObject(className, entry.getValue());
-            CLIPBOARD.put(className, state);
+            clipboard.put(className, state);
           } catch (JsonDeserializationException e) {
             GWT.log("Could not load selection state of class: " + className, e);
           }
@@ -84,28 +86,14 @@ public class ListSelectionUtils {
     }
   }
 
-  private ListSelectionUtils() {
-    super();
-  }
-
   public static <T extends IsIndexed> ListSelectionState<T> create(T selected, Filter filter, Boolean justActive,
     Facets facets, Sorter sorter, Integer index) {
     return new ListSelectionState<>(selected, filter, justActive, facets, sorter, index);
   }
 
+  @FunctionalInterface
   public interface ProcessRelativeItem<T> {
     void process(T object);
-  }
-
-  private static <T extends IsIndexed> void openRelative(final ListSelectionState<T> state, final int relativeIndex,
-    final AsyncCallback<ListSelectionState<T>> callback) {
-    openRelative(state, relativeIndex, callback, new ProcessRelativeItem<T>() {
-
-      @Override
-      public void process(T object) {
-        HistoryUtils.resolve(object);
-      }
-    });
   }
 
   private static <T extends IsIndexed> void openRelative(final ListSelectionState<T> state, final int relativeIndex,
@@ -144,17 +132,17 @@ public class ListSelectionUtils {
 
   public static <T extends IsIndexed> void save(final ListSelectionState<T> state) {
     String className = state.getSelected().getClass().getName();
-    CLIPBOARD.put(className, state);
+    clipboard.put(className, state);
     saveOnStorage(className, state);
   }
 
   @SuppressWarnings("unchecked")
   public static <T extends IsIndexed> ListSelectionState<T> last(Class<T> objectClass) {
-    return (ListSelectionState<T>) CLIPBOARD.get(objectClass.getName());
+    return (ListSelectionState<T>) clipboard.get(objectClass.getName());
   }
 
   public static <T extends IsIndexed> boolean hasLast(Class<T> objectClass) {
-    return CLIPBOARD.containsKey(objectClass.getName());
+    return clipboard.containsKey(objectClass.getName());
   }
 
   public static <T extends IsIndexed> void jump(final T object, int relativeIndex) {

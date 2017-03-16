@@ -210,8 +210,7 @@ public class IngestJobPluginInfo extends JobPluginInfo {
     reportsFromBeingProcessed = null;
   }
 
-  public <T extends IsRODAObject> void failOtherTransferredResourceAIPs(Plugin<T> plugin, ModelService model,
-    IndexService index, String transferredResourceId) {
+  public void failOtherTransferredResourceAIPs(ModelService model, IndexService index, String transferredResourceId) {
     for (Entry<String, Report> aipReportEntry : allReports.get(transferredResourceId).entrySet()) {
       Report report = aipReportEntry.getValue();
       if (report.getPluginState() != PluginState.FAILURE) {
@@ -221,7 +220,6 @@ public class IngestJobPluginInfo extends JobPluginInfo {
           .setPluginDetails("This AIP processing failed because a related AIP also failed");
         reportItems.remove(reportItems.size() - 1);
         reportItems.add(reportItem);
-        // report.setReports(reportItems);
         report.setPluginState(PluginState.FAILURE);
 
         try {
@@ -230,15 +228,6 @@ public class IngestJobPluginInfo extends JobPluginInfo {
         } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
           LOGGER.error("Error updating last job report indicating other AIP failure.");
         }
-
-        // Report reportItem = PluginHelper
-        // .initPluginReportItem(plugin, aipReportEntry.getKey(),
-        // AIPState.INGEST_PROCESSING)
-        // .setPluginState(PluginState.FAILURE)
-        // .setPluginDetails("This AIP processing failed because a related AIP
-        // also failed");
-        // PluginHelper.updatePartialJobReport(plugin, model, index, reportItem,
-        // false);
       }
     }
   }

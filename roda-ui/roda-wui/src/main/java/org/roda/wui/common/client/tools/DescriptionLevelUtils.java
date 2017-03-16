@@ -56,10 +56,6 @@ public class DescriptionLevelUtils {
   }
 
   public static DescriptionLevel getDescriptionLevel(String levelString) {
-    return getDescriptionLevel(levelString, true);
-  }
-
-  public static DescriptionLevel getDescriptionLevel(String levelString, boolean showLabel) {
     if (levelsConfiguration == null) {
       logger.error("Requiring a description level while their are not yet loaded");
       return null;

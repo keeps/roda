@@ -233,8 +233,7 @@ public interface BrowserServiceAsync {
     List<String> representationFieldsToReturn, AsyncCallback<BrowseRepresentationBundle> callback);
 
   void retrieveBrowseFileBundle(String historyAipId, String historyRepresentationId, List<String> historyFilePath,
-    String historyFileId, String localeName, List<String> fileFieldsToReturn,
-    AsyncCallback<BrowseFileBundle> asyncCallback);
+    String historyFileId, List<String> fileFieldsToReturn, AsyncCallback<BrowseFileBundle> asyncCallback);
 
   <T extends IsIndexed> void retrieveFromModel(String objectClass, String objectUUID, AsyncCallback<T> asyncCallback);
 

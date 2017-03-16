@@ -167,7 +167,7 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
         Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
         reportItem.addPluginDetails("Could not move AIP: " + e.getMessage()).setPluginState(state);
         report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
 
         outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_MOVE_AIP_SUCCESS, aip.getId());
       }
@@ -219,7 +219,7 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
       Report reportItem = PluginHelper.initPluginReportItem(this, file.getId(), File.class);
       reportItem.addPluginDetails("Could not move file: " + e.getMessage()).setPluginState(state);
       report.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
 
       outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_MOVE_FILE_FAILURE, file.getId(),
         e.getClass().getSimpleName(), e.getMessage());

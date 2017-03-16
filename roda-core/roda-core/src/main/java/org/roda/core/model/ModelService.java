@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
@@ -34,7 +33,6 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.IdUtils;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.UserUtility;
 import org.roda.core.common.dips.DIPUtils;
@@ -56,6 +54,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.IsModelObject;
@@ -124,12 +123,9 @@ import org.slf4j.LoggerFactory;
 public class ModelService extends ModelObservable {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ModelService.class);
-
   private static final DateTimeFormatter LOG_NAME_DATE_FORMAT = DateTimeFormat.forPattern("yyyy-MM-dd");
-
-  private final StorageService storage;
-  private Path logFile;
   private static final boolean FAIL_IF_NO_DESCRIPTIVE_METADATA_SCHEMA = false;
+  private final StorageService storage;
 
   public ModelService(StorageService storage) {
     super();
@@ -870,23 +866,16 @@ public class ModelService extends ModelObservable {
     StoragePath directoryPath = ModelUtils.getRepresentationStoragePath(aipId, representationId);
 
     // verify structure of source representation
-    Directory sourceDirectory = sourceStorage.getDirectory(sourcePath);
-    ValidationReport validationReport = isRepresentationValid(sourceDirectory);
-    if (validationReport.isValid()) {
-      storage.copy(sourceStorage, sourcePath, directoryPath);
+    storage.copy(sourceStorage, sourcePath, directoryPath);
 
-      representation = new Representation(representationId, aipId, original, type);
+    representation = new Representation(representationId, aipId, original, type);
 
-      // update AIP metadata
-      AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
-      aip.getRepresentations().add(representation);
-      updateAIPMetadata(aip);
+    // update AIP metadata
+    AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
+    aip.getRepresentations().add(representation);
+    updateAIPMetadata(aip);
 
-      notifyRepresentationCreated(representation);
-    } else {
-      throw new ValidationException(validationReport);
-    }
-
+    notifyRepresentationCreated(representation);
     return representation;
   }
 
@@ -916,29 +905,20 @@ public class ModelService extends ModelObservable {
     GenericException, AuthorizationDeniedException, ValidationException {
     Representation representation;
 
-    // verify structure of source representation
-    Directory sourceDirectory = sourceStorage.getDirectory(sourcePath);
-    ValidationReport validationReport = isRepresentationValid(sourceDirectory);
+    // XXX possible optimization only creating new files, updating
+    // changed and removing deleted
 
-    if (validationReport.isValid()) {
-      // XXX possible optimization only creating new files, updating
-      // changed and removing deleted
-
-      StoragePath representationPath = ModelUtils.getRepresentationStoragePath(aipId, representationId);
-      storage.deleteResource(representationPath);
-      try {
-        storage.copy(sourceStorage, sourcePath, representationPath);
-      } catch (AlreadyExistsException e) {
-        throw new GenericException("Copying after delete gave an unexpected already exists exception", e);
-      }
-
-      // build return object
-      representation = new Representation(representationId, aipId, original, type);
-      notifyRepresentationUpdated(representation);
-    } else {
-      throw new ValidationException(validationReport);
+    StoragePath representationPath = ModelUtils.getRepresentationStoragePath(aipId, representationId);
+    storage.deleteResource(representationPath);
+    try {
+      storage.copy(sourceStorage, sourcePath, representationPath);
+    } catch (AlreadyExistsException e) {
+      throw new GenericException("Copying after delete gave an unexpected already exists exception", e);
     }
 
+    // build return object
+    representation = new Representation(representationId, aipId, original, type);
+    notifyRepresentationUpdated(representation);
     return representation;
   }
 
@@ -978,11 +958,6 @@ public class ModelService extends ModelObservable {
 
     return ret;
 
-  }
-
-  private ValidationReport isRepresentationValid(Directory directory) {
-    // FIXME test if representation is valid
-    return new ValidationReport();
   }
 
   /***************** File related *****************/
@@ -1503,7 +1478,7 @@ public class ModelService extends ModelObservable {
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     try {
       retrieveOtherMetadataBinary(aipId, representationId, fileDirectoryPath, fileId, fileSuffix, type);
-      String id = IdUtils.getOtherMetadataId(type, aipId, representationId, fileDirectoryPath, fileId);
+      String id = IdUtils.getOtherMetadataId(aipId, representationId, fileDirectoryPath, fileId);
       return new OtherMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, fileSuffix);
     } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
       throw e;
@@ -1524,7 +1499,7 @@ public class ModelService extends ModelObservable {
       storage.updateBinaryContent(binaryPath, payload, asReference, createIfNotExists);
     }
 
-    String id = IdUtils.getOtherMetadataId(type, aipId, representationId, fileDirectoryPath, fileId);
+    String id = IdUtils.getOtherMetadataId(aipId, representationId, fileDirectoryPath, fileId);
     OtherMetadata om = new OtherMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, fileSuffix);
 
     if (notify) {
@@ -1625,7 +1600,7 @@ public class ModelService extends ModelObservable {
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     String datePlusExtension = sdf.format(new Date()) + ".log";
-    logFile = logDirectory.resolve(datePlusExtension);
+    Path logFile = logDirectory.resolve(datePlusExtension);
     synchronized (logFile) {
 
       // verify if file exists and if not, if older files exist (in that case,
@@ -1990,7 +1965,7 @@ public class ModelService extends ModelObservable {
   public Risk createRisk(Risk risk, boolean commit) throws GenericException {
     try {
       if (risk.getId() == null) {
-        risk.setId(UUID.randomUUID().toString());
+        risk.setId(IdUtils.createUUID());
       }
 
       risk.setCreatedOn(new Date());
@@ -2084,7 +2059,7 @@ public class ModelService extends ModelObservable {
 
   public RiskIncidence createRiskIncidence(RiskIncidence riskIncidence, boolean commit) throws GenericException {
     try {
-      riskIncidence.setId(UUID.randomUUID().toString());
+      riskIncidence.setId(IdUtils.createUUID());
       riskIncidence.setDetectedOn(new Date());
 
       String riskIncidenceAsJson = JsonUtils.getJsonFromObject(riskIncidence);
@@ -2143,7 +2118,7 @@ public class ModelService extends ModelObservable {
 
   public Format createFormat(Format format, boolean commit) throws GenericException {
     try {
-      format.setId(UUID.randomUUID().toString());
+      format.setId(IdUtils.createUUID());
       String formatAsJson = JsonUtils.getJsonFromObject(format);
       StoragePath formatPath = ModelUtils.getFormatStoragePath(format.getId());
       storage.createBinary(formatPath, new StringContentPayload(formatAsJson), false);
@@ -2201,8 +2176,8 @@ public class ModelService extends ModelObservable {
   public Notification createNotification(final Notification notification, final NotificationProcessor processor)
     throws GenericException, AuthorizationDeniedException {
 
-    notification.setId(UUID.randomUUID().toString());
-    notification.setAcknowledgeToken(UUID.randomUUID().toString());
+    notification.setId(IdUtils.createUUID());
+    notification.setAcknowledgeToken(IdUtils.createUUID());
     Notification processedNotification = processor.processNotification(this, notification);
 
     try {
@@ -2270,7 +2245,7 @@ public class ModelService extends ModelObservable {
 
     if (notification.getAcknowledgeToken().equals(ackToken)) {
       for (String recipient : notification.getRecipientUsers()) {
-        String recipientUUID = UUID.nameUUIDFromBytes(recipient.getBytes()).toString();
+        String recipientUUID = IdUtils.createUUID(recipient);
         if (recipientUUID.equals(emailToken)) {
           DateFormat df = DateFormat.getDateTimeInstance();
           String ackDate = df.format(new Date());
@@ -2650,7 +2625,7 @@ public class ModelService extends ModelObservable {
     } else if (File.class.equals(objectClass)) {
       ret = listFiles();
     } else if (TransferredResource.class.equals(objectClass)) {
-      ret = LiteRODAObjectFactory.transformFromLite(this, null,
+      ret = LiteRODAObjectFactory.transformFromLite(this,
         RodaCoreFactory.getTransferredResourcesScanner().listTransferredResources());
     } else if (RODAMember.class.equals(objectClass)) {
       ret = listMembers();

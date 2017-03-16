@@ -18,16 +18,17 @@ package org.roda.wui.api.v1.utils;
 public final class ExtraMediaType {
 
   /**
-   * Constructor.
-   */
-  private ExtraMediaType() {
-  }
-
-  /**
    * A {@code String} constant representing {@value #TEXT_CSV} media type.
    */
   public static final String TEXT_CSV = "text/csv";
   public static final String APPLICATION_ZIP = "application/zip";
   public static final String APPLICATION_JAVASCRIPT = "application/javascript";
+
+  /**
+   * Constructor.
+   */
+  private ExtraMediaType() {
+    // do nothing
+  }
 
 }

@@ -164,7 +164,7 @@ public class ReindexActionLogPlugin extends AbstractPlugin<Void> {
         reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(message.toString());
         report.addReport(reportItem);
 
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
       }
     }
 

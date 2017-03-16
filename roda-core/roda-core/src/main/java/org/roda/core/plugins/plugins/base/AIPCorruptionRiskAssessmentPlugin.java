@@ -182,7 +182,7 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
                   passedFiles.add(fileEntry);
                 } else {
                   aipFailed = true;
-                  createIncidence(model, file, risks.get(0));
+                  createIncidence(model, file);
                 }
               }
             }
@@ -211,16 +211,16 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
       }
 
       report.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
       | ValidationException | AlreadyExistsException e) {
       LOGGER.error("Could not create a Fixity Plugin event");
     }
   }
 
-  private void createIncidence(ModelService model, File file, String riskId) throws RequestNotValidException,
-    GenericException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
-    Risk risk = PluginHelper.createRiskIfNotExists(model, 0, risks.get(0), getClass().getClassLoader());
+  private void createIncidence(ModelService model, File file) throws RequestNotValidException, GenericException,
+    AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
+    Risk risk = PluginHelper.createRiskIfNotExists(model, risks.get(0), getClass().getClassLoader());
     RiskIncidence incidence = new RiskIncidence();
     incidence.setDetectedOn(new Date());
     incidence.setDetectedBy(this.getName());

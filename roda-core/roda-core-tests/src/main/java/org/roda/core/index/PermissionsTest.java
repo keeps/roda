@@ -14,13 +14,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.UUID;
 
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -83,7 +83,7 @@ public class PermissionsTest {
   @Test
   public void testAIP() throws RODAException, ParseException {
     // Generate AIP Id
-    final String aipId = UUID.randomUUID().toString();
+    final String aipId = IdUtils.createUUID();
 
     // Create AIP
     model.createAIP(aipId, corporaService,
@@ -137,7 +137,7 @@ public class PermissionsTest {
   @Test
   public void testRepresentation() throws RODAException, ParseException {
     // Generate AIP Id
-    final String aipId = UUID.randomUUID().toString();
+    final String aipId = IdUtils.createUUID();
 
     // Create AIP
     model.createAIP(aipId, corporaService,
@@ -190,7 +190,7 @@ public class PermissionsTest {
   @Test
   public void testFiles() throws RODAException, ParseException {
     // Generate AIP Id
-    final String aipId = UUID.randomUUID().toString();
+    final String aipId = IdUtils.createUUID();
 
     // Create AIP
     model.createAIP(aipId, corporaService,
@@ -243,7 +243,7 @@ public class PermissionsTest {
   @Test
   public void testPreservationEvents() throws RODAException, ParseException {
     // Generate AIP Id
-    final String aipId = UUID.randomUUID().toString();
+    final String aipId = IdUtils.createUUID();
 
     // Create AIP
     model.createAIP(aipId, corporaService,

@@ -12,7 +12,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.mail.MessagingException;
 
@@ -23,6 +22,7 @@ import org.roda.core.common.ConfigurableEmailUtility;
 import org.roda.core.common.HandlebarsUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.notifications.Notification.NOTIFICATION_STATE;
 import org.roda.core.data.v2.user.User;
@@ -114,7 +114,7 @@ public class EmailNotificationProcessor implements NotificationProcessor {
     Map<String, Object> scopes) throws GenericException {
 
     // update body message with the recipient user and acknowledge URL
-    String userUUID = UUID.nameUUIDFromBytes(recipient.getBytes()).toString();
+    String userUUID = IdUtils.createUUID(recipient);
     String ackUrl = RodaCoreFactory.getRodaConfigurationAsString("core", "notification", "acknowledge");
     ackUrl = ackUrl.replaceAll("\\{notificationId\\}", notification.getId());
     ackUrl = ackUrl.replaceAll("\\{token\\}", notification.getAcknowledgeToken() + userUUID);

@@ -40,7 +40,6 @@ import org.roda.wui.common.client.widgets.wcag.WCAGUtilities;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.dom.client.Element;
-import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Command;
@@ -100,8 +99,7 @@ public class BrowseFile extends Composite {
         final String historyFileId = historyTokens.get(historyTokens.size() - 1);
 
         BrowserService.Util.getInstance().retrieveBrowseFileBundle(historyAipId, historyRepresentationId,
-          historyFilePath, historyFileId, LocaleInfo.getCurrentLocale().getLocaleName(), fileFieldsToReturn,
-          new AsyncCallback<BrowseFileBundle>() {
+          historyFilePath, historyFileId, fileFieldsToReturn, new AsyncCallback<BrowseFileBundle>() {
 
             @Override
             public void onFailure(Throwable caught) {

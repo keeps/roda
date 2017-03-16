@@ -50,7 +50,7 @@ public class CreateIngestJob extends CreateSelectedJob<TransferredResource> {
   private static PluginType[] pluginTypes = {PluginType.INGEST};
 
   public CreateIngestJob() {
-    super(TransferredResource.class, Arrays.asList(pluginTypes));
+    super(Arrays.asList(pluginTypes));
     super.setCategoryListBoxVisible(false);
   }
 

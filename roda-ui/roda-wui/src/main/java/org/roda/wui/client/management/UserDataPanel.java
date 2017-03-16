@@ -155,7 +155,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
   public UserDataPanel(boolean visible, boolean editmode, boolean enableGroupSelect, boolean enablePermissions) {
 
     password = new PasswordPanel(editmode);
-    groupSelect = new GroupSelect(enableGroupSelect);
+    groupSelect = new GroupSelect();
 
     initWidget(uiBinder.createAndBindUi(this));
 

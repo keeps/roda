@@ -14,7 +14,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.roda.core.common.IdUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -22,6 +21,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -307,7 +307,7 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
     createPreservationEvent(file, index, model, fileReport);
 
     jobReport.addReport(fileReport);
-    PluginHelper.updatePartialJobReport(this, model, index, fileReport, true, job);
+    PluginHelper.updatePartialJobReport(this, model, fileReport, true, job);
     return result;
   }
 
@@ -495,7 +495,7 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
   private void createRiskIncidence(final File file, final Report report, final Result result,
     final ModelService model) {
     try {
-      final Risk risk = PluginHelper.createRiskIfNotExists(model, 0, FILE_NOT_CHARACTERIZED_RISK_ID,
+      final Risk risk = PluginHelper.createRiskIfNotExists(model, FILE_NOT_CHARACTERIZED_RISK_ID,
         getClass().getClassLoader());
       final RiskIncidence incidence = new RiskIncidence();
       incidence.setDetectedOn(new Date());

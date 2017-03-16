@@ -26,9 +26,7 @@ import com.google.gwt.user.client.ui.Widget;
 import config.i18n.client.ClientMessages;
 
 public class DisseminationFileActions extends AbstractActionable<DIPFile> {
-
   private static final DisseminationFileActions INSTANCE = new DisseminationFileActions();
-
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private static final Set<DisseminationFileAction> POSSIBLE_ACTIONS_ON_SINGLE_DISSEMINATION_FILE = new HashSet<>(
@@ -40,7 +38,7 @@ public class DisseminationFileActions extends AbstractActionable<DIPFile> {
   }
 
   public enum DisseminationFileAction implements Actionable.Action<DIPFile> {
-    DOWNLOAD;// REMOVE, UPLOAD_FILES, CREATE_FOLDER;
+    DOWNLOAD;
   }
 
   public static DisseminationFileActions get() {

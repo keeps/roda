@@ -183,12 +183,12 @@ public class FileUtility {
       ch = (byte) (ch & 0x0F);
       // must do this is high order bit is on!
 
-      out.append(pseudo[(int) ch]); // convert the nibble to a String
+      out.append(pseudo[ch]); // convert the nibble to a String
       // Character
 
       ch = (byte) (in[i] & 0x0F); // Strip off low nibble
 
-      out.append(pseudo[(int) ch]); // convert the nibble to a String
+      out.append(pseudo[ch]); // convert the nibble to a String
       // Character
 
       i++;
@@ -219,20 +219,6 @@ public class FileUtility {
     }
 
     return files;
-  }
-
-  /**
-   * Reads bytes from a file
-   * 
-   * @param file
-   * @return an array of bytes read from file
-   * @throws IOException
-   */
-  public static byte[] readBytesFromFile(File file) throws IOException {
-    FileInputStream inputStream = new FileInputStream(file);
-    byte[] bytes = StreamUtility.byteArrayFromInputStream(inputStream);
-    inputStream.close();
-    return bytes;
   }
 
   /**

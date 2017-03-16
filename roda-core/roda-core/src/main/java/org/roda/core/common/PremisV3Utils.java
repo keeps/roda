@@ -40,6 +40,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.metadata.Fixity;
@@ -99,13 +100,12 @@ public final class PremisV3Utils {
 
   /** Private empty constructor */
   private PremisV3Utils() {
-
+    // do nothing
   }
 
   public static List<Fixity> calculateFixities(Binary binary, Collection<String> algorithms, String originator)
     throws IOException, NoSuchAlgorithmException {
     List<Fixity> ret = new ArrayList<>();
-
     InputStream stream = binary.getContent().createInputStream();
 
     Map<String, String> checksums = FileUtility.checksums(stream, algorithms);
@@ -117,7 +117,6 @@ public final class PremisV3Utils {
     }
 
     IOUtils.closeQuietly(stream);
-
     return ret;
   }
 
@@ -170,11 +169,6 @@ public final class PremisV3Utils {
     public List<SAXParseException> getErrors() {
       return errors;
     }
-
-    public void setErrors(List<SAXParseException> errors) {
-      this.errors = errors;
-    }
-
   }
 
   public static void updateFileFormat(gov.loc.premis.v3.File file, String formatDesignationName,
@@ -630,16 +624,14 @@ public final class PremisV3Utils {
   }
 
   public static SolrInputDocument getSolrDocument(Binary premisBinary) throws GenericException {
-
     SolrInputDocument doc = new SolrInputDocument();
-
     InputStream inputStream = null;
+
     try {
       inputStream = premisBinary.getContent().createInputStream();
       gov.loc.premis.v3.File premisFile = binaryToFile(inputStream);
       if (premisFile.getOriginalName() != null) {
         doc.setField(RodaConstants.FILE_ORIGINALNAME, premisFile.getOriginalName().getStringValue());
-
         // TODO extension
       }
 

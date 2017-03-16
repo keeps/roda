@@ -39,6 +39,10 @@ package org.roda.core.util;
  */
 public class Base64 {
 
+  private Base64() {
+    // do nothing
+  }
+
   /**
    * returns an array of base64-encoded characters to represent the passed data
    * array.
@@ -47,7 +51,7 @@ public class Base64 {
    *          the array of bytes to encode
    * @return base64-coded character array.
    */
-  static public char[] encode(byte[] data) {
+  public static char[] encode(byte[] data) {
     char[] out = new char[((data.length + 2) / 3) * 4];
 
     //
@@ -58,15 +62,15 @@ public class Base64 {
       boolean quad = false;
       boolean trip = false;
 
-      int val = (0xFF & (int) data[i]);
+      int val = (0xFF & data[i]);
       val <<= 8;
       if ((i + 1) < data.length) {
-        val |= (0xFF & (int) data[i + 1]);
+        val |= (0xFF & data[i + 1]);
         trip = true;
       }
       val <<= 8;
       if ((i + 2) < data.length) {
-        val |= (0xFF & (int) data[i + 2]);
+        val |= (0xFF & data[i + 2]);
         quad = true;
       }
       out[index + 3] = alphabet[(quad ? (val & 0x3F) : 64)];
@@ -94,7 +98,7 @@ public class Base64 {
    *          the data to decode
    * @return the decoded data.
    */
-  static public byte[] decode(char[] data) {
+  public static byte[] decode(char[] data) {
     // as our input could contain non-BASE64 data (newlines,
     // whitespace of any sort, whatever) we must first adjust
     // our count of USABLE data so that...
@@ -137,7 +141,7 @@ public class Base64 {
         {
           shift -= 8; // write them out (from the top, leaving any
           out[index++] = // excess at the bottom for next iteration.
-          (byte) ((accum >> shift) & 0xff);
+            (byte) ((accum >> shift) & 0xff);
         }
       }
       // we will also have skipped processing a padding null byte ('=')
@@ -163,14 +167,12 @@ public class Base64 {
   //
   // code characters for values 0..63
   //
-  static private char[] alphabet =
-
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".toCharArray();
+  private static char[] alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".toCharArray();
 
   //
   // lookup table for converting base64 characters to value in range 0..63
   //
-  static private byte[] codes = new byte[256];
+  private static byte[] codes = new byte[256];
   static {
     for (int i = 0; i < 256; i++)
       codes[i] = -1;

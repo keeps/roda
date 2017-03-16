@@ -72,13 +72,13 @@ public class ValidationUtils {
 
   /** Private empty constructor */
   private ValidationUtils() {
-
+    // do nothing
   }
 
   public static ValidationReport isAIPMetadataValid(boolean forceDescriptiveMetadataType,
     boolean validateDescriptiveMetadata, String fallbackMetadataType, String fallbackMetadataVersion,
-    boolean validatePremis, ModelService model, String aipId) throws GenericException, RequestNotValidException,
-    AuthorizationDeniedException, NotFoundException, ValidationException {
+    ModelService model, String aipId) throws GenericException, RequestNotValidException, AuthorizationDeniedException,
+    NotFoundException, ValidationException {
     ValidationReport report = new ValidationReport();
     report.setValid(true);
     List<DescriptiveMetadata> descriptiveMetadata = model.retrieveAIP(aipId).getDescriptiveMetadata();
@@ -113,7 +113,6 @@ public class ValidationUtils {
 
     // TODO handle premis...
     return report;
-
   }
 
   public static ValidationReport consolidateReports(ValidationReport mainReport, ValidationReport innerReport) {
@@ -185,21 +184,6 @@ public class ValidationUtils {
     ret.setValid(valid);
     ret.setIssues(issues);
     return ret;
-  }
-
-  /**
-   * Validates all preservation metadata files contained in the AIP
-   * 
-   * @throws RequestNotValidException
-   * @throws GenericException
-   * @throws NotFoundException
-   * @throws AuthorizationDeniedException
-   * 
-   * @throws ValidationException
-   */
-  public static boolean isAIPPreservationMetadataValid(ModelService model, String aipId, boolean failIfNoSchema)
-    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
-    return true;
   }
 
   /**

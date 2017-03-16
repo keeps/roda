@@ -21,7 +21,6 @@ import java.util.UUID;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.IdUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
@@ -32,6 +31,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
@@ -204,7 +204,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
 
     for (AIP aip : list) {
       Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
       PluginState reportState = PluginState.SUCCESS;
       ValidationReport validationReport = new ValidationReport();
       boolean hasNonPdfFiles = false;
@@ -216,7 +216,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
       try {
         for (Representation representation : aip.getRepresentations()) {
           List<File> unchangedFiles = new ArrayList<>();
-          String newRepresentationID = UUID.randomUUID().toString();
+          String newRepresentationID = IdUtils.createUUID();
           String verification = null;
           boolean notify = true;
 
@@ -370,7 +370,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
         jobPluginInfo.incrementObjectsProcessedWithFailure();
       } finally {
         report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
 
         LOGGER.debug("Creating digital signature plugin event on AIP {}", aip.getId());
         boolean notifyEvent = true;
@@ -388,7 +388,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
     List<String> newRepresentations = new ArrayList<>();
 
     for (Representation representation : list) {
-      String newRepresentationID = UUID.randomUUID().toString();
+      String newRepresentationID = IdUtils.createUUID();
       List<File> unchangedFiles = new ArrayList<>();
       List<File> alteredFiles = new ArrayList<>();
       List<File> extractedFiles = new ArrayList<>();
@@ -400,7 +400,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
 
       Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getRepresentationId(representation),
         Representation.class);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
       PluginState reportState = PluginState.SUCCESS;
       ValidationReport validationReport = new ValidationReport();
       boolean hasNonPdfFiles = false;
@@ -545,7 +545,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
         jobPluginInfo.incrementObjectsProcessedWithFailure();
       } finally {
         report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
       }
     }
 
@@ -557,7 +557,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
     SimpleJobPluginInfo jobPluginInfo, List<File> list, Job job) throws PluginException {
     List<String> newRepresentations = new ArrayList<>();
 
-    String newRepresentationID = UUID.randomUUID().toString();
+    String newRepresentationID = IdUtils.createUUID();
     List<File> unchangedFiles = new ArrayList<>();
     List<File> alteredFiles = new ArrayList<>();
     List<File> extractedFiles = new ArrayList<>();
@@ -570,7 +570,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
     for (File file : list) {
       LOGGER.debug("Processing file {}", file);
       Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getFileId(file), File.class);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
       PluginState reportState = PluginState.SUCCESS;
 
       try {
@@ -684,7 +684,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
         reportItem.setPluginState(reportState).setPluginDetails(e.getMessage());
       } finally {
         report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
       }
 
       LOGGER.debug("Creating digital signature plugin event for the representation {}", file.getRepresentationId());

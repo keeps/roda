@@ -53,7 +53,7 @@ public class DisseminationsSliderHelper {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private DisseminationsSliderHelper() {
-
+    // do nothing
   }
 
   private static void updateDisseminationsSliderPanel(final IndexedAIP aip,
@@ -74,8 +74,7 @@ public class DisseminationsSliderHelper {
     updateDisseminations(filter, disseminationsSliderPanel);
   }
 
-  private static <T extends IsIndexed> void updateDisseminations(Filter filter,
-    final SliderPanel disseminationsSliderPanel) {
+  private static void updateDisseminations(Filter filter, final SliderPanel disseminationsSliderPanel) {
     Sorter sorter = new Sorter(new SortParameter(RodaConstants.DIP_DATE_CREATED, true));
     Sublist sublist = new Sublist(0, 100);
     Facets facets = Facets.NONE;
@@ -100,8 +99,7 @@ public class DisseminationsSliderHelper {
       });
   }
 
-  private static <T extends IsIndexed> void updateDisseminationsSliderPanel(List<IndexedDIP> dips,
-    SliderPanel disseminationsSliderPanel) {
+  private static void updateDisseminationsSliderPanel(List<IndexedDIP> dips, SliderPanel disseminationsSliderPanel) {
 
     disseminationsSliderPanel.clear();
     disseminationsSliderPanel.addTitle(new Label(messages.viewRepresentationFileDisseminationTitle()));
@@ -112,13 +110,12 @@ public class DisseminationsSliderHelper {
       dipEmpty.addStyleName("dip-empty");
     } else {
       for (final IndexedDIP dip : dips) {
-        disseminationsSliderPanel.addContent(createDisseminationPanel(dip, disseminationsSliderPanel));
+        disseminationsSliderPanel.addContent(createDisseminationPanel(dip));
       }
     }
   }
 
-  private static <T extends IsIndexed> FlowPanel createDisseminationPanel(final IndexedDIP dip,
-    final SliderPanel disseminationsSliderPanel) {
+  private static FlowPanel createDisseminationPanel(final IndexedDIP dip) {
     FlowPanel layout = new FlowPanel();
 
     // open layout
@@ -201,16 +198,14 @@ public class DisseminationsSliderHelper {
         @Override
         public void onSuccess(Actionable.ActionImpact impact) {
           if (!Actionable.ActionImpact.NONE.equals(impact)) {
-            // update();
+            // update
           }
           actionsPopup.hide();
         }
       };
 
       actionsPopup.setWidget(DisseminationActions.get().createActionsLayout(dip, callback));
-
       actionsPopup.showRelativeTo(actionsButton, CalloutPosition.TOP_RIGHT);
-
     }
 
   }

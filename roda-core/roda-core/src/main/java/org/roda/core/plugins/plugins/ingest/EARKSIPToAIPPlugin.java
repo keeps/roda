@@ -152,26 +152,24 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
         if (IPEnums.IPStatus.NEW == sip.getStatus()) {
           parentId = PluginHelper.getComputedParent(model, index, sip.getAncestors(), computedSearchScope,
             forceSearchScope, jobId);
-          aip = processNewSIP(index, model, storage, reportItem, sip, parentId);
+          aip = processNewSIP(index, model, reportItem, sip, parentId);
         } else if (IPEnums.IPStatus.UPDATE == sip.getStatus()) {
           aip = processUpdateSIP(index, model, storage, sip, computedSearchScope, forceSearchScope);
         } else {
           throw new GenericException("Unknown IP Status: " + sip.getStatus());
         }
 
-        if (aip != null) {
-          // put SIP inside the created AIP (if it is supposed to do so)
-          PluginHelper.createSubmission(model, createSubmission, earkSIPPath, aip.getId());
+        // put SIP inside the created AIP (if it is supposed to do so)
+        PluginHelper.createSubmission(model, createSubmission, earkSIPPath, aip.getId());
 
-          createUnpackingEventSuccess(model, index, transferredResource, aip, UNPACK_DESCRIPTION);
-          reportItem.setOutcomeObjectId(aip.getId()).setPluginState(PluginState.SUCCESS);
+        createUnpackingEventSuccess(model, index, transferredResource, aip, UNPACK_DESCRIPTION);
+        reportItem.setOutcomeObjectId(aip.getId()).setPluginState(PluginState.SUCCESS);
 
-          if (sip.getAncestors() != null && !sip.getAncestors().isEmpty() && aip.getParentId() == null) {
-            reportItem.setPluginDetails(String.format("Parent with id '%s' not found", parentId));
-          }
-          createWellformedEventSuccess(model, index, transferredResource, aip);
-          LOGGER.debug("Done with converting {} to AIP {}", earkSIPPath, aip.getId());
+        if (sip.getAncestors() != null && !sip.getAncestors().isEmpty() && aip.getParentId() == null) {
+          reportItem.setPluginDetails(String.format("Parent with id '%s' not found", parentId));
         }
+        createWellformedEventSuccess(model, index, transferredResource, aip);
+        LOGGER.debug("Done with converting {} to AIP {}", earkSIPPath, aip.getId());
       } else {
         reportItem.setPluginState(PluginState.FAILURE).setHtmlPluginDetails(true)
           .setPluginDetails(sip.getValidationReport().toHtml(true, true, true, false, false));
@@ -192,7 +190,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
     }
   }
 
-  private AIP processNewSIP(IndexService index, ModelService model, StorageService storage, Report reportItem, SIP sip,
+  private AIP processNewSIP(IndexService index, ModelService model, Report reportItem, SIP sip,
     Optional<String> computedParentId) throws NotFoundException, GenericException, RequestNotValidException,
     AuthorizationDeniedException, AlreadyExistsException, ValidationException, IOException {
     String jobUsername = PluginHelper.getJobUsername(this, index);
@@ -203,19 +201,19 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
       new HashSet<>(Arrays.asList(Permissions.PermissionType.CREATE, Permissions.PermissionType.READ,
         Permissions.PermissionType.UPDATE, Permissions.PermissionType.DELETE, Permissions.PermissionType.GRANT)));
 
-    return EARKSIPToAIPPluginUtils.earkSIPToAIP(sip, jobUsername, fullPermissions, model, storage, sip.getIds(),
+    return EARKSIPToAIPPluginUtils.earkSIPToAIP(sip, jobUsername, fullPermissions, model, sip.getIds(),
       reportItem.getJobId(), computedParentId);
   }
 
   private AIP processUpdateSIP(IndexService index, ModelService model, StorageService storage, SIP sip,
     Optional<String> searchScope, boolean forceSearchScope) throws GenericException, RequestNotValidException,
     NotFoundException, AuthorizationDeniedException, AlreadyExistsException, ValidationException {
-    AIP aip = null;
     String searchScopeString = searchScope.orElse(null);
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_IDS, sip.getId()));
     if (searchScopeString != null && !forceSearchScope) {
       filter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, searchScopeString));
     }
+
     IndexResult<IndexedAIP> result = index.find(IndexedAIP.class, filter, Sorter.NONE, new Sublist(0, 1),
       Arrays.asList(RodaConstants.INDEX_UUID));
     IndexedAIP indexedAIP;
@@ -237,14 +235,11 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
           + (searchScopeString != null ? " under AIP " + searchScopeString : ""));
       }
     }
-    if (indexedAIP != null) {
-      String jobUsername = PluginHelper.getJobUsername(this, index);
-      String jobId = PluginHelper.getJobId(this);
-      // Update the AIP
-      aip = EARKSIPToAIPPluginUtils.earkSIPToAIPUpdate(sip, indexedAIP, model, storage, jobUsername, searchScope,
-        jobId);
-    }
-    return aip;
+
+    String jobUsername = PluginHelper.getJobUsername(this, index);
+    String jobId = PluginHelper.getJobId(this);
+    // Update the AIP
+    return EARKSIPToAIPPluginUtils.earkSIPToAIPUpdate(sip, indexedAIP, model, storage, jobUsername, searchScope, jobId);
   }
 
   @Override

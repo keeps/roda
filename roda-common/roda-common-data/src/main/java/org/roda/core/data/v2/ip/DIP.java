@@ -12,11 +12,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.IsModelObject;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -49,7 +49,7 @@ public class DIP implements IsModelObject {
   public DIP() {
     super();
 
-    this.id = UUID.randomUUID().toString();
+    this.id = IdUtils.createUUID();
     this.title = "";
     this.description = "";
     this.type = "";

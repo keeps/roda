@@ -152,7 +152,7 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
         }
 
         pluginReport.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
       }
     }
   }

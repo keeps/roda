@@ -328,11 +328,11 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       ActorRef jobStateInfoActor = runningJobs.get(jobId);
       if (PluginType.INGEST == plugin.getType()) {
         IngestJobPluginInfo jobPluginInfo = new IngestJobPluginInfo();
-        initJobPluginInfo(plugin, jobId, jobActor, jobStateInfoActor, jobPluginInfo, objectsCount);
+        initJobPluginInfo(plugin, jobActor, jobStateInfoActor, jobPluginInfo, objectsCount);
         plugin.injectJobPluginInfo(jobPluginInfo);
       } else if (PluginType.MISC == plugin.getType() || PluginType.AIP_TO_AIP == plugin.getType()) {
         SimpleJobPluginInfo jobPluginInfo = new SimpleJobPluginInfo();
-        initJobPluginInfo(plugin, jobId, jobActor, jobStateInfoActor, jobPluginInfo, objectsCount);
+        initJobPluginInfo(plugin, jobActor, jobStateInfoActor, jobPluginInfo, objectsCount);
         plugin.injectJobPluginInfo(jobPluginInfo);
       }
     } else {
@@ -362,11 +362,11 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       ActorRef jobStateInfoActor = getJobContextInformation(PluginHelper.getJobId(plugin));
       if (PluginType.INGEST == plugin.getType()) {
         IngestJobPluginInfo jobPluginInfo = new IngestJobPluginInfo();
-        initJobPluginInfo(innerPlugin, jobId, jobActor, jobStateInfoActor, jobPluginInfo, objectsCount);
+        initJobPluginInfo(innerPlugin, jobActor, jobStateInfoActor, jobPluginInfo, objectsCount);
         innerPlugin.injectJobPluginInfo(jobPluginInfo);
       } else {
         SimpleJobPluginInfo jobPluginInfo = new SimpleJobPluginInfo();
-        initJobPluginInfo(innerPlugin, jobId, jobActor, jobStateInfoActor, jobPluginInfo, objectsCount);
+        initJobPluginInfo(innerPlugin, jobActor, jobStateInfoActor, jobPluginInfo, objectsCount);
         innerPlugin.injectJobPluginInfo(jobPluginInfo);
       }
     } else {
@@ -377,11 +377,10 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
   }
 
-  private <T extends IsRODAObject> void initJobPluginInfo(Plugin<T> innerPlugin, String jobId, ActorRef jobActor,
+  private <T extends IsRODAObject> void initJobPluginInfo(Plugin<T> innerPlugin, ActorRef jobActor,
     ActorRef jobStateInfoActor, JobPluginInfo jobPluginInfo, int objectsCount) {
     jobPluginInfo.setSourceObjectsCount(objectsCount);
     jobPluginInfo.setSourceObjectsWaitingToBeProcessed(objectsCount);
-
     jobStateInfoActor.tell(new Messages.JobInfoUpdated(innerPlugin, jobPluginInfo), jobActor);
   }
 

@@ -78,6 +78,10 @@ public interface BrowserService extends RemoteService {
    */
   public static class Util {
 
+    private Util() {
+      // do nothing
+    }
+
     /**
      * Get singleton instance
      *
@@ -100,7 +104,7 @@ public interface BrowserService extends RemoteService {
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   BrowseFileBundle retrieveBrowseFileBundle(String historyAipId, String historyRepresentationId,
-    List<String> historyFilePath, String historyFileId, String localeName, List<String> fileFieldsToReturn)
+    List<String> historyFilePath, String historyFileId, List<String> fileFieldsToReturn)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(String aipId, String representationId,

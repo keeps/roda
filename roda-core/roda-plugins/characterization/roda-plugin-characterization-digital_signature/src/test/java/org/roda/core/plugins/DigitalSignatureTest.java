@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.solr.client.solrj.SolrServerException;
@@ -36,6 +35,7 @@ import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -120,8 +120,8 @@ public class DigitalSignatureTest {
     f.updateTransferredResources(Optional.empty(), true);
     index.commit(TransferredResource.class);
 
-    resources.add(index.retrieve(TransferredResource.class,
-      UUID.nameUUIDFromBytes(transferredResourceId.getBytes()).toString(), new ArrayList<>()));
+    resources
+      .add(index.retrieve(TransferredResource.class, IdUtils.createUUID(transferredResourceId), new ArrayList<>()));
     return resources;
   }
 

@@ -27,6 +27,10 @@ import org.slf4j.LoggerFactory;
 public class CommandUtility {
   private static final Logger LOGGER = LoggerFactory.getLogger(CommandUtility.class);
 
+  private CommandUtility() {
+    // do nothing
+  }
+
   /**
    * Execute the given command line.
    * 
@@ -52,16 +56,15 @@ public class CommandUtility {
    * @throws CommandException
    */
   public static String execute(boolean withErrorStream, String... args) throws CommandException {
-
     int exitValue = 0;
     String output;
 
     try {
-
       StringBuilder builder = new StringBuilder();
       for (String arg : args) {
         builder.append(arg + " ");
       }
+
       LOGGER.debug("Executing {}", builder);
 
       // create and execute process
@@ -71,24 +74,18 @@ public class CommandUtility {
 
       // Get process output
       InputStream is = process.getInputStream();
-
-      // output = StreamUtility.inputStreamToString(is);
-
       CaptureOutputThread captureOutputThread = new CaptureOutputThread(is);
 
       synchronized (is) {
-
         captureOutputThread.start();
 
         // Wait until the CaptureOutputThread notifies that is finished
         // reading the input stream.
         LOGGER.debug("Waiting until CaptureOutputThread notifies");
         is.wait();
-
       }
 
       LOGGER.debug("CaptureOutputThread notified. Getting output...");
-
       output = captureOutputThread.output;
 
       // Get process exit value
@@ -150,9 +147,7 @@ class CaptureOutputThread extends Thread {
     StringBuilder outputBuffer = new StringBuilder();
 
     try {
-      // output = StreamUtility.inputStreamToString(is);
       BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-
       String line;
 
       while ((line = reader.readLine()) != null) {

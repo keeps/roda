@@ -17,7 +17,6 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import javax.xml.validation.Schema;
 
@@ -32,6 +31,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
@@ -98,7 +98,7 @@ public class ValidationUtilsTest {
   @Test
   public void testValidateDescriptiveMetadata() throws ValidationException, RequestNotValidException, GenericException,
     AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
-    final String aipId = UUID.randomUUID().toString();
+    final String aipId = IdUtils.createUUID();
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
       RodaConstants.ADMIN);
@@ -110,7 +110,7 @@ public class ValidationUtilsTest {
   @Test(enabled = false)
   public void testValidateDescriptiveMetadataBuggy() throws RODAException {
     // buggy aip have acqinfo2 instead of acqinfo in ead.xml
-    final String aipId = UUID.randomUUID().toString();
+    final String aipId = IdUtils.createUUID();
     try {
       model.createAIP(aipId, corporaService,
         DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_BUGGY_ID),
@@ -126,7 +126,7 @@ public class ValidationUtilsTest {
   @Test
   public void testValidateAIP() throws ValidationException, RequestNotValidException, GenericException,
     AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
-    final String aipId = UUID.randomUUID().toString();
+    final String aipId = IdUtils.createUUID();
     final AIP aip = model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
       RodaConstants.ADMIN);
@@ -138,7 +138,7 @@ public class ValidationUtilsTest {
     AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
     // TODO AIP changed, so the corpora also needs to be changed
     // buggy aip have acqinfo2 instead of acqinfo in ead.xml
-    final String aipId = UUID.randomUUID().toString();
+    final String aipId = IdUtils.createUUID();
     final AIP aip = model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_BUGGY_ID),
       RodaConstants.ADMIN);
@@ -149,7 +149,7 @@ public class ValidationUtilsTest {
   public void testValidationOfDescriptiveMetadata() throws ValidationException, RequestNotValidException,
     GenericException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException, IOException {
     // AIP 1 (wrong one)
-    final AIP aip = model.createAIP(UUID.randomUUID().toString(), corporaService, DefaultStoragePath.parse(
+    final AIP aip = model.createAIP(IdUtils.createUUID(), corporaService, DefaultStoragePath.parse(
       CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_WITH_INVALID_METADATA), RodaConstants.ADMIN);
 
     DefaultStoragePath path = DefaultStoragePath.parse(CorporaConstants.SOURCE_PRESERVATION_CONTAINER,
@@ -160,7 +160,7 @@ public class ValidationUtilsTest {
     assertEquals(xmlSchema.isPresent(), true);
 
     // AIP 2 (correct one)
-    final AIP aip2 = model.createAIP(UUID.randomUUID().toString(), corporaService,
+    final AIP aip2 = model.createAIP(IdUtils.createUUID(), corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
       RodaConstants.ADMIN);
 

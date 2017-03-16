@@ -7,6 +7,7 @@
  */
 package org.roda.wui.api.controllers;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
@@ -43,7 +44,7 @@ public class Jobs extends RodaWuiController {
     Job updatedJob = JobsHelper.createJob(job, async);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "job", updatedJob);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_JOB_PARAM, updatedJob);
 
     return updatedJob;
   }
@@ -59,7 +60,7 @@ public class Jobs extends RodaWuiController {
     Job job = JobsHelper.startJob(jobId);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "jobId", jobId);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_JOB_ID_PARAM, jobId);
 
     return job;
   }
@@ -75,7 +76,7 @@ public class Jobs extends RodaWuiController {
     JobsHelper.stopJob(jobId);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "jobId", jobId);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_JOB_ID_PARAM, jobId);
   }
 
   public static void deleteJob(User user, String jobId)
@@ -89,7 +90,7 @@ public class Jobs extends RodaWuiController {
     JobsHelper.deleteJob(jobId);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "jobId", jobId);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_JOB_ID_PARAM, jobId);
   }
 
   /*

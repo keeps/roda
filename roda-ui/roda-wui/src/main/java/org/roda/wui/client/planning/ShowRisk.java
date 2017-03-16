@@ -78,13 +78,6 @@ public class ShowRisk extends Composite {
   private static ShowRisk instance = null;
   private static ClientMessages messages = GWT.create(ClientMessages.class);
 
-  public static ShowRisk getInstance() {
-    if (instance == null) {
-      instance = new ShowRisk();
-    }
-    return instance;
-  }
-
   interface MyUiBinder extends UiBinder<Widget, ShowRisk> {
   }
 
@@ -159,6 +152,13 @@ public class ShowRisk extends Composite {
         buttonHistory.setVisible(bundle.booleanValue());
       }
     });
+  }
+
+  public static ShowRisk getInstance() {
+    if (instance == null) {
+      instance = new ShowRisk();
+    }
+    return instance;
   }
 
   @Override

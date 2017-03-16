@@ -7,11 +7,9 @@
  */
 package org.roda.core.plugins.plugins.ingest;
 
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.common.MetadataFileUtils;
@@ -21,6 +19,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Permissions;
@@ -38,10 +37,13 @@ public class BagitToAIPPluginUtils {
   private static final String METADATA_VERSION = null;
   private static final String BAGIT_FILE_PATH_SEPARATOR = "/";
 
-  public static AIP bagitToAip(Bag bag, Path bagitPath, ModelService model, String metadataFilename,
-    List<String> ingestSIPIds, String ingestJobId, Optional<String> computedParentId, String createdBy)
-    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
-    AuthorizationDeniedException {
+  private BagitToAIPPluginUtils() {
+    // do nothing
+  }
+
+  public static AIP bagitToAip(Bag bag, ModelService model, String metadataFilename, List<String> ingestSIPIds,
+    String ingestJobId, Optional<String> computedParentId, String createdBy) throws RequestNotValidException,
+    NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException {
 
     BagInfoTxt bagInfoTxt = bag.getBagInfoTxt();
     String metadataAsString = MetadataFileUtils.generateMetadataFile(bagInfoTxt);
@@ -51,7 +53,6 @@ public class BagitToAIPPluginUtils {
     Permissions permissions = new Permissions();
 
     boolean notify = false;
-
     String aipType = RodaConstants.AIP_TYPE_MIXED;
 
     AIP aip = model.createAIP(state, computedParentId.orElse(null), aipType, permissions, ingestSIPIds, ingestJobId,
@@ -60,9 +61,8 @@ public class BagitToAIPPluginUtils {
     model.createDescriptiveMetadata(aip.getId(), metadataFilename, metadataAsPayload, METADATA_TYPE, METADATA_VERSION,
       notify);
 
-    String representationId = UUID.randomUUID().toString();
+    String representationId = IdUtils.createUUID();
     boolean original = true;
-
     String representationType = RodaConstants.REPRESENTATION_TYPE_MIXED;
 
     model.createRepresentation(aip.getId(), representationId, original, representationType, notify);
@@ -85,9 +85,7 @@ public class BagitToAIPPluginUtils {
     // FIXME 20160516 hsilva: put SIP inside the AIP
 
     model.notifyAipCreated(aip.getId());
-
     return model.retrieveAIP(aip.getId());
-
   }
 
 }

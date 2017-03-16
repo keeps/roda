@@ -32,7 +32,6 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.validation.ValidationException;
-import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.plugins.PluginHelper;
@@ -52,8 +51,8 @@ public class TikaFullTextPluginUtils {
     // do nothing
   }
 
-  public static LinkingIdentifier runTikaFullTextOnFile(IndexService index, ModelService model, StorageService storage,
-    File file, boolean doFeatureExtraction, boolean doFulltextExtraction) throws NotFoundException, GenericException,
+  public static LinkingIdentifier runTikaFullTextOnFile(ModelService model, StorageService storage, File file,
+    boolean doFeatureExtraction, boolean doFulltextExtraction) throws NotFoundException, GenericException,
     RequestNotValidException, AuthorizationDeniedException, ValidationException, IOException {
 
     boolean notify = true; // need to index tika properties...

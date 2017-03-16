@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
-import org.roda.core.common.IdUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -25,6 +24,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.filter.AndFiltersParameters;
@@ -303,7 +303,7 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
 
     final String fileId = IdUtils.getFileId(file);
     final Report fileReport = PluginHelper.initPluginReportItem(this, fileId, File.class, AIPState.ACTIVE);
-    PluginHelper.updatePartialJobReport(this, model, index, fileReport, false, job);
+    PluginHelper.updatePartialJobReport(this, model, fileReport, false, job);
 
     try {
       final FileFormat fileFormat = index
@@ -349,7 +349,7 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
     }
 
     jobReport.addReport(fileReport);
-    PluginHelper.updatePartialJobReport(this, model, index, fileReport, true, job);
+    PluginHelper.updatePartialJobReport(this, model, fileReport, true, job);
   }
 
   /**
@@ -484,7 +484,7 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
    */
   private void createRiskIncidence(final File file, final Report report, final ModelService model) {
     try {
-      final Risk risk = PluginHelper.createRiskIfNotExists(model, 0, RISK_ID, getClass().getClassLoader());
+      final Risk risk = PluginHelper.createRiskIfNotExists(model, RISK_ID, getClass().getClassLoader());
       final RiskIncidence incidence = new RiskIncidence();
       incidence.setDetectedOn(new Date());
       incidence.setDetectedBy(this.getName());

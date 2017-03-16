@@ -10,10 +10,10 @@ package org.roda.wui.common;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.log.LogEntryParameter;
@@ -58,7 +58,7 @@ public final class ControllerAssistantUtils {
   private static LogEntry createLogEntry(User user, String actionComponent, String actionMethod, String relatedObjectId,
     long duration, LOG_ENTRY_STATE state, List<LogEntryParameter> parameters) {
     LogEntry logEntry = new LogEntry();
-    logEntry.setId(UUID.randomUUID().toString());
+    logEntry.setId(IdUtils.createUUID());
     logEntry.setAddress(user.getIpAddress());
     logEntry.setUsername(user.getName());
     logEntry.setActionComponent(actionComponent);

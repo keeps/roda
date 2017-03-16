@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
@@ -52,6 +51,7 @@ import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
@@ -67,7 +67,6 @@ import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.log.LogEntryParameter;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
-import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.DefaultStoragePath;
@@ -303,7 +302,7 @@ public class ModelServiceTest {
   public void testCreateAIPVersionEAD3() throws RODAException, ParseException, IOException, XmlException {
 
     // generate AIP ID
-    final String aipId = UUID.randomUUID().toString();
+    final String aipId = IdUtils.createUUID();
 
     // testing AIP
     final AIP aip = model.createAIP(aipId, corporaService,
@@ -349,7 +348,7 @@ public class ModelServiceTest {
   public void testCreateAIPVersionUnknown() throws RODAException, ParseException, IOException, XmlException {
 
     // generate AIP ID
-    final String aipId = UUID.randomUUID().toString();
+    final String aipId = IdUtils.createUUID();
 
     // testing AIP
     final AIP aip = model.createAIP(aipId, corporaService,
@@ -395,7 +394,7 @@ public class ModelServiceTest {
   public void testCreateAIPWithSubFolders() throws RODAException, ParseException, IOException {
 
     // generate AIP ID
-    final String aipId = UUID.randomUUID().toString();
+    final String aipId = IdUtils.createUUID();
 
     // testing AIP
     model.createAIP(aipId, corporaService,
@@ -424,8 +423,6 @@ public class ModelServiceTest {
     assertTrue(reusableList.contains(new File("RODA 2 logo-circle-white.svg", aipId,
       CorporaConstants.REPRESENTATION_1_ID, Arrays.asList("folder"), false)));
 
-    // assertThat(allFiles, containsInAnyOrder());
-
     // cleanup
     model.deleteAIP(aipId);
   }
@@ -433,7 +430,7 @@ public class ModelServiceTest {
   @Test
   public void testDeleteAIP() throws RODAException {
     // generate AIP ID
-    final String aipId = UUID.randomUUID().toString();
+    final String aipId = IdUtils.createUUID();
 
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
@@ -486,9 +483,9 @@ public class ModelServiceTest {
   public void testListAIPs() throws RODAException {
 
     // generate AIP ID
-    final String aip1Id = UUID.randomUUID().toString();
-    final String aip2Id = UUID.randomUUID().toString();
-    final String aip3Id = UUID.randomUUID().toString();
+    final String aip1Id = IdUtils.createUUID();
+    final String aip2Id = IdUtils.createUUID();
+    final String aip3Id = IdUtils.createUUID();
 
     final AIP aip1 = model.createAIP(aip1Id, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
@@ -517,7 +514,7 @@ public class ModelServiceTest {
   @Test
   public void testCreateAIPWithExistingId() throws RODAException {
     // generate AIP ID
-    final String aipId = UUID.randomUUID().toString();
+    final String aipId = IdUtils.createUUID();
 
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
@@ -540,7 +537,7 @@ public class ModelServiceTest {
   @Test
   public void testUpdateAIP() throws RODAException, IOException {
     // set up
-    final String aipId = UUID.randomUUID().toString();
+    final String aipId = IdUtils.createUUID();
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
       RodaConstants.ADMIN);
@@ -564,7 +561,7 @@ public class ModelServiceTest {
   @Test
   public void testListDescriptiveMetadata() throws RODAException {
     // set up
-    final String aipId = UUID.randomUUID().toString();
+    final String aipId = IdUtils.createUUID();
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
       RodaConstants.ADMIN);
@@ -582,12 +579,12 @@ public class ModelServiceTest {
   @Test
   public void testCreateDescriptiveMetadata() throws RODAException, IOException {
     // set up
-    final String aipId = UUID.randomUUID().toString();
+    final String aipId = IdUtils.createUUID();
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
       RodaConstants.ADMIN);
 
-    final String newDescriptiveMetadataId = UUID.randomUUID().toString();
+    final String newDescriptiveMetadataId = IdUtils.createUUID();
     final Binary binary = corporaService
       .getBinary(DefaultStoragePath.parse(CorporaConstants.OTHER_DESCRIPTIVE_METADATA_STORAGEPATH));
 
@@ -612,9 +609,9 @@ public class ModelServiceTest {
   }
 
   @Test
-  public void testUpdateDescriptiveMetadata() throws RODAException, IOException, ValidationException {
+  public void testUpdateDescriptiveMetadata() throws RODAException, IOException {
     // set up
-    final String aipId = UUID.randomUUID().toString();
+    final String aipId = IdUtils.createUUID();
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
       RodaConstants.ADMIN);
@@ -663,7 +660,7 @@ public class ModelServiceTest {
   @Test
   public void testDeleteDescriptiveMetadata() throws RODAException {
     // set up
-    final String aipId = UUID.randomUUID().toString();
+    final String aipId = IdUtils.createUUID();
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
       RodaConstants.ADMIN);
@@ -685,7 +682,7 @@ public class ModelServiceTest {
   @Test
   public void testListRepresentations() throws RODAException {
     // set up
-    final String aipId = UUID.randomUUID().toString();
+    final String aipId = IdUtils.createUUID();
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
       RodaConstants.ADMIN);
@@ -707,12 +704,12 @@ public class ModelServiceTest {
   @Test
   public void testCreateRepresentation() throws RODAException, IOException {
     // set up
-    final String aipId = UUID.randomUUID().toString();
+    final String aipId = IdUtils.createUUID();
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
       RodaConstants.ADMIN);
 
-    final String newRepresentationId = UUID.randomUUID().toString();
+    final String newRepresentationId = IdUtils.createUUID();
     final StoragePath corporaRepresentationPath = DefaultStoragePath
       .parse(CorporaConstants.OTHER_REPRESENTATION_STORAGEPATH);
 
@@ -735,7 +732,7 @@ public class ModelServiceTest {
   @Test
   public void testUpdateRepresentation() throws RODAException, IOException {
     // set up
-    final String aipId = UUID.randomUUID().toString();
+    final String aipId = IdUtils.createUUID();
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
       RodaConstants.ADMIN);
@@ -761,7 +758,7 @@ public class ModelServiceTest {
   @Test
   public void testDeleteRepresentation() throws RODAException {
     // set up
-    final String aipId = UUID.randomUUID().toString();
+    final String aipId = IdUtils.createUUID();
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
       RodaConstants.ADMIN);
@@ -792,12 +789,12 @@ public class ModelServiceTest {
   @Test
   public void testCreateFile() throws RODAException, IOException {
     // set up
-    final String aipId = UUID.randomUUID().toString();
+    final String aipId = IdUtils.createUUID();
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
       RodaConstants.ADMIN);
 
-    final String newFileId = UUID.randomUUID().toString();
+    final String newFileId = IdUtils.createUUID();
     final List<String> newFileDirectoryPath = new ArrayList<>();
     final StoragePath corporaFilePath = DefaultStoragePath.parse(CorporaConstants.OTHER_FILE_STORAGEPATH);
     final Binary binary = corporaService.getBinary(corporaFilePath);
@@ -822,7 +819,7 @@ public class ModelServiceTest {
   @Test
   public void testUpdateFile() throws RODAException, IOException {
     // set up
-    final String aipId = UUID.randomUUID().toString();
+    final String aipId = IdUtils.createUUID();
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
       RodaConstants.ADMIN);
@@ -853,7 +850,7 @@ public class ModelServiceTest {
   @Test
   public void testDeleteFile() throws RODAException {
     // set up
-    final String aipId = UUID.randomUUID().toString();
+    final String aipId = IdUtils.createUUID();
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
       RodaConstants.ADMIN);
@@ -877,7 +874,7 @@ public class ModelServiceTest {
   @Test
   public void testRetrieveEventPreservationObject() throws RODAException {
     // set up
-    final String aipId = UUID.randomUUID().toString();
+    final String aipId = IdUtils.createUUID();
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
       RodaConstants.ADMIN);
@@ -1087,19 +1084,19 @@ public class ModelServiceTest {
       Path p;
       if (i % 2 == 0) {
         if (currentLevel > 1) {
-          p = Files.createFile(path.resolve(UUID.randomUUID().toString() + ".txt"));
+          p = Files.createFile(path.resolve(IdUtils.createUUID() + ".txt"));
           Files.write(p, "NUNCAMAISACABA".getBytes());
           fileCounter++;
         }
       } else {
-        p = Files.createDirectory(path.resolve(UUID.randomUUID().toString()));
+        p = Files.createDirectory(path.resolve(IdUtils.createUUID()));
         fileCounter++;
         if (currentLevel <= numberOfLevels) {
           populate(p, numberOfItemsByLevel, numberOfLevels, currentLevel, randomno);
         } else {
           if (currentLevel > 1) {
             for (int j = 0; j < numberOfItemsByLevel; j++) {
-              Path temp = Files.createFile(p.resolve(UUID.randomUUID().toString() + ".txt"));
+              Path temp = Files.createFile(p.resolve(IdUtils.createUUID() + ".txt"));
               Files.write(temp, "NUNCAMAISACABA".getBytes());
               fileCounter++;
             }

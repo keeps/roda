@@ -37,7 +37,6 @@ import config.i18n.client.ClientMessages;
 public class DisseminationActions extends AbstractActionable<IndexedDIP> {
 
   private static final DisseminationActions INSTANCE = new DisseminationActions();
-
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private static final Set<DisseminationAction> POSSIBLE_ACTIONS_ON_SINGLE_DISSEMINATION = new HashSet<>(
@@ -51,7 +50,6 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
 
   public enum DisseminationAction implements Actionable.Action<IndexedDIP> {
     DOWNLOAD, REMOVE, NEW_PROCESS, UPDATE_PERMISSIONS;
-    // UPLOAD_FILES, CREATE_FOLDER;
   }
 
   public static DisseminationActions get() {

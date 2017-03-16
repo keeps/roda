@@ -46,23 +46,23 @@ import com.google.common.collect.Sets;
 public class UserUtility {
   private static final Logger LOGGER = LoggerFactory.getLogger(UserUtility.class);
   public static final String RODA_USER = "RODA_USER";
-  private static String REGISTER_ACTIVE_PROPERTY = "ui.register.active";
-  private static String REGISTER_DEFAULT_GROUPS = "ui.register.defaultGroups";
-  private static String REGISTER_DEFAULT_ROLES = "ui.register.defaultRoles";
+  private static final String REGISTER_ACTIVE_PROPERTY = "ui.register.active";
+  private static final String REGISTER_DEFAULT_GROUPS = "ui.register.defaultGroups";
+  private static final String REGISTER_DEFAULT_ROLES = "ui.register.defaultRoles";
 
-  private static LdapUtility LDAP_UTILITY;
+  private static LdapUtility ldapUtility;
 
   /** Private empty constructor */
   private UserUtility() {
-
+    // do nothing
   }
 
   public static LdapUtility getLdapUtility() {
-    return LDAP_UTILITY;
+    return ldapUtility;
   }
 
-  public static void setLdapUtility(LdapUtility ldapUtility) {
-    LDAP_UTILITY = ldapUtility;
+  public static void setLdapUtility(LdapUtility utility) {
+    ldapUtility = utility;
   }
 
   public static User getApiUser(final HttpServletRequest request) throws AuthorizationDeniedException {
@@ -171,38 +171,7 @@ public class UserUtility {
    * @throws AuthorizationDeniedException
    */
   public static void checkTransferredResourceAccess(User user, List<String> ids) throws AuthorizationDeniedException {
-    // FIXME provide a better method for ensuring that producers don't change
-    // others files
-    // if ("admin".equalsIgnoreCase(user.getId())) {
-    // return;
-    // } else {
-    // for (String id : ids) {
-    //
-    // if (id == null && !"admin".equals(user.getName())) {
-    // throw new AuthorizationDeniedException(
-    // "The user '" + user.getId() + "' does not have permissions to create
-    // resource in root!");
-    // } else {
-    // try {
-    // IndexService index = RodaCoreFactory.getIndexService();
-    // TransferredResource parent = index.retrieve(TransferredResource.class,
-    // id);
-    // if
-    // (!Paths.get(parent.getRelativePath()).getName(0).toString().equalsIgnoreCase(user.getName()))
-    // {
-    // throw new AuthorizationDeniedException("The user '" + user.getId()
-    // + "' does not have permissions to access to transferred resource " + id +
-    // " !");
-    // }
-    // } catch (GenericException | NotFoundException e) {
-    // throw new AuthorizationDeniedException("The user '" + user.getId()
-    // + "' does not have permissions to access to transferred resource " + id +
-    // " !");
-    // }
-    //
-    // }
-    // }
-    // }
+    // do nothing
   }
 
   public static boolean isAdministrator(String username) {

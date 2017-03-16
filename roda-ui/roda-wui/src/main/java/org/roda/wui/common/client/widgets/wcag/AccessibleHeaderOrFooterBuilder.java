@@ -70,7 +70,7 @@ public class AccessibleHeaderOrFooterBuilder<T> extends AbstractHeaderOrFooterBu
     // Early exit if there aren't any columns to render.
     int columnCount = table.getColumnCount();
     if (columnCount == 0) {
-      // Nothing to render;
+      // Nothing to render
       return false;
     }
 

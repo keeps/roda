@@ -7,7 +7,6 @@
  */
 package org.roda.core.plugins.plugins.characterization;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
@@ -23,7 +22,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.bouncycastle.cms.CMSException;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.IdUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
@@ -32,6 +30,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
@@ -139,7 +138,7 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractA
           for (OptionalWithCause<File> oFile : allFiles) {
             if (oFile.isPresent()) {
               File file = oFile.get();
-              dipId = UUID.randomUUID().toString();
+              dipId = IdUtils.createUUID();
 
               FileLink fileLink = new FileLink(representation.getAipId(), representation.getId(), file.getPath(),
                 file.getId());
@@ -176,7 +175,7 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractA
           }
         } finally {
           report.addReport(reportItem);
-          PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+          PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
         }
       }
 
@@ -188,7 +187,7 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractA
 
       reportItem.setPluginState(pluginState);
       report.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
     }
 
     return report;
@@ -212,7 +211,7 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractA
         for (OptionalWithCause<File> oFile : allFiles) {
           if (oFile.isPresent()) {
             File file = oFile.get();
-            dipId = UUID.randomUUID().toString();
+            dipId = IdUtils.createUUID();
 
             Permissions aipPermissions = model.retrieveAIP(representation.getAipId()).getPermissions();
 
@@ -253,7 +252,7 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractA
         }
       } finally {
         report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
       }
     }
 
@@ -265,7 +264,7 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractA
     SimpleJobPluginInfo jobPluginInfo, List<File> list, Job job) throws PluginException {
 
     for (File file : list) {
-      String dipId = UUID.randomUUID().toString();
+      String dipId = IdUtils.createUUID();
 
       try {
         Permissions aipPermissions = model.retrieveAIP(file.getAipId()).getPermissions();
@@ -308,7 +307,7 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractA
           model.deleteDIP(dipId);
         } finally {
           report.addReport(reportItem);
-          PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+          PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
         }
       } catch (GenericException | AuthorizationDeniedException | RequestNotValidException | NotFoundException e1) {
         LOGGER.error("Error creating DIP for file " + file.getId());
@@ -357,7 +356,7 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractA
   private void addDIPFileSignature(ModelService model, StorageService storage, String dipId, List<String> filePath,
     String fileId, Path inputFile)
     throws RequestNotValidException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
-    NotFoundException, IOException, GeneralSecurityException, DocumentException, CMSException, FileNotFoundException {
+    NotFoundException, IOException, GeneralSecurityException, DocumentException, CMSException {
     ContentPayload payload = new FSPathContentPayload(inputFile);
     DIPFile dipFile = model.createDIPFile(dipId, filePath, fileId, inputFile.toFile().length(), payload, false);
     DirectResourceAccess dipFileDirectAccess = storage.getDirectAccess(ModelUtils.getDIPFileStoragePath(dipFile));

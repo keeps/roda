@@ -8,6 +8,7 @@
 package org.roda.wui.client.browse.bundle;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.roda.wui.client.browse.MetadataValue;
@@ -21,6 +22,12 @@ public class UserExtraBundle implements Serializable {
 
   public UserExtraBundle() {
     super();
+  }
+
+  public UserExtraBundle(String userName) {
+    super();
+    this.userName = userName;
+    this.values = new HashSet<>();
   }
 
   public UserExtraBundle(String userName, Set<MetadataValue> values) {

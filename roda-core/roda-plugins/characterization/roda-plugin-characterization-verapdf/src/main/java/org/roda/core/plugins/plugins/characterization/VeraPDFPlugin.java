@@ -16,7 +16,6 @@ import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.IdUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
@@ -26,6 +25,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.common.Pair;
@@ -150,7 +150,7 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractAIPComponents
       LOGGER.debug("Processing AIP {}", aip.getId());
       Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING)
         .setHtmlPluginDetails(true);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
       PluginState pluginResultState = PluginState.SUCCESS;
       PluginState reportState = PluginState.SUCCESS;
       ValidationReport validationReport = new ValidationReport();
@@ -261,7 +261,7 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractAIPComponents
       }
 
       report.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
     }
 
     return report;
@@ -279,7 +279,7 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractAIPComponents
         Report reportItem = PluginHelper
           .initPluginReportItem(this, IdUtils.getRepresentationId(representation), Representation.class)
           .setHtmlPluginDetails(true);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
         PluginState pluginResultState = PluginState.SUCCESS;
         PluginState reportState = PluginState.SUCCESS;
         AIP aip = model.retrieveAIP(representation.getAipId());
@@ -387,7 +387,7 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractAIPComponents
         }
 
         report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
       }
 
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
@@ -411,7 +411,7 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractAIPComponents
 
       try {
         List<File> failedList = new ArrayList<>();
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
         PluginState pluginResultState = PluginState.SUCCESS;
 
         LOGGER.debug("Processing file: {}", file);
@@ -487,7 +487,7 @@ public class VeraPDFPlugin<T extends IsRODAObject> extends AbstractAIPComponents
       } finally {
         reportItem.setPluginState(reportState);
         report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
       }
     }
 

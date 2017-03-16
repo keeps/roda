@@ -201,8 +201,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   }
 
   private void download(IndexedAIP aip, AsyncCallback<ActionImpact> callback) {
-    SafeUri downloadUri;
-    downloadUri = RestUtils.createAIPDownloadUri(aip.getId());
+    SafeUri downloadUri = RestUtils.createAIPDownloadUri(aip.getId());
     Window.Location.assign(downloadUri.asString());
     callback.onSuccess(ActionImpact.NONE);
   }

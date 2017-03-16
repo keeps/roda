@@ -96,7 +96,7 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
         SimpleJobPluginInfo jobPluginInfo, Plugin<Void> plugin) {
-        fixAncestors(index, model, report, cachedJob, jobPluginInfo, jobPluginInfo.getSourceObjectsCount());
+        fixAncestors(index, model, report, jobPluginInfo, jobPluginInfo.getSourceObjectsCount());
       }
     }, index, model, storage, counter);
   }
@@ -118,8 +118,8 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
     return count;
   }
 
-  private void fixAncestors(IndexService index, ModelService model, Report report, Job cachedJob,
-    SimpleJobPluginInfo jobPluginInfo, int counter) {
+  private void fixAncestors(IndexService index, ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo,
+    int counter) {
     try {
       Optional<String> computedSearchScope = PluginHelper.getSearchScopeFromParameters(this, model);
       Job originalJob = PluginHelper.getJob(originalJobId, model);

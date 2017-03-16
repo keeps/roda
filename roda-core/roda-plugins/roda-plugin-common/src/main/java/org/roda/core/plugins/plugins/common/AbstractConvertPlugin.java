@@ -16,13 +16,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.xmlbeans.XmlException;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.IdUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
@@ -33,6 +31,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
@@ -243,7 +242,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
       List<File> unchangedFiles = new ArrayList<>();
 
       for (Representation representation : aip.getRepresentations()) {
-        newRepresentationID = UUID.randomUUID().toString();
+        newRepresentationID = IdUtils.createUUID();
         PluginState pluginResultState = PluginState.SUCCESS;
 
         Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getRepresentationId(representation),
@@ -385,7 +384,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
           reportItem.setPluginState(pluginResultState).setPluginDetails(e.getMessage());
         } finally {
           report.addReport(reportItem);
-          PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+          PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
 
           if (!createDIP) {
             try {
@@ -425,7 +424,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
 
     for (Representation representation : list) {
       List<File> unchangedFiles = new ArrayList<>();
-      String newRepresentationID = UUID.randomUUID().toString();
+      String newRepresentationID = IdUtils.createUUID();
       List<File> alteredFiles = new ArrayList<>();
       List<File> newFiles = new ArrayList<>();
       List<DIPFile> newDIPFiles = new ArrayList<>();
@@ -550,8 +549,8 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
             LOGGER.error("Cannot process AIP representation file", oFile.getCause());
           }
         }
-        IOUtils.closeQuietly(allFiles);
 
+        IOUtils.closeQuietly(allFiles);
         reportItem.setPluginState(reportState);
 
         if (reportState.equals(PluginState.SUCCESS) && ignoreFiles && !validationReport.getIssues().isEmpty()) {
@@ -564,7 +563,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
         }
 
         report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
 
         // add unchanged files to the new representation
         if (!alteredFiles.isEmpty()) {
@@ -633,7 +632,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
           reportItem.setOutcomeObjectClass(DIP.class.getName());
         }
 
-        newRepresentationID = UUID.randomUUID().toString();
+        newRepresentationID = IdUtils.createUUID();
         pluginResultState = PluginState.SUCCESS;
 
         if (!file.isDirectory()) {
@@ -749,7 +748,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
       } finally {
         reportItem.setPluginState(pluginResultState);
         report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
       }
 
       boolean notifyEvent = false;

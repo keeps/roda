@@ -9,7 +9,6 @@ package org.roda.core.plugins;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermission;
@@ -139,8 +138,8 @@ public class ReplicationPluginTest {
     return new ByteArrayInputStream(RandomStringUtils.randomAscii(GENERATED_FILE_SIZE).getBytes());
   }
 
-  private String createCorpora() throws InterruptedException, IOException, FileAlreadyExistsException,
-    NotFoundException, GenericException, RequestNotValidException, AlreadyExistsException {
+  private String createCorpora() throws InterruptedException, IOException, NotFoundException, GenericException,
+    RequestNotValidException, AlreadyExistsException {
     TransferredResourcesScanner f = RodaCoreFactory.getTransferredResourcesScanner();
 
     String parentUUID = f.createFolder(null, "test").getUUID();
@@ -151,7 +150,7 @@ public class ReplicationPluginTest {
   }
 
   private TransferredResource createCorpora(String parentUUID, int i) throws InterruptedException, IOException,
-    FileAlreadyExistsException, NotFoundException, GenericException, RequestNotValidException, AlreadyExistsException {
+    NotFoundException, GenericException, RequestNotValidException, AlreadyExistsException {
     TransferredResourcesScanner f = RodaCoreFactory.getTransferredResourcesScanner();
 
     String test1UUID = f.createFolder(parentUUID, "test" + i).getUUID();
@@ -161,9 +160,9 @@ public class ReplicationPluginTest {
     return index.retrieve(TransferredResource.class, test1UUID, new ArrayList<>());
   }
 
-  private List<String> ingestCorpora() throws RequestNotValidException, NotFoundException, GenericException,
-    AlreadyExistsException, AuthorizationDeniedException, InvalidParameterException, InterruptedException, IOException,
-    FileAlreadyExistsException, SolrServerException {
+  private List<String> ingestCorpora()
+    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException, InvalidParameterException, InterruptedException, IOException, SolrServerException {
 
     if (parentResourceUUID == null) {
       parentResourceUUID = createCorpora();
@@ -186,9 +185,9 @@ public class ReplicationPluginTest {
   }
 
   @Test
-  private void testRsyncViaListOfIds() throws FileAlreadyExistsException, RequestNotValidException, NotFoundException,
-    GenericException, AlreadyExistsException, AuthorizationDeniedException, InvalidParameterException,
-    InterruptedException, IOException, SolrServerException, JobAlreadyStartedException, CommandException {
+  private void testRsyncViaListOfIds() throws RequestNotValidException, NotFoundException, GenericException,
+    AlreadyExistsException, AuthorizationDeniedException, InvalidParameterException, InterruptedException, IOException,
+    SolrServerException, JobAlreadyStartedException, CommandException {
     // increase number of job workers
     int originalNumberOfJobWorkers = JobsHelper.getNumberOfJobsWorkers();
     JobsHelper.setNumberOfJobsWorkers(originalNumberOfJobWorkers * 2);
@@ -252,9 +251,9 @@ public class ReplicationPluginTest {
   }
 
   @Test(enabled = false)
-  private void testRsyncViaFilter() throws FileAlreadyExistsException, RequestNotValidException, NotFoundException,
-    GenericException, AlreadyExistsException, AuthorizationDeniedException, InvalidParameterException,
-    InterruptedException, IOException, SolrServerException, JobAlreadyStartedException, CommandException {
+  private void testRsyncViaFilter() throws RequestNotValidException, NotFoundException, GenericException,
+    AlreadyExistsException, AuthorizationDeniedException, InvalidParameterException, InterruptedException, IOException,
+    SolrServerException, JobAlreadyStartedException, CommandException {
     // increase sync job execution timeout in seconds
     JobsHelper.setSyncTimeout(1200);
     JobsHelper.setBlockSize(100);

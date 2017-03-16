@@ -53,7 +53,7 @@ public final class OOXMLSignatureUtils {
 
   /** Private empty constructor */
   private OOXMLSignatureUtils() {
-
+    // do nothing
   }
 
   public static String runDigitalSignatureVerify(Path input) throws IOException, GeneralSecurityException {

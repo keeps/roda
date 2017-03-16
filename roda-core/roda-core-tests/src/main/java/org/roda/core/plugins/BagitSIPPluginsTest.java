@@ -9,7 +9,6 @@ package org.roda.core.plugins;
 
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -105,8 +104,8 @@ public class BagitSIPPluginsTest {
     FSUtils.deletePath(basePath);
   }
 
-  private TransferredResource createCorpora() throws InterruptedException, IOException, FileAlreadyExistsException,
-    NotFoundException, GenericException, RequestNotValidException, AlreadyExistsException {
+  private TransferredResource createCorpora() throws InterruptedException, IOException, NotFoundException,
+    GenericException, RequestNotValidException, AlreadyExistsException {
     TransferredResourcesScanner f = RodaCoreFactory.getTransferredResourcesScanner();
 
     Path sip = corporaPath.resolve(CorporaConstants.SIP_FOLDER).resolve(CorporaConstants.BAGIT_SIP);
@@ -121,9 +120,9 @@ public class BagitSIPPluginsTest {
     return transferredResource;
   }
 
-  private AIP ingestCorpora() throws RequestNotValidException, NotFoundException, GenericException,
-    AlreadyExistsException, AuthorizationDeniedException, InvalidParameterException, InterruptedException, IOException,
-    FileAlreadyExistsException, SolrServerException {
+  private AIP ingestCorpora()
+    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException, InvalidParameterException, InterruptedException, IOException, SolrServerException {
     String parentId = null;
     String aipType = RodaConstants.AIP_TYPE_MIXED;
 

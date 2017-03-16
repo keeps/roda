@@ -38,17 +38,6 @@ public class StringContentPayload implements ContentPayload {
   public void writeToPath(Path path) throws IOException {
     InputStream inputStream = createInputStream();
     FSUtils.safeUpdate(inputStream, path);
-
-    // try {
-    // Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
-    // } catch (FileAlreadyExistsException e) {
-    // // XFS sometimes sends this exception
-    // // although we've chosen to replace existing
-    // FSUtils.deletePathQuietly(path);
-    // Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
-    // } finally {
-    // IOUtils.closeQuietly(inputStream);
-    // }
   }
 
   @Override

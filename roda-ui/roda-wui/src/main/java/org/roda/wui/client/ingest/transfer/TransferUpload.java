@@ -103,20 +103,6 @@ public class TransferUpload extends Composite {
     }
   };
 
-  private static TransferUpload instance = null;
-
-  /**
-   * Get the singleton instance
-   * 
-   * @return the instance
-   */
-  public static TransferUpload getInstance() {
-    if (instance == null) {
-      instance = new TransferUpload();
-    }
-    return instance;
-  }
-
   interface MyUiBinder extends UiBinder<Widget, TransferUpload> {
   }
 
@@ -162,10 +148,23 @@ public class TransferUpload extends Composite {
   @SuppressWarnings("unused")
   private HandlerRegistration handlerRegistration;
 
+  private static TransferUpload instance = null;
   protected boolean verified = false;
 
   private TransferUpload() {
     initWidget(uiBinder.createAndBindUi(this));
+  }
+
+  /**
+   * Get the singleton instance
+   * 
+   * @return the instance
+   */
+  public static TransferUpload getInstance() {
+    if (instance == null) {
+      instance = new TransferUpload();
+    }
+    return instance;
   }
 
   @Override

@@ -100,10 +100,12 @@ public class PreservationEvents extends Composite {
       UserLogin.getInstance().checkRoles(new HistoryResolver[] {BrowseAIP.RESOLVER}, false, callback);
     }
 
+    @Override
     public List<String> getHistoryPath() {
       return ListUtils.concat(BrowseAIP.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
+    @Override
     public String getHistoryToken() {
       return "events";
     }
@@ -127,18 +129,16 @@ public class PreservationEvents extends Composite {
       UserLogin.getInstance().checkRole(this, callback);
     }
 
+    @Override
     public List<String> getHistoryPath() {
       return ListUtils.concat(Planning.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
+    @Override
     public String getHistoryToken() {
       return "events";
     }
   };
-
-  public static final List<String> getViewItemHistoryToken(String id) {
-    return ListUtils.concat(BROWSE_RESOLVER.getHistoryPath(), id);
-  }
 
   interface MyUiBinder extends UiBinder<Widget, PreservationEvents> {
   }
@@ -273,6 +273,10 @@ public class PreservationEvents extends Composite {
     }
   }
 
+  public static final List<String> getViewItemHistoryToken(String id) {
+    return ListUtils.concat(BROWSE_RESOLVER.getHistoryPath(), id);
+  }
+
   @Override
   protected void onLoad() {
     super.onLoad();
@@ -340,8 +344,7 @@ public class PreservationEvents extends Composite {
         @Override
         public void onSuccess(IndexedFile file) {
           BrowserService.Util.getInstance().retrieveBrowseFileBundle(file.getAipId(), file.getRepresentationId(),
-            file.getPath(), file.getId(), LocaleInfo.getCurrentLocale().getLocaleName(), fileFieldsToReturn,
-            new AsyncCallback<BrowseFileBundle>() {
+            file.getPath(), file.getId(), fileFieldsToReturn, new AsyncCallback<BrowseFileBundle>() {
 
               @Override
               public void onFailure(Throwable caught) {

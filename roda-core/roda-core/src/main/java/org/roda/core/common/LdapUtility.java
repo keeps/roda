@@ -728,7 +728,7 @@ public class LdapUtility {
    *           if some error occurred.
    */
   public Group modifyGroup(final Group modifiedGroup)
-    throws NotFoundException, IllegalOperationException, GenericException, GenericException {
+    throws NotFoundException, IllegalOperationException, GenericException {
     return modifyGroup(modifiedGroup, false);
   }
 
@@ -1349,7 +1349,7 @@ public class LdapUtility {
    *           if some error occurred.
    */
   private Group modifyGroup(final Group modifiedGroup, final boolean force)
-    throws NotFoundException, IllegalOperationException, GenericException, GenericException {
+    throws NotFoundException, IllegalOperationException, GenericException {
 
     if (!force && this.ldapProtectedGroups.contains(modifiedGroup.getName())) {
       throw new IllegalOperationException(
@@ -2008,7 +2008,7 @@ public class LdapUtility {
     return value;
   }
 
-  public void resetAdminAccess(final String password) throws GenericException, GenericException {
+  public void resetAdminAccess(final String password) throws GenericException {
     try {
 
       final CoreSession session = this.service.getAdminSession();

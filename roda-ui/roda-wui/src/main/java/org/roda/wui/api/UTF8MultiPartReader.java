@@ -103,7 +103,7 @@ public class UTF8MultiPartReader implements MessageBodyReader<MultiPart> {
   public MultiPart readFrom(Class<MultiPart> type, Type genericType, Annotation[] annotations, MediaType mediaType,
     MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws IOException, WebApplicationException {
     try {
-      return readMultiPart(type, genericType, annotations, mediaType, httpHeaders, entityStream);
+      return readMultiPart(genericType, annotations, mediaType, httpHeaders, entityStream);
     } catch (final MIMEParsingException mpe) {
       if (mpe.getCause() instanceof IOException) {
         throw (IOException) mpe.getCause();
@@ -113,9 +113,8 @@ public class UTF8MultiPartReader implements MessageBodyReader<MultiPart> {
     }
   }
 
-  protected MultiPart readMultiPart(final Class<MultiPart> type, final Type genericType, final Annotation[] annotations,
-    MediaType mediaType, final MultivaluedMap<String, String> headers, final InputStream stream)
-    throws IOException, MIMEParsingException {
+  protected MultiPart readMultiPart(final Type genericType, final Annotation[] annotations, MediaType mediaType,
+    final MultivaluedMap<String, String> headers, final InputStream stream) throws IOException, MIMEParsingException {
     MediaType media = unquoteMediaTypeParameters(mediaType, "boundary");
 
     final MIMEMessage mimeMessage = new MIMEMessage(stream, media.getParameters().get("boundary"), mimeConfig);

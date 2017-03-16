@@ -15,7 +15,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.hamcrest.MatcherAssert;
@@ -26,6 +25,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -94,7 +94,7 @@ public final class TestsHelper {
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
     Job job = new Job();
-    job.setId(UUID.randomUUID().toString());
+    job.setId(IdUtils.createUUID());
     job.setName(plugin.getName());
     job.setPlugin(plugin.getName());
     job.setPluginParameters(pluginParameters);
@@ -125,7 +125,7 @@ public final class TestsHelper {
     JOB_STATE expectedJobState)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     Job job = new Job();
-    job.setId(UUID.randomUUID().toString());
+    job.setId(IdUtils.createUUID());
     job.setName(plugin.getName());
     job.setPlugin(plugin.getName());
     job.setPluginParameters(pluginParameters);

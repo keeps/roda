@@ -26,7 +26,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.configuration.ConfigurationException;
@@ -37,19 +36,17 @@ import org.hamcrest.collection.IsCollectionWithSize;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
-import org.roda.core.common.IdUtils;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.common.notifications.EmailNotificationProcessor;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.exceptions.UserAlreadyExistsException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexRunnable;
@@ -178,7 +175,7 @@ public class IndexServiceTest {
   @Test
   public void testAIPIndexCreateDelete() throws RODAException, ParseException {
     // generate AIP ID
-    final String aipId = UUID.randomUUID().toString();
+    final String aipId = IdUtils.createUUID();
 
     // Create AIP
     final AIP aip = model.createAIP(aipId, corporaService,
@@ -230,27 +227,6 @@ public class IndexServiceTest {
     List<String> representationIds = aip.getRepresentations().stream().map(r -> r.getId()).collect(Collectors.toList());
     MatcherAssert.assertThat(sro_IDs, Matchers.contains(representationIds.toArray()));
 
-    /*
-     * filterMimetype.add(new SimpleFilterParameter(RodaConstants.SRFM_MIMETYPE,
-     * CorporaConstants.TEXT_XML));
-     * assertEquals(index.find(SimpleEventPreservationMetadata.class,
-     * filterMimetype, null, new Sublist(0, 10)).getTotalCount(),1L);
-     */
-
-    /*
-     * SimpleRepresentationPreservationMetadata srpm =
-     * index.retrieveSimpleRepresentationPreservationMetadata(aipId,
-     * CorporaConstants.REPRESENTATION_1_ID,CorporaConstants.
-     * REPRESENTATION_PREMIS_XML); assertEquals(srpm.getAipId(), aipId);
-     * assertEquals(srpm.getFileId(),CorporaConstants.
-     * REPRESENTATION_PREMIS_XML); Filter filterFileId = new Filter();
-     * filterFileId.add(new SimpleFilterParameter(RodaConstants.SRPM_FILE_ID,
-     * CorporaConstants.REPRESENTATION_PREMIS_XML));
-     * assertEquals(""+index.countSimpleRepresentationPreservationMetadata(
-     * filterFileId),""+1L);
-     * assertEquals(index.find(SimpleEventPreservationMetadata.class,
-     * filterFileId, null, new Sublist(0, 10)).getTotalCount(),1L);
-     */
     model.deleteAIP(aipId);
     try {
       index.retrieve(IndexedAIP.class, aipId, new ArrayList<>());
@@ -265,7 +241,7 @@ public class IndexServiceTest {
 
   @Test
   public void testAIPIndexCreateDelete2() throws RODAException {
-    final String aipId = UUID.randomUUID().toString();
+    final String aipId = IdUtils.createUUID();
 
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID_3),
@@ -289,7 +265,7 @@ public class IndexServiceTest {
   @Test
   public void testAIPUpdate() throws RODAException {
     // generate AIP ID
-    final String aipId = UUID.randomUUID().toString();
+    final String aipId = IdUtils.createUUID();
 
     // testing AIP
     model.createAIP(aipId, corporaService,
@@ -384,7 +360,7 @@ public class IndexServiceTest {
   @Test
   public void testGetElementWithoutParentId() throws RODAException {
     // generate AIP ID
-    final String aipId = UUID.randomUUID().toString();
+    final String aipId = IdUtils.createUUID();
 
     // Create AIP
     model.createAIP(aipId, corporaService,
@@ -522,7 +498,7 @@ public class IndexServiceTest {
     index.clearIndex(RodaConstants.INDEX_AIP);
 
     for (int i = 0; i < 10; i++) {
-      final String aipId = UUID.randomUUID().toString();
+      final String aipId = IdUtils.createUUID();
       model.createAIP(aipId, corporaService,
         DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID), false,
         RodaConstants.ADMIN);
@@ -536,7 +512,7 @@ public class IndexServiceTest {
 
   @Test
   public void indexMembers() throws AlreadyExistsException, GenericException, RequestNotValidException,
-    EmailAlreadyExistsException, UserAlreadyExistsException, IllegalOperationException, NotFoundException {
+    IllegalOperationException, NotFoundException {
     Set<String> groups = new HashSet<>();
     groups.add("administrators");
 
@@ -591,7 +567,7 @@ public class IndexServiceTest {
   public void testIdWithComma() throws RODAException {
     // generate AIP ID
     final String origAipId = "id, with, comma";
-    final String aipId = UUID.nameUUIDFromBytes(origAipId.getBytes()).toString();
+    final String aipId = IdUtils.createUUID(origAipId);
 
     // Create AIP
     model.createAIP(aipId, corporaService,
@@ -604,8 +580,7 @@ public class IndexServiceTest {
       Collections.emptyList());
     assertEquals(1, find.getTotalCount());
 
-    IndexedAIP aip = index.retrieve(IndexedAIP.class, UUID.nameUUIDFromBytes(origAipId.getBytes()).toString(),
-      new ArrayList<>());
+    IndexedAIP aip = index.retrieve(IndexedAIP.class, aipId, new ArrayList<>());
     assertNotNull(aip);
 
     // cleanup

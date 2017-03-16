@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -25,7 +26,6 @@ import java.util.Map.Entry;
 import java.util.MissingResourceException;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -40,7 +40,6 @@ import org.roda.core.common.ConsumesOutputStream;
 import org.roda.core.common.DownloadUtils;
 import org.roda.core.common.EntityResponse;
 import org.roda.core.common.HandlebarsUtility;
-import org.roda.core.common.IdUtils;
 import org.roda.core.common.Messages;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.RodaUtils;
@@ -63,6 +62,7 @@ import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.LinkingObjectUtils;
 import org.roda.core.data.v2.common.ObjectPermission;
@@ -250,7 +250,7 @@ public class BrowserHelper {
   }
 
   public static BrowseFileBundle retrieveBrowseFileBundle(IndexedAIP aip, IndexedRepresentation representation,
-    IndexedFile file, Locale locale, User user) throws NotFoundException, GenericException, RequestNotValidException {
+    IndexedFile file, User user) throws NotFoundException, GenericException, RequestNotValidException {
     BrowseFileBundle bundle = new BrowseFileBundle();
 
     bundle.setAip(aip);
@@ -284,7 +284,6 @@ public class BrowserHelper {
     Filter dipsFilter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, file.getUUID()));
     Long dipCount = RodaCoreFactory.getIndexService().count(IndexedDIP.class, dipsFilter);
     bundle.setDipCount(dipCount);
-
     return bundle;
   }
 
@@ -305,8 +304,8 @@ public class BrowserHelper {
     }
     List<DescriptiveMetadataViewBundle> descriptiveMetadataList = new ArrayList<>();
 
-    if (listDescriptiveMetadataBinaries != null) { // Can be null when the AIP
-                                                   // is a ghost
+    // Can be null when the AIP is a ghost
+    if (listDescriptiveMetadataBinaries != null) {
       for (DescriptiveMetadata descriptiveMetadata : listDescriptiveMetadataBinaries) {
         DescriptiveMetadataViewBundle bundle = retrieveDescriptiveMetadataBundle(aipId, representationId,
           descriptiveMetadata, locale);
@@ -1256,8 +1255,8 @@ public class BrowserHelper {
     if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP.equals(acceptFormat)
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
-      CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationFiles;
-      preservationFiles = RodaCoreFactory.getModelService().listPreservationMetadata(aipId, representationId);
+      CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationFiles = RodaCoreFactory.getModelService()
+        .listPreservationMetadata(aipId, representationId);
       return getAIPRepresentationPreservationMetadataEntityResponse(aipId, representationId, startAgent, limitAgent,
         startEvent, limitEvent, startFile, limitFile, acceptFormat, preservationFiles);
     } else {
@@ -1327,7 +1326,7 @@ public class BrowserHelper {
     } catch (IOException e) {
       throw new GenericException("Error creating or updating AIP representation preservation metadata file", e);
     } finally {
-      if (file != null && FSUtils.exists(file)) {
+      if (FSUtils.exists(file)) {
         try {
           Files.delete(file);
         } catch (IOException e) {
@@ -1541,7 +1540,7 @@ public class BrowserHelper {
     String eventDescription = messages.getTranslation(RodaConstants.EVENT_UPDATE_ON_REPOSITORY);
 
     Job job = new Job();
-    job.setId(UUID.randomUUID().toString());
+    job.setId(IdUtils.createUUID());
     job.setName("Move AIP in hierarchy");
     job.setSourceObjects(selected);
     job.setPlugin(MovePlugin.class.getCanonicalName());
@@ -1586,7 +1585,7 @@ public class BrowserHelper {
   public static void deleteAIP(User user, SelectedItems<IndexedAIP> selected, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     Job job = new Job();
-    job.setId(UUID.randomUUID().toString());
+    job.setId(IdUtils.createUUID());
     job.setName("Delete AIP");
     job.setSourceObjects(selected);
     job.setPlugin(DeleteRODAObjectPlugin.class.getCanonicalName());
@@ -1608,7 +1607,7 @@ public class BrowserHelper {
   public static void deleteRepresentation(User user, SelectedItems<IndexedRepresentation> selected, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     Job job = new Job();
-    job.setId(UUID.randomUUID().toString());
+    job.setId(IdUtils.createUUID());
     job.setName("Delete representations");
     job.setSourceObjects(selected);
     job.setPlugin(DeleteRODAObjectPlugin.class.getCanonicalName());
@@ -1630,7 +1629,7 @@ public class BrowserHelper {
   public static void deleteFile(User user, SelectedItems<IndexedFile> selected, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     Job job = new Job();
-    job.setId(UUID.randomUUID().toString());
+    job.setId(IdUtils.createUUID());
     job.setName("Delete files");
     job.setSourceObjects(selected);
     job.setPlugin(DeleteRODAObjectPlugin.class.getCanonicalName());
@@ -1733,7 +1732,7 @@ public class BrowserHelper {
     }
   }
 
-  public static Representation updateRepresentation(User user, Representation representation) throws GenericException,
+  public static Representation updateRepresentation(Representation representation) throws GenericException,
     AuthorizationDeniedException, RequestNotValidException, NotFoundException, AlreadyExistsException {
     return RodaCoreFactory.getModelService().updateRepresentationInfo(representation);
   }
@@ -1966,14 +1965,15 @@ public class BrowserHelper {
           key += RodaConstants.METADATA_VERSION_SEPARATOR + version.toLowerCase();
         }
         String label = messages.getTranslation(key, type);
-        InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(RodaConstants.METADATA_TEMPLATE_FOLDER
-          + "/" + ((version != null) ? type + RodaConstants.METADATA_VERSION_SEPARATOR + version : type)
-          + RodaConstants.METADATA_TEMPLATE_EXTENSION);
 
         String template = null;
-        Set<MetadataValue> values = null;
-        if (templateStream != null) {
-          try {
+        Set<MetadataValue> values = new HashSet<>();
+        try (InputStream templateStream = RodaCoreFactory
+          .getConfigurationFileAsStream(RodaConstants.METADATA_TEMPLATE_FOLDER + "/"
+            + ((version != null) ? type + RodaConstants.METADATA_VERSION_SEPARATOR + version : type)
+            + RodaConstants.METADATA_TEMPLATE_EXTENSION)) {
+
+          if (templateStream != null) {
             template = IOUtils.toString(templateStream, RodaConstants.DEFAULT_ENCODING);
             values = ServerTools.transform(template);
             for (MetadataValue mv : values) {
@@ -2032,9 +2032,9 @@ public class BrowserHelper {
               }
 
             }
-          } catch (IOException e) {
-            LOGGER.error("Error getting the template from the stream", e);
           }
+        } catch (IOException e) {
+          LOGGER.error("Error getting the template from the stream", e);
         }
 
         supportedMetadata.add(new SupportedMetadataTypeBundle(id, type, version, label, template, values));
@@ -2150,10 +2150,9 @@ public class BrowserHelper {
         } else if (RODA_TYPE.TRANSFERRED_RESOURCE.equals(linkingType)) {
           String id = LinkingObjectUtils.getTransferredResourceIdFromLinkingId(idValue);
           if (id != null) {
-            String uuid = UUID.nameUUIDFromBytes(id.getBytes()).toString();
             List<String> resourceFields = Arrays.asList(RodaConstants.INDEX_UUID,
               RodaConstants.TRANSFERRED_RESOURCE_NAME, RodaConstants.TRANSFERRED_RESOURCE_FULLPATH);
-            TransferredResource tr = retrieve(TransferredResource.class, uuid, resourceFields);
+            TransferredResource tr = retrieve(TransferredResource.class, IdUtils.createUUID(id), resourceFields);
             transferredResources.put(idValue, tr);
           }
         } else {
@@ -2248,7 +2247,7 @@ public class BrowserHelper {
         Boolean.FALSE);
 
       Job job = new Job();
-      job.setId(UUID.randomUUID().toString());
+      job.setId(IdUtils.createUUID());
       job.setName("Update AIP permissions recursively");
       job.setSourceObjects(selectedItems);
       job.setPlugin(UpdateAIPPermissionsPlugin.class.getCanonicalName());
@@ -2490,7 +2489,7 @@ public class BrowserHelper {
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
     InvalidParameterException, JobAlreadyStartedException {
     Job job = new Job();
-    job.setId(UUID.randomUUID().toString());
+    job.setId(IdUtils.createUUID());
     job.setName("Delete risks");
     job.setSourceObjects(selected);
     job.setPlugin(DeleteRODAObjectPlugin.class.getCanonicalName());
@@ -2508,7 +2507,7 @@ public class BrowserHelper {
   public static void deleteFormat(User user, SelectedItems<Format> selected)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     Job job = new Job();
-    job.setId(UUID.randomUUID().toString());
+    job.setId(IdUtils.createUUID());
     job.setName("Delete formats");
     job.setSourceObjects(selected);
     job.setPlugin(DeleteRODAObjectPlugin.class.getCanonicalName());
@@ -2801,7 +2800,7 @@ public class BrowserHelper {
     }
 
     Job job = new Job();
-    job.setId(UUID.randomUUID().toString());
+    job.setId(IdUtils.createUUID());
     job.setName("Move files");
     job.setSourceObjects(selectedFiles);
     job.setPlugin(MovePlugin.class.getCanonicalName());
@@ -2836,7 +2835,7 @@ public class BrowserHelper {
     }
 
     Job job = new Job();
-    job.setId(UUID.randomUUID().toString());
+    job.setId(IdUtils.createUUID());
     job.setName("Move transferred resources");
     job.setSourceObjects(selected);
     job.setPlugin(MovePlugin.class.getCanonicalName());
@@ -2969,8 +2968,8 @@ public class BrowserHelper {
     }
   }
 
-  public static void updateMultipleIncidences(User user, SelectedItems<RiskIncidence> selected, String status,
-    String severity, Date mitigatedOn, String mitigatedBy, String mitigatedDescription)
+  public static void updateMultipleIncidences(SelectedItems<RiskIncidence> selected, String status, String severity,
+    Date mitigatedOn, String mitigatedBy, String mitigatedDescription)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     IndexService index = RodaCoreFactory.getIndexService();
     ModelService model = RodaCoreFactory.getModelService();
@@ -3154,7 +3153,7 @@ public class BrowserHelper {
   public static void createFormatIdentificationJob(User user, SelectedItems<?> selected) throws GenericException,
     JobAlreadyStartedException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     Job job = new Job();
-    job.setId(UUID.randomUUID().toString());
+    job.setId(IdUtils.createUUID());
     job.setName("Format identification using Siegfried");
     job.setSourceObjects(selected);
     job.setPlugin(SiegfriedPlugin.class.getCanonicalName());

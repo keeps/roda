@@ -21,7 +21,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -31,6 +30,7 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.jobs.Job;
@@ -225,7 +225,7 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
 
   private CSVPrinter createCSVPrinter() {
     Path jobCSVTempFolder = getJobCSVTempFolder();
-    Path csvTempFile = jobCSVTempFolder.resolve(UUID.randomUUID().toString() + ".csv");
+    Path csvTempFile = jobCSVTempFolder.resolve(IdUtils.createUUID() + ".csv");
 
     CSVFormat csvFileFormat = CSVFormat.DEFAULT.withRecordSeparator("\n");
     try (BufferedWriter fileWriter = Files.newBufferedWriter(csvTempFile)) {

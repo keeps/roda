@@ -52,8 +52,7 @@ import org.slf4j.LoggerFactory;
  * 
  */
 public class SignatureUtility {
-  private Logger LOGGER = LoggerFactory.getLogger(getClass());
-
+  private static final Logger LOGGER = LoggerFactory.getLogger(SignatureUtility.class);
   private static final String DEFAULT_PROVIDER = BouncyCastleProvider.PROVIDER_NAME;
 
   private final KeyStore ks;
@@ -110,9 +109,8 @@ public class SignatureUtility {
    * @throws InvalidAlgorithmParameterException
    * @throws CertStoreException
    */
-  public void initSign(String alias, char[] password)
-    throws UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, InvalidAlgorithmParameterException,
-    NoSuchProviderException, CertStoreException, CMSException {
+  public void initSign(String alias) throws UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException,
+    InvalidAlgorithmParameterException, NoSuchProviderException, CertStoreException, CMSException {
     java.security.cert.Certificate[] certificateChain = ks.getCertificateChain(alias);
     if (certificateChain != null) {
       List<java.security.cert.Certificate> certList = new ArrayList<>(Arrays.asList(certificateChain));

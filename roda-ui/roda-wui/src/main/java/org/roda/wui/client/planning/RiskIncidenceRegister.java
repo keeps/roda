@@ -329,7 +329,7 @@ public class RiskIncidenceRegister extends Composite {
 
   private void getFileBreadCrumbs() {
     BrowserService.Util.getInstance().retrieveBrowseFileBundle(aipId, representationId, filePath, fileId,
-      LocaleInfo.getCurrentLocale().getLocaleName(), fileFieldsToReturn, new AsyncCallback<BrowseFileBundle>() {
+      fileFieldsToReturn, new AsyncCallback<BrowseFileBundle>() {
 
         @Override
         public void onFailure(Throwable caught) {

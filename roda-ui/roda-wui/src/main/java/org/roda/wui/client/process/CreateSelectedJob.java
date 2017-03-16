@@ -147,7 +147,7 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
   @UiField
   Button buttonCancel;
 
-  public CreateSelectedJob(Class<T> classToReceive, final List<PluginType> pluginType) {
+  public CreateSelectedJob(final List<PluginType> pluginType) {
     this.selected = LastSelectedItemsSingleton.getInstance().getSelectedItems();
 
     initWidget(uiBinder.createAndBindUi(this));

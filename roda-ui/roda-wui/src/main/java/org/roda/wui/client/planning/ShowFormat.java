@@ -73,13 +73,6 @@ public class ShowFormat extends Composite {
 
   private static ShowFormat instance = null;
 
-  public static ShowFormat getInstance() {
-    if (instance == null) {
-      instance = new ShowFormat();
-    }
-    return instance;
-  }
-
   interface MyUiBinder extends UiBinder<Widget, ShowFormat> {
   }
 
@@ -327,6 +320,13 @@ public class ShowFormat extends Composite {
         formatVersionsValue.add(parPanel);
       }
     }
+  }
+
+  public static ShowFormat getInstance() {
+    if (instance == null) {
+      instance = new ShowFormat();
+    }
+    return instance;
   }
 
   @Override

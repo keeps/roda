@@ -8,6 +8,7 @@
 package org.roda.wui.api.controllers;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -44,7 +45,7 @@ public class Risks extends RodaWuiController {
     Risk createdRisk = RodaCoreFactory.getModelService().createRisk(risk, false);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "risk", risk);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_RISK_PARAM, risk);
     return createdRisk;
   }
 
@@ -58,7 +59,7 @@ public class Risks extends RodaWuiController {
     Risk updatedRisk = RodaCoreFactory.getModelService().updateRisk(risk, null, false, 0);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "risk", risk);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_RISK_PARAM, risk);
     return updatedRisk;
   }
 
@@ -73,7 +74,7 @@ public class Risks extends RodaWuiController {
     RodaCoreFactory.getModelService().deleteRisk(riskId, false);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "riskId", riskId);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_RISK_ID_PARAM, riskId);
   }
 
   public static RiskIncidence createRiskIncidence(User user, RiskIncidence incidence)
@@ -86,7 +87,8 @@ public class Risks extends RodaWuiController {
     RiskIncidence createdIncidence = RodaCoreFactory.getModelService().createRiskIncidence(incidence, false);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "incidence", incidence);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_INCIDENCE_PARAM,
+      incidence);
     return createdIncidence;
   }
 
@@ -100,7 +102,8 @@ public class Risks extends RodaWuiController {
     RiskIncidence updatedIncidence = RodaCoreFactory.getModelService().updateRiskIncidence(incidence, false);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "incidence", incidence);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_INCIDENCE_PARAM,
+      incidence);
     return updatedIncidence;
   }
 
@@ -115,7 +118,8 @@ public class Risks extends RodaWuiController {
     RodaCoreFactory.getModelService().deleteRiskIncidence(incidenceId, false);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "incidenceId", incidenceId);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_INCIDENCE_PARAM,
+      incidenceId);
   }
 
   /*

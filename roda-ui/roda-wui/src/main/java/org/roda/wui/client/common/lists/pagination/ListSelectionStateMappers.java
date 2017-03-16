@@ -21,67 +21,61 @@ import com.google.gwt.core.client.GWT;
 public class ListSelectionStateMappers {
 
   // IndexedAIP
-
-  public static interface IndexedAIP_MAPPER extends ObjectMapper<ListSelectionState<IndexedAIP>> {
+  public static interface IndexedAIPMapper extends ObjectMapper<ListSelectionState<IndexedAIP>> {
   }
 
-  private static IndexedAIP_MAPPER IndexedAIP_MAPPER = GWT.create(IndexedAIP_MAPPER.class);
+  private static IndexedAIPMapper indexedAIPMapper = GWT.create(IndexedAIPMapper.class);
 
   // IndexedRepresentation
-
-  public static interface IndexedRepresentation_MAPPER extends ObjectMapper<ListSelectionState<IndexedRepresentation>> {
+  public static interface IndexedRepresentationMapper extends ObjectMapper<ListSelectionState<IndexedRepresentation>> {
   }
 
-  private static IndexedRepresentation_MAPPER IndexedRepresentation_MAPPER = GWT
-    .create(IndexedRepresentation_MAPPER.class);
+  private static IndexedRepresentationMapper indexedRepresentationMapper = GWT
+    .create(IndexedRepresentationMapper.class);
 
   // IndexedFile
-
-  public static interface IndexedFile_MAPPER extends ObjectMapper<ListSelectionState<IndexedFile>> {
+  public static interface IndexedFileMapper extends ObjectMapper<ListSelectionState<IndexedFile>> {
   }
 
-  private static IndexedFile_MAPPER IndexedFile_MAPPER = GWT.create(IndexedFile_MAPPER.class);
+  private static IndexedFileMapper indexedFileMapper = GWT.create(IndexedFileMapper.class);
 
   // IndexedDIP
-
-  public static interface IndexedDIP_MAPPER extends ObjectMapper<ListSelectionState<IndexedDIP>> {
+  public static interface IndexedDIPMapper extends ObjectMapper<ListSelectionState<IndexedDIP>> {
   }
 
-  private static IndexedDIP_MAPPER IndexedDIP_MAPPER = GWT.create(IndexedDIP_MAPPER.class);
+  private static IndexedDIPMapper indexedDIPMapper = GWT.create(IndexedDIPMapper.class);
 
   // DIPFile
-
-  public static interface DIPFile_MAPPER extends ObjectMapper<ListSelectionState<DIPFile>> {
+  public static interface DIPFileMapper extends ObjectMapper<ListSelectionState<DIPFile>> {
   }
 
-  private static DIPFile_MAPPER DIPFile_MAPPER = GWT.create(DIPFile_MAPPER.class);
+  private static DIPFileMapper dipFileMapper = GWT.create(DIPFileMapper.class);
 
   // Job report
-
-  public static interface IndexedReport_MAPPER extends ObjectMapper<ListSelectionState<IndexedReport>> {
+  public static interface IndexedReportMapper extends ObjectMapper<ListSelectionState<IndexedReport>> {
   }
 
-  private static IndexedReport_MAPPER IndexedReport_MAPPER = GWT.create(IndexedReport_MAPPER.class);
+  private static IndexedReportMapper indexedReportMapper = GWT.create(IndexedReportMapper.class);
 
   private ListSelectionStateMappers() {
-
+    // do nothing
   }
 
   @SuppressWarnings("unchecked")
   public static <T extends IsIndexed> String getJson(String objectClass, ListSelectionState<T> object) {
     String ret;
     if (IndexedAIP.class.getName().equals(objectClass)) {
-      ret = IndexedAIP_MAPPER.write((ListSelectionState<IndexedAIP>) object);
+      ret = indexedAIPMapper.write((ListSelectionState<IndexedAIP>) object);
     } else if (IndexedRepresentation.class.getName().equals(objectClass)) {
-      ret = IndexedRepresentation_MAPPER.write((ListSelectionState<IndexedRepresentation>) object);
+      ret = indexedRepresentationMapper.write((ListSelectionState<IndexedRepresentation>) object);
     } else if (IndexedFile.class.getName().equals(objectClass)) {
-      ret = IndexedFile_MAPPER.write((ListSelectionState<IndexedFile>) object);
+      ret = indexedFileMapper.write((ListSelectionState<IndexedFile>) object);
     } else if (IndexedDIP.class.getName().equals(objectClass)) {
-      ret = IndexedDIP_MAPPER.write((ListSelectionState<IndexedDIP>) object);
+      ret = indexedDIPMapper.write((ListSelectionState<IndexedDIP>) object);
     } else if (DIPFile.class.getName().equals(objectClass)) {
-      ret = DIPFile_MAPPER.write((ListSelectionState<DIPFile>) object);
+      ret = dipFileMapper.write((ListSelectionState<DIPFile>) object);
     } else if (IndexedReport.class.getName().equals(objectClass)) {
-      ret = IndexedReport_MAPPER.write((ListSelectionState<IndexedReport>) object);
+      ret = indexedReportMapper.write((ListSelectionState<IndexedReport>) object);
     } else {
       ret = null;
     }
@@ -92,17 +86,17 @@ public class ListSelectionStateMappers {
   public static <T extends IsIndexed> ListSelectionState<T> getObject(String objectClass, String json) {
     ListSelectionState<T> state;
     if (IndexedAIP.class.getName().equals(objectClass)) {
-      state = (ListSelectionState<T>) IndexedAIP_MAPPER.read(json);
+      state = (ListSelectionState<T>) indexedAIPMapper.read(json);
     } else if (IndexedRepresentation.class.getName().equals(objectClass)) {
-      state = (ListSelectionState<T>) IndexedRepresentation_MAPPER.read(json);
+      state = (ListSelectionState<T>) indexedRepresentationMapper.read(json);
     } else if (IndexedFile.class.getName().equals(objectClass)) {
-      state = (ListSelectionState<T>) IndexedFile_MAPPER.read(json);
+      state = (ListSelectionState<T>) indexedFileMapper.read(json);
     } else if (IndexedDIP.class.getName().equals(objectClass)) {
-      state = (ListSelectionState<T>) IndexedDIP_MAPPER.read(json);
+      state = (ListSelectionState<T>) indexedDIPMapper.read(json);
     } else if (DIPFile.class.getName().equals(objectClass)) {
-      state = (ListSelectionState<T>) DIPFile_MAPPER.read(json);
+      state = (ListSelectionState<T>) dipFileMapper.read(json);
     } else if (IndexedReport.class.getName().equals(objectClass)) {
-      state = (ListSelectionState<T>) IndexedReport_MAPPER.read(json);
+      state = (ListSelectionState<T>) indexedReportMapper.read(json);
     } else {
       state = null;
     }

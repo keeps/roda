@@ -50,7 +50,7 @@ public class CreateActionJob extends CreateSelectedJob<IsIndexed> {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   public CreateActionJob() {
-    super(IsIndexed.class, pluginTypes);
+    super(pluginTypes);
   }
 
   @Override

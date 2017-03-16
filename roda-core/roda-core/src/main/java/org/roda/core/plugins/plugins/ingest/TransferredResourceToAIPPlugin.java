@@ -22,12 +22,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.roda.core.common.MetadataFileUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
@@ -140,7 +140,7 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
 
       PluginHelper.createSubmission(model, createSubmission, transferredResourcePath, aip.getId());
 
-      final String representationId = UUID.randomUUID().toString();
+      final String representationId = IdUtils.createUUID();
       final boolean original = true;
       boolean notifyRepresentationCreated = false;
 

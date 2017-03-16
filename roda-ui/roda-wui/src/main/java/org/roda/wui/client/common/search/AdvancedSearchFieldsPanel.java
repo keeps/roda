@@ -107,7 +107,7 @@ public class AdvancedSearchFieldsPanel extends FlowPanel implements HasValueChan
 
       @Override
       public void onValueChange(ValueChangeEvent<String> event) {
-        setSuggestions(event.getValue(), searchFieldPanel);
+        setSuggestions(searchFieldPanel);
       }
     });
 
@@ -119,8 +119,7 @@ public class AdvancedSearchFieldsPanel extends FlowPanel implements HasValueChan
       }
     });
 
-    setSuggestions(selectedField, searchFieldPanel);
-
+    setSuggestions(searchFieldPanel);
     add(searchFieldPanel);
     removeStyleName("empty");
 
@@ -147,7 +146,7 @@ public class AdvancedSearchFieldsPanel extends FlowPanel implements HasValueChan
     }
   }
 
-  private void setSuggestions(String searchFieldId, SearchFieldPanel searchFieldPanel) {
+  private void setSuggestions(SearchFieldPanel searchFieldPanel) {
     SearchField searchField = searchFieldPanel.getSearchField();
 
     if (searchField.getType().equals(RodaConstants.SEARCH_FIELD_TYPE_SUGGEST)) {

@@ -152,7 +152,7 @@ public class CreateMetsPlugin extends AbstractPlugin<AIP> {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
         SimpleJobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {
-        executeOnAip(object, index, model, storage, jobPluginInfo, report, cachedJob);
+        executeOnAip(object, index, model, jobPluginInfo, report, cachedJob);
       }
     }, index, model, storage, liteList);
   }
@@ -174,11 +174,11 @@ public class CreateMetsPlugin extends AbstractPlugin<AIP> {
    *          the {@link Report}.
    */
   private void executeOnAip(final AIP aip, final IndexService index, final ModelService model,
-    final StorageService storage, final JobPluginInfo jobPluginInfo, final Report report, final Job job) {
+    final JobPluginInfo jobPluginInfo, final Report report, final Job job) {
     LOGGER.debug("Processing AIP {}", aip.getId());
 
     final Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
-    PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
 
     try {
       final Path aipPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(),
@@ -200,6 +200,6 @@ public class CreateMetsPlugin extends AbstractPlugin<AIP> {
     }
 
     report.addReport(reportItem);
-    PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
   }
 }

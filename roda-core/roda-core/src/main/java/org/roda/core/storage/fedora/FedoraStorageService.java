@@ -21,7 +21,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
 import org.fcrepo.client.BadRequestException;
@@ -39,6 +38,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.storage.Binary;
@@ -242,7 +242,7 @@ public class FedoraStorageService implements StorageService {
 
     FedoraObject directory;
     try {
-      StoragePath storagePath = DefaultStoragePath.parse(parentStoragePath, UUID.randomUUID().toString());
+      StoragePath storagePath = DefaultStoragePath.parse(parentStoragePath, IdUtils.createUUID());
       do {
         try {
           // XXX may want to change create object to native Fedora method that
@@ -355,7 +355,7 @@ public class FedoraStorageService implements StorageService {
     } else {
       try {
         FedoraDatastream binary;
-        StoragePath storagePath = DefaultStoragePath.parse(parentStoragePath, UUID.randomUUID().toString());
+        StoragePath storagePath = DefaultStoragePath.parse(parentStoragePath, IdUtils.createUUID());
         do {
           try {
             // XXX may want to change create object to native Fedora method that
@@ -766,7 +766,7 @@ public class FedoraStorageService implements StorageService {
   public BinaryVersion createBinaryVersion(StoragePath storagePath, Map<String, String> properties)
     throws RequestNotValidException, NotFoundException, GenericException {
     try {
-      String id = UUID.randomUUID().toString();
+      String id = IdUtils.createUUID();
       FedoraDatastream binary = fedoraRepository.getDatastream(FedoraUtils.storagePathToFedoraPath(storagePath));
       String versionID = id + encodeProperties(properties);
       binary.createVersionSnapshot(versionID);

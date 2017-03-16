@@ -155,7 +155,7 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
       Job job = PluginHelper.getJob(this, model);
-      List<AIP> aips = PluginHelper.transformLitesIntoObjects(model, index, this, report, jobPluginInfo, liteList, job);
+      List<AIP> aips = PluginHelper.transformLitesIntoObjects(model, this, report, jobPluginInfo, liteList, job);
 
       Path outputPath = Paths.get(outputFolder);
       String error = null;
@@ -174,7 +174,7 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
       if (error == null && exportType == ExportType.ZIP) {
         report = exportMultiZip(aips, outputPath, report, model, index, storage, jobPluginInfo, job);
       } else if (error == null && exportType == ExportType.FOLDER) {
-        report = exportFolders(aips, outputPath, storage, model, index, report, jobPluginInfo, job);
+        report = exportFolders(aips, storage, model, index, report, jobPluginInfo, job);
       } else if (error != null) {
         jobPluginInfo.incrementObjectsProcessedWithFailure(aips.size());
         report.setCompletionPercentage(100);
@@ -191,8 +191,8 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
     return report;
   }
 
-  private Report exportFolders(List<AIP> aips, Path outputPath, StorageService storage, ModelService model,
-    IndexService index, Report report, SimpleJobPluginInfo jobPluginInfo, Job job) {
+  private Report exportFolders(List<AIP> aips, StorageService storage, ModelService model, IndexService index,
+    Report report, SimpleJobPluginInfo jobPluginInfo, Job job) {
     try {
       FileStorageService localStorage = new FileStorageService(Paths.get(outputFolder));
       for (AIP aip : aips) {
@@ -224,7 +224,7 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
         }
         report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
 
         try {
           boolean notify = true;
@@ -279,7 +279,7 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
       }
       report.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
     }
     return report;
   }

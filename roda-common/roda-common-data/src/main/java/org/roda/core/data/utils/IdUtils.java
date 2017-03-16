@@ -5,28 +5,36 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.common;
+package org.roda.core.data.utils;
 
 import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 
-import org.roda.core.data.utils.URNUtils;
-import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.FileLink;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.RepresentationLink;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
-import org.roda.core.plugins.Plugin;
 
 public final class IdUtils {
   private static final String ID_SEPARATOR = "-";
 
   /** Private empty constructor */
   private IdUtils() {
+    // do nothing
+  }
 
+  public static String createUUID() {
+    return UUID.randomUUID().toString();
+  }
+
+  /**
+   * This function will not verify if given string is null
+   **/
+  public static String createUUID(String fromString) {
+    return UUID.nameUUIDFromBytes(fromString.getBytes()).toString();
   }
 
   public static String getRepresentationId(Representation representation) {
@@ -42,7 +50,7 @@ public final class IdUtils {
     idBuilder.append(aipId);
     idBuilder.append(ID_SEPARATOR);
     idBuilder.append(representationId);
-    return UUID.nameUUIDFromBytes(idBuilder.toString().getBytes()).toString();
+    return IdUtils.createUUID(idBuilder.toString());
   }
 
   public static String getFileId(String aipId, String representationId, List<String> fileDirectoryPath, String fileId) {
@@ -60,7 +68,7 @@ public final class IdUtils {
       }
     }
     idBuilder.append(fileId);
-    return UUID.nameUUIDFromBytes(idBuilder.toString().getBytes()).toString();
+    return IdUtils.createUUID(idBuilder.toString());
   }
 
   public static String getFileId(FileLink link) {
@@ -81,16 +89,16 @@ public final class IdUtils {
     }
     idBuilder.append(fileId);
 
-    return UUID.nameUUIDFromBytes(idBuilder.toString().getBytes()).toString();
+    return IdUtils.createUUID(idBuilder.toString());
   }
 
   public static String getDIPFileId(DIPFile file) {
     return getDIPFileId(file.getDipId(), file.getPath(), file.getId());
   }
 
-  public static String getOtherMetadataId(String type, String aipId, String representationId,
-    List<String> fileDirectoryPath, String fileId) {
-    return getFileId(aipId, representationId, fileDirectoryPath, fileId, type, ID_SEPARATOR);
+  public static String getOtherMetadataId(String aipId, String representationId, List<String> fileDirectoryPath,
+    String fileId) {
+    return getFileId(aipId, representationId, fileDirectoryPath, fileId, ID_SEPARATOR);
   }
 
   public static String getJobReportId(String jobId, String aipId) {
@@ -99,7 +107,7 @@ public final class IdUtils {
 
   // FIXME 20160809 hsilva: type is not being used. but should it???
   private static String getFileId(String aipId, String representationId, List<String> fileDirectoryPath, String fileId,
-    String type, String separator) {
+    String separator) {
     StringBuilder idBuilder = new StringBuilder();
     addNonNullStringToBuilder(idBuilder, aipId, separator);
     addNonNullStringToBuilder(idBuilder, representationId, separator);
@@ -132,10 +140,6 @@ public final class IdUtils {
     return prefix + ID_SEPARATOR + suffix;
   }
 
-  public static <T extends IsRODAObject> String getPluginAgentId(Plugin<T> plugin) {
-    return getPluginAgentId(plugin.getClass().getName(), plugin.getVersion());
-  }
-
   public static String getPluginAgentId(String pluginClassName, String version) {
     return URNUtils.createRodaPreservationURN(PreservationMetadataType.AGENT, pluginClassName + "@" + version);
   }
@@ -145,7 +149,7 @@ public final class IdUtils {
   }
 
   public static String createPreservationMetadataId(PreservationMetadataType type) {
-    return URNUtils.createRodaPreservationURN(type, UUID.randomUUID().toString());
+    return URNUtils.createRodaPreservationURN(type, IdUtils.createUUID());
   }
 
   public static String getRepresentationPreservationId(String aipId, String representationId) {
@@ -155,9 +159,7 @@ public final class IdUtils {
   public static String getPreservationId(PreservationMetadataType type, String aipId, String representationId,
     List<String> fileDirectoryPath, String fileId) {
     return URNUtils.createRodaPreservationURN(type,
-      UUID
-        .nameUUIDFromBytes(getFileId(aipId, representationId, fileDirectoryPath, fileId, null, ID_SEPARATOR).getBytes())
-        .toString());
+      IdUtils.createUUID(getFileId(aipId, representationId, fileDirectoryPath, fileId, ID_SEPARATOR)));
   }
 
   public static PreservationMetadataType getPreservationTypeFromId(String id) {
@@ -169,7 +171,7 @@ public final class IdUtils {
   }
 
   public static String getTransferredResourceUUID(String relativeToBase) {
-    return UUID.nameUUIDFromBytes(relativeToBase.getBytes()).toString();
+    return IdUtils.createUUID(relativeToBase);
   }
 
 }

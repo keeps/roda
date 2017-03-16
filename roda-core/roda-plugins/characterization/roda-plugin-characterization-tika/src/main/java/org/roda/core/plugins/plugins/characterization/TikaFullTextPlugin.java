@@ -131,7 +131,7 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractAIPCompo
       for (AIP aip : list) {
         Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
         reportItem.setPluginState(PluginState.SUCCESS);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
         LOGGER.debug("Processing AIP {}", aip.getId());
         String outcomeDetailExtension = "";
         List<LinkingIdentifier> sources = new ArrayList<>();
@@ -147,8 +147,8 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractAIPCompo
               if (oFile.isPresent()) {
                 File file = oFile.get();
 
-                LinkingIdentifier tikaResult = TikaFullTextPluginUtils.runTikaFullTextOnFile(index, model, storage,
-                  file, doFeatureExtraction, doFulltextExtraction);
+                LinkingIdentifier tikaResult = TikaFullTextPluginUtils.runTikaFullTextOnFile(model, storage, file,
+                  doFeatureExtraction, doFulltextExtraction);
                 sources.add(tikaResult);
               } else {
                 LOGGER.error("Cannot process File", oFile.getCause());
@@ -177,7 +177,7 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractAIPCompo
         }
 
         report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
 
         try {
           List<LinkingIdentifier> outcomes = null;
@@ -207,7 +207,7 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractAIPCompo
         Report reportItem = PluginHelper.initPluginReportItem(this, representation.getId(), Representation.class,
           AIPState.INGEST_PROCESSING);
         reportItem.setPluginState(PluginState.SUCCESS);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
         List<LinkingIdentifier> sources = new ArrayList<>();
         String outcomeDetailExtension = "";
 
@@ -219,7 +219,7 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractAIPCompo
             if (oFile.isPresent()) {
               File file = oFile.get();
 
-              LinkingIdentifier tikaResult = TikaFullTextPluginUtils.runTikaFullTextOnFile(index, model, storage, file,
+              LinkingIdentifier tikaResult = TikaFullTextPluginUtils.runTikaFullTextOnFile(model, storage, file,
                 doFeatureExtraction, doFulltextExtraction);
               sources.add(tikaResult);
             } else {
@@ -247,7 +247,7 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractAIPCompo
         }
 
         report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
 
         try {
           List<LinkingIdentifier> outcomes = null;
@@ -279,12 +279,12 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractAIPCompo
         file.getAipId());
       Report reportItem = PluginHelper.initPluginReportItem(this, file.getId(), File.class, AIPState.INGEST_PROCESSING);
       reportItem.setPluginState(PluginState.SUCCESS);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
       List<LinkingIdentifier> sources = new ArrayList<>();
       String outcomeDetailExtension = "";
 
       try {
-        LinkingIdentifier tikaResult = TikaFullTextPluginUtils.runTikaFullTextOnFile(index, model, storage, file,
+        LinkingIdentifier tikaResult = TikaFullTextPluginUtils.runTikaFullTextOnFile(model, storage, file,
           doFeatureExtraction, doFulltextExtraction);
         sources.add(tikaResult);
 
@@ -312,7 +312,7 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractAIPCompo
       }
 
       report.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
 
       try {
         List<LinkingIdentifier> outcomes = null;

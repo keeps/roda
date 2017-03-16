@@ -117,8 +117,7 @@ public class IngestAppraisal extends Composite {
   @UiField(provided = true)
   Button acceptButton, rejectButton;
 
-  // cannot let reps and files to be selectable for now
-  // boolean selectable = true;
+  // cannot let representations and files to be selectable for now
   boolean itemsSelectable = true;
   boolean representationsSelectable = false;
   boolean filesSelectable = false;

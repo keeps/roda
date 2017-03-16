@@ -107,7 +107,7 @@ public class FITSPlugin extends AbstractPlugin<AIP> {
     LOGGER.debug("Processing AIP {}", aip.getId());
     boolean inotify = false;
     Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
-    PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
     PluginState reportState = PluginState.SUCCESS;
     ValidationReport validationReport = new ValidationReport();
     List<LinkingIdentifier> sources = new ArrayList<>();
@@ -188,7 +188,7 @@ public class FITSPlugin extends AbstractPlugin<AIP> {
     }
 
     report.addReport(reportItem);
-    PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
   }
 
   @Override

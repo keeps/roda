@@ -11,8 +11,8 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.SerializableOptional;
@@ -25,14 +25,18 @@ import org.slf4j.LoggerFactory;
 public class Messages {
   private static final Logger LOGGER = LoggerFactory.getLogger(Messages.class);
 
-  public static abstract class AbstractMessage implements Serializable {
+  private Messages() {
+    // do nothing
+  }
+
+  public abstract static class AbstractMessage implements Serializable {
     private static final long serialVersionUID = 1898368418865765060L;
     private String uuid;
     private long creationTime;
 
     private AbstractMessage() {
       if (LOGGER.isTraceEnabled()) {
-        uuid = UUID.randomUUID().toString();
+        uuid = IdUtils.createUUID();
         LOGGER.trace("{} Created message {}", uuid, getClass().getSimpleName());
       }
 

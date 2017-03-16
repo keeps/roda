@@ -23,7 +23,6 @@ import java.util.function.Function;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.IdUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
 import org.roda.core.data.common.RodaConstants;
@@ -32,6 +31,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.IsRODAObject;
@@ -66,8 +66,10 @@ import org.slf4j.LoggerFactory;
 
 public class ResourceParseUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(ResourceParseUtils.class);
+  private static final String RESOURCE_CANNOT_BE_NULL = "Resource cannot be null";
 
   private ResourceParseUtils() {
+    // do nothing
   }
 
   public static File convertResourceToFile(Resource resource)
@@ -75,7 +77,7 @@ public class ResourceParseUtils {
     File ret;
 
     if (resource == null) {
-      throw new RequestNotValidException("Resource cannot be null");
+      throw new RequestNotValidException(RESOURCE_CANNOT_BE_NULL);
     }
 
     StoragePath resourcePath = resource.getStoragePath();
@@ -103,7 +105,7 @@ public class ResourceParseUtils {
     DIPFile ret;
 
     if (resource == null) {
-      throw new RequestNotValidException("Resource cannot be null");
+      throw new RequestNotValidException(RESOURCE_CANNOT_BE_NULL);
     }
 
     StoragePath resourcePath = resource.getStoragePath();
@@ -129,7 +131,7 @@ public class ResourceParseUtils {
     throws RequestNotValidException {
 
     if (resource == null) {
-      throw new RequestNotValidException("Resource cannot be null");
+      throw new RequestNotValidException(RESOURCE_CANNOT_BE_NULL);
     }
 
     StoragePath resourcePath = resource.getStoragePath();
@@ -192,7 +194,7 @@ public class ResourceParseUtils {
   private static OtherMetadata convertResourceToOtherMetadata(Resource resource) throws RequestNotValidException {
 
     if (resource == null) {
-      throw new RequestNotValidException("Resource cannot be null");
+      throw new RequestNotValidException(RESOURCE_CANNOT_BE_NULL);
     }
 
     StoragePath resourcePath = resource.getStoragePath();
@@ -209,7 +211,7 @@ public class ResourceParseUtils {
     String suffix = filename.substring(filename.lastIndexOf('.'), filename.length());
 
     OtherMetadata om = new OtherMetadata();
-    om.setId(IdUtils.getOtherMetadataId(type, aipId, representationId, fileDirectoryPath, fileId));
+    om.setId(IdUtils.getOtherMetadataId(aipId, representationId, fileDirectoryPath, fileId));
     om.setAipId(aipId);
     om.setRepresentationId(representationId);
     om.setFileDirectoryPath(fileDirectoryPath);
@@ -223,7 +225,7 @@ public class ResourceParseUtils {
     throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
 
     if (resource == null) {
-      throw new RequestNotValidException("Resource cannot be null");
+      throw new RequestNotValidException(RESOURCE_CANNOT_BE_NULL);
     }
 
     StoragePath resourcePath = resource.getStoragePath();
@@ -234,14 +236,14 @@ public class ResourceParseUtils {
     if (rep.isPresent()) {
       return rep.get();
     } else {
-      return null;
+      throw new NotFoundException("Unable to find representation with storage path " + resourcePath);
     }
   }
 
   public static <T extends Serializable> T convertResourceToObject(Resource resource, Class<T> objectClass)
     throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException, IOException {
     if (resource == null) {
-      throw new RequestNotValidException("Resource cannot be null");
+      throw new RequestNotValidException(RESOURCE_CANNOT_BE_NULL);
     }
 
     Binary binary = (Binary) resource;
@@ -283,8 +285,8 @@ public class ResourceParseUtils {
     return ret;
   }
 
-  public static <T extends IsRODAObject> OptionalWithCause<LiteRODAObject> convertResourceToLite(StorageService storage,
-    Resource resource, Class<T> classToReturn) {
+  public static <T extends IsRODAObject> OptionalWithCause<LiteRODAObject> convertResourceToLite(Resource resource,
+    Class<T> classToReturn) {
     OptionalWithCause<LiteRODAObject> ret;
     StoragePath storagePath = resource.getStoragePath();
     String fileName = resource.getStoragePath().getName();
@@ -439,7 +441,7 @@ public class ResourceParseUtils {
 
   public static <T extends IsRODAObject> CloseableIterable<OptionalWithCause<LiteRODAObject>> convertLite(
     StorageService storage, CloseableIterable<Resource> iterable, Class<T> classToReturn) {
-    return convert(storage, iterable, classToReturn, (s, r, c) -> ResourceParseUtils.convertResourceToLite(s, r, c));
+    return convert(storage, iterable, classToReturn, (s, r, c) -> ResourceParseUtils.convertResourceToLite(r, c));
   }
 
   private static <T extends IsRODAObject, R extends Serializable> CloseableIterable<OptionalWithCause<R>> convert(

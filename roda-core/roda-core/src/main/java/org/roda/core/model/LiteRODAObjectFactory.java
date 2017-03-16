@@ -15,12 +15,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.roda.core.common.IdUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.LiteRODAObject;
@@ -49,7 +49,6 @@ import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
-import org.roda.core.index.IndexService;
 import org.roda.core.model.utils.ModelUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -522,7 +521,7 @@ public final class LiteRODAObjectFactory {
   }
 
   public static <T extends IsRODAObject> CloseableIterable<OptionalWithCause<T>> transformFromLite(ModelService model,
-    IndexService index, final CloseableIterable<OptionalWithCause<LiteRODAObject>> list) {
+    final CloseableIterable<OptionalWithCause<LiteRODAObject>> list) {
     CloseableIterable<OptionalWithCause<T>> it;
 
     final Iterator<OptionalWithCause<LiteRODAObject>> iterator = list.iterator();

@@ -74,13 +74,6 @@ public class ShowRiskIncidence extends Composite {
 
   private static ShowRiskIncidence instance = null;
 
-  public static ShowRiskIncidence getInstance() {
-    if (instance == null) {
-      instance = new ShowRiskIncidence();
-    }
-    return instance;
-  }
-
   interface MyUiBinder extends UiBinder<Widget, ShowRiskIncidence> {
   }
 
@@ -197,7 +190,13 @@ public class ShowRiskIncidence extends Composite {
     } else {
       mitigatedDescriptionKey.setVisible(false);
     }
+  }
 
+  public static ShowRiskIncidence getInstance() {
+    if (instance == null) {
+      instance = new ShowRiskIncidence();
+    }
+    return instance;
   }
 
   @Override

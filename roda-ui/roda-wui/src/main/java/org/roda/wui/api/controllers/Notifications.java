@@ -35,23 +35,24 @@ public class Notifications extends RodaWuiController {
    * ---------------- REST related methods - start -----------------------------
    * ---------------------------------------------------------------------------
    */
-  public static Notification createNotification(User user, Notification notification, String t)
+  public static Notification createNotification(User user, Notification notification, String template)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    String template = t;
+    String tmpl = template;
 
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    if (template == null) {
-      template = RodaConstants.API_NOTIFICATION_DEFAULT_TEMPLATE;
+    if (tmpl == null) {
+      tmpl = RodaConstants.API_NOTIFICATION_DEFAULT_TEMPLATE;
     }
 
     Notification createdNotification = RodaCoreFactory.getModelService().createNotification(notification,
-      new EmailNotificationProcessor(template));
+      new EmailNotificationProcessor(tmpl));
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "notification", notification);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.RODA_OBJECT_NOTIFICATION,
+      notification);
     return createdNotification;
   }
 
@@ -65,7 +66,8 @@ public class Notifications extends RodaWuiController {
     Notification updatedNotification = RodaCoreFactory.getModelService().updateNotification(notification);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "notification", notification);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.RODA_OBJECT_NOTIFICATION,
+      notification);
     return updatedNotification;
   }
 
@@ -80,7 +82,8 @@ public class Notifications extends RodaWuiController {
     RodaCoreFactory.getModelService().deleteNotification(notificationId);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "notificationId", notificationId);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_NOTIFICATION_ID_PARAM,
+      notificationId);
   }
 
   public static void acknowledgeNotification(User user, String notificationId, String token)
@@ -94,7 +97,8 @@ public class Notifications extends RodaWuiController {
     RodaCoreFactory.getModelService().acknowledgeNotification(notificationId, token);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "notificationId", notificationId, "token", token);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_NOTIFICATION_ID_PARAM,
+      notificationId, RodaConstants.CONTROLLER_NOTIFICATION_TOKEN_PARAM, token);
   }
 
   /*

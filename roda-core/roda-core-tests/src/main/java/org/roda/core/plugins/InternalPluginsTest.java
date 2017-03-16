@@ -9,7 +9,6 @@ package org.roda.core.plugins;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
@@ -19,7 +18,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
@@ -31,7 +29,6 @@ import org.hamcrest.Matchers;
 import org.hamcrest.core.Is;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
-import org.roda.core.common.IdUtils;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.monitor.TransferredResourcesScanner;
@@ -44,6 +41,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
@@ -66,6 +64,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
+import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.plugins.plugins.antivirus.AntivirusPlugin;
 import org.roda.core.plugins.plugins.characterization.PremisSkeletonPlugin;
 import org.roda.core.plugins.plugins.characterization.SiegfriedPlugin;
@@ -167,8 +166,8 @@ public class InternalPluginsTest {
     return new ByteArrayInputStream(RandomStringUtils.randomAscii(GENERATED_FILE_SIZE).getBytes());
   }
 
-  private TransferredResource createCorpora() throws InterruptedException, IOException, FileAlreadyExistsException,
-    NotFoundException, GenericException, RequestNotValidException, AlreadyExistsException {
+  private TransferredResource createCorpora() throws InterruptedException, IOException, NotFoundException,
+    GenericException, RequestNotValidException, AlreadyExistsException {
     TransferredResourcesScanner f = RodaCoreFactory.getTransferredResourcesScanner();
 
     String parentUUID = f.createFolder(null, "test").getUUID();
@@ -193,14 +192,14 @@ public class InternalPluginsTest {
 
     index.commit(TransferredResource.class);
 
-    TransferredResource transferredResource = index.retrieve(TransferredResource.class,
-      UUID.nameUUIDFromBytes("test".getBytes()).toString(), new ArrayList<>());
+    TransferredResource transferredResource = index.retrieve(TransferredResource.class, IdUtils.createUUID("test"),
+      new ArrayList<>());
     return transferredResource;
   }
 
-  private AIP ingestCorpora() throws RequestNotValidException, NotFoundException, GenericException,
-    AlreadyExistsException, AuthorizationDeniedException, InvalidParameterException, InterruptedException, IOException,
-    FileAlreadyExistsException, SolrServerException {
+  private AIP ingestCorpora()
+    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException, InvalidParameterException, InterruptedException, IOException, SolrServerException {
     String parentId = null;
     String aipType = RodaConstants.AIP_TYPE_MIXED;
     AIP root = model.createAIP(parentId, aipType, new Permissions(), RodaConstants.ADMIN);
@@ -245,8 +244,8 @@ public class InternalPluginsTest {
   }
 
   @Test
-  public void testVirusCheck() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException,
-    SolrServerException, XmlException {
+  public void testVirusCheck()
+    throws RODAException, InterruptedException, IOException, SolrServerException, XmlException {
     AIP aip = ingestCorpora();
 
     Job job = TestsHelper.executeJob(AntivirusPlugin.class, PluginType.AIP_TO_AIP,
@@ -258,7 +257,7 @@ public class InternalPluginsTest {
 
     Plugin<? extends IsRODAObject> plugin = RodaCoreFactory.getPluginManager()
       .getPlugin(AntivirusPlugin.class.getName());
-    String agentID = IdUtils.getPluginAgentId(plugin);
+    String agentID = PluginHelper.getPluginAgentId(plugin);
     boolean found = false;
     CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationMetadataList = model
       .listPreservationMetadata(aip.getId(), true);
@@ -300,8 +299,7 @@ public class InternalPluginsTest {
 
   @SuppressWarnings("unchecked")
   @Test
-  public void testPremisSkeleton()
-    throws RODAException, FileAlreadyExistsException, InterruptedException, IOException, SolrServerException {
+  public void testPremisSkeleton() throws RODAException, InterruptedException, IOException, SolrServerException {
     AIP aip = ingestCorpora();
 
     TestsHelper.executeJob(PremisSkeletonPlugin.class, PluginType.AIP_TO_AIP,
@@ -345,8 +343,8 @@ public class InternalPluginsTest {
 
   @SuppressWarnings("unchecked")
   @Test
-  public void testSiegfried() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException,
-    SolrServerException, XmlException {
+  public void testSiegfried()
+    throws RODAException, InterruptedException, IOException, SolrServerException, XmlException {
     AIP aip = ingestCorpora();
 
     // ensure PREMIS objects are created
@@ -405,7 +403,7 @@ public class InternalPluginsTest {
 
     Plugin<? extends IsRODAObject> plugin = RodaCoreFactory.getPluginManager()
       .getPlugin(SiegfriedPlugin.class.getName());
-    String agentID = IdUtils.getPluginAgentId(plugin);
+    String agentID = PluginHelper.getPluginAgentId(plugin);
 
     boolean found = false;
     CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationMetadataList = model
@@ -446,8 +444,8 @@ public class InternalPluginsTest {
   }
 
   @Test
-  public void testAutoAccept() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException,
-    InvalidDateException, SolrServerException {
+  public void testAutoAccept()
+    throws RODAException, InterruptedException, IOException, InvalidDateException, SolrServerException {
     AIP aip = ingestCorpora();
 
     TestsHelper.executeJob(AutoAcceptSIPPlugin.class, PluginType.AIP_TO_AIP,

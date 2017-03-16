@@ -99,18 +99,17 @@ public class MoveOrphansToParentNodePlugin extends AbstractPlugin<AIP> {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
         SimpleJobPluginInfo jobPluginInfo, Plugin<AIP> plugin, List<AIP> objects) {
-        processAIPs(index, model, report, jobPluginInfo, cachedJob, objects);
+        processAIPs(model, jobPluginInfo, cachedJob, objects);
       }
     }, index, model, storage, liteList);
   }
 
-  private void processAIPs(IndexService index, ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo,
-    Job cachedJob, List<AIP> list) {
+  private void processAIPs(ModelService model, SimpleJobPluginInfo jobPluginInfo, Job cachedJob, List<AIP> list) {
 
     for (AIP aip : list) {
       Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE)
         .setPluginState(PluginState.SUCCESS);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, cachedJob);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
 
       try {
         LOGGER.debug("Processing AIP {}", aip.getId());

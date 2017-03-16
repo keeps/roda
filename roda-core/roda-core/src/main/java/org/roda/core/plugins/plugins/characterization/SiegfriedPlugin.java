@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.roda.core.common.IdUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -21,6 +20,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
@@ -93,7 +93,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
     try {
       for (AIP aip : list) {
         Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
 
         LOGGER.debug("Processing AIP {}", aip.getId());
         List<LinkingIdentifier> sources = new ArrayList<>();
@@ -127,7 +127,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
         }
 
         report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
       }
     } catch (ClassCastException e) {
       LOGGER.error("Trying to execute an AIP-only plugin with other objects");
@@ -146,7 +146,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
 
       Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getRepresentationId(representation),
         Representation.class);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
       LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), representation.getAipId());
       try {
         sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(this, model, representation));
@@ -173,7 +173,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
       }
 
       report.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
     }
 
     return report;
@@ -187,7 +187,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
       List<LinkingIdentifier> sources = new ArrayList<>();
 
       Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getFileId(file), File.class);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false, job);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
       LOGGER.debug("Processing file {} from representation {} of AIP {}", file.getId(), file.getRepresentationId(),
         file.getAipId());
 
@@ -215,7 +215,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
       }
 
       report.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true, job);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
     }
 
     return report;

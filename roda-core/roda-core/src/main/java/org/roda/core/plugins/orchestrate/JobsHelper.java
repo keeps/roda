@@ -64,7 +64,7 @@ public final class JobsHelper {
   private static final int DEFAULT_SYNC_TIMEOUT = 600;
 
   private JobsHelper() {
-
+    // do nothing
   }
 
   public static int getMaxNumberOfJobsInParallel() {
@@ -117,8 +117,7 @@ public final class JobsHelper {
     }
   }
 
-  public static <T extends IsRODAObject> void updateJobState(Job job, ModelService model, JOB_STATE state,
-    Optional<String> stateDetails) {
+  public static void updateJobState(Job job, ModelService model, JOB_STATE state, Optional<String> stateDetails) {
     try {
       Job jobFromModel = PluginHelper.getJob(job.getId(), model);
       jobFromModel.setState(state);
@@ -221,7 +220,7 @@ public final class JobsHelper {
     return ret;
   }
 
-  public static List<AIP> getAIPs(ModelService model, IndexService index, List<String> uuids) throws NotFoundException {
+  public static List<AIP> getAIPs(ModelService model, List<String> uuids) throws NotFoundException {
     List<AIP> aipsToReturn = new ArrayList<>();
     if (!uuids.isEmpty()) {
       for (String uuid : uuids) {
@@ -306,21 +305,21 @@ public final class JobsHelper {
   public static <T extends IsRODAObject> List<T> getObjectsFromUUID(ModelService model, IndexService index,
     Class<T> objectClass, List<String> uuids) throws NotFoundException, GenericException {
     if (AIP.class.equals(objectClass)) {
-      return (List<T>) getAIPs(model, index, uuids);
+      return (List<T>) getAIPs(model, uuids);
     } else if (Representation.class.equals(objectClass)) {
       return (List<T>) getRepresentations(model, index, uuids);
     } else if (File.class.equals(objectClass)) {
       return (List<T>) getFiles(model, index, uuids);
     } else {
-      return (List<T>) getObjectsFromIndex(index, objectClass, uuids);
+      return getObjectsFromIndex(index, objectClass, uuids);
     }
   }
 
   public static <T extends IsRODAObject, T1 extends IsIndexed> List<T> getObjectsFromIndexObjects(ModelService model,
-    IndexService index, Class<T> objectClass, List<T1> indexObjects)
+    Class<T> objectClass, List<T1> indexObjects)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
     if (AIP.class.equals(objectClass)) {
-      return (List<T>) getAIPs(model, index, indexObjects.stream().map(e -> e.getUUID()).collect(Collectors.toList()));
+      return (List<T>) getAIPs(model, indexObjects.stream().map(e -> e.getUUID()).collect(Collectors.toList()));
     } else if (Representation.class.equals(objectClass)) {
       return (List<T>) getRepresentationFromList(model, (List<IndexedRepresentation>) indexObjects);
     } else if (File.class.equals(objectClass)) {
@@ -371,7 +370,7 @@ public final class JobsHelper {
     throw new GenericException("Error while getting class from string");
   }
 
-  public static <T extends IsRODAObject> void doJobObjectsCleanup(Job job, ModelService model, IndexService index) {
+  public static void doJobObjectsCleanup(Job job, ModelService model, IndexService index) {
 
     if (RodaCoreFactory.getNodeType() == NodeType.MASTER) {
       try {

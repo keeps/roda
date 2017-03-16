@@ -340,9 +340,14 @@ public final class RodaConstants {
   public static final String CONTROLLER_RISK_PARAM = RODA_OBJECT_RISK;
   public static final String CONTROLLER_RISK_ID_PARAM = "riskId";
   public static final String CONTROLLER_FORMAT_PARAM = RODA_OBJECT_FORMAT;
+  public static final String CONTROLLER_FORMAT_ID_PARAM = "formatId";
   public static final String CONTROLLER_MESSAGE_PARAM = "message";
   public static final String CONTROLLER_INCIDENCE_PARAM = RODA_OBJECT_INCIDENCE;
   public static final String CONTROLLER_TEMPLATE_PARAM = "template";
+  public static final String CONTROLLER_NOTIFICATION_ID_PARAM = "notificationId";
+  public static final String CONTROLLER_NOTIFICATION_TOKEN_PARAM = "token";
+  public static final String CONTROLLER_JOB_PARAM = "job";
+  public static final String CONTROLLER_JOB_ID_PARAM = "jobId";
 
   public static final String CONTROLLER_PRE_MITIGATION_PROBABILITY_PARAM = "preMitigationProbability";
   public static final String CONTROLLER_PRE_MITIGATION_IMPACT_PARAM = "preMitigationImpact";
@@ -382,7 +387,11 @@ public final class RodaConstants {
   public static final String CONTROLLER_SELECTED_VERSION_PARAM = "selectedVersion";
   public static final String CONTROLLER_FILES_PARAM = "files";
   public static final String CONTROLLER_USERNAME_PARAM = "username";
+  public static final String CONTROLLER_GROUPNAME_PARAM = "groupname";
+  public static final String CONTROLLER_USER_PARAM = "user";
+  public static final String CONTROLLER_GROUP_PARAM = "group";
   public static final String CONTROLLER_PERMISSION_TYPE_PARAM = "permissionType";
+  public static final String CONTROLLER_NAME_PARAM = "name";
 
   /*
    * Core (storage, index, orchestrator, etc.)

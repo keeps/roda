@@ -35,7 +35,7 @@ import config.i18n.client.ClientMessages;
 
 public class SimpleFileList extends BasicAsyncTableCell<IndexedFile> {
 
-  private final ClientLogger LOGGER = new ClientLogger(getClass().getName());
+  private final ClientLogger logger = new ClientLogger(getClass().getName());
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private Column<IndexedFile, SafeHtml> iconColumn;
@@ -73,7 +73,7 @@ public class SimpleFileList extends BasicAsyncTableCell<IndexedFile> {
             return SafeHtmlUtils.fromSafeConstant("<i class='fa fa-file-o'></i>");
           }
         } else {
-          LOGGER.error("Trying to display a NULL item");
+          logger.error("Trying to display a NULL item");
         }
         return null;
       }

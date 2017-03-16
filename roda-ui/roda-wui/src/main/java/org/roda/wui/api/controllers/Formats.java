@@ -8,6 +8,7 @@
 package org.roda.wui.api.controllers;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -43,7 +44,7 @@ public class Formats extends RodaWuiController {
     Format createdFormat = RodaCoreFactory.getModelService().createFormat(format, false);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "format", format);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_FORMAT_PARAM, format);
     return createdFormat;
   }
 
@@ -57,7 +58,7 @@ public class Formats extends RodaWuiController {
     Format updatedFormat = RodaCoreFactory.getModelService().updateFormat(format, false);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "format", format);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_FORMAT_PARAM, format);
     return updatedFormat;
   }
 
@@ -72,7 +73,8 @@ public class Formats extends RodaWuiController {
     RodaCoreFactory.getModelService().deleteFormat(formatId, false);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, "formatId", formatId);
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_FORMAT_ID_PARAM,
+      formatId);
   }
 
   /*
