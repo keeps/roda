@@ -16,7 +16,6 @@ import java.util.Map;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.IsModelObject;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -49,7 +48,7 @@ public class DIP implements IsModelObject {
   public DIP() {
     super();
 
-    this.id = IdUtils.createUUID();
+    this.id = "";
     this.title = "";
     this.description = "";
     this.type = "";

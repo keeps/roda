@@ -57,6 +57,7 @@ import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StringContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
+import org.roda.core.util.IdUtils;
 import org.roda_project.commons_ip.model.ParseException;
 import org.roda_project.commons_ip.model.impl.eark.EARKAIP;
 import org.roda_project.commons_ip.utils.IPEnums.IPType;
@@ -322,6 +323,7 @@ public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
         links.add(aipLink);
 
         DIP dip = new DIP();
+        dip.setId(IdUtils.createUUID());
         dip.setAipIds(links);
         dip.setPermissions(aip.getPermissions());
         dip.setTitle("EARK-DIP");

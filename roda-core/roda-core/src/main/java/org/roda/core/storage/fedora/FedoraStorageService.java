@@ -38,7 +38,6 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.storage.Binary;
@@ -59,6 +58,7 @@ import org.roda.core.storage.fedora.utils.FedoraUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.roda.core.storage.utils.StorageRecursiveListingUtils;
 import org.roda.core.util.Base64;
+import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

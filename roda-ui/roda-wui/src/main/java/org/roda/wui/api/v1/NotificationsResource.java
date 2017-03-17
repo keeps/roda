@@ -164,7 +164,7 @@ public class NotificationsResource {
   }
 
   @GET
-  @Path("/{" + RodaConstants.API_PATH_PARAM_NOTIFICATION_ID + "}/acknowledge")
+  @Path("/{" + RodaConstants.API_PATH_PARAM_NOTIFICATION_ID + "}/" + RodaConstants.API_ACKNOWLEDGE)
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @ApiOperation(value = "Acknowledge notification", notes = "Acknowledge a notification.", response = Void.class)
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Void.class),

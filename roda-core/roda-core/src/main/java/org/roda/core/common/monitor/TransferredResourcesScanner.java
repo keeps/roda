@@ -36,7 +36,6 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -46,6 +45,7 @@ import org.roda.core.index.IndexService;
 import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.fs.FSUtils;
+import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

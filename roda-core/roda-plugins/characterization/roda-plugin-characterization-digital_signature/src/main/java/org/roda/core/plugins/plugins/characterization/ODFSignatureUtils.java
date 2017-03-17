@@ -90,7 +90,7 @@ import org.apache.xml.security.c14n.Canonicalizer;
 import org.apache.xml.security.c14n.InvalidCanonicalizerException;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.utils.IdUtils;
+import org.roda.core.util.IdUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

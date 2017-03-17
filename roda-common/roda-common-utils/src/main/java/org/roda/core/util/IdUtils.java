@@ -5,12 +5,13 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.data.utils;
+package org.roda.core.util;
 
 import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 
+import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.FileLink;

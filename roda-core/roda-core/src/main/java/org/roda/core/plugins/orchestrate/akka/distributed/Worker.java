@@ -13,7 +13,6 @@ import static akka.actor.SupervisorStrategy.stop;
 
 import java.io.Serializable;
 
-import org.roda.core.data.utils.IdUtils;
 import org.roda.core.plugins.orchestrate.akka.distributed.Master.Ack;
 import org.roda.core.plugins.orchestrate.akka.distributed.Master.Work;
 import org.roda.core.plugins.orchestrate.akka.distributed.MasterWorkerProtocol.RegisterWorker;
@@ -21,6 +20,7 @@ import org.roda.core.plugins.orchestrate.akka.distributed.MasterWorkerProtocol.W
 import org.roda.core.plugins.orchestrate.akka.distributed.MasterWorkerProtocol.WorkIsDone;
 import org.roda.core.plugins.orchestrate.akka.distributed.MasterWorkerProtocol.WorkIsReady;
 import org.roda.core.plugins.orchestrate.akka.distributed.MasterWorkerProtocol.WorkerRequestsWork;
+import org.roda.core.util.IdUtils;
 
 import akka.actor.ActorInitializationException;
 import akka.actor.ActorRef;

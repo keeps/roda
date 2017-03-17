@@ -196,6 +196,9 @@ public final class RodaConstants {
   public static final String API_PRESERVATION_METADATA = RODA_OBJECT_PRESERVATION_METADATA;
   public static final String API_OTHER_METADATA = RODA_OBJECT_OTHER_METADATA;
   public static final String API_FIND = "find";
+  public static final String API_ACKNOWLEDGE = "acknowledge";
+  public static final String API_STOP = "stop";
+  public static final String API_REPORTS = "reports";
   // "http query string" related strings
   public static final String API_QUERY_START = "?";
   public static final String API_QUERY_ASSIGN_SYMBOL = "=";

@@ -31,7 +31,6 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
@@ -67,6 +66,7 @@ import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.util.CommandException;
+import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -297,6 +297,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                       links.add(fileLink);
 
                       DIP dip = new DIP();
+                      dip.setId(IdUtils.createUUID());
                       dip.setFileIds(links);
                       dip.setPermissions(aip.getPermissions());
                       dip.setTitle(dipTitle);
@@ -492,6 +493,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                       AIP aip = model.retrieveAIP(aipId);
 
                       DIP dip = new DIP();
+                      dip.setId(IdUtils.createUUID());
                       dip.setFileIds(links);
                       dip.setPermissions(aip.getPermissions());
                       dip.setTitle(dipTitle);
@@ -676,6 +678,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                 AIP aip = model.retrieveAIP(file.getAipId());
 
                 DIP dip = new DIP();
+                dip.setId(IdUtils.createUUID());
                 dip.setFileIds(links);
                 dip.setPermissions(aip.getPermissions());
                 dip.setTitle(dipTitle);

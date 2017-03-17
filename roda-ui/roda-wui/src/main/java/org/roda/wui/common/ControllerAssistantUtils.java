@@ -13,11 +13,11 @@ import java.util.List;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.log.LogEntryParameter;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

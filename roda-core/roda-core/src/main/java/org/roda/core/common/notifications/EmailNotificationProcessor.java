@@ -22,11 +22,11 @@ import org.roda.core.common.ConfigurableEmailUtility;
 import org.roda.core.common.HandlebarsUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.notifications.Notification.NOTIFICATION_STATE;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.model.ModelService;
+import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

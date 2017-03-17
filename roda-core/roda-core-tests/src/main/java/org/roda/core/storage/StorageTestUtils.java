@@ -20,8 +20,8 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.utils.IdUtils;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.util.IdUtils;
 import org.testng.Assert;
 
 public class StorageTestUtils {
