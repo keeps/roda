@@ -134,7 +134,9 @@ public final class FSUtils {
 
     // ensure parent directory exists or can be created
     try {
-      Files.createDirectories(targetPath.getParent());
+      if (targetPath != null) {
+        Files.createDirectories(targetPath.getParent());
+      }
     } catch (FileAlreadyExistsException e) {
       // do nothing
     } catch (IOException e) {
@@ -229,7 +231,9 @@ public final class FSUtils {
 
     // ensure parent directory exists or can be created
     try {
-      Files.createDirectories(targetPath.getParent());
+      if (targetPath != null) {
+        Files.createDirectories(targetPath.getParent());
+      }
     } catch (IOException e) {
       throw new GenericException("Error while creating target directory parent folder", e);
     }

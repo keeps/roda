@@ -16,7 +16,10 @@ public class Pair<K, V> {
     super();
   }
 
-  private Pair(K first, V second) {
+  /**
+   * Instead of using this construtor, the of function should be used
+   */
+  public Pair(K first, V second) {
     this.first = first;
     this.second = second;
   }
