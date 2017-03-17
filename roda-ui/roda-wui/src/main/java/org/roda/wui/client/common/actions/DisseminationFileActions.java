@@ -35,6 +35,7 @@ public class DisseminationFileActions extends AbstractActionable<DIPFile> {
   private static final Set<DisseminationFileAction> POSSIBLE_ACTIONS_ON_MULTIPLE_DISSEMINATION_FILES = new HashSet<>();
 
   private DisseminationFileActions() {
+    // do nothing
   }
 
   public enum DisseminationFileAction implements Actionable.Action<DIPFile> {
@@ -100,12 +101,10 @@ public class DisseminationFileActions extends AbstractActionable<DIPFile> {
 
   @Override
   public Widget createActionsLayout(SelectedItems<DIPFile> disseminationFiles, AsyncCallback<ActionImpact> callback) {
-    FlowPanel layout = createLayout();
-
     // MANAGEMENT
     // addTitle(layout, messages.disseminationFile());
 
-    return layout;
+    return createLayout();
   }
 
 }

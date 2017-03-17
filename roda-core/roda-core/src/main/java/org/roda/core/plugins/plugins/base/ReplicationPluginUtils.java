@@ -21,7 +21,11 @@ import org.roda.core.util.CommandException;
 import org.roda.core.util.CommandUtility;
 
 public class ReplicationPluginUtils {
-  protected static String PROPERTIES_ERROR_MESSAGE = "Rsync properties are not well defined";
+  protected static final String PROPERTIES_ERROR_MESSAGE = "Rsync properties are not well defined";
+
+  private ReplicationPluginUtils() {
+    // do nothing
+  }
 
   public static String executeRsyncAIP(AIP aip, boolean hasCompression) throws CommandException {
     String dataTarget = RodaCoreFactory.getRodaConfigurationAsString("core", "aip_rsync", "target");

@@ -18,6 +18,10 @@ import org.roda.core.util.CommandUtility;
 
 public class UnoconvConvertPluginUtils {
 
+  private UnoconvConvertPluginUtils() {
+    // do nothing
+  }
+
   public static String executeUnoconvConvert(Path input, Path output, String outputFormat, String commandArguments)
     throws CommandException, IOException, UnsupportedOperationException {
 

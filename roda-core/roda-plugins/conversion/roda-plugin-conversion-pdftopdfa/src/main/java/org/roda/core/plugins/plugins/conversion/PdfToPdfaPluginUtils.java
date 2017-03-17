@@ -32,6 +32,10 @@ import org.verapdf.processor.plugins.PluginsCollectionConfig;
 
 public class PdfToPdfaPluginUtils {
 
+  private PdfToPdfaPluginUtils() {
+    // do nothing
+  }
+
   public static String executePdfToPdfa(Path input, Path fixed, boolean validatePDF)
     throws IOException, CommandException {
     try {

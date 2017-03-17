@@ -41,21 +41,20 @@ import config.i18n.client.ClientMessages;
 public class HtmlSnippetUtils {
 
   private static final String OPEN_SPAN_CLASS_LABEL_INFO = "<span class='label-info'>";
-
   private static final String OPEN_SPAN_CLASS_LABEL_DEFAULT = "<span class='label-default'>";
-
   private static final String OPEN_SPAN_CLASS_LABEL_DANGER = "<span class='label-danger'>";
-
   private static final String OPEN_SPAN_CLASS_LABEL_WARNING = "<span class='label-warning'>";
-
   private static final String OPEN_SPAN_CLASS_LABEL_SUCCESS = "<span class='label-success'>";
-
   private static final String CLOSE_SPAN = "</span>";
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   public static final SafeHtml LOADING = SafeHtmlUtils.fromSafeConstant(
     "<div class='spinner'><div class='double-bounce1'></div><div class='double-bounce2'></div></div>");
+
+  private HtmlSnippetUtils() {
+    // do nothing
+  }
 
   public static SafeHtml getJobStateHtml(Job job) {
     SafeHtml ret = null;

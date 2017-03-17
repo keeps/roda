@@ -14,6 +14,7 @@ package org.roda.wui.client.browse;
  * @author Luis Faria
  * 
  */
+@FunctionalInterface
 public interface SliderEventListener {
 
   /**

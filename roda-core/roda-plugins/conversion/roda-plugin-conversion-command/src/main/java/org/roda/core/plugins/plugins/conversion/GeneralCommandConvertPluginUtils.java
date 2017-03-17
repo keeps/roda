@@ -17,6 +17,10 @@ import org.roda.core.util.CommandUtility;
 
 public class GeneralCommandConvertPluginUtils {
 
+  private GeneralCommandConvertPluginUtils() {
+    // do nothing
+  }
+
   public static String executeGeneralCommand(Path input, Path output, String command)
     throws CommandException, IOException, UnsupportedOperationException {
     String updatedCommand = command;

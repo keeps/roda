@@ -45,6 +45,10 @@ import org.slf4j.LoggerFactory;
 public class JobsHelper {
   private static final Logger LOGGER = LoggerFactory.getLogger(JobsHelper.class);
 
+  private JobsHelper() {
+    // do nothing
+  }
+
   protected static void validateAndSetJobInformation(User user, Job job) throws RequestNotValidException {
     LOGGER.debug("Job being validated: {}", job);
     validateJobPluginInformation(job);

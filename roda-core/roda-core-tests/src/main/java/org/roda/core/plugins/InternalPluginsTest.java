@@ -338,7 +338,6 @@ public class InternalPluginsTest {
     // check file original name
     String originalName = fpo.getOriginalName().getStringValue();
     AssertJUnit.assertEquals(CORPORA_TEST1_TXT, originalName);
-
   }
 
   @SuppressWarnings("unchecked")
@@ -440,7 +439,6 @@ public class InternalPluginsTest {
     IndexResult<IndexedPreservationEvent> events = index.find(IndexedPreservationEvent.class, filter, null,
       new Sublist(0, 10), new ArrayList<>());
     AssertJUnit.assertEquals(1, events.getTotalCount());
-
   }
 
   @Test
@@ -452,7 +450,6 @@ public class InternalPluginsTest {
       SelectedItemsList.create(AIP.class, aip.getId()));
 
     aip = model.retrieveAIP(aip.getId());
-
     MatcherAssert.assertThat(aip.getState(), Is.is(AIPState.ACTIVE));
   }
 

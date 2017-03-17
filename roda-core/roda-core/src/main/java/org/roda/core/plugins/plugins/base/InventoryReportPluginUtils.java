@@ -43,8 +43,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class InventoryReportPluginUtils {
-
   private static final Logger LOGGER = LoggerFactory.getLogger(InventoryReportPluginUtils.class);
+
+  private InventoryReportPluginUtils() {
+    // do nothing
+  }
 
   public static void mergeFiles(List<Path> files, Path mergedFile) throws IOException {
     try (FileChannel out = FileChannel.open(mergedFile, StandardOpenOption.APPEND, StandardOpenOption.WRITE)) {

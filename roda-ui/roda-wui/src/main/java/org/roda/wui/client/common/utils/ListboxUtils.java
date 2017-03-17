@@ -14,6 +14,10 @@ import com.google.gwt.user.client.ui.ListBox;
 
 public class ListboxUtils {
 
+  private ListboxUtils() {
+    // do nothing
+  }
+
   public static final void removeItemByValue(ListBox listbox, String value) {
     List<Integer> indexesToRemove = new ArrayList<>();
     // going from the end to the start so remove is easier
@@ -37,7 +41,7 @@ public class ListboxUtils {
         break;
       }
     }
-    
+
     if (indexToInsert < 0) {
       indexToInsert = listbox.getItemCount();
     }
@@ -48,7 +52,7 @@ public class ListboxUtils {
 
   public static final void copyValues(ListBox listBoxOrigin, ListBox listBoxDestination) {
     for (int i = 0; i < listBoxOrigin.getItemCount(); i++) {
-      listBoxDestination.addItem(listBoxOrigin.getItemText(i), listBoxOrigin.getValue(i)); 
+      listBoxDestination.addItem(listBoxOrigin.getItemText(i), listBoxOrigin.getValue(i));
     }
   }
 

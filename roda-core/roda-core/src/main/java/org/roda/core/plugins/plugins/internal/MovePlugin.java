@@ -134,7 +134,7 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
         if (!objects.isEmpty()) {
           if (objects.get(0) instanceof AIP) {
             for (T object : objects) {
-              processAIP(index, model, report, jobPluginInfo, cachedJob, (AIP) object);
+              processAIP(model, report, jobPluginInfo, cachedJob, (AIP) object);
             }
           } else if (objects.get(0) instanceof File) {
             for (T object : objects) {
@@ -148,8 +148,7 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
     }, index, model, storage, liteList);
   }
 
-  private void processAIP(IndexService index, ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo,
-    Job job, AIP aip) {
+  private void processAIP(ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo, Job job, AIP aip) {
     Locale locale = PluginHelper.parseLocale(RodaConstants.DEFAULT_EVENT_LOCALE);
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
     PluginState state = PluginState.SUCCESS;

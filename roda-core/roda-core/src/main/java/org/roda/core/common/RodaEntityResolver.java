@@ -39,22 +39,15 @@ public class RodaEntityResolver implements EntityResolver {
       String systemId = pair.getSecond();
 
       String filename = Paths.get(URI.create(systemId)).getFileName().toString();
+      String configurationFile = RodaConstants.CORE_SCHEMAS_FOLDER + "/" + filename;
 
-      InputStream in = null;
-      ByteArrayOutputStream out = null;
-      try {
-        String configurationFile = RodaConstants.CORE_SCHEMAS_FOLDER + "/" + filename;
-        in = RodaCoreFactory.getConfigurationFileAsStream(configurationFile);
-
+      try (InputStream in = RodaCoreFactory.getConfigurationFileAsStream(configurationFile);
+        ByteArrayOutputStream out = new ByteArrayOutputStream()) {
         if (in != null) {
-          out = new ByteArrayOutputStream();
           IOUtils.copy(in, out);
           return out.toByteArray();
         } else
           throw new NotFoundException(configurationFile);
-      } finally {
-        IOUtils.closeQuietly(in);
-        IOUtils.closeQuietly(out);
       }
     }
 

@@ -385,6 +385,7 @@ final class RodaFolderAIP extends AIPWrap {
    * {@link IPMetadata} setter interface. Implementations of this interface
    * should add the {@link IPMetadata} records to themselves.
    */
+  @FunctionalInterface
   interface IPMetadataSetter {
     /**
      * Add the specified metadata.

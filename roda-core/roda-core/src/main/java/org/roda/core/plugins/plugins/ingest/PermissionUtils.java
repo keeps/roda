@@ -34,6 +34,10 @@ import org.roda.core.storage.Binary;
  */
 public class PermissionUtils {
 
+  private PermissionUtils() {
+    // do nothing
+  }
+
   public static Permissions grantReadPermissionToUserGroup(ModelService model, AIP aip, Permissions permissions)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException, IOException {
     List<DescriptiveMetadata> descriptiveMetadataList = aip.getDescriptiveMetadata();

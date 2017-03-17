@@ -10,6 +10,7 @@ package org.roda.wui.client.main;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+@FunctionalInterface
 public interface DescriptionLevelServiceAsync {
 
   DescriptionLevelServiceAsync INSTANCE = GWT.create(DescriptionLevelService.class);

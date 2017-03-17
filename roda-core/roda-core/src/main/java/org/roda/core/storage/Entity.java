@@ -17,6 +17,7 @@ import org.roda.core.data.v2.ip.StoragePath;
  * 
  * @author Hélder Silva <hsilva@keep.pt>
  */
+@FunctionalInterface
 public interface Entity extends Serializable {
   /**
    * The path of the entity in storage

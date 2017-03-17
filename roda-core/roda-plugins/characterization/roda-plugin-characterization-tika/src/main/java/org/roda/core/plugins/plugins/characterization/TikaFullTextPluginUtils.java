@@ -38,7 +38,6 @@ import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.InputStreamContentPayload;
-import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StringContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,9 +50,9 @@ public class TikaFullTextPluginUtils {
     // do nothing
   }
 
-  public static LinkingIdentifier runTikaFullTextOnFile(ModelService model, StorageService storage, File file,
-    boolean doFeatureExtraction, boolean doFulltextExtraction) throws NotFoundException, GenericException,
-    RequestNotValidException, AuthorizationDeniedException, ValidationException, IOException {
+  public static LinkingIdentifier runTikaFullTextOnFile(ModelService model, File file, boolean doFeatureExtraction,
+    boolean doFulltextExtraction) throws NotFoundException, GenericException, RequestNotValidException,
+    AuthorizationDeniedException, ValidationException, IOException {
 
     boolean notify = true; // need to index tika properties...
 

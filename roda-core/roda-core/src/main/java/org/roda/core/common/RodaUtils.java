@@ -72,9 +72,32 @@ import net.sf.saxon.s9api.XsltTransformer;
 public class RodaUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(RodaUtils.class);
 
+  private static final Processor PROCESSOR = new Processor(false);
+
+  private static final LoadingCache<Triple<String, String, String>, XsltExecutable> CACHE = CacheBuilder.newBuilder()
+    .expireAfterWrite(1, TimeUnit.MINUTES).build(new CacheLoader<Triple<String, String, String>, XsltExecutable>() {
+
+      @Override
+      public XsltExecutable load(Triple<String, String, String> key) throws Exception {
+        String basePath = key.getLeft();
+        String metadataType = key.getMiddle();
+        String metadataVersion = key.getRight();
+        return createMetadataTransformer(basePath, metadataType, metadataVersion);
+      }
+
+    });
+
+  private static final LoadingCache<String, XsltExecutable> EVENT_CACHE = CacheBuilder.newBuilder()
+    .expireAfterWrite(1, TimeUnit.MINUTES).build(new CacheLoader<String, XsltExecutable>() {
+      @Override
+      public XsltExecutable load(String path) throws Exception {
+        return createEventTransformer(path);
+      }
+    });
+
   /** Private empty constructor */
   private RodaUtils() {
-
+    // do nothing
   }
 
   /**
@@ -149,6 +172,7 @@ public class RodaUtils {
    * @deprecated 20160907 hsilva: not seeing any method using it, so it will be
    *             removed soon
    */
+  @Deprecated
   public static Map<String, Object> copyMap(Object object) {
     if (!(object instanceof Map)) {
       return null;
@@ -194,7 +218,7 @@ public class RodaUtils {
     Source xsltSource = new StreamSource(xsltReader);
     Transformer transformer = factory.newTransformer(xsltSource);
     for (Entry<String, String> parameter : parameters.entrySet()) {
-      transformer.setParameter(parameter.getKey(), (String) parameter.getValue());
+      transformer.setParameter(parameter.getKey(), parameter.getValue());
     }
     try {
       XMLReader xmlReader = XMLReaderFactory.createXMLReader();
@@ -207,35 +231,10 @@ public class RodaUtils {
     }
   }
 
-  private static Processor PROCESSOR = new Processor(false);
-
-  private static LoadingCache<Triple<String, String, String>, XsltExecutable> CACHE = CacheBuilder.newBuilder()
-    .expireAfterWrite(1, TimeUnit.MINUTES).build(new CacheLoader<Triple<String, String, String>, XsltExecutable>() {
-
-      @Override
-      public XsltExecutable load(Triple<String, String, String> key) throws Exception {
-        String basePath = key.getLeft();
-        String metadataType = key.getMiddle();
-        String metadataVersion = key.getRight();
-        return createMetadataTransformer(basePath, metadataType, metadataVersion);
-      }
-
-    });
-
-  private static LoadingCache<String, XsltExecutable> EVENT_CACHE = CacheBuilder.newBuilder()
-    .expireAfterWrite(1, TimeUnit.MINUTES).build(new CacheLoader<String, XsltExecutable>() {
-      @Override
-      public XsltExecutable load(String path) throws Exception {
-        return createEventTransformer(path);
-      }
-    });
-
   public static Reader applyMetadataStylesheet(Binary binary, String basePath, String metadataType,
     String metadataVersion, Map<String, String> parameters) throws GenericException {
-    Reader descMetadataReader = null;
-
-    try {
-      descMetadataReader = new InputStreamReader(new BOMInputStream(binary.getContent().createInputStream()));
+    try (
+      Reader descMetadataReader = new InputStreamReader(new BOMInputStream(binary.getContent().createInputStream()))) {
 
       XMLReader xmlReader = XMLReaderFactory.createXMLReader();
       xmlReader.setEntityResolver(new RodaEntityResolver());
@@ -263,17 +262,13 @@ public class RodaUtils {
     } catch (IOException | SAXException | ExecutionException | SaxonApiException e) {
       throw new GenericException("Could not process descriptive metadata binary " + binary.getStoragePath()
         + " metadata type " + metadataType + " and version " + metadataVersion, e);
-    } finally {
-      IOUtils.closeQuietly(descMetadataReader);
     }
   }
 
   public static Reader applyEventStylesheet(Binary binary, boolean onlyDetails, Map<String, String> translations,
     String path) throws GenericException {
-    Reader descMetadataReader = null;
-
-    try {
-      descMetadataReader = new InputStreamReader(new BOMInputStream(binary.getContent().createInputStream()));
+    try (
+      Reader descMetadataReader = new InputStreamReader(new BOMInputStream(binary.getContent().createInputStream()))) {
 
       XMLReader xmlReader = XMLReaderFactory.createXMLReader();
       xmlReader.setEntityResolver(new RodaEntityResolver());
@@ -302,8 +297,6 @@ public class RodaUtils {
     } catch (IOException | SAXException | ExecutionException | SaxonApiException e) {
       LOGGER.error(e.getMessage(), e);
       throw new GenericException("Could not process event binary " + binary.getStoragePath(), e);
-    } finally {
-      IOUtils.closeQuietly(descMetadataReader);
     }
   }
 
@@ -366,6 +359,7 @@ public class RodaUtils {
    * @deprecated 20160907 hsilva: not seeing any method using it, so it will be
    *             removed soon
    */
+  @Deprecated
   public static void indentXML(Reader input, Writer output) throws TransformerException {
     Transformer transformer = TransformerFactory.newInstance().newTransformer();
     transformer.setOutputProperty(OutputKeys.INDENT, "yes");
@@ -380,6 +374,7 @@ public class RodaUtils {
    * @deprecated 20160907 hsilva: not seeing any method using it, so it will be
    *             removed soon
    */
+  @Deprecated
   public static String indentXML(String xml) throws GenericException {
     Reader input = new StringReader(xml);
     Writer output = new StringWriter();
@@ -396,6 +391,7 @@ public class RodaUtils {
    * @deprecated 20160907 hsilva: not seeing any method using it, so it will be
    *             removed soon
    */
+  @Deprecated
   public static long getPathSize(Path startPath) throws IOException {
     final AtomicLong size = new AtomicLong(0);
 

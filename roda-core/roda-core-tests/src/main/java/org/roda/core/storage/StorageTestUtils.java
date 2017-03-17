@@ -26,6 +26,10 @@ import org.testng.Assert;
 
 public class StorageTestUtils {
 
+  private StorageTestUtils() {
+    // do nothing
+  }
+
   public static StoragePath generateRandomContainerStoragePath() throws RequestNotValidException {
     return DefaultStoragePath.parse(IdUtils.createUUID());
   }

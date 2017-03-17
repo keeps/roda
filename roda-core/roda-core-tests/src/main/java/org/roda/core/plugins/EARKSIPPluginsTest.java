@@ -134,9 +134,7 @@ public class EARKSIPPluginsTest {
     f.updateTransferredResources(Optional.empty(), true);
     index.commit(TransferredResource.class);
 
-    TransferredResource transferredResource = index.retrieve(TransferredResource.class,
-      IdUtils.createUUID(CorporaConstants.EARK_SIP), new ArrayList<>());
-    return transferredResource;
+    return index.retrieve(TransferredResource.class, IdUtils.createUUID(CorporaConstants.EARK_SIP), new ArrayList<>());
   }
 
   private AIP ingestCorpora() throws RequestNotValidException, NotFoundException, GenericException,
@@ -167,8 +165,7 @@ public class EARKSIPPluginsTest {
     Assert.assertEquals(find.getTotalCount(), 1L);
     IndexedAIP indexedAIP = find.getResults().get(0);
 
-    AIP aip = model.retrieveAIP(indexedAIP.getId());
-    return aip;
+    return model.retrieveAIP(indexedAIP.getId());
   }
 
   @Test

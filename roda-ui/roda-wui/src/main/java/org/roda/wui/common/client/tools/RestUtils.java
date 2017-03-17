@@ -35,6 +35,10 @@ import com.google.gwt.user.client.ui.RootPanel;
 
 public class RestUtils {
 
+  private RestUtils() {
+    // do nothing
+  }
+
   public static SafeUri createAIPDownloadUri(String aipId) {
 
     // api/v1/aips/{aip_id}/?acceptFormat=zip

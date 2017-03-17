@@ -49,6 +49,10 @@ import com.google.common.cache.LoadingCache;
 
 public class VeraPDFPluginUtils {
 
+  private VeraPDFPluginUtils() {
+    // do nothing
+  }
+
   private static final LoadingCache<Pair<String, Boolean>, ItemProcessor> PROCESSOR_CACHE = CacheBuilder.newBuilder()
     .build(new CacheLoader<Pair<String, Boolean>, ItemProcessor>() {
 

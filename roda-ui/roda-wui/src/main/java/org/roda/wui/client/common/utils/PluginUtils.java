@@ -18,6 +18,10 @@ import org.roda.core.data.v2.jobs.PluginType;
 
 public class PluginUtils {
 
+  private PluginUtils() {
+    // do nothing
+  }
+
   public static void sortByName(List<PluginInfo> list) {
     Collections.sort(list, new Comparator<PluginInfo>() {
 

@@ -19,7 +19,7 @@ public class GAnalyticsTracker {
   /**
    * constructor - nothing to do
    */
-  public GAnalyticsTracker() {
+  private GAnalyticsTracker() {
     // do nothing
   }
 

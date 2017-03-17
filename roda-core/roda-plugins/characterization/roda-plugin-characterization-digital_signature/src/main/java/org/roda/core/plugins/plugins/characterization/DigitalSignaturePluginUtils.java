@@ -32,14 +32,16 @@ import org.slf4j.LoggerFactory;
 import com.itextpdf.text.DocumentException;
 
 public class DigitalSignaturePluginUtils {
-
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalSignaturePluginUtils.class);
   protected static final String PDF_FORMAT = "pdf";
   protected static final String OOXML_FORMAT = "ooxml";
   protected static final String ODF_FORMAT = "odf";
 
-  public static String runDigitalSignatureVerify(Path input, String fileFormat, String mimetype) {
+  private DigitalSignaturePluginUtils() {
+    // do nothing
+  }
 
+  public static String runDigitalSignatureVerify(Path input, String fileFormat, String mimetype) {
     String generalFileFormat = SignatureUtils.canHaveEmbeddedSignature(fileFormat, mimetype);
 
     try {

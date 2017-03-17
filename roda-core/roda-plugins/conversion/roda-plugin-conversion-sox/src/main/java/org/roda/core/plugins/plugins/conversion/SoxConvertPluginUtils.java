@@ -18,6 +18,10 @@ import org.roda.core.util.CommandUtility;
 
 public class SoxConvertPluginUtils {
 
+  private SoxConvertPluginUtils() {
+    // do nothing
+  }
+
   public static String executeSox(Path input, Path output, String commandArguments)
     throws CommandException, IOException, UnsupportedOperationException {
 

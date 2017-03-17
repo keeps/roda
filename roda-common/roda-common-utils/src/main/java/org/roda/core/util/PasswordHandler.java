@@ -26,12 +26,13 @@ public class PasswordHandler {
   private static PasswordHandler handler;
 
   protected PasswordHandler() {
+    // do nothing
   }
 
   /**
    * @return an instance of PasswordHandler.
    */
-  public synchronized static PasswordHandler getInstance() {
+  public static synchronized PasswordHandler getInstance() {
     if (handler == null) {
       handler = new PasswordHandler();
     }

@@ -15,7 +15,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.descriptionLevels.DescriptionLevel;
+import org.roda.core.data.descriptionlevels.DescriptionLevel;
 import org.roda.core.data.v2.index.IsIndexed;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;

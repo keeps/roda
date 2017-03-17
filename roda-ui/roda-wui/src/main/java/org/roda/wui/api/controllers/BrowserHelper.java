@@ -174,6 +174,10 @@ public class BrowserHelper {
   private static final List<String> aipAncestorsFieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
     RodaConstants.AIP_GHOST, RodaConstants.AIP_LEVEL, RodaConstants.AIP_TITLE, RodaConstants.AIP_PARENT_ID);
 
+  private BrowserHelper() {
+    // do nothing
+  }
+
   protected static BrowseAIPBundle retrieveBrowseAipBundle(IndexedAIP aip, Locale locale)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
     BrowseAIPBundle bundle = new BrowseAIPBundle();

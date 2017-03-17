@@ -17,6 +17,10 @@ import org.roda.core.RodaCoreFactory;
 
 public class FileFormatUtils {
 
+  private FileFormatUtils() {
+    // do nothing
+  }
+
   public static Map<String, List<String>> getPronomToExtension(String tool) {
     Map<String, List<String>> map = new HashMap<>();
     String inputFormatPronoms = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", tool,

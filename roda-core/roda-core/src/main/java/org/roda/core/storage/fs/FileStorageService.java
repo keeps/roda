@@ -390,8 +390,7 @@ public class FileStorageService implements StorageService {
 
       Resource resource = FSUtils.convertPathToResource(basePath, binaryPath);
       if (resource instanceof Binary) {
-        DefaultBinary binary = (DefaultBinary) resource;
-        return binary;
+        return (DefaultBinary) resource;
       } else {
         throw new GenericException("Looking for a binary but found something else");
       }

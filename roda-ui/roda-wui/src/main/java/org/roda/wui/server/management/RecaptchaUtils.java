@@ -21,17 +21,21 @@ import org.roda.wui.client.management.recaptcha.RecaptchaException;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class RecaptchaUtils {
+  private RecaptchaUtils() {
+    // do nothing
+  }
+
   public static void recaptchaVerify(String secret, String captcha) throws RecaptchaException {
     BufferedReader bufferedReader = null;
     try {
       String urlParameters = "secret=" + secret + "&response=" + captcha;
       String url = "https://www.google.com/recaptcha/api/siteverify?" + urlParameters;
-      String USER_AGENT = "Mozilla/5.0";
+      String userAgent = "Mozilla/5.0";
 
       HttpClient client = HttpClientBuilder.create().build();
       HttpGet request = new HttpGet(url);
 
-      request.addHeader("User-Agent", USER_AGENT);
+      request.addHeader("User-Agent", userAgent);
       HttpResponse response = client.execute(request);
 
       StringBuilder builder = new StringBuilder();

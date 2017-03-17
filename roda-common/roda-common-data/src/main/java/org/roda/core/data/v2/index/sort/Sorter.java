@@ -100,7 +100,7 @@ public class Sorter implements Serializable {
    * @return the parameters
    */
   public SortParameter[] getParameters() {
-    return (SortParameter[]) parameters.toArray(new SortParameter[parameters.size()]);
+    return parameters.toArray(new SortParameter[parameters.size()]);
   }
 
   /**

@@ -76,13 +76,13 @@ public class SIPRemovePlugin extends AbstractPlugin<TransferredResource> {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
         SimpleJobPluginInfo jobPluginInfo, Plugin<TransferredResource> plugin, TransferredResource object) {
-        processTransferredResource(index, model, report, jobPluginInfo, cachedJob, object);
+        processTransferredResource(model, report, jobPluginInfo, cachedJob, object);
       }
     }, index, model, storage, liteList);
   }
 
-  private void processTransferredResource(IndexService index, ModelService model, Report report,
-    SimpleJobPluginInfo pluginInfo, Job job, TransferredResource transferredResource) {
+  private void processTransferredResource(ModelService model, Report report, SimpleJobPluginInfo pluginInfo, Job job,
+    TransferredResource transferredResource) {
     Report reportItem = PluginHelper.initPluginReportItem(this, transferredResource);
     PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
 

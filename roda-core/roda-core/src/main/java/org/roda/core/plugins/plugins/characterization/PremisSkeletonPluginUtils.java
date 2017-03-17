@@ -34,8 +34,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PremisSkeletonPluginUtils {
-
   private static final Logger LOGGER = LoggerFactory.getLogger(PremisSkeletonPlugin.class);
+
+  private PremisSkeletonPluginUtils() {
+    // do nothing
+  }
 
   public static void createPremisSkeletonOnRepresentation(ModelService model, AIP aip, String representationId,
     Collection<String> fixityAlgorithms) throws RequestNotValidException, GenericException, NotFoundException,

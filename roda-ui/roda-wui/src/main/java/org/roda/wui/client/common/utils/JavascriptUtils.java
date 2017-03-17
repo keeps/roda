@@ -11,6 +11,10 @@ import com.google.gwt.core.client.JavaScriptObject;
 
 public class JavascriptUtils {
 
+  private JavascriptUtils() {
+    // do nothing
+  }
+
   public static native void runHighlighter() /*-{
 		$wnd.console.log("running highlighter");
 		$wnd.jQuery('pre code').each(function(i, block) {

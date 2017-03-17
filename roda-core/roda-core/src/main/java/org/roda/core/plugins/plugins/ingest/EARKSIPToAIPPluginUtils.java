@@ -36,12 +36,12 @@ import org.roda_project.commons_ip.model.IPMetadata;
 import org.roda_project.commons_ip.model.IPRepresentation;
 import org.roda_project.commons_ip.model.RepresentationStatus;
 import org.roda_project.commons_ip.model.SIP;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class EARKSIPToAIPPluginUtils {
-  @SuppressWarnings("unused")
-  private static final Logger LOGGER = LoggerFactory.getLogger(EARKSIPToAIPPluginUtils.class);
+
+  private EARKSIPToAIPPluginUtils() {
+    // do nothing
+  }
 
   public static AIP earkSIPToAIP(SIP sip, String username, Permissions fullPermissions, ModelService model,
     List<String> ingestSIPIds, String ingestJobId, Optional<String> parentId)
@@ -82,12 +82,12 @@ public class EARKSIPToAIPPluginUtils {
   public static AIP earkSIPToAIPUpdate(SIP sip, IndexedAIP indexedAIP, ModelService model, StorageService storage,
     String username, String ingestJobId) throws RequestNotValidException, NotFoundException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, ValidationException {
-    return earkSIPToAIPUpdate(sip, indexedAIP, model, storage, username, Optional.empty(), ingestJobId);
+    return earkSIPToAIPUpdate(sip, indexedAIP, model, username, Optional.empty(), ingestJobId);
   }
 
-  public static AIP earkSIPToAIPUpdate(SIP sip, IndexedAIP indexedAIP, ModelService model, StorageService storage,
-    String username, Optional<String> searchScope, String ingestJobId) throws RequestNotValidException,
-    NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException, ValidationException {
+  public static AIP earkSIPToAIPUpdate(SIP sip, IndexedAIP indexedAIP, ModelService model, String username,
+    Optional<String> searchScope, String ingestJobId) throws RequestNotValidException, NotFoundException,
+    GenericException, AlreadyExistsException, AuthorizationDeniedException, ValidationException {
     boolean notify = false;
 
     // process IP information

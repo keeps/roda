@@ -29,8 +29,11 @@ import edu.harvard.hul.ois.jhove.OutputHandler;
 public class JHOVEPluginUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(JHOVEPluginUtils.class);
 
-  public static Path inspect(File targetFile) throws Exception {
+  private JHOVEPluginUtils() {
+    // do nothing
+  }
 
+  public static Path inspect(File targetFile) throws Exception {
     if (targetFile == null || !targetFile.isFile() || !targetFile.exists()) {
       LOGGER.warn("target file '{}' cannot be found.", targetFile);
       throw new FileNotFoundException("target file '" + targetFile + "' cannot be found.");

@@ -692,7 +692,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
   }
 
   // LISTENER
-
+  @FunctionalInterface
   public interface CheckboxSelectionListener<T extends IsIndexed> {
     public void onSelectionChange(SelectedItems<T> selected);
   }

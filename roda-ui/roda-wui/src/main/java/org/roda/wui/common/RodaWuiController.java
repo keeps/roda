@@ -12,6 +12,11 @@ import org.roda.core.RodaCoreFactory;
 import com.codahale.metrics.MetricRegistry;
 
 public abstract class RodaWuiController {
+
+  public RodaWuiController() {
+    super();
+  }
+
   protected static MetricRegistry getMetricRegistry() {
     return RodaCoreFactory.getMetrics();
   }

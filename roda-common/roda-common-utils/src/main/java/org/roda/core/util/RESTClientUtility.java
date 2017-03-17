@@ -29,6 +29,7 @@ public final class RESTClientUtility {
 
   /** Private empty constructor */
   private RESTClientUtility() {
+    // do nothing
   }
 
   public static <T extends Serializable> T sendPostRequest(T element, Class<T> elementClass, String url,

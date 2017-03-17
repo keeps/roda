@@ -16,7 +16,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
@@ -450,21 +449,6 @@ public class CreateMetsDIPPlugin extends AbstractPlugin<AIP> {
     }
 
     return representationIds;
-  }
-
-  private List<String> copyAIPDescriptiveMetadata(StorageService storage, AIP aip, StoragePath aipPath,
-    StoragePath aipOnDIPPath) throws RequestNotValidException, AlreadyExistsException, GenericException,
-    NotFoundException, AuthorizationDeniedException {
-    List<String> descriptiveMetadataIds = new ArrayList<>();
-
-    for (DescriptiveMetadata dm : aip.getDescriptiveMetadata()) {
-      String dmId = copyDescriptiveMetadata(storage, dm, aipPath, aipOnDIPPath);
-      if (StringUtils.isNotBlank(dmId)) {
-        descriptiveMetadataIds.add(dmId);
-      }
-    }
-
-    return descriptiveMetadataIds;
   }
 
   private String copyDescriptiveMetadata(StorageService storage, DescriptiveMetadata dm, StoragePath sourcePath,

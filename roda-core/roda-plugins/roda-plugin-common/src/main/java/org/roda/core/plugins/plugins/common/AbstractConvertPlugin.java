@@ -194,12 +194,10 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
 
-    // input image format
     if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_INPUT_FORMAT)) {
       setInputFormat(parameters.get(RodaConstants.PLUGIN_PARAMS_INPUT_FORMAT));
     }
 
-    // output image format
     if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_OUTPUT_FORMAT)) {
       setOutputFormat(parameters.get(RodaConstants.PLUGIN_PARAMS_OUTPUT_FORMAT));
     }
@@ -227,7 +225,6 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
   @Override
   protected Report executeOnAIP(IndexService index, ModelService model, StorageService storage, Report report,
     SimpleJobPluginInfo jobPluginInfo, List<AIP> list, Job job) throws PluginException {
-
     for (AIP aip : list) {
       LOGGER.debug("Processing AIP {}", aip.getId());
       List<String> newRepresentations = new ArrayList<>();
@@ -419,7 +416,6 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
   @Override
   protected Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage,
     Report report, SimpleJobPluginInfo jobPluginInfo, List<Representation> list, Job job) throws PluginException {
-
     List<String> newRepresentations = new ArrayList<>();
     String aipId = null;
 
@@ -628,14 +624,13 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
     for (File file : list) {
       try {
         LOGGER.debug("Processing file {}", file.getId());
+        newRepresentationID = IdUtils.createUUID();
+        pluginResultState = PluginState.SUCCESS;
 
         reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getFileId(file), File.class, AIPState.ACTIVE);
         if (createDIP) {
           reportItem.setOutcomeObjectClass(DIP.class.getName());
         }
-
-        newRepresentationID = IdUtils.createUUID();
-        pluginResultState = PluginState.SUCCESS;
 
         if (!file.isDirectory()) {
           IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file),
@@ -650,7 +645,6 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
 
           if (doPluginExecute(fileFormat, filePronom, fileMimetype, applicableTo, convertableTo, pronomToExtension,
             mimetypeToExtension)) {
-
             fileFormat = getNewFileFormat(fileFormat, filePronom, fileMimetype, applicableTo, pronomToExtension,
               mimetypeToExtension);
 
@@ -830,7 +824,6 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
     List<String> convertableTo, Map<String, List<String>> pronomToExtension,
     Map<String, List<String>> mimetypeToExtension) {
     LOGGER.info("Testing if input and output formats are correct");
-
     boolean format = (!getInputFormat().isEmpty() && fileFormat.equalsIgnoreCase(getInputFormat()))
       || getInputFormat().isEmpty();
     boolean applicable = applicableTo.isEmpty() || (filePronom != null && pronomToExtension.containsKey(filePronom))
@@ -859,7 +852,6 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
   private void createNewFilesOnRepresentation(StorageService storage, ModelService model, List<File> unchangedFiles,
     String newRepresentationID, boolean notify) throws RequestNotValidException, GenericException, NotFoundException,
     AuthorizationDeniedException, UnsupportedOperationException, IOException, AlreadyExistsException {
-
     for (File f : unchangedFiles) {
       StoragePath fileStoragePath = ModelUtils.getFileStoragePath(f);
       Binary binary = storage.getBinary(fileStoragePath);
@@ -872,7 +864,6 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
   private void createNewFilesOnDIP(StorageService storage, ModelService model, List<File> unchangedFiles,
     String newRepresentationID, boolean notify) throws RequestNotValidException, GenericException, NotFoundException,
     AuthorizationDeniedException, UnsupportedOperationException, IOException, AlreadyExistsException {
-
     for (File f : unchangedFiles) {
       StoragePath fileStoragePath = ModelUtils.getFileStoragePath(f);
       Binary binary = storage.getBinary(fileStoragePath);

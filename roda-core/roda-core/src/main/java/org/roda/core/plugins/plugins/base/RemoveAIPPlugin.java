@@ -57,7 +57,8 @@ public class RemoveAIPPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getDescription() {
-    return "Permanently removes selected AIP(s) from the repository. Data, metadata and event history will be deleted permanently. WARNING: This operation cannot be undone. Use with extreme caution.";
+    return "Permanently removes selected AIP(s) from the repository. Data, metadata and event history will be deleted permanently. WARNING: "
+      + "This operation cannot be undone. Use with extreme caution.";
   }
 
   @Override
@@ -77,30 +78,26 @@ public class RemoveAIPPlugin extends AbstractPlugin<AIP> {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
         SimpleJobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {
-        processAIP(index, model, report, jobPluginInfo, cachedJob, object);
+        processAIP(model, report, jobPluginInfo, cachedJob, object);
       }
     }, index, model, storage, liteList);
   }
 
-  private void processAIP(IndexService index, ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo,
-    Job job, AIP aip) {
-    String error = null;
+  private void processAIP(ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo, Job job, AIP aip) {
+    Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
+
     try {
       LOGGER.debug("Removing AIP {}", aip.getId());
       model.deleteAIP(aip.getId());
-    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      error = e.getMessage();
-    }
-    Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
-    if (error != null) {
-      reportItem.setPluginState(PluginState.FAILURE)
-        .setPluginDetails("Removal of AIP " + aip.getId() + " did not end successfully: " + error);
-      jobPluginInfo.incrementObjectsProcessedWithFailure();
-    } else {
       reportItem.setPluginState(PluginState.SUCCESS)
         .setPluginDetails("Removal of AIP " + aip.getId() + " ended successfully");
       jobPluginInfo.incrementObjectsProcessedWithSuccess();
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+      reportItem.setPluginState(PluginState.FAILURE)
+        .setPluginDetails("Removal of AIP " + aip.getId() + " did not end successfully: " + e.getMessage());
+      jobPluginInfo.incrementObjectsProcessedWithFailure();
     }
+
     report.addReport(reportItem);
     PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
   }

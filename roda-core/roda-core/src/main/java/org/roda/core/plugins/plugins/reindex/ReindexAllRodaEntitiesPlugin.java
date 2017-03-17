@@ -14,7 +14,6 @@ import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
-import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.IsRODAObject;
@@ -74,11 +73,6 @@ public class ReindexAllRodaEntitiesPlugin extends AbstractPlugin<Void> {
   }
 
   @Override
-  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
-    super.setParameterValues(parameters);
-  }
-
-  @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> list) throws PluginException {
     final List<Class<? extends IsRODAObject>> classes = PluginHelper.getReindexObjectClasses();
@@ -87,13 +81,13 @@ public class ReindexAllRodaEntitiesPlugin extends AbstractPlugin<Void> {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
         SimpleJobPluginInfo jobPluginInfo, Plugin<Void> plugin) {
-        reindexAll(index, model, report, jobPluginInfo, cachedJob, classes);
+        reindexAll(model, report, jobPluginInfo, cachedJob, classes);
       }
     }, index, model, storage, classes.size());
   }
 
-  private void reindexAll(IndexService index, ModelService model, Report pluginReport,
-    SimpleJobPluginInfo jobPluginInfo, Job job, List<Class<? extends IsRODAObject>> classes) {
+  private void reindexAll(ModelService model, Report pluginReport, SimpleJobPluginInfo jobPluginInfo, Job job,
+    List<Class<? extends IsRODAObject>> classes) {
 
     for (Class<? extends IsRODAObject> reindexClass : classes) {
       Report reportItem = reindexRODAObject(model, reindexClass, jobPluginInfo);

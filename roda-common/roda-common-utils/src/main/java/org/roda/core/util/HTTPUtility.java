@@ -29,7 +29,7 @@ public final class HTTPUtility {
 
   /** Private empty constructor */
   private HTTPUtility() {
-
+    // do nothing
   }
 
   public static String doMethod(String url, String method, Optional<Pair<String, String>> basicAuth)

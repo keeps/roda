@@ -33,21 +33,16 @@ public class RodaURIFileResolver implements URIResolver {
 
     @Override
     public byte[] load(String href) throws Exception {
-      InputStream in = null;
-      ByteArrayOutputStream out = null;
-      try {
-        String filePath = RodaConstants.CROSSWALKS_DISSEMINATION_OTHER_PATH + href;
-        in = RodaCoreFactory.getConfigurationFileAsStream(filePath);
+      String filePath = RodaConstants.CROSSWALKS_DISSEMINATION_OTHER_PATH + href;
+
+      try (InputStream in = RodaCoreFactory.getConfigurationFileAsStream(filePath);
+        ByteArrayOutputStream out = new ByteArrayOutputStream()) {
         if (in == null) {
           throw new NotFoundException(filePath);
         }
-        out = new ByteArrayOutputStream();
-        IOUtils.copy(in, out);
 
+        IOUtils.copy(in, out);
         return out.toByteArray();
-      } finally {
-        IOUtils.closeQuietly(in);
-        IOUtils.closeQuietly(out);
       }
     }
 

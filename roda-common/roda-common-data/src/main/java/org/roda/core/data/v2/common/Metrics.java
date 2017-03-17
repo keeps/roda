@@ -22,18 +22,18 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Metrics {
-  private Map<String, String> metrics;
+  private Map<String, String> metricList;
 
   public Metrics() {
-    metrics = new HashMap<>();
+    metricList = new HashMap<>();
   }
 
   public Map<String, String> getMetrics() {
-    return metrics;
+    return metricList;
   }
 
   public void addMetric(String metricName, String metricValue) {
-    metrics.put(metricName, metricValue);
+    metricList.put(metricName, metricValue);
   }
 
 }

@@ -32,6 +32,11 @@ import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.RODAMember;
 
 public class SearchFilters {
+
+  private SearchFilters() {
+    // do nothing
+  }
+
   public static Filter defaultFilter(String actualClass) {
     if (actualClass.equals(AIP.class.getName()) || actualClass.equals(IndexedAIP.class.getName())) {
       return new Filter(new BasicSearchFilterParameter(RodaConstants.AIP_SEARCH, "*"));

@@ -18,6 +18,10 @@ import org.roda.core.util.CommandUtility;
 
 public class AvconvConvertPluginUtils {
 
+  private AvconvConvertPluginUtils() {
+    // do nothing
+  }
+
   public static String executeAvconv(Path input, Path output, String commandArguments, String outputArguments)
     throws CommandException, IOException, UnsupportedOperationException {
 

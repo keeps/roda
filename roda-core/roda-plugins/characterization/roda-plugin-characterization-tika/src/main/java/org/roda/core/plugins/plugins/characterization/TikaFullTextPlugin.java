@@ -147,7 +147,7 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractAIPCompo
               if (oFile.isPresent()) {
                 File file = oFile.get();
 
-                LinkingIdentifier tikaResult = TikaFullTextPluginUtils.runTikaFullTextOnFile(model, storage, file,
+                LinkingIdentifier tikaResult = TikaFullTextPluginUtils.runTikaFullTextOnFile(model, file,
                   doFeatureExtraction, doFulltextExtraction);
                 sources.add(tikaResult);
               } else {
@@ -219,7 +219,7 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractAIPCompo
             if (oFile.isPresent()) {
               File file = oFile.get();
 
-              LinkingIdentifier tikaResult = TikaFullTextPluginUtils.runTikaFullTextOnFile(model, storage, file,
+              LinkingIdentifier tikaResult = TikaFullTextPluginUtils.runTikaFullTextOnFile(model, file,
                 doFeatureExtraction, doFulltextExtraction);
               sources.add(tikaResult);
             } else {
@@ -284,8 +284,8 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractAIPCompo
       String outcomeDetailExtension = "";
 
       try {
-        LinkingIdentifier tikaResult = TikaFullTextPluginUtils.runTikaFullTextOnFile(model, storage, file,
-          doFeatureExtraction, doFulltextExtraction);
+        LinkingIdentifier tikaResult = TikaFullTextPluginUtils.runTikaFullTextOnFile(model, file, doFeatureExtraction,
+          doFulltextExtraction);
         sources.add(tikaResult);
 
         RepresentationLink link = new RepresentationLink(file.getAipId(), file.getRepresentationId());

@@ -16,6 +16,7 @@ import org.roda.core.data.v2.user.User;
  * @author Luis Faria
  * 
  */
+@FunctionalInterface
 public interface LoginStatusListener {
 
   /**

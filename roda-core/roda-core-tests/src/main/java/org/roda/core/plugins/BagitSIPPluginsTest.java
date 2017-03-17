@@ -114,10 +114,7 @@ public class BagitSIPPluginsTest {
       Files.newInputStream(sip));
 
     index.commit(TransferredResource.class);
-
-    TransferredResource transferredResource = index.retrieve(TransferredResource.class,
-      transferredResourceCreated.getUUID(), new ArrayList<>());
-    return transferredResource;
+    return index.retrieve(TransferredResource.class, transferredResourceCreated.getUUID(), new ArrayList<>());
   }
 
   private AIP ingestCorpora()
@@ -148,8 +145,7 @@ public class BagitSIPPluginsTest {
     AssertJUnit.assertEquals(1L, find.getTotalCount());
     IndexedAIP indexedAIP = find.getResults().get(0);
 
-    AIP aip = model.retrieveAIP(indexedAIP.getId());
-    return aip;
+    return model.retrieveAIP(indexedAIP.getId());
   }
 
   @Test

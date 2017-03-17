@@ -42,6 +42,11 @@ public class SeleniumUtils {
   private static String url;
   private static String driverPath; // "/path/to/chromedriver"
   private static Map<String, String> locations = new HashMap<>();
+  private static final String TABLE_CLASS = "org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableEvenRow";
+
+  private SeleniumUtils() {
+    // do nothing
+  }
 
   public static void main(String[] args) throws InterruptedException, IOException {
     if (args.length != 2) {
@@ -94,8 +99,7 @@ public class SeleniumUtils {
       saveHTML();
 
       // show browse page
-      List<WebElement> aipList = driver.findElements(
-        By.className("org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableEvenRow"));
+      List<WebElement> aipList = driver.findElements(By.className(TABLE_CLASS));
       aipList.get(0).click();
       saveHTML();
 
@@ -124,14 +128,12 @@ public class SeleniumUtils {
       goBack();
 
       // show browse representation page
-      List<WebElement> representationList = driver.findElements(
-        By.className("org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableEvenRow"));
+      List<WebElement> representationList = driver.findElements(By.className(TABLE_CLASS));
       representationList.get(0).click();
       saveHTML();
 
       // show browse file page
-      List<WebElement> fileList = driver.findElements(
-        By.className("org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableEvenRow"));
+      List<WebElement> fileList = driver.findElements(By.className(TABLE_CLASS));
       fileList.get(0).click();
       saveHTML();
       goBack();
@@ -279,8 +281,7 @@ public class SeleniumUtils {
       saveHTML();
 
       // show risk page
-      List<WebElement> tableRisks = driver.findElements(
-        By.className("org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableEvenRow"));
+      List<WebElement> tableRisks = driver.findElements(By.className(TABLE_CLASS));
       if (!tableRisks.isEmpty()) {
         tableRisks.get(0).click();
         saveHTML();
@@ -309,8 +310,7 @@ public class SeleniumUtils {
       saveHTML();
 
       // show format page
-      List<WebElement> tableFormats = driver.findElements(
-        By.className("org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableEvenRow"));
+      List<WebElement> tableFormats = driver.findElements(By.className(TABLE_CLASS));
       if (!tableFormats.isEmpty()) {
         tableFormats.get(0).click();
         saveHTML();
@@ -339,8 +339,7 @@ public class SeleniumUtils {
       saveHTML();
 
       // show format page
-      List<WebElement> tableEvents = driver.findElements(
-        By.className("org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableEvenRow"));
+      List<WebElement> tableEvents = driver.findElements(By.className(TABLE_CLASS));
       if (!tableEvents.isEmpty()) {
         tableEvents.get(0).click();
         saveHTML();
@@ -356,8 +355,7 @@ public class SeleniumUtils {
       saveHTML();
 
       // show format page
-      List<WebElement> tableAgents = driver.findElements(
-        By.className("org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableEvenRow"));
+      List<WebElement> tableAgents = driver.findElements(By.className(TABLE_CLASS));
       if (!tableAgents.isEmpty()) {
         tableAgents.get(0).click();
         saveHTML();

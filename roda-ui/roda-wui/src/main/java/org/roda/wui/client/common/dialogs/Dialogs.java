@@ -34,6 +34,10 @@ public class Dialogs {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
+  private Dialogs() {
+    // do nothing
+  }
+
   public static void showConfirmDialog(String title, String message, String cancelButtonText, String confirmButtonText,
     final AsyncCallback<Boolean> callback) {
     final DialogBox dialogBox = new DialogBox(false, true);

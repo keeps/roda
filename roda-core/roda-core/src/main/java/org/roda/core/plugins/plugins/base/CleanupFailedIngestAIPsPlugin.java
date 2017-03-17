@@ -10,14 +10,12 @@ package org.roda.core.plugins.plugins.base;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
@@ -73,11 +71,6 @@ public class CleanupFailedIngestAIPsPlugin extends AbstractPlugin<Void> {
   @Override
   public String getVersionImpl() {
     return "1.0";
-  }
-
-  @Override
-  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
-    super.setParameterValues(parameters);
   }
 
   @Override
@@ -151,9 +144,7 @@ public class CleanupFailedIngestAIPsPlugin extends AbstractPlugin<Void> {
     activeJobsIds.forEach(e -> aipsFilter.add(new NotSimpleFilterParameter(RodaConstants.INGEST_JOB_ID, e)));
     // aip state is INGEST_PROCESSING
     aipsFilter.add(new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.INGEST_PROCESSING.toString()));
-    IterableIndexResult<IndexedAIP> findAipsToDelete = index.findAll(IndexedAIP.class, aipsFilter, false, true,
-      Arrays.asList(RodaConstants.INDEX_UUID));
-    return findAipsToDelete;
+    return index.findAll(IndexedAIP.class, aipsFilter, false, true, Arrays.asList(RodaConstants.INDEX_UUID));
   }
 
   @Override

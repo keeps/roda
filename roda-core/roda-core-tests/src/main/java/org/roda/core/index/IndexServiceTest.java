@@ -97,7 +97,6 @@ public class IndexServiceTest {
   private static ModelService model;
   private static IndexService index;
 
-  private static Path corporaPath;
   private static StorageService corporaService;
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IndexServiceTest.class);
@@ -120,8 +119,7 @@ public class IndexServiceTest {
     index = RodaCoreFactory.getIndexService();
 
     URL corporaURL = IndexServiceTest.class.getResource("/corpora");
-    corporaPath = Paths.get(corporaURL.toURI());
-    corporaService = new FileStorageService(corporaPath);
+    corporaService = new FileStorageService(Paths.get(corporaURL.toURI()));
 
     LOGGER.debug("Running index tests under storage {}", basePath);
   }
@@ -219,13 +217,13 @@ public class IndexServiceTest {
       new Sublist(0, 10), Collections.emptyList());
     assertEquals(aip.getRepresentations().size(), sros.getTotalCount());
 
-    List<String> sro_IDs = new ArrayList<>();
+    List<String> sroIDs = new ArrayList<>();
     for (Representation sro : sros.getResults()) {
-      sro_IDs.add(sro.getId());
+      sroIDs.add(sro.getId());
     }
 
     List<String> representationIds = aip.getRepresentations().stream().map(r -> r.getId()).collect(Collectors.toList());
-    MatcherAssert.assertThat(sro_IDs, Matchers.contains(representationIds.toArray()));
+    MatcherAssert.assertThat(sroIDs, Matchers.contains(representationIds.toArray()));
 
     model.deleteAIP(aipId);
     try {

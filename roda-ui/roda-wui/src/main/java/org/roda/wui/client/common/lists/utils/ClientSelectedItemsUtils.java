@@ -18,6 +18,11 @@ import org.roda.wui.client.browse.BrowserService;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class ClientSelectedItemsUtils {
+
+  private ClientSelectedItemsUtils() {
+    // do nothing
+  }
+
   public static boolean isEmpty(SelectedItems<?> selected) {
     return selected instanceof SelectedItemsList && ((SelectedItemsList<?>) selected).getIds().isEmpty();
   }

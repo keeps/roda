@@ -46,7 +46,6 @@ public class PermissionsTest {
   private static ModelService model;
   private static IndexService index;
 
-  private static Path corporaPath;
   private static StorageService corporaService;
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PermissionsTest.class);
@@ -68,8 +67,7 @@ public class PermissionsTest {
     index = RodaCoreFactory.getIndexService();
 
     URL corporaURL = PermissionsTest.class.getResource("/corpora");
-    corporaPath = Paths.get(corporaURL.toURI());
-    corporaService = new FileStorageService(corporaPath);
+    corporaService = new FileStorageService(Paths.get(corporaURL.toURI()));
 
     LOGGER.debug("Running index tests under storage {}", basePath);
   }

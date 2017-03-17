@@ -46,6 +46,10 @@ import net.sf.saxon.s9api.XdmValue;
 public class ServerTools {
   private static final Logger LOGGER = LoggerFactory.getLogger(ServerTools.class);
 
+  private ServerTools() {
+    // do nothing
+  }
+
   /**
    * Parse a locale string into a Locale
    * 

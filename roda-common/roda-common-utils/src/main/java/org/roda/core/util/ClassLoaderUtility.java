@@ -27,8 +27,11 @@ public class ClassLoaderUtility {
 
   // Parameters
   private static final Class[] PARAMETERS = new Class[] {URL.class};
-
   private static final ClassLoader CLASS_LOADER = ClassLoaderUtility.class.getClassLoader();
+
+  private ClassLoaderUtility() {
+    // do nothing
+  }
 
   /**
    * Add file to CLASSPATH

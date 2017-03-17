@@ -10,7 +10,7 @@ package org.roda.wui.common.client.tools;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.descriptionLevels.DescriptionLevel;
+import org.roda.core.data.descriptionlevels.DescriptionLevel;
 import org.roda.wui.client.main.DescriptionLevelConfiguration;
 import org.roda.wui.client.main.DescriptionLevelServiceAsync;
 import org.roda.wui.common.client.ClientLogger;

@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.data.descriptionLevels;
+package org.roda.core.data.descriptionlevels;
 
 import java.io.Serializable;
 
@@ -94,6 +94,4 @@ public class DescriptionLevel implements Serializable {
     return "DescriptionLevel [level=" + level + ", label=" + label + ", iconClass=" + iconClass + "]";
   }
 
-  
-  
 }

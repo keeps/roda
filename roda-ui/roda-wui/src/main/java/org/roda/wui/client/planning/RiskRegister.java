@@ -93,18 +93,6 @@ public class RiskRegister extends Composite {
 
   private static RiskRegister instance = null;
 
-  /**
-   * Get the singleton instance
-   *
-   * @return the instance
-   */
-  public static RiskRegister getInstance() {
-    if (instance == null) {
-      instance = new RiskRegister();
-    }
-    return instance;
-  }
-
   interface MyUiBinder extends UiBinder<Widget, RiskRegister> {
   }
 
@@ -158,7 +146,6 @@ public class RiskRegister extends Composite {
    *
    * @param user
    */
-
   public RiskRegister() {
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.RISK_CATEGORY),
       new SimpleFacetParameter(RodaConstants.RISK_CURRENT_SEVERITY_LEVEL),
@@ -230,6 +217,18 @@ public class RiskRegister extends Composite {
 
     inputDateInitial.getElement().setPropertyString("placeholder", messages.sidebarFilterFromDatePlaceHolder());
     inputDateFinal.getElement().setPropertyString("placeholder", messages.sidebarFilterToDatePlaceHolder());
+  }
+
+  /**
+   * Get the singleton instance
+   *
+   * @return the instance
+   */
+  public static RiskRegister getInstance() {
+    if (instance == null) {
+      instance = new RiskRegister();
+    }
+    return instance;
   }
 
   @Override

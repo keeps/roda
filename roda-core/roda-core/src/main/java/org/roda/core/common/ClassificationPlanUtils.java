@@ -41,6 +41,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class ClassificationPlanUtils {
 
+  private ClassificationPlanUtils() {
+    // do nothing
+  }
+
   public static ConsumesOutputStream retrieveClassificationPlan(User user, String filename)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     try {

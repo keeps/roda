@@ -60,8 +60,6 @@ public class ValidationUtilsTest {
   private static Path basePath;
   private static ModelService model;
   private static IndexService index;
-
-  private static Path corporaPath;
   private static StorageService corporaService;
 
   private static final Logger logger = LoggerFactory.getLogger(ModelServiceTest.class);
@@ -83,8 +81,7 @@ public class ValidationUtilsTest {
     index = RodaCoreFactory.getIndexService();
 
     URL corporaURL = IndexServiceTest.class.getResource("/corpora");
-    corporaPath = Paths.get(corporaURL.toURI());
-    corporaService = new FileStorageService(corporaPath);
+    corporaService = new FileStorageService(Paths.get(corporaURL.toURI()));
 
     logger.debug("Running model test under storage: {}", basePath);
   }

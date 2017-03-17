@@ -10,7 +10,7 @@ package org.roda.core.plugins.orchestrate;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.plugins.Plugin;
 
+@FunctionalInterface
 public interface JobPluginInfoInterface {
-
   <T extends IsRODAObject> JobPluginInfo processJobPluginInformation(Plugin<T> plugin, JobInfo jobInfo);
 }

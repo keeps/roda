@@ -28,8 +28,11 @@ import org.roda.core.util.CommandException;
 import org.roda.core.util.CommandUtility;
 
 public class AvprobePluginUtils {
-
   public static final String AVPROBE_METADATA_FORMAT = "json";
+
+  private AvprobePluginUtils() {
+    // do nothing
+  }
 
   public static String inspect(Path path) throws RODAException {
     try {

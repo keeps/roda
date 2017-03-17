@@ -18,6 +18,10 @@ import org.roda.core.util.CommandUtility;
 
 public class GhostScriptConvertPluginUtils {
 
+  private GhostScriptConvertPluginUtils() {
+    // do nothing
+  }
+
   public static String executeGS(Path input, Path output, String commandArguments)
     throws GhostscriptException, IOException, UnsupportedOperationException {
 

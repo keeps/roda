@@ -74,12 +74,10 @@ public class MetadataFileUtilsEscapeTest {
   }
 
   public static InputStream documentToPrettyInputStream(Document document) throws IOException {
-
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     XMLWriter xmlWriter = new XMLWriter(outputStream, OutputFormat.createPrettyPrint());
     xmlWriter.write(document);
     xmlWriter.close();
-    InputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
-    return inputStream;
+    return new ByteArrayInputStream(outputStream.toByteArray());
   }
 }

@@ -24,6 +24,10 @@ import org.apache.commons.io.IOUtils;
  */
 public class ZipTools {
 
+  private ZipTools() {
+    // do nothing
+  }
+
   /**
    * Zip a list of files into an output stream
    * 

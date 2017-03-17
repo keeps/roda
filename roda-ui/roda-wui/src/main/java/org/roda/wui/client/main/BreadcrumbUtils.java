@@ -40,6 +40,10 @@ public class BreadcrumbUtils {
 
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
+  private BreadcrumbUtils() {
+    // do nothing
+  }
+
   private static BreadcrumbItem getBreadcrumbItem(IndexedAIP aip) {
     return new BreadcrumbItem(getBreadcrumbLabel(aip), getBreadcrumbTitle(aip), getViewItemHistoryToken(aip.getId()));
   }

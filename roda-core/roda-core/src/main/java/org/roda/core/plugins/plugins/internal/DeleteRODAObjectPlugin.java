@@ -124,7 +124,7 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
         } else if (object instanceof Risk) {
           processRisk(index, model, report, jobPluginInfo, cachedJob, (Risk) object);
         } else if (object instanceof Format) {
-          processFormat(index, model, report, jobPluginInfo, cachedJob, (Format) object);
+          processFormat(model, report, jobPluginInfo, cachedJob, (Format) object);
         }
       }
     }, index, model, storage, liteList);
@@ -293,8 +293,8 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     jobPluginInfo.incrementObjectsProcessed(state);
   }
 
-  private void processFormat(IndexService index, ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo,
-    Job job, Format format) {
+  private void processFormat(ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo, Job job,
+    Format format) {
     Report reportItem = PluginHelper.initPluginReportItem(this, format.getId(), Format.class);
     PluginState state = PluginState.SUCCESS;
 

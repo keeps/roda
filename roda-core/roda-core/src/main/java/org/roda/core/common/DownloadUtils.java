@@ -36,6 +36,10 @@ public class DownloadUtils {
   private static final String ZIP_FILE_NAME_EXTENSION = ".zip";
   private static final String ZIP_PATH_DELIMITER = "/";
 
+  private DownloadUtils() {
+    // do nothing
+  }
+
   public static ConsumesOutputStream download(final StorageService storage, final Resource resource) {
     return download(storage, resource, null);
   }

@@ -31,10 +31,6 @@ public class Process {
   private static Process instance = null;
   private HTMLWidgetWrapper page;
 
-  private Process() {
-    // do nothing
-  }
-
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
@@ -57,6 +53,10 @@ public class Process {
       return "process";
     }
   };
+
+  private Process() {
+    // do nothing
+  }
 
   /**
    * Get the singleton instance

@@ -27,7 +27,11 @@ import config.i18n.client.ClientMessages;
 public class AsyncCallbackUtils {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-  private static ClientLogger LOGGER = new ClientLogger(AsyncCallbackUtils.class.getName());
+  private static final ClientLogger LOGGER = new ClientLogger(AsyncCallbackUtils.class.getName());
+
+  private AsyncCallbackUtils() {
+    // do nothing
+  }
 
   public static final boolean treatCommonFailures(Throwable caught) {
     return treatCommonFailures(caught, null);

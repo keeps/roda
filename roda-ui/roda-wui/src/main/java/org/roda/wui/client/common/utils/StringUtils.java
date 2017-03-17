@@ -12,6 +12,10 @@ import java.util.List;
 
 public class StringUtils {
 
+  private StringUtils() {
+    // do nothing
+  }
+
   public static final boolean isNotBlank(String s) {
     return s != null && s.trim().length() > 0;
   }

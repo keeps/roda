@@ -78,6 +78,10 @@ public class ApiUtils {
   private static final String CONTENT_DISPOSITION_INLINE = "inline; ";
   private static final String CONTENT_DISPOSITION_ATTACHMENT = "attachment; ";
 
+  private ApiUtils() {
+    // do nothing
+  }
+
   /**
    * Get media type
    * 

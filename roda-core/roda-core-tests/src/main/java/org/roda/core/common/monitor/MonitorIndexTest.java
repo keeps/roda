@@ -274,7 +274,7 @@ public class MonitorIndexTest {
     }
     int diff = max - min;
     if (diff >= 0 && diff != Integer.MAX_VALUE) {
-      return (min + rng.nextInt(diff + 1));
+      return min + rng.nextInt(diff + 1);
     }
     int i;
     do {

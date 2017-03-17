@@ -13,6 +13,7 @@ import java.util.List;
 public class ListUtils {
 
   private ListUtils() {
+    // do nothing
   }
 
   @SafeVarargs

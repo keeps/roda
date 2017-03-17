@@ -12,6 +12,10 @@ import org.roda.core.data.v2.IsRODAObject;
 
 public class SelectedItemsUtils {
 
+  private SelectedItemsUtils() {
+    // do nothing
+  }
+
   @SuppressWarnings("unchecked")
   public static <T extends IsRODAObject> Class<T> parseClass(String classNameToReturn) throws GenericException {
     Class<T> classToReturn;
