@@ -22,6 +22,7 @@ public class TransferUpdateStatus {
   private static Set<String> isUpdatingFolderStatus;
 
   private TransferUpdateStatus() {
+    // do nothing
   }
 
   public static TransferUpdateStatus getInstance() {

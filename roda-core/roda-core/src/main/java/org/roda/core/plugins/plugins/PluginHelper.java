@@ -58,7 +58,6 @@ import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
-import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
@@ -910,36 +909,6 @@ public final class PluginHelper {
     li.setType("URN");
     li.setRoles(Arrays.asList(role));
     return li;
-  }
-
-  /**
-   * @deprecated 20160824 hsilva: not seeing any method using it, so it will be
-   *             removed soon
-   */
-  @Deprecated
-  public static List<LinkingIdentifier> getLinkingRepresentations(AIP aip, String role) {
-    List<LinkingIdentifier> identifiers = new ArrayList<>();
-    if (aip.getRepresentations() != null && !aip.getRepresentations().isEmpty()) {
-      for (Representation representation : aip.getRepresentations()) {
-        identifiers.add(getLinkingIdentifier(aip.getId(), representation.getId(), role));
-      }
-    }
-    return identifiers;
-  }
-
-  /**
-   * @deprecated 20160824 hsilva: not seeing any method using it, so it will be
-   *             removed soon
-   */
-  @Deprecated
-  public static List<LinkingIdentifier> getLinkingIdentifiers(List<TransferredResource> resources, String role) {
-    List<LinkingIdentifier> identifiers = new ArrayList<>();
-    if (resources != null && !resources.isEmpty()) {
-      for (TransferredResource tr : resources) {
-        identifiers.add(getLinkingIdentifier(tr, role));
-      }
-    }
-    return identifiers;
   }
 
   public static <T extends IsRODAObject> void moveSIPs(Plugin<T> plugin, ModelService model, IndexService index,

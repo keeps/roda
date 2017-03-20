@@ -344,7 +344,6 @@ public class ValidationUtils {
           for (SAXParseException saxParseException : errorHandler.getErrors()) {
             report.addIssue(convertSAXParseException(saxParseException));
           }
-
         }
       } else if (failIfNoSchema) {
         report.setValid(false);

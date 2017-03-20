@@ -61,9 +61,9 @@ import org.slf4j.LoggerFactory;
 public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
   private static final Logger LOGGER = LoggerFactory.getLogger(RiskAssociationPlugin.class);
 
-  private static String riskIds = null;
-  private static String incidenceDescription = "";
-  private static String severity = "";
+  private String riskIds = null;
+  private String incidenceDescription = "";
+  private String severity = "";
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {

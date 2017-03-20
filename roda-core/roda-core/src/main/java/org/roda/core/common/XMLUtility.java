@@ -29,7 +29,7 @@ public final class XMLUtility {
 
   /** Private empty constructor */
   private XMLUtility() {
-
+    // do nothing
   }
 
   public static String getStringFromFile(Path file, String xpath) {

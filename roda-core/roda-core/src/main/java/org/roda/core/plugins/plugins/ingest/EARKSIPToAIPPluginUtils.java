@@ -230,6 +230,7 @@ public class EARKSIPToAIPPluginUtils {
       try {
         representation = model.retrieveRepresentation(aipId, sr.getObjectID());
       } catch (NotFoundException e) {
+        // do nothing
       }
     }
     // Either we're not updating or the retrieve failed

@@ -171,10 +171,8 @@ public class MigrationManager {
     Reflections reflections = new Reflections("org.roda.core.data.v2");
     Set<Class<? extends IsModelObject>> modelClasses = reflections.getSubTypesOf(IsModelObject.class);
     for (Class<? extends IsModelObject> clazz : modelClasses) {
-      if (Modifier.isAbstract(clazz.getModifiers())) {
-        continue;
-      }
-      if (avoidClassesByNamePrefix && clazz.getSimpleName().startsWith(avoidByNamePrefix)) {
+      if (Modifier.isAbstract(clazz.getModifiers())
+        || (avoidClassesByNamePrefix && clazz.getSimpleName().startsWith(avoidByNamePrefix))) {
         continue;
       }
 

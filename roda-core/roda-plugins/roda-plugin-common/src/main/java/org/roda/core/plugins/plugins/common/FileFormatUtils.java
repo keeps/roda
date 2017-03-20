@@ -16,6 +16,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 
 public class FileFormatUtils {
+  private static final String CORE = "core";
+  private static final String TOOLS = "tools";
 
   private FileFormatUtils() {
     // do nothing
@@ -23,11 +25,10 @@ public class FileFormatUtils {
 
   public static Map<String, List<String>> getPronomToExtension(String tool) {
     Map<String, List<String>> map = new HashMap<>();
-    String inputFormatPronoms = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", tool,
-      "inputFormatPronoms");
+    String inputFormatPronoms = RodaCoreFactory.getRodaConfigurationAsString(CORE, TOOLS, tool, "inputFormatPronoms");
 
     for (String pronom : Arrays.asList(inputFormatPronoms.split(" "))) {
-      String pronomExtensions = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "pronom", pronom);
+      String pronomExtensions = RodaCoreFactory.getRodaConfigurationAsString(CORE, TOOLS, "pronom", pronom);
       map.put(pronom, Arrays.asList(pronomExtensions.split(" ")));
     }
 
@@ -36,12 +37,12 @@ public class FileFormatUtils {
 
   public static Map<String, List<String>> getMimetypeToExtension(String tool) {
     Map<String, List<String>> map = new HashMap<>();
-    String inputFormatMimetypes = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", tool,
+    String inputFormatMimetypes = RodaCoreFactory.getRodaConfigurationAsString(CORE, TOOLS, tool,
       "inputFormatMimetypes");
 
     if (StringUtils.isNotBlank(inputFormatMimetypes)) {
       for (String mimetype : Arrays.asList(inputFormatMimetypes.split(" "))) {
-        String mimeExtensions = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "mimetype", mimetype);
+        String mimeExtensions = RodaCoreFactory.getRodaConfigurationAsString(CORE, TOOLS, "mimetype", mimetype);
         if (StringUtils.isNotBlank(mimeExtensions)) {
           map.put(mimetype, Arrays.asList(mimeExtensions.split(" ")));
         }
@@ -52,7 +53,7 @@ public class FileFormatUtils {
   }
 
   public static List<String> getInputExtensions(String tool) {
-    String inputFormatExtensions = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", tool,
+    String inputFormatExtensions = RodaCoreFactory.getRodaConfigurationAsString(CORE, TOOLS, tool,
       "inputFormatExtensions");
     return Arrays.asList(inputFormatExtensions.split(" "));
   }

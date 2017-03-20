@@ -27,6 +27,7 @@ public class DIPUtils {
   public static OptionalWithCause<String> getCompleteOpenExternalURL(DIP dip) {
     OptionalWithCause<String> ret;
     Optional<String> dipProperty = getDIPProperty(dip, RodaConstants.RODA_OBJECT_DIP, dip.getType(), "openExternalURL");
+
     if (dipProperty.isPresent()) {
       try {
         String externalUrl = HandlebarsUtility.executeHandlebars(dipProperty.get(), dip.getProperties());
@@ -45,6 +46,7 @@ public class DIPUtils {
     OptionalWithCause<String> ret;
     Optional<String> dipProperty = getDIPProperty(dip, RodaConstants.RODA_OBJECT_DIP, dip.getType(),
       "deleteExternalURL");
+
     if (dipProperty.isPresent()) {
       try {
         String externalUrl = HandlebarsUtility.executeHandlebars(dipProperty.get(), dip.getProperties());
@@ -64,16 +66,16 @@ public class DIPUtils {
   }
 
   public static Optional<Pair<String, String>> getDeleteCredentials(DIP dip) {
-    Optional<Pair<String, String>> credentials = Optional.empty();
-
     Optional<String> username = getDIPProperty(dip, RodaConstants.RODA_OBJECT_DIP, dip.getType(), "credentials",
       "username");
     Optional<String> password = getDIPProperty(dip, RodaConstants.RODA_OBJECT_DIP, dip.getType(), "credentials",
       "password");
+
     if (username.isPresent() && password.isPresent()) {
-      credentials = Optional.of(Pair.of(username.get(), password.get()));
+      return Optional.of(Pair.of(username.get(), password.get()));
+    } else {
+      return Optional.empty();
     }
-    return credentials;
   }
 
   private static Optional<String> getDIPProperty(DIP dip, String... property) {

@@ -79,7 +79,7 @@ public final class ModelUtils {
    * Private empty constructor
    */
   private ModelUtils() {
-
+    // do nothing
   }
 
   private static List<String> build(List<String> basePath, String... path) {
@@ -461,7 +461,7 @@ public final class ModelUtils {
       && directoryPath.get(2).equals(RodaConstants.STORAGE_DIRECTORY_OTHER)) {
       return directoryPath.subList(4, directoryPath.size());
     } else {
-      return null;
+      return new ArrayList<>();
     }
   }
 

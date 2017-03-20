@@ -9,7 +9,7 @@ package org.roda.core.plugins.plugins.characterization;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -49,10 +49,6 @@ import com.google.common.cache.LoadingCache;
 
 public class VeraPDFPluginUtils {
 
-  private VeraPDFPluginUtils() {
-    // do nothing
-  }
-
   private static final LoadingCache<Pair<String, Boolean>, ItemProcessor> PROCESSOR_CACHE = CacheBuilder.newBuilder()
     .build(new CacheLoader<Pair<String, Boolean>, ItemProcessor>() {
 
@@ -79,17 +75,20 @@ public class VeraPDFPluginUtils {
       }
     });
 
-  private static final String resourceRoot = "org/verapdf/report/";
-  private static final String detailedReport = resourceRoot + "DetailedHtmlReport.xsl";
+  private static final String RESOURCE_ROOT = "org/verapdf/report/";
+  private static final String DETAILED_REPORT = RESOURCE_ROOT + "DetailedHtmlReport.xsl";
+
+  private VeraPDFPluginUtils() {
+    // do nothing
+  }
 
   public static Pair<StringContentPayload, Boolean> runVeraPDF(Path input, String profile, boolean hasFeatures)
     throws GenericException {
-
-    ByteArrayOutputStream xmlOutput = new ByteArrayOutputStream();
-    ByteArrayOutputStream htmlOutput = new ByteArrayOutputStream();
     ByteArrayInputStream xmlInput = null;
-    try {
-      ItemProcessor processor = PROCESSOR_CACHE.get(Pair.of(profile, hasFeatures));
+
+    try (ByteArrayOutputStream xmlOutput = new ByteArrayOutputStream();
+      ByteArrayOutputStream htmlOutput = new ByteArrayOutputStream();
+      ItemProcessor processor = PROCESSOR_CACHE.get(Pair.of(profile, hasFeatures))) {
       ProcessorResult result = processor.process(input.toFile());
 
       boolean prettyPrint = true;
@@ -99,17 +98,14 @@ public class VeraPDFPluginUtils {
       Map<String, String> arguments = new HashMap<>();
       arguments.put("wikiPath", "");
       arguments.put("isFullHTML", Boolean.toString(true));
-      XsltTransformer.transform(xmlInput, HTMLReport.class.getClassLoader().getResourceAsStream(detailedReport),
+      XsltTransformer.transform(xmlInput, HTMLReport.class.getClassLoader().getResourceAsStream(DETAILED_REPORT),
         htmlOutput, arguments);
 
-      StringContentPayload s = new StringContentPayload(htmlOutput.toString(RodaConstants.DEFAULT_ENCODING));
-      return Pair.of(s, result.getValidationResult().isCompliant());
-    } catch (ExecutionException | VeraPDFException | JAXBException | UnsupportedEncodingException
-      | TransformerException e) {
+      StringContentPayload payload = new StringContentPayload(htmlOutput.toString(RodaConstants.DEFAULT_ENCODING));
+      return Pair.of(payload, result.getValidationResult().isCompliant());
+    } catch (ExecutionException | VeraPDFException | JAXBException | TransformerException | IOException e) {
       throw new GenericException("Could not run VeraPDF: [" + e.getClass().getSimpleName() + "] " + e.getMessage(), e);
     } finally {
-      IOUtils.closeQuietly(xmlOutput);
-      IOUtils.closeQuietly(htmlOutput);
       IOUtils.closeQuietly(xmlInput);
     }
   }
