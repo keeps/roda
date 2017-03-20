@@ -882,4 +882,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     return RodaCoreFactory.getRodaConfiguration().getInt("ui.list.threshold", RodaConstants.DEFAULT_LIST_THRESHOLD);
   }
 
+  @Override
+  public boolean hasDocumentation(String aipId)
+    throws AuthorizationDeniedException, RequestNotValidException, GenericException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Browser.hasDocumentation(user, aipId);
+  }
+
 }

@@ -239,4 +239,5 @@ public interface BrowserServiceAsync {
 
   void getListThreshold(AsyncCallback<Integer> asyncCallback);
 
+  void hasDocumentation(String aipId, AsyncCallback<Boolean> asyncCallback);
 }

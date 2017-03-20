@@ -2516,15 +2516,10 @@ public class ModelService extends ModelObservable {
   public File createDocumentation(String aipId, String representationId, List<String> directoryPath, String fileId,
     ContentPayload contentPayload) throws RequestNotValidException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException, NotFoundException {
-    File file;
     boolean asReference = false;
-
     StoragePath filePath = ModelUtils.getDocumentationStoragePath(aipId, representationId, directoryPath, fileId);
-
     final Binary createdBinary = storage.createBinary(filePath, contentPayload, asReference);
-    file = ResourceParseUtils.convertResourceToFile(createdBinary);
-
-    return file;
+    return ResourceParseUtils.convertResourceToFile(createdBinary);
   }
 
   public Directory getSchemasDirectory(String aipId)

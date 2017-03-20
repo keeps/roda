@@ -2619,4 +2619,19 @@ public class Browser extends RodaWuiController {
     return result;
   }
 
+  public static boolean hasDocumentation(User user, String aipId)
+    throws AuthorizationDeniedException, RequestNotValidException, GenericException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    // delegate
+    boolean hasDocumentation = BrowserHelper.hasDocumentation(aipId);
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId);
+    return hasDocumentation;
+  }
+
 }

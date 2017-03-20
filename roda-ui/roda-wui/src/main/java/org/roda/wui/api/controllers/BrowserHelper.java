@@ -3230,4 +3230,16 @@ public class BrowserHelper {
     return result;
   }
 
+  public static boolean hasDocumentation(String aipId)
+    throws RequestNotValidException, AuthorizationDeniedException, GenericException {
+    StoragePath aipPath = ModelUtils.getAIPStoragePath(aipId);
+    StoragePath documentationPath = DefaultStoragePath.parse(aipPath, RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION);
+    try {
+      Long counter = RodaCoreFactory.getStorageService().countResourcesUnderContainer(documentationPath, false);
+      return counter > 0;
+    } catch (NotFoundException e) {
+      return false;
+    }
+  }
+
 }

@@ -334,4 +334,7 @@ public interface BrowserService extends RemoteService {
     throws AuthorizationDeniedException, GenericException, NotFoundException;
 
   int getListThreshold();
+
+  boolean hasDocumentation(String aipId)
+    throws AuthorizationDeniedException, RequestNotValidException, GenericException;
 }

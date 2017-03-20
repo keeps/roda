@@ -69,7 +69,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   private static final Set<AipAction> POSSIBLE_ACTIONS_ON_SINGLE_AIP = new HashSet<>(
     Arrays.asList(AipAction.NEW_CHILD_AIP, AipAction.DOWNLOAD, AipAction.MOVE_IN_HIERARCHY,
       AipAction.UPDATE_PERMISSIONS, AipAction.ADD_REPRESENTATION, AipAction.REMOVE, AipAction.NEW_PROCESS,
-      AipAction.SHOW_EVENTS, AipAction.SHOW_RISKS, AipAction.SHOW_LOGS));
+      AipAction.SHOW_EVENTS, AipAction.SHOW_RISKS, AipAction.SHOW_LOGS, AipAction.DOWNLOAD_DOCUMENTATION));
 
   private static final Set<AipAction> POSSIBLE_ACTIONS_ON_MULTIPLE_AIPS = new HashSet<>(
     Arrays.asList(AipAction.MOVE_IN_HIERARCHY, AipAction.UPDATE_PERMISSIONS, AipAction.REMOVE, AipAction.NEW_PROCESS));
@@ -87,7 +87,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
   public enum AipAction implements Actionable.Action<IndexedAIP> {
     NEW_CHILD_AIP, DOWNLOAD, MOVE_IN_HIERARCHY, UPDATE_PERMISSIONS, ADD_REPRESENTATION, REMOVE, NEW_PROCESS,
-    SHOW_EVENTS, SHOW_RISKS, SHOW_LOGS, APPRAISAL_ACCEPT, APPRAISAL_REJECT;
+    SHOW_EVENTS, SHOW_RISKS, SHOW_LOGS, APPRAISAL_ACCEPT, APPRAISAL_REJECT, DOWNLOAD_DOCUMENTATION;
   }
 
   public static AipActions get() {
@@ -150,6 +150,8 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
       appraisalAccept(aip, callback);
     } else if (AipAction.APPRAISAL_REJECT.equals(action)) {
       appraisalReject(aip, callback);
+    } else if (AipAction.DOWNLOAD_DOCUMENTATION.equals(action)) {
+      downloadDocumentation(aip, callback);
     } else {
       callback.onFailure(new RequestNotValidException("Unsupported action in this context: " + action));
     }
@@ -597,6 +599,29 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
       });
   }
 
+  private void downloadDocumentation(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
+    BrowserService.Util.getInstance().hasDocumentation(aip.getId(), new AsyncCallback<Boolean>() {
+
+      @Override
+      public void onFailure(Throwable caught) {
+        callback.onFailure(caught);
+      }
+
+      @Override
+      public void onSuccess(Boolean result) {
+        if (result) {
+          SafeUri downloadUri = RestUtils.createAIPPartDownloadUri(aip.getId(),
+            RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION);
+          Window.Location.assign(downloadUri.asString());
+        } else {
+          Toast.showInfo(messages.downloadNoDocumentationTitle(), messages.downloadNoDocumentationDescription());
+        }
+
+        callback.onSuccess(ActionImpact.NONE);
+      }
+    });
+  }
+
   @Override
   public Widget createActionsLayout(IndexedAIP aip, AsyncCallback<ActionImpact> callback) {
     FlowPanel layout = createLayout();
@@ -643,6 +668,9 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     addButton(layout, messages.appraisalReject(), AipAction.APPRAISAL_REJECT, aip, ActionImpact.DESTROYED, callback,
       "btn-ban");
 
+    addButton(layout, messages.downloadDocumentation(), AipAction.DOWNLOAD_DOCUMENTATION, aip, ActionImpact.NONE,
+      callback, "btn-download");
+
     return layout;
   }
 
@@ -688,6 +716,9 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
     addButton(layout, messages.appraisalReject(), AipAction.APPRAISAL_REJECT, aips, ActionImpact.DESTROYED, callback,
       "btn-ban");
+
+    addButton(layout, messages.downloadDocumentation(), AipAction.DOWNLOAD_DOCUMENTATION, aips, ActionImpact.NONE,
+      callback, "btn-download");
 
     return layout;
   }

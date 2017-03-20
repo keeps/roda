@@ -1357,6 +1357,10 @@ public interface ClientMessages extends Messages {
 
   String downloadSchemas();
 
+  String downloadNoDocumentationTitle();
+
+  String downloadNoDocumentationDescription();
+
   String addPermission();
 
   String permissionAssignedGroups();
