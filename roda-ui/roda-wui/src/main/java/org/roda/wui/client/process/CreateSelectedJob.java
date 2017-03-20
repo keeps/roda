@@ -221,8 +221,8 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
 
                     if (plugins != null) {
                       PluginUtils.sortByName(plugins);
+                      List<String> pluginsAdded = new ArrayList<>();
 
-                      int pluginsAdded = 0;
                       for (PluginInfo pluginInfo : plugins) {
                         if (pluginInfo != null) {
                           List<String> categories = pluginInfo.getCategories();
@@ -237,13 +237,16 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
                                 if (categories.contains(checkbox.getName())
                                   && !categories.contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)
                                   && ((!isSelectedEmpty() && pluginInfo.hasObjectClass(selectedClass))
-                                    || (isSelectedEmpty() && pluginInfo.hasObjectClass(listSelectedClass)))) {
+                                    || (isSelectedEmpty() && pluginInfo.hasObjectClass(listSelectedClass)))
+                                  && !pluginsAdded.contains(pluginInfo.getId())) {
                                   Widget pluginItem = addPluginItemWidgetToWorkflowList(pluginInfo);
-                                  if (pluginsAdded == 0) {
+
+                                  if (pluginsAdded.isEmpty()) {
                                     CreateSelectedJob.this.selectedPlugin = lookupPlugin(pluginInfo.getId());
                                     pluginItem.addStyleName("plugin-list-item-selected");
-                                    pluginsAdded++;
                                   }
+
+                                  pluginsAdded.add(pluginInfo.getId());
                                 }
 
                               }
@@ -254,11 +257,12 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
                                 && ((!isSelectedEmpty() && pluginInfo.hasObjectClass(selectedClass))
                                   || (isSelectedEmpty() && pluginInfo.hasObjectClass(listSelectedClass)))) {
                                 Widget pluginItem = addPluginItemWidgetToWorkflowList(pluginInfo);
-                                if (pluginsAdded == 0) {
+                                if (pluginsAdded.isEmpty()) {
                                   CreateSelectedJob.this.selectedPlugin = lookupPlugin(pluginInfo.getId());
                                   pluginItem.addStyleName("plugin-list-item-selected");
-                                  pluginsAdded++;
                                 }
+
+                                pluginsAdded.add(pluginInfo.getId());
                               }
                             }
                           }
