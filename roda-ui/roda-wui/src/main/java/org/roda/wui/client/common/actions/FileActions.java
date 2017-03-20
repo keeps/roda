@@ -169,7 +169,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
   }
 
   public void rename(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
-    Dialogs.showPromptDialog(messages.renameItemTitle(), null, messages.renamePlaceholder(), RegExp.compile(".*"),
+    Dialogs.showPromptDialog(messages.renameItemTitle(), null, file.getId(), RegExp.compile(".*"),
       messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
 
         @Override

@@ -550,6 +550,7 @@ public class IngestTransfer extends Composite {
               }
             });
         }
+
       });
 
     }
@@ -588,50 +589,52 @@ public class IngestTransfer extends Composite {
 
   @UiHandler("rename")
   void buttonRenameHandler(ClickEvent e) {
-    final String transferredResourceId;
+    if (!ClientSelectedItemsUtils.isEmpty(getSelected()) && getSelected() instanceof SelectedItemsList) {
+      SelectedItemsList<TransferredResource> resourceList = (SelectedItemsList<TransferredResource>) getSelected();
 
-    if (ClientSelectedItemsUtils.isEmpty(getSelected())) {
-      if (resource != null) {
-        transferredResourceId = resource.getUUID();
-      } else {
-        Toast.showInfo("Rename failed", "It is not possible to rename the root folder");
-        return;
-      }
+      BrowserService.Util.getInstance().retrieve(TransferredResource.class.getName(), resourceList.getIds().get(0),
+        Arrays.asList(RodaConstants.TRANSFERRED_RESOURCE_ID, RodaConstants.TRANSFERRED_RESOURCE_NAME),
+        new AsyncCallback<TransferredResource>() {
+
+          @Override
+          public void onFailure(Throwable caught) {
+            Toast.showInfo(messages.dialogFailure(), messages.renameSIPFailed());
+          }
+
+          @Override
+          public void onSuccess(final TransferredResource resultResource) {
+            Dialogs.showPromptDialog(messages.renameTransferredResourcesDialogTitle(), null, resultResource.getName(),
+              RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
+
+                @Override
+                public void onFailure(Throwable caught) {
+                  // do nothing
+                }
+
+                @Override
+                public void onSuccess(String result) {
+                  BrowserService.Util.getInstance().renameTransferredResource(resultResource.getId(), result,
+                    new AsyncCallback<String>() {
+
+                      @Override
+                      public void onFailure(Throwable caught) {
+                        Toast.showInfo(messages.dialogFailure(), messages.renameSIPFailed());
+                      }
+
+                      @Override
+                      public void onSuccess(String result) {
+                        Toast.showInfo(messages.dialogSuccess(), messages.renameSIPSuccessful());
+                        HistoryUtils.newHistory(IngestTransfer.RESOLVER, result);
+                      }
+                    });
+                }
+              });
+          }
+        });
+
     } else {
-      if (getSelected() instanceof SelectedItemsList) {
-        SelectedItemsList<TransferredResource> resourceList = (SelectedItemsList<TransferredResource>) getSelected();
-        transferredResourceId = resourceList.getIds().get(0);
-      } else {
-        return;
-      }
+      return;
     }
-
-    Dialogs.showPromptDialog(messages.renameTransferredResourcesDialogTitle(), null, messages.renameSIPPlaceholder(),
-      RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          // do nothing
-        }
-
-        @Override
-        public void onSuccess(String result) {
-          BrowserService.Util.getInstance().renameTransferredResource(transferredResourceId, result,
-            new AsyncCallback<String>() {
-
-              @Override
-              public void onFailure(Throwable caught) {
-                Toast.showInfo(messages.dialogFailure(), messages.renameSIPFailed());
-              }
-
-              @Override
-              public void onSuccess(String result) {
-                Toast.showInfo(messages.dialogSuccess(), messages.renameSIPSuccessful());
-                HistoryUtils.newHistory(IngestTransfer.RESOLVER, result);
-              }
-            });
-        }
-      });
   }
 
   @UiHandler("move")
