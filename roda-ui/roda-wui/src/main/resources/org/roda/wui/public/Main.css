@@ -4007,7 +4007,7 @@ td.datePickerMonth, td.datePickerYear {
     display: block;
 }
 
-.viewRepresentationPDFFilePreview {
+.viewRepresentationPDFFilePreview, .viewDIPPreview {
     width: 100%;
     height: 670px;
 }

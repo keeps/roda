@@ -65,15 +65,77 @@ import config.i18n.client.ClientMessages;
  */
 public class BrowseDIP extends Composite {
 
+  public static final HistoryResolver RESOLVER = new HistoryResolver() {
+
+    @Override
+    public void resolve(final List<String> historyTokens, final AsyncCallback<Widget> callback) {
+      BrowserService.Util.getInstance().retrieveViewersProperties(new AsyncCallback<Viewers>() {
+
+        @Override
+        public void onSuccess(Viewers viewers) {
+          load(viewers, historyTokens, callback);
+        }
+
+        @Override
+        public void onFailure(Throwable caught) {
+          errorRedirect(callback);
+        }
+      });
+    }
+
+    @Override
+    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
+      UserLogin.getInstance().checkRole(this, callback);
+    }
+
+    @Override
+    public List<String> getHistoryPath() {
+      return ListUtils.concat(BrowseAIP.RESOLVER.getHistoryPath(), getHistoryToken());
+    }
+
+    @Override
+    public String getHistoryToken() {
+      return "dip";
+    }
+
+    private void load(final Viewers viewers, final List<String> historyTokens, final AsyncCallback<Widget> callback) {
+      if (!historyTokens.isEmpty()) {
+        final String historyDipUUID = historyTokens.get(0);
+        final String historyDipFileUUID = historyTokens.size() > 1 ? historyTokens.get(1) : null;
+
+        BrowserService.Util.getInstance().retrieveDipBundle(historyDipUUID, historyDipFileUUID,
+          new AsyncCallback<DipBundle>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+              AsyncCallbackUtils.defaultFailureTreatment(caught);
+            }
+
+            @Override
+            public void onSuccess(DipBundle dipBundle) {
+              callback.onSuccess(new BrowseDIP(viewers, dipBundle));
+            }
+          });
+
+      } else {
+        errorRedirect(callback);
+      }
+    }
+
+    private void errorRedirect(AsyncCallback<Widget> callback) {
+      HistoryUtils.newHistory(BrowseAIP.RESOLVER);
+      callback.onSuccess(null);
+    }
+
+  };
+
   interface MyUiBinder extends UiBinder<Widget, BrowseDIP> {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   public static final int DEFAULT_DIPFILE_INDEX = 0;
-
   public static final Sorter DEFAULT_DIPFILE_SORTER = new Sorter(new SortParameter(RodaConstants.DIPFILE_ID, false));
 
   // system
@@ -266,6 +328,8 @@ public class BrowseDIP extends Composite {
   private void update() {
     if (dipFile != null) {
       center.add(new DipFilePreview(viewers, dipFile));
+    } else if (dip.getOpenExternalURL() != null) {
+      center.add(new DipUrlPreview(viewers, dip));
     } else {
       final Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIPFILE_DIP_ID, dip.getId()),
         new EmptyKeyFilterParameter(RodaConstants.DIPFILE_PARENT_UUID));
@@ -332,67 +396,4 @@ public class BrowseDIP extends Composite {
     return BreadcrumbUtils.getDipBreadcrumbs(dip, dipFile, dipFileAncestors);
   }
 
-  public static final HistoryResolver RESOLVER = new HistoryResolver() {
-
-    @Override
-    public void resolve(final List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      BrowserService.Util.getInstance().retrieveViewersProperties(new AsyncCallback<Viewers>() {
-
-        @Override
-        public void onSuccess(Viewers viewers) {
-          load(viewers, historyTokens, callback);
-        }
-
-        @Override
-        public void onFailure(Throwable caught) {
-          errorRedirect(callback);
-        }
-      });
-    }
-
-    @Override
-    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRole(this, callback);
-    }
-
-    @Override
-    public List<String> getHistoryPath() {
-      return ListUtils.concat(BrowseAIP.RESOLVER.getHistoryPath(), getHistoryToken());
-    }
-
-    @Override
-    public String getHistoryToken() {
-      return "dip";
-    }
-
-    private void load(final Viewers viewers, final List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      if (!historyTokens.isEmpty()) {
-        final String historyDipUUID = historyTokens.get(0);
-        final String historyDipFileUUID = historyTokens.size() > 1 ? historyTokens.get(1) : null;
-
-        BrowserService.Util.getInstance().retrieveDipBundle(historyDipUUID, historyDipFileUUID,
-          new AsyncCallback<DipBundle>() {
-
-            @Override
-            public void onFailure(Throwable caught) {
-              AsyncCallbackUtils.defaultFailureTreatment(caught);
-            }
-
-            @Override
-            public void onSuccess(DipBundle dipBundle) {
-              callback.onSuccess(new BrowseDIP(viewers, dipBundle));
-            }
-          });
-
-      } else {
-        errorRedirect(callback);
-      }
-    }
-
-    private void errorRedirect(AsyncCallback<Widget> callback) {
-      HistoryUtils.newHistory(BrowseAIP.RESOLVER);
-      callback.onSuccess(null);
-    }
-
-  };
 }

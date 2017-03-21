@@ -9,6 +9,7 @@ package org.roda.wui.client.browse;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
@@ -145,6 +146,9 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
         } else {
           notSupportedPreview();
         }
+      } else if (object instanceof IndexedDIP) {
+        IndexedDIP dip = (IndexedDIP) object;
+        dipUrlPreview(dip);
       } else {
         notSupportedPreview();
       }
@@ -324,6 +328,13 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
 
     // TODO audio player might not support provided file format
     return ret;
+  }
+
+  private void dipUrlPreview(IndexedDIP dip) {
+    Frame frame = new Frame(dip.getOpenExternalURL());
+    frame.setStyleName("viewDIPPreview");
+    frame.setTitle(dip.getTitle());
+    panel.add(frame);
   }
 
   private String encode(String string) {

@@ -3041,9 +3041,14 @@ public class BrowserHelper {
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
 
     if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP.equals(acceptFormat)) {
+      StorageService storage = RodaCoreFactory.getStorageService();
       StoragePath storagePath = ModelUtils.getDIPDataStoragePath(dipId);
-      Directory directory = RodaCoreFactory.getStorageService().getDirectory(storagePath);
-      return ApiUtils.download(directory, dipId);
+
+      if (!storage.hasDirectory(storagePath)) {
+        storagePath = ModelUtils.getDIPStoragePath(dipId);
+      }
+
+      return ApiUtils.download(storage.getDirectory(storagePath), dipId);
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
       DIP dip = RodaCoreFactory.getModelService().retrieveDIP(dipId);

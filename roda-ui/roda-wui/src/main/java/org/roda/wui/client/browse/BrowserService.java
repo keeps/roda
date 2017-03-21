@@ -333,8 +333,10 @@ public interface BrowserService extends RemoteService {
   <T extends IsIndexed> T retrieveFromModel(String classNameToReturn, String id)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
 
-  int getListThreshold();
-
   boolean hasDocumentation(String aipId)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException;
+
+  int getListThreshold();
+
+  boolean showDIPEmbedded();
 }

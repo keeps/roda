@@ -237,7 +237,9 @@ public interface BrowserServiceAsync {
 
   <T extends IsIndexed> void retrieveFromModel(String objectClass, String objectUUID, AsyncCallback<T> asyncCallback);
 
+  void hasDocumentation(String aipId, AsyncCallback<Boolean> asyncCallback);
+
   void getListThreshold(AsyncCallback<Integer> asyncCallback);
 
-  void hasDocumentation(String aipId, AsyncCallback<Boolean> asyncCallback);
+  void showDIPEmbedded(AsyncCallback<Boolean> asyncCallback);
 }

@@ -28,7 +28,6 @@ import config.i18n.client.ClientMessages;
 public class DipFilePreview extends BitstreamPreview<DIPFile> {
 
   private static final FileFormat NO_FORMAT = null;
-
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   public DipFilePreview(Viewers viewers, DIPFile dipFile) {
@@ -59,7 +58,6 @@ public class DipFilePreview extends BitstreamPreview<DIPFile> {
     layout.add(folderList);
 
     ListSelectionUtils.bindBrowseOpener(folderList);
-
     return layout;
   }
 

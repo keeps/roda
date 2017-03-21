@@ -144,6 +144,7 @@ public class DisseminationsSliderHelper {
         showActions(dip, optionsButton);
       }
     });
+
     layout.add(optionsButton);
 
     titleLabel.addStyleName("dipTitle");
@@ -157,13 +158,24 @@ public class DisseminationsSliderHelper {
 
       @Override
       public void onClick(ClickEvent event) {
-        if (StringUtils.isNotBlank(dip.getOpenExternalURL())) {
-          Window.open(dip.getOpenExternalURL(), "_blank", "");
-          Toast.showInfo(messages.browseFileDipOpenedExternalURL(), dip.getOpenExternalURL());
-        } else {
-          HistoryUtils.openBrowse(dip);
-        }
+        BrowserService.Util.getInstance().showDIPEmbedded(new AsyncCallback<Boolean>() {
+          @Override
+          public void onFailure(Throwable caught) {
+            AsyncCallbackUtils.defaultFailureTreatment(caught);
+          }
+
+          @Override
+          public void onSuccess(Boolean showEmbedded) {
+            if (StringUtils.isNotBlank(dip.getOpenExternalURL()) && !showEmbedded) {
+              Window.open(dip.getOpenExternalURL(), "_blank", "");
+              Toast.showInfo(messages.browseFileDipOpenedExternalURL(), dip.getOpenExternalURL());
+            } else {
+              HistoryUtils.openBrowse(dip);
+            }
+          }
+        });
       }
+
     });
 
     return layout;
