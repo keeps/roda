@@ -178,13 +178,14 @@ public class BrowserHelper {
     // do nothing
   }
 
-  protected static BrowseAIPBundle retrieveBrowseAipBundle(IndexedAIP aip, Locale locale)
+  protected static BrowseAIPBundle retrieveBrowseAipBundle(User user, IndexedAIP aip, Locale locale)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
     BrowseAIPBundle bundle = new BrowseAIPBundle();
 
     // set aip
     bundle.setAIP(aip);
     String aipId = aip.getId();
+    boolean justActive = aip.getState().equals(AIPState.ACTIVE);
 
     // set aip ancestors
     try {
@@ -204,17 +205,17 @@ public class BrowserHelper {
 
     // Count child AIPs
     Filter childAIPfilter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aip.getId()));
-    Long childAIPCount = RodaCoreFactory.getIndexService().count(IndexedAIP.class, childAIPfilter);
+    Long childAIPCount = RodaCoreFactory.getIndexService().count(IndexedAIP.class, childAIPfilter, user, justActive);
     bundle.setChildAIPCount(childAIPCount);
 
     // Count representations
     Filter repFilter = new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aipId));
-    Long repCount = RodaCoreFactory.getIndexService().count(IndexedRepresentation.class, repFilter);
+    Long repCount = RodaCoreFactory.getIndexService().count(IndexedRepresentation.class, repFilter, user, justActive);
     bundle.setRepresentationCount(repCount);
 
     // Count DIPs
     Filter dipsFilter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_AIP_UUIDS, aip.getId()));
-    Long dipCount = RodaCoreFactory.getIndexService().count(IndexedDIP.class, dipsFilter);
+    Long dipCount = RodaCoreFactory.getIndexService().count(IndexedDIP.class, dipsFilter, user, justActive);
     bundle.setDipCount(dipCount);
 
     return bundle;

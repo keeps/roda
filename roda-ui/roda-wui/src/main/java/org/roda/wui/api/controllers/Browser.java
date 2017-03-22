@@ -112,7 +112,7 @@ public class Browser extends RodaWuiController {
     UserUtility.checkAIPPermissions(user, aip, PermissionType.READ);
 
     // delegate
-    BrowseAIPBundle browseAipBundle = BrowserHelper.retrieveBrowseAipBundle(aip, locale);
+    BrowseAIPBundle browseAipBundle = BrowserHelper.retrieveBrowseAipBundle(user, aip, locale);
 
     // register action
     controllerAssistant.registerAction(user, aipId, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_AIP_ID_PARAM,
