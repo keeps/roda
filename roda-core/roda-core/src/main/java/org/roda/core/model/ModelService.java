@@ -126,6 +126,7 @@ public class ModelService extends ModelObservable {
   private static final DateTimeFormatter LOG_NAME_DATE_FORMAT = DateTimeFormat.forPattern("yyyy-MM-dd");
   private static final boolean FAIL_IF_NO_DESCRIPTIVE_METADATA_SCHEMA = false;
   private final StorageService storage;
+  private Object logFileLock = new Object();
 
   public ModelService(StorageService storage) {
     super();
@@ -866,6 +867,7 @@ public class ModelService extends ModelObservable {
     StoragePath directoryPath = ModelUtils.getRepresentationStoragePath(aipId, representationId);
 
     // verify structure of source representation
+    // 20170324 should we validate the representation???
     storage.copy(sourceStorage, sourcePath, directoryPath);
 
     representation = new Representation(representationId, aipId, original, type);
@@ -1601,7 +1603,7 @@ public class ModelService extends ModelObservable {
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     String datePlusExtension = sdf.format(new Date()) + ".log";
     Path logFile = logDirectory.resolve(datePlusExtension);
-    synchronized (logFile) {
+    synchronized (logFileLock) {
 
       // verify if file exists and if not, if older files exist (in that case,
       // move them to storage)
