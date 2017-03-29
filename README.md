@@ -43,7 +43,28 @@ On Linux, use the following instructions:
 3. Run the container: `sudo docker run -p 8080:8080 -v ~/.roda:/root/.roda keeps/roda`
 4. Access RODA on your browser: [http://localhost:8080](http://localhost:8080)
 
-NOTE: the docker commands only need `sudo` if your user does not belong to the `docker` group.
+NOTE: the docker commands only need `sudo` if your user does not belong to the `docker` group.   
+NOTE 2: if one wants to run some cronjobs in RODA container, there're two possibilities. But before, lets create a cronjob file with the right permissions (chmod 644 ~/cronjob). In this example we are updating, at 2 am, siegfried signature file:
+```
+MAILTO=""
+
+0 2 * * * root sf -update && pkill sf
+```
+
+And the two possibilities are:
+1. Add cronjob file via docker copy (after starting the container)
+```bash
+$> docker cp ~/crontab CONTAINER_NAME:/etc/cron.d/crontab
+```
+
+2. Run the container using the volume option (-v) to pass by the cronjob file
+
+In this scenario, the cronjob file must be owned by root because RODA container user is root (besides file permissions mentioned abouve)
+```bash
+$> sudo chown root.root ~/crontab
+$> docker run -p 8080:8080 -v ~/.roda:/root/.roda -v ~/crontab:/etc/cron.d/crontab keeps/roda
+```
+
 
 To start as a service you can install supervisord and create the file `/etc/supervisor/conf.d/roda.conf` with:
 
