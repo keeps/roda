@@ -39,22 +39,20 @@ import org.xml.sax.SAXException;
 
 import com.google.common.xml.XmlEscapers;
 
-import gov.loc.repository.bagit.BagInfoTxt;
-
 public class MetadataFileUtils {
-  private static Logger LOGGER = LoggerFactory.getLogger(MetadataFileUtils.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(MetadataFileUtils.class);
 
   /** Private empty constructor */
   private MetadataFileUtils() {
-
+    // do nothing
   }
 
-  public static String generateMetadataFile(BagInfoTxt bagInfoTxt) throws GenericException {
+  public static String generateMetadataFile(Map<String, String> bagInfo) throws GenericException {
     try {
       Element root = new Element("metadata");
       org.jdom2.Document doc = new org.jdom2.Document();
 
-      for (Map.Entry<String, String> entry : bagInfoTxt.entrySet()) {
+      for (Map.Entry<String, String> entry : bagInfo.entrySet()) {
         if (!"parent".equalsIgnoreCase(entry.getKey())) {
           Element child = new Element("field");
           child.setAttribute("name", escapeAttribute(entry.getKey()));

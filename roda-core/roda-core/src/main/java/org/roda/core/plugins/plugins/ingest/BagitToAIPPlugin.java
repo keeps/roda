@@ -10,12 +10,10 @@ package org.roda.core.plugins.plugins.ingest;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
@@ -33,16 +31,16 @@ import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
+import org.roda_project.commons_ip.model.ParseException;
+import org.roda_project.commons_ip.model.SIP;
+import org.roda_project.commons_ip.model.impl.bagit.BagitSIP;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import gov.loc.repository.bagit.Bag;
-import gov.loc.repository.bagit.BagFactory;
-import gov.loc.repository.bagit.utilities.SimpleResult;
 
 public class BagitToAIPPlugin extends SIPToAIPPlugin {
   private static final Logger LOGGER = LoggerFactory.getLogger(BagitToAIPPlugin.class);
   private static final String UNPACK_DESCRIPTION = "Extracted objects from package in Bagit format.";
+  private static final String METADATA_FILE = "metadata.xml";
 
   private boolean createSubmission = false;
 
@@ -112,38 +110,30 @@ public class BagitToAIPPlugin extends SIPToAIPPlugin {
 
     try {
       LOGGER.debug("Converting {} to AIP", bagitPath);
-      BagFactory bagFactory = new BagFactory();
-      Bag bag = bagFactory.createBag(bagitPath.toFile());
-      SimpleResult result = bag.verifyPayloadManifests();
-      if (result.isSuccess()) {
-        String parentIdFromBagit = bag.getBagInfoTxt().get("parent");
-        List<String> ancestors = StringUtils.isNotBlank(parentIdFromBagit) ? Arrays.asList(parentIdFromBagit)
-          : Collections.emptyList();
-        Optional<String> computedParentId = PluginHelper.getComputedParent(model, index, ancestors, computedSearchScope,
-          forceSearchScope, job.getId());
+      SIP bagit = BagitSIP.parse(bagitPath);
 
-        AIP aipCreated = BagitToAIPPluginUtils.bagitToAip(bag, model, "metadata.xml",
-          Arrays.asList(transferredResource.getName()), reportItem.getJobId(), computedParentId, job.getUsername());
+      Optional<String> computedParentId = PluginHelper.getComputedParent(model, index, bagit.getAncestors(),
+        computedSearchScope, forceSearchScope, job.getId());
 
-        PluginHelper.createSubmission(model, createSubmission, bagitPath, aipCreated.getId());
+      AIP aipCreated = BagitToAIPPluginUtils.bagitToAip(bagit, model, METADATA_FILE,
+        Arrays.asList(transferredResource.getName()), reportItem.getJobId(), computedParentId, job.getUsername());
 
-        createUnpackingEventSuccess(model, index, transferredResource, aipCreated, UNPACK_DESCRIPTION);
-        reportItem.setOutcomeObjectId(aipCreated.getId()).setPluginState(PluginState.SUCCESS);
+      PluginHelper.createSubmission(model, createSubmission, bagitPath, aipCreated.getId());
 
-        if (aipCreated.getParentId() == null && computedParentId.isPresent()) {
-          reportItem.setPluginDetails(String.format("Parent with id '%s' not found", computedParentId.get()));
-        }
+      createUnpackingEventSuccess(model, index, transferredResource, aipCreated, UNPACK_DESCRIPTION);
+      reportItem.setOutcomeObjectId(aipCreated.getId()).setPluginState(PluginState.SUCCESS);
 
-        createWellformedEventSuccess(model, index, transferredResource, aipCreated);
-        LOGGER.debug("Done with converting {} to AIP {}", bagitPath, aipCreated.getId());
-      } else {
-        reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(result.getMessages() + "");
+      if (aipCreated.getParentId() == null && computedParentId.isPresent()) {
+        reportItem.setPluginDetails(String.format("Parent with id '%s' not found", computedParentId.get()));
       }
-    } catch (RODAException | RuntimeException e) {
-      reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
 
+      createWellformedEventSuccess(model, index, transferredResource, aipCreated);
+      LOGGER.debug("Done with converting {} to AIP {}", bagitPath, aipCreated.getId());
+    } catch (RODAException | RuntimeException | ParseException e) {
+      reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
       LOGGER.error("Error converting " + bagitPath + " to AIP", e);
     }
+
     report.addReport(reportItem);
     PluginHelper.createJobReport(this, model, reportItem);
   }
