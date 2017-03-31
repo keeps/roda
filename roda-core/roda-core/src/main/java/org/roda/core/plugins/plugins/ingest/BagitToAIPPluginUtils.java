@@ -25,7 +25,6 @@ import org.roda.core.model.ModelService;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StringContentPayload;
 import org.roda.core.storage.fs.FSPathContentPayload;
-import org.roda.core.util.IdUtils;
 import org.roda_project.commons_ip.model.IPFile;
 import org.roda_project.commons_ip.model.IPRepresentation;
 import org.roda_project.commons_ip.model.SIP;
@@ -60,17 +59,16 @@ public class BagitToAIPPluginUtils {
     model.createDescriptiveMetadata(aip.getId(), metadataFilename, metadataAsPayload, METADATA_TYPE, METADATA_VERSION,
       notify);
 
-    String representationId = IdUtils.createUUID();
     boolean original = true;
     String representationType = RodaConstants.REPRESENTATION_TYPE_MIXED;
 
-    model.createRepresentation(aip.getId(), representationId, original, representationType, notify);
-
     for (IPRepresentation rep : bagit.getRepresentations()) {
+      model.createRepresentation(aip.getId(), rep.getRepresentationID(), original, representationType, notify);
+
       for (IPFile bagFile : rep.getData()) {
         ContentPayload payload = new FSPathContentPayload(bagFile.getPath());
-        model.createFile(aip.getId(), representationId, bagFile.getRelativeFolders(), bagFile.getFileName(), payload,
-          notify);
+        model.createFile(aip.getId(), rep.getRepresentationID(), bagFile.getRelativeFolders(), bagFile.getFileName(),
+          payload, notify);
       }
     }
 

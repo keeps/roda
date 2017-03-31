@@ -61,6 +61,11 @@
 		<appender-ref ref="CORE_FILEOUT" />
 	</logger>
 	
+	<logger name="org.roda_project" additivity="false">
+		<level value="WARN" />
+		<appender-ref ref="CORE_FILEOUT" />
+	</logger>
+	
 	<logger name="akka" additivity="false">
 		<level value="DEBUG" />
 		<appender-ref ref="AKKA" />
