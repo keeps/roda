@@ -8,10 +8,8 @@
 package org.roda.core.plugins.plugins.ingest;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
-import org.roda.core.common.MetadataFileUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -21,6 +19,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Permissions;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.model.ModelService;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StringContentPayload;
@@ -29,8 +28,11 @@ import org.roda_project.commons_ip.model.IPFile;
 import org.roda_project.commons_ip.model.IPRepresentation;
 import org.roda_project.commons_ip.model.SIP;
 import org.roda_project.commons_ip.model.impl.bagit.BagitUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BagitToAIPPluginUtils {
+  private static final Logger LOGGER = LoggerFactory.getLogger(BagitToAIPPluginUtils.class);
   private static final String METADATA_TYPE = "key-value";
   private static final String METADATA_VERSION = null;
 
@@ -42,9 +44,9 @@ public class BagitToAIPPluginUtils {
     String ingestJobId, Optional<String> computedParentId, String createdBy) throws RequestNotValidException,
     NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException {
 
-    Map<String, String> bagitInfo = BagitUtils
-      .getBagitInfo(bagit.getDescriptiveMetadata().get(0).getMetadata().getPath());
-    String metadataAsString = MetadataFileUtils.generateMetadataFile(bagitInfo);
+    String metadataAsString = BagitUtils
+      .generateMetadataFile(bagit.getDescriptiveMetadata().get(0).getMetadata().getPath());
+
     ContentPayload metadataAsPayload = new StringContentPayload(metadataAsString);
 
     AIPState state = AIPState.INGEST_PROCESSING;
@@ -62,13 +64,14 @@ public class BagitToAIPPluginUtils {
     boolean original = true;
     String representationType = RodaConstants.REPRESENTATION_TYPE_MIXED;
 
-    for (IPRepresentation rep : bagit.getRepresentations()) {
-      model.createRepresentation(aip.getId(), rep.getRepresentationID(), original, representationType, notify);
+    for (IPRepresentation irep : bagit.getRepresentations()) {
+      Representation rep = model.createRepresentation(aip.getId(), irep.getRepresentationID(), original,
+        representationType, notify);
 
-      for (IPFile bagFile : rep.getData()) {
+      for (IPFile bagFile : irep.getData()) {
         ContentPayload payload = new FSPathContentPayload(bagFile.getPath());
-        model.createFile(aip.getId(), rep.getRepresentationID(), bagFile.getRelativeFolders(), bagFile.getFileName(),
-          payload, notify);
+        model.createFile(aip.getId(), rep.getId(), bagFile.getRelativeFolders(), bagFile.getFileName(), payload,
+          notify);
       }
     }
 

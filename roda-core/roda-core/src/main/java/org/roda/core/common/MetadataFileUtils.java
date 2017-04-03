@@ -26,7 +26,6 @@ import org.jdom2.Element;
 import org.jdom2.IllegalDataException;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
@@ -45,29 +44,6 @@ public class MetadataFileUtils {
   /** Private empty constructor */
   private MetadataFileUtils() {
     // do nothing
-  }
-
-  public static String generateMetadataFile(Map<String, String> bagInfo) throws GenericException {
-    try {
-      Element root = new Element("metadata");
-      org.jdom2.Document doc = new org.jdom2.Document();
-
-      for (Map.Entry<String, String> entry : bagInfo.entrySet()) {
-        if (!"parent".equalsIgnoreCase(entry.getKey())) {
-          Element child = new Element("field");
-          child.setAttribute("name", escapeAttribute(entry.getKey()));
-          child.addContent(escapeContent(entry.getValue()));
-          root.addContent(child);
-        }
-      }
-      doc.setRootElement(root);
-      XMLOutputter outter = new XMLOutputter();
-      outter.setFormat(Format.getPrettyFormat());
-      outter.outputString(doc);
-      return outter.outputString(doc);
-    } catch (IllegalDataException e) {
-      throw new GenericException(e);
-    }
   }
 
   public static ContentPayload getMetadataPayload(TransferredResource transferredResource) {
