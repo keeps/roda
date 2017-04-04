@@ -32,5 +32,6 @@
 	<entry-point class='org.roda.wui.client.main.Main' />
 	<stylesheet src="Main.css" />
 	<stylesheet src="../api/v1/theme?resource_id=theme.css" />
-
+	<stylesheet src="../api/v1/theme?resource_id=printing.css" />
+	
 </module>
