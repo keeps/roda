@@ -2,4 +2,22 @@
   .sidebar {
   	display: none;
   }
+  .row {
+  	display: block;  	
+  }
+  
+  .row .col_1,
+  .row .col_2,
+  .row .col_3,
+  .row .col_4,
+  .row .col_5,
+  .row .col_6,
+  .row .col_7,
+  .row .col_8,
+  .row .col_9,
+  .row .col_10,
+  .row .col_11,
+  .row .col_12 {
+  	width: 100%;
+  }
 }
