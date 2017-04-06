@@ -77,9 +77,7 @@ public class BagitSIPPluginsTest {
 
   @BeforeMethod
   public void setUp() throws Exception {
-
-    basePath = Files.createTempDirectory("indexTests");
-    System.setProperty("roda.home", basePath.toString());
+    basePath = TestsHelper.createBaseTempDir(getClass(), true);
 
     boolean deploySolr = true;
     boolean deployLdap = false;
@@ -127,6 +125,7 @@ public class BagitSIPPluginsTest {
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());
+    parameters.put(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID, "true");
 
     TransferredResource transferredResource = createCorpora();
     AssertJUnit.assertNotNull(transferredResource);
