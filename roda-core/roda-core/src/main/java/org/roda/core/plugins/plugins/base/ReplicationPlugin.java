@@ -218,7 +218,7 @@ public class ReplicationPlugin extends AbstractPlugin<AIP> {
         LOGGER.error("Error sending post request to reindex AIPs", e);
       }
     } else {
-      LOGGER.error("Error getting rsync properties to send post request");
+      LOGGER.info("Error getting rsync properties to send post request");
     }
   }
 

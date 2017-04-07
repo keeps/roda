@@ -280,7 +280,7 @@ public class ValidationUtils {
             ret.addIssue(convertSAXParseException(saxParseException));
           }
         } catch (SAXException e) {
-          LOGGER.error("Error validating descriptive binary " + descriptiveMetadataType, e);
+          LOGGER.debug("Error validating descriptive binary " + descriptiveMetadataType, e);
           ret.setValid(false);
           for (SAXParseException saxParseException : errorHandler.getErrors()) {
             ret.addIssue(convertSAXParseException(saxParseException));

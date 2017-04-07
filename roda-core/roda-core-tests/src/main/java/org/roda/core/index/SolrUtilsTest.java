@@ -84,7 +84,7 @@ public class SolrUtilsTest {
   }
 
   @Test
-  public void testGetDescriptiveMetataFields() throws RODAException {
+  public void testGetDescriptiveMetadataFields() throws RODAException {
     final DefaultStoragePath strangeMetadataPath = DefaultStoragePath
       .parse(CorporaConstants.SOURCE_DESC_METADATA_CONTAINER, CorporaConstants.STRANGE_DESC_METADATA_FILE);
     Binary strangeMetadata = corporaService.getBinary(strangeMetadataPath);

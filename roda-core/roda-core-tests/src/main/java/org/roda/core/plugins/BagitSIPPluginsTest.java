@@ -80,7 +80,7 @@ public class BagitSIPPluginsTest {
     basePath = TestsHelper.createBaseTempDir(getClass(), true);
 
     boolean deploySolr = true;
-    boolean deployLdap = false;
+    boolean deployLdap = true;
     boolean deployFolderMonitor = true;
     boolean deployOrchestrator = true;
     boolean deployPluginManager = true;

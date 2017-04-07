@@ -126,14 +126,10 @@ public class EARKSIPPluginsTest {
   private TransferredResource createCorpora() throws InterruptedException, IOException, NotFoundException,
     GenericException, RequestNotValidException, IsStillUpdatingException, AlreadyExistsException {
     TransferredResourcesScanner f = RodaCoreFactory.getTransferredResourcesScanner();
-
     Path sip = corporaPath.resolve(CorporaConstants.SIP_FOLDER).resolve(CorporaConstants.EARK_SIP);
-
     f.createFile(null, CorporaConstants.EARK_SIP, Files.newInputStream(sip));
-
     f.updateTransferredResources(Optional.empty(), true);
     index.commit(TransferredResource.class);
-
     return index.retrieve(TransferredResource.class, IdUtils.createUUID(CorporaConstants.EARK_SIP), new ArrayList<>());
   }
 

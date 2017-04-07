@@ -42,7 +42,6 @@ import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexServiceTest;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.ModelServiceTest;
 import org.roda.core.plugins.plugins.base.DescriptiveMetadataValidationPlugin;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
@@ -62,14 +61,14 @@ public class ValidationUtilsTest {
   private static IndexService index;
   private static StorageService corporaService;
 
-  private static final Logger logger = LoggerFactory.getLogger(ModelServiceTest.class);
+  private static final Logger logger = LoggerFactory.getLogger(ValidationUtilsTest.class);
 
   @BeforeClass
   public static void setUp() throws IOException, URISyntaxException, GenericException {
     basePath = TestsHelper.createBaseTempDir(ValidationUtilsTest.class, true);
 
     boolean deploySolr = true;
-    boolean deployLdap = false;
+    boolean deployLdap = true;
     boolean deployFolderMonitor = false;
     boolean deployOrchestrator = true;
     boolean deployPluginManager = true;

@@ -1243,6 +1243,8 @@ public class SolrUtils {
               ret.addField(field.getName(), field.getValue(), field.getBoost());
             }
           }
+        } catch (GenericException e) {
+          LOGGER.info("Problem processing descriptive metadata: {}", e.getMessage());
         } catch (Exception e) {
           LOGGER.error("Error processing descriptive metadata: {}", metadata, e);
         }
