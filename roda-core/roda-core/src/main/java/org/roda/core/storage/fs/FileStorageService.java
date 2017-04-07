@@ -86,7 +86,6 @@ public class FileStorageService implements StorageService {
     initialize(historyPath);
     initialize(historyDataPath.resolve(RodaConstants.STORAGE_CONTAINER_AIP));
     initialize(historyMetadataPath.resolve(RodaConstants.STORAGE_CONTAINER_AIP));
-    FSUtils.deletePathQuietly(trashPath);
     initialize(trashPath);
 
   }
