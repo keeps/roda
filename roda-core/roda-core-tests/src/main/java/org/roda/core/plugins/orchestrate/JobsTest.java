@@ -21,7 +21,9 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.select.SelectedItemsNone;
+import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
@@ -137,7 +139,8 @@ public class JobsTest {
     JobsHelper.setNumberOfJobsWorkers(1);
     JobsHelper.setBlockSize(1);
 
-    TestsHelper.executeJob(PluginThatStopsItself.class, PluginType.MISC, SelectedItemsNone.create(), JOB_STATE.STOPPED);
+    TestsHelper.executeJob(PluginThatStopsItself.class, PluginType.MISC, SelectedItemsList.create(AIP.class, aips),
+      JOB_STATE.STOPPED);
 
     // resetting number of job workers & block size
     JobsHelper.setNumberOfJobsWorkers(originalNumberOfJobWorkers);

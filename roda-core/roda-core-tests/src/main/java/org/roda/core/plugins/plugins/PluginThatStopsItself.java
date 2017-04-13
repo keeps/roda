@@ -10,7 +10,6 @@ package org.roda.core.plugins.plugins;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
@@ -19,7 +18,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
-import org.roda.core.data.v2.Void;
+import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -35,7 +34,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Hélder Silva <hsilva@keep.pt>
  */
-public class PluginThatStopsItself extends AbstractPlugin<Void> {
+public class PluginThatStopsItself extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(PluginThatStopsItself.class);
 
   @Override
@@ -79,7 +78,7 @@ public class PluginThatStopsItself extends AbstractPlugin<Void> {
   }
 
   @Override
-  public Plugin<Void> cloneMe() {
+  public Plugin<AIP> cloneMe() {
     return new PluginThatStopsItself();
   }
 
@@ -94,8 +93,8 @@ public class PluginThatStopsItself extends AbstractPlugin<Void> {
   }
 
   @Override
-  public List<Class<Void>> getObjectClasses() {
-    return Arrays.asList(Void.class);
+  public List<Class<AIP>> getObjectClasses() {
+    return Arrays.asList(AIP.class);
   }
 
   @Override
@@ -108,7 +107,7 @@ public class PluginThatStopsItself extends AbstractPlugin<Void> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> list) throws PluginException {
-    long sleepTime = ThreadLocalRandom.current().nextLong(1, 3 + 1) * 1000;
+    long sleepTime = 1000;
     LOGGER.info("Going to request to stop job executing me (after sleeping for {} miliseconds)", sleepTime);
     try {
       Thread.sleep(sleepTime);
