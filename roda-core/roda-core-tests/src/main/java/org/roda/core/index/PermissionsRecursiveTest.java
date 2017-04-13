@@ -26,6 +26,7 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -41,12 +42,11 @@ import org.testng.annotations.Test;
 
 @Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_TRAVIS})
 public class PermissionsRecursiveTest {
+  private static final Logger LOGGER = LoggerFactory.getLogger(PermissionsRecursiveTest.class);
 
   private static Path basePath;
   private static ModelService model;
   private static IndexService index;
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(PermissionsRecursiveTest.class);
 
   @BeforeClass
   public static void setUp() throws Exception {
@@ -57,7 +57,7 @@ public class PermissionsRecursiveTest {
     boolean deployFolderMonitor = false;
     boolean deployOrchestrator = true;
     boolean deployPluginManager = true;
-    boolean deployDefaultResources = true;
+    boolean deployDefaultResources = false;
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
       deployPluginManager, deployDefaultResources);
 
@@ -75,10 +75,10 @@ public class PermissionsRecursiveTest {
 
   @Test
   public void testUpdatePermissionsRecursively() throws RODAException, ParseException {
-    // INFO this test may fail if the default objects change
-    String parentAIPId = "8faeaf8c-9a1f-49cc-a239-f3410d8bc13b";
-    String firstAIPChild = "ee1b2aa0-d336-418b-ad1d-1aa659fb97a8";
-    String otherAIPChild = "d743a569-945a-49d9-844f-39af67992f05";
+    AIP parent = model.createAIP(null, "", new Permissions(), RodaConstants.ADMIN);
+    AIP firstChild = model.createAIP(parent.getId(), "", new Permissions(), RodaConstants.ADMIN);
+    AIP otherChild = model.createAIP(parent.getId(), "", new Permissions(), RodaConstants.ADMIN);
+    model.createAIP(otherChild.getId(), "", new Permissions(), RodaConstants.ADMIN);
 
     User user = new User();
     user.setName("rodauser");
@@ -87,16 +87,14 @@ public class PermissionsRecursiveTest {
     model.registerUser(user, "rodapassword", false);
 
     // change parent permissions
-    AIP parent = model.retrieveAIP(parentAIPId);
     Set<PermissionType> userPermissions = new HashSet<>();
     userPermissions.add(PermissionType.READ);
     parent.getPermissions().setUserPermissions(user.getName(), userPermissions);
     model.updateAIPPermissions(parent, RodaConstants.ADMIN);
 
     // change a child permissions as well
-    AIP child = model.retrieveAIP(firstAIPChild);
-    child.getPermissions().setUserPermissions(user.getName(), userPermissions);
-    model.updateAIPPermissions(child, RodaConstants.ADMIN);
+    firstChild.getPermissions().setUserPermissions(user.getName(), userPermissions);
+    model.updateAIPPermissions(firstChild, RodaConstants.ADMIN);
     index.commitAIPs();
 
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, parent.getId()),
@@ -114,9 +112,9 @@ public class PermissionsRecursiveTest {
 
     Job job = TestsHelper.executeJob(UpdateAIPPermissionsPlugin.class, pluginParameters, PluginType.INTERNAL,
       selectedItems);
-    assertEquals(6, job.getJobStats().getSourceObjectsCount());
+    assertEquals(2, job.getJobStats().getSourceObjectsCount());
 
-    Set<PermissionType> permissions = model.retrieveAIP(otherAIPChild).getPermissions()
+    Set<PermissionType> permissions = model.retrieveAIP(otherChild.getId()).getPermissions()
       .getUserPermissions(user.getName());
     assertEquals(permissions.contains(PermissionType.READ), true);
   }
