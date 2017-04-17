@@ -66,20 +66,22 @@ public class IndexedReport extends Report implements IsIndexed {
 
   @Override
   public List<String> toCsvHeaders() {
-    return Arrays.asList("id", "jobId", "sourceObjectId", "sourceObjectClass", "sourceObjectOriginalIds",
-      "outcomeObjectId", "outcomeObjectClass", "outcomeObjectState", "title", "dateCreated", "dateUpdated",
-      "completionPercentage", "stepsCompleted", "totalSteps", "plugin", "pluginName", "pluginVersion", "pluginState",
-      "pluginDetails", "htmlPluginDetails", "reports");
+    return Arrays.asList("id", "jobId", "jobName", "sourceObjectId", "sourceObjectOriginalName", "sourceObjectLabel",
+      "sourceObjectClass", "sourceObjectOriginalIds", "outcomeObjectId", "outcomeObjectLabel", "outcomeObjectClass",
+      "outcomeObjectState", "title", "dateCreated", "dateUpdated", "completionPercentage", "stepsCompleted",
+      "totalSteps", "plugin", "pluginName", "pluginVersion", "pluginState", "pluginDetails", "htmlPluginDetails",
+      "reports");
   }
 
   @Override
   public List<Object> toCsvValues() {
-    return Arrays.asList(super.getId(), super.getJobId(), super.getSourceObjectId(), super.getSourceObjectClass(),
-      super.getSourceObjectOriginalIds(), super.getOutcomeObjectId(), super.getOutcomeObjectClass(),
-      super.getOutcomeObjectState(), super.getTitle(), super.getDateCreated(), super.getDateUpdated(),
-      super.getCompletionPercentage(), super.getStepsCompleted(), super.getTotalSteps(), super.getPlugin(),
-      super.getPluginName(), super.getPluginVersion(), super.getPluginState(), super.getPluginDetails(),
-      super.isHtmlPluginDetails(), super.getReports());
+    return Arrays.asList(super.getId(), super.getJobId(), getJobName(), super.getSourceObjectId(),
+      super.getSourceObjectOriginalName(), getSourceObjectLabel(), super.getSourceObjectClass(),
+      super.getSourceObjectOriginalIds(), super.getOutcomeObjectId(), getOutcomeObjectLabel(),
+      super.getOutcomeObjectClass(), super.getOutcomeObjectState(), super.getTitle(), super.getDateCreated(),
+      super.getDateUpdated(), super.getCompletionPercentage(), super.getStepsCompleted(), super.getTotalSteps(),
+      super.getPlugin(), super.getPluginName(), super.getPluginVersion(), super.getPluginState(),
+      super.getPluginDetails(), super.isHtmlPluginDetails(), super.getReports());
   }
 
   @JsonIgnore
