@@ -68,20 +68,20 @@ public class PreservationMetadataFileToVersion2 implements MigrationAction<Prese
                 }
               }
             } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
-              LOGGER.warn("Could not find preservation metadata files");
+              LOGGER.warn("Could not find preservation metadata files", e);
             } finally {
               IOUtils.closeQuietly(pms);
             }
           }
 
         } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
-          LOGGER.warn("Could not find representations");
+          LOGGER.warn("Could not find representations", e);
         } finally {
           IOUtils.closeQuietly(representations);
         }
       }
     } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
-      LOGGER.warn("Could not find AIPs");
+      LOGGER.warn("Could not find AIPs", e);
     } finally {
       IOUtils.closeQuietly(aips);
     }

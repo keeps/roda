@@ -258,7 +258,7 @@ public class MigrationManager {
           Integer collectionVersionFromCode = indexFromCode.getValue();
           if (indexVersionsInstalled.containsKey(collection)) {
             Integer collectionVersionInstalled = indexVersionsInstalled.get(collection);
-            if (collectionVersionFromCode != collectionVersionInstalled) {
+            if (!collectionVersionFromCode.equals(collectionVersionInstalled)) {
               LOGGER.warn(
                 "A migration is needed! Collection '{}' version is set to {} in code schema.xml & installed version (Solr deployed) is set to {}",
                 collection, collectionVersionFromCode, collectionVersionInstalled);
