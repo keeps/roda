@@ -292,7 +292,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
   public void createFolder(final IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
 
     Dialogs.showPromptDialog(messages.createFolderTitle(), null, messages.createFolderPlaceholder(),
-      RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
+      RegExp.compile("^[^/]+$"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
         @Override
         public void onFailure(Throwable caught) {
           Toast.showInfo(messages.dialogFailure(), messages.renameFailed());

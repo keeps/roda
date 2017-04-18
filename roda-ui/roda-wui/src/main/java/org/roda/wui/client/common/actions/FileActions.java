@@ -169,7 +169,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
   }
 
   public void rename(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
-    Dialogs.showPromptDialog(messages.renameItemTitle(), null, file.getId(), RegExp.compile(".*"),
+    Dialogs.showPromptDialog(messages.renameItemTitle(), null, file.getId(), RegExp.compile("^[^/]+$"),
       messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
 
         @Override
@@ -289,7 +289,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
   public void createFolder(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
     Dialogs.showPromptDialog(messages.createFolderTitle(), null, messages.createFolderPlaceholder(),
-      RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
+      RegExp.compile("^[^/]+$"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
         @Override
         public void onFailure(Throwable caught) {
           Toast.showInfo(messages.dialogFailure(), messages.renameFailed());

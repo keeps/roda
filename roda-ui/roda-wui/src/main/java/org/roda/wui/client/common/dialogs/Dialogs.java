@@ -18,6 +18,8 @@ import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.regexp.shared.RegExp;
@@ -160,7 +162,6 @@ public class Dialogs {
     dialogBox.setAnimationEnabled(false);
 
     cancelButton.addClickHandler(new ClickHandler() {
-
       @Override
       public void onClick(ClickEvent event) {
         dialogBox.hide();
@@ -169,38 +170,38 @@ public class Dialogs {
     });
 
     confirmButton.addClickHandler(new ClickHandler() {
-
       @Override
       public void onClick(ClickEvent event) {
-        dialogBox.hide();
-        callback.onSuccess(inputBox.getText());
+        boolean isValid = validator.test(inputBox.getText());
+        if (isValid) {
+          dialogBox.hide();
+          callback.onSuccess(inputBox.getText());
+        }
       }
     });
 
     inputBox.addValueChangeHandler(new ValueChangeHandler<String>() {
-
       @Override
       public void onValueChange(ValueChangeEvent<String> event) {
-        boolean isValid = validator.test(inputBox.getText());
+        boolean isValid = validator.test(event.getValue());
+        confirmButton.setEnabled(isValid);
         if (isValid) {
-          inputBox.addStyleName("error");
-        } else {
           inputBox.removeStyleName("error");
+        } else {
+          inputBox.addStyleName("error");
         }
       }
     });
 
     inputBox.addKeyPressHandler(new KeyPressHandler() {
-
       @Override
       public void onKeyPress(KeyPressEvent event) {
-        boolean isValid = validator.test(inputBox.getText());
-        confirmButton.setEnabled(isValid);
+        TextBox box = (TextBox) event.getSource();
+        confirmButton.setEnabled(validator.test(box.getText()));
       }
     });
 
     inputBox.addKeyDownHandler(new KeyDownHandler() {
-
       @Override
       public void onKeyDown(KeyDownEvent event) {
         if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
@@ -209,12 +210,28 @@ public class Dialogs {
             dialogBox.hide();
             callback.onSuccess(inputBox.getText());
           }
+        } else {
+          TextBox box = (TextBox) event.getSource();
+          confirmButton.setEnabled(validator.test(box.getText()));
         }
       }
-
     });
 
-    confirmButton.setEnabled(validator.test(inputBox.getText()));
+    inputBox.addKeyUpHandler(new KeyUpHandler() {
+      @Override
+      public void onKeyUp(KeyUpEvent event) {
+        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+          boolean isValid = validator.test(inputBox.getText());
+          if (isValid) {
+            dialogBox.hide();
+            callback.onSuccess(inputBox.getText());
+          }
+        } else {
+          TextBox box = (TextBox) event.getSource();
+          confirmButton.setEnabled(validator.test(box.getText()));
+        }
+      }
+    });
 
     dialogBox.addStyleName("wui-dialog-prompt");
     layout.addStyleName("wui-dialog-layout");
