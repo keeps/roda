@@ -172,6 +172,15 @@
 			</modules>
 		</profile>
 		<profile>
+			<id>core-and-plugins</id>
+			<modules>
+				<module>roda-common</module>
+				<module>roda-core/roda-core</module>
+				<module>roda-core/roda-plugins</module>
+				<module>roda-core/roda-core-tests</module>
+			</modules>
+		</profile>
+		<profile>
 			<id>wui</id>
 			<modules>
 				<module>roda-common</module>
