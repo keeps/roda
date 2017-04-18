@@ -613,7 +613,7 @@ public class IngestTransfer extends Composite {
 
                 @Override
                 public void onSuccess(String result) {
-                  BrowserService.Util.getInstance().renameTransferredResource(resultResource.getId(), result,
+                  BrowserService.Util.getInstance().renameTransferredResource(resultResource.getUUID(), result,
                     new AsyncCallback<String>() {
 
                       @Override
