@@ -33,16 +33,13 @@ import config.i18n.client.ClientMessages;
 public class IndexedFilePreview extends BitstreamPreview<IndexedFile> {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private SearchFileList folderList = null;
+  private boolean justActive = true;
 
-  public IndexedFilePreview(Viewers viewers, IndexedFile file) {
-    super(viewers, RestUtils.createRepresentationFileDownloadUri(file.getUUID()), file.getFileFormat(),
-      file.getOriginalName() != null ? file.getOriginalName() : file.getId(), file.getSize(), file.isDirectory(), file);
-  }
-
-  public IndexedFilePreview(Viewers viewers, IndexedFile file, Command onPreviewFailure) {
+  public IndexedFilePreview(Viewers viewers, IndexedFile file, boolean justActive, Command onPreviewFailure) {
     super(viewers, RestUtils.createRepresentationFileDownloadUri(file.getUUID()), file.getFileFormat(),
       file.getOriginalName() != null ? file.getOriginalName() : file.getId(), file.getSize(), file.isDirectory(),
       onPreviewFailure, file);
+    this.justActive = justActive;
   }
 
   @Override
@@ -54,7 +51,6 @@ public class IndexedFilePreview extends BitstreamPreview<IndexedFile> {
     final SearchPanel fileSearch = new SearchPanel(filter, RodaConstants.FILE_SEARCH, true,
       messages.searchPlaceHolder(), false, false, true);
 
-    boolean justActive = true;
     boolean selectable = true;
     boolean showFilesPath = false;
 

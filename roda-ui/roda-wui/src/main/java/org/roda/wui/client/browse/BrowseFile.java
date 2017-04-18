@@ -172,9 +172,10 @@ public class BrowseFile extends Composite {
    */
   public BrowseFile(Viewers viewers, final BrowseFileBundle bundle) {
     this.bundle = bundle;
+    final boolean justActive = AIPState.ACTIVE.equals(bundle.getAip().getState());
 
     // initialize preview
-    filePreview = new IndexedFilePreview(viewers, bundle.getFile(), new Command() {
+    filePreview = new IndexedFilePreview(viewers, bundle.getFile(), justActive, new Command() {
 
       @Override
       public void execute() {
@@ -183,7 +184,6 @@ public class BrowseFile extends Composite {
           public void execute() {
             Filter filter = new Filter(
               new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, bundle.getFile().getUUID()));
-            boolean justActive = AIPState.ACTIVE.equals(bundle.getAip().getState());
             BrowserService.Util.getInstance().count(IndexedDIP.class.getName(), filter, justActive,
               new AsyncCallback<Long>() {
 
