@@ -28,6 +28,7 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.actions.AipActions;
 import org.roda.wui.client.common.actions.FileActions;
 import org.roda.wui.client.common.actions.RepresentationActions;
@@ -249,6 +250,7 @@ public class MainSearch extends Composite {
 
     FacetUtils.bindFacets(itemsSearchResultPanel, facetPanels);
     ListSelectionUtils.bindBrowseOpener(itemsSearchResultPanel);
+    LastSelectedItemsSingleton.getInstance().setSelectedJustActive(justActive);
     itemsSearchResultPanel.setActionable(AipActions.get(parentAipId, parentAipState));
   }
 
@@ -280,6 +282,7 @@ public class MainSearch extends Composite {
 
     FacetUtils.bindFacets(filesSearchResultPanel, facetPanels);
     ListSelectionUtils.bindBrowseOpener(filesSearchResultPanel);
+    LastSelectedItemsSingleton.getInstance().setSelectedJustActive(justActive);
     filesSearchResultPanel.setActionable(FileActions.get());
   }
 

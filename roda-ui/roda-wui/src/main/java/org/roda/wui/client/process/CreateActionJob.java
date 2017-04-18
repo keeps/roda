@@ -57,7 +57,6 @@ public class CreateActionJob extends CreateSelectedJob<IsIndexed> {
   public boolean updateObjectList() {
     SelectedItems<?> selected = getSelected();
     boolean selectable = false;
-    boolean isEmpty = true;
 
     if (selected != null) {
       getTargetPanel().clear();
@@ -84,7 +83,7 @@ public class CreateActionJob extends CreateSelectedJob<IsIndexed> {
       return false;
     }
 
-    return isEmpty;
+    return true;
   }
 
   @Override

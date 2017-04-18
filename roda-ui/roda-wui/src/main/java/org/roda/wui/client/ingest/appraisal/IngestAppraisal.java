@@ -22,6 +22,7 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.AipActions;
@@ -200,6 +201,7 @@ public class IngestAppraisal extends Composite {
     } else if (selected.getSelectedClass().equals(IndexedAIP.class.getName())) {
       AipAction action = accept ? AipAction.APPRAISAL_ACCEPT : AipAction.APPRAISAL_REJECT;
 
+      LastSelectedItemsSingleton.getInstance().setSelectedJustActive(justActive);
       AipActions.get().act(action, (SelectedItems<IndexedAIP>) selected, new AsyncCallback<Actionable.ActionImpact>() {
 
         @Override

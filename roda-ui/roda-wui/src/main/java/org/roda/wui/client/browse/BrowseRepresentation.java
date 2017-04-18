@@ -27,6 +27,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataViewBundle;
+import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.DisseminationActions;
@@ -241,6 +242,7 @@ public class BrowseRepresentation extends Composite {
       new EmptyKeyFilterParameter(RodaConstants.FILE_PARENT_UUID));
 
     filesList = new SearchFileList(filter, justActive, Facets.NONE, summary, selectable, showFilesPath);
+    LastSelectedItemsSingleton.getInstance().setSelectedJustActive(justActive);
     filesList.setActionable(FileActions.get(aipId, repId));
 
     ListSelectionUtils.bindBrowseOpener(filesList);

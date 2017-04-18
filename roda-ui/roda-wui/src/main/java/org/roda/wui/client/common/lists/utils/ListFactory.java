@@ -28,6 +28,7 @@ import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.RODAMember;
+import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.DIPFileList;
 import org.roda.wui.client.common.lists.DIPList;
@@ -54,14 +55,15 @@ public class ListFactory {
   public BasicAsyncTableCell<?> getList(String actualClass, String title, Filter filter, boolean selectable,
     int pageSize, int incrementPage) {
     if (actualClass.equals(AIP.class.getName()) || actualClass.equals(IndexedAIP.class.getName())) {
-      return new AIPList(filter, true, null, messages.selectAipSearchResults(), selectable, pageSize, incrementPage);
+      return new AIPList(filter, LastSelectedItemsSingleton.getInstance().isSelectedJustActive(), null,
+        messages.selectAipSearchResults(), selectable, pageSize, incrementPage);
     } else if (actualClass.equals(Representation.class.getName())
       || actualClass.equals(IndexedRepresentation.class.getName())) {
-      return new RepresentationList(filter, true, null, messages.selectRepresentationSearchResults(), selectable,
-        pageSize, incrementPage);
+      return new RepresentationList(filter, LastSelectedItemsSingleton.getInstance().isSelectedJustActive(), null,
+        messages.selectRepresentationSearchResults(), selectable, pageSize, incrementPage);
     } else if (actualClass.equals(File.class.getName()) || actualClass.equals(IndexedFile.class.getName())) {
-      return new SimpleFileList(filter, true, null, messages.selectFileSearchResults(), selectable, pageSize,
-        incrementPage);
+      return new SimpleFileList(filter, LastSelectedItemsSingleton.getInstance().isSelectedJustActive(), null,
+        messages.selectFileSearchResults(), selectable, pageSize, incrementPage);
     } else if (actualClass.equals(Format.class.getName())) {
       return new FormatList(filter, null, title, selectable, pageSize, incrementPage);
     } else if (actualClass.equals(IndexedRisk.class.getName()) || actualClass.equals(Risk.class.getName())) {

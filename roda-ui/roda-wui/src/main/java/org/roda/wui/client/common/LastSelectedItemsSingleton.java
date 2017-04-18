@@ -22,8 +22,10 @@ public class LastSelectedItemsSingleton {
   private List<String> lastHistory = new ArrayList<>();
   private IsIndexed lastObject = null;
   private ListSelectionState<? extends IsIndexed> lastListSelectionState = null;
+  private boolean selectedJustActive = true;
 
   private LastSelectedItemsSingleton() {
+    // do nothing
   }
 
   public static LastSelectedItemsSingleton getInstance() {
@@ -75,6 +77,14 @@ public class LastSelectedItemsSingleton {
 
   public ListSelectionState<? extends IsIndexed> getLastListSelectionState() {
     return lastListSelectionState;
+  }
+
+  public boolean isSelectedJustActive() {
+    return selectedJustActive;
+  }
+
+  public void setSelectedJustActive(boolean selectedJustActive) {
+    this.selectedJustActive = selectedJustActive;
   }
 
 }

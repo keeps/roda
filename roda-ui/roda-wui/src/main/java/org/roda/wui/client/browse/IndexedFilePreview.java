@@ -16,6 +16,7 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.actions.FileActions;
 import org.roda.wui.client.common.lists.SearchFileList;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
@@ -57,6 +58,7 @@ public class IndexedFilePreview extends BitstreamPreview<IndexedFile> {
     this.folderList = new SearchFileList(filter, justActive, Facets.NONE, messages.representationListOfFiles(),
       selectable, showFilesPath);
 
+    LastSelectedItemsSingleton.getInstance().setSelectedJustActive(justActive);
     this.folderList.setActionable(FileActions.get(getObject().getAipId(), getObject().getRepresentationId()));
 
     fileSearch.setList(folderList);

@@ -29,6 +29,7 @@ import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataViewBundle;
+import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.AipActions;
@@ -550,6 +551,7 @@ public class BrowseAIP extends Composite {
         aipChildrenSearch.setDefaultFilter(filter, true);
         aipChildrenSearch.clearSearchInputBox();
         aipChildrenList.set(filter, justActive, facets);
+        LastSelectedItemsSingleton.getInstance().setSelectedJustActive(justActive);
         aipChildrenList.setActionable(AipActions.get(aip.getId(), aip.getState()));
       }
 
@@ -747,6 +749,7 @@ public class BrowseAIP extends Composite {
 
     aipChildrenSearch.setDefaultFilter(COLLECTIONS_FILTER, true);
     aipChildrenList.set(COLLECTIONS_FILTER, justActive, facets);
+    LastSelectedItemsSingleton.getInstance().setSelectedJustActive(justActive);
     aipChildrenList.setActionable(AipActions.get());
 
     aipChildrenSearch.setVisible(true);

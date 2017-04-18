@@ -101,7 +101,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   @Override
   public boolean canAct(Actionable.Action<IndexedAIP> action, IndexedAIP aip) {
     boolean canAct;
-    if (aip.equals(NO_AIP_OBJECT)) {
+    if (aip == NO_AIP_OBJECT) {
       canAct = POSSIBLE_ACTIONS_ON_NO_AIP.contains(action);
     } else if (AIPState.UNDER_APPRAISAL.equals(aip.getState())) {
       canAct = POSSIBLE_ACTIONS_ON_SINGLE_AIP.contains(action) || APPRAISAL_ACTIONS.contains(action);
