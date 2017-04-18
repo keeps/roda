@@ -18,7 +18,6 @@ import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -35,7 +34,6 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -75,8 +73,6 @@ import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -253,6 +249,7 @@ public class ShowJob extends Composite {
 
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.JOB_REPORT_PLUGIN_STATE),
       new SimpleFacetParameter(RodaConstants.JOB_REPORT_PLUGIN_NAME));
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getUUID()));
 
     if (job.getPluginType().equals(PluginType.INGEST)) {
       ingestJobReports = new IngestJobReportList(
@@ -268,8 +265,6 @@ public class ShowJob extends Composite {
       ListSelectionUtils.bindBrowseOpener(simpleJobReports);
       ingestJobReports = new IngestJobReportList();
     }
-
-    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getUUID()));
 
     ingestJobReportsSearchPanel = new SearchPanel(filter, RodaConstants.JOB_REPORT_SEARCH, true,
       messages.jobProcessedSearchPlaceHolder(), false, false, false);
@@ -291,7 +286,6 @@ public class ShowJob extends Composite {
     simpleJobReports.setVisible(!isIngest);
     ingestJobReportsSearchPanel.setVisible(isIngest);
     ingestJobReports.setVisible(isIngest);
-    reportListPanel.setVisible(false);
     buttonProcess.setVisible(isIngest);
 
     name.setText(job.getName());
@@ -300,16 +294,10 @@ public class ShowJob extends Composite {
     update();
 
     SelectedItems<?> selected = job.getSourceObjects();
+    selectedListPanel.setVisible(true);
 
     if (isIngest) {
       FacetUtils.bindFacets(ingestJobReports, facetPanels);
-
-      ingestJobReports.addValueChangeHandler(new ValueChangeHandler<IndexResult<IndexedReport>>() {
-        @Override
-        public void onValueChange(ValueChangeEvent<IndexResult<IndexedReport>> event) {
-          reportListPanel.setVisible(event.getValue().getTotalCount() > 0);
-        }
-      });
 
       if (isJobRunning()) {
         ingestJobReports.autoUpdate(PERIOD_MILLIS);
@@ -325,19 +313,9 @@ public class ShowJob extends Composite {
         }
       });
 
-      selectedListPanel.setVisible(true);
       showIngestSourceObjects(selected);
-
     } else {
       FacetUtils.bindFacets(simpleJobReports, facetPanels);
-
-      simpleJobReports.addValueChangeHandler(new ValueChangeHandler<IndexResult<IndexedReport>>() {
-
-        @Override
-        public void onValueChange(ValueChangeEvent<IndexResult<IndexedReport>> event) {
-          reportListPanel.setVisible(event.getValue().getTotalCount() > 0);
-        }
-      });
 
       if (isJobRunning()) {
         simpleJobReports.autoUpdate(PERIOD_MILLIS);
@@ -353,7 +331,6 @@ public class ShowJob extends Composite {
         }
       });
 
-      selectedListPanel.setVisible(true);
       showActionSourceObjects(selected);
     }
 
