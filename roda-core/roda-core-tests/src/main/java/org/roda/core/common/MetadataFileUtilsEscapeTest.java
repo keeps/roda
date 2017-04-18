@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
@@ -22,11 +23,26 @@ import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.storage.ContentPayload;
+import org.roda.core.storage.StringContentPayload;
+import org.testng.Assert;
 import org.testng.AssertJUnit;
 import org.testng.annotations.Test;
 
 @Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_TRAVIS})
 public class MetadataFileUtilsEscapeTest {
+
+  @Test
+  public void testGetMetadataPayload() throws GenericException, IOException {
+    TransferredResource resource = new TransferredResource();
+    resource.setName("a&b.csv");
+
+    ContentPayload metadataPayload = MetadataFileUtils.getMetadataPayload(resource);
+    Assert.assertTrue(metadataPayload instanceof StringContentPayload);
+    Assert.assertTrue(
+      IOUtils.toString(metadataPayload.createInputStream()).contains("<field name=\"title\">a&amp;b.csv</field>"));
+  }
 
   @Test
   public void testEscape() throws GenericException {

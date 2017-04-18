@@ -292,7 +292,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
       RegExp.compile("^[^/]+$"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
         @Override
         public void onFailure(Throwable caught) {
-          Toast.showInfo(messages.dialogFailure(), messages.renameFailed());
+          // do nothing
         }
 
         @Override

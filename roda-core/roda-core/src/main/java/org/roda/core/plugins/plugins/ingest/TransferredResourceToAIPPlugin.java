@@ -161,6 +161,7 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
       } else {
         processTransferredResourceDirectory(model, transferredResourcePath, aip, representationId);
       }
+
       createUnpackingEventSuccess(model, index, transferredResource, aip, UNPACK_DESCRIPTION);
       ContentPayload metadataPayload = MetadataFileUtils.getMetadataPayload(transferredResource);
       boolean notifyDescriptiveMetadataCreated = false;

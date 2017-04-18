@@ -705,6 +705,7 @@ public class SolrUtils {
         }
       }
     }
+
     if (doc.get(RodaConstants.AIP_DATE_FINAL) != null) {
       Object value = doc.get(RodaConstants.AIP_DATE_FINAL).getValue();
       if (value instanceof String) {
@@ -717,6 +718,7 @@ public class SolrUtils {
         }
       }
     }
+
     return doc;
   }
 
@@ -1187,8 +1189,9 @@ public class SolrUtils {
     String level;
     if (ghost) {
       level = RodaConstants.AIP_GHOST;
-    } else
+    } else {
       level = levels.isEmpty() ? null : levels.get(0);
+    }
 
     return new IndexedAIP(id, state, level, title, dateInitial, dateFinal, description, parentId, ancestors,
       permissions, numberOfSubmissionFiles, numberOfDocumentationFiles, numberOfSchemaFiles, hasRepresentations, ghost)

@@ -52,7 +52,7 @@ public class MetadataFileUtils {
       org.jdom2.Document doc = new org.jdom2.Document();
       Element child = new Element("field");
       child.setAttribute("name", "title");
-      child.addContent(escapeContent(transferredResource.getName()));
+      child.addContent(transferredResource.getName());
       root.addContent(child);
       doc.setRootElement(root);
       XMLOutputter outter = new XMLOutputter();
