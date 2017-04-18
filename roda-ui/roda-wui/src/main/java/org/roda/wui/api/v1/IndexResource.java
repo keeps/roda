@@ -326,18 +326,15 @@ public class IndexResource {
     }
 
     if (findRequest.exportFacets) {
-
       final IndexResult<T> result = Browser.find(returnClass, findRequest.filter, Sorter.NONE, Sublist.NONE,
         findRequest.facets, user, findRequest.onlyActive, new ArrayList<>());
 
       return ApiUtils.okResponse(
         new RodaStreamingOutput(new FacetsCSVOutputStream(result.getFacetResults(), findRequest.filename, delimiter))
           .toStreamResponse());
-
     } else {
-
       final IterableIndexResult<T> result = Browser.findAll(returnClass, findRequest.filter, findRequest.sorter,
-        findRequest.sublist, user, findRequest.onlyActive, new ArrayList<>());
+        findRequest.sublist, findRequest.facets, user, findRequest.onlyActive, new ArrayList<>());
 
       return ApiUtils
         .okResponse(new RodaStreamingOutput(new ResultsCSVOutputStream<>(result, findRequest.filename, delimiter))

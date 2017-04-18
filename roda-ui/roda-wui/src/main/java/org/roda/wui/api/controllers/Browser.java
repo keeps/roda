@@ -313,7 +313,7 @@ public class Browser extends RodaWuiController {
   }
 
   public static <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> classToReturn, final Filter filter,
-    final Sorter sorter, final Sublist sublist, final User user, final boolean justActive,
+    final Sorter sorter, final Sublist sublist, final Facets facets, final User user, final boolean justActive,
     final List<String> fieldsToReturn) throws GenericException, AuthorizationDeniedException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -321,7 +321,7 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user, classToReturn);
 
     // delegate
-    final IterableIndexResult<T> result = BrowserHelper.findAll(classToReturn, filter, sorter, sublist, user,
+    final IterableIndexResult<T> result = BrowserHelper.findAll(classToReturn, filter, sorter, sublist, facets, user,
       justActive, fieldsToReturn);
 
     // register action

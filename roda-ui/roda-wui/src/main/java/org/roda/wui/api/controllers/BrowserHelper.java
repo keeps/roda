@@ -551,10 +551,10 @@ public class BrowserHelper {
   }
 
   protected static <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
-    final Sorter sorter, final Sublist sublist, final User user, final boolean justActive,
+    final Sorter sorter, final Sublist sublist, final Facets facets, final User user, final boolean justActive,
     List<String> fieldsToReturn) {
-    return RodaCoreFactory.getIndexService().findAll(returnClass, filter, sorter, sublist, user, justActive, true,
-      fieldsToReturn);
+    return RodaCoreFactory.getIndexService().findAll(returnClass, filter, sorter, sublist, facets, user, justActive,
+      true, fieldsToReturn);
   }
 
   protected static <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter, boolean justActive, User user)

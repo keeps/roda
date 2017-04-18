@@ -182,6 +182,13 @@ public class IndexService {
       justActive, removeDuplicates, fieldsToReturn);
   }
 
+  public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
+    final Sorter sorter, final Sublist sublist, final Facets facets, final User user, final boolean justActive,
+    final boolean removeDuplicates, final List<String> fieldsToReturn) {
+    return new IterableIndexResult<>(getSolrClient(), returnClass, filter, sorter, sublist, facets, user, justActive,
+      removeDuplicates, fieldsToReturn);
+  }
+
   public <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter, User user, boolean justActive)
     throws GenericException, RequestNotValidException {
     return SolrUtils.count(getSolrClient(), returnClass, filter, user, justActive);
