@@ -293,7 +293,7 @@ public class PluginParameterPanel extends Composite {
         for (final PluginInfo pluginInfo : pluginsInfo) {
           if (pluginInfo != null) {
             RadioButton pRadio = new RadioButton(parameter.getName(),
-              messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()));
+              messages.pluginLabelWithVersion(pluginInfo.getName(), pluginInfo.getVersion()));
 
             if (pluginInfo.getId().equals(parameter.getDefaultValue())) {
               pRadio.setValue(true);

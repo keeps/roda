@@ -336,7 +336,7 @@ public class ShowJob extends Composite {
 
     PluginInfo pluginInfo = pluginsInfo.get(job.getPlugin());
     if (pluginInfo != null) {
-      plugin.setText(messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()));
+      plugin.setText(messages.pluginLabelWithVersion(pluginInfo.getName(), pluginInfo.getVersion()));
 
       if (pluginInfo.getParameters().isEmpty()) {
         pluginPanel.setVisible(false);
@@ -706,7 +706,7 @@ public class ShowJob extends Composite {
 
       if (sipToAipPlugin != null) {
         pluginValue = new RadioButton(parameter.getId(),
-          messages.pluginLabel(sipToAipPlugin.getName(), sipToAipPlugin.getVersion()));
+          messages.pluginLabelWithVersion(sipToAipPlugin.getName(), sipToAipPlugin.getVersion()));
 
         pluginValue.setValue(true);
         pluginValue.setEnabled(false);

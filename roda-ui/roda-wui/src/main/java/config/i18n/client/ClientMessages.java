@@ -570,7 +570,9 @@ public interface ClientMessages extends Messages {
 
   String processNewDefaultName(Date date);
 
-  String pluginLabel(String name, String version);
+  String pluginLabel(String name);
+
+  String pluginLabelWithVersion(String name, String version);
 
   String pluginAipIdButton();
 

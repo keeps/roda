@@ -151,7 +151,12 @@ public class SimpleJobReportList extends BasicAsyncTableCell<IndexedReport> {
             } else {
               pluginName = jobPlugin;
             }
-            value = messages.pluginLabel(pluginName, job.getPluginVersion());
+
+            if (StringUtils.isNotBlank(job.getPluginVersion())) {
+              value = messages.pluginLabelWithVersion(pluginName, job.getPluginVersion());
+            } else {
+              value = messages.pluginLabel(pluginName);
+            }
           }
         }
 

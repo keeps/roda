@@ -50,8 +50,8 @@ public class MinimalIngestPlugin extends DefaultIngestPlugin {
         PluginParameterType.BOOLEAN, "true", true, true, PremisSkeletonPlugin.getStaticDescription()));
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_PRODUCER_AUTHORIZATION_CHECK,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_PRODUCER_AUTHORIZATION_CHECK,
-        VerifyProducerAuthorizationPlugin.getStaticName(), PluginParameterType.BOOLEAN, "true", true, true,
-        VerifyProducerAuthorizationPlugin.getStaticDescription()));
+        VerifyUserAuthorizationPlugin.getStaticName(), PluginParameterType.BOOLEAN, "true", true, true,
+        VerifyUserAuthorizationPlugin.getStaticDescription()));
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT, AutoAcceptSIPPlugin.getStaticName(),
         PluginParameterType.BOOLEAN, "true", true, true, AutoAcceptSIPPlugin.getStaticDescription()));

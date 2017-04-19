@@ -231,7 +231,15 @@ public class ShowJobReport extends Composite {
       Label attributeLabel = new Label(messages.reportAgent());
       attributeLabel.setStyleName("label");
       panelBody.add(attributeLabel);
-      Label attributeValue = new Label(messages.pluginLabel(reportItem.getPlugin(), reportItem.getPluginVersion()));
+
+      String text;
+      if (StringUtils.isNotBlank(reportItem.getPluginVersion())) {
+        text = messages.pluginLabelWithVersion(reportItem.getPlugin(), reportItem.getPluginVersion());
+      } else {
+        text = messages.pluginLabel(reportItem.getPlugin());
+      }
+
+      Label attributeValue = new Label(text);
       attributeValue.setStyleName("value");
       panelBody.add(attributeValue);
 

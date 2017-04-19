@@ -136,7 +136,12 @@ public class IngestJobReportList extends BasicAsyncTableCell<IndexedReport> {
           } else {
             pluginName = job.getPlugin();
           }
-          value = messages.pluginLabel(pluginName, job.getPluginVersion());
+
+          if (StringUtils.isNotBlank(job.getPluginVersion())) {
+            value = messages.pluginLabelWithVersion(pluginName, job.getPluginVersion());
+          } else {
+            value = messages.pluginLabel(pluginName);
+          }
         }
 
         return value;

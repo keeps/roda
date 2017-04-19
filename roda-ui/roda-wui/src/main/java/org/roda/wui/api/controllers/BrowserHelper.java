@@ -2654,7 +2654,7 @@ public class BrowserHelper {
       Report reportItem = new Report();
       Messages messages = RodaCoreFactory.getI18NMessages(locale);
       reportItem.setTitle(messages.getTranslation(RodaConstants.I18N_UI_APPRAISAL));
-      reportItem.setPlugin(user.getName());
+      reportItem.setPlugin(messages.getTranslation(RodaConstants.I18N_UI_APPRAISAL));
       reportItem.setPluginDetails(rejectReason);
       reportItem.setPluginState(accept ? PluginState.SUCCESS : PluginState.FAILURE);
       reportItem.setOutcomeObjectState(accept ? AIPState.ACTIVE : AIPState.DELETED);
@@ -2670,7 +2670,6 @@ public class BrowserHelper {
       } else {
         jobState.put(jobId, Pair.of(pair.getFirst() + 1, pair.getSecond() + (accept ? 1 : 0)));
       }
-
     }
 
     try {

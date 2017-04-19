@@ -563,7 +563,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
   private Report verifyProducerAuthorization(IndexService index, ModelService model, StorageService storage,
     List<AIP> aips) {
-    return executePlugin(index, model, storage, aips, VerifyProducerAuthorizationPlugin.class.getName());
+    return executePlugin(index, model, storage, aips, VerifyUserAuthorizationPlugin.class.getName());
   }
 
   private Report doFileFormatIdentification(IndexService index, ModelService model, StorageService storage,

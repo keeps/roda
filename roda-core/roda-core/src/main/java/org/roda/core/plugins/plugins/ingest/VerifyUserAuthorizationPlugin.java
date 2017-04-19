@@ -42,8 +42,8 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(VerifyProducerAuthorizationPlugin.class);
+public class VerifyUserAuthorizationPlugin extends AbstractPlugin<AIP> {
+  private static final Logger LOGGER = LoggerFactory.getLogger(VerifyUserAuthorizationPlugin.class);
 
   private static final String NO_PERMISSION_TO_CREATE_UNDER_AIP = "The user doesn't have permission to create under AIP";
   private static final String PARENT_AIP_NOT_FOUND = "The parent of the AIP was not found";
@@ -65,7 +65,7 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticName() {
-    return "Verify producer authorization";
+    return "Verify user authorization";
   }
 
   @Override
@@ -74,7 +74,7 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticDescription() {
-    return "Checks if the producer has enough permissions to place the AIP under the desired node in the classification scheme";
+    return "Checks if the user has enough permissions to place the AIP under the desired node in the classification scheme";
   }
 
   @Override
@@ -169,7 +169,7 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public Plugin<AIP> cloneMe() {
-    return new VerifyProducerAuthorizationPlugin();
+    return new VerifyUserAuthorizationPlugin();
   }
 
   @Override

@@ -333,7 +333,7 @@ public class CreateDefaultJob extends Composite {
     }
 
     Label label = new Label();
-    String labelContent = messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion());
+    String labelContent = messages.pluginLabelWithVersion(pluginInfo.getName(), pluginInfo.getVersion());
     label.setText(labelContent);
     label.setTitle(labelContent);
     label.addStyleName("plugin-list-item-label");
@@ -354,7 +354,7 @@ public class CreateDefaultJob extends Composite {
       workflowListDescriptionCategories.setVisible(false);
       workflowOptions.setPluginInfo(null);
     } else {
-      String pluginName = messages.pluginLabel(selectedPlugin.getName(), selectedPlugin.getVersion());
+      String pluginName = messages.pluginLabelWithVersion(selectedPlugin.getName(), selectedPlugin.getVersion());
       name.setText(pluginName);
       workflowListTitle.setText(pluginName);
 
