@@ -623,9 +623,7 @@ public final class PluginHelper {
       try {
         IndexedAIP computedParent = index.retrieve(IndexedAIP.class, computedSearchScope.get(),
           Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_ANCESTORS));
-        if (!computedParent.getAncestors().isEmpty()) {
-          ancestorFilter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, computedParent.getId()));
-        }
+        ancestorFilter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, computedParent.getId()));
       } catch (NotFoundException | GenericException e) {
         // Do nothing
       }
@@ -1032,11 +1030,12 @@ public final class PluginHelper {
     for (IndexedAIP aip : ghosts) {
       if (aip.getIngestSIPIds() != null && !aip.getIngestSIPIds().isEmpty()) {
         List<String> temp = new ArrayList<>();
-        if (sipIdToGhost.containsKey(aip.getIngestSIPIds().get(0))) {
-          temp = sipIdToGhost.get(aip.getIngestSIPIds().get(0));
+        String firstIngestSIPId = aip.getIngestSIPIds().get(0);
+        if (sipIdToGhost.containsKey(firstIngestSIPId)) {
+          temp = sipIdToGhost.get(firstIngestSIPId);
         }
         temp.add(aip.getId());
-        sipIdToGhost.put(aip.getIngestSIPIds().get(0), temp);
+        sipIdToGhost.put(firstIngestSIPId, temp);
       } else {
         List<String> temp = new ArrayList<>();
         if (aipIdToGhost.containsKey(aip.getId())) {
