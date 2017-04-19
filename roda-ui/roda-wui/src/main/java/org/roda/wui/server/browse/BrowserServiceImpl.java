@@ -415,10 +415,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public String createTransferredResourcesFolder(String parent, String folderName)
+  public String createTransferredResourcesFolder(String parent, String folderName, boolean commit)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.createTransferredResourcesFolder(user, parent, folderName, false).getUUID();
+    return Browser.createTransferredResourcesFolder(user, parent, folderName, commit).getUUID();
   }
 
   @Override

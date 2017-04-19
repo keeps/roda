@@ -95,7 +95,8 @@ public interface BrowserServiceAsync {
 
   void retrieveDescriptiveMetadataPreview(SupportedMetadataTypeBundle bundle, AsyncCallback<String> async);
 
-  void createTransferredResourcesFolder(String parent, String folderName, AsyncCallback<String> callback);
+  void createTransferredResourcesFolder(String parent, String folderName, boolean commit,
+    AsyncCallback<String> callback);
 
   void deleteTransferredResources(SelectedItems<TransferredResource> selected, AsyncCallback<Void> callback);
 

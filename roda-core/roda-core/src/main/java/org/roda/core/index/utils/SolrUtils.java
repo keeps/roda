@@ -2081,7 +2081,6 @@ public class SolrUtils {
 
   public static Format solrDocumentToFormat(SolrDocument doc) {
     Format format = new Format();
-
     format.setId(objectToString(doc.get(RodaConstants.INDEX_UUID), null));
     format.setName(objectToString(doc.get(RodaConstants.FORMAT_NAME), null));
     format.setDefinition(objectToString(doc.get(RodaConstants.FORMAT_DEFINITION), null));
@@ -2100,13 +2099,11 @@ public class SolrUtils {
     format.setUtis(objectToListString(doc.get(RodaConstants.FORMAT_UTIS)));
     format.setAlternativeDesignations(objectToListString(doc.get(RodaConstants.FORMAT_ALTERNATIVE_DESIGNATIONS)));
     format.setVersions(objectToListString(doc.get(RodaConstants.FORMAT_VERSIONS)));
-
     return format;
   }
 
   public static SolrInputDocument notificationToSolrDocument(Notification notification) {
     SolrInputDocument doc = new SolrInputDocument();
-
     doc.addField(RodaConstants.INDEX_UUID, notification.getId());
     doc.addField(RodaConstants.NOTIFICATION_ID, notification.getId());
     doc.addField(RodaConstants.NOTIFICATION_SUBJECT, notification.getSubject());
@@ -2148,7 +2145,6 @@ public class SolrUtils {
 
   public static SolrInputDocument riskIncidenceToSolrDocument(RiskIncidence incidence) {
     SolrInputDocument doc = new SolrInputDocument();
-
     doc.addField(RodaConstants.INDEX_UUID, incidence.getId());
     doc.addField(RodaConstants.RISK_INCIDENCE_ID, incidence.getId());
     doc.addField(RodaConstants.RISK_INCIDENCE_AIP_ID, incidence.getAipId());
@@ -2166,10 +2162,8 @@ public class SolrUtils {
     doc.addField(RodaConstants.RISK_INCIDENCE_MITIGATED_ON, incidence.getMitigatedOn());
     doc.addField(RodaConstants.RISK_INCIDENCE_MITIGATED_BY, incidence.getMitigatedBy());
     doc.addField(RodaConstants.RISK_INCIDENCE_MITIGATED_DESCRIPTION, incidence.getMitigatedDescription());
-
     doc.addField(RodaConstants.RISK_INCIDENCE_FILE_PATH_COMPUTED,
       StringUtils.join(incidence.getFilePath(), RodaConstants.RISK_INCIDENCE_FILE_PATH_COMPUTED_SEPARATOR));
-
     return doc;
   }
 
@@ -2504,7 +2498,6 @@ public class SolrUtils {
    * ____________________________________________________________________________________________________________________
    */
   private static Permissions getPermissions(SolrDocument doc) {
-
     Permissions permissions = new Permissions();
 
     EnumMap<PermissionType, Set<String>> userPermissions = new EnumMap<>(PermissionType.class);
@@ -2535,14 +2528,12 @@ public class SolrUtils {
     for (Entry<PermissionType, Set<String>> entry : permissions.getUsers().entrySet()) {
       String key = RodaConstants.INDEX_PERMISSION_USERS_PREFIX + entry.getKey();
       List<String> value = new ArrayList<>(entry.getValue());
-
       ret.addField(key, value);
     }
 
     for (Entry<PermissionType, Set<String>> entry : permissions.getGroups().entrySet()) {
       String key = RodaConstants.INDEX_PERMISSION_GROUPS_PREFIX + entry.getKey();
       List<String> value = new ArrayList<>(entry.getValue());
-
       ret.addField(key, value);
     }
   }

@@ -29,6 +29,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.xml.transform.TransformerException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.roda.core.common.EntityResponse;
@@ -139,6 +140,7 @@ public class TransferredResource {
     @ApiParam(value = "Locale", required = false) @QueryParam(RodaConstants.LOCALE) String localeString,
     @FormDataParam(RodaConstants.API_PARAM_UPLOAD) InputStream inputStream,
     @FormDataParam(RodaConstants.API_PARAM_UPLOAD) FormDataContentDisposition fileDetail,
+    @ApiParam(value = "Commit after creation", defaultValue = "false", required = false) @QueryParam(RodaConstants.API_QUERY_PARAM_COMMIT) String commitString,
     @ApiParam(value = "Choose format in which to get the resource", allowableValues = RodaConstants.API_POST_PUT_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
@@ -151,6 +153,10 @@ public class TransferredResource {
       org.roda.core.data.v2.ip.TransferredResource transferredResource;
       String fileName = fileDetail.getFileName();
       boolean forceCommit = false;
+      if (StringUtils.isNotBlank(commitString)) {
+        forceCommit = Boolean.parseBoolean(commitString);
+      }
+
       if (name == null) {
         transferredResource = Browser.createTransferredResourceFile(user, parentUUID, fileName, inputStream,
           forceCommit);

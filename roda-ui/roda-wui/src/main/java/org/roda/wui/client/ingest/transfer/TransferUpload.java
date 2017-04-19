@@ -108,6 +108,7 @@ public class TransferUpload extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
+  private static final String DRAGOVER = "dragover";
 
   @UiField
   Label uploadTitle;
@@ -278,7 +279,7 @@ public class TransferUpload extends Composite {
 
         @Override
         public void onDragOver(DragOverEvent event) {
-          uploadForm.addStyleName("dragover");
+          uploadForm.addStyleName(DRAGOVER);
         }
       }, DragOverEvent.getType());
 
@@ -286,7 +287,7 @@ public class TransferUpload extends Composite {
 
         @Override
         public void onDragLeave(DragLeaveEvent event) {
-          uploadForm.removeStyleName("dragover");
+          uploadForm.removeStyleName(DRAGOVER);
         }
       }, DragLeaveEvent.getType());
 
@@ -294,7 +295,7 @@ public class TransferUpload extends Composite {
 
         @Override
         public void onDrop(DropEvent event) {
-          uploadForm.removeStyleName("dragover");
+          uploadForm.removeStyleName(DRAGOVER);
         }
       }, DropEvent.getType());
 
@@ -306,10 +307,6 @@ public class TransferUpload extends Composite {
 
   @UiHandler("done")
   void buttonDoneHandler(ClickEvent e) {
-    historyBack();
-  }
-
-  void historyBack() {
     if (isIngest) {
       if (resource != null) {
         HistoryUtils.newHistory(IngestTransfer.RESOLVER, resource.getUUID());

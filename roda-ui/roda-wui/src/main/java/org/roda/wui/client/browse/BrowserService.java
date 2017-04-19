@@ -147,7 +147,7 @@ public interface BrowserService extends RemoteService {
   String retrieveDescriptiveMetadataPreview(SupportedMetadataTypeBundle bundle) throws AuthorizationDeniedException,
     GenericException, ValidationException, NotFoundException, RequestNotValidException;
 
-  String createTransferredResourcesFolder(String parent, String folderName)
+  String createTransferredResourcesFolder(String parent, String folderName, boolean commit)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
   void deleteTransferredResources(SelectedItems<TransferredResource> selected)

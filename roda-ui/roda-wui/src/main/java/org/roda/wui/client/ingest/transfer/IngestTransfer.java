@@ -196,7 +196,6 @@ public class IngestTransfer extends Composite {
     ingestTransferDescription.add(new HTMLWidgetWrapper("IngestTransferDescription.html"));
 
     transferredResourceList.addValueChangeHandler(new ValueChangeHandler<IndexResult<TransferredResource>>() {
-
       @Override
       public void onValueChange(ValueChangeEvent<IndexResult<TransferredResource>> event) {
         updateVisibles();
@@ -204,7 +203,6 @@ public class IngestTransfer extends Composite {
     });
 
     transferredResourceList.getSelectionModel().addSelectionChangeHandler(new Handler() {
-
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
         TransferredResource r = transferredResourceList.getSelectionModel().getSelectedObject();
@@ -216,7 +214,6 @@ public class IngestTransfer extends Composite {
     });
 
     transferredResourceList.addCheckboxSelectionListener(new CheckboxSelectionListener<TransferredResource>() {
-
       @Override
       public void onSelectionChange(SelectedItems<TransferredResource> selected) {
         boolean empty = ClientSelectedItemsUtils.isEmpty(selected);
@@ -235,7 +232,6 @@ public class IngestTransfer extends Composite {
           rename.setEnabled(false);
         }
       }
-
     });
 
     rename.setEnabled(resource != null);
@@ -448,7 +444,7 @@ public class IngestTransfer extends Composite {
         @Override
         public void onSuccess(String folderName) {
           String parent = resource != null ? resource.getUUID() : null;
-          BrowserService.Util.getInstance().createTransferredResourcesFolder(parent, folderName,
+          BrowserService.Util.getInstance().createTransferredResourcesFolder(parent, folderName, true,
             new AsyncCallback<String>() {
 
               @Override
