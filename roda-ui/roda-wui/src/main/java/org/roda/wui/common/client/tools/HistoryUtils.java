@@ -90,18 +90,20 @@ public class HistoryUtils {
     return historyPath;
   }
 
-  public static List<String> getCurrentHistoryPath() {
-    String hash = Window.Location.getHash();
-    if (hash.length() > 0) {
-      hash = hash.substring(1);
-    }
-
-    List<String> splitted = Arrays.asList(hash.split(HISTORY_SEP_REGEX));
+  public static List<String> decodeList(List<String> splitted) {
     List<String> tokens = new ArrayList<>();
     for (String item : splitted) {
       tokens.add(URL.decodeQueryString(item));
     }
     return tokens;
+  }
+
+  public static List<String> getCurrentHistoryPath() {
+    String hash = Window.Location.getHash();
+    if (hash.length() > 0) {
+      hash = hash.substring(1);
+    }
+    return decodeList(Arrays.asList(hash.split(HISTORY_SEP_REGEX)));
   }
 
   public static String createHistoryToken(List<String> tokens) {
@@ -114,12 +116,10 @@ public class HistoryUtils {
         builder.append(HISTORY_SEP);
       }
 
-      String encodedToken = URL.encode(token).replaceAll(HISTORY_SEP_REGEX, HISTORY_SEP_ESCAPE);
+      String encodedToken = URL.encodeQueryString(token).replaceAll(HISTORY_SEP_REGEX, HISTORY_SEP_ESCAPE);
       builder.append(encodedToken);
     }
-
     return builder.toString();
-
   }
 
   public static void newHistory(List<String> path) {
@@ -239,7 +239,6 @@ public class HistoryUtils {
     history.add(representationId);
     history.addAll(filePath);
     history.add(fileId);
-
     return history;
   }
 
@@ -263,7 +262,6 @@ public class HistoryUtils {
     history.add(folder.getRepresentationId());
     history.addAll(folder.getPath());
     history.add(folder.getId());
-
     return history;
   }
 

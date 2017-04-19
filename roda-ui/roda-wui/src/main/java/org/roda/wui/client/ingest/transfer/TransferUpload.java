@@ -199,7 +199,6 @@ public class TransferUpload extends Composite {
       }
 
       ret = RestUtils.createFileUploadUri(aipId, representationId, directory, details);
-
     }
 
     return ret;

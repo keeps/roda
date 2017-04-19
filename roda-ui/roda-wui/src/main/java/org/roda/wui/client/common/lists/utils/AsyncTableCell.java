@@ -281,13 +281,11 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
       resetFacets.addStyleName("table-empty-clear-facets btn btn-primary btn-ban");
 
       resetFacets.addClickHandler(new ClickHandler() {
-
         @Override
         public void onClick(ClickEvent event) {
           FacetUtils.clearFacets(getFacets());
           refresh();
         }
-
       });
       layout.add(l);
       layout.add(resetFacets);

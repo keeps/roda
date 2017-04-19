@@ -169,6 +169,7 @@ public class IngestJobPluginInfo extends JobPluginInfo {
         transferredResourceToAipIds.put(sourceObjectId, aipIds);
       }
     }
+
     if (reportsFromBeingProcessed.get(sourceObjectId) != null) {
       reportsFromBeingProcessed.get(sourceObjectId).put(outcomeObjectId, report);
       allReports.get(sourceObjectId).put(outcomeObjectId, report);

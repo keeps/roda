@@ -238,7 +238,6 @@ public class FormatRegister extends Composite {
 
   @UiHandler("buttonRemove")
   void buttonRemoveFormatHandler(ClickEvent e) {
-
     final SelectedItems<Format> selected = formatList.getSelected();
 
     ClientSelectedItemsUtils.size(Format.class, selected, new AsyncCallback<Long>() {
