@@ -58,7 +58,6 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
   private static final String UNPACK_DESCRIPTION = "Extracted objects from package in file/folder format.";
 
   private boolean createSubmission = false;
-
   private Optional<String> computedSearchScope;
 
   @Override
@@ -123,7 +122,6 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
     try {
       Path transferredResourcePath = Paths.get(transferredResource.getFullPath());
       LOGGER.debug("Converting {} to AIP", transferredResourcePath);
-
       AIPState state = AIPState.INGEST_PROCESSING;
 
       Permissions permissions = new Permissions();
@@ -132,7 +130,6 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
           Permissions.PermissionType.UPDATE, Permissions.PermissionType.DELETE, Permissions.PermissionType.GRANT)));
 
       boolean notifyCreatedAIP = false;
-
       String aipType = RodaConstants.AIP_TYPE_MIXED;
 
       final AIP aip = model.createAIP(state, computedSearchScope.orElse(null), aipType, permissions,
@@ -143,14 +140,12 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
       final String representationId = IdUtils.createUUID();
       final boolean original = true;
       boolean notifyRepresentationCreated = false;
-
       String representationType = RodaConstants.REPRESENTATION_TYPE_MIXED;
 
       model.createRepresentation(aip.getId(), representationId, original, representationType,
         notifyRepresentationCreated);
 
       // create files
-
       if (transferredResource.isFile()) {
         String fileId = transferredResource.getName();
         List<String> directoryPath = new ArrayList<>();
@@ -179,7 +174,6 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
     } catch (RODAException | IOException | RuntimeException e) {
       LOGGER.error("Error converting " + transferredResource.getId() + " to AIP", e);
       reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
-
     }
 
     report.addReport(reportItem);
@@ -188,8 +182,7 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
 
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    // do nothing
-    return null;
+    return new Report();
   }
 
   private void processTransferredResourceDirectory(ModelService model, Path transferredResourcePath, final AIP aip,
@@ -212,6 +205,7 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
         } catch (RODAException e) {
           LOGGER.error("Could not create file on {}", file.toString(), e);
         }
+
         return FileVisitResult.CONTINUE;
       }
 

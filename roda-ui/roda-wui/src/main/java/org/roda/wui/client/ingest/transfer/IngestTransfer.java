@@ -37,6 +37,7 @@ import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
@@ -282,7 +283,6 @@ public class IngestTransfer extends Composite {
       download.setVisible(true);
       move.setEnabled(true);
     } else {
-
       Filter filter = new Filter(
         new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID, r.getRelativePath()));
       transferredResourceList.setFilter(filter);
@@ -291,9 +291,9 @@ public class IngestTransfer extends Composite {
       searchPanel.setVisible(true);
       transferredResourceList.setVisible(true);
       download.setVisible(false);
-      move.setEnabled(false);
     }
 
+    move.setEnabled(resource != null);
     rename.setEnabled(resource != null);
     breadcrumb.updatePath(BreadcrumbUtils.getTransferredResourceBreadcrumbs(r));
     breadcrumb.setVisible(true);
@@ -319,6 +319,7 @@ public class IngestTransfer extends Composite {
     itemTitle.addStyleName("browseTitle-allCollections");
     itemIcon.getParent().addStyleName("browseTitle-allCollections-wrapper");
 
+    move.setEnabled(resource != null);
     rename.setEnabled(resource != null);
     searchPanel.setVisible(true);
     transferredResourceList.setVisible(true);
@@ -640,7 +641,13 @@ public class IngestTransfer extends Composite {
 
   @UiHandler("move")
   void buttonMoveHandler(ClickEvent e) {
-    BrowserService.Util.getInstance().retrieveSelectedTransferredResource(getSelected(),
+    SelectedItems<TransferredResource> selected = getSelected();
+
+    if (ClientSelectedItemsUtils.isEmpty(selected) && resource != null) {
+      selected = SelectedItemsList.create(TransferredResource.class.getName(), resource.getUUID());
+    }
+
+    BrowserService.Util.getInstance().retrieveSelectedTransferredResource(selected,
       new AsyncCallback<List<TransferredResource>>() {
 
         @Override
@@ -652,36 +659,32 @@ public class IngestTransfer extends Composite {
         public void onSuccess(List<TransferredResource> result) {
           doTransferredResourceMove(result);
         }
-
       });
   }
 
   private void doTransferredResourceMove(List<TransferredResource> resources) {
     Filter filter = new Filter();
+    filter.add(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, Boolean.FALSE.toString()));
 
     if (resource != null) {
-      boolean isFile = resource.isFile();
-
-      if (isFile) {
+      if (resource.isFile()) {
         filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, resources.get(0).getParentUUID()));
       } else {
-        filter.add(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, Boolean.FALSE.toString()));
-
         if (resources.size() <= RodaConstants.DIALOG_FILTER_LIMIT_NUMBER) {
-          for (TransferredResource resource : resources) {
-            filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, resource.getUUID()));
+          for (TransferredResource tresource : resources) {
+            filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, tresource.getUUID()));
             filter.add(
-              new NotSimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ANCESTORS, resource.getRelativePath()));
-            filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, resource.getParentUUID()));
+              new NotSimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ANCESTORS, tresource.getRelativePath()));
+            if (StringUtils.isNotBlank(resource.getParentUUID())) {
+              filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, tresource.getParentUUID()));
+            }
           }
         }
       }
     } else {
-      filter.add(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, Boolean.FALSE.toString()));
-
       if (resources.size() <= RodaConstants.DIALOG_FILTER_LIMIT_NUMBER) {
-        for (TransferredResource resource : resources) {
-          filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, resource.getUUID()));
+        for (TransferredResource tresource : resources) {
+          filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, tresource.getUUID()));
         }
       }
     }

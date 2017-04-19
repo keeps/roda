@@ -2902,14 +2902,12 @@ public class BrowserHelper {
     SelectedItems<TransferredResource> selected) throws GenericException, RequestNotValidException {
     if (selected instanceof SelectedItemsList) {
       SelectedItemsList<TransferredResource> selectedList = (SelectedItemsList<TransferredResource>) selected;
-
       Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, selectedList.getIds()));
       IndexResult<TransferredResource> iresults = RodaCoreFactory.getIndexService().find(TransferredResource.class,
         filter, Sorter.NONE, new Sublist(0, selectedList.getIds().size()), new ArrayList<>());
       return iresults.getResults();
     } else if (selected instanceof SelectedItemsFilter) {
       SelectedItemsFilter<TransferredResource> selectedFilter = (SelectedItemsFilter<TransferredResource>) selected;
-
       Long counter = RodaCoreFactory.getIndexService().count(TransferredResource.class, selectedFilter.getFilter());
       IndexResult<TransferredResource> iresults = RodaCoreFactory.getIndexService().find(TransferredResource.class,
         selectedFilter.getFilter(), Sorter.NONE, new Sublist(0, counter.intValue()), new ArrayList<>());
