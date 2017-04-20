@@ -11,10 +11,11 @@
 package org.roda.wui.client.browse;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.validation.ValidationException;
@@ -171,9 +172,9 @@ public class EditDescriptiveMetadata extends Composite {
     this.bundle = bundleParam;
 
     // Create new Set of MetadataValues so we can keep the original
-    HashSet<MetadataValue> newValues = null;
+    Set<MetadataValue> newValues = null;
     if (bundle.getValues() != null) {
-      newValues = new HashSet<>();
+      newValues = new TreeSet<>();
       for (MetadataValue mv : bundle.getValues())
         newValues.add(mv.copy());
     }
@@ -213,12 +214,13 @@ public class EditDescriptiveMetadata extends Composite {
             public void onSuccess(DescriptiveMetadataEditBundle editBundle) {
               bundle = editBundle;
               // Create new Set of MetadataValues so we can keep the original
-              HashSet<MetadataValue> newValues = null;
+              Set<MetadataValue> newValues = null;
               if (bundle.getValues() != null) {
-                newValues = new HashSet<>();
+                newValues = new TreeSet<>();
                 for (MetadataValue mv : bundle.getValues())
                   newValues.add(mv.copy());
               }
+
               supportedBundle = new SupportedMetadataTypeBundle(bundle.getId(), bundle.getType(), bundle.getVersion(),
                 bundle.getId(), bundle.getRawTemplate(), newValues);
               updateFormOrXML();
