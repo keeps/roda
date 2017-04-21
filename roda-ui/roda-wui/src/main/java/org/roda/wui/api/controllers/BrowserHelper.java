@@ -132,7 +132,6 @@ import org.roda.core.plugins.plugins.ingest.AutoAcceptSIPPlugin;
 import org.roda.core.plugins.plugins.internal.DeleteRODAObjectPlugin;
 import org.roda.core.plugins.plugins.internal.MovePlugin;
 import org.roda.core.plugins.plugins.internal.UpdateAIPPermissionsPlugin;
-import org.roda.core.plugins.plugins.risks.RiskIncidenceRemoverPlugin;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryVersion;
 import org.roda.core.storage.ContentPayload;
@@ -2670,16 +2669,6 @@ public class BrowserHelper {
       } else {
         jobState.put(jobId, Pair.of(pair.getFirst() + 1, pair.getSecond() + (accept ? 1 : 0)));
       }
-    }
-
-    try {
-      Job job = new Job();
-      job.setName(RiskIncidenceRemoverPlugin.class.getSimpleName() + " " + job.getStartDate());
-      job.setPlugin(RiskIncidenceRemoverPlugin.class.getName());
-      job.setSourceObjects(SelectedItemsList.create(AIP.class, aipsToDelete));
-      Jobs.createJob(user, job, false);
-    } catch (JobAlreadyStartedException e) {
-      LOGGER.error("Could not delete AIP associated incidences");
     }
 
     // update job counters
