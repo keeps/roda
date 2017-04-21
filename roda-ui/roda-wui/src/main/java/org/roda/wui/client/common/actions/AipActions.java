@@ -325,6 +325,8 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
                   @Override
                   public void onSuccessImpl(IndexedAIP result) {
+                    Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+
                     if (result != null) {
                       HistoryUtils.newHistory(BrowseAIP.RESOLVER, result.getId());
                     } else {
@@ -472,7 +474,8 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
                         @Override
                         public void onSuccessImpl(Void result) {
-                          Toast.showInfo(messages.removingSuccessTitle(), messages.removingSuccessMessage(size));
+                          Toast.showInfo(messages.runningInBackgroundTitle(),
+                            messages.runningInBackgroundDescription());
                           callback.onSuccess(ActionImpact.DESTROYED);
                         }
                       });

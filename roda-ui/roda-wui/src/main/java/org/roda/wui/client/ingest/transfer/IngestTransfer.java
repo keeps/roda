@@ -61,6 +61,7 @@ import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
@@ -706,13 +707,21 @@ public class IngestTransfer extends Composite {
             }
 
             @Override
-            public void onSuccess(String result) {
-              Toast.showInfo(messages.dialogSuccess(), messages.movingSIP());
-              if (result != null) {
-                HistoryUtils.newHistory(IngestTransfer.RESOLVER, result);
-              } else {
-                HistoryUtils.newHistory(IngestTransfer.RESOLVER);
-              }
+            public void onSuccess(final String result) {
+              Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+
+              Timer timer = new Timer() {
+                @Override
+                public void run() {
+                  if (result != null) {
+                    HistoryUtils.newHistory(IngestTransfer.RESOLVER, result);
+                  } else {
+                    HistoryUtils.newHistory(IngestTransfer.RESOLVER);
+                  }
+                }
+              };
+
+              timer.schedule(RodaConstants.ACTION_TIMEOUT);
             }
           });
       }

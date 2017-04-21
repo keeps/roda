@@ -40,6 +40,7 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.safehtml.shared.SafeUri;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -241,12 +242,21 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
                   @Override
                   public void onSuccessImpl(Void nothing) {
-                    if (toFolder != null) {
-                      HistoryUtils.openBrowse(toFolder);
-                    } else {
-                      HistoryUtils.openBrowse(aipId, representationId);
-                    }
-                    callback.onSuccess(null);
+                    Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+
+                    Timer timer = new Timer() {
+                      @Override
+                      public void run() {
+                        if (toFolder != null) {
+                          HistoryUtils.openBrowse(toFolder);
+                        } else {
+                          HistoryUtils.openBrowse(aipId, representationId);
+                        }
+                        callback.onSuccess(null);
+                      }
+                    };
+
+                    timer.schedule(RodaConstants.ACTION_TIMEOUT);
                   }
 
                   @Override
@@ -396,16 +406,25 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
                     @Override
                     public void onSuccess(Void result) {
-                      List<String> path = file.getPath();
-                      if (path.isEmpty()) {
-                        HistoryUtils.openBrowse(file.getAipId(), file.getRepresentationId());
-                      } else {
-                        int lastIndex = path.size() - 1;
-                        List<String> parentPath = new ArrayList<>(path.subList(0, lastIndex));
-                        String parentId = path.get(lastIndex);
-                        HistoryUtils.openBrowse(file.getAipId(), file.getRepresentationId(), parentPath, parentId);
-                      }
-                      callback.onSuccess(ActionImpact.DESTROYED);
+                      Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+
+                      Timer timer = new Timer() {
+                        @Override
+                        public void run() {
+                          List<String> path = file.getPath();
+                          if (path.isEmpty()) {
+                            HistoryUtils.openBrowse(file.getAipId(), file.getRepresentationId());
+                          } else {
+                            int lastIndex = path.size() - 1;
+                            List<String> parentPath = new ArrayList<>(path.subList(0, lastIndex));
+                            String parentId = path.get(lastIndex);
+                            HistoryUtils.openBrowse(file.getAipId(), file.getRepresentationId(), parentPath, parentId);
+                          }
+                          callback.onSuccess(ActionImpact.DESTROYED);
+                        }
+                      };
+
+                      timer.schedule(RodaConstants.ACTION_TIMEOUT);
                     }
 
                     @Override
@@ -446,7 +465,16 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
                     @Override
                     public void onSuccess(Void result) {
-                      callback.onSuccess(ActionImpact.DESTROYED);
+                      Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+
+                      Timer timer = new Timer() {
+                        @Override
+                        public void run() {
+                          callback.onSuccess(ActionImpact.DESTROYED);
+                        }
+                      };
+
+                      timer.schedule(RodaConstants.ACTION_TIMEOUT);
                     }
 
                     @Override

@@ -29,6 +29,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
@@ -261,8 +262,12 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
 
         RodaCoreFactory.getTransferredResourcesScanner().updateTransferredResources(Optional.of(relativePath), true);
       }
+
+      index.commit((Class<? extends IsIndexed>) Class.forName(job.getSourceObjects().getSelectedClass()));
     } catch (NotFoundException | GenericException | IsStillUpdatingException e) {
       LOGGER.error("Could not update new resource parent folder");
+    } catch (ClassNotFoundException e) {
+      LOGGER.error("Error commiting after move operation");
     }
     return new Report();
   }

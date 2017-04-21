@@ -1257,6 +1257,8 @@ public final class RodaConstants {
   /* List threshold */
   public static final int DEFAULT_LIST_THRESHOLD = 100;
 
+  public static final int ACTION_TIMEOUT = 2000;
+
   /* DIP types */
 
   public static final String DIP_TYPE_CONVERSION = "conversion";

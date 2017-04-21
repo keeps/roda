@@ -2480,4 +2480,7 @@ public interface ClientMessages extends Messages {
 
   String thresholdExceeded(Integer threshold, int size);
 
+  String runningInBackgroundTitle();
+
+  String runningInBackgroundDescription();
 }
