@@ -31,6 +31,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -181,7 +182,7 @@ public class ShowLogEntry extends Composite {
     if (parameters != null && !parameters.isEmpty()) {
       for (LogEntryParameter par : parameters) {
         HTML parPanel = new HTML();
-        parPanel.setHTML(messages.logParameter(par.getName(), par.getValue()));
+        parPanel.setHTML(SafeHtmlUtils.fromString(messages.logParameter(par.getName(), par.getValue())));
         logParametersValue.add(parPanel);
       }
       logParametersLabel.setVisible(true);
