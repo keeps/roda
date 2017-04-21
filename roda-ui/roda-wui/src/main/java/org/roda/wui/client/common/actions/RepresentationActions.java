@@ -155,7 +155,8 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
         public void onSuccess(Boolean confirmed) {
           if (confirmed) {
             Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-              RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
+              RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false,
+              new AsyncCallback<String>() {
 
                 @Override
                 public void onFailure(Throwable caught) {
@@ -219,7 +220,8 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
         @Override
         public void onSuccess(final String newType) {
           Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-            RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
+            RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false,
+            new AsyncCallback<String>() {
 
               @Override
               public void onFailure(Throwable caught) {
@@ -299,7 +301,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
   public void createFolder(final IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
 
     Dialogs.showPromptDialog(messages.createFolderTitle(), null, null, messages.createFolderPlaceholder(),
-      RegExp.compile("^[^/]+$"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
+      RegExp.compile("^[^/]+$"), messages.cancelButton(), messages.confirmButton(), true, new AsyncCallback<String>() {
         @Override
         public void onFailure(Throwable caught) {
           // do nothing
@@ -308,7 +310,8 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
         @Override
         public void onSuccess(final String newName) {
           Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-            RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
+            RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false,
+            new AsyncCallback<String>() {
 
               @Override
               public void onFailure(Throwable caught) {
@@ -344,7 +347,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
 
   public void uploadFiles(final IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
     Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-      RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
+      RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, new AsyncCallback<String>() {
 
         @Override
         public void onFailure(Throwable caught) {

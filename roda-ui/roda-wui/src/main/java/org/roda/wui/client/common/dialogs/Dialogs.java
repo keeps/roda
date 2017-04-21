@@ -130,7 +130,8 @@ public class Dialogs {
   }
 
   public static void showPromptDialog(String title, String message, String value, String placeHolder,
-    final RegExp validator, String cancelButtonText, String confirmButtonText, final AsyncCallback<String> callback) {
+    final RegExp validator, String cancelButtonText, String confirmButtonText, boolean mandatory,
+    final AsyncCallback<String> callback) {
     final DialogBox dialogBox = new DialogBox(false, true);
     dialogBox.setText(title);
 
@@ -155,13 +156,13 @@ public class Dialogs {
 
     final Button cancelButton = new Button(cancelButtonText);
     final Button confirmButton = new Button(confirmButtonText);
+    confirmButton.setEnabled(!mandatory);
 
     layout.add(inputBox);
     layout.add(cancelButton);
     layout.add(confirmButton);
 
     dialogBox.setWidget(layout);
-
     dialogBox.setGlassEnabled(true);
     dialogBox.setAnimationEnabled(false);
 
@@ -176,8 +177,7 @@ public class Dialogs {
     confirmButton.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        boolean isValid = validator.test(inputBox.getText());
-        if (isValid) {
+        if (validator.test(inputBox.getText())) {
           dialogBox.hide();
           callback.onSuccess(inputBox.getText());
         }
@@ -208,16 +208,8 @@ public class Dialogs {
     inputBox.addKeyDownHandler(new KeyDownHandler() {
       @Override
       public void onKeyDown(KeyDownEvent event) {
-        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-          boolean isValid = validator.test(inputBox.getText());
-          if (isValid) {
-            dialogBox.hide();
-            callback.onSuccess(inputBox.getText());
-          }
-        } else {
-          TextBox box = (TextBox) event.getSource();
-          confirmButton.setEnabled(validator.test(box.getText()));
-        }
+        TextBox box = (TextBox) event.getSource();
+        confirmButton.setEnabled(validator.test(box.getText()));
       }
     });
 
@@ -225,8 +217,7 @@ public class Dialogs {
       @Override
       public void onKeyUp(KeyUpEvent event) {
         if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-          boolean isValid = validator.test(inputBox.getText());
-          if (isValid) {
+          if (validator.test(inputBox.getText())) {
             dialogBox.hide();
             callback.onSuccess(inputBox.getText());
           }

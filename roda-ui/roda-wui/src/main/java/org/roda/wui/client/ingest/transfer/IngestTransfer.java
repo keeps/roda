@@ -435,7 +435,8 @@ public class IngestTransfer extends Composite {
   @UiHandler("createFolder")
   void buttonCreateFolderHandler(ClickEvent e) {
     Dialogs.showPromptDialog(messages.ingestTransferCreateFolderTitle(), messages.ingestTransferCreateFolderMessage(),
-      null, null, RegExp.compile("^[^/]+$"), messages.dialogCancel(), messages.dialogOk(), new AsyncCallback<String>() {
+      null, null, RegExp.compile("^[^/]+$"), messages.dialogCancel(), messages.dialogOk(), true,
+      new AsyncCallback<String>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -602,7 +603,7 @@ public class IngestTransfer extends Composite {
           @Override
           public void onSuccess(final TransferredResource resultResource) {
             Dialogs.showPromptDialog(messages.renameTransferredResourcesDialogTitle(), null, resultResource.getName(),
-              null, RegExp.compile("^[^/]*$"), messages.cancelButton(), messages.confirmButton(),
+              null, RegExp.compile("^[^/]*$"), messages.cancelButton(), messages.confirmButton(), true,
               new AsyncCallback<String>() {
 
                 @Override
