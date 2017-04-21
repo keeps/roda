@@ -255,6 +255,9 @@ public class TransferUpload extends Composite {
       if (historyTokens.size() >= 3) {
         folderPath = new ArrayList<>(historyTokens.subList(2, historyTokens.size() - 1));
         folderId = historyTokens.get(historyTokens.size() - 1);
+      } else {
+        folderPath = null;
+        folderId = null;
       }
 
       callback.onSuccess(TransferUpload.this);

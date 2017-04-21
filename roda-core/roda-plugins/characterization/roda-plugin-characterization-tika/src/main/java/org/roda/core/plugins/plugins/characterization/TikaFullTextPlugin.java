@@ -45,6 +45,7 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
+import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -203,7 +204,8 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractAIPCompo
 
     try {
       for (Representation representation : list) {
-        LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), representation.getAipId());
+        LOGGER.debug("Processing representation {} of AIP {}", IdUtils.getRepresentationId(representation),
+          representation.getAipId());
         Report reportItem = PluginHelper.initPluginReportItem(this, representation.getId(), Representation.class,
           AIPState.INGEST_PROCESSING);
         reportItem.setPluginState(PluginState.SUCCESS);
@@ -277,7 +279,8 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractAIPCompo
     for (File file : list) {
       LOGGER.debug("Processing file {} of representation {} of AIP {}", file.getId(), file.getRepresentationId(),
         file.getAipId());
-      Report reportItem = PluginHelper.initPluginReportItem(this, file.getId(), File.class, AIPState.INGEST_PROCESSING);
+      Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getFileId(file), File.class,
+        AIPState.INGEST_PROCESSING);
       reportItem.setPluginState(PluginState.SUCCESS);
       PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
       List<LinkingIdentifier> sources = new ArrayList<>();

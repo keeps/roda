@@ -275,7 +275,6 @@ public class HistoryUtils {
     history.add(TransferUpload.BROWSE_RESOLVER.getHistoryToken());
     history.add(representation.getAipId());
     history.add(representation.getId());
-
     return history;
   }
 

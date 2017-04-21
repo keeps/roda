@@ -446,7 +446,7 @@ public class EditPermissions extends Composite {
   private void apply(final boolean recursive) {
     final Permissions permissions = getPermissions();
 
-    Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, messages.outcomeDetailPlaceholder(),
+    Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
       RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<String>() {
 
         @Override

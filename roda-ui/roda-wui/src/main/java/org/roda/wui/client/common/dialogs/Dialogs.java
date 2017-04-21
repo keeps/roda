@@ -129,8 +129,8 @@ public class Dialogs {
     dialogBox.show();
   }
 
-  public static void showPromptDialog(String title, String message, String placeHolder, final RegExp validator,
-    String cancelButtonText, String confirmButtonText, final AsyncCallback<String> callback) {
+  public static void showPromptDialog(String title, String message, String value, String placeHolder,
+    final RegExp validator, String cancelButtonText, String confirmButtonText, final AsyncCallback<String> callback) {
     final DialogBox dialogBox = new DialogBox(false, true);
     dialogBox.setText(title);
 
@@ -144,6 +144,10 @@ public class Dialogs {
 
     final TextBox inputBox = new TextBox();
     inputBox.setTitle("input box");
+
+    if (value != null) {
+      inputBox.setText(value);
+    }
 
     if (placeHolder != null) {
       inputBox.getElement().setPropertyString("placeholder", placeHolder);
