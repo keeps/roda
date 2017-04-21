@@ -470,6 +470,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
                       Timer timer = new Timer() {
                         @Override
                         public void run() {
+                          HistoryUtils.newHistory(HistoryUtils.getCurrentHistoryPath());
                           callback.onSuccess(ActionImpact.DESTROYED);
                         }
                       };

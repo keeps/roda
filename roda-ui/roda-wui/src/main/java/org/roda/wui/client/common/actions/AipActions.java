@@ -47,6 +47,7 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.safehtml.shared.SafeUri;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -423,12 +424,20 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
                       @Override
                       public void onSuccess(Void result) {
                         Toast.showInfo(messages.removingSuccessTitle(), messages.removingSuccessMessage(1L));
-                        if (parentId != null) {
-                          HistoryUtils.newHistory(BrowseAIP.RESOLVER, parentId);
-                        } else {
-                          HistoryUtils.newHistory(BrowseAIP.RESOLVER);
-                        }
-                        callback.onSuccess(ActionImpact.DESTROYED);
+
+                        Timer timer = new Timer() {
+                          @Override
+                          public void run() {
+                            if (parentId != null) {
+                              HistoryUtils.newHistory(BrowseAIP.RESOLVER, parentId);
+                            } else {
+                              HistoryUtils.newHistory(BrowseAIP.RESOLVER);
+                            }
+                            callback.onSuccess(ActionImpact.DESTROYED);
+                          }
+                        };
+
+                        timer.schedule(RodaConstants.ACTION_TIMEOUT);
                       }
                     });
                 }

@@ -29,6 +29,7 @@ import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexRunnable;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -56,8 +57,11 @@ import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
+  private static final Logger LOGGER = LoggerFactory.getLogger(DeleteRODAObjectPlugin.class);
   private String details = null;
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
@@ -329,6 +333,13 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
 
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+    try {
+      Job job = PluginHelper.getJob(this, index);
+      index.commit((Class<? extends IsIndexed>) Class.forName(job.getSourceObjects().getSelectedClass()));
+    } catch (NotFoundException | GenericException | ClassNotFoundException e) {
+      LOGGER.error("Could not commit after delete operation");
+    }
+
     return new Report();
   }
 

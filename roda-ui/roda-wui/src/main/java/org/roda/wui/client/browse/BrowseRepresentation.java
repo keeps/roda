@@ -91,9 +91,7 @@ import config.i18n.client.ClientMessages;
  * 
  */
 public class BrowseRepresentation extends Composite {
-
   private static final MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
   private static final ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {

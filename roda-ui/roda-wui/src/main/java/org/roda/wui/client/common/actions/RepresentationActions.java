@@ -35,6 +35,7 @@ import org.roda.wui.common.client.widgets.Toast;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.safehtml.shared.SafeUri;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -168,11 +169,17 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
 
                       @Override
                       public void onSuccess(Void result) {
-                        if (aipId != null) {
-                          HistoryUtils.openBrowse(aipId);
-                        }
+                        Timer timer = new Timer() {
+                          @Override
+                          public void run() {
+                            if (aipId != null) {
+                              HistoryUtils.openBrowse(aipId);
+                            }
+                            callback.onSuccess(ActionImpact.DESTROYED);
+                          }
+                        };
 
-                        callback.onSuccess(ActionImpact.DESTROYED);
+                        timer.schedule(RodaConstants.ACTION_TIMEOUT);
                       }
 
                       @Override

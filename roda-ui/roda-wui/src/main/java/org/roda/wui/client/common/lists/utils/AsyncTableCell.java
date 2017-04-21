@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
@@ -863,7 +864,16 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
           @Override
           public void onSuccess(Actionable.ActionImpact impact) {
-            if (!Actionable.ActionImpact.NONE.equals(impact)) {
+            if (Actionable.ActionImpact.DESTROYED.equals(impact)) {
+              Timer timer = new Timer() {
+                @Override
+                public void run() {
+                  update();
+                }
+              };
+
+              timer.schedule(RodaConstants.ACTION_TIMEOUT);
+            } else if (!Actionable.ActionImpact.NONE.equals(impact)) {
               update();
             }
             actionsPopup.hide();
