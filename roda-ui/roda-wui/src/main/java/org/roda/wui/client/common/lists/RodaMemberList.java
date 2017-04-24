@@ -113,7 +113,7 @@ public class RodaMemberList extends BasicAsyncTableCell<RODAMember> {
 
     typeColumn.setSortable(true);
     nameColumn.setSortable(true);
-    nameColumn.setSortable(true);
+    fullNameColumn.setSortable(true);
     activeColumn.setSortable(true);
 
     addColumn(typeColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-user'></i>"), false, false, 3);
