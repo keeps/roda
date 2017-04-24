@@ -802,6 +802,8 @@ public class BrowseAIP extends Composite {
 
         @Override
         public void onResponseReceived(Request request, Response response) {
+          String escapedDescId = SafeHtmlUtils.htmlEscape(descId);
+
           if (200 == response.getStatusCode()) {
             String html = response.getText();
 
@@ -811,18 +813,20 @@ public class BrowseAIP extends Composite {
             if (bundle.hasHistory()) {
               // History link
               String historyLink = HistoryUtils.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId,
-                descId);
+                escapedDescId);
               String historyLinkHtml = "<a href='" + historyLink
                 + "' class='toolbarLink'><i class='fa fa-history'></i></a>";
               b.append(SafeHtmlUtils.fromSafeConstant(historyLinkHtml));
             }
+
             // Edit link
-            String editLink = HistoryUtils.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId, descId);
+            String editLink = HistoryUtils.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId,
+              escapedDescId);
             String editLinkHtml = "<a href='" + editLink + "' class='toolbarLink'><i class='fa fa-edit'></i></a>";
             b.append(SafeHtmlUtils.fromSafeConstant(editLinkHtml));
 
             // Download link
-            SafeUri downloadUri = RestUtils.createDescriptiveMetadataDownloadUri(aipId, descId);
+            SafeUri downloadUri = RestUtils.createDescriptiveMetadataDownloadUri(aipId, escapedDescId);
             String downloadLinkHtml = "<a href='" + downloadUri.asString()
               + "' class='toolbarLink'><i class='fa fa-download'></i></a>";
             b.append(SafeHtmlUtils.fromSafeConstant(downloadLinkHtml));
@@ -851,14 +855,15 @@ public class BrowseAIP extends Composite {
             if (bundle.hasHistory()) {
               // History link
               String historyLink = HistoryUtils.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId,
-                descId);
+                escapedDescId);
               String historyLinkHtml = "<a href='" + historyLink
                 + "' class='toolbarLink'><i class='fa fa-history'></i></a>";
               b.append(SafeHtmlUtils.fromSafeConstant(historyLinkHtml));
             }
 
             // Edit link
-            String editLink = HistoryUtils.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId, descId);
+            String editLink = HistoryUtils.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId,
+              escapedDescId);
             String editLinkHtml = "<a href='" + editLink + "' class='toolbarLink'><i class='fa fa-edit'></i></a>";
             b.append(SafeHtmlUtils.fromSafeConstant(editLinkHtml));
 

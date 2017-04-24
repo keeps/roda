@@ -404,8 +404,7 @@ public class BrowserHelper {
         aip, representation, locale);
       for (SupportedMetadataTypeBundle typeBundle : supportedMetadataTypeBundles) {
         if (typeBundle.getType() != null && typeBundle.getType().equalsIgnoreCase(type)) {
-          if (typeBundle.getVersion().equals(version)
-            || (typeBundle.getVersion() != null && typeBundle.getVersion().equalsIgnoreCase(version))) {
+          if (typeBundle.getVersion() != null && typeBundle.getVersion().equalsIgnoreCase(version)) {
             metadataTypeBundle = typeBundle;
             break;
           }

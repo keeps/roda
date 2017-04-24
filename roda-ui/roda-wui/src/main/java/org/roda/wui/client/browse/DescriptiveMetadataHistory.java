@@ -72,7 +72,7 @@ public class DescriptiveMetadataHistory extends Composite {
       if (historyTokens.size() == 2 || historyTokens.size() == 3) {
         final String aipId = historyTokens.get(0);
         final String representationId = historyTokens.size() == 3 ? historyTokens.get(1) : null;
-        final String descriptiveMetadataId = historyTokens.get(historyTokens.size() - 1);
+        final String descriptiveMetadataId = new HTML(historyTokens.get(historyTokens.size() - 1)).getText();
 
         BrowserService.Util.getInstance().retrieveDescriptiveMetadataVersionsBundle(aipId, representationId,
           descriptiveMetadataId, LocaleInfo.getCurrentLocale().getLocaleName(),

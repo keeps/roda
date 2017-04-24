@@ -977,7 +977,7 @@ public class ModelServiceTest {
   @Test
   public void testMemberInheritance() throws RODAException {
     // create group 1
-    Group group1 = new Group("group1");
+    Group group1 = new Group("group-1");
     group1.setActive(true);
     group1.setFullName("NAMEGROUP1");
     group1.setDirectRoles(new HashSet<>(Arrays.asList(ROLE1)));
@@ -1000,7 +1000,7 @@ public class ModelServiceTest {
     MatcherAssert.assertThat(retrievedGroup2.getAllRoles(), Matchers.containsInAnyOrder(ROLE2));
 
     // create user 1
-    User user = new User("user1");
+    User user = new User("user_1");
     user.setActive(true);
     user.setEmail("user1@example.com");
     user.setGuest(false);

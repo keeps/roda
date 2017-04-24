@@ -27,9 +27,6 @@ import org.roda.wui.common.client.widgets.wcag.WCAGUtilities;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
@@ -192,21 +189,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
       }
     };
 
-    username.addKeyDownHandler(new KeyDownHandler() {
-
-      @Override
-      public void onKeyDown(KeyDownEvent event) {
-        int keyCode = event.getNativeKeyCode();
-
-        if (!(keyCode >= '0' && keyCode <= '9') && !(keyCode >= 'A' && keyCode <= 'Z')
-          && !(keyCode >= 'a' && keyCode <= 'z') && keyCode != '.' && keyCode != '_' && (keyCode != KeyCodes.KEY_TAB)
-          && (keyCode != KeyCodes.KEY_DELETE) && (keyCode != KeyCodes.KEY_ENTER) && (keyCode != KeyCodes.KEY_HOME)
-          && (keyCode != KeyCodes.KEY_END) && (keyCode != KeyCodes.KEY_LEFT) && (keyCode != KeyCodes.KEY_UP)
-          && (keyCode != KeyCodes.KEY_RIGHT) && (keyCode != KeyCodes.KEY_DOWN) && (keyCode != KeyCodes.KEY_BACKSPACE)) {
-          ((TextBox) event.getSource()).cancelKey();
-        }
-      }
-    });
+    username.addKeyDownHandler(new UserAndGroupKeyDownHandler());
 
     username.addChangeHandler(changeHandler);
     username.addKeyUpHandler(keyUpHandler);
