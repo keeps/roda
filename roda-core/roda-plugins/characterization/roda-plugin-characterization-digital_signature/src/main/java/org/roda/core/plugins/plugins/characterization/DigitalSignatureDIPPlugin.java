@@ -32,7 +32,6 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.AIPLink;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
@@ -128,9 +127,23 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractA
       Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
 
       for (Representation representation : aip.getRepresentations()) {
-        String dipId = "";
+        String dipId = IdUtils.createUUID();
 
         try {
+          RepresentationLink representationLink = new RepresentationLink(representation.getAipId(),
+            representation.getId());
+          List<RepresentationLink> links = new ArrayList<>();
+          links.add(representationLink);
+
+          DIP dip = new DIP();
+          dip.setId(dipId);
+          dip.setRepresentationIds(links);
+          dip.setPermissions(aip.getPermissions());
+          dip.setTitle(getDIPTitle());
+          dip.setDescription(getDIPDescription());
+          dip.setType(RodaConstants.DIP_TYPE_DIGITAL_SIGNATURE);
+          dip = model.createDIP(dip, false);
+
           LOGGER.debug("Processing representation {}", representation);
           boolean recursive = true;
           CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(representation.getAipId(),
@@ -139,30 +152,14 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractA
           for (OptionalWithCause<File> oFile : allFiles) {
             if (oFile.isPresent()) {
               File file = oFile.get();
-              dipId = IdUtils.createUUID();
-
-              AIPLink aipLink = new AIPLink(representation.getAipId());
-              List<AIPLink> links = new ArrayList<>();
-              links.add(aipLink);
-
-              DIP dip = new DIP();
-              dip.setId(dipId);
-              dip.setAipIds(links);
-              dip.setPermissions(aip.getPermissions());
-              dip.setTitle(getDIPTitle());
-              dip.setDescription(getDIPDescription());
-              dip.setType(RodaConstants.DIP_TYPE_DIGITAL_SIGNATURE);
-              dip = model.createDIP(dip, false);
-
               manageFileSigning(model, index, storage, file, dip.getId());
-
-              model.notifyDIPCreated(dip, true);
             } else {
               LOGGER.error("Cannot process representation file", oFile.getCause());
             }
           }
 
           IOUtils.closeQuietly(allFiles);
+          model.notifyDIPCreated(dip, true);
 
         } catch (Exception | LinkageError e) {
           LOGGER.error("Error processing Representation " + representation.getId() + ": " + e.getMessage(), e);
@@ -200,9 +197,25 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractA
     for (Representation representation : list) {
       Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getRepresentationId(representation),
         Representation.class);
-      String dipId = "";
+      String dipId = IdUtils.createUUID();
 
       try {
+        Permissions aipPermissions = model.retrieveAIP(representation.getAipId()).getPermissions();
+
+        RepresentationLink representationLink = new RepresentationLink(representation.getAipId(),
+          representation.getId());
+        List<RepresentationLink> links = new ArrayList<>();
+        links.add(representationLink);
+
+        DIP dip = new DIP();
+        dip.setId(dipId);
+        dip.setRepresentationIds(links);
+        dip.setPermissions(aipPermissions);
+        dip.setTitle(getDIPTitle());
+        dip.setDescription(getDIPDescription());
+        dip.setType(RodaConstants.DIP_TYPE_DIGITAL_SIGNATURE);
+        dip = model.createDIP(dip, false);
+
         LOGGER.debug("Processing representation {}", representation);
         boolean recursive = true;
         CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(representation.getAipId(),
@@ -210,32 +223,13 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractA
 
         for (OptionalWithCause<File> oFile : allFiles) {
           if (oFile.isPresent()) {
-            File file = oFile.get();
-            dipId = IdUtils.createUUID();
-
-            Permissions aipPermissions = model.retrieveAIP(representation.getAipId()).getPermissions();
-
-            RepresentationLink representationLink = new RepresentationLink(representation.getAipId(), representation.getId());
-            List<RepresentationLink> links = new ArrayList<>();
-            links.add(representationLink);
-
-            DIP dip = new DIP();
-            dip.setId(dipId);
-            dip.setRepresentationIds(links);
-            dip.setPermissions(aipPermissions);
-            dip.setTitle(getDIPTitle());
-            dip.setDescription(getDIPDescription());
-            dip.setType(RodaConstants.DIP_TYPE_DIGITAL_SIGNATURE);
-            dip = model.createDIP(dip, false);
-
-            manageFileSigning(model, index, storage, file, dip.getId());
-
-            model.notifyDIPCreated(dip, true);
+            manageFileSigning(model, index, storage, oFile.get(), dip.getId());
           } else {
             LOGGER.error("Cannot process representation file", oFile.getCause());
           }
         }
 
+        model.notifyDIPCreated(dip, true);
         IOUtils.closeQuietly(allFiles);
         reportItem.setPluginState(PluginState.SUCCESS);
         jobPluginInfo.incrementObjectsProcessedWithSuccess();

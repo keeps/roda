@@ -248,6 +248,7 @@ public class BrowseDIP extends Composite {
     boolean requireAltModifier = false;
 
     if (aip != null && representation != null && file != null) {
+      GWT.log("TESTE1");
       refererTitle.setText(file.isDirectory() ? messages.catalogueFolderTitle() : messages.catalogueFileTitle());
       refererBreadcrumb.updatePath(BreadcrumbUtils.getFileBreadcrumbs(aip, representation, file));
       refererBreadcrumb.setVisible(true);
@@ -291,7 +292,9 @@ public class BrowseDIP extends Composite {
             openReferred(aip, filter);
           }
         });
-    } else {
+    } else
+
+    {
       refererToolbar.setVisible(false);
     }
   }
@@ -353,7 +356,6 @@ public class BrowseDIP extends Composite {
     // update breadcrumb
     breadcrumb.updatePath(getBreadcrumbs());
     breadcrumb.setVisible(true);
-
   }
 
   public void open(String parentDipDileUUID, final Sorter sorter, final int openIndex) {
