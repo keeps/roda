@@ -86,7 +86,7 @@ public class Search extends Composite {
   FlowPanel representationsFacets, facetRepresentationType, facetRepresentationOriginal;
 
   @UiField(provided = true)
-  FlowPanel filesFacets, facetFormats, facetPronoms, facetMimetypes;
+  FlowPanel filesFacets, facetFormats, facetPronoms, facetMimetypes, facetFileType;
 
   boolean justActive = true;
   boolean itemsSelectable = true;
@@ -107,6 +107,7 @@ public class Search extends Composite {
     facetFormats = new FlowPanel();
     facetPronoms = new FlowPanel();
     facetMimetypes = new FlowPanel();
+    facetFileType = new FlowPanel();
 
     // Define facets and facets panels
     Map<FacetParameter, FlowPanel> itemsFacetsMap = new HashMap<>();
@@ -123,6 +124,7 @@ public class Search extends Composite {
     filesFacetsMap.put(new SimpleFacetParameter(RodaConstants.FILE_FILEFORMAT), facetFormats);
     filesFacetsMap.put(new SimpleFacetParameter(RodaConstants.FILE_PRONOM), facetPronoms);
     filesFacetsMap.put(new SimpleFacetParameter(RodaConstants.FILE_FORMAT_MIMETYPE), facetMimetypes);
+    filesFacetsMap.put(new SimpleFacetParameter(RodaConstants.FILE_ISDIRECTORY), facetFileType);
 
     // Create main search
     String parentAipId = null;

@@ -1486,6 +1486,8 @@ public interface ClientMessages extends Messages {
 
   String searchMimetypes();
 
+  String searchFileType();
+
   String searchDuplicateWarningMessage(String field);
 
   /**** Activity log ****/
