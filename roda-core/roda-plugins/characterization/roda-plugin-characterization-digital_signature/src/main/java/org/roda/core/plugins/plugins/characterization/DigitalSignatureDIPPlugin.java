@@ -32,6 +32,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPLink;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
@@ -39,6 +40,7 @@ import org.roda.core.data.v2.ip.FileLink;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.RepresentationLink;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -139,14 +141,13 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractA
               File file = oFile.get();
               dipId = IdUtils.createUUID();
 
-              FileLink fileLink = new FileLink(representation.getAipId(), representation.getId(), file.getPath(),
-                file.getId());
-              List<FileLink> links = new ArrayList<>();
-              links.add(fileLink);
+              AIPLink aipLink = new AIPLink(representation.getAipId());
+              List<AIPLink> links = new ArrayList<>();
+              links.add(aipLink);
 
               DIP dip = new DIP();
               dip.setId(dipId);
-              dip.setFileIds(links);
+              dip.setAipIds(links);
               dip.setPermissions(aip.getPermissions());
               dip.setTitle(getDIPTitle());
               dip.setDescription(getDIPDescription());
@@ -214,14 +215,13 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractA
 
             Permissions aipPermissions = model.retrieveAIP(representation.getAipId()).getPermissions();
 
-            FileLink fileLink = new FileLink(representation.getAipId(), representation.getId(), file.getPath(),
-              file.getId());
-            List<FileLink> links = new ArrayList<>();
-            links.add(fileLink);
+            RepresentationLink representationLink = new RepresentationLink(representation.getAipId(), representation.getId());
+            List<RepresentationLink> links = new ArrayList<>();
+            links.add(representationLink);
 
             DIP dip = new DIP();
             dip.setId(dipId);
-            dip.setFileIds(links);
+            dip.setRepresentationIds(links);
             dip.setPermissions(aipPermissions);
             dip.setTitle(getDIPTitle());
             dip.setDescription(getDIPDescription());
