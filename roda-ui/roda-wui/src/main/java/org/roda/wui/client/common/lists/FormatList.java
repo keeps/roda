@@ -96,9 +96,6 @@ public class FormatList extends BasicAsyncTableCell<Format> {
     };
 
     nameColumn.setSortable(true);
-    categoryColumn.setSortable(true);
-    mimetypeColumn.setSortable(true);
-
     addColumn(categoryColumn, messages.formatCategory(), true, false, 8);
     addColumn(nameColumn, messages.formatName(), false, false);
     addColumn(mimetypeColumn, messages.formatMimetypes(), false, false, 10);

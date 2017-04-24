@@ -127,7 +127,6 @@ public class NotificationList extends BasicAsyncTableCell<Notification> {
     };
 
     fromUser.setSortable(true);
-    recipientUsers.setSortable(true);
     sentOn.setSortable(true);
     subject.setSortable(true);
     acknowledged.setSortable(true);
