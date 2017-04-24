@@ -823,12 +823,20 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
   private boolean doPluginExecute(String fileFormat, String filePronom, String fileMimetype, List<String> applicableTo,
     List<String> convertableTo, Map<String, List<String>> pronomToExtension,
     Map<String, List<String>> mimetypeToExtension) {
-    LOGGER.info("Testing if input and output formats are correct");
-    boolean format = (!getInputFormat().isEmpty() && fileFormat.equalsIgnoreCase(getInputFormat()))
-      || getInputFormat().isEmpty();
+    String lowerCaseFileFormat = fileFormat == null ? null : fileFormat.toLowerCase();
+    if (LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Testing if input and output formats are correct: [{}, {}, {}, {}, {}, {}, {}]", lowerCaseFileFormat,
+        filePronom, fileMimetype, applicableTo, convertableTo, pronomToExtension, mimetypeToExtension);
+    }
+
+    boolean format = getInputFormat().isEmpty() || lowerCaseFileFormat.equalsIgnoreCase(getInputFormat());
     boolean applicable = applicableTo.isEmpty() || (filePronom != null && pronomToExtension.containsKey(filePronom))
-      || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype)) || (applicableTo.contains(fileFormat));
+      || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype))
+      || (applicableTo.contains(lowerCaseFileFormat));
     boolean convertable = convertableTo.isEmpty() || convertableTo.contains(outputFormat.toLowerCase());
+
+    LOGGER.debug("Input and ouput test results: format={} applicable={} convertable={}", format, applicable,
+      convertable);
     return format && applicable && convertable;
   }
 
