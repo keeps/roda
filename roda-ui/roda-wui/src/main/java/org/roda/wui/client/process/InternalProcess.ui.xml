@@ -35,12 +35,6 @@
 					<g:FlowPanel addStyleNames="sticky-padding">
 						<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
 							<g:Label addStyleNames="h4">
-								<ui:text from='{messages.processJobTypes}' />
-							</g:Label>
-							<g:FlowPanel ui:field="jobTypeFacets" />
-						</g:FlowPanel>
-						<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
-							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.processStatus}' />
 							</g:Label>
 							<g:FlowPanel ui:field="stateFacets" />

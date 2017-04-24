@@ -101,9 +101,6 @@ public class InternalProcess extends Composite {
   @UiField(provided = true)
   FlowPanel producerFacets;
 
-  @UiField(provided = true)
-  FlowPanel jobTypeFacets;
-
   @UiField
   DateBox inputDateInitial;
 
@@ -121,12 +118,10 @@ public class InternalProcess extends Composite {
     jobList = new JobList(filter, facets, messages.jobList(), false);
     producerFacets = new FlowPanel();
     stateFacets = new FlowPanel();
-    jobTypeFacets = new FlowPanel();
 
     Map<String, FlowPanel> facetPanels = new HashMap<>();
     facetPanels.put(RodaConstants.JOB_STATE, stateFacets);
     facetPanels.put(RodaConstants.JOB_USERNAME, producerFacets);
-    facetPanels.put(RodaConstants.JOB_PLUGIN_TYPE, jobTypeFacets);
     FacetUtils.bindFacets(jobList, facetPanels);
 
     initWidget(uiBinder.createAndBindUi(this));
