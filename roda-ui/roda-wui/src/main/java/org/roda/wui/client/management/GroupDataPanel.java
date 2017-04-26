@@ -206,7 +206,6 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
     }
 
     checked = true;
-
     return valid;
   }
 

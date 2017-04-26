@@ -35,6 +35,7 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -395,6 +396,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
       username.addStyleName("isWrong");
       usernameError.setText(messages.mandatoryField());
       usernameError.setVisible(true);
+      Window.scrollTo(username.getAbsoluteLeft(), username.getAbsoluteTop());
       errorList.add(messages.isAMandatoryField(messages.username()));
     } else {
       username.removeStyleName("isWrong");
@@ -402,6 +404,9 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     }
 
     if (!password.isValid()) {
+      if (errorList.isEmpty()) {
+        Window.scrollTo(password.getAbsoluteLeft(), password.getAbsoluteTop());
+      }
       errorList.add(messages.isNotValid(messages.password()));
     }
 
@@ -409,8 +414,10 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
       fullname.addStyleName("isWrong");
       fullnameError.setText(messages.mandatoryField());
       fullnameError.setVisible(true);
+      if (errorList.isEmpty()) {
+        Window.scrollTo(fullname.getAbsoluteLeft(), fullname.getAbsoluteTop());
+      }
       errorList.add(messages.isAMandatoryField(messages.fullname()));
-
     } else {
       fullname.removeStyleName("isWrong");
       fullnameError.setVisible(false);
@@ -420,12 +427,18 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
       email.addStyleName("isWrong");
       emailError.setText(messages.mandatoryField());
       emailError.setVisible(true);
+      if (errorList.isEmpty()) {
+        Window.scrollTo(email.getAbsoluteLeft(), email.getAbsoluteTop());
+      }
       errorList.add(messages.isAMandatoryField(messages.email()));
     } else if (!email.getText()
       .matches("^[_A-Za-z0-9-%+]+(\\.[_A-Za-z0-9-%+]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[_A-Za-z0-9-]+)")) {
       email.addStyleName("isWrong");
       emailError.setText(messages.wrongMailFormat());
       emailError.setVisible(true);
+      if (errorList.isEmpty()) {
+        Window.scrollTo(email.getAbsoluteLeft(), email.getAbsoluteTop());
+      }
       errorList.add(messages.isNotValid(messages.email()));
     } else {
       email.removeStyleName("isWrong");

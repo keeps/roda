@@ -119,13 +119,11 @@ public class Register extends Composite {
    *          the user to edit
    */
   public Register() {
-
     this.userDataPanel = new UserDataPanel(true, false, false, false);
 
     UserManagementService.Util.getInstance().retrieveDefaultExtraBundle(new AsyncCallback<UserExtraBundle>() {
       @Override
       public void onFailure(Throwable caught) {
-        GWT.log(caught.getMessage());
         errorMessage(caught);
       }
 
@@ -185,7 +183,6 @@ public class Register extends Composite {
 
           @Override
           public void onFailure(Throwable caught) {
-            GWT.log("ERROR: " + caught.getMessage());
             errorMessage(caught);
           }
 
@@ -240,6 +237,7 @@ public class Register extends Composite {
     if (recaptchaActive) {
       recaptchaWidget.reset();
     }
+
     if (caught instanceof EmailAlreadyExistsException) {
       Toast.showError(messages.registerEmailAlreadyExists());
     } else if (caught instanceof UserAlreadyExistsException) {
