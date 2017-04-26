@@ -40,6 +40,7 @@ import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
@@ -231,8 +232,13 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     jobPluginInfo.incrementObjectsProcessed(state);
 
     String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_DELETE_FILE_SUCCESS, file.getId());
-    model.createRepositoryEvent(PreservationEventType.DELETION, eventDescription, state, outcomeText, details,
-      job.getUsername(), true);
+
+    List<LinkingIdentifier> sources = new ArrayList<>();
+    sources.add(PluginHelper.getLinkingIdentifier(file.getAipId(), file.getRepresentationId(),
+      RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+
+    model.createRepositoryEvent(PreservationEventType.DELETION, eventDescription, sources, null, state, outcomeText,
+      details, job.getUsername(), true);
   }
 
   private void processRepresentation(IndexService index, ModelService model, Report report,
@@ -268,8 +274,12 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
 
     String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_DELETE_REPRESENTATION_SUCCESS,
       representation.getId());
-    model.createRepositoryEvent(PreservationEventType.DELETION, eventDescription, state, outcomeText, details,
-      job.getUsername(), true);
+
+    List<LinkingIdentifier> sources = new ArrayList<>();
+    sources.add(
+      PluginHelper.getLinkingIdentifier(representation.getAipId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+    model.createRepositoryEvent(PreservationEventType.DELETION, eventDescription, sources, null, state, outcomeText,
+      details, job.getUsername(), true);
   }
 
   private void processRisk(IndexService index, ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo,

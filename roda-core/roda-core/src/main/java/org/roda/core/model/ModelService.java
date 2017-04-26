@@ -1114,7 +1114,14 @@ public class ModelService extends ModelObservable {
 
   public void createRepositoryEvent(PreservationEventType eventType, String eventDescription, PluginState outcomeState,
     String outcomeText, String outcomeDetail, String agentName, boolean notify) {
-    createEvent(null, null, null, null, eventType, eventDescription, null, null, outcomeState, outcomeText,
+    createRepositoryEvent(eventType, eventDescription, null, null, outcomeState, outcomeText, outcomeDetail, agentName,
+      notify);
+  }
+
+  public void createRepositoryEvent(PreservationEventType eventType, String eventDescription,
+    List<LinkingIdentifier> sources, List<LinkingIdentifier> targets, PluginState outcomeState, String outcomeText,
+    String outcomeDetail, String agentName, boolean notify) {
+    createEvent(null, null, null, null, eventType, eventDescription, sources, targets, outcomeState, outcomeText,
       outcomeDetail, agentName, notify);
   }
 

@@ -210,7 +210,6 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
       }
 
       File movedFile = model.moveFile(file, toAIP, toRepresentation, toPath, file.getId(), true, true);
-
       outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_MOVE_FILE_SUCCESS,
         ModelUtils.getFileStoragePath(file).toString(), ModelUtils.getFileStoragePath(movedFile).toString());
     } catch (GenericException | AlreadyExistsException | NotFoundException | RequestNotValidException
