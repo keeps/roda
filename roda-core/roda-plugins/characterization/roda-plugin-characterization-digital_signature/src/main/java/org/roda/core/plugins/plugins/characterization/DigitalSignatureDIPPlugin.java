@@ -151,8 +151,7 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractA
 
           for (OptionalWithCause<File> oFile : allFiles) {
             if (oFile.isPresent()) {
-              File file = oFile.get();
-              manageFileSigning(model, index, storage, file, dip.getId());
+              manageFileSigning(model, index, storage, oFile.get(), dip.getId());
             } else {
               LOGGER.error("Cannot process representation file", oFile.getCause());
             }

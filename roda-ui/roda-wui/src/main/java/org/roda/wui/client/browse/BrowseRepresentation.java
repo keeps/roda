@@ -366,7 +366,22 @@ public class BrowseRepresentation extends Composite {
 
         @Override
         public void onSuccess(Actionable.ActionImpact impact) {
-          // TODO update interface
+          if (Actionable.ActionImpact.UPDATED.equals(impact)) {
+            BrowserService.Util.getInstance().retrieve(IndexedRepresentation.class.getName(), representation.getUUID(),
+              representationFields, new AsyncCallback<IndexedRepresentation>() {
+
+                @Override
+                public void onFailure(Throwable caught) {
+                  AsyncCallbackUtils.defaultFailureTreatment(caught);
+                }
+
+                @Override
+                public void onSuccess(IndexedRepresentation rep) {
+                  representation = rep;
+                  representationType.setText(rep.getType());
+                }
+              });
+          }
         }
       }));
 

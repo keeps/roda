@@ -3185,6 +3185,7 @@ public class BrowserHelper {
 
       try {
         model.updateRepresentationType(irep.getAipId(), irep.getId(), newType);
+        index.commit(IndexedRepresentation.class);
         String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_CHANGE_TYPE_REPRESENTATION_SUCCESS,
           irep.getId(), oldType, newType);
 
@@ -3196,12 +3197,9 @@ public class BrowserHelper {
 
         model.createEvent(irep.getAipId(), irep.getId(), null, null, PreservationEventType.UPDATE, eventDescription,
           sources, null, PluginState.FAILURE, outcomeText, details, user.getName(), true);
-
         throw e;
       }
     }
-
-    index.commit(IndexedRepresentation.class);
   }
 
   public static ObjectPermissionResult verifyPermissions(String username, String permissionType,

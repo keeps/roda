@@ -299,7 +299,6 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
   }
 
   public void createFolder(final IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
-
     Dialogs.showPromptDialog(messages.createFolderTitle(), null, null, messages.createFolderPlaceholder(),
       RegExp.compile("^[^/]+$"), messages.cancelButton(), messages.confirmButton(), true, new AsyncCallback<String>() {
         @Override
