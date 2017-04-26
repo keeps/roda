@@ -26,8 +26,7 @@
 						</g:Label>
 						<g:SimplePanel styleName="browseItemIcon" ui:field="representationIcon" />
 						<g:FlowPanel styleName="browseItemPanelText">
-							<g:Label styleName="h4" addStyleNames="browseItemText"
-								ui:field="representationType" />
+							<g:HTML addStyleNames="browseItemTextWithoutFontSize" ui:field="representationType" />
 						</g:FlowPanel>
 						<g:Label addStyleNames="browseRepresentationId" ui:field="representationId"
 							title="{messages.representationId}" />

@@ -45,6 +45,9 @@ public class HtmlSnippetUtils {
   private static final String OPEN_SPAN_CLASS_LABEL_DANGER = "<span class='label-danger'>";
   private static final String OPEN_SPAN_CLASS_LABEL_WARNING = "<span class='label-warning'>";
   private static final String OPEN_SPAN_CLASS_LABEL_SUCCESS = "<span class='label-success'>";
+
+  private static final String OPEN_SPAN_ORIGINAL_LABEL_SUCCESS = "<span class='label-success browseRepresentationOriginalIcon'>";
+  private static final String OPEN_H4_CLASS_LABEL_SUCCESS = "<span class='h4' style='font-size: 3.2rem'>";
   private static final String CLOSE_SPAN = "</span>";
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
@@ -112,6 +115,23 @@ public class HtmlSnippetUtils {
     b.append(SafeHtmlUtils.fromString(messages.aipState(aipState)));
     b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
 
+    return b.toSafeHtml();
+  }
+
+  public static SafeHtml getRepresentationTypeHTML(String type, boolean isOriginal) {
+    SafeHtmlBuilder b = new SafeHtmlBuilder();
+    b.append(SafeHtmlUtils.fromSafeConstant(OPEN_H4_CLASS_LABEL_SUCCESS));
+    b.append(SafeHtmlUtils.fromString(type));
+    b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
+
+    b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_ORIGINAL_LABEL_SUCCESS));
+    if (isOriginal) {
+      b.append(SafeHtmlUtils.fromString(messages.originalRepresentation()));
+    } else {
+      b.append(SafeHtmlUtils.fromString(messages.alternativeRepresentation()));
+    }
+
+    b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
     return b.toSafeHtml();
   }
 

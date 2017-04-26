@@ -173,7 +173,7 @@ public class BrowseRepresentation extends Composite {
   SimplePanel representationIcon;
 
   @UiField
-  Label representationType;
+  HTML representationType;
 
   @UiField
   Label representationId;
@@ -270,7 +270,9 @@ public class BrowseRepresentation extends Composite {
       DescriptionLevelUtils.getRepresentationTypeIcon(representation.getType(), false));
     representationIconHtmlPanel.addStyleName("browseItemIcon-other");
     representationIcon.setWidget(representationIconHtmlPanel);
-    representationType.setText(representation.getType() != null ? representation.getType() : representation.getId());
+
+    String type = representation.getType() != null ? representation.getType() : representation.getId();
+    representationType.setHTML(HtmlSnippetUtils.getRepresentationTypeHTML(type, representation.isOriginal()));
     representationId.setText(representation.getId());
 
     breadcrumb.updatePath(BreadcrumbUtils.getRepresentationBreadcrumbs(bundle));

@@ -2168,10 +2168,22 @@ td.datePickerMonth, td.datePickerYear {
 .browseItemText {
     display: inline;
     margin-bottom: 0 !important;
-    
     font-size: 3.2rem;
     line-height: 1.2;
     letter-spacing: -.1rem;
+}
+
+.browseItemTextWithoutFontSize {
+    display: inline;
+    margin-bottom: 0 !important;
+    line-height: 1.2;
+    letter-spacing: -.1rem;
+}
+
+.browseRepresentationOriginalIcon {
+    margin-left: 10px;
+    font-size: 85%;
+    vertical-align: super;
 }
 
 .browseItemId,
