@@ -225,7 +225,8 @@ public class AvprobePlugin extends AbstractPlugin<AIP> {
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_CHARACTERIZATION);
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_FEATURE_EXTRACTION,
+      RodaConstants.PLUGIN_CATEGORY_CHARACTERIZATION);
   }
 
   @Override

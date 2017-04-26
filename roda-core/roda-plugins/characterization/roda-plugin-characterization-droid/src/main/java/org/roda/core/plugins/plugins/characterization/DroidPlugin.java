@@ -240,7 +240,8 @@ public class DroidPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_CHARACTERIZATION);
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_FORMAT_IDENTIFICATION,
+      RodaConstants.PLUGIN_CATEGORY_CHARACTERIZATION);
   }
 
   @Override

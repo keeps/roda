@@ -825,7 +825,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_CHARACTERIZATION);
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_VALIDATION, RodaConstants.PLUGIN_CATEGORY_CHARACTERIZATION);
   }
 
   public List<String> getApplicableTo() {

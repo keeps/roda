@@ -277,7 +277,8 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_CHARACTERIZATION);
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_FORMAT_IDENTIFICATION,
+      RodaConstants.PLUGIN_CATEGORY_CHARACTERIZATION);
   }
 
   @SuppressWarnings({"unchecked", "rawtypes"})

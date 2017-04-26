@@ -223,7 +223,8 @@ public class JpylyzerPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_CHARACTERIZATION, RodaConstants.PLUGIN_CATEGORY_EXPERIMENTAL);
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_VALIDATION, RodaConstants.PLUGIN_CATEGORY_FEATURE_EXTRACTION,
+      RodaConstants.PLUGIN_CATEGORY_CHARACTERIZATION, RodaConstants.PLUGIN_CATEGORY_EXPERIMENTAL);
   }
 
   @Override

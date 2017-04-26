@@ -166,4 +166,10 @@ public class PdfToPdfaPlugin<T extends IsRODAObject> extends AbstractConvertPlug
     return null;
   }
 
+  @Override
+  public List<String> getCategories() {
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_CONVERSION, RodaConstants.PLUGIN_CATEGORY_DISSEMINATION,
+      RodaConstants.PLUGIN_CATEGORY_EXPERIMENTAL);
+  }
+
 }
