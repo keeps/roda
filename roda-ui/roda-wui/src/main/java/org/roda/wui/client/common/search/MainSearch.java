@@ -124,7 +124,6 @@ public class MainSearch extends Composite {
     this.parentAipState = parentAipState;
 
     ValueChangeHandler<Integer> searchAdvancedFieldsPanelHandler = new ValueChangeHandler<Integer>() {
-
       @Override
       public void onValueChange(ValueChangeEvent<Integer> event) {
         searchPanel.setSearchAdvancedGoEnabled(event.getValue() == 0 ? false : true);

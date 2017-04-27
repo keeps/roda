@@ -134,7 +134,6 @@ public class Search extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
     searchDescription.add(new HTMLWidgetWrapper("SearchDescription.html"));
-
   }
 
   public static Search getInstance() {

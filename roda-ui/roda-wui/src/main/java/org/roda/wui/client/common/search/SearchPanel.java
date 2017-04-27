@@ -21,6 +21,7 @@ import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.filter.OrFiltersParameters;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 import org.roda.wui.common.client.widgets.wcag.WCAGUtilities;
 
@@ -82,6 +83,9 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
 
   @UiField
   Button searchAdvancedGo;
+
+  @UiField
+  Button searchAdvancedClean;
 
   @UiField
   FlowPanel searchPreFilters;
@@ -357,6 +361,11 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
   public void hidePreFilters() {
     searchPreFilters.clear();
     searchPreFilters.setVisible(false);
+  }
+
+  @UiHandler("searchAdvancedClean")
+  void handleSearchAdvancedClean(ClickEvent e) {
+    JavascriptUtils.cleanAdvancedSearch();
   }
 
   @UiHandler("searchAdvancedGo")

@@ -3352,6 +3352,11 @@ td.datePickerMonth, td.datePickerYear {
     float: right;
 }
 
+.advancedSearchCleanButton {
+	margin-right: 10px;
+    float: right;
+}
+
 .searchAdvancedDisclosureButton {
     background-color: #eee;
     color: rgba(0, 0, 0, 0.5);

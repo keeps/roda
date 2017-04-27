@@ -500,6 +500,8 @@ public interface ClientMessages extends Messages {
 
   String changeTypeButton();
 
+  String clearButton();
+
   /*** Identify formats ***/
 
   String identifyFormatsButton();

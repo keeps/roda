@@ -332,4 +332,7 @@ public class JavascriptUtils {
 		imageViewerObject.destroy();
   }-*/;
 
+  public static native void cleanAdvancedSearch() /*-{
+		$wnd.jQuery('.searchAdvancedPanel input').val('');
+  }-*/;
 }
