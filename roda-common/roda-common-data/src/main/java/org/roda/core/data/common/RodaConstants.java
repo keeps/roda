@@ -1233,6 +1233,7 @@ public final class RodaConstants {
   public static final String LEVELS_ICONS_REPRESENTATION_TYPES_PREFIX = "levels.internal.icon.representation.type";
   public static final String LEVEL_I18N_PREFIX = "level";
   public static final String REPRESENTATION_TYPE_DEFAULT = "default";
+  public static final String NONE_SELECTED_LEVEL = "noneselected";
 
   /* Dialog filter limit */
   public static final int DIALOG_FILTER_LIMIT_NUMBER = 120;

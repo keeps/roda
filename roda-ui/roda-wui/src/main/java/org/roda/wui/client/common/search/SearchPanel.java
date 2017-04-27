@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -112,7 +113,6 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
     searchAdvancedPanel.setVisible(false);
 
     searchInputBox.addKeyDownHandler(new KeyDownHandler() {
-
       @Override
       public void onKeyDown(KeyDownEvent event) {
         if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
@@ -122,7 +122,6 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
     });
 
     searchInputButton.addClickHandler(new ClickHandler() {
-
       @Override
       public void onClick(ClickEvent event) {
         doSearch();
@@ -130,7 +129,6 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
     });
 
     searchAdvancedDisclosureButton.addClickHandler(new ClickHandler() {
-
       @Override
       public void onClick(ClickEvent event) {
         showSearchAdvancedPanel();
@@ -138,7 +136,6 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
     });
 
     searchInputListBox.addValueChangeHandler(new ValueChangeHandler<String>() {
-
       @Override
       public void onValueChange(ValueChangeEvent<String> event) {
         onChange();
@@ -158,7 +155,6 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
 
   private void drawSearchPreFilters() {
     searchPreFilters.clear();
-
     searchPreFilters.setVisible(defaultFilter != null && !defaultFilter.getParameters().isEmpty());
 
     if (defaultFilter != null) {
@@ -219,8 +215,16 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
       for (int i = 0; i < fieldsPanel.getWidgetCount(); i++) {
         SearchFieldPanel searchAdvancedFieldPanel = (SearchFieldPanel) fieldsPanel.getWidget(i);
         String searchFieldId = searchAdvancedFieldPanel.getSearchField().getId();
-        FilterParameter filterParameter = searchAdvancedFieldPanel.getFilter();
         FilterParameter oldFilterParameter = advancedSearchFilters.get(searchFieldId);
+        FilterParameter filterParameter = searchAdvancedFieldPanel.getFilter();
+
+        if (filterParameter instanceof SimpleFilterParameter) {
+          SimpleFilterParameter parameter = (SimpleFilterParameter) filterParameter;
+          if (RodaConstants.AIP_LEVEL.equals(parameter.getName())
+            && RodaConstants.NONE_SELECTED_LEVEL.equals(parameter.getValue())) {
+            filterParameter = null;
+          }
+        }
 
         if (filterParameter != null) {
           if (oldFilterParameter != null) {
@@ -250,16 +254,13 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
     if (defaultFilterIncremental) {
       filter = defaultFilter != null ? new Filter(defaultFilter) : new Filter();
       filter.add(parameters);
-      searchPreFilters.setVisible(filter != null && !filter.getParameters().isEmpty());
-      GWT.log("Incremental filter: " + filter);
+      searchPreFilters.setVisible(!filter.getParameters().isEmpty());
     } else if (parameters.isEmpty()) {
       filter = defaultFilter;
       searchPreFilters.setVisible(filter != null && !filter.getParameters().isEmpty());
-      GWT.log("Default filter: " + filter);
     } else {
       filter = new Filter(parameters);
       searchPreFilters.setVisible(false);
-      GWT.log("New filter: " + filter);
     }
 
     return filter;
