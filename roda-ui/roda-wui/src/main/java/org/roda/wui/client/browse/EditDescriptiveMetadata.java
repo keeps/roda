@@ -184,6 +184,7 @@ public class EditDescriptiveMetadata extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
     metadataXML = new TextArea();
     metadataXML.addStyleName("form-textbox metadata-edit-area metadata-form-textbox");
+    metadataXML.setTitle("Metadata edit area");
 
     id.setText(bundle.getId());
     id.setEnabled(false);
