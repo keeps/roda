@@ -70,10 +70,18 @@ public class DefaultSelectDialog<T extends IsIndexed, O> extends DialogBox imple
     setAnimationEnabled(false);
 
     setText(title);
-
     center();
 
     emptyParentButton.setVisible(false);
+    selectButton.setEnabled(false);
+
+    this.searchResultsPanel.getSelectionModel().addSelectionChangeHandler(new Handler() {
+
+      @Override
+      public void onSelectionChange(SelectionChangeEvent event) {
+        selectButton.setEnabled(DefaultSelectDialog.this.getValue() != null);
+      }
+    });
   }
 
   @Override
@@ -87,12 +95,13 @@ public class DefaultSelectDialog<T extends IsIndexed, O> extends DialogBox imple
   }
 
   public void setSingleSelectionMode() {
-    selectButton.setVisible(false);
+    selectButton.setEnabled(false);
+
     searchResultsPanel.getSelectionModel().addSelectionChangeHandler(new Handler() {
 
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
-        if (DefaultSelectDialog.this.searchResultsPanel.getSelectionModel().getSelectedObject() != null) {
+        if (DefaultSelectDialog.this.getValue() != null) {
           onChange();
           hide();
         }

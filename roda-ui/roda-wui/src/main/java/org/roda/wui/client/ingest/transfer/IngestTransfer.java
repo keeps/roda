@@ -127,7 +127,6 @@ public class IngestTransfer extends Composite {
 
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
-
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
   private TransferredResource resource;
