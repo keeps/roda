@@ -332,7 +332,8 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                   } catch (CommandException e) {
                     pluginResultState = PluginState.PARTIAL_SUCCESS;
                     reportState = pluginResultState;
-                    reportItem.setPluginState(pluginResultState).addPluginDetails(e.getMessage() + "\n");
+                    reportItem.setPluginState(pluginResultState)
+                      .addPluginDetails(e.getMessage() + "\n" + e.getOutput() + "\n");
 
                     LOGGER.debug("Conversion ({} to {}) failed on file {} of representation {} from AIP {}", fileFormat,
                       outputFormat, file.getId(), representation.getId(), aip.getId());
@@ -527,7 +528,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
 
                 } catch (CommandException e) {
                   reportState = PluginState.PARTIAL_SUCCESS;
-                  reportItem.setPluginState(reportState).addPluginDetails(e.getMessage() + "\n");
+                  reportItem.setPluginState(reportState).addPluginDetails(e.getMessage() + "\n" + e.getOutput() + "\n");
 
                   LOGGER.debug("Conversion ({} to {}) failed on file {} of representation {} from AIP {}", fileFormat,
                     outputFormat, file.getId(), representation.getId(), representation.getAipId());
@@ -712,7 +713,8 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
               pluginResultState = PluginState.PARTIAL_SUCCESS;
               Report fileReportItem = PluginHelper.initPluginReportItem(this, file.getId(), File.class,
                 AIPState.ACTIVE);
-              fileReportItem.setPluginState(PluginState.PARTIAL_SUCCESS).setPluginDetails(e.getMessage());
+              fileReportItem.setPluginState(PluginState.PARTIAL_SUCCESS)
+                .setPluginDetails(e.getMessage() + "\n" + e.getOutput());
               reportItem.addReport(fileReportItem);
 
               LOGGER.debug("Conversion ({} to {}) failed on file {} of representation {} from AIP {}", fileFormat,

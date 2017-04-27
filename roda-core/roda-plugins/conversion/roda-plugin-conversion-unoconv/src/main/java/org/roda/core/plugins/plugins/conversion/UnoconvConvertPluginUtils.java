@@ -39,7 +39,7 @@ public class UnoconvConvertPluginUtils {
     }
 
     // running the command
-    return CommandUtility.execute(commandList);
+    return CommandUtility.execute(commandList, true);
   }
 
   public static String getVersion() throws CommandException, IOException, UnsupportedOperationException {

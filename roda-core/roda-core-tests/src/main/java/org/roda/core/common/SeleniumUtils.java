@@ -48,9 +48,18 @@ public class SeleniumUtils {
     // do nothing
   }
 
+  /**
+   * 
+   * @param args:
+   *          the first argument is the RODA base url and the second argument is
+   *          the driver path
+   * @throws InterruptedException
+   * @throws IOException
+   */
   public static void main(String[] args) throws InterruptedException, IOException {
     if (args.length != 2) {
-      System.err.println("Number of arguments not correct");
+      System.err.println("Number of arguments not correct since it is only needed two arguments. "
+        + "The first argument is the RODA base url and the second argument is the driver path");
       commandHelp();
       System.exit(0);
     }
