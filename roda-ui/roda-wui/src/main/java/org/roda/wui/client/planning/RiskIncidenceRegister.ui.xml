@@ -47,7 +47,7 @@
 							<g:FlowPanel ui:field="facetDetectedBy" />	
 						</g:FlowPanel>
 						<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
-						<g:Label addStyleNames="h4">
+							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.riskIncidenceStatus}' />
 							</g:Label>
 							<g:FlowPanel ui:field="facetStatus" />

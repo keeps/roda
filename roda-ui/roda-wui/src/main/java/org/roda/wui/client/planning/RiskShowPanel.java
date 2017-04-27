@@ -8,7 +8,12 @@
 
 package org.roda.wui.client.planning;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.index.facet.Facets;
+import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -25,6 +30,7 @@ import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.ClientLogger;
+import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.core.client.GWT;
@@ -38,6 +44,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
@@ -147,22 +154,31 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
+  private FlowPanel facetIncidenceStatus;
+
   private static final Filter DEFAULT_FILTER = SearchFilters.defaultFilter(RiskIncidence.class.getName());
   private static final String ALL_FILTER = SearchFilters.allFilter(RiskIncidence.class.getName());
 
   public RiskShowPanel() {
-    incidenceList = new RiskIncidenceList(null, null, messages.riskIncidences(), true);
+    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.RISK_INCIDENCE_STATUS));
+    incidenceList = new RiskIncidenceList(Filter.NULL, facets, messages.riskIncidences(), true);
 
     searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, true, messages.riskIncidenceRegisterSearchPlaceHolder(),
       false, false, false);
     searchPanel.setList(incidenceList);
+
+    facetIncidenceStatus = new FlowPanel();
+    Map<String, FlowPanel> facetPanels = new HashMap<>();
+    facetPanels.put(RodaConstants.RISK_INCIDENCE_STATUS, facetIncidenceStatus);
+    FacetUtils.bindFacets(incidenceList, facetPanels);
 
     initWidget(uiBinder.createAndBindUi(this));
   }
 
   public RiskShowPanel(Risk risk, boolean hasTitle) {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISK_ID, risk.getId()));
-    incidenceList = new RiskIncidenceList(filter, null, messages.riskIncidences(), hasTitle);
+    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.RISK_INCIDENCE_STATUS));
+    incidenceList = new RiskIncidenceList(filter, facets, messages.riskIncidences(), hasTitle);
 
     Filter incidenceFilter = new Filter(new BasicSearchFilterParameter(RodaConstants.RISK_INCIDENCE_SEARCH, "*"),
       new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISK_ID, risk.getId()));
@@ -170,6 +186,11 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
     searchPanel = new SearchPanel(incidenceFilter, ALL_FILTER, true, messages.riskIncidenceRegisterSearchPlaceHolder(),
       false, false, false);
     searchPanel.setList(incidenceList);
+
+    facetIncidenceStatus = new FlowPanel();
+    Map<String, FlowPanel> facetPanels = new HashMap<>();
+    facetPanels.put(RodaConstants.RISK_INCIDENCE_STATUS, facetIncidenceStatus);
+    FacetUtils.bindFacets(incidenceList, facetPanels);
 
     incidenceList.addCheckboxSelectionListener(new CheckboxSelectionListener<RiskIncidence>() {
 
@@ -370,5 +391,9 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
 
   public void refreshList() {
     incidenceList.refresh();
+  }
+
+  public FlowPanel getFacetIncidenceStatus() {
+    return this.facetIncidenceStatus;
   }
 }

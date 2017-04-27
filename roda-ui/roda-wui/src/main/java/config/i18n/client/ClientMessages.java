@@ -1257,6 +1257,8 @@ public interface ClientMessages extends Messages {
 
   String riskIncidenceStatusValue(@Select INCIDENCE_STATUS status);
 
+  String riskIncidenceStatusTitle();
+
   /*** Formats ***/
 
   String formatIdentifier();

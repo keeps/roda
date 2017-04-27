@@ -42,6 +42,7 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -117,6 +118,9 @@ public class ShowRisk extends Composite {
   @UiField
   Button buttonEditIncidence;
 
+  @UiField(provided = true)
+  FlowPanel facetIncidenceStatus;
+
   /**
    * Create a new panel to view a risk
    *
@@ -126,6 +130,7 @@ public class ShowRisk extends Composite {
   public ShowRisk() {
     this.risk = new Risk();
     this.riskShowPanel = new RiskShowPanel();
+    this.facetIncidenceStatus = this.riskShowPanel.getFacetIncidenceStatus();
     initWidget(uiBinder.createAndBindUi(this));
     buttonProcess.setEnabled(false);
     buttonEditIncidence.setEnabled(false);
@@ -135,6 +140,7 @@ public class ShowRisk extends Composite {
   public ShowRisk(Risk risk) {
     this.risk = risk;
     this.riskShowPanel = new RiskShowPanel(risk, true);
+    this.facetIncidenceStatus = this.riskShowPanel.getFacetIncidenceStatus();
     initWidget(uiBinder.createAndBindUi(this));
     buttonProcess.setEnabled(false);
     buttonEditIncidence.setEnabled(false);
