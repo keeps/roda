@@ -44,10 +44,7 @@ import org.slf4j.LoggerFactory;
 
 public class VerifyUserAuthorizationPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(VerifyUserAuthorizationPlugin.class);
-
-  private static final String NO_PERMISSION_TO_CREATE_UNDER_AIP = "The user doesn't have permission to create under AIP";
   private static final String PARENT_AIP_NOT_FOUND = "The parent of the AIP was not found";
-  private static final String NO_CREATE_TOP_LEVEL_AIP_PERMISSION = "The user doesn't have CREATE_TOP_LEVEL_AIP_PERMISSION permission";
 
   private static final List<String> userFieldsToReturn = Arrays.asList(RodaConstants.MEMBERS_GROUPS,
     RodaConstants.MEMBERS_ID);
@@ -150,7 +147,8 @@ public class VerifyUserAuthorizationPlugin extends AbstractPlugin<AIP> {
           reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(PARENT_AIP_NOT_FOUND);
         } catch (AuthorizationDeniedException e) {
           LOGGER.debug("User '{}' doesn't have CREATE permission on parent... Error...", jobCreatorUsername);
-          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(NO_PERMISSION_TO_CREATE_UNDER_AIP);
+          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(
+            "The user " + jobCreatorUsername + " doesn't have permission to create under AIP " + aip.getId());
         }
       } else {
         RODAMember member = index.retrieve(RODAMember.class, jobCreatorUsername,
@@ -158,7 +156,8 @@ public class VerifyUserAuthorizationPlugin extends AbstractPlugin<AIP> {
         if (member.getAllRoles().contains(RodaConstants.REPOSITORY_PERMISSIONS_AIP_CREATE_TOP)) {
           LOGGER.debug("User have CREATE_TOP_LEVEL_AIP_PERMISSION permission.");
         } else {
-          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(NO_CREATE_TOP_LEVEL_AIP_PERMISSION);
+          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(
+            "The user " + jobCreatorUsername + " doesn't have CREATE_TOP_LEVEL_AIP_PERMISSION permission");
           LOGGER.debug("User doesn't have CREATE_TOP_LEVEL_AIP_PERMISSION permission...");
         }
       }
