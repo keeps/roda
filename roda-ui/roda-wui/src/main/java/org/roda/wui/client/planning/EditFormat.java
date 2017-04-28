@@ -13,6 +13,7 @@ import java.util.List;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.formats.Format;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
@@ -99,6 +100,9 @@ public class EditFormat extends Composite {
   Button buttonApply;
 
   @UiField
+  Button buttonRemove;
+
+  @UiField
   Button buttonCancel;
 
   @UiField(provided = true)
@@ -144,6 +148,23 @@ public class EditFormat extends Composite {
     } else {
       HistoryUtils.newHistory(ShowFormat.RESOLVER, format.getId());
     }
+  }
+
+  @UiHandler("buttonRemove")
+  void buttonRemoveHandler(ClickEvent e) {
+    BrowserService.Util.getInstance().deleteFormat(
+      new SelectedItemsList<Format>(Arrays.asList(format.getUUID()), Format.class.getName()),
+      new AsyncCallback<Void>() {
+        @Override
+        public void onFailure(Throwable caught) {
+          errorMessage(caught);
+        }
+
+        @Override
+        public void onSuccess(Void result) {
+          HistoryUtils.newHistory(FormatRegister.RESOLVER);
+        }
+      });
   }
 
   @UiHandler("buttonCancel")

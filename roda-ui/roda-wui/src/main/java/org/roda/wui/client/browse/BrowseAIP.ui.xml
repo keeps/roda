@@ -54,7 +54,7 @@
 						<g:TabPanel ui:field="descriptiveMetadata"
 							addStyleNames="browseItemMetadata" />
 						<g:Button
-							addStyleNames="btn  btn-block btn-plus browseNewDescriptiveMetadataButton"
+							addStyleNames="btn btn-block btn-plus browseNewDescriptiveMetadataButton"
 							ui:field="newDescriptiveMetadata">
 							<ui:text from='{messages.newDescriptiveMetadataTitle}' />
 						</g:Button>

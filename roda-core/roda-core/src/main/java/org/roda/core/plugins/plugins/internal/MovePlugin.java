@@ -29,10 +29,16 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
+import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.sort.Sorter;
+import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
@@ -135,7 +141,7 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
         if (!objects.isEmpty()) {
           if (objects.get(0) instanceof AIP) {
             for (T object : objects) {
-              processAIP(model, report, jobPluginInfo, cachedJob, (AIP) object);
+              processAIP(model, index, report, jobPluginInfo, cachedJob, (AIP) object);
             }
           } else if (objects.get(0) instanceof File) {
             for (T object : objects) {
@@ -149,7 +155,8 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
     }, index, model, storage, liteList);
   }
 
-  private void processAIP(ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo, Job job, AIP aip) {
+  private void processAIP(ModelService model, IndexService index, Report report, SimpleJobPluginInfo jobPluginInfo,
+    Job job, AIP aip) {
     Locale locale = PluginHelper.parseLocale(RodaConstants.DEFAULT_EVENT_LOCALE);
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
     PluginState state = PluginState.SUCCESS;
@@ -159,17 +166,30 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
       LOGGER.debug("Moving AIP {} under {}", aip.getId(), destinationId);
 
       try {
-        model.moveAIP(aip.getId(), destinationId);
+        Filter filter = new Filter();
+        filter.add(new SimpleFilterParameter(RodaConstants.INDEX_UUID, destinationId));
+        filter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aip.getId()));
+        IndexResult<IndexedAIP> result = index.find(IndexedAIP.class, filter, Sorter.NONE, new Sublist(0, 1),
+          Arrays.asList(RodaConstants.INDEX_UUID));
 
-        outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_MOVE_AIP_SUCCESS, aip.getId());
+        if (result.getResults().isEmpty()) {
+          model.moveAIP(aip.getId(), destinationId);
+          outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_MOVE_AIP_SUCCESS, aip.getId());
+        } else {
+          state = PluginState.FAILURE;
+          Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
+          reportItem.addPluginDetails("Could not move AIP because the destination is a sublevel").setPluginState(state);
+          report.addReport(reportItem);
+          PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
+          outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_MOVE_AIP_FAILURE, aip.getId());
+        }
       } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
         state = PluginState.FAILURE;
         Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
         reportItem.addPluginDetails("Could not move AIP: " + e.getMessage()).setPluginState(state);
         report.addReport(reportItem);
         PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
-
-        outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_MOVE_AIP_SUCCESS, aip.getId());
+        outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_MOVE_AIP_FAILURE, aip.getId());
       }
     }
 
