@@ -2265,7 +2265,7 @@ public class BrowserHelper {
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_EVENT_DESCRIPTION, eventDescription);
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OUTCOME_TEXT,
-        "Parent permissions were updated and all sublevels will be too");
+        "AIP " + indexedAIP.getId() + " permissions were updated and all sublevels will be too");
       job.setPluginParameters(pluginParameters);
 
       RodaCoreFactory.getModelService().createJob(job);

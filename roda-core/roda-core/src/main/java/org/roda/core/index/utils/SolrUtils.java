@@ -1361,7 +1361,7 @@ public class SolrUtils {
     }
 
     String fileId = file.getId();
-    if (!fileId.startsWith(".")) {
+    if (!file.isDirectory() && fileId.contains(".") && !fileId.startsWith(".")) {
       String extension = fileId.substring(fileId.lastIndexOf('.') + 1);
       doc.addField(RodaConstants.FILE_EXTENSION, extension);
     }
