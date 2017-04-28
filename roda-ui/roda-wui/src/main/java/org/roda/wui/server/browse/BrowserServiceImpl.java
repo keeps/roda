@@ -326,7 +326,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
       User user = UserUtility.getUser(getThreadLocalRequest());
       return Browser.moveAIPInHierarchy(user, selected, parentId, details);
     } catch (Exception e) {
-      LOGGER.error("Unexpected error", e);
       throw e;
     }
   }

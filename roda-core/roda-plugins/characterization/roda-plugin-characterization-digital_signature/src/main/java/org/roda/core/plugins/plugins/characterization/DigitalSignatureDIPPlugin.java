@@ -150,7 +150,7 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractA
             representation.getId(), recursive);
 
           for (OptionalWithCause<File> oFile : allFiles) {
-            if (oFile.isPresent()) {
+            if (oFile.isPresent() && !oFile.get().isDirectory()) {
               manageFileSigning(model, index, storage, oFile.get(), dip.getId());
             } else {
               LOGGER.error("Cannot process representation file", oFile.getCause());
@@ -221,7 +221,7 @@ public class DigitalSignatureDIPPlugin<T extends IsRODAObject> extends AbstractA
           representation.getId(), recursive);
 
         for (OptionalWithCause<File> oFile : allFiles) {
-          if (oFile.isPresent()) {
+          if (oFile.isPresent() && !oFile.get().isDirectory()) {
             manageFileSigning(model, index, storage, oFile.get(), dip.getId());
           } else {
             LOGGER.error("Cannot process representation file", oFile.getCause());
