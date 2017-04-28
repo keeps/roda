@@ -232,6 +232,8 @@ public class UserUtility {
       checkDIPPermissions(user, (IndexedDIP) obj, permissionType);
     } else if (obj instanceof DIPFile) {
       checkDIPFilePermissions(user, (DIPFile) obj, permissionType);
+    } else if (obj instanceof IndexedPreservationEvent) {
+      checkPreservationEventPermissions(user, (IndexedPreservationEvent) obj, permissionType);
     }
   }
 
@@ -339,6 +341,34 @@ public class UserUtility {
     }
   }
 
+  public static void checkDIPPermissions(User user, SelectedItems<IndexedDIP> selected, PermissionType permission)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
+
+    if (isAdministrator(user)) {
+      return;
+    }
+
+    IndexService index = RodaCoreFactory.getIndexService();
+    if (selected instanceof SelectedItemsFilter) {
+      SelectedItemsFilter<IndexedDIP> selectedItems = (SelectedItemsFilter<IndexedDIP>) selected;
+      IterableIndexResult<IndexedDIP> findAll = index.findAll(IndexedDIP.class, selectedItems.getFilter(),
+        RodaConstants.DIP_PERMISSIONS_FIELDS_TO_RETURN);
+
+      for (IndexedDIP dip : findAll) {
+        checkDIPPermissions(user, dip, permission);
+      }
+    } else if (selected instanceof SelectedItemsList) {
+      SelectedItemsList<IndexedDIP> selectedItems = (SelectedItemsList<IndexedDIP>) selected;
+      List<IndexedDIP> dips = ModelUtils.getIndexedDIPsFromObjectIds(selectedItems);
+      for (IndexedDIP dip : dips) {
+        checkDIPPermissions(user, dip, permission);
+      }
+    } else {
+      throw new RequestNotValidException(
+        "SelectedItems implementations not supported: " + selected.getClass().getName());
+    }
+  }
+
   @SuppressWarnings("unchecked")
   public static <T extends IsIndexed> void checkObjectPermissions(User user, SelectedItems<T> selected,
     PermissionType permissionType) throws AuthorizationDeniedException, GenericException, RequestNotValidException {
@@ -350,6 +380,8 @@ public class UserUtility {
       checkRepresentationPermissions(user, (SelectedItems<IndexedRepresentation>) selected, permissionType);
     } else if (classToReturn.equals(IndexedFile.class)) {
       checkFilePermissions(user, (SelectedItems<IndexedFile>) selected, permissionType);
+    } else if (classToReturn.equals(IndexedDIP.class)) {
+      checkDIPPermissions(user, (SelectedItems<IndexedDIP>) selected, permissionType);
     }
   }
 

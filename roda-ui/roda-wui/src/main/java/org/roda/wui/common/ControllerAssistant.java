@@ -12,6 +12,11 @@ import java.util.Date;
 
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.user.User;
 
@@ -45,6 +50,26 @@ public class ControllerAssistant {
   public void checkRoles(final User user, final Class<?> classToReturn) throws AuthorizationDeniedException {
     try {
       UserUtility.checkRoles(user, this.getClass(), classToReturn);
+    } catch (final AuthorizationDeniedException e) {
+      registerAction(user, LOG_ENTRY_STATE.UNAUTHORIZED);
+      throw e;
+    }
+  }
+
+  public <T extends IsIndexed> void checkObjectPermissions(final User user, T obj, PermissionType permissionType)
+    throws AuthorizationDeniedException {
+    try {
+      UserUtility.checkObjectPermissions(user, obj, permissionType);
+    } catch (final AuthorizationDeniedException e) {
+      registerAction(user, LOG_ENTRY_STATE.UNAUTHORIZED);
+      throw e;
+    }
+  }
+
+  public <T extends IsIndexed> void checkObjectPermissions(final User user, SelectedItems<T> objs,
+    PermissionType permissionType) throws AuthorizationDeniedException, GenericException, RequestNotValidException {
+    try {
+      UserUtility.checkObjectPermissions(user, objs, permissionType);
     } catch (final AuthorizationDeniedException e) {
       registerAction(user, LOG_ENTRY_STATE.UNAUTHORIZED);
       throw e;

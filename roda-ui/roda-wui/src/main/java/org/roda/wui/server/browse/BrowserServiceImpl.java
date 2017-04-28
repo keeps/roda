@@ -322,12 +322,8 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public IndexedAIP moveAIPInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
     AlreadyExistsException, ValidationException {
-    try {
-      User user = UserUtility.getUser(getThreadLocalRequest());
-      return Browser.moveAIPInHierarchy(user, selected, parentId, details);
-    } catch (Exception e) {
-      throw e;
-    }
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Browser.moveAIPInHierarchy(user, selected, parentId, details);
   }
 
   @Override

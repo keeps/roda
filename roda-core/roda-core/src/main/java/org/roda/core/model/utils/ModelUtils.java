@@ -898,7 +898,7 @@ public final class ModelUtils {
         try {
           res.add(RodaCoreFactory.getIndexService().retrieve(IndexedAIP.class, objectId, new ArrayList<>()));
         } catch (GenericException | NotFoundException e) {
-          LOGGER.error("Error retrieving TransferredResource", e);
+          LOGGER.error("Error retrieving AIP", e);
         }
       }
     } else if (selectedItems instanceof SelectedItemsFilter) {
@@ -909,6 +909,31 @@ public final class ModelUtils {
         List<IndexedAIP> aips = index.find(IndexedAIP.class, selectedItemsFilter.getFilter(), null,
           new Sublist(i, RodaConstants.DEFAULT_PAGINATION_VALUE), null).getResults();
         res.addAll(aips);
+      }
+    }
+    return res;
+  }
+
+  public static List<IndexedDIP> getIndexedDIPsFromObjectIds(SelectedItems<IndexedDIP> selectedItems)
+    throws GenericException, RequestNotValidException {
+    List<IndexedDIP> res = new ArrayList<>();
+    if (selectedItems instanceof SelectedItemsList) {
+      SelectedItemsList<IndexedDIP> list = (SelectedItemsList<IndexedDIP>) selectedItems;
+      for (String objectId : list.getIds()) {
+        try {
+          res.add(RodaCoreFactory.getIndexService().retrieve(IndexedDIP.class, objectId, new ArrayList<>()));
+        } catch (GenericException | NotFoundException e) {
+          LOGGER.error("Error retrieving DIP", e);
+        }
+      }
+    } else if (selectedItems instanceof SelectedItemsFilter) {
+      IndexService index = RodaCoreFactory.getIndexService();
+      SelectedItemsFilter<IndexedDIP> selectedItemsFilter = (SelectedItemsFilter<IndexedDIP>) selectedItems;
+      long count = index.count(IndexedDIP.class, selectedItemsFilter.getFilter());
+      for (int i = 0; i < count; i += RodaConstants.DEFAULT_PAGINATION_VALUE) {
+        List<IndexedDIP> dips = index.find(IndexedDIP.class, selectedItemsFilter.getFilter(), null,
+          new Sublist(i, RodaConstants.DEFAULT_PAGINATION_VALUE), null).getResults();
+        res.addAll(dips);
       }
     }
     return res;
