@@ -42,7 +42,7 @@ public class SeleniumUtils {
   private static String url;
   private static String driverPath; // "/path/to/chromedriver"
   private static Map<String, String> locations = new HashMap<>();
-  private static final String TABLE_CLASS = "org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableEvenRow";
+  private static final String TABLE_CLASS = "cellTableOddRow";
 
   private SeleniumUtils() {
     // do nothing
