@@ -166,13 +166,17 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
       LOGGER.debug("Moving AIP {} under {}", aip.getId(), destinationId);
 
       try {
-        Filter filter = new Filter();
-        filter.add(new SimpleFilterParameter(RodaConstants.INDEX_UUID, destinationId));
-        filter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aip.getId()));
-        IndexResult<IndexedAIP> result = index.find(IndexedAIP.class, filter, Sorter.NONE, new Sublist(0, 1),
-          Arrays.asList(RodaConstants.INDEX_UUID));
+        IndexResult<IndexedAIP> result = new IndexResult<>();
 
-        if (result.getResults().isEmpty()) {
+        if (destinationId != null) {
+          Filter filter = new Filter();
+          filter.add(new SimpleFilterParameter(RodaConstants.INDEX_UUID, destinationId));
+          filter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aip.getId()));
+          result = index.find(IndexedAIP.class, filter, Sorter.NONE, new Sublist(0, 1),
+            Arrays.asList(RodaConstants.INDEX_UUID));
+        }
+
+        if (destinationId == null || result.getResults().isEmpty()) {
           model.moveAIP(aip.getId(), destinationId);
           outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_MOVE_AIP_SUCCESS, aip.getId());
         } else {

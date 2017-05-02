@@ -1618,9 +1618,9 @@ public class SolrUtils {
     }
 
     final Date eventDateTime = objectToDate(doc.get(RodaConstants.PRESERVATION_EVENT_DATETIME));
-    final String eventDetail = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_DETAIL), null);
-    final String eventType = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_TYPE), null);
-    final String eventOutcome = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_OUTCOME), null);
+    final String eventDetail = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_DETAIL), "");
+    final String eventType = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_TYPE), "");
+    final String eventOutcome = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_OUTCOME), "");
 
     final List<String> agents = objectToListString(doc.get(RodaConstants.PRESERVATION_EVENT_LINKING_AGENT_IDENTIFIER));
     final List<String> outcomes = objectToListString(

@@ -80,7 +80,6 @@ public class PreservationEventList extends BasicAsyncTableCell<IndexedPreservati
     };
 
     eventTypeColumn = new TextColumn<IndexedPreservationEvent>() {
-
       @Override
       public String getValue(IndexedPreservationEvent event) {
         return event != null ? event.getEventType() : null;
@@ -88,7 +87,6 @@ public class PreservationEventList extends BasicAsyncTableCell<IndexedPreservati
     };
 
     eventDetailColumn = new TextColumn<IndexedPreservationEvent>() {
-
       @Override
       public String getValue(IndexedPreservationEvent event) {
         return event != null ? event.getEventDetail() : null;
@@ -128,7 +126,6 @@ public class PreservationEventList extends BasicAsyncTableCell<IndexedPreservati
 
     // default sorting
     display.getColumnSortList().push(new ColumnSortInfo(eventDateTimeColumn, false));
-
   }
 
   @Override

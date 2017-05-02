@@ -215,7 +215,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
     Filter filter = new Filter(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, aipId));
     SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle(), filter, justActive, false);
-    selectAipDialog.setEmptyParentButtonVisible(aip.getParentID() != null);
+    selectAipDialog.setEmptyParentButtonVisible(true);
     selectAipDialog.setSingleSelectionMode();
     selectAipDialog.showAndCenter();
     selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {

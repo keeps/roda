@@ -306,16 +306,19 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                       DIPFile f = model.createDIPFile(newRepresentationID, file.getPath(), newFileId,
                         directAccess.getPath().toFile().length(), payload, notify);
                       newDIPFiles.add(f);
-                    } else if (!newRepresentations.contains(newRepresentationID)) {
+                    } else {
                       // create a new representation if it does not exist
-                      LOGGER.debug("Creating a new representation {} on AIP {}", newRepresentationID, aip.getId());
-                      boolean original = false;
-                      newRepresentations.add(newRepresentationID);
-                      String newRepresentationType = representation.getType();
-                      model.createRepresentation(aip.getId(), newRepresentationID, original, newRepresentationType,
-                        notify);
-                      reportItem.setOutcomeObjectId(
-                        IdUtils.getRepresentationId(representation.getAipId(), newRepresentationID));
+                      if (!newRepresentations.contains(newRepresentationID)) {
+                        LOGGER.debug("Creating a new representation {} on AIP {}", newRepresentationID, aip.getId());
+                        boolean original = false;
+                        newRepresentations.add(newRepresentationID);
+                        String newRepresentationType = representation.getType();
+                        model.createRepresentation(aip.getId(), newRepresentationID, original, newRepresentationType,
+                          notify);
+                        reportItem.setOutcomeObjectId(
+                          IdUtils.getRepresentationId(representation.getAipId(), newRepresentationID));
+                      }
+
                       File f = model.createFile(aip.getId(), newRepresentationID, file.getPath(), newFileId, payload,
                         notify);
                       newFiles.add(f);
@@ -684,8 +687,12 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
               } else {
                 // INFO will be a parameter
                 String newRepresentationType = RodaConstants.REPRESENTATION_TYPE_MIXED;
-                model.createRepresentation(file.getAipId(), newRepresentationID, original, newRepresentationType,
-                  model.getStorage(), storagePath);
+                Representation newRep = model.createRepresentation(file.getAipId(), newRepresentationID, original,
+                  newRepresentationType, model.getStorage(), storagePath);
+                StoragePath metadataPath = ModelUtils.getRepresentationMetadataStoragePath(newRep.getAipId(),
+                  newRep.getId());
+                storage.deleteResource(metadataPath);
+                storage.createDirectory(metadataPath);
               }
 
               // update file on new representation
@@ -831,7 +838,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
         filePronom, fileMimetype, applicableTo, convertableTo, pronomToExtension, mimetypeToExtension);
     }
 
-    boolean format = getInputFormat().isEmpty() || lowerCaseFileFormat.equalsIgnoreCase(getInputFormat());
+    boolean format = getInputFormat().isEmpty() || getInputFormat().equalsIgnoreCase(lowerCaseFileFormat);
     boolean applicable = applicableTo.isEmpty() || (filePronom != null && pronomToExtension.containsKey(filePronom))
       || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype))
       || (applicableTo.contains(lowerCaseFileFormat));
