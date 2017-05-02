@@ -31,4 +31,5 @@ do :
 	cp -v -f  "$i" "$PLUGIN_FOLDER"
 done
 
+mkdir -p "${PLUGINS_DST_DIR}shared"
 mv -v "${PLUGINS_DST_DIR}roda-plugin-common-"* "${PLUGINS_DST_DIR}shared"
