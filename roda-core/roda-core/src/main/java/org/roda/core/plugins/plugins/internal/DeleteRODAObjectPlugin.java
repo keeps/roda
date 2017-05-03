@@ -11,12 +11,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.Messages;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -63,6 +60,7 @@ import org.slf4j.LoggerFactory;
 
 public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
   private static final Logger LOGGER = LoggerFactory.getLogger(DeleteRODAObjectPlugin.class);
+  private static final String EVENT_DESCRIPTION = "The process of deleting an object of the repository";
   private String details = null;
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
@@ -137,21 +135,9 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
 
   private void processAIP(IndexService index, ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo,
     Job job, AIP aip) {
-    Locale locale = PluginHelper.parseLocale(RodaConstants.DEFAULT_EVENT_LOCALE);
-    Messages messages = RodaCoreFactory.getI18NMessages(locale);
     PluginState state = PluginState.SUCCESS;
-
-    final String eventDescription = messages.getTranslation(RodaConstants.EVENT_DELETE_ON_REPOSITORY);
     Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
     final List<String> aipsDeleted = new ArrayList<>();
-
-    try {
-      model.deleteAIP(aip.getId());
-      aipsDeleted.add(aip.getId());
-    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
-      state = PluginState.FAILURE;
-      reportItem.addPluginDetails("Could not delete AIP: " + e.getMessage());
-    }
 
     try {
       Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aip.getId()));
@@ -168,9 +154,15 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
             reportItem.addPluginDetails("Could not delete AIP: " + e.getMessage());
           }
 
-          String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_DELETE_AIP_SUCCESS, aip.getId());
-          model.createRepositoryEvent(PreservationEventType.DELETION, eventDescription, state, outcomeText, details,
-            job.getUsername(), true);
+          String outcomeText;
+          if (state.equals(PluginState.SUCCESS)) {
+            outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has been manually deleted");
+          } else {
+            outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has not been manually deleted");
+          }
+
+          model.createRepositoryEvent(PreservationEventType.DELETION, EVENT_DESCRIPTION, state, outcomeText,
+            details, job.getUsername(), true);
         }
       });
     } catch (GenericException | RequestNotValidException | AuthorizationDeniedException e) {
@@ -192,18 +184,33 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
     jobPluginInfo.incrementObjectsProcessed(state);
 
-    String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_DELETE_AIP_SUCCESS, aip.getId());
-    model.createRepositoryEvent(PreservationEventType.DELETION, eventDescription, state, outcomeText, details,
+    String outcomeText = "";
+
+    try {
+      IndexedAIP item = index.retrieve(IndexedAIP.class, aip.getId(),
+        Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_TITLE));
+
+      if (state.equals(PluginState.SUCCESS)) {
+        outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has been manually deleted");
+      } else {
+        outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has not been manually deleted");
+      }
+
+      model.deleteAIP(aip.getId());
+      aipsDeleted.add(aip.getId());
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      state = PluginState.FAILURE;
+      reportItem.addPluginDetails("Could not delete AIP: " + e.getMessage());
+      outcomeText = "Archival Information Package [id: " + aip.getId() + "] has not been manually deleted";
+    }
+
+    model.createRepositoryEvent(PreservationEventType.DELETION, EVENT_DESCRIPTION, state, outcomeText, details,
       job.getUsername(), true);
   }
 
   private void processFile(IndexService index, ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo,
     Job job, File file) {
-    Locale locale = PluginHelper.parseLocale(RodaConstants.DEFAULT_EVENT_LOCALE);
-    Messages messages = RodaCoreFactory.getI18NMessages(locale);
     PluginState state = PluginState.SUCCESS;
-
-    final String eventDescription = messages.getTranslation(RodaConstants.EVENT_DELETE_ON_REPOSITORY);
     Report reportItem = PluginHelper.initPluginReportItem(this, file.getId(), File.class);
 
     try {
@@ -231,23 +238,24 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
     jobPluginInfo.incrementObjectsProcessed(state);
 
-    String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_DELETE_FILE_SUCCESS, file.getId());
+    String outcomeText;
+    if (state.equals(PluginState.SUCCESS)) {
+      outcomeText = "The file '" + file.getId() + "' has been manually deleted.";
+    } else {
+      outcomeText = "The file '" + file.getId() + "' has not been manually deleted.";
+    }
 
     List<LinkingIdentifier> sources = new ArrayList<>();
     sources.add(PluginHelper.getLinkingIdentifier(file.getAipId(), file.getRepresentationId(),
       RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
-    model.createRepositoryEvent(PreservationEventType.DELETION, eventDescription, sources, null, state, outcomeText,
-      details, job.getUsername(), true);
+    model.createRepositoryEvent(PreservationEventType.DELETION, EVENT_DESCRIPTION, sources, null, state,
+      outcomeText, details, job.getUsername(), true);
   }
 
   private void processRepresentation(IndexService index, ModelService model, Report report,
     SimpleJobPluginInfo jobPluginInfo, Job job, Representation representation) {
-    Locale locale = PluginHelper.parseLocale(RodaConstants.DEFAULT_EVENT_LOCALE);
-    Messages messages = RodaCoreFactory.getI18NMessages(locale);
     PluginState state = PluginState.SUCCESS;
-
-    final String eventDescription = messages.getTranslation(RodaConstants.EVENT_DELETE_ON_REPOSITORY);
     Report reportItem = PluginHelper.initPluginReportItem(this, representation.getId(), Representation.class);
 
     try {
@@ -272,14 +280,18 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
     jobPluginInfo.incrementObjectsProcessed(state);
 
-    String outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_DELETE_REPRESENTATION_SUCCESS,
-      representation.getId());
+    String outcomeText;
+    if (state.equals(PluginState.SUCCESS)) {
+      outcomeText = "The representation '" + representation.getId() + "' has been manually deleted.";
+    } else {
+      outcomeText = "The representation '" + representation.getId() + "' has not been manually deleted.";
+    }
 
     List<LinkingIdentifier> sources = new ArrayList<>();
     sources.add(
       PluginHelper.getLinkingIdentifier(representation.getAipId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
-    model.createRepositoryEvent(PreservationEventType.DELETION, eventDescription, sources, null, state, outcomeText,
-      details, job.getUsername(), true);
+    model.createRepositoryEvent(PreservationEventType.DELETION, EVENT_DESCRIPTION, sources, null, state,
+      outcomeText, details, job.getUsername(), true);
   }
 
   private void processRisk(IndexService index, ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo,

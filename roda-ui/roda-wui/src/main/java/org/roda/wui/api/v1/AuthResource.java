@@ -107,14 +107,14 @@ public class AuthResource {
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_JAVASCRIPT})
   @ApiOperation(value = "POST call to login", notes = "POST call to login", response = User.class)
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = User.class),
-    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class),
-    @ApiResponse(code = 401, message = "Not authorized", response = ApiResponseMessage.class)})
+    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
   public Response loginPost(
     @ApiParam(value = "Choose format in which to get the User", allowableValues = RodaConstants.API_LIST_MEDIA_TYPES_2, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
     @ApiParam(value = "JSONP callback name", required = false, allowMultiple = false, defaultValue = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK) @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
     throws RODAException {
-    return loginGet(acceptFormat, jsonpCallbackName);
+    String mediaType = ApiUtils.getMediaType(acceptFormat, request);
+    return Response.ok(UserUtility.getApiUser(request), mediaType).build();
   }
 
 }

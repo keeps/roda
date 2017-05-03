@@ -10,6 +10,7 @@ package org.roda.core.plugins.plugins;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -17,7 +18,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -1218,22 +1218,28 @@ public final class PluginHelper {
     return finalObjects;
   }
 
-  public static Locale parseLocale(String localeString) {
-    Locale locale = null;
-    if (StringUtils.isNotBlank(localeString)) {
-      String[] localeArgs = localeString.split("_");
+  public static String createOutcomeTextForAIP(IndexedAIP item, String actionMessage) {
+    SimpleDateFormat format = new SimpleDateFormat(RodaConstants.SIMPLE_DATE_FORMATTER);
+    StringBuilder outcomeText = new StringBuilder("Archival Information Package [id: ").append(item.getId());
 
-      if (localeArgs.length == 1) {
-        locale = new Locale(localeArgs[0]);
-      } else if (localeArgs.length == 2) {
-        locale = new Locale(localeArgs[0], localeArgs[1]);
-      } else if (localeArgs.length == 3) {
-        locale = new Locale(localeArgs[0], localeArgs[1], localeArgs[2]);
-      }
-    } else {
-      locale = Locale.ENGLISH;
+    if (StringUtils.isNotBlank(item.getTitle())) {
+      outcomeText.append("; title: ").append(item.getTitle());
     }
 
-    return locale;
+    if (StringUtils.isNotBlank(item.getLevel())) {
+      outcomeText.append("; level: ").append(item.getLevel());
+    }
+
+    if (item.getDateInitial() != null) {
+      outcomeText.append("; initial date: ").append(format.format(item.getDateInitial()));
+    }
+
+    if (item.getDateFinal() != null) {
+      outcomeText.append("; end date: ").append(format.format(item.getDateFinal()));
+    }
+
+    outcomeText.append("] ").append(actionMessage);
+    return outcomeText.toString();
   }
+
 }

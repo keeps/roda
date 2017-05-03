@@ -16,12 +16,15 @@ import com.google.gwt.i18n.client.NumberFormat;
 import config.i18n.client.ClientMessages;
 
 public class Humanize {
-
-  private Humanize() {
-
-  }
-
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
+
+  public static final long ONE_SECOND = 1000;
+  public static final long SECONDS = 60;
+  public static final long ONE_MINUTE = ONE_SECOND * 60;
+  public static final long MINUTES = 60;
+  public static final long ONE_HOUR = ONE_MINUTE * 60;
+  public static final long HOURS = 24;
+  public static final long ONE_DAY = ONE_HOUR * 24;
 
   public static final String BYTES = "B";
   public static final String KILOBYTES = "KB";
@@ -48,51 +51,52 @@ public class Humanize {
   public static final DateTimeFormat DATE_TIME_FORMAT = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss");
   public static final DateTimeFormat DATE_TIME_MS_FORMAT = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
+  private Humanize() {
+    // do nothing
+  }
+
   public static Long parseFileSize(String size, String unit) {
-    Long ret = null;
     if (size != null && !size.isEmpty()) {
       String trimmedSize = size.trim();
       if (unit.equals(PETABYTES)) {
-        ret = Math.round(Double.parseDouble(trimmedSize) * BYTES_IN_PETABYTES);
+        return Math.round(Double.parseDouble(trimmedSize) * BYTES_IN_PETABYTES);
       } else if (unit.equals(TERABYTES)) {
-        ret = Math.round(Double.parseDouble(trimmedSize) * BYTES_IN_TERABYTES);
+        return Math.round(Double.parseDouble(trimmedSize) * BYTES_IN_TERABYTES);
       } else if (unit.equals(GIGABYTES)) {
-        ret = Math.round(Double.parseDouble(trimmedSize) * BYTES_IN_GIGABYTES);
+        return Math.round(Double.parseDouble(trimmedSize) * BYTES_IN_GIGABYTES);
       } else if (unit.equals(MEGABYTES)) {
-        ret = Math.round(Double.parseDouble(trimmedSize) * BYTES_IN_MEGABYTES);
+        return Math.round(Double.parseDouble(trimmedSize) * BYTES_IN_MEGABYTES);
       } else if (unit.equals(KILOBYTES)) {
-        ret = Math.round(Double.parseDouble(trimmedSize) * BYTES_IN_KILOBYTES);
+        return Math.round(Double.parseDouble(trimmedSize) * BYTES_IN_KILOBYTES);
       } else if (unit.equals(BYTES)) {
-        ret = Long.parseLong(trimmedSize);
+        return Long.parseLong(trimmedSize);
       } else {
         throw new IllegalArgumentException(trimmedSize);
       }
     }
-    return ret;
+
+    return null;
   }
 
   public static String readableFileSize(long size) {
     if (size <= 0) {
       return "0 B";
     }
+
     int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
     return NumberFormat.getFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + UNITS[digitGroups];
   }
 
   public static String getDatesText(Date dateInitial, Date dateFinal, boolean extendedDate) {
-    String ret;
-
     if (dateInitial == null && dateFinal == null) {
-      ret = extendedDate ? messages.titleDatesEmpty() : messages.simpleDatesEmpty();
+      return extendedDate ? messages.titleDatesEmpty() : messages.simpleDatesEmpty();
     } else if (dateInitial != null && dateFinal == null) {
-      ret = extendedDate ? messages.titleDatesNoFinal(dateInitial) : messages.simpleDatesNoFinal(dateInitial);
+      return extendedDate ? messages.titleDatesNoFinal(dateInitial) : messages.simpleDatesNoFinal(dateInitial);
     } else if (dateInitial == null) {
-      ret = extendedDate ? messages.titleDatesNoInitial(dateFinal) : messages.simpleDatesNoInitial(dateFinal);
+      return extendedDate ? messages.titleDatesNoInitial(dateFinal) : messages.simpleDatesNoInitial(dateFinal);
     } else {
-      ret = extendedDate ? messages.titleDates(dateInitial, dateFinal) : messages.simpleDates(dateInitial, dateFinal);
+      return extendedDate ? messages.titleDates(dateInitial, dateFinal) : messages.simpleDates(dateInitial, dateFinal);
     }
-
-    return ret;
   }
 
   public enum DHMSFormat {
@@ -104,17 +108,6 @@ public class Humanize {
     long duration = endDate.getTime() - start.getTime();
     return DHMSFormat.LONG.equals(format) ? durationMillisToLongDHMS(duration) : durationMillisToShortDHMS(duration);
   }
-
-  public final static long ONE_SECOND = 1000;
-  public final static long SECONDS = 60;
-
-  public final static long ONE_MINUTE = ONE_SECOND * 60;
-  public final static long MINUTES = 60;
-
-  public final static long ONE_HOUR = ONE_MINUTE * 60;
-  public final static long HOURS = 24;
-
-  public final static long ONE_DAY = ONE_HOUR * 24;
 
   /**
    * converts time (in milliseconds) to human-readable format "<dd:>hh:mm:ss"
@@ -130,21 +123,17 @@ public class Humanize {
     int hours = (int) (d % HOURS);
     int days = (int) (d / HOURS);
 
-    String ret;
-
     if (days > 0) {
-      ret = messages.durationDHMSShortDays(days, hours, minutes, seconds);
+      return messages.durationDHMSShortDays(days, hours, minutes, seconds);
     } else if (hours > 0) {
-      ret = messages.durationDHMSShortHours(hours, minutes, seconds);
+      return messages.durationDHMSShortHours(hours, minutes, seconds);
     } else if (minutes > 0) {
-      ret = messages.durationDHMSShortMinutes(minutes, seconds);
+      return messages.durationDHMSShortMinutes(minutes, seconds);
     } else if (seconds > 0) {
-      ret = messages.durationDHMSShortSeconds(seconds);
+      return messages.durationDHMSShortSeconds(seconds);
     } else {
-      ret = messages.durationDHMSShortMillis(millis);
+      return messages.durationDHMSShortMillis(millis);
     }
-
-    return ret;
   }
 
   /**
@@ -161,20 +150,15 @@ public class Humanize {
     int hours = (int) (d % HOURS);
     int days = (int) (d / HOURS);
 
-    String ret;
-
     if (days > 0) {
-      ret = messages.durationDHMSLongDays(days, hours, minutes, seconds);
+      return messages.durationDHMSLongDays(days, hours, minutes, seconds);
     } else if (hours > 0) {
-      ret = messages.durationDHMSLongHours(hours, minutes, seconds);
+      return messages.durationDHMSLongHours(hours, minutes, seconds);
     } else if (minutes > 0) {
-      ret = messages.durationDHMSLongMinutes(minutes, seconds);
+      return messages.durationDHMSLongMinutes(minutes, seconds);
     } else {
-      ret = messages.durationDHMSLongSeconds(seconds);
+      return messages.durationDHMSLongSeconds(seconds);
     }
-
-    return ret;
-
   }
 
   /**
@@ -185,8 +169,6 @@ public class Humanize {
    * @return a formatted string for time duration
    */
   public static String formatValueMilliseconds(long value, boolean showMillis) {
-    String ret;
-
     long hours = value / 3600000;
     long minutes = (value % 3600000) / 60000;
     long seconds = ((value % 3600000) % 60000) / 1000;
@@ -196,13 +178,11 @@ public class Humanize {
     NumberFormat millisFormat = NumberFormat.getFormat("000");
 
     if (showMillis) {
-      ret = numberFormat.format(hours) + ":" + numberFormat.format(minutes) + ":" + numberFormat.format(seconds) + "."
+      return numberFormat.format(hours) + ":" + numberFormat.format(minutes) + ":" + numberFormat.format(seconds) + "."
         + millisFormat.format(millis);
     } else {
-      ret = numberFormat.format(hours) + ":" + numberFormat.format(minutes) + ":" + numberFormat.format(seconds);
+      return numberFormat.format(hours) + ":" + numberFormat.format(minutes) + ":" + numberFormat.format(seconds);
     }
-
-    return ret;
   }
 
   public static String formatDate(Date date) {

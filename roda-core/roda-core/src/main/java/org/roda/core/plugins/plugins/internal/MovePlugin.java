@@ -11,13 +11,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.Messages;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -62,10 +60,10 @@ import org.slf4j.LoggerFactory;
 
 public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
   private static final Logger LOGGER = LoggerFactory.getLogger(MovePlugin.class);
+  private static final String EVENT_DESCRIPTION = "The process of updating an object of the repository";
 
   private String destinationId = null;
   private String details = null;
-  private String eventDescription = null;
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
@@ -74,10 +72,6 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, new PluginParameter(RodaConstants.PLUGIN_PARAMS_DETAILS,
       "Event details", PluginParameterType.STRING, "", false, false, "Details that will be used when creating event"));
-
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_EVENT_DESCRIPTION,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_EVENT_DESCRIPTION, "Event description",
-        PluginParameterType.STRING, "", false, false, "Description that will be used when creating event"));
   }
 
   @Override
@@ -109,7 +103,6 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
   public List<PluginParameter> getParameters() {
     ArrayList<PluginParameter> parameters = new ArrayList<>();
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_ID));
-    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_EVENT_DESCRIPTION));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DETAILS));
     return parameters;
   }
@@ -123,10 +116,6 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
 
     if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_DETAILS)) {
       details = parameters.get(RodaConstants.PLUGIN_PARAMS_DETAILS);
-    }
-
-    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_EVENT_DESCRIPTION)) {
-      eventDescription = parameters.get(RodaConstants.PLUGIN_PARAMS_EVENT_DESCRIPTION);
     }
   }
 
@@ -157,10 +146,7 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
 
   private void processAIP(ModelService model, IndexService index, Report report, SimpleJobPluginInfo jobPluginInfo,
     Job job, AIP aip) {
-    Locale locale = PluginHelper.parseLocale(RodaConstants.DEFAULT_EVENT_LOCALE);
-    Messages messages = RodaCoreFactory.getI18NMessages(locale);
     PluginState state = PluginState.SUCCESS;
-    String outcomeText = "";
 
     if (!aip.getId().equals(destinationId)) {
       LOGGER.debug("Moving AIP {} under {}", aip.getId(), destinationId);
@@ -178,14 +164,12 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
 
         if (destinationId == null || result.getResults().isEmpty()) {
           model.moveAIP(aip.getId(), destinationId);
-          outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_MOVE_AIP_SUCCESS, aip.getId());
         } else {
           state = PluginState.FAILURE;
           Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
           reportItem.addPluginDetails("Could not move AIP because the destination is a sublevel").setPluginState(state);
           report.addReport(reportItem);
           PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
-          outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_MOVE_AIP_FAILURE, aip.getId());
         }
       } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
         state = PluginState.FAILURE;
@@ -193,21 +177,37 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
         reportItem.addPluginDetails("Could not move AIP: " + e.getMessage()).setPluginState(state);
         report.addReport(reportItem);
         PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
-        outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_MOVE_AIP_FAILURE, aip.getId());
+      }
+    }
+
+    String outcomeText = "";
+
+    try {
+      IndexedAIP item = index.retrieve(IndexedAIP.class, aip.getId(),
+        Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_TITLE));
+
+      if (state.equals(PluginState.SUCCESS)) {
+        outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has been manually moved");
+      } else {
+        outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has not been manually moved");
+      }
+    } catch (NotFoundException | GenericException e1) {
+      if (state.equals(PluginState.SUCCESS)) {
+        outcomeText = "Archival Information Package [id: " + aip.getId() + "] has been manually moved";
+      } else {
+        outcomeText = "Archival Information Package [id: " + aip.getId() + "] has not been manually moved";
       }
     }
 
     jobPluginInfo.incrementObjectsProcessed(state);
-    model.createUpdateAIPEvent(aip.getId(), null, null, null, PreservationEventType.UPDATE, eventDescription, state,
+    model.createUpdateAIPEvent(aip.getId(), null, null, null, PreservationEventType.UPDATE, EVENT_DESCRIPTION, state,
       outcomeText, details, job.getUsername(), true);
   }
 
   private void processFile(IndexService index, ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo,
     Job job, File file) {
-    Locale locale = PluginHelper.parseLocale(RodaConstants.DEFAULT_EVENT_LOCALE);
-    Messages messages = RodaCoreFactory.getI18NMessages(locale);
     PluginState state = PluginState.SUCCESS;
-    String outcomeText = "";
+    StringBuilder outcomeText = new StringBuilder();
 
     try {
       String toAIP;
@@ -234,8 +234,10 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
       }
 
       File movedFile = model.moveFile(file, toAIP, toRepresentation, toPath, file.getId(), true, true);
-      outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_MOVE_FILE_SUCCESS,
-        ModelUtils.getFileStoragePath(file).toString(), ModelUtils.getFileStoragePath(movedFile).toString());
+      outcomeText.append("The file '").append(ModelUtils.getFileStoragePath(file).toString())
+        .append("' has been manually moved to '").append(ModelUtils.getFileStoragePath(movedFile).toString())
+        .append("'");
+
     } catch (GenericException | AlreadyExistsException | NotFoundException | RequestNotValidException
       | AuthorizationDeniedException e) {
       state = PluginState.FAILURE;
@@ -244,13 +246,13 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
       report.addReport(reportItem);
       PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
 
-      outcomeText = messages.getTranslationWithArgs(RodaConstants.EVENT_MOVE_FILE_FAILURE, file.getId(),
-        e.getClass().getSimpleName(), e.getMessage());
+      outcomeText.append("The file '").append(file.getId()).append("' has not been manually moved: [")
+        .append(e.getClass().getSimpleName()).append("] ").append(e.getMessage());
     }
 
     jobPluginInfo.incrementObjectsProcessed(state);
     model.createUpdateAIPEvent(file.getAipId(), file.getRepresentationId(), null, null, PreservationEventType.UPDATE,
-      eventDescription, state, outcomeText, details, job.getUsername(), true);
+      EVENT_DESCRIPTION, state, outcomeText.toString(), details, job.getUsername(), true);
   }
 
   private void processTransferredResource(SimpleJobPluginInfo jobPluginInfo, List<TransferredResource> resources) {

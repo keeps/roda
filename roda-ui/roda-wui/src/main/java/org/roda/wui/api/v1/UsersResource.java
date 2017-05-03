@@ -74,7 +74,6 @@ public class UsersResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-
     boolean isUser = true;
     boolean justActive = false;
     Filter filter = new Filter();

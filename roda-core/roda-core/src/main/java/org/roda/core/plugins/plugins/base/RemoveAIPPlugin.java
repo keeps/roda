@@ -19,6 +19,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -71,19 +72,22 @@ public class RemoveAIPPlugin extends AbstractPlugin<AIP> {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
         SimpleJobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {
-        processAIP(model, report, jobPluginInfo, cachedJob, object);
+        processAIP(model, index, report, jobPluginInfo, cachedJob, object);
       }
     }, index, model, storage, liteList);
   }
 
-  private void processAIP(ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo, Job job, AIP aip) {
+  private void processAIP(ModelService model, IndexService index, Report report, SimpleJobPluginInfo jobPluginInfo,
+    Job job, AIP aip) {
     Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
 
     try {
       LOGGER.debug("Removing AIP {}", aip.getId());
+      IndexedAIP iAIP = index.retrieve(IndexedAIP.class, aip.getId(),
+        Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_TITLE));
       model.deleteAIP(aip.getId());
-      reportItem.setPluginState(PluginState.SUCCESS)
-        .setPluginDetails("Removal of AIP " + aip.getId() + " ended successfully");
+      reportItem.setPluginState(PluginState.SUCCESS).setPluginDetails("Removal of AIP " + aip.getId() + " (title: "
+        + iAIP.getTitle() + "; level: " + iAIP.getLevel() + ") ended successfully");
       jobPluginInfo.incrementObjectsProcessedWithSuccess();
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       reportItem.setPluginState(PluginState.FAILURE)
