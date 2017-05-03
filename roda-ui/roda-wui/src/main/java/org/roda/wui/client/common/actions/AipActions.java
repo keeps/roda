@@ -269,7 +269,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   private void move(final SelectedItems<IndexedAIP> selected, final AsyncCallback<ActionImpact> callback) {
     int counter = 0;
     boolean justActive = parentAipState != null ? AIPState.ACTIVE.equals(parentAipState) : true;
-    Filter filter = Filter.ALL;
+    Filter filter = new Filter();
 
     if (selected instanceof SelectedItemsList) {
       SelectedItemsList<IndexedAIP> list = (SelectedItemsList<IndexedAIP>) selected;

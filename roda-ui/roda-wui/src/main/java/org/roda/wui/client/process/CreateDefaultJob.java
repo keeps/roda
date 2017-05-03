@@ -286,8 +286,6 @@ public class CreateDefaultJob extends Composite {
             }
           }
 
-        } else {
-          GWT.log("Got a null plugin");
         }
       }
 

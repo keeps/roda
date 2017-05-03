@@ -297,10 +297,6 @@ public class UserLogin {
 
       @Override
       public void onSuccess(final String role) {
-        if (role == null) {
-          GWT.log("Could not find role for path " + res.getHistoryPath());
-        }
-
         getAuthenticatedUser(new AsyncCallback<User>() {
 
           @Override
@@ -312,9 +308,7 @@ public class UserLogin {
           public void onSuccess(User authUser) {
             callback.onSuccess(authUser.hasRole(role));
           }
-
         });
-
       }
 
     });

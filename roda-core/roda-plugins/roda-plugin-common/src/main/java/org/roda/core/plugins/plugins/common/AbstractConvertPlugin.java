@@ -687,12 +687,8 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
               } else {
                 // INFO will be a parameter
                 String newRepresentationType = RodaConstants.REPRESENTATION_TYPE_MIXED;
-                Representation newRep = model.createRepresentation(file.getAipId(), newRepresentationID, original,
-                  newRepresentationType, model.getStorage(), storagePath);
-                StoragePath metadataPath = ModelUtils.getRepresentationMetadataStoragePath(newRep.getAipId(),
-                  newRep.getId());
-                storage.deleteResource(metadataPath);
-                storage.createDirectory(metadataPath);
+                model.createRepresentation(file.getAipId(), newRepresentationID, original, newRepresentationType,
+                  model.getStorage(), storagePath, true);
               }
 
               // update file on new representation

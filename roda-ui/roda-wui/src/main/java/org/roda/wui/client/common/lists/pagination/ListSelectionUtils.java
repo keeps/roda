@@ -73,7 +73,7 @@ public class ListSelectionUtils {
             ListSelectionState<T> state = ListSelectionStateMappers.getObject(className, entry.getValue());
             clipboard.put(className, state);
           } catch (JsonDeserializationException e) {
-            GWT.log("Could not load selection state of class: " + className, e);
+            // do nothing
           }
         }
       }
@@ -185,8 +185,6 @@ public class ListSelectionUtils {
         };
 
         openRelative(last, relativeIndex, callback, processor);
-      } else {
-        GWT.log("Trying to jump with an incoherent state");
       }
     }
   }

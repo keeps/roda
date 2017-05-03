@@ -248,7 +248,6 @@ public class BrowseDIP extends Composite {
     boolean requireAltModifier = false;
 
     if (aip != null && representation != null && file != null) {
-      GWT.log("TESTE1");
       refererTitle.setText(file.isDirectory() ? messages.catalogueFolderTitle() : messages.catalogueFileTitle());
       refererBreadcrumb.updatePath(BreadcrumbUtils.getFileBreadcrumbs(aip, representation, file));
       refererBreadcrumb.setVisible(true);

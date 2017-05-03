@@ -318,8 +318,6 @@ public class PluginParameterPanel extends Composite {
                 }
               }
             });
-          } else {
-            GWT.log("Got a null plugin");
           }
         }
 

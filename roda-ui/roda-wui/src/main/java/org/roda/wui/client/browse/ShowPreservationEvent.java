@@ -113,10 +113,12 @@ public class ShowPreservationEvent extends Composite {
       UserLogin.getInstance().checkRoles(new HistoryResolver[] {BrowseAIP.RESOLVER}, false, callback);
     }
 
+    @Override
     public List<String> getHistoryPath() {
       return ListUtils.concat(PreservationEvents.BROWSE_RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
+    @Override
     public String getHistoryToken() {
       return "event";
     }
@@ -335,8 +337,6 @@ public class ShowPreservationEvent extends Composite {
         addRepresentationPanel(bundle, layout, idValue);
       } else if (type == RODA_TYPE.AIP) {
         addAipPanel(bundle, layout, idValue);
-      } else {
-        GWT.log("RODA type is not supported");
       }
 
       objectsPanel.add(layout);

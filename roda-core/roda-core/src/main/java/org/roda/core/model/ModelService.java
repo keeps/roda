@@ -860,15 +860,21 @@ public class ModelService extends ModelObservable {
   }
 
   public Representation createRepresentation(String aipId, String representationId, boolean original, String type,
-    StorageService sourceStorage, StoragePath sourcePath) throws RequestNotValidException, GenericException,
-    NotFoundException, AuthorizationDeniedException, AlreadyExistsException, ValidationException {
+    StorageService sourceStorage, StoragePath sourcePath, boolean justData) throws RequestNotValidException,
+    GenericException, NotFoundException, AuthorizationDeniedException, AlreadyExistsException, ValidationException {
     Representation representation;
 
-    StoragePath directoryPath = ModelUtils.getRepresentationStoragePath(aipId, representationId);
+    if (justData) {
+      StoragePath metadataPath = ModelUtils.getRepresentationDataStoragePath(aipId, representationId);
+      StoragePath sourceMetadataPath = DefaultStoragePath.parse(sourcePath, RodaConstants.STORAGE_DIRECTORY_DATA);
+      storage.copy(sourceStorage, sourceMetadataPath, metadataPath);
+    } else {
+      StoragePath directoryPath = ModelUtils.getRepresentationStoragePath(aipId, representationId);
 
-    // verify structure of source representation
-    // 20170324 should we validate the representation???
-    storage.copy(sourceStorage, sourcePath, directoryPath);
+      // verify structure of source representation
+      // 20170324 should we validate the representation???
+      storage.copy(sourceStorage, sourcePath, directoryPath);
+    }
 
     representation = new Representation(representationId, aipId, original, type);
 

@@ -715,7 +715,7 @@ public class ModelServiceTest {
 
     Representation createdRepresentation = model.createRepresentation(aipId, newRepresentationId,
       CorporaConstants.REPRESENTATION_1_ORIGINAL, CorporaConstants.REPRESENTATION_1_TYPE, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.OTHER_REPRESENTATION_STORAGEPATH));
+      DefaultStoragePath.parse(CorporaConstants.OTHER_REPRESENTATION_STORAGEPATH), false);
 
     // check if it is connected
     Representation retrievedRepresentation = model.retrieveRepresentation(aipId, newRepresentationId);

@@ -292,8 +292,6 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
             }
           }
 
-        } else {
-          GWT.log("Got a null plugin");
         }
       }
 

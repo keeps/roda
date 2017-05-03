@@ -70,7 +70,6 @@ public class CreateDescriptiveMetadata extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      GWT.log(historyTokens.toString());
       boolean isAIP = historyTokens.get(0).equals(RodaConstants.RODA_OBJECT_AIP);
 
       if ((isAIP && (historyTokens.size() == 2 || historyTokens.size() == 3))

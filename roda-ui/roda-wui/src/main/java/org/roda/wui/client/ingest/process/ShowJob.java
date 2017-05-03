@@ -357,7 +357,6 @@ public class ShowJob extends Composite {
         } else if (PluginParameterType.AIP_ID.equals(parameter.getType())) {
           createSelectAipLayout(parameter);
         } else {
-          GWT.log("Plugin parameter type not supported. It will be used 'STRING' as default");
           createStringLayout(parameter);
         }
       }
@@ -718,7 +717,6 @@ public class ShowJob extends Composite {
         pluginValue.setValue(true);
         pluginValue.setEnabled(false);
         pluginOptions.add(pluginValue);
-        GWT.log("Plugin not found: " + value);
       }
 
       pluginLabel.addStyleName("label");

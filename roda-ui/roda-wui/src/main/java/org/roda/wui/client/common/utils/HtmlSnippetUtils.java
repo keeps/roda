@@ -156,9 +156,7 @@ public class HtmlSnippetUtils {
   }
 
   public static SafeHtml getNotificationStateHTML(NOTIFICATION_STATE state) {
-    GWT.log("STATE1: " + state);
     String label = messages.notificationStateValue(state);
-    GWT.log("STATE2: " + label);
     return getNotificationStateHTML(state, label);
   }
 

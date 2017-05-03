@@ -52,7 +52,6 @@ public class ShowPreservationAgent extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      GWT.log(historyTokens.toString());
       if (historyTokens.size() == 1) {
         final String agentId = historyTokens.get(0);
         ShowPreservationAgent preservationAgents = new ShowPreservationAgent(agentId);

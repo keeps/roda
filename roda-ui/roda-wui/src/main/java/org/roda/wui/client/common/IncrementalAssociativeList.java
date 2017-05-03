@@ -188,7 +188,7 @@ public class IncrementalAssociativeList extends Composite implements HasHandlers
           dialog.addValueChangeHandler(changeHandler);
 
         } catch (NotFoundException e) {
-          GWT.log(actualClass.getSimpleName() + " dialog not found: " + e);
+          // do nothing
         }
 
       }

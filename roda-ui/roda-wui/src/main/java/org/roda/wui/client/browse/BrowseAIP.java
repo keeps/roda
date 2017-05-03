@@ -476,7 +476,6 @@ public class BrowseAIP extends Composite {
     if (caught instanceof NotFoundException) {
       title = messages.notFoundErrorTitle();
       message = messages.notFoundErrorMessage(aipId);
-      GWT.log(messages.notFoundError(), caught);
     } else {
       title = messages.genericErrorTitle();
       message = messages.genericErrorMessage(caught.getMessage());
