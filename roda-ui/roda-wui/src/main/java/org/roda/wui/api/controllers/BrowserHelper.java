@@ -555,7 +555,7 @@ public class BrowserHelper {
     final Sorter sorter, final Sublist sublist, final Facets facets, final User user, final boolean justActive,
     List<String> fieldsToReturn) {
     return RodaCoreFactory.getIndexService().findAll(returnClass, filter, sorter, sublist, facets, user, justActive,
-      true, fieldsToReturn);
+      fieldsToReturn);
   }
 
   protected static <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter, boolean justActive, User user)

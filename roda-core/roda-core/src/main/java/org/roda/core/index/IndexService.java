@@ -149,44 +149,33 @@ public class IndexService {
 
   public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
     final List<String> fieldsToReturn) {
-    return findAll(returnClass, filter, new Sorter(new SortParameter(RodaConstants.INDEX_UUID, true)), true,
-      fieldsToReturn);
-  }
-
-  public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
-    final boolean removeDuplicates, final List<String> fieldsToReturn) {
-    return findAll(returnClass, filter, new Sorter(new SortParameter(RodaConstants.INDEX_UUID, true)), removeDuplicates,
-      fieldsToReturn);
-  }
-
-  public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
-    final boolean justActive, final boolean removeDuplicates, final List<String> fieldsToReturn) {
     return findAll(returnClass, filter, new Sorter(new SortParameter(RodaConstants.INDEX_UUID, true)), Sublist.ALL,
-      null, justActive, removeDuplicates, fieldsToReturn);
+      null, true, fieldsToReturn);
+  }
+
+  public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
+    final boolean justActive, final List<String> fieldsToReturn) {
+    return findAll(returnClass, filter, new Sorter(new SortParameter(RodaConstants.INDEX_UUID, true)), Sublist.ALL,
+      null, justActive, fieldsToReturn);
   }
 
   public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
     final Sorter sorter, final List<String> fieldsToReturn) {
-    return findAll(returnClass, filter, sorter, true, fieldsToReturn);
-  }
-
-  public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
-    final Sorter sorter, final boolean removeDuplicates, final List<String> fieldsToReturn) {
-    return findAll(returnClass, filter, sorter, Sublist.ALL, null, true, removeDuplicates, fieldsToReturn);
+    return findAll(returnClass, filter, sorter, Sublist.ALL, null, true, fieldsToReturn);
   }
 
   public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
     final Sorter sorter, final Sublist sublist, final User user, final boolean justActive,
-    final boolean removeDuplicates, final List<String> fieldsToReturn) {
+    final List<String> fieldsToReturn) {
     return new IterableIndexResult<>(getSolrClient(), returnClass, filter, sorter, sublist, Facets.NONE, user,
-      justActive, removeDuplicates, fieldsToReturn);
+      justActive, true, fieldsToReturn);
   }
 
   public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
     final Sorter sorter, final Sublist sublist, final Facets facets, final User user, final boolean justActive,
-    final boolean removeDuplicates, final List<String> fieldsToReturn) {
+    final List<String> fieldsToReturn) {
     return new IterableIndexResult<>(getSolrClient(), returnClass, filter, sorter, sublist, facets, user, justActive,
-      removeDuplicates, fieldsToReturn);
+      true, fieldsToReturn);
   }
 
   public <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter, User user, boolean justActive)
