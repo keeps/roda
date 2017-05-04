@@ -161,8 +161,8 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
             outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has not been manually deleted");
           }
 
-          model.createRepositoryEvent(PreservationEventType.DELETION, EVENT_DESCRIPTION, state, outcomeText,
-            details, job.getUsername(), true);
+          model.createRepositoryEvent(PreservationEventType.DELETION, EVENT_DESCRIPTION, state, outcomeText, details,
+            job.getUsername(), true);
         }
       });
     } catch (GenericException | RequestNotValidException | AuthorizationDeniedException e) {
@@ -184,24 +184,33 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
     jobPluginInfo.incrementObjectsProcessed(state);
 
-    String outcomeText = "";
+    IndexedAIP item = null;
+    String outcomeText;
 
     try {
-      IndexedAIP item = index.retrieve(IndexedAIP.class, aip.getId(),
+      item = index.retrieve(IndexedAIP.class, aip.getId(),
         Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_TITLE));
+    } catch (NotFoundException | GenericException e) {
+      // do nothing
+    }
 
-      if (state.equals(PluginState.SUCCESS)) {
-        outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has been manually deleted");
-      } else {
-        outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has not been manually deleted");
-      }
-
+    try {
       model.deleteAIP(aip.getId());
       aipsDeleted.add(aip.getId());
+
+      if (item != null) {
+        outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has been manually deleted");
+      } else {
+        outcomeText = "Archival Information Package [id: " + aip.getId() + "] has been manually deleted";
+      }
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
       state = PluginState.FAILURE;
       reportItem.addPluginDetails("Could not delete AIP: " + e.getMessage());
-      outcomeText = "Archival Information Package [id: " + aip.getId() + "] has not been manually deleted";
+      if (item != null) {
+        outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has not been manually deleted");
+      } else {
+        outcomeText = "Archival Information Package [id: " + aip.getId() + "] has not been manually deleted";
+      }
     }
 
     model.createRepositoryEvent(PreservationEventType.DELETION, EVENT_DESCRIPTION, state, outcomeText, details,
@@ -249,8 +258,8 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     sources.add(PluginHelper.getLinkingIdentifier(file.getAipId(), file.getRepresentationId(),
       RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
-    model.createRepositoryEvent(PreservationEventType.DELETION, EVENT_DESCRIPTION, sources, null, state,
-      outcomeText, details, job.getUsername(), true);
+    model.createRepositoryEvent(PreservationEventType.DELETION, EVENT_DESCRIPTION, sources, null, state, outcomeText,
+      details, job.getUsername(), true);
   }
 
   private void processRepresentation(IndexService index, ModelService model, Report report,
@@ -290,8 +299,8 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     List<LinkingIdentifier> sources = new ArrayList<>();
     sources.add(
       PluginHelper.getLinkingIdentifier(representation.getAipId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
-    model.createRepositoryEvent(PreservationEventType.DELETION, EVENT_DESCRIPTION, sources, null, state,
-      outcomeText, details, job.getUsername(), true);
+    model.createRepositoryEvent(PreservationEventType.DELETION, EVENT_DESCRIPTION, sources, null, state, outcomeText,
+      details, job.getUsername(), true);
   }
 
   private void processRisk(IndexService index, ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo,

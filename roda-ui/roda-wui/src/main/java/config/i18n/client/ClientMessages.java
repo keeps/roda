@@ -1810,6 +1810,8 @@ public interface ClientMessages extends Messages {
 
   String password();
 
+  String passwordConfirmation();
+
   String passwordNote();
 
   String userDataChangePassword();
@@ -2445,7 +2447,11 @@ public interface ClientMessages extends Messages {
 
   String isAMandatoryField(String field);
 
-  String isNotValid(String field);
+  String passwordIsTooSmall();
+
+  String passwordDoesNotMatchConfirmation();
+
+  String emailNotValid();
 
   String wrongMailFormat();
 

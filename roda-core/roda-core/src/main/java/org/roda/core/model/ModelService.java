@@ -865,9 +865,9 @@ public class ModelService extends ModelObservable {
     Representation representation;
 
     if (justData) {
-      StoragePath metadataPath = ModelUtils.getRepresentationDataStoragePath(aipId, representationId);
-      StoragePath sourceMetadataPath = DefaultStoragePath.parse(sourcePath, RodaConstants.STORAGE_DIRECTORY_DATA);
-      storage.copy(sourceStorage, sourceMetadataPath, metadataPath);
+      StoragePath dataPath = ModelUtils.getRepresentationDataStoragePath(aipId, representationId);
+      StoragePath sourceDataPath = DefaultStoragePath.parse(sourcePath, RodaConstants.STORAGE_DIRECTORY_DATA);
+      storage.copy(sourceStorage, sourceDataPath, dataPath);
     } else {
       StoragePath directoryPath = ModelUtils.getRepresentationStoragePath(aipId, representationId);
 

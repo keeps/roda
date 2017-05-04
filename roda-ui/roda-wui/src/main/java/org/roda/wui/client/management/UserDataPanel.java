@@ -403,11 +403,16 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
       usernameError.setVisible(false);
     }
 
-    if (!password.isValid()) {
+    if (!password.matchConfirmation()) {
       if (errorList.isEmpty()) {
         Window.scrollTo(password.getAbsoluteLeft(), password.getAbsoluteTop());
       }
-      errorList.add(messages.isNotValid(messages.password()));
+      errorList.add(messages.passwordDoesNotMatchConfirmation());
+    } else if (password.isSmall()) {
+      if (errorList.isEmpty()) {
+        Window.scrollTo(password.getAbsoluteLeft(), password.getAbsoluteTop());
+      }
+      errorList.add(messages.passwordIsTooSmall());
     }
 
     if (fullname.getText().length() == 0) {
@@ -439,7 +444,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
       if (errorList.isEmpty()) {
         Window.scrollTo(email.getAbsoluteLeft(), email.getAbsoluteTop());
       }
-      errorList.add(messages.isNotValid(messages.email()));
+      errorList.add(messages.emailNotValid());
     } else {
       email.removeStyleName("isWrong");
       emailError.setVisible(false);

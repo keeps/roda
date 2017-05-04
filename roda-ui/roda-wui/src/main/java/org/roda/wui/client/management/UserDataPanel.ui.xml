@@ -19,7 +19,6 @@
 
 	<g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width no_padding">
-			
 			<g:FlowPanel addStyleNames="wui-data-panel">
 				<g:FlowPanel addStyleNames="wui-error-panel">
 					<g:HTML ui:field="errors"></g:HTML>
@@ -29,9 +28,6 @@
 				</g:Label>
 				<g:TextBox title="{messages.username}" ui:field="username" addStyleNames="form-textbox" />
 				<g:Label ui:field="usernameError" addStyleNames="form-label-error"></g:Label>
-				<g:Label addStyleNames="form-label">
-					<ui:text from='{messages.password}' /> *
-				</g:Label>
 				<u:PasswordPanel ui:field="password" />
 				<g:Label ui:field="passwordError" addStyleNames="form-label-error"></g:Label>
 				<g:Label addStyleNames="form-label">
@@ -39,58 +35,11 @@
 				</g:Label>
 				<g:TextBox title="{messages.fullname}" ui:field="fullname" addStyleNames="form-textbox" />
 				<g:Label ui:field="fullnameError" addStyleNames="form-label-error"></g:Label>
-				<!-- 
-				<g:Label addStyleNames="form-label">
-					<ui:text from="{messages.jobFunction}" />
-				</g:Label>
-				<g:ListBox ui:field="businessCategory" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label">
-					<ui:text from="{messages.idTypeAndNumber}" />
-				</g:Label>
-				<g:ListBox ui:field="idType" addStyleNames="form-textbox form-textbox-small" />
-				<g:TextBox ui:field="idNumber" addStyleNames="form-textbox form-textbox-small" />
-				<g:Label addStyleNames="form-label">
-					<ui:text from="{messages.idDateAndLocality}" />
-				</g:Label>
-				<d:DateBox ui:field="idDate" addStyleNames="form-textbox form-textbox-small" />
-				<g:TextBox ui:field="idLocality" addStyleNames="form-textbox form-textbox-small" />
-				<g:Label addStyleNames="form-label">
-					<ui:text from="{messages.nationality}" />
-				</g:Label>
-				<g:SuggestBox ui:field="nationality" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label">
-					<ui:text from="{messages.nif}" />
-				</g:Label>
-				<g:TextBox ui:field="nif" addStyleNames="form-textbox" />
-				 -->
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.email}' /> *
 				</g:Label>
 				<g:TextBox title="{messages.email}" ui:field="email" addStyleNames="form-textbox" />
 				<g:Label ui:field="emailError" addStyleNames="form-label-error"></g:Label>
-				<!--
-				<g:Label addStyleNames="form-label">
-					<ui:text from='{messages.address}' />
-				</g:Label>
-				<g:TextArea ui:field="postalAddress" addStyleNames="form-textbox {style.postalAddress}" />
-				<g:Label addStyleNames="form-label">
-					<ui:text from='{messages.postalCodeAndLocality}' />
-				</g:Label>
-				<g:TextBox ui:field="postalCode" addStyleNames="form-textbox form-textbox-small" />
-				<g:TextBox ui:field="locality" addStyleNames="form-textbox form-textbox-small" />
-				<g:Label addStyleNames="form-label">
-					<ui:text from="{messages.country}" />
-				</g:Label>
-				<g:SuggestBox ui:field="country" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label">
-					<ui:text from='{messages.phonenumber}' />
-				</g:Label>
-				<g:TextBox ui:field="phoneNumber" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label">
-					<ui:text from='{messages.fax}' />
-				</g:Label>
-				<g:TextBox ui:field="fax" addStyleNames="form-textbox" />
-				-->
 				<g:FlowPanel ui:field="extra"/>
 				<g:Label styleName="wui-user-data-note">
 					<ui:text from="{messages.userDataNote}" />
