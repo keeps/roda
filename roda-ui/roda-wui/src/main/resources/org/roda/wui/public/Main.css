@@ -1230,7 +1230,7 @@ pre code {
 }
 
 .dateBoxPopup {
-
+	z-index: 2000;
 }
 
 .gwt-DatePicker {
@@ -3572,7 +3572,11 @@ td.datePickerMonth, td.datePickerYear {
     font-weight: 500;
 }
 
-.wui-dialog-confirm, .wui-dialog-information {
+.wui-dialog-confirm {
+	
+}
+
+.wui-dialog-information {
 	max-width: 95%
 }
 
