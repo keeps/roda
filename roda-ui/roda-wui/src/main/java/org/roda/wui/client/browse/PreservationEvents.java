@@ -12,6 +12,7 @@ package org.roda.wui.client.browse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,7 @@ import java.util.Map;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
+import org.roda.core.data.v2.index.filter.DateRangeFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -43,6 +45,9 @@ import org.roda.wui.common.client.tools.RestUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -56,6 +61,8 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.datepicker.client.DateBox;
+import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
@@ -161,6 +168,18 @@ public class PreservationEvents extends Composite {
   @UiField(provided = true)
   FlowPanel facetClasses;
 
+  @UiField(provided = true)
+  FlowPanel facetType;
+
+  @UiField(provided = true)
+  FlowPanel facetOutcome;
+
+  @UiField
+  DateBox inputDateInitial;
+
+  @UiField
+  DateBox inputDateFinal;
+
   @UiField
   BreadcrumbPanel breadcrumb;
 
@@ -212,17 +231,17 @@ public class PreservationEvents extends Composite {
     this.representationUUID = representationUUID;
     this.fileUUID = fileUUID;
 
-    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS));
+    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS),
+      new SimpleFacetParameter(RodaConstants.PRESERVATION_EVENT_TYPE),
+      new SimpleFacetParameter(RodaConstants.PRESERVATION_EVENT_OUTCOME));
     Filter filter = new Filter();
 
     if (aipId != null) {
       filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, aipId));
     }
-
     if (representationUUID != null) {
       filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_REPRESENTATION_UUID, representationUUID));
     }
-
     if (fileUUID != null) {
       filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_FILE_UUID, fileUUID));
     }
@@ -230,8 +249,13 @@ public class PreservationEvents extends Composite {
     eventList = new PreservationEventList(filter, facets, messages.preservationEventsTitle(), false);
 
     facetClasses = new FlowPanel();
+    facetType = new FlowPanel();
+    facetOutcome = new FlowPanel();
+
     Map<String, FlowPanel> facetPanels = new HashMap<>();
     facetPanels.put(RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS, facetClasses);
+    facetPanels.put(RodaConstants.PRESERVATION_EVENT_TYPE, facetType);
+    facetPanels.put(RodaConstants.PRESERVATION_EVENT_OUTCOME, facetOutcome);
     FacetUtils.bindFacets(eventList, facetPanels);
 
     eventList.getSelectionModel().addSelectionChangeHandler(new Handler() {
@@ -271,10 +295,44 @@ public class PreservationEvents extends Composite {
     } else {
       breadcrumb.setVisible(false);
     }
+
+    DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
+    ValueChangeHandler<Date> valueChangeHandler = new ValueChangeHandler<Date>() {
+
+      @Override
+      public void onValueChange(ValueChangeEvent<Date> event) {
+        updateDateFilter();
+      }
+    };
+
+    inputDateInitial.setFormat(dateFormat);
+    inputDateInitial.getDatePicker().setYearArrowsVisible(true);
+    inputDateInitial.setFireNullValues(true);
+    inputDateInitial.addValueChangeHandler(valueChangeHandler);
+    inputDateInitial.setTitle(messages.dateIntervalLabelInitial());
+
+    inputDateFinal.setFormat(dateFormat);
+    inputDateFinal.getDatePicker().setYearArrowsVisible(true);
+    inputDateFinal.setFireNullValues(true);
+    inputDateFinal.addValueChangeHandler(valueChangeHandler);
+    inputDateFinal.setTitle(messages.dateIntervalLabelFinal());
+
+    inputDateInitial.getElement().setPropertyString("placeholder", messages.sidebarFilterFromDatePlaceHolder());
+    inputDateFinal.getElement().setPropertyString("placeholder", messages.sidebarFilterToDatePlaceHolder());
   }
 
   public static final List<String> getViewItemHistoryToken(String id) {
     return ListUtils.concat(BROWSE_RESOLVER.getHistoryPath(), id);
+  }
+
+  private void updateDateFilter() {
+    Date dateInitial = inputDateInitial.getDatePicker().getValue();
+    Date dateFinal = inputDateFinal.getDatePicker().getValue();
+
+    DateRangeFilterParameter filterParameter = new DateRangeFilterParameter(RodaConstants.PRESERVATION_EVENT_DATETIME,
+      dateInitial, dateFinal, RodaConstants.DateGranularity.DAY);
+
+    eventList.setFilter(new Filter(filterParameter));
   }
 
   @Override

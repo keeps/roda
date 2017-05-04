@@ -4,6 +4,7 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:i="urn:import:config.i18n.client" xmlns:m="urn:import:org.roda.wui.client.main"
 	xmlns:commonsearch="urn:import:org.roda.wui.client.common.search"
+	xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
 	xmlns:lists="urn:import:org.roda.wui.client.common.lists">
 
 	<ui:style>
@@ -53,6 +54,24 @@
 								<ui:text from='{messages.preservationEventClass}' />
 							</g:Label>
 							<g:FlowPanel ui:field="facetClasses" />
+							<g:Label addStyleNames="h4">
+								<ui:text from='{messages.preservationEventType}' />
+							</g:Label>
+							<g:FlowPanel ui:field="facetType" />
+							<g:Label addStyleNames="h4">
+								<ui:text from='{messages.preservationEventOutcome}' />
+							</g:Label>
+							<g:FlowPanel ui:field="facetOutcome" />
+							<g:Label addStyleNames="h4">
+								<ui:text from='{messages.sidebarFilterDates}' />
+							</g:Label>
+							<d:DateBox
+								addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
+								ui:field="inputDateInitial" />
+							<g:Label addStyleNames="sidebar-facet-date-separator">-</g:Label>
+							<d:DateBox
+								addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
+								ui:field="inputDateFinal" />
 						</g:FlowPanel>
 					</g:FlowPanel>
 				</g:FlowPanel>
