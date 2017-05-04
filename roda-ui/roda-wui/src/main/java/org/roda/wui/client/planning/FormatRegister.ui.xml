@@ -28,16 +28,6 @@
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">
 					<g:FlowPanel addStyleNames="sticky-padding">
-						<g:Label addStyleNames="h4">
-							<ui:text from='{messages.sidebarFilterDates}' />
-						</g:Label>
-						<d:DateBox
-							addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
-							ui:field="inputDateInitial" />
-						<g:Label addStyleNames="sidebar-facet-date-separator">-</g:Label>
-						<d:DateBox
-							addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
-							ui:field="inputDateFinal" />
 						<g:FlowPanel ui:field="formatsSidebar">
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarFormatsTitle}' />

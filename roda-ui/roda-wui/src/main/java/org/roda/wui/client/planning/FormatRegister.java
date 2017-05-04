@@ -10,13 +10,11 @@
  */
 package org.roda.wui.client.planning;
 
-import java.util.Date;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.facet.Facets;
-import org.roda.core.data.v2.index.filter.DateRangeFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.wui.client.browse.BrowserService;
@@ -39,9 +37,6 @@ import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -50,8 +45,6 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.user.datepicker.client.DateBox;
-import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
 import com.google.gwt.view.client.SelectionChangeEvent;
 
 import config.i18n.client.ClientMessages;
@@ -115,12 +108,6 @@ public class FormatRegister extends Composite {
   FormatList formatList;
 
   @UiField
-  DateBox inputDateInitial;
-
-  @UiField
-  DateBox inputDateFinal;
-
-  @UiField
   Button buttonAdd;
 
   @UiField
@@ -172,46 +159,12 @@ public class FormatRegister extends Composite {
     formatRegisterDescription.add(new HTMLWidgetWrapper("FormatRegisterDescription.html"));
     buttonRemove.setEnabled(false);
     startProcess.setEnabled(false);
-
-    DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
-    ValueChangeHandler<Date> valueChangeHandler = new ValueChangeHandler<Date>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<Date> event) {
-        updateDateFilter();
-      }
-    };
-
-    inputDateInitial.setFormat(dateFormat);
-    inputDateInitial.getDatePicker().setYearArrowsVisible(true);
-    inputDateInitial.setFireNullValues(true);
-    inputDateInitial.addValueChangeHandler(valueChangeHandler);
-    inputDateInitial.setTitle(messages.dateIntervalLabelInitial());
-
-    inputDateFinal.setFormat(dateFormat);
-    inputDateFinal.getDatePicker().setYearArrowsVisible(true);
-    inputDateFinal.setFireNullValues(true);
-    inputDateFinal.addValueChangeHandler(valueChangeHandler);
-    inputDateFinal.setTitle(messages.dateIntervalLabelFinal());
-
-    inputDateInitial.getElement().setPropertyString("placeholder", messages.sidebarFilterFromDatePlaceHolder());
-    inputDateFinal.getElement().setPropertyString("placeholder", messages.sidebarFilterToDatePlaceHolder());
   }
 
   @Override
   protected void onLoad() {
     super.onLoad();
     JavascriptUtils.stickSidebar();
-  }
-
-  private void updateDateFilter() {
-    Date dateInitial = inputDateInitial.getDatePicker().getValue();
-    Date dateFinal = inputDateFinal.getDatePicker().getValue();
-
-    DateRangeFilterParameter filterParameter = new DateRangeFilterParameter(RodaConstants.FORMAT_INITIAL_RELEASE,
-      dateInitial, dateFinal, RodaConstants.DateGranularity.DAY);
-
-    formatList.setFilter(new Filter(filterParameter));
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
