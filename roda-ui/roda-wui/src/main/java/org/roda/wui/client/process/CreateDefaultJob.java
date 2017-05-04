@@ -37,6 +37,7 @@ import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
@@ -162,6 +163,9 @@ public class CreateDefaultJob extends Composite {
 
   @UiField
   Button buttonCreate;
+
+  @UiField
+  Button buttonObtainCommand;
 
   @UiField
   Button buttonCancel;
@@ -483,7 +487,7 @@ public class CreateDefaultJob extends Composite {
   @SuppressWarnings("rawtypes")
   @UiHandler("buttonCreate")
   public void buttonCreateHandler(ClickEvent e) {
-    getButtonCreate().setEnabled(false);
+    buttonCreate.setEnabled(false);
     String jobName = getName().getText();
     SelectedItems selected = list.getSelected();
 
@@ -499,7 +503,7 @@ public class CreateDefaultJob extends Composite {
         @Override
         public void onFailure(Throwable caught) {
           Toast.showError(messages.dialogFailure(), caught.getMessage());
-          getButtonCreate().setEnabled(true);
+          buttonCreate.setEnabled(true);
         }
 
         @Override
@@ -508,7 +512,34 @@ public class CreateDefaultJob extends Composite {
           HistoryUtils.newHistory(ActionProcess.RESOLVER);
         }
       });
+  }
 
+  @SuppressWarnings("rawtypes")
+  @UiHandler("buttonObtainCommand")
+  public void buttonObtainCommandHandler(ClickEvent e) {
+    String jobName = getName().getText();
+    SelectedItems selected = list.getSelected();
+
+    if (org.roda.core.data.v2.Void.class.getName().equals(targetList.getSelectedValue())) {
+      selected = new SelectedItemsNone();
+    } else if (isListEmpty) {
+      selected = SelectedItemsAll.create(targetList.getSelectedValue());
+    }
+
+    BrowserService.Util.getInstance().createProcessJson(jobName, selected, getSelectedPlugin().getId(),
+      getWorkflowOptions().getValue(), selected.getSelectedClass(), new AsyncCallback<String>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          Toast.showError(messages.dialogFailure(), caught.getMessage());
+        }
+
+        @Override
+        public void onSuccess(String result) {
+          Dialogs.showInformationDialog(messages.createJobCurlCommand(), "<pre><code>" + result + "</code></pre>",
+            messages.confirmButton());
+        }
+      });
   }
 
   @UiHandler("buttonCancel")
@@ -522,10 +553,6 @@ public class CreateDefaultJob extends Composite {
 
   public void setSelectedPlugin(PluginInfo selectedPlugin) {
     this.selectedPlugin = selectedPlugin;
-  }
-
-  public Button getButtonCreate() {
-    return this.buttonCreate;
   }
 
   public TextBox getName() {

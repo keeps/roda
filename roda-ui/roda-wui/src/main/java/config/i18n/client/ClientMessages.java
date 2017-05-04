@@ -404,6 +404,8 @@ public interface ClientMessages extends Messages {
 
   String createJobCreateTitle();
 
+  String createJobObtainCommandTitle();
+
   String createJobCancelTitle();
 
   String createJobWorkflow();
@@ -415,6 +417,8 @@ public interface ClientMessages extends Messages {
   String allCategoryItem();
 
   String emptyAssociativeObjectLabel();
+
+  String createJobCurlCommand();
 
   /****** INGEST TRANSFER UPLOAD *********/
 

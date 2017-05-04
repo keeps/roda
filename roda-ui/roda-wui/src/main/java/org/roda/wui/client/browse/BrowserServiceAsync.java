@@ -193,6 +193,9 @@ public interface BrowserServiceAsync {
   void createProcess(String jobName, SelectedItems<?> selected, String id, Map<String, String> value,
     String selectedClass, AsyncCallback<Job> asyncCallback);
 
+  void createProcessJson(String jobName, SelectedItems<?> selected, String id, Map<String, String> value,
+    String selectedClass, AsyncCallback<String> asyncCallback);
+
   void updateRiskCounters(AsyncCallback<Void> asyncCallback);
 
   void appraisal(SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason, String localeString,

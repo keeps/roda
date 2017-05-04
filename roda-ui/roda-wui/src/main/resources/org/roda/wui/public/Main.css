@@ -3573,7 +3573,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .wui-dialog-confirm, .wui-dialog-information {
-
+	max-width: 95%
 }
 
 .wui-dialog-layout {

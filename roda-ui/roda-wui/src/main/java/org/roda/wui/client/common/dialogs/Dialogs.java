@@ -27,6 +27,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 
@@ -100,7 +101,7 @@ public class Dialogs {
     dialogBox.setText(title);
 
     FlowPanel layout = new FlowPanel();
-    Label messageLabel = new Label(message);
+    HTML messageLabel = new HTML(message);
     Button continueButton = new Button(continueButtonText);
 
     layout.add(messageLabel);

@@ -145,6 +145,9 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
   Button buttonCreate;
 
   @UiField
+  Button buttonObtainCommand;
+
+  @UiField
   Button buttonCancel;
 
   public CreateSelectedJob(final List<PluginType> pluginType) {
@@ -414,6 +417,9 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
 
   @UiHandler("buttonCreate")
   public abstract void buttonCreateHandler(ClickEvent e);
+
+  @UiHandler("buttonObtainCommand")
+  public abstract void buttonObtainCommandHandler(ClickEvent e);
 
   @UiHandler("buttonCancel")
   void buttonCancelHandler(ClickEvent e) {

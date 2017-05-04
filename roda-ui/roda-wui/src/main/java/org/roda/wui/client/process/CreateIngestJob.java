@@ -132,7 +132,51 @@ public class CreateIngestJob extends CreateSelectedJob<TransferredResource> {
           }
         });
     }
+  }
 
+  @Override
+  public void buttonObtainCommandHandler(ClickEvent e) {
+    String jobName = getName().getText();
+
+    List<PluginParameter> missingMandatoryParameters = getWorkflowOptions().getMissingMandatoryParameters();
+    if (missingMandatoryParameters.isEmpty()) {
+
+      BrowserService.Util.getInstance().createProcessJson(jobName, getSelected(), getSelectedPlugin().getId(),
+        getWorkflowOptions().getValue(), null, new AsyncCallback<String>() {
+
+          @Override
+          public void onFailure(Throwable caught) {
+            AsyncCallbackUtils.defaultFailureTreatment(caught);
+          }
+
+          @Override
+          public void onSuccess(String result) {
+            Dialogs.showInformationDialog(messages.createJobCurlCommand(), "<pre><code>" + result + "</code></pre>",
+              messages.confirmButton());
+          }
+        });
+    } else {
+
+      List<String> missingPluginNames = new ArrayList<>();
+      for (PluginParameter parameter : missingMandatoryParameters) {
+        missingPluginNames.add(parameter.getName());
+      }
+
+      Dialogs.showInformationDialog(messages.processNewMissingMandatoryInfoDialogTitle(),
+        messages.processNewMissingMandatoryInfoDialogMessage(missingPluginNames), messages.dialogOk(),
+        new AsyncCallback<Void>() {
+
+          @Override
+          public void onFailure(Throwable caught) {
+            AsyncCallbackUtils.defaultFailureTreatment(caught);
+          }
+
+          @Override
+          public void onSuccess(Void result) {
+            // do nothing
+          }
+        });
+    }
   }
 
   @Override

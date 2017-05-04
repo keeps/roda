@@ -23,6 +23,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
+import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
 import org.roda.wui.client.common.lists.utils.ListFactory;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
@@ -106,7 +107,26 @@ public class CreateActionJob extends CreateSelectedJob<IsIndexed> {
           HistoryUtils.newHistory(ActionProcess.RESOLVER);
         }
       });
+  }
 
+  @Override
+  public void buttonObtainCommandHandler(ClickEvent e) {
+    String jobName = getName().getText();
+
+    BrowserService.Util.getInstance().createProcessJson(jobName, getSelected(), getSelectedPlugin().getId(),
+      getWorkflowOptions().getValue(), getSelectedClass(), new AsyncCallback<String>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
+        }
+
+        @Override
+        public void onSuccess(String result) {
+          Dialogs.showInformationDialog(messages.createJobCurlCommand(), "<pre><code>" + result + "</code></pre>",
+            messages.confirmButton());
+        }
+      });
   }
 
   @Override

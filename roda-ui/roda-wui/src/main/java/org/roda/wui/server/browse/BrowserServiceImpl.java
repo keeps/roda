@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
 import org.roda.core.common.RodaUtils;
@@ -34,6 +35,7 @@ import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.common.Pair;
@@ -725,6 +727,38 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     job.setPluginParameters(value);
 
     return Jobs.createJob(user, job, true);
+  }
+
+  @Override
+  public <T extends IsIndexed> String createProcessJson(String jobName, SelectedItems<T> selected, String id,
+    Map<String, String> value, String selectedClass) throws AuthorizationDeniedException, RequestNotValidException,
+    NotFoundException, GenericException, JobAlreadyStartedException {
+    SelectedItems<T> selectedItems = selected;
+    User user = UserUtility.getUser(getThreadLocalRequest());
+
+    if (selectedItems instanceof SelectedItemsList) {
+      SelectedItemsList<T> items = (SelectedItemsList<T>) selectedItems;
+
+      if (items.getIds().isEmpty()) {
+        selectedItems = getAllItemsByClass(selectedClass);
+      }
+    }
+
+    Job job = new Job();
+    job.setId(IdUtils.createUUID());
+    job.setName(jobName);
+    job.setSourceObjects(selectedItems);
+    job.setPlugin(id);
+    job.setPluginParameters(value);
+    job.setUsername(user.getName());
+
+    String command = RodaCoreFactory.getRodaConfiguration().getString("ui.createJob.curl");
+    if (command != null) {
+      command = command.replace("{{jsonObject}}", StringEscapeUtils.escapeJava(JsonUtils.getJsonFromObject(job)));
+      return command;
+    } else {
+      return "";
+    }
   }
 
   private <T extends IsIndexed> SelectedItems<T> getAllItemsByClass(String selectedClass) {
