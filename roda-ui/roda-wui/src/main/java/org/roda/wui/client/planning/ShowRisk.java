@@ -23,6 +23,7 @@ import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.EditMultipleRiskIncidenceDialog;
+import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.management.MemberManagement;
@@ -213,9 +214,9 @@ public class ShowRisk extends Composite {
 
   @UiHandler("buttonRemove")
   void handleButtonRemove(ClickEvent e) {
-    SelectedItems<RiskIncidence> incidences = riskShowPanel.getSelectedIncidences();
+    final SelectedItems<RiskIncidence> incidences = riskShowPanel.getSelectedIncidences();
 
-    BrowserService.Util.getInstance().deleteRiskIncidences(incidences, new AsyncCallback<Void>() {
+    ClientSelectedItemsUtils.size(RiskIncidence.class, incidences, new AsyncCallback<Long>() {
 
       @Override
       public void onFailure(Throwable caught) {
@@ -223,9 +224,20 @@ public class ShowRisk extends Composite {
       }
 
       @Override
-      public void onSuccess(Void result) {
-        riskShowPanel.refreshList();
-        Toast.showInfo(messages.removeSuccessTitle(), messages.removeAllSuccessMessage());
+      public void onSuccess(final Long result) {
+        BrowserService.Util.getInstance().deleteRiskIncidences(incidences, new AsyncCallback<Void>() {
+
+          @Override
+          public void onFailure(Throwable caught) {
+            AsyncCallbackUtils.defaultFailureTreatment(caught);
+          }
+
+          @Override
+          public void onSuccess(Void nothing) {
+            riskShowPanel.refreshList();
+            Toast.showInfo(messages.removeSuccessTitle(), messages.removeSuccessMessage(result));
+          }
+        });
       }
     });
   }
