@@ -10,7 +10,7 @@ RODA is a complete digital repository that delivers functionality for all the ma
 * Off-the-shelf support for Dublin Core and Enconded Archival Description.
 * Configurable multi-step ingestion workflow
 * PREMIS 3 for preservation metadata
-* Authentication & authorization via LDAP and CAS for 
+* Authentication & authorization via LDAP and CAS for
 * Reports and statistics
 * REST API
 * Supports pluggable preservation actions
@@ -25,14 +25,14 @@ For more information, please fell free to visit RODA website:
 
 ## Installation
 
-We provide two installation methods: 
+We provide two installation methods:
 
-* Testing Mode (Easy like sunday morning!) 
+* Testing Mode (Easy like sunday morning!)
 * Production Mode (Powerful as thunder!)
 
 ### Testing Mode (Easy like sunday morning!)
 
-This is the easiast way to install RODA 2.0. If you want to test drive the software, just follow these instructions based on your operating system. We support Linux, MacOS and Windows. 
+This is the easiast way to install RODA 2.0. If you want to test drive the software, just follow these instructions based on your operating system. We support Linux, MacOS and Windows.
 
 #### Linux
 
@@ -89,16 +89,15 @@ user=roda
 
 Just install [Kitematic](https://kitematic.com), and search for "roda". Install and run docker container. It's that easy.
 
-Kitematic is like an AppStore that automates the Docker installation and setup process and provides an intuitive graphical user interface (GUI) for running Docker containers (i.e. lightweight Virtual Machines). 
+Kitematic is like an AppStore that automates the Docker installation and setup process and provides an intuitive graphical user interface (GUI) for running Docker containers (i.e. lightweight Virtual Machines).
 
 #### Windows
 
 Just install [Kitematic](https://kitematic.com), and search for "roda". Install and run docker container. It's that easy.
 
-Kitematic is like an AppStore that automates the Docker installation and setup process and provides an intuitive graphical user interface (GUI) for running Docker containers (i.e. lightweight Virtual Machines). 
+Kitematic is like an AppStore that automates the Docker installation and setup process and provides an intuitive graphical user interface (GUI) for running Docker containers (i.e. lightweight Virtual Machines).
 
 The RODA docker container has some limitations on Windows due to filename incompatibilities. This means that your will be limited to the storage capacity within the container. If you change the default configuration to use the storage of the host machine it will not work..
-
 
 
 ### Production Mode (Powerful as thunder!)
@@ -137,6 +136,10 @@ To start developing new components for RODA check the [Developer guide](https://
 
 ## Translators
 
-Translations are maintained in [Transifex](https://www.transifex.com/roda-1/roda2) and updated using the [Transifex Client](http://docs.transifex.com/client/). After installing the client and setting up your `~/.transifexrc` use `tx push -s` to when you have new source translations to push to server, and `tx pull -a` to update the translation on your local installation. 
+Translations are maintained in [Transifex](https://www.transifex.com/roda-1/roda2) and updated using the [Transifex Client](http://docs.transifex.com/client/). After installing the client and setting up your `~/.transifexrc` use `tx push -s` to when you have new source translations to push to server, and `tx pull -a` to update the translation on your local installation.
+
+## Specifications
+
+RODA implements a series of specifications and standards. To know more about the OAIS Information Packages that RODA implements, please check out the [DLM Archival Standards Board](http://www.dasboard.eu) repositories at https://github.com/DLMArchivalStandardsBoard
 
 [![Build Status](https://travis-ci.org/keeps/roda.png?branch=master)](https://travis-ci.org/keeps/roda)
