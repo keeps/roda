@@ -506,6 +506,8 @@ public interface ClientMessages extends Messages {
 
   String clearButton();
 
+  String selectAllButton();
+
   /*** Identify formats ***/
 
   String identifyFormatsButton();

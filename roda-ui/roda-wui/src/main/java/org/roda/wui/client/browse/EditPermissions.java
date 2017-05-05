@@ -368,7 +368,6 @@ public class EditPermissions extends Composite {
 
   @UiHandler("buttonAdd")
   void buttonAddHandler(ClickEvent e) {
-
     Filter filter = new Filter();
 
     for (String username : getAssignedUserNames()) {
@@ -402,6 +401,7 @@ public class EditPermissions extends Composite {
         ret.add(permissionPanel.getName());
       }
     }
+
     return ret;
   }
 
@@ -414,6 +414,7 @@ public class EditPermissions extends Composite {
         ret.add(permissionPanel.getName());
       }
     }
+
     return ret;
   }
 
@@ -513,6 +514,7 @@ public class EditPermissions extends Composite {
     private Label nameLabel;
     private FlowPanel editPermissionsPanel;
     private Button removePanel;
+    private Button selectAllPanel;
 
     private String name;
     private boolean isUser;
@@ -533,25 +535,34 @@ public class EditPermissions extends Composite {
       nameLabel = new Label(name);
 
       rightPanel = new FlowPanel();
-
       editPermissionsPanel = new FlowPanel();
+      boolean allSelected = true;
 
       for (PermissionType permissionType : Permissions.PermissionType.values()) {
         ValueCheckBox valueCheckBox = new ValueCheckBox(permissionType);
         if (permissions.contains(permissionType)) {
           valueCheckBox.setValue(true);
+        } else {
+          allSelected = false;
         }
+
         editPermissionsPanel.add(valueCheckBox);
         valueCheckBox.addStyleName("permission-edit-checkbox");
       }
 
       removePanel = new Button(messages.removeButton());
+      if (!allSelected) {
+        selectAllPanel = new Button(messages.selectAllButton());
+      } else {
+        selectAllPanel = new Button(messages.clearButton());
+      }
 
       panelBody.add(type);
       panelBody.add(nameLabel);
       panelBody.add(rightPanel);
 
       rightPanel.add(editPermissionsPanel);
+      rightPanel.add(selectAllPanel);
       rightPanel.add(removePanel);
 
       panel.add(panelBody);
@@ -566,12 +577,32 @@ public class EditPermissions extends Composite {
       rightPanel.addStyleName("pull-right");
       editPermissionsPanel.addStyleName("permission-edit");
       removePanel.addStyleName("permission-remove btn btn-danger btn-ban");
+      selectAllPanel.addStyleName("permission-remove permission-clear btn btn-check");
 
       removePanel.addClickHandler(new ClickHandler() {
 
         @Override
         public void onClick(ClickEvent event) {
           PermissionPanel.this.removeFromParent();
+        }
+      });
+
+      selectAllPanel.addClickHandler(new ClickHandler() {
+
+        @Override
+        public void onClick(ClickEvent event) {
+          boolean selectAll = selectAllPanel.getText().equals(messages.selectAllButton());
+
+          for (int i = 0; i < editPermissionsPanel.getWidgetCount(); i++) {
+            ValueCheckBox valueCheckBox = (ValueCheckBox) editPermissionsPanel.getWidget(i);
+            valueCheckBox.setValue(selectAll);
+          }
+
+          if (!selectAll) {
+            selectAllPanel.setText(messages.selectAllButton());
+          } else {
+            selectAllPanel.setText(messages.clearButton());
+          }
         }
       });
 
