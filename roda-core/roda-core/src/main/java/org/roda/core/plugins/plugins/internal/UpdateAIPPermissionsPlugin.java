@@ -26,6 +26,7 @@ import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Permissions;
+import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
@@ -182,8 +183,11 @@ public class UpdateAIPPermissionsPlugin extends AbstractPlugin<AIP> {
     }
 
     jobPluginInfo.incrementObjectsProcessed(state);
-    model.createUpdateAIPEvent(aip.getId(), null, null, null, PreservationEventType.UPDATE, eventDescription, state,
-      outcomeText, details, job.getUsername(), true);
+
+    List<LinkingIdentifier> sources = Arrays
+      .asList(PluginHelper.getLinkingIdentifier(aip.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
+    model.createEvent(aip.getId(), null, null, null, PreservationEventType.UPDATE, eventDescription, sources, null,
+      state, outcomeText, details, job.getUsername(), true);
   }
 
   @Override

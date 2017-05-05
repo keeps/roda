@@ -2221,15 +2221,18 @@ public class BrowserHelper {
     final ModelService model = RodaCoreFactory.getModelService();
     AIP aip = model.retrieveAIP(indexedAIP.getId());
     aip.setPermissions(permissions);
+    List<LinkingIdentifier> sources = Arrays
+      .asList(PluginHelper.getLinkingIdentifier(aip.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
 
     try {
       model.updateAIPPermissions(aip, user.getName());
-      String outcomeText = PluginHelper.createOutcomeTextForAIP(indexedAIP, "has been manually updated");
-      model.createUpdateAIPEvent(aip.getId(), null, null, null, PreservationEventType.UPDATE, eventDescription,
+      String outcomeText = PluginHelper.createOutcomeTextForAIP(indexedAIP, " permissions has been manually updated");
+      model.createEvent(aip.getId(), null, null, null, PreservationEventType.UPDATE, eventDescription, sources, null,
         PluginState.SUCCESS, outcomeText, details, user.getName(), true);
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      String outcomeText = PluginHelper.createOutcomeTextForAIP(indexedAIP, "has not been manually updated");
-      model.createUpdateAIPEvent(aip.getId(), null, null, null, PreservationEventType.UPDATE, eventDescription,
+      String outcomeText = PluginHelper.createOutcomeTextForAIP(indexedAIP,
+        " permissions has not been manually updated");
+      model.createEvent(aip.getId(), null, null, null, PreservationEventType.UPDATE, eventDescription, sources, null,
         PluginState.FAILURE, outcomeText, details, user.getName(), true);
 
       throw e;
