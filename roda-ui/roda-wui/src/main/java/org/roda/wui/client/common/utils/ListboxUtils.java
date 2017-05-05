@@ -61,6 +61,7 @@ public class ListboxUtils {
     for (int i = 0; i < listBox.getItemCount() && !found; i++) {
       if (listBox.getValue(i).equals(field)) {
         listBox.setSelectedIndex(i);
+        listBox.setTitle(listBox.getSelectedItemText());
         found = true;
       }
     }

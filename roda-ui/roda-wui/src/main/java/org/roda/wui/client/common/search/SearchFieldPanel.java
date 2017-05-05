@@ -182,7 +182,6 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
     fieldLabel.addStyleName("search-field-label");
     fieldBox.addStyleName("form-listbox");
     searchAdvancedFields.addStyleName("form-listbox");
-    searchAdvancedFields.getElement().setAttribute("title", "search advanced fields box");
     duplicateWarning.addStyleName("search-field-warning-label");
     duplicateWarning.setVisible(false);
 
