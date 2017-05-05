@@ -38,6 +38,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
@@ -196,14 +197,17 @@ public class RepresentationsResource {
   public Response deleteRepresentation(
     @ApiParam(value = "The ID of the existing AIP that contains the representation to delete", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
     @ApiParam(value = "The ID of the existing representation to delete", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
+    @ApiParam(value = "Reason to remove representation") @QueryParam(RodaConstants.API_QUERY_PARAM_DETAILS) String details,
     @ApiParam(value = "Choose format in which to get the response", allowableValues = RodaConstants.API_DELETE_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
     // get user
     User user = UserUtility.getApiUser(request);
+    String eventDetails = details == null ? "" : details;
 
     // delegate action to controller
-    Browser.deleteRepresentation(user, aipId, representationId);
+    Browser.deleteRepresentation(user, SelectedItemsList.create(IndexedRepresentation.class, representationId),
+      eventDetails);
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Representation deleted"), mediaType).build();
   }
 

@@ -69,8 +69,7 @@ public class PremisSkeletonPluginUtils {
         if (!file.isDirectory()) {
           LOGGER.debug("Processing {}", file);
           try {
-            model.retrievePreservationFile(aipId, representationId, file.getPath(), file.getId(),
-              PreservationMetadataType.FILE);
+            model.retrievePreservationFile(aipId, representationId, file.getPath(), file.getId());
           } catch (NotFoundException e1) {
             PremisSkeletonPluginUtils.createPremisSkeletonOnFile(model, file, fixityAlgorithms, representation);
           }
@@ -116,8 +115,7 @@ public class PremisSkeletonPluginUtils {
     if (!file.isDirectory()) {
       LOGGER.debug("Processing {}", file);
       try {
-        model.retrievePreservationFile(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
-          PreservationMetadataType.FILE);
+        model.retrievePreservationFile(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId());
       } catch (NotFoundException e) {
         ContentPayload filePreservation = PremisV3Utils.createBaseFile(file, model, fixityAlgorithms);
         String pmId;

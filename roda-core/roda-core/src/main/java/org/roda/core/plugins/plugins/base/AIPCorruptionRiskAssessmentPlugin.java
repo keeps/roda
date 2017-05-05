@@ -38,6 +38,8 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.Fixity;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -92,7 +94,8 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
     return "Computes the fixity/checksum information of files inside an Archival Information Package (AIP) and verifies if this "
       + "information differs from the information stored in the preservation metadata (i.e. PREMIS objects). If so, it creates a "
       + "new risk called “File(s) corrupted due to hardware malfunction or human intervention“ and assigns the corrupted file to "
-      + "that risk in the Risk register.\nWithin the repository, fixity checking is used to ensure that digital files have not been "
+      + "that risk in the Risk register.\n It also creates an incidence linked to the representation if a PREMIS file exists but "
+      + "the associated file does not. Within the repository, fixity checking is used to ensure that digital files have not been "
       + "affected by data rot or other digital preservation dangers. By itself, fixity checking does not ensure the preservation "
       + "of a digital file. Instead, it allows a repository to identify which corrupted files to replace with a clean copy from "
       + "the producer or from a backup.";
@@ -182,16 +185,41 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
                   passedFiles.add(fileEntry);
                 } else {
                   aipFailed = true;
-                  createIncidence(model, file);
+                  createIncidence(model, file, risks.get(0));
                 }
               }
             }
           }
         }
 
+        CloseableIterable<OptionalWithCause<PreservationMetadata>> pmList = model.listPreservationMetadata(aip.getId(),
+          r.getId());
+        boolean premisWithoutFile = false;
+        for (OptionalWithCause<PreservationMetadata> opm : pmList) {
+          if (opm.isPresent()) {
+            PreservationMetadata pm = opm.get();
+            if (PreservationMetadataType.FILE.equals(pm.getType())) {
+              try {
+                model.retrieveFile(pm.getAipId(), pm.getRepresentationId(), pm.getFileDirectoryPath(), pm.getFileId());
+              } catch (NotFoundException e) {
+                ValidationIssue issue = new ValidationIssue(
+                  "File " + pm.getFileId() + " of representation " + pm.getRepresentationId() + " of AIP "
+                    + pm.getAipId() + " was not found but the PREMIS file exists");
+                validationReport.addIssue(issue);
+                aipFailed = true;
+                premisWithoutFile = true;
+              }
+            }
+          }
+        }
+
+        if (premisWithoutFile) {
+          createIncidence(model, aip.getId(), r.getId(), null, null, risks.get(0));
+        }
+
         IOUtils.closeQuietly(allFiles);
       } catch (IOException | RODAException | XmlException e) {
-        LOGGER.error("Error processing Representation {}", r.getId(), e);
+        LOGGER.error("Error processing representation {}", r.getId(), e);
       }
     }
 
@@ -200,7 +228,7 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
 
       if (aipFailed) {
         reportItem.setPluginState(PluginState.FAILURE).setHtmlPluginDetails(true)
-          .setPluginDetails(validationReport.toHtml(false, false, false, "Corrupted files and their checksums"));
+          .setPluginDetails(validationReport.toHtml(false, false, false, "Corrupted files and checksums"));
         jobPluginInfo.incrementObjectsProcessedWithFailure();
         PluginHelper.createPluginEvent(this, aip.getId(), model, index, sources, null, PluginState.FAILURE,
           validationReport.toHtml(false, false, false, "Corrupted files and their checksums"), true);
@@ -218,21 +246,31 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
     }
   }
 
-  private void createIncidence(ModelService model, File file) throws RequestNotValidException, GenericException,
+  private RiskIncidence createIncidence(ModelService model, File file, String riskId) throws RequestNotValidException,
+    GenericException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
+    return createIncidence(model, file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(), riskId);
+  }
+
+  private RiskIncidence createIncidence(ModelService model, String aipId, String representationId,
+    List<String> filePath, String fileId, String riskId) throws RequestNotValidException, GenericException,
     AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
-    Risk risk = PluginHelper.createRiskIfNotExists(model, risks.get(0), getClass().getClassLoader());
+    Risk risk = PluginHelper.createRiskIfNotExists(model, riskId, getClass().getClassLoader());
     RiskIncidence incidence = new RiskIncidence();
     incidence.setDetectedOn(new Date());
     incidence.setDetectedBy(this.getName());
-    incidence.setRiskId(risks.get(0));
-    incidence.setAipId(file.getAipId());
-    incidence.setRepresentationId(file.getRepresentationId());
-    incidence.setFilePath(file.getPath());
-    incidence.setFileId(file.getId());
+    incidence.setRiskId(riskId);
+    incidence.setAipId(aipId);
+    incidence.setRepresentationId(representationId);
+    if (filePath != null) {
+      incidence.setFilePath(filePath);
+    }
+    if (fileId != null) {
+      incidence.setFileId(fileId);
+    }
     incidence.setObjectClass(AIP.class.getSimpleName());
     incidence.setStatus(INCIDENCE_STATUS.UNMITIGATED);
     incidence.setSeverity(risk.getPreMitigationSeverityLevel());
-    model.createRiskIncidence(incidence, false);
+    return model.createRiskIncidence(incidence, false);
   }
 
   @Override

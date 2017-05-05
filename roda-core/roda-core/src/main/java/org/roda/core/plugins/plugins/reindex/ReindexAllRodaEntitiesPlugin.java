@@ -107,7 +107,7 @@ public class ReindexAllRodaEntitiesPlugin extends AbstractPlugin<Void> {
 
     if (model.hasObjects(reindexClass)) {
       String jobId = IdUtils.createUUID();
-      String jobName = ReindexRodaEntityPlugin.class.getSimpleName() + " (" + reindexClass.getSimpleName() + ")";
+      String jobName = "Reindex RODA entity (" + reindexClass.getSimpleName() + ")";
       report = PluginHelper.initPluginReportItem(this, jobId, Job.class);
 
       try {

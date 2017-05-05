@@ -1200,36 +1200,17 @@ public class ModelService extends ModelObservable {
     return storage.getBinary(path);
   }
 
-  public Binary retrievePreservationRepresentation(String aipId, String representationId, List<String> filePath,
-    String fileId) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    String urn = IdUtils.getPreservationFileId(fileId);
-    StoragePath path = ModelUtils.getPreservationMetadataStoragePath(urn, PreservationMetadataType.FILE, aipId,
-      representationId, filePath, fileId);
-    return storage.getBinary(path);
-  }
-
-  public Binary retrievePreservationFile(String aipId, String representationId, List<String> fileDirectoryPath,
-    String fileId) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    return retrievePreservationFile(aipId, representationId, fileDirectoryPath, fileId, PreservationMetadataType.FILE);
-  }
-
-  public Binary retrievePreservationFile(String aipId, String representationId, List<String> fileDirectoryPath,
-    String fileId, PreservationMetadataType type)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    String identifier = null;
-    if (PreservationMetadataType.FILE.equals(type)) {
-      identifier = IdUtils.getPreservationFileId(fileId);
-    } else {
-      identifier = IdUtils.getPreservationId(type, aipId, representationId, fileDirectoryPath, fileId);
-    }
-    StoragePath filePath = ModelUtils.getPreservationMetadataStoragePath(identifier, type, aipId, representationId,
-      fileDirectoryPath, fileId);
-    return storage.getBinary(filePath);
-  }
-
   public Binary retrievePreservationFile(File file)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     return retrievePreservationFile(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId());
+  }
+
+  public Binary retrievePreservationFile(String aipId, String representationId, List<String> fileDirectoryPath,
+    String fileId) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    String identifier = IdUtils.getPreservationFileId(fileId);
+    StoragePath filePath = ModelUtils.getPreservationMetadataStoragePath(identifier, PreservationMetadataType.FILE,
+      aipId, representationId, fileDirectoryPath, fileId);
+    return storage.getBinary(filePath);
   }
 
   public Binary retrievePreservationEvent(String aipId, String representationId, List<String> filePath, String fileId,

@@ -1324,25 +1324,6 @@ public class Browser extends RodaWuiController {
     return updatedRep;
   }
 
-  public static void deleteRepresentation(User user, String aipId, String representationId)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-    IndexedRepresentation rep = BrowserHelper.retrieve(IndexedRepresentation.class,
-      IdUtils.getRepresentationId(aipId, representationId), RodaConstants.REPRESENTATION_FIELDS_TO_RETURN);
-    controllerAssistant.checkObjectPermissions(user, rep, PermissionType.DELETE);
-
-    // delegate
-    BrowserHelper.deleteRepresentation(rep.getAipId(), rep.getId());
-
-    // register action
-    controllerAssistant.registerAction(user, rep.getAipId(), LOG_ENTRY_STATE.SUCCESS,
-      RodaConstants.CONTROLLER_AIP_ID_PARAM, rep.getAipId(), RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM,
-      rep.getId());
-  }
-
   public static EntityResponse retrieveAIPRepresentationFile(User user, String fileUuid, String acceptFormat)
     throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};

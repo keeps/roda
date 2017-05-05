@@ -1276,7 +1276,7 @@ public class BrowserHelper {
     ModelService model = RodaCoreFactory.getModelService();
 
     if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP.equals(acceptFormat)) {
-      Binary binary = model.retrievePreservationRepresentation(aipId, representationId, filePath, fileId);
+      Binary binary = model.retrievePreservationFile(aipId, representationId, filePath, fileId);
       String filename = binary.getStoragePath().getName();
 
       ConsumesOutputStream stream = new ConsumesOutputStream() {
@@ -1734,11 +1734,6 @@ public class BrowserHelper {
   public static Representation updateRepresentation(Representation representation) throws GenericException,
     AuthorizationDeniedException, RequestNotValidException, NotFoundException, AlreadyExistsException {
     return RodaCoreFactory.getModelService().updateRepresentationInfo(representation);
-  }
-
-  public static void deleteRepresentation(String aipId, String representationId)
-    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    RodaCoreFactory.getModelService().deleteRepresentation(aipId, representationId);
   }
 
   public static File createFile(User user, String aipId, String representationId, List<String> directoryPath,

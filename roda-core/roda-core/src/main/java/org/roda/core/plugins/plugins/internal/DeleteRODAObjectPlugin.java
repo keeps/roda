@@ -21,6 +21,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.formats.Format;
@@ -38,6 +39,7 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
@@ -243,6 +245,15 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
       reportItem.addPluginDetails("Could not delete file related incidences: " + e.getMessage());
     }
 
+    // removing PREMIS file
+    try {
+      String pmId = URNUtils.getPremisPrefix(PreservationMetadataType.FILE) + file.getId();
+      model.deletePreservationMetadata(PreservationMetadataType.FILE, file.getAipId(), file.getRepresentationId(), pmId,
+        false);
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+      reportItem.addPluginDetails("Could not delete associated PREMIS file: " + e.getMessage());
+    }
+
     report.addReport(reportItem.setPluginState(state));
     PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
     jobPluginInfo.incrementObjectsProcessed(state);
@@ -283,6 +294,15 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
       state = PluginState.FAILURE;
       reportItem.addPluginDetails("Could not delete representation related incidences: " + e.getMessage());
+    }
+
+    // removing PREMIS file
+    try {
+      String pmId = URNUtils.getPremisPrefix(PreservationMetadataType.REPRESENTATION) + representation.getId();
+      model.deletePreservationMetadata(PreservationMetadataType.REPRESENTATION, representation.getAipId(),
+        representation.getId(), pmId, false);
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+      reportItem.addPluginDetails("Could not delete associated PREMIS file: " + e.getMessage());
     }
 
     report.addReport(reportItem.setPluginState(state));
