@@ -50,6 +50,7 @@ import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -293,7 +294,6 @@ public class RiskRegister extends Composite {
 
   @UiHandler("buttonRemove")
   void buttonRemoveRiskHandler(ClickEvent e) {
-
     final SelectedItems<IndexedRisk> selected = riskList.getSelected();
 
     ClientSelectedItemsUtils.size(IndexedRisk.class, selected, new AsyncCallback<Long>() {
@@ -327,8 +327,15 @@ public class RiskRegister extends Composite {
 
                   @Override
                   public void onSuccess(Void result) {
-                    Toast.showInfo(messages.riskRemoveSuccessTitle(), messages.riskRemoveSuccessMessage(size));
-                    riskList.refresh();
+                    Timer timer = new Timer() {
+                      @Override
+                      public void run() {
+                        Toast.showInfo(messages.riskRemoveSuccessTitle(), messages.riskRemoveSuccessMessage(size));
+                        riskList.refresh();
+                      }
+                    };
+
+                    timer.schedule(RodaConstants.ACTION_TIMEOUT);
                   }
                 });
               }

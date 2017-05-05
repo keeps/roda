@@ -40,6 +40,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -224,8 +225,15 @@ public class FormatRegister extends Composite {
 
                   @Override
                   public void onSuccess(Void result) {
-                    Toast.showInfo(messages.formatRemoveSuccessTitle(), messages.formatRemoveSuccessMessage(size));
-                    formatList.refresh();
+                    Timer timer = new Timer() {
+                      @Override
+                      public void run() {
+                        Toast.showInfo(messages.formatRemoveSuccessTitle(), messages.formatRemoveSuccessMessage(size));
+                        formatList.refresh();
+                      }
+                    };
+
+                    timer.schedule(RodaConstants.ACTION_TIMEOUT);
                   }
                 });
               }
