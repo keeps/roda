@@ -1,0 +1,5 @@
+SIP ID,zip relative path,absolute path,checksum_type,checksum,size
+old - uuid-b122f9c7-7f6a-4469-8c5d-851113b7cf1b,bag-info.txt,,MD5,914d85c6095de6ec6379d91882f4fc63,1317
+old - uuid-b122f9c7-7f6a-4469-8c5d-851113b7cf1b,manifest-md5.txt,,MD5,ca145a3acfd1de1afdbd3a71488941cb,49
+old - uuid-b122f9c7-7f6a-4469-8c5d-851113b7cf1b,bagit.txt,,MD5,9e5ad981e0d29adc278f6a294b8c2aca,55
+old - uuid-b122f9c7-7f6a-4469-8c5d-851113b7cf1b,data/email.txt,,MD5,3ad03035dfbb6755291201bc33b54b89,25
