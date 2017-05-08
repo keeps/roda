@@ -139,8 +139,18 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
             if (!file.isDirectory()) {
               StoragePath storagePath = ModelUtils.getFileStoragePath(file);
               Binary currentFileBinary = storage.getBinary(storagePath);
-              Binary premisFile = model.retrievePreservationFile(file);
-              List<Fixity> fixities = PremisV3Utils.extractFixities(premisFile);
+              List<Fixity> fixities = null;
+
+              try {
+                Binary premisFile = model.retrievePreservationFile(file);
+                fixities = PremisV3Utils.extractFixities(premisFile);
+              } catch (NotFoundException e) {
+                ValidationIssue issue = new ValidationIssue(
+                  "File " + file.getId() + " of representation " + file.getRepresentationId() + " of AIP "
+                    + file.getAipId() + " was found but the PREMIS file does not exist");
+                validationReport.addIssue(issue);
+              }
+
               sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), file.getRepresentationId(), file.getPath(),
                 file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
@@ -187,6 +197,9 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
                   aipFailed = true;
                   createIncidence(model, file, risks.get(0));
                 }
+              } else {
+                aipFailed = true;
+                createIncidence(model, file, risks.get(0));
               }
             }
           }
