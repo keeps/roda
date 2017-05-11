@@ -8,6 +8,7 @@
 package org.roda.core.plugins.plugins.conversion;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
@@ -26,13 +27,28 @@ import org.roda.core.plugins.plugins.common.CommandConvertPlugin;
 import org.roda.core.plugins.plugins.common.FileFormatUtils;
 import org.roda.core.storage.StorageService;
 import org.roda.core.util.CommandException;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class UnoconvConvertPlugin<T extends IsRODAObject> extends CommandConvertPlugin<T> {
   public static final String TOOLNAME = "unoconvconvert";
+  private static final Logger LOGGER = LoggerFactory.getLogger(UnoconvConvertPlugin.class);
 
   public UnoconvConvertPlugin() {
     super();
+  }
+
+  @Override
+  public void init() {
+    LOGGER.info("Executing unoconv on init to start temporary listener");
+
+    try {
+      Path tempPath = Files.createTempFile("unoconvtest", ".pdf");
+      UnoconvConvertPluginUtils.executeUnoconvConvert(tempPath, tempPath, "pdf", "");
+      tempPath.toFile().delete();
+    } catch (CommandException | UnsupportedOperationException | IOException e) {
+      // do nothing
+    }
   }
 
   @Override
