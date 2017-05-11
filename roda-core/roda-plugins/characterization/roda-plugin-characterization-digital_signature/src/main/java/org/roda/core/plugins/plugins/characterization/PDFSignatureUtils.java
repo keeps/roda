@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.roda.core.data.common.RodaConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,12 +55,10 @@ import com.itextpdf.text.pdf.security.PdfPKCS7;
 import com.itextpdf.text.pdf.security.PrivateKeySignature;
 
 public final class PDFSignatureUtils {
-
   private static final Logger LOGGER = LoggerFactory.getLogger(PDFSignatureUtils.class);
 
-  /** Private empty constructor */
   private PDFSignatureUtils() {
-
+    // do nothing
   }
 
   public static String runDigitalSignatureVerify(Path input) throws IOException, GeneralSecurityException {
@@ -68,7 +67,7 @@ public final class PDFSignatureUtils {
     PdfReader reader = new PdfReader(input.toString());
     AcroFields fields = reader.getAcroFields();
     ArrayList<String> names = fields.getSignatureNames();
-    String result = "Passed";
+    String result = RodaConstants.SIGNATURE_VERIFICATION_PASSED;
 
     for (int i = 0; i < names.size(); i++) {
       String name = names.get(i);
@@ -79,7 +78,6 @@ public final class PDFSignatureUtils {
         certificate.checkValidity();
 
         if (!SignatureUtils.isCertificateSelfSigned(certificate)) {
-
           Set<Certificate> trustedRootCerts = new HashSet<>();
           Set<Certificate> intermediateCerts = new HashSet<>();
 
@@ -87,10 +85,11 @@ public final class PDFSignatureUtils {
             X509Certificate cert = (X509Certificate) c;
             cert.checkValidity();
 
-            if (SignatureUtils.isCertificateSelfSigned(c))
+            if (SignatureUtils.isCertificateSelfSigned(c)) {
               trustedRootCerts.add(c);
-            else
+            } else {
               intermediateCerts.add(c);
+            }
           }
 
           SignatureUtils.verifyCertificateChain(trustedRootCerts, intermediateCerts, certificate);
@@ -270,7 +269,7 @@ public final class PDFSignatureUtils {
       ArrayList<String> names = af.getSignatureNames();
       counter = names.size();
     } catch (IOException e) {
-      LOGGER.error("Error getting path of file {}", e.getMessage());
+      LOGGER.error("Error getting path of file {}", e);
     }
     return counter;
   }

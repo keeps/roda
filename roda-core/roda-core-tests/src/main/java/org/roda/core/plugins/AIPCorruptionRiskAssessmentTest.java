@@ -21,12 +21,14 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.plugins.base.AIPCorruptionRiskAssessmentPlugin;
@@ -73,7 +75,7 @@ public class AIPCorruptionRiskAssessmentTest {
     corporaPath = Paths.get(corporaURL.toURI());
     corporaService = new FileStorageService(corporaPath);
 
-    LOGGER.info("Running internal plugins tests under storage {}", basePath);
+    LOGGER.info("Running AIP corruption risk assessment tests under storage {}", basePath);
   }
 
   @AfterMethod
@@ -94,10 +96,13 @@ public class AIPCorruptionRiskAssessmentTest {
 
     List<Report> jobReports = TestsHelper.getJobReports(index, job, false);
     int count = StringUtils.countMatches(jobReports.get(0).getPluginDetails(), "<div class=\"entry level_error\">");
+    index.commit(RiskIncidence.class);
+    long incidences = index.count(RiskIncidence.class, Filter.ALL);
 
     // 3 errors: 1 checksum checking error, 1 file without premis, 1 premis
     // without file
     Assert.assertEquals(count, 3);
+    Assert.assertEquals(incidences, 3);
     Assert.assertEquals(jobReports.get(0).getPluginState(), PluginState.FAILURE);
   }
 

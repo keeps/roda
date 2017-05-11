@@ -97,8 +97,9 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
         PluginParameterType.BOOLEAN, "true", true, false, "Removes the digital signature from the original file."));
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES, "Ignore non PDF files",
-        PluginParameterType.BOOLEAN, "true", false, false, "Ignore files that are not recognised as PDF."));
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_IGNORE_OTHER_FILES,
+        "Ignore non embedded digital signed format files", PluginParameterType.BOOLEAN, "true", false, false,
+        "Ignore files that are not recognised as a embedded digital signed format."));
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP, new PluginParameter(
       RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP, "Create dissemination", PluginParameterType.BOOLEAN, "true",
@@ -254,9 +255,11 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
                       fileFormat, fileMimetype);
                     verifiedFiles.put(file.getId(), verification);
 
-                    if (!"Passed".equals(verification) && verificationAffectsOnOutcome) {
+                    if (!RodaConstants.SIGNATURE_VERIFICATION_PASSED.equals(verification)
+                      && verificationAffectsOnOutcome) {
                       reportState = PluginState.FAILURE;
-                      reportItem.addPluginDetails(" Signature validation failed on " + fileInfoPath + ".\n");
+                      reportItem.addPluginDetails(
+                        " Signature validation failed on " + fileInfoPath + " (" + verification + ").\n");
                     }
                   }
 
@@ -361,7 +364,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
         }
 
         if (hasNonPdfFiles) {
-          reportItem.setPluginDetails("Non PDF files were not ignored");
+          reportItem.setPluginDetails("Non embedded digital signed files were not ignored");
         }
 
       } catch (RODAException | IOException | RuntimeException e) {
@@ -369,13 +372,14 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
         reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
         jobPluginInfo.incrementObjectsProcessedWithFailure();
       } finally {
-        report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
-
         LOGGER.debug("Creating digital signature plugin event on AIP {}", aip.getId());
         boolean notifyEvent = true;
-        createEvent(model, index, aip.getId(), null, null, null, reportState, alteredFiles, extractedFiles, newFiles,
-          verifiedFiles, notifyEvent);
+        String outcome = createEvent(model, index, aip.getId(), null, null, null, reportState, alteredFiles,
+          extractedFiles, newFiles, verifiedFiles, notifyEvent);
+
+        reportItem.addPluginDetails(outcome);
+        report.addReport(reportItem);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
       }
     }
 
@@ -442,9 +446,11 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
                     fileFormat, fileMimetype);
                   verifiedFiles.put(file.getId(), verification);
 
-                  if (!"Passed".equals(verification) && verificationAffectsOnOutcome) {
+                  if (!RodaConstants.SIGNATURE_VERIFICATION_PASSED.equals(verification)
+                    && verificationAffectsOnOutcome) {
                     reportState = PluginState.FAILURE;
-                    reportItem.addPluginDetails(" Signature validation failed on " + fileInfoPath + ".");
+                    reportItem
+                      .addPluginDetails(" Signature validation failed on " + fileInfoPath + " (" + verification + ").");
                   }
                 }
 
@@ -522,20 +528,21 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
 
         LOGGER.debug("Creating digital signature plugin event for the representation {}", representation.getId());
         boolean notifyEvent = true;
-        createEvent(model, index, aipId, representation.getId(), null, null, reportState, alteredFiles, extractedFiles,
-          newFiles, verifiedFiles, notifyEvent);
+        String outcome = createEvent(model, index, aipId, representation.getId(), null, null, reportState, alteredFiles,
+          extractedFiles, newFiles, verifiedFiles, notifyEvent);
+        reportItem.addPluginDetails(outcome);
         reportItem.setPluginState(reportState);
         jobPluginInfo.incrementObjectsProcessed(reportState);
 
         if (!reportState.equals(PluginState.FAILURE)) {
           if (ignoreFiles) {
             reportItem.setHtmlPluginDetails(true)
-              .setPluginDetails(validationReport.toHtml(false, false, false, "Ignored files"));
+              .addPluginDetails(validationReport.toHtml(false, false, false, "Ignored files"));
           }
         }
 
         if (hasNonPdfFiles) {
-          reportItem.setPluginDetails("Non PDF files were not ignored");
+          reportItem.addPluginDetails("Non embedded digital signed files were not ignored");
         }
 
       } catch (RODAException | IOException | RuntimeException e) {
@@ -597,9 +604,10 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
                 fileMimetype);
               verifiedFiles.put(file.getId(), verification);
 
-              if (!"Passed".equals(verification) && verificationAffectsOnOutcome) {
+              if (!RodaConstants.SIGNATURE_VERIFICATION_PASSED.equals(verification) && verificationAffectsOnOutcome) {
                 reportState = PluginState.FAILURE;
-                reportItem.addPluginDetails("Signature validation failed on " + file.getId() + ".");
+                reportItem
+                  .addPluginDetails("Signature validation failed on " + file.getId() + " (" + verification + ").");
               }
             }
 
@@ -683,21 +691,23 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
         reportState = PluginState.FAILURE;
         reportItem.setPluginState(reportState).setPluginDetails(e.getMessage());
       } finally {
+        LOGGER.debug("Creating digital signature plugin event for the representation {}", file.getRepresentationId());
+        boolean notifyEvent = true;
+        String outcome = createEvent(model, index, file.getAipId(), file.getRepresentationId(), file.getPath(),
+          file.getId(), reportState, alteredFiles, extractedFiles, newFiles, verifiedFiles, notifyEvent);
+        jobPluginInfo.incrementObjectsProcessed(reportState);
+
+        reportItem.addPluginDetails(outcome);
         report.addReport(reportItem);
         PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
       }
 
-      LOGGER.debug("Creating digital signature plugin event for the representation {}", file.getRepresentationId());
-      boolean notifyEvent = true;
-      createEvent(model, index, file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(), reportState,
-        alteredFiles, extractedFiles, newFiles, verifiedFiles, notifyEvent);
-      jobPluginInfo.incrementObjectsProcessed(reportState);
     }
 
     return report;
   }
 
-  private void createEvent(ModelService model, IndexService index, String aipId, String representationId,
+  private String createEvent(ModelService model, IndexService index, String aipId, String representationId,
     List<String> filePath, String fileId, PluginState pluginResultState, List<File> alteredFiles,
     List<File> extractedFiles, List<File> newFiles, Map<String, String> verifiedFiles, boolean notify)
     throws PluginException {
@@ -759,6 +769,8 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
       | ValidationException | AlreadyExistsException e) {
       throw new PluginException(e.getMessage(), e);
     }
+
+    return stringBuilder.toString();
   }
 
   private String getNewFileFormat(String fileFormat, String filePronom, String fileMimetype) {

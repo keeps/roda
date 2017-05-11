@@ -1261,13 +1261,14 @@ public final class RodaConstants {
   public static final String TEST_GROUP_TRAVIS = "travis";
   public static final String TEST_GROUP_PLUGIN = "plugin";
 
-  /* List threshold */
+  /* List threshold and action timeout */
   public static final int DEFAULT_LIST_THRESHOLD = 100;
-
   public static final int ACTION_TIMEOUT = 2000;
 
-  /* DIP types */
+  /* Verification passed value */
+  public static final String SIGNATURE_VERIFICATION_PASSED = "Passed";
 
+  /* DIP types */
   public static final String DIP_TYPE_CONVERSION = "conversion";
   public static final String DIP_TYPE_DIGITAL_SIGNATURE = "digital_signature";
 
