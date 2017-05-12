@@ -552,9 +552,8 @@ public class BrowserHelper {
   }
 
   protected static <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
-    final Sorter sorter, final Sublist sublist, final Facets facets, final User user, final boolean justActive,
-    List<String> fieldsToReturn) {
-    return RodaCoreFactory.getIndexService().findAll(returnClass, filter, sorter, sublist, facets, user, justActive,
+    final Sorter sorter, final Facets facets, final User user, final boolean justActive, List<String> fieldsToReturn) {
+    return RodaCoreFactory.getIndexService().findAll(returnClass, filter, sorter, facets, user, justActive,
       fieldsToReturn);
   }
 

@@ -334,7 +334,7 @@ public class IndexResource {
           .toStreamResponse());
     } else {
       final IterableIndexResult<T> result = Browser.findAll(returnClass, findRequest.filter, findRequest.sorter,
-        findRequest.sublist, findRequest.facets, user, findRequest.onlyActive, new ArrayList<>());
+        findRequest.facets, user, findRequest.onlyActive, new ArrayList<>());
 
       return ApiUtils
         .okResponse(new RodaStreamingOutput(new ResultsCSVOutputStream<>(result, findRequest.filename, delimiter))

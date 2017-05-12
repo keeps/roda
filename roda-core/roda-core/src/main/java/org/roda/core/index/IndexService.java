@@ -149,33 +149,32 @@ public class IndexService {
 
   public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
     final List<String> fieldsToReturn) {
-    return findAll(returnClass, filter, new Sorter(new SortParameter(RodaConstants.INDEX_UUID, true)), Sublist.ALL,
-      null, true, fieldsToReturn);
+    return findAll(returnClass, filter, new Sorter(new SortParameter(RodaConstants.INDEX_UUID, true)), null, true,
+      fieldsToReturn);
   }
 
   public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
     final boolean justActive, final List<String> fieldsToReturn) {
-    return findAll(returnClass, filter, new Sorter(new SortParameter(RodaConstants.INDEX_UUID, true)), Sublist.ALL,
-      null, justActive, fieldsToReturn);
+    return findAll(returnClass, filter, new Sorter(new SortParameter(RodaConstants.INDEX_UUID, true)), null, justActive,
+      fieldsToReturn);
   }
 
   public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
     final Sorter sorter, final List<String> fieldsToReturn) {
-    return findAll(returnClass, filter, sorter, Sublist.ALL, null, true, fieldsToReturn);
+    return findAll(returnClass, filter, sorter, null, true, fieldsToReturn);
   }
 
   public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
-    final Sorter sorter, final Sublist sublist, final User user, final boolean justActive,
-    final List<String> fieldsToReturn) {
-    return new IterableIndexResult<>(getSolrClient(), returnClass, filter, sorter, sublist, Facets.NONE, user,
-      justActive, true, fieldsToReturn);
+    final Sorter sorter, final User user, final boolean justActive, final List<String> fieldsToReturn) {
+    return new IterableIndexResult<>(getSolrClient(), returnClass, filter, sorter, Facets.NONE, user, justActive, true,
+      fieldsToReturn);
   }
 
   public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
-    final Sorter sorter, final Sublist sublist, final Facets facets, final User user, final boolean justActive,
+    final Sorter sorter, final Facets facets, final User user, final boolean justActive,
     final List<String> fieldsToReturn) {
-    return new IterableIndexResult<>(getSolrClient(), returnClass, filter, sorter, sublist, facets, user, justActive,
-      true, fieldsToReturn);
+    return new IterableIndexResult<>(getSolrClient(), returnClass, filter, sorter, facets, user, justActive, true,
+      fieldsToReturn);
   }
 
   public <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter, User user, boolean justActive)

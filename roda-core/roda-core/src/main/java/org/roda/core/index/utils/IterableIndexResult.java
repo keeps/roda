@@ -61,12 +61,12 @@ public class IterableIndexResult<T extends IsIndexed> implements Iterable<T> {
 
   public IterableIndexResult(final SolrClient solrClient, final Class<T> returnClass, final Filter filter,
     final Sorter sorter, final Facets facets, final boolean removeDuplicates, final List<String> fieldsToReturn) {
-    this(solrClient, returnClass, filter, sorter, Sublist.ALL, facets, null, true, removeDuplicates, fieldsToReturn);
+    this(solrClient, returnClass, filter, sorter, facets, null, true, removeDuplicates, fieldsToReturn);
   }
 
   public IterableIndexResult(final SolrClient solrClient, final Class<T> returnClass, final Filter filter,
-    final Sorter sorter, final Sublist sublist, final Facets facets, final User user, final boolean justActive,
-    final boolean removeDuplicates, final List<String> fieldsToReturn) {
+    final Sorter sorter, final Facets facets, final User user, final boolean justActive, final boolean removeDuplicates,
+    final List<String> fieldsToReturn) {
     this.solrClient = solrClient;
     this.returnClass = returnClass;
     this.filter = filter;
