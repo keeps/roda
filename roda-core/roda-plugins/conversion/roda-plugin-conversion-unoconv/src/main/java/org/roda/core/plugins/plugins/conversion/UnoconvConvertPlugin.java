@@ -26,6 +26,7 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.common.CommandConvertPlugin;
 import org.roda.core.plugins.plugins.common.FileFormatUtils;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.CommandException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,12 +43,14 @@ public class UnoconvConvertPlugin<T extends IsRODAObject> extends CommandConvert
   public void init() {
     LOGGER.info("Executing unoconv on init to start temporary listener");
 
+    Path tempPath = null;
     try {
-      Path tempPath = Files.createTempFile("unoconvtest", ".pdf");
+      tempPath = Files.createTempFile("unoconvtest", ".pdf");
       UnoconvConvertPluginUtils.executeUnoconvConvert(tempPath, tempPath, "pdf", "");
-      tempPath.toFile().delete();
     } catch (CommandException | UnsupportedOperationException | IOException e) {
       // do nothing
+    } finally {
+      FSUtils.deletePathQuietly(tempPath);
     }
   }
 

@@ -9,7 +9,7 @@
   </xs:element>
   
   <xs:complexType mixed="true" name="fieldType">
-  	<xs:sequence>
+    <xs:sequence>
       <xs:any minOccurs="0" maxOccurs="unbounded" processContents="skip"/>
     </xs:sequence>
     <xs:attribute name="name" use="required" type="xs:NCName"/>

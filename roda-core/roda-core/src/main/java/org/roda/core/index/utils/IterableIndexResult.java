@@ -72,7 +72,8 @@ public class IterableIndexResult<T extends IsIndexed> implements Iterable<T> {
     this.filter = filter;
     this.sorter = sorter;
     this.facets = facets;
-    // TODO implement sublist support
+    // 20170512 hsilva: this is the default & non configurable page size to be
+    // used
     this.sublist = new Sublist(0, PAGE_SIZE);
     this.user = user;
     this.justActive = justActive;
