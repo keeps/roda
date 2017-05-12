@@ -7,7 +7,7 @@
  */
 package org.roda.wui.api.v1;
 
-import java.util.ArrayList;
+import java.util.Collections;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -26,15 +26,14 @@ import javax.ws.rs.core.Response;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
-import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.RODAMembers;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.controllers.UserManagement;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
@@ -79,10 +78,13 @@ public class UsersResource {
     Filter filter = new Filter();
     filter.add(new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, Boolean.toString(isUser)));
 
-    IndexResult<RODAMember> find = Browser.find(RODAMember.class, filter, Sorter.NONE, Sublist.ALL, Facets.NONE, user,
-      justActive, new ArrayList<>());
+    RODAMembers members = new RODAMembers();
+    IterableIndexResult<RODAMember> findAll = Browser.findAll(RODAMember.class, filter, Sorter.NONE, Facets.NONE, user,
+      justActive, Collections.emptyList());
+    for (RODAMember member : findAll) {
+      members.addObject(member);
+    }
 
-    RODAMembers members = new RODAMembers(find.getResults());
     return Response.ok(members, mediaType).build();
   }
 
