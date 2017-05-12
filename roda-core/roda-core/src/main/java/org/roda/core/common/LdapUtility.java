@@ -339,7 +339,11 @@ public class LdapUtility {
       final Entry entryRoda = service.newEntry(dnRoot);
       entryRoda.add(OBJECT_CLASS, OBJECT_CLASS_TOP, OBJECT_CLASS_DOMAIN, OBJECT_CLASS_EXTENSIBLE_OBJECT);
       entryRoda.add("dc", getFirstNameFromDN(dnRoot));
-      session.add(entryRoda);
+      try {
+        session.add(entryRoda);
+      } catch (LdapEntryAlreadyExistsException e) {
+        LOGGER.warn("Error injecting the context entry for dc=roda,dc=org partition: {}", e.getMessage());
+      }
     }
 
     if (ldifs != null) {
