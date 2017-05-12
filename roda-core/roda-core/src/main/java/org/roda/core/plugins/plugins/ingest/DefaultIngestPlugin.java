@@ -10,6 +10,7 @@ package org.roda.core.plugins.plugins.ingest;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -31,9 +32,12 @@ import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobStats;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -44,6 +48,7 @@ import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
+import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
@@ -60,6 +65,7 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.jknack.handlebars.Handlebars;
 import com.google.common.base.CaseFormat;
 
 /***
@@ -284,7 +290,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     LOGGER.debug("Doing stuff in afterAllExecute");
     try {
-      sendNotification(model);
+      sendNotification(model, index);
       index.commitAIPs();
       PluginHelper.fixParents(index, model, Optional.ofNullable(PluginHelper.getJobId(this)),
         PluginHelper.getSearchScopeFromParameters(this, model));
@@ -351,7 +357,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     return aips;
   }
 
-  private void sendNotification(ModelService model)
+  private void sendNotification(ModelService model, IndexService index)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     Job job = PluginHelper.getJob(this, model);
     JobStats jobStats = job.getJobStats();
@@ -370,7 +376,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
       String subject = RodaCoreFactory.getRodaConfigurationAsString("core", "notification", "ingest_subject");
       if (StringUtils.isNotBlank(subject)) {
-        subject += outcome;
+        subject += " " + outcome;
       } else {
         subject = outcome;
       }
@@ -388,6 +394,23 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       scopes.put("name", job.getName());
       scopes.put("creator", job.getUsername());
 
+      if (outcome.equals(PluginState.FAILURE.toString())) {
+        Filter filter = new Filter();
+        filter.add(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getId()));
+        filter.add(new SimpleFilterParameter(RodaConstants.JOB_REPORT_PLUGIN_STATE, PluginState.FAILURE.toString()));
+        IterableIndexResult<IndexedReport> reports = index.findAll(IndexedReport.class, filter,
+          Collections.emptyList());
+
+        StringBuilder builder = new StringBuilder();
+
+        for (IndexedReport report : reports) {
+          Report last = report.getReports().get(report.getReports().size() - 1);
+          builder.append(last.getPluginDetails() + "\n\n");
+        }
+
+        scopes.put("failures", new Handlebars.SafeString(builder.toString()));
+      }
+
       SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
       scopes.put("start", parser.format(job.getStartDate()));
 
@@ -399,6 +422,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
     String httpNotifications = RodaCoreFactory.getRodaConfiguration()
       .getString(RodaConstants.NOTIFICATION_HTTP_ENDPOINT, "");
+
     if (StringUtils.isNotBlank(httpNotifications)) {
       Notification notification = new Notification();
       String outcome = PluginState.SUCCESS.toString();

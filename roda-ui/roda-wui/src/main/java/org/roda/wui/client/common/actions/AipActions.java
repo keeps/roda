@@ -632,7 +632,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
     // MANAGEMENT
     addTitle(layout, messages.intellectualEntity(), aip, AipAction.NEW_CHILD_AIP, AipAction.MOVE_IN_HIERARCHY,
-      AipAction.UPDATE_PERMISSIONS, AipAction.ADD_REPRESENTATION, AipAction.REMOVE, AipAction.DOWNLOAD);
+      AipAction.UPDATE_PERMISSIONS, AipAction.REMOVE, AipAction.DOWNLOAD);
 
     addButton(layout, messages.newArchivalPackage(), AipAction.NEW_CHILD_AIP, aip, ActionImpact.UPDATED, callback,
       "btn-plus");
@@ -642,13 +642,15 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     addButton(layout, messages.archivalPackagePermissions(), AipAction.UPDATE_PERMISSIONS, aip, ActionImpact.UPDATED,
       callback, "btn-edit");
 
-    addButton(layout, messages.addRepresentation(), AipAction.ADD_REPRESENTATION, aip, ActionImpact.UPDATED, callback,
-      "btn-plus");
-
     addButton(layout, messages.removeArchivalPackage(), AipAction.REMOVE, aip, ActionImpact.DESTROYED, callback,
       "btn-ban");
 
     addButton(layout, messages.downloadButton(), AipAction.DOWNLOAD, aip, ActionImpact.NONE, callback, "btn-download");
+
+    addTitle(layout, messages.representation(), aip, AipAction.ADD_REPRESENTATION);
+
+    addButton(layout, messages.newButton(), AipAction.ADD_REPRESENTATION, aip, ActionImpact.UPDATED, callback,
+      "btn-plus");
 
     // PRESERVATION
     addTitle(layout, messages.preservationTitle(), aip, AipAction.NEW_PROCESS, AipAction.SHOW_EVENTS,
@@ -684,20 +686,22 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
     // MANAGEMENT
     addTitle(layout, messages.intellectualEntity(), aips, AipAction.NEW_CHILD_AIP, AipAction.MOVE_IN_HIERARCHY,
-      AipAction.UPDATE_PERMISSIONS, AipAction.ADD_REPRESENTATION, AipAction.REMOVE, AipAction.DOWNLOAD);
+      AipAction.UPDATE_PERMISSIONS, AipAction.REMOVE, AipAction.DOWNLOAD);
 
     addButton(layout, messages.moveArchivalPackage(), AipAction.MOVE_IN_HIERARCHY, aips, ActionImpact.UPDATED, callback,
       "btn-edit");
     addButton(layout, messages.archivalPackagePermissions(), AipAction.UPDATE_PERMISSIONS, aips, ActionImpact.UPDATED,
       callback, "btn-edit");
 
-    addButton(layout, messages.addRepresentation(), AipAction.ADD_REPRESENTATION, aips, ActionImpact.UPDATED, callback,
-      "btn-plus");
-
     addButton(layout, messages.removeArchivalPackage(), AipAction.REMOVE, aips, ActionImpact.DESTROYED, callback,
       "btn-ban");
 
     addButton(layout, messages.downloadButton(), AipAction.DOWNLOAD, aips, ActionImpact.NONE, callback, "btn-download");
+
+    addTitle(layout, messages.representation(), aips, AipAction.ADD_REPRESENTATION);
+
+    addButton(layout, messages.newButton(), AipAction.ADD_REPRESENTATION, aips, ActionImpact.UPDATED, callback,
+      "btn-plus");
 
     // PRESERVATION
     addTitle(layout, messages.preservationTitle(), aips, AipAction.NEW_PROCESS, AipAction.SHOW_EVENTS,

@@ -62,6 +62,7 @@ public class EmailNotificationProcessor implements NotificationProcessor {
       String templatePath = RodaCoreFactory.getRodaConfigurationAsString("core", "notification", "template_path");
       String templateCompletePath = templatePath + templateName;
       InputStream templateStream;
+
       if (localeString != null) {
         String localeTemplateCompletePath = templateCompletePath.replace(RodaConstants.EMAIL_TEMPLATE_EXTENSION,
           "_" + localeString + RodaConstants.EMAIL_TEMPLATE_EXTENSION);
@@ -69,11 +70,14 @@ public class EmailNotificationProcessor implements NotificationProcessor {
       } else {
         templateStream = RodaCoreFactory.getConfigurationFileAsStream(templateCompletePath);
       }
+
       String template = IOUtils.toString(templateStream, RodaConstants.DEFAULT_ENCODING);
       IOUtils.closeQuietly(templateStream);
+
       if (!scope.containsKey(FROM)) {
         scope.put(FROM, processedNotification.getFromUser());
       }
+
       if (recipients.size() == 1) {
         scope.put(RECIPIENT, recipients.get(0));
       } else {
@@ -87,9 +91,11 @@ public class EmailNotificationProcessor implements NotificationProcessor {
         LOGGER.error("Error processing notification body", e);
         processedNotification.setBody(strippedTemplate);
       }
+
       scope.remove(RECIPIENT);
       ConfigurableEmailUtility emailUtility = new ConfigurableEmailUtility(processedNotification.getFromUser(),
         processedNotification.getSubject());
+
       for (String recipient : recipients) {
         String modifiedBody = getUpdatedMessageBody(model, notification, recipient, template, scope);
         String host = RodaCoreFactory.getRodaConfigurationAsString("core", "email", "host");

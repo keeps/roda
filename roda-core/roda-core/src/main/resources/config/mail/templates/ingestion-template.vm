@@ -1,20 +1,53 @@
 <html>
+	<head>
+		<style>
+			.code {
+			    padding: .2rem .5rem;
+			    margin: 0 .2rem;
+			    font-size: 90%;
+			    white-space: nowrap;
+			    background: #F1F1F1;
+			    border: 1px solid #E1E1E1;
+			    border-radius: 4px;
+			}
+
+			.pre > .code {
+			    display: block;
+			    padding: 1rem 1.5rem;
+			    white-space: pre-wrap;
+
+			    /* Word break in FF */
+			    overflow-wrap: break-word;
+			    word-wrap: break-word;
+			    -ms-word-break: break-all;
+			    word-break: break-all;
+			    word-break: break-word;
+			}
+
+			.pre .code {
+			    max-height: 15em;
+			}
+		</style>
+	</head>
 	<body>
 		<p>Dear <em>{{recipient}}</em>,</p>
 		<p>RODA wants to inform you that an ingest process has just finished. The details of the job are as follows:</p>	
 		
+		<h2><strong>Job details</strong></h2>	
+		<strong>Name:</strong> {{name}}<br/>
+		<strong>Creator:</strong> {{creator}}<br/>
+		<strong>Start date:</strong> {{start}}<br/>
+		<strong>Duration:</strong> {{duration}}<br/>
+
 		<h2><strong>Summary</strong></h2>
 		<strong>Outcome:</strong> {{outcome}}<br/>
 		<strong>Job Type:</strong> {{type}}<br/>
 		<strong>Total SIPs processed:</strong> {{sips}}<br/>
 		<strong>Successful:</strong> {{success}}<br/>
 		<strong>Failed:</strong> {{failed}}<br/>
-			
-		<h2><strong>Job details</strong></h2>	
-		<strong>Name:</strong> {{name}}<br/>
-		<strong>Creator:</strong> {{creator}}<br/>
-		<strong>Start date:</strong> {{start}}<br/>
-		<strong>Duration:</strong> {{duration}}<br/>	
+
+		<h2><strong>Failure details</strong></h2>
+		<div class="pre"><div class="code">{{failures}}</div></div>
 
 		<h2><strong>Acknowledgement</strong></h2>		
 		<p>To acknowledge this message, please click on the following link: <a href="{{acknowledge}}">Message received</a></p>
@@ -23,5 +56,6 @@
 		<hr>
 		<p>RODA - Repository of Authentic Digital Objects</p>
 		<p>An open-source digital repository designed for preservation</p>
+		}
 	</body>
 <html>
