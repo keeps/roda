@@ -66,6 +66,7 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetada
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Reports;
 import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
+import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
@@ -2610,6 +2611,22 @@ public class Browser extends RodaWuiController {
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId);
     return hasDocumentation;
+  }
+
+  public static Notification acknowledgeNotification(User user, String notificationId, String ackToken)
+    throws GenericException, NotFoundException, AuthorizationDeniedException {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    // delegate
+    Notification notification = BrowserHelper.acknowledgeNotification(notificationId, ackToken);
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_NOTIFICATION_ID_PARAM,
+      notificationId, RodaConstants.CONTROLLER_NOTIFICATION_TOKEN_PARAM, ackToken);
+    return notification;
   }
 
 }

@@ -33,6 +33,7 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
@@ -246,4 +247,6 @@ public interface BrowserServiceAsync {
   void getListThreshold(AsyncCallback<Integer> asyncCallback);
 
   void showDIPEmbedded(AsyncCallback<Boolean> asyncCallback);
+
+  void acknowledgeNotification(String notificationId, String ackToken, AsyncCallback<Notification> asyncCallback);
 }

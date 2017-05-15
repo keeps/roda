@@ -187,7 +187,7 @@ public class SignatureUtility {
     throws CertificateException, NoSuchAlgorithmException, NoSuchProviderException, CMSException {
     boolean valid = true;
 
-    Store<?> certStore = s.getCertificates();
+    Store certStore = s.getCertificates();
     SignerInformationStore signers = s.getSignerInfos();
 
     Collection<SignerInformation> c = signers.getSigners();

@@ -39,6 +39,7 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
@@ -343,4 +344,7 @@ public interface BrowserService extends RemoteService {
   int getListThreshold();
 
   boolean showDIPEmbedded();
+
+  Notification acknowledgeNotification(String notificationId, String ackToken)
+    throws GenericException, NotFoundException, AuthorizationDeniedException;
 }

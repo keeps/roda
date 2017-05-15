@@ -5836,7 +5836,7 @@ td.datePickerMonth, td.datePickerYear {
 
 
 /**********************************************
-				ERROR 404 PAGE
+		ERROR 404 AND ACKNOWLEDGED PAGE
 ************************************************/
 
 #main404 h1 {
@@ -5847,7 +5847,15 @@ td.datePickerMonth, td.datePickerYear {
     text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
     color: white;
 }
-#main404 p {
+#acknowledgePage h1 {
+	font-size: 9rem;
+    line-height: 1.2;
+    letter-spacing: -.1rem;
+    text-align: center;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+    color: white;
+}
+#main404 p, #acknowledgePage p {
 	margin-bottom: 0.5em;
     font-size: 2.3rem;
     line-height: 1.5em;

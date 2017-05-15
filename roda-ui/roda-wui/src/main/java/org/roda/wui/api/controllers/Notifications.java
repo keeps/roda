@@ -86,21 +86,6 @@ public class Notifications extends RodaWuiController {
       notificationId);
   }
 
-  public static void acknowledgeNotification(User user, String notificationId, String token)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    // delegate
-    RodaCoreFactory.getModelService().acknowledgeNotification(notificationId, token);
-
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_NOTIFICATION_ID_PARAM,
-      notificationId, RodaConstants.CONTROLLER_NOTIFICATION_TOKEN_PARAM, token);
-  }
-
   /*
    * ---------------------------------------------------------------------------
    * ---------------- REST related methods - end -------------------------------

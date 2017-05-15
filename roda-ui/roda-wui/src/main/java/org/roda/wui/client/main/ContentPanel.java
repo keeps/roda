@@ -21,6 +21,7 @@ import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.ingest.Ingest;
+import org.roda.wui.client.management.AcknowledgeNotification;
 import org.roda.wui.client.management.Management;
 import org.roda.wui.client.management.Profile;
 import org.roda.wui.client.management.RecoverLogin;
@@ -111,6 +112,9 @@ public class ContentPanel extends SimplePanel {
 
     // UUID resolver
     resolvers.add(HistoryUtils.UUID_RESOLVER);
+
+    // Acknowlege page
+    resolvers.add(AcknowledgeNotification.RESOLVER);
   }
 
   /**

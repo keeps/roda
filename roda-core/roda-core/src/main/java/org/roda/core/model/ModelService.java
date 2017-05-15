@@ -2240,7 +2240,7 @@ public class ModelService extends ModelObservable {
     return ret;
   }
 
-  public void acknowledgeNotification(String notificationId, String token)
+  public Notification acknowledgeNotification(String notificationId, String token)
     throws GenericException, NotFoundException, AuthorizationDeniedException {
 
     Notification notification = this.retrieveNotification(notificationId);
@@ -2259,6 +2259,8 @@ public class ModelService extends ModelObservable {
         }
       }
     }
+
+    return notification;
   }
 
   /***************** DIP related *****************/

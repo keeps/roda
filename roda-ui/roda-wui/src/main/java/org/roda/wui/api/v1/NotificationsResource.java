@@ -186,7 +186,7 @@ public class NotificationsResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    org.roda.wui.api.controllers.Notifications.acknowledgeNotification(user, notificationId, token);
+    Browser.acknowledgeNotification(user, notificationId, token);
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Notification acknowledged"), mediaType).build();
   }
 }

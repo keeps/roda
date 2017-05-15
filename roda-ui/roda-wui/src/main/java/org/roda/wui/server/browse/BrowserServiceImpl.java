@@ -61,6 +61,7 @@ import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
@@ -921,6 +922,13 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public boolean showDIPEmbedded() {
     return RodaCoreFactory.getRodaConfiguration().getBoolean("ui.dip.externalURL.showEmbedded", false);
+  }
+
+  @Override
+  public Notification acknowledgeNotification(String notificationId, String ackToken)
+    throws GenericException, NotFoundException, AuthorizationDeniedException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Browser.acknowledgeNotification(user, notificationId, ackToken);
   }
 
 }

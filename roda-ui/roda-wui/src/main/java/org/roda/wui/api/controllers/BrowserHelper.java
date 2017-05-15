@@ -114,6 +114,7 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.jobs.Reports;
+import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
@@ -3204,6 +3205,11 @@ public class BrowserHelper {
     } catch (NotFoundException e) {
       return false;
     }
+  }
+
+  public static Notification acknowledgeNotification(String notificationId, String ackToken)
+    throws GenericException, NotFoundException, AuthorizationDeniedException {
+    return RodaCoreFactory.getModelService().acknowledgeNotification(notificationId, ackToken);
   }
 
 }
