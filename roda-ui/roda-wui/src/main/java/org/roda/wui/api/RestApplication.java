@@ -19,6 +19,8 @@ import io.swagger.jaxrs.listing.SwaggerSerializers;
 public class RestApplication extends ResourceConfig {
   private static final String RODA_API_PACKAGE = "org.roda.wui.api";
   private static final String SWAGGER_PACKAGE = "io.swagger.jaxrs.listing";
+  public static final String API_VERSION = "1";
+  public static final String API_BASE_PATH = "/api";
 
   public RestApplication() {
     super();
@@ -31,8 +33,8 @@ public class RestApplication extends ResourceConfig {
     register(ApiListingResource.class);
     register(SwaggerSerializers.class);
     BeanConfig beanConfig = new BeanConfig();
-    beanConfig.setVersion("1");
-    beanConfig.setBasePath("/api");
+    beanConfig.setVersion(API_VERSION);
+    beanConfig.setBasePath(API_BASE_PATH);
     beanConfig.setResourcePackage(RODA_API_PACKAGE);
     beanConfig.setScan(true);
   }

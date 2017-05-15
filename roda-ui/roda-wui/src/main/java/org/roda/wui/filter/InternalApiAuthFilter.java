@@ -66,10 +66,8 @@ public class InternalApiAuthFilter implements Filter {
     if (!isRequestUrlExcluded(request) && request.getSession().getAttribute(UserUtility.RODA_USER) == null) {
       // No user yet
       try {
-
         UserUtility.setUser(request, getBasicAuthUser(request));
         chain.doFilter(servletRequest, servletResponse);
-
       } catch (final AuthenticationDeniedException | GenericException e) {
         LOGGER.debug(e.getMessage(), e);
         response.setHeader(RodaConstants.HTTP_HEADERS_WWW_AUTHENTICATE, "Basic realm=\"" + realm + "\"");
@@ -116,7 +114,8 @@ public class InternalApiAuthFilter implements Filter {
    */
   private boolean isRequestUrlExcluded(final HttpServletRequest request) {
     for (String exclusion : this.exclusions) {
-      if (request.getPathInfo().matches(exclusion)) {
+      String pathInfo = request.getPathInfo();
+      if (pathInfo != null && exclusion != null && pathInfo.matches(exclusion)) {
         return true;
       }
     }
