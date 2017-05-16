@@ -128,6 +128,10 @@ public class JavascriptUtils {
 										// either via the browse button, or via drag/drop:
 										add : function(e, data) {
 
+											$wnd.jQuery('.btn').prop(
+													'disabled', true);
+											$wnd.jQuery('#upload-message')
+													.hide();
 											var tpl = $wnd
 													.jQuery('<li class="working"><input type="text" value="0" data-width="30" data-height="30"'
 															+ ' data-fgColor="#089de3" data-readOnly="1" data-bgColor="#3e4043" /><p></p><span class="icon"></span></li>');
@@ -180,6 +184,15 @@ public class JavascriptUtils {
 											if (progress == 100) {
 												data.context
 														.removeClass('working');
+												$wnd.jQuery('.btn').prop(
+														'disabled', false);
+												$wnd.jQuery('#upload-message')
+														.show();
+											} else {
+												$wnd.jQuery('.btn').prop(
+														'disabled', true);
+												$wnd.jQuery('#upload-message')
+														.hide();
 											}
 										},
 

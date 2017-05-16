@@ -511,6 +511,20 @@ pre code {
     margin-right: 5px;
 }
 
+.success {
+    color: #24c279;
+}
+
+.success:before {
+    content: '\f00c';
+    font-family: FontAwesome;
+    padding-left: 5px;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    margin-right: 5px;
+}
+
 .error pre > code {
     color: black;
 }

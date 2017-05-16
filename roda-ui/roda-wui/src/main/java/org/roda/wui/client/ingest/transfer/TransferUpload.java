@@ -122,9 +122,11 @@ public class TransferUpload extends Composite {
   @UiField
   Label itemDates;
 
-  // BUTTONS
   @UiField
   Button done;
+
+  @UiField
+  HTML uploadMessage;
 
   @UiField
   HTML uploadForm;
@@ -213,6 +215,10 @@ public class TransferUpload extends Composite {
 
   protected void resolve(final List<String> historyTokens, final AsyncCallback<Widget> callback) {
     isIngest = true;
+
+    uploadMessage.getElement().setId("upload-message");
+    uploadMessage.setHTML("<span class='success'>" + messages.uploadDoneMessage() + "</span>");
+    uploadMessage.setVisible(false);
 
     if (historyTokens.isEmpty()) {
       // Upload to root

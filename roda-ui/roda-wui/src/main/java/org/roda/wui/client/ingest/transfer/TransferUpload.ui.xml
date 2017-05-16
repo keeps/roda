@@ -25,6 +25,7 @@
 						<g:Label addStyleNames="browseItemDates" ui:field="itemDates" />
 					</g:FlowPanel>
 				</g:FlowPanel>
+				<g:HTML ui:field="uploadMessage"/>
 				<g:HTML ui:field="uploadForm" />
 				<g:HTML ui:field="uploadList">
 					<ul id="upload-list">

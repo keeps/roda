@@ -432,6 +432,8 @@ public interface ClientMessages extends Messages {
 
   String ingestTransferUploadFinishButton();
 
+  String uploadDoneMessage();
+
   /******** DIALOG GENERIC **************/
 
   String dialogCancel();
