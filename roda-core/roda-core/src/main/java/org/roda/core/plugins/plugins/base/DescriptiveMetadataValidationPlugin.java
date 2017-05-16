@@ -11,11 +11,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.common.validation.ValidationUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
+import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.jobs.Job;
@@ -69,6 +71,8 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
   private boolean forceDescriptiveMetadataType;
   private String metadataType;
   private String metadataVersion;
+
+  private List<Pair<String, String>> schemasInfo;
 
   @Override
   public void init() throws PluginException {
@@ -143,13 +147,16 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
 
     try {
       LOGGER.debug("Validating AIP {}", aip.getId());
-      ValidationReport report = ValidationUtils.isAIPMetadataValid(forceDescriptiveMetadataType,
-        validateDescriptiveMetadata, metadataType, metadataVersion, model, aip.getId());
-      if (report.isValid()) {
+      Pair<ValidationReport, List<Pair<String, String>>> reportAndSchemaInfo = ValidationUtils.isAIPMetadataValid(
+        forceDescriptiveMetadataType, validateDescriptiveMetadata, metadataType, metadataVersion, model, aip.getId());
+      schemasInfo = reportAndSchemaInfo.getSecond();
+
+      if (reportAndSchemaInfo.getFirst().isValid()) {
         reportItem.setPluginState(state);
       } else {
         state = PluginState.FAILURE;
-        reportItem.setPluginState(state).setHtmlPluginDetails(true).setPluginDetails(report.toHtml(false, false));
+        reportItem.setPluginState(state).setHtmlPluginDetails(true)
+          .setPluginDetails(reportAndSchemaInfo.getFirst().toHtml(false, false));
       }
     } catch (RODAException mse) {
       state = PluginState.FAILURE;
@@ -204,12 +211,40 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "Descriptive metadata is well formed and complete.";
+    return addSchemaToBuilder("Descriptive metadata is well formed and complete.");
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Descriptive metadata was not well formed or failed to meet the established ingest policy.";
+    return addSchemaToBuilder(
+      "Descriptive metadata was not well formed or failed to meet the established ingest policy.");
+  }
+
+  private String addSchemaToBuilder(String eventMessage) {
+    if (!schemasInfo.isEmpty()) {
+      StringBuilder builder = new StringBuilder(eventMessage);
+      builder.append("\nSchemas used on validation: ");
+
+      Pair<String, String> firstSchema = schemasInfo.get(0);
+      builder.append(firstSchema.getFirst());
+
+      if (StringUtils.isNotBlank(firstSchema.getSecond())) {
+        builder.append(" (").append(schemasInfo.get(0).getSecond()).append(")");
+      }
+
+      for (int i = 1; i < schemasInfo.size(); i++) {
+        Pair<String, String> schema = schemasInfo.get(i);
+        builder.append(", ").append(schema.getFirst());
+
+        if (StringUtils.isNotBlank(schema.getSecond())) {
+          builder.append(" (").append(schema.getSecond()).append(")");
+        }
+      }
+
+      return builder.toString();
+    }
+
+    return eventMessage;
   }
 
   @Override

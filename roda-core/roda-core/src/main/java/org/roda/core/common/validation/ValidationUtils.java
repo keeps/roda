@@ -34,6 +34,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
@@ -75,13 +76,14 @@ public class ValidationUtils {
     // do nothing
   }
 
-  public static ValidationReport isAIPMetadataValid(boolean forceDescriptiveMetadataType,
-    boolean validateDescriptiveMetadata, String fallbackMetadataType, String fallbackMetadataVersion,
-    ModelService model, String aipId) throws GenericException, RequestNotValidException, AuthorizationDeniedException,
-    NotFoundException, ValidationException {
+  public static Pair<ValidationReport, List<Pair<String, String>>> isAIPMetadataValid(
+    boolean forceDescriptiveMetadataType, boolean validateDescriptiveMetadata, String fallbackMetadataType,
+    String fallbackMetadataVersion, ModelService model, String aipId) throws GenericException, RequestNotValidException,
+    AuthorizationDeniedException, NotFoundException, ValidationException {
     ValidationReport report = new ValidationReport();
     report.setValid(true);
     List<DescriptiveMetadata> descriptiveMetadata = model.retrieveAIP(aipId).getDescriptiveMetadata();
+    List<Pair<String, String>> schemasInfo = new ArrayList<>();
     for (DescriptiveMetadata dm : descriptiveMetadata) {
       StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(dm);
       Binary binary = model.getStorage().getBinary(storagePath);
@@ -90,6 +92,9 @@ public class ValidationUtils {
           ValidationReport dmReport = validateDescriptiveBinary(binary.getContent(), fallbackMetadataType,
             fallbackMetadataVersion, false);
           consolidateReports(report, dmReport);
+          if (schemasInfo.isEmpty()) {
+            schemasInfo.add(Pair.of(fallbackMetadataType, fallbackMetadataVersion));
+          }
         }
         // XXX review why should a validation method update data
         Map<String, String> properties = new HashMap<>();
@@ -107,12 +112,17 @@ public class ValidationUtils {
         ValidationReport dmReport = validateDescriptiveBinary(binary.getContent(), metadataType, metadataVersion,
           false);
         consolidateReports(report, dmReport);
+
+        Pair<String, String> pair = Pair.of(metadataType, metadataVersion);
+        if (!schemasInfo.contains(pair)) {
+          schemasInfo.add(pair);
+        }
       }
 
     }
 
     // TODO handle premis...
-    return report;
+    return Pair.of(report, schemasInfo);
   }
 
   public static ValidationReport consolidateReports(ValidationReport mainReport, ValidationReport innerReport) {
