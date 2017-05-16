@@ -7,6 +7,8 @@
  */
 package org.roda.wui.client.management;
 
+import org.roda.wui.client.common.utils.StringUtils;
+
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -131,7 +133,14 @@ public class PasswordPanel extends SimplePanel implements HasValueChangeHandlers
   }
 
   public boolean isSmall() {
-    boolean small = editPassword.getValue().length() < 6;
+    boolean small;
+
+    if (buttonMode && StringUtils.isBlank(editPassword.getValue())) {
+      small = false;
+    } else {
+      small = editPassword.getValue().length() < 6;
+    }
+
     updateAfterValidation(!small);
     return small;
   }
