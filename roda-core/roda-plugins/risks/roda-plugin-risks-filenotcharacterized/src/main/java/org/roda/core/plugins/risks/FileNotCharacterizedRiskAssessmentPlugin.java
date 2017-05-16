@@ -421,8 +421,9 @@ public class FileNotCharacterizedRiskAssessmentPlugin extends AbstractPlugin<Fil
         new SimpleFilterParameter("riskId", FILE_NOT_CHARACTERIZED_RISK_ID),
         new SimpleFilterParameter("aipId", file.getAipId()),
         new SimpleFilterParameter("representationId", file.getRepresentationId()),
-        new SimpleFilterParameter("fileId", file.getId())));
-    // new SimpleFilterParameter("filePath", file.getPath())
+        new SimpleFilterParameter("fileId", file.getId()),
+        new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_FILE_PATH_COMPUTED,
+          StringUtils.join(file.getPath(), RodaConstants.RISK_INCIDENCE_FILE_PATH_COMPUTED_SEPARATOR))));
 
     try {
       final List<RiskIncidence> results = index.find(RiskIncidence.class, filter,

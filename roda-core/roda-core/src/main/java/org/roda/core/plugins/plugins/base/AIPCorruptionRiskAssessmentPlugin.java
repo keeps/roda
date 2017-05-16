@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.xmlbeans.XmlException;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -31,6 +32,11 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.common.OptionalWithCause;
+import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.sort.Sorter;
+import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
@@ -193,13 +199,17 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
 
                 if (passedFixity) {
                   passedFiles.add(fileEntry);
+                  updateIncidence(model, index, file.getAipId(), file.getRepresentationId(), file.getPath(),
+                    file.getId(), risks.get(0));
                 } else {
                   aipFailed = true;
-                  createIncidence(model, file, risks.get(0));
+                  createIncidence(model, index, file.getAipId(), file.getRepresentationId(), file.getPath(),
+                    file.getId(), risks.get(0));
                 }
               } else {
                 aipFailed = true;
-                createIncidence(model, file, risks.get(0));
+                createIncidence(model, index, file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
+                  risks.get(0));
               }
             }
           }
@@ -207,7 +217,7 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
 
         CloseableIterable<OptionalWithCause<PreservationMetadata>> pmList = model.listPreservationMetadata(aip.getId(),
           r.getId());
-        boolean premisWithoutFile = false;
+
         for (OptionalWithCause<PreservationMetadata> opm : pmList) {
           if (opm.isPresent()) {
             PreservationMetadata pm = opm.get();
@@ -220,14 +230,11 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
                     + pm.getAipId() + " was not found but the PREMIS file exists");
                 validationReport.addIssue(issue);
                 aipFailed = true;
-                premisWithoutFile = true;
+                createIncidence(model, index, aip.getId(), pm.getRepresentationId(), pm.getFileDirectoryPath(),
+                  pm.getFileId(), risks.get(0));
               }
             }
           }
-        }
-
-        if (premisWithoutFile) {
-          createIncidence(model, aip.getId(), r.getId(), null, null, risks.get(0));
         }
 
         IOUtils.closeQuietly(allFiles);
@@ -259,31 +266,64 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
     }
   }
 
-  private RiskIncidence createIncidence(ModelService model, File file, String riskId) throws RequestNotValidException,
-    GenericException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
-    return createIncidence(model, file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(), riskId);
-  }
-
-  private RiskIncidence createIncidence(ModelService model, String aipId, String representationId,
+  private void createIncidence(ModelService model, IndexService index, String aipId, String representationId,
     List<String> filePath, String fileId, String riskId) throws RequestNotValidException, GenericException,
     AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
-    Risk risk = PluginHelper.createRiskIfNotExists(model, riskId, getClass().getClassLoader());
-    RiskIncidence incidence = new RiskIncidence();
-    incidence.setDetectedOn(new Date());
-    incidence.setDetectedBy(this.getName());
-    incidence.setRiskId(riskId);
-    incidence.setAipId(aipId);
-    incidence.setRepresentationId(representationId);
+    List<RiskIncidence> results = getUnmitigatedIncidences(index, aipId, representationId, filePath, fileId, riskId);
+
+    if (results.isEmpty()) {
+      Risk risk = PluginHelper.createRiskIfNotExists(model, riskId, getClass().getClassLoader());
+      RiskIncidence incidence = new RiskIncidence();
+      incidence.setDetectedOn(new Date());
+      incidence.setDetectedBy(this.getName());
+      incidence.setRiskId(riskId);
+      incidence.setAipId(aipId);
+      incidence.setRepresentationId(representationId);
+      if (filePath != null) {
+        incidence.setFilePath(filePath);
+      }
+      if (fileId != null) {
+        incidence.setFileId(fileId);
+      }
+      incidence.setObjectClass(AIP.class.getSimpleName());
+      incidence.setStatus(INCIDENCE_STATUS.UNMITIGATED);
+      incidence.setSeverity(risk.getPreMitigationSeverityLevel());
+      model.createRiskIncidence(incidence, false);
+    }
+  }
+
+  private void updateIncidence(ModelService model, IndexService index, String aipId, String representationId,
+    List<String> filePath, String fileId, String riskId) throws GenericException, RequestNotValidException {
+    List<RiskIncidence> results = getUnmitigatedIncidences(index, aipId, representationId, filePath, fileId, riskId);
+
+    for (RiskIncidence incidence : results) {
+      incidence.setStatus(INCIDENCE_STATUS.MITIGATED);
+      model.updateRiskIncidence(incidence, false);
+    }
+  }
+
+  private List<RiskIncidence> getUnmitigatedIncidences(IndexService index, String aipId, String representationId,
+    List<String> filePath, String fileId, String riskId) throws GenericException, RequestNotValidException {
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, aipId),
+      new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISK_ID, riskId),
+      new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_STATUS, INCIDENCE_STATUS.UNMITIGATED.toString()));
+
+    if (representationId != null) {
+      filter.add(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, representationId));
+    }
+
     if (filePath != null) {
-      incidence.setFilePath(filePath);
+      filter.add(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_FILE_PATH_COMPUTED,
+        StringUtils.join(filePath, RodaConstants.RISK_INCIDENCE_FILE_PATH_COMPUTED_SEPARATOR)));
     }
+
     if (fileId != null) {
-      incidence.setFileId(fileId);
+      filter.add(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_FILE_ID, fileId));
     }
-    incidence.setObjectClass(AIP.class.getSimpleName());
-    incidence.setStatus(INCIDENCE_STATUS.UNMITIGATED);
-    incidence.setSeverity(risk.getPreMitigationSeverityLevel());
-    return model.createRiskIncidence(incidence, false);
+
+    IndexResult<RiskIncidence> incidences = index.find(RiskIncidence.class, filter, Sorter.NONE, new Sublist(0, 1),
+      new ArrayList<>());
+    return incidences.getResults();
   }
 
   @Override

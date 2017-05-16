@@ -456,8 +456,9 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
       Arrays.asList(new SimpleFilterParameter("status", RiskIncidence.INCIDENCE_STATUS.UNMITIGATED.toString()),
         new SimpleFilterParameter("riskId", RISK_ID), new SimpleFilterParameter("aipId", file.getAipId()),
         new SimpleFilterParameter("representationId", file.getRepresentationId()),
-        new SimpleFilterParameter("fileId", file.getId())));
-    // new SimpleFilterParameter("filePath", file.getPath())
+        new SimpleFilterParameter("fileId", file.getId()),
+        new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_FILE_PATH_COMPUTED,
+          StringUtils.join(file.getPath(), RodaConstants.RISK_INCIDENCE_FILE_PATH_COMPUTED_SEPARATOR))));
 
     try {
       final List<RiskIncidence> results = index.find(RiskIncidence.class, filter,
