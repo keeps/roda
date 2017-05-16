@@ -110,6 +110,10 @@
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarActionsTitle}' />
 							</g:Label>
+							<g:Button addStyleNames="btn btn-block btn-download"
+								ui:field="downloadButton">
+								<ui:text from='{messages.downloadButton}' />
+							</g:Button>
 							<g:Button addStyleNames="btn btn-block btn-default btn-back"
 								ui:field="backButton">
 								<ui:text from='{messages.preservationEventsBackButton}' />

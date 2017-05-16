@@ -36,9 +36,9 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
-@Path(PreservationMetadataResource.ENDPOINT)
-@Api(value = PreservationMetadataResource.SWAGGER_ENDPOINT)
-public class PreservationMetadataResource {
+@Path(PreservationMetadataEventsResource.ENDPOINT)
+@Api(value = PreservationMetadataEventsResource.SWAGGER_ENDPOINT)
+public class PreservationMetadataEventsResource {
   public static final String ENDPOINT = "/v1/events";
   public static final String SWAGGER_ENDPOINT = "v1 events";
 

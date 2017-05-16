@@ -190,6 +190,7 @@ public final class RodaConstants {
   public static final String API_REST_V1_DIPS = "api/v1/dips/";
   public static final String API_REST_V1_DIPFILES = "api/v1/dipfiles/";
   public static final String API_REST_V1_EVENTS = "api/v1/events/";
+  public static final String API_REST_V1_AGENTS = "api/v1/agents/";
   // sub-resources strings
   public static final String API_DATA = "data";
   public static final Object API_FILE = "file";

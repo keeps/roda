@@ -716,6 +716,25 @@ public class Browser extends RodaWuiController {
     return event;
   }
 
+  public static EntityResponse retrievePreservationMetadataAgent(User user, String id, String acceptFormat)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // validate input
+    BrowserHelper.validateGetPreservationMetadataParams(acceptFormat);
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    // delegate
+    EntityResponse agent = BrowserHelper.retrievePreservationMetadataAgent(id, acceptFormat);
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
+
+    return agent;
+  }
+
   public static void createOrUpdatePreservationMetadataWithAIP(User user, String aipId, String fileId, InputStream is,
     String fileName, boolean create) throws AuthorizationDeniedException, GenericException, NotFoundException,
     RequestNotValidException, ValidationException, AlreadyExistsException {
@@ -2617,8 +2636,10 @@ public class Browser extends RodaWuiController {
     throws GenericException, NotFoundException, AuthorizationDeniedException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
-    // check user permissions
-    controllerAssistant.checkRoles(user);
+    // 20170515 nvieira: decided to not check roles considering the ackToken
+    // should be enough and it is not necessary nor usable to create a new role
+    // only for this purpose
+    // controllerAssistant.checkRoles(user);
 
     // delegate
     Notification notification = BrowserHelper.acknowledgeNotification(notificationId, ackToken);

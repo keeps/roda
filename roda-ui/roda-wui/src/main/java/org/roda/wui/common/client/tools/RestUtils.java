@@ -192,7 +192,6 @@ public class RestUtils {
   }
 
   public static SafeUri createPreservationMetadataDownloadUri(String aipId) {
-
     // api/v1/aips/{aip_id}/preservation_metadata/?acceptFormat=zip
     StringBuilder b = new StringBuilder();
     // base uri
@@ -207,7 +206,7 @@ public class RestUtils {
 
   public static String createRepresentationPreservationMetadataUri(String aipId, String representationId,
     int startAgent, int limitAgent, int startEvent, int limitEvent, int startFile, int limitFile) {
-    // api/v1/representations/{aip_id}/{representation_id}/descriptive_metadata/?acceptFormat=zip
+    // api/v1/representations/{aip_id}/{representation_id}/preservation_metadata/?acceptFormat=zip
     StringBuilder b = new StringBuilder();
     // base uri
     b.append(RodaConstants.API_REST_V1_REPRESENTATIONS).append(URL.encodeQueryString(aipId))
@@ -292,9 +291,10 @@ public class RestUtils {
     return UriUtils.fromSafeConstant(b.toString());
   }
 
-  public static SafeUri createPreservationEventDetailsHTMLUri(String eventId, String aipId, String representationUUID,
-    String fileUUID) {
-    // api/v1/events?id={event_id}&aipId={aip_id}&representationUUID={representationUUID}&fileUUID={fileUUID}&onlyDetails=true&acceptFormat=html&lang={lang}
+  public static SafeUri createPreservationEventDetailsUri(String eventId, String aipId, String representationUUID,
+    String fileUUID, boolean onlyDetails, String acceptFormat) {
+    // api/v1/events?id={event_id}&aipId={aip_id}&representationUUID={representationUUID}&
+    // fileUUID={fileUUID}&onlyDetails={onlyDetails}&acceptFormat={format}&lang={lang}
     StringBuilder b = new StringBuilder();
 
     b.append(RodaConstants.API_REST_V1_EVENTS).append(RodaConstants.API_QUERY_START)
@@ -317,14 +317,27 @@ public class RestUtils {
     }
 
     b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_PARAM_ONLY_DETAILS)
-      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(URL.encodeQueryString(Boolean.toString(true)));
+      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(URL.encodeQueryString(Boolean.toString(onlyDetails)));
 
     b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT)
-      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
-      .append(URL.encodeQueryString(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML));
+      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(URL.encodeQueryString(acceptFormat));
 
     b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_KEY_LANG)
       .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(LocaleInfo.getCurrentLocale().getLocaleName());
+
+    return UriUtils.fromSafeConstant(b.toString());
+  }
+
+  public static SafeUri createPreservationAgentUri(String agentId, String acceptFormat) {
+    // api/v1/agents?id={agent_id}&acceptFormat={format}
+    StringBuilder b = new StringBuilder();
+
+    b.append(RodaConstants.API_REST_V1_AGENTS).append(RodaConstants.API_QUERY_START)
+      .append(RodaConstants.API_QUERY_PARAM_ID).append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
+      .append(URL.encodeQueryString(agentId));
+
+    b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT)
+      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(URL.encodeQueryString(acceptFormat));
 
     return UriUtils.fromSafeConstant(b.toString());
   }

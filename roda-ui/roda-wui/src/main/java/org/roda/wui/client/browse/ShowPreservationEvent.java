@@ -57,6 +57,7 @@ import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
@@ -178,6 +179,9 @@ public class ShowPreservationEvent extends Composite {
 
   @UiField
   Button backButton;
+
+  @UiField
+  Button downloadButton;
 
   private String aipId;
   private String representationUUID;
@@ -681,8 +685,9 @@ public class ShowPreservationEvent extends Composite {
 
   private void getEventDetailsHTML(final AsyncCallback<SafeHtml> callback) {
     IndexedPreservationEvent event = bundle.getEvent();
-    SafeUri uri = RestUtils.createPreservationEventDetailsHTMLUri(eventId, event.getAipID(),
-      event.getRepresentationUUID(), event.getFileUUID());
+    SafeUri uri = RestUtils.createPreservationEventDetailsUri(eventId, event.getAipID(), event.getRepresentationUUID(),
+      event.getFileUUID(), true, RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML);
+
     RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri.asString());
     requestBuilder.setHeader("Authorization", "Custom");
     try {
@@ -745,5 +750,13 @@ public class ShowPreservationEvent extends Composite {
     } else {
       HistoryUtils.newHistory(PreservationEvents.PLANNING_RESOLVER);
     }
+  }
+
+  @UiHandler("downloadButton")
+  void buttonDownloadHandler(ClickEvent e) {
+    IndexedPreservationEvent event = bundle.getEvent();
+    SafeUri downloadUri = RestUtils.createPreservationEventDetailsUri(eventId, event.getAipID(),
+      event.getRepresentationUUID(), event.getFileUUID(), false, RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN);
+    Window.Location.assign(downloadUri.asString());
   }
 }

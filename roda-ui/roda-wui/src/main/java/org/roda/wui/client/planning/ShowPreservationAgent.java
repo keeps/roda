@@ -25,13 +25,16 @@ import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -109,6 +112,9 @@ public class ShowPreservationAgent extends Composite {
   @UiField
   Button backButton;
 
+  @UiField
+  Button downloadButton;
+
   private IndexedPreservationAgent agent = null;
   private String eventId = null;
 
@@ -173,5 +179,12 @@ public class ShowPreservationAgent extends Composite {
     } else {
       HistoryUtils.newHistory(PreservationAgents.RESOLVER);
     }
+  }
+
+  @UiHandler("downloadButton")
+  void buttonDownloadHandler(ClickEvent e) {
+    SafeUri downloadUri = RestUtils.createPreservationAgentUri(agent.getId(),
+      RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN);
+    Window.Location.assign(downloadUri.asString());
   }
 }

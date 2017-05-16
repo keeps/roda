@@ -1364,13 +1364,13 @@ public class BrowserHelper {
       fileId = file.getId();
     } else if (representationUUID != null) {
       IndexedRepresentation rep = index.retrieve(IndexedRepresentation.class, representationUUID,
-        Arrays.asList(RodaConstants.REPRESENTATION_ID));
+        Arrays.asList(RodaConstants.REPRESENTATION_ID, RodaConstants.INDEX_UUID));
       representationId = rep.getId();
     }
 
     if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
       final Binary binary = model.retrievePreservationEvent(aipId, representationId, filePath, fileId, id);
-      final String mediaType = RodaConstants.MEDIA_TYPE_TEXT_XML;
+      final String mediaType = RodaConstants.MEDIA_TYPE_APPLICATION_XML;
 
       final ConsumesOutputStream stream = new ConsumesOutputStream() {
 
@@ -1422,6 +1422,43 @@ public class BrowserHelper {
         }
       };
       return new StreamResponse(filename, mediaType, stream);
+    } else {
+      throw new GenericException("Unsupported accept format: " + acceptFormat);
+    }
+  }
+
+  public static EntityResponse retrievePreservationMetadataAgent(String id, String acceptFormat)
+    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+    ModelService model = RodaCoreFactory.getModelService();
+
+    if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
+      final Binary binary = model.retrievePreservationAgent(id);
+      final String mediaType = RodaConstants.MEDIA_TYPE_APPLICATION_XML;
+
+      final ConsumesOutputStream stream = new ConsumesOutputStream() {
+
+        @Override
+        public String getMediaType() {
+          return mediaType;
+        }
+
+        @Override
+        public String getFileName() {
+          return binary.getStoragePath().getName();
+        }
+
+        @Override
+        public void consumeOutputStream(OutputStream out) throws IOException {
+          IOUtils.copy(binary.getContent().createInputStream(), out);
+        }
+      };
+
+      return new StreamResponse(stream.getFileName(), mediaType, stream);
+    } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
+      || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
+      PreservationMetadata pm = model.retrievePreservationMetadata(null, null, null, null,
+        PreservationMetadataType.AGENT);
+      return new ObjectResponse<PreservationMetadata>(acceptFormat, pm);
     } else {
       throw new GenericException("Unsupported accept format: " + acceptFormat);
     }
