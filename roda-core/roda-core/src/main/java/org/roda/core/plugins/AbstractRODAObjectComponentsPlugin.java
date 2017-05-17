@@ -7,8 +7,13 @@
  */
 package org.roda.core.plugins;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
@@ -17,6 +22,7 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
@@ -25,8 +31,8 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractAIPComponentsPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractAIPComponentsPlugin.class);
+public abstract class AbstractRODAObjectComponentsPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
+  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractRODAObjectComponentsPlugin.class);
 
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
@@ -44,6 +50,9 @@ public abstract class AbstractAIPComponentsPlugin<T extends IsRODAObject> extend
                 (List<Representation>) objects, cachedJob);
             } else if (objects.get(0) instanceof File) {
               report = executeOnFile(index, model, storage, report, jobPluginInfo, (List<File>) objects, cachedJob);
+            } else if (objects.get(0) instanceof RiskIncidence) {
+              report = executeOnIncidence(index, model, storage, report, jobPluginInfo, (List<RiskIncidence>) objects,
+                cachedJob);
             }
           } catch (PluginException e) {
             LOGGER.error("Error while executing 'executeOnX' method", e);
@@ -63,5 +72,53 @@ public abstract class AbstractAIPComponentsPlugin<T extends IsRODAObject> extend
 
   protected abstract Report executeOnFile(IndexService index, ModelService model, StorageService storage, Report report,
     SimpleJobPluginInfo jobPluginInfo, List<File> list, Job job) throws PluginException;
+
+  protected Report executeOnIncidence(IndexService index, ModelService model, StorageService storage, Report report,
+    SimpleJobPluginInfo jobPluginInfo, List<RiskIncidence> list, Job job) throws PluginException {
+
+    List<File> fileList = new ArrayList<>();
+    List<Representation> representationList = new ArrayList<>();
+    List<AIP> aipList = new ArrayList<>();
+
+    for (RiskIncidence incidence : list) {
+      try {
+        if (incidence.getObjectClass().equals(File.class.getSimpleName())) {
+          fileList.add(model.retrieveFile(incidence.getAipId(), incidence.getRepresentationId(),
+            incidence.getFilePath(), incidence.getFileId()));
+        } else if (incidence.getObjectClass().equals(Representation.class.getSimpleName())) {
+          representationList.add(model.retrieveRepresentation(incidence.getAipId(), incidence.getRepresentationId()));
+        } else if (incidence.getObjectClass().equals(AIP.class.getSimpleName())) {
+          aipList.add(model.retrieveAIP(incidence.getAipId()));
+        }
+      } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+        LOGGER.error("Could not retrieve associated object from incidence {}", incidence.getId());
+      }
+    }
+
+    if (!fileList.isEmpty()) {
+      executeOnFile(index, model, storage, report, jobPluginInfo, fileList, job);
+    }
+
+    if (!representationList.isEmpty()) {
+      executeOnRepresentation(index, model, storage, report, jobPluginInfo, representationList, job);
+    }
+
+    if (!aipList.isEmpty()) {
+      executeOnAIP(index, model, storage, report, jobPluginInfo, aipList, job);
+    }
+
+    return report;
+  }
+
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  @Override
+  public List<Class<T>> getObjectClasses() {
+    List<Class<? extends IsRODAObject>> list = new ArrayList<>();
+    list.add(AIP.class);
+    list.add(Representation.class);
+    list.add(File.class);
+    list.add(RiskIncidence.class);
+    return (List) list;
+  }
 
 }

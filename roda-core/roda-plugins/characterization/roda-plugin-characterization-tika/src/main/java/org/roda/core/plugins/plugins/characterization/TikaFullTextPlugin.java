@@ -39,7 +39,7 @@ import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
-import org.roda.core.plugins.AbstractAIPComponentsPlugin;
+import org.roda.core.plugins.AbstractRODAObjectComponentsPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
@@ -49,7 +49,7 @@ import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractAIPComponentsPlugin<T> {
+public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractRODAObjectComponentsPlugin<T> {
   private static final Logger LOGGER = LoggerFactory.getLogger(TikaFullTextPlugin.class);
 
   private boolean doFeatureExtraction = true;
@@ -398,16 +398,6 @@ public class TikaFullTextPlugin<T extends IsRODAObject> extends AbstractAIPCompo
   @Override
   public List<String> getCategories() {
     return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_CHARACTERIZATION);
-  }
-
-  @SuppressWarnings({"unchecked", "rawtypes"})
-  @Override
-  public List<Class<T>> getObjectClasses() {
-    List<Class<? extends IsRODAObject>> list = new ArrayList<>();
-    list.add(AIP.class);
-    list.add(Representation.class);
-    list.add(File.class);
-    return (List) list;
   }
 
 }

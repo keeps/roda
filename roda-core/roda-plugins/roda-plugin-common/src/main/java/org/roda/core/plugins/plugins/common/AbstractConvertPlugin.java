@@ -55,7 +55,7 @@ import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
-import org.roda.core.plugins.AbstractAIPComponentsPlugin;
+import org.roda.core.plugins.AbstractRODAObjectComponentsPlugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
@@ -70,7 +70,7 @@ import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends AbstractAIPComponentsPlugin<T> {
+public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends AbstractRODAObjectComponentsPlugin<T> {
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractConvertPlugin.class);
 
   private String inputFormat;
@@ -904,16 +904,6 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
   @Override
   public String getPreservationEventFailureMessage() {
     return "File conversion failed.";
-  }
-
-  @SuppressWarnings({"unchecked", "rawtypes"})
-  @Override
-  public List<Class<T>> getObjectClasses() {
-    List<Class<? extends IsRODAObject>> list = new ArrayList<>();
-    list.add(AIP.class);
-    list.add(Representation.class);
-    list.add(File.class);
-    return (List) list;
   }
 
   @Override
