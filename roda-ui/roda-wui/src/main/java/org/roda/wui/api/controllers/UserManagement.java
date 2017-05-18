@@ -27,6 +27,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.InvalidTokenException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.notifications.Notification;
@@ -51,14 +52,18 @@ public class UserManagement extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    // delegate
-    User ret = UserManagementHelper.retrieveUser(username);
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_USERNAME_PARAM,
-      username);
-
-    return ret;
+    try {
+      // delegate
+      return UserManagementHelper.retrieveUser(username);
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_USERNAME_PARAM, username);
+    }
   }
 
   public static Group retrieveGroup(User user, String groupname)
@@ -68,14 +73,18 @@ public class UserManagement extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    // delegate
-    Group ret = UserManagementHelper.retrieveGroup(groupname);
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_GROUPNAME_PARAM,
-      groupname);
-
-    return ret;
+    try {
+      // delegate
+      return UserManagementHelper.retrieveGroup(groupname);
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_GROUPNAME_PARAM, groupname);
+    }
   }
 
   public static List<Group> listAllGroups(User user) throws AuthorizationDeniedException, GenericException {
@@ -84,26 +93,36 @@ public class UserManagement extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    // delegate
-    List<Group> ret = UserManagementHelper.listAllGroups();
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
-
-    return ret;
+    try {
+      // delegate
+      return UserManagementHelper.listAllGroups();
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state);
+    }
   }
 
   public static User registerUser(User user, String password, UserExtraBundle extra, String localeString,
     String servletPath) throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
-    // delegate
-    User ret = UserManagementHelper.registerUser(user, password, extra, localeString, servletPath);
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_USER_PARAM, user);
-
-    return ret;
+    try {
+      // delegate
+      return UserManagementHelper.registerUser(user, password, extra, localeString, servletPath);
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_USER_PARAM, user);
+    }
   }
 
   public static User createUser(User user, User newUser, String password, UserExtraBundle extra)
@@ -114,13 +133,18 @@ public class UserManagement extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    // delegate
-    User ret = UserManagementHelper.createUser(newUser, password, extra);
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_USER_PARAM, newUser);
-
-    return ret;
+    try {
+      // delegate
+      return UserManagementHelper.createUser(newUser, password, extra);
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_USER_PARAM, newUser);
+    }
   }
 
   public static void updateMyUser(User user, User modifiedUser, String password, UserExtraBundle extra)
@@ -135,12 +159,18 @@ public class UserManagement extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    // delegate
-    UserManagementHelper.updateMyUser(modifiedUser, password, extra);
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_USER_PARAM,
-      modifiedUser);
+    try {
+      // delegate
+      UserManagementHelper.updateMyUser(modifiedUser, password, extra);
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_USER_PARAM, modifiedUser);
+    }
   }
 
   public static void updateUser(User user, User modifiedUser, String password, UserExtraBundle extra)
@@ -150,12 +180,18 @@ public class UserManagement extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    // delegate
-    UserManagementHelper.updateUser(modifiedUser, password, extra);
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_USER_PARAM,
-      modifiedUser);
+    try {
+      // delegate
+      UserManagementHelper.updateUser(modifiedUser, password, extra);
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_USER_PARAM, modifiedUser);
+    }
   }
 
   public static void deleteUser(User user, String username) throws AuthorizationDeniedException, GenericException {
@@ -164,11 +200,18 @@ public class UserManagement extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    UserManagementHelper.deleteUser(username);
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_USERNAME_PARAM,
-      username);
+    try {
+      // delegate
+      UserManagementHelper.deleteUser(username);
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_USERNAME_PARAM, username);
+    }
   }
 
   public static void createGroup(User user, Group group)
@@ -178,11 +221,18 @@ public class UserManagement extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    // delegate
-    UserManagementHelper.createGroup(group);
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_GROUP_PARAM, group);
+    try {
+      // delegate
+      UserManagementHelper.createGroup(group);
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_GROUP_PARAM, group);
+    }
   }
 
   public static void updateGroup(User user, Group group)
@@ -192,11 +242,18 @@ public class UserManagement extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    // delegate
-    UserManagementHelper.updateGroup(group);
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_GROUP_PARAM, group);
+    try {
+      // delegate
+      UserManagementHelper.updateGroup(group);
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_GROUP_PARAM, group);
+    }
   }
 
   public static void deleteGroup(User user, String groupname) throws AuthorizationDeniedException, GenericException {
@@ -205,14 +262,21 @@ public class UserManagement extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    UserManagementHelper.deleteGroup(groupname);
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_GROUPNAME_PARAM,
-      groupname);
+    try {
+      // delegate
+      UserManagementHelper.deleteGroup(groupname);
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_GROUPNAME_PARAM, groupname);
+    }
   }
 
-  // TODO: Methods bellow this line should also checkRoles? If so, a User is
+  // TODO: Methods below this line should also checkRoles? If so, a User is
   // needed.
   // TODO: The methods that call these methods don't have a User either.
   // TODO: From where should the User come from?
@@ -222,49 +286,38 @@ public class UserManagement extends RodaWuiController {
     final boolean generateNewToken, String localeString) throws GenericException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     User user = UserManagementHelper.retrieveUser(username);
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
-    if (generateNewToken) {
-      final UUID uuidToken = UUID.randomUUID();
-      final Calendar calendar = Calendar.getInstance();
-      calendar.add(Calendar.DAY_OF_MONTH, 1);
-      final String isoDateNoMillis = DateParser.getIsoDateNoMillis(calendar.getTime());
+    try {
+      if (generateNewToken) {
+        final UUID uuidToken = UUID.randomUUID();
+        final Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        final String isoDateNoMillis = DateParser.getIsoDateNoMillis(calendar.getTime());
 
-      user.setEmailConfirmationToken(uuidToken.toString());
-      user.setEmailConfirmationTokenExpirationDate(isoDateNoMillis);
+        user.setEmailConfirmationToken(uuidToken.toString());
+        user.setEmailConfirmationTokenExpirationDate(isoDateNoMillis);
 
-      try {
-        user = UserManagementHelper.updateUser(user, null, null);
-      } catch (final AlreadyExistsException | AuthorizationDeniedException e) {
-        throw new GenericException("Error updating email confirmation token - " + e.getMessage(), e);
+        try {
+          user = UserManagementHelper.updateUser(user, null, null);
+        } catch (final AlreadyExistsException | AuthorizationDeniedException e) {
+          throw new GenericException("Error updating email confirmation token - " + e.getMessage(), e);
+        }
       }
+
+      if (user.isActive() || user.getEmailConfirmationToken() == null) {
+        throw new GenericException(
+          "User " + username + " is already active or email confirmation token doesn't exist.");
+      }
+
+      return sendEmailVerification(servletPath, user, localeString);
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_USER_PARAM, user);
     }
-
-    if (user.isActive() || user.getEmailConfirmationToken() == null) {
-      throw new GenericException("User " + username + " is already active or email confirmation token doesn't exist.");
-    }
-
-    final Notification notification = sendEmailVerification(servletPath, user, localeString);
-
-    // register action
-    controllerAssistant.registerAction(user, getLogEntryState(notification), RodaConstants.CONTROLLER_USER_PARAM, user);
-
-    return notification;
-  }
-
-  private static LOG_ENTRY_STATE getLogEntryState(final Notification notification) {
-    final LOG_ENTRY_STATE logEntryState;
-    switch (notification.getState()) {
-      case COMPLETED:
-        logEntryState = LOG_ENTRY_STATE.SUCCESS;
-        break;
-      case FAILED:
-        logEntryState = LOG_ENTRY_STATE.FAILURE;
-        break;
-      default:
-        logEntryState = LOG_ENTRY_STATE.UNKNOWN;
-        break;
-    }
-    return logEntryState;
   }
 
   public static void confirmUserEmail(String username, String emailConfirmationToken)
@@ -362,7 +415,7 @@ public class UserManagement extends RodaWuiController {
         new EmailNotificationProcessor(RodaConstants.RECOVER_LOGIN_EMAIL_TEMPLATE, scopes, localeString));
 
     } catch (Exception e) {
-      throw new GenericException("Problem sending email");
+      throw new GenericException("Problem sending email", e);
     }
   }
 

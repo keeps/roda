@@ -7,11 +7,11 @@
  */
 package org.roda.wui.api.controllers;
 
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
@@ -41,11 +41,18 @@ public class Formats extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    Format createdFormat = RodaCoreFactory.getModelService().createFormat(format, false);
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_FORMAT_PARAM, format);
-    return createdFormat;
+    try {
+      // delegate
+      return BrowserHelper.createFormat(format, false);
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_FORMAT_PARAM, format);
+    }
   }
 
   public static Format updateFormat(User user, Format format)
@@ -55,11 +62,18 @@ public class Formats extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    Format updatedFormat = RodaCoreFactory.getModelService().updateFormat(format, false);
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_FORMAT_PARAM, format);
-    return updatedFormat;
+    try {
+      // delegate
+      return BrowserHelper.updateFormat(format, false);
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, format.getId(), state, RodaConstants.CONTROLLER_FORMAT_PARAM, format);
+    }
   }
 
   public static void deleteFormat(User user, String formatId)
@@ -69,12 +83,18 @@ public class Formats extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    // delegate
-    RodaCoreFactory.getModelService().deleteFormat(formatId, false);
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_FORMAT_ID_PARAM,
-      formatId);
+    try {
+      // delegate
+      BrowserHelper.deleteFormat(formatId, false);
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, formatId, state, RodaConstants.CONTROLLER_FORMAT_ID_PARAM, formatId);
+    }
   }
 
   /*

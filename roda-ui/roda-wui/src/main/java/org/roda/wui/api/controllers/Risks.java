@@ -7,11 +7,11 @@
  */
 package org.roda.wui.api.controllers;
 
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.risks.Risk;
@@ -42,11 +42,18 @@ public class Risks extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    Risk createdRisk = RodaCoreFactory.getModelService().createRisk(risk, false);
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_RISK_PARAM, risk);
-    return createdRisk;
+    try {
+      // delegate
+      return BrowserHelper.createRisk(risk, false);
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_RISK_PARAM, risk);
+    }
   }
 
   public static Risk updateRisk(User user, Risk risk)
@@ -56,11 +63,18 @@ public class Risks extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    Risk updatedRisk = RodaCoreFactory.getModelService().updateRisk(risk, null, false, 0);
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_RISK_PARAM, risk);
-    return updatedRisk;
+    try {
+      // delegate
+      return BrowserHelper.updateRisk(risk, null, false, 0);
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, risk.getId(), state, RodaConstants.CONTROLLER_RISK_PARAM, risk);
+    }
   }
 
   public static void deleteRisk(User user, String riskId)
@@ -70,11 +84,18 @@ public class Risks extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    // delegate
-    RodaCoreFactory.getModelService().deleteRisk(riskId, false);
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_RISK_ID_PARAM, riskId);
+    try {
+      // delegate
+      BrowserHelper.deleteRisk(riskId, false);
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, riskId, state, RodaConstants.CONTROLLER_RISK_ID_PARAM, riskId);
+    }
   }
 
   public static RiskIncidence createRiskIncidence(User user, RiskIncidence incidence)
@@ -84,12 +105,18 @@ public class Risks extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    RiskIncidence createdIncidence = RodaCoreFactory.getModelService().createRiskIncidence(incidence, false);
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_INCIDENCE_PARAM,
-      incidence);
-    return createdIncidence;
+    try {
+      // delegate
+      return BrowserHelper.createRiskIncidence(incidence, false);
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_INCIDENCE_PARAM, incidence);
+    }
   }
 
   public static RiskIncidence updateRiskIncidence(User user, RiskIncidence incidence)
@@ -99,12 +126,19 @@ public class Risks extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    RiskIncidence updatedIncidence = RodaCoreFactory.getModelService().updateRiskIncidence(incidence, false);
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_INCIDENCE_PARAM,
-      incidence);
-    return updatedIncidence;
+    try {
+      // delegate
+      return BrowserHelper.updateRiskIncidence(incidence, false);
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, incidence.getId(), state, RodaConstants.CONTROLLER_INCIDENCE_PARAM,
+        incidence);
+    }
   }
 
   public static void deleteRiskIncidence(User user, String incidenceId)
@@ -114,12 +148,19 @@ public class Risks extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    // delegate
-    RodaCoreFactory.getModelService().deleteRiskIncidence(incidenceId, false);
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_INCIDENCE_PARAM,
-      incidenceId);
+    try {
+      // delegate
+      BrowserHelper.deleteRiskIncidence(incidenceId, false);
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, incidenceId, state, RodaConstants.CONTROLLER_INCIDENCE_PARAM,
+        incidenceId);
+    }
   }
 
   /*

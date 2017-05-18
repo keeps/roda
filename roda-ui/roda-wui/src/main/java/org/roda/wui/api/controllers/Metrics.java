@@ -11,10 +11,6 @@ import java.util.List;
 import java.util.SortedMap;
 
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.JobAlreadyStartedException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.common.ControllerAssistant;
@@ -32,8 +28,7 @@ public class Metrics extends RodaWuiController {
   }
 
   public static org.roda.core.data.v2.common.Metrics getMetrics(User user, List<String> metricsToObtain)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException,
-    JobAlreadyStartedException {
+    throws AuthorizationDeniedException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -50,9 +45,7 @@ public class Metrics extends RodaWuiController {
     });
     counters.forEach((a, b) -> metrics.addMetric(a, Long.toString(b.getCount())));
 
-    // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
-
     return metrics;
   }
 }

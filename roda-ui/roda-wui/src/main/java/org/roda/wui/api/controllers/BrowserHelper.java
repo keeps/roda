@@ -48,6 +48,7 @@ import org.roda.core.common.UserUtility;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
 import org.roda.core.common.monitor.TransferredResourcesScanner;
+import org.roda.core.common.notifications.NotificationProcessor;
 import org.roda.core.common.tools.ZipEntryInfo;
 import org.roda.core.common.validation.ValidationUtils;
 import org.roda.core.data.common.RodaConstants;
@@ -2318,12 +2319,46 @@ public class BrowserHelper {
     RodaCoreFactory.getModelService().updateRisk(risk, properties, commit, incidences);
   }
 
+  public static Risk createRisk(Risk risk, boolean commit) throws GenericException, RequestNotValidException {
+    return RodaCoreFactory.getModelService().createRisk(risk, commit);
+  }
+
+  public static Risk updateRisk(Risk risk, Map<String, String> properties, boolean commit, int incidences)
+    throws GenericException, RequestNotValidException {
+    return RodaCoreFactory.getModelService().updateRisk(risk, properties, commit, incidences);
+  }
+
+  public static void deleteRisk(String riskId, boolean commit)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    RodaCoreFactory.getModelService().deleteRisk(riskId, commit);
+  }
+
   public static Format createFormat(Format format, boolean commit) throws GenericException, RequestNotValidException {
     return RodaCoreFactory.getModelService().createFormat(format, commit);
   }
 
-  public static void updateFormat(Format format, boolean commit) throws GenericException, RequestNotValidException {
-    RodaCoreFactory.getModelService().updateFormat(format, commit);
+  public static Format updateFormat(Format format, boolean commit) throws GenericException, RequestNotValidException {
+    return RodaCoreFactory.getModelService().updateFormat(format, commit);
+  }
+
+  public static void deleteFormat(String formatId, boolean commit)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    RodaCoreFactory.getModelService().deleteFormat(formatId, commit);
+  }
+
+  public static RiskIncidence createRiskIncidence(RiskIncidence incidence, boolean commit)
+    throws GenericException, RequestNotValidException {
+    return RodaCoreFactory.getModelService().createRiskIncidence(incidence, commit);
+  }
+
+  public static RiskIncidence updateRiskIncidence(RiskIncidence incidence, boolean commit)
+    throws GenericException, RequestNotValidException {
+    return RodaCoreFactory.getModelService().updateRiskIncidence(incidence, commit);
+  }
+
+  public static void deleteRiskIncidence(String incidenceId, boolean commit)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    RodaCoreFactory.getModelService().deleteRiskIncidence(incidenceId, commit);
   }
 
   public static RiskVersionsBundle retrieveRiskVersions(String riskId)
@@ -2358,9 +2393,9 @@ public class BrowserHelper {
     }
   }
 
-  public static boolean hasRiskVersions(String id)
+  public static boolean hasRiskVersions(String riskId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    StoragePath storagePath = ModelUtils.getRiskStoragePath(id);
+    StoragePath storagePath = ModelUtils.getRiskStoragePath(riskId);
     CloseableIterable<BinaryVersion> iterable = RodaCoreFactory.getStorageService().listBinaryVersions(storagePath);
     boolean hasRiskVersion = iterable.iterator().hasNext();
     IOUtils.closeQuietly(iterable);
@@ -3242,6 +3277,21 @@ public class BrowserHelper {
     } catch (NotFoundException e) {
       return false;
     }
+  }
+
+  public static Notification createNotification(Notification notification, NotificationProcessor processor)
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException {
+    return RodaCoreFactory.getModelService().createNotification(notification, processor);
+  }
+
+  public static Notification updateNotification(Notification notification)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    return RodaCoreFactory.getModelService().updateNotification(notification);
+  }
+
+  public static void deleteNotification(String notificationId)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    RodaCoreFactory.getModelService().deleteNotification(notificationId);
   }
 
   public static Notification acknowledgeNotification(String notificationId, String ackToken)

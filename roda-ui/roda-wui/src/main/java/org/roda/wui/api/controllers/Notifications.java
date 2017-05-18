@@ -7,12 +7,12 @@
  */
 package org.roda.wui.api.controllers;
 
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.notifications.EmailNotificationProcessor;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.notifications.Notification;
@@ -47,13 +47,18 @@ public class Notifications extends RodaWuiController {
       tmpl = RodaConstants.API_NOTIFICATION_DEFAULT_TEMPLATE;
     }
 
-    Notification createdNotification = RodaCoreFactory.getModelService().createNotification(notification,
-      new EmailNotificationProcessor(tmpl));
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.RODA_OBJECT_NOTIFICATION,
-      notification);
-    return createdNotification;
+    try {
+      // delegate
+      return BrowserHelper.createNotification(notification, new EmailNotificationProcessor(tmpl));
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.RODA_OBJECT_NOTIFICATION, notification);
+    }
   }
 
   public static Notification updateNotification(User user, Notification notification)
@@ -63,12 +68,19 @@ public class Notifications extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    Notification updatedNotification = RodaCoreFactory.getModelService().updateNotification(notification);
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.RODA_OBJECT_NOTIFICATION,
-      notification);
-    return updatedNotification;
+    try {
+      // delegate
+      return BrowserHelper.updateNotification(notification);
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, notification.getId(), state, RodaConstants.RODA_OBJECT_NOTIFICATION,
+        notification);
+    }
   }
 
   public static void deleteNotification(User user, String notificationId)
@@ -78,12 +90,19 @@ public class Notifications extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    // delegate
-    RodaCoreFactory.getModelService().deleteNotification(notificationId);
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_NOTIFICATION_ID_PARAM,
-      notificationId);
+    try {
+      // delegate
+      BrowserHelper.deleteNotification(notificationId);
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, notificationId, state, RodaConstants.CONTROLLER_NOTIFICATION_ID_PARAM,
+        notificationId);
+    }
   }
 
   /*

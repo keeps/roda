@@ -12,6 +12,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
@@ -40,13 +41,20 @@ public class Jobs extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    // delegate
-    Job updatedJob = JobsHelper.createJob(job, async);
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    Job updatedJob = new Job(job);
 
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_JOB_PARAM, updatedJob);
-
-    return updatedJob;
+    try {
+      // delegate
+      updatedJob = JobsHelper.createJob(job, async);
+      return updatedJob;
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_JOB_PARAM, updatedJob);
+    }
   }
 
   public static Job startJob(User user, String jobId) throws RequestNotValidException, GenericException,
@@ -56,13 +64,18 @@ public class Jobs extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    // delegate
-    Job job = JobsHelper.startJob(jobId);
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_JOB_ID_PARAM, jobId);
-
-    return job;
+    try {
+      // delegate
+      return JobsHelper.startJob(jobId);
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_JOB_ID_PARAM, jobId);
+    }
   }
 
   public static void stopJob(User user, String jobId)
@@ -72,11 +85,18 @@ public class Jobs extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    // delegate
-    JobsHelper.stopJob(jobId);
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_JOB_ID_PARAM, jobId);
+    try {
+      // delegate
+      JobsHelper.stopJob(jobId);
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_JOB_ID_PARAM, jobId);
+    }
   }
 
   public static void deleteJob(User user, String jobId)
@@ -86,11 +106,18 @@ public class Jobs extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    // delegate
-    JobsHelper.deleteJob(jobId);
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
-    // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_JOB_ID_PARAM, jobId);
+    try {
+      // delegate
+      JobsHelper.deleteJob(jobId);
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_JOB_ID_PARAM, jobId);
+    }
   }
 
   /*

@@ -324,6 +324,7 @@ public final class RodaConstants {
   public static final String CONTROLLER_REPRESENTATION_UUID_PARAM = "representationUUID";
   public static final String CONTROLLER_TRANSFERRED_RESOURCE_PARAM = RODA_OBJECT_TRANSFERRED_RESOURCE;
   public static final String CONTROLLER_TRANSFERRED_RESOURCE_ID_PARAM = "transferredResourceId";
+  public static final String CONTROLLER_TRANSFERRED_RESOURCE_NAME_PARAM = "transferredResourceName";
   public static final String CONTROLLER_FILE_PARAM = RODA_OBJECT_FILE;
   public static final String CONTROLLER_FILE_ID_PARAM = "fileId";
   public static final String CONTROLLER_FILE_UUID_PARAM = "fileUUID";
@@ -337,6 +338,7 @@ public final class RodaConstants {
   public static final String CONTROLLER_DIP_FILE_PARAM = RODA_OBJECT_DIPFILE;
   public static final String CONTROLLER_DIP_FILE_ID_PARAM = "dipFileId";
   public static final String CONTROLLER_DIP_FILE_UUID_PARAM = "dipFileUUID";
+  public static final String CONTROLLER_AGENT_ID_PARAM = "agentId";
 
   public static final String CONTROLLER_SIP_PARAM = "sip";
   public static final String CONTROLLER_ID_OBJECT_PARAM = "transferred_resource_uuid, transferred_resource_path, sip";
@@ -371,6 +373,7 @@ public final class RodaConstants {
   public static final String CONTROLLER_PARENT_PARAM = "parent";
   public static final String CONTROLLER_PARENT_ID_PARAM = "parentId";
   public static final String CONTROLLER_FOLDERNAME_PARAM = "folderName";
+  public static final String CONTROLLER_FOLDER_RELATIVEPATH_PARAM = "folderRelativePath";
   public static final String CONTROLLER_FILENAME_PARAM = "filename";
   public static final String CONTROLLER_PATH_PARAM = "path";
   public static final String CONTROLLER_DIRECTORY_PATH_PARAM = "directoryPath";
@@ -387,6 +390,7 @@ public final class RodaConstants {
   public static final String CONTROLLER_TO_PARENT_PARAM = "toParent";
   public static final String CONTROLLER_FIELD_PARAM = "field";
   public static final String CONTROLLER_QUERY_PARAM = "query";
+  public static final String CONTROLLER_QUERY_PARAMS = "queryParams";
   public static final String CONTROLLER_TYPE_PARAM = "type";
   public static final String CONTROLLER_ACCEPT_PARAM = "accept";
   public static final String CONTROLLER_REJECT_REASON_PARAM = "rejectReason";
