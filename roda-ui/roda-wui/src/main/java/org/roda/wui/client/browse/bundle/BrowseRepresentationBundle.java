@@ -8,6 +8,7 @@
 package org.roda.wui.client.browse.bundle;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -17,10 +18,10 @@ public class BrowseRepresentationBundle implements Serializable {
 
   private static final long serialVersionUID = 7901536603462531124L;
 
-  private List<IndexedAIP> aipAncestors;
+  private List<IndexedAIP> aipAncestors = new ArrayList<>();
   private IndexedAIP aip;
   private IndexedRepresentation representation;
-  private List<DescriptiveMetadataViewBundle> representationDescriptiveMetadata;
+  private List<DescriptiveMetadataViewBundle> representationDescriptiveMetadata = new ArrayList<>();
   private Long dipCount;
 
   public BrowseRepresentationBundle() {
