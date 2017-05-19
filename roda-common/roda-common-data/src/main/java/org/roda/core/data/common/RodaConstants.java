@@ -711,7 +711,6 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_OTHER_JOB_ID = "other_job.id";
   public static final String PLUGIN_PARAMS_DO_FULLTEXT_EXTRACTION = "parameter.do_fulltext_extraction";
   public static final String PLUGIN_PARAMS_TOTAL_STEPS = "parameter.total_steps";
-  public static final String PLUGIN_PARAMS_INT_VALUE = "parameter.int_value";
   public static final String PLUGIN_PARAMS_STRING_VALUE = "parameter.string_value";
   public static final String PLUGIN_PARAMS_BOOLEAN_VALUE = "parameter.boolean_value";
   public static final String PLUGIN_PARAMS_CLEAR_INDEXES = "parameter.clear_indexes";
@@ -765,6 +764,7 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_DETAILS = "parameter.details";
   public static final String PLUGIN_PARAMS_OUTCOME_TEXT = "parameter.outcome_text";
   public static final String PLUGIN_PARAMS_EVENT_DESCRIPTION = "parameter.event_description";
+  public static final String PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS = "parameter.delete_older_than_x_days";
 
   public static final String PLUGIN_PARAMS_INCLUDE_SELECTED_DESCRIPTIVE_METADATA = "parameter.include_selected_descriptive_metadata";
   public static final String PLUGIN_PARAMS_SELECTED_DESCRIPTIVE_METADATA = "parameter.selected_descriptive_metadata";

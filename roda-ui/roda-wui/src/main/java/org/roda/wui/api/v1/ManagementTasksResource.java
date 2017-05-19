@@ -178,7 +178,7 @@ public class ManagementTasksResource {
       .setPlugin(ActionLogCleanerPlugin.class.getName());
     if (!daysToKeep.isEmpty()) {
       Map<String, String> pluginParameters = new HashMap<>();
-      pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INT_VALUE, daysToKeep);
+      pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS, daysToKeep);
       job.setPluginParameters(pluginParameters);
     }
 

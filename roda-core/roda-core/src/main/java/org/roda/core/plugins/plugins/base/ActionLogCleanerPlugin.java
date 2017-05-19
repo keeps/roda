@@ -8,20 +8,23 @@
 package org.roda.core.plugins.plugins.base;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.solr.client.solrj.SolrServerException;
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
+import org.roda.core.data.v2.jobs.PluginParameter;
+import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
@@ -35,8 +38,15 @@ import org.slf4j.LoggerFactory;
 
 public class ActionLogCleanerPlugin extends AbstractPlugin<Void> {
   private static final Logger LOGGER = LoggerFactory.getLogger(ActionLogCleanerPlugin.class);
-  private int deleteOlderThanXDays = RodaCoreFactory.getRodaConfigurationAsInt(0, "core", "actionlogs",
-    "delete_older_than_x_days");
+  private int deleteOlderThanXDays = 90;
+
+  private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
+  static {
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS, "Delete older than X days",
+        PluginParameterType.INTEGER, "90", false, false,
+        "The plugin will delete all the logs before the introduced number of days."));
+  }
 
   @Override
   public void init() throws PluginException {
@@ -60,17 +70,32 @@ public class ActionLogCleanerPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getDescription() {
-    return "Removes all entries in the activity log that are older than " + deleteOlderThanXDays
-      + " days. The log is preserved as external physical files, however older entries will not be displayed on the graphical user interface. To access older log entries one needs access to the storage layer of the repository server.\nIf log entries were never deleted, it would eventually fill the index with rarely used information. Activity log truncation automatically frees index space and improves performance of the repository as a whole.";
+    return "Removes all entries in the activity log that are older than the introduced number of"
+      + " days. The log is preserved as external physical files, however older entries will not be displayed on the graphical user interface. "
+      + "To access older log entries one needs access to the storage layer of the repository server.\nIf log entries were never deleted, it "
+      + "would eventually fill the index with rarely used information. Activity log truncation automatically frees index space and improves "
+      + "performance of the repository as a whole.";
+  }
+
+  @Override
+  public List<PluginParameter> getParameters() {
+    ArrayList<PluginParameter> parameters = new ArrayList<>();
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS));
+    return parameters;
   }
 
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
-    if (parameters != null && parameters.get(RodaConstants.PLUGIN_PARAMS_INT_VALUE) != null) {
+    if (parameters != null && parameters.get(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS) != null) {
       try {
-        int deleteOlderThanXDays = Integer.parseInt(parameters.get(RodaConstants.PLUGIN_PARAMS_INT_VALUE));
-        this.deleteOlderThanXDays = deleteOlderThanXDays;
+        int deleteDays = Integer.parseInt(parameters.get(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS));
+
+        if (deleteDays >= 0) {
+          this.deleteOlderThanXDays = deleteDays;
+        } else {
+          this.deleteOlderThanXDays = 0;
+        }
       } catch (NumberFormatException e) {
         // do nothing
       }

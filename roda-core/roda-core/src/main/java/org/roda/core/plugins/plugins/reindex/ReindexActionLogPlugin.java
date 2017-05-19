@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.GenericException;
@@ -43,18 +42,16 @@ import org.slf4j.LoggerFactory;
 
 public class ReindexActionLogPlugin extends AbstractPlugin<Void> {
 
-  private static final int DEFAULT_DELETE_OLDER_THAN_X_DAYS = RodaCoreFactory.getRodaConfigurationAsInt(0, "core",
-    "actionlogs", "delete_older_than_x_days");
   private static final Logger LOGGER = LoggerFactory.getLogger(ReindexActionLogPlugin.class);
   private boolean clearIndexes = false;
   private boolean optimizeIndexes = true;
-  private int dontReindexOlderThanXDays = DEFAULT_DELETE_OLDER_THAN_X_DAYS;
+  private int dontReindexOlderThanXDays = 90;
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INT_VALUE,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_INT_VALUE, "Delete older logs", PluginParameterType.INTEGER,
-        Integer.toString(DEFAULT_DELETE_OLDER_THAN_X_DAYS), false, false, "Delete logs older than x days."));
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS, "Delete older logs",
+        PluginParameterType.INTEGER, "90", false, false, "Delete logs older than x days."));
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "Clear indexes", PluginParameterType.BOOLEAN,
@@ -95,7 +92,7 @@ public class ReindexActionLogPlugin extends AbstractPlugin<Void> {
   @Override
   public List<PluginParameter> getParameters() {
     ArrayList<PluginParameter> parameters = new ArrayList<>();
-    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_INT_VALUE));
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES));
     return parameters;
@@ -112,9 +109,10 @@ public class ReindexActionLogPlugin extends AbstractPlugin<Void> {
       optimizeIndexes = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES));
     }
 
-    if (parameters != null && parameters.containsKey(RodaConstants.PLUGIN_PARAMS_INT_VALUE)) {
+    if (parameters != null && parameters.containsKey(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS)) {
       try {
-        int dontReindexOlderThan = Integer.parseInt(parameters.get(RodaConstants.PLUGIN_PARAMS_INT_VALUE));
+        int dontReindexOlderThan = Integer
+          .parseInt(parameters.get(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS));
         if (dontReindexOlderThan >= 0) {
           dontReindexOlderThanXDays = dontReindexOlderThan;
         } else {
