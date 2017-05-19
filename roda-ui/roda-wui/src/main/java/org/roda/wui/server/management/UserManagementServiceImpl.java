@@ -76,6 +76,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
       RecaptchaUtils
         .recaptchaVerify(RodaCoreFactory.getRodaConfiguration().getString(RECAPTCHA_CODE_SECRET_PROPERTY, ""), captcha);
     }
+
     String servletPath = retrieveServletUrl(getThreadLocalRequest());
     return UserManagement.registerUser(user, password, extra, localeString, servletPath);
   }
@@ -130,14 +131,16 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   @Override
   public Notification sendEmailVerification(final String username, final boolean generateNewToken, String localeString)
     throws GenericException, NotFoundException {
-    final String servletPath = retrieveServletUrl(getThreadLocalRequest());
-    return UserManagement.sendEmailVerification(servletPath, username, generateNewToken, localeString);
+    HttpServletRequest request = getThreadLocalRequest();
+    final String servletPath = retrieveServletUrl(request);
+    return UserManagement.sendEmailVerification(servletPath, username, generateNewToken, request.getRemoteAddr(),
+      localeString);
   }
 
   @Override
   public void confirmUserEmail(String username, String emailConfirmationToken)
     throws InvalidTokenException, NotFoundException, GenericException {
-    UserManagement.confirmUserEmail(username, emailConfirmationToken);
+    UserManagement.confirmUserEmail(username, emailConfirmationToken, getThreadLocalRequest().getRemoteAddr());
   }
 
   @Override
@@ -147,14 +150,15 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
       RecaptchaUtils
         .recaptchaVerify(RodaCoreFactory.getRodaConfiguration().getString(RECAPTCHA_CODE_SECRET_PROPERTY, ""), captcha);
     }
-    String servletPath = retrieveServletUrl(getThreadLocalRequest());
-    UserManagement.requestPasswordReset(servletPath, usernameOrEmail, localeString);
+    HttpServletRequest request = getThreadLocalRequest();
+    String servletPath = retrieveServletUrl(request);
+    UserManagement.requestPasswordReset(servletPath, usernameOrEmail, localeString, request.getRemoteAddr());
   }
 
   @Override
   public void resetUserPassword(String username, String password, String resetPasswordToken)
     throws InvalidTokenException, IllegalOperationException, NotFoundException, GenericException {
-    UserManagement.resetUserPassword(username, password, resetPasswordToken);
+    UserManagement.resetUserPassword(username, password, resetPasswordToken, getThreadLocalRequest().getRemoteAddr());
   }
 
   private static String retrieveServletUrl(HttpServletRequest req) {

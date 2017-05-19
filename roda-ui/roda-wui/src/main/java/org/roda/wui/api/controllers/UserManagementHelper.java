@@ -72,7 +72,7 @@ public class UserManagementHelper {
       try {
         boolean generateNewToken = false;
         Notification notification = UserManagement.sendEmailVerification(servletPath, updatedUser.getName(),
-          generateNewToken, localeString);
+          generateNewToken, user.getIpAddress(), localeString);
 
         if (notification.getState() == NOTIFICATION_STATE.FAILED) {
           registeredUser.setActive(true);

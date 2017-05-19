@@ -283,9 +283,11 @@ public class UserManagement extends RodaWuiController {
   // return true if notification was sent, false if the mail cannot be sent and
   // the user was activated...
   public static Notification sendEmailVerification(final String servletPath, final String username,
-    final boolean generateNewToken, String localeString) throws GenericException, NotFoundException {
+    final boolean generateNewToken, String ipAddress, String localeString) throws GenericException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     User user = UserManagementHelper.retrieveUser(username);
+    user.setIpAddress(ipAddress);
+
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
     try {
@@ -320,18 +322,19 @@ public class UserManagement extends RodaWuiController {
     }
   }
 
-  public static void confirmUserEmail(String username, String emailConfirmationToken)
+  public static void confirmUserEmail(String username, String emailConfirmationToken, String ipAddress)
     throws InvalidTokenException, NotFoundException, GenericException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     User user = UserManagementHelper.confirmUserEmail(username, null, emailConfirmationToken);
+    user.setIpAddress(ipAddress);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_USER_PARAM, user);
   }
 
-  public static void requestPasswordReset(String servletPath, String usernameOrEmail, String localeString)
-    throws GenericException, NotFoundException, IllegalOperationException {
+  public static void requestPasswordReset(String servletPath, String usernameOrEmail, String localeString,
+    String ipAddress) throws GenericException, NotFoundException, IllegalOperationException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     String username = null;
@@ -345,17 +348,19 @@ public class UserManagement extends RodaWuiController {
     }
 
     User user = UserManagementHelper.requestPasswordReset(username, email);
+    user.setIpAddress(ipAddress);
     sendRecoverLoginEmail(servletPath, user, localeString);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_USER_PARAM, user);
   }
 
-  public static void resetUserPassword(String username, String password, String resetPasswordToken)
+  public static void resetUserPassword(String username, String password, String resetPasswordToken, String ipAddress)
     throws InvalidTokenException, IllegalOperationException, NotFoundException, GenericException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     User user = UserManagementHelper.resetUserPassword(username, password, resetPasswordToken);
+    user.setIpAddress(ipAddress);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_USER_PARAM, user);

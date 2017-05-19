@@ -72,10 +72,10 @@ public class UserUtility {
   public static User getUser(final HttpServletRequest request, final boolean returnGuestIfNoUserInSession) {
     User user = (User) request.getSession().getAttribute(RODA_USER);
     if (user == null) {
-      user = returnGuestIfNoUserInSession ? getGuest() : null;
+      user = returnGuestIfNoUserInSession ? getGuest(request) : null;
     } else {
       if (user.isGuest()) {
-        user = getGuest();
+        user = getGuest(request);
       }
     }
     return user;
@@ -147,8 +147,10 @@ public class UserUtility {
   /**
    * Retrieves guest used
    */
-  public static User getGuest() {
-    return new User("guest", "guest", true);
+  public static User getGuest(HttpServletRequest request) {
+    User newUser = new User("guest", "guest", true);
+    newUser.setIpAddress(request.getRemoteAddr());
+    return newUser;
   }
 
   private static boolean iterativeDisjoint(Set<String> set1, Set<String> set2) {
