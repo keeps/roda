@@ -135,8 +135,9 @@ public class User extends RodaPrincipal {
     return ipAddress;
   }
 
-  public void setIpAddress(final String ipAddress) {
+  public User setIpAddress(final String ipAddress) {
     this.ipAddress = ipAddress;
+    return this;
   }
 
   /**

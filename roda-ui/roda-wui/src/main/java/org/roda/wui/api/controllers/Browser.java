@@ -92,10 +92,6 @@ import org.roda.wui.client.planning.RiskVersionsBundle;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaWuiController;
 
-/**
- * FIXME 1) verify all checkObject*Permissions (because now also a permission
- * for insert is available)
- */
 public class Browser extends RodaWuiController {
 
   private Browser() {
@@ -333,13 +329,11 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user, classToReturn);
 
-    // delegate
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
     try {
-      final IndexResult<T> ret = BrowserHelper.find(classToReturn, filter, sorter, sublist, facets, user, justActive,
-        fieldsToReturn);
-      return ret;
+      // delegate
+      return BrowserHelper.find(classToReturn, filter, sorter, sublist, facets, user, justActive, fieldsToReturn);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;
@@ -378,12 +372,11 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user, classToReturn);
 
-    // delegate
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
     try {
-      final Long count = BrowserHelper.count(classToReturn, filter, justActive, user);
-      return count;
+      // delegate
+      return BrowserHelper.count(classToReturn, filter, justActive, user);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;
@@ -401,10 +394,10 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user, classToReturn);
 
-    // delegate
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
     try {
+      // delegate
       final T ret = BrowserHelper.retrieve(classToReturn, id, fieldsToReturn);
 
       // checking object permissions
@@ -429,10 +422,10 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user, classToReturn);
 
-    // delegate
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
     try {
+      // delegate
       final List<T> objects = BrowserHelper.retrieve(classToReturn, selectedItems, fieldsToReturn);
       for (T obj : objects) {
         controllerAssistant.checkObjectPermissions(user, obj, PermissionType.READ);
@@ -480,12 +473,11 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user, classToReturn);
 
-    // delegate
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
     try {
-      final List<String> ret = BrowserHelper.suggest(classToReturn, field, query, user, allowPartial);
-      return ret;
+      // delegate
+      return BrowserHelper.suggest(classToReturn, field, query, user, allowPartial);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;
@@ -553,18 +545,15 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    // delegate
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
     try {
+      // delegate
       IndexedRepresentation representation = BrowserHelper.retrieve(IndexedRepresentation.class,
         IdUtils.getRepresentationId(aipId, representationId), RodaConstants.REPRESENTATION_FIELDS_TO_RETURN);
 
-      IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, representation.getAipId(),
-        RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
-      controllerAssistant.checkObjectPermissions(user, aip, PermissionType.READ);
+      controllerAssistant.checkObjectPermissions(user, representation, PermissionType.READ);
 
-      // delegate
       return BrowserHelper.retrieveAIPRepresentation(representation, acceptFormat);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
@@ -609,10 +598,10 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    // delegate
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
     try {
+      // delegate
       IndexedRepresentation representation = BrowserHelper.retrieve(IndexedRepresentation.class,
         IdUtils.getRepresentationId(aipId, representationId), RodaConstants.REPRESENTATION_FIELDS_TO_RETURN);
       controllerAssistant.checkObjectPermissions(user, representation, PermissionType.READ);
@@ -3085,6 +3074,7 @@ public class Browser extends RodaWuiController {
     Path file = Files.createTempFile("descriptive", ".tmp");
 
     try {
+      // delegate
       DIPFile dipFile = BrowserHelper.retrieve(DIPFile.class, parentUUID, RodaConstants.DIPFILE_FIELDS_TO_RETURN);
 
       Files.copy(is, file, StandardCopyOption.REPLACE_EXISTING);
@@ -3116,6 +3106,7 @@ public class Browser extends RodaWuiController {
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
     try {
+      // delegate
       return BrowserHelper.createDIPFolder(dipId, folderUUID, newName);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
@@ -3139,6 +3130,7 @@ public class Browser extends RodaWuiController {
     Path file = Files.createTempFile("descriptive", ".tmp");
 
     try {
+      // delegate
       DIPFile dipFile = BrowserHelper.retrieve(DIPFile.class, fileUUID, RodaConstants.DIPFILE_FIELDS_TO_RETURN);
 
       Files.copy(is, file, StandardCopyOption.REPLACE_EXISTING);
@@ -3167,6 +3159,7 @@ public class Browser extends RodaWuiController {
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
     try {
+      // delegate
       BrowserHelper.deleteDIPFiles(files, user);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
@@ -3187,6 +3180,7 @@ public class Browser extends RodaWuiController {
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
     try {
+      // delegate
       BrowserHelper.createFormatIdentificationJob(user, selected);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;

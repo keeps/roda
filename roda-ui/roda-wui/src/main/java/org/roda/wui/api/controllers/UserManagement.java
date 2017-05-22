@@ -14,7 +14,6 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
@@ -33,6 +32,7 @@ import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.util.IdUtils;
 import org.roda.wui.client.browse.bundle.UserExtraBundle;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaWuiController;
@@ -292,12 +292,11 @@ public class UserManagement extends RodaWuiController {
 
     try {
       if (generateNewToken) {
-        final UUID uuidToken = UUID.randomUUID();
         final Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DAY_OF_MONTH, 1);
         final String isoDateNoMillis = DateParser.getIsoDateNoMillis(calendar.getTime());
 
-        user.setEmailConfirmationToken(uuidToken.toString());
+        user.setEmailConfirmationToken(IdUtils.createUUID());
         user.setEmailConfirmationTokenExpirationDate(isoDateNoMillis);
 
         try {

@@ -40,7 +40,7 @@ public class UserLogin extends RodaWuiController {
       return user;
 
     } catch (AuthenticationDeniedException e) {
-      user = UserUtility.getGuest(request);
+      user = UserUtility.getGuest(request.getRemoteAddr());
       // register action
       controllerAssistant.registerAction(user, LOG_ENTRY_STATE.FAILURE, RodaConstants.CONTROLLER_USERNAME_PARAM,
         username);

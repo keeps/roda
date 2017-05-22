@@ -19,7 +19,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -75,6 +74,7 @@ import org.roda.core.data.exceptions.RoleAlreadyExistsException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.util.IdUtils;
 import org.roda.core.util.PasswordHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -821,12 +821,11 @@ public class LdapUtility {
     throws UserAlreadyExistsException, EmailAlreadyExistsException, GenericException {
 
     // Generate an email verification token with 1 day expiration date.
-    final UUID uuidToken = UUID.randomUUID();
     final Calendar calendar = Calendar.getInstance();
     calendar.add(Calendar.DAY_OF_MONTH, 1);
     final String isoDateNoMillis = DateParser.getIsoDateNoMillis(calendar.getTime());
 
-    user.setEmailConfirmationToken(uuidToken.toString());
+    user.setEmailConfirmationToken(IdUtils.createUUID());
     user.setEmailConfirmationTokenExpirationDate(isoDateNoMillis);
 
     final User newUser = addUser(user);
@@ -969,12 +968,11 @@ public class LdapUtility {
     } else {
 
       // Generate a password reset token with 1 day expiration date.
-      final UUID uuidToken = UUID.randomUUID();
       final Calendar calendar = Calendar.getInstance();
       calendar.add(Calendar.DAY_OF_MONTH, 1);
       final String isoDateNoMillis = DateParser.getIsoDateNoMillis(calendar.getTime());
 
-      user.setResetPasswordToken(uuidToken.toString());
+      user.setResetPasswordToken(IdUtils.createUUID());
       user.setResetPasswordTokenExpirationDate(isoDateNoMillis);
 
       try {
