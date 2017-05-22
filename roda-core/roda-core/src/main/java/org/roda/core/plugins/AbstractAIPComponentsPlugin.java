@@ -31,8 +31,8 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractRODAObjectComponentsPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractRODAObjectComponentsPlugin.class);
+public abstract class AbstractAIPComponentsPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
+  private static final Logger LOGGER = LoggerFactory.getLogger(AbstractAIPComponentsPlugin.class);
 
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
@@ -117,7 +117,6 @@ public abstract class AbstractRODAObjectComponentsPlugin<T extends IsRODAObject>
     list.add(AIP.class);
     list.add(Representation.class);
     list.add(File.class);
-    list.add(RiskIncidence.class);
     return (List) list;
   }
 
