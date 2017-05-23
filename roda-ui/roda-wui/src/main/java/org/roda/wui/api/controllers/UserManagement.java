@@ -286,6 +286,7 @@ public class UserManagement extends RodaWuiController {
     final boolean generateNewToken, String ipAddress, String localeString) throws GenericException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     User user = UserManagementHelper.retrieveUser(username);
+    // 20170523 hsilva: need to set ip address for registering the action
     user.setIpAddress(ipAddress);
 
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
@@ -301,6 +302,9 @@ public class UserManagement extends RodaWuiController {
 
         try {
           user = UserManagementHelper.updateUser(user, null, null);
+          // 20170523 hsilva: need to set ip address for registering the action
+          // as the above method returns a new instante of the modified user
+          user.setIpAddress(ipAddress);
         } catch (final AlreadyExistsException | AuthorizationDeniedException e) {
           throw new GenericException("Error updating email confirmation token - " + e.getMessage(), e);
         }

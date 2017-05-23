@@ -77,7 +77,11 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
         .recaptchaVerify(RodaCoreFactory.getRodaConfiguration().getString(RECAPTCHA_CODE_SECRET_PROPERTY, ""), captcha);
     }
 
-    String servletPath = retrieveServletUrl(getThreadLocalRequest());
+    HttpServletRequest request = getThreadLocalRequest();
+    String ipAddress = request.getRemoteAddr();
+    String servletPath = retrieveServletUrl(request);
+    user.setIpAddress(ipAddress);
+
     return UserManagement.registerUser(user, password, extra, localeString, servletPath);
   }
 
