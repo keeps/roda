@@ -15,6 +15,52 @@
 	<!-- ********************************************** -->
 	<!-- Authentication related filters/filter-mappings -->
 	<!-- ********************************************** -->
+	<!-- validation filter must appear before the authentication filter -->
+	<filter>
+		<filter-name>CASValidationFilter</filter-name>
+		<filter-class>org.roda.wui.filter.OnOffFilter</filter-class>
+		<init-param>
+			<param-name>inner-filter-class</param-name>
+			<param-value>org.jasig.cas.client.validation.Cas30ProxyReceivingTicketValidationFilter</param-value>
+		</init-param>
+		<init-param>
+			<param-name>config-prefix</param-name>
+			<param-value>ui.filter.cas</param-value>
+		</init-param>
+		<init-param>
+			<param-name>casServerUrlPrefix</param-name>
+			<param-value>https://localhost:8443/cas</param-value>
+		</init-param>
+		<init-param>
+			<param-name>serverName</param-name>
+			<param-value>http://localhost:8888</param-value>
+		</init-param>
+		<init-param>
+			<param-name>exceptionOnValidationFailure</param-name>
+			<param-value>false</param-value>
+		</init-param>
+		<init-param>
+			<param-name>redirectAfterValidation</param-name>
+			<param-value>false</param-value>
+		</init-param>
+		<init-param>
+			<param-name>proxyCallbackUrl</param-name>
+			<param-value>https://localhost:8888/callback</param-value>
+		</init-param>
+		<init-param>
+			<param-name>proxyReceptorUrl</param-name>
+			<param-value>/callback</param-value>
+		</init-param>
+		<init-param>
+			<param-name>acceptAnyProxy</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>CASValidationFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
 	<filter>
 		<filter-name>InternalWebAuthFilter</filter-name>
 		<filter-class>org.roda.wui.filter.OnOffFilter</filter-class>
@@ -112,39 +158,6 @@
 	<filter-mapping>
 		<filter-name>CasApiAuthFilter</filter-name>
 		<url-pattern>/api/v1/*</url-pattern>
-	</filter-mapping>
-
-	<filter>
-		<filter-name>CASValidationFilter</filter-name>
-		<filter-class>org.roda.wui.filter.OnOffFilter</filter-class>
-		<init-param>
-			<param-name>inner-filter-class</param-name>
-			<param-value>org.jasig.cas.client.validation.Cas30ProxyReceivingTicketValidationFilter</param-value>
-		</init-param>
-		<init-param>
-			<param-name>config-prefix</param-name>
-			<param-value>ui.filter.cas</param-value>
-		</init-param>
-		<init-param>
-			<param-name>casServerUrlPrefix</param-name>
-			<param-value>https://localhost:8443/cas</param-value>
-		</init-param>
-		<init-param>
-			<param-name>serverName</param-name>
-			<param-value>http://localhost:8888</param-value>
-		</init-param>
-		<init-param>
-			<param-name>exceptionOnValidationFailure</param-name>
-			<param-value>false</param-value>
-		</init-param>
-		<init-param>
-			<param-name>redirectAfterValidation</param-name>
-			<param-value>false</param-value>
-		</init-param>
-	</filter>
-	<filter-mapping>
-		<filter-name>CASValidationFilter</filter-name>
-		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
 	<filter>
