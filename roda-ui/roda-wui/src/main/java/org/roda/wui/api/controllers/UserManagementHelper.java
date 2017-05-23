@@ -104,16 +104,16 @@ public class UserManagementHelper {
     return modifiedUser;
   }
 
-  public static User updateMyUser(User user, String password, UserExtraBundle extra)
+  public static User updateMyUser(User modifiedUser, String password, UserExtraBundle extra)
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
-    user.setExtra(getUserExtra(extra));
+    modifiedUser.setExtra(getUserExtra(extra));
 
-    User currentUser = RodaCoreFactory.getModelService().retrieveUserByName(user.getName());
-    User resetUser = resetUser(user, currentUser);
+    User currentUser = RodaCoreFactory.getModelService().retrieveUserByName(modifiedUser.getName());
+    User resetUser = resetUser(modifiedUser, currentUser);
 
-    User modifiedUser = RodaCoreFactory.getModelService().updateMyUser(resetUser, password, true);
+    User finalModifiedUser = RodaCoreFactory.getModelService().updateMyUser(resetUser, password, true);
     RodaCoreFactory.getIndexService().commit(RODAMember.class);
-    return modifiedUser;
+    return finalModifiedUser;
   }
 
   private static User resetUser(User newUser, User oldUser) {

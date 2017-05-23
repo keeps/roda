@@ -146,7 +146,7 @@ public interface UserManagementService extends RemoteService {
    * @throws GenericException
    * @throws IllegalOperationException
    */
-  public void updateMyUser(User user, String password, UserExtraBundle extra) throws AuthorizationDeniedException,
+  public User updateMyUser(User user, String password, UserExtraBundle extra) throws AuthorizationDeniedException,
     NotFoundException, AlreadyExistsException, GenericException, IllegalOperationException;
 
   /**

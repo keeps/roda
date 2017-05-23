@@ -137,7 +137,7 @@ public class Profile extends Composite {
         final String password = userDataPanel.getPassword();
 
         UserManagementService.Util.getInstance().updateMyUser(user, password, userDataPanel.getExtra(),
-          new AsyncCallback<Void>() {
+          new AsyncCallback<User>() {
 
             @Override
             public void onFailure(Throwable caught) {
@@ -145,8 +145,8 @@ public class Profile extends Composite {
             }
 
             @Override
-            public void onSuccess(Void result) {
-              UserLogin.getInstance().updateLoggedUser(user);
+            public void onSuccess(User updatedUser) {
+              UserLogin.getInstance().updateLoggedUser(updatedUser);
               HistoryUtils.newHistory(Welcome.RESOLVER);
             }
           });

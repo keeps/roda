@@ -85,6 +85,10 @@ public class UserUtility {
     return getUser(request, true);
   }
 
+  public static void setUser(User user, HttpServletRequest request) {
+    request.getSession().setAttribute(RODA_USER, user);
+  }
+
   public static void checkRoles(final User rsu, final List<String> rolesToCheck) throws AuthorizationDeniedException {
     // INFO 20170220 nvieira containsAll changed to set intersection (contain at
     // least one role)
