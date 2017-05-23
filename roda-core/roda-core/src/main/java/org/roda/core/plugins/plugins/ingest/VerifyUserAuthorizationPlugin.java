@@ -98,13 +98,13 @@ public class VerifyUserAuthorizationPlugin extends AbstractPlugin<AIP> {
 
   private void processAIP(IndexService index, ModelService model, Report report, Job currentJob,
     SimpleJobPluginInfo jobPluginInfo, AIP aip) {
-    LOGGER.debug("Checking producer authorization for AIPingest.submitP {}", aip.getId());
+    LOGGER.debug("Checking user authorization for creating AIP {}", aip.getId());
 
     Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
     PluginHelper.updatePartialJobReport(this, model, reportItem, false, currentJob);
 
     reportItem.setPluginState(PluginState.SUCCESS)
-      .setPluginDetails(String.format("Done with checking producer authorization for AIP %s", aip.getId()));
+      .setPluginDetails(String.format("Done with checking user authorization for AIP %s", aip.getId()));
 
     if (currentJob != null) {
       processAIPPermissions(index, currentJob, aip, reportItem);
@@ -128,7 +128,7 @@ public class VerifyUserAuthorizationPlugin extends AbstractPlugin<AIP> {
       jobPluginInfo.incrementObjectsProcessedWithFailure();
     }
 
-    LOGGER.debug("Done with checking producer authorization for AIP {}", aip.getId());
+    LOGGER.debug("Done with checking user authorization for AIP {}", aip.getId());
 
     report.addReport(reportItem);
     PluginHelper.updatePartialJobReport(this, model, reportItem, true, currentJob);
@@ -188,7 +188,7 @@ public class VerifyUserAuthorizationPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    String description = "Producer permissions have been checked to ensure that he has sufficient authorization to store the AIP under the desired "
+    String description = "User permissions have been checked to ensure that he has sufficient authorization to store the AIP under the desired "
       + "node of the classification scheme.";
 
     if (hasFreeAccess) {
@@ -200,12 +200,12 @@ public class VerifyUserAuthorizationPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "The producer has enough permissions to deposit the AIP under the designated node of the classification scheme";
+    return "The user has enough permissions to deposit the AIP under the designated node of the classification scheme";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "The producer does not have enough permissions to deposit the AIP under the designated node of the classification scheme";
+    return "The user does not have enough permissions to deposit the AIP under the designated node of the classification scheme";
   }
 
   @Override
