@@ -111,7 +111,7 @@ Change the values to match your LDAP.
     ```json
     {
       "@class": "org.jasig.cas.services.RegexRegisteredService",
-      "serviceId": "^http://localhost:8888/.*",
+      "serviceId": "^https://localhost:8888/.*",
       "name": "RODA",
       "id": "16226673791703",
       "description": "RODA",
@@ -128,7 +128,7 @@ Change the values to match your LDAP.
           ]
         },
         "authorizedToReleaseCredentialPassword": false,
-        "authorizedToReleaseProxyGrantingTicket": false
+        "authorizedToReleaseProxyGrantingTicket": true
       },
       "accessStrategy": {
         "@class": "org.jasig.cas.services.TimeBasedRegisteredServiceAccessStrategy",
@@ -136,6 +136,10 @@ Change the values to match your LDAP.
         "ssoEnabled": true,
         "requireAllAttributes": false,
         "caseInsensitive": false
+      },
+      "proxyPolicy" : {
+        "@class" : "org.jasig.cas.services.RegexMatchingRegisteredServiceProxyPolicy",
+        "pattern" : "^https?://.*"
       }
     }
     ```
@@ -361,12 +365,14 @@ Change the values to match your LDAP.
     
     ui.filter = CASAuthenticationFilter
     ui.filter.CASAuthenticationFilter.casServerLoginUrl = https://localhost:8443/cas/login
-    ui.filter.CASAuthenticationFilter.serverName = http://localhost:8888
+    ui.filter.CASAuthenticationFilter.serverName = https://localhost:8888
     
     ui.filter = CASValidationFilter
     ui.filter.CASValidationFilter.casServerLoginUrl = https://localhost:8443/cas/login
+    ui.filter.cas.proxyCallbackUrl = https://localhost:8888/callback
+    ui.filter.cas.proxyReceptorUrl = /callback
     # RODA base address
-    ui.filter.CASValidationFilter.serverName = http://localhost:8888
+    ui.filter.CASValidationFilter.serverName = https://localhost:8888
     ui.filter.CASValidationFilter.exceptionOnValidationFailure = false
     ui.filter.CASValidationFilter.redirectAfterValidation = false
     
@@ -402,3 +408,27 @@ To make java programs trust your self-signed certificate do the following steps:
     sudo keytool -import -keystore /usr/lib/jvm/java-8-oracle/jre/lib/security/cacerts -alias jetty -file jetty.cer
     ```
     **After successfully import the certificate, restart RODA.**
+
+### Development notes
+
+**Debug RODA while CAS is active**:
+
+Follow the instructions to set up CAS and trust the self-signed certificates, then use the following GWT Dev mode parameters:
+
+```
+-server :keystore=/etc/cas/jetty/thekeystore,password=changeit -bindAddress 0.0.0.0
+```
+
+And access RODA on [https://localhost:8888].
+
+If the keystore `/etc/cas/jetty/thekeystore` contains a single certificate (which will be the case when the instructions above were followed), that certificate will be used by GWT.
+
+**Debug multiple GWT applications that use CAS**:
+
+To debug multiple GWT applications that use CAS (eg. RODA and the database visualization toolkit), each application:
+
+* Must be accessed through a different hostname (although they can be running on the same IP);
+* Must have its own certificate (for the hostname in use);
+* Must have its own keystore containing only that certificate.
+
+All the certificates must also be added to the Java truststore (see section above) for some CAS features to work. 
