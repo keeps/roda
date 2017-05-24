@@ -117,6 +117,7 @@ Change the values to match your LDAP.
       "description": "RODA",
       "evaluationOrder": 3,
       "logoutType": "BACK_CHANNEL",
+      "logoutUrl" : "https://localhost:8888/logout",
       "attributeReleasePolicy": {
         "@class": "org.jasig.cas.services.ReturnAllAttributeReleasePolicy",
         "principalAttributesRepository": {
@@ -343,40 +344,24 @@ Change the values to match your LDAP.
     # Internal filters
     ##############################################
     
-    # Disable (comment) internal filters
-    # ui.filter = InternalWebAuthFilter
-    
-    # ui.filter = InternalApiAuthFilter
-    ui.filter.InternalApiAuthFilter.realm = RODA REST API
-    ui.filter.InternalApiAuthFilter.exclusions = ^/swagger.json,^/v1/theme/?
+    # Disable internal filters
+    ui.filter.internal.enabled = false
+    ui.filter.internal.realm = RODA REST API
+    ui.filter.internal.exclusions = ^/swagger.json,^/v1/theme/?
     
     ##############################################
     # CAS filters
     ##############################################
     
-    # Enable (uncomment) CAS filters
-    
-    ui.filter = CasWebAuthFilter
-    ui.filter.CasWebAuthFilter.casServerUrlPrefix = https://localhost:8443/cas
-    
-    ui.filter = CasApiAuthFilter
-    ui.filter.CasApiAuthFilter.casServerUrlPrefix = https://localhost:8443/cas
-    ui.filter.CasApiAuthFilter.exclusions = ^/swagger.json,^/v1/theme/?
-    
-    ui.filter = CASAuthenticationFilter
-    ui.filter.CASAuthenticationFilter.casServerLoginUrl = https://localhost:8443/cas/login
-    ui.filter.CASAuthenticationFilter.serverName = https://localhost:8888
-    
-    ui.filter = CASValidationFilter
-    ui.filter.CASValidationFilter.casServerLoginUrl = https://localhost:8443/cas/login
-    ui.filter.cas.proxyCallbackUrl = https://localhost:8888/callback
-    ui.filter.cas.proxyReceptorUrl = /callback
+    # Enable CAS filters
+    ui.filter.cas.enabled = true
+    ui.filter.cas.casServerUrlPrefix = https://localhost:8443/cas
+    ui.filter.cas.casServerLoginUrl = https://localhost:8443/cas/login
+    ui.filter.cas.exclusions = ^/swagger.json,^/v1/theme/?,^/v1/auth/ticket?
     # RODA base address
-    ui.filter.CASValidationFilter.serverName = https://localhost:8888
-    ui.filter.CASValidationFilter.exceptionOnValidationFailure = false
-    ui.filter.CASValidationFilter.redirectAfterValidation = false
-    
-    ui.filter = CASRequestWrapperFilter
+    ui.filter.cas.serverName = https://localhost:8888
+    ui.filter.cas.exceptionOnValidationFailure = false
+    ui.filter.cas.redirectAfterValidation = false
     ...
     ```
 
