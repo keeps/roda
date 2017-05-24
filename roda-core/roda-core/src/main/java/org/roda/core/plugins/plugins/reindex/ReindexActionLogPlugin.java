@@ -17,6 +17,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.LogEntryJsonParseException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
@@ -150,13 +151,23 @@ public class ReindexActionLogPlugin extends AbstractPlugin<Void> {
       } else {
         jobPluginInfo.incrementObjectsProcessedWithFailure();
 
-        Report reportItem = PluginHelper.initPluginReportItem(this, "log #" + i, LogEntry.class);
-        RODAException cause = logEntry.getCause();
+        // TODO should the report item have some kind of id?
+        Report reportItem = PluginHelper.initPluginReportItem(this, "", LogEntry.class);
         StringBuilder message = new StringBuilder("Could not parse log entry: ");
-        message.append("[" + cause.getClass().getSimpleName() + "] " + cause.getMessage());
-        if (cause.getCause() != null) {
-          message
-            .append("\n cause: [" + cause.getCause().getClass().getSimpleName() + "] " + cause.getCause().getMessage());
+        if (logEntry.getCause() instanceof LogEntryJsonParseException) {
+          LogEntryJsonParseException cause = (LogEntryJsonParseException) logEntry.getCause();
+          message.append("Error parsing JSON on file " + cause.getFilename() + " on line " + cause.getLine());
+          if (cause.getCause() != null) {
+            message.append("\n cause: [" + cause.getCause().getCause().getClass().getSimpleName() + "] "
+              + cause.getCause().getCause().getMessage());
+          }
+        } else {
+          RODAException cause = logEntry.getCause();
+          message.append("[" + cause.getClass().getSimpleName() + "] " + cause.getMessage());
+          if (cause.getCause() != null) {
+            message.append(
+              "\n cause: [" + cause.getCause().getClass().getSimpleName() + "] " + cause.getCause().getMessage());
+          }
         }
 
         reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(message.toString());

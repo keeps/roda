@@ -20,6 +20,7 @@ import java.util.NoSuchElementException;
 import org.apache.commons.io.IOUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.LogEntryJsonParseException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.log.LogEntry;
@@ -31,6 +32,8 @@ public class LogEntryFileSystemIterable implements CloseableIterable<OptionalWit
     private final Iterator<Path> paths;
     private BufferedReader br = null;
     private OptionalWithCause<LogEntry> next = null;
+    Path logFile = null;
+    int line = 0;
 
     public LogEntryIterator(Iterator<Path> paths) {
       this.paths = paths;
@@ -39,7 +42,8 @@ public class LogEntryFileSystemIterable implements CloseableIterable<OptionalWit
     private boolean forwardNextFile() {
       boolean foundIt = false;
       while (paths.hasNext()) {
-        Path logFile = paths.next();
+        logFile = paths.next();
+        line = 0;
         try {
           IOUtils.closeQuietly(br);
           // input stream is closed by the buffer
@@ -51,7 +55,8 @@ public class LogEntryFileSystemIterable implements CloseableIterable<OptionalWit
 
         } catch (IOException e) {
           foundIt = true;
-          next = OptionalWithCause.empty(new GenericException(e));
+          next = OptionalWithCause
+            .empty(new LogEntryJsonParseException(e).setFilename(logFile.toString()).setLine(line));
         }
       }
 
@@ -61,23 +66,23 @@ public class LogEntryFileSystemIterable implements CloseableIterable<OptionalWit
       }
 
       return foundIt;
-
     }
 
     private boolean forwardInFile() {
       boolean foundIt = false;
       try {
         String nextLine = br.readLine();
+        line++;
 
         if (nextLine != null) {
           next = OptionalWithCause.of(JsonUtils.getObjectFromJson(nextLine, LogEntry.class));
           foundIt = true;
         }
       } catch (GenericException e) {
-        next = OptionalWithCause.empty(e);
+        next = OptionalWithCause.empty(new LogEntryJsonParseException(e).setFilename(logFile.toString()).setLine(line));
         foundIt = true;
       } catch (IOException e) {
-        next = OptionalWithCause.empty(new GenericException(e));
+        next = OptionalWithCause.empty(new LogEntryJsonParseException(e).setFilename(logFile.toString()).setLine(line));
         foundIt = true;
       }
 
