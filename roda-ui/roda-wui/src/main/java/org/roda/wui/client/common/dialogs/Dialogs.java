@@ -9,6 +9,8 @@ package org.roda.wui.client.common.dialogs;
 
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.search.SearchSuggestBox;
+import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -91,20 +93,37 @@ public class Dialogs {
     dialogBox.show();
   }
 
-  public static void showInformationDialog(String title, String message, String continueButtonText) {
-    showInformationDialog(title, message, continueButtonText, new NoAsyncCallback<Void>());
+  public static void showInformationDialog(String title, final String message, String continueButtonText,
+    boolean canCopyMessage) {
+    showInformationDialog(title, message, continueButtonText, canCopyMessage, new NoAsyncCallback<Void>());
   }
 
-  public static void showInformationDialog(String title, String message, String continueButtonText,
-    final AsyncCallback<Void> callback) {
+  public static void showInformationDialog(String title, final String message, String continueButtonText,
+    boolean canCopyMessage, final AsyncCallback<Void> callback) {
     final DialogBox dialogBox = new DialogBox(false, true);
     dialogBox.setText(title);
 
     FlowPanel layout = new FlowPanel();
-    HTML messageLabel = new HTML(message);
-    Button continueButton = new Button(continueButtonText);
+    HTML messageLabel;
+
+    if (canCopyMessage) {
+      messageLabel = new HTML("<pre><code id='command_message'>" + message + "</code></pre>");
+      messageLabel.addClickHandler(new ClickHandler() {
+
+        @Override
+        public void onClick(ClickEvent event) {
+          JavascriptUtils.copyToClipboard("command_message");
+          Toast.showInfo(messages.copiedToClipboardTitle(), messages.copiedToClipboardMessage());
+        }
+      });
+
+    } else {
+      messageLabel = new HTML(message);
+    }
 
     layout.add(messageLabel);
+
+    Button continueButton = new Button(continueButtonText);
     layout.add(continueButton);
 
     dialogBox.setWidget(layout);

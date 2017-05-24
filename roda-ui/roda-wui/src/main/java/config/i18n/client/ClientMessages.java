@@ -420,6 +420,10 @@ public interface ClientMessages extends Messages {
 
   String createJobCurlCommand();
 
+  String copiedToClipboardTitle();
+
+  String copiedToClipboardMessage();
+
   /****** INGEST TRANSFER UPLOAD *********/
 
   String ingestTransferUploadTitle();
@@ -509,6 +513,8 @@ public interface ClientMessages extends Messages {
   String clearButton();
 
   String selectAllButton();
+
+  String closeButton();
 
   /*** Identify formats ***/
 

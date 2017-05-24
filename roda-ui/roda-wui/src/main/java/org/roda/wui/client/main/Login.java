@@ -178,7 +178,7 @@ public class Login extends Composite {
         public void onSuccess(final Notification result) {
           if (result.getState() == Notification.NOTIFICATION_STATE.COMPLETED) {
             Dialogs.showInformationDialog(messages.loginResendEmailSuccessDialogTitle(),
-              messages.loginResendEmailSuccessDialogMessage(), messages.loginResendEmailSuccessDialogButton(),
+              messages.loginResendEmailSuccessDialogMessage(), messages.loginResendEmailSuccessDialogButton(), false,
               new AsyncCallback<Void>() {
 
                 @Override
@@ -193,7 +193,7 @@ public class Login extends Composite {
               });
           } else {
             Dialogs.showInformationDialog(messages.loginResendEmailFailureDialogTitle(),
-              messages.loginResendEmailFailureDialogMessage(), messages.loginResendEmailFailureDialogButton(),
+              messages.loginResendEmailFailureDialogMessage(), messages.loginResendEmailFailureDialogButton(), false,
               new AsyncCallback<Void>() {
 
                 @Override

@@ -348,7 +348,7 @@ public class IngestTransfer extends Composite {
             public void onFailure(Throwable caught) {
               if (caught instanceof NotFoundException) {
                 Dialogs.showInformationDialog(messages.ingestTransferNotFoundDialogTitle(),
-                  messages.ingestTransferNotFoundDialogMessage(), messages.ingestTransferNotFoundDialogButton(),
+                  messages.ingestTransferNotFoundDialogMessage(), messages.ingestTransferNotFoundDialogButton(), false,
                   new AsyncCallback<Void>() {
 
                     @Override

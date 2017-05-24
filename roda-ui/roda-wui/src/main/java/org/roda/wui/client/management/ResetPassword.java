@@ -276,7 +276,7 @@ public class ResetPassword extends Composite {
           @Override
           public void onSuccess(Void result) {
             Dialogs.showInformationDialog(messages.resetPasswordSuccessDialogTitle(),
-              messages.resetPasswordSuccessDialogMessage(), messages.resetPasswordSuccessDialogButton(),
+              messages.resetPasswordSuccessDialogMessage(), messages.resetPasswordSuccessDialogButton(), false,
               new AsyncCallback<Void>() {
 
                 @Override

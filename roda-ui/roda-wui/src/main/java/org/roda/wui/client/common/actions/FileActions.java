@@ -336,7 +336,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
                     public void onFailureImpl(Throwable caught) {
                       if (caught instanceof AlreadyExistsException) {
                         Dialogs.showInformationDialog(messages.createFolderAlreadyExistsTitle(),
-                          messages.createFolderAlreadyExistsMessage(), messages.dialogOk());
+                          messages.createFolderAlreadyExistsMessage(), messages.dialogOk(), false);
                       } else {
                         callback.onFailure(caught);
                       }

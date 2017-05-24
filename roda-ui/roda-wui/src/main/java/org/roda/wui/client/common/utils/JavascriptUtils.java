@@ -348,4 +348,15 @@ public class JavascriptUtils {
   public static native void cleanAdvancedSearch() /*-{
 		$wnd.jQuery('.searchAdvancedPanel input').val('');
   }-*/;
+
+  public static native void copyToClipboard(String elementId) /*-{
+		var selection = $wnd.getSelection();
+		var text = $doc.getElementById(elementId);
+		var range = $doc.createRange();
+		range.selectNodeContents(text);
+		selection.removeAllRanges();
+		selection.addRange(range);
+		$doc.execCommand('copy');
+		selection.removeAllRanges();
+  }-*/;
 }

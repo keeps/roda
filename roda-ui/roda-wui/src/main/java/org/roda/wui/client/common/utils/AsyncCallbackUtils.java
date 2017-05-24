@@ -70,7 +70,7 @@ public class AsyncCallbackUtils {
               message = messages.authorizationDeniedAlertMessageMissingRoles(missingRolesTranslation);
             }
 
-            Dialogs.showInformationDialog(messages.authorizationDeniedAlert(), message, messages.dialogOk(),
+            Dialogs.showInformationDialog(messages.authorizationDeniedAlert(), message, messages.dialogOk(), false,
               new AsyncCallback<Void>() {
                 @Override
                 public void onFailure(Throwable caught) {

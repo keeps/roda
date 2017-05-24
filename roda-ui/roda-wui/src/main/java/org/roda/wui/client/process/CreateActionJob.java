@@ -123,8 +123,7 @@ public class CreateActionJob extends CreateSelectedJob<IsIndexed> {
 
         @Override
         public void onSuccess(String result) {
-          Dialogs.showInformationDialog(messages.createJobCurlCommand(), "<pre><code>" + result + "</code></pre>",
-            messages.confirmButton());
+          Dialogs.showInformationDialog(messages.createJobCurlCommand(), result, messages.confirmButton(), true);
         }
       });
   }

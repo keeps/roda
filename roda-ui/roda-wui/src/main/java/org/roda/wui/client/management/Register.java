@@ -190,7 +190,7 @@ public class Register extends Composite {
           public void onSuccess(final User registeredUser) {
             if (registeredUser.isActive()) {
               Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
-                messages.registerSuccessDialogMessageActive(), messages.registerSuccessDialogButton(),
+                messages.registerSuccessDialogMessageActive(), messages.registerSuccessDialogButton(), false,
                 new AsyncCallback<Void>() {
 
                   @Override
@@ -205,7 +205,7 @@ public class Register extends Composite {
                 });
             } else {
               Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
-                messages.registerSuccessDialogMessage(), messages.registerSuccessDialogButton(),
+                messages.registerSuccessDialogMessage(), messages.registerSuccessDialogButton(), false,
                 new AsyncCallback<Void>() {
 
                   @Override

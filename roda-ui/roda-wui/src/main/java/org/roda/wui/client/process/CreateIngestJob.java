@@ -117,7 +117,7 @@ public class CreateIngestJob extends CreateSelectedJob<TransferredResource> {
       }
 
       Dialogs.showInformationDialog(messages.processNewMissingMandatoryInfoDialogTitle(),
-        messages.processNewMissingMandatoryInfoDialogMessage(missingPluginNames), messages.dialogOk(),
+        messages.processNewMissingMandatoryInfoDialogMessage(missingPluginNames), messages.dialogOk(), false,
         new AsyncCallback<Void>() {
 
           @Override
@@ -151,8 +151,7 @@ public class CreateIngestJob extends CreateSelectedJob<TransferredResource> {
 
           @Override
           public void onSuccess(String result) {
-            Dialogs.showInformationDialog(messages.createJobCurlCommand(), "<pre><code>" + result + "</code></pre>",
-              messages.confirmButton());
+            Dialogs.showInformationDialog(messages.createJobCurlCommand(), result, messages.confirmButton(), true);
           }
         });
     } else {
@@ -163,7 +162,7 @@ public class CreateIngestJob extends CreateSelectedJob<TransferredResource> {
       }
 
       Dialogs.showInformationDialog(messages.processNewMissingMandatoryInfoDialogTitle(),
-        messages.processNewMissingMandatoryInfoDialogMessage(missingPluginNames), messages.dialogOk(),
+        messages.processNewMissingMandatoryInfoDialogMessage(missingPluginNames), messages.dialogOk(), false,
         new AsyncCallback<Void>() {
 
           @Override

@@ -162,7 +162,7 @@ public class ContentPanel extends SimplePanel {
                 UserLogin.getInstance().showSuggestLoginDialog();
               } else {
                 Dialogs.showInformationDialog(messages.authorizationDeniedAlert(),
-                  messages.authorizationDeniedAlertMessageExceptionSimple(), messages.dialogOk(),
+                  messages.authorizationDeniedAlertMessageExceptionSimple(), messages.dialogOk(), false,
                   new AsyncCallback<Void>() {
                     @Override
                     public void onFailure(Throwable caught) {

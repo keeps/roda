@@ -226,7 +226,7 @@ public class VerifyEmail extends Composite {
           @Override
           public void onSuccess(Void result) {
             Dialogs.showInformationDialog(messages.verifyEmailSuccessDialogTitle(),
-              messages.verifyEmailSuccessDialogMessage(), messages.verifyEmailSuccessDialogButton(),
+              messages.verifyEmailSuccessDialogMessage(), messages.verifyEmailSuccessDialogButton(), false,
               new AsyncCallback<Void>() {
 
                 @Override

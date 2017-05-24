@@ -83,10 +83,12 @@ public class RecoverLogin extends Composite {
       });
     }
 
+    @Override
     public List<String> getHistoryPath() {
       return Arrays.asList(getHistoryToken());
     }
 
+    @Override
     public String getHistoryToken() {
       return "recover";
     }
@@ -220,7 +222,7 @@ public class RecoverLogin extends Composite {
           @Override
           public void onSuccess(Void result) {
             Dialogs.showInformationDialog(messages.recoverLoginSuccessDialogTitle(),
-              messages.recoverLoginSuccessDialogMessage(), messages.recoverLoginSuccessDialogButton(),
+              messages.recoverLoginSuccessDialogMessage(), messages.recoverLoginSuccessDialogButton(), false,
               new AsyncCallback<Void>() {
 
                 @Override
