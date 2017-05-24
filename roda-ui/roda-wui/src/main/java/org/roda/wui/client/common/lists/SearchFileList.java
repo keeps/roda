@@ -94,7 +94,7 @@ public class SearchFileList extends BasicAsyncTableCell<IndexedFile> {
           b.append(SafeHtmlUtils.fromSafeConstant("'>"));
           if (showFilePath && filePath != null && !filePath.isEmpty()) {
             String path = StringUtils.join(filePath, "/");
-            b.append(SafeHtmlUtils.fromSafeConstant("<span class='file-path'>"));
+            b.append(SafeHtmlUtils.fromSafeConstant("<span class='table-file-path'>"));
             b.append(SafeHtmlUtils.fromString(path));
             b.append(SafeHtmlUtils.fromSafeConstant("/"));
             b.append(SafeHtmlUtils.fromSafeConstant("</span>"));

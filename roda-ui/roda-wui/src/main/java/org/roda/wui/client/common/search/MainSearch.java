@@ -270,7 +270,7 @@ public class MainSearch extends Composite {
 
   private void createFilesSearchResultPanel() {
     Facets facets = new Facets(filesFacetsMap.keySet());
-    boolean showFilesPath = false;
+    boolean showFilesPath = true;
     filesSearchResultPanel = new SearchFileList(filterFiles, justActive, facets, messages.searchResults(),
       filesSelectable, showFilesPath);
 

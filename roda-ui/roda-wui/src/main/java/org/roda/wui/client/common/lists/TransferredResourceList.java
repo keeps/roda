@@ -27,6 +27,7 @@ import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
@@ -46,7 +47,7 @@ public class TransferredResourceList extends BasicAsyncTableCell<TransferredReso
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private Column<TransferredResource, SafeHtml> isFileColumn;
-  private TextColumn<TransferredResource> nameColumn;
+  private Column<TransferredResource, SafeHtml> nameColumn;
   private TextColumn<TransferredResource> sizeColumn;
   private Column<TransferredResource, Date> creationDateColumn;
 
@@ -88,11 +89,31 @@ public class TransferredResourceList extends BasicAsyncTableCell<TransferredReso
       }
     };
 
-    nameColumn = new TextColumn<TransferredResource>() {
+    nameColumn = new Column<TransferredResource, SafeHtml>(new SafeHtmlCell()) {
 
       @Override
-      public String getValue(TransferredResource r) {
-        return r != null ? r.getName() : null;
+      public SafeHtml getValue(TransferredResource r) {
+        SafeHtmlBuilder b = new SafeHtmlBuilder();
+
+        if (r != null) {
+          String relativePath = r.getRelativePath();
+          b.append(SafeHtmlUtils.fromSafeConstant("<div title='"));
+          b.append(SafeHtmlUtils.fromString(relativePath));
+          b.append(SafeHtmlUtils.fromSafeConstant("'>"));
+          if (relativePath != null) {
+            String pathWithoutName = relativePath.substring(0, relativePath.lastIndexOf('/'));
+            b.append(SafeHtmlUtils.fromSafeConstant("<span class='table-file-path'>"));
+            b.append(SafeHtmlUtils.fromString(pathWithoutName));
+            if (!pathWithoutName.isEmpty()) {
+              b.append(SafeHtmlUtils.fromSafeConstant("/"));
+            }
+            b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
+          }
+          b.append(SafeHtmlUtils.fromString(r.getName()));
+          b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
+        }
+
+        return b.toSafeHtml();
       }
     };
 
