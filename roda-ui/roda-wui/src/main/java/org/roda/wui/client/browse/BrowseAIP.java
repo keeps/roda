@@ -316,7 +316,7 @@ public class BrowseAIP extends Composite {
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-    clear();
+    clear(false);
     if (historyTokens.isEmpty()) {
       viewAction();
       callback.onSuccess(this);
@@ -396,8 +396,7 @@ public class BrowseAIP extends Composite {
     }
   }
 
-  private void clear() {
-
+  private void clear(boolean clearFacets) {
     removeStyleName(BROWSE_TOP_CSS);
     removeStyleName(BROWSE_AIP_CSS);
 
@@ -459,8 +458,10 @@ public class BrowseAIP extends Composite {
       this.removeStyleName(state.toString().toLowerCase());
     }
 
-    facets = new Facets(new SimpleFacetParameter(RodaConstants.AIP_LEVEL),
-      new SimpleFacetParameter(RodaConstants.AIP_HAS_REPRESENTATIONS));
+    if (clearFacets) {
+      facets = new Facets(new SimpleFacetParameter(RodaConstants.AIP_LEVEL),
+        new SimpleFacetParameter(RodaConstants.AIP_HAS_REPRESENTATIONS));
+    }
   }
 
   protected void showError(String id, Throwable caught) {
@@ -573,7 +574,7 @@ public class BrowseAIP extends Composite {
         public void onSuccess(Actionable.ActionImpact impact) {
           if (Actionable.ActionImpact.UPDATED.equals(impact)) {
             // reload
-            clear();
+            clear(true);
             viewAction(aipId);
           }
         }
@@ -768,7 +769,7 @@ public class BrowseAIP extends Composite {
         public void onSuccess(Actionable.ActionImpact impact) {
           if (Actionable.ActionImpact.UPDATED.equals(impact)) {
             // reload
-            clear();
+            clear(true);
             viewAction(aipId);
           }
         }

@@ -127,7 +127,6 @@ public class ShowRisk extends Composite {
    *
    *
    */
-
   public ShowRisk() {
     this.risk = new Risk();
     this.riskShowPanel = new RiskShowPanel();
@@ -209,7 +208,7 @@ public class ShowRisk extends Composite {
 
   @UiHandler("buttonCancel")
   void handleButtonCancel(ClickEvent e) {
-    cancel();
+    HistoryUtils.newHistory(RiskRegister.RESOLVER);
   }
 
   @UiHandler("buttonRemove")
@@ -278,10 +277,6 @@ public class ShowRisk extends Composite {
           });
       }
     });
-  }
-
-  private void cancel() {
-    HistoryUtils.newHistory(RiskRegister.RESOLVER);
   }
 
   public void enableProcessButton(boolean enable) {

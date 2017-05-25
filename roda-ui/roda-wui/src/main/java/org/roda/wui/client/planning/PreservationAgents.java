@@ -52,16 +52,7 @@ public class PreservationAgents extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      if (historyTokens.isEmpty()) {
-        PreservationAgents preservationAgents = new PreservationAgents();
-        callback.onSuccess(preservationAgents);
-      } else if (!historyTokens.isEmpty()
-        && historyTokens.get(0).equals(ShowPreservationAgent.RESOLVER.getHistoryToken())) {
-        ShowPreservationAgent.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
-      } else {
-        HistoryUtils.newHistory(RESOLVER);
-        callback.onSuccess(null);
-      }
+      getInstance().resolve(historyTokens, callback);
     }
 
     @Override
@@ -82,6 +73,8 @@ public class PreservationAgents extends Composite {
 
   interface MyUiBinder extends UiBinder<Widget, PreservationAgents> {
   }
+
+  private static PreservationAgents instance = null;
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
@@ -127,9 +120,34 @@ public class PreservationAgents extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
   }
 
+  /**
+   * Get the singleton instance
+   *
+   * @return the instance
+   */
+  public static PreservationAgents getInstance() {
+    if (instance == null) {
+      instance = new PreservationAgents();
+    }
+    return instance;
+  }
+
   @Override
   protected void onLoad() {
     super.onLoad();
     JavascriptUtils.stickSidebar();
+  }
+
+  private void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
+    if (historyTokens.isEmpty()) {
+      agentList.refresh();
+      callback.onSuccess(this);
+    } else if (!historyTokens.isEmpty()
+      && historyTokens.get(0).equals(ShowPreservationAgent.RESOLVER.getHistoryToken())) {
+      ShowPreservationAgent.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+    } else {
+      HistoryUtils.newHistory(RESOLVER);
+      callback.onSuccess(null);
+    }
   }
 }

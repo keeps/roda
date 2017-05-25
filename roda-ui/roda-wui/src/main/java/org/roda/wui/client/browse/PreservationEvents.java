@@ -34,6 +34,7 @@ import org.roda.wui.client.common.lists.PreservationEventList;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.client.planning.Planning;
@@ -78,28 +79,7 @@ public class PreservationEvents extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      if (historyTokens.size() == 1) {
-        final String aipId = historyTokens.get(0);
-        PreservationEvents preservationEvents = new PreservationEvents(aipId);
-        callback.onSuccess(preservationEvents);
-      } else if (historyTokens.size() > 1
-        && historyTokens.get(0).equals(ShowPreservationEvent.RESOLVER.getHistoryToken())) {
-        ShowPreservationEvent.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
-      } else if (historyTokens.size() == 2) {
-        final String aipId = historyTokens.get(0);
-        final String representationUUID = historyTokens.get(1);
-        PreservationEvents preservationEvents = new PreservationEvents(aipId, representationUUID);
-        callback.onSuccess(preservationEvents);
-      } else if (historyTokens.size() == 3) {
-        final String aipId = historyTokens.get(0);
-        final String representationUUID = historyTokens.get(1);
-        final String fileUUID = historyTokens.get(2);
-        PreservationEvents preservationEvents = new PreservationEvents(aipId, representationUUID, fileUUID);
-        callback.onSuccess(preservationEvents);
-      } else {
-        HistoryUtils.newHistory(BrowseAIP.RESOLVER);
-        callback.onSuccess(null);
-      }
+      getInstance().browseResolve(historyTokens, callback);
     }
 
     @Override
@@ -122,13 +102,7 @@ public class PreservationEvents extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      if (historyTokens.isEmpty()) {
-        PreservationEvents preservationEvents = new PreservationEvents();
-        callback.onSuccess(preservationEvents);
-      } else {
-        HistoryUtils.newHistory(PLANNING_RESOLVER);
-        callback.onSuccess(null);
-      }
+      getInstance().planningResolve(historyTokens, callback);
     }
 
     @Override
@@ -146,6 +120,8 @@ public class PreservationEvents extends Composite {
       return "events";
     }
   };
+
+  private static PreservationEvents instance = null;
 
   interface MyUiBinder extends UiBinder<Widget, PreservationEvents> {
   }
@@ -335,6 +311,18 @@ public class PreservationEvents extends Composite {
     eventList.setFilter(new Filter(filterParameter));
   }
 
+  /**
+   * Get the singleton instance
+   *
+   * @return the instance
+   */
+  public static PreservationEvents getInstance() {
+    if (instance == null) {
+      instance = new PreservationEvents();
+    }
+    return instance;
+  }
+
   @Override
   protected void onLoad() {
     super.onLoad();
@@ -440,6 +428,61 @@ public class PreservationEvents extends Composite {
       HistoryUtils.newHistory(HistoryUtils.getHistoryBrowse(aipId));
     } else {
       // button not visible
+    }
+  }
+
+  private void browseResolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
+    if (historyTokens.size() == 1) {
+      final String aipId = historyTokens.get(0);
+      if (aipId.equals(this.aipId) && StringUtils.isBlank(this.representationUUID)) {
+        eventList.refresh();
+        callback.onSuccess(this);
+      } else {
+        instance = new PreservationEvents(aipId);
+        callback.onSuccess(instance);
+      }
+    } else if (historyTokens.size() > 1
+      && historyTokens.get(0).equals(ShowPreservationEvent.RESOLVER.getHistoryToken())) {
+      ShowPreservationEvent.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+    } else if (historyTokens.size() == 2) {
+      final String aipId = historyTokens.get(0);
+      final String representationUUID = historyTokens.get(1);
+
+      if (aipId.equals(this.aipId) && representationUUID.equals(this.representationUUID)
+        && StringUtils.isBlank(this.fileUUID)) {
+        eventList.refresh();
+        callback.onSuccess(this);
+      } else {
+        instance = new PreservationEvents(aipId, representationUUID);
+        callback.onSuccess(instance);
+      }
+    } else if (historyTokens.size() == 3) {
+      final String aipId = historyTokens.get(0);
+      final String representationUUID = historyTokens.get(1);
+      final String fileUUID = historyTokens.get(2);
+
+      if (aipId.equals(this.aipId) && representationUUID.equals(this.representationUUID)
+        && fileUUID.equals(this.fileUUID)) {
+        eventList.refresh();
+        callback.onSuccess(this);
+      } else {
+        instance = new PreservationEvents(aipId, representationUUID, fileUUID);
+        callback.onSuccess(instance);
+      }
+    } else {
+      HistoryUtils.newHistory(BrowseAIP.RESOLVER);
+      callback.onSuccess(null);
+    }
+  }
+
+  private void planningResolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
+    if (historyTokens.isEmpty() && StringUtils.isBlank(this.aipId)) {
+      eventList.refresh();
+      callback.onSuccess(this);
+    } else {
+      instance = new PreservationEvents();
+      HistoryUtils.newHistory(PLANNING_RESOLVER);
+      callback.onSuccess(null);
     }
   }
 }
