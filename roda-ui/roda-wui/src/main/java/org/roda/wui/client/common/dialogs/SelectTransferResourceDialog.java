@@ -37,6 +37,6 @@ public class SelectTransferResourceDialog extends DefaultSelectDialog<Transferre
 
   public SelectTransferResourceDialog(String title, Filter filter, boolean selectable) {
     super(title, filter, RodaConstants.TRANSFERRED_RESOURCE_SEARCH, new TransferredResourceList(filter, DEFAULT_FACETS,
-      messages.selectTransferredResourcesSearchResults(), selectable), false);
+      messages.selectTransferredResourcesSearchResults(), selectable, true), false);
   }
 }

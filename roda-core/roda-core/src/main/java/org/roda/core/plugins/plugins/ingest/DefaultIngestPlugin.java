@@ -376,7 +376,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
       String subject = RodaCoreFactory.getRodaConfigurationAsString("core", "notification", "ingest_subject");
       if (StringUtils.isNotBlank(subject)) {
-        subject += " " + outcome;
+        subject = subject.replaceAll("\\{RESULT\\}", outcome);
       } else {
         subject = outcome;
       }

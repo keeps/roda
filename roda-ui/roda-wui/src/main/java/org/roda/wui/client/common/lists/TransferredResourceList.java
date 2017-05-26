@@ -46,6 +46,8 @@ public class TransferredResourceList extends BasicAsyncTableCell<TransferredReso
   private final ClientLogger logger = new ClientLogger(getClass().getName());
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
+  private boolean addParentPath = false;
+
   private Column<TransferredResource, SafeHtml> isFileColumn;
   private Column<TransferredResource, SafeHtml> nameColumn;
   private TextColumn<TransferredResource> sizeColumn;
@@ -62,12 +64,27 @@ public class TransferredResourceList extends BasicAsyncTableCell<TransferredReso
 
   public TransferredResourceList(Filter filter, Facets facets, String summary, boolean selectable) {
     super(TransferredResource.class, filter, facets, summary, selectable, fieldsToReturn);
+    this.addParentPath = false;
+  }
+
+  public TransferredResourceList(Filter filter, Facets facets, String summary, boolean selectable,
+    boolean addParentPath) {
+    super(TransferredResource.class, filter, facets, summary, selectable, fieldsToReturn);
+    this.addParentPath = addParentPath;
   }
 
   public TransferredResourceList(Filter filter, Facets facets, String summary, boolean selectable, int initialPageSize,
     int pageSizeIncrement) {
     super(TransferredResource.class, filter, facets, summary, selectable, initialPageSize, pageSizeIncrement,
       fieldsToReturn);
+    this.addParentPath = false;
+  }
+
+  public TransferredResourceList(Filter filter, Facets facets, String summary, boolean selectable, int initialPageSize,
+    int pageSizeIncrement, boolean addParentPath) {
+    super(TransferredResource.class, filter, facets, summary, selectable, initialPageSize, pageSizeIncrement,
+      fieldsToReturn);
+    this.addParentPath = addParentPath;
   }
 
   @Override
@@ -100,7 +117,7 @@ public class TransferredResourceList extends BasicAsyncTableCell<TransferredReso
           b.append(SafeHtmlUtils.fromSafeConstant("<div title='"));
           b.append(SafeHtmlUtils.fromString(relativePath));
           b.append(SafeHtmlUtils.fromSafeConstant("'>"));
-          if (relativePath != null) {
+          if (relativePath != null && addParentPath) {
             String pathWithoutName = relativePath.substring(0, relativePath.lastIndexOf('/'));
             b.append(SafeHtmlUtils.fromSafeConstant("<span class='table-file-path'>"));
             b.append(SafeHtmlUtils.fromString(pathWithoutName));
