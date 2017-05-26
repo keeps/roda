@@ -7,10 +7,6 @@
  */
 package org.roda.core.data.exceptions;
 
-/**
- * @author Luis Faria <lfaria@keep.pt>
- * 
- */
 public class LogEntryJsonParseException extends RODAException {
 
   private static final long serialVersionUID = -8336065269567551582L;

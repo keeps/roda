@@ -38,6 +38,7 @@ import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
+import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -141,27 +142,30 @@ public class ReindexActionLogPlugin extends AbstractPlugin<Void> {
     SimpleJobPluginInfo jobPluginInfo) {
     report.setPluginState(PluginState.SUCCESS);
 
-    int i = 0;
     for (OptionalWithCause<LogEntry> logEntry : model.listLogEntries(dontReindexOlderThanXDays)) {
       jobPluginInfo.incrementObjectsCount();
-      i++;
+
       if (logEntry.isPresent()) {
         index.reindexActionLog(logEntry.get());
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
       } else {
         jobPluginInfo.incrementObjectsProcessedWithFailure();
 
-        // TODO should the report item have some kind of id?
-        Report reportItem = PluginHelper.initPluginReportItem(this, "", LogEntry.class);
+        // INFO when log entry is not present, a unique id is needed to create
+        // multiple reports
+        String id;
+
         StringBuilder message = new StringBuilder("Could not parse log entry: ");
         if (logEntry.getCause() instanceof LogEntryJsonParseException) {
           LogEntryJsonParseException cause = (LogEntryJsonParseException) logEntry.getCause();
+          id = IdUtils.createUUID(cause.getFilename() + cause.getLine());
           message.append("Error parsing JSON on file " + cause.getFilename() + " on line " + cause.getLine());
           if (cause.getCause() != null) {
             message.append("\n cause: [" + cause.getCause().getCause().getClass().getSimpleName() + "] "
               + cause.getCause().getCause().getMessage());
           }
         } else {
+          id = IdUtils.createUUID();
           RODAException cause = logEntry.getCause();
           message.append("[" + cause.getClass().getSimpleName() + "] " + cause.getMessage());
           if (cause.getCause() != null) {
@@ -170,6 +174,7 @@ public class ReindexActionLogPlugin extends AbstractPlugin<Void> {
           }
         }
 
+        Report reportItem = PluginHelper.initPluginReportItem(this, id, LogEntry.class);
         reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(message.toString());
         report.addReport(reportItem);
 
