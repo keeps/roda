@@ -416,4 +416,6 @@ To debug multiple GWT applications that use CAS (eg. RODA and the database visua
 * Must have its own certificate (for the hostname in use);
 * Must have its own keystore containing only that certificate.
 
-All the certificates must also be added to the Java truststore (see section above) for some CAS features to work. 
+All the certificates must also be added to the Java truststore (see section above) for some CAS features to work.
+
+The browser must be set to allow running insecure content (because the HTTPS website needs to communicate with the HTTP GWT code server) (eg. for chrome start it with the parameter `--allow-running-insecure-content`)
