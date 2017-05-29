@@ -3,35 +3,44 @@
   <h1>Instalar novos formatos de metadados descritivos</h1>
 
   <p>
-	O RODA suporta qualquer formato de metadados descritivo (i.e. Informação Descritiva conforme indicado no OAIS) desde que representado por um ficheiro XML. Se tem um formato de metadados descritivo que não é baseado em XML (por exemplo, CSV, JSON, MARC21, etc.), terá que converter para XML antes de poder usar no RODA. Existem várias ferramentas na Web que permitem converter a maioria dos formatos de dados em XML.
+	O RODA suporta qualquer formato de metadados descritivo (i.e. Informação Descritiva conforme indicado no OAIS) desde que representado por um ficheiro XML. Se tem um formato de metadados 
+	descritivo que não é baseado em XML (por exemplo, CSV, JSON, MARC21, etc.), terá que converter para XML antes de poder usar no RODA. Existem várias ferramentas na Web que permitem converter 
+	a maioria dos formatos de dados em XML.
   </p>
 
   <p>
-	Depois de ter os metadados em XML, está pronto para empacotá-lo num Pacote de Informações de Envio (SIP) e ingeri-lo no repositório. Como alternativa, você pode criar um arquivo de metadados diretamente no repositório usando a funcionalidade fornecida pelo Catálogo. Quando o formato de metadados é novo para o RODA, o repositório fará o seu melhor para suportar sem a necessidade de fazer qualquer reconfiguração do sistema, no entanto, as seguintes limitações se aplicam:
+	Depois de ter os metadados em XML, está pronto para empacotá-lo num Pacote de Informações de Envio (SIP) e ingeri-lo no repositório. Como alternativa, você pode criar um arquivo de metadados 
+	diretamente no repositório usando a funcionalidade fornecida pelo Catálogo. Quando o formato de metadados é novo para o RODA, o repositório fará o seu melhor para suportar sem a necessidade 
+	de fazer qualquer reconfiguração do sistema, no entanto, as seguintes limitações se aplicam:
 
     <p>
       <div class="row full_width">
         <div class="col_3 col_card">
           <h4>Validação</h4>
-          <p>Se nenhum schema for fornecido para o formato de metadados, o repositório verificará se o arquivo XML de metadados está bem formado, mas como o repositório não tem noção da gramática correta, ele não verificará se o arquivo é válido.</p>
+          <p>Se nenhum schema for fornecido para o formato de metadados, o repositório verificará se o arquivo XML de metadados está bem formado, mas como o repositório não tem noção da gramática 
+          correta, ele não verificará se o arquivo é válido.</p>
         </div>
         <div class="col_3 col_card">
           <h4>Indexação</h4>
-		  <p>O repositório irá indexar todos os elementos textuais e valores de atributos encontrados no ficheiro de metadados. No entanto, uma vez que o repositório não conhece o mapeamento correcto entre os elementos XML e o modelo de dados interno, apenas a pesquisa básica será possível nos metadados fornecidos.</p>
+		  <p>O repositório irá indexar todos os elementos textuais e valores de atributos encontrados no ficheiro de metadados. No entanto, uma vez que o repositório não conhece o mapeamento correcto 
+		  entre os elementos XML e o modelo de dados interno, apenas a pesquisa básica será possível nos metadados fornecidos.</p>
         </div>
         <div class="col_3 col_card">
           <h4>Visualização</h4>
-          <p>Quando nenhum mapeamento de visualização é configurado, um visualizador de metadados genérico será usado pelo repositório para exibir os metadados baseados em XML. Todos os elementos textuais e atributos serão mostrados com nenhuma ordem específica e seu XPath será usado como rótulo.</p>
+          <p>Quando nenhum mapeamento de visualização é configurado, um visualizador de metadados genérico será usado pelo repositório para exibir os metadados baseados em XML. Todos os elementos 
+          textuais e atributos serão mostrados com nenhuma ordem específica e seu XPath será usado como rótulo.</p>
         </div>
         <div class="col_3 col_card">
           <h4>Edição</h4>
-          <p>O RODA precisa de um arquivo de configuração para informar como os arquivos de metadados devem ser exibidos para fins de edição. Se não existir tal configuração, o repositório exibirá uma área de texto onde o usuário é capaz de editar o XML diretamente.</p>
+          <p>O RODA precisa de um arquivo de configuração para informar como os arquivos de metadados devem ser exibidos para fins de edição. Se não existir tal configuração, o repositório 
+          exibirá uma área de texto onde o usuário é capaz de editar o XML diretamente.</p>
         </div>
       </div>
     </p>
 
     <p>
-	Para suportar novos formatos de metadados, o repositório deve ser configurado de acordo com isso. As secções a seguir descrevem com detalhe o conjunto de ações que precisam ser executadas para suportar totalmente um novo esquema de metadados no RODA.
+	Para suportar novos formatos de metadados, o repositório deve ser configurado de acordo com isso. As secções a seguir descrevem com detalhe o conjunto de ações que precisam ser executadas 
+	para suportar totalmente um novo esquema de metadados no RODA.
     </p>
 
 
@@ -41,13 +50,15 @@
     </p>
     <h3>Validação</h3>
     <p>
-	  O RODA usa um <a href="http://www.w3.org/standards/xml/schema"> schema XML </a> para validar a estrutura e os tipos de dados do arquivo de metadados fornecido. O esquema de Validação será usado durante o processo de ingestão para verificar se os metadados incluídos no SIP são válidos de acordo com as restrições estabelecidas, bem como quando os metadados são editados através do catálogo.
+	  O RODA usa um <a href="http://www.w3.org/standards/xml/schema"> schema XML </a> para validar a estrutura e os tipos de dados do arquivo de metadados fornecido. O esquema de Validação será 
+	  usado durante o processo de ingestão para verificar se os metadados incluídos no SIP são válidos de acordo com as restrições estabelecidas, bem como quando os metadados são editados através do catálogo.
     </p>
     <p>      
-	  Pode-se usar um ficheiro de schema padrão para fins de validação ou criar um específico que verifique todas as condições particulares que se precisa verificar na instalação de repositório, e.g. Campos obrigatórios, vocabulários fechados para os valores de certos elementos, etc.
+	  Pode-se usar um ficheiro de schema padrão para fins de validação ou criar um específico que verifique todas as condições particulares que se precisa verificar na instalação de repositório, 
+	  e.g. Campos obrigatórios, vocabulários fechados para os valores de certos elementos, etc.
     </p>
     <p>
-      Os arquivos do schema de Validação devem ser colocados na pasta <code>[RODA_HOME]/config/schemas/</code>.
+      Os arquivos do schema de validação devem ser colocados na pasta <code>[RODA_HOME]/config/schemas/</code>.
     </p>
 
     <p>

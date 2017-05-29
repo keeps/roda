@@ -13,25 +13,30 @@
       <div class="row full_width">
         <div class="col_3 col_card">
           <h4>Validation</h4>
-          <p>If no schema is provided for your metadata format, the repository will check if the metadata XML file is well-formed, however because the repository has no notion of  the right grammar, it will not verify if the file is valid.</p>
+          <p>If no schema is provided for your metadata format, the repository will check if the metadata XML file is well-formed, however because the repository has no notion of 
+          the right grammar, it will not verify if the file is valid.</p>
         </div>
         <div class="col_3 col_card">
           <h4>Indexing</h4>
-          <p>The repository will index all text elements and attribute values found on the metadata file, however because the repository does not know the right mapping between the XML elements and the inner data model, only basic search will possible on the provided metadata.</p>
+          <p>The repository will index all text elements and attribute values found on the metadata file, however because the repository does not know the right mapping between the XML 
+          elements and the inner data model, only basic search will possible on the provided metadata.</p>
         </div>
         <div class="col_3 col_card">
           <h4>Visualization</h4>
-          <p>When no visualization mappings are configured, a generic metadata viewer will be used by the repository to display the XML-based metadata. All text elements and attributes will shown in no particular order and their XPath will be used as the label.</p>
+          <p>When no visualization mappings are configured, a generic metadata viewer will be used by the repository to display the XML-based metadata. All text elements and attributes
+           will shown in no particular order and their XPath will be used as the label.</p>
         </div>
         <div class="col_3 col_card">
           <h4>Edition</h4>
-          <p>RODA needs a configuration file to inform how metadata files should be displayed for editing purposes. If no such configuration exists, the repository will display a text area where the user is able to edit the XML directly. </p>
+          <p>RODA needs a configuration file to inform how metadata files should be displayed for editing purposes. If no such configuration exists, the repository will display a text 
+          area where the user is able to edit the XML directly. </p>
         </div>
       </div>
     </p>
 
     <p>
-    In order to support new metadata formats, the repository must be configured accordingly. The following sections describe in detail the set of actions that need to be performed to fully support a new metadata schema in RODA.
+    In order to support new metadata formats, the repository must be configured accordingly. The following sections describe in detail the set of actions that need to be performed to 
+    fully support a new metadata schema in RODA.
     </p>
 
 
@@ -41,15 +46,16 @@
     </p>
     <h3>Validation</h3>
     <p>
-      RODA uses a <a href="http://www.w3.org/standards/xml/schema"> XML schema </a> to validate the structure and data types of the provided metadata file. The Validation schema will be used during ingest process to check if the metadata included in the SIP is valid according the the established
+      RODA uses a <a href="http://www.w3.org/standards/xml/schema"> XML schema </a> to validate the structure and data types of the provided metadata file. The Validation schema will be used 
+      during ingest process to check if the metadata included in the SIP is valid according the the established
       constraints, as well as when the metadata is edited via the catalogue.
     </p>
     <p>
-      You may use a standard schema file for validation purposes or create a specific one that verifies all the particular conditions that you need to check in your repository installation, e.g. mandatory fields, closed-vocabularies for the values of certain
-      elements, etc.
+      You may use a standard schema file for validation purposes or create a specific one that verifies all the particular conditions that you need to check in your repository installation, e.g. 
+      mandatory fields, closed-vocabularies for the values of certain elements, etc.
     </p>
     <p>
-      The Validation Schema files should be placed on the configuration folder under <code>[RODA_HOME]/config/schemas/</code>.
+      The validation schema files should be placed on the configuration folder under <code>[RODA_HOME]/config/schemas/</code>.
     </p>
 
     <p>

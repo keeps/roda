@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Map.Entry;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
@@ -146,6 +146,7 @@ public class ReplicationPlugin extends AbstractPlugin<AIP> {
         if (rsyncResult.equals(ReplicationPluginUtils.PROPERTIES_ERROR_MESSAGE)) {
           pluginState = PluginState.FAILURE;
         }
+
         reportItem.addPluginDetails("\n" + rsyncResult);
       }
 
@@ -153,7 +154,7 @@ public class ReplicationPlugin extends AbstractPlugin<AIP> {
       String rsyncAgentsResult = ReplicationPluginUtils.executeRsyncAgents(hasCompression);
 
       // create reindex job on the remote side
-      sendReindexRequest(model, index, objects.stream().map(aip -> aip.getId()).collect(Collectors.toList()));
+      reports = sendReindexRequest(index, reports);
 
       // create success reports for all AIPs
       for (AIP aip : objects) {
@@ -187,7 +188,7 @@ public class ReplicationPlugin extends AbstractPlugin<AIP> {
     }
   }
 
-  private void sendReindexRequest(ModelService model, IndexService index, List<String> aipIds) throws RODAException {
+  private Map<String, Report> sendReindexRequest(IndexService index, Map<String, Report> reports) throws RODAException {
     String targetApi = RodaCoreFactory.getRodaConfigurationAsString("core", "aip_rsync", "target_api");
     String targetResource = RodaCoreFactory.getRodaConfigurationAsString("core", "aip_rsync", "target_job_resource");
     String username = RodaCoreFactory.getRodaConfigurationAsString("core", "aip_rsync", "username");
@@ -197,7 +198,7 @@ public class ReplicationPlugin extends AbstractPlugin<AIP> {
       Job job = new Job();
       job.setId(IdUtils.createUUID());
       job.setName(getName());
-      job.setSourceObjects(SelectedItemsList.create(AIP.class, aipIds));
+      job.setSourceObjects(SelectedItemsList.create(AIP.class, new ArrayList<>(reports.keySet())));
       job.setPlugin(ReindexAIPPlugin.class.getCanonicalName());
       job.setPluginType(PluginType.MISC);
       job.setUsername(PluginHelper.getJobUsername(this, index));
@@ -211,15 +212,16 @@ public class ReplicationPlugin extends AbstractPlugin<AIP> {
       try {
         RESTClientUtility.sendPostRequest(job, Job.class, targetApi, targetResource, username, password);
       } catch (RODAException e) {
-        Report reportItem = PluginHelper.initPluginReport(this);
-        reportItem.setPluginState(PluginState.FAILURE)
-          .setPluginDetails("Error sending post request to reindex AIPs after replication");
-        PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
         LOGGER.error("Error sending post request to reindex AIPs", e);
+        for (Entry<String, Report> reportEntry : reports.entrySet()) {
+          reportEntry.getValue().addPluginDetails("\nError sending post request to reindex AIPs after replication");
+        }
       }
     } else {
       LOGGER.info("Error getting rsync properties to send post request");
     }
+
+    return reports;
   }
 
   @Override
