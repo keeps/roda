@@ -57,6 +57,7 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.JobMixIn;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
@@ -755,7 +756,8 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
     String command = RodaCoreFactory.getRodaConfiguration().getString("ui.createJob.curl");
     if (command != null) {
-      command = command.replace("{{jsonObject}}", StringEscapeUtils.escapeJava(JsonUtils.getJsonFromObject(job)));
+      command = command.replace("{{jsonObject}}",
+        StringEscapeUtils.escapeJava(JsonUtils.getJsonFromObject(job, JobMixIn.class)));
       return command;
     } else {
       return "";

@@ -689,6 +689,7 @@ public final class RodaConstants {
   public static final String JOB_END_DATE = "endDate";
   public static final String JOB_STATE = "state";
   public static final String JOB_STATE_DETAILS = "stateDetails";
+  public static final String JOB_STATS = "jobStats";
   public static final String JOB_COMPLETION_PERCENTAGE = "completionPercentage";
   public static final String JOB_SOURCE_OBJECTS_COUNT = "sourceObjectsCount";
   public static final String JOB_SOURCE_OBJECTS_WAITING_TO_BE_PROCESSED = "sourceObjectsWaitingToBeProcessed";
@@ -702,6 +703,8 @@ public final class RodaConstants {
   public static final String JOB_RESOURCE_TYPE = "resourceType";
   public static final String JOB_SOURCE_OBJECTS = "sourceObjects";
   public static final String JOB_OUTCOME_OBJECTS_CLASS = "outcomeObjectsClass";
+  public static final String JOB_IN_FINAL_STATE = "inFinalState";
+  public static final String JOB_STOPPING = "stopping";
   public static final String JOB_FILE_EXTENSION = ".json";
 
   public static final String JOB_SEARCH = "search";

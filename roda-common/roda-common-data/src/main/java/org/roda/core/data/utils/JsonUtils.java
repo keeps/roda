@@ -83,10 +83,14 @@ public final class JsonUtils {
   }
 
   public static String getJsonFromObject(Object object) {
+    return getJsonFromObject(object, null);
+  }
+
+  public static String getJsonFromObject(Object object, Class<?> mixin) {
     String ret = null;
     try {
       ObjectMapper mapper = new ObjectMapper(new JsonFactory());
-      mapper = addMixinsToMapper(mapper, object);
+      mapper = addMixinsToMapper(mapper, object, mixin);
       ret = mapper.writeValueAsString(object);
     } catch (IOException e) {
       LOGGER.error("Error transforming object '{}' to json string", object, e);
@@ -94,7 +98,7 @@ public final class JsonUtils {
     return ret;
   }
 
-  private static ObjectMapper addMixinsToMapper(ObjectMapper mapper, Object object) {
+  private static ObjectMapper addMixinsToMapper(ObjectMapper mapper, Object object, Class<?> mixin) {
     if (!(object instanceof DescriptiveMetadata)) {
       if (object instanceof List<?>) {
         List<?> objectList = (List<?>) object;
@@ -104,6 +108,10 @@ public final class JsonUtils {
       } else {
         mapper.addMixIn(DescriptiveMetadata.class, DescriptiveMetadataMixIn.class);
       }
+    }
+
+    if (mixin != null) {
+      mapper.addMixIn(object.getClass(), mixin);
     }
 
     return mapper;
