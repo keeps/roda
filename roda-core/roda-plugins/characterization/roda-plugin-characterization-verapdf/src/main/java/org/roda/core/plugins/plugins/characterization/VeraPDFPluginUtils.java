@@ -12,6 +12,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -35,11 +36,16 @@ import org.verapdf.pdfa.VeraGreenfieldFoundryProvider;
 import org.verapdf.pdfa.flavours.PDFAFlavour;
 import org.verapdf.pdfa.validation.validators.ValidatorConfig;
 import org.verapdf.pdfa.validation.validators.ValidatorFactory;
+import org.verapdf.processor.BatchProcessingHandler;
+import org.verapdf.processor.BatchProcessor;
+import org.verapdf.processor.FormatOption;
 import org.verapdf.processor.ItemProcessor;
+import org.verapdf.processor.ProcessorConfig;
 import org.verapdf.processor.ProcessorFactory;
 import org.verapdf.processor.ProcessorResult;
 import org.verapdf.processor.TaskType;
 import org.verapdf.processor.plugins.PluginsCollectionConfig;
+import org.verapdf.processor.reports.BatchSummary;
 import org.verapdf.report.HTMLReport;
 import org.verapdf.report.XsltTransformer;
 
@@ -49,11 +55,11 @@ import com.google.common.cache.LoadingCache;
 
 public class VeraPDFPluginUtils {
 
-  private static final LoadingCache<Pair<String, Boolean>, ItemProcessor> PROCESSOR_CACHE = CacheBuilder.newBuilder()
-    .build(new CacheLoader<Pair<String, Boolean>, ItemProcessor>() {
+  private static final LoadingCache<Pair<String, Boolean>, BatchProcessor> PROCESSOR_CACHE = CacheBuilder.newBuilder()
+    .build(new CacheLoader<Pair<String, Boolean>, BatchProcessor>() {
 
       @Override
-      public ItemProcessor load(Pair<String, Boolean> config) throws Exception {
+      public BatchProcessor load(Pair<String, Boolean> config) throws Exception {
         String profile = config.getFirst();
         Boolean hasFeatures = config.getSecond();
 
@@ -70,8 +76,10 @@ public class VeraPDFPluginUtils {
           tasks.add(TaskType.EXTRACT_FEATURES);
         }
 
-        return ProcessorFactory.createProcessor(
-          ProcessorFactory.fromValues(validatorConfig, featureConfig, pluginConfig, fixerConfig, tasks));
+        ProcessorConfig processorConfig = ProcessorFactory.fromValues(validatorConfig, featureConfig, pluginConfig,
+          fixerConfig, tasks);
+
+        return ProcessorFactory.fileBatchProcessor(processorConfig);
       }
     });
 
@@ -85,28 +93,33 @@ public class VeraPDFPluginUtils {
   public static Pair<StringContentPayload, Boolean> runVeraPDF(Path input, String profile, boolean hasFeatures)
     throws GenericException {
     ByteArrayInputStream xmlInput = null;
+    BatchProcessingHandler handler = null;
 
     try (ByteArrayOutputStream xmlOutput = new ByteArrayOutputStream();
       ByteArrayOutputStream htmlOutput = new ByteArrayOutputStream();
-      ItemProcessor processor = PROCESSOR_CACHE.get(Pair.of(profile, hasFeatures))) {
-      ProcessorResult result = processor.process(input.toFile());
+      BatchProcessor processor = PROCESSOR_CACHE.get(Pair.of(profile, hasFeatures))) {
 
-      boolean prettyPrint = true;
-      ProcessorFactory.resultToXml(result, xmlOutput, prettyPrint);
+      boolean verbose = true;
+      int maxFailsChecksPerRule = 10;
+      boolean logPassed = true;
+      String wikipath = "";
+      boolean isFullHTML = true;
+
+      handler = ProcessorFactory.getHandler(FormatOption.MRR, verbose, xmlOutput, maxFailsChecksPerRule, logPassed);
+      BatchSummary summary = processor.process(Arrays.asList(input.toFile()), handler);
 
       xmlInput = new ByteArrayInputStream(xmlOutput.toByteArray());
-      Map<String, String> arguments = new HashMap<>();
-      arguments.put("wikiPath", "");
-      arguments.put("isFullHTML", Boolean.toString(true));
-      XsltTransformer.transform(xmlInput, HTMLReport.class.getClassLoader().getResourceAsStream(DETAILED_REPORT),
-        htmlOutput, arguments);
+
+      HTMLReport.writeHTMLReport(xmlInput, htmlOutput, summary, wikipath, isFullHTML);
 
       StringContentPayload payload = new StringContentPayload(htmlOutput.toString(RodaConstants.DEFAULT_ENCODING));
-      return Pair.of(payload, result.getValidationResult().isCompliant());
-    } catch (ExecutionException | VeraPDFException | JAXBException | TransformerException | IOException e) {
+
+      return Pair.of(payload, summary.getValidationSummary().getNonCompliantPdfaCount() == 0);
+    } catch (ExecutionException | VeraPDFException | TransformerException | IOException e) {
       throw new GenericException("Could not run VeraPDF: [" + e.getClass().getSimpleName() + "] " + e.getMessage(), e);
     } finally {
       IOUtils.closeQuietly(xmlInput);
+      IOUtils.closeQuietly(handler);
     }
   }
 
