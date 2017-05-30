@@ -11,6 +11,7 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
+import org.roda.wui.client.common.utils.IndexedDIPUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 
@@ -25,6 +26,7 @@ import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.media.client.Audio;
 import com.google.gwt.media.client.Video;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -331,7 +333,8 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
   }
 
   private void dipUrlPreview(IndexedDIP dip) {
-    Frame frame = new Frame(dip.getOpenExternalURL());
+    String url = IndexedDIPUtils.interpolateOpenExternalURL(dip, LocaleInfo.getCurrentLocale().getLocaleName());
+    Frame frame = new Frame(url);
     frame.setStyleName("viewDIPPreview");
     frame.setTitle(dip.getTitle());
     panel.add(frame);

@@ -29,6 +29,7 @@ import org.roda.wui.client.common.actions.DisseminationActions;
 import org.roda.wui.client.common.popup.CalloutPopup;
 import org.roda.wui.client.common.popup.CalloutPopup.CalloutPosition;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.common.utils.IndexedDIPUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
@@ -167,8 +168,9 @@ public class DisseminationsSliderHelper {
           @Override
           public void onSuccess(Boolean showEmbedded) {
             if (StringUtils.isNotBlank(dip.getOpenExternalURL()) && !showEmbedded) {
-              Window.open(dip.getOpenExternalURL(), "_blank", "");
-              Toast.showInfo(messages.browseFileDipOpenedExternalURL(), dip.getOpenExternalURL());
+              String url = IndexedDIPUtils.interpolateOpenExternalURL(dip, LocaleInfo.getCurrentLocale().getLocaleName());
+              Window.open(url, "_blank", "");
+              Toast.showInfo(messages.browseFileDipOpenedExternalURL(), url);
             } else {
               HistoryUtils.openBrowse(dip);
             }
