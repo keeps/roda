@@ -19,6 +19,7 @@ import org.roda.wui.client.browse.BrowseAIP;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.EditPermissions;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
+import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -122,7 +123,7 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
         @Override
         public void onSuccess(Boolean confirmed) {
           if (confirmed) {
-            BrowserService.Util.getInstance().deleteDIPs(selectedItems, new AsyncCallback<Void>() {
+            BrowserService.Util.getInstance().deleteDIPs(selectedItems, new LoadingAsyncCallback<Void>() {
 
               @Override
               public void onFailure(Throwable caught) {
@@ -130,7 +131,7 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
               }
 
               @Override
-              public void onSuccess(Void result) {
+              public void onSuccessImpl(Void result) {
                 History.fireCurrentHistoryState();
                 callback.onSuccess(ActionImpact.DESTROYED);
               }
