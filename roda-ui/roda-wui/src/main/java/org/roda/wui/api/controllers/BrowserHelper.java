@@ -2867,15 +2867,13 @@ public class BrowserHelper {
     }
   }
 
-  public static String moveTransferredResource(User user, SelectedItems<TransferredResource> selected,
+  public static void moveTransferredResource(User user, SelectedItems<TransferredResource> selected,
     TransferredResource transferredResource) throws GenericException, RequestNotValidException, AlreadyExistsException,
     IsStillUpdatingException, NotFoundException {
 
     String resourceRelativePath = "";
-    String uuid = null;
     if (transferredResource != null) {
       resourceRelativePath = transferredResource.getRelativePath();
-      uuid = transferredResource.getUUID();
     }
 
     Job job = new Job();
@@ -2896,8 +2894,6 @@ public class BrowserHelper {
     } catch (JobAlreadyStartedException | AuthorizationDeniedException e) {
       LOGGER.error("Could not execute move job", e);
     }
-
-    return uuid;
   }
 
   public static IndexedFile createFolder(User user, String aipId, String representationId, String folderUUID,

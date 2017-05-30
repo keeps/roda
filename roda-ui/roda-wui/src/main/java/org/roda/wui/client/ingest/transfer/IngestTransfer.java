@@ -37,7 +37,6 @@ import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
@@ -663,27 +662,8 @@ public class IngestTransfer extends Composite {
     Filter filter = new Filter();
     filter.add(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, Boolean.FALSE.toString()));
 
-    if (resource != null) {
-      if (resource.isFile()) {
-        filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, resources.get(0).getParentUUID()));
-      } else {
-        if (resources.size() <= RodaConstants.DIALOG_FILTER_LIMIT_NUMBER) {
-          for (TransferredResource tresource : resources) {
-            filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, tresource.getUUID()));
-            filter.add(
-              new NotSimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ANCESTORS, tresource.getRelativePath()));
-            if (StringUtils.isNotBlank(resource.getParentUUID())) {
-              filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, tresource.getParentUUID()));
-            }
-          }
-        }
-      }
-    } else {
-      if (resources.size() <= RodaConstants.DIALOG_FILTER_LIMIT_NUMBER) {
-        for (TransferredResource tresource : resources) {
-          filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, tresource.getUUID()));
-        }
-      }
+    if (resource != null && resource.isFile()) {
+      filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, resources.get(0).getParentUUID()));
     }
 
     SelectTransferResourceDialog dialog = new SelectTransferResourceDialog(messages.selectParentTitle(), filter);
@@ -699,7 +679,7 @@ public class IngestTransfer extends Composite {
         final TransferredResource transferredResource = event.getValue();
 
         BrowserService.Util.getInstance().moveTransferredResource(getSelected(), transferredResource,
-          new AsyncCallback<String>() {
+          new AsyncCallback<Void>() {
 
             @Override
             public void onFailure(Throwable caught) {
@@ -707,14 +687,14 @@ public class IngestTransfer extends Composite {
             }
 
             @Override
-            public void onSuccess(final String result) {
+            public void onSuccess(Void result) {
               Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
 
               Timer timer = new Timer() {
                 @Override
                 public void run() {
-                  if (result != null) {
-                    HistoryUtils.newHistory(IngestTransfer.RESOLVER, result);
+                  if (transferredResource.getUUID() != null) {
+                    HistoryUtils.newHistory(IngestTransfer.RESOLVER, transferredResource.getUUID());
                   } else {
                     HistoryUtils.newHistory(IngestTransfer.RESOLVER);
                   }

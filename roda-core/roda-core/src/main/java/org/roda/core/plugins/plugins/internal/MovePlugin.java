@@ -137,7 +137,7 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
               processFile(index, model, report, jobPluginInfo, cachedJob, (File) object);
             }
           } else if (objects.get(0) instanceof TransferredResource) {
-            processTransferredResource(jobPluginInfo, (List<TransferredResource>) objects);
+            processTransferredResource(model, report, jobPluginInfo, cachedJob, (List<TransferredResource>) objects);
           }
         }
       }
@@ -255,18 +255,42 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
       EVENT_DESCRIPTION, state, outcomeText.toString(), details, job.getUsername(), true);
   }
 
-  private void processTransferredResource(SimpleJobPluginInfo jobPluginInfo, List<TransferredResource> resources) {
+  private void processTransferredResource(ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo, Job job,
+    List<TransferredResource> resources) {
     if (destinationId == null) {
       destinationId = "";
     }
 
     try {
-      RodaCoreFactory.getTransferredResourcesScanner().moveTransferredResource(resources, destinationId, false, true);
-      jobPluginInfo.incrementObjectsProcessedWithSuccess(resources.size());
-    } catch (AlreadyExistsException | GenericException | IsStillUpdatingException | NotFoundException e) {
-      LOGGER.error("Could not move transferred resource list");
-      jobPluginInfo.incrementObjectsProcessedWithFailure(resources.size());
+      Map<String, String> moveResult = RodaCoreFactory.getTransferredResourcesScanner()
+        .moveTransferredResource(resources, destinationId, false, true);
+
+      for (TransferredResource resource : resources) {
+        if (!moveResult.containsKey(resource.getId())) {
+          addFailedReport(model, report, jobPluginInfo, job, resource.getId());
+        } else {
+          jobPluginInfo.incrementObjectsProcessedWithSuccess();
+        }
+      }
+
+    } catch (GenericException | IsStillUpdatingException | NotFoundException | RuntimeException e) {
+      LOGGER.error("Could not move transferred resource list", e);
+
+      for (TransferredResource resource : resources) {
+        addFailedReport(model, report, jobPluginInfo, job, resource.getId());
+      }
     }
+  }
+
+  private void addFailedReport(ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo, Job job,
+    String resourceId) {
+    jobPluginInfo.incrementObjectsProcessedWithFailure();
+    Report reportItem = PluginHelper.initPluginReportItem(this, resourceId, File.class);
+    reportItem
+      .addPluginDetails("Could not move transferred resource " + resourceId + " due to inapropriate move operations")
+      .setPluginState(PluginState.FAILURE);
+    report.addReport(reportItem);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
   }
 
   @Override

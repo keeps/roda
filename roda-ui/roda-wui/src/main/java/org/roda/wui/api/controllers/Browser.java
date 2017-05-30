@@ -2717,7 +2717,7 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static String moveTransferredResource(User user, SelectedItems<TransferredResource> selected,
+  public static void moveTransferredResource(User user, SelectedItems<TransferredResource> selected,
     TransferredResource transferredResource) throws AuthorizationDeniedException, GenericException,
     RequestNotValidException, AlreadyExistsException, IsStillUpdatingException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -2729,7 +2729,7 @@ public class Browser extends RodaWuiController {
 
     try {
       // delegate
-      return BrowserHelper.moveTransferredResource(user, selected, transferredResource);
+      BrowserHelper.moveTransferredResource(user, selected, transferredResource);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;

@@ -291,13 +291,13 @@ public class TransferredResourcesScanner {
 
   public Map<String, String> moveTransferredResource(List<TransferredResource> resources, String newRelativePath,
     boolean replaceExisting, boolean reindexResources)
-    throws AlreadyExistsException, GenericException, IsStillUpdatingException, NotFoundException {
+    throws GenericException, IsStillUpdatingException, NotFoundException {
     return moveTransferredResource(resources, newRelativePath, replaceExisting, reindexResources, false);
   }
 
   public Map<String, String> moveTransferredResource(List<TransferredResource> resources, String newRelativePath,
     boolean replaceExisting, boolean reindexResources, boolean addOldRelativePathToNewRelativePath)
-    throws AlreadyExistsException, GenericException, IsStillUpdatingException, NotFoundException {
+    throws IsStillUpdatingException, GenericException, NotFoundException {
 
     Map<String, String> oldToNewTransferredResourceIds = new HashMap<>();
     List<TransferredResource> resourcesToIndex = new ArrayList<>();
@@ -311,47 +311,55 @@ public class TransferredResourcesScanner {
       .getString("core.ingest.processed.unsuccessfully_ingested", "UNSUCCESSFULLY_INGESTED");
 
     for (TransferredResource resource : resources) {
-      if (FSUtils.exists(Paths.get(resource.getFullPath()))) {
-        Path newResourcePath = basePath.resolve(newRelativePath);
-        if (addOldRelativePathToNewRelativePath) {
-          newResourcePath = newResourcePath.resolve(resource.getRelativePath()
-            .replace(baseFolder + "/" + successFolder + "/", "").replace(baseFolder + "/" + unsuccessFolder + "/", ""));
+      try {
+        if (FSUtils.exists(Paths.get(resource.getFullPath()))) {
+          Path newResourcePath = basePath.resolve(newRelativePath);
+          if (addOldRelativePathToNewRelativePath) {
+            newResourcePath = newResourcePath
+              .resolve(resource.getRelativePath().replace(baseFolder + "/" + successFolder + "/", "")
+                .replace(baseFolder + "/" + unsuccessFolder + "/", ""));
+          } else {
+            newResourcePath = newResourcePath.resolve(resource.getName());
+          }
+
+          FSUtils.move(Paths.get(resource.getFullPath()), newResourcePath, replaceExisting);
+
+          // create & index transferred resource in the new location
+          TransferredResource newResource = instantiateTransferredResource(newResourcePath, basePath);
+          Date creationDate = resource.getCreationDate();
+          try {
+            BasicFileAttributes attr = Files.readAttributes(newResourcePath, BasicFileAttributes.class);
+            creationDate = new Date(attr.creationTime().toMillis());
+          } catch (IOException e) {
+            creationDate = new Date();
+          }
+
+          newResource.setCreationDate(creationDate);
+          newResource.setSize(resource.getSize());
+          newResource.setLastScanDate(new Date());
+          try {
+            index.create(TransferredResource.class, newResource);
+          } catch (RequestNotValidException e) {
+            // do nothing
+          }
+
+          oldToNewTransferredResourceIds.put(resource.getUUID(), newResource.getUUID());
+          resourcesToIndex.add(resource);
         } else {
-          newResourcePath = newResourcePath.resolve(resource.getName());
+          notFoundResources = true;
         }
-
-        FSUtils.move(Paths.get(resource.getFullPath()), newResourcePath, replaceExisting);
-
-        // create & index transferred resource in the new location
-        TransferredResource newResource = instantiateTransferredResource(newResourcePath, basePath);
-        Date creationDate = resource.getCreationDate();
-        try {
-          BasicFileAttributes attr = Files.readAttributes(newResourcePath, BasicFileAttributes.class);
-          creationDate = new Date(attr.creationTime().toMillis());
-        } catch (IOException e) {
-          creationDate = new Date();
-        }
-
-        newResource.setCreationDate(creationDate);
-        newResource.setSize(resource.getSize());
-        newResource.setLastScanDate(new Date());
-        try {
-          index.create(TransferredResource.class, newResource);
-        } catch (RequestNotValidException e) {
-          // do nothing
-        }
-
-        oldToNewTransferredResourceIds.put(resource.getUUID(), newResource.getUUID());
-        resourcesToIndex.add(resource);
-      } else {
-        notFoundResources = true;
+      } catch (Exception e) {
+        // do nothing
       }
     }
 
     if (reindexResources) {
       updateTransferredResources(Optional.of(newRelativePath), true);
     }
-    reindexOldResourcesParentsAfterMove(resourcesToIndex);
+
+    if (!resourcesToIndex.isEmpty()) {
+      reindexOldResourcesParentsAfterMove(resourcesToIndex);
+    }
 
     // doing the throw after the moving process to reindex the moved ones
     if (notFoundResources) {
