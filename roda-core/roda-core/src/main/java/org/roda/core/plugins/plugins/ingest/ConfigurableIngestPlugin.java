@@ -163,9 +163,14 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
           PluginParameterType.BOOLEAN, "false", true, false, ReplicationPlugin.getStaticDescription()));
 
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION,
-        new PluginParameter(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION, "Ingest finished notification",
+        new PluginParameter(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION, "Ingest finished email notification",
           PluginParameterType.STRING, "", false, false,
           "Send a notification after finishing the ingest process to one or more e-mail addresses (comma separated)"));
+
+      pluginParameters.put(RodaConstants.NOTIFICATION_HTTP_ENDPOINT,
+        new PluginParameter(RodaConstants.NOTIFICATION_HTTP_ENDPOINT, "Ingest finished HTTP notification",
+          PluginParameterType.STRING, RodaCoreFactory.getRodaConfigurationAsString("ingest.configurable.http_endpoint"),
+          false, false, "Send a notification after finishing the ingest process to a specific HTTP endpoint"));
     }
   }
 

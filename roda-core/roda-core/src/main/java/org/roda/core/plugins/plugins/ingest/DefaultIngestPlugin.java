@@ -420,8 +420,8 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
         new EmailNotificationProcessor(RodaConstants.INGEST_EMAIL_TEMPLATE, scopes));
     }
 
-    String httpNotifications = RodaCoreFactory.getRodaConfiguration()
-      .getString(RodaConstants.NOTIFICATION_HTTP_ENDPOINT, "");
+    String httpNotifications = PluginHelper.getStringFromParameters(this,
+      getPluginParameter(RodaConstants.NOTIFICATION_HTTP_ENDPOINT));
 
     if (StringUtils.isNotBlank(httpNotifications)) {
       Notification notification = new Notification();
