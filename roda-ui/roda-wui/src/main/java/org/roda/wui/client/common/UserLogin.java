@@ -141,7 +141,7 @@ public class UserLogin {
    * Login into RODA Core
    */
   public void login() {
-    String currentURL = Window.Location.getHref().replaceAll("#", "%23");
+    String currentPath = Window.Location.getPath();
     String hash = Window.Location.getHash();
     if (hash.length() > 0) {
       hash = hash.substring(1);
@@ -150,7 +150,7 @@ public class UserLogin {
     String locale = LocaleInfo.getCurrentLocale().getLocaleName();
     String moduleBaseURL = GWT.getModuleBaseURL();
     moduleBaseURL = moduleBaseURL.substring(0, moduleBaseURL.length() - 2).substring(0, moduleBaseURL.indexOf('/'));
-    Window.open(moduleBaseURL + "login?service=" + currentURL + "&hash=" + hash + "&locale=" + locale, "_self", "");
+    Window.open(moduleBaseURL + "login?service=" + currentPath + "&hash=" + hash + "&locale=" + locale, "_self", "");
   }
 
   public void login(String username, String password, final AsyncCallback<User> callback) {
@@ -170,10 +170,10 @@ public class UserLogin {
     });
   }
 
-  /**
-   * 
-   */
   public void logout() {
+    // 2017-06-1 bferreira: this could probably be changed to use getPath() as
+    // the service and pass in a separate hash parameter (similar to what login
+    // does)
     String currentURL = Window.Location.getHref().replaceAll("#", "%23");
     String locale = LocaleInfo.getCurrentLocale().getLocaleName();
     String moduleBaseURL = GWT.getModuleBaseURL();
