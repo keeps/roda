@@ -41,18 +41,19 @@ import config.i18n.client.ClientMessages;
  */
 public class FormUtilities {
 
-  private FormUtilities() {
-
-  }
-
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
+
+  private FormUtilities() {
+    // do nothing
+  }
 
   public static void create(FlowPanel panel, Set<MetadataValue> bundle, boolean addStyle) {
     for (MetadataValue mv : bundle) {
       boolean mandatory = (mv.get("mandatory") != null && "true".equalsIgnoreCase(mv.get("mandatory"))) ? true : false;
 
-      if (mv.get("hidden") != null && "true".equals(mv.get("hidden")))
+      if (mv.get("hidden") != null && "true".equals(mv.get("hidden"))) {
         continue;
+      }
 
       FlowPanel layout = new FlowPanel();
 

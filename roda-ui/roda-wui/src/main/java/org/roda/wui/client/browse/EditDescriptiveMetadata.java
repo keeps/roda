@@ -175,8 +175,9 @@ public class EditDescriptiveMetadata extends Composite {
     Set<MetadataValue> newValues = null;
     if (bundle.getValues() != null) {
       newValues = new TreeSet<>();
-      for (MetadataValue mv : bundle.getValues())
+      for (MetadataValue mv : bundle.getValues()) {
         newValues.add(mv.copy());
+      }
     }
     supportedBundle = new SupportedMetadataTypeBundle(bundle.getId(), bundle.getType(), bundle.getVersion(),
       bundle.getId(), bundle.getRawTemplate(), newValues);
@@ -193,7 +194,7 @@ public class EditDescriptiveMetadata extends Composite {
       @Override
       public void onChange(ChangeEvent changeEvent) {
         String typeString = null;
-        String version = "";
+        String version = null;
         String value = type.getSelectedValue();
         if (value.contains(RodaConstants.METADATA_VERSION_SEPARATOR) && bundle.getVersion() != null) {
           typeString = value.substring(0, value.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR));

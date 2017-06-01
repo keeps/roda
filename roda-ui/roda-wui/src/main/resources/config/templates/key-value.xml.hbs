@@ -4,8 +4,8 @@
 {{~field name="date" 	type="date" label="{\"en\": \"Date\"}" auto-generate="now" xpath="//*:field[@name='date']/string()"~}}
 <?xml version="1.0" encoding="utf-8" ?>
 <metadata>
-	<field name="id">{{id}}</field>
-	<field name="title">{{title}}</field>
-	<field name="producer">{{user}}</field>
-	<field name="date">{{date}}</field>
+	{{~#if id~}}<field name="id">{{id}}</field>{{~/if~}}
+	{{~#if title~}}<field name="title">{{title}}</field>{{~/if~}}
+	{{~#if user~}}<field name="producer">{{user}}</field>{{~/if~}}
+	{{~#if date~}}<field name="date">{{date}}</field>{{~/if~}}
 </metadata>
