@@ -24,4 +24,15 @@ public class LongRangeFilterParameter extends RangeFilterParameter<Long> {
   public LongRangeFilterParameter(String name, Long fromValue, Long toValue) {
     super(name, fromValue, toValue);
   }
+
+  public LongRangeFilterParameter(String name, String fromValue, String toValue) {
+    super(name, parseInput(fromValue), parseInput(toValue));
+  }
+
+  private static Long parseInput(String value) {
+    if (value != null && value.length() > 0) {
+      return Long.parseLong(value);
+    }
+    return null;
+  }
 }

@@ -277,8 +277,7 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
         filterParameter = new BasicSearchFilterParameter(field, inputNumeric.getValue());
       } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_NUMERIC_INTERVAL)
         && intervalValid(inputNumericFrom, inputNumericTo)) {
-        filterParameter = new LongRangeFilterParameter(field, Long.valueOf(inputNumericFrom.getValue()),
-          Long.valueOf(inputNumericTo.getValue()));
+        filterParameter = new LongRangeFilterParameter(field, inputNumericFrom.getValue(), inputNumericTo.getValue());
       } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_STORAGE)
         && intervalValid(inputStorageSizeFrom, inputStorageSizeTo)) {
         filterParameter = new LongRangeFilterParameter(field,
@@ -398,9 +397,6 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
 
   private boolean intervalValid(TextBox inputFrom, TextBox inputTo) {
     try {
-      if (!inputFrom.getValue().isEmpty() && !inputTo.getValue().isEmpty()) {
-        return true;
-      }
       if (!inputFrom.getValue().isEmpty() || !inputTo.getValue().isEmpty()) {
         return true;
       }
