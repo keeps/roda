@@ -266,7 +266,7 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
         .moveTransferredResource(resources, destinationId, false, true);
 
       for (TransferredResource resource : resources) {
-        if (!moveResult.containsKey(resource.getId())) {
+        if (!moveResult.containsKey(resource.getUUID())) {
           addFailedReport(model, report, jobPluginInfo, job, resource.getId());
         } else {
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
@@ -287,7 +287,8 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
     jobPluginInfo.incrementObjectsProcessedWithFailure();
     Report reportItem = PluginHelper.initPluginReportItem(this, resourceId, File.class);
     reportItem
-      .addPluginDetails("Could not move transferred resource " + resourceId + " due to inapropriate move operations")
+      .addPluginDetails("Could not move transferred resource " + resourceId
+        + " due to inapropriate move operation. A likely scenario is a move operation of a parent to a child.")
       .setPluginState(PluginState.FAILURE);
     report.addReport(reportItem);
     PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
