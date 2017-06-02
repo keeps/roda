@@ -7,7 +7,7 @@ env:
   - MAVEN_OPTS="-Xmx4g"
 addons:
   sonarqube:
-    organization: "keeps"
+    organization: "default"
     token:
       secure: "On53R35PWhHE5kJZophSGhiyfU3w/df/TgdVObsw1N64LGaGXiQQxaYuaYRTYT34SQHuZPRqpV84L8QMW5WGDEwH3EhaN3I3on1w6djrQ4lqk0+2yrqHtKkhL5+hByC50UQcdLoX84q6Ri6A570/tpNhT+/GnT2+1deJ5C+fjiU="
     branches:
