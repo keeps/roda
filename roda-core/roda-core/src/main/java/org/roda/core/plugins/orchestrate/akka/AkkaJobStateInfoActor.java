@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
+import com.google.common.collect.Iterables;
 
 import akka.actor.ActorRef;
 import akka.actor.Props;
@@ -179,10 +180,7 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
     LOGGER.trace("{} Started processing message {}", "NO_UUID", Terminated.class.getSimpleName());
     boolean allChildrenAreDead = true;
     if (stopping) {
-      for (ActorRef child : getContext().getChildren()) {
-        allChildrenAreDead = false;
-        break;
-      }
+      allChildrenAreDead = Iterables.isEmpty(getContext().getChildren());
       if (allChildrenAreDead) {
         getSelf().tell(new Messages.JobStateUpdated(plugin, JOB_STATE.STOPPED), getSelf());
       }
