@@ -9,7 +9,6 @@ package org.roda.wui.client.main;
 
 import org.roda.wui.client.browse.BrowserService;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class GAnalyticsTracker {
@@ -35,6 +34,10 @@ public class GAnalyticsTracker {
         @Override
         public void onSuccess(String result) {
           accountId = result;
+
+          // setting account only once
+          setAccount(accountId);
+
           callback.onSuccess(accountId);
         }
       });
@@ -49,10 +52,7 @@ public class GAnalyticsTracker {
    * @param historyToken
    */
   public static void track(String historyToken) {
-    String baseURL = GWT.getHostPageBaseURL();
-
-    String urlPath = baseURL.substring(baseURL.indexOf('/', "https://".length() + 1));
-    final String page = urlPath + "#" + historyToken;
+    final String page = "/#" + historyToken;
 
     getAccountId(new AsyncCallback<String>() {
 
@@ -63,43 +63,24 @@ public class GAnalyticsTracker {
 
       @Override
       public void onSuccess(String accountId) {
-        if (!"".equals(accountId)) {
-          trackGoogleAnalytics(page, accountId);
-        }
+        pageview(page);
       }
     });
 
   }
 
+  private static native void setAccount(String accountId) /*-{
+		$wnd.ga('create', accountId, 'auto');
+  }-*/;
+
   /**
-   * trigger google analytic native js
-   * 
-   * https://developers.google.com/analytics/devguides/collection/gajs/methods/
-   * gaJSApiEventTracking?hl=en-US
+   * https://developers.google.com/analytics/devguides/collection/analyticsjs/single-page-applications
    * 
    * @param historyToken
    */
-  public static native void trackGoogleAnalytics(String historyToken, String accountId) /*-{
-		try {
-
-			// setup tracking object with account
-			//var pageTracker = $wnd._gat._getTracker(accountId);
-
-			//pageTracker._setRemoteServerMode();
-
-			// turn on anchor observing
-			//pageTracker._setAllowAnchor(true)
-
-			// send event to google server
-			//pageTracker._trackPageview(historyToken);
-
-			$wnd._gaq.push([ '_setAccount', accountId ]);
-			$wnd._gaq.push([ '_trackPageview', historyToken ]);
-
-		} catch (err) {
-
-			// debug
-			alert('FAILURE: to send in event to google analytics: ' + err);
-		}
+  private static native void pageview(String page) /*-{
+		$wnd.ga('set', 'page', page);
+		$wnd.ga('send', 'pageview');
   }-*/;
+
 }
