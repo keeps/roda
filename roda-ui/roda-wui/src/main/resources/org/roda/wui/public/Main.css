@@ -5970,3 +5970,46 @@ td.datePickerMonth, td.datePickerYear {
 .actions-empty-help {
 	color: white;
 }
+
+/***************************************
+ MARKDOWN STYLING
+****************************************/
+
+.markdown img {
+    max-width: 100%;
+}
+
+.markdown ol {
+    list-style-type: decimal;
+    padding-left: 1.2em;
+    margin-bottom: 1em;
+}
+
+.markdown li {
+    margin-bottom: 0.3em;
+}
+
+.markdown pre > code {
+    overflow: auto;
+    margin-bottom: 1em;
+}
+
+.markdown th {
+    background-color: #58595b;
+    color: #e6e7e8;
+    border-left: 1px solid #e6e7e8;
+    border-right: 1px solid #e6e7e8;
+    padding: 2px 5px;
+}
+
+.markdown td {
+    border-bottom: 1px solid #58595b;
+    padding: 5px;
+    font-size: 11px;
+    vertical-align: top;
+    text-align: left;
+}
+
+.markdown td * {
+    font-size: 11px;
+}

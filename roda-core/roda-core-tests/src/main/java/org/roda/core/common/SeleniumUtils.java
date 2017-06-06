@@ -381,26 +381,6 @@ public class SeleniumUtils {
       WebElement helpMenu = driver.findElement(By.className("help_menu_item"));
       helpMenu.click();
       saveHTML();
-
-      // installing descriptive metadata formats help page
-      driver.get(url + "#theme/InstallingNewDescriptiveMetadataFormats.html");
-      saveHTML();
-      goBack();
-
-      // statistics help page
-      driver.get(url + "#theme/HelpStatistics.html");
-      saveHTML();
-      goBack();
-
-      // advanced search help page
-      driver.get(url + "#theme/AdvancedSearch.html");
-      saveHTML();
-      goBack();
-
-      // build help page
-      driver.get(url + "#theme/BuildHelpPage.html");
-      saveHTML();
-      goBack();
     } catch (FileNotFoundException | UnsupportedEncodingException | InterruptedException e) {
       System.err.println("Error running Selenium on help pages");
     }
@@ -439,21 +419,6 @@ public class SeleniumUtils {
     throws FileNotFoundException, UnsupportedEncodingException, InterruptedException {
     // publications page
     driver.get(url + "#theme/Publications.html");
-    saveHTML();
-    goBack();
-
-    // community help page
-    driver.get(url + "#theme/Community_help.html");
-    saveHTML();
-    goBack();
-
-    // license page
-    driver.get(url + "#theme/License.html");
-    saveHTML();
-    goBack();
-
-    // what is roda page
-    driver.get(url + "#theme/What_is_RODA.html");
     saveHTML();
     goBack();
   }

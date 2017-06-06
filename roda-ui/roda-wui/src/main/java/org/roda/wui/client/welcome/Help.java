@@ -74,7 +74,7 @@ public class Help {
   private void init() {
     if (!initialized) {
       initialized = true;
-      layout = new HTMLWidgetWrapper("Help.html");
+      layout = new HTMLWidgetWrapper("README.md");
       layout.addStyleName("wui-home");
     }
   }

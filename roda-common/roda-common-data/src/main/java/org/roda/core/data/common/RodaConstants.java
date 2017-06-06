@@ -154,6 +154,7 @@ public final class RodaConstants {
   public static final String CORE_SCHEMAS_FOLDER = "schemas";
   public static final String CORE_LDAP_FOLDER = "ldap";
   public static final String CORE_THEME_FOLDER = "theme";
+  public static final String CORE_MARKDOWN_FOLDER = "documentation";
   public static final String CORE_RISK_FOLDER = "risk";
   public static final String CORE_AGENT_FOLDER = "agent";
   public static final String CORE_FORMAT_FOLDER = "format";

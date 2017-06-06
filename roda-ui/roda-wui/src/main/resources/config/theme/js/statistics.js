@@ -68,7 +68,7 @@
         }
       }
     }
-    
+
     function buildDataUrl(element) {
     	buildDataUrl(element, false);
     }
@@ -88,7 +88,7 @@
         return "facet=" + facet
       }).join("&");
 
-      
+
       var onlyActive = $(element).data("source-only-active") || "false";
       var lang = document.locale;
 
@@ -105,7 +105,7 @@
 	      var start = $(element).data("source-start") || 0;
 	      var limit = $(element).data("source-limit") || 0;
 	      var facetLimit = $(element).data("view-limit") || 100;
-	
+
 	      url = pathname + "api/v1/index?returnClass=" +
 	          returnClass + "&" +
 	          filterParams + "&" +
@@ -376,7 +376,7 @@
 
   $(window).ready(
     function() {
-    	
+
 	  $(document).on('DOMNodeInserted', ".chartjs-hidden-iframe", function(e) {
 		elem = e.target;
 		$(elem).attr("title", "statistic_frame");

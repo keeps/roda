@@ -72,7 +72,7 @@ public class PreIngest {
 
   private PreIngest() {
     layout = new VerticalPanel();
-    html = new HTMLWidgetWrapper("PreIngest.html");
+    html = new HTMLWidgetWrapper("Pre_Ingest.md");
     layout.add(html);
     layout.addStyleName("wui-ingest-pre");
     WCAGUtilities.getInstance().makeAccessible(layout.getElement());
