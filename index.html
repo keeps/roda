@@ -35,12 +35,16 @@
 
   <!-- Initializer -->
   <script>
-    $.ajax("https://raw.githubusercontent.com/keeps/roda/bf-dev/roda-ui/roda-wui/src/main/resources/config/flatdoc.json").done(function(data) {
-      console.log(data);
-      /*Flatdoc.run({
-        fetcher: Flatdoc.github('keeps/roda')
-      });*/
+    $.getJSON( "https://raw.githubusercontent.com/keeps/roda/bf-dev/roda-ui/roda-wui/src/main/resources/config/flatdoc.json", function( config ) {
+      console.log("config base: " + config.base);
+      console.log("pages: " + config.pages);
     });
+    /*$.ajax("https://raw.githubusercontent.com/keeps/roda/bf-dev/roda-ui/roda-wui/src/main/resources/config/flatdoc.json").done(function(data) {
+      console.log(data);
+      Flatdoc.run({
+        fetcher: Flatdoc.github('keeps/roda')
+      });
+    });*/
   </script>
 </head>
 <body role='flatdoc'>
