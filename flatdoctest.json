@@ -1,0 +1,36 @@
+{
+  "base": "roda-ui/roda-wui/src/main/resources/config/theme/",
+  "pages": [
+    "Introduction.md",
+    {
+      "Installation": [
+        {"InstallTesting.md": "install-for-testing"},
+        {"InstallProduction.md": "install-for-production"}
+      ]
+    },
+    {
+      "Configuration": [
+        {"MetadataFormats.md": "metadata-formats"},
+        {"StaticPages.md": "static-pages"},
+        {"CAS.md": "cas"}
+      ]
+    },
+    {
+      "Usage": [
+        {"Quickstart.md": "quick-start"},
+        {"PreIngest.md": "ingest"},
+        {"RiskAssessment.md": "risk-assessment"},
+        {"FAQs.md": "frequently-asked-questions"},
+        {"Troubleshooting.md": "troubleshooting"}
+      ]
+    },
+    {
+      "Development": [
+        {"DeveloperGuide.md": "developer-guide"},
+        {"InternationalizationGuidelines.md": "internationalization-guidelines"},
+        {"REST-API.md": "rest-api"},
+        {"License.md": "license"}
+      ]
+    }
+  ]
+}

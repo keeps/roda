@@ -1,24 +1,17 @@
 <!doctype html>
-<!--
-
-  Instructions:
-
-  - Save this file.
-  - Replace "keeps" with your GitHub username.
-  - Replace "roda" with your GitHub repo name.
-  - Replace "Your Project" with your project name.
-  - Upload this file (or commit to GitHub Pages).
-
-  Customize as you see fit!
-
--->
 <html>
 <head>
   <meta charset='utf-8'>
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <meta name="viewport" content="width=device-width">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Your Project</title>
+  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+  <link rel="apple-touch-icon-precomposed" href="favicon.png">
+  <meta name="msapplication-TileColor" content="#FFFFFF">
+  <meta name="msapplication-TileImage" content="favicon.png">
+
+  <title>RODA Documentation</title>
 
   <!-- Flatdoc -->
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -26,33 +19,28 @@
   <script src='https://cdn.rawgit.com/rstacruz/flatdoc/v0.9.0/flatdoc.js'></script>
 
   <!-- Flatdoc theme -->
-  <link  href='https://cdn.rawgit.com/rstacruz/flatdoc/v0.9.0/theme-white/style.css' rel='stylesheet'>
-  <script src='https://cdn.rawgit.com/rstacruz/flatdoc/v0.9.0/theme-white/script.js'></script>
+  <link  href='style.css' rel='stylesheet'>
+  <script src='theme.js'></script>
+
+  <!-- loading -->
+  <link  href='spinner.css' rel='stylesheet'>
+
+  <!-- Highlighter -->
+  <link  href='highlight/tomorrow.css' rel='stylesheet'>
+  <script src='highlight/highlight.js'></script>
 
   <!-- Meta -->
-  <meta content="Your Project" property="og:title">
-  <meta content="Your Project description goes here." name="description">
+  <meta content="RODA documentation" property="og:title">
+  <meta content="Documentation for RODA: a complete digital repository that delivers functionality for all the main units of the OAIS reference model. RODA is capable of ingesting, managing and providing access to the various types of digital objects produced by large corporations or public bodies. RODA is based on open-source technologies and is supported by existing standards such as the OAIS, METS, EAD and PREMIS." name="description">
 
   <!-- Initializer -->
-  <script>
-    var urlStart = "https://raw.githubusercontent.com/keeps/roda/bf-dev/"
-    $.getJSON( urlStart + "roda-ui/roda-wui/src/main/resources/config/flatdoc.json", function( config ) {
-      console.log("config base: " + config.base);
-      console.log("pages: " + config.pages);
-
-      var pages = $.map(config.pages, function(v){
-        return urlStart + config.base + config.pages;
-      });
-
-      Flatdoc.run({fetcher: Flatdoc.file(pages)});
-    });
-  </script>
+  <script src='script.js'></script>
 </head>
-<body role='flatdoc'>
+<body role='flatdoc' class='no-literate'>
 
   <div class='header'>
     <div class='left'>
-      <h1>Your Project</h1>
+      <h1>RODA</h1>
       <ul>
         <li><a href='https://github.com/keeps/roda'>View on GitHub</a></li>
         <li><a href='https://github.com/keeps/roda/issues'>Issues</a></li>
@@ -68,7 +56,13 @@
     <div class='menubar'>
       <div class='menu section' role='flatdoc-menu'></div>
     </div>
-    <div role='flatdoc-content' class='content'></div>
+    <div role='flatdoc-content' class='content'>
+      <!-- Loading -->
+      <div class="spinner" id="loading">
+        <div class="double-bounce1"></div>
+        <div class="double-bounce2"></div>
+      </div>
+    </div>
   </div>
 
 </body>
