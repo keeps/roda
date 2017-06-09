@@ -2,18 +2,21 @@
   var $window = $(window);
   var $document = $(document);
 
- /*
-  * Scrollspy.
-  */
+  /*
+   * ScrollAgent.
+   */
+  $document.on('flatdoc:ready', function() {
+    var sa = new ScrollAgent();
+    var latestID = undefined;
+    $("h1, h2, h3").each(function(i, elem){
+      var $elem = $(elem);
+      sa.add(elem, function() {
+        if(latestID) $("[href='#"+latestID+"']").removeClass('active');
 
- $document.on('flatdoc:ready', function() {
-    $("h1, h2, h3").scrollagent(function(cid, pid, currentElement, previousElement) {
-      if (pid) {
-       $("[href='#"+pid+"']").removeClass('active');
-      }
-      if (cid) {
-       $("[href='#"+cid+"']").addClass('active');
-      }
+        var id = $elem.attr('id');
+        $("[href='#"+id+"']").addClass('active');
+        latestID = id;
+      });
     });
   });
 
@@ -75,7 +78,6 @@
 })(jQuery);
 /*! jQuery.scrollagent (c) 2012, Rico Sta. Cruz. MIT License.
  *  https://github.com/rstacruz/jquery-stuff/tree/master/scrollagent */
-
 // Call $(...).scrollagent() with a callback function.
 //
 // The callback will be called everytime the focus changes.
@@ -90,7 +92,6 @@
 //          $("[href='#"+cid+"']").addClass('active');
 //        }
 //      });
-
 (function($) {
 
   $.fn.scrollagent = function(options, callback) {
