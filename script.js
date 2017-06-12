@@ -1,4 +1,4 @@
-// look for duplicate IDs
+// function to look for duplicate IDs
 var hasDuplicateIDs = function () {
   var ids = {};
   var found = false;
@@ -17,10 +17,13 @@ var hasDuplicateIDs = function () {
   }
 };
 
-var urlStart = "https://raw.githubusercontent.com/keeps/roda/bf-dev/";
-var config = {};
-
 $(document).on('flatdoc:ready', function() {
+  // get, transform and remove the markdown file identifiers
+  $("span[data-markdown-file-placeholder]").each(function(i,e){
+    e = $(e);
+    e.parent().nextAll('h1').first().attr('data-markdown-file', e.attr('data-markdown-file-placeholder'));
+    e.parent().remove();
+  });
 
   // handle new headers
   $.each(
@@ -29,11 +32,10 @@ $(document).on('flatdoc:ready', function() {
     }),
     function(index, v){
       var display = Object.keys(v)[0];
-      var values = v[display];
+      var mds = v[display];
 
-      // get IDs from config
-      var childrenIDs = $.map(values, function(v){
-        return v[Object.keys(v)[0]];
+      childrenIDs = $.map(mds, function(md){
+        return $("h1[data-markdown-file='"+md+"']").first().attr('id');
       });
 
       // build and add this:
@@ -94,31 +96,46 @@ $(document).on('flatdoc:ready', function() {
   hasDuplicateIDs();
 });
 
-$.ajaxSetup({ cache: false });
 
+// set some defaults
+$.ajaxSetup({ cache: false });
+var urlStart = "https://raw.githubusercontent.com/keeps/roda/bf-dev/";
 var jsonURL = urlStart + "roda-ui/roda-wui/src/main/resources/config/flatdoc.json";
 //var jsonURL = 'http://localhost:8000/flatdoctest.json';
 
+// define some globals
+var config = {};
+var menu = {};
+var fileList = [];
+
+// all set, go get'em!
 $.getJSON( jsonURL, function( c ) {
   $.ajaxSetup({ cache: false });
   config = c;
 
   console.log("config: " + JSON.stringify(config, null, 4));
 
-  /*
-  config.pages = [
-    {
-      'top': [
-        {'Acknowledgements.md': 'acknowledgements'},
-        {'CAS.md': 'cas'}
-      ]
-    }
-  ];
-  */
+  /***** SET OPTIONS *************/
 
-  var md2url = function(md){
+  // flattened list of markdown files
+  fileList = $.map(
+    $.map(config.pages, function(v){
+      if(typeof v === "object"){
+        // {key: [md1, md2, md3]} -> [md1, md2, md3]
+        return v[Object.keys(v)[0]];
+      }else{
+        // md -> md
+        return v;
+      }
+    }), function(v){return v}
+  );
+
+  // list of markdown files (as URLs) to process
+  var urlFileList = $.map(fileList, function(md){
+    // convert markdown filename to markdown URL
     return urlStart + config.base + md;
-  }
+  });
+
 
   // make mangle also handle image URLs
   var imageLinkRegex = /^(images\/.*?)$/;
@@ -137,29 +154,84 @@ $.getJSON( jsonURL, function( c ) {
     });
   };
 
-  Flatdoc.run({
-    fetcher: Flatdoc.file(//'http://localhost:8000/test.md'
-      $.map(
-        $.map(config.pages, function(v){
-          if(typeof v === "object"){
-            // {key: [{md1: id1}, {md2: id2}, {md3: id3}]} -> [URLmd1, URLmd2, URLmd3]
-            return $.map(v[Object.keys(v)[0]], function(mdAndId){
-              // {md: id} -> URLmd
-              return md2url(Object.keys(mdAndId)[0]);
-            });
-          }else{
-            // md -> URLmd
-            return md2url(v);
-          }
-        }), function(v){return v}
-      )
-    ),
-    highlight: function (code, lang) {
-      if (lang && hljs.getLanguage(lang)) {
-        return hljs.highlight(lang, code, true).value;
-      } else {
-        return hljs.highlightAuto(code).value;
-      }
+  // make setMarkedOptions set all the options (not just highlight)
+  Flatdoc.parser.setMarkedOptions = function(options) {
+    marked.setOptions(options);
+  };
+
+  // extract the menu object as soon as Flatdoc generates it
+  Flatdoc.parser.originalParse = Flatdoc.parser.parse;
+  Flatdoc.parser.parse = function(source, highlight){
+    var result = Flatdoc.parser.originalParse(source, highlight);
+    menu = result.menu;
+    console.log(result);
+    return result;
+  };
+
+  // set marked options
+  var markedOptions = {};
+
+  markedOptions.highlight = function (code, lang) {
+    if (lang && hljs.getLanguage(lang)) {
+      return hljs.highlight(lang, code, true).value;
+    } else {
+      return hljs.highlightAuto(code).value;
     }
+  };
+
+  /*markedOptions.renderer = function(){
+    var renderer = new marked.Renderer();
+    renderer.heading = function(text, level, raw) {
+      return '<h'
+        + level
+        + ' id="'
+        + raw.toLowerCase().replace(/[^\w]+/g, '-')
+        + '">'
+        + text
+        + '</h'
+        + level
+        + '>\n';
+    };
+
+    return renderer;
+  }();*/
+
+  // fetcher based on Flatdoc.file that injects a file identifier in a span element
+  // on 'flatdoc:ready', the span element is removed and the file id is moved to the next H1 element
+  identifiedFileFetcherCounter = 0;
+  identifiedFileFetcher = function(url) {
+    function loadData(locations, response, callback) {
+      if (locations.length === 0)
+        callback(null, response);
+      else
+        $.get(locations.shift())
+          .fail(function(e) {
+            callback(e, null);
+          })
+          .done(function (data) {
+            response = response
+                + '\n\n'
+                + '<span data-markdown-file-placeholder="'+fileList[identifiedFileFetcherCounter]+'" />'
+                + '\n\n'
+                + data;
+              identifiedFileFetcherCounter++;
+            loadData(locations, response, callback);
+          });
+    }
+
+    return function(callback) {
+      loadData(url instanceof Array ?
+        url : [url], '', callback);
+    };
+  };
+
+  /***** FLATDOC CALL *************/
+  Flatdoc.run({
+    fetcher: identifiedFileFetcher(
+      //'http://localhost:8000/test.md'
+      urlFileList
+    ),
+    // originally was just highlighting, now it may be used to set all marked options
+    highlight: markedOptions
   });
 });
