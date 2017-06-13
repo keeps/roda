@@ -1,5 +1,5 @@
 {
-  "base": "roda-ui/roda-wui/src/main/resources/config/theme/",
+  "base": "documentation/",
   "pages": [
     "Introduction.md",
     {

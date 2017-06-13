@@ -896,3 +896,9 @@ code .comment {
   position: relative;
   z-index: 1;
 }
+img {
+  max-width: 100%;
+}
+ul .level-3 {
+  display: none;
+}

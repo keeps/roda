@@ -100,7 +100,7 @@ $(document).on('flatdoc:ready', function() {
 // set some defaults
 $.ajaxSetup({ cache: false });
 var urlStart = "https://raw.githubusercontent.com/keeps/roda/bf-dev/";
-var jsonURL = urlStart + "roda-ui/roda-wui/src/main/resources/config/flatdoc.json";
+var jsonURL = urlStart + "documentation/config.json";
 //var jsonURL = 'http://localhost:8000/flatdoctest.json';
 
 // define some globals
