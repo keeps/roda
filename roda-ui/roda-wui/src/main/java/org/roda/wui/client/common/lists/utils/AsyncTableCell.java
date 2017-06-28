@@ -231,8 +231,20 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
       @Override
       public void onClick(ClickEvent event) {
-        RestUtils.requestCSVExport(getClassToReturn(), getFilter(), dataProvider.getSorter(), dataProvider.getSublist(),
-          getFacets(), getJustActive(), false, notNullSummary + ".csv");
+        BrowserService.Util.getInstance().getExportLimit(new AsyncCallback<Integer>() {
+
+          @Override
+          public void onFailure(Throwable caught) {
+            AsyncCallbackUtils.defaultFailureTreatment(caught);
+          }
+
+          @Override
+          public void onSuccess(Integer result) {
+            GWT.log("TESTE: " + result);
+            RestUtils.requestCSVExport(getClassToReturn(), getFilter(), dataProvider.getSorter(),
+              new Sublist(0, result), getFacets(), getJustActive(), false, notNullSummary + ".csv");
+          }
+        });
       }
     });
 

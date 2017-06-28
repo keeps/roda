@@ -347,4 +347,6 @@ public interface BrowserService extends RemoteService {
 
   Notification acknowledgeNotification(String notificationId, String ackToken)
     throws GenericException, NotFoundException, AuthorizationDeniedException;
+
+  int getExportLimit();
 }

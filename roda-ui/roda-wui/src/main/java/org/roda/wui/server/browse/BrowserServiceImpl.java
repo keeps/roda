@@ -933,4 +933,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     return Browser.acknowledgeNotification(user, notificationId, ackToken);
   }
 
+  @Override
+  public int getExportLimit() {
+    return RodaCoreFactory.getRodaConfiguration().getInt("ui.list.export_limit",
+      RodaConstants.DEFAULT_LIST_EXPORT_LIMIT);
+  }
+
 }

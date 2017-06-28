@@ -1273,6 +1273,7 @@ public final class RodaConstants {
   /* List threshold and action timeout */
   public static final int DEFAULT_LIST_THRESHOLD = 100;
   public static final int ACTION_TIMEOUT = 2000;
+  public static final int DEFAULT_LIST_EXPORT_LIMIT = 1000;
 
   /* Verification passed value */
   public static final String SIGNATURE_VERIFICATION_PASSED = "Passed";

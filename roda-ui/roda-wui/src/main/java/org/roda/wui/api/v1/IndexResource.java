@@ -49,7 +49,6 @@ import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.user.User;
-import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.ExtraMediaType;
@@ -333,8 +332,8 @@ public class IndexResource {
         new RodaStreamingOutput(new FacetsCSVOutputStream(result.getFacetResults(), findRequest.filename, delimiter))
           .toStreamResponse());
     } else {
-      final IterableIndexResult<T> result = Browser.findAll(returnClass, findRequest.filter, findRequest.sorter,
-        findRequest.facets, user, findRequest.onlyActive, new ArrayList<>());
+      final IndexResult<T> result = Browser.find(returnClass, findRequest.filter, findRequest.sorter,
+        findRequest.sublist, findRequest.facets, user, findRequest.onlyActive, new ArrayList<>());
 
       return ApiUtils
         .okResponse(new RodaStreamingOutput(new ResultsCSVOutputStream<>(result, findRequest.filename, delimiter))

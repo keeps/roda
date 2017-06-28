@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
 import org.apache.commons.csv.CSVPrinter;
+import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.index.utils.IterableIndexResult;
 
@@ -25,7 +26,7 @@ import org.roda.core.index.utils.IterableIndexResult;
 public class ResultsCSVOutputStream<T extends IsIndexed> extends CSVOutputStream {
 
   /** The results to write to output stream. */
-  private final IterableIndexResult<T> results;
+  private final IndexResult<T> results;
 
   /**
    * Constructor.
@@ -37,7 +38,7 @@ public class ResultsCSVOutputStream<T extends IsIndexed> extends CSVOutputStream
    * @param delimiter
    *          the CSV field delimiter.
    */
-  public ResultsCSVOutputStream(final IterableIndexResult<T> results, final String filename, final char delimiter) {
+  public ResultsCSVOutputStream(final IndexResult<T> results, final String filename, final char delimiter) {
     super(filename, delimiter);
     this.results = results;
   }
@@ -47,7 +48,7 @@ public class ResultsCSVOutputStream<T extends IsIndexed> extends CSVOutputStream
     final OutputStreamWriter writer = new OutputStreamWriter(out);
     CSVPrinter printer = null;
     boolean isFirst = true;
-    for (final T result : this.results) {
+    for (final T result : this.results.getResults()) {
       if (isFirst) {
         printer = getFormat().withHeader(result.toCsvHeaders().toArray(new String[0])).print(writer);
         isFirst = false;

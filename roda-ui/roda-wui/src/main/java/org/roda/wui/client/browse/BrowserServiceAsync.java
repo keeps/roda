@@ -249,4 +249,6 @@ public interface BrowserServiceAsync {
   void showDIPEmbedded(AsyncCallback<Boolean> asyncCallback);
 
   void acknowledgeNotification(String notificationId, String ackToken, AsyncCallback<Notification> asyncCallback);
+
+  void getExportLimit(AsyncCallback<Integer> asyncCallback);
 }
