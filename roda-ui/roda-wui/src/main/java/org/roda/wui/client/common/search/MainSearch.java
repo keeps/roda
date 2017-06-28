@@ -154,7 +154,7 @@ public class MainSearch extends Composite {
 
       @Override
       public void onValueChange(ValueChangeEvent<String> event) {
-        search();
+        search(RodaConstants.SEARCH_BUTTON_EVENT_MARK.equals(event.getValue()));
       }
     });
 
@@ -180,10 +180,12 @@ public class MainSearch extends Composite {
     return justActive;
   }
 
-  public void showSearchAdvancedFieldsPanel() {
+  public void showSearchAdvancedFieldsPanel(boolean isVisible) {
     if (itemsSearchResultPanel == null) {
-      createItemsSearchResultPanel();
+      createItemsSearchResultPanel(isVisible);
     }
+
+    itemsSearchResultPanel.setVisible(isVisible);
 
     searchPanel.setVariables(filterAips, RodaConstants.AIP_SEARCH, true, itemsSearchResultPanel,
       itemsSearchAdvancedFieldsPanel);
@@ -194,15 +196,17 @@ public class MainSearch extends Composite {
     searchResultPanel.add(itemsSearchResultPanel);
     selectedItem = AIP.class.getName();
 
-    itemsFacets.setVisible(true);
+    itemsFacets.setVisible(isVisible);
     representationsFacets.setVisible(false);
     filesFacets.setVisible(false);
   }
 
-  public void showRepresentationsSearchAdvancedFieldsPanel() {
+  public void showRepresentationsSearchAdvancedFieldsPanel(boolean isVisible) {
     if (representationsSearchResultPanel == null) {
-      createRepresentationsSearchResultPanel();
+      createRepresentationsSearchResultPanel(isVisible);
     }
+
+    representationsSearchResultPanel.setVisible(isVisible);
 
     searchPanel.setVariables(filterRepresentations, RodaConstants.REPRESENTATION_SEARCH, true,
       representationsSearchResultPanel, representationsSearchAdvancedFieldsPanel);
@@ -215,14 +219,16 @@ public class MainSearch extends Composite {
     selectedItem = Representation.class.getName();
 
     itemsFacets.setVisible(false);
-    representationsFacets.setVisible(true);
+    representationsFacets.setVisible(isVisible);
     filesFacets.setVisible(false);
   }
 
-  public void showFilesSearchAdvancedFieldsPanel() {
+  public void showFilesSearchAdvancedFieldsPanel(boolean isVisible) {
     if (filesSearchResultPanel == null) {
-      createFilesSearchResultPanel();
+      createFilesSearchResultPanel(isVisible);
     }
+
+    filesSearchResultPanel.setVisible(isVisible);
 
     searchPanel.setVariables(filterFiles, RodaConstants.FILE_SEARCH, true, filesSearchResultPanel,
       filesSearchAdvancedFieldsPanel);
@@ -235,12 +241,16 @@ public class MainSearch extends Composite {
 
     itemsFacets.setVisible(false);
     representationsFacets.setVisible(false);
-    filesFacets.setVisible(true);
+    filesFacets.setVisible(isVisible);
   }
 
-  private void createItemsSearchResultPanel() {
+  private void createItemsSearchResultPanel(boolean isVisible) {
     Facets facets = new Facets(itemsFacetsMap.keySet());
-    itemsSearchResultPanel = new AIPList(filterAips, justActive, facets, messages.searchResults(), itemsSelectable);
+    if (isVisible) {
+      itemsSearchResultPanel = new AIPList(filterAips, justActive, facets, messages.searchResults(), itemsSelectable);
+    } else {
+      itemsSearchResultPanel = new AIPList(null, false, null, null, false);
+    }
 
     Map<String, FlowPanel> facetPanels = new HashMap<>();
     for (Entry<FacetParameter, FlowPanel> entry : itemsFacetsMap.entrySet()) {
@@ -253,10 +263,14 @@ public class MainSearch extends Composite {
     itemsSearchResultPanel.setActionable(AipActions.get(parentAipId, parentAipState));
   }
 
-  private void createRepresentationsSearchResultPanel() {
+  private void createRepresentationsSearchResultPanel(boolean isVisible) {
     Facets facets = new Facets(representationsFacetsMap.keySet());
-    representationsSearchResultPanel = new RepresentationList(filterRepresentations, justActive, facets,
-      messages.searchResults(), representationsSelectable);
+    if (isVisible) {
+      representationsSearchResultPanel = new RepresentationList(filterRepresentations, justActive, facets,
+        messages.searchResults(), representationsSelectable);
+    } else {
+      representationsSearchResultPanel = new RepresentationList(null, false, null, null, false);
+    }
 
     Map<String, FlowPanel> facetPanels = new HashMap<>();
     for (Entry<FacetParameter, FlowPanel> entry : representationsFacetsMap.entrySet()) {
@@ -268,11 +282,15 @@ public class MainSearch extends Composite {
     representationsSearchResultPanel.setActionable(RepresentationActions.get());
   }
 
-  private void createFilesSearchResultPanel() {
+  private void createFilesSearchResultPanel(boolean isVisible) {
     Facets facets = new Facets(filesFacetsMap.keySet());
-    boolean showFilesPath = true;
-    filesSearchResultPanel = new SearchFileList(filterFiles, justActive, facets, messages.searchResults(),
-      filesSelectable, showFilesPath);
+    if (isVisible) {
+      boolean showFilesPath = true;
+      filesSearchResultPanel = new SearchFileList(filterFiles, justActive, facets, messages.searchResults(),
+        filesSelectable, showFilesPath);
+    } else {
+      filesSearchResultPanel = new SearchFileList(null, false, null, null, false, true);
+    }
 
     Map<String, FlowPanel> facetPanels = new HashMap<>();
     for (Entry<FacetParameter, FlowPanel> entry : filesFacetsMap.entrySet()) {
@@ -304,7 +322,6 @@ public class MainSearch extends Composite {
   }
 
   public void clearSelected() {
-
     if (itemsSearchResultPanel != null) {
       itemsSearchResultPanel.clearSelected();
     }
@@ -369,15 +386,18 @@ public class MainSearch extends Composite {
     return successful;
   }
 
-  public void search() {
+  public void search(boolean isVisible) {
     if (searchPanel.getDropdownSelectedValue().equals(RodaConstants.SEARCH_ITEMS)) {
-      showSearchAdvancedFieldsPanel();
+      showSearchAdvancedFieldsPanel(isVisible);
     } else if (searchPanel.getDropdownSelectedValue().equals(RodaConstants.SEARCH_REPRESENTATIONS)) {
-      showRepresentationsSearchAdvancedFieldsPanel();
+      showRepresentationsSearchAdvancedFieldsPanel(isVisible);
     } else {
-      showFilesSearchAdvancedFieldsPanel();
+      showFilesSearchAdvancedFieldsPanel(isVisible);
     }
-    searchPanel.doSearch();
+
+    if (isVisible) {
+      searchPanel.doSearch();
+    }
   }
 
   public void defaultFilters() {

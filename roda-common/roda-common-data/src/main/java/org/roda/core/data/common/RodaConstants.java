@@ -1196,6 +1196,8 @@ public final class RodaConstants {
   public static final String SEARCH_FIELD_TYPE_SUGGEST_PARTIAL = "suggestPartial";
   public static final String SEARCH_FIELD_TYPE_CONTROLLED = "controlled";
 
+  public static final String SEARCH_BUTTON_EVENT_MARK = "do_search";
+
   public static final String METADATA_VERSION_SEPARATOR = "_";
   public static final String METADATA_TEMPLATE_FOLDER = "templates";
   public static final String METADATA_TEMPLATE_EXTENSION = ".xml.hbs";

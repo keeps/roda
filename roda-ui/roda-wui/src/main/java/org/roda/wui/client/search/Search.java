@@ -152,13 +152,13 @@ public class Search extends Composite {
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     mainSearch.defaultFilters();
     if (historyTokens.isEmpty()) {
-      mainSearch.search();
+      mainSearch.search(false);
       callback.onSuccess(this);
     } else {
       // #search/TYPE/key/value/key/value
       boolean successful = mainSearch.setSearch(historyTokens);
       if (successful) {
-        mainSearch.search();
+        mainSearch.search(true);
         callback.onSuccess(this);
       } else {
         HistoryUtils.newHistory(RESOLVER);

@@ -129,6 +129,7 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
       @Override
       public void onClick(ClickEvent event) {
         doSearch();
+        onChange(RodaConstants.SEARCH_BUTTON_EVENT_MARK);
       }
     });
 
@@ -142,7 +143,7 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
     searchInputListBox.addValueChangeHandler(new ValueChangeHandler<String>() {
       @Override
       public void onValueChange(ValueChangeEvent<String> event) {
-        onChange();
+        onChange(searchInputListBox.getSelectedValue());
       }
     });
 
@@ -371,6 +372,7 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
   @UiHandler("searchAdvancedGo")
   void handleSearchAdvancedGo(ClickEvent e) {
     doSearch();
+    onChange(RodaConstants.SEARCH_BUTTON_EVENT_MARK);
   }
 
   @Override
@@ -378,8 +380,8 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
     return addHandler(handler, ValueChangeEvent.getType());
   }
 
-  protected void onChange() {
-    ValueChangeEvent.fire(this, searchInputListBox.getSelectedValue());
+  protected void onChange(String value) {
+    ValueChangeEvent.fire(this, value);
   }
 
   public void addKeyDownEvent(KeyDownHandler handler) {

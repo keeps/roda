@@ -60,6 +60,13 @@ public class SearchFileList extends BasicAsyncTableCell<IndexedFile> {
     this.showFilePath = showFilePath;
   }
 
+  public SearchFileList(Filter filter, boolean justActive, Facets facets, String summary, boolean selectable,
+    boolean showFilePath, int initialPageSize, int pageSizeIncrement) {
+    super(IndexedFile.class, filter, justActive, facets, summary, selectable, initialPageSize, pageSizeIncrement,
+      fieldsToReturn);
+    this.showFilePath = showFilePath;
+  }
+
   @Override
   protected void configureDisplay(CellTable<IndexedFile> display) {
     iconColumn = new Column<IndexedFile, SafeHtml>(new SafeHtmlCell()) {
