@@ -42,6 +42,7 @@ import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.widgets.MyCellTableResources;
+import org.roda.wui.common.client.widgets.Toast;
 import org.roda.wui.common.client.widgets.wcag.AccessibleCellTable;
 import org.roda.wui.common.client.widgets.wcag.AccessibleSimplePager;
 import org.roda.wui.common.client.widgets.wcag.AcessibleCheckboxCell;
@@ -240,7 +241,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
           @Override
           public void onSuccess(Integer result) {
-            GWT.log("TESTE: " + result);
+            Toast.showInfo(messages.exportListTitle(), messages.exportListMessage(result));
             RestUtils.requestCSVExport(getClassToReturn(), getFilter(), dataProvider.getSorter(),
               new Sublist(0, result), getFacets(), getJustActive(), false, notNullSummary + ".csv");
           }

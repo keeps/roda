@@ -182,7 +182,7 @@ public class MainSearch extends Composite {
 
   public void showSearchAdvancedFieldsPanel(boolean isVisible) {
     if (itemsSearchResultPanel == null) {
-      createItemsSearchResultPanel(isVisible);
+      createItemsSearchResultPanel(true);
     }
 
     itemsSearchResultPanel.setVisible(isVisible);
@@ -249,7 +249,7 @@ public class MainSearch extends Composite {
     if (isVisible) {
       itemsSearchResultPanel = new AIPList(filterAips, justActive, facets, messages.searchResults(), itemsSelectable);
     } else {
-      itemsSearchResultPanel = new AIPList(null, false, null, null, false);
+      itemsSearchResultPanel = new AIPList(Filter.NULL, false, facets, null, true);
     }
 
     Map<String, FlowPanel> facetPanels = new HashMap<>();
@@ -269,7 +269,7 @@ public class MainSearch extends Composite {
       representationsSearchResultPanel = new RepresentationList(filterRepresentations, justActive, facets,
         messages.searchResults(), representationsSelectable);
     } else {
-      representationsSearchResultPanel = new RepresentationList(null, false, null, null, false);
+      representationsSearchResultPanel = new RepresentationList(null, false, null, null, true);
     }
 
     Map<String, FlowPanel> facetPanels = new HashMap<>();
@@ -289,7 +289,7 @@ public class MainSearch extends Composite {
       filesSearchResultPanel = new SearchFileList(filterFiles, justActive, facets, messages.searchResults(),
         filesSelectable, showFilesPath);
     } else {
-      filesSearchResultPanel = new SearchFileList(null, false, null, null, false, true);
+      filesSearchResultPanel = new SearchFileList(null, false, null, null, true, true);
     }
 
     Map<String, FlowPanel> facetPanels = new HashMap<>();

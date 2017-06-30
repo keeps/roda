@@ -2509,4 +2509,10 @@ public interface ClientMessages extends Messages {
   String runningInBackgroundTitle();
 
   String runningInBackgroundDescription();
+
+  /* Export list messages */
+
+  String exportListTitle();
+
+  String exportListMessage(int limit);
 }
