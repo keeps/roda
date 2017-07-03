@@ -290,7 +290,18 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     LOGGER.debug("Doing stuff in afterAllExecute");
     try {
-      sendNotification(model, index);
+      Job job = PluginHelper.getJob(this, model);
+      JobStats jobStats = job.getJobStats();
+
+      boolean whenFailed = PluginHelper.getBooleanFromParameters(this,
+        getPluginParameter(RodaConstants.PLUGIN_PARAMS_NOTIFICATION_WHEN_FAILED));
+
+      if (whenFailed && jobStats.getSourceObjectsProcessedWithFailure() == 0) {
+        // do nothing
+      } else {
+        sendNotification(model, index, job, jobStats);
+      }
+
       index.commitAIPs();
       PluginHelper.fixParents(index, model, Optional.ofNullable(PluginHelper.getJobId(this)),
         PluginHelper.getSearchScopeFromParameters(this, model));
@@ -357,11 +368,8 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     return aips;
   }
 
-  private void sendNotification(ModelService model, IndexService index)
+  private void sendNotification(ModelService model, IndexService index, Job job, JobStats jobStats)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    Job job = PluginHelper.getJob(this, model);
-    JobStats jobStats = job.getJobStats();
-
     String emails = PluginHelper.getStringFromParameters(this,
       getPluginParameter(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION));
 

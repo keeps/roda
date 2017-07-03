@@ -78,6 +78,7 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
     pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT));
     pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_REPLICATION));
     pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION));
+    pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_NOTIFICATION_WHEN_FAILED));
     return pluginParameters;
   }
 
@@ -161,6 +162,11 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_REPLICATION,
         new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_REPLICATION, ReplicationPlugin.getStaticName(),
           PluginParameterType.BOOLEAN, "false", true, false, ReplicationPlugin.getStaticDescription()));
+
+      pluginParameters.put(RodaConstants.PLUGIN_PARAMS_NOTIFICATION_WHEN_FAILED,
+        new PluginParameter(RodaConstants.PLUGIN_PARAMS_NOTIFICATION_WHEN_FAILED,
+          "Ingest finished notification only when failed", PluginParameterType.BOOLEAN, "false", false, false,
+          "If checked, the ingest finished notification will only be sent if a fail occurs during ingestion"));
 
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION,
         new PluginParameter(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION, "Ingest finished email notification",
