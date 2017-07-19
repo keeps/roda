@@ -24,7 +24,6 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginManager;
 import org.roda.core.plugins.plugins.antivirus.AntivirusPlugin;
 import org.roda.core.plugins.plugins.base.DescriptiveMetadataValidationPlugin;
-import org.roda.core.plugins.plugins.base.ReplicationPlugin;
 import org.roda.core.plugins.plugins.characterization.PremisSkeletonPlugin;
 import org.roda.core.plugins.plugins.characterization.SiegfriedPlugin;
 
@@ -158,10 +157,6 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT,
         new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT, AutoAcceptSIPPlugin.getStaticName(),
           PluginParameterType.BOOLEAN, "true", true, false, AutoAcceptSIPPlugin.getStaticDescription()));
-
-      pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_REPLICATION,
-        new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_REPLICATION, ReplicationPlugin.getStaticName(),
-          PluginParameterType.BOOLEAN, "false", true, false, ReplicationPlugin.getStaticDescription()));
 
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_NOTIFICATION_WHEN_FAILED,
         new PluginParameter(RodaConstants.PLUGIN_PARAMS_NOTIFICATION_WHEN_FAILED,

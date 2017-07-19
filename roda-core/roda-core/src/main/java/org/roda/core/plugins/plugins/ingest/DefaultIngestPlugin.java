@@ -58,7 +58,6 @@ import org.roda.core.plugins.orchestrate.IngestJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.plugins.plugins.antivirus.AntivirusPlugin;
 import org.roda.core.plugins.plugins.base.DescriptiveMetadataValidationPlugin;
-import org.roda.core.plugins.plugins.base.ReplicationPlugin;
 import org.roda.core.plugins.plugins.characterization.PremisSkeletonPlugin;
 import org.roda.core.plugins.plugins.characterization.SiegfriedPlugin;
 import org.roda.core.storage.StorageService;
@@ -86,7 +85,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
   public static final String END_DESCRIPTION = "The ingest process has ended.";
   public static final PreservationEventType END_TYPE = PreservationEventType.INGEST_END;
 
-  protected int totalSteps = 11;
+  protected int totalSteps = 10;
 
   private String successMessage;
   private String failureMessage;
@@ -263,14 +262,6 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       }
 
       createIngestEndedEvent(model, index, aips);
-
-      // 11) Replication
-      if (!aips.isEmpty() && PluginHelper.verifyIfStepShouldBePerformed(this,
-        getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_REPLICATION))) {
-        pluginReport = doReplication(index, model, storage, aips);
-        mergeReports(jobPluginInfo, pluginReport);
-        PluginHelper.updateJobInformation(this, jobPluginInfo.incrementStepsCompletedByOne());
-      }
 
       getAfterExecute().ifPresent(e -> e.execute(jobPluginInfo, aips));
 
@@ -615,10 +606,6 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
   private Report doAutoAccept(IndexService index, ModelService model, StorageService storage, List<AIP> aips) {
     return executePlugin(index, model, storage, aips, AutoAcceptSIPPlugin.class.getName());
-  }
-
-  private Report doReplication(IndexService index, ModelService model, StorageService storage, List<AIP> aips) {
-    return executePlugin(index, model, storage, aips, ReplicationPlugin.class.getName());
   }
 
   private Report executePlugin(IndexService index, ModelService model, StorageService storage, List<AIP> aips,

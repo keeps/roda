@@ -17,7 +17,6 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.FacetParameter;
 import org.roda.core.data.v2.index.facet.Facets;
-import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
 import org.roda.core.data.v2.index.filter.OrFiltersParameters;
@@ -60,12 +59,9 @@ public class MainSearch extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  private static final Filter DEFAULT_FILTER_AIP = new Filter(
-    new BasicSearchFilterParameter(RodaConstants.AIP_SEARCH, "*"));
-  private static final Filter DEFAULT_FILTER_REPRESENTATIONS = new Filter(
-    new BasicSearchFilterParameter(RodaConstants.REPRESENTATION_SEARCH, "*"));
-  private static final Filter DEFAULT_FILTER_FILES = new Filter(
-    new BasicSearchFilterParameter(RodaConstants.FILE_SEARCH, "*"));
+  private static final Filter DEFAULT_FILTER_AIP = Filter.ALL;
+  private static final Filter DEFAULT_FILTER_REPRESENTATIONS = Filter.ALL;
+  private static final Filter DEFAULT_FILTER_FILES = Filter.ALL;
 
   Filter filterAips;
   Filter filterRepresentations;

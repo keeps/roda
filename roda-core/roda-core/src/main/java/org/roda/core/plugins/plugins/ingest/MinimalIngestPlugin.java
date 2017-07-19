@@ -21,7 +21,6 @@ import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.plugins.base.DescriptiveMetadataValidationPlugin;
-import org.roda.core.plugins.plugins.base.ReplicationPlugin;
 import org.roda.core.plugins.plugins.characterization.PremisSkeletonPlugin;
 
 public class MinimalIngestPlugin extends DefaultIngestPlugin {
@@ -55,9 +54,6 @@ public class MinimalIngestPlugin extends DefaultIngestPlugin {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT, AutoAcceptSIPPlugin.getStaticName(),
         PluginParameterType.BOOLEAN, "true", true, true, AutoAcceptSIPPlugin.getStaticDescription()));
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_REPLICATION,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_REPLICATION, ReplicationPlugin.getStaticName(),
-        PluginParameterType.BOOLEAN, "false", true, true, ReplicationPlugin.getStaticDescription()));
   }
 
   @Override
