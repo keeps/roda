@@ -40,6 +40,11 @@ public class IndexedAIP implements IsIndexed, HasPermissions {
   private Date dateInitial = null;
   private Date dateFinal = null;
 
+  private Date createdOn = null;
+  private String createdBy = null;
+  private Date updatedOn = null;
+  private String updatedBy = null;
+
   private String description = null;
 
   private String parentID = null;
@@ -316,6 +321,42 @@ public class IndexedAIP implements IsIndexed, HasPermissions {
     this.ghost = ghost;
   }
 
+  public Date getCreatedOn() {
+    return createdOn;
+  }
+
+  public IndexedAIP setCreatedOn(Date createdOn) {
+    this.createdOn = createdOn;
+    return this;
+  }
+
+  public String getCreatedBy() {
+    return createdBy;
+  }
+
+  public IndexedAIP setCreatedBy(String createdBy) {
+    this.createdBy = createdBy;
+    return this;
+  }
+
+  public Date getUpdatedOn() {
+    return updatedOn;
+  }
+
+  public IndexedAIP setUpdatedOn(Date updatedOn) {
+    this.updatedOn = updatedOn;
+    return this;
+  }
+
+  public String getUpdatedBy() {
+    return updatedBy;
+  }
+
+  public IndexedAIP setUpdatedBy(String updatedBy) {
+    this.updatedBy = updatedBy;
+    return this;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o)
@@ -395,21 +436,23 @@ public class IndexedAIP implements IsIndexed, HasPermissions {
       + ", numberOfSubmissionFiles=" + numberOfSubmissionFiles + ", numberOfDocumentationFiles="
       + numberOfDocumentationFiles + ", numberOfSchemaFiles=" + numberOfSchemaFiles + ", hasRepresentations="
       + hasRepresentations + ", ghost=" + ghost + ", ingestSIPId='" + ingestSIPIds + '\'' + ", ingestJobId="
-      + ingestJobId + ", ingestUpdateJobIds='" + ingestUpdateJobIds + '\'' + '}';
+      + ingestJobId + ", ingestUpdateJobIds='" + ingestUpdateJobIds + '\'' + ", createdOn='" + createdOn
+      + "', createdBy='" + createdBy + "', updatedOn='" + updatedOn + "', updatedBy='" + updatedBy + "'}";
   }
 
   @Override
   public List<String> toCsvHeaders() {
     return Arrays.asList("id", "state", "level", "title", "dateInitial", "dateFinal", "description", "parentID",
       "ancestors", "permissions", "numberOfSubmissionFiles", "numberOfDocumentationFiles", "numberOfSchemaFiles",
-      "hasRepresentations", "ghost", "ingestSIPId", "ingestJobId", "ingestUpdateJobIds");
+      "hasRepresentations", "ghost", "ingestSIPId", "ingestJobId", "ingestUpdateJobIds", "createdOn", "createdBy",
+      "updatedOn", "updatedBy");
   }
 
   @Override
   public List<Object> toCsvValues() {
     return Arrays.asList(id, state, level, title, dateInitial, dateFinal, description, parentID, ancestors, permissions,
       numberOfSubmissionFiles, numberOfDocumentationFiles, numberOfSchemaFiles, hasRepresentations, ghost, ingestSIPIds,
-      ingestJobId, ingestUpdateJobIds);
+      ingestJobId, ingestUpdateJobIds, createdOn, createdBy, updatedOn, updatedBy);
   }
 
   @JsonIgnore

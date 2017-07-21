@@ -105,6 +105,7 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.RepresentationLink;
+import org.roda.core.data.v2.ip.RepresentationState;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
@@ -160,7 +161,6 @@ public class SolrUtils {
 
   private static Map<String, List<String>> liteFieldsForEachClass = new HashMap<>();
 
-  /** Private empty constructor */
   private SolrUtils() {
     // do nothing
   }
@@ -1186,6 +1186,11 @@ public class SolrUtils {
     final String title = titles.isEmpty() ? null : titles.get(0);
     final String description = descriptions.isEmpty() ? null : descriptions.get(0);
 
+    final Date createdOn = objectToDate(doc.get(RodaConstants.AIP_CREATED_ON));
+    final String createdBy = objectToString(doc.get(RodaConstants.AIP_CREATED_BY), "");
+    final Date updatedOn = objectToDate(doc.get(RodaConstants.AIP_UPDATED_ON));
+    final String updatedBy = objectToString(doc.get(RodaConstants.AIP_UPDATED_BY), "");
+
     String level;
     if (ghost) {
       level = RodaConstants.AIP_GHOST;
@@ -1195,37 +1200,43 @@ public class SolrUtils {
 
     return new IndexedAIP(id, state, level, title, dateInitial, dateFinal, description, parentId, ancestors,
       permissions, numberOfSubmissionFiles, numberOfDocumentationFiles, numberOfSchemaFiles, hasRepresentations, ghost)
-        .setIngestSIPIds(ingestSIPIds).setIngestJobId(ingestJobId).setIngestUpdateJobIds(ingestUpdateJobIds);
+        .setIngestSIPIds(ingestSIPIds).setIngestJobId(ingestJobId).setIngestUpdateJobIds(ingestUpdateJobIds)
+        .setCreatedOn(createdOn).setCreatedBy(createdBy).setUpdatedOn(updatedOn).setUpdatedBy(updatedBy);
   }
 
   public static SolrInputDocument aipToSolrInputDocument(AIP aip, List<String> ancestors, ModelService model,
     boolean safemode)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    SolrInputDocument ret = new SolrInputDocument();
+    SolrInputDocument doc = new SolrInputDocument();
 
-    ret.addField(RodaConstants.INDEX_UUID, aip.getId());
-    ret.addField(RodaConstants.AIP_ID, aip.getId());
-    ret.addField(RodaConstants.AIP_PARENT_ID, aip.getParentId());
-    ret.addField(RodaConstants.STATE, aip.getState().toString());
+    doc.addField(RodaConstants.INDEX_UUID, aip.getId());
+    doc.addField(RodaConstants.AIP_ID, aip.getId());
+    doc.addField(RodaConstants.AIP_PARENT_ID, aip.getParentId());
+    doc.addField(RodaConstants.STATE, aip.getState().toString());
 
-    ret.addField(RodaConstants.INGEST_SIP_IDS, aip.getIngestSIPIds());
-    ret.addField(RodaConstants.INGEST_JOB_ID, aip.getIngestJobId());
-    ret.addField(RodaConstants.INGEST_UPDATE_JOB_IDS, aip.getIngestUpdateJobIds());
+    doc.addField(RodaConstants.AIP_CREATED_ON, aip.getCreatedOn());
+    doc.addField(RodaConstants.AIP_CREATED_BY, aip.getCreatedBy());
+    doc.addField(RodaConstants.AIP_UPDATED_ON, aip.getUpdatedOn());
+    doc.addField(RodaConstants.AIP_UPDATED_BY, aip.getUpdatedBy());
 
-    ret.addField(RodaConstants.AIP_ANCESTORS, ancestors);
+    doc.addField(RodaConstants.INGEST_SIP_IDS, aip.getIngestSIPIds());
+    doc.addField(RodaConstants.INGEST_JOB_ID, aip.getIngestJobId());
+    doc.addField(RodaConstants.INGEST_UPDATE_JOB_IDS, aip.getIngestUpdateJobIds());
+
+    doc.addField(RodaConstants.AIP_ANCESTORS, ancestors);
 
     List<String> descriptiveMetadataIds = aip.getDescriptiveMetadata().stream().map(dm -> dm.getId())
       .collect(Collectors.toList());
 
-    ret.addField(RodaConstants.AIP_DESCRIPTIVE_METADATA_ID, descriptiveMetadataIds);
+    doc.addField(RodaConstants.AIP_DESCRIPTIVE_METADATA_ID, descriptiveMetadataIds);
 
     List<String> representationIds = aip.getRepresentations().stream().map(r -> r.getId()).collect(Collectors.toList());
-    ret.addField(RodaConstants.AIP_REPRESENTATION_ID, representationIds);
-    ret.addField(RodaConstants.AIP_HAS_REPRESENTATIONS, !representationIds.isEmpty());
+    doc.addField(RodaConstants.AIP_REPRESENTATION_ID, representationIds);
+    doc.addField(RodaConstants.AIP_HAS_REPRESENTATIONS, !representationIds.isEmpty());
 
-    setPermissions(aip.getPermissions(), ret);
+    setPermissions(aip.getPermissions(), doc);
 
-    ret.addField(RodaConstants.AIP_GHOST, aip.getGhost() != null ? aip.getGhost() : false);
+    doc.addField(RodaConstants.AIP_GHOST, aip.getGhost() != null ? aip.getGhost() : false);
 
     if (!safemode) {
       // guarding against repeated fields
@@ -1240,10 +1251,10 @@ public class SolrUtils {
             if (NON_REPEATABLE_FIELDS.contains(field.getName())) {
               boolean added = usedNonRepeatableFields.add(field.getName());
               if (added) {
-                ret.addField(field.getName(), field.getValue(), field.getBoost());
+                doc.addField(field.getName(), field.getValue(), field.getBoost());
               }
             } else {
-              ret.addField(field.getName(), field.getValue(), field.getBoost());
+              doc.addField(field.getName(), field.getValue(), field.getBoost());
             }
           }
         } catch (GenericException e) {
@@ -1281,11 +1292,11 @@ public class SolrUtils {
       numberOfSchemaFiles = 0L;
     }
 
-    ret.addField(RodaConstants.AIP_NUMBER_OF_SUBMISSION_FILES, numberOfSubmissionFiles);
-    ret.addField(RodaConstants.AIP_NUMBER_OF_DOCUMENTATION_FILES, numberOfDocumentationFiles);
-    ret.addField(RodaConstants.AIP_NUMBER_OF_SCHEMA_FILES, numberOfSchemaFiles);
+    doc.addField(RodaConstants.AIP_NUMBER_OF_SUBMISSION_FILES, numberOfSubmissionFiles);
+    doc.addField(RodaConstants.AIP_NUMBER_OF_DOCUMENTATION_FILES, numberOfDocumentationFiles);
+    doc.addField(RodaConstants.AIP_NUMBER_OF_SCHEMA_FILES, numberOfSchemaFiles);
 
-    return ret;
+    return doc;
   }
 
   public static IndexedRepresentation solrDocumentToRepresentation(SolrDocument doc) {
@@ -1304,8 +1315,18 @@ public class SolrUtils {
 
     final List<String> ancestors = objectToListString(doc.get(RodaConstants.AIP_ANCESTORS));
 
-    return new IndexedRepresentation(uuid, id, aipId, Boolean.TRUE.equals(original), type, sizeInBytes,
-      totalNumberOfFiles, numberOfDocumentationFiles, numberOfSchemaFiles, ancestors);
+    IndexedRepresentation rep = new IndexedRepresentation(uuid, id, aipId, Boolean.TRUE.equals(original), type,
+      sizeInBytes, totalNumberOfFiles, numberOfDocumentationFiles, numberOfSchemaFiles, ancestors);
+    rep.setCreatedOn(objectToDate(doc.get(RodaConstants.REPRESENTATION_CREATED_ON)));
+    rep.setCreatedBy(objectToString(doc.get(RodaConstants.REPRESENTATION_CREATED_BY), ""));
+    rep.setUpdatedOn(objectToDate(doc.get(RodaConstants.REPRESENTATION_UPDATED_ON)));
+    rep.setUpdatedBy(objectToString(doc.get(RodaConstants.REPRESENTATION_UPDATED_BY), ""));
+
+    RepresentationState state = RepresentationState
+      .valueOf(objectToString(doc.get(RodaConstants.REPRESENTATION_STATE), RepresentationState.ORIGINAL.toString()));
+    rep.setRepresentationState(state);
+
+    return rep;
   }
 
   public static SolrInputDocument representationToSolrDocument(AIP aip, Representation rep, Long sizeInBytes,
@@ -1322,14 +1343,25 @@ public class SolrUtils {
     doc.addField(RodaConstants.REPRESENTATION_NUMBER_OF_DOCUMENTATION_FILES, numberOfDocumentationFiles);
     doc.addField(RodaConstants.REPRESENTATION_NUMBER_OF_SCHEMA_FILES, numberOfSchemaFiles);
 
+    doc.addField(RodaConstants.REPRESENTATION_CREATED_ON, rep.getCreatedOn());
+    doc.addField(RodaConstants.REPRESENTATION_CREATED_BY, rep.getCreatedBy());
+    doc.addField(RodaConstants.REPRESENTATION_UPDATED_ON, rep.getUpdatedOn());
+    doc.addField(RodaConstants.REPRESENTATION_UPDATED_BY, rep.getUpdatedBy());
+
+    if (rep.getRepresentationState() != null) {
+      doc.addField(RodaConstants.REPRESENTATION_STATE, rep.getRepresentationState().toString());
+    } else if (rep.isOriginal()) {
+      doc.addField(RodaConstants.REPRESENTATION_STATE, RepresentationState.ORIGINAL.toString());
+    }
+
     // indexing active state and permissions
     doc.addField(RodaConstants.STATE, aip.getState().toString());
     doc.addField(RodaConstants.INGEST_SIP_IDS, aip.getIngestSIPIds());
     doc.addField(RodaConstants.INGEST_JOB_ID, aip.getIngestJobId());
     doc.addField(RodaConstants.INGEST_UPDATE_JOB_IDS, aip.getIngestUpdateJobIds());
     doc.addField(RodaConstants.REPRESENTATION_ANCESTORS, ancestors);
-    setPermissions(aip.getPermissions(), doc);
 
+    setPermissions(aip.getPermissions(), doc);
     return doc;
   }
 

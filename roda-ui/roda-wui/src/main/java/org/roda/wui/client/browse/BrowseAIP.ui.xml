@@ -45,6 +45,8 @@
 							title="{messages.sipId}" />
 						<g:FlowPanel ui:field="ingestJobId" title="{messages.processId}" />
 						<g:FlowPanel ui:field="ingestUpdateJobIds" title="{messages.updateProcessId}" />
+						<g:Label addStyleNames="browseItemId" ui:field="dateCreated"/>
+						<g:Label addStyleNames="browseItemId" ui:field="dateUpdated"/>
 					</g:FlowPanel>
 					<m:BreadcrumbPanel ui:field="breadcrumb"
 						addStyleNames="browseBreadcrumb" />

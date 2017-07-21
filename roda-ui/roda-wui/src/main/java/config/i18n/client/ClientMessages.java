@@ -679,6 +679,10 @@ public interface ClientMessages extends Messages {
 
   String sipIdMin(String sipId);
 
+  String dateCreated(String date, String person);
+
+  String dateUpdated(String date, String person);
+
   /************* Search ****************/
   String searchListBoxItems();
 

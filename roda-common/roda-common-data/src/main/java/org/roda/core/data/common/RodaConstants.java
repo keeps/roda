@@ -556,6 +556,12 @@ public final class RodaConstants {
   public static final String AIP_DESCRIPTION = "description";
   public static final String AIP_STATE = "state";
   public static final String AIP_LABEL = "label";
+
+  public static final String AIP_CREATED_ON = "createdOn";
+  public static final String AIP_CREATED_BY = "createdBy";
+  public static final String AIP_UPDATED_ON = "updatedOn";
+  public static final String AIP_UPDATED_BY = "updatedBy";
+
   public static final String AIP_SEARCH = "search";
 
   // AIP types
@@ -579,6 +585,14 @@ public final class RodaConstants {
   public static final String REPRESENTATION_NUMBER_OF_DOCUMENTATION_FILES = "numberOfDocumentationFiles";
   public static final String REPRESENTATION_NUMBER_OF_SCHEMA_FILES = "numberOfSchemaFiles";
   public static final String REPRESENTATION_ANCESTORS = "ancestors";
+
+  public static final String REPRESENTATION_CREATED_ON = "createdOn";
+  public static final String REPRESENTATION_CREATED_BY = "createdBy";
+  public static final String REPRESENTATION_UPDATED_ON = "updatedOn";
+  public static final String REPRESENTATION_UPDATED_BY = "updatedBy";
+
+  public static final String REPRESENTATION_STATE = "representationState";
+
   public static final String REPRESENTATION_SEARCH = "search";
 
   // Representation types

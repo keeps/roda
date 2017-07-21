@@ -139,19 +139,22 @@ public class IndexedRepresentation extends Representation implements IsIndexed, 
   public String toString() {
     return "IndexedRepresentation [uuid=" + uuid + ", sizeInBytes=" + sizeInBytes + ", numberOfDataFiles="
       + numberOfDataFiles + ", numberOfDocumentationFiles=" + numberOfDocumentationFiles + ", numberOfSchemaFiles="
-      + numberOfSchemaFiles + ", ancestors=" + ancestors + "]";
+      + numberOfSchemaFiles + ", ancestors=" + ancestors + ", createdOn=" + super.getCreatedOn() + ", createdBy="
+      + super.getCreatedBy() + ", updatedOn=" + super.getUpdatedOn() + ", updatedBy=" + super.getUpdatedBy()
+      + ", state=" + super.getRepresentationState() + ']';
   }
 
   @Override
   public List<String> toCsvHeaders() {
     return Arrays.asList("uuid", "sizeInBytes", "numberOfDataFiles", "numberOfDocumentationFiles",
-      "numberOfSchemaFiles", "ancestors");
+      "numberOfSchemaFiles", "ancestors", "createdOn", "createdBy", "updatedOn", "updatedBy", "representationState");
   }
 
   @Override
   public List<Object> toCsvValues() {
     return Arrays.asList(uuid, sizeInBytes, numberOfDataFiles, numberOfDocumentationFiles, numberOfSchemaFiles,
-      ancestors);
+      ancestors, super.getCreatedOn(), super.getCreatedBy(), super.getUpdatedOn(), super.getUpdatedBy(),
+      super.getRepresentationState());
   }
 
   @Override

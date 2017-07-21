@@ -37,10 +37,12 @@ import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.ModelInfo;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.formats.Format;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.migration.model.FormatToVersion2;
 import org.roda.core.migration.model.PreservationMetadataFileToVersion2;
+import org.roda.core.migration.model.RepresentationToVersion2;
 import org.roda.core.migration.model.RiskToVersion2;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
@@ -64,6 +66,7 @@ public class MigrationManager {
     addModelMigration(Risk.class, 2, RiskToVersion2.class);
     addModelMigration(Format.class, 2, FormatToVersion2.class);
     addModelMigration(PreservationMetadata.class, 2, PreservationMetadataFileToVersion2.class);
+    addModelMigration(Representation.class, 2, RepresentationToVersion2.class);
   }
 
   private <T extends IsModelObject> void addModelMigration(final Class<T> clazz, final int toVersion,

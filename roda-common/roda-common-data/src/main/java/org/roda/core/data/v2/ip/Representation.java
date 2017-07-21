@@ -8,6 +8,7 @@
 package org.roda.core.data.v2.ip;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -30,8 +31,14 @@ public class Representation implements IsModelObject {
 
   private String id;
   private boolean original;
+  private RepresentationState representationState;
 
   private String type;
+
+  private Date createdOn = null;
+  private String createdBy = null;
+  private Date updatedOn = null;
+  private String updatedBy = null;
 
   private List<DescriptiveMetadata> descriptiveMetadata = new ArrayList<>();
 
@@ -56,7 +63,7 @@ public class Representation implements IsModelObject {
   @JsonIgnore
   @Override
   public int getClassVersion() {
-    return 1;
+    return 2;
   }
 
   @Override
@@ -102,6 +109,46 @@ public class Representation implements IsModelObject {
 
   public void addDescriptiveMetadata(DescriptiveMetadata descriptiveMetadata) {
     this.descriptiveMetadata.add(descriptiveMetadata);
+  }
+
+  public Date getCreatedOn() {
+    return createdOn;
+  }
+
+  public void setCreatedOn(Date createdOn) {
+    this.createdOn = createdOn;
+  }
+
+  public String getCreatedBy() {
+    return createdBy;
+  }
+
+  public void setCreatedBy(String createdBy) {
+    this.createdBy = createdBy;
+  }
+
+  public Date getUpdatedOn() {
+    return updatedOn;
+  }
+
+  public void setUpdatedOn(Date updatedOn) {
+    this.updatedOn = updatedOn;
+  }
+
+  public String getUpdatedBy() {
+    return updatedBy;
+  }
+
+  public void setUpdatedBy(String updatedBy) {
+    this.updatedBy = updatedBy;
+  }
+
+  public RepresentationState getRepresentationState() {
+    return representationState;
+  }
+
+  public void setRepresentationState(RepresentationState state) {
+    this.representationState = state;
   }
 
   @Override
@@ -153,7 +200,8 @@ public class Representation implements IsModelObject {
   @Override
   public String toString() {
     return "Representation [aipId=" + aipId + ", id=" + id + ", original=" + original + ", type=" + type
-      + ", descriptiveMetadata=" + descriptiveMetadata + "]";
+      + ", descriptiveMetadata=" + descriptiveMetadata + ", createdOn=" + createdOn + ", createdBy=" + createdBy
+      + ", updatedOn=" + updatedOn + ", updatedBy=" + updatedBy + ", representationState=" + representationState + ']';
   }
 
 }

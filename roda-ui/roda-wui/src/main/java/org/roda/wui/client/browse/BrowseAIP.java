@@ -55,6 +55,7 @@ import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.RestErrorOverlayType;
 import org.roda.wui.common.client.tools.RestUtils;
@@ -179,6 +180,9 @@ public class BrowseAIP extends Composite {
 
   @UiField
   FlowPanel ingestJobId, ingestUpdateJobIds;
+
+  @UiField
+  Label dateCreated, dateUpdated;
 
   // DESCRIPTIVE METADATA
 
@@ -419,6 +423,11 @@ public class BrowseAIP extends Composite {
     ingestJobId.removeStyleName("browseIngestJobId");
     ingestUpdateJobIds.clear();
     ingestUpdateJobIds.removeStyleName("browseIngestJobId");
+
+    dateCreated.setText("");
+    dateCreated.removeStyleName("browseItemId");
+    dateUpdated.setText("");
+    dateUpdated.removeStyleName("browseItemId");
 
     breadcrumb.setVisible(false);
 
@@ -721,6 +730,16 @@ public class BrowseAIP extends Composite {
           ingestUpdateJobIds.add(new InlineHTML(", "));
         }
       }
+    }
+
+    if (aip.getCreatedOn() != null && StringUtils.isNotBlank(aip.getCreatedBy())) {
+      dateCreated.setText(messages.dateCreated(Humanize.formatDateTime(aip.getCreatedOn()), aip.getCreatedBy()));
+      dateCreated.addStyleName("browseItemId");
+    }
+
+    if (aip.getUpdatedOn() != null && StringUtils.isNotBlank(aip.getUpdatedBy())) {
+      dateUpdated.setText(messages.dateUpdated(Humanize.formatDateTime(aip.getUpdatedOn()), aip.getUpdatedBy()));
+      dateUpdated.addStyleName("browseItemId");
     }
 
   }

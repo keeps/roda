@@ -38,9 +38,8 @@ public final class JsonUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(JsonUtils.class);
   private static final String JSON_ERROR_MESSAGE = "Error while parsing JSON";
 
-  /** Private empty constructor */
   private JsonUtils() {
-
+    // do nothing
   }
 
   public static <T> T readObjectFromFile(Path jsonFile, Class<T> objectClass) throws GenericException {
