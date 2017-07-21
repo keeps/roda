@@ -255,6 +255,7 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
       EVENT_DESCRIPTION, state, outcomeText.toString(), details, job.getUsername(), true);
   }
 
+  @SuppressWarnings("unchecked")
   private void processTransferredResource(ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo, Job job,
     List<TransferredResource> resources) {
     if (destinationId == null) {
@@ -267,7 +268,7 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
 
       for (TransferredResource resource : resources) {
         if (!moveResult.containsKey(resource.getUUID())) {
-          addFailedReport(model, report, jobPluginInfo, job, resource.getId());
+          addFailedReport(model, report, jobPluginInfo, job, resource.getUUID(), (Class<T>) TransferredResource.class);
         } else {
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
         }
@@ -277,15 +278,15 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
       LOGGER.error("Could not move transferred resource list", e);
 
       for (TransferredResource resource : resources) {
-        addFailedReport(model, report, jobPluginInfo, job, resource.getId());
+        addFailedReport(model, report, jobPluginInfo, job, resource.getId(), (Class<T>) TransferredResource.class);
       }
     }
   }
 
   private void addFailedReport(ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo, Job job,
-    String resourceId) {
+    String resourceId, Class<T> objectClass) {
     jobPluginInfo.incrementObjectsProcessedWithFailure();
-    Report reportItem = PluginHelper.initPluginReportItem(this, resourceId, File.class);
+    Report reportItem = PluginHelper.initPluginReportItem(this, resourceId, objectClass);
     reportItem
       .addPluginDetails("Could not move transferred resource " + resourceId
         + " due to inapropriate move operation. A likely scenario is a move operation of a parent to a child.")

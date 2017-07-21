@@ -10,6 +10,7 @@ package org.roda.core.plugins.plugins.ingest;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -28,10 +29,13 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.FilterParameter;
+import org.roda.core.data.v2.index.filter.OrFiltersParameters;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
@@ -209,7 +213,13 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
     Optional<String> searchScope, boolean forceSearchScope) throws GenericException, RequestNotValidException,
     NotFoundException, AuthorizationDeniedException, AlreadyExistsException, ValidationException {
     String searchScopeString = searchScope.orElse(null);
-    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_IDS, sip.getId()));
+
+    List<FilterParameter> possibleStates = new ArrayList<>();
+    possibleStates.add(new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.ACTIVE.toString()));
+    possibleStates.add(new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.UNDER_APPRAISAL.toString()));
+
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_IDS, sip.getId()),
+      new OrFiltersParameters(possibleStates));
     if (searchScopeString != null && !forceSearchScope) {
       filter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, searchScopeString));
     }
