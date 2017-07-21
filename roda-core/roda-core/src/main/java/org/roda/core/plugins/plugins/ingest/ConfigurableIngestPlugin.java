@@ -75,7 +75,6 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
 
     pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_PRODUCER_AUTHORIZATION_CHECK));
     pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT));
-    pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_REPLICATION));
     pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION));
     pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_NOTIFICATION_WHEN_FAILED));
     return pluginParameters;
@@ -199,7 +198,7 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
 
   @Override
   public void setTotalSteps() {
-    this.totalSteps = 11 - deactivatedPlugins.size();
+    this.totalSteps = DefaultIngestPlugin.INITIAL_TOTAL_STEPS - deactivatedPlugins.size();
   }
 
   @Override

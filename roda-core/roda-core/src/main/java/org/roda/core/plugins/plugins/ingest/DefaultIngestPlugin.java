@@ -85,7 +85,8 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
   public static final String END_DESCRIPTION = "The ingest process has ended.";
   public static final PreservationEventType END_TYPE = PreservationEventType.INGEST_END;
 
-  protected int totalSteps = 10;
+  protected static int INITIAL_TOTAL_STEPS = 10;
+  protected int totalSteps = INITIAL_TOTAL_STEPS;
 
   private String successMessage;
   private String failureMessage;
@@ -493,7 +494,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
   private int calculateEfectiveTotalSteps() {
     List<String> parameterIdsToIgnore = Arrays.asList(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID,
       RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION, RodaConstants.PLUGIN_PARAMS_DO_FULL_TEXT_EXTRACTION,
-      RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT);
+      RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT, RodaConstants.PLUGIN_PARAMS_NOTIFICATION_WHEN_FAILED);
     int effectiveTotalSteps = getTotalSteps();
     boolean tikaParameters = false;
     boolean dontDoFeatureExtraction = false;
