@@ -184,6 +184,9 @@ public class BrowseAIP extends Composite {
   @UiField
   Label dateCreated, dateUpdated;
 
+  @UiField
+  Label type;
+
   // DESCRIPTIVE METADATA
 
   @UiField
@@ -428,6 +431,9 @@ public class BrowseAIP extends Composite {
     dateCreated.removeStyleName("browseItemId");
     dateUpdated.setText("");
     dateUpdated.removeStyleName("browseItemId");
+
+    type.setText("");
+    type.removeStyleName("browseItemId");
 
     breadcrumb.setVisible(false);
 
@@ -742,6 +748,10 @@ public class BrowseAIP extends Composite {
       dateUpdated.addStyleName("browseItemId");
     }
 
+    if (StringUtils.isNotBlank(aip.getType())) {
+      type.setText(messages.aipTypeItem(aip.getType()));
+      type.addStyleName("browseItemId");
+    }
   }
 
   protected void viewAction() {

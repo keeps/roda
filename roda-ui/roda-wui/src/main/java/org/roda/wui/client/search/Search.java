@@ -83,7 +83,7 @@ public class Search extends Composite {
   FlowPanel itemsFacets, facetDescriptionLevels, facetHasRepresentations;
 
   @UiField(provided = true)
-  FlowPanel representationsFacets, facetRepresentationType, facetRepresentationOriginal;
+  FlowPanel representationsFacets, facetRepresentationType, facetRepresentationOriginal, facetRepresentationStates;
 
   @UiField(provided = true)
   FlowPanel filesFacets, facetFormats, facetPronoms, facetMimetypes, facetFileType;
@@ -102,6 +102,7 @@ public class Search extends Composite {
     representationsFacets = new FlowPanel();
     facetRepresentationType = new FlowPanel();
     facetRepresentationOriginal = new FlowPanel();
+    facetRepresentationStates = new FlowPanel();
 
     filesFacets = new FlowPanel();
     facetFormats = new FlowPanel();
@@ -120,6 +121,8 @@ public class Search extends Composite {
     representationsFacetsMap.put(new SimpleFacetParameter(RodaConstants.REPRESENTATION_TYPE), facetRepresentationType);
     representationsFacetsMap.put(new SimpleFacetParameter(RodaConstants.REPRESENTATION_ORIGINAL),
       facetRepresentationOriginal);
+    representationsFacetsMap.put(new SimpleFacetParameter(RodaConstants.REPRESENTATION_STATES),
+      facetRepresentationStates);
 
     filesFacetsMap.put(new SimpleFacetParameter(RodaConstants.FILE_FILEFORMAT), facetFormats);
     filesFacetsMap.put(new SimpleFacetParameter(RodaConstants.FILE_PRONOM), facetPronoms);

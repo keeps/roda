@@ -2,6 +2,7 @@ package org.roda.core.migration.model;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -51,9 +52,9 @@ public class RepresentationToVersion2 implements MigrationAction<Representation>
             representation.setUpdatedBy(aip.getUpdatedBy());
 
             if (representation.isOriginal()) {
-              representation.setRepresentationState(RepresentationState.ORIGINAL);
+              representation.setRepresentationStates(Arrays.asList(RepresentationState.ORIGINAL));
             } else {
-              representation.setRepresentationState(RepresentationState.NONE);
+              representation.setRepresentationStates(Arrays.asList(RepresentationState.OTHER));
             }
           }
 

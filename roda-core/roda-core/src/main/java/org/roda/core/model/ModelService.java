@@ -455,7 +455,7 @@ public class ModelService extends ModelObservable {
     return aip;
   }
 
-  public AIP moveAIP(String aipId, String parentId)
+  public AIP moveAIP(String aipId, String parentId, String updatedBy)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
 
     if (aipId.equals(parentId)) {
@@ -466,6 +466,8 @@ public class ModelService extends ModelObservable {
     AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
     String oldParentId = aip.getParentId();
     aip.setParentId(parentId);
+    aip.setUpdatedOn(new Date());
+    aip.setUpdatedBy(updatedBy);
     updateAIPMetadata(aip);
 
     notifyAipMoved(aip, oldParentId, parentId);
@@ -495,6 +497,16 @@ public class ModelService extends ModelObservable {
     // FIXME validate others aspects
 
     return report;
+  }
+
+  public void changeAIPType(String aipId, String type, String updatedBy)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    AIP aip = retrieveAIP(aipId);
+    aip.setType(type);
+    aip.setUpdatedOn(new Date());
+    aip.setUpdatedBy(updatedBy);
+    notifyAipUpdated(aip);
+    updateAIPMetadata(aip);
   }
 
   /***************** Descriptive Metadata related *****************/
@@ -661,11 +673,9 @@ public class ModelService extends ModelObservable {
 
     updateAIPMetadata(aip);
     notifyDescriptiveMetadataDeleted(aipId, representationId, descriptiveMetadataId);
-
   }
 
   private void deleteDescriptiveMetadata(AIP aip, String representationId, String descriptiveMetadataId) {
-
     for (Iterator<DescriptiveMetadata> it = getDescriptiveMetadata(aip, representationId).iterator(); it.hasNext();) {
       DescriptiveMetadata descriptiveMetadata = it.next();
       if (descriptiveMetadata.getId().equals(descriptiveMetadataId)) {
@@ -840,9 +850,11 @@ public class ModelService extends ModelObservable {
   }
 
   public Representation createRepresentation(String aipId, String representationId, boolean original, String type,
-    boolean notify) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
-    AlreadyExistsException {
+    boolean notify, String createdBy) throws RequestNotValidException, GenericException, NotFoundException,
+    AuthorizationDeniedException, AlreadyExistsException {
     Representation representation = new Representation(representationId, aipId, original, type);
+    representation.setCreatedBy(createdBy);
+    representation.setUpdatedBy(createdBy);
 
     StoragePath directoryPath = ModelUtils.getRepresentationStoragePath(aipId, representationId);
     storage.createDirectory(directoryPath);
@@ -860,8 +872,9 @@ public class ModelService extends ModelObservable {
   }
 
   public Representation createRepresentation(String aipId, String representationId, boolean original, String type,
-    StorageService sourceStorage, StoragePath sourcePath, boolean justData) throws RequestNotValidException,
-    GenericException, NotFoundException, AuthorizationDeniedException, AlreadyExistsException, ValidationException {
+    StorageService sourceStorage, StoragePath sourcePath, boolean justData, String createdBy)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
+    AlreadyExistsException, ValidationException {
     Representation representation;
 
     if (justData) {
@@ -877,6 +890,8 @@ public class ModelService extends ModelObservable {
     }
 
     representation = new Representation(representationId, aipId, original, type);
+    representation.setCreatedBy(createdBy);
+    representation.setUpdatedBy(createdBy);
 
     // update AIP metadata
     AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
@@ -892,7 +907,7 @@ public class ModelService extends ModelObservable {
     return representation;
   }
 
-  public void updateRepresentationType(String aipId, String representationId, String type)
+  public void changeRepresentationType(String aipId, String representationId, String type, String updatedBy)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     AIP aip = retrieveAIP(aipId);
     Iterator<Representation> it = aip.getRepresentations().iterator();
@@ -901,6 +916,8 @@ public class ModelService extends ModelObservable {
       Representation representation = it.next();
       if (representation.getId().equals(representationId)) {
         representation.setType(type);
+        representation.setUpdatedOn(new Date());
+        representation.setUpdatedBy(updatedBy);
         notifyRepresentationUpdated(representation);
         break;
       }
@@ -909,9 +926,33 @@ public class ModelService extends ModelObservable {
     updateAIPMetadata(aip);
   }
 
+  public void changeRepresentationStates(String aipId, String representationId, List<String> newStates,
+    String updatedBy)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    AIP aip = retrieveAIP(aipId);
+    Iterator<Representation> it = aip.getRepresentations().iterator();
+    Optional<Representation> representation = Optional.empty();
+
+    while (it.hasNext()) {
+      Representation next = it.next();
+      if (next.getId().equals(representationId)) {
+        representation = Optional.of(next);
+        break;
+      }
+    }
+
+    if (representation.isPresent()) {
+      representation.get().setRepresentationStates(newStates);
+      representation.get().setUpdatedOn(new Date());
+      representation.get().setUpdatedBy(updatedBy);
+      updateAIPMetadata(aip);
+      notifyRepresentationUpdated(representation.get());
+    }
+  }
+
   public Representation updateRepresentation(String aipId, String representationId, boolean original, String type,
-    StorageService sourceStorage, StoragePath sourcePath) throws RequestNotValidException, NotFoundException,
-    GenericException, AuthorizationDeniedException, ValidationException {
+    StorageService sourceStorage, StoragePath sourcePath, String updatedBy) throws RequestNotValidException,
+    NotFoundException, GenericException, AuthorizationDeniedException, ValidationException {
     Representation representation;
 
     // XXX possible optimization only creating new files, updating
@@ -927,6 +968,7 @@ public class ModelService extends ModelObservable {
 
     // build return object
     representation = new Representation(representationId, aipId, original, type);
+    representation.setUpdatedBy(updatedBy);
     notifyRepresentationUpdated(representation);
     return representation;
   }
@@ -945,6 +987,7 @@ public class ModelService extends ModelObservable {
         break;
       }
     }
+
     updateAIPMetadata(aip);
     notifyRepresentationDeleted(aipId, representationId);
   }

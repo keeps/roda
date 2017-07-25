@@ -35,6 +35,8 @@ public class IndexedAIP implements IsIndexed, HasPermissions {
   private String id;
   private AIPState state;
 
+  private String type = null;
+
   private String level = null;
   private String title = null;
   private Date dateInitial = null;
@@ -76,7 +78,7 @@ public class IndexedAIP implements IsIndexed, HasPermissions {
    *          the {@link IndexedAIP} to be cloned.
    */
   public IndexedAIP(IndexedAIP other) {
-    this(other.getId(), other.getState(), other.getLevel(), other.getTitle(), other.getDateInitial(),
+    this(other.getId(), other.getState(), other.getType(), other.getLevel(), other.getTitle(), other.getDateInitial(),
       other.getDateFinal(), other.getDescription(), other.getParentID(), other.getAncestors(), other.getPermissions(),
       other.getNumberOfSubmissionFiles(), other.getNumberOfDocumentationFiles(), other.getNumberOfSchemaFiles(),
       other.getHasRepresentations(), other.getGhost());
@@ -94,12 +96,14 @@ public class IndexedAIP implements IsIndexed, HasPermissions {
    * @param description
    * @param parentID
    */
-  public IndexedAIP(String id, AIPState state, String level, String title, Date dateInitial, Date dateFinal,
-    String description, String parentID, List<String> ancestors, Permissions permissions, Long numberOfSubmissionFiles,
-    Long numberOfDocumentationFiles, Long numberOfSchemaFiles, Boolean hasRepresentations, Boolean ghost) {
+  public IndexedAIP(String id, AIPState state, String type, String level, String title, Date dateInitial,
+    Date dateFinal, String description, String parentID, List<String> ancestors, Permissions permissions,
+    Long numberOfSubmissionFiles, Long numberOfDocumentationFiles, Long numberOfSchemaFiles, Boolean hasRepresentations,
+    Boolean ghost) {
     super();
     this.id = id;
     this.state = state;
+    this.type = type;
     this.level = level;
     this.title = title;
     this.dateInitial = dateInitial;
@@ -173,6 +177,14 @@ public class IndexedAIP implements IsIndexed, HasPermissions {
   @Override
   public String getId() {
     return id;
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
   }
 
   /**
@@ -430,10 +442,10 @@ public class IndexedAIP implements IsIndexed, HasPermissions {
 
   @Override
   public String toString() {
-    return "IndexedAIP{" + "id='" + id + '\'' + ", state=" + state + ", level='" + level + '\'' + ", title='" + title
-      + '\'' + ", dateInitial=" + dateInitial + ", dateFinal=" + dateFinal + ", description='" + description + '\''
-      + ", parentID='" + parentID + '\'' + ", ancestors=" + ancestors + ", permissions=" + permissions
-      + ", numberOfSubmissionFiles=" + numberOfSubmissionFiles + ", numberOfDocumentationFiles="
+    return "IndexedAIP{" + "id='" + id + '\'' + ", state=" + state + ", type='" + type + "', level='" + level + '\''
+      + ", title='" + title + '\'' + ", dateInitial=" + dateInitial + ", dateFinal=" + dateFinal + ", description='"
+      + description + '\'' + ", parentID='" + parentID + '\'' + ", ancestors=" + ancestors + ", permissions="
+      + permissions + ", numberOfSubmissionFiles=" + numberOfSubmissionFiles + ", numberOfDocumentationFiles="
       + numberOfDocumentationFiles + ", numberOfSchemaFiles=" + numberOfSchemaFiles + ", hasRepresentations="
       + hasRepresentations + ", ghost=" + ghost + ", ingestSIPId='" + ingestSIPIds + '\'' + ", ingestJobId="
       + ingestJobId + ", ingestUpdateJobIds='" + ingestUpdateJobIds + '\'' + ", createdOn='" + createdOn
@@ -442,7 +454,7 @@ public class IndexedAIP implements IsIndexed, HasPermissions {
 
   @Override
   public List<String> toCsvHeaders() {
-    return Arrays.asList("id", "state", "level", "title", "dateInitial", "dateFinal", "description", "parentID",
+    return Arrays.asList("id", "state", "type", "level", "title", "dateInitial", "dateFinal", "description", "parentID",
       "ancestors", "permissions", "numberOfSubmissionFiles", "numberOfDocumentationFiles", "numberOfSchemaFiles",
       "hasRepresentations", "ghost", "ingestSIPId", "ingestJobId", "ingestUpdateJobIds", "createdOn", "createdBy",
       "updatedOn", "updatedBy");
@@ -450,9 +462,9 @@ public class IndexedAIP implements IsIndexed, HasPermissions {
 
   @Override
   public List<Object> toCsvValues() {
-    return Arrays.asList(id, state, level, title, dateInitial, dateFinal, description, parentID, ancestors, permissions,
-      numberOfSubmissionFiles, numberOfDocumentationFiles, numberOfSchemaFiles, hasRepresentations, ghost, ingestSIPIds,
-      ingestJobId, ingestUpdateJobIds, createdOn, createdBy, updatedOn, updatedBy);
+    return Arrays.asList(id, state, type, level, title, dateInitial, dateFinal, description, parentID, ancestors,
+      permissions, numberOfSubmissionFiles, numberOfDocumentationFiles, numberOfSchemaFiles, hasRepresentations, ghost,
+      ingestSIPIds, ingestJobId, ingestUpdateJobIds, createdOn, createdBy, updatedOn, updatedBy);
   }
 
   @JsonIgnore

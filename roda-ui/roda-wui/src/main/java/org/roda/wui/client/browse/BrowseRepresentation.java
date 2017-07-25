@@ -46,6 +46,7 @@ import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.RestErrorOverlayType;
 import org.roda.wui.common.client.tools.RestUtils;
@@ -179,6 +180,9 @@ public class BrowseRepresentation extends Composite {
   Label representationId;
 
   @UiField
+  Label dateCreated, dateUpdated;
+
+  @UiField
   BreadcrumbPanel breadcrumb;
 
   // DESCRIPTIVE METADATA
@@ -229,8 +233,8 @@ public class BrowseRepresentation extends Composite {
     handlers = new ArrayList<>();
     String summary = messages.representationListOfFiles();
 
-    AIPState state = bundle.getAip().getState();
-    boolean justActive = AIPState.ACTIVE.equals(state);
+    final AIPState state = bundle.getAip().getState();
+    final boolean justActive = AIPState.ACTIVE.equals(state);
     boolean selectable = true;
     boolean showFilesPath = false;
 
@@ -260,20 +264,7 @@ public class BrowseRepresentation extends Composite {
     // INIT
     initWidget(uiBinder.createAndBindUi(this));
 
-    // STATUS
-    aipState.setHTML(HtmlSnippetUtils.getAIPStateHTML(state));
-    aipState.setVisible(!justActive);
-
-    // IDENTIFICATION
-
-    HTMLPanel representationIconHtmlPanel = new HTMLPanel(
-      DescriptionLevelUtils.getRepresentationTypeIcon(representation.getType(), false));
-    representationIconHtmlPanel.addStyleName("browseItemIcon-other");
-    representationIcon.setWidget(representationIconHtmlPanel);
-
-    String type = representation.getType() != null ? representation.getType() : representation.getId();
-    representationType.setHTML(HtmlSnippetUtils.getRepresentationTypeHTML(type, representation.isOriginal()));
-    representationId.setText(representation.getId());
+    updateLayout(state, justActive);
 
     breadcrumb.updatePath(BreadcrumbUtils.getRepresentationBreadcrumbs(bundle));
     breadcrumb.setVisible(true);
@@ -357,6 +348,44 @@ public class BrowseRepresentation extends Composite {
     }
     disseminationsList.getParent().setVisible(bundle.getDipCount() > 0);
 
+    ListSelectionUtils.bindLayout(representation, searchPrevious, searchNext, keyboardFocus, true, false, false,
+      searchSection);
+
+    // CSS
+    this.addStyleName("browse");
+    this.addStyleName("browse-representation");
+    this.addStyleName(state.toString().toLowerCase());
+
+    Element firstElement = this.getElement().getFirstChildElement();
+    if ("input".equalsIgnoreCase(firstElement.getTagName())) {
+      firstElement.setAttribute("title", "browse input");
+    }
+
+    WCAGUtilities.getInstance().makeAccessible(itemMetadata.getElement());
+  }
+
+  private void updateLayout(final AIPState state, final boolean justActive) {
+    // STATUS
+    aipState.setHTML(HtmlSnippetUtils.getAIPStateHTML(state));
+    aipState.setVisible(!justActive);
+
+    // IDENTIFICATION
+
+    HTMLPanel representationIconHtmlPanel = new HTMLPanel(
+      DescriptionLevelUtils.getRepresentationTypeIcon(representation.getType(), false));
+    representationIconHtmlPanel.addStyleName("browseItemIcon-other");
+    representationIcon.setWidget(representationIconHtmlPanel);
+
+    String type = representation.getType() != null ? representation.getType() : representation.getId();
+    representationType
+      .setHTML(HtmlSnippetUtils.getRepresentationTypeHTML(type, representation.getRepresentationStates()));
+    representationId.setText(representation.getId());
+
+    dateCreated.setText(
+      messages.dateCreated(Humanize.formatDateTime(representation.getCreatedOn()), representation.getCreatedBy()));
+    dateUpdated.setText(
+      messages.dateUpdated(Humanize.formatDateTime(representation.getUpdatedOn()), representation.getUpdatedBy()));
+
     // SIDEBAR
     actionsSidebar.setWidget(RepresentationActions.get(aipId).createActionsLayout(representation,
       new AsyncCallback<Actionable.ActionImpact>() {
@@ -380,27 +409,12 @@ public class BrowseRepresentation extends Composite {
                 @Override
                 public void onSuccess(IndexedRepresentation rep) {
                   representation = rep;
-                  representationType.setText(rep.getType());
+                  updateLayout(state, justActive);
                 }
               });
           }
         }
       }));
-
-    ListSelectionUtils.bindLayout(representation, searchPrevious, searchNext, keyboardFocus, true, false, false,
-      searchSection);
-
-    // CSS
-    this.addStyleName("browse");
-    this.addStyleName("browse-representation");
-    this.addStyleName(state.toString().toLowerCase());
-
-    Element firstElement = this.getElement().getFirstChildElement();
-    if ("input".equalsIgnoreCase(firstElement.getTagName())) {
-      firstElement.setAttribute("title", "browse input");
-    }
-
-    WCAGUtilities.getInstance().makeAccessible(itemMetadata.getElement());
   }
 
   @Override

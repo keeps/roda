@@ -30,6 +30,8 @@
 						</g:FlowPanel>
 						<g:Label addStyleNames="browseRepresentationId" ui:field="representationId"
 							title="{messages.representationId}" />
+						<g:Label addStyleNames="browseRepresentationId" ui:field="dateCreated" />
+						<g:Label addStyleNames="browseRepresentationId" ui:field="dateUpdated" />
 					</g:FlowPanel>
 					<m:BreadcrumbPanel ui:field="breadcrumb"
 						addStyleNames="browseBreadcrumb" />

@@ -1748,7 +1748,8 @@ public class BrowserHelper {
     ModelService model = RodaCoreFactory.getModelService();
 
     try {
-      Representation representation = model.createRepresentation(aipId, representationId, true, type, true);
+      Representation representation = model.createRepresentation(aipId, representationId, true, type, true,
+        user.getName());
 
       List<LinkingIdentifier> targets = new ArrayList<>();
       targets.add(PluginHelper.getLinkingIdentifier(aipId, representation.getId(),
@@ -3226,7 +3227,7 @@ public class BrowserHelper {
         RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
       try {
-        model.updateRepresentationType(irep.getAipId(), irep.getId(), newType);
+        model.changeRepresentationType(irep.getAipId(), irep.getId(), newType, user.getName());
         index.commit(IndexedRepresentation.class);
         StringBuilder outcomeText = new StringBuilder().append("The representation '").append(irep.getId())
           .append("' changed its type from '").append(oldType).append("' to '").append(newType).append("'.");
@@ -3241,6 +3242,72 @@ public class BrowserHelper {
           sources, null, PluginState.FAILURE, outcomeText.toString(), details, user.getName(), true);
         throw e;
       }
+    }
+  }
+
+  public static void changeAIPType(User user, SelectedItems<IndexedAIP> selected, String newType, String details)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
+    String eventDescription = "The process of updating an object of the repository.";
+
+    List<String> aipIds = consolidate(user, IndexedAIP.class, selected);
+    ModelService model = RodaCoreFactory.getModelService();
+    IndexService index = RodaCoreFactory.getIndexService();
+
+    Filter filter = new Filter();
+    filter.add(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, aipIds));
+    IndexResult<IndexedAIP> aips = index.find(IndexedAIP.class, filter, Sorter.NONE, new Sublist(0, aipIds.size()),
+      Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_ID, RodaConstants.AIP_TYPE));
+
+    for (IndexedAIP iaip : aips.getResults()) {
+      String oldType = iaip.getType();
+      List<LinkingIdentifier> sources = new ArrayList<>();
+      sources.add(PluginHelper.getLinkingIdentifier(iaip.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+
+      try {
+        model.changeAIPType(iaip.getId(), newType, user.getName());
+        index.commit(IndexedAIP.class);
+        StringBuilder outcomeText = new StringBuilder().append("The AIP '").append(iaip.getId())
+          .append("' changed its type from '").append(oldType).append("' to '").append(newType).append("'.");
+
+        model.createEvent(iaip.getId(), null, null, null, PreservationEventType.UPDATE, eventDescription, sources, null,
+          PluginState.SUCCESS, outcomeText.toString(), details, user.getName(), true);
+      } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+        StringBuilder outcomeText = new StringBuilder().append("The AIP '").append(iaip.getId())
+          .append("' did not change its type from '").append(oldType).append("' to '").append(newType).append("'.");
+
+        model.createEvent(iaip.getId(), null, null, null, PreservationEventType.UPDATE, eventDescription, sources, null,
+          PluginState.FAILURE, outcomeText.toString(), details, user.getName(), true);
+        throw e;
+      }
+    }
+  }
+
+  public static void changeRepresentationStates(User user, IndexedRepresentation representation, List<String> newStates,
+    String details) throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
+    String eventDescription = "The process of updating an object of the repository.";
+
+    ModelService model = RodaCoreFactory.getModelService();
+    IndexService index = RodaCoreFactory.getIndexService();
+
+    List<LinkingIdentifier> sources = new ArrayList<>();
+    sources.add(PluginHelper.getLinkingIdentifier(representation.getAipId(), representation.getId(),
+      RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+
+    try {
+      model.changeRepresentationStates(representation.getAipId(), representation.getId(), newStates, user.getName());
+      index.commit(IndexedRepresentation.class);
+      StringBuilder outcomeText = new StringBuilder().append("The states of the representation '")
+        .append(representation.getId()).append("' were updated.");
+
+      model.createEvent(representation.getAipId(), representation.getId(), null, null, PreservationEventType.UPDATE,
+        eventDescription, sources, null, PluginState.SUCCESS, outcomeText.toString(), details, user.getName(), true);
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+      StringBuilder outcomeText = new StringBuilder().append("The states of the representation '")
+        .append(representation.getId()).append("' were not updated.");
+
+      model.createEvent(representation.getAipId(), representation.getId(), null, null, PreservationEventType.UPDATE,
+        eventDescription, sources, null, PluginState.FAILURE, outcomeText.toString(), details, user.getName(), true);
+      throw e;
     }
   }
 

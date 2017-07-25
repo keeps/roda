@@ -329,6 +329,12 @@ public interface BrowserService extends RemoteService {
   void changeRepresentationType(SelectedItems<IndexedRepresentation> selectedRepresentation, String newType,
     String details) throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
+  void changeAIPType(SelectedItems<IndexedAIP> selectedAIP, String newType, String details)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
+
+  void changeRepresentationStates(IndexedRepresentation selectedRepresentation, List<String> newStates, String details)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
+
   DipBundle retrieveDipBundle(String dipUUID, String dipFileUUID)
     throws RequestNotValidException, AuthorizationDeniedException, GenericException, NotFoundException;
 

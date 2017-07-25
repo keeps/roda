@@ -70,7 +70,7 @@ public class ReindexFilePluginTest {
   public void testReindexWithEmptyRepresentation() throws RequestNotValidException, NotFoundException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException {
     AIP aip = model.createAIP(null, "", new Permissions(), RodaConstants.ADMIN);
-    model.createRepresentation(aip.getId(), IdUtils.createUUID(), true, "", true);
+    model.createRepresentation(aip.getId(), IdUtils.createUUID(), true, "", true, RodaConstants.ADMIN);
     Job job = TestsHelper.executeJob(ReindexFilePlugin.class, PluginType.MISC, SelectedItemsAll.create(File.class));
     TestsHelper.getJobReports(index, job, true);
   }

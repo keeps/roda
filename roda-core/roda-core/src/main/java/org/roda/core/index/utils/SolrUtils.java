@@ -1170,6 +1170,7 @@ public class SolrUtils {
     final String ingestJobId = objectToString(doc.get(RodaConstants.INGEST_JOB_ID), "");
     final List<String> ingestUpdateJobIds = objectToListString(doc.get(RodaConstants.INGEST_UPDATE_JOB_IDS));
     final List<String> ancestors = objectToListString(doc.get(RodaConstants.AIP_ANCESTORS));
+    final String type = objectToString(doc.get(RodaConstants.AIP_TYPE), "");
     final List<String> levels = objectToListString(doc.get(RodaConstants.AIP_LEVEL));
     final List<String> titles = objectToListString(doc.get(RodaConstants.AIP_TITLE));
     final List<String> descriptions = objectToListString(doc.get(RodaConstants.AIP_DESCRIPTION));
@@ -1198,7 +1199,7 @@ public class SolrUtils {
       level = levels.isEmpty() ? null : levels.get(0);
     }
 
-    return new IndexedAIP(id, state, level, title, dateInitial, dateFinal, description, parentId, ancestors,
+    return new IndexedAIP(id, state, type, level, title, dateInitial, dateFinal, description, parentId, ancestors,
       permissions, numberOfSubmissionFiles, numberOfDocumentationFiles, numberOfSchemaFiles, hasRepresentations, ghost)
         .setIngestSIPIds(ingestSIPIds).setIngestJobId(ingestJobId).setIngestUpdateJobIds(ingestUpdateJobIds)
         .setCreatedOn(createdOn).setCreatedBy(createdBy).setUpdatedOn(updatedOn).setUpdatedBy(updatedBy);
@@ -1213,6 +1214,7 @@ public class SolrUtils {
     doc.addField(RodaConstants.AIP_ID, aip.getId());
     doc.addField(RodaConstants.AIP_PARENT_ID, aip.getParentId());
     doc.addField(RodaConstants.STATE, aip.getState().toString());
+    doc.addField(RodaConstants.AIP_TYPE, aip.getType());
 
     doc.addField(RodaConstants.AIP_CREATED_ON, aip.getCreatedOn());
     doc.addField(RodaConstants.AIP_CREATED_BY, aip.getCreatedBy());
@@ -1322,10 +1324,7 @@ public class SolrUtils {
     rep.setUpdatedOn(objectToDate(doc.get(RodaConstants.REPRESENTATION_UPDATED_ON)));
     rep.setUpdatedBy(objectToString(doc.get(RodaConstants.REPRESENTATION_UPDATED_BY), ""));
 
-    RepresentationState state = RepresentationState
-      .valueOf(objectToString(doc.get(RodaConstants.REPRESENTATION_STATE), RepresentationState.ORIGINAL.toString()));
-    rep.setRepresentationState(state);
-
+    rep.setRepresentationStates(objectToListString(doc.get(RodaConstants.REPRESENTATION_STATES)));
     return rep;
   }
 
@@ -1348,10 +1347,10 @@ public class SolrUtils {
     doc.addField(RodaConstants.REPRESENTATION_UPDATED_ON, rep.getUpdatedOn());
     doc.addField(RodaConstants.REPRESENTATION_UPDATED_BY, rep.getUpdatedBy());
 
-    if (rep.getRepresentationState() != null) {
-      doc.addField(RodaConstants.REPRESENTATION_STATE, rep.getRepresentationState().toString());
+    if (!rep.getRepresentationStates().isEmpty()) {
+      doc.addField(RodaConstants.REPRESENTATION_STATES, rep.getRepresentationStates());
     } else if (rep.isOriginal()) {
-      doc.addField(RodaConstants.REPRESENTATION_STATE, RepresentationState.ORIGINAL.toString());
+      doc.addField(RodaConstants.REPRESENTATION_STATES, Arrays.asList(RepresentationState.ORIGINAL));
     }
 
     // indexing active state and permissions

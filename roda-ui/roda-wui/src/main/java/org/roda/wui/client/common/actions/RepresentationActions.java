@@ -62,7 +62,8 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
   }
 
   public enum RepresentationAction implements Actionable.Action<IndexedRepresentation> {
-    DOWNLOAD, CHANGE_TYPE, REMOVE, NEW_PROCESS, IDENTIFY_FORMATS, SHOW_EVENTS, SHOW_RISKS, UPLOAD_FILES, CREATE_FOLDER;
+    DOWNLOAD, CHANGE_TYPE, REMOVE, NEW_PROCESS, IDENTIFY_FORMATS, SHOW_EVENTS, SHOW_RISKS, UPLOAD_FILES, CREATE_FOLDER,
+    CHANGE_STATE;
   }
 
   public static RepresentationActions get() {
@@ -105,6 +106,8 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
       uploadFiles(representation, callback);
     } else if (RepresentationAction.CREATE_FOLDER.equals(action)) {
       createFolder(representation, callback);
+    } else if (RepresentationAction.CHANGE_STATE.equals(action)) {
+      changeState(representation, callback);
     } else {
       callback.onFailure(new RequestNotValidException("Unsupported action in this context: " + action));
     }
@@ -363,6 +366,44 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
       });
   }
 
+  public void changeState(final IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
+    GWT.log(representation.toString());
+    Dialogs.showPromptDialogRepresentationStates(messages.changeStateTitle(), messages.cancelButton(),
+      messages.confirmButton(), representation.getRepresentationStates(), new AsyncCallback<List<String>>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          // do nothing
+        }
+
+        @Override
+        public void onSuccess(final List<String> newStates) {
+          Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
+            RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false,
+            new AsyncCallback<String>() {
+
+              @Override
+              public void onFailure(Throwable caught) {
+                // do nothing
+              }
+
+              @Override
+              public void onSuccess(String details) {
+                BrowserService.Util.getInstance().changeRepresentationStates(representation, newStates, details,
+                  new LoadingAsyncCallback<Void>() {
+
+                    @Override
+                    public void onSuccessImpl(Void nothing) {
+                      Toast.showInfo(messages.dialogSuccess(), messages.changeStateSuccessful());
+                      callback.onSuccess(ActionImpact.UPDATED);
+                    }
+                  });
+              }
+            });
+        }
+      });
+  }
+
   @Override
   public Widget createActionsLayout(IndexedRepresentation representation, AsyncCallback<ActionImpact> callback) {
     FlowPanel layout = createLayout();
@@ -373,8 +414,9 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
 
     addButton(layout, messages.downloadButton(), RepresentationAction.DOWNLOAD, representation, ActionImpact.NONE,
       callback, "btn-download");
-
     addButton(layout, messages.changeTypeButton(), RepresentationAction.CHANGE_TYPE, representation,
+      ActionImpact.UPDATED, callback, "btn-edit");
+    addButton(layout, messages.changeStateButton(), RepresentationAction.CHANGE_STATE, representation,
       ActionImpact.UPDATED, callback, "btn-edit");
     addButton(layout, messages.removeButton(), RepresentationAction.REMOVE, representation, ActionImpact.DESTROYED,
       callback, "btn-ban");

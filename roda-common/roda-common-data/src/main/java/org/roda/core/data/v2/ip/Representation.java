@@ -31,7 +31,7 @@ public class Representation implements IsModelObject {
 
   private String id;
   private boolean original;
-  private RepresentationState representationState;
+  private List<String> representationStates = new ArrayList<>();
 
   private String type;
 
@@ -58,6 +58,8 @@ public class Representation implements IsModelObject {
     this.original = original;
     this.type = type;
     this.descriptiveMetadata = descriptiveMetadata;
+    this.createdOn = new Date();
+    this.updatedOn = new Date();
   }
 
   @JsonIgnore
@@ -143,12 +145,12 @@ public class Representation implements IsModelObject {
     this.updatedBy = updatedBy;
   }
 
-  public RepresentationState getRepresentationState() {
-    return representationState;
+  public List<String> getRepresentationStates() {
+    return representationStates;
   }
 
-  public void setRepresentationState(RepresentationState state) {
-    this.representationState = state;
+  public void setRepresentationStates(List<String> states) {
+    this.representationStates = states;
   }
 
   @Override
@@ -201,7 +203,8 @@ public class Representation implements IsModelObject {
   public String toString() {
     return "Representation [aipId=" + aipId + ", id=" + id + ", original=" + original + ", type=" + type
       + ", descriptiveMetadata=" + descriptiveMetadata + ", createdOn=" + createdOn + ", createdBy=" + createdBy
-      + ", updatedOn=" + updatedOn + ", updatedBy=" + updatedBy + ", representationState=" + representationState + ']';
+      + ", updatedOn=" + updatedOn + ", updatedBy=" + updatedBy + ", representationStates=" + representationStates
+      + ']';
   }
 
 }

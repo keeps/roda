@@ -7,10 +7,24 @@
  */
 package org.roda.core.data.v2.ip;
 
-public enum RepresentationState {
-  ORIGINAL, INGESTED, MASTER, ACCESS, NONE;
+import java.util.Arrays;
+import java.util.List;
 
-  public static RepresentationState getDefault() {
-    return ORIGINAL;
+public class RepresentationState {
+  public static final String ORIGINAL = "ORIGINAL";
+  public static final String INGESTED = "INGESTED";
+  public static final String PRESERVATION = "PRESERVATION";
+  public static final String ACCESS = "ACCESS";
+  public static final String OTHER = "OTHER";
+
+  private static final List<String> VALUES = Arrays.asList(ORIGINAL, INGESTED, PRESERVATION, ACCESS);
+
+  private RepresentationState() {
+    // do nothing
   }
+
+  public static List<String> values() {
+    return VALUES;
+  }
+
 }

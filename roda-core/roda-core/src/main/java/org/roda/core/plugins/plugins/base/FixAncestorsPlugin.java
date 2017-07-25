@@ -123,7 +123,8 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
     try {
       Optional<String> computedSearchScope = PluginHelper.getSearchScopeFromParameters(this, model);
       Job originalJob = PluginHelper.getJob(originalJobId, model);
-      PluginHelper.fixParents(index, model, Optional.ofNullable(originalJob.getId()), computedSearchScope);
+      PluginHelper.fixParents(index, model, Optional.ofNullable(originalJob.getId()), computedSearchScope,
+        originalJob.getUsername());
       jobPluginInfo.incrementObjectsProcessedWithSuccess(counter);
       report.setPluginState(PluginState.SUCCESS);
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {

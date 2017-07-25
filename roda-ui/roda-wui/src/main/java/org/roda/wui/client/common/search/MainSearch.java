@@ -199,7 +199,7 @@ public class MainSearch extends Composite {
 
   public void showRepresentationsSearchAdvancedFieldsPanel(boolean isVisible) {
     if (representationsSearchResultPanel == null) {
-      createRepresentationsSearchResultPanel(isVisible);
+      createRepresentationsSearchResultPanel(true);
     }
 
     representationsSearchResultPanel.setVisible(isVisible);
@@ -221,7 +221,7 @@ public class MainSearch extends Composite {
 
   public void showFilesSearchAdvancedFieldsPanel(boolean isVisible) {
     if (filesSearchResultPanel == null) {
-      createFilesSearchResultPanel(isVisible);
+      createFilesSearchResultPanel(true);
     }
 
     filesSearchResultPanel.setVisible(isVisible);

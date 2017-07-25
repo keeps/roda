@@ -403,6 +403,7 @@ public final class RodaConstants {
   public static final String CONTROLLER_GROUP_PARAM = "group";
   public static final String CONTROLLER_PERMISSION_TYPE_PARAM = "permissionType";
   public static final String CONTROLLER_NAME_PARAM = "name";
+  public static final String CONTROLLER_STATES_PARAM = "states";
 
   /*
    * Core (storage, index, orchestrator, etc.)
@@ -547,6 +548,7 @@ public final class RodaConstants {
   public static final String AIP_NUMBER_OF_DOCUMENTATION_FILES = "numberOfDocumentationFiles";
   public static final String AIP_NUMBER_OF_SCHEMA_FILES = "numberOfSchemaFiles";
 
+  public static final String AIP_TYPE = "type";
   public static final String AIP_LEVEL = "level";
   public static final String AIP_TITLE = "title";
   public static final String AIP_TITLE_SORT = "title_sort";
@@ -591,7 +593,7 @@ public final class RodaConstants {
   public static final String REPRESENTATION_UPDATED_ON = "updatedOn";
   public static final String REPRESENTATION_UPDATED_BY = "updatedBy";
 
-  public static final String REPRESENTATION_STATE = "representationState";
+  public static final String REPRESENTATION_STATES = "representationStates";
 
   public static final String REPRESENTATION_SEARCH = "search";
 

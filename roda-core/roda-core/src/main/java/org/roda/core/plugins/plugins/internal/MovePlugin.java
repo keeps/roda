@@ -163,7 +163,7 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
         }
 
         if (destinationId == null || result.getResults().isEmpty()) {
-          model.moveAIP(aip.getId(), destinationId);
+          model.moveAIP(aip.getId(), destinationId, job.getUsername());
         } else {
           state = PluginState.FAILURE;
           Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);

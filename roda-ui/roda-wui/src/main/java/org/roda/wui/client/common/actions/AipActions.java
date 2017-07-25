@@ -32,6 +32,7 @@ import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.SelectAipDialog;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
+import org.roda.wui.client.common.search.SearchSuggestBox;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.management.UserLog;
@@ -67,13 +68,14 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   private static final Set<AipAction> POSSIBLE_ACTIONS_ON_NO_AIP = new HashSet<>(
     Arrays.asList(AipAction.NEW_CHILD_AIP));
 
-  private static final Set<AipAction> POSSIBLE_ACTIONS_ON_SINGLE_AIP = new HashSet<>(
-    Arrays.asList(AipAction.NEW_CHILD_AIP, AipAction.DOWNLOAD, AipAction.MOVE_IN_HIERARCHY,
-      AipAction.UPDATE_PERMISSIONS, AipAction.ADD_REPRESENTATION, AipAction.REMOVE, AipAction.NEW_PROCESS,
-      AipAction.SHOW_EVENTS, AipAction.SHOW_RISKS, AipAction.SHOW_LOGS, AipAction.DOWNLOAD_DOCUMENTATION));
+  private static final Set<AipAction> POSSIBLE_ACTIONS_ON_SINGLE_AIP = new HashSet<>(Arrays.asList(
+    AipAction.NEW_CHILD_AIP, AipAction.DOWNLOAD, AipAction.MOVE_IN_HIERARCHY, AipAction.UPDATE_PERMISSIONS,
+    AipAction.ADD_REPRESENTATION, AipAction.REMOVE, AipAction.NEW_PROCESS, AipAction.SHOW_EVENTS, AipAction.SHOW_RISKS,
+    AipAction.SHOW_LOGS, AipAction.DOWNLOAD_DOCUMENTATION, AipAction.CHANGE_TYPE));
 
   private static final Set<AipAction> POSSIBLE_ACTIONS_ON_MULTIPLE_AIPS = new HashSet<>(
-    Arrays.asList(AipAction.MOVE_IN_HIERARCHY, AipAction.UPDATE_PERMISSIONS, AipAction.REMOVE, AipAction.NEW_PROCESS));
+    Arrays.asList(AipAction.MOVE_IN_HIERARCHY, AipAction.UPDATE_PERMISSIONS, AipAction.REMOVE, AipAction.NEW_PROCESS,
+      AipAction.CHANGE_TYPE));
 
   private static final Set<AipAction> APPRAISAL_ACTIONS = new HashSet<>(
     Arrays.asList(AipAction.APPRAISAL_ACCEPT, AipAction.APPRAISAL_REJECT));
@@ -88,7 +90,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
   public enum AipAction implements Actionable.Action<IndexedAIP> {
     NEW_CHILD_AIP, DOWNLOAD, MOVE_IN_HIERARCHY, UPDATE_PERMISSIONS, ADD_REPRESENTATION, REMOVE, NEW_PROCESS,
-    SHOW_EVENTS, SHOW_RISKS, SHOW_LOGS, APPRAISAL_ACCEPT, APPRAISAL_REJECT, DOWNLOAD_DOCUMENTATION;
+    SHOW_EVENTS, SHOW_RISKS, SHOW_LOGS, APPRAISAL_ACCEPT, APPRAISAL_REJECT, DOWNLOAD_DOCUMENTATION, CHANGE_TYPE;
   }
 
   public static AipActions get() {
@@ -153,6 +155,8 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
       appraisalReject(aip, callback);
     } else if (AipAction.DOWNLOAD_DOCUMENTATION.equals(action)) {
       downloadDocumentation(aip, callback);
+    } else if (AipAction.CHANGE_TYPE.equals(action)) {
+      changeType(aip, callback);
     } else {
       callback.onFailure(new RequestNotValidException("Unsupported action in this context: " + action));
     }
@@ -176,6 +180,8 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
       appraisalAccept(aips, callback);
     } else if (AipAction.APPRAISAL_REJECT.equals(action)) {
       appraisalReject(aips, callback);
+    } else if (AipAction.CHANGE_TYPE.equals(action)) {
+      changeType(aips, callback);
     } else {
       callback.onFailure(new RequestNotValidException("Unsupported action in this context: " + action));
     }
@@ -294,6 +300,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     if (counter > 0 && counter <= RodaConstants.DIALOG_FILTER_LIMIT_NUMBER) {
       selectAipDialog.addStyleName("object-dialog");
     }
+
     selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {
 
       @Override
@@ -626,17 +633,61 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     });
   }
 
+  public void changeType(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
+    changeType(objectToSelectedItems(aip), callback);
+  }
+
+  private void changeType(final SelectedItems<IndexedAIP> aips, final AsyncCallback<ActionImpact> callback) {
+    SearchSuggestBox<IndexedAIP> suggestBox = new SearchSuggestBox<>(IndexedAIP.class, RodaConstants.AIP_TYPE, true);
+
+    Dialogs.showPromptDialogSuggest(messages.changeTypeTitle(), null, messages.changeTypePlaceHolder(),
+      messages.cancelButton(), messages.confirmButton(), suggestBox, new AsyncCallback<String>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          // do nothing
+        }
+
+        @Override
+        public void onSuccess(final String newType) {
+          Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
+            RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false,
+            new AsyncCallback<String>() {
+
+              @Override
+              public void onFailure(Throwable caught) {
+                // do nothing
+              }
+
+              @Override
+              public void onSuccess(String details) {
+                BrowserService.Util.getInstance().changeAIPType(aips, newType, details,
+                  new LoadingAsyncCallback<Void>() {
+
+                    @Override
+                    public void onSuccessImpl(Void nothing) {
+                      Toast.showInfo(messages.dialogSuccess(), messages.changeTypeSuccessful());
+                      callback.onSuccess(ActionImpact.UPDATED);
+                    }
+                  });
+              }
+            });
+        }
+      });
+  }
+
   @Override
   public Widget createActionsLayout(IndexedAIP aip, AsyncCallback<ActionImpact> callback) {
     FlowPanel layout = createLayout();
 
     // MANAGEMENT
-    addTitle(layout, messages.intellectualEntity(), aip, AipAction.NEW_CHILD_AIP, AipAction.MOVE_IN_HIERARCHY,
-      AipAction.UPDATE_PERMISSIONS, AipAction.REMOVE, AipAction.DOWNLOAD);
+    addTitle(layout, messages.intellectualEntity(), aip, AipAction.NEW_CHILD_AIP, AipAction.CHANGE_TYPE,
+      AipAction.MOVE_IN_HIERARCHY, AipAction.UPDATE_PERMISSIONS, AipAction.REMOVE, AipAction.DOWNLOAD);
 
     addButton(layout, messages.newArchivalPackage(), AipAction.NEW_CHILD_AIP, aip, ActionImpact.UPDATED, callback,
       "btn-plus");
-
+    addButton(layout, messages.changeTypeButton(), AipAction.CHANGE_TYPE, aip, ActionImpact.UPDATED, callback,
+      "btn-edit");
     addButton(layout, messages.moveArchivalPackage(), AipAction.MOVE_IN_HIERARCHY, aip, ActionImpact.UPDATED, callback,
       "btn-edit");
     addButton(layout, messages.archivalPackagePermissions(), AipAction.UPDATE_PERMISSIONS, aip, ActionImpact.UPDATED,
@@ -685,9 +736,11 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     FlowPanel layout = createLayout();
 
     // MANAGEMENT
-    addTitle(layout, messages.intellectualEntity(), aips, AipAction.NEW_CHILD_AIP, AipAction.MOVE_IN_HIERARCHY,
-      AipAction.UPDATE_PERMISSIONS, AipAction.REMOVE, AipAction.DOWNLOAD);
+    addTitle(layout, messages.intellectualEntity(), aips, AipAction.NEW_CHILD_AIP, AipAction.CHANGE_TYPE,
+      AipAction.MOVE_IN_HIERARCHY, AipAction.UPDATE_PERMISSIONS, AipAction.REMOVE, AipAction.DOWNLOAD);
 
+    addButton(layout, messages.changeTypeButton(), AipAction.CHANGE_TYPE, aips, ActionImpact.UPDATED, callback,
+      "btn-edit");
     addButton(layout, messages.moveArchivalPackage(), AipAction.MOVE_IN_HIERARCHY, aips, ActionImpact.UPDATED, callback,
       "btn-edit");
     addButton(layout, messages.archivalPackagePermissions(), AipAction.UPDATE_PERMISSIONS, aips, ActionImpact.UPDATED,

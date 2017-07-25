@@ -715,7 +715,7 @@ public class ModelServiceTest {
 
     Representation createdRepresentation = model.createRepresentation(aipId, newRepresentationId,
       CorporaConstants.REPRESENTATION_1_ORIGINAL, CorporaConstants.REPRESENTATION_1_TYPE, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.OTHER_REPRESENTATION_STORAGEPATH), false);
+      DefaultStoragePath.parse(CorporaConstants.OTHER_REPRESENTATION_STORAGEPATH), false, RodaConstants.ADMIN);
 
     // check if it is connected
     Representation retrievedRepresentation = model.retrieveRepresentation(aipId, newRepresentationId);
@@ -741,7 +741,7 @@ public class ModelServiceTest {
       .parse(CorporaConstants.OTHER_REPRESENTATION_STORAGEPATH);
     Representation updatedRepresentation = model.updateRepresentation(aipId, CorporaConstants.REPRESENTATION_1_ID,
       CorporaConstants.REPRESENTATION_1_ORIGINAL, CorporaConstants.REPRESENTATION_1_TYPE, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.OTHER_REPRESENTATION_STORAGEPATH));
+      DefaultStoragePath.parse(CorporaConstants.OTHER_REPRESENTATION_STORAGEPATH), RodaConstants.ADMIN);
 
     // check if it is connected
     Representation retrievedRepresentation = model.retrieveRepresentation(aipId, CorporaConstants.REPRESENTATION_1_ID);

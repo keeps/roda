@@ -296,7 +296,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
       index.commitAIPs();
       PluginHelper.fixParents(index, model, Optional.ofNullable(PluginHelper.getJobId(this)),
-        PluginHelper.getSearchScopeFromParameters(this, model));
+        PluginHelper.getSearchScopeFromParameters(this, model), PluginHelper.getJobUsername(this, index));
     } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
       LOGGER.error("Could not send ingest notification");
     }

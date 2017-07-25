@@ -66,7 +66,7 @@ public class BagitToAIPPluginUtils {
 
     for (IPRepresentation irep : bagit.getRepresentations()) {
       Representation rep = model.createRepresentation(aip.getId(), irep.getRepresentationID(), original,
-        representationType, notify);
+        representationType, notify, createdBy);
 
       for (IPFile bagFile : irep.getData()) {
         ContentPayload payload = new FSPathContentPayload(bagFile.getPath());

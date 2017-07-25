@@ -90,8 +90,8 @@ public class DIPList extends BasicAsyncTableCell<IndexedDIP> {
     lastModified.setSortable(true);
 
     display.addColumn(titleColumn, messages.aipGenericTitle());
-    display.addColumn(dateCreated, messages.dipCreatedDate());
-    display.addColumn(lastModified, messages.dipLastModified());
+    display.addColumn(dateCreated, messages.objectCreatedDate());
+    display.addColumn(lastModified, messages.objectLastModified());
 
     Label emptyInfo = new Label(messages.noItemsToDisplay());
     display.setEmptyTableWidget(emptyInfo);

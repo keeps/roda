@@ -314,7 +314,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                         newRepresentations.add(newRepresentationID);
                         String newRepresentationType = representation.getType();
                         model.createRepresentation(aip.getId(), newRepresentationID, original, newRepresentationType,
-                          notify);
+                          notify, job.getUsername());
                         reportItem.setOutcomeObjectId(
                           IdUtils.getRepresentationId(representation.getAipId(), newRepresentationID));
                       }
@@ -504,7 +504,8 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                     } else {
                       // INFO will be a parameter
                       String newRepresentationType = RodaConstants.REPRESENTATION_TYPE_MIXED;
-                      model.createRepresentation(aipId, newRepresentationID, original, newRepresentationType, notify);
+                      model.createRepresentation(aipId, newRepresentationID, original, newRepresentationType, notify,
+                        job.getUsername());
                       reportItem.setOutcomeObjectId(
                         IdUtils.getRepresentationId(representation.getAipId(), newRepresentationID));
                     }
@@ -688,7 +689,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                 // INFO will be a parameter
                 String newRepresentationType = RodaConstants.REPRESENTATION_TYPE_MIXED;
                 model.createRepresentation(file.getAipId(), newRepresentationID, original, newRepresentationType,
-                  model.getStorage(), storagePath, true);
+                  model.getStorage(), storagePath, true, job.getUsername());
               }
 
               // update file on new representation

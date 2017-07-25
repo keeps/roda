@@ -887,6 +887,20 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
+  public void changeAIPType(SelectedItems<IndexedAIP> selected, String newType, String details)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    Browser.changeAIPType(user, selected, newType, details);
+  }
+
+  @Override
+  public void changeRepresentationStates(IndexedRepresentation representation, List<String> newStates, String details)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    Browser.changeRepresentationStates(user, representation, newStates, details);
+  }
+
+  @Override
   public DipBundle retrieveDipBundle(String dipUUID, String dipFileUUID)
     throws RequestNotValidException, AuthorizationDeniedException, GenericException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());

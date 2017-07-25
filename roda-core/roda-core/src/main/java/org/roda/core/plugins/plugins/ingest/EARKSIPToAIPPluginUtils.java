@@ -62,7 +62,7 @@ public class EARKSIPToAIPPluginUtils {
 
     // process IPRepresentation information
     for (IPRepresentation representation : sip.getRepresentations()) {
-      processIPRepresentationInformation(model, representation, aip.getId(), notify, false);
+      processIPRepresentationInformation(model, representation, aip.getId(), notify, false, username);
     }
 
     model.notifyAipCreated(aip.getId());
@@ -95,7 +95,7 @@ public class EARKSIPToAIPPluginUtils {
 
     // process IPRepresentation information
     for (IPRepresentation representation : sip.getRepresentations()) {
-      processIPRepresentationInformation(model, representation, indexedAIP.getId(), notify, true);
+      processIPRepresentationInformation(model, representation, indexedAIP.getId(), notify, true, username);
     }
 
     AIP aip = model.retrieveAIP(indexedAIP.getId());
@@ -220,8 +220,8 @@ public class EARKSIPToAIPPluginUtils {
   }
 
   private static void processIPRepresentationInformation(ModelService model, IPRepresentation sr, String aipId,
-    boolean notify, boolean update) throws RequestNotValidException, GenericException, AlreadyExistsException,
-    AuthorizationDeniedException, NotFoundException, ValidationException {
+    boolean notify, boolean update, String username) throws RequestNotValidException, GenericException,
+    AlreadyExistsException, AuthorizationDeniedException, NotFoundException, ValidationException {
     String representationType = IngestHelper.getType(sr);
     boolean isOriginal = RepresentationStatus.getORIGINAL().equals(sr.getStatus());
 
@@ -235,7 +235,8 @@ public class EARKSIPToAIPPluginUtils {
     }
     // Either we're not updating or the retrieve failed
     if (representation == null) {
-      representation = model.createRepresentation(aipId, sr.getObjectID(), isOriginal, representationType, notify);
+      representation = model.createRepresentation(aipId, sr.getObjectID(), isOriginal, representationType, notify,
+        username);
     }
     // process representation descriptive metadata
     processDescriptiveMetadata(model, aipId, representation.getId(), sr.getDescriptiveMetadata(), notify, update);

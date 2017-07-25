@@ -130,6 +130,16 @@ public interface ClientMessages extends Messages {
 
   String changeTypePlaceHolder();
 
+  String changeStateTitle();
+
+  String changeStateSuccessful();
+
+  String stateLabel(@Select String state);
+
+  String otherStateLabel();
+
+  String otherStatePlaceholder();
+
   String createFolderTitle();
 
   String createFolderPlaceholder();
@@ -510,6 +520,8 @@ public interface ClientMessages extends Messages {
 
   String changeTypeButton();
 
+  String changeStateButton();
+
   String clearButton();
 
   String selectAllButton();
@@ -683,6 +695,8 @@ public interface ClientMessages extends Messages {
 
   String dateUpdated(String date, String person);
 
+  String aipTypeItem(String type);
+
   /************* Search ****************/
   String searchListBoxItems();
 
@@ -766,9 +780,9 @@ public interface ClientMessages extends Messages {
 
   String representationSchemas();
 
-  String dipCreatedDate();
+  String objectCreatedDate();
 
-  String dipLastModified();
+  String objectLastModified();
 
   String openFileAsFolderError();
 
@@ -1501,6 +1515,8 @@ public interface ClientMessages extends Messages {
   String searchRepresentationType();
 
   String searchRepresentationOriginal();
+
+  String searchRepresentationStates();
 
   String searchFormats();
 

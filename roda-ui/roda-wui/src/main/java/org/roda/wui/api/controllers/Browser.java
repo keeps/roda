@@ -3212,6 +3212,48 @@ public class Browser extends RodaWuiController {
     }
   }
 
+  public static void changeAIPType(User user, SelectedItems<IndexedAIP> selected, String newType, String details)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+
+    try {
+      BrowserHelper.changeAIPType(user, selected, newType, details);
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selected,
+        RodaConstants.CONTROLLER_TYPE_PARAM, newType);
+    }
+  }
+
+  public static void changeRepresentationStates(User user, IndexedRepresentation representation, List<String> newStates,
+    String details) throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+
+    try {
+      BrowserHelper.changeRepresentationStates(user, representation, newStates, details);
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_REPRESENTATION_PARAM, representation,
+        RodaConstants.CONTROLLER_STATES_PARAM, newStates);
+    }
+  }
+
   public static ObjectPermissionResult verifyPermissions(User user, String username, String permissionType,
     MultivaluedMap<String, String> queryParams)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {

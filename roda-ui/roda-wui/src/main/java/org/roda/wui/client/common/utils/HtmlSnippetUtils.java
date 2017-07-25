@@ -118,20 +118,18 @@ public class HtmlSnippetUtils {
     return b.toSafeHtml();
   }
 
-  public static SafeHtml getRepresentationTypeHTML(String type, boolean isOriginal) {
+  public static SafeHtml getRepresentationTypeHTML(String type, List<String> representationStates) {
     SafeHtmlBuilder b = new SafeHtmlBuilder();
     b.append(SafeHtmlUtils.fromSafeConstant(OPEN_H4_CLASS_LABEL_SUCCESS));
     b.append(SafeHtmlUtils.fromString(type));
     b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
 
-    b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_ORIGINAL_LABEL_SUCCESS));
-    if (isOriginal) {
-      b.append(SafeHtmlUtils.fromString(messages.originalRepresentation()));
-    } else {
-      b.append(SafeHtmlUtils.fromString(messages.alternativeRepresentation()));
+    for (String state : representationStates) {
+      b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_ORIGINAL_LABEL_SUCCESS));
+      b.append(SafeHtmlUtils.fromString(messages.stateLabel(state)));
+      b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
     }
 
-    b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
     return b.toSafeHtml();
   }
 

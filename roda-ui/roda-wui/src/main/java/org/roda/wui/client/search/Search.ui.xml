@@ -55,6 +55,12 @@
 								</g:Label>
 								<g:FlowPanel ui:field="facetRepresentationOriginal" />
 							</g:FlowPanel>
+							<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+								<g:Label addStyleNames="h4">
+									<ui:text from='{messages.searchRepresentationStates}' />
+								</g:Label>
+								<g:FlowPanel ui:field="facetRepresentationStates" />
+							</g:FlowPanel>
 						</g:FlowPanel>
 						<g:FlowPanel styleName="sidebar-group" ui:field="filesFacets">
 							<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">

@@ -7,9 +7,14 @@
  */
 package org.roda.wui.client.common.dialogs;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.roda.core.data.v2.ip.RepresentationState;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.search.SearchSuggestBox;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -27,6 +32,7 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -138,6 +144,7 @@ public class Dialogs {
         dialogBox.hide();
         callback.onSuccess(null);
       }
+
     });
 
     dialogBox.addStyleName("wui-dialog-information");
@@ -317,6 +324,92 @@ public class Dialogs {
     dialogBox.center();
     dialogBox.show();
     inputBox.setFocus(true);
+  }
+
+  private static CheckBox getRepresentationStateCheckBox(String state, boolean value) {
+    final CheckBox stateBox = new CheckBox();
+    stateBox.setText(messages.stateLabel(state));
+    stateBox.setFormValue(state);
+    stateBox.setValue(value);
+    stateBox.addStyleName("form-checkbox");
+    return stateBox;
+  }
+
+  public static void showPromptDialogRepresentationStates(String title, String cancelButtonText,
+    String confirmButtonText, List<String> states, final AsyncCallback<List<String>> callback) {
+    final DialogBox dialogBox = new DialogBox(true, true);
+    dialogBox.setText(title);
+
+    final FlowPanel layout = new FlowPanel();
+    final List<CheckBox> checkBoxes = new ArrayList<>();
+
+    final Label label = new Label(messages.otherStateLabel());
+    final TextBox otherBox = new TextBox();
+    otherBox.getElement().setPropertyString("placeholder", messages.otherStatePlaceholder());
+    otherBox.addStyleName("form-textbox wui-dialog-message");
+
+    for (String state : states) {
+      CheckBox stateBox = getRepresentationStateCheckBox(state, true);
+      layout.add(stateBox);
+      checkBoxes.add(stateBox);
+    }
+
+    for (String state : RepresentationState.values()) {
+      if (!states.contains(state)) {
+        CheckBox stateBox = getRepresentationStateCheckBox(state, false);
+        layout.add(stateBox);
+        checkBoxes.add(stateBox);
+      }
+    }
+
+    layout.add(label);
+    layout.add(otherBox);
+
+    final Button cancelButton = new Button(cancelButtonText);
+    final Button confirmButton = new Button(confirmButtonText);
+
+    layout.add(cancelButton);
+    layout.add(confirmButton);
+    dialogBox.setWidget(layout);
+
+    dialogBox.setGlassEnabled(true);
+    dialogBox.setAnimationEnabled(false);
+
+    cancelButton.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        dialogBox.hide();
+        callback.onFailure(null);
+      }
+    });
+
+    confirmButton.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        dialogBox.hide();
+        List<String> newStates = new ArrayList<>();
+
+        for (CheckBox checkBox : checkBoxes) {
+          if (checkBox.getValue()) {
+            newStates.add(checkBox.getFormValue());
+          }
+        }
+
+        if (StringUtils.isNotBlank(otherBox.getValue())) {
+          newStates.add(otherBox.getValue());
+        }
+
+        callback.onSuccess(newStates);
+      }
+    });
+
+    dialogBox.addStyleName("wui-dialog-prompt");
+    layout.addStyleName("wui-dialog-layout");
+    cancelButton.addStyleName("btn btn-link");
+    confirmButton.addStyleName("pull-right btn btn-play");
+
+    dialogBox.center();
+    dialogBox.show();
   }
 
   public static DialogBox showLoadingModel() {

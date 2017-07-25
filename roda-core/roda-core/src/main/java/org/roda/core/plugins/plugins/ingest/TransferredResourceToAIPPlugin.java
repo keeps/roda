@@ -143,7 +143,7 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
       String representationType = RodaConstants.REPRESENTATION_TYPE_MIXED;
 
       model.createRepresentation(aip.getId(), representationId, original, representationType,
-        notifyRepresentationCreated);
+        notifyRepresentationCreated, job.getUsername());
 
       // create files
       if (transferredResource.isFile()) {

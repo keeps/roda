@@ -1015,7 +1015,7 @@ public final class PluginHelper {
   }
 
   public static void fixParents(IndexService index, ModelService model, Optional<String> jobId,
-    Optional<String> computedSearchScope)
+    Optional<String> computedSearchScope, String updatedBy)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
 
     // collect all ghost ids
@@ -1062,7 +1062,7 @@ public final class PluginHelper {
       } else if (result.getTotalCount() == 1) {
         IndexedAIP newParentIAIP = result.getResults().get(0);
         for (String id : entry.getValue()) {
-          moveChildrenAIPsAndDelete(index, model, id, newParentIAIP.getId(), computedSearchScope);
+          moveChildrenAIPsAndDelete(index, model, id, newParentIAIP.getId(), computedSearchScope, updatedBy);
         }
       } else if (result.getTotalCount() == 0) {
         String ghostIdToKeep = entry.getValue().get(0);
@@ -1099,13 +1099,13 @@ public final class PluginHelper {
   }
 
   private static void moveChildrenAIPsAndDelete(IndexService index, ModelService model, String aipId,
-    String newParentId, Optional<String> searchScope)
+    String newParentId, Optional<String> searchScope, String updatedBy)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException {
     Filter parentFilter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aipId));
     searchScope.ifPresent(id -> parentFilter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, id)));
     index.execute(IndexedAIP.class, parentFilter, Arrays.asList(RodaConstants.INDEX_UUID), child -> {
       try {
-        model.moveAIP(child.getId(), newParentId);
+        model.moveAIP(child.getId(), newParentId, updatedBy);
       } catch (NotFoundException e) {
         LOGGER.debug("Can't move child. It wasn't found.", e);
       }
