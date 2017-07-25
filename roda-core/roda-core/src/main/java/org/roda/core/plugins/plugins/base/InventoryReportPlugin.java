@@ -206,33 +206,31 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> liteList) throws PluginException {
-    final CSVPrinter csvFilePrinter = createCSVPrinter();
 
-    return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<AIP>() {
-      @Override
-      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-        SimpleJobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {
-        processAIP(model, storage, jobPluginInfo, csvFilePrinter, object);
-      }
-    }, new RODAProcessingLogic<AIP>() {
-      @Override
-      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-        SimpleJobPluginInfo jobPluginInfo, Plugin<AIP> plugin) {
-        IOUtils.closeQuietly(csvFilePrinter);
-      }
-    }, index, model, storage, liteList);
-  }
-
-  private CSVPrinter createCSVPrinter() {
     Path jobCSVTempFolder = getJobCSVTempFolder();
     Path csvTempFile = jobCSVTempFolder.resolve(IdUtils.createUUID() + ".csv");
 
     CSVFormat csvFileFormat = CSVFormat.DEFAULT.withRecordSeparator("\n");
-    try (BufferedWriter fileWriter = Files.newBufferedWriter(csvTempFile)) {
-      return new CSVPrinter(fileWriter, csvFileFormat);
+    try {
+      // this writer is closed on the afterLogic method
+      BufferedWriter fileWriter = Files.newBufferedWriter(csvTempFile);
+      CSVPrinter csvFilePrinter = new CSVPrinter(fileWriter, csvFileFormat);
+
+      return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<AIP>() {
+        @Override
+        public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+          SimpleJobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {
+          processAIP(model, storage, jobPluginInfo, csvFilePrinter, object);
+        }
+      }, new RODAProcessingLogic<AIP>() {
+        @Override
+        public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+          SimpleJobPluginInfo jobPluginInfo, Plugin<AIP> plugin) {
+          IOUtils.closeQuietly(csvFilePrinter);
+        }
+      }, index, model, storage, liteList);
     } catch (IOException e) {
-      LOGGER.error("Unable to instantiate CSVPrinter", e);
-      return null;
+      throw new PluginException("Unable to create/write to CSVPrinter", e);
     }
   }
 
@@ -262,6 +260,7 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
       }
       jobPluginInfo.incrementObjectsProcessedWithSuccess();
     } catch (IOException e) {
+      LOGGER.error("Error writing CSV file", e);
       jobPluginInfo.incrementObjectsProcessedWithFailure();
     }
   }
