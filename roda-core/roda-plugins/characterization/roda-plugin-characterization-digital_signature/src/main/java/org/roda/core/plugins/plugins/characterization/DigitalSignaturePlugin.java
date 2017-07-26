@@ -304,7 +304,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
                           boolean original = false;
                           newRepresentations.add(newRepresentationID);
                           model.createRepresentation(aip.getId(), newRepresentationID, original,
-                            representation.getType(), notify);
+                            representation.getType(), notify, job.getUsername());
                         }
 
                         // update file on new representation
@@ -476,8 +476,8 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
                       LOGGER.debug("Creating a new representation {} on AIP {}", newRepresentationID, aipId);
                       boolean original = false;
                       newRepresentations.add(newRepresentationID);
-                      model.createRepresentation(aipId, newRepresentationID, original, representation.getType(),
-                        notify);
+                      model.createRepresentation(aipId, newRepresentationID, original, representation.getType(), notify,
+                        job.getUsername());
                       reportItem.setOutcomeObjectId(
                         IdUtils.getRepresentationId(representation.getAipId(), newRepresentationID));
                     }
@@ -636,7 +636,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
                   Representation representation = model.retrieveRepresentation(file.getAipId(),
                     file.getRepresentationId());
                   model.createRepresentation(file.getAipId(), newRepresentationID, original, representation.getType(),
-                    notify);
+                    notify, job.getUsername());
                 }
 
                 // update file on new representation
