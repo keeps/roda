@@ -105,7 +105,6 @@ public class MoveOrphansToParentNodePlugin extends AbstractPlugin<AIP> {
   }
 
   private void processAIPs(ModelService model, SimpleJobPluginInfo jobPluginInfo, Job cachedJob, List<AIP> list) {
-
     for (AIP aip : list) {
       Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE)
         .setPluginState(PluginState.SUCCESS);
@@ -129,7 +128,6 @@ public class MoveOrphansToParentNodePlugin extends AbstractPlugin<AIP> {
         jobPluginInfo.incrementObjectsProcessedWithFailure();
       }
     }
-
   }
 
   @Override

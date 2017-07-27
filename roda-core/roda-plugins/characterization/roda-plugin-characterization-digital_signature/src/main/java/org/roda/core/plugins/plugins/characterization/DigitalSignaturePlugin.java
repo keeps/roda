@@ -658,6 +658,7 @@ public class DigitalSignaturePlugin<T extends IsRODAObject> extends AbstractAIPC
                   .addPluginDetails(" Signature validation stripping on " + file.getId() + ".");
               }
             }
+
             IOUtils.closeQuietly(directAccess);
           } else {
             unchangedFiles.add(file);

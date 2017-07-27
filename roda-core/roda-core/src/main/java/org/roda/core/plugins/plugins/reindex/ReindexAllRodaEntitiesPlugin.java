@@ -62,7 +62,7 @@ public class ReindexAllRodaEntitiesPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getDescription() {
-    return "Clears all indexes and recreates them from actual physical data that exists on the storage. This task aims to fix inconsistencies between what "
+    return "Clears all indexes and recreates them from actual physical data that exists on the storage, except for jobs. This task aims to fix inconsistencies between what "
       + "is shown in the graphical user interface of the repository and what is actually kept at the storage layer. Such inconsistencies may occur for "
       + "various reasons, e.g. index corruption, ungraceful shutdown of the repository, etc.";
   }

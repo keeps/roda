@@ -23,6 +23,7 @@ import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -37,9 +38,12 @@ import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // FIXME 20161202 hsilva: expose params PLUGIN_PARAMS_PARENT_ID & PLUGIN_PARAMS_OTHER_JOB_ID
 public class FixAncestorsPlugin extends AbstractPlugin<Void> {
+  private static final Logger LOGGER = LoggerFactory.getLogger(FixAncestorsPlugin.class);
 
   private String originalJobId;
 
@@ -115,6 +119,7 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
     } catch (RequestNotValidException | GenericException e) {
       count = 0;
     }
+
     return count;
   }
 
@@ -128,10 +133,20 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
       jobPluginInfo.incrementObjectsProcessedWithSuccess(counter);
       report.setPluginState(PluginState.SUCCESS);
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      LOGGER.error("Error when fixing ancestors", e);
       jobPluginInfo.incrementObjectsProcessedWithFailure(counter);
       report.setPluginState(PluginState.FAILURE);
-    }
 
+      Report reportItem = PluginHelper.initPluginReportItem(this, "", AIP.class);
+      reportItem.setPluginDetails("Ancestors fix failed: " + e.getMessage());
+      reportItem.setPluginState(PluginState.FAILURE);
+      report.addReport(reportItem);
+      try {
+        PluginHelper.updatePartialJobReport(this, model, reportItem, true, PluginHelper.getJob(this, index));
+      } catch (NotFoundException | GenericException e1) {
+        // do nothing
+      }
+    }
   }
 
   @Override
@@ -184,7 +199,7 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_MISC);
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_MANAGEMENT);
   }
 
   @Override
