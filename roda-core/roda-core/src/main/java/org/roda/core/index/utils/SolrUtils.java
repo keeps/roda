@@ -2737,20 +2737,12 @@ public class SolrUtils {
     List<String> fieldsToReturn, IndexRunnable<T> indexRunnable)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException {
 
-    Sorter sorter = null;
-    int offset = 0;
-    int pagesize = RodaConstants.DEFAULT_PAGINATION_VALUE;
-    boolean done;
+    IterableIndexResult<T> iterableIndexResult = new IterableIndexResult<>(index, classToRetrieve, filter, Sorter.NONE,
+      Facets.NONE, true, fieldsToReturn);
 
-    do {
-      Sublist sublist = new Sublist(offset, pagesize);
-      IndexResult<T> find = SolrUtils.find(index, classToRetrieve, filter, sorter, sublist, fieldsToReturn);
-      for (T target : find.getResults()) {
-        indexRunnable.run(target);
-      }
-      done = find.getResults().isEmpty();
-      offset += pagesize;
-    } while (!done);
+    for (T target : iterableIndexResult) {
+      indexRunnable.run(target);
+    }
   }
 
   private static SolrInputDocument solrDocumentToSolrInputDocument(SolrDocument d) {
