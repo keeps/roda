@@ -294,11 +294,16 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
         sendNotification(model, index, job, jobStats);
       }
 
+    } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
+      LOGGER.error("Could not send ingest notification");
+    }
+
+    try {
       index.commitAIPs();
       PluginHelper.fixParents(index, model, Optional.ofNullable(PluginHelper.getJobId(this)),
         PluginHelper.getSearchScopeFromParameters(this, model), PluginHelper.getJobUsername(this, index));
-    } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
-      LOGGER.error("Could not send ingest notification");
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
+      LOGGER.error("Could not fix parents", e);
     }
 
     return null;
