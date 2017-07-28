@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrClient;
@@ -501,8 +502,9 @@ public class IndexService {
   }
 
   public <T extends IsIndexed> void execute(Class<T> classToRetrieve, Filter filter, List<String> fieldsToReturn,
-    IndexRunnable<T> indexRunnable) throws GenericException, RequestNotValidException, AuthorizationDeniedException {
-    SolrUtils.execute(getSolrClient(), classToRetrieve, filter, fieldsToReturn, indexRunnable);
+    IndexRunnable<T> indexRunnable, Consumer<RODAException> exceptionHandler)
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException {
+    SolrUtils.execute(getSolrClient(), classToRetrieve, filter, fieldsToReturn, indexRunnable, exceptionHandler);
   }
 
   public <T extends IsIndexed> void delete(Class<T> classToRetrieve, List<String> ids)

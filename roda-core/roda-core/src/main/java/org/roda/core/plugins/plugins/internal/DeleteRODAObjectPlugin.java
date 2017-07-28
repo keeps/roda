@@ -29,7 +29,6 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
@@ -137,9 +136,8 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
 
   private void processAIP(IndexService index, ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo,
     Job job, AIP aip) {
-    PluginState state = PluginState.SUCCESS;
     Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
-    final List<String> aipsDeleted = new ArrayList<>();
+    reportItem.setPluginState(PluginState.SUCCESS);
 
     try {
       Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aip.getId()));
@@ -150,7 +148,6 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
           PluginState state = PluginState.SUCCESS;
           try {
             model.deleteAIP(item.getId());
-            aipsDeleted.add(item.getId());
           } catch (NotFoundException e) {
             state = PluginState.FAILURE;
             reportItem.addPluginDetails("Could not delete AIP: " + e.getMessage());
@@ -166,25 +163,18 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
           model.createRepositoryEvent(PreservationEventType.DELETION, EVENT_DESCRIPTION, state, outcomeText, details,
             job.getUsername(), true);
         }
+      }, e -> {
+        reportItem.setPluginState(PluginState.FAILURE);
+        reportItem.addPluginDetails("Could not delete sublevel AIPs: " + e.getMessage());
       });
     } catch (GenericException | RequestNotValidException | AuthorizationDeniedException e) {
-      state = PluginState.FAILURE;
+      reportItem.setPluginState(PluginState.FAILURE);
       reportItem.addPluginDetails("Could not delete sublevel AIPs: " + e.getMessage());
     }
 
-    try {
-      // removing related risk incidences
-      Filter incidenceFilter = new Filter(
-        new OneOfManyFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, aipsDeleted));
-      deleteRelatedIncidences(model, index, incidenceFilter);
-    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
-      state = PluginState.FAILURE;
-      reportItem.addPluginDetails("Could not delete AIP related incidences: " + e.getMessage());
-    }
-
-    report.addReport(reportItem.setPluginState(state));
+    report.addReport(reportItem);
     PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
-    jobPluginInfo.incrementObjectsProcessed(state);
+    jobPluginInfo.incrementObjectsProcessed(reportItem.getPluginState());
 
     IndexedAIP item = null;
     String outcomeText;
@@ -198,7 +188,6 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
 
     try {
       model.deleteAIP(aip.getId());
-      aipsDeleted.add(aip.getId());
 
       if (item != null) {
         outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has been manually deleted");
@@ -206,7 +195,7 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
         outcomeText = "Archival Information Package [id: " + aip.getId() + "] has been manually deleted";
       }
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
-      state = PluginState.FAILURE;
+      reportItem.setPluginState(PluginState.FAILURE);
       reportItem.addPluginDetails("Could not delete AIP: " + e.getMessage());
       if (item != null) {
         outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has not been manually deleted");
@@ -215,8 +204,8 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
       }
     }
 
-    model.createRepositoryEvent(PreservationEventType.DELETION, EVENT_DESCRIPTION, state, outcomeText, details,
-      job.getUsername(), true);
+    model.createRepositoryEvent(PreservationEventType.DELETION, EVENT_DESCRIPTION, reportItem.getPluginState(),
+      outcomeText, details, job.getUsername(), true);
   }
 
   private void processFile(IndexService index, ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo,

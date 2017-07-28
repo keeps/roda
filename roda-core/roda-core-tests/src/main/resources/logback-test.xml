@@ -23,7 +23,7 @@
 	</logger>
 
 	<logger name="org.roda" additivity="false">
-		<level value="WARN" />
+		<level value="DEBUG" />
 		<appender-ref ref="STDOUT" />
 	</logger>	
 

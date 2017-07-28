@@ -120,7 +120,7 @@ public class EARKSIPPluginsTest {
           // do nothing
         }
       }
-    });
+    }, e -> Assert.fail("Error cleaning up", e));
   }
 
   private TransferredResource createCorpora() throws InterruptedException, IOException, NotFoundException,

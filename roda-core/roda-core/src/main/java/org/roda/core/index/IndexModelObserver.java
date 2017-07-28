@@ -495,7 +495,8 @@ public class IndexModelObserver implements ModelObserver {
       updateRepresentationAndFileAncestors(aip, topAncestors);
 
       LOGGER.debug("Finding descendants of moved aip {}", aip.getId());
-      Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aip.getId()));
+      Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aip.getId()),
+        new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.FALSE.toString()));
       List<String> aipFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_PARENT_ID,
         RodaConstants.AIP_HAS_REPRESENTATIONS);
       SolrUtils.execute(index, IndexedAIP.class, filter, aipFields, new IndexRunnable<IndexedAIP>() {
@@ -522,7 +523,7 @@ public class IndexModelObserver implements ModelObserver {
             LOGGER.error("Error indexing moved AIP {} from {} to {}", aip.getId(), oldParentId, newParentId, e);
           }
         }
-      });
+      }, e -> LOGGER.error("Error indexing moved AIP", e));
 
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | SolrServerException
       | IOException | NotFoundException e) {

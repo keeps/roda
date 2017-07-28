@@ -38,6 +38,38 @@ import org.slf4j.LoggerFactory;
  */
 
 public class IterableIndexResult<T extends IsIndexed> implements Iterable<T> {
+  
+  
+  private final class IteratorIndexResult implements Iterator<T> {
+    @Override
+    public boolean hasNext() {
+      return indexResult != null && currentObject < totalObjects;
+    }
+
+    @Override
+    public T next() {
+      try {
+        final T t = indexResultObjects.get(currentObjectInPartialList);
+        currentObject += 1;
+        currentObjectInPartialList += 1;
+        if (LOGGER.isTraceEnabled()) {
+          LOGGER.trace("({} of {}) Returning object of class '{}' with id '{}'", currentObject, totalObjects,
+            returnClass.getSimpleName(), t.getUUID());
+        }
+
+        // see if a new page needs to be obtained
+        if (currentObjectInPartialList == indexResultObjects.size()) {
+          getResults(sublist.setFirstElementIndex(sublist.getFirstElementIndex() + PAGE_SIZE));
+          currentObjectInPartialList = 0;
+        }
+
+        return t;
+      } catch (IndexOutOfBoundsException e) {
+        throw new NoSuchElementException();
+      }
+    }
+  }
+
   private static final Logger LOGGER = LoggerFactory.getLogger(IterableIndexResult.class);
   private static final int PAGE_SIZE = RodaConstants.DEFAULT_PAGINATION_VALUE;
 
@@ -116,41 +148,7 @@ public class IterableIndexResult<T extends IsIndexed> implements Iterable<T> {
 
   @Override
   public Iterator<T> iterator() {
-    return new Iterator<T>() {
-
-      @Override
-      public boolean hasNext() {
-        return indexResult != null && currentObject < totalObjects;
-      }
-
-      @Override
-      public T next() {
-        try {
-          final T t = indexResultObjects.get(currentObjectInPartialList);
-          currentObject += 1;
-          currentObjectInPartialList += 1;
-          if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("({} of {}) Returning object of class '{}' with id '{}'", currentObject, totalObjects,
-              returnClass.getSimpleName(), t.getUUID());
-          }
-
-          // see if a new page needs to be obtained
-          if (currentObjectInPartialList == indexResultObjects.size()) {
-            getResults(sublist.setFirstElementIndex(sublist.getFirstElementIndex() + PAGE_SIZE));
-            currentObjectInPartialList = 0;
-          }
-
-          return t;
-        } catch (IndexOutOfBoundsException e) {
-          LOGGER.error(
-            "Error while processing next element. filter='{}'; sorter='{}'; sublist='{}'; justActive='{}'; removeDuplicates='{}'; "
-              + "currentObjectInPartialList='{}'; currentObject='{}'; totalObjects='{}'",
-            filter, sorter, sublist, justActive, removeDuplicates, currentObjectInPartialList, currentObject,
-            totalObjects, e);
-          throw new NoSuchElementException("Error while processing next element");
-        }
-      }
-    };
+    return new IteratorIndexResult();
   }
 
   public long getTotalObjects() {

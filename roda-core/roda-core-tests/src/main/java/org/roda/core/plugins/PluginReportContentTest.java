@@ -57,6 +57,7 @@ import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.Assert;
 import org.testng.AssertJUnit;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
@@ -119,7 +120,7 @@ public class PluginReportContentTest {
           // do nothing
         }
       }
-    });
+    }, e -> Assert.fail("Error cleaning up", e));
 
     // delete all Transferred Resources
     index.execute(TransferredResource.class, Filter.ALL, new ArrayList<>(), new IndexRunnable<TransferredResource>() {
@@ -129,7 +130,7 @@ public class PluginReportContentTest {
         throws GenericException, RequestNotValidException, AuthorizationDeniedException {
         model.deleteTransferredResource(item);
       }
-    });
+    }, e -> Assert.fail("Error cleaning up", e));
   }
 
   private ByteArrayInputStream generateContentData() {

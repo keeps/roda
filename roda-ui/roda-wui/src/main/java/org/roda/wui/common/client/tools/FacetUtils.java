@@ -109,7 +109,7 @@ public class FacetUtils {
         }
 
       } else {
-        LOGGER.warn("Got a facet but haven't got a panel for it");
+        LOGGER.warn("Got a facet but haven't got a panel for it: " + facetField);
       }
     }
   }

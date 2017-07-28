@@ -141,7 +141,7 @@ public class IndexServiceTest {
           // do nothing
         }
       }
-    });
+    }, e -> Assert.fail("Error cleaning up", e));
   }
 
   private void compareAIPWithIndexedAIP(final AIP aip, final IndexedAIP indexedAIP) {

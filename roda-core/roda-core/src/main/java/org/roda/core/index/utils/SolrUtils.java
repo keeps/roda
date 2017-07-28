@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -59,6 +60,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.NotSupportedException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.LiteRODAObject;
@@ -2734,15 +2736,23 @@ public class SolrUtils {
   }
 
   public static <T extends IsIndexed> void execute(SolrClient index, Class<T> classToRetrieve, Filter filter,
-    List<String> fieldsToReturn, IndexRunnable<T> indexRunnable)
+    List<String> fieldsToReturn, IndexRunnable<T> indexRunnable, final Consumer<RODAException> exceptionHandler)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException {
 
-    IterableIndexResult<T> iterableIndexResult = new IterableIndexResult<>(index, classToRetrieve, filter, Sorter.NONE,
-      Facets.NONE, true, fieldsToReturn);
+    User user = null;
+    boolean justActive = false;
+    boolean removeDuplicates = true;
 
-    for (T target : iterableIndexResult) {
-      indexRunnable.run(target);
-    }
+    IterableIndexResult<T> iterableIndexResult = new IterableIndexResult<>(index, classToRetrieve, filter, Sorter.NONE,
+      Facets.NONE, user, justActive, removeDuplicates, fieldsToReturn);
+
+    iterableIndexResult.forEach(target -> {
+      try {
+        indexRunnable.run(target);
+      } catch (RODAException e) {
+        exceptionHandler.accept(e);
+      }
+    });
   }
 
   private static SolrInputDocument solrDocumentToSolrInputDocument(SolrDocument d) {
