@@ -1105,12 +1105,13 @@ public final class PluginHelper {
       new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.FALSE.toString()));
     searchScope.ifPresent(id -> parentFilter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, id)));
 
-    IterableIndexResult<IndexedAIP> aips = index.findAll(IndexedAIP.class, parentFilter,
-      Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_ID));
+    List<String> aipIds = new ArrayList<>();
+    index.findAll(IndexedAIP.class, parentFilter, Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_ID))
+      .forEach(e -> aipIds.add(e.getUUID()));
 
-    for (IndexedAIP child : aips) {
+    for (String id : aipIds) {
       try {
-        model.moveAIP(child.getId(), newParentId, updatedBy);
+        model.moveAIP(id, newParentId, updatedBy);
       } catch (NotFoundException e) {
         LOGGER.debug("Can't move child. It wasn't found.", e);
       }

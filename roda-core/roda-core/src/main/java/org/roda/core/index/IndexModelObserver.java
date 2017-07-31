@@ -10,6 +10,7 @@ package org.roda.core.index;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -34,10 +35,11 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.formats.Format;
-import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.DIP;
@@ -68,6 +70,7 @@ import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelObserver;
 import org.roda.core.model.ModelService;
@@ -499,31 +502,34 @@ public class IndexModelObserver implements ModelObserver {
         new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.FALSE.toString()));
       List<String> aipFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_PARENT_ID,
         RodaConstants.AIP_HAS_REPRESENTATIONS);
-      SolrUtils.execute(index, IndexedAIP.class, filter, aipFields, new IndexRunnable<IndexedAIP>() {
+      boolean justActive = false;
+      boolean removeDuplicates = true;
 
-        @Override
-        public void run(IndexedAIP item)
-          throws RequestNotValidException, GenericException, AuthorizationDeniedException {
-          SolrInputDocument descendantDoc;
-          try {
-            LOGGER.debug("Reindexing aip {} descendant {}", aip.getId(), item.getId());
-            // 20161109 hsilva: lets test if descendant exists, otherwise there
-            // is not point in trying to updated it in the index
-            AIP aip = model.retrieveAIP(item.getId());
-            List<String> ancestors = SolrUtils.getAncestors(item.getParentID(), model);
-            descendantDoc = SolrUtils.updateAIPAncestors(item.getId(), ancestors);
-            index.add(RodaConstants.INDEX_AIP, descendantDoc);
+      List<String> aipIds = new ArrayList<>();
+      new IterableIndexResult<>(index, IndexedAIP.class, filter, Sorter.NONE, Facets.NONE, null, justActive,
+        removeDuplicates, aipFields).forEach(e -> aipIds.add(e.getUUID()));
 
-            // update representation and file ancestors information
-            if (item.getHasRepresentations()) {
-              updateRepresentationAndFileAncestors(aip, ancestors);
-            }
+      for (String aipId : aipIds) {
+        IndexedAIP item = SolrUtils.retrieve(index, IndexedAIP.class, aipId, aipFields);
+        SolrInputDocument descendantDoc;
+        try {
+          LOGGER.debug("Reindexing aip {} descendant {}", aip.getId(), item.getId());
+          // 20161109 hsilva: lets test if descendant exists, otherwise there
+          // is not point in trying to updated it in the index
+          AIP aipModel = model.retrieveAIP(item.getId());
+          List<String> ancestors = SolrUtils.getAncestors(item.getParentID(), model);
+          descendantDoc = SolrUtils.updateAIPAncestors(item.getId(), ancestors);
+          index.add(RodaConstants.INDEX_AIP, descendantDoc);
 
-          } catch (SolrServerException | IOException | NotFoundException e) {
-            LOGGER.error("Error indexing moved AIP {} from {} to {}", aip.getId(), oldParentId, newParentId, e);
+          // update representation and file ancestors information
+          if (item.getHasRepresentations()) {
+            updateRepresentationAndFileAncestors(aipModel, ancestors);
           }
+
+        } catch (SolrServerException | IOException | NotFoundException e) {
+          LOGGER.error("Error indexing moved AIP {} from {} to {}", aip.getId(), oldParentId, newParentId, e);
         }
-      }, e -> LOGGER.error("Error indexing moved AIP", e));
+      }
 
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | SolrServerException
       | IOException | NotFoundException e) {

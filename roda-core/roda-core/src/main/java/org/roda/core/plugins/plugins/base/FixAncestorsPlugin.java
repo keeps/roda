@@ -7,7 +7,9 @@
  */
 package org.roda.core.plugins.plugins.base;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -26,6 +28,8 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginParameter;
+import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
@@ -41,11 +45,18 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// FIXME 20161202 hsilva: expose params PLUGIN_PARAMS_PARENT_ID & PLUGIN_PARAMS_OTHER_JOB_ID
+// FIXME 20161202 hsilva: expose params PLUGIN_PARAMS_PARENT_ID
 public class FixAncestorsPlugin extends AbstractPlugin<Void> {
   private static final Logger LOGGER = LoggerFactory.getLogger(FixAncestorsPlugin.class);
 
   private String originalJobId;
+
+  private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
+  static {
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OTHER_JOB_ID,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_OTHER_JOB_ID, "Ingest job identifier", PluginParameterType.STRING,
+        "", true, false, "The identifier of the job responsible to ingest the information package to fix."));
+  }
 
   @Override
   public void init() throws PluginException {
@@ -80,6 +91,13 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
   @Override
   public String getVersionImpl() {
     return "1.0";
+  }
+
+  @Override
+  public List<PluginParameter> getParameters() {
+    ArrayList<PluginParameter> parameters = new ArrayList<>();
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_OTHER_JOB_ID));
+    return parameters;
   }
 
   @Override
