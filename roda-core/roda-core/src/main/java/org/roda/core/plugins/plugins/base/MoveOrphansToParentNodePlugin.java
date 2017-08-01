@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 
 public class MoveOrphansToParentNodePlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(MoveOrphansToParentNodePlugin.class);
+  private static final String MOVED_ORPHAN_AIP_FROM_TO = "Moved orphan AIP from %s to %s";
   private String newParentId = "";
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
@@ -106,25 +107,31 @@ public class MoveOrphansToParentNodePlugin extends AbstractPlugin<AIP> {
 
   private void processAIPs(ModelService model, SimpleJobPluginInfo jobPluginInfo, Job cachedJob, List<AIP> list) {
     for (AIP aip : list) {
-      Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE)
-        .setPluginState(PluginState.SUCCESS);
-      PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
-
       try {
         LOGGER.debug("Processing AIP {}", aip.getId());
         String parentId = aip.getParentId();
 
-        try {
-          model.retrieveAIP(parentId);
-        } catch (RODAException e) {
-          aip.setParentId(newParentId);
-          model.updateAIP(aip, cachedJob.getUsername());
+        if (parentId != null) {
+          try {
+            model.retrieveAIP(parentId);
+          } catch (RODAException e) {
+            // orphan was found
+            aip.setParentId(newParentId);
+            model.updateAIP(aip, cachedJob.getUsername());
+            // reporting
+            Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE)
+              .setPluginState(PluginState.SUCCESS)
+              .setPluginDetails(String.format(MOVED_ORPHAN_AIP_FROM_TO, parentId, newParentId));
+            PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
+          }
         }
 
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
       } catch (RODAException e) {
         LOGGER.error("Error processing AIP {} (RemoveOrphansAction)", aip.getId(), e);
-        reportItem.setPluginState(PluginState.FAILURE).addPluginDetails(e.getMessage());
+        Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE)
+          .setPluginState(PluginState.FAILURE).addPluginDetails(e.getMessage());
+        PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
         jobPluginInfo.incrementObjectsProcessedWithFailure();
       }
     }
