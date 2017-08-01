@@ -12,13 +12,14 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.IsModelObject;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @XmlRootElement(name = RodaConstants.RODA_OBJECT_OTHER_METADATA)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class OtherMetadata implements IsRODAObject {
+public class OtherMetadata implements IsModelObject {
   private static final long serialVersionUID = 7643339238489130326L;
 
   private String id;
@@ -106,6 +107,12 @@ public class OtherMetadata implements IsRODAObject {
 
   public void setFileDirectoryPath(List<String> fileDirectoryPath) {
     this.fileDirectoryPath = fileDirectoryPath;
+  }
+  
+  @JsonIgnore
+  @Override
+  public int getClassVersion() {
+    return 1;
   }
 
   @Override

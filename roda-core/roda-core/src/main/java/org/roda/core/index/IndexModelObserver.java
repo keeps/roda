@@ -505,24 +505,21 @@ public class IndexModelObserver implements ModelObserver {
       boolean justActive = false;
       boolean removeDuplicates = true;
 
-      List<String> aipIds = new ArrayList<>();
+      List<IndexedAIP> items = new ArrayList<>();
       new IterableIndexResult<>(index, IndexedAIP.class, filter, Sorter.NONE, Facets.NONE, null, justActive,
-        removeDuplicates, aipFields).forEach(e -> aipIds.add(e.getUUID()));
+        removeDuplicates, aipFields).forEach(items::add);
 
-      for (String aipId : aipIds) {
-        IndexedAIP item = SolrUtils.retrieve(index, IndexedAIP.class, aipId, aipFields);
+      for (IndexedAIP item : items) {
         SolrInputDocument descendantDoc;
         try {
           LOGGER.debug("Reindexing aip {} descendant {}", aip.getId(), item.getId());
-          // 20161109 hsilva: lets test if descendant exists, otherwise there
-          // is not point in trying to updated it in the index
-          AIP aipModel = model.retrieveAIP(item.getId());
           List<String> ancestors = SolrUtils.getAncestors(item.getParentID(), model);
           descendantDoc = SolrUtils.updateAIPAncestors(item.getId(), ancestors);
           index.add(RodaConstants.INDEX_AIP, descendantDoc);
 
           // update representation and file ancestors information
           if (item.getHasRepresentations()) {
+            AIP aipModel = model.retrieveAIP(item.getId());
             updateRepresentationAndFileAncestors(aipModel, ancestors);
           }
 
