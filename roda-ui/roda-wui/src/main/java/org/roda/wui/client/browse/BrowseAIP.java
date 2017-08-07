@@ -323,7 +323,7 @@ public class BrowseAIP extends Composite {
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-    clear(false);
+    clear(true);
     if (historyTokens.isEmpty()) {
       viewAction();
       callback.onSuccess(this);
