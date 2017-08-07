@@ -466,7 +466,7 @@ public class BrowseAIP extends Composite {
 
     actionsSidebar.setVisible(false);
 
-    searchSection.setVisible(false);
+    searchSection.setVisible(true);
 
     // Set button visibility
     for (AIPState state : AIPState.values()) {
@@ -597,7 +597,7 @@ public class BrowseAIP extends Composite {
 
       // Set button visibility
       keyboardFocus.setFocus(true);
-      ListSelectionUtils.bindLayout(aip, searchPrevious, searchNext, keyboardFocus, true, false, false, searchSection);
+      ListSelectionUtils.bindLayout(aip, searchPrevious, searchNext, keyboardFocus, true, false, false);
 
     } else {
       viewAction();
