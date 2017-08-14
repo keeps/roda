@@ -101,3 +101,8 @@ Redeploy on docker
 
 	* Analyze RODA dependencies for version update
 		$> mvn versions:display-dependency-updates
+
+
+# Run CLI on docker or using tomcat libs
+
+$> java -cp "webapps/ROOT/WEB-INF/lib/*:lib/*" org.roda.core.RodaCoreFactory migrate model
