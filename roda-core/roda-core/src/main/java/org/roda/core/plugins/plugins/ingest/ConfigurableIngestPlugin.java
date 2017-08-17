@@ -159,7 +159,8 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
 
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_NOTIFICATION_WHEN_FAILED,
         new PluginParameter(RodaConstants.PLUGIN_PARAMS_NOTIFICATION_WHEN_FAILED,
-          "Ingest finished notification only when failed", PluginParameterType.BOOLEAN, "false", false, false,
+          "Ingest finished notification only when failed", PluginParameterType.BOOLEAN,
+          RodaCoreFactory.getRodaConfigurationAsString("ingest.notification.when_failed"), false, false,
           "If checked, the ingest finished notification will only be sent if a fail occurs during ingestion"));
 
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION,

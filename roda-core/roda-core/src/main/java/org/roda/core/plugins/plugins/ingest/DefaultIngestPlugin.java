@@ -85,7 +85,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
   public static final String END_DESCRIPTION = "The ingest process has ended.";
   public static final PreservationEventType END_TYPE = PreservationEventType.INGEST_END;
 
-  protected static int INITIAL_TOTAL_STEPS = 10;
+  protected static final int INITIAL_TOTAL_STEPS = 10;
   protected int totalSteps = INITIAL_TOTAL_STEPS;
 
   private String successMessage;
