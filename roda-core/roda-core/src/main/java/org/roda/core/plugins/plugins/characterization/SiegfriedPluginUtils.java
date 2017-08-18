@@ -12,6 +12,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -91,9 +93,23 @@ public class SiegfriedPluginUtils {
       String siegfriedPath = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "siegfried", "binary");
       List<String> command = new ArrayList<>(Arrays.asList(siegfriedPath, "--version"));
       String siegfriedOutput = CommandUtility.execute(command);
+      StringBuilder result = new StringBuilder("");
+
       if (siegfriedOutput.contains("\n")) {
-        return siegfriedOutput.split("\\n")[0].split(" ")[1];
+        result.append(siegfriedOutput.split("\\n")[0].split(" ")[1]);
       }
+
+      if (siegfriedOutput.contains("DROID_SignatureFile_")) {
+        result.append(" w/ ");
+
+        Pattern pattern = Pattern.compile("DROID_SignatureFile_V[0-9]+");
+        Matcher matcher = pattern.matcher(siegfriedOutput);
+        if (matcher.find()) {
+          result.append(matcher.group(0));
+        }
+      }
+
+      return result.toString();
     } catch (CommandException ce) {
       LOGGER.error("Error getting Siegfried version: " + ce.getMessage(), ce);
     }
@@ -174,7 +190,7 @@ public class SiegfriedPluginUtils {
           String version = null;
           String pronom = null;
           String mime = null;
-          String[] pluginVersion = plugin.getVersion().split("\\.");
+          String[] pluginVersion = plugin.getVersion().split(" ")[0].split("\\.");
 
           if ("1".equals(pluginVersion[0])) {
             if (Integer.parseInt(pluginVersion[1]) > 4) {
