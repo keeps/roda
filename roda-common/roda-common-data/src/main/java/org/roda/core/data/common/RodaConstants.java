@@ -535,6 +535,7 @@ public final class RodaConstants {
   public static final String INGEST_SIP_IDS = "ingestSIPIds";
   public static final String INGEST_JOB_ID = "ingestJobId";
   public static final String INGEST_UPDATE_JOB_IDS = "ingestUpdateJobIds";
+  public static final String ALL_INGEST_JOB_IDS = "allIngestJobIds";
 
   public static final String AIP_DESCRIPTIVE_METADATA_ID = "descriptiveMetadataId";
   public static final String AIP_REPRESENTATION_ID = "representationId";

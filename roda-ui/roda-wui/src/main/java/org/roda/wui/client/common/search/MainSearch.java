@@ -351,17 +351,7 @@ public class MainSearch extends Composite {
       for (int i = 1; i < historyTokens.size() - 1; i += 2) {
         String key = historyTokens.get(i);
         String value = historyTokens.get(i + 1);
-
-        // INFO 20170526 nvieira: workaround to search on both ingest job id
-        // fields
-        if (RodaConstants.INGEST_JOB_ID.equals(key)) {
-          List<FilterParameter> orParameter = new ArrayList<>();
-          orParameter.add(new SimpleFilterParameter(key, value));
-          orParameter.add(new SimpleFilterParameter(RodaConstants.INGEST_UPDATE_JOB_IDS, value));
-          params.add(new OrFiltersParameters(orParameter));
-        } else {
-          params.add(new SimpleFilterParameter(key, value));
-        }
+        params.add(new SimpleFilterParameter(key, value));
       }
 
       if (!params.isEmpty()) {

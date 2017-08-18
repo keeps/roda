@@ -1171,6 +1171,7 @@ public class SolrUtils {
     final List<String> ingestSIPIds = objectToListString(doc.get(RodaConstants.INGEST_SIP_IDS));
     final String ingestJobId = objectToString(doc.get(RodaConstants.INGEST_JOB_ID), "");
     final List<String> ingestUpdateJobIds = objectToListString(doc.get(RodaConstants.INGEST_UPDATE_JOB_IDS));
+    final List<String> allIngestJobIds = objectToListString(doc.get(RodaConstants.ALL_INGEST_JOB_IDS));
     final List<String> ancestors = objectToListString(doc.get(RodaConstants.AIP_ANCESTORS));
     final String type = objectToString(doc.get(RodaConstants.AIP_TYPE), "");
     final List<String> levels = objectToListString(doc.get(RodaConstants.AIP_LEVEL));
@@ -1204,7 +1205,8 @@ public class SolrUtils {
     return new IndexedAIP(id, state, type, level, title, dateInitial, dateFinal, description, parentId, ancestors,
       permissions, numberOfSubmissionFiles, numberOfDocumentationFiles, numberOfSchemaFiles, hasRepresentations, ghost)
         .setIngestSIPIds(ingestSIPIds).setIngestJobId(ingestJobId).setIngestUpdateJobIds(ingestUpdateJobIds)
-        .setCreatedOn(createdOn).setCreatedBy(createdBy).setUpdatedOn(updatedOn).setUpdatedBy(updatedBy);
+        .setCreatedOn(createdOn).setCreatedBy(createdBy).setUpdatedOn(updatedOn).setUpdatedBy(updatedBy)
+        .setAllUpdateJobIds(allIngestJobIds);
   }
 
   public static SolrInputDocument aipToSolrInputDocument(AIP aip, List<String> ancestors, ModelService model,
@@ -1226,6 +1228,10 @@ public class SolrUtils {
     doc.addField(RodaConstants.INGEST_SIP_IDS, aip.getIngestSIPIds());
     doc.addField(RodaConstants.INGEST_JOB_ID, aip.getIngestJobId());
     doc.addField(RodaConstants.INGEST_UPDATE_JOB_IDS, aip.getIngestUpdateJobIds());
+
+    ArrayList<String> allJobIds = new ArrayList<>(aip.getIngestUpdateJobIds());
+    allJobIds.add(aip.getIngestJobId());
+    doc.addField(RodaConstants.ALL_INGEST_JOB_IDS, allJobIds);
 
     doc.addField(RodaConstants.AIP_ANCESTORS, ancestors);
 

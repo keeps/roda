@@ -789,7 +789,7 @@ public class ShowJob extends Composite {
   @UiHandler("buttonProcess")
   void buttonProcessHandler(ClickEvent e) {
     if (job != null) {
-      HistoryUtils.newHistory(Search.RESOLVER, "items", "ingestJobId", job.getId());
+      HistoryUtils.newHistory(Search.RESOLVER, "items", RodaConstants.ALL_INGEST_JOB_IDS, job.getId());
     }
   }
 }
