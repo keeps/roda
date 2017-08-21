@@ -81,12 +81,30 @@
 								</field>
 							</xsl:matching-substring>
 						</xsl:analyze-string>
+						<xsl:analyze-string regex="^(\d{{4}}-02)$"
+							select="normalize-space(substring-after(//ead:did/ead:unitdate/@normal, '/'))">
+							<xsl:matching-substring>
+								<field name="dateFinal">
+									<xsl:value-of select="regex-group(1)" />
+									<xsl:text>-28T00:00:00Z</xsl:text>
+								</field>
+							</xsl:matching-substring>
+						</xsl:analyze-string>
+						<xsl:analyze-string regex="^(\d{{4}}-(0[469]|11))$"
+							select="normalize-space(substring-after(//ead:did/ead:unitdate/@normal, '/'))">
+							<xsl:matching-substring>
+								<field name="dateFinal">
+									<xsl:value-of select="regex-group(1)" />
+									<xsl:text>-30T00:00:00Z</xsl:text>
+								</field>
+							</xsl:matching-substring>
+						</xsl:analyze-string>
 						<xsl:analyze-string regex="^(\d{{4}}-\d{{2}})$"
 							select="normalize-space(substring-after(//ead:did/ead:unitdate/@normal, '/'))">
 							<xsl:matching-substring>
 								<field name="dateFinal">
 									<xsl:value-of select="regex-group(1)" />
-									<xsl:text>-01T00:00:00Z</xsl:text>
+									<xsl:text>-31T00:00:00Z</xsl:text>
 								</field>
 							</xsl:matching-substring>
 						</xsl:analyze-string>
@@ -95,7 +113,7 @@
 							<xsl:matching-substring>
 								<field name="dateFinal">
 									<xsl:value-of select="regex-group(1)" />
-									<xsl:text>-01-01T00:00:00Z</xsl:text>
+									<xsl:text>-12-31T00:00:00Z</xsl:text>
 								</field>
 							</xsl:matching-substring>
 						</xsl:analyze-string>
@@ -112,6 +130,28 @@
 								</field>
 							</xsl:matching-substring>
 						</xsl:analyze-string>
+						<xsl:analyze-string regex="^(\d{{4}})(02)$"
+							select="normalize-space(substring-after(//ead:did/ead:unitdate/@normal, '/'))">
+							<xsl:matching-substring>
+								<field name="dateFinal">
+									<xsl:value-of select="regex-group(1)" />
+									<xsl:text>-</xsl:text>
+									<xsl:value-of select="regex-group(2)" />
+									<xsl:text>-28T00:00:00Z</xsl:text>
+								</field>
+							</xsl:matching-substring>
+						</xsl:analyze-string>
+						<xsl:analyze-string regex="^(\d{{4}})(0[469]|11)$"
+							select="normalize-space(substring-after(//ead:did/ead:unitdate/@normal, '/'))">
+							<xsl:matching-substring>
+								<field name="dateFinal">
+									<xsl:value-of select="regex-group(1)" />
+									<xsl:text>-</xsl:text>
+									<xsl:value-of select="regex-group(2)" />
+									<xsl:text>-30T00:00:00Z</xsl:text>
+								</field>
+							</xsl:matching-substring>
+						</xsl:analyze-string>
 						<xsl:analyze-string regex="^(\d{{4}})(\d{{2}})$"
 							select="normalize-space(substring-after(//ead:did/ead:unitdate/@normal, '/'))">
 							<xsl:matching-substring>
@@ -119,7 +159,7 @@
 									<xsl:value-of select="regex-group(1)" />
 									<xsl:text>-</xsl:text>
 									<xsl:value-of select="regex-group(2)" />
-									<xsl:text>-01T00:00:00Z</xsl:text>
+									<xsl:text>-31T00:00:00Z</xsl:text>
 								</field>
 							</xsl:matching-substring>
 						</xsl:analyze-string>
