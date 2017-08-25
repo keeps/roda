@@ -35,6 +35,12 @@ public class JavascriptUtils {
 		});
   }-*/;
 
+  public static native void runIframeResizer(JavaScriptObject iframe) /*-{
+    $wnd.jQuery(iframe).iFrameResize({
+      log: false,
+    });
+  }-*/;
+
   public static native void slideToggle(String selector) /*-{
 		$wnd.jQuery(selector).click(function() {
 			$wnd.jQuery(this).next().slideToggle(300, function() {
