@@ -121,6 +121,7 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
       public void onKeyDown(KeyDownEvent event) {
         if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
           doSearch();
+          onChange(RodaConstants.SEARCH_BUTTON_EVENT_MARK);
         }
       }
     });
