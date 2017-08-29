@@ -1,108 +1,39 @@
 RODA 2.0 - Repository of Authentic Digital Objects
 ==============================================
-RODA is a complete digital repository that delivers functionality for all the main units of the OAIS reference model. RODA is capable of ingesting, managing and providing access to the various types of digital objects produced by large corporations or public bodies. RODA is based on open-source technologies and is supported by existing standards such as the OAIS, METS, EAD and PREMIS.
+RODA is a digital repository solution that delivers functionality for all the main units of the OAIS reference model. RODA is capable of ingesting, managing and providing access to the various types of digital objects produced by large corporations or public bodies. RODA is based on open-source technologies and is supported by existing standards such as the OAIS, METS, EAD and PREMIS.
 
 ## Features
 
 * User-friendly graphical user interface based on HTML 5 and CSS 3
 * Digital objects storage and management
 * Catalog based on rich metadata (supports any XML-based format as descriptive metadata)
-* Off-the-shelf support for Dublin Core and Enconded Archival Description.
+* Off-the-shelf support for Dublin Core (DC) and Enconded Archival Description (EAD).
 * Configurable multi-step ingestion workflow
 * PREMIS 3 for preservation metadata
-* Authentication & authorization via LDAP and CAS for
+* Authentication & authorization via LDAP and CAS (support for additional authentication methods)
 * Reports and statistics
 * REST API
-* Supports pluggable preservation actions
+* Pluggable preservation actions
 * Integrated Risk management
 * Integrated Format Registry
-* Uses native file system for data storage
+* Uses native file system for data storage for greater performance and transparency
 * 100% compatible with E-ARK SIP, AIP, and DIP specifications
-* Support for themess
+* Support for design themes
 
 For more information, please fell free to visit RODA website:
 **<http://www.roda-community.org>**
 
+
+## Documentation
+
+RODA is provided with a series of documentation articles that are constantly being updated. You may find all the available documentation [here](https://github.com/keeps/roda/tree/master/documentation).
+
+All documentation articles are written in markdown, which means that you can easily converted to various formats such as PDF, HTML, etc. Check this online tool that converts markdown to PDF [http://www.markdowntopdf.com](http://www.markdowntopdf.com).
+
 ## Installation
 
-We provide two installation methods:
+We provide installation methods for testing and production environments for several different operating systems. For more information on the installation process, please visit our [documentation page](https://github.com/keeps/roda/tree/master/documentation).
 
-* Testing Mode (Easy like sunday morning!)
-* Production Mode (Powerful as thunder!)
-
-### Testing Mode (Easy like sunday morning!)
-
-This is the easiast way to install RODA 2.0. If you want to test drive the software, just follow these instructions based on your operating system. We support Linux, MacOS and Windows.
-
-#### Linux
-
-On Linux, use the following instructions:
-
-1. Install docker for your system: https://docs.docker.com/engine/installation/
-2. Pull or update to the latest roda container, on the command line run:  `sudo docker pull keeps/roda`
-3. Run the container: `sudo docker run -p 8080:8080 -v ~/.roda:/root/.roda keeps/roda`
-4. Access RODA on your browser: [http://localhost:8080](http://localhost:8080)
-
-NOTE: the docker commands only need `sudo` if your user does not belong to the `docker` group.   
-NOTE 2: if one wants to run some cronjobs in RODA container, there're two possibilities. But before, lets create a cronjob file with the right permissions (chmod 644 ~/cronjob). In this example we are updating, at 2 am, siegfried signature file:
-```
-MAILTO=""
-
-0 2 * * * root sf -update && pkill sf
-```
-
-And the two possibilities are:
-1. Add cronjob file via docker copy (after starting the container)
-```bash
-$> docker cp ~/crontab CONTAINER_NAME:/etc/cron.d/crontab
-```
-
-2. Run the container using the volume option (-v) to pass by the cronjob file
-
-In this scenario, the cronjob file must be owned by root because RODA container user is root (besides file permissions mentioned abouve)
-```bash
-$> sudo chown root.root ~/crontab
-$> docker run -p 8080:8080 -v ~/.roda:/root/.roda -v ~/crontab:/etc/cron.d/crontab keeps/roda
-```
-
-
-To start as a service you can install supervisord and create the file `/etc/supervisor/conf.d/roda.conf` with:
-
-```
-[program:roda]
-command=docker run -p 8080:8080 -v /home/roda/:/root/.roda keeps/roda
-directory=/tmp/
-autostart=true
-autorestart=true
-startretries=3
-stderr_logfile=/var/log/supervisor/roda.err.log
-stdout_logfile=/var/log/supervisor/roda.out.log
-user=roda
-```
-
-1. Create user 'roda': `sudo adduser roda`
-2. Add user 'roda' to 'docker' group: `sudo usermod -aG docker roda`
-3. Then restart supervisord (`sudo service supervisord restart`)
-
-
-#### MacOS
-
-Just install [Kitematic](https://kitematic.com), and search for "roda". Install and run docker container. It's that easy.
-
-Kitematic is like an AppStore that automates the Docker installation and setup process and provides an intuitive graphical user interface (GUI) for running Docker containers (i.e. lightweight Virtual Machines).
-
-#### Windows
-
-Just install [Kitematic](https://kitematic.com), and search for "roda". Install and run docker container. It's that easy.
-
-Kitematic is like an AppStore that automates the Docker installation and setup process and provides an intuitive graphical user interface (GUI) for running Docker containers (i.e. lightweight Virtual Machines).
-
-The RODA docker container has some limitations on Windows due to filename incompatibilities. This means that your will be limited to the storage capacity within the container. If you change the default configuration to use the storage of the host machine it will not work..
-
-
-### Production Mode (Powerful as thunder!)
-
-This installation method takes full advantage of the resources available on your server. To install RODA in production mode (i.e. without containers) see the [Install RODA in Production Mode](INSTALL.md).
 
 ## Usage
 
@@ -111,9 +42,9 @@ After installing, direct your browser to the correct IP address (this depends on
 * Username: admin
 * Password: roda
 
-With this you will have access to all features.
+With these credentials you will have access to all features.
 
-Then you can start using RODA:
+Then you can start using RODA. Here's an example of what you can do:
 
 1. Go to Catalogue and click the button **NEW**, select Dublin Core and fill the title of your new collection.
 2. Go to **Ingest > Transfer** and upload files (e.g. PDF) or SIPs made by [RODA-in](http://rodain.roda-community.org/). SIPs will have metadata while PDFs wont. To know how to use RODA-in [watch the tutorials](http://rodain.roda-community.org/).
@@ -127,17 +58,20 @@ Then you can start using RODA:
 
 ## Developers
 
-To start developing new components for RODA check the [Developer guide](https://github.com/keeps/roda/wiki/Developer-guide) which has information on:
+To start developing new components for RODA check the [Developer guide](https://github.com/keeps/roda/blob/master/documentation/Developers_Guide.md) which has information on:
 
-1. [How to get the source code](https://github.com/keeps/roda/wiki/Developer-guide#-how-to-get-the-source-code)
-2. [How the code is laid out](https://github.com/keeps/roda/wiki/Developer-guide#-how-the-code-is-laid-out)
-3. [How to set up the development environment](https://github.com/keeps/roda/wiki/Developer-guide#-how-to-set-up-the-development-environment)
-4. [How to contribute](https://github.com/keeps/roda/wiki/Developer-guide#-how-to-contribute)
+- How to get the source code
+- How to build and run
+- How to set up the development environment
+- Code structure
+- How to contribute
+- etc.
 
 ## Translators
 
-Translations are maintained in [Transifex](https://www.transifex.com/roda-1/roda2) and updated using the [Transifex Client](http://docs.transifex.com/client/). After installing the client and setting up your `~/.transifexrc` use `tx push -s` to when you have new source translations to push to server, and `tx pull -a` to update the translation on your local installation.
+Translations are maintained in [Transifex](https://www.transifex.com/roda-1/roda2) and updated using the [Transifex Client](http://docs.transifex.com/client/).
 
+Check our [Translation guide](https://github.com/keeps/roda/blob/master/documentation/Translation_Guide.md) for more information.
 ## Specifications
 
 RODA implements a series of specifications and standards. To know more about the OAIS Information Packages that RODA implements, please check out the [DLM Archival Standards Board](http://www.dasboard.eu) repositories at https://github.com/DLMArchivalStandardsBoard
