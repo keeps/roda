@@ -1,6 +1,6 @@
 RODA 2.0 - Repository of Authentic Digital Objects
 ==============================================
-RODA is a digital repository solution that delivers functionality for all the main units of the OAIS reference model. RODA is capable of ingesting, managing and providing access to the various types of digital objects produced by large corporations or public bodies. RODA is based on open-source technologies and is supported by existing standards such as the OAIS, METS, EAD and PREMIS.
+RODA is a **digital repository solution** that delivers functionality for all the main units of the OAIS reference model. RODA is capable of ingesting, managing and providing access to the various types of digital objects produced by large corporations or public bodies. RODA is based on open-source technologies and is supported by existing standards such as the Open Archival Information System (OAIS), Metadata Encoding and Transmission Standard (METS), Encoded Archival Description (EAD), Dublin Core (DC) and PREMIS (Preservation Metadata).
 
 ## Features
 
@@ -80,7 +80,7 @@ RODA implements a series of specifications and standards. To know more about the
 
 # Professional Support
 
-We’re committed to providing the highest standard of service that empowers you to succeed in preserving your digital assets, on premises, in the cloud or anywhere in between. 
+We’re committed to providing the highest standard of service that empowers you to succeed in preserving your digital assets, on premises, in the cloud or anywhere in between.
 
 Professional Support is available as a single “pay-per-incident” (PPI) or anual support service. Professional Support incidents focus on troubleshooting a specific problem, error message, or functionality that is not working as intended. An incident is defined as a single support issue and the reasonable effort to resolve it. Incidents should be submitted online. Response time will be between 2 and 8 days, depending on severity of incident.
 
