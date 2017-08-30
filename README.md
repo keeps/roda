@@ -26,13 +26,13 @@ For more information, please fell free to visit RODA website:
 
 ## Documentation
 
-RODA is provided with a series of documentation articles that are constantly being updated. You may find all the available documentation [here](https://github.com/keeps/roda/tree/master/documentation).
+RODA is provided with a series of documentation articles that are constantly being updated. You may find all the available documentation [here](https://github.com/keeps/roda/tree/master/documentation/README.md).
 
 All documentation articles are written in markdown, which means that you can easily converted to various formats such as PDF, HTML, etc. Check this online tool that converts markdown to PDF [http://www.markdowntopdf.com](http://www.markdowntopdf.com).
 
 ## Installation
 
-We provide installation methods for testing and production environments for several different operating systems. For more information on the installation process, please visit our [documentation page](https://github.com/keeps/roda/tree/master/documentation).
+We provide installation methods for testing and production environments for several different operating systems. For more information on the installation process, please visit our [documentation page](https://github.com/keeps/roda/tree/master/documentation/README.md).
 
 
 ## Usage
