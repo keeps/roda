@@ -1,4 +1,4 @@
-# Ajuda
+# Documentação
 
 O RODA é uma **solução de repositório digital** que oferece funcionalidade para todas as principais unidades funcionais do modelo de referência OAIS. O RODA é capaz de ingerir, gerir e fornecer acesso aos diversos tipos de objetos digital produzidos por grandes empresas ou entidades públicas. O RODA é baseado em tecnologias de código aberto e suportado por standards existentes, tais como o Open Archival Information System (OAIS), Metadata Encoding and Transmission Standard (METS), Encoded Archival Description (EAD), Dublin Core (DC) e Metadados de preservação (PREMIS).
 
