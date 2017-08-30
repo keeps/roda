@@ -1,6 +1,6 @@
 # Help
 
-RODA is a ** digital repository solution** that delivers functionality for all the main functional units of the OAIS reference model. RODA is capable of ingesting, managing and providing access to the various types of digital content produced by large corporations or public bodies. RODA is based on open-source technologies and is supported by existing standards such as the Open Archival Information System (OAIS), Metadata Encoding and Transmission Standard (METS), Encoded Archival Description (EAD), Dublin Core (DC) and PREMIS (Preservation Metadata).
+RODA is a **digital repository solution** that delivers functionality for all the main units of the OAIS reference model. RODA is capable of ingesting, managing and providing access to the various types of digital content produced by large corporations or public bodies. RODA is based on open-source technologies and is supported by existing standards such as the Open Archival Information System (OAIS), Metadata Encoding and Transmission Standard (METS), Encoded Archival Description (EAD), Dublin Core (DC) and PREMIS (Preservation Metadata).
 
 This page links to an assortment of **technical information articles** that will help usuers, developers, translators and implementers to adapt this product to their particular needs.
 
@@ -17,7 +17,7 @@ Among others articles, in this series of documentation you will find information
 	- [Risk assessment](Risk_Assessment.md)
 	- [Format normalization policy](Format_Normalization_Policy.md)
 - Support
-	- [Community support](Community_Support.md)	
+	- [Community support](Community_Support.md)
 	- [Professional support](Professional_Support.md)
 - Installation
 	- [Demo](Installation_Testing_Environments.md)
@@ -38,7 +38,7 @@ Among others articles, in this series of documentation you will find information
 ## Standards and specifications
 
 ### Package specifications
- 
+
 * [E-ARK Common Specification for Information Packages](http://www.dasboard.eu/specifications/common-specification)
 * [E-ARK Submission Information Package specification](http://www.dasboard.eu/specifications/sip)
 * [E-ARK Archival Information Package specification](http://www.dasboard.eu/specifications/aip)
@@ -54,4 +54,3 @@ Among others articles, in this series of documentation you will find information
 ### Other
 
 * [Digital Repository Audit Method Based on Risk Assessment (DRAMBORA)](http://www.repositoryaudit.eu/download/)
-
