@@ -6,7 +6,7 @@
 	<url>http://roda.keep.pt/</url>
 	<groupId>org.roda-project</groupId>
 	<artifactId>roda</artifactId>
-	<version>2.0.2</version>
+	<version>2.0.3</version>
 	<packaging>pom</packaging>
 	<description>RODA is a full-featured open-source digital preservation repository providing all the functionality
 		prescribed by the OAIS reference model.
@@ -650,39 +650,39 @@
 				<groupId>org.roda-project</groupId>
 				<artifactId>roda-common-data</artifactId>
 				<classifier>sources</classifier>
-				<version>2.0.2</version>
+				<version>2.0.3</version>
 			</dependency>
 			<dependency>
 				<groupId>org.roda-project</groupId>
 				<artifactId>roda-common-data</artifactId>
-				<version>2.0.2</version>
+				<version>2.0.3</version>
 			</dependency>
 			<dependency>
 				<groupId>org.roda-project</groupId>
 				<artifactId>roda-common-utils</artifactId>
-				<version>2.0.2</version>
+				<version>2.0.3</version>
 			</dependency>
 			<dependency>
 				<groupId>org.roda-project</groupId>
 				<artifactId>roda-core</artifactId>
-				<version>2.0.2</version>
+				<version>2.0.3</version>
 			</dependency>
 			<dependency>
 				<groupId>org.roda-project</groupId>
 				<artifactId>roda-core-tests</artifactId>
-				<version>2.0.2</version>
+				<version>2.0.3</version>
 			</dependency>
 			<dependency>
 				<groupId>org.roda-project</groupId>
 				<artifactId>roda-plugin-common</artifactId>
-				<version>2.0.2</version>
+				<version>2.0.3</version>
 			</dependency>
 			<dependency>
 				<groupId>org.roda-project</groupId>
 				<artifactId>roda-core-tests</artifactId>
 				<type>test-jar</type>
 				<scope>test</scope>
-				<version>2.0.2</version>
+				<version>2.0.3</version>
 			</dependency>
 			<!-- RODA own modules dependencies - end -->
 			<dependency>

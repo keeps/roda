@@ -786,6 +786,7 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_OUTCOME_TEXT = "parameter.outcome_text";
   public static final String PLUGIN_PARAMS_EVENT_DESCRIPTION = "parameter.event_description";
   public static final String PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS = "parameter.delete_older_than_x_days";
+  public static final String PLUGIN_PARAMS_UPDATED_DATA = "parameter.updated_data";
 
   public static final String PLUGIN_PARAMS_INCLUDE_SELECTED_DESCRIPTIVE_METADATA = "parameter.include_selected_descriptive_metadata";
   public static final String PLUGIN_PARAMS_SELECTED_DESCRIPTIVE_METADATA = "parameter.selected_descriptive_metadata";

@@ -249,7 +249,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
     String jobUsername = PluginHelper.getJobUsername(this, index);
     String jobId = PluginHelper.getJobId(this);
     // Update the AIP
-    return EARKSIPToAIPPluginUtils.earkSIPToAIPUpdate(sip, indexedAIP, model, jobUsername, searchScope, jobId);
+    return EARKSIPToAIPPluginUtils.earkSIPToAIPUpdate(sip, indexedAIP, model, jobUsername, searchScope, jobId, null);
   }
 
   @Override

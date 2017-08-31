@@ -21,15 +21,18 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.model.ModelService;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
+import org.roda.core.util.IdUtils;
 import org.roda_project.commons_ip.model.IPDescriptiveMetadata;
 import org.roda_project.commons_ip.model.IPFile;
 import org.roda_project.commons_ip.model.IPMetadata;
@@ -62,7 +65,7 @@ public class EARKSIPToAIPPluginUtils {
 
     // process IPRepresentation information
     for (IPRepresentation representation : sip.getRepresentations()) {
-      processIPRepresentationInformation(model, representation, aip.getId(), notify, false, username);
+      processIPRepresentationInformation(model, representation, aip.getId(), notify, false, username, null);
     }
 
     model.notifyAipCreated(aip.getId());
@@ -80,14 +83,14 @@ public class EARKSIPToAIPPluginUtils {
   }
 
   public static AIP earkSIPToAIPUpdate(SIP sip, IndexedAIP indexedAIP, ModelService model, StorageService storage,
-    String username, String ingestJobId) throws RequestNotValidException, NotFoundException, GenericException,
-    AlreadyExistsException, AuthorizationDeniedException, ValidationException {
-    return earkSIPToAIPUpdate(sip, indexedAIP, model, username, Optional.empty(), ingestJobId);
+    String username, String ingestJobId, Report reportItem) throws RequestNotValidException, NotFoundException,
+    GenericException, AlreadyExistsException, AuthorizationDeniedException, ValidationException {
+    return earkSIPToAIPUpdate(sip, indexedAIP, model, username, Optional.empty(), ingestJobId, reportItem);
   }
 
   public static AIP earkSIPToAIPUpdate(SIP sip, IndexedAIP indexedAIP, ModelService model, String username,
-    Optional<String> searchScope, String ingestJobId) throws RequestNotValidException, NotFoundException,
-    GenericException, AlreadyExistsException, AuthorizationDeniedException, ValidationException {
+    Optional<String> searchScope, String ingestJobId, Report reportItem) throws RequestNotValidException,
+    NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException, ValidationException {
     boolean notify = false;
 
     // process IP information
@@ -95,7 +98,7 @@ public class EARKSIPToAIPPluginUtils {
 
     // process IPRepresentation information
     for (IPRepresentation representation : sip.getRepresentations()) {
-      processIPRepresentationInformation(model, representation, indexedAIP.getId(), notify, true, username);
+      processIPRepresentationInformation(model, representation, indexedAIP.getId(), notify, true, username, reportItem);
     }
 
     AIP aip = model.retrieveAIP(indexedAIP.getId());
@@ -126,7 +129,6 @@ public class EARKSIPToAIPPluginUtils {
 
     // process schemas
     processSchemas(model, sip.getSchemas(), aipId, null, update);
-
   }
 
   private static void processDescriptiveMetadata(ModelService model, String aipId, String representationId,
@@ -220,8 +222,8 @@ public class EARKSIPToAIPPluginUtils {
   }
 
   private static void processIPRepresentationInformation(ModelService model, IPRepresentation sr, String aipId,
-    boolean notify, boolean update, String username) throws RequestNotValidException, GenericException,
-    AlreadyExistsException, AuthorizationDeniedException, NotFoundException, ValidationException {
+    boolean notify, boolean update, String username, Report reportItem) throws RequestNotValidException,
+    GenericException, AlreadyExistsException, AuthorizationDeniedException, NotFoundException, ValidationException {
     String representationType = IngestHelper.getType(sr);
     boolean isOriginal = RepresentationStatus.getORIGINAL().equals(sr.getStatus());
 
@@ -237,7 +239,11 @@ public class EARKSIPToAIPPluginUtils {
     if (representation == null) {
       representation = model.createRepresentation(aipId, sr.getObjectID(), isOriginal, representationType, notify,
         username);
+      if (reportItem != null && update) {
+        reportItem.addRepresentationData(aipId, IdUtils.getRepresentationId(representation));
+      }
     }
+
     // process representation descriptive metadata
     processDescriptiveMetadata(model, aipId, representation.getId(), sr.getDescriptiveMetadata(), notify, update);
 
@@ -254,10 +260,17 @@ public class EARKSIPToAIPPluginUtils {
       String fileId = file.getFileName();
       ContentPayload payload = new FSPathContentPayload(file.getPath());
       try {
-        model.createFile(aipId, representation.getId(), directoryPath, fileId, payload, notify);
+        File createdFile = model.createFile(aipId, representation.getId(), directoryPath, fileId, payload, notify);
+        if (reportItem != null && update) {
+          reportItem.addFileData(aipId, IdUtils.getRepresentationId(representation), createdFile);
+        }
       } catch (AlreadyExistsException e) {
         if (update) {
-          model.updateFile(aipId, representation.getId(), directoryPath, fileId, payload, true, notify);
+          File updatedFile = model.updateFile(aipId, representation.getId(), directoryPath, fileId, payload, true,
+            notify);
+          if (reportItem != null) {
+            reportItem.addFileData(aipId, IdUtils.getRepresentationId(representation), updatedFile);
+          }
         } else
           throw e;
       }

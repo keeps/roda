@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
@@ -19,7 +20,9 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
@@ -46,6 +49,8 @@ import org.slf4j.LoggerFactory;
 public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponentsPlugin<T> {
   private static final Logger LOGGER = LoggerFactory.getLogger(SiegfriedPlugin.class);
   public static final String FILE_SUFFIX = ".json";
+
+  private Map<String, Map<String, List<String>>> updatedData = null;
 
   @Override
   public void init() throws PluginException {
@@ -85,6 +90,14 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
+
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_UPDATED_DATA)) {
+      try {
+        updatedData = JsonUtils.getObjectFromJson(parameters.get(RodaConstants.PLUGIN_PARAMS_UPDATED_DATA), Map.class);
+      } catch (GenericException e) {
+        // do nothing
+      }
+    }
   }
 
   @Override
@@ -97,23 +110,49 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
 
         LOGGER.debug("Processing AIP {}", aip.getId());
         List<LinkingIdentifier> sources = new ArrayList<>();
-        try {
 
-          for (Representation representation : aip.getRepresentations()) {
-            LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
-            sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(this, model, representation));
-            model.notifyRepresentationUpdated(representation);
+        if (updatedData == null || !updatedData.containsKey(aip.getId())) {
+          try {
+            for (Representation representation : aip.getRepresentations()) {
+              LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
+              sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(this, model, representation));
+              model.notifyRepresentationUpdated(representation);
+            }
+
+            jobPluginInfo.incrementObjectsProcessedWithSuccess();
+            reportItem.setPluginState(PluginState.SUCCESS);
+          } catch (PluginException | NotFoundException | GenericException | RequestNotValidException
+            | AuthorizationDeniedException | AlreadyExistsException e) {
+            LOGGER.error("Error running Siegfried {}: {}", aip.getId(), e.getMessage(), e);
+
+            jobPluginInfo.incrementObjectsProcessedWithFailure();
+            reportItem.setPluginState(PluginState.FAILURE)
+              .setPluginDetails("Error running Siegfried " + aip.getId() + ": " + e.getMessage());
+          }
+        } else {
+          Map<String, List<String>> aipData = updatedData.get(aip.getId());
+          PluginState state = PluginState.SUCCESS;
+
+          if (aipData.containsKey(RodaConstants.RODA_OBJECT_REPRESENTATION)) {
+            List<Representation> filteredList = aip.getRepresentations().stream()
+              .filter(
+                r -> aipData.get(RodaConstants.RODA_OBJECT_REPRESENTATION).contains(IdUtils.getRepresentationId(r)))
+              .collect(Collectors.toList());
+
+            for (Representation representation : filteredList) {
+              try {
+                LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
+                sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(this, model, representation));
+                model.notifyRepresentationUpdated(representation);
+              } catch (RODAException e) {
+                state = PluginState.FAILURE;
+                LOGGER.error("Error running Siegfried " + aip.getId(), e);
+              }
+            }
           }
 
-          jobPluginInfo.incrementObjectsProcessedWithSuccess();
-          reportItem.setPluginState(PluginState.SUCCESS);
-        } catch (PluginException | NotFoundException | GenericException | RequestNotValidException
-          | AuthorizationDeniedException | AlreadyExistsException e) {
-          LOGGER.error("Error running Siegfried {}: {}", aip.getId(), e.getMessage(), e);
-
-          jobPluginInfo.incrementObjectsProcessedWithFailure();
-          reportItem.setPluginState(PluginState.FAILURE)
-            .setPluginDetails("Error running Siegfried " + aip.getId() + ": " + e.getMessage());
+          reportItem.setPluginState(state).setPluginDetails("Executed on a SIP update context.");
+          jobPluginInfo.incrementObjectsProcessed(state);
         }
 
         try {

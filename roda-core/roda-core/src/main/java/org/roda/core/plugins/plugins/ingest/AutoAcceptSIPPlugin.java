@@ -99,8 +99,10 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
     try {
       LOGGER.debug("Auto accepting AIP {}", aip.getId());
 
-      aip.setState(AIPState.ACTIVE);
-      model.updateAIPState(aip, job.getUsername());
+      if (aip.getState() != AIPState.ACTIVE) {
+        aip.setState(AIPState.ACTIVE);
+        model.updateAIPState(aip, job.getUsername());
+      }
       reportItem.setPluginState(PluginState.SUCCESS).setOutcomeObjectState(AIPState.ACTIVE);
       LOGGER.debug("Done with auto accepting AIP {}", aip.getId());
     } catch (RODAException e) {

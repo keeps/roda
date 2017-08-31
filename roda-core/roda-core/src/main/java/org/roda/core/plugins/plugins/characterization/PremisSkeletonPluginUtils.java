@@ -34,7 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PremisSkeletonPluginUtils {
-  private static final Logger LOGGER = LoggerFactory.getLogger(PremisSkeletonPlugin.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(PremisSkeletonPluginUtils.class);
 
   private PremisSkeletonPluginUtils() {
     // do nothing
@@ -67,9 +67,11 @@ public class PremisSkeletonPluginUtils {
       if (oFile.isPresent()) {
         File file = oFile.get();
         if (!file.isDirectory()) {
-          LOGGER.debug("Processing {}", file);
           try {
             model.retrievePreservationFile(aipId, representationId, file.getPath(), file.getId());
+            // 20170830 hsilva: this log is after the retrieve because the
+            // method in the catch also does the same logging
+            LOGGER.debug("Processing {}", file);
           } catch (NotFoundException e1) {
             PremisSkeletonPluginUtils.createPremisSkeletonOnFile(model, file, fixityAlgorithms, representation);
           }
@@ -135,7 +137,6 @@ public class PremisSkeletonPluginUtils {
           RodaConstants.PREMIS_RELATIONSHIP_SUBTYPE_HASPART, representation);
       }
     }
-
   }
 
 }
