@@ -299,12 +299,12 @@ public class Report implements IsModelObject {
     return this;
   }
 
-  public SIPUpdateInformation getUpdatedData() {
+  public SIPUpdateInformation getUpdateInformation() {
     return updateInformation;
   }
 
-  public void setUpdatedData(SIPUpdateInformation updatedData) {
-    this.updateInformation = updatedData;
+  public void setUpdateInformation(SIPUpdateInformation updateInformation) {
+    this.updateInformation = updateInformation;
   }
 
   public Report addRepresentationData(String aipId, String representationUUID) {
