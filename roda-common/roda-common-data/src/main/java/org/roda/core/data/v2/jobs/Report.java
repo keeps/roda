@@ -308,9 +308,16 @@ public class Report implements IsModelObject {
   }
 
   public Report addReport(Report report) {
+    return addReport(report, true);
+  }
+
+  public Report addReport(Report report, boolean updateReportItemDateUpdated) {
+
     // FIXME not quite sure that this is the best place for this logic but it's
     // very handy
-    report.setDateUpdated(new Date());
+    if (updateReportItemDateUpdated) {
+      report.setDateUpdated(new Date());
+    }
     setDateUpdated(report.getDateUpdated());
     if (totalSteps == 0 && report.getTotalSteps() != 0) {
       setTotalSteps(report.getTotalSteps());

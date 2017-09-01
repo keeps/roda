@@ -181,9 +181,10 @@ public class IngestJobPluginInfo extends JobPluginInfo {
     }
   }
 
-  public void addReport(String outcomeObjectId, Report report) {
+  public void addReport(Report report) {
+    String outcomeObjectId = report.getOutcomeObjectId();
     reportsFromBeingProcessed.get(aipIdToTransferredResourceId.get(outcomeObjectId)).get(outcomeObjectId)
-      .addReport(report);
+      .addReport(report, false);
   }
 
   public void remove(String transferredResourceId) {
