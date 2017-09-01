@@ -240,7 +240,7 @@ public class EARKSIPToAIPPluginUtils {
       representation = model.createRepresentation(aipId, sr.getObjectID(), isOriginal, representationType, notify,
         username);
       if (reportItem != null && update) {
-        reportItem.addRepresentationData(aipId, IdUtils.getRepresentationId(representation));
+        reportItem.getUpdateInformation().addRepresentationData(aipId, IdUtils.getRepresentationId(representation));
       }
     }
 
@@ -262,14 +262,16 @@ public class EARKSIPToAIPPluginUtils {
       try {
         File createdFile = model.createFile(aipId, representation.getId(), directoryPath, fileId, payload, notify);
         if (reportItem != null && update) {
-          reportItem.addFileData(aipId, IdUtils.getRepresentationId(representation), createdFile);
+          reportItem.getUpdateInformation().addFileData(aipId, IdUtils.getRepresentationId(representation),
+            createdFile);
         }
       } catch (AlreadyExistsException e) {
         if (update) {
           File updatedFile = model.updateFile(aipId, representation.getId(), directoryPath, fileId, payload, true,
             notify);
           if (reportItem != null) {
-            reportItem.addFileData(aipId, IdUtils.getRepresentationId(representation), updatedFile);
+            reportItem.getUpdateInformation().addFileData(aipId, IdUtils.getRepresentationId(representation),
+              updatedFile);
           }
         } else
           throw e;

@@ -9,16 +9,13 @@ package org.roda.core.data.v2.jobs;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.ip.AIPState;
-import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.SIPUpdateInformation;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -58,7 +55,8 @@ public class Report implements IsModelObject {
   private String pluginDetails = "";
   private boolean htmlPluginDetails = false;
 
-  private transient SIPUpdateInformation updateInformation = null;
+  @JsonIgnore
+  private SIPUpdateInformation updateInformation = new SIPUpdateInformation();
 
   private List<Report> reports = new ArrayList<>();
 
@@ -299,64 +297,14 @@ public class Report implements IsModelObject {
     return this;
   }
 
+  @JsonIgnore
   public SIPUpdateInformation getUpdateInformation() {
     return updateInformation;
   }
 
+  @JsonIgnore
   public void setUpdateInformation(SIPUpdateInformation updateInformation) {
     this.updateInformation = updateInformation;
-  }
-
-  public Report addRepresentationData(String aipId, String representationUUID) {
-    if (updateInformation == null) {
-      updateInformation = new SIPUpdateInformation();
-    }
-
-    Map<String, Map<String, List<String>>> updatedData = updateInformation.getUpdatedData();
-
-    if (!updatedData.containsKey(aipId)) {
-      updatedData.put(aipId, new HashMap<String, List<String>>());
-    }
-
-    Map<String, List<String>> map = updatedData.get(aipId);
-
-    if (!updatedData.get(aipId).containsKey(RodaConstants.RODA_OBJECT_REPRESENTATION)) {
-      map.put(RodaConstants.RODA_OBJECT_REPRESENTATION, new ArrayList<String>());
-    }
-
-    map.get(RodaConstants.RODA_OBJECT_REPRESENTATION).add(representationUUID);
-    return this;
-  }
-
-  public Report addFileData(String aipId, String representationUUID, File file) {
-    if (updateInformation == null) {
-      updateInformation = new SIPUpdateInformation();
-    }
-
-    Map<String, Map<String, List<String>>> updatedData = updateInformation.getUpdatedData();
-
-    if (!updatedData.containsKey(aipId)) {
-      updatedData.put(aipId, new HashMap<String, List<String>>());
-    } else if (updatedData.get(aipId).containsKey(RodaConstants.RODA_OBJECT_REPRESENTATION)
-      && updatedData.get(aipId).get(RodaConstants.RODA_OBJECT_REPRESENTATION).contains(representationUUID)) {
-      return this;
-    }
-
-    Map<String, List<String>> map = updatedData.get(aipId);
-
-    if (!updatedData.get(aipId).containsKey(RodaConstants.RODA_OBJECT_FILE)) {
-      map.put(RodaConstants.RODA_OBJECT_FILE, new ArrayList<String>());
-    }
-
-    StringBuilder builder = new StringBuilder();
-    builder.append(file.getRepresentationId());
-    for (String path : file.getPath()) {
-      builder.append("/").append(path);
-    }
-    builder.append("/").append(file.getId());
-
-    map.get(RodaConstants.RODA_OBJECT_FILE).add(builder.toString());
-    return this;
   }
 
   public Report addReport(Report report) {

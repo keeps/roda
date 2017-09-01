@@ -116,7 +116,7 @@ public class ApiUtils {
         mediaType = applicationJs;
       } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equalsIgnoreCase(acceptFormat)) {
         mediaType = MediaType.APPLICATION_OCTET_STREAM;
-      } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equalsIgnoreCase(acceptFormat)) {
+      } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML.equalsIgnoreCase(acceptFormat)) {
         mediaType = MediaType.TEXT_HTML;
       } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_CSV.contains(acceptFormat)) {
         mediaType = ExtraMediaType.TEXT_CSV;

@@ -346,23 +346,11 @@ public final class PluginHelper {
   public static <T extends IsRODAObject> void updatePartialJobReport(Plugin<T> plugin, ModelService model,
     Report reportItem, boolean replaceLastReportItemIfTheSame, Job cachedJob) {
     String jobId = getJobId(plugin);
-    boolean retrieved = true;
     try {
       Report jobReport;
       try {
         jobReport = model.retrieveJobReport(jobId, reportItem.getOutcomeObjectId(), true);
-      } catch (NotFoundException e) {
-        jobReport = initPluginReportItem(plugin, reportItem.getOutcomeObjectId(), reportItem.getSourceObjectId())
-          .setSourceObjectClass(reportItem.getSourceObjectClass())
-          .setOutcomeObjectClass(reportItem.getOutcomeObjectClass());
 
-        jobReport.setId(reportItem.getId());
-        jobReport.setDateCreated(reportItem.getDateCreated());
-        jobReport.addReport(reportItem);
-        retrieved = false;
-      }
-
-      if (retrieved) {
         if (!replaceLastReportItemIfTheSame) {
           jobReport.addReport(reportItem);
         } else {
@@ -374,6 +362,14 @@ public final class PluginHelper {
             jobReport.addReport(reportItem);
           }
         }
+      } catch (NotFoundException e) {
+        jobReport = initPluginReportItem(plugin, reportItem.getOutcomeObjectId(), reportItem.getSourceObjectId())
+          .setSourceObjectClass(reportItem.getSourceObjectClass())
+          .setOutcomeObjectClass(reportItem.getOutcomeObjectClass());
+
+        jobReport.setId(reportItem.getId());
+        jobReport.setDateCreated(reportItem.getDateCreated());
+        jobReport.addReport(reportItem);
       }
 
       model.createOrUpdateJobReport(jobReport, cachedJob);

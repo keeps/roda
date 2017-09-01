@@ -28,6 +28,7 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.SIPUpdateInformation;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -50,7 +51,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
   private static final Logger LOGGER = LoggerFactory.getLogger(SiegfriedPlugin.class);
   public static final String FILE_SUFFIX = ".json";
 
-  private Map<String, Map<String, List<String>>> updatedData = null;
+  private SIPUpdateInformation sipUpdateInformation = new SIPUpdateInformation();
 
   @Override
   public void init() throws PluginException {
@@ -91,11 +92,12 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
 
-    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_UPDATED_DATA)) {
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_SIP_UPDATE_INFORMATION)) {
       try {
-        updatedData = JsonUtils.getObjectFromJson(parameters.get(RodaConstants.PLUGIN_PARAMS_UPDATED_DATA), Map.class);
+        sipUpdateInformation = JsonUtils.getObjectFromJson(
+          parameters.get(RodaConstants.PLUGIN_PARAMS_SIP_UPDATE_INFORMATION), SIPUpdateInformation.class);
       } catch (GenericException e) {
-        // do nothing
+        LOGGER.debug("Could not serializable SIP Update information from JSON", e);
       }
     }
   }
@@ -110,8 +112,9 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
 
         LOGGER.debug("Processing AIP {}", aip.getId());
         List<LinkingIdentifier> sources = new ArrayList<>();
+        Map<String, Map<String, List<String>>> updatedData = sipUpdateInformation.getUpdatedData();
 
-        if (updatedData == null || !updatedData.containsKey(aip.getId())) {
+        if (sipUpdateInformation.hasUpdatedData() || !updatedData.containsKey(aip.getId())) {
           try {
             for (Representation representation : aip.getRepresentations()) {
               LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
