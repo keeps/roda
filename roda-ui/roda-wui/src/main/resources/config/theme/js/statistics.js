@@ -100,7 +100,8 @@
           filterParams + "&" +
           facetParams +
           "&lang=" + lang +
-          "&onlyActive=" + onlyActive;
+          "&onlyActive=" + onlyActive +
+          "&acceptFormat=csv";
       } else {
 	      var start = $(element).data("source-start") || 0;
 	      var limit = $(element).data("source-limit") || 0;
@@ -114,7 +115,8 @@
 	          "&limit=" + limit +
 	          "&facetLimit=" + facetLimit +
 	          "&lang=" + lang +
-	          "&onlyActive=" + onlyActive;
+	          "&onlyActive=" + onlyActive +
+	          "&acceptFormat=csv";
       }
       return url;
     }

@@ -215,6 +215,7 @@ public final class RodaConstants {
   public static final String API_QUERY_VALUE_ACCEPT_FORMAT_JSON = "json";
   public static final String API_QUERY_VALUE_ACCEPT_FORMAT_ZIP = "zip";
   public static final String API_QUERY_VALUE_ACCEPT_FORMAT_CSV = "csv";
+  public static final String API_QUERY_VALUE_ACCEPT_FORMAT_JSONP = "jsonp";
   public static final String API_QUERY_KEY_LANG = "lang";
   public static final String API_QUERY_VALUE_LANG_DEFAULT = RodaConstants.API_QUERY_VALUE_LANG_PT_PT;
   public static final String API_QUERY_VALUE_LANG_PT_PT = "pt_PT";

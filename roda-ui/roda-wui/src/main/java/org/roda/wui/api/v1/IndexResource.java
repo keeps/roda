@@ -153,10 +153,11 @@ public class IndexResource {
     @ApiParam(value = "Language", example = "en", defaultValue = "en") @QueryParam(RodaConstants.API_QUERY_KEY_LANG) final String localeString,
     @ApiParam(value = "Return only active resources?", defaultValue = "true") @QueryParam(RodaConstants.API_QUERY_KEY_ONLY_ACTIVE) final Boolean onlyActive,
     @ApiParam(value = "Export facet data", defaultValue = "false") @QueryParam(RodaConstants.API_QUERY_KEY_EXPORT_FACETS) final boolean exportFacets,
-    @ApiParam(value = "Filename", defaultValue = DEFAULT_CSV_FILENAME) @QueryParam(RodaConstants.API_QUERY_KEY_FILENAME) final String filename)
+    @ApiParam(value = "Filename", defaultValue = DEFAULT_CSV_FILENAME) @QueryParam(RodaConstants.API_QUERY_KEY_FILENAME) final String filename,
+    @ApiParam(value = "Choose format in which to get the response") @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
 
-    final String mediaType = ApiUtils.getMediaType(null, request);
+    final String mediaType = ApiUtils.getMediaType(acceptFormat, request);
     final User user = UserUtility.getApiUser(request);
 
     final FindRequest findRequest = new FindRequest();
@@ -199,7 +200,7 @@ public class IndexResource {
 
     final Response response;
     if (ExtraMediaType.TEXT_CSV.equals(mediaType)) {
-      response = csvResponse(findRequest, user);
+      response = csvResponse(findRequest, user, localeString);
     } else {
       final Class<T> classToReturn = getClass(findRequest.classToReturn);
 
@@ -236,7 +237,7 @@ public class IndexResource {
     final User user = UserUtility.getApiUser(request);
 
     if (ExtraMediaType.TEXT_CSV.equals(mediaType)) {
-      return csvResponse(findRequest, user);
+      return csvResponse(findRequest, user, null);
     } else {
       final IndexResult<T> result = Browser.find(getClass(findRequest.classToReturn), findRequest.filter,
         findRequest.sorter, findRequest.sublist, findRequest.facets, user, findRequest.onlyActive, new ArrayList<>());
@@ -266,7 +267,7 @@ public class IndexResource {
     final FindRequest findRequest = JsonUtils.getObjectFromJson(findRequestString, FindRequest.class);
 
     if (type.equals(IndexResource.TYPE_CSV)) {
-      return csvResponse(findRequest, user);
+      return csvResponse(findRequest, user, null);
     } else {
       // TODO support JSON type
       throw new GenericException("Type not yet supported:" + type);
@@ -312,8 +313,8 @@ public class IndexResource {
    * @throws GenericException
    *           if some other error occurs.
    */
-  private <T extends IsIndexed> Response csvResponse(final FindRequest findRequest, final User user)
-    throws RequestNotValidException, AuthorizationDeniedException, GenericException {
+  private <T extends IsIndexed> Response csvResponse(final FindRequest findRequest, final User user,
+    String localeString) throws RequestNotValidException, AuthorizationDeniedException, GenericException {
 
     final Class<T> returnClass = getClass(findRequest.classToReturn);
     final Configuration config = RodaCoreFactory.getRodaConfiguration();
@@ -325,15 +326,21 @@ public class IndexResource {
     }
 
     if (findRequest.exportFacets) {
-      final IndexResult<T> result = Browser.find(returnClass, findRequest.filter, Sorter.NONE, Sublist.NONE,
+      IndexResult<T> result = Browser.find(returnClass, findRequest.filter, Sorter.NONE, Sublist.NONE,
         findRequest.facets, user, findRequest.onlyActive, new ArrayList<>());
+      if (localeString != null) {
+        result = I18nUtility.translate(result, returnClass, localeString);
+      }
 
       return ApiUtils.okResponse(
         new RodaStreamingOutput(new FacetsCSVOutputStream(result.getFacetResults(), findRequest.filename, delimiter))
           .toStreamResponse());
     } else {
-      final IndexResult<T> result = Browser.find(returnClass, findRequest.filter, findRequest.sorter,
-        findRequest.sublist, findRequest.facets, user, findRequest.onlyActive, new ArrayList<>());
+      IndexResult<T> result = Browser.find(returnClass, findRequest.filter, findRequest.sorter, findRequest.sublist,
+        findRequest.facets, user, findRequest.onlyActive, new ArrayList<>());
+      if (localeString != null) {
+        result = I18nUtility.translate(result, returnClass, localeString);
+      }
 
       return ApiUtils
         .okResponse(new RodaStreamingOutput(new ResultsCSVOutputStream<>(result, findRequest.filename, delimiter))

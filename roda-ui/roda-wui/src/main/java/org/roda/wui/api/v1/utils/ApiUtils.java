@@ -110,14 +110,16 @@ public class ApiUtils {
     String mediaType = MediaType.APPLICATION_JSON + "; charset=UTF-8";
 
     if (StringUtils.isNotBlank(acceptFormat)) {
-      if ("XML".equalsIgnoreCase(acceptFormat)) {
+      if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equalsIgnoreCase(acceptFormat)) {
         mediaType = MediaType.APPLICATION_XML;
-      } else if ("JSONP".equalsIgnoreCase(acceptFormat)) {
+      } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSONP.equalsIgnoreCase(acceptFormat)) {
         mediaType = applicationJs;
-      } else if ("bin".equalsIgnoreCase(acceptFormat)) {
+      } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equalsIgnoreCase(acceptFormat)) {
         mediaType = MediaType.APPLICATION_OCTET_STREAM;
-      } else if ("html".equalsIgnoreCase(acceptFormat)) {
+      } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equalsIgnoreCase(acceptFormat)) {
         mediaType = MediaType.TEXT_HTML;
+      } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_CSV.contains(acceptFormat)) {
+        mediaType = ExtraMediaType.TEXT_CSV;
       }
     } else if (StringUtils.isNotBlank(acceptHeaders)) {
       if (acceptHeaders.contains(MediaType.APPLICATION_XML)) {
