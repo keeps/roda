@@ -18,6 +18,8 @@ import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -37,13 +39,14 @@ import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
 
 import config.i18n.client.ClientMessages;
 
 public class Dialogs {
-
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
+  private static final String ADD_REPRESENTATION_TYPE = "#__ADDNEW__#";
 
   private Dialogs() {
     // do nothing
@@ -324,6 +327,96 @@ public class Dialogs {
     dialogBox.center();
     dialogBox.show();
     inputBox.setFocus(true);
+  }
+
+  public static void showPromptDialogRepresentationTypes(String title, String message, String cancelButtonText,
+    String confirmButtonText, List<String> types, boolean isControlledVocabulary,
+    final AsyncCallback<String> callback) {
+    final DialogBox dialogBox = new DialogBox(false, true);
+    dialogBox.setText(title);
+
+    final FlowPanel layout = new FlowPanel();
+
+    if (message != null) {
+      final Label messageLabel = new Label(message);
+      layout.add(messageLabel);
+      messageLabel.addStyleName("wui-dialog-message");
+    }
+
+    final ListBox select = new ListBox();
+
+    for (String type : types) {
+      select.addItem(type);
+    }
+
+    final Button cancelButton = new Button(cancelButtonText);
+    final Button confirmButton = new Button(confirmButtonText);
+
+    layout.add(select);
+
+    final TextBox newTypeBox = new TextBox();
+    final Label newTypeLabel = new Label(messages.representationTypeNewLabel() + ": ");
+    newTypeBox.setVisible(false);
+    newTypeLabel.setVisible(false);
+
+    if (!isControlledVocabulary) {
+      select.addItem(messages.representationTypeAddNew(), ADD_REPRESENTATION_TYPE);
+
+      newTypeBox.getElement().setPropertyString("placeholder", messages.representationTypeNewLabel());
+      layout.add(newTypeLabel);
+      layout.add(newTypeBox);
+    }
+
+    select.addChangeHandler(new ChangeHandler() {
+      @Override
+      public void onChange(ChangeEvent event) {
+        String selectedValue = select.getSelectedValue();
+        newTypeLabel.setVisible(selectedValue.equals(ADD_REPRESENTATION_TYPE));
+        newTypeBox.setVisible(selectedValue.equals(ADD_REPRESENTATION_TYPE));
+      }
+    });
+
+    layout.add(cancelButton);
+    layout.add(confirmButton);
+
+    dialogBox.setWidget(layout);
+
+    dialogBox.setGlassEnabled(true);
+    dialogBox.setAnimationEnabled(false);
+
+    cancelButton.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        dialogBox.hide();
+        callback.onFailure(null);
+      }
+    });
+
+    confirmButton.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        dialogBox.hide();
+
+        if (StringUtils.isNotBlank(newTypeBox.getText())) {
+          callback.onSuccess(newTypeBox.getText());
+        } else {
+          callback.onSuccess(select.getSelectedValue());
+        }
+      }
+    });
+
+    dialogBox.addStyleName("wui-dialog-prompt");
+    layout.addStyleName("wui-dialog-layout");
+    select.addStyleName("form-textbox wui-dialog-message");
+    cancelButton.addStyleName("btn btn-link");
+    confirmButton.addStyleName("pull-right btn btn-play");
+    newTypeBox.addStyleName("form-textbox wui-dialog-message");
+
+    dialogBox.center();
+    dialogBox.show();
+    select.setFocus(true);
   }
 
   private static CheckBox getRepresentationStateCheckBox(String state, boolean value) {

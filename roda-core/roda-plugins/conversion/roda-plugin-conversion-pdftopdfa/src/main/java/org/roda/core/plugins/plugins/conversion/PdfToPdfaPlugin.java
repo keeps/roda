@@ -60,6 +60,11 @@ public class PdfToPdfaPlugin<T extends IsRODAObject> extends AbstractConvertPlug
       RodaConstants.PLUGIN_PARAMS_DISSEMINATION_DESCRIPTION, "Dissemination description", PluginParameterType.STRING,
       "PDF/A document converted from PDF", false, false,
       "If the 'create dissemination' option is checked, then this will be the respective dissemination description."));
+
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_TYPE,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_TYPE, "Representation type",
+        PluginParameterType.REPRESENTATION_TYPE, "", false, false,
+        "Attribute a type when creating a new representation"));
   }
 
   public PdfToPdfaPlugin() {
@@ -76,6 +81,7 @@ public class PdfToPdfaPlugin<T extends IsRODAObject> extends AbstractConvertPlug
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_TITLE));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_DESCRIPTION));
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_TYPE));
     return parameters;
   }
 

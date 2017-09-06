@@ -66,6 +66,11 @@ public class PluginParameter implements Serializable {
     SEVERITY,
 
     /**
+     * Interface to select a representation type
+     */
+    REPRESENTATION_TYPE,
+
+    /**
      * Interface to select a RODA object
      */
     RODA_OBJECT;

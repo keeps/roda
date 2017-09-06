@@ -42,7 +42,10 @@ import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.index.facet.FacetFieldResult;
+import org.roda.core.data.v2.index.facet.FacetValue;
 import org.roda.core.data.v2.index.facet.Facets;
+import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsAll;
@@ -953,4 +956,29 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
       RodaConstants.DEFAULT_LIST_EXPORT_LIMIT);
   }
 
+  @Override
+  public Pair<Boolean, List<String>> retrieveRepresentationTypeOptions(String locale) {
+    List<String> types = new ArrayList<>();
+    boolean isControlled = RodaCoreFactory.getRodaConfiguration()
+      .getBoolean("core.representation_type.controlled_vocabulary", false);
+
+    if (isControlled) {
+      types = RodaCoreFactory.getRodaConfigurationAsList("core.representation_type.value");
+    } else {
+      try {
+        Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.REPRESENTATION_TYPE));
+        IndexResult<IndexedRepresentation> result = find(IndexedRepresentation.class.getName(), Filter.NULL,
+          Sorter.NONE, Sublist.NONE, facets, locale, false, new ArrayList<String>());
+
+        List<FacetFieldResult> facetResults = result.getFacetResults();
+        for (FacetValue facetValue : facetResults.get(0).getValues()) {
+          types.add(facetValue.getValue());
+        }
+      } catch (GenericException | AuthorizationDeniedException | RequestNotValidException e) {
+        LOGGER.error("Could not execute find request on representations", e);
+      }
+    }
+
+    return Pair.of(isControlled, types);
+  }
 }

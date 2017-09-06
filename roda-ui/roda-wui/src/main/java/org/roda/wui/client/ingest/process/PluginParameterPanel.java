@@ -34,6 +34,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
@@ -54,6 +55,7 @@ import config.i18n.client.ClientMessages;
 public class PluginParameterPanel extends Composite {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private ClientLogger logger = new ClientLogger(getClass().getName());
+  private static final String ADD_REPRESENTATION_TYPE = "#__ADDNEW__#";
 
   private final PluginParameter parameter;
   private final FlowPanel layout;
@@ -85,6 +87,8 @@ public class PluginParameterPanel extends Composite {
       createSelectRiskLayout();
     } else if (PluginParameterType.SEVERITY.equals(parameter.getType())) {
       createSelectSeverityLayout();
+    } else if (PluginParameterType.REPRESENTATION_TYPE.equals(parameter.getType())) {
+      createRepresentationTypeLayout();
     } else if (PluginParameterType.RODA_OBJECT.equals(parameter.getType())) {
       createSelectRodaObjectLayout();
     } else if (PluginParameterType.INTEGER.equals(parameter.getType())) {
@@ -94,6 +98,69 @@ public class PluginParameterPanel extends Composite {
         .warn("Unsupported plugin parameter type: " + parameter.getType() + ". Reverting to default parameter editor.");
       createStringLayout();
     }
+  }
+
+  private void createRepresentationTypeLayout() {
+    Label parameterName = new Label(parameter.getName());
+
+    final ListBox selectBox = new ListBox();
+    selectBox.addStyleName("form-selectbox");
+    selectBox.addStyleName("form-textbox-small");
+
+    final TextBox newTypeBox = new TextBox();
+    final Label newTypeLabel = new Label(messages.representationTypeNewLabel() + ": ");
+
+    newTypeBox.getElement().setPropertyString("placeholder", messages.representationTypeNewLabel());
+    newTypeBox.addStyleName("form-textbox wui-dialog-message plugin-representation-type-box");
+    newTypeLabel.addStyleName("plugin-representation-type-label");
+
+    newTypeLabel.setVisible(false);
+    newTypeBox.setVisible(false);
+
+    BrowserService.Util.getInstance().retrieveRepresentationTypeOptions(LocaleInfo.getCurrentLocale().getLocaleName(),
+      new AsyncCallback<Pair<Boolean, List<String>>>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          selectBox.setVisible(false);
+        }
+
+        @Override
+        public void onSuccess(Pair<Boolean, List<String>> result) {
+          for (String option : result.getSecond()) {
+            selectBox.addItem(option);
+          }
+
+          if (!result.getFirst()) {
+            selectBox.addItem(messages.representationTypeAddNew(), ADD_REPRESENTATION_TYPE);
+          }
+
+          selectBox.addChangeHandler(new ChangeHandler() {
+            @Override
+            public void onChange(ChangeEvent event) {
+              value = selectBox.getSelectedValue();
+              newTypeLabel.setVisible(value.equals(ADD_REPRESENTATION_TYPE));
+              newTypeBox.setVisible(value.equals(ADD_REPRESENTATION_TYPE));
+            }
+          });
+
+          newTypeBox.addChangeHandler(new ChangeHandler() {
+            @Override
+            public void onChange(ChangeEvent event) {
+              value = newTypeBox.getText();
+            }
+          });
+        }
+      });
+
+    value = selectBox.getSelectedValue();
+    selectBox.setTitle("representation type box");
+
+    layout.add(parameterName);
+    layout.add(selectBox);
+    layout.add(newTypeLabel);
+    layout.add(newTypeBox);
+    addHelp();
   }
 
   private void createSelectSeverityLayout() {

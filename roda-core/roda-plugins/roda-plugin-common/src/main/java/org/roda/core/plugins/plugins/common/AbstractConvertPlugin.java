@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.xmlbeans.XmlException;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -80,6 +81,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
   private boolean hasPartialSuccessOnOutcome = false;
   private String dipTitle = "";
   private String dipDescription = "";
+  private String representationType = "";
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
@@ -112,6 +114,11 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
       RodaConstants.PLUGIN_PARAMS_DISSEMINATION_DESCRIPTION, "Dissemination description", PluginParameterType.STRING,
       "Dissemination description", false, false,
       "If the 'create dissemination' option is checked, then this will be the respective dissemination description."));
+
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_TYPE,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_TYPE, "Representation type",
+        PluginParameterType.REPRESENTATION_TYPE, "", false, false,
+        "Attribute a type when creating a new representation"));
   }
 
   protected AbstractConvertPlugin() {
@@ -133,6 +140,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
     orderedList.add(params.get(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP));
     orderedList.add(params.get(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_TITLE));
     orderedList.add(params.get(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_DESCRIPTION));
+    orderedList.add(params.get(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_TYPE));
     return orderedList;
   }
 
@@ -216,6 +224,10 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
 
     if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_DESCRIPTION)) {
       dipDescription = parameters.get(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_DESCRIPTION);
+    }
+
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_TYPE)) {
+      representationType = parameters.get(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_TYPE);
     }
 
     hasPartialSuccessOnOutcome = Boolean.parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("core", "tools",
@@ -313,6 +325,11 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                         boolean original = false;
                         newRepresentations.add(newRepresentationID);
                         String newRepresentationType = representation.getType();
+
+                        if (StringUtils.isNotBlank(representationType)) {
+                          newRepresentationType = representationType;
+                        }
+
                         model.createRepresentation(aip.getId(), newRepresentationID, original, newRepresentationType,
                           notify, job.getUsername());
                         reportItem.setOutcomeObjectId(
@@ -504,6 +521,11 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                     } else {
                       // INFO will be a parameter
                       String newRepresentationType = RodaConstants.REPRESENTATION_TYPE_MIXED;
+
+                      if (StringUtils.isNotBlank(representationType)) {
+                        newRepresentationType = representationType;
+                      }
+
                       model.createRepresentation(aipId, newRepresentationID, original, newRepresentationType, notify,
                         job.getUsername());
                       reportItem.setOutcomeObjectId(
@@ -688,6 +710,11 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
               } else {
                 // INFO will be a parameter
                 String newRepresentationType = RodaConstants.REPRESENTATION_TYPE_MIXED;
+
+                if (StringUtils.isNotBlank(representationType)) {
+                  newRepresentationType = representationType;
+                }
+
                 model.createRepresentation(file.getAipId(), newRepresentationID, original, newRepresentationType,
                   model.getStorage(), storagePath, true, job.getUsername());
               }

@@ -114,6 +114,7 @@ public class AvconvConvertPlugin<T extends IsRODAObject> extends CommandConvertP
     orderedList.add(parameters.get(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP));
     orderedList.add(parameters.get(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_TITLE));
     orderedList.add(parameters.get(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_DESCRIPTION));
+    orderedList.add(parameters.get(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_TYPE));
     orderedList.add(new PluginParameter(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_COMMAND_ARGUMENTS)));
     orderedList.add(new PluginParameter(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_OUTPUT_ARGUMENTS)));
     return orderedList;

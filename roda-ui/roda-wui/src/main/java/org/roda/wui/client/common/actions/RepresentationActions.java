@@ -16,6 +16,7 @@ import java.util.Set;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
@@ -24,7 +25,6 @@ import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.dialogs.Dialogs;
-import org.roda.wui.client.common.search.SearchSuggestBox;
 import org.roda.wui.client.planning.Planning;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
 import org.roda.wui.client.process.CreateSelectedJob;
@@ -33,6 +33,7 @@ import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.user.client.Timer;
@@ -209,22 +210,18 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
 
   public void changeType(final SelectedItems<IndexedRepresentation> representations,
     final AsyncCallback<ActionImpact> callback) {
-    SearchSuggestBox<IndexedRepresentation> suggestBox = new SearchSuggestBox<>(IndexedRepresentation.class,
-      RodaConstants.REPRESENTATION_TYPE, true);
 
-    Dialogs.showPromptDialogSuggest(messages.changeTypeTitle(), null, messages.changeTypePlaceHolder(),
-      messages.cancelButton(), messages.confirmButton(), suggestBox, new AsyncCallback<String>() {
-
+    BrowserService.Util.getInstance().retrieveRepresentationTypeOptions(LocaleInfo.getCurrentLocale().getLocaleName(),
+      new AsyncCallback<Pair<Boolean, List<String>>>() {
         @Override
         public void onFailure(Throwable caught) {
           // do nothing
         }
 
         @Override
-        public void onSuccess(final String newType) {
-          Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-            RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false,
-            new AsyncCallback<String>() {
+        public void onSuccess(Pair<Boolean, List<String>> result) {
+          Dialogs.showPromptDialogRepresentationTypes(messages.changeTypeTitle(), null, messages.cancelButton(),
+            messages.confirmButton(), result.getSecond(), result.getFirst(), new AsyncCallback<String>() {
 
               @Override
               public void onFailure(Throwable caught) {
@@ -232,14 +229,27 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
               }
 
               @Override
-              public void onSuccess(String details) {
-                BrowserService.Util.getInstance().changeRepresentationType(representations, newType, details,
-                  new LoadingAsyncCallback<Void>() {
+              public void onSuccess(final String newType) {
+                Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
+                  RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false,
+                  new AsyncCallback<String>() {
 
                     @Override
-                    public void onSuccessImpl(Void nothing) {
-                      Toast.showInfo(messages.dialogSuccess(), messages.changeTypeSuccessful());
-                      callback.onSuccess(ActionImpact.UPDATED);
+                    public void onFailure(Throwable caught) {
+                      // do nothing
+                    }
+
+                    @Override
+                    public void onSuccess(String details) {
+                      BrowserService.Util.getInstance().changeRepresentationType(representations, newType, details,
+                        new LoadingAsyncCallback<Void>() {
+
+                          @Override
+                          public void onSuccessImpl(Void nothing) {
+                            Toast.showInfo(messages.dialogSuccess(), messages.changeTypeSuccessful());
+                            callback.onSuccess(ActionImpact.UPDATED);
+                          }
+                        });
                     }
                   });
               }

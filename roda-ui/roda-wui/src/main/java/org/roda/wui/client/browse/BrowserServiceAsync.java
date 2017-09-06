@@ -257,4 +257,6 @@ public interface BrowserServiceAsync {
   void acknowledgeNotification(String notificationId, String ackToken, AsyncCallback<Notification> asyncCallback);
 
   void getExportLimit(AsyncCallback<Integer> asyncCallback);
+
+  void retrieveRepresentationTypeOptions(String locale, AsyncCallback<Pair<Boolean, List<String>>> asyncCallback);
 }

@@ -5823,6 +5823,17 @@ td.datePickerMonth, td.datePickerYear {
 	padding-bottom: 20px;
 }
 
+.plugin-representation-type-label {
+	display: inline;
+    padding-left: 10px;
+}
+
+.plugin-representation-type-box {
+	display: inline;
+    width: auto;
+    padding-left: 10px;
+}
+
 /**********************************************
 				STATISTICS
 ************************************************/

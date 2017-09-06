@@ -7,7 +7,10 @@
  */
 package org.roda.core.data.v2.common;
 
-public class Pair<K, V> {
+import java.io.Serializable;
+
+public class Pair<K, V> implements Serializable {
+  private static final long serialVersionUID = 5089252869038977385L;
 
   private K first;
   private V second;

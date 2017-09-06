@@ -1441,6 +1441,10 @@ public interface ClientMessages extends Messages {
 
   String representationRemoveMessage();
 
+  String representationTypeAddNew();
+
+  String representationTypeNewLabel();
+
   /***** File ****/
 
   String file();

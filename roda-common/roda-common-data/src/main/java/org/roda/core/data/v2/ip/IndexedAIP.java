@@ -63,6 +63,8 @@ public class IndexedAIP implements IsIndexed, HasPermissions {
   private List<String> ingestSIPIds;
   private String ingestJobId;
   private List<String> ingestUpdateJobIds = new ArrayList<>();
+
+  @JsonIgnore
   private List<String> allIngestJobIds = new ArrayList<>();
 
   /**

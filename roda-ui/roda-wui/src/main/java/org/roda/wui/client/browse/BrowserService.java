@@ -355,4 +355,6 @@ public interface BrowserService extends RemoteService {
     throws GenericException, NotFoundException, AuthorizationDeniedException;
 
   int getExportLimit();
+
+  Pair<Boolean, List<String>> retrieveRepresentationTypeOptions(String locale);
 }
