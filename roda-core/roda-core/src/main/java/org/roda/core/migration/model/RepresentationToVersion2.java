@@ -2,9 +2,14 @@ package org.roda.core.migration.model;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
+import java.util.Date;
 
 import org.apache.commons.io.IOUtils;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -24,6 +29,7 @@ import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StringContentPayload;
+import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,9 +52,18 @@ public class RepresentationToVersion2 implements MigrationAction<Representation>
 
           AIP aip = JsonUtils.getObjectFromJson(inputStream, AIP.class);
           for (Representation representation : aip.getRepresentations()) {
-            representation.setCreatedOn(aip.getCreatedOn());
+            DefaultStoragePath representationStoragePath = DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP,
+              aip.getId(), RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS, representation.getId());
+            Path representationPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(),
+              representationStoragePath);
+
+            BasicFileAttributes attr = Files.readAttributes(representationPath, BasicFileAttributes.class);
+            Date createDate = new Date(attr.creationTime().toMillis());
+            Date updateDate = new Date(attr.lastModifiedTime().toMillis());
+
+            representation.setCreatedOn(createDate);
             representation.setCreatedBy(aip.getCreatedBy());
-            representation.setUpdatedOn(aip.getUpdatedOn());
+            representation.setUpdatedOn(updateDate);
             representation.setUpdatedBy(aip.getUpdatedBy());
 
             if (representation.isOriginal()) {

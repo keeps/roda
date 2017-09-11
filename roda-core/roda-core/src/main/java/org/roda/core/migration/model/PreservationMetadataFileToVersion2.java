@@ -107,7 +107,7 @@ public class PreservationMetadataFileToVersion2 implements MigrationAction<Prese
         }
       }
 
-      List<String> pathList = new ArrayList<String>(oldStoragePath.asList());
+      List<String> pathList = new ArrayList<>(oldStoragePath.asList());
 
       if (value != null) {
         pathList.remove(pathList.size() - 1);
