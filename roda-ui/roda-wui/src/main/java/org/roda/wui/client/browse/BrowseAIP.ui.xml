@@ -43,8 +43,8 @@
 							title="{messages.itemId}" />
 						<g:Label addStyleNames="browseSipId" ui:field="sipId"
 							title="{messages.sipId}" />
-						<g:FlowPanel ui:field="ingestJobId" title="{messages.processId}" />
-						<g:FlowPanel ui:field="ingestUpdateJobIds" title="{messages.updateProcessId}" />
+						<g:FlowPanel ui:field="ingestJobId" title="{messages.processIdTitle}" />
+						<g:FlowPanel ui:field="ingestUpdateJobIds" title="{messages.updateProcessIdTitle}" />
 						<g:Label addStyleNames="browseItemId" ui:field="dateCreated"/>
 						<g:Label addStyleNames="browseItemId" ui:field="dateUpdated"/>
 						<g:Label addStyleNames="browseItemId" ui:field="type"/>

@@ -687,6 +687,10 @@ public interface ClientMessages extends Messages {
 
   String updateProcessId();
 
+  String processIdTitle();
+
+  String updateProcessIdTitle();
+
   String itemIdMin(String itemId);
 
   String sipIdMin(String sipId);
