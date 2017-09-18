@@ -381,10 +381,15 @@ public class BrowseRepresentation extends Composite {
       .setHTML(HtmlSnippetUtils.getRepresentationTypeHTML(type, representation.getRepresentationStates()));
     representationId.setText(representation.getId());
 
-    dateCreated.setText(
-      messages.dateCreated(Humanize.formatDateTime(representation.getCreatedOn()), representation.getCreatedBy()));
-    dateUpdated.setText(
-      messages.dateUpdated(Humanize.formatDateTime(representation.getUpdatedOn()), representation.getUpdatedBy()));
+    if (representation.getCreatedOn() != null) {
+      dateCreated.setText(
+        messages.dateCreated(Humanize.formatDateTime(representation.getCreatedOn()), representation.getCreatedBy()));
+    }
+
+    if (representation.getUpdatedOn() != null) {
+      dateUpdated.setText(
+        messages.dateUpdated(Humanize.formatDateTime(representation.getUpdatedOn()), representation.getUpdatedBy()));
+    }
 
     // SIDEBAR
     actionsSidebar.setWidget(RepresentationActions.get(aipId).createActionsLayout(representation,
