@@ -2,7 +2,7 @@
 
 ## Asking questions or reporting issues
 
-If you have a question or an issue, please, follow next steps:
+If you have a question or an issue, please, follow these steps:
 
 - Try to find an answer to your question using the [search](https://github.com/keeps/roda/issues) functionallity provided by GitHub
 - See if the question or issue you are having has already been submitted by someone else and add to that
