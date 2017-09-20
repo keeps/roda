@@ -47,7 +47,6 @@ import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
@@ -1043,8 +1042,7 @@ public final class PluginHelper {
     }
 
     for (Map.Entry<String, List<String>> entry : sipIdToGhost.entrySet()) {
-      Filter nonGhostsFilter = new Filter(
-        new OneOfManyFilterParameter(RodaConstants.INGEST_SIP_IDS, Arrays.asList(entry.getKey())),
+      Filter nonGhostsFilter = new Filter(new SimpleFilterParameter(RodaConstants.INGEST_SIP_IDS, entry.getKey()),
         new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.FALSE.toString()));
 
       computedSearchScope
@@ -1097,12 +1095,11 @@ public final class PluginHelper {
   private static void moveChildrenAIPsAndDelete(IndexService index, ModelService model, String aipId,
     String newParentId, Optional<String> searchScope, String updatedBy)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException {
-    Filter parentFilter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aipId),
-      new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.FALSE.toString()));
+    Filter parentFilter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aipId));
     searchScope.ifPresent(id -> parentFilter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, id)));
 
     List<String> aipIds = new ArrayList<>();
-    index.findAll(IndexedAIP.class, parentFilter, Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_ID))
+    index.findAll(IndexedAIP.class, parentFilter, false, Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_ID))
       .forEach(e -> aipIds.add(e.getUUID()));
 
     for (String id : aipIds) {
