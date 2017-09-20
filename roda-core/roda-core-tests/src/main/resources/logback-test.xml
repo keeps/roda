@@ -23,9 +23,9 @@
 	</logger>
 
 	<logger name="org.roda" additivity="false">
-		<level value="DEBUG" />
+		<level value="INFO" />
 		<appender-ref ref="STDOUT" />
-	</logger>	
+	</logger>
 
 	<logger name="org.apache.solr" additivity="false">
 		<level value="ERROR" />
