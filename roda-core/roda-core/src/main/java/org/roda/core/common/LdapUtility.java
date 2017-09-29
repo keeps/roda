@@ -2043,6 +2043,19 @@ public class LdapUtility {
       | IllegalOperationException | GroupAlreadyExistsException | LdapException e) {
       throw new GenericException(e.getMessage(), e);
     }
+
+  }
+
+  public boolean isInternal(String username) throws GenericException {
+    final CoreSession session = this.service.getAdminSession();
+    Entry entry;
+    try {
+      entry = session.lookup(new Dn(getUserDN(username)));
+      return entry.containsAttribute(USER_PASSWORD);
+    } catch (LdapException e) {
+      throw new GenericException(e);
+    }
+
   }
 
 }

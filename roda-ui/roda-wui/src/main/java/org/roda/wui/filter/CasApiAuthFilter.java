@@ -25,9 +25,11 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
 import org.jasig.cas.client.util.AbstractCasFilter;
 import org.jasig.cas.client.validation.Assertion;
+import org.roda.core.common.UserUtility;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.user.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,8 +117,17 @@ public class CasApiAuthFilter implements Filter {
   private void doFilterWithCredentials(final HttpServletRequest request, final HttpServletResponse response,
     final FilterChain filterChain, final String username, final String password)
     throws GenericException, IOException, ServletException, AuthenticationDeniedException {
-    final String tgt = this.casClient.getTicketGrantingTicket(username, password);
-    doFilterWithTGT(request, response, filterChain, tgt);
+
+    // check if user is internal
+    if (UserUtility.getLdapUtility().isInternal(username)) {
+      final User user = UserUtility.getLdapUtility().getAuthenticatedUser(username, password);
+      user.setIpAddress(request.getRemoteAddr());
+      UserUtility.setUser(request, user);
+    } else {
+      // if user is external then try to use CAS
+      final String tgt = this.casClient.getTicketGrantingTicket(username, password);
+      doFilterWithTGT(request, response, filterChain, tgt);
+    }
   }
 
   private String constructServiceUrl(final HttpServletRequest request) {

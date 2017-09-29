@@ -185,6 +185,7 @@ public class UserUtility {
   public static boolean isAdministrator(User user) {
     return user.getName().equals(RodaConstants.ADMIN);
   }
+  
 
   public static void checkAIPPermissions(User user, IndexedAIP aip, PermissionType permissionType)
     throws AuthorizationDeniedException {
