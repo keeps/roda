@@ -2117,6 +2117,10 @@ td.datePickerMonth, td.datePickerYear {
 /*******************************************************************/
 /*******************************************************************/
 
+.content > .h1 {
+    margin-top: 0;
+}
+
 /* Browser v2*/
 
 .browse, .wui-browse-representation {
