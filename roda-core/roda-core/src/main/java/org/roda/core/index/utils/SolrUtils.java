@@ -2752,13 +2752,15 @@ public class SolrUtils {
     IterableIndexResult<T> iterableIndexResult = new IterableIndexResult<>(index, classToRetrieve, filter, Sorter.NONE,
       Facets.NONE, user, justActive, removeDuplicates, fieldsToReturn);
 
-    iterableIndexResult.forEach(target -> {
-      try {
-        indexRunnable.run(target);
-      } catch (RODAException e) {
-        exceptionHandler.accept(e);
-      }
-    });
+    if (iterableIndexResult.getTotalObjects() > 0) {
+      iterableIndexResult.forEach(target -> {
+        try {
+          indexRunnable.run(target);
+        } catch (RODAException e) {
+          exceptionHandler.accept(e);
+        }
+      });
+    }
   }
 
   private static SolrInputDocument solrDocumentToSolrInputDocument(SolrDocument d) {
