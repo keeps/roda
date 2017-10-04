@@ -38,8 +38,7 @@ import org.slf4j.LoggerFactory;
  */
 
 public class IterableIndexResult<T extends IsIndexed> implements Iterable<T> {
-  
-  
+
   private final class IteratorIndexResult implements Iterator<T> {
     @Override
     public boolean hasNext() {
@@ -65,6 +64,7 @@ public class IterableIndexResult<T extends IsIndexed> implements Iterable<T> {
 
         return t;
       } catch (IndexOutOfBoundsException e) {
+        LOGGER.warn("Error iterating through index result", e);
         throw new NoSuchElementException(e.getMessage());
       }
     }
