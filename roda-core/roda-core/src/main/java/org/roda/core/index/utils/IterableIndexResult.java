@@ -65,7 +65,7 @@ public class IterableIndexResult<T extends IsIndexed> implements Iterable<T> {
 
         return t;
       } catch (IndexOutOfBoundsException e) {
-        throw new NoSuchElementException();
+        throw new NoSuchElementException(e.getMessage());
       }
     }
   }
