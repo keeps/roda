@@ -293,9 +293,8 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       } else {
         sendNotification(model, index, job, jobStats);
       }
-
     } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
-      LOGGER.error("Could not send ingest notification");
+      LOGGER.error("Could not send ingest notification", e);
     }
 
     try {
