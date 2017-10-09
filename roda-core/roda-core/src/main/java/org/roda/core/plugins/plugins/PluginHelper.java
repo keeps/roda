@@ -595,14 +595,16 @@ public final class PluginHelper {
     IndexService index, String jobId) throws NotFoundException, GenericException, RequestNotValidException,
     AlreadyExistsException, AuthorizationDeniedException {
     String username = getJobUsername(jobId, index);
-    Permissions permissions = new Permissions();
 
+    Permissions permissions = new Permissions();
     permissions.setUserPermissions(username,
       new HashSet<>(Arrays.asList(Permissions.PermissionType.CREATE, Permissions.PermissionType.READ,
         Permissions.PermissionType.UPDATE, Permissions.PermissionType.DELETE, Permissions.PermissionType.GRANT)));
+
     boolean isGhost = true;
     AIP ghostAIP = model.createAIP(parent.orElse(null), "", permissions, Arrays.asList(ancestor), jobId, true, username,
       isGhost);
+
     return Optional.ofNullable(ghostAIP.getId());
   }
 
@@ -1020,11 +1022,12 @@ public final class PluginHelper {
     Filter ghostsFilter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.TRUE.toString()));
     jobId.ifPresent(id -> ghostsFilter.add(new SimpleFilterParameter(RodaConstants.INGEST_JOB_ID, id)));
     IterableIndexResult<IndexedAIP> ghosts = index.findAll(IndexedAIP.class, ghostsFilter,
-      Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.INGEST_SIP_IDS));
+      Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.INGEST_SIP_IDS, RodaConstants.AIP_GHOST));
 
     for (IndexedAIP aip : ghosts) {
+      List<String> temp = new ArrayList<>();
+
       if (aip.getIngestSIPIds() != null && !aip.getIngestSIPIds().isEmpty()) {
-        List<String> temp = new ArrayList<>();
         String firstIngestSIPId = aip.getIngestSIPIds().get(0);
         if (sipIdToGhost.containsKey(firstIngestSIPId)) {
           temp = sipIdToGhost.get(firstIngestSIPId);
@@ -1032,7 +1035,6 @@ public final class PluginHelper {
         temp.add(aip.getId());
         sipIdToGhost.put(firstIngestSIPId, temp);
       } else {
-        List<String> temp = new ArrayList<>();
         if (aipIdToGhost.containsKey(aip.getId())) {
           temp = aipIdToGhost.get(aip.getId());
         }
@@ -1060,12 +1062,9 @@ public final class PluginHelper {
         }
       } else if (result.getTotalCount() == 0) {
         String ghostIdToKeep = entry.getValue().get(0);
-        AIP ghostToKeep = model.retrieveAIP(ghostIdToKeep);
-        ghostToKeep.setGhost(false);
-        model.updateAIP(ghostToKeep, "test");
         if (entry.getValue().size() > 1) {
           for (int i = 1; i < entry.getValue().size(); i++) {
-            updateParent(index, model, entry.getValue().get(i), ghostIdToKeep, computedSearchScope);
+            updateParent(index, model, entry.getValue().get(i), ghostIdToKeep, computedSearchScope, updatedBy);
           }
         }
       }
@@ -1073,14 +1072,15 @@ public final class PluginHelper {
   }
 
   private static void updateParent(IndexService index, ModelService model, String aipId, String newParentId,
-    Optional<String> searchScope) throws GenericException, AuthorizationDeniedException, RequestNotValidException {
+    Optional<String> searchScope, String updatedBy)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException {
     Filter parentFilter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aipId));
     searchScope.ifPresent(id -> parentFilter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, id)));
     index.execute(IndexedAIP.class, parentFilter, Arrays.asList(RodaConstants.INDEX_UUID), child -> {
       try {
         AIP aip = model.retrieveAIP(child.getId());
         aip.setParentId(newParentId);
-        model.updateAIP(aip, "test");
+        model.updateAIP(aip, updatedBy);
       } catch (NotFoundException e) {
         LOGGER.debug("Can't move child. It wasn't found.", e);
       }

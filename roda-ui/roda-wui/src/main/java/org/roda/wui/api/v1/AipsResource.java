@@ -106,8 +106,8 @@ public class AipsResource {
   @GET
   @Path("/{" + RodaConstants.API_PATH_PARAM_AIP_ID + "}")
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_ZIP})
-  @ApiOperation(value = "Get AIP", notes = "Get AIP information", response = AIP.class)
-  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = AIP.class),
+  @ApiOperation(value = "Get AIP", notes = "Get AIP information", response = IndexedAIP.class)
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = IndexedAIP.class),
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
   public Response retrieveAIP(

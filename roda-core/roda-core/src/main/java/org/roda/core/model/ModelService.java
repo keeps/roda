@@ -67,6 +67,7 @@ import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.Representation;
@@ -2808,7 +2809,8 @@ public class ModelService extends ModelObservable {
   public boolean hasObjects(Class<? extends IsRODAObject> objectClass) {
     try {
       if (LogEntry.class.equals(objectClass) || RODAMember.class.equals(objectClass)
-        || TransferredResource.class.equals(objectClass) || IndexedPreservationAgent.class.equals(objectClass)) {
+        || TransferredResource.class.equals(objectClass) || IndexedPreservationAgent.class.equals(objectClass)
+        || IndexedAIP.class.equals(objectClass)) {
         return true;
       } else {
         StoragePath storagePath = ModelUtils.getContainerPath(objectClass);
