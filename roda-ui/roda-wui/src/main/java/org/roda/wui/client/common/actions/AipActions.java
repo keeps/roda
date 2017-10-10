@@ -32,6 +32,7 @@ import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.common.dialogs.RepresentationDialogs;
 import org.roda.wui.client.common.dialogs.SelectAipDialog;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
@@ -190,7 +191,6 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
   // ACTIONS
   private void newChildAip(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
-
     String newChildParentAipId = aip != null ? aip.getId() : null;
     String aipType = RodaConstants.AIP_TYPE_MIXED;
     BrowserService.Util.getInstance().createAIP(newChildParentAipId, aipType, new AsyncCallback<String>() {
@@ -648,8 +648,9 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
         @Override
         public void onSuccess(Pair<Boolean, List<String>> result) {
-          Dialogs.showPromptDialogEntityTypes(messages.changeTypeTitle(), messages.cancelButton(),
-            messages.confirmButton(), result.getSecond(), result.getFirst(), new AsyncCallback<String>() {
+          RepresentationDialogs.showPromptDialogRepresentationTypes(messages.changeTypeTitle(), null,
+            messages.cancelButton(), messages.confirmButton(), result.getSecond(), result.getFirst(),
+            new AsyncCallback<String>() {
 
               @Override
               public void onFailure(Throwable caught) {

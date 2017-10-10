@@ -121,6 +121,10 @@ ul {
     color: rgb(88, 89, 91);
 }
 
+.value a {
+	font-weight: 300;
+}
+
 .field {
     margin-bottom: 1rem;
 }
@@ -128,6 +132,7 @@ ul {
 .field ul {
     color: rgb(88, 89, 91);
 }
+
 
 .errormessage {
     margin-top: 0.5rem;
@@ -184,7 +189,7 @@ table .label-success, table .label-danger, table .label-warning, table .label-in
 }
 
 .label-info {
-    background-color: #337ab7;
+    background-color: #3e9ce8;
     display: inline;
     padding: .2em .6em .3em;
     /*     font-size: 75%; */
@@ -551,6 +556,23 @@ pre code {
     font-size: 1.4rem;
 }
 
+.ri-form-separator {
+    color: #3e9ce8;
+    font-size: 1.8rem;
+    font-weight: 300;
+    margin: 0.7em 0px 0.2em 0px !important;
+}
+
+.form-label-inline {
+	display: inline;
+	margin-right: 10px;	
+}
+
+.ri-form-label-inline {
+	display: inline;
+	margin-right: 5px;	
+}
+
 .panelDescriptiveMetadata .form-separator:first-child {
 	margin-top:0px !important;
 }
@@ -654,15 +676,25 @@ pre code {
 }
 
 .form-textbox-medium {
-    width: 50%;
+    width: 160px;
 }
 
 .form-button {
     margin-bottom: 10px;
 }
 
-.form-controlled{
+.form-controlled {
 	padding: 0px 5px 0px 5px;
+}
+
+.form-ri-select-boxes {
+    width: 30%;
+    margin-right: 10px;
+}
+
+.form-ri-text-boxes {
+    width: 30%;
+    margin-right: 10px;
 }
 
 .itemPanel {
@@ -1220,7 +1252,8 @@ pre code {
 .dropdown-popup {
     border: 1px solid #eee;
     position: absolute;
-    z-index: 1;
+    z-index: 9;
+    box-shadow: 0 0px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
 }
 
 .dropdown-label,
@@ -2162,6 +2195,11 @@ td.datePickerMonth, td.datePickerYear {
     vertical-align: middle;
 }
 
+.browseItemPanelWithMargin {
+    vertical-align: middle;
+    margin-bottom: 1.5rem;
+}
+
 .browseItemPanelText {
     display: inline;
     vertical-align: middle;
@@ -2177,9 +2215,6 @@ td.datePickerMonth, td.datePickerYear {
 .browseTitle-allCollections-wrapper .browseItemPanelText {
     display: inline-block;
 }
-
-
-
 
 .browseItemHeader {
 	color: #999;
@@ -2225,6 +2260,25 @@ td.datePickerMonth, td.datePickerYear {
     margin-left: 10px;
     font-size: 85%;
     vertical-align: super;
+}
+
+.browseRepresentationInformationIcon {
+    margin-left: 10px;
+    vertical-align: super;
+    font-size: 112%;
+}
+
+.browseFileInformationIcon {
+    color: white;
+    margin-left: 3px;
+}
+
+.browseIconRed i {
+    color: #af1612 !important;
+    background-color: white;
+    border-radius: 1em;
+    width: 1em;
+    text-align: center;
 }
 
 .browseItemId,
@@ -3633,6 +3687,10 @@ td.datePickerMonth, td.datePickerYear {
     margin-bottom: 10px;
 }
 
+.wui-dialog-fixed {
+	max-width: 60vw !important;
+}
+
 .pull-right {
     float: right;
 }
@@ -4212,6 +4270,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .viewRepresentationFile .infoFileEntry, .viewRepresentationFile .dip {
     margin-bottom: 1em;
+    line-height: 1;
 }
 
 .viewRepresentationFile .infoFileEntryKey, .viewRepresentationFile .dipTitle {
@@ -4249,8 +4308,6 @@ td.datePickerMonth, td.datePickerYear {
     word-break: break-all;
     line-height: 1.1em;
 }
-
-
 
 .table-file-path {
     color: #a7a9ac;
@@ -5698,7 +5755,9 @@ td.datePickerMonth, td.datePickerYear {
 .btn-separator {
 	margin-left: 10px;
 }
-
+.btn-separator-right {
+	margin-right: 10px;
+}
 
 .plugin-list-item {
     display: block;
@@ -5920,6 +5979,13 @@ td.datePickerMonth, td.datePickerYear {
 	font-size: 1.8rem;
 }
 
+.info-icon-static {
+    font-size: 2000%;
+    width: 100%;
+    text-align: center;
+    color: #089de3;
+}
+
 /***************************************
  DOWNLOAD CSV
 ****************************************/
@@ -6034,4 +6100,124 @@ td.datePickerMonth, td.datePickerYear {
 
 .markdown td * {
     font-size: 11px;
+}
+
+/***************************************
+ REPRESENTATION INFORMATION STYLING
+****************************************/
+
+.dialog-left-side {
+	margin-bottom: 15px;
+}
+
+.dialog-right-side {
+	padding: 10px 20px;
+	background: #eee;
+	margin-bottom: 15px;
+}
+
+.dialog-left-item-label {
+    color: #089de3;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    line-height: 30px;
+    padding: 2px 7px;
+}
+
+.dialog-left-item-selected {
+	background-color: #eee;
+}
+
+.dialog-left-item-label:hover {
+	background-color: #eee;
+	cursor: pointer;
+}
+
+.ri-category:hover {
+	cursor: pointer;
+}
+
+.ri-dialog {
+	max-width: 60vw !important;
+}
+
+.ri-dialog .wui-dialog-layout {
+    padding: 15px 15px 15px 10px;
+}
+
+
+.ri-entity-relation-section {
+	color: #999;
+    font-size: 90%;
+    border-top: 1px solid #ddd;
+    margin-top: 20px;
+    padding-top: 7px;
+    padding-left: 1.5%;
+    position: relative;
+    left: -1.5%;
+    width: 103%;
+}
+
+.incremental-list .removable-textbox {
+    display: inline-block;
+}
+
+.removable-textbox {
+    margin-right: 15px;
+}
+
+.bullet {
+	margin-right: 5px;
+}
+
+.link-color {
+	color: #089de3;
+}
+
+.ri-toolbarLink {
+    display: inline-block;
+    font-size: 15px;
+    line-height: 25px;
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+    cursor: hand;
+    text-align: center;
+    color: #58595b;
+}
+
+.ri-toolbarLink:hover {
+    color: white;
+    background-color: #d9534f;
+}
+
+.ri-dropdown-listbox {
+	border-bottom: 2px solid #089de3;
+    margin-bottom: 20px;
+}
+
+.ri-dropdown-listbox .dropdown-panel {
+	width: 200px;
+}
+
+.ri-content {
+	display: block;
+    padding-bottom: 10px;
+}
+
+.ri-content-label {
+	display: inline-block;
+    min-width: 203px;
+    text-align: center;
+}
+
+.ri-content-textbox {
+	display: inline-block;
+    max-width: 70%;
+}
+
+.relation-form-panel {
+	background-color: #eee;
+	margin-bottom: 10px;
 }

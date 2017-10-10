@@ -20,6 +20,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.formats.Format;
@@ -40,6 +41,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
@@ -51,6 +53,7 @@ import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.browse.bundle.DipBundle;
 import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
+import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
 import org.roda.wui.client.common.search.SearchField;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
@@ -231,16 +234,10 @@ public interface BrowserService extends RemoteService {
   void updateDIPPermissions(List<IndexedDIP> dips, Permissions permissions, String details)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
 
-  void updateRisk(Risk risk, int incidences)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
-
-  void updateFormat(Format format)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
-
   Risk createRisk(Risk risk)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
-  Format createFormat(Format format)
+  void updateRisk(Risk risk, int incidences)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
   void revertRiskVersion(String riskId, String versionId)
@@ -267,9 +264,6 @@ public interface BrowserService extends RemoteService {
 
   void deleteRisk(SelectedItems<IndexedRisk> selected) throws AuthorizationDeniedException, GenericException,
     RequestNotValidException, NotFoundException, InvalidParameterException, JobAlreadyStartedException;
-
-  void deleteFormat(SelectedItems<Format> selected)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
   <T extends IsIndexed> Job createProcess(String jobName, SelectedItems<T> selected, String id,
     Map<String, String> value, String selectedClass) throws AuthorizationDeniedException, RequestNotValidException,
@@ -359,4 +353,32 @@ public interface BrowserService extends RemoteService {
   Pair<Boolean, List<String>> retrieveAIPTypeOptions(String locale);
 
   Pair<Boolean, List<String>> retrieveRepresentationTypeOptions(String locale);
+
+  RepresentationInformation createRepresentationInformation(RepresentationInformation ri)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+
+  void updateRepresentationInformation(RepresentationInformation ri)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+
+  void deleteRepresentationInformation(SelectedItems<RepresentationInformation> selected)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
+
+  Pair<String, Integer> retrieveRepresentationInformationWithFilter(String riFilter) throws RODAException;
+
+  RepresentationInformationFilterBundle retrieveObjectClassFields(String locale) throws AuthorizationDeniedException;
+
+  Format createFormat(Format f)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+
+  void updateFormat(Format f)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+
+  void deleteFormat(SelectedItems<Format> selected)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
+
+  List<String> retrieveRelationTypeOptions();
+
+  List<String> retrieveRepresentationInformationFamilyOptions();
+
+  Map<String, String> retrieveRelationTypeTranslations(String localeString) throws AuthorizationDeniedException;
 }

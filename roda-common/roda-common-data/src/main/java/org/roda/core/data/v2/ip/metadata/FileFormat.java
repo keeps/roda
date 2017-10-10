@@ -15,6 +15,7 @@ public class FileFormat implements Serializable {
 
   private String formatDesignationName;
   private String formatDesignationVersion;
+  private String formatDesignation;
 
   private String mimeType;
   private String pronom;
@@ -30,6 +31,13 @@ public class FileFormat implements Serializable {
     super();
     this.formatDesignationName = formatDesignationName;
     this.formatDesignationVersion = formatDesignationVersion;
+
+    if (formatDesignationVersion != null && !formatDesignationVersion.isEmpty()) {
+      this.formatDesignation = formatDesignationName + " " + formatDesignationVersion;
+    } else {
+      this.formatDesignation = formatDesignationName;
+    }
+
     this.mimeType = mimeType;
     this.pronom = pronom;
     this.extension = extension;
@@ -50,6 +58,14 @@ public class FileFormat implements Serializable {
 
   public void setFormatDesignationVersion(String formatDesignationVersion) {
     this.formatDesignationVersion = formatDesignationVersion;
+  }
+
+  public String getFormatDesignation() {
+    return formatDesignation;
+  }
+
+  public void setFormatDesignation(String formatDesignation) {
+    this.formatDesignation = formatDesignation;
   }
 
   public String getMimeType() {
@@ -142,8 +158,8 @@ public class FileFormat implements Serializable {
   @Override
   public String toString() {
     return "FileFormat [formatDesignationName=" + formatDesignationName + ", formatDesignationVersion="
-      + formatDesignationVersion + ", mimeType=" + mimeType + ", pronom=" + pronom + ", extension=" + extension
-      + ", formatRegistries=" + formatRegistries + "]";
+      + formatDesignationVersion + ", formatDesignation=" + formatDesignation + ", mimeType=" + mimeType + ", pronom="
+      + pronom + ", extension=" + extension + ", formatRegistries=" + formatRegistries + "]";
   }
 
 }

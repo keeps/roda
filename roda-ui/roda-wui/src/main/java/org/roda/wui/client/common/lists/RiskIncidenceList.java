@@ -135,7 +135,7 @@ public class RiskIncidenceList extends BasicAsyncTableCell<RiskIncidence> {
     detectedByColumn.setSortable(true);
     statusColumn.setSortable(true);
 
-    addColumn(objectTypeColumn, messages.riskIncidenceObjectType(), true, true, 8);
+    addColumn(objectTypeColumn, messages.riskIncidenceObjectType(), true, false, 8);
     addColumn(objectColumn, messages.riskIncidenceObjectId(), false, false);
     addColumn(riskColumn, messages.riskIncidenceRisk(), false, false);
     addColumn(detectedOnColumn, messages.riskIncidenceDetectedOn(), false, false);

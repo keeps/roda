@@ -34,6 +34,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
@@ -44,6 +45,7 @@ import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.browse.bundle.DipBundle;
 import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
+import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
 import org.roda.wui.client.common.search.SearchField;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
@@ -164,10 +166,6 @@ public interface BrowserServiceAsync {
 
   void updateRisk(Risk risk, int incidences, AsyncCallback<Void> asyncCallback);
 
-  void createFormat(Format format, AsyncCallback<Format> asyncCallback);
-
-  void updateFormat(Format format, AsyncCallback<Void> asyncCallback);
-
   void revertRiskVersion(String riskId, String versionId, AsyncCallback<Void> callback);
 
   void deleteRiskVersion(String riskId, String versionId, AsyncCallback<Void> callback);
@@ -188,8 +186,6 @@ public interface BrowserServiceAsync {
   void deleteRisk(SelectedItems<IndexedRisk> selected, AsyncCallback<Void> asyncCallback);
 
   void deleteRiskIncidences(SelectedItems<RiskIncidence> selected, AsyncCallback<Void> asyncCallback);
-
-  void deleteFormat(SelectedItems<Format> selected, AsyncCallback<Void> asyncCallback);
 
   void createProcess(String jobName, SelectedItems<?> selected, String id, Map<String, String> value,
     String selectedClass, AsyncCallback<Job> asyncCallback);
@@ -261,4 +257,28 @@ public interface BrowserServiceAsync {
   void retrieveAIPTypeOptions(String locale, AsyncCallback<Pair<Boolean, List<String>>> asyncCallback);
 
   void retrieveRepresentationTypeOptions(String locale, AsyncCallback<Pair<Boolean, List<String>>> asyncCallback);
+
+  void createRepresentationInformation(RepresentationInformation ri,
+    AsyncCallback<RepresentationInformation> asyncCallback);
+
+  void updateRepresentationInformation(RepresentationInformation ri, AsyncCallback<Void> asyncCallback);
+
+  void deleteRepresentationInformation(SelectedItems<RepresentationInformation> selected,
+    AsyncCallback<Void> asyncCallback);
+
+  void retrieveRepresentationInformationWithFilter(String riFilter, AsyncCallback<Pair<String, Integer>> asyncCallback);
+
+  void retrieveObjectClassFields(String locale, AsyncCallback<RepresentationInformationFilterBundle> asyncCallback);
+
+  void createFormat(Format f, AsyncCallback<Format> asyncCallback);
+
+  void updateFormat(Format f, AsyncCallback<Void> asyncCallback);
+
+  void deleteFormat(SelectedItems<Format> selected, AsyncCallback<Void> asyncCallback);
+
+  void retrieveRelationTypeOptions(AsyncCallback<List<String>> asyncCallback);
+
+  void retrieveRepresentationInformationFamilyOptions(AsyncCallback<List<String>> asyncCallback);
+
+  void retrieveRelationTypeTranslations(String localeString, AsyncCallback<Map<String, String>> asyncCallback);
 }

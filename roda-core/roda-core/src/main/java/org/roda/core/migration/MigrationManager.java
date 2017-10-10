@@ -36,11 +36,9 @@ import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.ModelInfo;
 import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.risks.Risk;
-import org.roda.core.migration.model.FormatToVersion2;
 import org.roda.core.migration.model.PreservationMetadataFileToVersion2;
 import org.roda.core.migration.model.RepresentationToVersion2;
 import org.roda.core.migration.model.RiskToVersion2;
@@ -64,7 +62,8 @@ public class MigrationManager {
   // get very big & therefore should be done in a lazy fashion
   public void setupModelMigrations() throws GenericException {
     addModelMigration(Risk.class, 2, RiskToVersion2.class);
-    addModelMigration(Format.class, 2, FormatToVersion2.class);
+    // addModelMigration(RepresentationInformation.class, 2,
+    // FormatToVersion2.class);
     addModelMigration(PreservationMetadata.class, 2, PreservationMetadataFileToVersion2.class);
     addModelMigration(Representation.class, 2, RepresentationToVersion2.class);
   }
@@ -230,7 +229,7 @@ public class MigrationManager {
           break;
         } catch (RODAException e) {
           LOGGER.error("Error executing migration action '{}'. Stopping migrations for class '{}'.",
-            migrationClass.getName(), className);
+            migrationClass.getName(), className, e);
           break;
         }
       }

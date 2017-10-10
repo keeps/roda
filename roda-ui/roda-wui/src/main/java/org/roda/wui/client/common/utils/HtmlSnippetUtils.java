@@ -7,8 +7,12 @@
  */
 package org.roda.wui.client.common.utils;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.utils.RepresentationInformationUtils;
+import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
 import org.roda.core.data.v2.index.facet.FacetValue;
 import org.roda.core.data.v2.ip.AIP;
@@ -26,15 +30,23 @@ import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.risks.RiskIncidence.INCIDENCE_STATUS;
 import org.roda.wui.client.browse.BrowseAIP;
 import org.roda.wui.client.browse.BrowseRepresentation;
+import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.LastSelectedItemsSingleton;
+import org.roda.wui.client.planning.RepresentationInformationRegister;
+import org.roda.wui.client.planning.ShowRepresentationInformation;
+import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.UIObject;
+import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
 
@@ -118,19 +130,60 @@ public class HtmlSnippetUtils {
     return b.toSafeHtml();
   }
 
-  public static SafeHtml getRepresentationTypeHTML(String type, List<String> representationStates) {
-    SafeHtmlBuilder b = new SafeHtmlBuilder();
-    b.append(SafeHtmlUtils.fromSafeConstant(OPEN_H4_CLASS_LABEL_SUCCESS));
-    b.append(SafeHtmlUtils.fromString(type));
-    b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
+  public static List<Widget> getRepresentationTypeHTML(String type, List<String> representationStates) {
+    List<Widget> widgets = new ArrayList<>();
+
+    InlineHTML typeHTML = new InlineHTML();
+    typeHTML.setHTML(SafeHtmlUtils.fromSafeConstant(OPEN_H4_CLASS_LABEL_SUCCESS + type + CLOSE_SPAN));
+    widgets.add(typeHTML);
+
+    final Anchor anchor = new Anchor();
+    anchor.setHTML(SafeHtmlUtils
+      .fromSafeConstant("<i class='fa fa-info-circle browseRepresentationInformationIcon' aria-hidden='true'></i>"));
+
+    final String riFilter = RepresentationInformationUtils.createRepresentationInformationRepresentationFilter(type);
+
+    BrowserService.Util.getInstance().retrieveRepresentationInformationWithFilter(riFilter,
+      new AsyncCallback<Pair<String, Integer>>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
+        }
+
+        @Override
+        public void onSuccess(Pair<String, Integer> pair) {
+          LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
+          selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
+          anchor.removeStyleName("browseIconRed");
+
+          if (pair.getSecond() == 1) {
+            anchor.setHref(HistoryUtils.createHistoryHashLink(ShowRepresentationInformation.RESOLVER, pair.getFirst()));
+          } else if (pair.getSecond() > 1) {
+            anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationRegister.RESOLVER,
+              Search.RESOLVER.getHistoryToken(), RodaConstants.REPRESENTATION_INFORMATION_FILTERS, riFilter));
+          } else {
+            anchor.addStyleName("browseIconRed");
+            anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationRegister.RESOLVER,
+              Search.RESOLVER.getHistoryToken(), RodaConstants.REPRESENTATION_INFORMATION_FILTERS, riFilter));
+          }
+        }
+      });
+
+    widgets.add(anchor);
 
     for (String state : representationStates) {
+      SafeHtmlBuilder b = new SafeHtmlBuilder();
       b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_ORIGINAL_LABEL_SUCCESS));
       b.append(SafeHtmlUtils.fromString(messages.statusLabel(state)));
       b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
+
+      InlineHTML labelsHTML = new InlineHTML();
+      labelsHTML.setHTML(b.toSafeHtml());
+      widgets.add(labelsHTML);
     }
 
-    return b.toSafeHtml();
+    return widgets;
   }
 
   public static SafeHtml getPluginStateHTML(PluginState pluginState) {

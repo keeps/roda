@@ -22,7 +22,7 @@
 			<g:FlowPanel styleName="searchPanelRight">
 				<wcag:AccessibleFocusPanel styleName="searchAdvancedDisclosureButton"
 					ui:field="searchAdvancedDisclosureButton">
-					<g:HTML addStyleNames="searchButton-html">
+					<g:HTML addStyleNames="searchButton-html" ui:field="searchButton">
 						<span class="fa-stack fa-lg">
 							<i class="fa fa-angle-down fa-stack-1x"></i>
 							<i class="fa fa-angle-up fa-stack-1x"></i>

@@ -638,7 +638,7 @@ public class FormatMissingRepresentationInformationPlugin extends AbstractPlugin
 
       if (checkFormatDesignation()) {
 
-        final FilterParameter mainName = new SimpleFilterParameter(RodaConstants.FORMAT_NAME,
+        final FilterParameter mainName = new SimpleFilterParameter(RodaConstants.REPRESENTATION_INFORMATION_NAME,
           fileFormat.getFormatDesignationName());
         final FilterParameter alternativeName = new SimpleFilterParameter(RodaConstants.FORMAT_ALTERNATIVE_DESIGNATIONS,
           fileFormat.getFormatDesignationName());

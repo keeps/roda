@@ -23,6 +23,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.Group;
@@ -261,9 +262,21 @@ public abstract class ModelObservable {
     }
   }
 
-  public void notifyFormatCreatedOrUpdated(Format format, boolean commit) {
+  public void notifyRepresentationInformationCreatedOrUpdated(RepresentationInformation ri, boolean commit) {
     for (ModelObserver observer : observers) {
-      observer.formatCreatedOrUpdated(format, commit);
+      observer.representationInformationCreatedOrUpdated(ri, commit);
+    }
+  }
+
+  public void notifyRepresentationInformationDeleted(String representationInformationId, boolean commit) {
+    for (ModelObserver observer : observers) {
+      observer.representationInformationDeleted(representationInformationId, commit);
+    }
+  }
+
+  public void notifyFormatCreatedOrUpdated(Format f, boolean commit) {
+    for (ModelObserver observer : observers) {
+      observer.formatCreatedOrUpdated(f, commit);
     }
   }
 

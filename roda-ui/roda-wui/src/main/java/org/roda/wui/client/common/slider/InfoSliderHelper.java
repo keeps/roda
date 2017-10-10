@@ -8,33 +8,46 @@
 package org.roda.wui.client.common.slider;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.utils.RepresentationInformationUtils;
+import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
+import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.LastSelectedItemsSingleton;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.StringUtils;
+import org.roda.wui.client.planning.RepresentationInformationRegister;
+import org.roda.wui.client.planning.ShowRepresentationInformation;
+import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
 
 public class InfoSliderHelper {
-
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
+  private static final String INFO_ICON = "<i class='fa fa-info-circle browseFileInformationIcon' aria-hidden='true'></i>";
 
   private InfoSliderHelper() {
-
+    // do nothing
   }
 
   protected static <T extends IsIndexed> void updateInfoObjectSliderPanel(T object, SliderPanel slider) {
@@ -50,23 +63,24 @@ public class InfoSliderHelper {
   }
 
   private static void updateInfoSliderPanel(IndexedAIP aip, SliderPanel infoSliderPanel) {
-    HashMap<String, SafeHtml> values = new HashMap<>();
+    HashMap<String, Widget> values = new HashMap<>();
 
     infoSliderPanel.clear();
     infoSliderPanel.addTitle(new Label(messages.viewRepresentationInfoTitle()));
 
     if (aip != null) {
       if (StringUtils.isNotBlank(aip.getLevel())) {
-        values.put(messages.aipLevel(), DescriptionLevelUtils.getElementLevelIconSafeHtml(aip.getLevel(), true));
+        values.put(messages.aipLevel(),
+          new InlineHTML(DescriptionLevelUtils.getElementLevelIconSafeHtml(aip.getLevel(), true)));
       }
 
       if (StringUtils.isNotBlank(aip.getTitle())) {
-        values.put(messages.aipGenericTitle(), SafeHtmlUtils.fromString(aip.getTitle()));
+        values.put(messages.aipGenericTitle(), new InlineHTML(SafeHtmlUtils.fromString(aip.getTitle())));
       }
 
       if (aip.getDateInitial() != null || aip.getDateFinal() != null) {
-        values.put(messages.aipDates(),
-          SafeHtmlUtils.fromString(Humanize.getDatesText(aip.getDateInitial(), aip.getDateFinal(), true)));
+        values.put(messages.aipDates(), new InlineHTML(
+          SafeHtmlUtils.fromString(Humanize.getDatesText(aip.getDateInitial(), aip.getDateFinal(), true))));
       }
     }
 
@@ -74,7 +88,7 @@ public class InfoSliderHelper {
   }
 
   private static void updateInfoSliderPanel(IndexedRepresentation representation, SliderPanel infoSliderPanel) {
-    HashMap<String, SafeHtml> values = new HashMap<>();
+    HashMap<String, Widget> values = new HashMap<>();
 
     infoSliderPanel.clear();
     infoSliderPanel.addTitle(new Label(messages.viewRepresentationInfoTitle()));
@@ -83,77 +97,69 @@ public class InfoSliderHelper {
 
       if (StringUtils.isNotBlank(messages.representationType())) {
         values.put(messages.representationType(),
-          DescriptionLevelUtils.getRepresentationTypeIcon(representation.getType(), true));
+          new InlineHTML(DescriptionLevelUtils.getRepresentationTypeIcon(representation.getType(), true)));
       }
 
       if (StringUtils.isNotBlank(messages.representationFiles())) {
         values.put(messages.representationFiles(),
-          SafeHtmlUtils.fromString(messages.numberOfFiles(representation.getNumberOfDataFiles())));
+          new InlineHTML(SafeHtmlUtils.fromString(messages.numberOfFiles(representation.getNumberOfDataFiles()))));
       }
 
       if (representation.getNumberOfDataFiles() > 0) {
         values.put(messages.representationFiles(),
-          SafeHtmlUtils.fromString(messages.numberOfFiles(representation.getNumberOfDataFiles())));
+          new InlineHTML(SafeHtmlUtils.fromString(messages.numberOfFiles(representation.getNumberOfDataFiles()))));
       }
 
-      values.put(messages.representationOriginal(), SafeHtmlUtils.fromString(
-        representation.isOriginal() ? messages.originalRepresentation() : messages.alternativeRepresentation()));
+      values.put(messages.representationOriginal(), new InlineHTML(SafeHtmlUtils.fromString(
+        representation.isOriginal() ? messages.originalRepresentation() : messages.alternativeRepresentation())));
     }
 
     populate(infoSliderPanel, values);
   }
 
   private static void updateInfoSliderPanel(IndexedFile file, SliderPanel infoSliderPanel) {
-    HashMap<String, SafeHtml> values = new HashMap<>();
-
+    HashMap<String, Widget> values = new HashMap<>();
     infoSliderPanel.clear();
     infoSliderPanel.addTitle(new Label(messages.viewRepresentationInfoTitle()));
 
     if (file != null) {
       String fileName = file.getOriginalName() != null ? file.getOriginalName() : file.getId();
-      values.put(messages.viewRepresentationInfoFilename(), SafeHtmlUtils.fromString(fileName));
+      values.put(messages.viewRepresentationInfoFilename(), new InlineHTML(SafeHtmlUtils.fromString(fileName)));
 
       if (file.getSize() > 0) {
         values.put(messages.viewRepresentationInfoSize(),
-          SafeHtmlUtils.fromString(Humanize.readableFileSize(file.getSize())));
+          new InlineHTML(SafeHtmlUtils.fromString(Humanize.readableFileSize(file.getSize()))));
       }
 
       if (file.getFileFormat() != null) {
         FileFormat fileFormat = file.getFileFormat();
 
         if (StringUtils.isNotBlank(fileFormat.getMimeType())) {
-          values.put(messages.viewRepresentationInfoMimetype(), SafeHtmlUtils.fromString(fileFormat.getMimeType()));
+          values.put(messages.viewRepresentationInfoMimetype(), createMimetypeHTML(fileFormat.getMimeType()));
         }
 
         if (StringUtils.isNotBlank(fileFormat.getFormatDesignationName())) {
-          values.put(messages.viewRepresentationInfoFormat(),
-            SafeHtmlUtils.fromString(fileFormat.getFormatDesignationName()));
-        }
-
-        if (StringUtils.isNotBlank(fileFormat.getFormatDesignationVersion())) {
-          values.put(messages.viewRepresentationInfoFormatVersion(),
-            SafeHtmlUtils.fromString(fileFormat.getFormatDesignationVersion()));
+          values.put(messages.viewRepresentationInfoFormat(), createExtensionHTML(fileFormat.getFormatDesignation()));
         }
 
         if (StringUtils.isNotBlank(fileFormat.getPronom())) {
-          values.put(messages.viewRepresentationInfoPronom(), SafeHtmlUtils.fromString(fileFormat.getPronom()));
+          values.put(messages.viewRepresentationInfoPronom(), createPronomHTML(fileFormat.getPronom()));
         }
-
       }
 
       if (StringUtils.isNotBlank(file.getCreatingApplicationName())) {
         values.put(messages.viewRepresentationInfoCreatingApplicationName(),
-          SafeHtmlUtils.fromString(file.getCreatingApplicationName()));
+          new InlineHTML(SafeHtmlUtils.fromString(file.getCreatingApplicationName())));
       }
 
       if (StringUtils.isNotBlank(file.getCreatingApplicationVersion())) {
         values.put(messages.viewRepresentationInfoCreatingApplicationVersion(),
-          SafeHtmlUtils.fromString(file.getCreatingApplicationVersion()));
+          new InlineHTML(SafeHtmlUtils.fromString(file.getCreatingApplicationVersion())));
       }
 
       if (StringUtils.isNotBlank(file.getDateCreatedByApplication())) {
         values.put(messages.viewRepresentationInfoDateCreatedByApplication(),
-          SafeHtmlUtils.fromString(file.getDateCreatedByApplication()));
+          new InlineHTML(SafeHtmlUtils.fromString(file.getDateCreatedByApplication())));
       }
 
       if (file.getHash() != null && !file.getHash().isEmpty()) {
@@ -169,7 +175,7 @@ public class InfoSliderHelper {
           b.append(SafeHtmlUtils.fromString(hash));
           b.append(SafeHtmlUtils.fromSafeConstant("</small>"));
         }
-        values.put(messages.viewRepresentationInfoHash(), b.toSafeHtml());
+        values.put(messages.viewRepresentationInfoHash(), new InlineHTML(b.toSafeHtml()));
       }
 
       if (file.getStoragePath() != null) {
@@ -178,28 +184,147 @@ public class InfoSliderHelper {
         b.append(SafeHtmlUtils.fromString(file.getStoragePath()));
         b.append(SafeHtmlUtils.fromSafeConstant("</small>"));
 
-        values.put(messages.viewRepresentationInfoStoragePath(), b.toSafeHtml());
+        values.put(messages.viewRepresentationInfoStoragePath(), new InlineHTML(b.toSafeHtml()));
       }
     }
 
     populate(infoSliderPanel, values);
   }
 
-  private static void populate(SliderPanel infoSliderPanel, HashMap<String, SafeHtml> values) {
-    for (Entry<String, SafeHtml> entry : values.entrySet()) {
+  private static void populate(SliderPanel infoSliderPanel, HashMap<String, Widget> values) {
+    for (Entry<String, Widget> entry : values.entrySet()) {
       FlowPanel entryPanel = new FlowPanel();
 
       Label keyLabel = new Label(entry.getKey());
-      HTML valueLabel = new HTML(entry.getValue());
+      Widget valueLabel = entry.getValue();
 
       entryPanel.add(keyLabel);
       entryPanel.add(valueLabel);
-
       infoSliderPanel.addContent(entryPanel);
 
       keyLabel.addStyleName("infoFileEntryKey");
       valueLabel.addStyleName("infoFileEntryValue");
       entryPanel.addStyleName("infoFileEntry");
     }
+  }
+
+  private static FlowPanel createMimetypeHTML(String mimetype) {
+    FlowPanel mimetypePanel = new FlowPanel();
+    mimetypePanel.add(new InlineHTML(SafeHtmlUtils.fromString(mimetype)));
+
+    final Anchor anchor = new Anchor();
+    anchor.setHTML(SafeHtmlUtils.fromSafeConstant(INFO_ICON));
+    final List<String> filter = RepresentationInformationUtils.createRepresentationInformationFileFilter(null, mimetype,
+      null);
+
+    BrowserService.Util.getInstance().retrieveRepresentationInformationWithFilter(filter.get(0),
+      new AsyncCallback<Pair<String, Integer>>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
+        }
+
+        @Override
+        public void onSuccess(Pair<String, Integer> pair) {
+          LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
+          selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
+          anchor.removeStyleName("browseIconRed");
+
+          if (pair.getSecond() == 1) {
+            anchor.setHref(HistoryUtils.createHistoryHashLink(ShowRepresentationInformation.RESOLVER, pair.getFirst()));
+          } else if (pair.getSecond() > 1) {
+            anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationRegister.RESOLVER,
+              Search.RESOLVER.getHistoryToken(), RodaConstants.REPRESENTATION_INFORMATION_FILTERS, filter.get(0)));
+          } else {
+            anchor.addStyleName("browseIconRed");
+            anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationRegister.RESOLVER,
+              Search.RESOLVER.getHistoryToken(), RodaConstants.REPRESENTATION_INFORMATION_FILTERS, filter.get(0)));
+          }
+        }
+      });
+
+    mimetypePanel.add(anchor);
+    return mimetypePanel;
+  }
+
+  private static FlowPanel createPronomHTML(String pronom) {
+    FlowPanel pronomPanel = new FlowPanel();
+    pronomPanel.add(new InlineHTML(SafeHtmlUtils.fromString(pronom)));
+
+    final Anchor anchor = new Anchor();
+    anchor.setHTML(SafeHtmlUtils.fromSafeConstant(INFO_ICON));
+    final List<String> filter = RepresentationInformationUtils.createRepresentationInformationFileFilter(pronom, null,
+      null);
+
+    BrowserService.Util.getInstance().retrieveRepresentationInformationWithFilter(filter.get(0),
+      new AsyncCallback<Pair<String, Integer>>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
+        }
+
+        @Override
+        public void onSuccess(Pair<String, Integer> pair) {
+          LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
+          selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
+          anchor.removeStyleName("browseIconRed");
+
+          if (pair.getSecond() == 1) {
+            anchor.setHref(HistoryUtils.createHistoryHashLink(ShowRepresentationInformation.RESOLVER, pair.getFirst()));
+          } else if (pair.getSecond() > 1) {
+            anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationRegister.RESOLVER,
+              Search.RESOLVER.getHistoryToken(), RodaConstants.REPRESENTATION_INFORMATION_FILTERS, filter.get(0)));
+          } else {
+            anchor.addStyleName("browseIconRed");
+            anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationRegister.RESOLVER,
+              Search.RESOLVER.getHistoryToken(), RodaConstants.REPRESENTATION_INFORMATION_FILTERS, filter.get(0)));
+          }
+        }
+      });
+
+    pronomPanel.add(anchor);
+    return pronomPanel;
+  }
+
+  private static FlowPanel createExtensionHTML(String designation) {
+    FlowPanel pronomPanel = new FlowPanel();
+    pronomPanel.add(new InlineHTML(SafeHtmlUtils.fromString(designation)));
+
+    final Anchor anchor = new Anchor();
+    anchor.setHTML(SafeHtmlUtils.fromSafeConstant(INFO_ICON));
+    final List<String> filter = RepresentationInformationUtils.createRepresentationInformationFileFilter(null, null,
+      designation);
+
+    BrowserService.Util.getInstance().retrieveRepresentationInformationWithFilter(filter.get(0),
+      new AsyncCallback<Pair<String, Integer>>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
+        }
+
+        @Override
+        public void onSuccess(Pair<String, Integer> pair) {
+          LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
+          selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
+          anchor.removeStyleName("browseIconRed");
+
+          if (pair.getSecond() == 1) {
+            anchor.setHref(HistoryUtils.createHistoryHashLink(ShowRepresentationInformation.RESOLVER, pair.getFirst()));
+          } else if (pair.getSecond() > 1) {
+            anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationRegister.RESOLVER,
+              Search.RESOLVER.getHistoryToken(), RodaConstants.REPRESENTATION_INFORMATION_FILTERS, filter.get(0)));
+          } else {
+            anchor.addStyleName("browseIconRed");
+            anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationRegister.RESOLVER,
+              Search.RESOLVER.getHistoryToken(), RodaConstants.REPRESENTATION_INFORMATION_FILTERS, filter.get(0)));
+          }
+        }
+      });
+
+    pronomPanel.add(anchor);
+    return pronomPanel;
   }
 }

@@ -558,10 +558,6 @@ public class CreateDefaultJob extends Composite {
     return this.name;
   }
 
-  public FlowPanel getWorkflowList() {
-    return workflowList;
-  }
-
   public PluginOptionsPanel getWorkflowOptions() {
     return this.workflowOptions;
   }

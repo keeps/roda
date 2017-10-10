@@ -123,6 +123,7 @@
    <field name="formatPronom" type="string" indexed="true" stored="true" required="false" multiValued="false" />  
    <field name="isEntryPoint" type="boolean" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="fileFormat" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
+   <field name="formatDesignation" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
   
    <field name="originalName" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="size" type="long" indexed="true" stored="true" required="false" multiValued="false" /> 
@@ -145,6 +146,8 @@
    <copyField source="formatMimetype" dest="formatMimetype_txt"/>
    <copyField source="formatVersion" dest="search"/>
    <copyField source="formatVersion" dest="formatVersion_txt"/>
+   <copyField source="formatDesignation" dest="search"/>
+   <copyField source="formatDesignation" dest="formatDesignation_txt"/>
    <copyField source="formatPronom" dest="search"/>
    <copyField source="formatPronom" dest="formatPronom_txt"/>
    <copyField source="fileFormat" dest="search"/>

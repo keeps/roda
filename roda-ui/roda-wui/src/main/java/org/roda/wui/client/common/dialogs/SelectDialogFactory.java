@@ -8,7 +8,6 @@
 package org.roda.wui.client.common.dialogs;
 
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.AIP;
@@ -23,6 +22,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 
@@ -30,7 +30,7 @@ public class SelectDialogFactory {
 
   public <T extends IsIndexed> DefaultSelectDialog getSelectDialog(Class<T> actualClass, String title, Filter filter,
     boolean selectable) throws NotFoundException {
-    return (DefaultSelectDialog) getSelectDialog(actualClass.getName(), title, filter, selectable);
+    return getSelectDialog(actualClass.getName(), title, filter, selectable);
   }
 
   public DefaultSelectDialog getSelectDialog(String actualClass, String title, Filter filter, boolean selectable)
@@ -45,8 +45,8 @@ public class SelectDialogFactory {
     } else if (actualClass.equals(File.class.getName()) || actualClass.equals(IndexedFile.class.getName())) {
       boolean justActive = true;
       return new SelectFileDialog(title, filter, justActive, false, selectable);
-    } else if (actualClass.equals(Format.class.getName())) {
-      return new SelectFormatDialog(title, filter, selectable);
+    } else if (actualClass.equals(RepresentationInformation.class.getName())) {
+      return new SelectRepresentationInformationDialog(title, filter, selectable);
     } else if (actualClass.equals(IndexedRisk.class.getName()) || actualClass.equals(Risk.class.getName())) {
       return new SelectRiskDialog(title, filter, selectable);
     } else if (actualClass.equals(Job.class.getName())) {

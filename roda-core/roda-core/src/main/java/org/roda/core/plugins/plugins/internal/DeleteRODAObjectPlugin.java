@@ -24,7 +24,6 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
-import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -45,6 +44,7 @@ import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.index.IndexService;
@@ -127,8 +127,8 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
           processRepresentation(index, model, report, jobPluginInfo, cachedJob, (Representation) object);
         } else if (object instanceof Risk) {
           processRisk(index, model, report, jobPluginInfo, cachedJob, (Risk) object);
-        } else if (object instanceof Format) {
-          processFormat(model, report, jobPluginInfo, cachedJob, (Format) object);
+        } else if (object instanceof RepresentationInformation) {
+          processRepresentationInformation(model, report, jobPluginInfo, cachedJob, (RepresentationInformation) object);
         }
       }
     }, index, model, storage, liteList);
@@ -337,13 +337,13 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     jobPluginInfo.incrementObjectsProcessed(state);
   }
 
-  private void processFormat(ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo, Job job,
-    Format format) {
-    Report reportItem = PluginHelper.initPluginReportItem(this, format.getId(), Format.class);
+  private void processRepresentationInformation(ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo,
+    Job job, RepresentationInformation ri) {
+    Report reportItem = PluginHelper.initPluginReportItem(this, ri.getId(), RepresentationInformation.class);
     PluginState state = PluginState.SUCCESS;
 
     try {
-      model.deleteFormat(format.getId(), true);
+      model.deleteRepresentationInformation(ri.getId(), true);
     } catch (GenericException | NotFoundException | AuthorizationDeniedException | RequestNotValidException e) {
       state = PluginState.FAILURE;
     }
@@ -377,7 +377,7 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
       Job job = PluginHelper.getJob(this, index);
       index.commit((Class<? extends IsIndexed>) Class.forName(job.getSourceObjects().getSelectedClass()));
     } catch (NotFoundException | GenericException | ClassNotFoundException e) {
-      LOGGER.error("Could not commit after delete operation");
+      LOGGER.error("Could not commit after delete operation", e);
     }
 
     return new Report();
@@ -431,7 +431,7 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     list.add(Representation.class);
     list.add(File.class);
     list.add(Risk.class);
-    list.add(Format.class);
+    list.add(RepresentationInformation.class);
     return (List) list;
   }
 }

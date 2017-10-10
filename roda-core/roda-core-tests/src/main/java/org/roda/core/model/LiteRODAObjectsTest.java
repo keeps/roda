@@ -14,7 +14,6 @@ import java.util.Optional;
 
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteRODAObject;
-import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.Representation;
@@ -24,6 +23,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.Group;
@@ -59,12 +59,12 @@ public class LiteRODAObjectsTest {
     }
 
     // Format
-    Format format = new Format();
-    format.setId(id1);
-    lite = LiteRODAObjectFactory.get(format);
+    RepresentationInformation ri = new RepresentationInformation();
+    ri.setId(id1);
+    lite = LiteRODAObjectFactory.get(ri);
     assertTrue(lite.isPresent());
     if (lite.isPresent()) {
-      assertEquals(getExpected(Format.class, id1), lite.get().getInfo());
+      assertEquals(getExpected(RepresentationInformation.class, id1), lite.get().getInfo());
     }
 
     // Job

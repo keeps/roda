@@ -68,7 +68,7 @@ public class EditRiskIncidence extends Composite {
             }
           });
       } else {
-        HistoryUtils.newHistory(FormatRegister.RESOLVER);
+        HistoryUtils.newHistory(RepresentationInformationRegister.RESOLVER);
         callback.onSuccess(null);
       }
     }

@@ -43,6 +43,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
@@ -68,7 +69,8 @@ import org.slf4j.LoggerFactory;
  * </tr>
  * <tr>
  * <td>Format</td>
- * <td>org.roda.core.data.v2.formats.Format | formatId</td>
+ * <td>org.roda.core.data.v2.formats.RepresentationInformation |
+ * representationInformationId</td>
  * </tr>
  * <tr>
  * <td>Job</td>
@@ -149,8 +151,9 @@ public final class LiteRODAObjectFactory {
     Optional<LiteRODAObject> ret = Optional.empty();
 
     if (object instanceof AIP || object instanceof IndexedAIP || object instanceof DIP || object instanceof IndexedDIP
-      || object instanceof Format || object instanceof Job || object instanceof Notification || object instanceof Risk
-      || object instanceof IndexedRisk || object instanceof RiskIncidence || object instanceof LogEntry) {
+      || object instanceof RepresentationInformation || object instanceof Format || object instanceof Job
+      || object instanceof Notification || object instanceof Risk || object instanceof IndexedRisk
+      || object instanceof RiskIncidence || object instanceof LogEntry) {
       ret = get(ModelUtils.giveRespectiveModelClass(object.getClass()), Arrays.asList(object.getId()), false);
     } else if (object instanceof DescriptiveMetadata) {
       ret = getDescriptiveMetadata(object);
@@ -192,9 +195,9 @@ public final class LiteRODAObjectFactory {
     Optional<LiteRODAObject> ret = Optional.empty();
 
     if (objectClass == AIP.class || objectClass == IndexedAIP.class || objectClass == DIP.class
-      || objectClass == Format.class || objectClass == Job.class || objectClass == Notification.class
-      || objectClass == Risk.class || objectClass == RiskIncidence.class || objectClass == User.class
-      || objectClass == Group.class || objectClass == LogEntry.class) {
+      || objectClass == RepresentationInformation.class || objectClass == Format.class || objectClass == Job.class
+      || objectClass == Notification.class || objectClass == Risk.class || objectClass == RiskIncidence.class
+      || objectClass == User.class || objectClass == Group.class || objectClass == LogEntry.class) {
       ret = create(objectClass, 1, ids);
     } else if (objectClass == DescriptiveMetadata.class) {
       if (ids.size() == 2 || ids.size() == 3) {
@@ -305,6 +308,8 @@ public final class LiteRODAObjectFactory {
           ret = getDIPFile(model, split);
         } else if (File.class.getName().equals(clazz) || IndexedFile.class.getName().equals(clazz)) {
           ret = getFile(model, split);
+        } else if (RepresentationInformation.class.getName().equals(clazz)) {
+          ret = (T) model.retrieveRepresentationInformation(firstId);
         } else if (Format.class.getName().equals(clazz)) {
           ret = (T) model.retrieveFormat(firstId);
         } else if (Job.class.getName().equals(clazz)) {

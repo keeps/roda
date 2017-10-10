@@ -23,6 +23,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.Group;
@@ -103,7 +104,12 @@ public interface ModelObserver {
 
   public void riskIncidenceDeleted(String riskIncidenceId, boolean commit);
 
-  public ReturnWithExceptions<Void> formatCreatedOrUpdated(Format format, boolean commit);
+  public ReturnWithExceptions<Void> representationInformationCreatedOrUpdated(RepresentationInformation ri,
+    boolean commit);
+
+  public void representationInformationDeleted(String representationInformationId, boolean commit);
+
+  public ReturnWithExceptions<Void> formatCreatedOrUpdated(Format f, boolean commit);
 
   public void formatDeleted(String formatId, boolean commit);
 

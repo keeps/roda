@@ -177,7 +177,7 @@ public class BrowseRepresentation extends Composite {
   SimplePanel representationIcon;
 
   @UiField
-  HTML representationType;
+  FlowPanel representationType;
 
   @UiField
   Label representationId;
@@ -381,9 +381,14 @@ public class BrowseRepresentation extends Composite {
     representationIcon.setWidget(representationIconHtmlPanel);
 
     String type = representation.getType() != null ? representation.getType() : representation.getId();
-    representationType
-      .setHTML(HtmlSnippetUtils.getRepresentationTypeHTML(type, representation.getRepresentationStates()));
-    representationId.setText(representation.getId());
+    List<Widget> widgets = HtmlSnippetUtils.getRepresentationTypeHTML(type, representation.getRepresentationStates());
+
+    representationType.clear();
+    for (Widget widget : widgets) {
+      representationType.add(widget);
+    }
+
+    representationId.setText(messages.representationId() + ": " + representation.getId());
 
     if (!breadcrumbItems.isEmpty()) {
       breadcrumbItems.remove(breadcrumbItems.size() - 1);

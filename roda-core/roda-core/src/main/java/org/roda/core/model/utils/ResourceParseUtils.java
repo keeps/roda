@@ -51,6 +51,7 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetada
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.model.LiteRODAObjectFactory;
@@ -312,6 +313,9 @@ public class ResourceParseUtils {
       ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, ModelUtils.getRiskId(storagePath)));
     } else if (classToReturn.equals(RiskIncidence.class)) {
       ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, ModelUtils.getRiskIncidenceId(storagePath)));
+    } else if (classToReturn.equals(RepresentationInformation.class)) {
+      ret = OptionalWithCause
+        .of(LiteRODAObjectFactory.get(classToReturn, ModelUtils.getRepresentationInformationId(storagePath)));
     } else if (classToReturn.equals(Format.class)) {
       ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, ModelUtils.getFormatId(storagePath)));
     } else if (classToReturn.equals(Notification.class)) {

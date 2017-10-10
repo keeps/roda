@@ -65,6 +65,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
@@ -303,10 +304,6 @@ public class IndexService {
     }
   }
 
-  public ReturnWithExceptions<Void> reindexRiskIncidence(RiskIncidence riskIncidence) {
-    return observer.riskIncidenceCreatedOrUpdated(riskIncidence, false);
-  }
-
   public ReturnWithExceptions<Void> reindexFormat(Format format) {
     return observer.formatCreatedOrUpdated(format, false);
   }
@@ -314,6 +311,23 @@ public class IndexService {
   public void reindexFormats(StorageService storage) {
     try {
       reindexAll(storage, Format.class);
+    } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
+      | IOException | IsStillUpdatingException e) {
+      LOGGER.error("Error reindexing formats");
+    }
+  }
+
+  public ReturnWithExceptions<Void> reindexRiskIncidence(RiskIncidence riskIncidence) {
+    return observer.riskIncidenceCreatedOrUpdated(riskIncidence, false);
+  }
+
+  public ReturnWithExceptions<Void> reindexRepresentationInformation(RepresentationInformation ri) {
+    return observer.representationInformationCreatedOrUpdated(ri, false);
+  }
+
+  public void reindexRepresentationInformation(StorageService storage) {
+    try {
+      reindexAll(storage, RepresentationInformation.class);
     } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
       | IOException | IsStillUpdatingException e) {
       LOGGER.error("Error reindexing formats");
@@ -408,8 +422,8 @@ public class IndexService {
     Class<T> objectClass = (Class<T>) object.getClass();
     if (AIP.class.equals(objectClass) || IndexedAIP.class.equals(objectClass)) {
       return reindexAIP(AIP.class.cast(object));
-    } else if (Format.class.equals(objectClass)) {
-      return reindexFormat(Format.class.cast(object));
+    } else if (RepresentationInformation.class.equals(objectClass)) {
+      return reindexRepresentationInformation(RepresentationInformation.class.cast(object));
     } else if (Notification.class.equals(objectClass)) {
       return reindexNotification(Notification.class.cast(object));
     } else if (Risk.class.equals(objectClass) || IndexedRisk.class.equals(objectClass)) {
@@ -428,6 +442,8 @@ public class IndexService {
       return reindexDIP(DIP.class.cast(object));
     } else if (DIPFile.class.equals(objectClass)) {
       return reindexDIPFile(DIPFile.class.cast(object));
+    } else if (Format.class.equals(objectClass)) {
+      return reindexFormat(Format.class.cast(object));
     } else {
       LOGGER.error("Error trying to reindex an unconfigured object class: {}", objectClass.getName());
       ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<>();
@@ -523,6 +539,11 @@ public class IndexService {
   public <T extends IsIndexed> void delete(Class<T> classToRetrieve, Filter filter)
     throws GenericException, RequestNotValidException {
     SolrUtils.delete(getSolrClient(), classToRetrieve, filter);
+  }
+
+  public <T extends IsIndexed> void deleteByQuery(String classToRetrieve, Filter filter)
+    throws GenericException, RequestNotValidException {
+    SolrUtils.deleteByQuery(getSolrClient(), classToRetrieve, filter);
   }
 
   public <T extends IsIndexed> void create(Class<T> classToCreate, T instance)

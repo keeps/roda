@@ -46,7 +46,6 @@ import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
@@ -67,6 +66,7 @@ import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.log.LogEntryParameter;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.notifications.Notification.NOTIFICATION_STATE;
+import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
@@ -655,63 +655,38 @@ public class IndexServiceTest {
   }
 
   @Test
-  public void testFormatIndex() throws RODAException {
-    Format format = new Format();
-    format.setName("Portable Document Format");
-    format.setDefinition("PDF definition");
-    format.setCategories(Arrays.asList("Page Layout Files"));
-    format.setLatestVersion("1.7");
-    format.setPopularity(4);
-    format.setDeveloper("Adobe Systems");
-    format.setInitialRelease(new Date());
-    format.setStandard("ISO 32000-1");
-    format.setOpenFormat(true);
-    format.setWebsites(Arrays.asList("https://www.adobe.com/devnet/pdf/pdf_reference_archive.html"));
-    format.setProvenanceInformation("https://en.wikipedia.org/wiki/Portable_Document_Format");
+  public void testRepresentationInformationIndex() throws RODAException {
+    RepresentationInformation ri = new RepresentationInformation();
+    ri.setName("Portable Document Format");
+    ri.setDescription("PDF definition");
+    ri.setCategories(Arrays.asList("Page Layout Files"));
+    ri.setExtras("");
+    model.createRepresentationInformation(ri, false);
+    index.commit(RepresentationInformation.class);
 
-    List<String> extensions = new ArrayList<>();
-    extensions.add(".pdf");
-    format.setExtensions(extensions);
+    RepresentationInformation ri2 = model.retrieveRepresentationInformation(ri.getId());
+    assertNotNull(ri2);
+    assertEquals(ri.getId(), ri2.getId());
+    assertEquals(ri.getName(), ri2.getName());
 
-    List<String> mimetypes = new ArrayList<>();
-    mimetypes.add("application/pdf");
-    format.setMimetypes(mimetypes);
-
-    List<String> pronoms = new ArrayList<>();
-    pronoms.add("fmt/100");
-    format.setPronoms(pronoms);
-
-    List<String> utis = new ArrayList<>();
-    utis.add("com.adobe.pdf");
-    format.setUtis(utis);
-
-    model.createFormat(format, false);
-
-    index.commit(Format.class);
-
-    Format format2 = model.retrieveFormat(format.getId());
-    assertNotNull(format2);
-    assertEquals(format.getId(), format2.getId());
-    assertEquals(format.getName(), format2.getName());
-
-    IndexResult<Format> find = index.find(Format.class, null, null, new Sublist(0, 10), Collections.emptyList());
+    IndexResult<RepresentationInformation> find = index.find(RepresentationInformation.class, null, null,
+      new Sublist(0, 10), Collections.emptyList());
     assertEquals(1, find.getTotalCount());
 
-    Format format3 = index.retrieve(Format.class, format.getId(), new ArrayList<>());
-    assertNotNull(format3);
-    assertEquals(format.getId(), format3.getId());
-    assertEquals(format.getName(), format3.getName());
+    RepresentationInformation ri3 = index.retrieve(RepresentationInformation.class, ri.getId(), new ArrayList<>());
+    assertNotNull(ri3);
+    assertEquals(ri.getId(), ri3.getId());
+    assertEquals(ri.getName(), ri3.getName());
 
-    format3.setName("Format New Name");
-    model.updateFormat(format3, false);
+    ri3.setName("RepresentationInformation New Name");
+    model.updateRepresentationInformation(ri3, false);
 
-    Format format4 = index.retrieve(Format.class, format.getId(), new ArrayList<>());
-    assertNotNull(format4);
-    assertEquals(format.getId(), format4.getId());
-    assertEquals(format4.getName(), "Format New Name");
+    RepresentationInformation ri4 = index.retrieve(RepresentationInformation.class, ri.getId(), new ArrayList<>());
+    assertNotNull(ri4);
+    assertEquals(ri.getId(), ri4.getId());
+    assertEquals(ri4.getName(), "RepresentationInformation New Name");
 
-    model.deleteFormat(format.getId(), false);
-
+    model.deleteRepresentationInformation(ri.getId(), false);
   }
 
   @Test

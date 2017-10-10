@@ -28,6 +28,7 @@ import javax.xml.transform.TransformerException;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.ConsumesOutputStream;
 import org.roda.core.common.EntityResponse;
+import org.roda.core.common.Messages;
 import org.roda.core.common.StreamResponse;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
@@ -41,6 +42,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.ObjectPermissionResult;
+import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -68,6 +70,7 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Reports;
 import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
@@ -85,6 +88,7 @@ import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.browse.bundle.DipBundle;
 import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
+import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
 import org.roda.wui.client.planning.MitigationPropertiesBundle;
 import org.roda.wui.client.planning.RiskMitigationBundle;
@@ -2254,50 +2258,6 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static void updateRisk(User user, Risk risk, int incidences)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
-
-    try {
-      Map<String, String> properties = new HashMap<>();
-      properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATED.toString());
-
-      BrowserHelper.updateRisk(risk, user, properties, true, incidences);
-    } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
-      throw e;
-    } finally {
-      // register action
-      controllerAssistant.registerAction(user, risk.getId(), state, RodaConstants.CONTROLLER_RISK_PARAM, risk,
-        RodaConstants.CONTROLLER_MESSAGE_PARAM, RodaConstants.VersionAction.UPDATED.toString());
-    }
-  }
-
-  public static void updateFormat(User user, Format format)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
-
-    try {
-      BrowserHelper.updateFormat(format, true);
-    } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
-      throw e;
-    } finally {
-      // register action
-      controllerAssistant.registerAction(user, format.getId(), state, RodaConstants.CONTROLLER_FORMAT_PARAM, format);
-    }
-  }
-
   public static Risk createRisk(User user, Risk risk)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -2319,7 +2279,7 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static Format createFormat(User user, Format format)
+  public static void updateRisk(User user, Risk risk, int incidences)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -2329,14 +2289,17 @@ public class Browser extends RodaWuiController {
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
     try {
-      // delegate
-      return BrowserHelper.createFormat(format, true);
+      Map<String, String> properties = new HashMap<>();
+      properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATED.toString());
+
+      BrowserHelper.updateRisk(risk, user, properties, true, incidences);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;
     } finally {
       // register action
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_FORMAT_PARAM, format);
+      controllerAssistant.registerAction(user, risk.getId(), state, RodaConstants.CONTROLLER_RISK_PARAM, risk,
+        RodaConstants.CONTROLLER_MESSAGE_PARAM, RodaConstants.VersionAction.UPDATED.toString());
     }
   }
 
@@ -2528,27 +2491,6 @@ public class Browser extends RodaWuiController {
     try {
       // delegate
       BrowserHelper.deleteRisk(user, selected);
-    } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
-      throw e;
-    } finally {
-      // register action
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selected);
-    }
-  }
-
-  public static void deleteFormat(User user, SelectedItems<Format> selected)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
-
-    try {
-      // delegate
-      BrowserHelper.deleteFormat(user, selected);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;
@@ -3406,4 +3348,172 @@ public class Browser extends RodaWuiController {
     }
   }
 
+  public static RepresentationInformation createRepresentationInformation(User user, RepresentationInformation ri)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+
+    try {
+      // delegate
+      return BrowserHelper.createRepresentationInformation(ri, true);
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_REPRESENTATION_INFORMATION_PARAM, ri);
+    }
+  }
+
+  public static void updateRepresentationInformation(User user, RepresentationInformation ri)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+
+    try {
+      BrowserHelper.updateRepresentationInformation(ri, true);
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, ri.getId(), state,
+        RodaConstants.CONTROLLER_REPRESENTATION_INFORMATION_PARAM, ri);
+    }
+  }
+
+  public static void deleteRepresentationInformation(User user, SelectedItems<RepresentationInformation> selected)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+
+    try {
+      // delegate
+      BrowserHelper.deleteRepresentationInformation(user, selected);
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selected);
+    }
+  }
+
+  public static Pair<String, Integer> retrieveRepresentationInformationWithFilter(User user, String riFilter)
+    throws RODAException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+
+    try {
+      // delegate
+      return BrowserHelper.retrieveRepresentationInformationWithFilter(riFilter);
+    } catch (GenericException | RequestNotValidException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_REPRESENTATION_INFORMATION_FILTER_PARAM,
+        riFilter);
+    }
+  }
+
+  public static RepresentationInformationFilterBundle retrieveObjectClassFields(User user, Messages messages)
+    throws AuthorizationDeniedException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
+    return BrowserHelper.retrieveObjectClassFields(messages);
+  }
+
+  public static Format createFormat(User user, Format format)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+
+    try {
+      // delegate
+      return BrowserHelper.createFormat(format, true);
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_FORMAT_PARAM, format);
+    }
+  }
+
+  public static void updateFormat(User user, Format format)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+
+    try {
+      BrowserHelper.updateFormat(format, true);
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, format.getId(), state, RodaConstants.CONTROLLER_FORMAT_PARAM, format);
+    }
+  }
+
+  public static void deleteFormat(User user, SelectedItems<Format> selected)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+
+    try {
+      // delegate
+      BrowserHelper.deleteFormat(user, selected);
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selected);
+    }
+  }
+
+  public static Map<String, String> retrieveRelationTypeTranslations(User user, Messages messages)
+    throws AuthorizationDeniedException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
+    return BrowserHelper.retrieveRelationTypeTranslations(messages);
+  }
 }

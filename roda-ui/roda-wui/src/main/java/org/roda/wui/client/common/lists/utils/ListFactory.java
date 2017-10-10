@@ -7,7 +7,6 @@
  */
 package org.roda.wui.client.common.lists.utils;
 
-import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
@@ -24,6 +23,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
@@ -32,10 +32,10 @@ import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.DIPFileList;
 import org.roda.wui.client.common.lists.DIPList;
-import org.roda.wui.client.common.lists.FormatList;
 import org.roda.wui.client.common.lists.JobList;
 import org.roda.wui.client.common.lists.LogEntryList;
 import org.roda.wui.client.common.lists.NotificationList;
+import org.roda.wui.client.common.lists.RepresentationInformationList;
 import org.roda.wui.client.common.lists.RepresentationList;
 import org.roda.wui.client.common.lists.RiskIncidenceList;
 import org.roda.wui.client.common.lists.RiskList;
@@ -64,8 +64,8 @@ public class ListFactory {
     } else if (actualClass.equals(File.class.getName()) || actualClass.equals(IndexedFile.class.getName())) {
       return new SimpleFileList(filter, LastSelectedItemsSingleton.getInstance().isSelectedJustActive(), null,
         messages.selectFileSearchResults(), selectable, pageSize, incrementPage);
-    } else if (actualClass.equals(Format.class.getName())) {
-      return new FormatList(filter, null, title, selectable, pageSize, incrementPage);
+    } else if (actualClass.equals(RepresentationInformation.class.getName())) {
+      return new RepresentationInformationList(filter, null, title, selectable, pageSize, incrementPage);
     } else if (actualClass.equals(IndexedRisk.class.getName()) || actualClass.equals(Risk.class.getName())) {
       return new RiskList(filter, null, title, selectable, pageSize, incrementPage);
     } else if (actualClass.equals(RiskIncidence.class.getName())) {

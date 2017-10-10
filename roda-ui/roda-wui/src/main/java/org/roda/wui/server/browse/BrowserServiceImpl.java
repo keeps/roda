@@ -34,6 +34,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
@@ -66,6 +67,7 @@ import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
@@ -87,6 +89,7 @@ import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.browse.bundle.DipBundle;
 import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
+import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
 import org.roda.wui.client.common.search.SearchField;
 import org.roda.wui.client.common.utils.Tree;
@@ -614,20 +617,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void updateRisk(Risk risk, int incidences)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.updateRisk(user, risk, incidences);
-  }
-
-  @Override
-  public void updateFormat(Format format)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.updateFormat(user, format);
-  }
-
-  @Override
   public Risk createRisk(Risk risk)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
@@ -635,10 +624,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public Format createFormat(Format format)
+  public void updateRisk(Risk risk, int incidences)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.createFormat(user, format);
+    Browser.updateRisk(user, risk, incidences);
   }
 
   @Override
@@ -701,13 +690,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     RequestNotValidException, NotFoundException, InvalidParameterException, JobAlreadyStartedException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Browser.deleteRisk(user, selected);
-  }
-
-  @Override
-  public void deleteFormat(SelectedItems<Format> selected)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.deleteFormat(user, selected);
   }
 
   @Override
@@ -1007,4 +989,80 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
     return Pair.of(isControlled, types);
   }
+
+  @Override
+  public RepresentationInformation createRepresentationInformation(RepresentationInformation ri)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Browser.createRepresentationInformation(user, ri);
+  }
+
+  @Override
+  public void updateRepresentationInformation(RepresentationInformation ri)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    Browser.updateRepresentationInformation(user, ri);
+  }
+
+  @Override
+  public void deleteRepresentationInformation(SelectedItems<RepresentationInformation> selected)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    Browser.deleteRepresentationInformation(user, selected);
+  }
+
+  @Override
+  public Pair<String, Integer> retrieveRepresentationInformationWithFilter(String riFilter) throws RODAException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Browser.retrieveRepresentationInformationWithFilter(user, riFilter);
+  }
+
+  @Override
+  public RepresentationInformationFilterBundle retrieveObjectClassFields(String localeString)
+    throws AuthorizationDeniedException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    Locale locale = ServerTools.parseLocale(localeString);
+    Messages messages = RodaCoreFactory.getI18NMessages(locale);
+    return Browser.retrieveObjectClassFields(user, messages);
+  }
+
+  @Override
+  public Format createFormat(Format format)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Browser.createFormat(user, format);
+  }
+
+  @Override
+  public void updateFormat(Format format)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    Browser.updateFormat(user, format);
+  }
+
+  @Override
+  public void deleteFormat(SelectedItems<Format> selected)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    Browser.deleteFormat(user, selected);
+  }
+
+  @Override
+  public List<String> retrieveRelationTypeOptions() {
+    return RodaCoreFactory.getRodaConfigurationAsList("core.ri.relation");
+  }
+
+  @Override
+  public List<String> retrieveRepresentationInformationFamilyOptions() {
+    return RodaCoreFactory.getRodaConfigurationAsList("core.ri.family");
+  }
+
+  @Override
+  public Map<String, String> retrieveRelationTypeTranslations(String localeString) throws AuthorizationDeniedException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    Locale locale = ServerTools.parseLocale(localeString);
+    Messages messages = RodaCoreFactory.getI18NMessages(locale);
+    return Browser.retrieveRelationTypeTranslations(user, messages);
+  }
+
 }

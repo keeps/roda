@@ -16,9 +16,7 @@
 	<g:FlowPanel styleName="wui-format-register" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<g:Label styleName="h1">
-					<ui:text from='{messages.formatRegisterTitle}' />
-				</g:Label>
+				<g:FlowPanel ui:field="title"></g:FlowPanel>
 				<g:FlowPanel addStyleNames="page-description" ui:field="formatRegisterDescription">
 				</g:FlowPanel>
 				<commonsearch:SearchPanel ui:field="searchPanel" />

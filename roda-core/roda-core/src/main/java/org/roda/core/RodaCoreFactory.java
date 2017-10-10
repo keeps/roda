@@ -512,6 +512,7 @@ public class RodaCoreFactory {
 
           index.reindexRisks(fileStorageService);
           index.reindexFormats(fileStorageService);
+          index.reindexRepresentationInformation(fileStorageService);
           index.reindexAIPs();
           // reindex other default objects HERE
         }
@@ -846,14 +847,16 @@ public class RodaCoreFactory {
     System.setProperty("solr.data.dir.jobreport",
       indexDataPath.resolve(RodaConstants.CORE_JOBREPORT_FOLDER).toString());
     System.setProperty("solr.data.dir.risk", indexDataPath.resolve(RodaConstants.CORE_RISK_FOLDER).toString());
-    System.setProperty("solr.data.dir.agent", indexDataPath.resolve(RodaConstants.CORE_AGENT_FOLDER).toString());
     System.setProperty("solr.data.dir.format", indexDataPath.resolve(RodaConstants.CORE_FORMAT_FOLDER).toString());
+    System.setProperty("solr.data.dir.agent", indexDataPath.resolve(RodaConstants.CORE_AGENT_FOLDER).toString());
     System.setProperty("solr.data.dir.notification",
       indexDataPath.resolve(RodaConstants.CORE_NOTIFICATION_FOLDER).toString());
     System.setProperty("solr.data.dir.riskincidence",
       indexDataPath.resolve(RodaConstants.CORE_RISKINCIDENCE_FOLDER).toString());
     System.setProperty("solr.data.dir.dip", indexDataPath.resolve(RodaConstants.CORE_DIP_FOLDER).toString());
     System.setProperty("solr.data.dir.dipfile", indexDataPath.resolve(RodaConstants.CORE_DIP_FILE_FOLDER).toString());
+    System.setProperty("solr.data.dir.representation-information",
+      indexDataPath.resolve(RodaConstants.CORE_REPRESENTATION_INFORMATION_FOLDER).toString());
   }
 
   private static void instantiateNodeSpecificObjects(NodeType nodeType) {

@@ -19,6 +19,7 @@ import org.roda.core.data.v2.index.facet.FacetParameter;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
+import org.roda.core.data.v2.index.filter.OrFiltersParameters;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
@@ -343,8 +344,17 @@ public class MainSearch extends Composite {
   public boolean setSearch(List<String> historyTokens) {
     // #search/TYPE/key/value/key/value
     String type = historyTokens.get(0);
+    boolean hasOperator = historyTokens.size() % 2 == 1 ? false : true;
+    String operator = RodaConstants.OPERATOR_AND;
 
     boolean successful = searchPanel.setDropdownSelectedValue(type, false);
+
+    if (hasOperator) {
+      operator = historyTokens.remove(1);
+      successful = successful
+        && (operator.equals(RodaConstants.OPERATOR_AND) || operator.equals(RodaConstants.OPERATOR_OR));
+    }
+
     if (successful) {
       List<FilterParameter> params = new ArrayList<>();
       for (int i = 1; i < historyTokens.size() - 1; i += 2) {
@@ -355,11 +365,25 @@ public class MainSearch extends Composite {
 
       if (!params.isEmpty()) {
         if (searchPanel.isDefaultFilterIncremental()) {
-          filterAips.add(params);
-          filterRepresentations.add(params);
-          filterFiles.add(params);
+          if (operator.equals(RodaConstants.OPERATOR_OR)) {
+            OrFiltersParameters orParameters = new OrFiltersParameters(params);
+            filterAips.add(orParameters);
+            filterRepresentations.add(orParameters);
+            filterFiles.add(orParameters);
+          } else {
+            filterAips.add(params);
+            filterRepresentations.add(params);
+            filterFiles.add(params);
+          }
         } else {
-          Filter filter = new Filter(params);
+          Filter filter;
+
+          if (operator.equals(RodaConstants.OPERATOR_OR)) {
+            filter = new Filter(new OrFiltersParameters(params));
+          } else {
+            filter = new Filter(params);
+          }
+
           filterAips = filter;
           filterRepresentations = filter;
           filterFiles = filter;

@@ -64,6 +64,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
@@ -1119,9 +1120,47 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   @Override
-  public ReturnWithExceptions<Void> formatCreatedOrUpdated(Format format, boolean commit) {
+  public ReturnWithExceptions<Void> representationInformationCreatedOrUpdated(RepresentationInformation ri,
+    boolean commit) {
     ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<>();
-    SolrInputDocument formatDoc = SolrUtils.formatToSolrDocument(format);
+    SolrInputDocument doc = SolrUtils.representationInformationToSolrDocument(ri);
+
+    try {
+      index.add(RodaConstants.INDEX_REPRESENTATION_INFORMATION, doc);
+    } catch (SolrServerException | SolrException | IOException e) {
+      LOGGER.error("RepresentationInformation document was not added to index");
+      exceptions.addException(e);
+    }
+
+    if (commit) {
+      try {
+        SolrUtils.commit(index, RepresentationInformation.class);
+      } catch (GenericException | SolrException e) {
+        LOGGER.warn("Commit did not run as expected");
+        exceptions.addException(e);
+      }
+    }
+
+    return exceptions;
+  }
+
+  @Override
+  public void representationInformationDeleted(String representationInformationId, boolean commit) {
+    deleteDocumentFromIndex(RepresentationInformation.class, representationInformationId);
+
+    if (commit) {
+      try {
+        SolrUtils.commit(index, RepresentationInformation.class);
+      } catch (GenericException e) {
+        LOGGER.warn("Commit did not run as expected");
+      }
+    }
+  }
+
+  @Override
+  public ReturnWithExceptions<Void> formatCreatedOrUpdated(Format f, boolean commit) {
+    ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<>();
+    SolrInputDocument formatDoc = SolrUtils.formatToSolrDocument(f);
 
     try {
       index.add(RodaConstants.INDEX_FORMAT, formatDoc);

@@ -93,7 +93,6 @@ public final class RodaConstants {
   public static final String RODA_OBJECT_NOTIFICATION = "notification";
   public static final String RODA_OBJECT_RISK = "risk";
   public static final String RODA_OBJECT_INCIDENCE = "incidence";
-  public static final String RODA_OBJECT_FORMAT = "format";
   public static final String RODA_OBJECT_TRANSFERRED_RESOURCE = "transferred_resource";
   public static final String RODA_OBJECT_USER = "user";
   public static final String RODA_OBJECT_GROUP = "group";
@@ -101,6 +100,8 @@ public final class RodaConstants {
   public static final String RODA_OBJECT_PRESERVATION_METADATA = "preservation_metadata";
   public static final String RODA_OBJECT_OTHER_METADATA = "other_metadata";
   public static final String RODA_OBJECT_MEMBER = "member";
+  public static final String RODA_OBJECT_REPRESENTATION_INFORMATION = "representation_information";
+  public static final String RODA_OBJECT_FORMAT = "format";
 
   public static final String RODA_OBJECT_MEMBERS = "members";
   public static final String RODA_OBJECT_RISKS = "risks";
@@ -118,6 +119,7 @@ public final class RodaConstants {
   public static final String RODA_OBJECT_DIPS = "dips";
   public static final String RODA_OBJECT_DIPFILES = "dip_files";
   public static final String RODA_OBJECT_TRANSFERRED_RESOURCES = "transferred_resources";
+  public static final String RODA_OBJECT_REPRESENTATION_INFORMATION_LIST = "representation_information_list";
   public static final String RODA_OBJECT_FORMATS = "formats";
 
   public static final String RODA_OBJECT_PERMISSION = "permission";
@@ -164,7 +166,6 @@ public final class RodaConstants {
   public static final String CORE_MARKDOWN_FOLDER = "documentation";
   public static final String CORE_RISK_FOLDER = "risk";
   public static final String CORE_AGENT_FOLDER = "agent";
-  public static final String CORE_FORMAT_FOLDER = "format";
   public static final String CORE_NOTIFICATION_FOLDER = "notification";
   public static final String CORE_RISKINCIDENCE_FOLDER = "riskincidence";
   public static final String CORE_MAIL_TEMPLATE_FOLDER = "mail/templates";
@@ -172,6 +173,8 @@ public final class RodaConstants {
   public static final String CORE_REPORT_FOLDER = "reports";
   public static final String CORE_DIP_FOLDER = "dip";
   public static final String CORE_DIP_FILE_FOLDER = "dipfile";
+  public static final String CORE_REPRESENTATION_INFORMATION_FOLDER = "representation-information";
+  public static final String CORE_FORMAT_FOLDER = "format";
 
   public static final String CORE_I18N_CLIENT_FOLDER = "client";
   public static final String CORE_I18_GWT_XML_FILE = "I18N.gwt.xml";
@@ -252,12 +255,14 @@ public final class RodaConstants {
   public static final String API_PATH_PARAM_SIP_ID = "sip_id";
   public static final String API_PATH_PARAM_NOTIFICATION_ID = "notification_id";
   public static final String API_PATH_PARAM_AGENT_ID = "agent_id";
-  public static final String API_PATH_PARAM_FORMAT_ID = "format_id";
   public static final String API_PATH_PARAM_RISK_ID = "risk_id";
   public static final String API_PATH_PARAM_RISK_INCIDENCE_ID = "risk_incidence_id";
   public static final String API_PATH_PARAM_DIP_ID = "dip_id";
   public static final String API_PATH_PARAM_DIP_FILE_ID = "dip_file_id";
   public static final String API_PATH_PARAM_DIP_FILE_UUID = "dip_file_uuid";
+  public static final String API_PATH_PARAM_REPRESENTATION_INFORMATION_ID = "representation_information_id";
+  public static final String API_PATH_PARAM_FORMAT_ID = "format_id";
+
   public static final String API_PATH_PARAM_PART = "part";
   public static final String API_PATH_PARAM_NAME = "name";
   public static final String API_PATH_PARAM_USERNAME = "username";
@@ -353,8 +358,6 @@ public final class RodaConstants {
   public static final String CONTROLLER_PERMISSIONS_PARAM = "permissions";
   public static final String CONTROLLER_RISK_PARAM = RODA_OBJECT_RISK;
   public static final String CONTROLLER_RISK_ID_PARAM = "riskId";
-  public static final String CONTROLLER_FORMAT_PARAM = RODA_OBJECT_FORMAT;
-  public static final String CONTROLLER_FORMAT_ID_PARAM = "formatId";
   public static final String CONTROLLER_MESSAGE_PARAM = "message";
   public static final String CONTROLLER_INCIDENCE_PARAM = RODA_OBJECT_INCIDENCE;
   public static final String CONTROLLER_TEMPLATE_PARAM = "template";
@@ -362,6 +365,10 @@ public final class RodaConstants {
   public static final String CONTROLLER_NOTIFICATION_TOKEN_PARAM = "token";
   public static final String CONTROLLER_JOB_PARAM = "job";
   public static final String CONTROLLER_JOB_ID_PARAM = "jobId";
+  public static final String CONTROLLER_REPRESENTATION_INFORMATION_PARAM = RODA_OBJECT_REPRESENTATION_INFORMATION;
+  public static final String CONTROLLER_REPRESENTATION_INFORMATION_ID_PARAM = "representationInformationId";
+  public static final String CONTROLLER_FORMAT_PARAM = RODA_OBJECT_FORMAT;
+  public static final String CONTROLLER_FORMAT_ID_PARAM = "formatId";
 
   public static final String CONTROLLER_PRE_MITIGATION_PROBABILITY_PARAM = "preMitigationProbability";
   public static final String CONTROLLER_PRE_MITIGATION_IMPACT_PARAM = "preMitigationImpact";
@@ -409,6 +416,7 @@ public final class RodaConstants {
   public static final String CONTROLLER_PERMISSION_TYPE_PARAM = "permissionType";
   public static final String CONTROLLER_NAME_PARAM = "name";
   public static final String CONTROLLER_STATES_PARAM = "states";
+  public static final String CONTROLLER_REPRESENTATION_INFORMATION_FILTER_PARAM = "filter";
 
   /*
    * Core (storage, index, orchestrator, etc.)
@@ -455,11 +463,12 @@ public final class RodaConstants {
   public static final String INDEX_FILE = "File";
   public static final String INDEX_RISK = "Risk";
   public static final String INDEX_AGENT = "Agent";
-  public static final String INDEX_FORMAT = "Format";
   public static final String INDEX_NOTIFICATION = "Notification";
   public static final String INDEX_RISK_INCIDENCE = "RiskIncidence";
   public static final String INDEX_DIP = "DIP";
   public static final String INDEX_DIP_FILE = "DIPFile";
+  public static final String INDEX_REPRESENTATION_INFORMATION = "RepresentationInformation";
+  public static final String INDEX_FORMAT = "Format";
 
   /*
    * STORAGE CONTAINERS
@@ -472,10 +481,11 @@ public final class RodaConstants {
   public static final String STORAGE_CONTAINER_RISK = "risk";
   public static final String STORAGE_CONTAINER_RISK_INCIDENCE = "risk-incidence";
   public static final String STORAGE_CONTAINER_AGENT = "agent";
-  public static final String STORAGE_CONTAINER_FORMAT = "format";
   public static final String STORAGE_CONTAINER_NOTIFICATION = "notification";
   public static final String STORAGE_CONTAINER_PRESERVATION_AGENTS = "agents";
   public static final String STORAGE_CONTAINER_DIP = "dip";
+  public static final String STORAGE_CONTAINER_REPRESENTATION_INFORMATION = "representation-information";
+  public static final String STORAGE_CONTAINER_FORMAT = "format";
 
   public static final String STORAGE_HISTORY_CONTAINER_DATA = "data";
   public static final String STORAGE_HISTORY_CONTAINER_METADATA = "metadata";
@@ -659,6 +669,9 @@ public final class RodaConstants {
 
   public static final String REPOSITORY_PERMISSIONS_RISK_MANAGE = "risk.manage";
   public static final String REPOSITORY_PERMISSIONS_RISK_READ = "risk.read";
+
+  public static final String REPOSITORY_PERMISSIONS_REPRESENTATION_INFORMATION_MANAGE = "ri.manage";
+  public static final String REPOSITORY_PERMISSIONS_REPRESENTATION_INFORMATION_READ = "ri.read";
 
   public static final String REPOSITORY_PERMISSIONS_FORMAT_MANAGE = "format.manage";
   public static final String REPOSITORY_PERMISSIONS_FORMAT_READ = "format.read";
@@ -892,6 +905,7 @@ public final class RodaConstants {
   public static final String FILE_HASH = "hash";
   public static final String FILE_FULLTEXT = "fulltext";
   public static final String FILE_ANCESTORS = "ancestors";
+  public static final String FILE_FORMAT_DESIGNATION = "formatDesignation";
   public static final String FILE_SEARCH = "search";
 
   /* Risks */
@@ -955,6 +969,26 @@ public final class RodaConstants {
   public static final String RISK_INCIDENCE_FILE_PATH_COMPUTED_SEPARATOR = "/";
   public static final String RISK_INCIDENCE_FILE_EXTENSION = ".json";
   public static final String RISK_INCIDENCE_SEARCH = "search";
+
+  /* Representation information */
+  public static final String REPRESENTATION_INFORMATION_ID = "id";
+  public static final String REPRESENTATION_INFORMATION_NAME = "name";
+  public static final String REPRESENTATION_INFORMATION_NAME_SORT = "name_sort";
+  public static final String REPRESENTATION_INFORMATION_DESCRIPTION = "description";
+  public static final String REPRESENTATION_INFORMATION_FAMILY = "family";
+  public static final String REPRESENTATION_INFORMATION_CATEGORIES = "categories";
+  public static final String REPRESENTATION_INFORMATION_CATEGORIES_SORT = "categories_sort";
+  public static final String REPRESENTATION_INFORMATION_EXTRAS = "extras";
+  public static final String REPRESENTATION_INFORMATION_SUPPORT = "support";
+  public static final String REPRESENTATION_INFORMATION_RELATIONS = "relations";
+  public static final String REPRESENTATION_INFORMATION_FILTERS = "filters";
+  public static final String REPRESENTATION_INFORMATION_RELATION_TYPE = "relationType";
+  public static final String REPRESENTATION_INFORMATION_OBJECT_TYPE = "objectType";
+  public static final String REPRESENTATION_INFORMATION_LINK = "link";
+  public static final String REPRESENTATION_INFORMATION_TITLE = "title";
+
+  public static final String REPRESENTATION_INFORMATION_FILE_EXTENSION = ".json";
+  public static final String REPRESENTATION_INFORMATION_SEARCH = "search";
 
   /* Formats */
   public static final String FORMAT_ID = "id";
@@ -1290,6 +1324,10 @@ public final class RodaConstants {
   public static final String MEDIA_TYPE_TEXT_HTML = "text/html";
   public static final String HTTP_HEADERS_WWW_AUTHENTICATE = "WWW-Authenticate";
   public static final int STATUS_OK = 200;
+
+  /* Url operators for searches */
+  public static final String OPERATOR_AND = "and";
+  public static final String OPERATOR_OR = "or";
 
   /* Test groups */
   public static final String TEST_GROUP_ALL = "all";

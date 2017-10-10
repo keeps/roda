@@ -656,11 +656,20 @@ public final class PremisV3Utils {
         if (occt.getFormatArray() != null && occt.getFormatArray().length > 0) {
           FormatComplexType fct = occt.getFormatArray(0);
           if (fct.getFormatDesignation() != null) {
-            if (StringUtils.isNotBlank(fct.getFormatDesignation().getFormatName().getStringValue())) {
-              doc.addField(RodaConstants.FILE_FILEFORMAT, fct.getFormatDesignation().getFormatName().getStringValue());
+            String format = fct.getFormatDesignation().getFormatName().getStringValue();
+            String formatVersion = fct.getFormatDesignation().getFormatVersion();
+            String formatDesignation = "";
+
+            if (StringUtils.isNotBlank(format)) {
+              doc.addField(RodaConstants.FILE_FILEFORMAT, format);
+              formatDesignation += format;
             }
-            if (StringUtils.isNotBlank(fct.getFormatDesignation().getFormatVersion())) {
-              doc.addField(RodaConstants.FILE_FORMAT_VERSION, fct.getFormatDesignation().getFormatVersion());
+            if (StringUtils.isNotBlank(formatVersion)) {
+              doc.addField(RodaConstants.FILE_FORMAT_VERSION, formatVersion);
+              formatDesignation += " " + formatVersion;
+            }
+            if (StringUtils.isNotBlank(formatDesignation)) {
+              doc.addField(RodaConstants.FILE_FORMAT_DESIGNATION, formatDesignation);
             }
           }
 

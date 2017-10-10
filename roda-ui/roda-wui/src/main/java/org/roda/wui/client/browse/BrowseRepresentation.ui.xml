@@ -25,8 +25,7 @@
 							<ui:text from='{messages.catalogueRepresentationTitle}' />
 						</g:Label>
 						<g:SimplePanel styleName="browseItemIcon" ui:field="representationIcon" />
-						<g:FlowPanel styleName="browseItemPanelText">
-							<g:HTML addStyleNames="browseItemTextWithoutFontSize" ui:field="representationType" />
+						<g:FlowPanel styleName="browseItemPanelText browseItemTextWithoutFontSize" ui:field="representationType">
 						</g:FlowPanel>
 						<g:Label addStyleNames="browseRepresentationId" ui:field="representationId"
 							title="{messages.representationId}" />

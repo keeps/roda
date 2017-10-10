@@ -45,6 +45,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.SelectionChangeEvent;
 
@@ -98,6 +100,9 @@ public class FormatRegister extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
+
+  @UiField
+  FlowPanel title;
 
   @UiField
   FlowPanel formatRegisterDescription;
@@ -156,6 +161,13 @@ public class FormatRegister extends Composite {
     });
 
     initWidget(uiBinder.createAndBindUi(this));
+
+    Label titleLabel = new Label(messages.formatRegisterTitle());
+    titleLabel.addStyleName("h1 browseItemText");
+    title.add(titleLabel);
+
+    InlineHTML badge = new InlineHTML("<span class='label-warning browseRepresentationOriginalIcon'>Deprecated</span>");
+    title.add(badge);
 
     formatRegisterDescription.add(new HTMLWidgetWrapper("FormatRegisterDescription.html"));
     buttonRemove.setEnabled(false);

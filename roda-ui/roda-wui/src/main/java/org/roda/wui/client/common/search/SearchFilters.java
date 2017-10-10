@@ -8,7 +8,6 @@
 package org.roda.wui.client.common.search;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.AIP;
@@ -26,6 +25,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
@@ -45,8 +45,8 @@ public class SearchFilters {
       return new Filter(new BasicSearchFilterParameter(RodaConstants.REPRESENTATION_SEARCH, "*"));
     } else if (actualClass.equals(File.class.getName()) || actualClass.equals(IndexedFile.class.getName())) {
       return new Filter(new BasicSearchFilterParameter(RodaConstants.FILE_SEARCH, "*"));
-    } else if (actualClass.equals(Format.class.getName())) {
-      return new Filter(new BasicSearchFilterParameter(RodaConstants.FORMAT_SEARCH, "*"));
+    } else if (actualClass.equals(RepresentationInformation.class.getName())) {
+      return new Filter(new BasicSearchFilterParameter(RodaConstants.REPRESENTATION_INFORMATION_SEARCH, "*"));
     } else if (actualClass.equals(IndexedRisk.class.getName()) || actualClass.equals(Risk.class.getName())) {
       return new Filter(new BasicSearchFilterParameter(RodaConstants.RISK_SEARCH, "*"));
     } else if (actualClass.equals(RiskIncidence.class.getName())) {
@@ -80,8 +80,8 @@ public class SearchFilters {
       return RodaConstants.REPRESENTATION_SEARCH;
     } else if (actualClass.equals(File.class.getName()) || actualClass.equals(IndexedFile.class.getName())) {
       return RodaConstants.FILE_SEARCH;
-    } else if (actualClass.equals(Format.class.getName())) {
-      return RodaConstants.FORMAT_SEARCH;
+    } else if (actualClass.equals(RepresentationInformation.class.getName())) {
+      return RodaConstants.REPRESENTATION_INFORMATION_SEARCH;
     } else if (actualClass.equals(IndexedRisk.class.getName()) || actualClass.equals(Risk.class.getName())) {
       return RodaConstants.RISK_SEARCH;
     } else if (actualClass.equals(RiskIncidence.class.getName())) {

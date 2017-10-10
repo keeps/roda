@@ -34,6 +34,7 @@ import org.roda.wui.client.management.UserLog;
 import org.roda.wui.client.planning.FormatRegister;
 import org.roda.wui.client.planning.Planning;
 import org.roda.wui.client.planning.PreservationAgents;
+import org.roda.wui.client.planning.RepresentationInformationRegister;
 import org.roda.wui.client.planning.RiskRegister;
 import org.roda.wui.client.process.ActionProcess;
 import org.roda.wui.client.process.IngestProcess;
@@ -104,9 +105,10 @@ public class Menu extends Composite {
   private final AcessibleMenuBar planningMenu;
   // private MenuItem planningMonitoring;
   private MenuItem planningRisk;
-  private MenuItem planningFormat;
+  private MenuItem planningRepresentationInformation;
   private MenuItem planningEvent;
   private MenuItem planningAgent;
+  private MenuItem planningFormat;
 
   private final MenuItem help;
   private final AcessibleMenuBar userMenu;
@@ -176,15 +178,18 @@ public class Menu extends Composite {
     planningRisk = planningMenu.addItem(messages.title("planning_risk"),
       createCommand(RiskRegister.RESOLVER.getHistoryPath()));
     planningRisk.addStyleName("planning_risk_item");
-    planningFormat = planningMenu.addItem(messages.title("planning_format"),
-      createCommand(FormatRegister.RESOLVER.getHistoryPath()));
-    planningFormat.addStyleName("planning_format_item");
+    planningRepresentationInformation = planningMenu.addItem(messages.title("planning_representation_information"),
+      createCommand(RepresentationInformationRegister.RESOLVER.getHistoryPath()));
+    planningRepresentationInformation.addStyleName("planning_representation_information_item");
     planningEvent = planningMenu.addItem(messages.title("planning_event"),
       createCommand(PreservationEvents.PLANNING_RESOLVER.getHistoryPath()));
     planningEvent.addStyleName("planning_event_item");
     planningAgent = planningMenu.addItem(messages.title("planning_agent"),
       createCommand(PreservationAgents.RESOLVER.getHistoryPath()));
     planningAgent.addStyleName("planning_agent_item");
+    planningFormat = planningMenu.addItem(messages.title("planning_format"),
+      createCommand(FormatRegister.RESOLVER.getHistoryPath()));
+    planningFormat.addStyleName("planning_format_item");
 
     help = new MenuItem(messages.title("help"), createCommand(Help.RESOLVER.getHistoryPath()));
     help.addStyleName("help_menu_item");
@@ -292,6 +297,7 @@ public class Menu extends Composite {
     // updateResolverSubItemVisibility(Planning.RESOLVER, planningMonitoring);
     updateResolverSubItemVisibility(RiskRegister.RESOLVER, planningRisk);
     updateResolverSubItemVisibility(FormatRegister.RESOLVER, planningFormat);
+    updateResolverSubItemVisibility(RepresentationInformationRegister.RESOLVER, planningRepresentationInformation);
     updateResolverSubItemVisibility(PreservationEvents.PLANNING_RESOLVER, planningEvent);
     updateResolverSubItemVisibility(PreservationAgents.RESOLVER, planningAgent);
     MenuItem planningItem = new MenuItem(messages.title("planning"), planningMenu);

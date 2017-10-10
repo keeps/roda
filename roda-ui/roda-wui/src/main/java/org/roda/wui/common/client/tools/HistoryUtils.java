@@ -14,7 +14,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.roda.core.data.v2.formats.Format;
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -25,6 +26,7 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.BrowseAIP;
@@ -38,9 +40,10 @@ import org.roda.wui.client.ingest.process.ShowJobReport;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.client.ingest.transfer.TransferUpload;
 import org.roda.wui.client.management.ShowNotification;
-import org.roda.wui.client.planning.ShowFormat;
+import org.roda.wui.client.planning.ShowRepresentationInformation;
 import org.roda.wui.client.planning.ShowRisk;
 import org.roda.wui.client.planning.ShowRiskIncidence;
+import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -291,6 +294,22 @@ public class HistoryUtils {
     return history;
   }
 
+  public static String getSearchHistoryByRepresentationInformationFilter(List<String> filters, String searchType) {
+    List<String> history = new ArrayList<>();
+    history.addAll(Search.RESOLVER.getHistoryPath());
+    history.add(searchType);
+    history.add(RodaConstants.OPERATOR_OR);
+
+    for (String filter : filters) {
+      String[] splittedFilter = filter
+        .split(RepresentationInformationUtils.REPRESENTATION_INFORMATION_FILTER_SEPARATOR);
+      history.add(splittedFilter[1]);
+      history.add(splittedFilter[2]);
+    }
+
+    return createHistoryHashLink(history);
+  }
+
   public static void resolve(final String objectClass, final String objectUUID) {
     resolve(objectClass, objectUUID, false);
   }
@@ -339,9 +358,9 @@ public class HistoryUtils {
     } else if (object instanceof IndexedRisk) {
       IndexedRisk risk = (IndexedRisk) object;
       path = HistoryUtils.getHistory(ShowRisk.RESOLVER.getHistoryPath(), risk.getUUID());
-    } else if (object instanceof Format) {
-      Format format = (Format) object;
-      path = HistoryUtils.getHistory(ShowFormat.RESOLVER.getHistoryPath(), format.getUUID());
+    } else if (object instanceof RepresentationInformation) {
+      RepresentationInformation ri = (RepresentationInformation) object;
+      path = HistoryUtils.getHistory(ShowRepresentationInformation.RESOLVER.getHistoryPath(), ri.getUUID());
     } else if (object instanceof Notification) {
       Notification notification = (Notification) object;
       path = HistoryUtils.getHistory(ShowNotification.RESOLVER.getHistoryPath(), notification.getUUID());

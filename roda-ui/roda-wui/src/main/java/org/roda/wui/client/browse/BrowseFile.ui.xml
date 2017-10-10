@@ -39,7 +39,7 @@
 					<wcag:AccessibleFocusPanel ui:field="infoFileButton"
 						addStyleNames="toolbarLink filePreviewToolbarInfoIcon">
 						<g:HTML>
-							<i class="fa fa-info-circle"></i>
+							<i class="fa fa-list-alt"></i>
 						</g:HTML>
 					</wcag:AccessibleFocusPanel>
 					<wcag:AccessibleFocusPanel ui:field="previousButton" addStyleNames="toolbarLink">

@@ -206,7 +206,6 @@ public class NotificationRegister extends Composite {
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.isEmpty()) {
-      notificationList.refresh();
       notificationList.setFilter(Filter.ALL);
       callback.onSuccess(this);
     } else if (historyTokens.size() > 1 && ShowNotification.RESOLVER.getHistoryToken().equals(historyTokens.get(0))) {

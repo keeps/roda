@@ -314,19 +314,20 @@ public class SeleniumUtils {
       directoryButton = driver.findElement(By.className("planning_menu_item"));
       directoryButton.click();
       Thread.sleep(1000);
-      WebElement formatPage = driver.findElement(By.className("planning_format_item"));
-      formatPage.click();
+      WebElement representationInformationPage = driver
+        .findElement(By.className("planning_representation_information_item"));
+      representationInformationPage.click();
       saveHTML();
 
-      // show format page
-      List<WebElement> tableFormats = driver.findElements(By.className(TABLE_CLASS));
-      if (!tableFormats.isEmpty()) {
-        tableFormats.get(0).click();
+      // show representation information page
+      List<WebElement> tableRepresentationInformation = driver.findElements(By.className(TABLE_CLASS));
+      if (!tableRepresentationInformation.isEmpty()) {
+        tableRepresentationInformation.get(0).click();
         saveHTML();
 
         // edit format page
-        WebElement editFormat = driver.findElement(By.className("btn-edit"));
-        editFormat.click();
+        WebElement editRepresentationInformation = driver.findElement(By.className("btn-edit"));
+        editRepresentationInformation.click();
         saveHTML();
         goBack();
 
@@ -334,8 +335,8 @@ public class SeleniumUtils {
       }
 
       // new format page
-      List<WebElement> newFormat = driver.findElements(By.className("btn-plus"));
-      newFormat.get(1).click();
+      List<WebElement> newRepresentationInformation = driver.findElements(By.className("btn-plus"));
+      newRepresentationInformation.get(1).click();
       saveHTML();
       goBack();
 

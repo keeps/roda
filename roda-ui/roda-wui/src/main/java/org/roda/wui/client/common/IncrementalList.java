@@ -10,6 +10,8 @@ package org.roda.wui.client.common;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.roda.wui.client.common.utils.StringUtils;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -37,7 +39,7 @@ public class IncrementalList extends Composite implements HasHandlers {
   FlowPanel textBoxPanel;
 
   @UiField
-  Button addDynamicTextBoxButton;
+  Button addDynamicButton;
 
   private ArrayList<RemovableTextBox> textBoxes;
   boolean changed = false;
@@ -50,7 +52,9 @@ public class IncrementalList extends Composite implements HasHandlers {
   public List<String> getTextBoxesValue() {
     ArrayList<String> listValues = new ArrayList<>();
     for (RemovableTextBox textBox : textBoxes) {
-      listValues.add(textBox.getTextBoxValue());
+      if (StringUtils.isNotBlank(textBox.getTextBoxValue())) {
+        listValues.add(textBox.getTextBoxValue());
+      }
     }
     return listValues;
   }
@@ -66,8 +70,8 @@ public class IncrementalList extends Composite implements HasHandlers {
     textBoxes = new ArrayList<>();
   }
 
-  @UiHandler("addDynamicTextBoxButton")
-  void addMoreTextBox(ClickEvent event) {
+  @UiHandler("addDynamicButton")
+  void addMore(ClickEvent event) {
     addTextBox(null);
   }
 

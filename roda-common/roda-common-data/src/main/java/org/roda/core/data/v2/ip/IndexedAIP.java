@@ -10,7 +10,9 @@ package org.roda.core.data.v2.ip;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -66,6 +68,8 @@ public class IndexedAIP implements IsIndexed, HasPermissions {
 
   @JsonIgnore
   private List<String> allIngestJobIds = new ArrayList<>();
+
+  private Map<String, Object> fields = new HashMap<>();
 
   /**
    * Constructs an empty (<strong>invalid</strong>) {@link IndexedAIP}.
@@ -383,6 +387,15 @@ public class IndexedAIP implements IsIndexed, HasPermissions {
 
   public IndexedAIP setUpdatedBy(String updatedBy) {
     this.updatedBy = updatedBy;
+    return this;
+  }
+
+  public Map<String, Object> getFields() {
+    return fields;
+  }
+
+  public IndexedAIP setFields(Map<String, Object> fields) {
+    this.fields = fields;
     return this;
   }
 

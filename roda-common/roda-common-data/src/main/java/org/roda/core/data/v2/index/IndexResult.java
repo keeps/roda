@@ -31,6 +31,7 @@ import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.Group;
@@ -107,6 +108,7 @@ public class IndexResult<T extends Serializable> implements Serializable {
     @XmlElement(name = RodaConstants.RODA_OBJECT_NOTIFICATION, type = Notification.class),
     @XmlElement(name = RodaConstants.RODA_OBJECT_RISK, type = IndexedRisk.class),
     @XmlElement(name = RodaConstants.RODA_OBJECT_INCIDENCE, type = RiskIncidence.class),
+    @XmlElement(name = RodaConstants.RODA_OBJECT_REPRESENTATION_INFORMATION, type = RepresentationInformation.class),
     @XmlElement(name = RodaConstants.RODA_OBJECT_FORMAT, type = Format.class),
     @XmlElement(name = RodaConstants.RODA_OBJECT_TRANSFERRED_RESOURCE, type = TransferredResource.class),
     @XmlElement(name = RodaConstants.RODA_OBJECT_USER, type = User.class),

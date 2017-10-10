@@ -19,6 +19,7 @@ import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -100,7 +101,11 @@ public class Dropdown extends Composite implements HasValueChangeHandlers<String
       popup.hide();
       popupShowing = popup.isShowing();
     } else {
-      popup.showRelativeTo(panel);
+      // popup.showRelativeTo(panel);
+      popup.setWidth(panel.getOffsetWidth() + "px");
+      popup.setPopupPosition(panel.getAbsoluteLeft(),
+        panel.getAbsoluteTop() + panel.getOffsetHeight() + Window.getScrollTop());
+      popup.show();
       popupShowing = popup.isShowing();
       panel.addStyleName("open");
     }

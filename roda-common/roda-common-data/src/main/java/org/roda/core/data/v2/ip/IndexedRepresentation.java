@@ -9,6 +9,7 @@ package org.roda.core.data.v2.ip;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -31,6 +32,8 @@ public class IndexedRepresentation extends Representation implements IsIndexed, 
   private long numberOfSchemaFiles;
 
   private List<String> ancestors;
+
+  private Map<String, Object> fields;
 
   public IndexedRepresentation() {
     super();
@@ -94,6 +97,15 @@ public class IndexedRepresentation extends Representation implements IsIndexed, 
 
   public void setAncestors(List<String> ancestors) {
     this.ancestors = ancestors;
+  }
+
+  public Map<String, Object> getFields() {
+    return fields;
+  }
+
+  public IndexedRepresentation setFields(Map<String, Object> fields) {
+    this.fields = fields;
+    return this;
   }
 
   @Override

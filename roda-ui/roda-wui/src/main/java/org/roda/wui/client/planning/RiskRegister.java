@@ -251,7 +251,6 @@ public class RiskRegister extends Composite {
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.isEmpty()) {
       riskList.setFilter(Filter.ALL);
-      riskList.refresh();
       callback.onSuccess(this);
     } else if (historyTokens.size() == 2 && historyTokens.get(0).equals(ShowRisk.RESOLVER.getHistoryToken())) {
       ShowRisk.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);

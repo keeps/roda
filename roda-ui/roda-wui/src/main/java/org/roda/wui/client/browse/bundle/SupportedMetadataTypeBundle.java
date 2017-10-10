@@ -29,7 +29,7 @@ public class SupportedMetadataTypeBundle implements Serializable {
 
   public SupportedMetadataTypeBundle(String id, String type, String version, String label, String template) {
     super();
-    this.id  = id;
+    this.id = id;
     this.type = type;
     this.version = version;
     this.label = label;
@@ -46,8 +46,6 @@ public class SupportedMetadataTypeBundle implements Serializable {
     this.template = template;
     this.values = values;
   }
-  
-  
 
   public String getId() {
     return id;

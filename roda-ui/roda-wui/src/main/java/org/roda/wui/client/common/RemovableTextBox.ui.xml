@@ -11,7 +11,7 @@
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
-	<g:FlowPanel>
+	<g:FlowPanel addStyleNames="removable-textbox">
 		<g:TextBox title="Removable text box" addStyleNames="form-textbox form-textbox-medium" ui:field="item"></g:TextBox>
 		<g:Anchor addStyleNames="toolbarLink toolbarLinkSmall" ui:field="removeDynamicTextBoxButton"><i class="fa fa-close"></i></g:Anchor>
 	</g:FlowPanel>

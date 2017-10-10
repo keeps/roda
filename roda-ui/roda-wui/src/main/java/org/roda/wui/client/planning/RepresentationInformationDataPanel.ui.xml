@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+	xmlns:i="urn:import:config.i18n.client" xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
+	xmlns:u="urn:import:org.roda.wui.client.management" xmlns:l="urn:import:org.roda.wui.client.common">
+
+	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
+
+	<ui:style>
+	.postalAddress {
+		min-height: 84px;
+	}
+	
+	.section {
+		margin-top: 20px;
+	}
+	</ui:style>
+
+	<g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
+		<g:FlowPanel addStyleNames="row full_width no_padding">
+			<g:FlowPanel addStyleNames="wui-data-panel">
+				<g:Label addStyleNames="form-label">
+					<ui:text from='{messages.representationInformationName}' />
+				</g:Label>
+				<g:TextBox title="{messages.representationInformationName}"
+					ui:field="name" addStyleNames="form-textbox" />
+				<g:Label addStyleNames="form-label">
+					<ui:text from='{messages.representationInformationDescription}' />
+				</g:Label>
+				<g:TextArea title="{messages.representationInformationDescription}"
+					ui:field="description" addStyleNames="form-textbox metadata-form-text-area" />
+				<g:Label addStyleNames="form-label">
+					<ui:text from='{messages.representationInformationFamily}' />
+				</g:Label>
+				<g:ListBox title="{messages.representationInformationFamily}"
+					ui:field="family" addStyleNames="form-listbox" />
+				<g:Label addStyleNames="form-label">
+					<ui:text from='{messages.representationInformationCategories}' />
+				</g:Label>
+				<l:IncrementalList ui:field="categories"></l:IncrementalList>
+
+				<g:Label addStyleNames="form-label">
+					<ui:text from='{messages.representationInformationSupport}' />
+				</g:Label>
+				<g:ListBox title="{messages.representationInformationSupport}"
+					ui:field="support" addStyleNames="form-selectbox form-ri-select-boxes" />
+
+				<g:FlowPanel addStyleNames="ri-form-separator">
+					<g:Label addStyleNames="form-label">
+						<ui:text
+							from='{messages.representationInformationAdditionalInformation}' />
+					</g:Label>
+				</g:FlowPanel>
+				<l:IncrementalRelationList ui:field="relations"></l:IncrementalRelationList>
+
+				<g:Label addStyleNames="form-label" ui:field="extrasLabel">
+					<ui:text from='{messages.representationInformationExtras}' />
+				</g:Label>
+				<g:TextBox title="{messages.representationInformationExtras}"
+					ui:field="extras" addStyleNames="form-textbox" />
+
+				<l:IncrementalFilterList ui:field="filters"></l:IncrementalFilterList>
+			</g:FlowPanel>
+		</g:FlowPanel>
+	</g:FlowPanel>
+</ui:UiBinder>

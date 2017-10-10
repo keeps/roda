@@ -40,7 +40,6 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.common.RODAObjectList;
-import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
@@ -58,6 +57,7 @@ import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
@@ -282,8 +282,9 @@ public class ApiUtils {
       ret = new org.roda.core.data.v2.risks.Risks(risks);
     } else if (objectClass.equals(TransferredResource.class)) {
       ret = new org.roda.core.data.v2.ip.TransferredResources((List<TransferredResource>) result.getResults());
-    } else if (objectClass.equals(Format.class)) {
-      ret = new org.roda.core.data.v2.formats.Formats((List<Format>) result.getResults());
+    } else if (objectClass.equals(RepresentationInformation.class)) {
+      ret = new org.roda.core.data.v2.ri.RepresentationInformationList(
+        (List<RepresentationInformation>) result.getResults());
     } else if (objectClass.equals(Notification.class)) {
       ret = new org.roda.core.data.v2.notifications.Notifications((List<Notification>) result.getResults());
     } else if (objectClass.equals(LogEntry.class)) {

@@ -47,7 +47,7 @@
 						<g:FlowPanel ui:field="ingestUpdateJobIds" title="{messages.updateProcessIdTitle}" />
 						<g:Label addStyleNames="browseItemId" ui:field="dateCreated"/>
 						<g:Label addStyleNames="browseItemId" ui:field="dateUpdated"/>
-						<g:Label addStyleNames="browseItemId" ui:field="type"/>
+						<g:FlowPanel addStyleNames="ingestJobId" ui:field="type"/>
 					</g:FlowPanel>
 					<m:BreadcrumbPanel ui:field="breadcrumb"
 						addStyleNames="browseBreadcrumb" />

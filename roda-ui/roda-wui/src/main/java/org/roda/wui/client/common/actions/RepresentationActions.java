@@ -25,6 +25,7 @@ import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.common.dialogs.RepresentationDialogs;
 import org.roda.wui.client.planning.Planning;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
 import org.roda.wui.client.process.CreateSelectedJob;
@@ -220,8 +221,9 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
 
         @Override
         public void onSuccess(Pair<Boolean, List<String>> result) {
-          Dialogs.showPromptDialogEntityTypes(messages.changeTypeTitle(), messages.cancelButton(),
-            messages.confirmButton(), result.getSecond(), result.getFirst(), new AsyncCallback<String>() {
+          RepresentationDialogs.showPromptDialogRepresentationTypes(messages.changeTypeTitle(), null,
+            messages.cancelButton(), messages.confirmButton(), result.getSecond(), result.getFirst(),
+            new AsyncCallback<String>() {
 
               @Override
               public void onFailure(Throwable caught) {
@@ -280,7 +282,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
       @Override
       public void onSuccess(Void object) {
         Toast.showInfo(messages.identifyingFormatsTitle(), messages.identifyingFormatsDescription());
-        callback.onSuccess(ActionImpact.UPDATED);
+        callback.onSuccess(ActionImpact.NONE);
       }
 
       @Override
@@ -378,7 +380,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
 
   public void changeState(final IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
     GWT.log(representation.toString());
-    Dialogs.showPromptDialogRepresentationStates(messages.changeStatusTitle(), messages.cancelButton(),
+    RepresentationDialogs.showPromptDialogRepresentationStates(messages.changeStatusTitle(), messages.cancelButton(),
       messages.confirmButton(), representation.getRepresentationStates(), new AsyncCallback<List<String>>() {
 
         @Override

@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -117,6 +118,7 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.jobs.Reports;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
@@ -156,6 +158,7 @@ import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataViewBundle;
 import org.roda.wui.client.browse.bundle.DipBundle;
 import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
+import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
 import org.roda.wui.client.planning.MitigationPropertiesBundle;
 import org.roda.wui.client.planning.RiskMitigationBundle;
@@ -2179,7 +2182,7 @@ public class BrowserHelper {
           List<String> fileFields = new ArrayList<>(RodaConstants.FILE_FIELDS_TO_RETURN);
           fileFields.addAll(RodaConstants.FILE_FORMAT_FIELDS_TO_RETURN);
           fileFields.addAll(Arrays.asList(RodaConstants.FILE_ORIGINALNAME, RodaConstants.FILE_SIZE,
-            RodaConstants.FILE_FILEFORMAT, RodaConstants.FILE_FORMAT_VERSION));
+            RodaConstants.FILE_FILEFORMAT, RodaConstants.FILE_FORMAT_VERSION, RodaConstants.FILE_FORMAT_DESIGNATION));
           IndexedFile file = retrieve(IndexedFile.class, LinkingObjectUtils.getFileIdFromLinkingId(idValue),
             fileFields);
           files.put(idValue, file);
@@ -2337,19 +2340,6 @@ public class BrowserHelper {
   public static void deleteRisk(String riskId, boolean commit)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     RodaCoreFactory.getModelService().deleteRisk(riskId, commit);
-  }
-
-  public static Format createFormat(Format format, boolean commit) throws GenericException, RequestNotValidException {
-    return RodaCoreFactory.getModelService().createFormat(format, commit);
-  }
-
-  public static Format updateFormat(Format format, boolean commit) throws GenericException, RequestNotValidException {
-    return RodaCoreFactory.getModelService().updateFormat(format, commit);
-  }
-
-  public static void deleteFormat(String formatId, boolean commit)
-    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    RodaCoreFactory.getModelService().deleteFormat(formatId, commit);
   }
 
   public static RiskIncidence createRiskIncidence(RiskIncidence incidence, boolean commit)
@@ -2571,24 +2561,6 @@ public class BrowserHelper {
       RodaCoreFactory.getPluginOrchestrator().executeJob(job, true);
     } catch (JobAlreadyStartedException e) {
       LOGGER.error("Could not execute risk delete action", e);
-    }
-  }
-
-  public static void deleteFormat(User user, SelectedItems<Format> selected)
-    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
-    Job job = new Job();
-    job.setId(IdUtils.createUUID());
-    job.setName("Delete formats");
-    job.setSourceObjects(selected);
-    job.setPlugin(DeleteRODAObjectPlugin.class.getCanonicalName());
-    job.setPluginType(PluginType.INTERNAL);
-    job.setUsername(user.getName());
-
-    try {
-      RodaCoreFactory.getModelService().createJob(job);
-      RodaCoreFactory.getPluginOrchestrator().executeJob(job, true);
-    } catch (JobAlreadyStartedException e) {
-      LOGGER.error("Could not execute format delete action", e);
     }
   }
 
@@ -3382,4 +3354,124 @@ public class BrowserHelper {
     return RodaCoreFactory.getModelService().acknowledgeNotification(notificationId, ackToken);
   }
 
+  public static RepresentationInformation createRepresentationInformation(RepresentationInformation ri, boolean commit)
+    throws GenericException, RequestNotValidException {
+    return RodaCoreFactory.getModelService().createRepresentationInformation(ri, commit);
+  }
+
+  public static RepresentationInformation updateRepresentationInformation(RepresentationInformation ri, boolean commit)
+    throws GenericException, RequestNotValidException {
+    return RodaCoreFactory.getModelService().updateRepresentationInformation(ri, commit);
+  }
+
+  public static void deleteRepresentationInformation(String representationInformationId, boolean commit)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    RodaCoreFactory.getModelService().deleteRepresentationInformation(representationInformationId, commit);
+  }
+
+  public static void deleteRepresentationInformation(User user, SelectedItems<RepresentationInformation> selected)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
+    Job job = new Job();
+    job.setId(IdUtils.createUUID());
+    job.setName("Delete representation information");
+    job.setSourceObjects(selected);
+    job.setPlugin(DeleteRODAObjectPlugin.class.getCanonicalName());
+    job.setPluginType(PluginType.INTERNAL);
+    job.setUsername(user.getName());
+
+    try {
+      RodaCoreFactory.getModelService().createJob(job);
+      RodaCoreFactory.getPluginOrchestrator().executeJob(job, true);
+    } catch (JobAlreadyStartedException e) {
+      LOGGER.error("Could not execute representation information delete action", e);
+    }
+  }
+
+  public static Pair<String, Integer> retrieveRepresentationInformationWithFilter(String riFilter)
+    throws GenericException, RequestNotValidException {
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_INFORMATION_FILTERS, riFilter));
+    IndexResult<RepresentationInformation> result = RodaCoreFactory.getIndexService().find(
+      RepresentationInformation.class, filter, Sorter.NONE, new Sublist(0, 3),
+      Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.REPRESENTATION_INFORMATION_ID));
+
+    if (result.getTotalCount() == 1) {
+      return Pair.of(result.getResults().get(0).getId(), 1);
+    } else {
+      return Pair.of("", (int) result.getTotalCount());
+    }
+  }
+
+  public static RepresentationInformationFilterBundle retrieveObjectClassFields(Messages messages) {
+    RepresentationInformationFilterBundle newBundle = new RepresentationInformationFilterBundle();
+    Iterator<String> keys = RodaCoreFactory.getRodaConfiguration().getKeys("core.ri.rule");
+    Map<String, List<String>> fieldsResult = new HashMap<>();
+    Map<String, String> translationsResult = new HashMap<>();
+
+    while (keys.hasNext()) {
+      String key = keys.next();
+      String[] splittedKey = key.split("\\.");
+      List<String> fields = RodaCoreFactory.getRodaConfigurationAsList(key);
+      List<String> fieldsAndTranslations = new ArrayList<>();
+
+      for (String field : fields) {
+        String fieldName = RodaCoreFactory.getRodaConfigurationAsString(field, RodaConstants.SEARCH_FIELD_FIELDS);
+        fieldsAndTranslations.add(fieldName);
+
+        String translation = messages
+          .getTranslation(RodaCoreFactory.getRodaConfigurationAsString(field, RodaConstants.SEARCH_FIELD_I18N));
+        translationsResult.put(splittedKey[3] + ":" + fieldName, translation);
+      }
+
+      fieldsResult.put(splittedKey[3], fieldsAndTranslations);
+    }
+
+    newBundle.setObjectClassFields(fieldsResult);
+    newBundle.setTranslations(translationsResult);
+    return newBundle;
+  }
+
+  public static Format createFormat(Format format, boolean commit) throws GenericException, RequestNotValidException {
+    return RodaCoreFactory.getModelService().createFormat(format, commit);
+  }
+
+  public static Format updateFormat(Format format, boolean commit) throws GenericException, RequestNotValidException {
+    return RodaCoreFactory.getModelService().updateFormat(format, commit);
+  }
+
+  public static void deleteFormat(String formatId, boolean commit)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    RodaCoreFactory.getModelService().deleteFormat(formatId, commit);
+  }
+
+  public static void deleteFormat(User user, SelectedItems<Format> selected)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
+    Job job = new Job();
+    job.setId(IdUtils.createUUID());
+    job.setName("Delete formats");
+    job.setSourceObjects(selected);
+    job.setPlugin(DeleteRODAObjectPlugin.class.getCanonicalName());
+    job.setPluginType(PluginType.INTERNAL);
+    job.setUsername(user.getName());
+
+    try {
+      RodaCoreFactory.getModelService().createJob(job);
+      RodaCoreFactory.getPluginOrchestrator().executeJob(job, true);
+    } catch (JobAlreadyStartedException e) {
+      LOGGER.error("Could not execute format delete action", e);
+    }
+  }
+
+  public static Map<String, String> retrieveRelationTypeTranslations(Messages messages) {
+    Map<String, String> translations = new HashMap<>();
+    List<String> configs = RodaCoreFactory.getRodaConfigurationAsList("core.ri.relation");
+
+    for (String config : configs) {
+      String fieldName = RodaCoreFactory.getRodaConfigurationAsString(config, RodaConstants.SEARCH_FIELD_FIELDS);
+      String translation = messages
+        .getTranslation(RodaCoreFactory.getRodaConfigurationAsString(config, RodaConstants.SEARCH_FIELD_I18N));
+      translations.put(fieldName, translation);
+    }
+
+    return translations;
+  }
 }

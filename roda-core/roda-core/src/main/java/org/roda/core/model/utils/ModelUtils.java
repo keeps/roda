@@ -52,6 +52,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
@@ -675,6 +676,20 @@ public final class ModelUtils {
     return incidencePath.getName().replace(RodaConstants.RISK_INCIDENCE_FILE_EXTENSION, "");
   }
 
+  public static StoragePath getRepresentationInformationContainerPath() throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_REPRESENTATION_INFORMATION);
+  }
+
+  public static StoragePath getRepresentationInformationStoragePath(String representationInformationId)
+    throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_REPRESENTATION_INFORMATION,
+      representationInformationId + RodaConstants.REPRESENTATION_INFORMATION_FILE_EXTENSION);
+  }
+
+  public static String getRepresentationInformationId(StoragePath representationInformationPath) {
+    return representationInformationPath.getName().replace(RodaConstants.REPRESENTATION_INFORMATION_FILE_EXTENSION, "");
+  }
+
   public static StoragePath getFormatContainerPath() throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_FORMAT);
   }
@@ -753,8 +768,8 @@ public final class ModelUtils {
   }
 
   public static <T extends Serializable> StoragePath getContainerPath(Class<T> clazz) throws RequestNotValidException {
-    if (clazz.equals(Format.class)) {
-      return getFormatContainerPath();
+    if (clazz.equals(RepresentationInformation.class)) {
+      return getRepresentationInformationContainerPath();
     } else if (clazz.equals(Notification.class)) {
       return getNotificationContainerPath();
     } else if (clazz.equals(Risk.class)) {
@@ -771,6 +786,8 @@ public final class ModelUtils {
       return getRiskIncidenceContainerPath();
     } else if (clazz.equals(DIP.class)) {
       return getDIPContainerPath();
+    } else if (clazz.equals(Format.class)) {
+      return getFormatContainerPath();
     } else {
       throw new RequestNotValidException("Unknown class for getting container path: " + clazz.getName());
     }

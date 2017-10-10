@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
@@ -49,6 +50,8 @@ import org.roda.wui.client.ingest.transfer.TransferUpload;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
+import org.roda.wui.client.planning.RepresentationInformationRegister;
+import org.roda.wui.client.planning.ShowRepresentationInformation;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.HistoryResolver;
@@ -66,6 +69,7 @@ import org.roda.wui.common.client.widgets.wcag.WCAGUtilities;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
@@ -185,7 +189,7 @@ public class BrowseAIP extends Composite {
   Label dateCreated, dateUpdated;
 
   @UiField
-  Label type;
+  FlowPanel type;
 
   // DESCRIPTIVE METADATA
 
@@ -432,7 +436,7 @@ public class BrowseAIP extends Composite {
     dateUpdated.setText("");
     dateUpdated.removeStyleName("browseItemId");
 
-    type.setText("");
+    type.clear();
     type.removeStyleName("browseItemId");
 
     breadcrumb.setVisible(false);
@@ -700,15 +704,13 @@ public class BrowseAIP extends Composite {
     }
 
     if (StringUtils.isNotBlank(aip.getIngestJobId())) {
-      final IndexedAIP ingestedAIP = aip;
-
       InlineHTML html = new InlineHTML();
       html.setText(messages.processId());
 
       Anchor anchor = new Anchor();
       anchor.setText(aip.getIngestJobId());
-      anchor.setHref(HistoryUtils.createHistoryHashLink(ShowJobReport.RESOLVER,
-        ingestedAIP.getIngestJobId() + '-' + ingestedAIP.getId()));
+      anchor
+        .setHref(HistoryUtils.createHistoryHashLink(ShowJobReport.RESOLVER, aip.getIngestJobId() + '-' + aip.getId()));
 
       ingestJobId.add(html);
       ingestJobId.add(anchor);
@@ -749,7 +751,49 @@ public class BrowseAIP extends Composite {
     }
 
     if (StringUtils.isNotBlank(aip.getType())) {
-      type.setText(messages.aipTypeItem(aip.getType()));
+      InlineHTML html = new InlineHTML();
+      html.setText(messages.aipTypeItem());
+
+      InlineHTML typeText = new InlineHTML();
+      typeText.setText(aip.getType());
+      typeText.getElement().getStyle().setPaddingRight(3, Style.Unit.PX);
+
+      final Anchor anchor = new Anchor();
+      anchor.setHTML(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-info-circle' aria-hidden='true'></i>"));
+
+      final String riFilter = RepresentationInformationUtils.createRepresentationInformationAipFilter(aip.getType());
+
+      BrowserService.Util.getInstance().retrieveRepresentationInformationWithFilter(riFilter,
+        new AsyncCallback<Pair<String, Integer>>() {
+
+          @Override
+          public void onFailure(Throwable caught) {
+            AsyncCallbackUtils.defaultFailureTreatment(caught);
+          }
+
+          @Override
+          public void onSuccess(Pair<String, Integer> pair) {
+            LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
+            selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
+            anchor.removeStyleName("browseIconRed");
+
+            if (pair.getSecond() == 1) {
+              anchor
+                .setHref(HistoryUtils.createHistoryHashLink(ShowRepresentationInformation.RESOLVER, pair.getFirst()));
+            } else if (pair.getSecond() > 1) {
+              anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationRegister.RESOLVER,
+                Search.RESOLVER.getHistoryToken(), RodaConstants.REPRESENTATION_INFORMATION_FILTERS, riFilter));
+            } else {
+              anchor.addStyleName("browseIconRed");
+              anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationRegister.RESOLVER,
+                Search.RESOLVER.getHistoryToken(), RodaConstants.REPRESENTATION_INFORMATION_FILTERS, riFilter));
+            }
+          }
+        });
+
+      type.add(html);
+      type.add(typeText);
+      type.add(anchor);
       type.addStyleName("browseItemId");
     }
   }

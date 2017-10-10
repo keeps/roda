@@ -47,6 +47,8 @@ public class IndexedFile implements IsIndexed, HasPermissionFilters {
   private List<String> ancestors;
   private Map<String, List<String>> otherProperties;
 
+  private Map<String, Object> fields;
+
   public IndexedFile() {
     super();
   }
@@ -231,6 +233,15 @@ public class IndexedFile implements IsIndexed, HasPermissionFilters {
 
   public void setAncestorsPath(List<String> ancestorsPath) {
     this.ancestorsPath = ancestorsPath;
+  }
+
+  public Map<String, Object> getFields() {
+    return fields;
+  }
+
+  public IndexedFile setFields(Map<String, Object> fields) {
+    this.fields = fields;
+    return this;
   }
 
   @Override

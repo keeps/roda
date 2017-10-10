@@ -60,6 +60,16 @@ public interface ClientMessages extends Messages {
 
   String showRiskIncidenceTitle();
 
+  String newRepresentationInformationTitle();
+
+  String createRepresentationInformationTitle();
+
+  String editRepresentationInformationTitle();
+
+  String showRepresentationInformationTitle();
+
+  String representationInformationTitle();
+
   String newFormatTitle();
 
   String createFormatTitle();
@@ -172,6 +182,8 @@ public interface ClientMessages extends Messages {
 
   String sidebarPreservationTitle();
 
+  String sidebarRepresentationInformationTitle();
+
   String sidebarFormatsTitle();
 
   String sidebarRisksTitle();
@@ -183,6 +195,10 @@ public interface ClientMessages extends Messages {
   String sidebarJobReportStatusTitle();
 
   String sidebarJobReportLastActionTitle();
+
+  String sidebarGoToTitle();
+
+  String sidebarRelationsTitle();
 
   SafeHtml metadataParseError(int line, int column, String message);
 
@@ -317,6 +333,8 @@ public interface ClientMessages extends Messages {
   String allRisks();
 
   String allRiskIncidences();
+
+  String allRepresentationInformation();
 
   String allFormats();
 
@@ -528,6 +546,8 @@ public interface ClientMessages extends Messages {
 
   String closeButton();
 
+  String selectButton();
+
   /*** Identify formats ***/
 
   String identifyFormatsButton();
@@ -699,7 +719,7 @@ public interface ClientMessages extends Messages {
 
   String dateUpdated(String date, String person);
 
-  String aipTypeItem(String type);
+  String aipTypeItem();
 
   /************* Search ****************/
   String searchListBoxItems();
@@ -1024,6 +1044,50 @@ public interface ClientMessages extends Messages {
 
   String editIncidenceFailure(String errorMessage);
 
+  /************* RepresentationInformation register ****************/
+
+  String getRepresentationInformationDialogName();
+
+  String representationInformationRegisterTitle();
+
+  String representationInformationRegisterProcessButton();
+
+  String representationInformationRegisterSearchPlaceHolder();
+
+  String createRepresentationInformationFailure(String message);
+
+  String editRepresentationInformationNotFound(String name);
+
+  String editRepresentationInformationFailure(String message);
+
+  String representationInformationRemoveFolderConfirmDialogTitle();
+
+  String representationInformationRemoveSelectedConfirmDialogMessage(Long size);
+
+  String representationInformationRemoveFolderConfirmDialogCancel();
+
+  String representationInformationRemoveFolderConfirmDialogOk();
+
+  String representationInformationRemoveSuccessTitle();
+
+  String representationInformationRemoveSuccessMessage(Long size);
+
+  String representationInformationListItems(String item);
+
+  String representationInformationAdditionalInformation();
+
+  String representationInformationMissingFieldsTitle();
+
+  String representationInformationMissingFields();
+
+  /*** Representation information dialog ***/
+
+  String representationInformationChooseOptionLabel();
+
+  String representationInformationChooseOption();
+
+  String representationInformationEntitiesOption();
+
   /************* Format register ****************/
 
   String getFormatsDialogName();
@@ -1295,6 +1359,44 @@ public interface ClientMessages extends Messages {
 
   String riskIncidenceStatusTitle();
 
+  /*** Representation information ***/
+
+  String representationInformationIdentifier();
+
+  String representationInformationName();
+
+  String representationInformationDescription();
+
+  String representationInformationFamily();
+
+  String representationInformationCategories();
+
+  String representationInformationExtras();
+
+  String representationInformationSupport();
+
+  String representationInformationSupportValue(@Select String value);
+
+  String representationInformationRelations();
+
+  String representationInformationFilters();
+
+  String representationInformationRelationType();
+
+  String representationInformationRelationObjectType(@Select String type);
+
+  String representationInformationRelationLink();
+
+  String representationInformationRelationTitle();
+
+  String representationInformationAddNewRelation();
+
+  String representationInformationIntellectualEntities(@PluralCount int size, String link);
+
+  String representationInformationRepresentations(@PluralCount int size, String link);
+
+  String representationInformationFiles(@PluralCount int size, String link);
+
   /*** Formats ***/
 
   String formatIdentifier();
@@ -1418,6 +1520,8 @@ public interface ClientMessages extends Messages {
   String listOfRepresentations();
 
   String listOfDisseminations();
+
+  String listOfIntellectualEntities();
 
   String unknownAncestorError();
 

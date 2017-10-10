@@ -70,6 +70,7 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.RODAMember;
@@ -96,6 +97,7 @@ import org.roda.core.plugins.plugins.reindex.ReindexJobPlugin;
 import org.roda.core.plugins.plugins.reindex.ReindexNotificationPlugin;
 import org.roda.core.plugins.plugins.reindex.ReindexPreservationAgentPlugin;
 import org.roda.core.plugins.plugins.reindex.ReindexPreservationRepositoryEventPlugin;
+import org.roda.core.plugins.plugins.reindex.ReindexRepresentationInformationPlugin;
 import org.roda.core.plugins.plugins.reindex.ReindexRiskPlugin;
 import org.roda.core.plugins.plugins.reindex.ReindexRodaMemberPlugin;
 import org.roda.core.plugins.plugins.reindex.ReindexTransferredResourcePlugin;
@@ -499,7 +501,7 @@ public final class PluginHelper {
     list.add(TransferredResource.class);
     list.add(AIP.class);
     list.add(RODAMember.class);
-    list.add(Format.class);
+    list.add(RepresentationInformation.class);
     list.add(Notification.class);
     list.add(Risk.class);
     list.add(LogEntry.class);
@@ -508,6 +510,7 @@ public final class PluginHelper {
     list.add(IndexedPreservationAgent.class);
     list.add(IndexedPreservationEvent.class);
     list.add(DIP.class);
+    list.add(Format.class);
     return list;
   }
 
@@ -972,7 +975,6 @@ public final class PluginHelper {
     // update Job (with all new ids)
     successOldToNewTransferredResourceIds.putAll(unsuccessOldToNewTransferredResourceIds);
     updateJobAfterMovingSIPs(plugin, index, successOldToNewTransferredResourceIds);
-
   }
 
   private static void updateReportsAfterMovingSIPs(ModelService model, IngestJobPluginInfo jobPluginInfo,
@@ -1127,8 +1129,8 @@ public final class PluginHelper {
   public static String getReindexPluginName(Class<?> reindexClass) throws NotFoundException {
     if (reindexClass.equals(AIP.class)) {
       return ReindexAIPPlugin.class.getName();
-    } else if (reindexClass.equals(Format.class)) {
-      return ReindexFormatPlugin.class.getName();
+    } else if (reindexClass.equals(RepresentationInformation.class)) {
+      return ReindexRepresentationInformationPlugin.class.getName();
     } else if (reindexClass.equals(Risk.class)) {
       return ReindexRiskPlugin.class.getName();
     } else if (reindexClass.equals(RiskIncidence.class)) {
@@ -1149,6 +1151,8 @@ public final class PluginHelper {
       return ReindexPreservationRepositoryEventPlugin.class.getName();
     } else if (reindexClass.equals(DIP.class)) {
       return ReindexDIPPlugin.class.getName();
+    } else if (reindexClass.equals(Format.class)) {
+      return ReindexFormatPlugin.class.getName();
     } else {
       throw new NotFoundException("No reindex plugin available");
     }
