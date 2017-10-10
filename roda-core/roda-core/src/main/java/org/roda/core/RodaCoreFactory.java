@@ -394,11 +394,10 @@ public class RodaCoreFactory {
           throw new RuntimeException("Unable to create RODA HOME " + rodaHomePath + ". Aborting...", e);
         }
       }
-
-      // set roda.home in order to correctly configure logging even if no
-      // property has been defined
-      System.setProperty(RodaConstants.INSTALL_FOLDER_SYSTEM_PROPERTY, rodaHomePath.toString());
     }
+    // set roda.home in order to correctly configure logging even if no
+    // property has been defined
+    System.setProperty(RodaConstants.INSTALL_FOLDER_SYSTEM_PROPERTY, rodaHomePath.toString());
 
     // instantiate essential directories
     configPath = rodaHomePath.resolve(RodaConstants.CORE_CONFIG_FOLDER);
