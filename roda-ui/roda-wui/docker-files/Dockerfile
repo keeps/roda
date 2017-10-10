@@ -35,12 +35,23 @@ RUN unzip -q /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/roda-core-*.jar config/r
     rm -rf /var/lib/apt/lists/*
 
 ENV RODA_HOME=/roda
-ADD setenv.sh /usr/local/tomcat/bin/setenv.sh
 VOLUME /roda
 
 ADD /docker-entrypoint.sh /
 ADD /docker-entrypoint.d/* /docker-entrypoint.d/
 ONBUILD ADD /docker-entrypoint.d/* /docker-entrypoint.d/
 
-ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["catalina.sh", "run"]
+# Adding roda user and fixing permissions
+RUN groupadd -r roda && useradd --no-log-init -r -g roda -d /usr/local/tomcat/ roda && \
+    chown -R roda:roda /usr/local/tomcat && \
+    mkdir -p /roda && chown roda:roda /roda && \
+    usermod -a -G clamav roda && \
+    mkdir -p /var/run/clamav/ && chown -R roda:clamav /var/run/clamav/ && \
+    mkdir -p /var/log/clamav/ && chown -R roda:clamav /var/log/clamav/ && \
+    usermod -a -G crontab roda && \
+    chown roda:crontab /usr/bin/crontab && \
+    touch /var/run/crond.pid && chown roda:roda /var/run/crond.pid
+
+USER roda
+
+ENTRYPOINT ["/docker-entrypoint.sh","catalina.sh", "run"]
