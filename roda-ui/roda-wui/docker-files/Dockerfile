@@ -1,5 +1,6 @@
 FROM tomcat:8.0-jre8
-LABEL maintainer="admin@keep.pt"
+LABEL maintainer="admin@keep.pt" vendor="KEEP SOLUTIONS"
+
 
 # Install dependencies
 RUN curl -s https://bintray.com/user/downloadSubjectPublicKey?username=bintray | \
@@ -47,10 +48,7 @@ RUN groupadd -r roda && useradd --no-log-init -r -g roda -d /usr/local/tomcat/ r
     mkdir -p /roda && chown roda:roda /roda && \
     usermod -a -G clamav roda && \
     mkdir -p /var/run/clamav/ && chown -R roda:clamav /var/run/clamav/ && \
-    mkdir -p /var/log/clamav/ && chown -R roda:clamav /var/log/clamav/ && \
-    usermod -a -G crontab roda && \
-    chown roda:crontab /usr/bin/crontab && \
-    touch /var/run/crond.pid && chown roda:roda /var/run/crond.pid
+    mkdir -p /var/log/clamav/ && chown -R roda:clamav /var/log/clamav/
 
 USER roda
 
