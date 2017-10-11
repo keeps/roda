@@ -17,6 +17,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
 
+import javax.activation.MimetypesFileTypeMap;
+
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.ConsumesOutputStream;
@@ -32,6 +34,14 @@ public class Theme extends RodaWuiController {
 
   @SuppressWarnings("unused")
   private static final Logger LOGGER = LoggerFactory.getLogger(Theme.class);
+
+  private static final MimetypesFileTypeMap MIMEMAP = new MimetypesFileTypeMap();
+  
+  static {
+    MIMEMAP.addMimeTypes("text/css css CSS");
+    MIMEMAP.addMimeTypes("application/javascript js JS");
+    MIMEMAP.addMimeTypes("image/svg+xml svg SVG");
+  }
 
   private static final Date INITIAL_DATE = new Date();
 
@@ -56,19 +66,7 @@ public class Theme extends RodaWuiController {
   public static StreamResponse getThemeResourceStreamResponse(final Pair<String, InputStream> themeResourceInputstream)
     throws IOException, NotFoundException {
     String resourceId = themeResourceInputstream.getFirst();
-    String mimeType;
-
-    if (resourceId.endsWith(".html")) {
-      mimeType = RodaConstants.MEDIA_TYPE_TEXT_HTML;
-    } else if (resourceId.endsWith(".css")) {
-      mimeType = "text/css";
-    } else if (resourceId.endsWith(".png")) {
-      mimeType = "image/png";
-    } else if (resourceId.endsWith(".js")) {
-      mimeType = "text/javascript";
-    } else {
-      mimeType = RodaConstants.MEDIA_TYPE_APPLICATION_OCTET_STREAM;
-    }
+    String mimeType = MIMEMAP.getContentType(resourceId);
 
     ConsumesOutputStream stream = new ConsumesOutputStream() {
 
