@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
@@ -141,7 +142,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
   @Override
   public void shutdown() {
-    LOGGER.info("Going to shutdown actor system (which will be done asynchronously)");
+    LOGGER.info("Going to shutdown actor system");
     Future<Terminated> terminate = jobsSystem.terminate();
     terminate.onComplete(new OnComplete<Terminated>() {
       @Override
@@ -153,6 +154,16 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
         }
       }
     }, jobsSystem.dispatcher());
+
+    try {
+      LOGGER.info("Waiting up to 30 seconds for actor system to shutdown");
+      Await.result(jobsSystem.whenTerminated(), Duration.create(30, "seconds"));
+    } catch (TimeoutException e) {
+      LOGGER.warn("Actor system shutdown wait timed out, continuing...");
+    } catch (Exception e) {
+      LOGGER.error("Error while shutting down actor system", e);
+    }
+
   }
 
   @Override
