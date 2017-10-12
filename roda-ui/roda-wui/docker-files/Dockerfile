@@ -1,6 +1,31 @@
 FROM tomcat:8.0-jre8
 LABEL maintainer="admin@keep.pt" vendor="KEEP SOLUTIONS"
 
+# Install gosu
+ENV GOSU_VERSION 1.10
+RUN set -ex; \
+	\
+	fetchDeps=' \
+		ca-certificates \
+		wget \
+	'; \
+	apt-get update; \
+	apt-get install -y --no-install-recommends $fetchDeps; \
+	rm -rf /var/lib/apt/lists/*; \
+	\
+	dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')"; \
+	wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch"; \
+	wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch.asc"; \
+	\
+# verify the signature
+	export GNUPGHOME="$(mktemp -d)"; \
+	gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4; \
+	gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu; \
+	rm -r "$GNUPGHOME" /usr/local/bin/gosu.asc; \
+	\
+	chmod +x /usr/local/bin/gosu; \
+# verify that the binary works
+	gosu nobody true;
 
 # Install dependencies
 RUN curl -s https://bintray.com/user/downloadSubjectPublicKey?username=bintray | \
@@ -42,14 +67,4 @@ ADD /docker-entrypoint.sh /
 ADD /docker-entrypoint.d/* /docker-entrypoint.d/
 ONBUILD ADD /docker-entrypoint.d/* /docker-entrypoint.d/
 
-# Adding roda user and fixing permissions
-RUN groupadd -r roda && useradd --no-log-init -r -g roda -d /usr/local/tomcat/ roda && \
-    chown -R roda:roda /usr/local/tomcat && \
-    mkdir -p /roda && chown roda:roda /roda && \
-    usermod -a -G clamav roda && \
-    mkdir -p /var/run/clamav/ && chown -R roda:clamav /var/run/clamav/ && \
-    mkdir -p /var/log/clamav/ && chown -R roda:clamav /var/log/clamav/
-
-USER roda
-
-ENTRYPOINT ["/docker-entrypoint.sh","catalina.sh", "run"]
+ENTRYPOINT ["/docker-entrypoint.sh"]
