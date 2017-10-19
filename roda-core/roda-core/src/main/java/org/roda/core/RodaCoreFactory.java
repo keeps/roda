@@ -8,6 +8,7 @@
 package org.roda.core;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.Console;
 import java.io.IOException;
 import java.io.InputStream;
@@ -51,6 +52,10 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.request.CollectionAdminRequest;
+import org.apache.solr.client.solrj.request.CoreAdminRequest;
+import org.apache.solr.client.solrj.response.CollectionAdminResponse;
+import org.apache.solr.client.solrj.response.CoreAdminResponse;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -672,26 +677,128 @@ public class RodaCoreFactory {
     }
   }
 
+  private static String getConfigurationString(String key, String defaultType) {
+    String envKey = "RODA_" + key.toUpperCase().replace('.', '_');
+    String value = System.getenv(envKey);
+    if (value == null) {
+      value = getRodaConfiguration().getString(key, defaultType);
+    }
+
+    return value;
+  }
+
   private static SolrClient instantiateSolr(Path solrHome) {
-    SolrType solrType = SolrType.valueOf(
-      getRodaConfiguration().getString(RodaConstants.CORE_SOLR_TYPE, RodaConstants.DEFAULT_SOLR_TYPE.toString()));
+    SolrType solrType = SolrType
+      .valueOf(getConfigurationString(RodaConstants.CORE_SOLR_TYPE, RodaConstants.DEFAULT_SOLR_TYPE.toString()));
+
     if (TEST_SOLR_TYPE != null) {
       solrType = TEST_SOLR_TYPE;
     }
 
     if (solrType == RodaConstants.SolrType.HTTP) {
-      String solrBaseUrl = getRodaConfiguration().getString(RodaConstants.CORE_SOLR_HTTP_URL,
-        "http://localhost:8983/solr/");
+      String solrBaseUrl = getConfigurationString(RodaConstants.CORE_SOLR_HTTP_URL, "http://localhost:8983/solr/");
       return new HttpSolrClient(solrBaseUrl);
-    } else if (solrType == RodaConstants.SolrType.HTTP_CLOUD) {
-      String solrCloudZooKeeperUrls = getRodaConfiguration().getString(RodaConstants.CORE_SOLR_HTTP_CLOUD_URLS,
-        "localhost:2181,localhost:2182,localhost:2183");
-      return new CloudSolrClient(solrCloudZooKeeperUrls);
+    } else if (solrType == RodaConstants.SolrType.HTTP_CLOUD || solrType == RodaConstants.SolrType.CLOUD) {
+      String solrCloudZooKeeperUrls = getConfigurationString(RodaConstants.CORE_SOLR_CLOUD_URLS, getConfigurationString(
+        RodaConstants.CORE_SOLR_HTTP_CLOUD_URLS, "localhost:2181,localhost:2182,localhost:2183"));
+      CloudSolrClient cloudSolrClient = new CloudSolrClient(solrCloudZooKeeperUrls);
+      bootstrap(cloudSolrClient, solrHome);
+      return cloudSolrClient;
     } else {
       // default to Embedded
       setSolrSystemProperties();
       return new EmbeddedSolrServer(solrHome, "test");
     }
+  }
+
+  private static void bootstrap(CloudSolrClient cloudSolrClient, Path solrHome) {
+    CollectionAdminRequest.List req = new CollectionAdminRequest.List();
+    try {
+      CollectionAdminResponse response = req.process(cloudSolrClient);
+
+      @SuppressWarnings("unchecked")
+      List<String> existingCollections = (List<String>) response.getResponse().get("collections");
+      if (existingCollections == null) {
+        existingCollections = new ArrayList<>();
+      }
+
+      Map<String, Path> defaultCollections = getDefaultCollections(solrHome);
+
+      for (String defaultCollection : defaultCollections.keySet()) {
+        if (!existingCollections.contains(defaultCollections)) {
+          createCollection(cloudSolrClient, defaultCollection, defaultCollections.get(defaultCollection));
+        }
+      }
+
+    } catch (SolrServerException | IOException e) {
+      LOGGER.error("Solr bootstrap failed", e);
+    }
+  }
+
+  private static Map<String, Path> getDefaultCollections(Path solrHome) throws IOException {
+    Map<String, Path> collections = new HashMap<>();
+    Files.list(solrHome).forEach(p -> {
+      if (Files.isDirectory(p)) {
+        collections.put(p.getFileName().toString(), p);
+      }
+    });
+    return collections;
+  }
+
+  private static void createCollection(CloudSolrClient cloudSolrClient, String collection, Path configPath) {
+    CollectionAdminRequest.Create req = new CollectionAdminRequest.Create();
+    try {
+
+      LOGGER.info("Creating SOLR collection {}", collection);
+      Path collectionConf = configPath.resolve("conf");
+      Path solrCoreProperties = collectionConf.resolve("solrcore.properties");
+      try (BufferedWriter solrCorePropertiesWriter = Files.newBufferedWriter(solrCoreProperties)) {
+        IOUtils.write(String.format("name=%1$s\nsolr.data.dir.%2$s=data", collection, collection.toLowerCase()),
+          solrCorePropertiesWriter);
+      }
+
+      cloudSolrClient.uploadConfig(collectionConf, collection);
+
+      req.setCollectionName(collection).setConfigName(collection);
+
+      req.setNumShards(getEnvInt("SOLR_NUM_SHARDS", 1));
+      req.setReplicationFactor(getEnvInt("SOLR_REPLICATION_FACTOR", 1));
+      req.setAutoAddReplicas(getEnvBoolean("SOLR_AUTO_ADD_REPLICAS", false));
+
+      CollectionAdminResponse response = req.process(cloudSolrClient);
+      if (!response.isSuccess()) {
+        LOGGER.error("Could not create collection {}: {}", collection, response.getErrorMessages());
+      }
+    } catch (SolrServerException | IOException e) {
+      LOGGER.error("Error creating collection {}", collection, e);
+    }
+
+  }
+
+  private static String getEnvString(String name, String defaultValue) {
+    String envString = System.getenv(name);
+    return StringUtils.isNotBlank(envString) ? envString : defaultValue;
+  }
+
+  private static Integer getEnvInt(String name, Integer defaultValue) {
+    Integer envInt;
+    try {
+      String envString = System.getenv(name);
+      envInt = envString != null ? Integer.valueOf(envString) : defaultValue;
+    } catch (NumberFormatException e) {
+      envInt = defaultValue;
+      LOGGER.error("Invalid value for " + name + ", using default " + defaultValue, e);
+    }
+    return envInt;
+  }
+
+  private static Boolean getEnvBoolean(String name, Boolean defaultValue) {
+    Boolean envInt;
+
+    String envString = System.getenv(name);
+    envInt = envString != null ? Boolean.valueOf(envString) : defaultValue;
+
+    return envInt;
   }
 
   private static void setSolrSystemProperties() {

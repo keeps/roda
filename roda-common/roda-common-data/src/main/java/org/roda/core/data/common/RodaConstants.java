@@ -36,7 +36,9 @@ public final class RodaConstants {
   public static final String CORE_STORAGE_FEDORA4_PASSWORD = "core.storage.fedora4.password";
   public static final String CORE_SOLR_TYPE = "core.solr.type";
   public static final String CORE_SOLR_HTTP_URL = "core.solr.http.url";
+  @Deprecated
   public static final String CORE_SOLR_HTTP_CLOUD_URLS = "core.solr.http_cloud.urls";
+  public static final String CORE_SOLR_CLOUD_URLS = "core.solr.cloud.urls";
 
   /*
    * Misc
@@ -416,7 +418,7 @@ public final class RodaConstants {
   public static final StorageType DEFAULT_STORAGE_TYPE = StorageType.FILESYSTEM;
 
   public enum SolrType {
-    EMBEDDED, HTTP, HTTP_CLOUD
+    EMBEDDED, HTTP, @Deprecated HTTP_CLOUD, CLOUD
   }
 
   public static final SolrType DEFAULT_SOLR_TYPE = SolrType.EMBEDDED;
