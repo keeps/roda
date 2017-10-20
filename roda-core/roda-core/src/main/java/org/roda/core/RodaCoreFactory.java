@@ -53,12 +53,11 @@ import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.CollectionAdminRequest;
-import org.apache.solr.client.solrj.request.CoreAdminRequest;
 import org.apache.solr.client.solrj.response.CollectionAdminResponse;
-import org.apache.solr.client.solrj.response.CoreAdminResponse;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.apache.solr.common.SolrException;
 import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
 import org.reflections.util.ClasspathHelper;
@@ -728,7 +727,7 @@ public class RodaCoreFactory {
       Map<String, Path> defaultCollections = getDefaultCollections(solrHome);
 
       for (String defaultCollection : defaultCollections.keySet()) {
-        if (!existingCollections.contains(defaultCollections)) {
+        if (!existingCollections.contains(defaultCollection)) {
           createCollection(cloudSolrClient, defaultCollection, defaultCollections.get(defaultCollection));
         }
       }
@@ -772,7 +771,7 @@ public class RodaCoreFactory {
       if (!response.isSuccess()) {
         LOGGER.error("Could not create collection {}: {}", collection, response.getErrorMessages());
       }
-    } catch (SolrServerException | IOException e) {
+    } catch (SolrServerException | SolrException | IOException e) {
       LOGGER.error("Error creating collection {}", collection, e);
     }
 
