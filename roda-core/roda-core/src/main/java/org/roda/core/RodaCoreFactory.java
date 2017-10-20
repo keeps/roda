@@ -697,16 +697,19 @@ public class RodaCoreFactory {
 
     if (solrType == RodaConstants.SolrType.HTTP) {
       String solrBaseUrl = getConfigurationString(RodaConstants.CORE_SOLR_HTTP_URL, "http://localhost:8983/solr/");
+      LOGGER.info("Instantiating SOLR HTTP at {}", solrBaseUrl);
       return new HttpSolrClient(solrBaseUrl);
     } else if (solrType == RodaConstants.SolrType.HTTP_CLOUD || solrType == RodaConstants.SolrType.CLOUD) {
       String solrCloudZooKeeperUrls = getConfigurationString(RodaConstants.CORE_SOLR_CLOUD_URLS, getConfigurationString(
         RodaConstants.CORE_SOLR_HTTP_CLOUD_URLS, "localhost:2181,localhost:2182,localhost:2183"));
+      LOGGER.info("Instantiating SOLR Cloud at {}", solrCloudZooKeeperUrls);
       CloudSolrClient cloudSolrClient = new CloudSolrClient(solrCloudZooKeeperUrls);
       bootstrap(cloudSolrClient, solrHome);
       return cloudSolrClient;
     } else {
       // default to Embedded
       setSolrSystemProperties();
+      LOGGER.info("Instantiating SOLR Embedded");
       return new EmbeddedSolrServer(solrHome, "test");
     }
   }
