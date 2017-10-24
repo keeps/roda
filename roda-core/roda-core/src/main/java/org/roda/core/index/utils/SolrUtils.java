@@ -2504,6 +2504,14 @@ public class SolrUtils {
     return doc;
   }
 
+  public static SolrInputDocument updateAIPHasRepresentations(String aipId, boolean hasRepresentations)
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException {
+    SolrInputDocument doc = new SolrInputDocument();
+    doc.addField(RodaConstants.INDEX_UUID, aipId);
+    doc.addField(RodaConstants.AIP_HAS_REPRESENTATIONS, set(hasRepresentations));
+    return doc;
+  }
+
   public static SolrInputDocument updateRepresentationAncestors(String representationUUID, List<String> ancestors)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException {
     SolrInputDocument doc = new SolrInputDocument();

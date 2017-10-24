@@ -620,8 +620,15 @@ public class IndexModelObserver implements ModelObserver {
 
       ReturnWithExceptions<Void> eventExceptions = indexPreservationsEvents(aip.getId(), representation.getId());
       exceptions.addExceptions(eventExceptions.getExceptions());
+
+      if (aip.getRepresentations().size() == 1) {
+        SolrInputDocument doc = SolrUtils.updateAIPHasRepresentations(aip.getId(), true);
+        index.add(RodaConstants.INDEX_AIP, doc);
+      }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Cannot index representation: {}", representation, e);
+    } catch (SolrServerException | IOException e) {
+      LOGGER.error("Cannot update hasRepresentations flag on AIP", e);
     }
 
     return exceptions;
@@ -643,6 +650,17 @@ public class IndexModelObserver implements ModelObserver {
 
     if (deleteIncidences) {
       deleteDocumentsFromIndex(RiskIncidence.class, RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, representationId);
+    }
+
+    try {
+      AIP aip = model.retrieveAIP(aipId);
+      if (aip.getRepresentations().size() == 0) {
+        SolrInputDocument doc = SolrUtils.updateAIPHasRepresentations(aipId, false);
+        index.add(RodaConstants.INDEX_AIP, doc);
+      }
+    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
+      | SolrServerException | IOException e) {
+      LOGGER.error("Cannot update hasRepresentations flag on AIP", e);
     }
   }
 
