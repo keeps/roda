@@ -520,26 +520,17 @@ public class RodaCoreFactory {
     classLoadersList.add(ClasspathHelper.contextClassLoader());
 
     Reflections reflections = new Reflections(
-      new ConfigurationBuilder().filterInputsBy(new FilterBuilder().include(FilterBuilder.prefix(classpathPrefix)))
-        .setScanners(new ResourcesScanner())
-        .setUrls(ClasspathHelper.forClassLoader(classLoadersList.toArray(new ClassLoader[] {}))));
+      new ConfigurationBuilder().setScanners(new ResourcesScanner()).setUrls(ClasspathHelper.forPackage(classpathPrefix,
+        ClasspathHelper.contextClassLoader(), ClasspathHelper.staticClassLoader())));
 
     Set<String> resources = reflections.getResources(Pattern.compile(".*"));
+    resources = resources.stream().filter(r -> !shouldExclude(r, classpathPrefix, excludePaths))
+      .collect(Collectors.toSet());
 
-    LOGGER.info("Copy files from classpath prefix={}, destination={}, removePrefix={}, excludePaths={}, #resources={}",
+    LOGGER.info("Copying files from classpath prefix={}, destination={}, removePrefix={}, excludePaths={}",
       classpathPrefix, destinationDirectory, removeClasspathPrefixFromFinalPath, excludePaths, resources.size());
 
     for (String resource : resources) {
-      boolean exclude = false;
-      for (String excludePath : excludePaths) {
-        if (resource.startsWith(excludePath)) {
-          exclude = true;
-          break;
-        }
-      }
-      if (exclude) {
-        continue;
-      }
 
       InputStream originStream = RodaCoreFactory.class.getClassLoader().getResourceAsStream(resource);
       Path destinyPath;
@@ -567,7 +558,25 @@ public class RodaCoreFactory {
       } finally {
         RodaUtils.closeQuietly(originStream);
       }
+
     }
+  }
+
+  private static boolean shouldExclude(String resource, String classpathPrefix, List<String> excludePaths) {
+    boolean exclude = false;
+
+    if (resource.startsWith(classpathPrefix)) {
+
+      for (String excludePath : excludePaths) {
+        if (resource.startsWith(excludePath)) {
+          exclude = true;
+          break;
+        }
+      }
+    } else {
+      exclude = true;
+    }
+    return exclude;
   }
 
   private static void copyFilesFromClasspath(String classpathPrefix, Path destinationDirectory) {
@@ -764,6 +773,7 @@ public class RodaCoreFactory {
       req.setCollectionName(collection).setConfigName(collection);
 
       req.setNumShards(getEnvInt("SOLR_NUM_SHARDS", 1));
+      req.setMaxShardsPerNode(getEnvInt("SOLR_MAX_SHARDS_PER_NODE", 1));
       req.setReplicationFactor(getEnvInt("SOLR_REPLICATION_FACTOR", 1));
       req.setAutoAddReplicas(getEnvBoolean("SOLR_AUTO_ADD_REPLICAS", false));
 

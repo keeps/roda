@@ -12,8 +12,8 @@ groupadd -g $GROUP_ID roda
 useradd  --shell /bin/bash --no-log-init -u $USER_ID -o -c "RODA" -g roda roda
 
 # Fixing permissions
-chown -R roda:roda /usr/local/tomcat
-mkdir -p /roda && chown roda:roda /roda
+chown -R roda:roda $CATALINA_HOME
+mkdir -p $RODA_HOME && chown roda:roda $RODA_HOME
 
 # run extension scripts
 DIR=/docker-entrypoint.d
