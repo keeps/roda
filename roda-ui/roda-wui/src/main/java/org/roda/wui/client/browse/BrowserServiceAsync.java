@@ -258,5 +258,7 @@ public interface BrowserServiceAsync {
 
   void getExportLimit(AsyncCallback<Integer> asyncCallback);
 
+  void retrieveAIPTypeOptions(String locale, AsyncCallback<Pair<Boolean, List<String>>> asyncCallback);
+
   void retrieveRepresentationTypeOptions(String locale, AsyncCallback<Pair<Boolean, List<String>>> asyncCallback);
 }

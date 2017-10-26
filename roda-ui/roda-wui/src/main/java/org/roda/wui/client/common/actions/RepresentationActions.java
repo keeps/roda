@@ -220,7 +220,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
 
         @Override
         public void onSuccess(Pair<Boolean, List<String>> result) {
-          Dialogs.showPromptDialogRepresentationTypes(messages.changeTypeTitle(), null, messages.cancelButton(),
+          Dialogs.showPromptDialogEntityTypes(messages.changeTypeTitle(), messages.cancelButton(),
             messages.confirmButton(), result.getSecond(), result.getFirst(), new AsyncCallback<String>() {
 
               @Override
@@ -378,7 +378,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
 
   public void changeState(final IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
     GWT.log(representation.toString());
-    Dialogs.showPromptDialogRepresentationStates(messages.changeStateTitle(), messages.cancelButton(),
+    Dialogs.showPromptDialogRepresentationStates(messages.changeStatusTitle(), messages.cancelButton(),
       messages.confirmButton(), representation.getRepresentationStates(), new AsyncCallback<List<String>>() {
 
         @Override
@@ -404,7 +404,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
 
                     @Override
                     public void onSuccessImpl(Void nothing) {
-                      Toast.showInfo(messages.dialogSuccess(), messages.changeStateSuccessful());
+                      Toast.showInfo(messages.dialogSuccess(), messages.changeStatusSuccessful());
                       callback.onSuccess(ActionImpact.UPDATED);
                     }
                   });
@@ -426,7 +426,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
       callback, "btn-download");
     addButton(layout, messages.changeTypeButton(), RepresentationAction.CHANGE_TYPE, representation,
       ActionImpact.UPDATED, callback, "btn-edit");
-    addButton(layout, messages.changeStateButton(), RepresentationAction.CHANGE_STATE, representation,
+    addButton(layout, messages.changeStatusButton(), RepresentationAction.CHANGE_STATE, representation,
       ActionImpact.UPDATED, callback, "btn-edit");
     addButton(layout, messages.removeButton(), RepresentationAction.REMOVE, representation, ActionImpact.DESTROYED,
       callback, "btn-ban");

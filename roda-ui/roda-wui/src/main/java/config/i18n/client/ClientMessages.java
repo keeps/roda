@@ -130,15 +130,15 @@ public interface ClientMessages extends Messages {
 
   String changeTypePlaceHolder();
 
-  String changeStateTitle();
+  String changeStatusTitle();
 
-  String changeStateSuccessful();
+  String changeStatusSuccessful();
 
-  String stateLabel(@Select String state);
+  String statusLabel(@Select String status);
 
-  String otherStateLabel();
+  String otherStatusLabel();
 
-  String otherStatePlaceholder();
+  String otherStatusPlaceholder();
 
   String createFolderTitle();
 
@@ -520,7 +520,7 @@ public interface ClientMessages extends Messages {
 
   String changeTypeButton();
 
-  String changeStateButton();
+  String changeStatusButton();
 
   String clearButton();
 
@@ -1445,9 +1445,9 @@ public interface ClientMessages extends Messages {
 
   String representationRemoveMessage();
 
-  String representationTypeAddNew();
+  String entityTypeAddNew();
 
-  String representationTypeNewLabel();
+  String entityTypeNewLabel();
 
   /***** File ****/
 

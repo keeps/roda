@@ -957,6 +957,32 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
+  public Pair<Boolean, List<String>> retrieveAIPTypeOptions(String locale) {
+    List<String> types = new ArrayList<>();
+    boolean isControlled = RodaCoreFactory.getRodaConfiguration().getBoolean("core.aip_type.controlled_vocabulary",
+      false);
+
+    if (isControlled) {
+      types = RodaCoreFactory.getRodaConfigurationAsList("core.aip_type.value");
+    } else {
+      try {
+        Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.AIP_TYPE));
+        IndexResult<IndexedAIP> result = find(IndexedAIP.class.getName(), Filter.NULL, Sorter.NONE, Sublist.NONE,
+          facets, locale, false, new ArrayList<String>());
+
+        List<FacetFieldResult> facetResults = result.getFacetResults();
+        for (FacetValue facetValue : facetResults.get(0).getValues()) {
+          types.add(facetValue.getValue());
+        }
+      } catch (GenericException | AuthorizationDeniedException | RequestNotValidException e) {
+        LOGGER.error("Could not execute find request on AIPs", e);
+      }
+    }
+
+    return Pair.of(isControlled, types);
+  }
+
+  @Override
   public Pair<Boolean, List<String>> retrieveRepresentationTypeOptions(String locale) {
     List<String> types = new ArrayList<>();
     boolean isControlled = RodaCoreFactory.getRodaConfiguration()

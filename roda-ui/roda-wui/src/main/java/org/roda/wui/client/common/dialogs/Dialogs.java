@@ -46,7 +46,7 @@ import config.i18n.client.ClientMessages;
 
 public class Dialogs {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-  private static final String ADD_REPRESENTATION_TYPE = "#__ADDNEW__#";
+  private static final String ADD_TYPE = "#__ADDNEW__#";
 
   private Dialogs() {
     // do nothing
@@ -329,20 +329,12 @@ public class Dialogs {
     inputBox.setFocus(true);
   }
 
-  public static void showPromptDialogRepresentationTypes(String title, String message, String cancelButtonText,
-    String confirmButtonText, List<String> types, boolean isControlledVocabulary,
-    final AsyncCallback<String> callback) {
+  public static void showPromptDialogEntityTypes(String title, String cancelButtonText, String confirmButtonText,
+    List<String> types, boolean isControlledVocabulary, final AsyncCallback<String> callback) {
     final DialogBox dialogBox = new DialogBox(false, true);
     dialogBox.setText(title);
 
     final FlowPanel layout = new FlowPanel();
-
-    if (message != null) {
-      final Label messageLabel = new Label(message);
-      layout.add(messageLabel);
-      messageLabel.addStyleName("wui-dialog-message");
-    }
-
     final ListBox select = new ListBox();
 
     for (String type : types) {
@@ -355,14 +347,14 @@ public class Dialogs {
     layout.add(select);
 
     final TextBox newTypeBox = new TextBox();
-    final Label newTypeLabel = new Label(messages.representationTypeNewLabel() + ": ");
+    final Label newTypeLabel = new Label(messages.entityTypeNewLabel() + ": ");
     newTypeBox.setVisible(false);
     newTypeLabel.setVisible(false);
 
     if (!isControlledVocabulary) {
-      select.addItem(messages.representationTypeAddNew(), ADD_REPRESENTATION_TYPE);
+      select.addItem(messages.entityTypeAddNew(), ADD_TYPE);
 
-      newTypeBox.getElement().setPropertyString("placeholder", messages.representationTypeNewLabel());
+      newTypeBox.getElement().setPropertyString("placeholder", messages.entityTypeNewLabel());
       layout.add(newTypeLabel);
       layout.add(newTypeBox);
     }
@@ -371,8 +363,8 @@ public class Dialogs {
       @Override
       public void onChange(ChangeEvent event) {
         String selectedValue = select.getSelectedValue();
-        newTypeLabel.setVisible(selectedValue.equals(ADD_REPRESENTATION_TYPE));
-        newTypeBox.setVisible(selectedValue.equals(ADD_REPRESENTATION_TYPE));
+        newTypeLabel.setVisible(selectedValue.equals(ADD_TYPE));
+        newTypeBox.setVisible(selectedValue.equals(ADD_TYPE));
       }
     });
 
@@ -421,7 +413,7 @@ public class Dialogs {
 
   private static CheckBox getRepresentationStateCheckBox(String state, boolean value) {
     final CheckBox stateBox = new CheckBox();
-    stateBox.setText(messages.stateLabel(state));
+    stateBox.setText(messages.statusLabel(state));
     stateBox.setFormValue(state);
     stateBox.setValue(value);
     stateBox.addStyleName("form-checkbox");
@@ -436,9 +428,9 @@ public class Dialogs {
     final FlowPanel layout = new FlowPanel();
     final List<CheckBox> checkBoxes = new ArrayList<>();
 
-    final Label label = new Label(messages.otherStateLabel());
+    final Label label = new Label(messages.otherStatusLabel());
     final TextBox otherBox = new TextBox();
-    otherBox.getElement().setPropertyString("placeholder", messages.otherStatePlaceholder());
+    otherBox.getElement().setPropertyString("placeholder", messages.otherStatusPlaceholder());
     otherBox.addStyleName("form-textbox wui-dialog-message");
 
     for (String state : states) {

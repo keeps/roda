@@ -54,8 +54,8 @@ import config.i18n.client.ClientMessages;
 
 public class PluginParameterPanel extends Composite {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-  private ClientLogger logger = new ClientLogger(getClass().getName());
-  private static final String ADD_REPRESENTATION_TYPE = "#__ADDNEW__#";
+  private static final ClientLogger LOGGER = new ClientLogger(PluginParameterPanel.class.getName());
+  private static final String ADD_TYPE = "#__ADDNEW__#";
 
   private final PluginParameter parameter;
   private final FlowPanel layout;
@@ -94,7 +94,7 @@ public class PluginParameterPanel extends Composite {
     } else if (PluginParameterType.INTEGER.equals(parameter.getType())) {
       createIntegerLayout();
     } else {
-      logger
+      LOGGER
         .warn("Unsupported plugin parameter type: " + parameter.getType() + ". Reverting to default parameter editor.");
       createStringLayout();
     }
@@ -108,9 +108,9 @@ public class PluginParameterPanel extends Composite {
     selectBox.addStyleName("form-textbox-small");
 
     final TextBox newTypeBox = new TextBox();
-    final Label newTypeLabel = new Label(messages.representationTypeNewLabel() + ": ");
+    final Label newTypeLabel = new Label(messages.entityTypeNewLabel() + ": ");
 
-    newTypeBox.getElement().setPropertyString("placeholder", messages.representationTypeNewLabel());
+    newTypeBox.getElement().setPropertyString("placeholder", messages.entityTypeNewLabel());
     newTypeBox.addStyleName("form-textbox wui-dialog-message plugin-representation-type-box");
     newTypeLabel.addStyleName("plugin-representation-type-label");
 
@@ -132,15 +132,15 @@ public class PluginParameterPanel extends Composite {
           }
 
           if (!result.getFirst()) {
-            selectBox.addItem(messages.representationTypeAddNew(), ADD_REPRESENTATION_TYPE);
+            selectBox.addItem(messages.entityTypeAddNew(), ADD_TYPE);
           }
 
           selectBox.addChangeHandler(new ChangeHandler() {
             @Override
             public void onChange(ChangeEvent event) {
               value = selectBox.getSelectedValue();
-              newTypeLabel.setVisible(value.equals(ADD_REPRESENTATION_TYPE));
-              newTypeBox.setVisible(value.equals(ADD_REPRESENTATION_TYPE));
+              newTypeLabel.setVisible(value.equals(ADD_TYPE));
+              newTypeBox.setVisible(value.equals(ADD_TYPE));
             }
           });
 

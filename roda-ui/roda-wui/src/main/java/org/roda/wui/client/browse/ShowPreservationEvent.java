@@ -10,6 +10,7 @@
  */
 package org.roda.wui.client.browse;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -499,8 +500,13 @@ public class ShowPreservationEvent extends Composite {
     if (irep != null) {
       Label originalLabel = new Label(messages.representationStatus());
       originalLabel.addStyleName("label");
-      Label originalValue = new Label(
-        irep.isOriginal() ? messages.originalRepresentation() : messages.alternativeRepresentation());
+
+      List<String> translatedStates = new ArrayList<>();
+      for (String state : irep.getRepresentationStates()) {
+        translatedStates.add(messages.statusLabel(state));
+      }
+
+      Label originalValue = new Label(StringUtils.prettyPrint(translatedStates));
       originalValue.addStyleName("value");
 
       body.add(originalLabel);

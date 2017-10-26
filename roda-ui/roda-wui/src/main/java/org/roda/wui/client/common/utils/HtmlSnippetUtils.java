@@ -126,7 +126,7 @@ public class HtmlSnippetUtils {
 
     for (String state : representationStates) {
       b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_ORIGINAL_LABEL_SUCCESS));
-      b.append(SafeHtmlUtils.fromString(messages.stateLabel(state)));
+      b.append(SafeHtmlUtils.fromString(messages.statusLabel(state)));
       b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
     }
 

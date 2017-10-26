@@ -356,5 +356,7 @@ public interface BrowserService extends RemoteService {
 
   int getExportLimit();
 
+  Pair<Boolean, List<String>> retrieveAIPTypeOptions(String locale);
+
   Pair<Boolean, List<String>> retrieveRepresentationTypeOptions(String locale);
 }

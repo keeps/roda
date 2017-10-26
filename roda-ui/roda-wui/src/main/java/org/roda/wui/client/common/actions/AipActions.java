@@ -9,11 +9,13 @@ package org.roda.wui.client.common.actions;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
@@ -32,7 +34,6 @@ import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.SelectAipDialog;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
-import org.roda.wui.client.common.search.SearchSuggestBox;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.management.UserLog;
@@ -638,21 +639,17 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   }
 
   private void changeType(final SelectedItems<IndexedAIP> aips, final AsyncCallback<ActionImpact> callback) {
-    SearchSuggestBox<IndexedAIP> suggestBox = new SearchSuggestBox<>(IndexedAIP.class, RodaConstants.AIP_TYPE, true);
-
-    Dialogs.showPromptDialogSuggest(messages.changeTypeTitle(), null, messages.changeTypePlaceHolder(),
-      messages.cancelButton(), messages.confirmButton(), suggestBox, new AsyncCallback<String>() {
-
+    BrowserService.Util.getInstance().retrieveAIPTypeOptions(LocaleInfo.getCurrentLocale().getLocaleName(),
+      new AsyncCallback<Pair<Boolean, List<String>>>() {
         @Override
         public void onFailure(Throwable caught) {
           // do nothing
         }
 
         @Override
-        public void onSuccess(final String newType) {
-          Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-            RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false,
-            new AsyncCallback<String>() {
+        public void onSuccess(Pair<Boolean, List<String>> result) {
+          Dialogs.showPromptDialogEntityTypes(messages.changeTypeTitle(), messages.cancelButton(),
+            messages.confirmButton(), result.getSecond(), result.getFirst(), new AsyncCallback<String>() {
 
               @Override
               public void onFailure(Throwable caught) {
@@ -660,14 +657,27 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
               }
 
               @Override
-              public void onSuccess(String details) {
-                BrowserService.Util.getInstance().changeAIPType(aips, newType, details,
-                  new LoadingAsyncCallback<Void>() {
+              public void onSuccess(final String newType) {
+                Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
+                  RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false,
+                  new AsyncCallback<String>() {
 
                     @Override
-                    public void onSuccessImpl(Void nothing) {
-                      Toast.showInfo(messages.dialogSuccess(), messages.changeTypeSuccessful());
-                      callback.onSuccess(ActionImpact.UPDATED);
+                    public void onFailure(Throwable caught) {
+                      // do nothing
+                    }
+
+                    @Override
+                    public void onSuccess(String details) {
+                      BrowserService.Util.getInstance().changeAIPType(aips, newType, details,
+                        new LoadingAsyncCallback<Void>() {
+
+                          @Override
+                          public void onSuccessImpl(Void nothing) {
+                            Toast.showInfo(messages.dialogSuccess(), messages.changeTypeSuccessful());
+                            callback.onSuccess(ActionImpact.UPDATED);
+                          }
+                        });
                     }
                   });
               }
