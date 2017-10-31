@@ -132,9 +132,7 @@
 		<jena.version>2.13.0</jena.version>
 		<solr.version>5.5.3</solr.version>
 		<akka.version>2.4.16</akka.version>
-		<!-- 20160818 hsilva: versions M22 & M23 don't work properly with RODA code base -->
-		<apacheds.version>2.0.0-M21</apacheds.version>
-		<apacheds_jdbm1.version>2.0.0-M3</apacheds_jdbm1.version>
+		<apacheds.version>2.0.0-M24</apacheds.version>
 		<httpcomponents.version>4.5.3</httpcomponents.version>
 		<poi.version>3.13</poi.version>
 		<commons_ip.version>1.0.1</commons_ip.version>
@@ -812,13 +810,6 @@
 				<groupId>org.apache.directory.server</groupId>
 				<artifactId>apacheds-interceptor-kerberos</artifactId>
 				<version>${apacheds.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.apache.directory.jdbm</groupId>
-				<artifactId>apacheds-jdbm1</artifactId>
-				<version>${apacheds_jdbm1.version}</version>
-				<!--type>bundle</type -->
 			</dependency>
 
 			<dependency>
