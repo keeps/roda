@@ -58,7 +58,10 @@ public class HTMLWidgetWrapper extends HTML {
     }
     if (id.endsWith(".md")) {
       isMarkdown = true;
-      id = RodaConstants.CORE_MARKDOWN_FOLDER + "/" + id.substring(0, id.length() - 3);
+      String markdownPathPrefix = RodaConstants.CORE_MARKDOWN_FOLDER + "/";
+      if (!id.startsWith(markdownPathPrefix)) {
+        id = markdownPathPrefix + id.substring(0, id.length() - 3);
+      }
     }
 
     String locale = LocaleInfo.getCurrentLocale().getLocaleName();
@@ -98,15 +101,22 @@ public class HTMLWidgetWrapper extends HTML {
 
               html = mdRegExp.replace(html, mdReplacement);
 
-              // <img src="images/kitematic_search.png" alt="Search and install"
-              // title="Search and install RODA in Kitematic">
+              // fix image links (that point to the documentation folder) by replacing them
+              // with proper "#theme/images/..." links
+              RegExp imgDocRegExp = RegExp
+                .compile("<img src=\"(" + RodaConstants.CORE_MARKDOWN_FOLDER + "/images/.*?)\"", "g");
+              String imgDocReplacement = ("<img src=\""
+                + RestUtils.createThemeResourceUri(filenameToken, null, false).asString() + "\"").replace(filenameToken,
+                  "$1");
 
-              // fix image links by replacing them with proper
-              // "#theme/images/..." links
+              html = imgDocRegExp.replace(html, imgDocReplacement);
+
+              // fix image links (that do not point to the documentation folder) by replacing
+              // them with proper "#theme/images/..." links
               RegExp imgRegExp = RegExp.compile("<img src=\"(images/.*?)\"", "g");
               String imgReplacement = ("<img src=\""
                 + RestUtils.createThemeResourceUri(filenameToken, null, false).asString() + "\"").replace(filenameToken,
-                RodaConstants.CORE_MARKDOWN_FOLDER  + "/$1");
+                  RodaConstants.CORE_MARKDOWN_FOLDER + "/$1");
 
               html = imgRegExp.replace(html, imgReplacement);
             } else {
