@@ -36,8 +36,8 @@ RUN curl -s https://bintray.com/user/downloadSubjectPublicKey?username=bintray |
     libreoffice-common unoconv libreoffice-writer libreoffice-draw libreoffice-calc libreoffice-impress cpio libgcrypt20 libnss3 libreoffice-pdfimport \
     exiftool python-jpylyzer mediainfo && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-ADD clamd.conf /etc/clamav/clamd.conf
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY clamd.conf /etc/clamav/clamd.conf
 
 # setup clamav, siegfried & remove old ROOT folder from tomcat
 RUN mkdir -p /var/run/clamav && chown clamav /var/run/clamav && freshclam ; \
@@ -45,8 +45,8 @@ RUN mkdir -p /var/run/clamav && chown clamav /var/run/clamav && freshclam ; \
 	rm -rf /usr/local/tomcat/webapps/ROOT
 
 # Install web application
-ADD /ROOT /usr/local/tomcat/webapps/ROOT
-ADD roda-cli.sh /usr/local/bin/roda-cli.sh
+COPY /ROOT /usr/local/tomcat/webapps/ROOT
+COPY roda-cli.sh /usr/local/bin/roda-cli.sh
 
 # Fix configuration & do some final cleanup
 RUN unzip -q /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/roda-core-*.jar config/roda-core.properties && \
@@ -63,8 +63,11 @@ RUN unzip -q /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/roda-core-*.jar config/r
 ENV RODA_HOME=/roda
 VOLUME /roda
 
-ADD /docker-entrypoint.sh /
-ADD /docker-entrypoint.d/* /docker-entrypoint.d/
-ONBUILD ADD /docker-entrypoint.d/* /docker-entrypoint.d/
+COPY /docker-entrypoint.sh /
+COPY /docker-entrypoint.d/* /docker-entrypoint.d/
+
+# Work-around to achieve optional copy
+ONBUILD COPY /docker-entrypoint.d/* Dockerfile /docker-entrypoint.d/
+ONBUILD RUN rm /docker-entrypoint.d/Dockerfile
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
