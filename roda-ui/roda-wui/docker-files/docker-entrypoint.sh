@@ -1,21 +1,5 @@
 #!/bin/bash
 
-# Either use the LOCAL_USER_ID and LOCAL_GROUP_ID
-# if passed in at runtime or fallback
-
-USER_ID=${LOCAL_USER_ID:-9001}
-GROUP_ID=${LOCAL_GROUP_ID:-9001}
-
-# Adding roda user and group
-echo "Starting with UID : $USER_ID and GUID : $GROUP_ID"
-groupadd -g $GROUP_ID roda
-useradd  --shell /bin/bash --no-log-init -u $USER_ID -o -c "RODA" -g roda roda
-
-# Fixing permissions
-chown -R roda:roda $CATALINA_HOME || echo "WARNING: Could not chown -R roda:roda $CATALINA_HOME "
-mkdir -p $RODA_HOME
-chown roda:roda $RODA_HOME || echo "WARNING: Could not chown roda:roda $RODA_HOME"
-
 # run extension scripts
 DIR=/docker-entrypoint.d
 
@@ -26,7 +10,7 @@ fi
 
 if [[ $# -eq 0 ]] ; then
     echo 'Starting Apache Tomcat (user: roda)'
-    exec gosu roda catalina.sh run
+    exec catalina.sh run
 fi
 
-exec gosu roda $@
+exec $@
