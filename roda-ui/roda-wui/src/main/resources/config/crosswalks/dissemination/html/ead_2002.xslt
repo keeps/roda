@@ -1,61 +1,103 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE xsl:stylesheet  [
-		<!ENTITY crarr  "&#13;">
-		<!ENTITY crarr  "&#xD;">]>
-<xsl:stylesheet version="2.0"
-				xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-				xmlns:xs="http://www.w3.org/2001/XMLSchema"
-				xmlns:my="http://www.keep.pt/xslt/functions"
-				xmlns:ead="urn:isbn:1-931666-22-9" exclude-result-prefixes="ead">
-	<xsl:output method="xml" indent="yes" encoding="UTF-8" omit-xml-declaration="yes" />
-	<!-- SECTION -->
-	<xsl:param name="i18n.identityarea" />
-	<xsl:param name="i18n.level" />
-	<xsl:param name="i18n.otherlevel" />
-	<xsl:param name="i18n.reference" />
-	<xsl:param name="i18n.repositorycode" />
-	<xsl:param name="i18n.countrycode" />
-	<xsl:param name="i18n.title" />
-	<xsl:param name="i18n.titletype" />
-	<xsl:param name="i18n.repository" />
-	<xsl:param name="i18n.initialdate" />
-	<xsl:param name="i18n.finaldate" />
-	<xsl:param name="i18n.unitdate" />
-	<xsl:param name="i18n.dimensions" />
-	<xsl:param name="i18n.extents" />
-	<!-- SECTION -->
-	<xsl:param name="i18n.contextarea" />
-	<xsl:param name="i18n.bioghist" />
-	<xsl:param name="i18n.geogname" />
-	<xsl:param name="i18n.legalstatus" />
-	<xsl:param name="i18n.custodhist" />
-	<xsl:param name="i18n.acqinfo" />
-	<!-- SECTION -->
-	<xsl:param name="i18n.contentstructurearea" />
-	<xsl:param name="i18n.scopecontent" />
-	<xsl:param name="i18n.appraisal" />
-	<xsl:param name="i18n.accruals" />
-	<xsl:param name="i18n.arrangement" />
-	<!-- SECTION -->
-	<xsl:param name="i18n.useaccessarea" />
-	<xsl:param name="i18n.accessrestrict" />
-	<xsl:param name="i18n.userestrict" />
-	<xsl:param name="i18n.physloc" />
-	<xsl:param name="i18n.langmaterial" />
-	<xsl:param name="i18n.phystech" />
-	<xsl:param name="i18n.otherfindaid" />
-	<!-- SECTION -->
-	<xsl:param name="i18n.alliedmaterialarea" />
-	<xsl:param name="i18n.originalsloc" />
-	<xsl:param name="i18n.altformavail" />
-	<xsl:param name="i18n.relatedmaterial" />
-	<xsl:param name="i18n.bibliography" />
-	<!-- SECTION -->
-	<xsl:param name="i18n.notesarea" />
-	<xsl:param name="i18n.oddarea" />
-	<!-- SECTION -->
-	<xsl:param name="i18n.descriptioncontrolarea" />
-	<xsl:param name="i18n.processinfo" />
+	<!ENTITY crarr  "&#13;">
+	<!ENTITY crarr  "&#xD;">
+]>
+<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+	xmlns:ead="urn:isbn:1-931666-22-9" exclude-result-prefixes="ead">
+	<xsl:output method="xml" indent="yes" encoding="UTF-8" omit-xml-declaration="yes"/>
+
+	<xsl:param name="i18n.identityarea"/>
+	<xsl:param name="i18n.reference"/>
+	<xsl:param name="i18n.title"/>
+	<xsl:param name="i18n.initialdate"/>
+	<xsl:param name="i18n.finaldate"/>
+	<xsl:param name="i18n.unitdate"/>
+	<xsl:param name="i18n.countrycode"/>
+	<xsl:param name="i18n.level"/>
+	<xsl:param name="i18n.materialspec"/>
+	<xsl:param name="i18n.origination"/>
+	<xsl:param name="i18n.physicaldescription"/>
+	<xsl:param name="i18n.extent"/>
+	<xsl:param name="i18n.dimensions"/>
+	<xsl:param name="i18n.physfacet"/>
+	<xsl:param name="i18n.quote"/>
+
+
+	<xsl:param name="i18n.contextarea"/>
+	<xsl:param name="i18n.bioghist"/>
+	<xsl:param name="i18n.creator"/>
+	<xsl:param name="i18n.producer"/>
+	<xsl:param name="i18n.repositorycode"/>
+	<xsl:param name="i18n.repository"/>
+	<xsl:param name="i18n.custodialhistory"/>
+	<xsl:param name="i18n.acquisitioninformation"/>
+
+
+	<xsl:param name="i18n.contentarea"/>
+	<xsl:param name="i18n.description"/>
+	<xsl:param name="i18n.appraisal"/>
+	<xsl:param name="i18n.accruals"/>
+	<xsl:param name="i18n.arrangement"/>
+
+
+	<xsl:param name="i18n.accessarea"/>
+	<xsl:param name="i18n.administrativeandbiographicalhistory"/>
+	<xsl:param name="i18n.accessrestrictions"/>
+	<xsl:param name="i18n.userestrict"/>
+	<xsl:param name="i18n.languages"/>
+	<xsl:param name="i18n.languagesMaterial"/>
+	<xsl:param name="i18n.phystech"/>
+
+
+	<xsl:param name="i18n.alliedarea"/>
+	<xsl:param name="i18n.originalsloc"/>
+	<xsl:param name="i18n.altformavail"/>
+	<xsl:param name="i18n.relatedmaterials"/>
+	<xsl:param name="i18n.bibliography"/>
+	<xsl:param name="i18n.otherfindaids"/>
+
+
+	<xsl:param name="i18n.notesarea"/>
+	<xsl:param name="i18n.notes"/>
+
+
+	<xsl:param name="i18n.descriptioncontrolarea"/>
+	<xsl:param name="i18n.rules"/>
+	
+	<xsl:param name="i18n.statusdescription"/>
+	<!-- TODO: Bruno, please check if these translations are working -->
+	<xsl:param name="i18n.status.final"/>
+	<xsl:param name="i18n.status.revised"/>
+	<xsl:param name="i18n.status.draft"/>
+	
+	
+	<xsl:param name="i18n.levelofdetail"/>
+	<!-- TODO: Bruno, please check if these translations are working -->
+	<xsl:param name="i18n.levelofdetail.full"/>
+	<xsl:param name="i18n.levelofdetail.partial"/>
+	<xsl:param name="i18n.levelofdetail.minimal"/>
+	
+	<xsl:param name="i18n.processdates"/>
+	<xsl:param name="i18n.sources"/>
+	<xsl:param name="i18n.archivistNotes"/>
+
+	<!-- Standard description levels -->
+	<xsl:param name="i18n.level.fonds" />
+	<xsl:param name="i18n.level.class" />
+	<xsl:param name="i18n.level.collection" />
+	<xsl:param name="i18n.level.recordgrp" />
+	<xsl:param name="i18n.level.subgrp" />
+	<xsl:param name="i18n.level.subfonds" />
+	<xsl:param name="i18n.level.subclass" />
+	<xsl:param name="i18n.level.series" />
+	<xsl:param name="i18n.level.subseries" />
+	<xsl:param name="i18n.level.file" />
+	<xsl:param name="i18n.level.item" />
+	
+	
+	<!-- Portuguese National Archives description levels -->
+	<xsl:param name="i18n.level.P" />
 	<xsl:param name="i18n.level.C" />
 	<xsl:param name="i18n.level.F" />
 	<xsl:param name="i18n.level.SF" />
@@ -69,565 +111,662 @@
 	<xsl:param name="i18n.level.UI" />
 	<xsl:param name="i18n.level.DC" />
 	<xsl:param name="i18n.level.D" />
+	
+	
+	
+	<!-- Translation maps to be used by templates  -->
+	<xsl:variable name="statusDescriptionTranslationMap">
+		<entry key="final"><xsl:value-of select="$i18n.status.final"/></entry>
+		<entry key="revised"><xsl:value-of select="$i18n.status.revised"/></entry>
+		<entry key="draft"><xsl:value-of select="$i18n.status.draft"/></entry>
+	</xsl:variable>
+	
+	
+	<xsl:variable name="levelOfDetailTranslationMap">
+		<entry key="full"><xsl:value-of select="$i18n.levelofdetail.full"/></entry>
+		<entry key="partial"><xsl:value-of select="$i18n.levelofdetail.partial"/></entry>
+		<entry key="minimal"><xsl:value-of select="$i18n.levelofdetail.minimal"/></entry>
+	</xsl:variable>
+	
 
-	<xsl:template name="join">
-		<xsl:param name="list" />
-		<xsl:param name="separator" />
-		<xsl:for-each select="$list">
-			<xsl:value-of select="." />
-			<xsl:if test="position() != last()">
-				<xsl:value-of select="$separator" />
+	<xsl:variable name="descriptionLevelTranslationMap">
+		<entry key="fonds"><xsl:value-of select="$i18n.level.fonds"/></entry>
+		<entry key="class"><xsl:value-of select="$i18n.level.class"/></entry>
+		<entry key="collection"><xsl:value-of select="$i18n.level.collection"/></entry>
+		<entry key="recordgrp"><xsl:value-of select="$i18n.level.recordgrp"/></entry>
+		<entry key="recordgrp"><xsl:value-of select="$i18n.level.recordgrp"/></entry>
+		<entry key="subgrp"><xsl:value-of select="$i18n.level.subgrp"/></entry>
+		<entry key="subfonds"><xsl:value-of select="$i18n.level.subfonds"/></entry>
+		<entry key="subclass"><xsl:value-of select="$i18n.level.subclass"/></entry>
+		<entry key="series"><xsl:value-of select="$i18n.level.series"/></entry>
+		<entry key="subseries"><xsl:value-of select="$i18n.level.subseries"/></entry>
+		<entry key="file"><xsl:value-of select="$i18n.level.file"/></entry>
+		<entry key="item"><xsl:value-of select="$i18n.level.item"/></entry>
+		
+		<entry key="P"><xsl:value-of select="$i18n.level.P"/></entry>
+		<entry key="C"><xsl:value-of select="$i18n.level.C"/></entry>
+		<entry key="F"><xsl:value-of select="$i18n.level.F"/></entry>
+		<entry key="SF"><xsl:value-of select="$i18n.level.SF"/></entry>
+		<entry key="SSF"><xsl:value-of select="$i18n.level.SSF"/></entry>
+		<entry key="SC"><xsl:value-of select="$i18n.level.SC"/></entry>
+		<entry key="SSC"><xsl:value-of select="$i18n.level.SSC"/></entry>
+		<entry key="SSSC"><xsl:value-of select="$i18n.level.SSSC"/></entry>
+		<entry key="SR"><xsl:value-of select="$i18n.level.SR"/></entry>
+		<entry key="SSR"><xsl:value-of select="$i18n.level.SSR"/></entry>
+		<entry key="SSSR"><xsl:value-of select="$i18n.level.SSSR"/></entry>
+		<entry key="UI"><xsl:value-of select="$i18n.level.UI"/></entry>
+		<entry key="DC"><xsl:value-of select="$i18n.level.DC"/></entry>
+		<entry key="D"><xsl:value-of select="$i18n.level.D"/></entry>
+	</xsl:variable>
+	
+
+	<xsl:template match="/">
+		<div class="descriptiveMetadata">
+
+
+			<xsl:if
+				test="
+					/ead:ead/ead:archdesc/ead:did/*:unitid/text() |
+					/ead:ead/ead:archdesc/@otherlevel |
+					/ead:ead//ead:did/ead:unittitle/text() |
+					/ead:ead/ead:did/ead:unitdate/@normal |
+					/ead:ead//ead:did/ead:unitdate/text() |
+					/ead:ead//ead:did/ead:unitid/@countrycode |
+					/ead:ead/ead:did/ead:unitid/@repositorycode |
+					/ead:ead/ead:archdesc/ead:did/ead:repository/ead:corpname/text() |
+					/ead:ead/ead:archdesc/ead:did/ead:physdesc/ead:dimensions/text() |
+					/ead:ead/ead:archdesc/ead:did/ead:physdesc/ead:extent/text() |
+					/ead:ead/ead:archdesc/ead:did/ead:materialspec/text()">
+
+				<div class="form-separator">
+					<xsl:value-of select="$i18n.identityarea"/>
+				</div>
+
+
+				<!-- Unit id -->
+				<xsl:call-template name="simpleField">
+					<xsl:with-param name="label" select="$i18n.reference"/>
+					<xsl:with-param name="value" select="/*:ead/*:archdesc/*:did/*:unitid/text()"/>
+				</xsl:call-template>
+
+				<!-- Description level -->
+				<xsl:call-template name="descriptionLevel"/>
+
+
+				<!-- Unit title -->
+				<xsl:call-template name="simpleField">
+					<xsl:with-param name="label" select="$i18n.title"/>
+					<xsl:with-param name="value" select="/ead:ead//ead:did/ead:unittitle/text()"/>
+				</xsl:call-template>
+
+
+				<!-- Range dates-->
+				<xsl:call-template name="UnitDates"/>
+
+				<!-- Descriptive date -->
+				<xsl:call-template name="simpleField">
+					<xsl:with-param name="label" select="$i18n.unitdate"/>
+					<xsl:with-param name="value" select="/ead:ead//ead:did/ead:unitdate/text()"/>
+				</xsl:call-template>
+
+				<!-- Country code -->
+				<xsl:call-template name="simpleField">
+					<xsl:with-param name="label" select="$i18n.countrycode"/>
+					<xsl:with-param name="value"
+						select="/*:ead/*:archdesc/*:did/*:unitid/@countrycode"/>
+				</xsl:call-template>
+
+				<!-- Repository code -->
+				<xsl:call-template name="simpleField">
+					<xsl:with-param name="label" select="$i18n.repositorycode"/>
+					<xsl:with-param name="value"
+						select="/ead:ead/ead:archdesc/ead:did/ead:unitid/@repositorycode"/>
+				</xsl:call-template>
+
+				<!-- Repository name -->
+				<xsl:call-template name="simpleField">
+					<xsl:with-param name="label" select="$i18n.repository"/>
+					<xsl:with-param name="value"
+						select="/*:ead/*:archdesc/*:did/*:repository/*:corpname/text()"/>
+				</xsl:call-template>
+
+				<!-- Dimensions -->
+				<xsl:call-template name="simpleField">
+					<xsl:with-param name="label" select="$i18n.dimensions"/>
+					<xsl:with-param name="value"
+						select="/ead:ead/ead:archdesc/ead:did/ead:physdesc/ead:dimensions/text()"/>
+				</xsl:call-template>
+
+				<!-- Extent -->
+				<xsl:call-template name="simpleField">
+					<xsl:with-param name="label" select="$i18n.extent"/>
+					<xsl:with-param name="value"
+						select="/ead:ead/ead:archdesc/ead:did/ead:physdesc/ead:extent/text()"/>
+				</xsl:call-template>
+
+				<!-- Material specification -->
+				<xsl:call-template name="simpleField">
+					<xsl:with-param name="label" select="$i18n.materialspec"/>
+					<xsl:with-param name="value"
+						select="/ead:ead/ead:archdesc/ead:did/ead:materialspec/text()"/>
+				</xsl:call-template>
+
+
 			</xsl:if>
-		</xsl:for-each>
-	</xsl:template>
-	<!-- ................................................
-          escapeNewLine: replaces NL by HTML BR elements
-         ................................................-->
-	<xsl:function name="my:escapeNewLine">
-		<xsl:param name="pText" as="xs:string"/>
-		<xsl:choose>
-			<xsl:when test="not(contains($pText, '&#xA;'))">
-				<xsl:value-of select="$pText"/>
-			</xsl:when>
-			<xsl:otherwise>
-				<xsl:sequence select="concat(substring-before($pText, '&#xA;'),'',my:escapeNewLine(substring-after($pText, '&#xA;')))"/>
-			</xsl:otherwise>
-		</xsl:choose>
-	</xsl:function>
-	<xsl:template name="showField">
-		<xsl:param name="label" />
-		<xsl:param name="value" />
-		<xsl:if test="$value">
-			<div class="row-fluid metadata">
-				<div class="label">
-					<xsl:value-of select="$label" />
+			<!-- closes Identity Area -->
+
+
+
+			<!-- Opens context area -->
+			<xsl:if
+				test="
+					/*:ead/*:archdesc/*:did/*:origination[@label = 'creator']/*:name/text() |
+					/*:ead/*:archdesc/*:did/*:origination[@label = 'producer']/*:name/text() |
+					/*:ead/*:archdesc/*:bioghist/*:p/text() |
+					/*:ead/*:archdesc/*:custodhist/*:p/text() |
+					/*:ead/*:archdesc/*:acqinfo/*:p/text()">
+
+
+				<div class="form-separator">
+					<xsl:value-of select="$i18n.contextarea"/>
 				</div>
-				<div class="value">
-					<xsl:for-each select="$value">
-						<xsl:if test=".">
-							<xsl:value-of select="my:escapeNewLine(.)"/>
-						</xsl:if>
-					</xsl:for-each>
+
+
+
+
+				<!-- Creator -->
+				<xsl:call-template name="simpleField">
+					<xsl:with-param name="label" select="$i18n.creator"/>
+					<xsl:with-param name="value"
+						select="/*:ead/*:archdesc/*:did/*:origination[@label = 'creator']/*:name/text()"
+					/>
+				</xsl:call-template>
+
+				<!-- Producer  -->
+				<xsl:call-template name="simpleField">
+					<xsl:with-param name="label" select="$i18n.producer"/>
+					<xsl:with-param name="value"
+						select="/*:ead/*:archdesc/*:did/*:origination[@label = 'producer']/*:name/text()"
+					/>
+				</xsl:call-template>
+
+
+				<!-- Administrative and biographical history -->
+				<xsl:call-template name="simpleField">
+					<xsl:with-param name="label" select="$i18n.bioghist"/>
+					<xsl:with-param name="value" select="/*:ead/*:archdesc/*:bioghist/*:p/text()"/>
+				</xsl:call-template>
+
+
+				<!-- Custodial history -->
+				<xsl:call-template name="simpleField">
+					<xsl:with-param name="label" select="$i18n.custodialhistory"/>
+					<xsl:with-param name="value" select="/*:ead/*:archdesc/*:custodhist/*:p/text()"
+					/>
+				</xsl:call-template>
+
+				<!--  Immediate source of acquisition or transfer -->
+				<xsl:call-template name="simpleField">
+					<xsl:with-param name="label" select="$i18n.acquisitioninformation"/>
+					<xsl:with-param name="value" select="/*:ead/*:archdesc/*:acqinfo/*:p/text()"/>
+				</xsl:call-template>
+
+
+			</xsl:if>
+			<!-- Closes context area -->
+
+
+			<!-- Opens content area -->
+			<xsl:if
+				test="
+					/*:ead/*:archdesc/*:scopecontent/*:p/text() |
+					/*:ead/*:archdesc/*:appraisal/*:p/text() |
+					/*:ead/*:archdesc/*:accruals/*:p/text() |
+					/*:ead/*:archdesc/*:arrangement/*:p/text()">
+
+
+				<div class="form-separator">
+					<xsl:value-of select="$i18n.contentarea"/>
 				</div>
-			</div>
-		</xsl:if>
-	</xsl:template>
-	<xsl:template name="showFieldWithAltRender">
-		<xsl:param name="value" />
-		<xsl:for-each select="$value">
-			<div class="row-fluid metadata">
-				<div class="label">
-					<xsl:if test="./@altrender">
-						<xsl:value-of select="my:escapeNewLine(./@altrender)"/>
-					</xsl:if>
+
+				<!--  Scope and content -->
+				<xsl:call-template name="simpleField">
+					<xsl:with-param name="label" select="$i18n.description"/>
+					<xsl:with-param name="value"
+						select="/*:ead/*:archdesc/*:scopecontent/*:p/text()"/>
+				</xsl:call-template>
+
+
+				<!--  Appraisal, destruction and scheduling -->
+				<xsl:call-template name="simpleField">
+					<xsl:with-param name="label" select="$i18n.appraisal"/>
+					<xsl:with-param name="value" select="/*:ead/*:archdesc/*:appraisal/*:p/text()"/>
+				</xsl:call-template>
+
+
+				<!--  Acruals -->
+				<xsl:call-template name="simpleField">
+					<xsl:with-param name="label" select="$i18n.accruals"/>
+					<xsl:with-param name="value" select="/*:ead/*:archdesc/*:accruals/*:p/text()"/>
+				</xsl:call-template>
+
+
+				<!--  System of arrangement -->
+				<xsl:call-template name="simpleField">
+					<xsl:with-param name="label" select="$i18n.arrangement"/>
+					<xsl:with-param name="value" select="/*:ead/*:archdesc/*:arrangement/*:p/text()"
+					/>
+				</xsl:call-template>
+
+
+
+			</xsl:if>
+			<!-- Closes content area -->
+
+
+
+			<!-- Opens access area -->
+			<xsl:if
+				test="
+					/*:ead/*:archdesc/*:accessrestrict/*:p/text() |
+					/*:ead/*:archdesc/*:userestrict/*:p/text() |
+					/*:ead/*:archdesc/*:did/*:langmaterial/*:language |
+					/*:ead/*:archdesc/*:did/*:langmaterial">
+
+
+				<div class="form-separator">
+					<xsl:value-of select="$i18n.accessarea"/>
 				</div>
-				<div class="value">
-					<xsl:if test=".">
-						<xsl:value-of select="my:escapeNewLine(.)"/>
-					</xsl:if>
+
+
+
+				<!-- Conditions governing access -->
+				<xsl:call-template name="simpleField">
+					<xsl:with-param name="label" select="$i18n.accessrestrictions"/>
+					<xsl:with-param name="value"
+						select="/*:ead/*:archdesc/*:accessrestrict/*:p/text()"/>
+				</xsl:call-template>
+
+
+
+				<!--  Conditions governing reproduction -->
+				<xsl:call-template name="simpleField">
+					<xsl:with-param name="label" select="$i18n.userestrict"/>
+					<xsl:with-param name="value" select="/*:ead/*:archdesc/*:userestrict/*:p/text()"
+					/>
+				</xsl:call-template>
+
+
+
+				<!--   -->
+				<xsl:call-template name="listField">
+					<xsl:with-param name="label" select="$i18n.languages"/>
+					<xsl:with-param name="value"
+						select="/*:ead/*:archdesc/*:did/*:langmaterial/*:language"/>
+				</xsl:call-template>
+
+
+
+				<!-- Language and script notes  -->
+				<xsl:call-template name="listField">
+					<xsl:with-param name="label" select="$i18n.languagesMaterial"/>
+					<xsl:with-param name="value" select="/*:ead/*:archdesc/*:did/*:langmaterial"/>
+				</xsl:call-template>
+
+
+
+				<!-- Physical Characteristics and technical requirements  -->
+				<xsl:call-template name="simpleField">
+					<xsl:with-param name="label" select="$i18n.phystech"/>
+					<xsl:with-param name="value" select="/*:ead/*:archdesc/*:phystech/*:p/text()"/>
+				</xsl:call-template>
+
+
+
+			</xsl:if>
+			<!-- Closes access area -->
+
+
+
+
+			<!-- Opens allied materials area -->
+			<xsl:if
+				test="
+					/*:ead/*:archdesc/*:originalsloc/*:p/text() |
+					/*:ead/*:archdesc/*:altformavail/*:p/text() |
+					/*:ead/*:archdesc/*:relatedmaterial/*:p/text() |
+					/*:ead/*:archdesc/*:otherfindaid/*:p/text() |
+					/*:ead/*:archdesc/*:bibliography/*:p/text()">
+
+
+				<div class="form-separator">
+					<xsl:value-of select="$i18n.alliedarea"/>
 				</div>
-			</div>
-		</xsl:for-each>
-	</xsl:template>
-	<xsl:template name="showTable">
-		<xsl:param name="label" />
-		<xsl:param name="value" />
-		<xsl:if test="$value">
-			<xsl:for-each select="$value/ead:table">
-				<div class="field">
-					<div class="label">
-						<xsl:value-of select="$label" />
-					</div>
-					<xsl:variable name="output">
-						<table>
-							<thead>
-								<tr>
-									<xsl:for-each select="ead:tgroup/ead:thead/ead:row/ead:entry">
-										<td>
-											<xsl:value-of select="text()" />
-										</td>
-									</xsl:for-each>
-								</tr>
-							</thead>
-							<tbody>
-								<xsl:for-each select="ead:tgroup/ead:tbody/ead:row">
-									<tr>
-										<xsl:for-each select="ead:entry">
-											<td>
-												<xsl:value-of select="text()" />
-											</td>
-										</xsl:for-each>
-									</tr>
-								</xsl:for-each>
-							</tbody>
-						</table>
+
+				<!-- Existence and location of originals -->
+				<xsl:call-template name="simpleField">
+					<xsl:with-param name="label" select="$i18n.originalsloc"/>
+					<xsl:with-param name="value"
+						select="/*:ead/*:archdesc/*:originalsloc/*:p/text()"/>
+				</xsl:call-template>
+
+
+				<!--  -->
+				<xsl:call-template name="simpleField">
+					<xsl:with-param name="label" select="$i18n.altformavail"/>
+					<xsl:with-param name="value"
+						select="/*:ead/*:archdesc/*:altformavail/*:p/text()"/>
+				</xsl:call-template>
+
+
+				<!-- Related units of description -->
+				<xsl:call-template name="simpleField">
+					<xsl:with-param name="label" select="$i18n.relatedmaterials"/>
+					<xsl:with-param name="value"
+						select="/*:ead/*:archdesc/*:relatedmaterial/*:p/text()"/>
+				</xsl:call-template>
+
+
+				<!-- Other finding aids -->
+				<xsl:call-template name="simpleField">
+					<xsl:with-param name="label" select="$i18n.otherfindaids"/>
+					<xsl:with-param name="value"
+						select="/*:ead/*:archdesc/*:otherfindaid/*:p/text()"/>
+				</xsl:call-template>
+
+				<!-- Publication notes -->
+				<xsl:call-template name="simpleField">
+					<xsl:with-param name="label" select="$i18n.bibliography"/>
+					<xsl:with-param name="value"
+						select="/*:ead/*:archdesc/*:bibliography/*:p/text()"/>
+				</xsl:call-template>
+
+			</xsl:if>
+			<!-- Closes allied materials area -->
+
+
+
+
+			<!-- Opens notes area -->
+			<xsl:if test="/*:ead/*:archdesc/*:did/*:note[@type = 'generalNote']/*:p/text()">
+				<div class="form-separator">
+					<xsl:value-of select="$i18n.notesarea"/>
+				</div>
+
+				<!-- Notes -->
+				<xsl:call-template name="simpleField">
+					<xsl:with-param name="label" select="$i18n.notes"/>
+					<xsl:with-param name="value"
+						select="/*:ead/*:archdesc/*:did/*:note[@type = 'generalNote']/*:p/text()"/>
+				</xsl:call-template>
+
+			</xsl:if>
+			<!-- Closes notes area -->
+
+
+			<!-- Opens description control area -->
+			<xsl:if
+				test="
+				/*:ead/*:eadheader/*:profiledesc/*:descrules/text() | 
+				/*:ead/*:archdesc/*:odd[@type = 'statusDescription']/*:p/text() | 
+				/*:ead/*:archdesc/*:odd[@type = 'levelOfDetail']/*:p/text() | 
+				/*:ead/*:archdesc/*:processinfo/*:p/*:date/text() | 
+				/*:ead/*:archdesc/*:did/*:note[@type = 'sourcesDescription']/*:p/text() | 
+				/*:ead/*:archdesc/*:processinfo/*:p/text()">
+				<div class="form-separator">
+					<xsl:value-of select="$i18n.descriptioncontrolarea"/>
+				</div>
+
+				<!-- Rules or conventions -->
+				<xsl:call-template name="simpleField">
+					<xsl:with-param name="label" select="$i18n.rules"/>
+					<xsl:with-param name="value"
+						select="/*:ead/*:eadheader/*:profiledesc/*:descrules/text()"/>
+				</xsl:call-template>
+
+
+
+				<!-- Status of description -->
+				<xsl:variable name="statusDescriptionTranslated">
+					<xsl:variable name="statusDescriptionValue">
+						<xsl:value-of select="/*:ead/*:archdesc/*:odd[@type = 'statusDescription']/*:p/text()"/>
 					</xsl:variable>
-					<div class="value">
-						<xsl:copy-of select="$output" />
-					</div>
+					<xsl:value-of select="$statusDescriptionTranslationMap/entry[@key=$statusDescriptionValue]/text()"/>
+				</xsl:variable>		
+				
+				<xsl:call-template name="simpleField">
+					<xsl:with-param name="label" select="$i18n.statusdescription"/>
+					<xsl:with-param name="value" select="$statusDescriptionTranslated"/>
+				</xsl:call-template>
+
+<!--
+				$statusDescriptionValue = <xsl:value-of select="$statusDescriptionValue"/>
+				$statusDescriptionTranslated = <xsl:value-of select="$statusDescriptionTranslated"/>
+				levelOfDetailValue = <xsl:value-of select="$levelOfDetailValue"/>
+				$levelOfDetailTranslated = <xsl:value-of select="levelOfDetailTranslated"/>
+-->
+				
+				<!-- Level of detail -->
+				<xsl:variable name="levelOfDetailTranslated">
+					<xsl:variable name="levelOfDetailValue">
+						<xsl:value-of select="/*:ead/*:archdesc/*:odd[@type = 'levelOfDetail']/*:p/text()"/>
+					</xsl:variable>
+					<xsl:value-of select="$levelOfDetailTranslationMap/entry[@key=$levelOfDetailValue]/text()"/>
+				</xsl:variable>		
+				
+				<xsl:call-template name="simpleField">
+					<xsl:with-param name="label" select="$i18n.levelofdetail"/>
+					<xsl:with-param name="value"
+						select="$levelOfDetailTranslated"/>
+				</xsl:call-template>
+
+				<!-- Date of creation or revision -->
+				<xsl:call-template name="simpleField">
+					<xsl:with-param name="label" select="$i18n.processdates"/>
+					<xsl:with-param name="value"
+						select="/*:ead/*:archdesc/*:processinfo/*:p/*:date/text()"/>
+				</xsl:call-template>
+
+				<!-- Sources -->
+				<xsl:call-template name="simpleField">
+					<xsl:with-param name="label" select="$i18n.sources"/>
+					<xsl:with-param name="value"
+						select="/*:ead/*:archdesc/*:did/*:note[@type='sourcesDescription']/*:p/text()"
+					/>
+				</xsl:call-template>
+
+				<!-- Archivist notes -->
+				<xsl:call-template name="simpleField">
+					<xsl:with-param name="label" select="$i18n.archivistNotes"/>
+					<xsl:with-param name="value" select="/*:ead/*:archdesc/*:processinfo/*:p/text()"
+					/>
+				</xsl:call-template>
+
+			</xsl:if>
+			<!-- Closes description control area -->
+
+		</div>
+	</xsl:template>
+
+
+
+
+
+
+
+
+	<!-- ************************ --> 
+	<!-- * Auxiliary templates  * -->
+	<!-- ************************ --> 
+	
+	
+	<!-- This template handles a simple key value attributes. Values are provided as XPath or String -->
+	<xsl:template name="simpleField">
+		<xsl:param name="label"/>
+		<xsl:param name="value"/>
+
+		<xsl:if test="$value">
+			<div class="field">
+				<div class="label">
+					<xsl:choose>
+						<xsl:when test="$label">
+							<xsl:value-of select="$label"/>
+						</xsl:when>
+						<xsl:otherwise>i18n.key missing or not found</xsl:otherwise>
+					</xsl:choose>
+
 				</div>
-			</xsl:for-each>
+				<div class="value prewrap">
+					<xsl:value-of select="$value"/>
+				</div>
+			</div>
 		</xsl:if>
 	</xsl:template>
-	<xsl:template name="showBibliography">
-		<xsl:param name="label" />
-		<xsl:param name="value" />
+
+
+	<!-- This template handles attributes whose values can be lists and renders values in one line separated by commas-->
+	<xsl:template name="listField">
+		<xsl:param name="label"/>
+		<xsl:param name="value"/>
+
 		<xsl:if test="$value">
-			<div class="row-fluid metadata">
+			<div class="field">
 				<div class="label">
-					<xsl:value-of select="$label" />
+					<xsl:choose>
+						<xsl:when test="$label">
+							<xsl:value-of select="$label"/>
+						</xsl:when>
+						<xsl:otherwise>i18n.key missing or not found</xsl:otherwise>
+					</xsl:choose>
+
 				</div>
-				<xsl:for-each select="$value/ead:bibref">
-					<div class="value">
-						<xsl:value-of select="my:escapeNewLine(./text())"/>
-					</div>
+				<xsl:for-each select="$value">
+					<xsl:if test="normalize-space(string-join(text(), '')) != ''">
+						<div class="value">
+							<xsl:value-of select="text()"/>
+						</div>
+					</xsl:if>
 				</xsl:for-each>
 			</div>
 		</xsl:if>
 	</xsl:template>
-	<xsl:template name="showInitialAndFinalDates">
-		<xsl:choose>
-			<xsl:when test="contains(/ead:ead/ead:archdesc/ead:did/ead:unitdate/@normal, '/')">
-				<!-- initial/final -->
-				<div class="row-fluid metadata">
-					<div class="label">
-						<xsl:value-of select="$i18n.initialdate" />
-					</div>
-					<div class="value">
-						<span class="value">
-							<xsl:value-of select="normalize-space(substring-before(/ead:ead/ead:archdesc/ead:did/ead:unitdate/@normal, '/'))" />
-						</span>
-					</div>
-				</div>
-				<div class="row-fluid metadata">
-					<div class="label">
-						<xsl:value-of select="$i18n.finaldate" />
-					</div>
-					<div class="value">
-						<span class="value">
-							<xsl:value-of select="normalize-space(substring-after(/ead:ead/ead:archdesc/ead:did/ead:unitdate/@normal, '/'))" />
-						</span>
-					</div>
-				</div>
-			</xsl:when>
-			<xsl:otherwise>
+
+
+	<!-- This template handles description levels and their translation -->	
+	<xsl:template name="descriptionLevel">
+		<xsl:if test="//ead:archdesc/@level">
+			
+			
+			<xsl:variable name="descriptionLevel">
 				<xsl:choose>
-					<xsl:when test="/ead:ead/ead:archdesc/ead:did/ead:unitdate[@label='UnitDateInitial']">
-						<!-- initial date. internal 'hack' -->
-						<div class="row-fluid metadata">
-							<div class="label">
-								<xsl:value-of select="$i18n.initialdate" />
-							</div>
-							<div class="value">
-								<span class="value">
-									<xsl:value-of select="normalize-space(/ead:ead/ead:archdesc/ead:did/ead:unitdate/@normal)" />
-								</span>
-							</div>
-						</div>
-						<xsl:call-template name="showField">
-							<xsl:with-param name="label" select="$i18n.reference" />
-							<xsl:with-param name="value" select="/ead:ead/ead:archdesc/ead:did/ead:unitid" />
-						</xsl:call-template>
-					</xsl:when>
-					<xsl:when test="/ead:ead/ead:archdesc/ead:did/ead:unitdate[@label='UnitDateFinal']">
-						<!-- final date. internal 'hack' -->
-						<div class="row-fluid metadata">
-							<div class="label">
-								<xsl:value-of select="$i18n.finaldate" />
-							</div>
-							<div class="value">
-								<span class="value">
-									<xsl:value-of select="normalize-space(/ead:ead/ead:archdesc/ead:did/ead:unitdate/@normal)" />
-								</span>
-							</div>
-						</div>
+					<xsl:when test="/ead:ead/ead:archdesc/@level='otherlevel'">
+						<xsl:variable name="levelCode">
+							<xsl:value-of select="/*:ead/*:archdesc/@otherlevel"/>
+						</xsl:variable>
+						<xsl:value-of select="$descriptionLevelTranslationMap/entry[@key=$levelCode]/text()"/>
 					</xsl:when>
 					<xsl:otherwise>
-						<!-- fallback to date initial -->
-						<div class="row-fluid metadata">
-							<div class="label">
-								<xsl:value-of select="$i18n.initialdate" />
-							</div>
-							<div class="value">
-								<span class="value">
-									<xsl:value-of select="normalize-space(/ead:ead/ead:archdesc/ead:did/ead:unitdate/@normal)" />
-								</span>
-							</div>
-						</div>
+						<xsl:variable name="levelCode">
+							<xsl:value-of select="/*:ead/*:archdesc/@level"/>
+						</xsl:variable>
+						
+						<xsl:value-of select="$descriptionLevelTranslationMap/entry[@key=$levelCode]/text()"/>
 					</xsl:otherwise>
 				</xsl:choose>
-			</xsl:otherwise>
-		</xsl:choose>
+			</xsl:variable>
+			
+			<xsl:call-template name="simpleField">
+				<xsl:with-param name="label" select="$i18n.level"></xsl:with-param>
+				<xsl:with-param name="value"><xsl:value-of select="$descriptionLevel"></xsl:value-of> </xsl:with-param>
+			</xsl:call-template>
+		</xsl:if>		
+		
 	</xsl:template>
-	<!-- ................................................
-          Takes care of @level attribute
-         ................................................-->
-	<xsl:template match="ead:archdesc[@level]">
-		<div class="row-fluid metadata">
-			<div class="label">
-				<xsl:value-of select="$i18n.level" />
-			</div>
+
+	<!-- This template handles rage dates -->
+	<!-- original template made by sleroux -->
+	<xsl:template name="UnitDates">
+		<xsl:if test="/ead:ead/ead:archdesc/ead:did/ead:unitdate/@normal">
 			<xsl:choose>
-				<xsl:when test="@level = 'otherlevel'">
-					<div class="value">
-						<xsl:choose>
-							<xsl:when test="@otherlevel = 'C'">
-								<xsl:value-of select="$i18n.level.C" />
-							</xsl:when>
-							<xsl:when test="@otherlevel = 'F'">
-								<xsl:value-of select="$i18n.level.F" />
-							</xsl:when>
-							<xsl:when test="@otherlevel = 'SF'">
-								<xsl:value-of select="$i18n.level.SF" />
-							</xsl:when>
-							<xsl:when test="@otherlevel = 'SSF'">
-								<xsl:value-of select="$i18n.level.SSF" />
-							</xsl:when>
-							<xsl:when test="@otherlevel = 'SC'">
-								<xsl:value-of select="$i18n.level.SC" />
-							</xsl:when>
-							<xsl:when test="@otherlevel = 'SSC'">
-								<xsl:value-of select="$i18n.level.SSC" />
-							</xsl:when>
-							<xsl:when test="@otherlevel = 'SSSC'">
-								<xsl:value-of select="$i18n.level.SSSC" />
-							</xsl:when>
-							<xsl:when test="@otherlevel = 'SR'">
-								<xsl:value-of select="$i18n.level.SR" />
-							</xsl:when>
-							<xsl:when test="@otherlevel = 'SSR'">
-								<xsl:value-of select="$i18n.level.SSR" />
-							</xsl:when>
-							<xsl:when test="@otherlevel = 'SSSR'">
-								<xsl:value-of select="$i18n.level.SSSR" />
-							</xsl:when>
-							<xsl:when test="@otherlevel = 'UI'">
-								<xsl:value-of select="$i18n.level.UI" />
-							</xsl:when>
-							<xsl:when test="@otherlevel = 'DC'">
-								<xsl:value-of select="$i18n.level.DC" />
-							</xsl:when>
-							<xsl:when test="@otherlevel = 'D'">
-								<xsl:value-of select="$i18n.level.D" />
-							</xsl:when>
-							<xsl:otherwise>
-								<xsl:value-of select="@otherlevel" />
-							</xsl:otherwise>
-						</xsl:choose>
+				<xsl:when test="contains(/ead:ead/ead:archdesc/ead:did/ead:unitdate/@normal, '/')">
+					<!-- initial/final -->
+					<div class="field">
+						<div class="label">
+							<xsl:value-of select="$i18n.initialdate"/>
+						</div>
+						<div class="value">
+							<span class="value">
+								<xsl:value-of
+									select="normalize-space(substring-before(/ead:ead/ead:archdesc/ead:did/ead:unitdate/@normal, '/'))"
+								/>
+							</span>
+						</div>
+					</div>
+					<div class="field">
+						<div class="label">
+							<xsl:value-of select="$i18n.finaldate"/>
+						</div>
+						<div class="value">
+							<span class="value">
+								<xsl:value-of
+									select="normalize-space(substring-after(/ead:ead/ead:archdesc/ead:did/ead:unitdate/@normal, '/'))"
+								/>
+							</span>
+						</div>
 					</div>
 				</xsl:when>
 				<xsl:otherwise>
-					<div class="value">
-						<xsl:value-of select="@level" />
-					</div>
+					<xsl:choose>
+						<xsl:when
+							test="/ead:ead/ead:archdesc/ead:did/ead:unitdate[@label = 'UnitDateInitial']">
+							<!-- initial date. internal 'hack' -->
+							<div class="field">
+								<div class="label">
+									<xsl:value-of select="$i18n.initialdate"/>
+								</div>
+								<div class="value">
+									<span class="value">
+										<xsl:value-of
+											select="normalize-space(/ead:ead/ead:archdesc/ead:did/ead:unitdate/@normal)"
+										/>
+									</span>
+								</div>
+							</div>
+						</xsl:when>
+						<xsl:when
+							test="/ead:ead/ead:archdesc/ead:did/ead:unitdate[@label = 'UnitDateFinal']">
+							<!-- final date. internal 'hack' -->
+							<div class="field">
+								<div class="label">
+									<xsl:value-of select="$i18n.finaldate"/>
+								</div>
+								<div class="value">
+									<span class="value">
+										<xsl:value-of
+											select="normalize-space(/ead:ead/ead:archdesc/ead:did/ead:unitdate/@normal)"
+										/>
+									</span>
+								</div>
+							</div>
+						</xsl:when>
+						<xsl:otherwise>
+							<!-- fallback to date initial -->
+							<div class="field">
+								<div class="label">
+									<xsl:value-of select="$i18n.initialdate"/>
+								</div>
+								<div class="value">
+									<span class="value">
+										<xsl:value-of
+											select="normalize-space(/ead:ead/ead:archdesc/ead:did/ead:unitdate/@normal)"
+										/>
+									</span>
+								</div>
+							</div>
+						</xsl:otherwise>
+					</xsl:choose>
 				</xsl:otherwise>
 			</xsl:choose>
-		</div>
-	</xsl:template>
-	<xsl:template name="showDimensions">
-		<xsl:if test="/ead:ead/ead:archdesc/ead:did/ead:physdesc/ead:dimensions">
-			<div class="row-fluid metadata">
-				<div class="label">
-					<xsl:value-of select="$i18n.dimensions" />
-				</div>
-				<xsl:for-each select="/ead:ead/ead:archdesc/ead:did/ead:physdesc/ead:dimensions">
-					<xsl:if test=".">
-						<div class="value">
-							<span class="value">
-								<xsl:value-of select="." />
-							</span>
-							<xsl:if test="./@unit">
-								<span class="unit">
-									<xsl:value-of select="./@unit" />
-								</span>
-							</xsl:if>
-						</div>
-					</xsl:if>
-				</xsl:for-each>
-			</div>
 		</xsl:if>
-	</xsl:template>
-	<xsl:template name="showExtent">
-		<xsl:if test="/ead:ead/ead:archdesc/ead:extent">
-			<div class="row-fluid metadata">
-				<div class="label">
-					<xsl:value-of select="$i18n.extents" />
-				</div>
-				<xsl:for-each select="/ead:ead/ead:archdesc/ead:extent">
-					<xsl:if test=".">
-						<div class="value">
-							<span class="value">
-								<xsl:value-of select="."/>
-							</span>
-							<xsl:if test="./@unit">
-								<span class="unit">
-									<xsl:value-of select="./@unit" />
-								</span>
-							</xsl:if>
-						</div>
-					</xsl:if>
-				</xsl:for-each>
-			</div>
-		</xsl:if>
-	</xsl:template>
-	<!-- Template for "identity area" -->
-	<xsl:template name="showIdentityArea">
-		<xsl:if test="/ead:ead/ead:archdesc/ead:did/ead:repository|/ead:ead/ead:archdesc/@level|/ead:ead/ead:archdesc/ead:did/ead:unitid|/ead:ead/ead:archdesc/ead:did/ead:unitid/@repositorycode|/ead:ead/ead:archdesc/ead:did/ead:unitid/@countrycode|/ead:ead/ead:archdesc/ead:did/ead:unittitle/text()|/ead:ead/ead:archdesc/ead:did/ead:unitdate/text()|/ead:ead/ead:archdesc/ead:did/ead:physdesc/ead:dimensions|/ead:ead/ead:archdesc/ead:did/ead:physdesc/ead:extent">
-			<div class="form-separator">
-				<xsl:value-of select="$i18n.identityarea" />
-			</div>
-			<!-- ....Processing description level.... -->
-			<xsl:apply-templates select="/ead:ead/ead:archdesc[@level]"/>
-			<!-- ....Processing unitid....-->
-			<xsl:if test="/ead:ead/ead:archdesc/ead:did/ead:unitid">
-				<div class="row-fluid metadata">
-					<div class="label">
-						<xsl:value-of select="$i18n.reference" />
-					</div>
-					<div class="value">
-						<xsl:value-of select="my:escapeNewLine(/ead:ead/ead:archdesc/ead:did/ead:unitid)"/>
-					</div>
-				</div>
-			</xsl:if>
-
-			<!-- ....Processing @repositorycode....-->
-			<!--
-            <xsl:if test="/ead:ead/ead:archdesc/ead:did/ead:unitid/@repositorycode"><div class="row-fluid metadata"><div class="label"><xsl:value-of select="$i18n.repositorycode" /></div><div class="value"><xsl:value-of select="my:escapeNewLine(/ead:ead/ead:archdesc/ead:did/ead:unitid/@repositorycode)"/></div></div></xsl:if>
-            -->
-
-			<!-- ....Processing @countrycode....-->
-			<!--
-            <xsl:if test="/ead:ead/ead:archdesc/ead:did/ead:unitid/@countrycode"><div class="row-fluid metadata"><div class="label"><xsl:value-of select="$i18n.countrycode" /></div><div class="value"><xsl:value-of select="my:escapeNewLine(/ead:ead/ead:archdesc/ead:did/ead:unitid/@countrycode)"/></div></div></xsl:if>
-            -->
-
-			<!-- ....Processing unittitle.... -->
-			<xsl:call-template name="showField">
-				<xsl:with-param name="label" select="$i18n.title" />
-				<xsl:with-param name="value" select="/ead:ead/ead:archdesc/ead:did/ead:unittitle" />
-			</xsl:call-template>
-
-			<!-- ....Processing unittitle/@type....-->
-			<xsl:variable name="titletype" select="/ead:ead/ead:archdesc/ead:did/ead:unittitle/@type" />
-			<xsl:call-template name="showField">
-				<xsl:with-param name="label" select="$i18n.titletype" />
-				<xsl:with-param name="value" select="$titletype" />
-			</xsl:call-template>
-
-			<!-- ....Processing repository....-->
-			<xsl:call-template name="showField">
-				<xsl:with-param name="label" select="$i18n.repository" />
-				<xsl:with-param name="value" select="/ead:ead/ead:archdesc/ead:did/ead:repository" />
-			</xsl:call-template>
-
-			<!-- ....Processing unitdate/@normal....-->
-			<xsl:if test="/ead:ead/ead:archdesc/ead:did/ead:unitdate/@normal">
-				<xsl:call-template name="showInitialAndFinalDates" />
-			</xsl:if>
-			<!-- ....Processing unitdate....-->
-			<!--
-            <xsl:if test="/ead:ead/ead:archdesc/ead:did/ead:unitdate">
-                <div class="row-fluid metadata">
-                    <div class="label">
-                        <xsl:value-of select="$i18n.unitdate" />
-                    </div>
-                    <div class="value">
-                        <xsl:value-of select="my:escapeNewLine(/ead:ead/ead:archdesc/ead:did/ead:unitdate)"/>
-                    </div>
-                </div>
-            </xsl:if>
-            -->
-			<!-- ....Processing dimensions....-->
-			<xsl:call-template name="showDimensions" />
-			<!-- ....Processing extent....-->
-			<xsl:call-template name="showExtent" />
-		</xsl:if>
-	</xsl:template>
-	<!-- Template for "context area" -->
-	<xsl:template name="showContextArea">
-		<xsl:if test="/ead:ead/ead:archdesc/ead:bioghist/ead:p|/ead:ead/ead:archdesc/ead:did/ead:physdesc/ead:geogname|/ead:ead/ead:archdesc/ead:legalstatus|/ead:ead/ead:archdesc/ead:custodhist/ead:p|/ead:ead/ead:archdesc/ead:acqinfo/ead:p">
-			<div class="form-separator">
-				<xsl:value-of select="$i18n.contextarea" />
-			</div>
-			<!-- ....Processing bioghist....-->
-			<xsl:call-template name="showField">
-				<xsl:with-param name="label" select="$i18n.bioghist" />
-				<xsl:with-param name="value" select="/ead:ead/ead:archdesc/ead:bioghist/ead:p" />
-			</xsl:call-template>
-
-			<!-- ....Processing geogname....-->
-			<xsl:call-template name="showField">
-				<xsl:with-param name="label" select="$i18n.geogname" />
-				<xsl:with-param name="value" select="/ead:ead/ead:archdesc/ead:did/ead:physdesc/ead:geogname" />
-			</xsl:call-template>
-
-			<!-- ....Processing legalstatus....-->
-			<!--
-            <xsl:call-template name="showField">
-                <xsl:with-param name="label" select="$i18n.legalstatus" />
-                <xsl:with-param name="value" select="/ead:ead/ead:archdesc/ead:accessrestrict/ead:legalstatus" />
-            </xsl:call-template>
-            -->
-
-			<!-- ....Processing custodhist....-->
-			<xsl:call-template name="showField">
-				<xsl:with-param name="label" select="$i18n.custodhist" />
-				<xsl:with-param name="value" select="/ead:ead/ead:archdesc/ead:custodhist/ead:p" />
-			</xsl:call-template>
-
-			<!-- ....Processing acqinfo....-->
-			<xsl:call-template name="showField">
-				<xsl:with-param name="label" select="$i18n.acqinfo" />
-				<xsl:with-param name="value" select="/ead:ead/ead:archdesc/ead:acqinfo/ead:p" />
-			</xsl:call-template>
-		</xsl:if>
-	</xsl:template>
-	<!-- Template for "content structure area" -->
-	<xsl:template name="showContentStructureArea">
-		<xsl:if test="/ead:ead/ead:archdesc/ead:appraisal/ead:p|/ead:ead/ead:archdesc/ead:scopecontent/ead:p|/ead:ead/ead:archdesc/ead:accruals/ead:p|/ead:ead/ead:archdesc/ead:arrangement/ead:p">
-			<div class="form-separator">
-				<xsl:value-of select="$i18n.contentstructurearea" />
-			</div>
-			<!-- ....Processing scopecontent....-->
-			<xsl:call-template name="showField">
-				<xsl:with-param name="label" select="$i18n.scopecontent" />
-				<xsl:with-param name="value" select="/ead:ead/ead:archdesc/ead:scopecontent/ead:p" />
-			</xsl:call-template>
-			<!-- ....Processing appraisal....-->
-			<xsl:call-template name="showField">
-				<xsl:with-param name="label" select="$i18n.appraisal" />
-				<xsl:with-param name="value" select="/ead:ead/ead:archdesc/ead:appraisal/ead:p" />
-			</xsl:call-template>
-			<!-- ....Processing accruals....-->
-			<xsl:call-template name="showField">
-				<xsl:with-param name="label" select="$i18n.accruals" />
-				<xsl:with-param name="value" select="/ead:ead/ead:archdesc/ead:accruals/ead:p" />
-			</xsl:call-template>
-			<!-- ....Processing arrangement....-->
-			<xsl:call-template name="showTable">
-				<xsl:with-param name="label" select="$i18n.arrangement" />
-				<xsl:with-param name="value" select="/ead:ead/ead:archdesc/ead:arrangement" />
-			</xsl:call-template>
-		</xsl:if>
-	</xsl:template>
-	<!-- Template for "use access area" -->
-	<xsl:template name="showUseAccessArea">
-		<xsl:if test="/ead:ead/ead:archdesc/ead:accessrestrict/ead:p|/ead:ead/ead:archdesc/ead:userestrict/ead:p|/ead:ead/ead:archdesc/ead:did/ead:physloc/ead:p|/ead:ead/ead:archdesc/ead:did/ead:langmaterial|/ead:ead/ead:archdesc/ead:phystech/ead:p|/ead:ead/ead:archdesc/ead:otherfindaid/ead:p">
-			<div class="form-separator">
-				<xsl:value-of select="$i18n.useaccessarea" />
-			</div>
-			<!-- ....Processing accessrestrict....-->
-			<xsl:call-template name="showField">
-				<xsl:with-param name="label" select="$i18n.accessrestrict" />
-				<xsl:with-param name="value" select="/ead:ead/ead:archdesc/ead:accessrestrict/ead:p" />
-			</xsl:call-template>
-			<!-- ....Processing userestrict....-->
-			<xsl:call-template name="showField">
-				<xsl:with-param name="label" select="$i18n.userestrict" />
-				<xsl:with-param name="value" select="/ead:ead/ead:archdesc/ead:userestrict/ead:p" />
-			</xsl:call-template>
-			<!-- ....Processing physloc....-->
-			<xsl:call-template name="showField">
-				<xsl:with-param name="label" select="$i18n.physloc" />
-				<xsl:with-param name="value" select="/ead:ead/ead:archdesc/ead:did/ead:physloc/ead:p" />
-			</xsl:call-template>
-			<!-- ....Processing langmaterial....-->
-			<xsl:variable name="langs">
-				<xsl:call-template name="join">
-					<xsl:with-param name="list" select="/ead:ead/ead:archdesc/ead:did/ead:langmaterial/ead:language/text()" />
-					<xsl:with-param name="separator" select="', '" />
-				</xsl:call-template>
-			</xsl:variable>
-			<xsl:if test="$langs != ''">
-				<xsl:call-template name="showField">
-					<xsl:with-param name="label" select="$i18n.langmaterial" />
-					<xsl:with-param name="value" select="$langs" />
-				</xsl:call-template>
-			</xsl:if>
-			<!-- ....Processing phystech....-->
-			<xsl:call-template name="showField">
-				<xsl:with-param name="label" select="$i18n.phystech" />
-				<xsl:with-param name="value" select="/ead:ead/ead:archdesc/ead:phystech/ead:p" />
-			</xsl:call-template>
-			<!-- ....Processing otherfindaid....-->
-			<xsl:call-template name="showField">
-				<xsl:with-param name="label" select="$i18n.otherfindaid" />
-				<xsl:with-param name="value" select="/ead:ead/ead:archdesc/ead:otherfindaid/ead:p" />
-			</xsl:call-template>
-		</xsl:if>
-	</xsl:template>
-	<!-- Template for "use access area" -->
-	<xsl:template name="showAlliedMaterialArea">
-		<xsl:if test="/ead:ead/ead:archdesc/ead:originalsloc/ead:p|/ead:ead/ead:archdesc/ead:altformavail/ead:p|/ead:ead/ead:archdesc/ead:relatedmaterial/ead:p">
-			<div class="form-separator">
-				<xsl:value-of select="$i18n.alliedmaterialarea" />
-			</div>
-			<!-- ....Processing originalsloc....-->
-			<xsl:call-template name="showField">
-				<xsl:with-param name="label" select="$i18n.originalsloc" />
-				<xsl:with-param name="value" select="/ead:ead/ead:archdesc/ead:originalsloc/ead:p/text()" />
-			</xsl:call-template>
-			<!-- ....Processing altformavail....-->
-			<xsl:call-template name="showField">
-				<xsl:with-param name="label" select="$i18n.altformavail" />
-				<xsl:with-param name="value" select="/ead:ead/ead:archdesc/ead:altformavail/ead:p/text()" />
-			</xsl:call-template>
-			<!-- ....Processing relatedmaterial....-->
-			<xsl:call-template name="showField">
-				<xsl:with-param name="label" select="$i18n.relatedmaterial" />
-				<xsl:with-param name="value" select="/ead:ead/ead:archdesc/ead:relatedmaterial/ead:p/text()" />
-			</xsl:call-template>
-			<!-- ....Processing bibliography....-->
-			<xsl:call-template name="showBibliography">
-				<xsl:with-param name="label" select="$i18n.bibliography" />
-				<xsl:with-param name="value" select="/ead:ead/ead:archdesc/ead:bibliography" />
-			</xsl:call-template>
-		</xsl:if>
-	</xsl:template>
-	<!-- Template for "use access area" -->
-	<xsl:template name="showNotesArea">
-		<xsl:if test="/ead:ead/ead:archdesc/ead:note/ead:p">
-			<div class="form-separator">
-				<xsl:value-of select="$i18n.notesarea" />
-			</div>
-		</xsl:if>
-		<xsl:call-template name="showFieldWithAltRender">
-			<xsl:with-param name="value" select="/ead:ead/ead:archdesc/ead:note/ead:p" />
-		</xsl:call-template>
-	</xsl:template>
-	<xsl:template name="showOtherDescriptiveMetadataArea">
-		<xsl:if test="/ead:ead/ead:archdesc/ead:odd/ead:p">
-			<div class="form-separator">
-				<xsl:value-of select="$i18n.oddarea" />
-			</div>
-		</xsl:if>
-		<xsl:call-template name="showFieldWithAltRender">
-			<xsl:with-param name="value" select="/ead:ead/ead:archdesc/ead:odd/ead:p" />
-		</xsl:call-template>
-	</xsl:template>
-	<xsl:template name="showDescriptionControlArea">
-		<xsl:if test="/ead:ead/ead:archdesc/ead:processinfo/ead:p">
-			<div class="form-separator">
-				<xsl:value-of select="$i18n.descriptioncontrolarea" />
-			</div>
-			<xsl:call-template name="showField">
-				<xsl:with-param name="label" select="$i18n.processinfo" />
-				<xsl:with-param name="value" select="/ead:ead/ead:archdesc/ead:processinfo/ead:p" />
-			</xsl:call-template>
-		</xsl:if>
-	</xsl:template>
-	<!--......Main template: driver......-->
-	<xsl:template match="/">
-		<div class="descriptiveMetadata">
-			<xsl:call-template name="showIdentityArea" />
-			<xsl:call-template name="showContextArea" />
-			<xsl:call-template name="showContentStructureArea" />
-			<xsl:call-template name="showUseAccessArea" />
-			<xsl:call-template name="showAlliedMaterialArea" />
-			<xsl:call-template name="showNotesArea" />
-			<xsl:call-template name="showOtherDescriptiveMetadataArea" />
-			<!--
-                    <xsl:call-template name="showDescriptionControlArea" />
-                -->
-		</div>
 	</xsl:template>
 </xsl:stylesheet>
