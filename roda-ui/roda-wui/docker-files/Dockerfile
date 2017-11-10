@@ -20,7 +20,6 @@ RUN mkdir -p /var/run/clamav && chown clamav /var/run/clamav && freshclam ; \
 
 # Install web application
 COPY /ROOT /usr/local/tomcat/webapps/ROOT
-COPY roda-cli.sh /usr/local/bin/roda-cli.sh
 
 # Fix configuration & do some final cleanup
 RUN unzip -q /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/roda-core-*.jar config/roda-core.properties && \
