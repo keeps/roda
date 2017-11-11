@@ -64,20 +64,20 @@
 
 	<xsl:param name="i18n.descriptioncontrolarea"/>
 	<xsl:param name="i18n.rules"/>
-	
+
 	<xsl:param name="i18n.statusdescription"/>
 	<!-- TODO: Bruno, please check if these translations are working -->
 	<xsl:param name="i18n.status.final"/>
 	<xsl:param name="i18n.status.revised"/>
 	<xsl:param name="i18n.status.draft"/>
-	
-	
+
+
 	<xsl:param name="i18n.levelofdetail"/>
 	<!-- TODO: Bruno, please check if these translations are working -->
 	<xsl:param name="i18n.levelofdetail.full"/>
 	<xsl:param name="i18n.levelofdetail.partial"/>
 	<xsl:param name="i18n.levelofdetail.minimal"/>
-	
+
 	<xsl:param name="i18n.processdates"/>
 	<xsl:param name="i18n.sources"/>
 	<xsl:param name="i18n.archivistNotes"/>
@@ -94,14 +94,16 @@
 	<xsl:param name="i18n.level.subseries" />
 	<xsl:param name="i18n.level.file" />
 	<xsl:param name="i18n.level.item" />
-	
-	
+
+
 	<!-- Portuguese National Archives description levels -->
 	<xsl:param name="i18n.level.P" />
-	<xsl:param name="i18n.level.C" />
 	<xsl:param name="i18n.level.F" />
 	<xsl:param name="i18n.level.SF" />
 	<xsl:param name="i18n.level.SSF" />
+	<xsl:param name="i18n.level.CL" />
+	<xsl:param name="i18n.level.SCL" />
+	<xsl:param name="i18n.level.SSCL" />
 	<xsl:param name="i18n.level.SC" />
 	<xsl:param name="i18n.level.SSC" />
 	<xsl:param name="i18n.level.SSSC" />
@@ -109,25 +111,28 @@
 	<xsl:param name="i18n.level.SSR" />
 	<xsl:param name="i18n.level.SSSR" />
 	<xsl:param name="i18n.level.UI" />
+	<xsl:param name="i18n.level.SUI" />
+	<xsl:param name="i18n.level.SSUI" />
+	<xsl:param name="i18n.level.AG" />
 	<xsl:param name="i18n.level.DC" />
 	<xsl:param name="i18n.level.D" />
-	
-	
-	
+
+
+
 	<!-- Translation maps to be used by templates  -->
 	<xsl:variable name="statusDescriptionTranslationMap">
 		<entry key="final"><xsl:value-of select="$i18n.status.final"/></entry>
 		<entry key="revised"><xsl:value-of select="$i18n.status.revised"/></entry>
 		<entry key="draft"><xsl:value-of select="$i18n.status.draft"/></entry>
 	</xsl:variable>
-	
-	
+
+
 	<xsl:variable name="levelOfDetailTranslationMap">
 		<entry key="full"><xsl:value-of select="$i18n.levelofdetail.full"/></entry>
 		<entry key="partial"><xsl:value-of select="$i18n.levelofdetail.partial"/></entry>
 		<entry key="minimal"><xsl:value-of select="$i18n.levelofdetail.minimal"/></entry>
 	</xsl:variable>
-	
+
 
 	<xsl:variable name="descriptionLevelTranslationMap">
 		<entry key="fonds"><xsl:value-of select="$i18n.level.fonds"/></entry>
@@ -142,9 +147,11 @@
 		<entry key="subseries"><xsl:value-of select="$i18n.level.subseries"/></entry>
 		<entry key="file"><xsl:value-of select="$i18n.level.file"/></entry>
 		<entry key="item"><xsl:value-of select="$i18n.level.item"/></entry>
-		
+
 		<entry key="P"><xsl:value-of select="$i18n.level.P"/></entry>
-		<entry key="C"><xsl:value-of select="$i18n.level.C"/></entry>
+		<entry key="CL"><xsl:value-of select="$i18n.level.CL"/></entry>
+		<entry key="SCL"><xsl:value-of select="$i18n.level.SCL"/></entry>
+		<entry key="SSCL"><xsl:value-of select="$i18n.level.SSCL"/></entry>
 		<entry key="F"><xsl:value-of select="$i18n.level.F"/></entry>
 		<entry key="SF"><xsl:value-of select="$i18n.level.SF"/></entry>
 		<entry key="SSF"><xsl:value-of select="$i18n.level.SSF"/></entry>
@@ -155,10 +162,13 @@
 		<entry key="SSR"><xsl:value-of select="$i18n.level.SSR"/></entry>
 		<entry key="SSSR"><xsl:value-of select="$i18n.level.SSSR"/></entry>
 		<entry key="UI"><xsl:value-of select="$i18n.level.UI"/></entry>
+		<entry key="SUI"><xsl:value-of select="$i18n.level.SUI"/></entry>
+		<entry key="SSUI"><xsl:value-of select="$i18n.level.SSUI"/></entry>
+		<entry key="AG"><xsl:value-of select="$i18n.level.AG"/></entry>
 		<entry key="DC"><xsl:value-of select="$i18n.level.DC"/></entry>
 		<entry key="D"><xsl:value-of select="$i18n.level.D"/></entry>
 	</xsl:variable>
-	
+
 
 	<xsl:template match="/">
 		<div class="descriptiveMetadata">
@@ -167,7 +177,7 @@
 			<xsl:if
 				test="
 					/ead:ead/ead:archdesc/ead:did/*:unitid/text() |
-					/ead:ead/ead:archdesc/@otherlevel |
+					/ead:ead/ead:archdesc/@level |
 					/ead:ead//ead:did/ead:unittitle/text() |
 					/ead:ead/ead:did/ead:unitdate/@normal |
 					/ead:ead//ead:did/ead:unitdate/text() |
@@ -507,11 +517,11 @@
 			<!-- Opens description control area -->
 			<xsl:if
 				test="
-				/*:ead/*:eadheader/*:profiledesc/*:descrules/text() | 
-				/*:ead/*:archdesc/*:odd[@type = 'statusDescription']/*:p/text() | 
-				/*:ead/*:archdesc/*:odd[@type = 'levelOfDetail']/*:p/text() | 
-				/*:ead/*:archdesc/*:processinfo/*:p/*:date/text() | 
-				/*:ead/*:archdesc/*:did/*:note[@type = 'sourcesDescription']/*:p/text() | 
+				/*:ead/*:eadheader/*:profiledesc/*:descrules/text() |
+				/*:ead/*:archdesc/*:odd[@type = 'statusDescription']/*:p/text() |
+				/*:ead/*:archdesc/*:odd[@type = 'levelOfDetail']/*:p/text() |
+				/*:ead/*:archdesc/*:processinfo/*:p/*:date/text() |
+				/*:ead/*:archdesc/*:did/*:note[@type = 'sourcesDescription']/*:p/text() |
 				/*:ead/*:archdesc/*:processinfo/*:p/text()">
 				<div class="form-separator">
 					<xsl:value-of select="$i18n.descriptioncontrolarea"/>
@@ -532,8 +542,8 @@
 						<xsl:value-of select="/*:ead/*:archdesc/*:odd[@type = 'statusDescription']/*:p/text()"/>
 					</xsl:variable>
 					<xsl:value-of select="$statusDescriptionTranslationMap/entry[@key=$statusDescriptionValue]/text()"/>
-				</xsl:variable>		
-				
+				</xsl:variable>
+
 				<xsl:call-template name="simpleField">
 					<xsl:with-param name="label" select="$i18n.statusdescription"/>
 					<xsl:with-param name="value" select="$statusDescriptionTranslated"/>
@@ -545,15 +555,15 @@
 				levelOfDetailValue = <xsl:value-of select="$levelOfDetailValue"/>
 				$levelOfDetailTranslated = <xsl:value-of select="levelOfDetailTranslated"/>
 -->
-				
+
 				<!-- Level of detail -->
 				<xsl:variable name="levelOfDetailTranslated">
 					<xsl:variable name="levelOfDetailValue">
 						<xsl:value-of select="/*:ead/*:archdesc/*:odd[@type = 'levelOfDetail']/*:p/text()"/>
 					</xsl:variable>
 					<xsl:value-of select="$levelOfDetailTranslationMap/entry[@key=$levelOfDetailValue]/text()"/>
-				</xsl:variable>		
-				
+				</xsl:variable>
+
 				<xsl:call-template name="simpleField">
 					<xsl:with-param name="label" select="$i18n.levelofdetail"/>
 					<xsl:with-param name="value"
@@ -595,11 +605,11 @@
 
 
 
-	<!-- ************************ --> 
+	<!-- ************************ -->
 	<!-- * Auxiliary templates  * -->
-	<!-- ************************ --> 
-	
-	
+	<!-- ************************ -->
+
+
 	<!-- This template handles a simple key value attributes. Values are provided as XPath or String -->
 	<xsl:template name="simpleField">
 		<xsl:param name="label"/>
@@ -652,11 +662,11 @@
 	</xsl:template>
 
 
-	<!-- This template handles description levels and their translation -->	
+	<!-- This template handles description levels and their translation -->
 	<xsl:template name="descriptionLevel">
 		<xsl:if test="//ead:archdesc/@level">
-			
-			
+
+
 			<xsl:variable name="descriptionLevel">
 				<xsl:choose>
 					<xsl:when test="/ead:ead/ead:archdesc/@level='otherlevel'">
@@ -669,18 +679,18 @@
 						<xsl:variable name="levelCode">
 							<xsl:value-of select="/*:ead/*:archdesc/@level"/>
 						</xsl:variable>
-						
+
 						<xsl:value-of select="$descriptionLevelTranslationMap/entry[@key=$levelCode]/text()"/>
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:variable>
-			
+
 			<xsl:call-template name="simpleField">
 				<xsl:with-param name="label" select="$i18n.level"></xsl:with-param>
 				<xsl:with-param name="value"><xsl:value-of select="$descriptionLevel"></xsl:value-of> </xsl:with-param>
 			</xsl:call-template>
-		</xsl:if>		
-		
+		</xsl:if>
+
 	</xsl:template>
 
 	<!-- This template handles rage dates -->
