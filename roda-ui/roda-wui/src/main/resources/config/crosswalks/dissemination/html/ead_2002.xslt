@@ -66,14 +66,12 @@
 	<xsl:param name="i18n.rules"/>
 
 	<xsl:param name="i18n.statusdescription"/>
-	<!-- TODO: Bruno, please check if these translations are working -->
-	<xsl:param name="i18n.status.final"/>
-	<xsl:param name="i18n.status.revised"/>
-	<xsl:param name="i18n.status.draft"/>
+	<xsl:param name="i18n.statusdescription.final"/>
+	<xsl:param name="i18n.statusdescription.revised"/>
+	<xsl:param name="i18n.statusdescription.draft"/>
 
 
 	<xsl:param name="i18n.levelofdetail"/>
-	<!-- TODO: Bruno, please check if these translations are working -->
 	<xsl:param name="i18n.levelofdetail.full"/>
 	<xsl:param name="i18n.levelofdetail.partial"/>
 	<xsl:param name="i18n.levelofdetail.minimal"/>
@@ -121,9 +119,9 @@
 
 	<!-- Translation maps to be used by templates  -->
 	<xsl:variable name="statusDescriptionTranslationMap">
-		<entry key="final"><xsl:value-of select="$i18n.status.final"/></entry>
-		<entry key="revised"><xsl:value-of select="$i18n.status.revised"/></entry>
-		<entry key="draft"><xsl:value-of select="$i18n.status.draft"/></entry>
+		<entry key="final"><xsl:value-of select="$i18n.statusdescription.final"/></entry>
+		<entry key="revised"><xsl:value-of select="$i18n.statusdescription.revised"/></entry>
+		<entry key="draft"><xsl:value-of select="$i18n.statusdescription.draft"/></entry>
 	</xsl:variable>
 
 
