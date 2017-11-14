@@ -46,7 +46,7 @@
 	<xsl:param name="i18n.accessrestrictions"/>
 	<xsl:param name="i18n.userestrict"/>
 	<xsl:param name="i18n.languages"/>
-	<xsl:param name="i18n.languagesMaterial"/>
+	<xsl:param name="i18n.languageScriptNotes"/>
 	<xsl:param name="i18n.phystech"/>
 
 
@@ -87,7 +87,6 @@
 	<xsl:param name="i18n.level.recordgrp" />
 	<xsl:param name="i18n.level.subgrp" />
 	<xsl:param name="i18n.level.subfonds" />
-	<xsl:param name="i18n.level.subclass" />
 	<xsl:param name="i18n.level.series" />
 	<xsl:param name="i18n.level.subseries" />
 	<xsl:param name="i18n.level.file" />
@@ -99,6 +98,7 @@
 	<xsl:param name="i18n.level.F" />
 	<xsl:param name="i18n.level.SF" />
 	<xsl:param name="i18n.level.SSF" />
+	<xsl:param name="i18n.level.C" />
 	<xsl:param name="i18n.level.CL" />
 	<xsl:param name="i18n.level.SCL" />
 	<xsl:param name="i18n.level.SSCL" />
@@ -113,6 +113,7 @@
 	<xsl:param name="i18n.level.SSUI" />
 	<xsl:param name="i18n.level.AG" />
 	<xsl:param name="i18n.level.DC" />
+	<xsl:param name="i18n.level.DS" />
 	<xsl:param name="i18n.level.D" />
 
 
@@ -140,13 +141,13 @@
 		<entry key="recordgrp"><xsl:value-of select="$i18n.level.recordgrp"/></entry>
 		<entry key="subgrp"><xsl:value-of select="$i18n.level.subgrp"/></entry>
 		<entry key="subfonds"><xsl:value-of select="$i18n.level.subfonds"/></entry>
-		<entry key="subclass"><xsl:value-of select="$i18n.level.subclass"/></entry>
 		<entry key="series"><xsl:value-of select="$i18n.level.series"/></entry>
 		<entry key="subseries"><xsl:value-of select="$i18n.level.subseries"/></entry>
 		<entry key="file"><xsl:value-of select="$i18n.level.file"/></entry>
 		<entry key="item"><xsl:value-of select="$i18n.level.item"/></entry>
 
 		<entry key="P"><xsl:value-of select="$i18n.level.P"/></entry>
+		<entry key="C"><xsl:value-of select="$i18n.level.C"/></entry>
 		<entry key="CL"><xsl:value-of select="$i18n.level.CL"/></entry>
 		<entry key="SCL"><xsl:value-of select="$i18n.level.SCL"/></entry>
 		<entry key="SSCL"><xsl:value-of select="$i18n.level.SSCL"/></entry>
@@ -164,6 +165,7 @@
 		<entry key="SSUI"><xsl:value-of select="$i18n.level.SSUI"/></entry>
 		<entry key="AG"><xsl:value-of select="$i18n.level.AG"/></entry>
 		<entry key="DC"><xsl:value-of select="$i18n.level.DC"/></entry>
+		<entry key="DS"><xsl:value-of select="$i18n.level.DS"/></entry>
 		<entry key="D"><xsl:value-of select="$i18n.level.D"/></entry>
 	</xsl:variable>
 
@@ -249,7 +251,7 @@
 				<xsl:call-template name="simpleField">
 					<xsl:with-param name="label" select="$i18n.extent"/>
 					<xsl:with-param name="value"
-						select="/ead:ead/ead:archdesc/ead:did/ead:physdesc/ead:extent/text()"/>
+						select="string-join((/ead:ead/ead:archdesc/ead:did/ead:physdesc/text(),/ead:ead/ead:archdesc/ead:did/ead:physdesc/ead:extent/text()), ' ')" />
 				</xsl:call-template>
 
 				<!-- Material specification -->
@@ -417,7 +419,7 @@
 
 				<!-- Language and script notes  -->
 				<xsl:call-template name="listField">
-					<xsl:with-param name="label" select="$i18n.languagesMaterial"/>
+					<xsl:with-param name="label" select="$i18n.languageScriptNotes"/>
 					<xsl:with-param name="value" select="/*:ead/*:archdesc/*:did/*:langmaterial"/>
 				</xsl:call-template>
 
