@@ -33,11 +33,13 @@ import config.i18n.client.ClientMessages;
 
 public class IndexedFilePreview extends BitstreamPreview<IndexedFile> {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
+  private static final boolean CONTENT_DISPOSITION_INLINE = true;
+
   private SearchFileList folderList = null;
   private boolean justActive = true;
 
   public IndexedFilePreview(Viewers viewers, IndexedFile file, boolean justActive, Command onPreviewFailure) {
-    super(viewers, RestUtils.createRepresentationFileDownloadUri(file.getUUID()), file.getFileFormat(),
+    super(viewers, RestUtils.createRepresentationFileDownloadUri(file.getUUID(), CONTENT_DISPOSITION_INLINE), file.getFileFormat(),
       file.getOriginalName() != null ? file.getOriginalName() : file.getId(), file.getSize(), file.isDirectory(),
       onPreviewFailure, file);
     this.justActive = justActive;

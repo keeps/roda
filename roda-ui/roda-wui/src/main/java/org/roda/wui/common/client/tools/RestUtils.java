@@ -90,14 +90,21 @@ public class RestUtils {
   }
 
   public static SafeUri createRepresentationFileDownloadUri(String fileUuid) {
+    return createRepresentationFileDownloadUri(fileUuid, false);
+  }
 
-    // api/v1/files/{file_uuid}?acceptFormat=bin
+  public static SafeUri createRepresentationFileDownloadUri(String fileUuid, boolean contentDispositionInline) {
+
+    // api/v1/files/{file_uuid}?acceptFormat=bin&inline={inline}
     StringBuilder b = new StringBuilder();
     // base uri
     b.append(RodaConstants.API_REST_V1_FILES).append(URL.encodeQueryString(fileUuid));
     // accept format attribute
     b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT)
       .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN);
+
+    b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_KEY_INLINE)
+      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(contentDispositionInline);
 
     return UriUtils.fromSafeConstant(b.toString());
   }

@@ -1826,7 +1826,7 @@ public class BrowserHelper {
       StorageService storage = RodaCoreFactory.getStorageService();
       Binary representationFileBinary = storage.getBinary(filePath);
       filename = representationFileBinary.getStoragePath().getName();
-      mediaType = RodaConstants.MEDIA_TYPE_WILDCARD;
+      mediaType = MimeTypeHelper.getContentType(filename, RodaConstants.MEDIA_TYPE_WILDCARD);
 
       stream = new ConsumesOutputStream() {
 

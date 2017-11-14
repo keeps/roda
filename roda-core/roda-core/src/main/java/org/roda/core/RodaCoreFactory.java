@@ -421,7 +421,7 @@ public class RodaCoreFactory {
   }
 
   private static Path getEssentialDirectoryPath(Path basePath, String directoryName) {
-    String configuredPath = getConfigurationString("core.essentialDirectory." + directoryName);
+    String configuredPath = System.getenv(RodaConstants.CORE_ESSENTIAL_DIRECTORY_PREFIX + directoryName.toUpperCase());
 
     Path ret;
 
@@ -704,16 +704,6 @@ public class RodaCoreFactory {
     String value = System.getenv(envKey);
     if (value == null) {
       value = getRodaConfiguration().getString(key, defaultValue);
-    }
-
-    return value;
-  }
-
-  private static String getConfigurationString(String key) {
-    String envKey = "RODA_" + key.toUpperCase().replace('.', '_');
-    String value = System.getenv(envKey);
-    if (value == null) {
-      value = getRodaConfiguration().getString(key);
     }
 
     return value;
@@ -1084,9 +1074,10 @@ public class RodaCoreFactory {
 
   public static void instantiateTransferredResourcesScanner() {
     try {
-      String transferredResourcesFolder = getRodaConfiguration().getString("transferredResources.folder",
+      String transferredResourcesFolder = getConfigurationString("transferredResources.folder",
         RodaConstants.CORE_TRANSFERREDRESOURCE_FOLDER);
       Path transferredResourcesFolderPath = dataPath.resolve(transferredResourcesFolder);
+
       if (!FSUtils.exists(transferredResourcesFolderPath)) {
         Files.createDirectories(transferredResourcesFolderPath);
       }

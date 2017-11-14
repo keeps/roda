@@ -28,6 +28,11 @@ public final class RodaConstants {
   public static final String INSTALL_FOLDER_SYSTEM_PROPERTY = "roda.home";
 
   /*
+   * RODA Core properties (provided via environment)
+   */
+  public static final String CORE_ESSENTIAL_DIRECTORY_PREFIX = "RODA_CORE_DIRECTORY_";
+  
+  /*
    * RODA Core properties (provided via configuration file)
    */
   public static final String CORE_STORAGE_TYPE = "core.storage.type";
@@ -209,6 +214,7 @@ public final class RodaConstants {
   public static final String API_QUERY_ASSIGN_SYMBOL = "=";
   public static final String API_QUERY_SEP = "&";
   public static final String API_QUERY_KEY_ACCEPT_FORMAT = "acceptFormat";
+  public static final String API_QUERY_KEY_INLINE = "inline";
   public static final String API_QUERY_KEY_JSONP_CALLBACK = "callback";
   public static final String API_QUERY_DEFAULT_JSONP_CALLBACK = "rodaCallback";
   public static final String API_QUERY_VALUE_ACCEPT_FORMAT_BIN = "bin";
@@ -1342,6 +1348,8 @@ public final class RodaConstants {
   public static final List<String> DIPFILE_FIELDS_TO_RETURN = Arrays.asList(RodaConstants.INDEX_UUID,
     RodaConstants.DIPFILE_ID, RodaConstants.DIPFILE_PATH, RodaConstants.DIPFILE_DIP_ID,
     RodaConstants.DIPFILE_IS_DIRECTORY);
+ 
+  
 
   /** Private empty constructor */
   private RodaConstants() {

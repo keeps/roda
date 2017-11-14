@@ -103,8 +103,8 @@ public class FilesResource {
 
   public Response retrieve(
     @ApiParam(value = "The UUID of the existing file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_UUID) String fileUUID,
-    @ApiParam(value = "Choose format in which to get the file", allowableValues = RodaConstants.API_GET_FILE_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
-    throws RODAException {
+    @ApiParam(value = "Choose format in which to get the file", allowableValues = RodaConstants.API_GET_FILE_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+    @QueryParam(RodaConstants.API_QUERY_KEY_INLINE) boolean inline) throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
@@ -117,7 +117,7 @@ public class FilesResource {
       ObjectResponse<org.roda.core.data.v2.ip.File> file = (ObjectResponse<org.roda.core.data.v2.ip.File>) efile;
       return Response.ok(file.getObject(), mediaType).build();
     } else {
-      return ApiUtils.okResponse((StreamResponse) efile);
+      return ApiUtils.okResponse((StreamResponse) efile, inline);
     }
   }
 

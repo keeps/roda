@@ -51,6 +51,7 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
   private static final String VIEWER_TYPE_VIDEO = "video";
   private static final String VIEWER_TYPE_AUDIO = "audio";
   private static final String VIEWER_TYPE_TEXT = "text";
+  private static final String VIEWER_TYPE_HTML = "html";
   private static final String VIEWER_TYPE_PDF = "pdf";
   private static final String VIEWER_TYPE_IMAGE = "image";
 
@@ -143,6 +144,8 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
           pdfPreview();
         } else if (type.equals(VIEWER_TYPE_TEXT)) {
           textPreview();
+        } else if (type.equals(VIEWER_TYPE_HTML)) {
+          htmlPreview();
         } else if (type.equals(VIEWER_TYPE_AUDIO)) {
           audioPreview();
         } else if (type.equals(VIEWER_TYPE_VIDEO)) {
@@ -253,6 +256,13 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
     } else {
       errorPreview(messages.viewRepresentationTooLargeErrorPreview());
     }
+  }
+
+  private void htmlPreview() {
+    Frame frame = new Frame();
+    frame.setUrl(bitstreamDownloadUri);
+    panel.add(frame);
+    frame.setStyleName("viewRepresentationPDFFilePreview");
   }
 
   private void audioPreview() {
