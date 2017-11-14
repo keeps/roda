@@ -547,6 +547,10 @@ pre code {
 	padding: 5px 15px !important;
 }
 
+.value table {
+    font-size: 1.4rem;
+}
+
 .panelDescriptiveMetadata .form-separator:first-child {
 	margin-top:0px !important;
 }
