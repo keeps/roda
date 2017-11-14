@@ -404,13 +404,13 @@ public class RodaCoreFactory {
     System.setProperty(RodaConstants.INSTALL_FOLDER_SYSTEM_PROPERTY, rodaHomePath.toString());
 
     // instantiate essential directories
-    configPath = rodaHomePath.resolve(RodaConstants.CORE_CONFIG_FOLDER);
-    exampleConfigPath = rodaHomePath.resolve(RodaConstants.CORE_EXAMPLE_CONFIG_FOLDER);
-    defaultPath = rodaHomePath.resolve(RodaConstants.CORE_DEFAULT_FOLDER);
-    dataPath = rodaHomePath.resolve(RodaConstants.CORE_DATA_FOLDER);
-    logPath = dataPath.resolve(RodaConstants.CORE_LOG_FOLDER);
-    storagePath = dataPath.resolve(RodaConstants.CORE_STORAGE_FOLDER);
-    indexDataPath = dataPath.resolve(RodaConstants.CORE_INDEX_FOLDER);
+    configPath = getEssentialDirectoryPath(rodaHomePath, RodaConstants.CORE_CONFIG_FOLDER);
+    exampleConfigPath = getEssentialDirectoryPath(rodaHomePath, RodaConstants.CORE_EXAMPLE_CONFIG_FOLDER);
+    defaultPath = getEssentialDirectoryPath(rodaHomePath, RodaConstants.CORE_DEFAULT_FOLDER);
+    dataPath = getEssentialDirectoryPath(rodaHomePath, RodaConstants.CORE_DATA_FOLDER);
+    logPath = getEssentialDirectoryPath(dataPath, RodaConstants.CORE_LOG_FOLDER);
+    storagePath = getEssentialDirectoryPath(dataPath, RodaConstants.CORE_STORAGE_FOLDER);
+    indexDataPath = getEssentialDirectoryPath(dataPath, RodaConstants.CORE_INDEX_FOLDER);
 
     // configure logback
     if (nodeType != NodeType.TEST) {
@@ -418,6 +418,20 @@ public class RodaCoreFactory {
     }
 
     return rodaHomePath;
+  }
+
+  private static Path getEssentialDirectoryPath(Path basePath, String directoryName) {
+    String configuredPath = getConfigurationString("core.essentialDirectory." + directoryName);
+
+    Path ret;
+
+    if (StringUtils.isNotBlank(configuredPath)) {
+      ret = Paths.get(configuredPath);
+    } else {
+      ret = basePath.resolve(directoryName);
+    }
+
+    return ret;
   }
 
   private static void configureLogback() {
@@ -685,11 +699,21 @@ public class RodaCoreFactory {
     }
   }
 
-  private static String getConfigurationString(String key, String defaultType) {
+  private static String getConfigurationString(String key, String defaultValue) {
     String envKey = "RODA_" + key.toUpperCase().replace('.', '_');
     String value = System.getenv(envKey);
     if (value == null) {
-      value = getRodaConfiguration().getString(key, defaultType);
+      value = getRodaConfiguration().getString(key, defaultValue);
+    }
+
+    return value;
+  }
+
+  private static String getConfigurationString(String key) {
+    String envKey = "RODA_" + key.toUpperCase().replace('.', '_');
+    String value = System.getenv(envKey);
+    if (value == null) {
+      value = getRodaConfiguration().getString(key);
     }
 
     return value;
