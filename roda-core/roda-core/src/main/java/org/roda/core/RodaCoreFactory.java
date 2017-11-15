@@ -969,7 +969,7 @@ public class RodaCoreFactory {
    * Start ApacheDS.
    */
   private static void startApacheDS() {
-    rodaApacheDSDataDirectory = RodaCoreFactory.getDataPath().resolve(RodaConstants.CORE_LDAP_FOLDER);
+    rodaApacheDSDataDirectory = getEssentialDirectoryPath(dataPath, RodaConstants.CORE_LDAP_FOLDER);
 
     try {
       final Configuration rodaConfig = RodaCoreFactory.getRodaConfiguration();
