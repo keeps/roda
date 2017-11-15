@@ -6,9 +6,7 @@ RUN curl -s https://bintray.com/user/downloadSubjectPublicKey?username=bintray |
     apt-key add - && echo "deb http://dl.bintray.com/siegfried/debian wheezy main" | \
     tee -a /etc/apt/sources.list && apt-get -qq update && \
     apt-get -qq -y --no-install-recommends install clamav clamav-daemon clamdscan siegfried supervisor zip \
-    libav-tools imagemagick sox libsox-fmt-all ghostscript libgs-dev \
-    libreoffice-common unoconv libreoffice-writer libreoffice-draw libreoffice-calc libreoffice-impress cpio libgcrypt20 libnss3 libreoffice-pdfimport \
-    exiftool python-jpylyzer mediainfo && apt-get clean && rm -rf /var/lib/apt/lists/*
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY clamd.conf /etc/clamav/clamd.conf

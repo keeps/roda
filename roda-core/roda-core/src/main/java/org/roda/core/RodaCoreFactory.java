@@ -1197,6 +1197,8 @@ public class RodaCoreFactory {
     propertiesConfiguration.setDelimiterParsingDisabled(true);
     propertiesConfiguration.setEncoding(RodaConstants.DEFAULT_ENCODING);
 
+    Configuration configuration = propertiesConfiguration;
+
     if (FSUtils.exists(config)) {
       LOGGER.trace("Loading configuration from file {}", config);
       propertiesConfiguration.load(config.toFile());
@@ -1209,12 +1211,16 @@ public class RodaCoreFactory {
       if (inputStream != null) {
         LOGGER.trace("Loading configuration from classpath {}", configurationFile);
         propertiesConfiguration.load(inputStream);
+
+        // do variable interpolation
+        configuration = propertiesConfiguration.interpolatedConfiguration();
+
       } else {
         LOGGER.trace("Configuration {} doesn't exist", configurationFile);
       }
     }
 
-    return propertiesConfiguration;
+    return configuration;
   }
 
   public static URL getConfigurationFile(String configurationFile) {

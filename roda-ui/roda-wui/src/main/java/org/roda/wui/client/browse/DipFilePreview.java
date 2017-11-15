@@ -27,17 +27,19 @@ import config.i18n.client.ClientMessages;
 
 public class DipFilePreview extends BitstreamPreview<DIPFile> {
 
+  private static final boolean CONTENT_DISPOSITION_INLINE = true;
+
   private static final FileFormat NO_FORMAT = null;
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   public DipFilePreview(Viewers viewers, DIPFile dipFile) {
-    super(viewers, RestUtils.createDipFileDownloadUri(dipFile.getUUID()), NO_FORMAT, dipFile.getId(), dipFile.getSize(),
-      dipFile.isDirectory(), dipFile);
+    super(viewers, RestUtils.createDipFileDownloadUri(dipFile.getUUID(), CONTENT_DISPOSITION_INLINE), NO_FORMAT,
+      dipFile.getId(), dipFile.getSize(), dipFile.isDirectory(), dipFile);
   }
 
   public DipFilePreview(Viewers viewers, DIPFile dipFile, Command onPreviewFailure) {
-    super(viewers, RestUtils.createDipFileDownloadUri(dipFile.getUUID()), NO_FORMAT, dipFile.getId(), dipFile.getSize(),
-      dipFile.isDirectory(), onPreviewFailure, dipFile);
+    super(viewers, RestUtils.createDipFileDownloadUri(dipFile.getUUID(), CONTENT_DISPOSITION_INLINE), NO_FORMAT,
+      dipFile.getId(), dipFile.getSize(), dipFile.isDirectory(), onPreviewFailure, dipFile);
   }
 
   @Override

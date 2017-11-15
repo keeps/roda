@@ -123,14 +123,21 @@ public class RestUtils {
   }
 
   public static SafeUri createDipFileDownloadUri(String dipFileUUID) {
+    return createDipFileDownloadUri(dipFileUUID, false);
+  }
 
-    // api/v1/dipfiles/{file_uuid}?acceptFormat=bin
+  public static SafeUri createDipFileDownloadUri(String dipFileUUID, boolean contentDispositionInline) {
+
+    // api/v1/dipfiles/{file_uuid}?acceptFormat=bin&inline={inline}
     StringBuilder b = new StringBuilder();
     // base uri
     b.append(RodaConstants.API_REST_V1_DIPFILES).append(URL.encodeQueryString(dipFileUUID));
     // accept format attribute
     b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT)
       .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN);
+
+    b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_KEY_INLINE)
+      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(contentDispositionInline);
 
     return UriUtils.fromSafeConstant(b.toString());
   }
