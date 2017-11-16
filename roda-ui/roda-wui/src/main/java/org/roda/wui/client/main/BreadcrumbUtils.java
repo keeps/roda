@@ -48,7 +48,7 @@ public class BreadcrumbUtils {
     return new BreadcrumbItem(getBreadcrumbLabel(aip), getBreadcrumbTitle(aip), getViewItemHistoryToken(aip.getId()));
   }
 
-  private static BreadcrumbItem getBreadcrumbItem(IndexedRepresentation representation) {
+  public static BreadcrumbItem getBreadcrumbItem(IndexedRepresentation representation) {
     return new BreadcrumbItem(DescriptionLevelUtils.getRepresentationTypeIcon(representation.getType(), true),
       representation.getType(), HistoryUtils.getHistoryBrowse(representation));
   }

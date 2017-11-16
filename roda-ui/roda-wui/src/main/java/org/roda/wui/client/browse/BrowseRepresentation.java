@@ -41,6 +41,7 @@ import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.common.client.HistoryResolver;
@@ -154,6 +155,8 @@ public class BrowseRepresentation extends Composite {
   private String repId;
   private String repUUID;
 
+  private List<BreadcrumbItem> breadcrumbItems = new ArrayList<>();
+
   private static final List<String> representationFields = new ArrayList<>(Arrays.asList(RodaConstants.INDEX_UUID,
     RodaConstants.REPRESENTATION_AIP_ID, RodaConstants.REPRESENTATION_ID, RodaConstants.REPRESENTATION_TYPE));
 
@@ -266,7 +269,8 @@ public class BrowseRepresentation extends Composite {
 
     updateLayout(state, justActive);
 
-    breadcrumb.updatePath(BreadcrumbUtils.getRepresentationBreadcrumbs(bundle));
+    breadcrumbItems = BreadcrumbUtils.getRepresentationBreadcrumbs(bundle);
+    breadcrumb.updatePath(breadcrumbItems);
     breadcrumb.setVisible(true);
 
     // DESCRIPTIVE METADATA
@@ -380,6 +384,12 @@ public class BrowseRepresentation extends Composite {
     representationType
       .setHTML(HtmlSnippetUtils.getRepresentationTypeHTML(type, representation.getRepresentationStates()));
     representationId.setText(representation.getId());
+
+    if (!breadcrumbItems.isEmpty()) {
+      breadcrumbItems.remove(breadcrumbItems.size() - 1);
+      breadcrumbItems.add(BreadcrumbUtils.getBreadcrumbItem(representation));
+      breadcrumb.updatePath(breadcrumbItems);
+    }
 
     if (representation.getCreatedOn() != null) {
       dateCreated.setText(
