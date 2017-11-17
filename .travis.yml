@@ -22,7 +22,6 @@ before_script:
 - sudo apt-get -qq install clamav clamav-daemon -y
 - sudo freshclam
 - sudo apt-get -qq install libav-tools -y
-- sudo apt-get -qq install imagemagick -y
 - sudo apt-get -qq install sox libsox-fmt-all -y
 - sudo apt-get -qq install ghostscript libgs-dev -y
 - sudo add-apt-repository ppa:libreoffice/ppa -y

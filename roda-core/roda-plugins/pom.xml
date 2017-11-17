@@ -17,7 +17,6 @@
 	<modules>
 		<module>roda-plugin-common</module>
 
-		<module>conversion/roda-plugin-conversion-imagemagick</module>
 		<module>conversion/roda-plugin-conversion-pdftopdfa</module>
 		<module>conversion/roda-plugin-conversion-ghostscript</module>
 		<module>conversion/roda-plugin-conversion-unoconv</module>
