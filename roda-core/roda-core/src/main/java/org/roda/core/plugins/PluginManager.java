@@ -33,6 +33,7 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.stream.Collectors;
 
+import org.apache.commons.configuration.ConfigurationException;
 import org.reflections.Reflections;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
@@ -336,6 +337,17 @@ public class PluginManager {
           URL[] jars = pluginJarURLs.toArray(new URL[pluginJarURLs.size()]);
           for (Path jarFile : pluginJarFiles) {
             processJar(jarFile, jars);
+          }
+
+          try (DirectoryStream<Path> propertiesStream = Files.newDirectoryStream(pluginFolder, "*.properties")) {
+            for (Path propertiesFile : propertiesStream) {
+              try {
+                RodaCoreFactory.addExternalConfiguration(propertiesFile);
+              } catch (ConfigurationException e) {
+                LOGGER.warn("Could not load plugin configuration: " + propertiesFile, e);
+              }
+
+            }
           }
         }
       }

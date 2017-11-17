@@ -1191,36 +1191,63 @@ public class RodaCoreFactory {
     configurationFiles.add(configurationFile);
   }
 
-  public static Configuration getConfiguration(String configurationFile) throws ConfigurationException {
-    Path config = RodaCoreFactory.getConfigPath().resolve(configurationFile);
-    PropertiesConfiguration propertiesConfiguration = new PropertiesConfiguration();
-    propertiesConfiguration.setDelimiterParsingDisabled(true);
-    propertiesConfiguration.setEncoding(RodaConstants.DEFAULT_ENCODING);
+  public static void addExternalConfiguration(Path configurationPath) throws ConfigurationException {
+    Configuration configuration = getExternalConfiguration(configurationPath);
+    rodaConfiguration.addConfiguration(configuration);
+  }
 
-    Configuration configuration = propertiesConfiguration;
+  private static Configuration getConfiguration(String configurationFile) throws ConfigurationException {
+    Path config = RodaCoreFactory.getConfigPath().resolve(configurationFile);
+
+    Configuration configuration;
 
     if (FSUtils.exists(config)) {
-      LOGGER.trace("Loading configuration from file {}", config);
-      propertiesConfiguration.load(config.toFile());
-      RodaPropertiesReloadStrategy rodaPropertiesReloadStrategy = new RodaPropertiesReloadStrategy();
-      rodaPropertiesReloadStrategy.setRefreshDelay(5000);
-      propertiesConfiguration.setReloadingStrategy(rodaPropertiesReloadStrategy);
+      configuration = getExternalConfiguration(config);
     } else {
-      InputStream inputStream = RodaCoreFactory.class
-        .getResourceAsStream("/" + RodaConstants.CORE_CONFIG_FOLDER + "/" + configurationFile);
-      if (inputStream != null) {
-        LOGGER.trace("Loading configuration from classpath {}", configurationFile);
-        propertiesConfiguration.load(inputStream);
-
-        // do variable interpolation
-        configuration = propertiesConfiguration.interpolatedConfiguration();
-
-      } else {
-        LOGGER.trace("Configuration {} doesn't exist", configurationFile);
-      }
+      configuration = getInternalConfiguration(configurationFile);
     }
 
     return configuration;
+  }
+
+  private static PropertiesConfiguration initConfiguration() {
+    PropertiesConfiguration propertiesConfiguration = new PropertiesConfiguration();
+    propertiesConfiguration.setDelimiterParsingDisabled(true);
+    propertiesConfiguration.setEncoding(RodaConstants.DEFAULT_ENCODING);
+    return propertiesConfiguration;
+  }
+
+  private static Configuration getInternalConfiguration(String configurationFile) throws ConfigurationException {
+    PropertiesConfiguration propertiesConfiguration = initConfiguration();
+    InputStream inputStream = RodaCoreFactory.class
+      .getResourceAsStream("/" + RodaConstants.CORE_CONFIG_FOLDER + "/" + configurationFile);
+    if (inputStream != null) {
+      LOGGER.trace("Loading configuration from classpath {}", configurationFile);
+      propertiesConfiguration.load(inputStream);
+
+    } else {
+      LOGGER.trace("Configuration {} doesn't exist", configurationFile);
+    }
+
+    // do variable interpolation
+    Configuration configuration = propertiesConfiguration.interpolatedConfiguration();
+
+    return configuration;
+  }
+
+  private static Configuration getExternalConfiguration(Path config) throws ConfigurationException {
+    PropertiesConfiguration propertiesConfiguration = initConfiguration();
+    LOGGER.trace("Loading configuration from file {}", config);
+    propertiesConfiguration.load(config.toFile());
+    RodaPropertiesReloadStrategy rodaPropertiesReloadStrategy = new RodaPropertiesReloadStrategy();
+    rodaPropertiesReloadStrategy.setRefreshDelay(5000);
+    propertiesConfiguration.setReloadingStrategy(rodaPropertiesReloadStrategy);
+
+    // do variable interpolation
+    Configuration configuration = propertiesConfiguration.interpolatedConfiguration();
+
+    return configuration;
+
   }
 
   public static URL getConfigurationFile(String configurationFile) {

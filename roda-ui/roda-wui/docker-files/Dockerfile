@@ -32,7 +32,6 @@ RUN unzip -q /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/roda-core-*.jar config/r
     rm -rf /var/lib/apt/lists/*
 
 ENV RODA_HOME=/roda
-VOLUME /roda
 
 COPY /docker-entrypoint.sh /
 COPY /docker-entrypoint.d/* /docker-entrypoint.d/
