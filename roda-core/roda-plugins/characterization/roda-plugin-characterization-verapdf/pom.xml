@@ -41,13 +41,13 @@
 									<shadedPattern>org.apache.pdfbox_verapdf</shadedPattern>
 								</relocation>
 								<relocation>
-										<pattern>org.bouncycastle</pattern> 
-										<shadedPattern>org.bouncycastle_verapdf</shadedPattern> 
+										<pattern>org.bouncycastle</pattern>
+										<shadedPattern>org.bouncycastle_verapdf</shadedPattern>
 								</relocation>
  								<relocation>
 									<pattern>com.itextpdf</pattern>
 									<shadedPattern>com.itextpdf_verapdf</shadedPattern>
-								</relocation>	
+								</relocation>
 							</relocations>
 							<filters>
 								<filter>
@@ -84,11 +84,6 @@
 		</plugins>
 	</build>
 	<dependencies>
-		<dependency>
-			<groupId>org.roda-project</groupId>
-			<artifactId>roda-plugin-common</artifactId>
-			<scope>provided</scope>
-		</dependency>
 		<dependency>
 			<groupId>org.roda-project</groupId>
 			<artifactId>roda-core</artifactId>

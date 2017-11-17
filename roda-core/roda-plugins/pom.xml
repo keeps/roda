@@ -15,8 +15,6 @@
 		<verapdf.version>1.5.19</verapdf.version>
 	</properties>
 	<modules>
-		<module>roda-plugin-common</module>
-
 		<module>conversion/roda-plugin-conversion-pdftopdfa</module>
 		<module>conversion/roda-plugin-conversion-ghostscript</module>
 		<module>conversion/roda-plugin-conversion-unoconv</module>

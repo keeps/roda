@@ -78,11 +78,6 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.roda-project</groupId>
-			<artifactId>roda-plugin-common</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.roda-project</groupId>
 			<artifactId>roda-core</artifactId>
 			<scope>provided</scope>
 		</dependency>
