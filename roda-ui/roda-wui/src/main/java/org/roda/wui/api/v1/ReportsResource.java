@@ -51,7 +51,7 @@ public class ReportsResource {
 
   public Response getTransferredResourceReports(
     @ApiParam(value = "The ID of the existing transferred resource or SIP") @QueryParam(RodaConstants.API_QUERY_PARAM_ID) String id,
-    @ApiParam(value = "Choose the ID related object", allowableValues = RodaConstants.API_GET_REPORTS_ID_OBJECT, defaultValue = RodaConstants.API_GET_REPORTS_ID_OBJECT_RESOURCE_PATH) @QueryParam(RodaConstants.API_QUERY_PARAM_TYPE) String resourceOrSip,
+    @ApiParam(value = "Choose the ID related object", allowableValues = RodaConstants.CONTROLLER_ID_OBJECT_PARAM, defaultValue = RodaConstants.CONTROLLER_ID_OBJECT_RESOURCE_PATH) @QueryParam(RodaConstants.API_QUERY_PARAM_TYPE) String resourceOrSip,
     @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam(RodaConstants.API_QUERY_KEY_START) String start,
     @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam(RodaConstants.API_QUERY_KEY_LIMIT) String limit,
     @ApiParam(value = "Choose format in which to get the reports", allowableValues = RodaConstants.API_LIST_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
@@ -78,7 +78,7 @@ public class ReportsResource {
 
   public Response getTransferredResourceLastReport(
     @ApiParam(value = "The ID of the existing transferred resource or SIP") @QueryParam(RodaConstants.API_QUERY_PARAM_ID) String id,
-    @ApiParam(value = "Choose the ID related object", allowableValues = RodaConstants.API_GET_REPORTS_ID_OBJECT, defaultValue = RodaConstants.API_GET_REPORTS_ID_OBJECT_RESOURCE_PATH) @QueryParam(RodaConstants.API_QUERY_PARAM_TYPE) String resourceOrSip,
+    @ApiParam(value = "Choose the ID related object", allowableValues = RodaConstants.CONTROLLER_ID_OBJECT_PARAM, defaultValue = RodaConstants.CONTROLLER_ID_OBJECT_RESOURCE_PATH) @QueryParam(RodaConstants.API_QUERY_PARAM_TYPE) String resourceOrSip,
     @ApiParam(value = "Choose format in which to get the reports", allowableValues = RodaConstants.API_LIST_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);

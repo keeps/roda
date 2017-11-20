@@ -3339,17 +3339,15 @@ public class Browser extends RodaWuiController {
 
       if (id == null || resourceOrSip == null) {
         reportList = BrowserHelper.listReports(start, limit);
+      } else if (RodaConstants.CONTROLLER_SIP_PARAM.equals(resourceOrSip)) {
+        reportList = BrowserHelper.listTransferredResourcesReportsWithSIP(id, start, limit);
+      } else if (RodaConstants.CONTROLLER_ID_OBJECT_RESOURCE_PATH.equals(resourceOrSip)) {
+        reportList = BrowserHelper.listTransferredResourcesReports(IdUtils.getTransferredResourceUUID(id), start,
+          limit);
+      } else if (RodaConstants.CONTROLLER_ID_OBJECT_SOURCE_NAME.equals(resourceOrSip)) {
+        reportList = BrowserHelper.listTransferredResourcesReportsWithSourceOriginalName(id, start, limit);
       } else {
-        if (RodaConstants.CONTROLLER_SIP_PARAM.equals(resourceOrSip)) {
-          reportList = BrowserHelper.listTransferredResourcesReportsWithSIP(id, start, limit);
-        } else {
-          if (RodaConstants.CONTROLLER_ID_OBJECT_RESOURCE_PATH.equals(resourceOrSip)) {
-            reportList = BrowserHelper.listTransferredResourcesReports(IdUtils.getTransferredResourceUUID(id), start,
-              limit);
-          } else {
-            reportList = BrowserHelper.listTransferredResourcesReports(id, start, limit);
-          }
-        }
+        reportList = BrowserHelper.listTransferredResourcesReports(id, start, limit);
       }
 
       return reportList;
@@ -3382,20 +3380,18 @@ public class Browser extends RodaWuiController {
 
       if (id == null || resourceOrSip == null) {
         reportList = BrowserHelper.listReports(0, 1);
+      } else if (RodaConstants.CONTROLLER_SIP_PARAM.equals(resourceOrSip)) {
+        reportList = BrowserHelper.listTransferredResourcesReportsWithSIP(id, 0, 1);
+      } else if (RodaConstants.CONTROLLER_ID_OBJECT_RESOURCE_PATH.equals(resourceOrSip)) {
+        reportList = BrowserHelper.listTransferredResourcesReports(IdUtils.getTransferredResourceUUID(id), 0, 1);
+      } else if (RodaConstants.CONTROLLER_ID_OBJECT_SOURCE_NAME.equals(resourceOrSip)) {
+        reportList = BrowserHelper.listTransferredResourcesReportsWithSourceOriginalName(id, 0, 1);
       } else {
-        if (RodaConstants.CONTROLLER_SIP_PARAM.equals(resourceOrSip)) {
-          reportList = BrowserHelper.listTransferredResourcesReportsWithSIP(id, 0, 1);
-        } else {
-          if (RodaConstants.CONTROLLER_ID_OBJECT_RESOURCE_PATH.equals(resourceOrSip)) {
-            reportList = BrowserHelper.listTransferredResourcesReports(IdUtils.getTransferredResourceUUID(id), 0, 1);
-          } else {
-            reportList = BrowserHelper.listTransferredResourcesReports(id, 0, 1);
-          }
-        }
+        reportList = BrowserHelper.listTransferredResourcesReports(id, 0, 1);
       }
 
       if (reportList.getObjects().isEmpty()) {
-        throw new NotFoundException("Could not find report for id: " + id);
+        throw new NotFoundException("Could not find report for value: " + id);
       } else {
         return reportList.getObjects().get(0);
       }
