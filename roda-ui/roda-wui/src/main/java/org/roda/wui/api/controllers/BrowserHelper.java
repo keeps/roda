@@ -3354,14 +3354,14 @@ public class BrowserHelper {
     return RodaCoreFactory.getModelService().acknowledgeNotification(notificationId, ackToken);
   }
 
-  public static RepresentationInformation createRepresentationInformation(RepresentationInformation ri, boolean commit)
-    throws GenericException, RequestNotValidException {
-    return RodaCoreFactory.getModelService().createRepresentationInformation(ri, commit);
+  public static RepresentationInformation createRepresentationInformation(RepresentationInformation ri,
+    String createdBy, boolean commit) throws GenericException, RequestNotValidException {
+    return RodaCoreFactory.getModelService().createRepresentationInformation(ri, createdBy, commit);
   }
 
-  public static RepresentationInformation updateRepresentationInformation(RepresentationInformation ri, boolean commit)
-    throws GenericException, RequestNotValidException {
-    return RodaCoreFactory.getModelService().updateRepresentationInformation(ri, commit);
+  public static RepresentationInformation updateRepresentationInformation(RepresentationInformation ri,
+    String updatedBy, boolean commit) throws GenericException, RequestNotValidException {
+    return RodaCoreFactory.getModelService().updateRepresentationInformation(ri, updatedBy, commit);
   }
 
   public static void deleteRepresentationInformation(String representationInformationId, boolean commit)

@@ -2161,6 +2161,12 @@ public class SolrUtils {
     doc.addField(RodaConstants.REPRESENTATION_INFORMATION_RELATIONS, JsonUtils.getJsonFromObject(ri.getRelations()));
 
     doc.addField(RodaConstants.REPRESENTATION_INFORMATION_FILTERS, ri.getFilters());
+
+    doc.addField(RodaConstants.REPRESENTATION_INFORMATION_CREATED_ON, ri.getCreatedOn());
+    doc.addField(RodaConstants.REPRESENTATION_INFORMATION_CREATED_BY, ri.getCreatedBy());
+    doc.addField(RodaConstants.REPRESENTATION_INFORMATION_UPDATED_ON, ri.getUpdatedOn());
+    doc.addField(RodaConstants.REPRESENTATION_INFORMATION_UPDATED_BY, ri.getUpdatedBy());
+
     return doc;
   }
 
@@ -2178,6 +2184,12 @@ public class SolrUtils {
     ri.setRelations(objectToListRelation(doc.get(RodaConstants.REPRESENTATION_INFORMATION_RELATIONS)));
 
     ri.setFilters(objectToListString(doc.get(RodaConstants.REPRESENTATION_INFORMATION_FILTERS)));
+
+    ri.setCreatedOn(objectToDate(doc.get(RodaConstants.REPRESENTATION_INFORMATION_CREATED_ON)));
+    ri.setCreatedBy(objectToString(doc.get(RodaConstants.REPRESENTATION_INFORMATION_CREATED_BY), ""));
+    ri.setUpdatedOn(objectToDate(doc.get(RodaConstants.REPRESENTATION_INFORMATION_UPDATED_ON)));
+    ri.setUpdatedBy(objectToString(doc.get(RodaConstants.REPRESENTATION_INFORMATION_UPDATED_BY), ""));
+
     return ri;
   }
 

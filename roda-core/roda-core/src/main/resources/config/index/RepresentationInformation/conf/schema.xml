@@ -118,6 +118,11 @@
    <field name="relations" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="filters" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    
+   <field name="createdOn" type="tdate" indexed="true" stored="true" required="false" multiValued="false" /> 
+   <field name="createdBy" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="updatedOn" type="tdate" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="updatedBy" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
+   
    <field name="search" type="text_general" indexed="true" stored="false" multiValued="true" />
    
    <copyField source="*" dest="search" />

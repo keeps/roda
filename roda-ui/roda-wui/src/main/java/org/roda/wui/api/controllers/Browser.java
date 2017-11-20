@@ -3359,7 +3359,7 @@ public class Browser extends RodaWuiController {
 
     try {
       // delegate
-      return BrowserHelper.createRepresentationInformation(ri, true);
+      return BrowserHelper.createRepresentationInformation(ri, user.getName(), true);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;
@@ -3379,7 +3379,7 @@ public class Browser extends RodaWuiController {
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
     try {
-      BrowserHelper.updateRepresentationInformation(ri, true);
+      BrowserHelper.updateRepresentationInformation(ri, user.getName(), true);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;

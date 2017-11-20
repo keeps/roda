@@ -41,6 +41,7 @@ import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.ListUtils;
 
 import com.google.gwt.core.client.GWT;
@@ -111,6 +112,9 @@ public class ShowRepresentationInformation extends Composite {
   Label representationInformationId;
 
   @UiField
+  Label dateCreated, dateUpdated;
+
+  @UiField
   Label representationInformationTitle;
 
   @UiField
@@ -156,7 +160,6 @@ public class ShowRepresentationInformation extends Composite {
   public ShowRepresentationInformation() {
     this.ri = new RepresentationInformation();
     initWidget(uiBinder.createAndBindUi(this));
-    objectPanel.setVisible(false);
     initElements();
   }
 
@@ -164,8 +167,8 @@ public class ShowRepresentationInformation extends Composite {
     instance = this;
     this.ri = ri;
 
-    initEntityFilters(ri);
     initWidget(uiBinder.createAndBindUi(this));
+    initEntityFilters(ri);
     objectPanel.addStyleName("ri-entity-relation-section");
     initElements();
   }
@@ -179,6 +182,15 @@ public class ShowRepresentationInformation extends Composite {
     representationInformationIcon.getParent().removeStyleName("browseTitle-allCollections-wrapper");
 
     representationInformationId.setText(messages.representationInformationIdentifier() + ": " + ri.getId());
+
+    if (ri.getCreatedOn() != null && StringUtils.isNotBlank(ri.getCreatedBy())) {
+      dateCreated.setText(messages.dateCreated(Humanize.formatDateTime(ri.getCreatedOn()), ri.getCreatedBy()));
+    }
+
+    if (ri.getUpdatedOn() != null && StringUtils.isNotBlank(ri.getUpdatedBy())) {
+      dateUpdated.setText(messages.dateUpdated(Humanize.formatDateTime(ri.getUpdatedOn()), ri.getUpdatedBy()));
+    }
+
     representationInformationDescriptionValue.setText(ri.getDescription());
     representationInformationDescriptionKey.setVisible(StringUtils.isNotBlank(ri.getDescription()));
 
@@ -222,7 +234,6 @@ public class ShowRepresentationInformation extends Composite {
     }
 
     initRelations(ri);
-    objectPanel.setVisible(!aipParams.isEmpty() || !representationParams.isEmpty() || !fileParams.isEmpty());
   }
 
   public void updateLists(final RepresentationInformation ri) {
@@ -232,7 +243,6 @@ public class ShowRepresentationInformation extends Composite {
 
     initEntityFilters(ri);
     initRelations(ri);
-    objectPanel.setVisible(!aipParams.isEmpty() || !representationParams.isEmpty() || !fileParams.isEmpty());
   }
 
   private void initEntityFilters(final RepresentationInformation ri) {
@@ -264,7 +274,8 @@ public class ShowRepresentationInformation extends Composite {
         public void onSuccess(Long result) {
           objectPanel.clear();
 
-          String url = HistoryUtils.getSearchHistoryByRepresentationInformationFilter(ri.getFilters(), "items");
+          String url = HistoryUtils.getSearchHistoryByRepresentationInformationFilter(ri.getFilters(),
+            RodaConstants.SEARCH_ITEMS);
           InlineHTML label = new InlineHTML(
             messages.representationInformationIntellectualEntities(result.intValue(), url));
           label.addStyleName("ri-form-label-inline");
@@ -298,9 +309,7 @@ public class ShowRepresentationInformation extends Composite {
           objectPanel.add(edit);
         }
       });
-    }
-
-    if (!representationParams.isEmpty()) {
+    } else if (!representationParams.isEmpty()) {
       Filter representationFilter = new Filter();
       representationFilter.add(new OrFiltersParameters(representationParams));
 
@@ -316,7 +325,7 @@ public class ShowRepresentationInformation extends Composite {
           public void onSuccess(Long result) {
             objectPanel.clear();
             String url = HistoryUtils.getSearchHistoryByRepresentationInformationFilter(ri.getFilters(),
-              "representations");
+              RodaConstants.SEARCH_REPRESENTATIONS);
             InlineHTML label = new InlineHTML(
               messages.representationInformationRepresentations(result.intValue(), url));
             label.addStyleName("ri-form-label-inline");
@@ -350,9 +359,7 @@ public class ShowRepresentationInformation extends Composite {
             objectPanel.add(edit);
           }
         });
-    }
-
-    if (!fileParams.isEmpty()) {
+    } else if (!fileParams.isEmpty()) {
       Filter fileFilter = new Filter();
       fileFilter.add(new OrFiltersParameters(fileParams));
 
@@ -367,7 +374,8 @@ public class ShowRepresentationInformation extends Composite {
           @Override
           public void onSuccess(Long result) {
             objectPanel.clear();
-            String url = HistoryUtils.getSearchHistoryByRepresentationInformationFilter(ri.getFilters(), "files");
+            String url = HistoryUtils.getSearchHistoryByRepresentationInformationFilter(ri.getFilters(),
+              RodaConstants.SEARCH_FILES);
             InlineHTML label = new InlineHTML(messages.representationInformationFiles(result.intValue(), url));
             label.addStyleName("ri-form-label-inline");
             objectPanel.add(label);
@@ -400,6 +408,41 @@ public class ShowRepresentationInformation extends Composite {
             objectPanel.add(edit);
           }
         });
+    } else {
+      objectPanel.clear();
+
+      String url = HistoryUtils.getSearchHistoryByRepresentationInformationFilter(ri.getFilters(),
+        RodaConstants.SEARCH_ITEMS);
+      InlineHTML label = new InlineHTML(messages.representationInformationIntellectualEntities(0, url));
+      label.addStyleName("ri-form-label-inline");
+      objectPanel.add(label);
+
+      InlineHTML edit = new InlineHTML("<i class='fa fa-pencil' aria-hidden='true'></i>");
+      edit.setTitle("Edit relation rules");
+      edit.addStyleName("ri-category link-color");
+
+      edit.addClickHandler(new ClickHandler() {
+
+        @Override
+        public void onClick(ClickEvent event) {
+          RepresentationInformationDialogs.showPromptDialogRepresentationInformation(
+            messages.representationInformationAddNewRelation(), messages.cancelButton(), messages.confirmButton(),
+            ShowRepresentationInformation.this.ri, new AsyncCallback<String>() {
+
+              @Override
+              public void onFailure(Throwable caught) {
+                // do nothing
+              }
+
+              @Override
+              public void onSuccess(final String newType) {
+                // do nothing
+              }
+            });
+        }
+      });
+
+      objectPanel.add(edit);
     }
   }
 

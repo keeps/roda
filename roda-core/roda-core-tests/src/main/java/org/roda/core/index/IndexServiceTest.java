@@ -661,7 +661,7 @@ public class IndexServiceTest {
     ri.setDescription("PDF definition");
     ri.setCategories(Arrays.asList("Page Layout Files"));
     ri.setExtras("");
-    model.createRepresentationInformation(ri, false);
+    model.createRepresentationInformation(ri, RodaConstants.ADMIN, false);
     index.commit(RepresentationInformation.class);
 
     RepresentationInformation ri2 = model.retrieveRepresentationInformation(ri.getId());
@@ -679,7 +679,7 @@ public class IndexServiceTest {
     assertEquals(ri.getName(), ri3.getName());
 
     ri3.setName("RepresentationInformation New Name");
-    model.updateRepresentationInformation(ri3, false);
+    model.updateRepresentationInformation(ri3, RodaConstants.ADMIN, false);
 
     RepresentationInformation ri4 = index.retrieve(RepresentationInformation.class, ri.getId(), new ArrayList<>());
     assertNotNull(ri4);

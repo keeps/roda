@@ -987,6 +987,11 @@ public final class RodaConstants {
   public static final String REPRESENTATION_INFORMATION_LINK = "link";
   public static final String REPRESENTATION_INFORMATION_TITLE = "title";
 
+  public static final String REPRESENTATION_INFORMATION_CREATED_ON = "createdOn";
+  public static final String REPRESENTATION_INFORMATION_CREATED_BY = "createdBy";
+  public static final String REPRESENTATION_INFORMATION_UPDATED_ON = "updatedOn";
+  public static final String REPRESENTATION_INFORMATION_UPDATED_BY = "updatedBy";
+
   public static final String REPRESENTATION_INFORMATION_FILE_EXTENSION = ".json";
   public static final String REPRESENTATION_INFORMATION_SEARCH = "search";
 

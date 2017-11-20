@@ -9,6 +9,7 @@ package org.roda.core.data.v2.ri;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -35,6 +36,11 @@ public class RepresentationInformation extends NamedIndexedModel implements IsMo
   private List<RepresentationInformationRelation> relations = new ArrayList<>();
   private List<String> filters = new ArrayList<>();
 
+  private Date createdOn = null;
+  private String createdBy = null;
+  private Date updatedOn = null;
+  private String updatedBy = null;
+
   public RepresentationInformation() {
     super();
   }
@@ -48,6 +54,10 @@ public class RepresentationInformation extends NamedIndexedModel implements IsMo
     this.support = representationInformation.getSupport();
     this.relations = new ArrayList<>(representationInformation.getRelations());
     this.filters = new ArrayList<>(representationInformation.getFilters());
+    this.createdOn = representationInformation.getCreatedOn();
+    this.createdBy = representationInformation.getCreatedBy();
+    this.updatedOn = representationInformation.getUpdatedOn();
+    this.updatedBy = representationInformation.getUpdatedBy();
   }
 
   @JsonIgnore
@@ -114,6 +124,38 @@ public class RepresentationInformation extends NamedIndexedModel implements IsMo
 
   public void addFilter(String filter) {
     this.filters.add(filter);
+  }
+
+  public String getCreatedBy() {
+    return createdBy;
+  }
+
+  public void setCreatedBy(String createdBy) {
+    this.createdBy = createdBy;
+  }
+
+  public Date getCreatedOn() {
+    return createdOn;
+  }
+
+  public void setCreatedOn(Date createdOn) {
+    this.createdOn = createdOn;
+  }
+
+  public Date getUpdatedOn() {
+    return updatedOn;
+  }
+
+  public void setUpdatedOn(Date updatedOn) {
+    this.updatedOn = updatedOn;
+  }
+
+  public String getUpdatedBy() {
+    return updatedBy;
+  }
+
+  public void setUpdatedBy(String updatedBy) {
+    this.updatedBy = updatedBy;
   }
 
   @Override

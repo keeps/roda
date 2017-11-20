@@ -2754,7 +2754,8 @@ public class ModelService extends ModelObservable {
     try {
       if (LogEntry.class.equals(objectClass) || RODAMember.class.equals(objectClass)
         || TransferredResource.class.equals(objectClass) || IndexedPreservationAgent.class.equals(objectClass)
-        || IndexedAIP.class.equals(objectClass)) {
+        || IndexedAIP.class.equals(objectClass) || RepresentationInformation.class.equals(objectClass)
+        || RiskIncidence.class.equals(objectClass)) {
         return true;
       } else {
         StoragePath storagePath = ModelUtils.getContainerPath(objectClass);
@@ -2817,10 +2818,17 @@ public class ModelService extends ModelObservable {
   /***************** Representation information related *****************/
   /*****************************************************************************/
 
-  public RepresentationInformation createRepresentationInformation(RepresentationInformation ri, boolean commit)
-    throws GenericException {
+  public RepresentationInformation createRepresentationInformation(RepresentationInformation ri, String createdBy,
+    boolean commit) throws GenericException {
     try {
       ri.setId(IdUtils.createUUID());
+
+      Date creationDate = new Date();
+      ri.setCreatedBy(createdBy);
+      ri.setCreatedOn(creationDate);
+      ri.setUpdatedBy(createdBy);
+      ri.setUpdatedOn(creationDate);
+
       String riAsJson = JsonUtils.getJsonFromObject(ri);
       StoragePath representationInformationPath = ModelUtils.getRepresentationInformationStoragePath(ri.getId());
       storage.createBinary(representationInformationPath, new StringContentPayload(riAsJson), false);
@@ -2833,9 +2841,12 @@ public class ModelService extends ModelObservable {
     return ri;
   }
 
-  public RepresentationInformation updateRepresentationInformation(RepresentationInformation ri, boolean commit)
-    throws GenericException {
+  public RepresentationInformation updateRepresentationInformation(RepresentationInformation ri, String updatedBy,
+    boolean commit) throws GenericException {
     try {
+      ri.setUpdatedBy(updatedBy);
+      ri.setUpdatedOn(new Date());
+
       String riAsJson = JsonUtils.getJsonFromObject(ri);
       StoragePath representationInformationPath = ModelUtils.getRepresentationInformationStoragePath(ri.getId());
       storage.updateBinaryContent(representationInformationPath, new StringContentPayload(riAsJson), false, true);

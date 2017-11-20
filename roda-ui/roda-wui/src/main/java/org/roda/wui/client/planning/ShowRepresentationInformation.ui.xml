@@ -31,6 +31,8 @@
 								</g:FlowPanel>
 								<g:Label addStyleNames="browseItemId" ui:field="representationInformationId"
 									title="{messages.representationInformationIdentifier}" />
+								<g:Label addStyleNames="browseItemId" ui:field="dateCreated"/>
+								<g:Label addStyleNames="browseItemId" ui:field="dateUpdated"/>
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
 								<g:Label styleName="label"
