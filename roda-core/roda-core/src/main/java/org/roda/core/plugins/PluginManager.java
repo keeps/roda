@@ -333,12 +333,6 @@ public class PluginManager {
             // do nothing as folder does not exist
           }
 
-          pluginJarURLs.addAll(sharedJarURLs);
-          URL[] jars = pluginJarURLs.toArray(new URL[pluginJarURLs.size()]);
-          for (Path jarFile : pluginJarFiles) {
-            processJar(jarFile, jars);
-          }
-
           try (DirectoryStream<Path> propertiesStream = Files.newDirectoryStream(pluginFolder, "*.properties")) {
             for (Path propertiesFile : propertiesStream) {
               try {
@@ -348,6 +342,12 @@ public class PluginManager {
               }
 
             }
+          }
+
+          pluginJarURLs.addAll(sharedJarURLs);
+          URL[] jars = pluginJarURLs.toArray(new URL[pluginJarURLs.size()]);
+          for (Path jarFile : pluginJarFiles) {
+            processJar(jarFile, jars);
           }
         }
       }
