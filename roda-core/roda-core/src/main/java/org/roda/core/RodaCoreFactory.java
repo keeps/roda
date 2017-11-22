@@ -281,8 +281,7 @@ public class RodaCoreFactory {
         configurationFiles = new ArrayList<>();
         rodaPropertiesCache = new HashMap<>();
         addConfiguration("roda-core.properties");
-        addConfiguration("roda-core-formats.properties");
-        LOGGER.debug("Finished loading roda-core.properties & roda-core-formats.properties");
+        LOGGER.debug("Finished loading roda-core.properties");
         addConfiguration("roda-roles.properties");
         LOGGER.debug("Finished loading roda-roles.properties");
 
