@@ -70,7 +70,7 @@ Optionally you may install the following tools:
 
 * Google Plugin for Eclipse ([Download & install instructions](https://developers.google.com/eclipse/docs/getting_started)) is usefull to develop and test graphical user interface developments.
 
-**NOTE:** This is not a restrictive list of software to be used for developing RODA (as other software, like IDEs, can be used instead of the one suggested.) 
+**NOTE:** This is not a restrictive list of software to be used for developing RODA (as other software, like IDEs, can be used instead of the one suggested.)
 
 ### How to import the code in Eclipse
 
@@ -102,12 +102,6 @@ RODA is structured as follows:
     * **index** - this package contains all indexing logic for RODA model objects, working together with RODA model through Observable pattern
     * **migration** - this package contains all migration logic (e.g. every time a change in a model object occurs a migration might be needed)
   * **roda-core-tests** - this module contains tests and tests helpers for roda-core module. Besides that, this module can be added as dependency for other project that have, for example, plugins and ones wants to test them more easily
-  * **roda-plugins** - this module contains core plugins sub-divided in sub-modules (characterization, reindex, ingest & others)
-    * **base** - this module contains roda core miscellaneous plugins 
-    * **antivirus** - this module contains roda core plugins related to antivirus 
-    * **characterization** - this module contains roda core description objects manipulation plugins 
-    * **ingest** - this module contains roda core ingest task plugins 
-    * **reindex** - this module contains index maintenance roda core plugins
 
 ### /roda-ui/
 
@@ -141,10 +135,10 @@ If you would like to translate RODA to a new language please read the [Translati
 
 To create new plugins and use them to RODA it is necessary to:
 
-1. Create a new Maven project that depends on roda-core and declare the plugin class qualified name in _pom.xml_ like, for example: [pom.xml](https://github.com/keeps/roda/blob/master/roda-core/roda-plugins/characterization/roda-plugin-characterization-droid/pom.xml)
-1. The plugin class must extend **AbstractPlugin** class and implement the necessary methods like, for example: [Droid plugin](https://github.com/keeps/roda/blob/master/roda-core/roda-plugins/characterization/roda-plugin-characterization-droid/src/main/java/org/roda/core/plugins/plugins/characterization/DroidPlugin.java)
-1. After creating the plugin, it is necessary to generate a jar file
-1. That jar file should then be included under RODA base installation folder specifically in **config/plugins/PLUGIN_NAME/**
+1. Create a new Maven project that depends on roda-core and declare the plugin class qualified name in _pom.xml_
+2. The plugin class must extend **AbstractPlugin** class and implement the necessary methods
+3. After creating the plugin, it is necessary to generate a jar file
+4. That jar file should then be included under RODA base installation folder specifically in **config/plugins/PLUGIN_NAME/**
 
 ## REST API
 
@@ -153,4 +147,3 @@ RODA is completely controlled via a REST API. This is great to develop external 
 ### Developing 3rd party integrations
 
 If you are interested in developing an integration with RODA via the REST API, please contact the product team for further information by leaving a question or a comment on https://github.com/keeps/roda/issues.
-
