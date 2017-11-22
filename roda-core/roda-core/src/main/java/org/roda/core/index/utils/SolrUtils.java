@@ -2179,8 +2179,8 @@ public class SolrUtils {
     ri.setCategories(objectToListString(doc.get(RodaConstants.REPRESENTATION_INFORMATION_CATEGORIES)));
     ri.setExtras(objectToString(doc.get(RodaConstants.REPRESENTATION_INFORMATION_EXTRAS), null));
 
-    ri.setSupport(RepresentationInformationSupport.valueOf(objectToString(
-      doc.get(RodaConstants.REPRESENTATION_INFORMATION_SUPPORT), RepresentationInformationSupport.KNOWN.toString())));
+    ri.setSupport(objectToEnum(doc.get(RodaConstants.REPRESENTATION_INFORMATION_SUPPORT),
+      RepresentationInformationSupport.class, RepresentationInformationSupport.KNOWN));
     ri.setRelations(objectToListRelation(doc.get(RodaConstants.REPRESENTATION_INFORMATION_RELATIONS)));
 
     ri.setFilters(objectToListString(doc.get(RodaConstants.REPRESENTATION_INFORMATION_FILTERS)));
