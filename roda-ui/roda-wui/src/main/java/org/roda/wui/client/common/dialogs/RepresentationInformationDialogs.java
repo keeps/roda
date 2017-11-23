@@ -251,7 +251,7 @@ public class RepresentationInformationDialogs {
 
                 @Override
                 public void onSuccess(Void result) {
-                  ShowRepresentationInformation.getInstance().updateLists(ri);
+                  ShowRepresentationInformation.getInstance().updateLists();
                 }
               });
             }

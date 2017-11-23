@@ -981,6 +981,7 @@ public final class RodaConstants {
   public static final String REPRESENTATION_INFORMATION_EXTRAS = "extras";
   public static final String REPRESENTATION_INFORMATION_SUPPORT = "support";
   public static final String REPRESENTATION_INFORMATION_RELATIONS = "relations";
+  public static final String REPRESENTATION_INFORMATION_RELATIONS_WITH_RI = "relationsWithRI";
   public static final String REPRESENTATION_INFORMATION_FILTERS = "filters";
   public static final String REPRESENTATION_INFORMATION_RELATION_TYPE = "relationType";
   public static final String REPRESENTATION_INFORMATION_OBJECT_TYPE = "objectType";

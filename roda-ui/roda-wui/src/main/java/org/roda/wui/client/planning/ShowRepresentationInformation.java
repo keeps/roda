@@ -32,6 +32,7 @@ import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.ri.RepresentationInformationRelation;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.RepresentationInformationDialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
@@ -168,7 +169,7 @@ public class ShowRepresentationInformation extends Composite {
     this.ri = ri;
 
     initWidget(uiBinder.createAndBindUi(this));
-    initEntityFilters(ri);
+    initEntityFilters();
     objectPanel.addStyleName("ri-entity-relation-section");
     initElements();
   }
@@ -233,19 +234,19 @@ public class ShowRepresentationInformation extends Composite {
       representationInformationSupportKey.setVisible(false);
     }
 
-    initRelations(ri);
+    initRelations();
   }
 
-  public void updateLists(final RepresentationInformation ri) {
+  public void updateLists() {
     aipParams.clear();
     representationParams.clear();
     fileParams.clear();
 
-    initEntityFilters(ri);
-    initRelations(ri);
+    initEntityFilters();
+    initRelations();
   }
 
-  private void initEntityFilters(final RepresentationInformation ri) {
+  private void initEntityFilters() {
     for (String filter : ri.getFilters()) {
       String[] splittedFilter = filter
         .split(RepresentationInformationUtils.REPRESENTATION_INFORMATION_FILTER_SEPARATOR);
@@ -263,191 +264,64 @@ public class ShowRepresentationInformation extends Composite {
       Filter aipFilter = new Filter();
       aipFilter.add(new OrFiltersParameters(aipParams));
 
-      BrowserService.Util.getInstance().count(IndexedAIP.class.getName(), aipFilter, false, new AsyncCallback<Long>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
-        }
-
-        @Override
-        public void onSuccess(Long result) {
-          objectPanel.clear();
-
-          String url = HistoryUtils.getSearchHistoryByRepresentationInformationFilter(ri.getFilters(),
-            RodaConstants.SEARCH_ITEMS);
-          InlineHTML label = new InlineHTML(
-            messages.representationInformationIntellectualEntities(result.intValue(), url));
-          label.addStyleName("ri-form-label-inline");
-          objectPanel.add(label);
-
-          InlineHTML edit = new InlineHTML("<i class='fa fa-pencil' aria-hidden='true'></i>");
-          edit.setTitle("Edit relation rules");
-          edit.addStyleName("ri-category link-color");
-
-          edit.addClickHandler(new ClickHandler() {
-
-            @Override
-            public void onClick(ClickEvent event) {
-              RepresentationInformationDialogs.showPromptDialogRepresentationInformation(
-                messages.representationInformationAddNewRelation(), messages.cancelButton(), messages.confirmButton(),
-                ShowRepresentationInformation.this.ri, new AsyncCallback<String>() {
-
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    // do nothing
-                  }
-
-                  @Override
-                  public void onSuccess(final String newType) {
-                    // do nothing
-                  }
-                });
-            }
-          });
-
-          objectPanel.add(edit);
-        }
-      });
+      BrowserService.Util.getInstance().count(IndexedAIP.class.getName(), aipFilter, false,
+        initEntityFiltersObjectPanel(RodaConstants.SEARCH_ITEMS));
     } else if (!representationParams.isEmpty()) {
       Filter representationFilter = new Filter();
       representationFilter.add(new OrFiltersParameters(representationParams));
 
       BrowserService.Util.getInstance().count(IndexedRepresentation.class.getName(), representationFilter, false,
-        new AsyncCallback<Long>() {
-
-          @Override
-          public void onFailure(Throwable caught) {
-            AsyncCallbackUtils.defaultFailureTreatment(caught);
-          }
-
-          @Override
-          public void onSuccess(Long result) {
-            objectPanel.clear();
-            String url = HistoryUtils.getSearchHistoryByRepresentationInformationFilter(ri.getFilters(),
-              RodaConstants.SEARCH_REPRESENTATIONS);
-            InlineHTML label = new InlineHTML(
-              messages.representationInformationRepresentations(result.intValue(), url));
-            label.addStyleName("ri-form-label-inline");
-            objectPanel.add(label);
-
-            InlineHTML edit = new InlineHTML("<i class='fa fa-pencil' aria-hidden='true'></i>");
-            edit.setTitle("Edit relation rules");
-            edit.addStyleName("ri-category link-color");
-
-            edit.addClickHandler(new ClickHandler() {
-
-              @Override
-              public void onClick(ClickEvent event) {
-                RepresentationInformationDialogs.showPromptDialogRepresentationInformation(
-                  messages.representationInformationAddNewRelation(), messages.cancelButton(), messages.confirmButton(),
-                  ShowRepresentationInformation.this.ri, new AsyncCallback<String>() {
-
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      // do nothing
-                    }
-
-                    @Override
-                    public void onSuccess(final String newType) {
-                      // do nothing
-                    }
-                  });
-              }
-            });
-
-            objectPanel.add(edit);
-          }
-        });
+        initEntityFiltersObjectPanel(RodaConstants.SEARCH_REPRESENTATIONS));
     } else if (!fileParams.isEmpty()) {
       Filter fileFilter = new Filter();
       fileFilter.add(new OrFiltersParameters(fileParams));
 
       BrowserService.Util.getInstance().count(IndexedFile.class.getName(), fileFilter, false,
-        new AsyncCallback<Long>() {
-
-          @Override
-          public void onFailure(Throwable caught) {
-            AsyncCallbackUtils.defaultFailureTreatment(caught);
-          }
-
-          @Override
-          public void onSuccess(Long result) {
-            objectPanel.clear();
-            String url = HistoryUtils.getSearchHistoryByRepresentationInformationFilter(ri.getFilters(),
-              RodaConstants.SEARCH_FILES);
-            InlineHTML label = new InlineHTML(messages.representationInformationFiles(result.intValue(), url));
-            label.addStyleName("ri-form-label-inline");
-            objectPanel.add(label);
-
-            InlineHTML edit = new InlineHTML("<i class='fa fa-pencil' aria-hidden='true'></i>");
-            edit.setTitle("Edit relation rules");
-            edit.addStyleName("ri-category link-color");
-
-            edit.addClickHandler(new ClickHandler() {
-
-              @Override
-              public void onClick(ClickEvent event) {
-                RepresentationInformationDialogs.showPromptDialogRepresentationInformation(
-                  messages.representationInformationAddNewRelation(), messages.cancelButton(), messages.confirmButton(),
-                  ShowRepresentationInformation.this.ri, new AsyncCallback<String>() {
-
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      // do nothing
-                    }
-
-                    @Override
-                    public void onSuccess(final String newType) {
-                      // do nothing
-                    }
-                  });
-              }
-            });
-
-            objectPanel.add(edit);
-          }
-        });
+        initEntityFiltersObjectPanel(RodaConstants.SEARCH_FILES));
     } else {
-      objectPanel.clear();
-
-      String url = HistoryUtils.getSearchHistoryByRepresentationInformationFilter(ri.getFilters(),
-        RodaConstants.SEARCH_ITEMS);
-      InlineHTML label = new InlineHTML(messages.representationInformationIntellectualEntities(0, url));
-      label.addStyleName("ri-form-label-inline");
-      objectPanel.add(label);
-
-      InlineHTML edit = new InlineHTML("<i class='fa fa-pencil' aria-hidden='true'></i>");
-      edit.setTitle("Edit relation rules");
-      edit.addStyleName("ri-category link-color");
-
-      edit.addClickHandler(new ClickHandler() {
-
-        @Override
-        public void onClick(ClickEvent event) {
-          RepresentationInformationDialogs.showPromptDialogRepresentationInformation(
-            messages.representationInformationAddNewRelation(), messages.cancelButton(), messages.confirmButton(),
-            ShowRepresentationInformation.this.ri, new AsyncCallback<String>() {
-
-              @Override
-              public void onFailure(Throwable caught) {
-                // do nothing
-              }
-
-              @Override
-              public void onSuccess(final String newType) {
-                // do nothing
-              }
-            });
-        }
-      });
-
-      objectPanel.add(edit);
+      initEntityFiltersObjectPanel(RodaConstants.SEARCH_ITEMS).onSuccess(0L);
     }
   }
 
-  private void initRelations(final RepresentationInformation ri) {
+  private AsyncCallback<Long> initEntityFiltersObjectPanel(final String searchType) {
+    return new AsyncCallback<Long>() {
+      @Override public void onFailure(Throwable caught) {
+        AsyncCallbackUtils.defaultFailureTreatment(caught);
+      }
+
+      @Override public void onSuccess(Long size) {
+        ShowRepresentationInformation.this.objectPanel.clear();
+
+        String url = HistoryUtils.getSearchHistoryByRepresentationInformationFilter(
+          ShowRepresentationInformation.this.ri.getFilters(), searchType);
+
+        InlineHTML label = new InlineHTML();
+        label.addStyleName("ri-form-label-inline");
+        label.setHTML(messages.representationInformationIntellectualEntities(size.intValue(), url));
+
+        ShowRepresentationInformation.this.objectPanel.add(label);
+
+        InlineHTML edit = new InlineHTML("<i class='fa fa-pencil' aria-hidden='true'></i>");
+        edit.setTitle("Edit relation rules");
+        edit.addStyleName("ri-category link-color");
+
+        edit.addClickHandler(new ClickHandler() {
+          @Override
+          public void onClick(ClickEvent event) {
+            RepresentationInformationDialogs.showPromptDialogRepresentationInformation(
+              messages.representationInformationAddNewRelation(), messages.cancelButton(), messages.confirmButton(),
+              ShowRepresentationInformation.this.ri, new NoAsyncCallback<String>());
+          }
+        });
+
+        ShowRepresentationInformation.this.objectPanel.add(edit);
+      }
+    };
+  }
+
+  private void initRelations() {
     additionalSeparator.setVisible(false);
+    final RepresentationInformation ri = ShowRepresentationInformation.this.ri;
 
     if (ri.getRelations() != null && !ri.getRelations().isEmpty()) {
       BrowserService.Util.getInstance().retrieveRelationTypeTranslations(LocaleInfo.getCurrentLocale().getLocaleName(),
@@ -557,9 +431,9 @@ public class ShowRepresentationInformation extends Composite {
 
   // Java method
   public native boolean isValidUrl(String url) /*-{
-		var pattern = /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
-		return pattern.test(url);
-  }-*/;
+                                               var pattern = /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+                                               return pattern.test(url);
+                                               }-*/;
 
   void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 1) {

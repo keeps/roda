@@ -116,6 +116,7 @@
    
    <field name="support" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="relations" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="relationsWithRI" type="string" indexed="true" stored="false" required="false" multiValued="true" />
    <field name="filters" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    
    <field name="createdOn" type="tdate" indexed="true" stored="true" required="false" multiValued="false" /> 

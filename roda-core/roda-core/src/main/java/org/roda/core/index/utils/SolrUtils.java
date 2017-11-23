@@ -2160,6 +2160,10 @@ public class SolrUtils {
     doc.addField(RodaConstants.REPRESENTATION_INFORMATION_SUPPORT, ri.getSupport().toString());
     doc.addField(RodaConstants.REPRESENTATION_INFORMATION_RELATIONS, JsonUtils.getJsonFromObject(ri.getRelations()));
 
+    doc.addField(RodaConstants.REPRESENTATION_INFORMATION_RELATIONS_WITH_RI,
+      ri.getRelations().stream().filter(r -> RelationObjectType.REPRESENTATION_INFORMATION.equals(r.getObjectType()))
+        .map(r -> r.getRelationType() + ":" + r.getLink()).collect(Collectors.toList()));
+
     doc.addField(RodaConstants.REPRESENTATION_INFORMATION_FILTERS, ri.getFilters());
 
     doc.addField(RodaConstants.REPRESENTATION_INFORMATION_CREATED_ON, ri.getCreatedOn());
