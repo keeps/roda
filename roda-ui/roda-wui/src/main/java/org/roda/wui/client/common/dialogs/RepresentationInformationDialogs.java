@@ -59,7 +59,7 @@ public class RepresentationInformationDialogs {
 
     final FlowPanel layout = new FlowPanel();
 
-    HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescription.html", new AsyncCallback<Void>() {
+    HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIAssociationsDescription.html", new AsyncCallback<Void>() {
       @Override
       public void onFailure(Throwable caught) {
         AsyncCallbackUtils.defaultFailureTreatment(caught);
@@ -307,7 +307,7 @@ public class RepresentationInformationDialogs {
           final FlowPanel rightSide = new FlowPanel();
           rightSide.addStyleName("dialog-right-side col9");
 
-          HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescription.html",
+          HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescriptionHelp.html",
             new AsyncCallback<Void>() {
               @Override
               public void onFailure(Throwable caught) {
@@ -395,7 +395,7 @@ public class RepresentationInformationDialogs {
               helpLabel.addStyleName("dialog-left-item-selected");
               rightSide.clear();
 
-              HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescription.html");
+              HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescriptionHelp.html");
               description.addStyleName("page-description");
               rightSide.add(description);
 
@@ -519,7 +519,7 @@ public class RepresentationInformationDialogs {
 
               rightSide.clear();
 
-              HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescription.html");
+              HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescriptionWithRI.html");
               description.addStyleName("page-description");
               rightSide.add(description);
 
@@ -625,7 +625,7 @@ public class RepresentationInformationDialogs {
 
               rightSide.clear();
 
-              HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescription.html");
+              HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescriptionWithText.html");
               description.addStyleName("page-description");
               rightSide.add(description);
 
@@ -681,7 +681,7 @@ public class RepresentationInformationDialogs {
 
               rightSide.clear();
 
-              HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescription.html");
+              HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescriptionWithWeb.html");
               description.addStyleName("page-description");
               rightSide.add(description);
 

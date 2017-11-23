@@ -20,10 +20,14 @@ import java.util.TreeMap;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
+import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
 import org.roda.core.data.v2.index.filter.OrFiltersParameters;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.sort.Sorter;
+import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
@@ -285,11 +289,13 @@ public class ShowRepresentationInformation extends Composite {
 
   private AsyncCallback<Long> initEntityFiltersObjectPanel(final String searchType) {
     return new AsyncCallback<Long>() {
-      @Override public void onFailure(Throwable caught) {
+      @Override
+      public void onFailure(Throwable caught) {
         AsyncCallbackUtils.defaultFailureTreatment(caught);
       }
 
-      @Override public void onSuccess(Long size) {
+      @Override
+      public void onSuccess(Long size) {
         ShowRepresentationInformation.this.objectPanel.clear();
 
         String url = HistoryUtils.getSearchHistoryByRepresentationInformationFilter(
@@ -336,9 +342,9 @@ public class ShowRepresentationInformation extends Composite {
           public void onSuccess(Map<String, String> translations) {
             additionalSeparator.setVisible(true);
             representationInformationRelationsValue.clear();
-            Map<String, List<RepresentationInformationRelation>> relationTypeToLink = new TreeMap<>();
+            final Map<String, List<RepresentationInformationRelation>> relationTypeToLink = new TreeMap<>();
 
-            FlowPanel allPanel = new FlowPanel();
+            final FlowPanel allPanel = new FlowPanel();
             representationInformationRelationsValue.add(allPanel);
 
             for (RepresentationInformationRelation relation : ri.getRelations()) {
@@ -352,29 +358,63 @@ public class ShowRepresentationInformation extends Composite {
               }
             }
 
-            for (Entry<String, List<RepresentationInformationRelation>> entry : relationTypeToLink.entrySet()) {
-              Label entryLabel = new Label(entry.getKey());
-              entryLabel.setStyleName("label");
-              allPanel.add(entryLabel);
+            Filter filter = new Filter(
+              new SimpleFilterParameter(RodaConstants.REPRESENTATION_INFORMATION_RELATIONS_WITH_RI, ri.getId()));
 
-              Collections.sort(entry.getValue(), new Comparator<RepresentationInformationRelation>() {
+            Sublist sublist = new Sublist(0, 1000);
 
+            BrowserService.Util.getInstance().find(RepresentationInformation.class.getName(), filter, Sorter.NONE,
+              sublist, Facets.NONE, LocaleInfo.getCurrentLocale().toString(), true, new ArrayList<String>(),
+              new NoAsyncCallback<IndexResult<RepresentationInformation>>() {
                 @Override
-                public int compare(RepresentationInformationRelation o1, RepresentationInformationRelation o2) {
-                  return o1.getObjectType().getWeight() - o2.getObjectType().getWeight();
+                public void onSuccess(IndexResult<RepresentationInformation> result) {
+                  for (RepresentationInformation ri : result.getResults()) {
+                    for (RepresentationInformationRelation relation : ri.getRelations()) {
+                      if(relation.getLink().equals(ri.getId())){
+                        // get existing list or create new list
+                        List<RepresentationInformationRelation> existingRelations = relationTypeToLink.get(messages.inverseOf(relation.getRelationType()));
+                        if(existingRelations == null){
+                          existingRelations = new ArrayList<RepresentationInformationRelation>();
+                          relationTypeToLink.put(messages.inverseOf(relation.getRelationType()), existingRelations);
+                        }
+
+                        // add new value to the list
+                        RepresentationInformationRelation newRelation = new RepresentationInformationRelation(messages.inverseOf(relation.getRelationType()), relation.getObjectType(), ri.getId(), ri.getName());
+                        existingRelations.add(newRelation);
+                      }
+                    }
+                  }
                 }
               });
 
-              SafeHtmlBuilder b = new SafeHtmlBuilder();
-              b.append(SafeHtmlUtils.fromSafeConstant("<ul>"));
-              for (RepresentationInformationRelation relation : entry.getValue()) {
-                b.append(createRelationViewer(relation));
-              }
-              b.append(SafeHtmlUtils.fromSafeConstant("</ul>"));
-              allPanel.add(new InlineHTML(b.toSafeHtml().asString()));
-            }
+            createRelationsLayout(relationTypeToLink, allPanel);
           }
         });
+    }
+  }
+
+  private void createRelationsLayout(Map<String, List<RepresentationInformationRelation>> relationTypeToLink,
+    FlowPanel allPanel) {
+    for (Entry<String, List<RepresentationInformationRelation>> entry : relationTypeToLink.entrySet()) {
+      Label entryLabel = new Label(entry.getKey());
+      entryLabel.setStyleName("label");
+      allPanel.add(entryLabel);
+
+      Collections.sort(entry.getValue(), new Comparator<RepresentationInformationRelation>() {
+
+        @Override
+        public int compare(RepresentationInformationRelation o1, RepresentationInformationRelation o2) {
+          return o1.getObjectType().getWeight() - o2.getObjectType().getWeight();
+        }
+      });
+
+      SafeHtmlBuilder b = new SafeHtmlBuilder();
+      b.append(SafeHtmlUtils.fromSafeConstant("<ul>"));
+      for (RepresentationInformationRelation relation : entry.getValue()) {
+        b.append(createRelationViewer(relation));
+      }
+      b.append(SafeHtmlUtils.fromSafeConstant("</ul>"));
+      allPanel.add(new InlineHTML(b.toSafeHtml().asString()));
     }
   }
 
