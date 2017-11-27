@@ -12,6 +12,7 @@ Among others articles, in this series of documentation you will find information
   - [Advanced search](Advanced_Search.md)
   - [Pre-ingest](Pre_Ingest_es_CL.md)
   - [Risk assessment](Risk_Assessment.md)
+  - [Representation Information](Representation_Information.md)
   - [Format normalization policy](Format_Normalization_Policy.md)
 - Support
   - [Community support](Community_Support.md)
