@@ -372,15 +372,16 @@ public class ShowRepresentationInformation extends Composite {
                     for (RepresentationInformationRelation relation : ri.getRelations()) {
                       if(relation.getLink().equals(ri.getId())){
                         // get existing list or create new list
-                        List<RepresentationInformationRelation> existingRelations = relationTypeToLink.get(messages.inverseOf(relation.getRelationType()));
-                        if(existingRelations == null){
-                          existingRelations = new ArrayList<RepresentationInformationRelation>();
-                          relationTypeToLink.put(messages.inverseOf(relation.getRelationType()), existingRelations);
-                        }
-
-                        // add new value to the list
-                        RepresentationInformationRelation newRelation = new RepresentationInformationRelation(messages.inverseOf(relation.getRelationType()), relation.getObjectType(), ri.getId(), ri.getName());
-                        existingRelations.add(newRelation);
+// TODO: Nov-2017, bferreira: @nvieira remove comments and continue to work on this (RI bidirectional relation)
+//                        List<RepresentationInformationRelation> existingRelations = relationTypeToLink.get(messages.inverseOf(relation.getRelationType()));
+//                        if(existingRelations == null){
+//                          existingRelations = new ArrayList<RepresentationInformationRelation>();
+//                          relationTypeToLink.put(messages.inverseOf(relation.getRelationType()), existingRelations);
+//                        }
+//
+//                        // add new value to the list
+//                        RepresentationInformationRelation newRelation = new RepresentationInformationRelation(messages.inverseOf(relation.getRelationType()), relation.getObjectType(), ri.getId(), ri.getName());
+//                        existingRelations.add(newRelation);
                       }
                     }
                   }
