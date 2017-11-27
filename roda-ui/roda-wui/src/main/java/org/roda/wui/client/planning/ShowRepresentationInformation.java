@@ -428,7 +428,7 @@ public class ShowRepresentationInformation extends Composite {
         HistoryUtils.createHistoryHashLink(HistoryUtils.getHistoryBrowse(relation.getLink())));
       b.append(SafeHtmlUtils.fromSafeConstant("<a href='"));
       b.append(SafeHtmlUtils.fromString(a.getHref()));
-      b.append(SafeHtmlUtils.fromSafeConstant("'>"));
+      b.append(SafeHtmlUtils.fromSafeConstant("' target='_blank'>"));
       b.append(SafeHtmlUtils.fromString(a.getText()));
       b.append(SafeHtmlUtils.fromSafeConstant("</a>"));
     } else if (relation.getObjectType().equals(RelationObjectType.REPRESENTATION_INFORMATION)) {
@@ -439,14 +439,14 @@ public class ShowRepresentationInformation extends Composite {
       Anchor a = new Anchor(relation.getTitle(), HistoryUtils.createHistoryHashLink(history));
       b.append(SafeHtmlUtils.fromSafeConstant("<a href='"));
       b.append(SafeHtmlUtils.fromString(a.getHref()));
-      b.append(SafeHtmlUtils.fromSafeConstant("'>"));
+      b.append(SafeHtmlUtils.fromSafeConstant("' target='_blank'>"));
       b.append(SafeHtmlUtils.fromString(a.getText()));
       b.append(SafeHtmlUtils.fromSafeConstant("</a>"));
     } else if (relation.getObjectType().equals(RelationObjectType.WEB)) {
       Anchor a = new Anchor(relation.getTitle(), relation.getLink());
       b.append(SafeHtmlUtils.fromSafeConstant("<a href='"));
       b.append(SafeHtmlUtils.fromString(a.getHref()));
-      b.append(SafeHtmlUtils.fromSafeConstant("'>"));
+      b.append(SafeHtmlUtils.fromSafeConstant("' target='_blank'>"));
       b.append(SafeHtmlUtils.fromString(a.getText()));
       b.append(SafeHtmlUtils.fromSafeConstant("</a>"));
     } else if (relation.getObjectType().equals(RelationObjectType.TEXT)) {
