@@ -299,7 +299,7 @@ public class RepresentationInformationDialogs {
         @Override
         public void onSuccess(final Map<String, String> relationTypes) {
           final FlowPanel content = new FlowPanel();
-          content.addStyleName("row skip_padding full_width");
+          content.addStyleName("row skip_padding full_width content");
 
           final FlowPanel leftSide = new FlowPanel();
           leftSide.addStyleName("dialog-left-side col3");
@@ -423,7 +423,7 @@ public class RepresentationInformationDialogs {
               rightSide.add(selectLabel);
 
               final ListBox select = new ListBox();
-              select.addStyleName("form-selectbox");
+              select.addStyleName("form-listbox");
 
               for (Entry<String, String> type : relationTypes.entrySet()) {
                 select.addItem(type.getValue(), type.getKey());
@@ -528,7 +528,7 @@ public class RepresentationInformationDialogs {
               rightSide.add(selectLabel);
 
               final ListBox select = new ListBox();
-              select.addStyleName("form-selectbox");
+              select.addStyleName("form-listbox");
               for (Entry<String, String> type : relationTypes.entrySet()) {
                 select.addItem(type.getValue(), type.getKey());
               }
@@ -634,7 +634,7 @@ public class RepresentationInformationDialogs {
               rightSide.add(selectLabel);
 
               final ListBox select = new ListBox();
-              select.addStyleName("form-selectbox");
+              select.addStyleName("form-listbox");
               for (Entry<String, String> type : relationTypes.entrySet()) {
                 select.addItem(type.getValue(), type.getKey());
               }
@@ -690,7 +690,7 @@ public class RepresentationInformationDialogs {
               rightSide.add(selectLabel);
 
               final ListBox select = new ListBox();
-              select.addStyleName("form-selectbox");
+              select.addStyleName("form-listbox");
               for (Entry<String, String> type : relationTypes.entrySet()) {
                 select.addItem(type.getValue(), type.getKey());
               }

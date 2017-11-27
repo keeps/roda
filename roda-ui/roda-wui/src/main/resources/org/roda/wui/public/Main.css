@@ -604,7 +604,7 @@ pre code {
     font-weight: 300;
 }
 
-.searchAdvancedPanel .fieldTextBox, .searchAdvancedPanel .form-textbox, .loginPanel .fieldTextBox {
+.searchAdvancedPanel .fieldTextBox, .searchAdvancedPanel .form-textbox, .loginPanel .fieldTextBox, .dialog-right-side .form-textbox {
     border: 1px solid #ccc;
     background-color: #fff;
 }

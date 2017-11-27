@@ -44,7 +44,7 @@
 					<ui:text from='{messages.representationInformationSupport}' />
 				</g:Label>
 				<g:ListBox title="{messages.representationInformationSupport}"
-					ui:field="support" addStyleNames="form-selectbox form-ri-select-boxes" />
+					ui:field="support" addStyleNames="form-listbox" />
 
 				<g:FlowPanel addStyleNames="ri-form-separator">
 					<g:Label addStyleNames="form-label">
