@@ -571,7 +571,6 @@ public class RepresentationInformationDialogs {
                   Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, riAlreadyLinked));
                   SelectRepresentationInformationDialog selectDialog = new SelectRepresentationInformationDialog(
                     messages.moveItemTitle(), filter, false);
-                  selectDialog.setEmptyParentButtonVisible(true);
                   selectDialog.setSingleSelectionMode();
                   selectDialog.showAndCenter();
                   selectDialog.addValueChangeHandler(new ValueChangeHandler<RepresentationInformation>() {
