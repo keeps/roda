@@ -38,7 +38,7 @@ public class Planning {
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
       UserLogin.getInstance().checkRoles(
-        new HistoryResolver[] {RepresentationInformationRegister.RESOLVER, RiskRegister.RESOLVER}, false, callback);
+        new HistoryResolver[] {RepresentationInformationNetwork.RESOLVER, RiskRegister.RESOLVER}, false, callback);
     }
 
     @Override
@@ -85,8 +85,8 @@ public class Planning {
     if (historyTokens.isEmpty()) {
       init();
       callback.onSuccess(page);
-    } else if (historyTokens.get(0).equals(RepresentationInformationRegister.RESOLVER.getHistoryToken())) {
-      RepresentationInformationRegister.getInstance().resolve(HistoryUtils.tail(historyTokens), callback);
+    } else if (historyTokens.get(0).equals(RepresentationInformationNetwork.RESOLVER.getHistoryToken())) {
+      RepresentationInformationNetwork.getInstance().resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.get(0).equals(RiskRegister.RESOLVER.getHistoryToken())) {
       RiskRegister.getInstance().resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.get(0).equals(RiskIncidenceRegister.RESOLVER.getHistoryToken())) {

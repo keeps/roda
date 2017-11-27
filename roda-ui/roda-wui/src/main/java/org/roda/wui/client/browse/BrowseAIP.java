@@ -50,7 +50,7 @@ import org.roda.wui.client.ingest.transfer.TransferUpload;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
-import org.roda.wui.client.planning.RepresentationInformationRegister;
+import org.roda.wui.client.planning.RepresentationInformationNetwork;
 import org.roda.wui.client.planning.ShowRepresentationInformation;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.client.welcome.Welcome;
@@ -781,11 +781,11 @@ public class BrowseAIP extends Composite {
               anchor
                 .setHref(HistoryUtils.createHistoryHashLink(ShowRepresentationInformation.RESOLVER, pair.getFirst()));
             } else if (pair.getSecond() > 1) {
-              anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationRegister.RESOLVER,
+              anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationNetwork.RESOLVER,
                 Search.RESOLVER.getHistoryToken(), RodaConstants.REPRESENTATION_INFORMATION_FILTERS, riFilter));
             } else {
               anchor.addStyleName("browseIconRed");
-              anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationRegister.RESOLVER,
+              anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationNetwork.RESOLVER,
                 Search.RESOLVER.getHistoryToken(), RodaConstants.REPRESENTATION_INFORMATION_FILTERS, riFilter));
             }
           }

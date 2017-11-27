@@ -47,7 +47,7 @@ public class CreateRepresentationInformation extends Composite {
 
     @Override
     public List<String> getHistoryPath() {
-      return ListUtils.concat(RepresentationInformationRegister.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(RepresentationInformationNetwork.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     @Override
@@ -103,7 +103,7 @@ public class CreateRepresentationInformation extends Composite {
 
           @Override
           public void onSuccess(RepresentationInformation result) {
-            HistoryUtils.newHistory(RepresentationInformationRegister.RESOLVER, result.getId());
+            HistoryUtils.newHistory(RepresentationInformationNetwork.RESOLVER, result.getId());
           }
 
         });
@@ -116,6 +116,6 @@ public class CreateRepresentationInformation extends Composite {
   }
 
   private void cancel() {
-    HistoryUtils.newHistory(RepresentationInformationRegister.RESOLVER);
+    HistoryUtils.newHistory(RepresentationInformationNetwork.RESOLVER);
   }
 }

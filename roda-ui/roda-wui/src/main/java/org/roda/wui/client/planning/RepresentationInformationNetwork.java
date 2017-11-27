@@ -68,7 +68,7 @@ import config.i18n.client.ClientMessages;
  * @author Luis Faria
  *
  */
-public class RepresentationInformationRegister extends Composite {
+public class RepresentationInformationNetwork extends Composite {
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
@@ -93,9 +93,9 @@ public class RepresentationInformationRegister extends Composite {
     }
   };
 
-  private static RepresentationInformationRegister instance = null;
+  private static RepresentationInformationNetwork instance = null;
 
-  interface MyUiBinder extends UiBinder<Widget, RepresentationInformationRegister> {
+  interface MyUiBinder extends UiBinder<Widget, RepresentationInformationNetwork> {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
@@ -141,7 +141,7 @@ public class RepresentationInformationRegister extends Composite {
    *
    * @param user
    */
-  public RepresentationInformationRegister() {
+  public RepresentationInformationNetwork() {
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.REPRESENTATION_INFORMATION_CATEGORIES),
       new SimpleFacetParameter(RodaConstants.REPRESENTATION_INFORMATION_SUPPORT));
 
@@ -222,9 +222,9 @@ public class RepresentationInformationRegister extends Composite {
    *
    * @return the instance
    */
-  public static RepresentationInformationRegister getInstance() {
+  public static RepresentationInformationNetwork getInstance() {
     if (instance == null) {
-      instance = new RepresentationInformationRegister();
+      instance = new RepresentationInformationNetwork();
     }
     return instance;
   }

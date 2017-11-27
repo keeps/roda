@@ -185,7 +185,7 @@ public class RepresentationInformationDataPanel extends Composite
             List<String> newFilters = new ArrayList<>();
 
             if (lastHistory.size() > 4
-              && lastHistory.get(1).equals(RepresentationInformationRegister.RESOLVER.getHistoryToken())
+              && lastHistory.get(1).equals(RepresentationInformationNetwork.RESOLVER.getHistoryToken())
               && lastHistory.get(2).equals(Search.RESOLVER.getHistoryToken())) {
               boolean hasOperator = lastHistory.size() % 2 == 1 ? false : true;
               int initialIndex = hasOperator ? 4 : 3;

@@ -92,7 +92,7 @@ public class ShowRepresentationInformation extends Composite {
 
     @Override
     public List<String> getHistoryPath() {
-      return ListUtils.concat(RepresentationInformationRegister.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(RepresentationInformationNetwork.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     @Override
@@ -216,7 +216,7 @@ public class ShowRepresentationInformation extends Composite {
           @Override
           public void onClick(ClickEvent event) {
             List<String> history = new ArrayList<>();
-            history.addAll(RepresentationInformationRegister.RESOLVER.getHistoryPath());
+            history.addAll(RepresentationInformationNetwork.RESOLVER.getHistoryPath());
             history.add(Search.RESOLVER.getHistoryToken());
             history.add(RodaConstants.REPRESENTATION_INFORMATION_CATEGORIES);
             history.add(category);
@@ -493,14 +493,14 @@ public class ShowRepresentationInformation extends Composite {
           }
         });
     } else {
-      HistoryUtils.newHistory(RepresentationInformationRegister.RESOLVER);
+      HistoryUtils.newHistory(RepresentationInformationNetwork.RESOLVER);
       callback.onSuccess(null);
     }
   }
 
   @UiHandler("buttonEdit")
   void handleButtonEdit(ClickEvent e) {
-    HistoryUtils.newHistory(RepresentationInformationRegister.RESOLVER,
+    HistoryUtils.newHistory(RepresentationInformationNetwork.RESOLVER,
       EditRepresentationInformation.RESOLVER.getHistoryToken(), ri.getId());
   }
 

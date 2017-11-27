@@ -61,7 +61,7 @@ public class EditRepresentationInformation extends Composite {
             }
           });
       } else {
-        HistoryUtils.newHistory(RepresentationInformationRegister.RESOLVER);
+        HistoryUtils.newHistory(RepresentationInformationNetwork.RESOLVER);
         callback.onSuccess(null);
       }
     }
@@ -73,7 +73,7 @@ public class EditRepresentationInformation extends Composite {
 
     @Override
     public List<String> getHistoryPath() {
-      return ListUtils.concat(RepresentationInformationRegister.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(RepresentationInformationNetwork.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     @Override
@@ -160,7 +160,7 @@ public class EditRepresentationInformation extends Composite {
           Timer timer = new Timer() {
             @Override
             public void run() {
-              HistoryUtils.newHistory(RepresentationInformationRegister.RESOLVER);
+              HistoryUtils.newHistory(RepresentationInformationNetwork.RESOLVER);
             }
           };
 

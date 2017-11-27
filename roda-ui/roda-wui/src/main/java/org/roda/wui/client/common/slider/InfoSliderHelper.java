@@ -23,7 +23,7 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.StringUtils;
-import org.roda.wui.client.planning.RepresentationInformationRegister;
+import org.roda.wui.client.planning.RepresentationInformationNetwork;
 import org.roda.wui.client.planning.ShowRepresentationInformation;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
@@ -234,11 +234,11 @@ public class InfoSliderHelper {
           if (pair.getSecond() == 1) {
             anchor.setHref(HistoryUtils.createHistoryHashLink(ShowRepresentationInformation.RESOLVER, pair.getFirst()));
           } else if (pair.getSecond() > 1) {
-            anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationRegister.RESOLVER,
+            anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationNetwork.RESOLVER,
               Search.RESOLVER.getHistoryToken(), RodaConstants.REPRESENTATION_INFORMATION_FILTERS, filter.get(0)));
           } else {
             anchor.addStyleName("browseIconRed");
-            anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationRegister.RESOLVER,
+            anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationNetwork.RESOLVER,
               Search.RESOLVER.getHistoryToken(), RodaConstants.REPRESENTATION_INFORMATION_FILTERS, filter.get(0)));
           }
         }
@@ -274,11 +274,11 @@ public class InfoSliderHelper {
           if (pair.getSecond() == 1) {
             anchor.setHref(HistoryUtils.createHistoryHashLink(ShowRepresentationInformation.RESOLVER, pair.getFirst()));
           } else if (pair.getSecond() > 1) {
-            anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationRegister.RESOLVER,
+            anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationNetwork.RESOLVER,
               Search.RESOLVER.getHistoryToken(), RodaConstants.REPRESENTATION_INFORMATION_FILTERS, filter.get(0)));
           } else {
             anchor.addStyleName("browseIconRed");
-            anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationRegister.RESOLVER,
+            anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationNetwork.RESOLVER,
               Search.RESOLVER.getHistoryToken(), RodaConstants.REPRESENTATION_INFORMATION_FILTERS, filter.get(0)));
           }
         }
@@ -314,11 +314,11 @@ public class InfoSliderHelper {
           if (pair.getSecond() == 1) {
             anchor.setHref(HistoryUtils.createHistoryHashLink(ShowRepresentationInformation.RESOLVER, pair.getFirst()));
           } else if (pair.getSecond() > 1) {
-            anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationRegister.RESOLVER,
+            anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationNetwork.RESOLVER,
               Search.RESOLVER.getHistoryToken(), RodaConstants.REPRESENTATION_INFORMATION_FILTERS, filter.get(0)));
           } else {
             anchor.addStyleName("browseIconRed");
-            anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationRegister.RESOLVER,
+            anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationNetwork.RESOLVER,
               Search.RESOLVER.getHistoryToken(), RodaConstants.REPRESENTATION_INFORMATION_FILTERS, filter.get(0)));
           }
         }
