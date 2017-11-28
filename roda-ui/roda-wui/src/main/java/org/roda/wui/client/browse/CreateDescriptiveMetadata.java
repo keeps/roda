@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
+import com.google.gwt.user.client.Window;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
@@ -348,6 +349,7 @@ public class CreateDescriptiveMetadata extends Composite {
 
           @Override
           public void onFailure(Throwable caught) {
+            Window.scrollTo(0, 0);
             if (caught instanceof ValidationException) {
               ValidationException e = (ValidationException) caught;
               updateErrors(e);
