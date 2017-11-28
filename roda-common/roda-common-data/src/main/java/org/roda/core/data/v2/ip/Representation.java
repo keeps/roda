@@ -60,6 +60,10 @@ public class Representation implements IsModelObject {
     this.descriptiveMetadata = descriptiveMetadata;
     this.createdOn = new Date();
     this.updatedOn = new Date();
+
+    if (original) {
+      representationStates.add(RepresentationState.ORIGINAL);
+    }
   }
 
   @JsonIgnore
@@ -91,6 +95,12 @@ public class Representation implements IsModelObject {
 
   public void setOriginal(boolean original) {
     this.original = original;
+
+    if (original) {
+      representationStates.add(RepresentationState.ORIGINAL);
+    } else {
+      representationStates.remove(RepresentationState.ORIGINAL);
+    }
   }
 
   public String getType() {
