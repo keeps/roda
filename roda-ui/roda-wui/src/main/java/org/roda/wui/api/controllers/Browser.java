@@ -91,6 +91,7 @@ import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
 import org.roda.wui.client.planning.MitigationPropertiesBundle;
+import org.roda.wui.client.planning.RelationTypeTranslationsBundle;
 import org.roda.wui.client.planning.RiskMitigationBundle;
 import org.roda.wui.client.planning.RiskVersionsBundle;
 import org.roda.wui.common.ControllerAssistant;
@@ -3506,7 +3507,7 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static Map<String, String> retrieveRelationTypeTranslations(User user, Messages messages)
+  public static RelationTypeTranslationsBundle retrieveRelationTypeTranslations(User user, Messages messages)
     throws AuthorizationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 

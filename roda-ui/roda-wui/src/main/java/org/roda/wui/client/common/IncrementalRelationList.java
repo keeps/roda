@@ -18,6 +18,7 @@ import org.roda.core.data.v2.ri.RepresentationInformationRelation;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.dialogs.RepresentationInformationDialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.planning.RelationTypeTranslationsBundle;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Document;
@@ -76,7 +77,7 @@ public class IncrementalRelationList extends Composite implements HasHandlers {
 
   public void setRelationList(final List<RepresentationInformationRelation> list) {
     BrowserService.Util.getInstance().retrieveRelationTypeTranslations(LocaleInfo.getCurrentLocale().getLocaleName(),
-      new AsyncCallback<Map<String, String>>() {
+      new AsyncCallback<RelationTypeTranslationsBundle>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -84,9 +85,9 @@ public class IncrementalRelationList extends Composite implements HasHandlers {
         }
 
         @Override
-        public void onSuccess(final Map<String, String> translations) {
+        public void onSuccess(final RelationTypeTranslationsBundle bundle) {
           for (RepresentationInformationRelation element : list) {
-            addRelation(element, false, translations);
+            addRelation(element, false, bundle.getTranslations());
           }
 
           listRelations();
@@ -166,7 +167,7 @@ public class IncrementalRelationList extends Composite implements HasHandlers {
           DomEvent.fireNativeEvent(Document.get().createChangeEvent(), IncrementalRelationList.this);
 
           BrowserService.Util.getInstance().retrieveRelationTypeTranslations(
-            LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<Map<String, String>>() {
+            LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<RelationTypeTranslationsBundle>() {
 
               @Override
               public void onFailure(Throwable caught) {
@@ -174,8 +175,8 @@ public class IncrementalRelationList extends Composite implements HasHandlers {
               }
 
               @Override
-              public void onSuccess(final Map<String, String> translations) {
-                addRelation(newRelation, true, translations);
+              public void onSuccess(final RelationTypeTranslationsBundle bundle) {
+                addRelation(newRelation, true, bundle.getTranslations());
               }
             });
         }

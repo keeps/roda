@@ -1247,6 +1247,7 @@ public final class RodaConstants {
   public static final String SEARCH_FIELD_I18N_PREFIX = "i18nPrefix";
   public static final String SEARCH_FIELD_VALUES = "values";
   public static final String SEARCH_FIELD_FIXED = "fixed";
+  public static final String SEARCH_FIELD_INVERSE = "inverse";
 
   public static final String SEARCH_FIELD_TYPE_TEXT = "text";
   public static final String SEARCH_FIELD_TYPE_DATE = "date";

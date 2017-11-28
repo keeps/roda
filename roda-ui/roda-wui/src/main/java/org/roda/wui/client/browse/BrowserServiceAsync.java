@@ -51,6 +51,7 @@ import org.roda.wui.client.common.search.SearchField;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.ingest.process.JobBundle;
 import org.roda.wui.client.planning.MitigationPropertiesBundle;
+import org.roda.wui.client.planning.RelationTypeTranslationsBundle;
 import org.roda.wui.client.planning.RiskMitigationBundle;
 import org.roda.wui.client.planning.RiskVersionsBundle;
 
@@ -280,5 +281,6 @@ public interface BrowserServiceAsync {
 
   void retrieveRepresentationInformationFamilyOptions(AsyncCallback<List<String>> asyncCallback);
 
-  void retrieveRelationTypeTranslations(String localeString, AsyncCallback<Map<String, String>> asyncCallback);
+  void retrieveRelationTypeTranslations(String localeString,
+    AsyncCallback<RelationTypeTranslationsBundle> asyncCallback);
 }

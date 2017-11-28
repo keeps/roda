@@ -2,7 +2,6 @@ package org.roda.wui.client.common.dialogs;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import org.roda.core.data.common.RodaConstants;
@@ -22,6 +21,7 @@ import org.roda.wui.client.common.ValuedLabel;
 import org.roda.wui.client.common.search.Dropdown;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.StringUtils;
+import org.roda.wui.client.planning.RelationTypeTranslationsBundle;
 import org.roda.wui.client.planning.ShowRepresentationInformation;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
@@ -289,7 +289,7 @@ public class RepresentationInformationDialogs {
     layout.addStyleName("wui-dialog-layout");
 
     BrowserService.Util.getInstance().retrieveRelationTypeTranslations(LocaleInfo.getCurrentLocale().getLocaleName(),
-      new AsyncCallback<Map<String, String>>() {
+      new AsyncCallback<RelationTypeTranslationsBundle>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -297,7 +297,7 @@ public class RepresentationInformationDialogs {
         }
 
         @Override
-        public void onSuccess(final Map<String, String> relationTypes) {
+        public void onSuccess(final RelationTypeTranslationsBundle relationTypes) {
           final FlowPanel content = new FlowPanel();
           content.addStyleName("row skip_padding full_width content");
 
@@ -425,7 +425,7 @@ public class RepresentationInformationDialogs {
               final ListBox select = new ListBox();
               select.addStyleName("form-listbox");
 
-              for (Entry<String, String> type : relationTypes.entrySet()) {
+              for (Entry<String, String> type : relationTypes.getTranslations().entrySet()) {
                 select.addItem(type.getValue(), type.getKey());
               }
               rightSide.add(select);
@@ -529,7 +529,7 @@ public class RepresentationInformationDialogs {
 
               final ListBox select = new ListBox();
               select.addStyleName("form-listbox");
-              for (Entry<String, String> type : relationTypes.entrySet()) {
+              for (Entry<String, String> type : relationTypes.getTranslations().entrySet()) {
                 select.addItem(type.getValue(), type.getKey());
               }
               rightSide.add(select);
@@ -634,7 +634,7 @@ public class RepresentationInformationDialogs {
 
               final ListBox select = new ListBox();
               select.addStyleName("form-listbox");
-              for (Entry<String, String> type : relationTypes.entrySet()) {
+              for (Entry<String, String> type : relationTypes.getTranslations().entrySet()) {
                 select.addItem(type.getValue(), type.getKey());
               }
               rightSide.add(select);
@@ -690,7 +690,7 @@ public class RepresentationInformationDialogs {
 
               final ListBox select = new ListBox();
               select.addStyleName("form-listbox");
-              for (Entry<String, String> type : relationTypes.entrySet()) {
+              for (Entry<String, String> type : relationTypes.getTranslations().entrySet()) {
                 select.addItem(type.getValue(), type.getKey());
               }
               rightSide.add(select);

@@ -164,8 +164,6 @@ public class ShowRepresentationInformation extends Composite {
 
   public ShowRepresentationInformation() {
     this.ri = new RepresentationInformation();
-    initWidget(uiBinder.createAndBindUi(this));
-    initElements();
   }
 
   public ShowRepresentationInformation(final RepresentationInformation ri) {
@@ -329,26 +327,25 @@ public class ShowRepresentationInformation extends Composite {
     additionalSeparator.setVisible(false);
     final RepresentationInformation ri = ShowRepresentationInformation.this.ri;
 
-    if (ri.getRelations() != null && !ri.getRelations().isEmpty()) {
-      BrowserService.Util.getInstance().retrieveRelationTypeTranslations(LocaleInfo.getCurrentLocale().getLocaleName(),
-        new AsyncCallback<Map<String, String>>() {
+    BrowserService.Util.getInstance().retrieveRelationTypeTranslations(LocaleInfo.getCurrentLocale().getLocaleName(),
+      new AsyncCallback<RelationTypeTranslationsBundle>() {
 
-          @Override
-          public void onFailure(Throwable caught) {
-            AsyncCallbackUtils.defaultFailureTreatment(caught);
-          }
+        @Override
+        public void onFailure(Throwable caught) {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
+        }
 
-          @Override
-          public void onSuccess(Map<String, String> translations) {
-            additionalSeparator.setVisible(true);
-            representationInformationRelationsValue.clear();
-            final Map<String, List<RepresentationInformationRelation>> relationTypeToLink = new TreeMap<>();
+        @Override
+        public void onSuccess(final RelationTypeTranslationsBundle bundle) {
+          representationInformationRelationsValue.clear();
+          final Map<String, List<RepresentationInformationRelation>> relationTypeToLink = new TreeMap<>();
 
-            final FlowPanel allPanel = new FlowPanel();
-            representationInformationRelationsValue.add(allPanel);
+          final FlowPanel allPanel = new FlowPanel();
+          representationInformationRelationsValue.add(allPanel);
 
+          if (ri.getRelations() != null) {
             for (RepresentationInformationRelation relation : ri.getRelations()) {
-              String relationType = translations.get(relation.getRelationType());
+              String relationType = bundle.getTranslations().get(relation.getRelationType());
               if (relationTypeToLink.containsKey(relationType)) {
                 relationTypeToLink.get(relationType).add(relation);
               } else {
@@ -357,41 +354,48 @@ public class ShowRepresentationInformation extends Composite {
                 relationTypeToLink.put(relationType, newRelations);
               }
             }
+          }
 
+          if (StringUtils.isNotBlank(ri.getId())) {
             Filter filter = new Filter(
               new SimpleFilterParameter(RodaConstants.REPRESENTATION_INFORMATION_RELATIONS_WITH_RI, ri.getId()));
 
-            Sublist sublist = new Sublist(0, 1000);
-
             BrowserService.Util.getInstance().find(RepresentationInformation.class.getName(), filter, Sorter.NONE,
-              sublist, Facets.NONE, LocaleInfo.getCurrentLocale().toString(), true, new ArrayList<String>(),
-              new NoAsyncCallback<IndexResult<RepresentationInformation>>() {
+              new Sublist(0, 1000), Facets.NONE, LocaleInfo.getCurrentLocale().toString(), true,
+              new ArrayList<String>(), new NoAsyncCallback<IndexResult<RepresentationInformation>>() {
                 @Override
                 public void onSuccess(IndexResult<RepresentationInformation> result) {
-                  for (RepresentationInformation ri : result.getResults()) {
-                    for (RepresentationInformationRelation relation : ri.getRelations()) {
-                      if(relation.getLink().equals(ri.getId())){
-                        // get existing list or create new list
-// TODO: Nov-2017, bferreira: @nvieira remove comments and continue to work on this (RI bidirectional relation)
-//                        List<RepresentationInformationRelation> existingRelations = relationTypeToLink.get(messages.inverseOf(relation.getRelationType()));
-//                        if(existingRelations == null){
-//                          existingRelations = new ArrayList<RepresentationInformationRelation>();
-//                          relationTypeToLink.put(messages.inverseOf(relation.getRelationType()), existingRelations);
-//                        }
-//
-//                        // add new value to the list
-//                        RepresentationInformationRelation newRelation = new RepresentationInformationRelation(messages.inverseOf(relation.getRelationType()), relation.getObjectType(), ri.getId(), ri.getName());
-//                        existingRelations.add(newRelation);
+                  for (RepresentationInformation r : result.getResults()) {
+                    if (r.getRelations() != null) {
+                      for (RepresentationInformationRelation relation : r.getRelations()) {
+                        if (relation.getLink().equals(ri.getId())) {
+                          String inverse = bundle.getInverseTranslations()
+                            .get(bundle.getInverses().get(relation.getRelationType()));
+
+                          if (StringUtils.isNotBlank(inverse)) {
+                            List<RepresentationInformationRelation> existingRelations = relationTypeToLink.get(inverse);
+                            if (existingRelations == null) {
+                              existingRelations = new ArrayList<>();
+                              relationTypeToLink.put(inverse, existingRelations);
+                            }
+
+                            // add new value to the list
+                            RepresentationInformationRelation newRelation = new RepresentationInformationRelation(
+                              inverse, relation.getObjectType(), r.getId(), r.getName());
+                            existingRelations.add(newRelation);
+                          }
+                        }
                       }
                     }
                   }
+
+                  additionalSeparator.setVisible(relationTypeToLink.size() > 0);
+                  createRelationsLayout(relationTypeToLink, allPanel);
                 }
               });
-
-            createRelationsLayout(relationTypeToLink, allPanel);
           }
-        });
-    }
+        }
+      });
   }
 
   private void createRelationsLayout(Map<String, List<RepresentationInformationRelation>> relationTypeToLink,
@@ -472,9 +476,9 @@ public class ShowRepresentationInformation extends Composite {
 
   // Java method
   public native boolean isValidUrl(String url) /*-{
-                                               var pattern = /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
-                                               return pattern.test(url);
-                                               }-*/;
+		var pattern = /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+		return pattern.test(url);
+  }-*/;
 
   void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 1) {

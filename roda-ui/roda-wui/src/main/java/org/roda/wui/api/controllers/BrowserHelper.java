@@ -161,6 +161,7 @@ import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
 import org.roda.wui.client.planning.MitigationPropertiesBundle;
+import org.roda.wui.client.planning.RelationTypeTranslationsBundle;
 import org.roda.wui.client.planning.RiskMitigationBundle;
 import org.roda.wui.client.planning.RiskVersionsBundle;
 import org.roda.wui.common.HTMLUtils;
@@ -3461,8 +3462,12 @@ public class BrowserHelper {
     }
   }
 
-  public static Map<String, String> retrieveRelationTypeTranslations(Messages messages) {
+  public static RelationTypeTranslationsBundle retrieveRelationTypeTranslations(Messages messages) {
+    RelationTypeTranslationsBundle bundle = new RelationTypeTranslationsBundle();
     Map<String, String> translations = new HashMap<>();
+    Map<String, String> inverseMap = new HashMap<>();
+    Map<String, String> inverseTranslations = new HashMap<>();
+
     List<String> configs = RodaCoreFactory.getRodaConfigurationAsList("core.ri.relation");
 
     for (String config : configs) {
@@ -3470,8 +3475,21 @@ public class BrowserHelper {
       String translation = messages
         .getTranslation(RodaCoreFactory.getRodaConfigurationAsString(config, RodaConstants.SEARCH_FIELD_I18N));
       translations.put(fieldName, translation);
+
+      String inverse = RodaCoreFactory.getRodaConfigurationAsString(config, RodaConstants.SEARCH_FIELD_INVERSE,
+        RodaConstants.SEARCH_FIELD_FIELDS);
+
+      if (StringUtils.isNotBlank(inverse)) {
+        String inverseTranslation = messages.getTranslation(RodaCoreFactory.getRodaConfigurationAsString(config,
+          RodaConstants.SEARCH_FIELD_INVERSE, RodaConstants.SEARCH_FIELD_I18N));
+        inverseTranslations.put(inverse, inverseTranslation);
+        inverseMap.put(fieldName, inverse);
+      }
     }
 
-    return translations;
+    bundle.setTranslations(translations);
+    bundle.setInverses(inverseMap);
+    bundle.setInverseTranslations(inverseTranslations);
+    return bundle;
   }
 }
