@@ -10,6 +10,7 @@ package org.roda.wui.client.common;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gwt.user.client.ui.InlineLabel;
 import org.roda.core.data.v2.ri.RelationObjectType;
 import org.roda.core.data.v2.ri.RepresentationInformationRelation;
 import org.roda.wui.client.planning.ShowRepresentationInformation;
@@ -72,7 +73,7 @@ public class RemovableRelation extends Composite implements HasHandlers {
     } else if (riRelation.getObjectType().equals(RelationObjectType.WEB)) {
       link.add(new Anchor(riRelation.getTitle(), riRelation.getLink(), "_blank"));
     } else if (riRelation.getObjectType().equals(RelationObjectType.TEXT)) {
-      link.add(new Label(riRelation.getTitle()));
+      link.add(new InlineLabel(riRelation.getTitle()));
     }
   }
 
