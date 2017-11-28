@@ -49,7 +49,7 @@
                 </div>
                 <xsl:for-each select="description">
 					<xsl:if test="normalize-space(text())!=''">
-						<div class="value">
+						<div class="value prewrap">
 							<xsl:value-of select="text()" />
 						</div>
 					</xsl:if>
