@@ -314,7 +314,26 @@ public class ShowRepresentationInformation extends Composite {
           public void onClick(ClickEvent event) {
             RepresentationInformationDialogs.showPromptDialogRepresentationInformation(
               messages.representationInformationAddNewRelation(), messages.cancelButton(), messages.confirmButton(),
-              ShowRepresentationInformation.this.ri, new NoAsyncCallback<String>());
+              ShowRepresentationInformation.this.ri, new AsyncCallback<RepresentationInformation>(){
+                @Override public void onFailure(Throwable caught) {
+                  // do nothing
+                }
+
+                @Override public void onSuccess(RepresentationInformation result) {
+                  // result is ri with updated filters
+                  BrowserService.Util.getInstance().updateRepresentationInformation(result, new AsyncCallback<Void>() {
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      AsyncCallbackUtils.defaultFailureTreatment(caught);
+                    }
+
+                    @Override
+                    public void onSuccess(Void result) {
+                      ShowRepresentationInformation.getInstance().updateLists();
+                    }
+                  });
+                }
+              });
           }
         });
 

@@ -52,7 +52,7 @@ public class RepresentationInformationDialogs {
   }
 
   public static void showPromptDialogRepresentationInformation(String title, String cancelButtonText,
-    String confirmButtonText, final RepresentationInformation ri, final AsyncCallback<String> callback) {
+    String confirmButtonText, final RepresentationInformation ri, final AsyncCallback<RepresentationInformation> callback) {
     final DialogBox dialogBox = new DialogBox(true, true);
     dialogBox.addStyleName("wui-dialog-fixed");
     dialogBox.setText(title);
@@ -243,18 +243,7 @@ public class RepresentationInformationDialogs {
                 }
               }
 
-              BrowserService.Util.getInstance().updateRepresentationInformation(ri, new AsyncCallback<Void>() {
-
-                @Override
-                public void onFailure(Throwable caught) {
-                  AsyncCallbackUtils.defaultFailureTreatment(caught);
-                }
-
-                @Override
-                public void onSuccess(Void result) {
-                  ShowRepresentationInformation.getInstance().updateLists();
-                }
-              });
+              callback.onSuccess(ri);
             }
           });
         }
