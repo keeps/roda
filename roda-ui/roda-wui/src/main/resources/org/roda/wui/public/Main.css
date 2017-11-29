@@ -6207,20 +6207,30 @@ td.datePickerMonth, td.datePickerYear {
 	width: 200px;
 }
 
-.ri-content {
-	display: block;
+.ri-content-group {
+    padding-left: 20px;
+    padding-right: 20px;
     padding-bottom: 10px;
 }
 
+.ri-content {
+	display: table;
+    width: 100%;
+}
+
 .ri-content-label {
-	display: inline-block;
-    min-width: 203px;
-    text-align: center;
+    display: table-cell;
+    text-align: left;
+    overflow: hidden !important;
+    max-width: 60px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .ri-content-textbox {
-	display: inline-block;
-    max-width: 70%;
+	display: table-cell;
+    max-width: 100% !important;
+    width: 100%;
 }
 
 .relation-form-panel {

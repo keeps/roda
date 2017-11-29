@@ -100,6 +100,7 @@ public class RepresentationInformationDialogs {
     dropDown.addItem(messages.searchListBoxFiles(), RodaConstants.SEARCH_FILES);
 
     final FlowPanel fieldsPanel = new FlowPanel();
+    fieldsPanel.setStyleName("ri-content-group");
 
     BrowserService.Util.getInstance().retrieveObjectClassFields(LocaleInfo.getCurrentLocale().getLocaleName(),
       new AsyncCallback<RepresentationInformationFilterBundle>() {
