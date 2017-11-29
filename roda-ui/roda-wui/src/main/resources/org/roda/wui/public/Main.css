@@ -3688,7 +3688,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .wui-dialog-fixed {
-	max-width: 60vw !important;
+	max-width: 40vw !important;
 }
 
 .pull-right {
@@ -6222,9 +6222,10 @@ td.datePickerMonth, td.datePickerYear {
     display: table-cell;
     text-align: left;
     overflow: hidden !important;
-    max-width: 60px;
     white-space: nowrap;
     text-overflow: ellipsis;
+    width: 185px;
+    max-width: 185px;
 }
 
 .ri-content-textbox {
