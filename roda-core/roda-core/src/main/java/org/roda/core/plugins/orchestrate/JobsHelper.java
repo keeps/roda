@@ -45,7 +45,6 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.JobStats;
 import org.roda.core.index.IndexService;
-import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.orchestrate.akka.Messages;
@@ -384,18 +383,22 @@ public final class JobsHelper {
         filter.add(new OneOfManyFilterParameter(RodaConstants.AIP_STATE,
           Arrays.asList(AIPState.CREATED.toString(), AIPState.INGEST_PROCESSING.toString())));
 
-        doJobCleanup(model, index.findAll(IndexedAIP.class, filter, false, Arrays.asList(RodaConstants.INDEX_UUID)));
+        List<String> aipIds = new ArrayList<>();
+        index.findAll(IndexedAIP.class, filter, false, Arrays.asList(RodaConstants.INDEX_UUID))
+          .forEach(e -> aipIds.add(e.getUUID()));
+        ;
+        doJobCleanup(model, aipIds);
       } catch (GenericException e) {
         LOGGER.error("Error doing Job cleanup", e);
       }
     }
   }
 
-  private static void doJobCleanup(ModelService model, IterableIndexResult<IndexedAIP> results) {
-    for (IndexedAIP indexedAIP : results) {
+  private static void doJobCleanup(ModelService model, List<String> aipIds) {
+    for (String aipId : aipIds) {
       try {
-        LOGGER.info("Job cleanup: deleting AIP {}", indexedAIP.getId());
-        model.deleteAIP(indexedAIP.getId());
+        LOGGER.info("Job cleanup: deleting AIP {}", aipId);
+        model.deleteAIP(aipId);
       } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
         LOGGER.error("Error doing deleting AIP during Job cleanup", e);
       }
