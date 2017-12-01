@@ -1388,7 +1388,9 @@ public class SolrUtils {
   }
 
   public static SolrInputDocument representationToSolrDocument(AIP aip, Representation rep, Long sizeInBytes,
-    Long numberOfDataFiles, Long numberOfDocumentationFiles, Long numberOfSchemaFiles, List<String> ancestors) {
+    Long numberOfDataFiles, Long numberOfDocumentationFiles, Long numberOfSchemaFiles, List<String> ancestors, ModelService model, boolean safemode)
+          throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException
+  {
     SolrInputDocument doc = new SolrInputDocument();
     doc.addField(RodaConstants.INDEX_UUID, IdUtils.getRepresentationId(rep));
     doc.addField(RodaConstants.REPRESENTATION_ID, rep.getId());
@@ -1420,6 +1422,35 @@ public class SolrUtils {
     doc.addField(RodaConstants.REPRESENTATION_ANCESTORS, ancestors);
 
     setPermissions(aip.getPermissions(), doc);
+
+    // pataki@: taken from aipToSolrInputDocument. TODO: may make refactor this to a separate method
+    if (!safemode) {
+      // guarding against repeated fields
+      Set<String> usedNonRepeatableFields = new HashSet<>();
+
+      for (DescriptiveMetadata metadata : rep.getDescriptiveMetadata()) {
+        StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aip.getId(), rep.getId(), metadata.getId());
+        Binary binary = model.getStorage().getBinary(storagePath);
+        try {
+          SolrInputDocument fields = getDescriptiveMetadataFields(binary, metadata.getType(), metadata.getVersion());
+          for (SolrInputField field : fields) {
+            if (NON_REPEATABLE_FIELDS.contains(field.getName())) {
+              boolean added = usedNonRepeatableFields.add(field.getName());
+              if (added) {
+                doc.addField(field.getName(), field.getValue(), field.getBoost());
+              }
+            } else {
+              doc.addField(field.getName(), field.getValue(), field.getBoost());
+            }
+          }
+        } catch (GenericException e) {
+          LOGGER.info("Problem processing descriptive metadata: {}", e.getMessage());
+        } catch (Exception e) {
+          LOGGER.error("Error processing descriptive metadata: {}", metadata, e);
+        }
+      }
+    }
+
     return doc;
   }
 

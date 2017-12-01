@@ -131,7 +131,7 @@
    <copyField source="id" dest="search"/>
    <copyField source="aipId" dest="search"/>
    <copyField source="type" dest="type_txt"/>
-  
+
    <!-- AIP -->
    <field name="state" type="string" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="ingestSIPIds" type="string" indexed="true" stored="true" required="false" multiValued="true" />
@@ -139,6 +139,23 @@
    <field name="ingestUpdateJobIds" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    <dynamicField name="permission_users_*" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    <dynamicField name="permission_groups_*" type="string" indexed="true" stored="true" required="false" multiValued="true" />
+
+    <!-- pataki@: START Copied fropm AIP's schema -->
+    <copyField source="title" dest="title_sort" />
+    <copyField source="*" dest="search" />
+
+    <field name="level" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+    <field name="title" type="text_general" indexed="true" stored="true" required="false" multiValued="false" />
+    <field name="ghost" type="boolean" default="false" indexed="true" stored="true" required="false" multiValued="false" />
+
+    <!-- XXX the field 'title_sort' with the type 'string' was added in order to have correct sorting
+(because 'title' is tokenized and might have other type of transformations that influence sorting)-->
+    <field name="title_sort" type="string" indexed="true" stored="false" required="false" multiValued="false" />
+    <field name="description" type="text_general" indexed="true" stored="true" required="false" multiValued="true" />
+    <field name="dateInitial" type="tdate" indexed="true" stored="true" required="false" multiValued="false" />
+    <field name="dateFinal" type="tdate" indexed="true" stored="true" required="false" multiValued="false" />
+    <!-- pataki@: END -->
+
 
    <!-- Dynamic field definitions allow using convention over configuration
        for fields via the specification of patterns to match field names. 
