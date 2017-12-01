@@ -265,7 +265,7 @@ public class IndexModelObserver implements ModelObserver {
       }
 
       SolrInputDocument representationDocument = SolrUtils.representationToSolrDocument(aip, representation,
-        sizeInBytes, numberOfDataFiles, numberOfDocumentationFiles, numberOfSchemaFiles, ancestors);
+        sizeInBytes, numberOfDataFiles, numberOfDocumentationFiles, numberOfSchemaFiles, ancestors, model, false);
       index.add(RodaConstants.INDEX_REPRESENTATION, representationDocument);
 
     } catch (SolrServerException | SolrException | IOException | RequestNotValidException | GenericException
@@ -579,6 +579,16 @@ public class IndexModelObserver implements ModelObserver {
         LOGGER.error("Error when descriptive metadata created on retrieving the full AIP", e);
       }
     }
+    else {
+      try {
+        AIP aip = model.retrieveAIP(descriptiveMetadata.getAipId());
+        List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
+        Representation representation = model.retrieveRepresentation(descriptiveMetadata.getAipId(), descriptiveMetadata.getRepresentationId());
+        indexRepresentation(aip, representation, ancestors);
+      } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+        LOGGER.error("Error when descriptive metadata updated on retrieving the full Representation", e);
+      }
+    }
 
     return exceptions;
   }
@@ -594,7 +604,18 @@ public class IndexModelObserver implements ModelObserver {
         LOGGER.error("Error when descriptive metadata updated on retrieving the full AIP", e);
       }
     }
+    else {
+      try {
+        AIP aip = model.retrieveAIP(descriptiveMetadata.getAipId());
+        List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
+        Representation representation = model.retrieveRepresentation(descriptiveMetadata.getAipId(), descriptiveMetadata.getRepresentationId());
+        indexRepresentation(aip, representation, ancestors);
+      } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+        LOGGER.error("Error when descriptive metadata updated on retrieving the full Representation", e);
+      }
+    }
   }
+
 
   @Override
   public void descriptiveMetadataDeleted(String aipId, String representationId, String descriptiveMetadataBinaryId) {
