@@ -15,7 +15,9 @@ public class NoAsyncCallback<T> implements AsyncCallback<T> {
 
   @Override
   public void onFailure(Throwable caught) {
-    AsyncCallbackUtils.defaultFailureTreatment(caught);
+    if(caught != null) {
+      AsyncCallbackUtils.defaultFailureTreatment(caught);
+    }
   }
 
   @Override

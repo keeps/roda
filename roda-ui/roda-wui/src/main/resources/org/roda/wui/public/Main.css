@@ -330,6 +330,20 @@ div.inline {
     padding-right: 10px;
 }
 
+.representationInformationCard > .h5 {
+    color: inherit;
+}
+
+.representationInformationCard > .h5:before {
+    content: '\f05a';
+    font-family: 'FontAwesome';
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    padding-right: 10px;
+    color: #089de3;
+}
+
 .browse_top .aipChildrenCard {
 	box-shadow: none;
 	padding: 0;
@@ -2275,6 +2289,14 @@ td.datePickerMonth, td.datePickerYear {
 
 .browseIconRed i {
     color: #af1612 !important;
+    background-color: white;
+    border-radius: 1em;
+    width: 1em;
+    text-align: center;
+}
+
+.browseIconBlue i {
+    color: #089de3 !important;
     background-color: white;
     border-radius: 1em;
     width: 1em;

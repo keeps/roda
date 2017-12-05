@@ -1006,6 +1006,14 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
+  public void updateRepresentationInformationListWithFilter(SelectedItemsList<RepresentationInformation> representationInformationIds,
+    String filterToAdd)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    Browser.updateRepresentationInformationListWithFilter(user, representationInformationIds, filterToAdd);
+  }
+
+  @Override
   public void deleteRepresentationInformation(SelectedItems<RepresentationInformation> selected)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());

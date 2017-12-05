@@ -1,13 +1,18 @@
 package org.roda.wui.client.common.dialogs;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
+import org.roda.core.data.v2.index.facet.Facets;
+import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
+import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -18,11 +23,14 @@ import org.roda.core.data.v2.ri.RepresentationInformationRelation;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.common.ValuedLabel;
+import org.roda.wui.client.common.lists.RepresentationInformationList;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.search.Dropdown;
+import org.roda.wui.client.common.search.SearchFilters;
+import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.planning.RelationTypeTranslationsBundle;
-import org.roda.wui.client.planning.ShowRepresentationInformation;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -52,7 +60,8 @@ public class RepresentationInformationDialogs {
   }
 
   public static void showPromptDialogRepresentationInformation(String title, String cancelButtonText,
-    String confirmButtonText, final RepresentationInformation ri, final AsyncCallback<RepresentationInformation> callback) {
+    String confirmButtonText, final RepresentationInformation ri,
+    final AsyncCallback<RepresentationInformation> callback) {
     final DialogBox dialogBox = new DialogBox(true, true);
     dialogBox.addStyleName("wui-dialog-fixed");
     dialogBox.setText(title);
@@ -724,5 +733,115 @@ public class RepresentationInformationDialogs {
           });
         }
       });
+  }
+
+  public static void showPromptAddRepresentationInformationwithAssociation(String title, final String cancelButtonText,
+    final String addToSelectedRIButtonText, final String addToNewRIButtonText,
+    final AsyncCallback<SelectedItemsList<RepresentationInformation>> callback) {
+
+    final List<HandlerRegistration> clickHandlers = new ArrayList<>();
+    final DialogBox dialogBox = new DialogBox(true, true);
+    dialogBox.addStyleName("ri-dialog");
+    dialogBox.setText(title);
+    final FlowPanel layout = new FlowPanel();
+
+    dialogBox.addStyleName("wui-dialog-prompt");
+    layout.addStyleName("wui-dialog-layout");
+
+    final FlowPanel buttonPanel = new FlowPanel();
+    final Button cancelButton = new Button(cancelButtonText);
+    final Button addToSelectedRIButton = new Button(addToSelectedRIButtonText);
+    final Button addToNewRIButton = new Button(addToNewRIButtonText);
+    addToSelectedRIButton.setEnabled(false);
+    buttonPanel.add(cancelButton);
+    buttonPanel.add(addToNewRIButton);
+    buttonPanel.add(addToSelectedRIButton);
+
+    final FlowPanel content = new FlowPanel();
+    content.addStyleName("row skip_padding full_width content");
+    content.add(createInnerAddRepresentationInformationwithAssociation(dialogBox, addToSelectedRIButton, callback));
+    layout.add(content);
+    layout.add(buttonPanel);
+    dialogBox.setWidget(layout);
+
+    dialogBox.setGlassEnabled(true);
+    dialogBox.setAnimationEnabled(false);
+
+    addToNewRIButton.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        dialogBox.hide();
+        callback.onSuccess(null);
+      }
+    });
+
+    cancelButton.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        dialogBox.hide();
+        callback.onFailure(null);
+      }
+    });
+
+    cancelButton.addStyleName("btn btn-link");
+    addToSelectedRIButton.addStyleName("pull-right btn btn-play");
+
+    dialogBox.center();
+    dialogBox.show();
+  }
+
+  public static FlowPanel createInnerAddRepresentationInformationwithAssociation(final DialogBox dialogBox,
+    final Button addToSelectedRIButton, final AsyncCallback<SelectedItemsList<RepresentationInformation>> callback) {
+    FlowPanel container = new FlowPanel();
+    container.addStyleName("wui-dialog-message");
+
+    // create search box and results list
+    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.REPRESENTATION_INFORMATION_CATEGORIES),
+      new SimpleFacetParameter(RodaConstants.REPRESENTATION_INFORMATION_SUPPORT));
+    Filter defaultFilter = SearchFilters.defaultFilter(RepresentationInformation.class.getName());
+    final RepresentationInformationList representationInformationList = new RepresentationInformationList(defaultFilter,
+      facets, messages.representationInformationTitle(), true);
+    SearchPanel representationInformationSearch = new SearchPanel(Filter.NULL,
+      RodaConstants.REPRESENTATION_INFORMATION_SEARCH, true, messages.searchPlaceHolder(), false, false, true);
+    representationInformationSearch.setList(representationInformationList);
+
+    container.add(representationInformationSearch);
+    container.add(representationInformationList);
+
+    representationInformationList
+      .addCheckboxSelectionListener(new AsyncTableCell.CheckboxSelectionListener<RepresentationInformation>() {
+        @Override
+        public void onSelectionChange(SelectedItems<RepresentationInformation> selected) {
+          if (selected instanceof SelectedItemsList) {
+            SelectedItemsList<RepresentationInformation> list = (SelectedItemsList<RepresentationInformation>) selected;
+            addToSelectedRIButton.setEnabled(!list.getIds().isEmpty());
+          } else {
+            // TODO bferreira 2017-12-04: add support for SelectedItemsFilter (is it
+            // needed?)
+            throw new RuntimeException("Only SelectedItemsList is supported on RI, for now");
+          }
+        }
+      });
+
+    addToSelectedRIButton.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        dialogBox.hide();
+
+        SelectedItems<RepresentationInformation> selected = representationInformationList.getSelected();
+        if (selected instanceof SelectedItemsList) {
+          SelectedItemsList<RepresentationInformation> list = (SelectedItemsList<RepresentationInformation>) selected;
+          callback.onSuccess(list);
+        } else {
+          // TODO bferreira 2017-12-04: add support for SelectedItemsFilter (is it
+          // needed?)
+          throw new RuntimeException("Only SelectedItemsList is supported on RI, for now");
+        }
+
+
+      }
+    });
+
+    return container;
   }
 }

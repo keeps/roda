@@ -35,9 +35,9 @@ public class CreateRepresentationInformation extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      CreateRepresentationInformation createFormat = new CreateRepresentationInformation(
+      CreateRepresentationInformation createRepresentationInformation = new CreateRepresentationInformation(
         new RepresentationInformation());
-      callback.onSuccess(createFormat);
+      callback.onSuccess(createRepresentationInformation);
     }
 
     @Override

@@ -487,11 +487,9 @@ public class BrowserHelper {
     throws GenericException, NotFoundException, RequestNotValidException {
     DipBundle bundle = new DipBundle();
 
-    bundle
-      .setDip(retrieve(IndexedDIP.class, dipUUID,
-        Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID, RodaConstants.DIP_TITLE,
-          RodaConstants.DIP_AIP_IDS, RodaConstants.DIP_AIP_UUIDS, RodaConstants.DIP_FILE_IDS,
-          RodaConstants.DIP_REPRESENTATION_IDS)));
+    bundle.setDip(retrieve(IndexedDIP.class, dipUUID,
+      Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID, RodaConstants.DIP_TITLE, RodaConstants.DIP_AIP_IDS,
+        RodaConstants.DIP_AIP_UUIDS, RodaConstants.DIP_FILE_IDS, RodaConstants.DIP_REPRESENTATION_IDS)));
 
     List<String> dipFileFields = new ArrayList<>();
 
@@ -3491,5 +3489,24 @@ public class BrowserHelper {
     bundle.setInverses(inverseMap);
     bundle.setInverseTranslations(inverseTranslations);
     return bundle;
+  }
+
+  public static boolean updateRepresentationInformationListWithFilter(
+    SelectedItemsList<RepresentationInformation> representationInformationIds, String filterToAdd, String username) {
+    ModelService model = RodaCoreFactory.getModelService();
+    boolean success = true;
+    for (String id : representationInformationIds.getIds()) {
+      try {
+        RepresentationInformation representationInformation = model.retrieveRepresentationInformation(id);
+        if(!representationInformation.getFilters().contains(filterToAdd)){
+          representationInformation.getFilters().add(filterToAdd);
+        }
+        model.updateRepresentationInformation(representationInformation, username, false);
+      } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+        success = false;
+        LOGGER.error("Could not update filter for representation information id: {}", id, e);
+      }
+    }
+    return success;
   }
 }

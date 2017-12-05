@@ -24,11 +24,14 @@ import org.roda.core.data.v2.index.filter.FilterParameter;
 import org.roda.core.data.v2.index.filter.OrFiltersParameters;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.common.dialogs.RepresentationInformationDialogs;
 import org.roda.wui.client.common.lists.RepresentationInformationList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
@@ -47,6 +50,7 @@ import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -101,8 +105,6 @@ public class RepresentationInformationNetwork extends Composite {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  Filter filter = Filter.ALL;
-
   @UiField
   FlowPanel title;
 
@@ -133,8 +135,27 @@ public class RepresentationInformationNetwork extends Composite {
   @UiField
   Button buttonCancel;
 
+  @UiField
+  FlowPanel sidebar;
+
+  @UiField
+  FlowPanel content;
+
+  @UiField
+  FlowPanel createPanel;
+
+  @UiField
+  Button buttonAddWithAssociation;
+
+  private static final String CONTENT_STYLE_WITH_SIDEBAR = "col_10";
+  private static final String CONTENT_STYLE_WITHOUT_SIDEBAR = "col_12";
+
   private static final Filter DEFAULT_FILTER = SearchFilters.defaultFilter(RepresentationInformation.class.getName());
   private static final String ALL_FILTER = SearchFilters.allFilter(RepresentationInformation.class.getName());
+
+  private Filter filter = DEFAULT_FILTER;
+
+  private boolean creatingMode = false;
 
   /**
    * Create a format register page
@@ -160,8 +181,13 @@ public class RepresentationInformationNetwork extends Composite {
     facetPanels.put(RodaConstants.REPRESENTATION_INFORMATION_SUPPORT, facetSupport);
     FacetUtils.bindFacets(representationInformationList, facetPanels);
 
-    representationInformationList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
+    initWidget(uiBinder.createAndBindUi(this));
 
+    sidebar.setVisible(false);
+    representationInformationList.setVisible(false);
+    searchPanel.setVisible(false);
+
+    representationInformationList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
         RepresentationInformation selected = representationInformationList.getSelectionModel().getSelectedObject();
@@ -175,7 +201,6 @@ public class RepresentationInformationNetwork extends Composite {
 
     representationInformationList
       .addCheckboxSelectionListener(new CheckboxSelectionListener<RepresentationInformation>() {
-
         @Override
         public void onSelectionChange(SelectedItems<RepresentationInformation> selected) {
           boolean empty = ClientSelectedItemsUtils.isEmpty(selected);
@@ -184,30 +209,28 @@ public class RepresentationInformationNetwork extends Composite {
         }
       });
 
+    searchPanel.addValueChangeHandler(new ValueChangeHandler<String>() {
+      @Override
+      public void onValueChange(ValueChangeEvent<String> event) {
+        creatingMode = false;
+      }
+    });
+
     representationInformationList
       .addValueChangeHandler(new ValueChangeHandler<IndexResult<RepresentationInformation>>() {
-
         @Override
         public void onValueChange(ValueChangeEvent<IndexResult<RepresentationInformation>> event) {
-          boolean empty = event.getValue().getTotalCount() == 0;
+          boolean empty = event.getValue().getTotalCount() == 0 && creatingMode;
           searchPanel.setVisible(!empty);
           representationInformationList.setVisible(!empty);
-          facetCategories.setVisible(!empty);
-          facetSupport.setVisible(!empty);
-          buttonRemove.setVisible(!empty);
-          startProcess.setVisible(!empty);
-          title.setVisible(!empty);
 
-          registerDescription.clear();
-          if (empty) {
-            registerDescription.add(new HTMLWidgetWrapper("MissingRepresentationInformation.html"));
-          } else {
-            registerDescription.add(new HTMLWidgetWrapper("FormatRegisterDescription.html"));
-          }
+          sidebar.setVisible(!empty);
+          content.setStyleName(CONTENT_STYLE_WITH_SIDEBAR, !empty);
+          content.setStyleName(CONTENT_STYLE_WITHOUT_SIDEBAR, empty);
+
+          createPanel.setVisible(empty);
         }
       });
-
-    initWidget(uiBinder.createAndBindUi(this));
 
     Label titleLabel = new Label(messages.representationInformationRegisterTitle());
     titleLabel.addStyleName("h1 browseItemText");
@@ -215,6 +238,53 @@ public class RepresentationInformationNetwork extends Composite {
 
     InlineHTML badge = new InlineHTML("<span class='label-warning browseRepresentationOriginalIcon'>Beta</span>");
     title.add(badge);
+
+    registerDescription.add(new HTMLWidgetWrapper("FormatRegisterDescription.html"));
+
+    buttonAddWithAssociation.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        RepresentationInformationDialogs.showPromptAddRepresentationInformationwithAssociation("title", "Cancel",
+          "Associate with selected", "Create and associate",
+          new NoAsyncCallback<SelectedItemsList<RepresentationInformation>>() {
+            @Override
+            public void onSuccess(SelectedItemsList<RepresentationInformation> selectedItemsList) {
+              if (selectedItemsList != null) {
+                String ids = "";
+                for (String id : selectedItemsList.getIds()) {
+                  ids += id + ", ";
+                }
+                GWT.log("received: " + ids);
+
+                String filtertoAdd = HistoryUtils.getCurrentHistoryPath()
+                  .get(HistoryUtils.getCurrentHistoryPath().size() - 1);
+
+                BrowserService.Util.getInstance().updateRepresentationInformationListWithFilter(selectedItemsList,
+                  filtertoAdd, new NoAsyncCallback<Void>() {
+                    @Override
+                    public void onSuccess(Void result) {
+                      List<String> reloadHistory = HistoryUtils.getCurrentHistoryPath().subList(2,
+                        HistoryUtils.getCurrentHistoryPath().size());
+
+
+                      String path = "";
+                      for (String token : reloadHistory) {
+                        path += token + ", ";
+                      }
+                      GWT.log("going to " + path);
+
+                      RepresentationInformationNetwork.this.resolve(reloadHistory, new NoAsyncCallback<Widget>());
+                    }
+                  });
+              } else {
+                LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
+                selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
+                HistoryUtils.newHistory(RESOLVER, CreateRepresentationInformation.RESOLVER.getHistoryToken());
+              }
+            }
+          });
+      }
+    });
   }
 
   /**
@@ -236,64 +306,65 @@ public class RepresentationInformationNetwork extends Composite {
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
+    sidebar.setVisible(false);
+    representationInformationList.setVisible(false);
+    searchPanel.setVisible(false);
+
     if (historyTokens.isEmpty()) {
-      filter = Filter.ALL;
-      representationInformationList.setFilter(Filter.ALL);
-      buttonCancel.setVisible(false);
-      callback.onSuccess(this);
-    } else if (historyTokens.size() == 2
-      && historyTokens.get(0).equals(ShowRepresentationInformation.RESOLVER.getHistoryToken())) {
-      ShowRepresentationInformation.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
-    } else if (historyTokens.size() == 1
-      && historyTokens.get(0).equals(CreateRepresentationInformation.RESOLVER.getHistoryToken())) {
-      CreateRepresentationInformation.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
-    } else if (historyTokens.size() == 2
-      && historyTokens.get(0).equals(EditRepresentationInformation.RESOLVER.getHistoryToken())) {
-      EditRepresentationInformation.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
-    } else if (historyTokens.size() > 2 && historyTokens.get(0).equals(Search.RESOLVER.getHistoryToken())) {
-      List<FilterParameter> params = new ArrayList<>();
-      boolean hasOperator = historyTokens.size() % 2 == 1 ? false : true;
-      String operator = RodaConstants.OPERATOR_AND;
+      filter = DEFAULT_FILTER;
+      creatingMode = false;
+      searchPanel.setDefaultFilter(filter, true);
+      representationInformationList.setFilter(filter);
+      searchPanel.clearSearchInputBox();
 
-      if (hasOperator) {
-        operator = historyTokens.remove(1);
-        if (!operator.equals(RodaConstants.OPERATOR_AND) && !operator.equals(RodaConstants.OPERATOR_OR)) {
-          HistoryUtils.newHistory(RESOLVER);
-          callback.onSuccess(null);
-        }
-      }
-
-      for (int i = 1; i < historyTokens.size() - 1; i += 2) {
-        String key = historyTokens.get(i);
-        String value = historyTokens.get(i + 1);
-        params.add(new SimpleFilterParameter(key, value));
-      }
-
-      if (operator.equals(RodaConstants.OPERATOR_OR)) {
-        filter = new Filter(new OrFiltersParameters(params));
-        representationInformationList.setFilter(new Filter(filter));
-      } else {
-        filter = Filter.ALL;
-        representationInformationList.setFilter(new Filter(params));
-      }
-
-      buttonCancel.setVisible(true);
       callback.onSuccess(this);
     } else {
-      HistoryUtils.newHistory(RESOLVER);
-      callback.onSuccess(null);
+      String basePage = historyTokens.remove(0);
+      if (ShowRepresentationInformation.RESOLVER.getHistoryToken().equals(basePage)) {
+        ShowRepresentationInformation.RESOLVER.resolve(historyTokens, callback);
+      } else if (CreateRepresentationInformation.RESOLVER.getHistoryToken().equals(basePage)) {
+        CreateRepresentationInformation.RESOLVER.resolve(historyTokens, callback);
+      } else if (EditRepresentationInformation.RESOLVER.getHistoryToken().equals(basePage)) {
+        EditRepresentationInformation.RESOLVER.resolve(historyTokens, callback);
+      } else if (Search.RESOLVER.getHistoryToken().equals(basePage) && !historyTokens.isEmpty()) {
+        creatingMode = true;
+        filter = createFilterFromHistoryTokens(historyTokens, false);
+
+        searchPanel.setDefaultFilter(filter, true);
+        representationInformationList.setFilter(filter);
+        searchPanel.clearSearchInputBox();
+
+        callback.onSuccess(this);
+      } else {
+        HistoryUtils.newHistory(RESOLVER);
+        callback.onSuccess(null);
+      }
     }
   }
 
+  private Filter createFilterFromHistoryTokens(List<String> historyTokens, boolean includingSearchToken) {
+    int offset = 0;
+    if (includingSearchToken && historyTokens.size() > 2
+      && Search.RESOLVER.getHistoryToken().equals(historyTokens.get(0))) {
+      offset = 1;
+    }
+
+    List<FilterParameter> params = new ArrayList<>();
+    if (historyTokens.size() == (2 + offset)) {
+      params.add(new SimpleFilterParameter(historyTokens.get(offset), historyTokens.get(1 + offset)));
+    }
+    return new Filter(new OrFiltersParameters(params));
+  }
+
   @UiHandler("buttonAdd")
-  void buttonAddFormatHandler(ClickEvent e) {
+  void buttonAddHandler(ClickEvent e) {
     LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
     selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
     HistoryUtils.newHistory(RESOLVER, CreateRepresentationInformation.RESOLVER.getHistoryToken());
   }
 
   @UiHandler("buttonRemove")
-  void buttonRemoveFormatHandler(ClickEvent e) {
+  void buttonRemoveHandler(ClickEvent e) {
     final SelectedItems<RepresentationInformation> selected = representationInformationList.getSelected();
 
     ClientSelectedItemsUtils.size(RepresentationInformation.class, selected, new AsyncCallback<Long>() {
