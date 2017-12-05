@@ -39,6 +39,7 @@ import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.HistoryResolver;
@@ -58,12 +59,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.InlineHTML;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.*;
 import com.google.gwt.view.client.SelectionChangeEvent;
 
 import config.i18n.client.ClientMessages;
@@ -147,6 +143,8 @@ public class RepresentationInformationNetwork extends Composite {
   @UiField
   Button buttonAddWithAssociation;
 
+  private String filterString = "";
+
   private static final String CONTENT_STYLE_WITH_SIDEBAR = "col_10";
   private static final String CONTENT_STYLE_WITHOUT_SIDEBAR = "col_12";
 
@@ -158,9 +156,7 @@ public class RepresentationInformationNetwork extends Composite {
   private boolean creatingMode = false;
 
   /**
-   * Create a format register page
-   *
-   * @param user
+   * Create a representation information page
    */
   public RepresentationInformationNetwork() {
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.REPRESENTATION_INFORMATION_CATEGORIES),
@@ -169,6 +165,7 @@ public class RepresentationInformationNetwork extends Composite {
     representationInformationList = new RepresentationInformationList(filter, facets,
       messages.representationInformationTitle(), true);
 
+    // TODO bferreira 2017-12-05: find a better way to show prefilters
     searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, true,
       messages.representationInformationRegisterSearchPlaceHolder(), false, false, false);
     searchPanel.setList(representationInformationList);
@@ -244,45 +241,36 @@ public class RepresentationInformationNetwork extends Composite {
     buttonAddWithAssociation.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        RepresentationInformationDialogs.showPromptAddRepresentationInformationwithAssociation("title", "Cancel",
-          "Associate with selected", "Create and associate",
-          new NoAsyncCallback<SelectedItemsList<RepresentationInformation>>() {
-            @Override
-            public void onSuccess(SelectedItemsList<RepresentationInformation> selectedItemsList) {
-              if (selectedItemsList != null) {
-                String ids = "";
-                for (String id : selectedItemsList.getIds()) {
-                  ids += id + ", ";
-                }
-                GWT.log("received: " + ids);
 
-                String filtertoAdd = HistoryUtils.getCurrentHistoryPath()
-                  .get(HistoryUtils.getCurrentHistoryPath().size() - 1);
+        String title = filterToHuman(filterString);
 
-                BrowserService.Util.getInstance().updateRepresentationInformationListWithFilter(selectedItemsList,
-                  filtertoAdd, new NoAsyncCallback<Void>() {
-                    @Override
-                    public void onSuccess(Void result) {
-                      List<String> reloadHistory = HistoryUtils.getCurrentHistoryPath().subList(2,
-                        HistoryUtils.getCurrentHistoryPath().size());
+          RepresentationInformationDialogs.showPromptAddRepresentationInformationwithAssociation(title, "Cancel",
+            "Associate with selected", "Create and associate",
+            new NoAsyncCallback<SelectedItemsList<RepresentationInformation>>() {
+              @Override
+              public void onSuccess(SelectedItemsList<RepresentationInformation> selectedItemsList) {
+                if (selectedItemsList != null) {
+                  String filtertoAdd = HistoryUtils.getCurrentHistoryPath()
+                    .get(HistoryUtils.getCurrentHistoryPath().size() - 1);
 
-
-                      String path = "";
-                      for (String token : reloadHistory) {
-                        path += token + ", ";
+                  BrowserService.Util.getInstance().updateRepresentationInformationListWithFilter(selectedItemsList,
+                    filtertoAdd, new NoAsyncCallback<Void>() {
+                      @Override
+                      public void onSuccess(Void result) {
+                        // TODO bferreira 2017-12-05: refresh is not working properly, even with
+                        // commit=true the list is empty. Clicking the search button makes the correct
+                        // results appear in the list
+                        RepresentationInformationNetwork.getInstance().creatingMode = false;
+                        RepresentationInformationNetwork.getInstance().representationInformationList.refresh();
                       }
-                      GWT.log("going to " + path);
-
-                      RepresentationInformationNetwork.this.resolve(reloadHistory, new NoAsyncCallback<Widget>());
-                    }
-                  });
-              } else {
-                LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
-                selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
-                HistoryUtils.newHistory(RESOLVER, CreateRepresentationInformation.RESOLVER.getHistoryToken());
+                    });
+                } else {
+                  LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
+                  selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
+                  HistoryUtils.newHistory(RESOLVER, CreateRepresentationInformation.RESOLVER.getHistoryToken());
+                }
               }
-            }
-          });
+            });
       }
     });
   }
@@ -310,6 +298,8 @@ public class RepresentationInformationNetwork extends Composite {
     representationInformationList.setVisible(false);
     searchPanel.setVisible(false);
 
+
+
     if (historyTokens.isEmpty()) {
       filter = DEFAULT_FILTER;
       creatingMode = false;
@@ -329,6 +319,7 @@ public class RepresentationInformationNetwork extends Composite {
       } else if (Search.RESOLVER.getHistoryToken().equals(basePage) && !historyTokens.isEmpty()) {
         creatingMode = true;
         filter = createFilterFromHistoryTokens(historyTokens, false);
+        filterString = historyTokens.get(historyTokens.size() - 1);
 
         searchPanel.setDefaultFilter(filter, true);
         representationInformationList.setFilter(filter);
@@ -353,7 +344,28 @@ public class RepresentationInformationNetwork extends Composite {
     if (historyTokens.size() == (2 + offset)) {
       params.add(new SimpleFilterParameter(historyTokens.get(offset), historyTokens.get(1 + offset)));
     }
+
     return new Filter(new OrFiltersParameters(params));
+  }
+
+  private String filterToHuman(String filter) {
+    String title = "Associate this property with Representation Information";
+    if (StringUtils.isNotBlank(filter)) {
+      String[] filterSplit = filter.split(":");
+      if (filterSplit.length == 3) {
+        title = messages.representationInformationAssociateWith(filterSplit[0], filterSplit[1], filterSplit[2],
+          messages.representationInformationTitle());
+      }
+    }
+    return title;
+
+    // TODO bferreira 2017-12-05: try to dynamically translate the filter
+    // String[] filterParts = filter.split(":");
+    // if(filterParts.length == 3){
+    // return Collections.emptyList();
+    // }else{
+    // return Collections.emptyList();
+    // }
   }
 
   @UiHandler("buttonAdd")

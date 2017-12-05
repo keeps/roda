@@ -6168,6 +6168,9 @@ td.datePickerMonth, td.datePickerYear {
     padding: 15px 15px 15px 10px;
 }
 
+.ri-dialog .pull-right.btn {
+    margin-left: 10px;
+}
 
 .ri-entity-relation-section {
 	color: #999;

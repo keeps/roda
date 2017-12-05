@@ -754,8 +754,8 @@ public class RepresentationInformationDialogs {
     final Button addToNewRIButton = new Button(addToNewRIButtonText);
     addToSelectedRIButton.setEnabled(false);
     buttonPanel.add(cancelButton);
-    buttonPanel.add(addToNewRIButton);
     buttonPanel.add(addToSelectedRIButton);
+    buttonPanel.add(addToNewRIButton);
 
     final FlowPanel content = new FlowPanel();
     content.addStyleName("row skip_padding full_width content");
@@ -785,6 +785,7 @@ public class RepresentationInformationDialogs {
 
     cancelButton.addStyleName("btn btn-link");
     addToSelectedRIButton.addStyleName("pull-right btn btn-play");
+    addToNewRIButton.addStyleName("pull-right btn btn-play");
 
     dialogBox.center();
     dialogBox.show();

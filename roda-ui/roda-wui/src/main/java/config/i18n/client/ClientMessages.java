@@ -2649,4 +2649,6 @@ public interface ClientMessages extends Messages {
   String exportListMessage(int limit);
 
   String representationInformationNoAssociations();
+
+  String representationInformationAssociateWith(String object, String field, String value, String representationInformation);
 }
