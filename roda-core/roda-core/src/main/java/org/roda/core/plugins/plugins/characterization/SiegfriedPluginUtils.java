@@ -33,7 +33,6 @@ import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
-import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.ContentPayload;
@@ -88,7 +87,6 @@ public class SiegfriedPluginUtils {
   }
 
   public static String getVersion() {
-    String version = null;
     try {
       String siegfriedPath = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "siegfried", "binary");
       List<String> command = new ArrayList<>(Arrays.asList(siegfriedPath, "--version"));
@@ -113,34 +111,34 @@ public class SiegfriedPluginUtils {
     } catch (CommandException ce) {
       LOGGER.error("Error getting Siegfried version: " + ce.getMessage(), ce);
     }
-    return version;
+    return null;
   }
 
-  public static <T extends IsRODAObject> List<LinkingIdentifier> runSiegfriedOnRepresentation(Plugin<T> plugin,
-    ModelService model, Representation representation) throws GenericException, RequestNotValidException,
-    AlreadyExistsException, NotFoundException, AuthorizationDeniedException, PluginException {
+  public static <T extends IsRODAObject> List<LinkingIdentifier> runSiegfriedOnRepresentation(ModelService model,
+    Representation representation) throws GenericException, RequestNotValidException, AlreadyExistsException,
+    NotFoundException, AuthorizationDeniedException, PluginException {
 
     StoragePath representationDataPath = ModelUtils.getRepresentationDataStoragePath(representation.getAipId(),
       representation.getId());
     DirectResourceAccess directAccess = model.getStorage().getDirectAccess(representationDataPath);
 
     Path representationFsPath = directAccess.getPath();
-    List<LinkingIdentifier> sources = runSiegfriedOnRepresentationOrFile(plugin, model, representation.getAipId(),
+    List<LinkingIdentifier> sources = runSiegfriedOnRepresentationOrFile(model, representation.getAipId(),
       representation.getId(), new ArrayList<>(), null, representationFsPath);
 
     IOUtils.closeQuietly(directAccess);
     return sources;
   }
 
-  public static <T extends IsRODAObject> List<LinkingIdentifier> runSiegfriedOnFile(Plugin<T> plugin,
-    ModelService model, File file) throws GenericException, RequestNotValidException, AlreadyExistsException,
-    NotFoundException, AuthorizationDeniedException, PluginException {
+  public static <T extends IsRODAObject> List<LinkingIdentifier> runSiegfriedOnFile(ModelService model, File file)
+    throws GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException,
+    AuthorizationDeniedException, PluginException {
 
     StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
     DirectResourceAccess directAccess = model.getStorage().getDirectAccess(fileStoragePath);
 
     Path filePath = directAccess.getPath();
-    List<LinkingIdentifier> sources = runSiegfriedOnRepresentationOrFile(plugin, model, file.getAipId(),
+    List<LinkingIdentifier> sources = runSiegfriedOnRepresentationOrFile(model, file.getAipId(),
       file.getRepresentationId(), file.getPath(), file.getId(), filePath);
     IOUtils.closeQuietly(directAccess);
 
@@ -148,8 +146,8 @@ public class SiegfriedPluginUtils {
     return sources;
   }
 
-  private static <T extends IsRODAObject> List<LinkingIdentifier> runSiegfriedOnRepresentationOrFile(Plugin<T> plugin,
-    ModelService model, String aipId, String representationId, List<String> fileDirectoryPath, String fileId, Path path)
+  private static <T extends IsRODAObject> List<LinkingIdentifier> runSiegfriedOnRepresentationOrFile(ModelService model,
+    String aipId, String representationId, List<String> fileDirectoryPath, String fileId, Path path)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
     PluginException {
     List<LinkingIdentifier> sources = new ArrayList<>();
@@ -190,7 +188,7 @@ public class SiegfriedPluginUtils {
           String version = null;
           String pronom = null;
           String mime = null;
-          String[] pluginVersion = plugin.getVersion().split(" ")[0].split("\\.");
+          String[] pluginVersion = getVersion().split(" ")[0].split("\\.");
 
           if ("1".equals(pluginVersion[0])) {
             if (Integer.parseInt(pluginVersion[1]) > 4) {

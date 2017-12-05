@@ -118,7 +118,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
           try {
             for (Representation representation : aip.getRepresentations()) {
               LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
-              sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(this, model, representation));
+              sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation));
               model.notifyRepresentationUpdated(representation);
             }
 
@@ -145,7 +145,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
             for (Representation representation : filteredList) {
               try {
                 LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
-                sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(this, model, representation));
+                sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation));
                 model.notifyRepresentationUpdated(representation);
               } catch (RODAException e) {
                 state = PluginState.FAILURE;
@@ -191,7 +191,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
       PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
       LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), representation.getAipId());
       try {
-        sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(this, model, representation));
+        sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation));
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
         reportItem.setPluginState(PluginState.SUCCESS);
         model.notifyRepresentationUpdated(representation);
@@ -234,7 +234,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
         file.getAipId());
 
       try {
-        sources.addAll(SiegfriedPluginUtils.runSiegfriedOnFile(this, model, file));
+        sources.addAll(SiegfriedPluginUtils.runSiegfriedOnFile(model, file));
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
         reportItem.setPluginState(PluginState.SUCCESS);
       } catch (PluginException | NotFoundException | GenericException | RequestNotValidException

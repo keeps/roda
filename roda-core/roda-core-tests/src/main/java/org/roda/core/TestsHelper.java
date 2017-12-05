@@ -111,7 +111,6 @@ public final class TestsHelper {
     Job jobUpdated = RodaCoreFactory.getModelService().retrieveJob(job.getId());
     MatcherAssert.assertThat(jobUpdated.getStateDetails(), jobUpdated.getState(), Is.is(expectedJobState));
     return jobUpdated;
-
   }
 
   public static <T extends IsIndexed, T1 extends Plugin<? extends IsRODAObject>> Job executeJob(Class<T1> plugin,

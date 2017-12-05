@@ -21,7 +21,6 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.OptionalWithCause;
-import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
@@ -38,12 +37,6 @@ public class PremisSkeletonPluginUtils {
 
   private PremisSkeletonPluginUtils() {
     // do nothing
-  }
-
-  public static void createPremisSkeletonOnRepresentation(ModelService model, AIP aip, String representationId,
-    Collection<String> fixityAlgorithms) throws RequestNotValidException, GenericException, NotFoundException,
-    AuthorizationDeniedException, ValidationException, IOException, XmlException {
-    createPremisSkeletonOnRepresentation(model, aip.getId(), representationId, fixityAlgorithms);
   }
 
   public static void createPremisSkeletonOnRepresentation(ModelService model, String aipId, String representationId,

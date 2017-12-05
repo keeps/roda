@@ -806,6 +806,7 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS = "parameter.delete_older_than_x_days";
   public static final String PLUGIN_PARAMS_SIP_UPDATE_INFORMATION = "parameter.sip_update_information";
   public static final String PLUGIN_PARAMS_REPRESENTATION_TYPE = "parameter.representation_type";
+  public static final String PLUGIN_PARAMS_DELETE_REPRESENTATION = "parameter.delete_representation";
 
   public static final String PLUGIN_PARAMS_INCLUDE_SELECTED_DESCRIPTIVE_METADATA = "parameter.include_selected_descriptive_metadata";
   public static final String PLUGIN_PARAMS_SELECTED_DESCRIPTIVE_METADATA = "parameter.selected_descriptive_metadata";
