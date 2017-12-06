@@ -3501,7 +3501,7 @@ public class BrowserHelper {
         if(!representationInformation.getFilters().contains(filterToAdd)){
           representationInformation.getFilters().add(filterToAdd);
         }
-        model.updateRepresentationInformation(representationInformation, username, false);
+        model.updateRepresentationInformation(representationInformation, username, true);
       } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
         success = false;
         LOGGER.error("Could not update filter for representation information id: {}", id, e);

@@ -6263,3 +6263,18 @@ td.datePickerMonth, td.datePickerYear {
 	background-color: #eee;
 	margin-bottom: 10px;
 }
+
+.ri-subtitle {
+    color: #999;
+    font-size: 2rem;
+    display: inline;
+    margin-bottom: 0 !important;
+    line-height: 1.2;
+
+    /*letter-spacing: -.1rem;*/
+}
+
+.ri-subtitle span.code {
+    font-family: "UbuntuMono", "Ubuntu", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: bold;
+}

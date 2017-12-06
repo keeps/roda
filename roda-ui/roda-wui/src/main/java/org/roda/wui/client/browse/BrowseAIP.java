@@ -10,12 +10,7 @@
  */
 package org.roda.wui.client.browse;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -50,18 +45,12 @@ import org.roda.wui.client.ingest.transfer.TransferUpload;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
-import org.roda.wui.client.planning.RepresentationInformationNetwork;
+import org.roda.wui.client.planning.RepresentationInformationAssociations;
 import org.roda.wui.client.planning.ShowRepresentationInformation;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.DescriptionLevelUtils;
-import org.roda.wui.common.client.tools.FacetUtils;
-import org.roda.wui.common.client.tools.HistoryUtils;
-import org.roda.wui.common.client.tools.Humanize;
-import org.roda.wui.common.client.tools.ListUtils;
-import org.roda.wui.common.client.tools.RestErrorOverlayType;
-import org.roda.wui.common.client.tools.RestUtils;
+import org.roda.wui.common.client.tools.*;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
 import org.roda.wui.common.client.widgets.wcag.WCAGUtilities;
@@ -74,11 +63,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.RequestBuilder;
-import com.google.gwt.http.client.RequestCallback;
-import com.google.gwt.http.client.RequestException;
-import com.google.gwt.http.client.Response;
+import com.google.gwt.http.client.*;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -88,18 +73,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.FocusPanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.InlineHTML;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.TabPanel;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.*;
 
 import config.i18n.client.ClientMessages;
 
@@ -781,12 +755,12 @@ public class BrowseAIP extends Composite {
               anchor
                 .setHref(HistoryUtils.createHistoryHashLink(ShowRepresentationInformation.RESOLVER, pair.getFirst()));
             } else if (pair.getSecond() > 1) {
-              anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationNetwork.RESOLVER,
-                Search.RESOLVER.getHistoryToken(), RodaConstants.REPRESENTATION_INFORMATION_FILTERS, riFilter));
+              anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationAssociations.RESOLVER,
+                RodaConstants.REPRESENTATION_INFORMATION_FILTERS, riFilter));
             } else {
               anchor.addStyleName("browseIconRed");
-              anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationNetwork.RESOLVER,
-                Search.RESOLVER.getHistoryToken(), RodaConstants.REPRESENTATION_INFORMATION_FILTERS, riFilter));
+              anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationAssociations.RESOLVER,
+                RodaConstants.REPRESENTATION_INFORMATION_FILTERS, riFilter));
             }
           }
         });

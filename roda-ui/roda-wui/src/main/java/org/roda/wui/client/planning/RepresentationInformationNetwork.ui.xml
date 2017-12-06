@@ -17,21 +17,9 @@
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content" ui:field="content">
 				<g:FlowPanel ui:field="title"></g:FlowPanel>
-				<g:FlowPanel addStyleNames="page-description" ui:field="registerDescription">
-				</g:FlowPanel>
-
-				<g:FlowPanel ui:field="createPanel" visible="false" addStyleNames="card representationInformationCard">
-					<g:Label addStyleNames="h5">
-						<ui:text from='{messages.representationInformationNoAssociations}' />
-					</g:Label>
-					<g:SimplePanel>
-						<g:Button addStyleNames="btn btn-incremental-list-add btn-plus" text="Add to new or existing" ui:field="buttonAddWithAssociation"/>
-					</g:SimplePanel>
-				</g:FlowPanel>
-
+				<g:FlowPanel addStyleNames="page-description" ui:field="registerDescription"></g:FlowPanel>
 				<commonsearch:SearchPanel ui:field="searchPanel" />
-				<lists:RepresentationInformationList
-					addStyleNames="searchResults" ui:field="representationInformationList" />
+				<lists:RepresentationInformationList addStyleNames="searchResults" ui:field="representationInformationList" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar" ui:field="sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">

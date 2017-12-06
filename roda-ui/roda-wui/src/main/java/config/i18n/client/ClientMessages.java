@@ -2651,4 +2651,6 @@ public interface ClientMessages extends Messages {
   String representationInformationNoAssociations();
 
   String representationInformationAssociateWith(String object, String field, String value, String representationInformation);
+
+  String representationInformationAssociationsTitle();
 }

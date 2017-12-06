@@ -137,23 +137,10 @@ public class RepresentationInformationNetwork extends Composite {
   @UiField
   FlowPanel content;
 
-  @UiField
-  FlowPanel createPanel;
-
-  @UiField
-  Button buttonAddWithAssociation;
-
-  private String filterString = "";
-
-  private static final String CONTENT_STYLE_WITH_SIDEBAR = "col_10";
-  private static final String CONTENT_STYLE_WITHOUT_SIDEBAR = "col_12";
-
   private static final Filter DEFAULT_FILTER = SearchFilters.defaultFilter(RepresentationInformation.class.getName());
   private static final String ALL_FILTER = SearchFilters.allFilter(RepresentationInformation.class.getName());
 
-  private Filter filter = DEFAULT_FILTER;
-
-  private boolean creatingMode = false;
+  private final Filter filter = DEFAULT_FILTER;
 
   /**
    * Create a representation information page
@@ -165,9 +152,8 @@ public class RepresentationInformationNetwork extends Composite {
     representationInformationList = new RepresentationInformationList(filter, facets,
       messages.representationInformationTitle(), true);
 
-    // TODO bferreira 2017-12-05: find a better way to show prefilters
     searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, true,
-      messages.representationInformationRegisterSearchPlaceHolder(), false, false, false);
+      messages.representationInformationRegisterSearchPlaceHolder(), false, false, true);
     searchPanel.setList(representationInformationList);
 
     facetCategories = new FlowPanel();
@@ -179,10 +165,6 @@ public class RepresentationInformationNetwork extends Composite {
     FacetUtils.bindFacets(representationInformationList, facetPanels);
 
     initWidget(uiBinder.createAndBindUi(this));
-
-    sidebar.setVisible(false);
-    representationInformationList.setVisible(false);
-    searchPanel.setVisible(false);
 
     representationInformationList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
       @Override
@@ -206,29 +188,6 @@ public class RepresentationInformationNetwork extends Composite {
         }
       });
 
-    searchPanel.addValueChangeHandler(new ValueChangeHandler<String>() {
-      @Override
-      public void onValueChange(ValueChangeEvent<String> event) {
-        creatingMode = false;
-      }
-    });
-
-    representationInformationList
-      .addValueChangeHandler(new ValueChangeHandler<IndexResult<RepresentationInformation>>() {
-        @Override
-        public void onValueChange(ValueChangeEvent<IndexResult<RepresentationInformation>> event) {
-          boolean empty = event.getValue().getTotalCount() == 0 && creatingMode;
-          searchPanel.setVisible(!empty);
-          representationInformationList.setVisible(!empty);
-
-          sidebar.setVisible(!empty);
-          content.setStyleName(CONTENT_STYLE_WITH_SIDEBAR, !empty);
-          content.setStyleName(CONTENT_STYLE_WITHOUT_SIDEBAR, empty);
-
-          createPanel.setVisible(empty);
-        }
-      });
-
     Label titleLabel = new Label(messages.representationInformationRegisterTitle());
     titleLabel.addStyleName("h1 browseItemText");
     title.add(titleLabel);
@@ -237,42 +196,6 @@ public class RepresentationInformationNetwork extends Composite {
     title.add(badge);
 
     registerDescription.add(new HTMLWidgetWrapper("FormatRegisterDescription.html"));
-
-    buttonAddWithAssociation.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-
-        String title = filterToHuman(filterString);
-
-          RepresentationInformationDialogs.showPromptAddRepresentationInformationwithAssociation(title, "Cancel",
-            "Associate with selected", "Create and associate",
-            new NoAsyncCallback<SelectedItemsList<RepresentationInformation>>() {
-              @Override
-              public void onSuccess(SelectedItemsList<RepresentationInformation> selectedItemsList) {
-                if (selectedItemsList != null) {
-                  String filtertoAdd = HistoryUtils.getCurrentHistoryPath()
-                    .get(HistoryUtils.getCurrentHistoryPath().size() - 1);
-
-                  BrowserService.Util.getInstance().updateRepresentationInformationListWithFilter(selectedItemsList,
-                    filtertoAdd, new NoAsyncCallback<Void>() {
-                      @Override
-                      public void onSuccess(Void result) {
-                        // TODO bferreira 2017-12-05: refresh is not working properly, even with
-                        // commit=true the list is empty. Clicking the search button makes the correct
-                        // results appear in the list
-                        RepresentationInformationNetwork.getInstance().creatingMode = false;
-                        RepresentationInformationNetwork.getInstance().representationInformationList.refresh();
-                      }
-                    });
-                } else {
-                  LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
-                  selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
-                  HistoryUtils.newHistory(RESOLVER, CreateRepresentationInformation.RESOLVER.getHistoryToken());
-                }
-              }
-            });
-      }
-    });
   }
 
   /**
@@ -294,15 +217,7 @@ public class RepresentationInformationNetwork extends Composite {
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-    sidebar.setVisible(false);
-    representationInformationList.setVisible(false);
-    searchPanel.setVisible(false);
-
-
-
     if (historyTokens.isEmpty()) {
-      filter = DEFAULT_FILTER;
-      creatingMode = false;
       searchPanel.setDefaultFilter(filter, true);
       representationInformationList.setFilter(filter);
       searchPanel.clearSearchInputBox();
@@ -316,56 +231,13 @@ public class RepresentationInformationNetwork extends Composite {
         CreateRepresentationInformation.RESOLVER.resolve(historyTokens, callback);
       } else if (EditRepresentationInformation.RESOLVER.getHistoryToken().equals(basePage)) {
         EditRepresentationInformation.RESOLVER.resolve(historyTokens, callback);
-      } else if (Search.RESOLVER.getHistoryToken().equals(basePage) && !historyTokens.isEmpty()) {
-        creatingMode = true;
-        filter = createFilterFromHistoryTokens(historyTokens, false);
-        filterString = historyTokens.get(historyTokens.size() - 1);
-
-        searchPanel.setDefaultFilter(filter, true);
-        representationInformationList.setFilter(filter);
-        searchPanel.clearSearchInputBox();
-
-        callback.onSuccess(this);
+      } else if (RepresentationInformationAssociations.RESOLVER.getHistoryToken().equals(basePage)) {
+        RepresentationInformationAssociations.RESOLVER.resolve(historyTokens, callback);
       } else {
         HistoryUtils.newHistory(RESOLVER);
         callback.onSuccess(null);
       }
     }
-  }
-
-  private Filter createFilterFromHistoryTokens(List<String> historyTokens, boolean includingSearchToken) {
-    int offset = 0;
-    if (includingSearchToken && historyTokens.size() > 2
-      && Search.RESOLVER.getHistoryToken().equals(historyTokens.get(0))) {
-      offset = 1;
-    }
-
-    List<FilterParameter> params = new ArrayList<>();
-    if (historyTokens.size() == (2 + offset)) {
-      params.add(new SimpleFilterParameter(historyTokens.get(offset), historyTokens.get(1 + offset)));
-    }
-
-    return new Filter(new OrFiltersParameters(params));
-  }
-
-  private String filterToHuman(String filter) {
-    String title = "Associate this property with Representation Information";
-    if (StringUtils.isNotBlank(filter)) {
-      String[] filterSplit = filter.split(":");
-      if (filterSplit.length == 3) {
-        title = messages.representationInformationAssociateWith(filterSplit[0], filterSplit[1], filterSplit[2],
-          messages.representationInformationTitle());
-      }
-    }
-    return title;
-
-    // TODO bferreira 2017-12-05: try to dynamically translate the filter
-    // String[] filterParts = filter.split(":");
-    // if(filterParts.length == 3){
-    // return Collections.emptyList();
-    // }else{
-    // return Collections.emptyList();
-    // }
   }
 
   @UiHandler("buttonAdd")

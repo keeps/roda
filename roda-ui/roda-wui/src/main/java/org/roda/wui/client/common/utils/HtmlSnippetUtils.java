@@ -32,9 +32,8 @@ import org.roda.wui.client.browse.BrowseAIP;
 import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
-import org.roda.wui.client.planning.RepresentationInformationNetwork;
+import org.roda.wui.client.planning.RepresentationInformationAssociations;
 import org.roda.wui.client.planning.ShowRepresentationInformation;
-import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.core.client.GWT;
@@ -42,11 +41,7 @@ import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.InlineHTML;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.UIObject;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.*;
 
 import config.i18n.client.ClientMessages;
 
@@ -160,12 +155,12 @@ public class HtmlSnippetUtils {
           if (pair.getSecond() == 1) {
             anchor.setHref(HistoryUtils.createHistoryHashLink(ShowRepresentationInformation.RESOLVER, pair.getFirst()));
           } else if (pair.getSecond() > 1) {
-            anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationNetwork.RESOLVER,
-              Search.RESOLVER.getHistoryToken(), RodaConstants.REPRESENTATION_INFORMATION_FILTERS, riFilter));
+            anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationAssociations.RESOLVER,
+              RodaConstants.REPRESENTATION_INFORMATION_FILTERS, riFilter));
           } else {
             anchor.addStyleName("browseIconRed");
-            anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationNetwork.RESOLVER,
-              Search.RESOLVER.getHistoryToken(), RodaConstants.REPRESENTATION_INFORMATION_FILTERS, riFilter));
+            anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationAssociations.RESOLVER,
+              RodaConstants.REPRESENTATION_INFORMATION_FILTERS, riFilter));
           }
         }
       });
