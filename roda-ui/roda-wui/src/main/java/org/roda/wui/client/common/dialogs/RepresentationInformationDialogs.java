@@ -1,10 +1,13 @@
 package org.roda.wui.client.common.dialogs;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.ui.Anchor;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.index.facet.Facets;
@@ -22,6 +25,8 @@ import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.ri.RepresentationInformationRelation;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
+import org.roda.wui.client.common.IncrementalList;
+import org.roda.wui.client.common.RemovableTextBox;
 import org.roda.wui.client.common.ValuedLabel;
 import org.roda.wui.client.common.lists.RepresentationInformationList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
@@ -125,95 +130,31 @@ public class RepresentationInformationDialogs {
           relationFormPanel.add(fieldsPanel);
 
           final List<String> appropriateFields = new ArrayList<>();
-          String className;
 
-          if (!ri.getFilters().isEmpty()) {
-            if (ri.getFilters().get(0).startsWith(Representation.class.getSimpleName())) {
-              dropDown.setSelectedValue(RodaConstants.SEARCH_REPRESENTATIONS, true);
-              className = Representation.class.getSimpleName();
-              appropriateFields.addAll(result.getObjectClassFields().get(className));
-            } else if (ri.getFilters().get(0).startsWith(File.class.getSimpleName())) {
-              dropDown.setSelectedValue(RodaConstants.SEARCH_FILES, true);
-              className = File.class.getSimpleName();
-              appropriateFields.addAll(result.getObjectClassFields().get(className));
-            } else {
-              className = AIP.class.getSimpleName();
-              appropriateFields.addAll(result.getObjectClassFields().get(className));
-            }
-          } else {
-            className = AIP.class.getSimpleName();
-            appropriateFields.addAll(result.getObjectClassFields().get(className));
-          }
-
-          for (String field : appropriateFields) {
-            FlowPanel fieldPanel = new FlowPanel();
-            fieldPanel.addStyleName("content ri-content");
-
-            ValuedLabel fieldLabel = new ValuedLabel(result.getTranslations().get(
-              className + RepresentationInformationUtils.REPRESENTATION_INFORMATION_FILTER_SEPARATOR + field), field);
-            fieldLabel.addStyleName("form-label ri-content-label");
-            fieldPanel.add(fieldLabel);
-
-            TextBox fieldBox = new TextBox();
-
-            for (String filter : ri.getFilters()) {
-              if (filter.startsWith(
-                className + RepresentationInformationUtils.REPRESENTATION_INFORMATION_FILTER_SEPARATOR + field)) {
-                fieldBox.setText(RepresentationInformationUtils.getValueFromFilter(filter));
-              }
-            }
-
-            fieldBox.addStyleName("form-textbox ri-content-textbox");
-            fieldPanel.add(fieldBox);
-            fieldsPanel.add(fieldPanel);
-          }
+          final Map<String, List<String>> values = new HashMap<>();
 
           dropDown.addValueChangeHandler(new ValueChangeHandler<String>() {
             @Override
             public void onValueChange(ValueChangeEvent<String> event) {
-              fieldsPanel.clear();
-              String className = "";
-
-              if (dropDown.getSelectedValue().equals(RodaConstants.SEARCH_ITEMS)) {
-                className = AIP.class.getSimpleName();
-                appropriateFields.clear();
-                appropriateFields.addAll(result.getObjectClassFields().get(className));
-              } else if (dropDown.getSelectedValue().equals(RodaConstants.SEARCH_REPRESENTATIONS)) {
-                className = Representation.class.getSimpleName();
-                appropriateFields.clear();
-                appropriateFields.addAll(result.getObjectClassFields().get(className));
-              } else if (dropDown.getSelectedValue().equals(RodaConstants.SEARCH_FILES)) {
-                className = File.class.getSimpleName();
-                appropriateFields.clear();
-                appropriateFields.addAll(result.getObjectClassFields().get(className));
-              }
-
-              for (String field : appropriateFields) {
-                FlowPanel fieldPanel = new FlowPanel();
-                fieldPanel.addStyleName("content ri-content");
-
-                ValuedLabel fieldLabel = new ValuedLabel(
-                  result.getTranslations().get(
-                    className + RepresentationInformationUtils.REPRESENTATION_INFORMATION_FILTER_SEPARATOR + field),
-                  field);
-                fieldLabel.addStyleName("form-label ri-content-label");
-                fieldPanel.add(fieldLabel);
-
-                TextBox fieldBox = new TextBox();
-
-                for (String filter : ri.getFilters()) {
-                  if (filter.startsWith(
-                    className + RepresentationInformationUtils.REPRESENTATION_INFORMATION_FILTER_SEPARATOR + field)) {
-                    fieldBox.setText(RepresentationInformationUtils.getValueFromFilter(filter));
-                  }
-                }
-
-                fieldBox.addStyleName("form-textbox ri-content-textbox");
-                fieldPanel.add(fieldBox);
-                fieldsPanel.add(fieldPanel);
-              }
+              updateAssociationFields(fieldsPanel, dropDown, appropriateFields, result, ri, values);
             }
           });
+
+          if (!ri.getFilters().isEmpty()) {
+            if (ri.getFilters().get(0).startsWith(Representation.class.getSimpleName())) {
+              appropriateFields.addAll(result.getObjectClassFields().get(Representation.class.getSimpleName()));
+              dropDown.setSelectedValue(RodaConstants.SEARCH_REPRESENTATIONS, true);
+            } else if (ri.getFilters().get(0).startsWith(File.class.getSimpleName())) {
+              appropriateFields.addAll(result.getObjectClassFields().get(File.class.getSimpleName()));
+              dropDown.setSelectedValue(RodaConstants.SEARCH_FILES, true);
+            } else if (ri.getFilters().get(0).startsWith(AIP.class.getSimpleName())) {
+              appropriateFields.addAll(result.getObjectClassFields().get(AIP.class.getSimpleName()));
+              dropDown.setSelectedValue(RodaConstants.SEARCH_ITEMS, true);
+            }
+          } else {
+            appropriateFields.addAll(result.getObjectClassFields().get(AIP.class.getSimpleName()));
+            dropDown.setSelectedValue(RodaConstants.SEARCH_ITEMS, true);
+          }
 
           confirmButton.addClickHandler(new ClickHandler() {
             @Override
@@ -221,33 +162,26 @@ public class RepresentationInformationDialogs {
               dialogBox.hide();
               ri.setFilters(new ArrayList<String>());
 
-              for (int i = 0; i < fieldsPanel.getWidgetCount(); i++) {
-                Widget w = fieldsPanel.getWidget(i);
+              String className;
+              switch (dropDown.getSelectedValue()) {
+                case RodaConstants.SEARCH_ITEMS:
+                  className = AIP.class.getSimpleName();
+                  break;
+                case RodaConstants.SEARCH_REPRESENTATIONS:
+                  className = Representation.class.getSimpleName();
+                  break;
+                case RodaConstants.SEARCH_FILES:
+                  className = File.class.getSimpleName();
+                  break;
+                default:
+                  return;
+              }
 
-                if (w instanceof FlowPanel) {
-                  FlowPanel panel = (FlowPanel) w;
-
-                  for (int j = 0; j < panel.getWidgetCount(); j = j + 2) {
-                    Widget w1 = panel.getWidget(j);
-                    Widget w2 = panel.getWidget(j + 1);
-
-                    if (w1 instanceof ValuedLabel && w2 instanceof TextBox) {
-                      ValuedLabel label = (ValuedLabel) w1;
-                      TextBox box = (TextBox) w2;
-
-                      if (StringUtils.isNotBlank(box.getText())) {
-                        if (dropDown.getSelectedValue().equals(RodaConstants.SEARCH_ITEMS)) {
-                          ri.addFilter(RepresentationInformationUtils.createRepresentationInformationFilter(
-                            AIP.class.getSimpleName(), label.getValue(), box.getValue()));
-                        } else if (dropDown.getSelectedValue().equals(RodaConstants.SEARCH_REPRESENTATIONS)) {
-                          ri.addFilter(RepresentationInformationUtils.createRepresentationInformationFilter(
-                            Representation.class.getSimpleName(), label.getValue(), box.getValue()));
-                        } else if (dropDown.getSelectedValue().equals(RodaConstants.SEARCH_FILES)) {
-                          ri.addFilter(RepresentationInformationUtils.createRepresentationInformationFilter(
-                            File.class.getSimpleName(), label.getValue(), box.getValue()));
-                        }
-                      }
-                    }
+              for (String field : values.keySet()) {
+                for (String value : values.get(field)) {
+                  if (StringUtils.isNotBlank(value)) {
+                    ri.addFilter(RepresentationInformationUtils.createRepresentationInformationFilter(className,
+                      field, value));
                   }
                 }
               }
@@ -273,6 +207,55 @@ public class RepresentationInformationDialogs {
 
     dialogBox.center();
     dialogBox.show();
+  }
+
+  private static void updateAssociationFields(FlowPanel fieldsPanel, Dropdown dropDown, List<String> appropriateFields,
+    RepresentationInformationFilterBundle result, RepresentationInformation ri, final Map<String, List<String>> values) {
+    fieldsPanel.clear();
+    String className = null;
+
+    if (dropDown.getSelectedValue().equals(RodaConstants.SEARCH_ITEMS)) {
+      className = AIP.class.getSimpleName();
+    } else if (dropDown.getSelectedValue().equals(RodaConstants.SEARCH_REPRESENTATIONS)) {
+      className = Representation.class.getSimpleName();
+    } else if (dropDown.getSelectedValue().equals(RodaConstants.SEARCH_FILES)) {
+      className = File.class.getSimpleName();
+    }
+
+    appropriateFields.clear();
+    appropriateFields.addAll(result.getObjectClassFields().get(className));
+
+    for (final String field : appropriateFields) {
+      String filterClassField = className + RepresentationInformationUtils.REPRESENTATION_INFORMATION_FILTER_SEPARATOR
+        + field;
+
+      FlowPanel fieldPanel = new FlowPanel();
+      fieldPanel.addStyleName("content ri-content");
+
+      ValuedLabel fieldLabel = new ValuedLabel(result.getTranslations().get(filterClassField), field);
+      fieldLabel.addStyleName("form-label ri-content-label");
+      fieldPanel.add(fieldLabel);
+
+      List<String> valuesForThisField = new ArrayList<>();
+
+      for (String filter : ri.getFilters()) {
+        if (filter.startsWith(filterClassField)) {
+          valuesForThisField.add(RepresentationInformationUtils.getValueFromFilter(filter));
+        }
+      }
+
+      IncrementalList incrementalList = new IncrementalList(true);
+      incrementalList.setTextBoxList(valuesForThisField);
+      incrementalList.addValueChangeHandler(new ValueChangeHandler<List<String>>() {
+        @Override public void onValueChange(ValueChangeEvent<List<String>> event) {
+          values.put(field, event.getValue());
+        }
+      });
+      fieldPanel.add(incrementalList);
+
+
+      fieldsPanel.add(fieldPanel);
+    }
   }
 
   public static void showPromptDialogRepresentationInformationRelations(String title, final String cancelButtonText,
@@ -838,7 +821,6 @@ public class RepresentationInformationDialogs {
           // needed?)
           throw new RuntimeException("Only SelectedItemsList is supported on RI, for now");
         }
-
 
       }
     });

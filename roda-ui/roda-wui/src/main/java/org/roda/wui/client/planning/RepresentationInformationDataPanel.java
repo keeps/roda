@@ -126,6 +126,12 @@ public class RepresentationInformationDataPanel extends Composite
       }
     };
 
+    ValueChangeHandler valueChangeHandler = new ValueChangeHandler() {
+      @Override public void onValueChange(ValueChangeEvent event) {
+        RepresentationInformationDataPanel.this.onChange();
+      }
+    };
+
     KeyUpHandler keyUpHandler = new KeyUpHandler() {
 
       @Override
@@ -140,7 +146,7 @@ public class RepresentationInformationDataPanel extends Composite
     description.addKeyUpHandler(keyUpHandler);
     family.addChangeHandler(changeHandler);
     family.addKeyUpHandler(keyUpHandler);
-    categories.addChangeHandler(changeHandler);
+    categories.addValueChangeHandler(valueChangeHandler);
     extras.addChangeHandler(changeHandler);
 
     support.addChangeHandler(changeHandler);

@@ -11,7 +11,7 @@
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
-	<g:FlowPanel addStyleNames="incremental-list">
+	<g:FlowPanel stylePrimaryName="incremental-list">
 		<g:FlowPanel ui:field="textBoxPanel" addStyleNames="incremental-list-layout"></g:FlowPanel>
 		<g:Button addStyleNames="btn btn-incremental-list-add btn-plus" ui:field="addDynamicButton">
 			<ui:text from='{messages.addButton}' />

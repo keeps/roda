@@ -140,6 +140,12 @@ public class FormatDataPanel extends Composite implements HasValueChangeHandlers
       }
     };
 
+    ValueChangeHandler valueChangeHandler = new ValueChangeHandler() {
+      @Override public void onValueChange(ValueChangeEvent event) {
+        FormatDataPanel.this.onChange();
+      }
+    };
+
     KeyUpHandler keyUpHandler = new KeyUpHandler() {
 
       @Override
@@ -152,7 +158,7 @@ public class FormatDataPanel extends Composite implements HasValueChangeHandlers
     name.addKeyUpHandler(keyUpHandler);
     definition.addChangeHandler(changeHandler);
     definition.addKeyUpHandler(keyUpHandler);
-    category.addChangeHandler(changeHandler);
+    category.addValueChangeHandler(valueChangeHandler);
 
     latestVersion.addChangeHandler(changeHandler);
     popularity.addChangeHandler(changeHandler);
@@ -166,15 +172,15 @@ public class FormatDataPanel extends Composite implements HasValueChangeHandlers
     });
 
     standard.addChangeHandler(changeHandler);
-    website.addChangeHandler(changeHandler);
+    website.addValueChangeHandler(valueChangeHandler);
     provenanceInformation.addChangeHandler(changeHandler);
 
-    extensions.addChangeHandler(changeHandler);
-    mimetypes.addChangeHandler(changeHandler);
-    pronoms.addChangeHandler(changeHandler);
-    utis.addChangeHandler(changeHandler);
-    alternatives.addChangeHandler(changeHandler);
-    versions.addChangeHandler(changeHandler);
+    extensions.addValueChangeHandler(valueChangeHandler);
+    mimetypes.addValueChangeHandler(valueChangeHandler);
+    pronoms.addValueChangeHandler(valueChangeHandler);
+    utis.addValueChangeHandler(valueChangeHandler);
+    alternatives.addValueChangeHandler(valueChangeHandler);
+    versions.addValueChangeHandler(valueChangeHandler);
 
     if (editmode) {
       setFormat(format);

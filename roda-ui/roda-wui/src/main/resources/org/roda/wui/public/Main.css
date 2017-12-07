@@ -6282,3 +6282,23 @@ span.code {
     font-family: "UbuntuMono", "Ubuntu", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: bold;
 }
+
+.incremental-list-vertical .removable-textbox {
+    display: block;
+    position: relative;
+    margin-right: 0;
+}
+
+.incremental-list-vertical .removable-textbox .form-textbox {
+    width: 100%;
+}
+
+.incremental-list-vertical .removable-textbox .ri-toolbarLink {
+    position: absolute;
+    right: 0;
+    margin-right: 0;
+}
+
+.incremental-list-vertical .removable-textbox .ri-toolbarLink:first {
+    background-color: yellow;
+}

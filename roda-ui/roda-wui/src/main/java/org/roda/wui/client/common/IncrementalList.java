@@ -10,6 +10,9 @@ package org.roda.wui.client.common;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import org.roda.wui.client.common.utils.StringUtils;
 
 import com.google.gwt.core.client.GWT;
@@ -29,7 +32,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-public class IncrementalList extends Composite implements HasHandlers {
+public class IncrementalList extends Composite implements HasValueChangeHandlers<List<String>> {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
   interface MyUiBinder extends UiBinder<Widget, IncrementalList> {
@@ -45,8 +48,15 @@ public class IncrementalList extends Composite implements HasHandlers {
   boolean changed = false;
 
   public IncrementalList() {
+    this(false);
+  }
+
+  public IncrementalList(boolean vertical) {
     initWidget(uiBinder.createAndBindUi(this));
     textBoxes = new ArrayList<>();
+    if (vertical) {
+      addStyleDependentName("vertical");
+    }
   }
 
   public List<String> getTextBoxesValue() {
@@ -81,26 +91,25 @@ public class IncrementalList extends Composite implements HasHandlers {
     textBoxes.add(box);
 
     box.addRemoveClickHandler(new ClickHandler() {
-
       @Override
       public void onClick(ClickEvent event) {
         textBoxPanel.remove(box);
         textBoxes.remove(box);
-        DomEvent.fireNativeEvent(Document.get().createChangeEvent(), box);
+        ValueChangeEvent.fire(IncrementalList.this, getTextBoxesValue());
       }
     });
 
     box.addChangeHandler(new ChangeHandler() {
-
       @Override
       public void onChange(ChangeEvent event) {
-        DomEvent.fireNativeEvent(Document.get().createChangeEvent(), IncrementalList.this);
+        ValueChangeEvent.fire(IncrementalList.this, getTextBoxesValue());
       }
     });
   }
 
-  public HandlerRegistration addChangeHandler(ChangeHandler handler) {
-    return addDomHandler(handler, ChangeEvent.getType());
+  @Override
+  public HandlerRegistration addValueChangeHandler(ValueChangeHandler<List<String>> handler) {
+    return addHandler(handler, ValueChangeEvent.getType());
   }
 
 }
