@@ -570,24 +570,19 @@ public class IndexModelObserver implements ModelObserver {
   @Override
   public ReturnWithExceptions<Void> descriptiveMetadataCreated(DescriptiveMetadata descriptiveMetadata) {
     ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<>();
-    if (descriptiveMetadata.isFromAIP()) {
-      try {
-        AIP aip = model.retrieveAIP(descriptiveMetadata.getAipId());
-        List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
+    try {
+      AIP aip = model.retrieveAIP(descriptiveMetadata.getAipId());
+      List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
+
+      if (descriptiveMetadata.isFromAIP()) {
         indexAIP(aip, ancestors);
-      } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-        LOGGER.error("Error when descriptive metadata created on retrieving the full AIP", e);
-      }
-    }
-    else {
-      try {
-        AIP aip = model.retrieveAIP(descriptiveMetadata.getAipId());
-        List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
-        Representation representation = model.retrieveRepresentation(descriptiveMetadata.getAipId(), descriptiveMetadata.getRepresentationId());
+      } else {
+        Representation representation = model.retrieveRepresentation(descriptiveMetadata.getAipId(),
+          descriptiveMetadata.getRepresentationId());
         indexRepresentation(aip, representation, ancestors);
-      } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-        LOGGER.error("Error when descriptive metadata updated on retrieving the full Representation", e);
       }
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+      LOGGER.error("Failed to index AIP or representation when creating descriptive metadata", e);
     }
 
     return exceptions;
@@ -595,27 +590,21 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void descriptiveMetadataUpdated(DescriptiveMetadata descriptiveMetadata) {
-    if (descriptiveMetadata.isFromAIP()) {
-      try {
-        AIP aip = model.retrieveAIP(descriptiveMetadata.getAipId());
-        List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
+    try {
+      AIP aip = model.retrieveAIP(descriptiveMetadata.getAipId());
+      List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
+
+      if (descriptiveMetadata.isFromAIP()) {
         indexAIP(aip, ancestors);
-      } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-        LOGGER.error("Error when descriptive metadata updated on retrieving the full AIP", e);
-      }
-    }
-    else {
-      try {
-        AIP aip = model.retrieveAIP(descriptiveMetadata.getAipId());
-        List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
-        Representation representation = model.retrieveRepresentation(descriptiveMetadata.getAipId(), descriptiveMetadata.getRepresentationId());
+      } else {
+        Representation representation = model.retrieveRepresentation(descriptiveMetadata.getAipId(),
+          descriptiveMetadata.getRepresentationId());
         indexRepresentation(aip, representation, ancestors);
-      } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-        LOGGER.error("Error when descriptive metadata updated on retrieving the full Representation", e);
       }
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+      LOGGER.error("Failed to index AIP or representation when updating descriptive metadata", e);
     }
   }
-
 
   @Override
   public void descriptiveMetadataDeleted(String aipId, String representationId, String descriptiveMetadataBinaryId) {

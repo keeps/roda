@@ -1293,30 +1293,7 @@ public class SolrUtils {
     doc.addField(RodaConstants.AIP_GHOST, aip.getGhost() != null ? aip.getGhost() : false);
 
     if (!safemode) {
-      // guarding against repeated fields
-      Set<String> usedNonRepeatableFields = new HashSet<>();
-
-      for (DescriptiveMetadata metadata : aip.getDescriptiveMetadata()) {
-        StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aip.getId(), metadata.getId());
-        Binary binary = model.getStorage().getBinary(storagePath);
-        try {
-          SolrInputDocument fields = getDescriptiveMetadataFields(binary, metadata.getType(), metadata.getVersion());
-          for (SolrInputField field : fields) {
-            if (NON_REPEATABLE_FIELDS.contains(field.getName())) {
-              boolean added = usedNonRepeatableFields.add(field.getName());
-              if (added) {
-                doc.addField(field.getName(), field.getValue(), field.getBoost());
-              }
-            } else {
-              doc.addField(field.getName(), field.getValue(), field.getBoost());
-            }
-          }
-        } catch (GenericException e) {
-          LOGGER.info("Problem processing descriptive metadata: {}", e.getMessage(), e);
-        } catch (Exception e) {
-          LOGGER.error("Error processing descriptive metadata: {}", metadata, e);
-        }
-      }
+      indexDescriptiveMetadataFields(model, aip.getId(), null, aip.getDescriptiveMetadata(), doc);
     }
 
     // Calculate number of documentation and schema files
@@ -1388,9 +1365,9 @@ public class SolrUtils {
   }
 
   public static SolrInputDocument representationToSolrDocument(AIP aip, Representation rep, Long sizeInBytes,
-    Long numberOfDataFiles, Long numberOfDocumentationFiles, Long numberOfSchemaFiles, List<String> ancestors, ModelService model, boolean safemode)
-          throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException
-  {
+    Long numberOfDataFiles, Long numberOfDocumentationFiles, Long numberOfSchemaFiles, List<String> ancestors,
+    ModelService model, boolean safemode)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     SolrInputDocument doc = new SolrInputDocument();
     doc.addField(RodaConstants.INDEX_UUID, IdUtils.getRepresentationId(rep));
     doc.addField(RodaConstants.REPRESENTATION_ID, rep.getId());
@@ -1423,35 +1400,40 @@ public class SolrUtils {
 
     setPermissions(aip.getPermissions(), doc);
 
-    // pataki@: taken from aipToSolrInputDocument. TODO: may make refactor this to a separate method
     if (!safemode) {
-      // guarding against repeated fields
-      Set<String> usedNonRepeatableFields = new HashSet<>();
-
-      for (DescriptiveMetadata metadata : rep.getDescriptiveMetadata()) {
-        StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aip.getId(), rep.getId(), metadata.getId());
-        Binary binary = model.getStorage().getBinary(storagePath);
-        try {
-          SolrInputDocument fields = getDescriptiveMetadataFields(binary, metadata.getType(), metadata.getVersion());
-          for (SolrInputField field : fields) {
-            if (NON_REPEATABLE_FIELDS.contains(field.getName())) {
-              boolean added = usedNonRepeatableFields.add(field.getName());
-              if (added) {
-                doc.addField(field.getName(), field.getValue(), field.getBoost());
-              }
-            } else {
-              doc.addField(field.getName(), field.getValue(), field.getBoost());
-            }
-          }
-        } catch (GenericException e) {
-          LOGGER.info("Problem processing descriptive metadata: {}", e.getMessage());
-        } catch (Exception e) {
-          LOGGER.error("Error processing descriptive metadata: {}", metadata, e);
-        }
-      }
+      indexDescriptiveMetadataFields(model, aip.getId(), rep.getId(), rep.getDescriptiveMetadata(), doc);
     }
 
     return doc;
+  }
+
+  private static void indexDescriptiveMetadataFields(ModelService model, String aipId, String representationId,
+    List<DescriptiveMetadata> metadataList, SolrInputDocument doc)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    // guarding against repeated fields
+    Set<String> usedNonRepeatableFields = new HashSet<>();
+
+    for (DescriptiveMetadata metadata : metadataList) {
+      StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, representationId, metadata.getId());
+      Binary binary = model.getStorage().getBinary(storagePath);
+      try {
+        SolrInputDocument fields = getDescriptiveMetadataFields(binary, metadata.getType(), metadata.getVersion());
+        for (SolrInputField field : fields) {
+          if (NON_REPEATABLE_FIELDS.contains(field.getName())) {
+            boolean added = usedNonRepeatableFields.add(field.getName());
+            if (added) {
+              doc.addField(field.getName(), field.getValue(), field.getBoost());
+            }
+          } else {
+            doc.addField(field.getName(), field.getValue(), field.getBoost());
+          }
+        }
+      } catch (GenericException e) {
+        LOGGER.info("Problem processing descriptive metadata: {}", e.getMessage());
+      } catch (Exception e) {
+        LOGGER.error("Error processing descriptive metadata: {}", metadata, e);
+      }
+    }
   }
 
   public static SolrInputDocument fileToSolrDocument(AIP aip, File file, List<String> ancestors) {
