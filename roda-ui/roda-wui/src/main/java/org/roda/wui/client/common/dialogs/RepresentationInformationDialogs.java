@@ -742,7 +742,7 @@ public class RepresentationInformationDialogs {
     final List<HandlerRegistration> clickHandlers = new ArrayList<>();
     final DialogBox dialogBox = new DialogBox(true, true);
     dialogBox.addStyleName("ri-dialog");
-    dialogBox.setText(title);
+    dialogBox.setHTML(title);
     final FlowPanel layout = new FlowPanel();
 
     dialogBox.addStyleName("wui-dialog-prompt");

@@ -330,6 +330,10 @@ div.inline {
     padding-right: 10px;
 }
 
+.representationInformationCard {
+    margin-top: 10px;
+}
+
 .representationInformationCard > .h5 {
     color: inherit;
 }
@@ -6274,7 +6278,7 @@ td.datePickerMonth, td.datePickerYear {
     /*letter-spacing: -.1rem;*/
 }
 
-.ri-subtitle span.code {
+span.code {
     font-family: "UbuntuMono", "Ubuntu", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: bold;
 }

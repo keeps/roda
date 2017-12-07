@@ -173,7 +173,7 @@ public class RepresentationInformationNetwork extends Composite {
         if (selected != null) {
           LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
           selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
-          HistoryUtils.newHistory(RESOLVER, ShowRepresentationInformation.RESOLVER.getHistoryToken(), selected.getId());
+          HistoryUtils.newHistory(ShowRepresentationInformation.RESOLVER, selected.getId());
         }
       }
     });
@@ -195,7 +195,7 @@ public class RepresentationInformationNetwork extends Composite {
     InlineHTML badge = new InlineHTML("<span class='label-warning browseRepresentationOriginalIcon'>Beta</span>");
     title.add(badge);
 
-    registerDescription.add(new HTMLWidgetWrapper("FormatRegisterDescription.html"));
+    registerDescription.add(new HTMLWidgetWrapper("RepresentationInformationNetworkDescription.html"));
   }
 
   /**

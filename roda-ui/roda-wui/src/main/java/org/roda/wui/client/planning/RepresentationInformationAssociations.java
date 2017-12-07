@@ -13,6 +13,7 @@ package org.roda.wui.client.planning;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.facet.Facets;
@@ -51,7 +52,7 @@ import com.google.gwt.view.client.SelectionChangeEvent;
 import config.i18n.client.ClientMessages;
 
 /**
- * @author Luis Faria
+ * @author Bruno Ferreira
  *
  */
 public class RepresentationInformationAssociations extends Composite {
@@ -216,7 +217,7 @@ public class RepresentationInformationAssociations extends Composite {
               } else {
                 LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
                 selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
-                HistoryUtils.newHistory(RESOLVER, CreateRepresentationInformation.RESOLVER.getHistoryToken());
+                HistoryUtils.newHistory(CreateRepresentationInformation.RESOLVER);
               }
             }
           });
@@ -265,16 +266,11 @@ public class RepresentationInformationAssociations extends Composite {
   }
 
   private Filter createFilterAndSubtitleFromHistoryTokens(List<String> historyTokens) {
-    int offset = 0;
-    if (historyTokens.size() > 2 && Search.RESOLVER.getHistoryToken().equals(historyTokens.get(0))) {
-      offset = 1;
-    }
-
     List<FilterParameter> params = new ArrayList<>();
-    if (historyTokens.size() == (2 + offset)) {
-      params.add(new SimpleFilterParameter(historyTokens.get(offset), historyTokens.get(1 + offset)));
+    if (historyTokens.size() == (2)) {
+      params.add(new SimpleFilterParameter(historyTokens.get(0), historyTokens.get(1)));
 
-      String[] filterSplit = historyTokens.get(1 + offset).split(":");
+      String[] filterSplit = historyTokens.get(1).split(":");
       if (filterSplit.length == 3) {
         // TODO bferreira 2017-12-05: add i18n and replace switch with something better
         StringBuilder subtitleStringBuilder = new StringBuilder("Associated with ");

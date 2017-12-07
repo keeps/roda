@@ -9,6 +9,7 @@
 package org.roda.wui.client.planning;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.roda.core.data.v2.ri.RepresentationInformation;
@@ -20,7 +21,7 @@ import org.roda.wui.client.common.IncrementalList;
 import org.roda.wui.client.common.IncrementalRelationList;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.search.Search;
+import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.core.client.GWT;
@@ -182,19 +183,13 @@ public class RepresentationInformationDataPanel extends Composite
           } else {
             LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
             List<String> lastHistory = selectedItems.getLastHistory();
-            List<String> newFilters = new ArrayList<>();
 
-            if (lastHistory.size() > 4
+            if (lastHistory.size() > 4 && lastHistory.get(0).equals(Planning.RESOLVER.getHistoryToken())
               && lastHistory.get(1).equals(RepresentationInformationNetwork.RESOLVER.getHistoryToken())
-              && lastHistory.get(2).equals(Search.RESOLVER.getHistoryToken())) {
-              boolean hasOperator = lastHistory.size() % 2 == 1 ? false : true;
-              int initialIndex = hasOperator ? 4 : 3;
+              && lastHistory.get(2).equals(RepresentationInformationAssociations.RESOLVER.getHistoryToken())) {
 
-              for (int i = initialIndex; i < lastHistory.size(); i = i + 2) {
-                newFilters.add(lastHistory.get(i + 1));
-              }
-
-              RepresentationInformationDataPanel.this.filters.setFilters(newFilters);
+              RepresentationInformationDataPanel.this.filters
+                .setFilters(Collections.singletonList(lastHistory.get(lastHistory.size()-1)));
             }
           }
         }
