@@ -11,8 +11,10 @@
 package org.roda.wui.client.common;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Vector;
 
 import org.roda.core.data.v2.user.Group;
@@ -50,9 +52,14 @@ public class UserLogin {
   private static UserLogin instance = null;
   private static Map<String, String> rodaProperties;
   private static boolean initialized = false;
+  private static boolean initializing = false;
+  private static Queue<AsyncCallback<Map<String, String>>> initQueue = new LinkedList<>();
 
   private static void init(final AsyncCallback<Map<String, String>> callback) {
-    if (!initialized) {
+    initQueue.add(callback);
+
+    if (!initialized && !initializing) {
+      initializing = true;
 
       userLoginService = UserLoginService.Util.getInstance();
       userLoginService.getRodaProperties(new AsyncCallback<Map<String, String>>() {
@@ -67,12 +74,18 @@ public class UserLogin {
         public void onSuccess(Map<String, String> properties) {
           rodaProperties = properties;
           initialized = true;
-          callback.onSuccess(properties);
+          treatInitQueue();
         }
 
       });
-    } else {
-      callback.onSuccess(rodaProperties);
+    } else if (initialized) {
+      treatInitQueue();
+    }
+  }
+
+  private static void treatInitQueue() {
+    while (!initQueue.isEmpty()) {
+      initQueue.poll().onSuccess(rodaProperties);
     }
   }
 
