@@ -47,7 +47,6 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -133,16 +132,17 @@ public class IndexServiceTest {
 
   @AfterMethod
   public void cleanUp() throws RODAException {
-    index.execute(IndexedAIP.class, Filter.ALL, new ArrayList<>(), new IndexRunnable<IndexedAIP>() {
-      @Override
-      public void run(IndexedAIP item) throws GenericException, RequestNotValidException, AuthorizationDeniedException {
-        try {
-          model.deleteAIP(item.getId());
-        } catch (NotFoundException e) {
-          // do nothing
-        }
+    List<String> aipsToDelete = new ArrayList<>();
+    index.findAll(IndexedAIP.class, Filter.ALL, new ArrayList<>()).forEach(e -> aipsToDelete.add(e.getId()));
+    for (String id : aipsToDelete) {
+      try {
+        model.deleteAIP(id);
+      } catch (NotFoundException e) {
+        // do nothing
       }
-    }, e -> Assert.fail("Error cleaning up", e));
+    }
+    // last attempt to delete everything (for model/index inconsistencies)
+    index.clearAIPs();
   }
 
   private void compareAIPWithIndexedAIP(final AIP aip, final IndexedAIP indexedAIP) {
