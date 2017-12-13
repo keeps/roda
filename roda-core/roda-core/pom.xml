@@ -406,6 +406,7 @@
 		<dependency>
 			<groupId>org.glassfish.jersey.bundles.repackaged</groupId>
 			<artifactId>jersey-guava</artifactId>
+			<version>2.26-b03</version>
 		</dependency>
 
 		<!-- / FEDORA TESTING GEAR -->

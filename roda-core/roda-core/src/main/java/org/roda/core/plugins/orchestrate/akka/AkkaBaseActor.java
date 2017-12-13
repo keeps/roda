@@ -16,9 +16,9 @@ import org.roda.core.storage.StorageService;
 
 import com.codahale.metrics.MetricRegistry;
 
-import akka.actor.UntypedActor;
+import akka.actor.UntypedAbstractActor;
 
-public abstract class AkkaBaseActor extends UntypedActor {
+public abstract class AkkaBaseActor extends UntypedAbstractActor {
 
   public AkkaBaseActor() {
     setup();

@@ -152,7 +152,7 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
     Report report = PluginHelper.initPluginReport(this);
     try {
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
+      PluginHelper.updateJobInformationAsync(this, jobPluginInfo);
 
       Job job = PluginHelper.getJob(this, model);
       List<AIP> aips = PluginHelper.transformLitesIntoObjects(model, this, report, jobPluginInfo, liteList, job);
@@ -183,7 +183,7 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
       }
 
       jobPluginInfo.finalizeInfo();
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
+      PluginHelper.updateJobInformationAsync(this, jobPluginInfo);
     } catch (JobException | AuthorizationDeniedException | NotFoundException | GenericException
       | RequestNotValidException e) {
       LOGGER.error("Could not update Job information");

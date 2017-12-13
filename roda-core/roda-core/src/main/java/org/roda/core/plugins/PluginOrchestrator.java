@@ -18,6 +18,14 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.orchestrate.akka.Messages.JobPartialUpdate;
 
+/**
+ * Plugin Orchestrator interface
+ * 
+ * <p>
+ * <b>NOTE:</b> methods are synchronous unless stated otherwise by method name
+ * or specific parameter
+ * </p>
+ */
 public interface PluginOrchestrator {
 
   public void setup();
@@ -41,23 +49,21 @@ public interface PluginOrchestrator {
   /** 201603 hsilva: only tests should invoke this method synchronously */
   public void executeJob(Job job, boolean async) throws JobAlreadyStartedException;
 
-  /** 201608 hsilva: this method is async */
-  public void stopJob(Job job);
+  /** 201712 hsilva: this method was known as stopJob */
+  public void stopJobAsync(Job job);
 
-  /** 201607 hsilva: this method is sync */
-  public void cleanUnfinishedJobs();
+  /** 201712 hsilva: this method was known as cleanUnfinishedJobs */
+  public void cleanUnfinishedJobsAsync();
 
-  /** 201607 hsilva: this method is sync */
   public void setJobContextInformation(String jobId, Object object);
 
-  /** 201701 hsilva: this method is sync */
   public void setJobInError(String jobId);
 
-  /** 201607 hsilva: this method is async */
-  public <T extends IsRODAObject> void updateJobInformation(Plugin<T> plugin, JobPluginInfo jobPluginInfo)
+  /** 201712 hsilva: this method was known as updateJobInformation */
+  public <T extends IsRODAObject> void updateJobInformationAsync(Plugin<T> plugin, JobPluginInfo jobPluginInfo)
     throws JobException;
 
-  /** 201608 hsilva: this method is async */
-  public <T extends IsRODAObject> void updateJob(Plugin<T> plugin, JobPartialUpdate partialUpdate);
+  /** 201712 hsilva: this method was known as updateJob */
+  public <T extends IsRODAObject> void updateJobAsync(Plugin<T> plugin, JobPartialUpdate partialUpdate);
 
 }

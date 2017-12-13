@@ -112,7 +112,7 @@ public class PluginThatStopsItself extends AbstractPlugin<AIP> {
     try {
       Thread.sleep(sleepTime);
       Job job = PluginHelper.getJob(this, RodaCoreFactory.getModelService());
-      RodaCoreFactory.getPluginOrchestrator().stopJob(job);
+      RodaCoreFactory.getPluginOrchestrator().stopJobAsync(job);
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException
       | InterruptedException e) {
       LOGGER.error("Error while trying to stop job", e);

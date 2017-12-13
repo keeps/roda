@@ -261,7 +261,7 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
       LOGGER.info("Doing job cleanup");
       IndexService indexService = getIndex();
       Job job = PluginHelper.getJob(plugin, indexService);
-      JobsHelper.doJobObjectsCleanup(job, super.getModel(), indexService);
+      JobsHelper.cleanJobObjects(job, super.getModel(), indexService);
       LOGGER.info("Ended doing job cleanup");
     } catch (NotFoundException | GenericException e) {
       LOGGER.error("Unable to get Job for doing cleanup", e);

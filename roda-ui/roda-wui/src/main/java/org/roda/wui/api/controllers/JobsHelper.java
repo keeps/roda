@@ -154,7 +154,7 @@ public class JobsHelper {
     Job job = RodaCoreFactory.getModelService().retrieveJob(jobId);
 
     // stop it
-    RodaCoreFactory.getPluginOrchestrator().stopJob(job);
+    RodaCoreFactory.getPluginOrchestrator().stopJobAsync(job);
 
     return job;
   }

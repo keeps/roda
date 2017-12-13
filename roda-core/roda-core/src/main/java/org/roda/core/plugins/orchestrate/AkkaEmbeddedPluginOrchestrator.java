@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.io.IOUtils;
@@ -37,14 +38,13 @@ import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.index.IndexService;
-import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
@@ -58,6 +58,8 @@ import org.roda.core.plugins.orchestrate.akka.Messages;
 import org.roda.core.plugins.orchestrate.akka.Messages.JobPartialUpdate;
 import org.roda.core.plugins.orchestrate.akka.Messages.JobStateUpdated;
 import org.roda.core.plugins.plugins.PluginHelper;
+import org.roda.core.plugins.plugins.internal.CleanUnfinishedJobsPlugin;
+import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -208,7 +210,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       // do nothing
     } catch (Exception e) {
       LOGGER.error("Error running plugin from index", e);
-      JobsHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
+      JobsHelper.updateJobStateAsync(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
     }
 
   }
@@ -250,7 +252,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       // do nothing
     } catch (Exception e) {
       LOGGER.error("Error running plugin on RODA Objects ({})", objectClass.getSimpleName(), e);
-      JobsHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
+      JobsHelper.updateJobStateAsync(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
     }
 
   }
@@ -296,7 +298,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       // do nothing
     } catch (Exception e) {
       LOGGER.error("Error running plugin on all objects", e);
-      JobsHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
+      JobsHelper.updateJobStateAsync(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
     }
 
   }
@@ -317,7 +319,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       // do nothing
     } catch (Exception e) {
       LOGGER.error("Error running plugin", e);
-      JobsHelper.updateJobState(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
+      JobsHelper.updateJobStateAsync(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
     }
   }
 
@@ -421,7 +423,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public void stopJob(Job job) {
+  public void stopJobAsync(Job job) {
     String jobId = job.getId();
     if (jobId != null && runningJobs.get(jobId) != null) {
       stoppingJobs.add(jobId);
@@ -431,43 +433,39 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public void cleanUnfinishedJobs() {
-    cleanUnfinishedJobs(findUnfinishedJobs());
-  }
-
-  private IterableIndexResult<Job> findUnfinishedJobs() {
-    Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.JOB_STATE, Job.nonFinalStateList()));
-    return index.findAll(Job.class, filter, new ArrayList<>());
-  }
-
-  private void cleanUnfinishedJobs(IterableIndexResult<Job> unfinishedJobs) {
-    List<Job> unfinishedJobsList = new ArrayList<>();
-    unfinishedJobs.forEach(job -> unfinishedJobsList.add(job));
-
-    List<String> jobsToBeDeletedFromIndex = new ArrayList<>();
-    for (Job job : unfinishedJobsList) {
-      try {
-        Job jobToBeCleaned = model.retrieveJob(job.getId());
-
-        // cleanup job related objects (aips, sips, etc.)
-        JobsHelper.doJobObjectsCleanup(job, model, index);
-
-        // only after deleting all the objects, delete the job
-        JobsHelper.updateJobInTheStateStartedOrCreated(jobToBeCleaned);
-        model.createOrUpdateJob(jobToBeCleaned);
-      } catch (NotFoundException e) {
-        jobsToBeDeletedFromIndex.add(job.getId());
-      } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
-        LOGGER.error("Unable to get/update Job", e);
+  public void cleanUnfinishedJobsAsync() {
+    List<Job> unfinishedJobsList = JobsHelper.findUnfinishedJobs(index);
+    List<String> unfinishedJobsIdsList = new ArrayList<>();
+    try {
+      // set all jobs state to TO_BE_CLEANED
+      for (Job job : unfinishedJobsList) {
+        unfinishedJobsIdsList.add(job.getId());
+        Job jobToUpdate = model.retrieveJob(job.getId());
+        jobToUpdate.setState(JOB_STATE.TO_BE_CLEANED);
+        model.createOrUpdateJob(jobToUpdate);
       }
-    }
-    if (!jobsToBeDeletedFromIndex.isEmpty()) {
-      index.deleteSilently(Job.class, jobsToBeDeletedFromIndex);
+
+      if (!unfinishedJobsIdsList.isEmpty()) {
+        // create job to clean the unfinished jobs
+        Job job = new Job();
+        job.setId(IdUtils.createUUID());
+        job.setName("Clean unfinished jobs during startup");
+        job.setSourceObjects(SelectedItemsList.create(Job.class, unfinishedJobsIdsList));
+        job.setPlugin(CleanUnfinishedJobsPlugin.class.getCanonicalName());
+        job.setPluginType(PluginType.INTERNAL);
+        job.setUsername(RodaConstants.ADMIN);
+
+        RodaCoreFactory.getModelService().createJob(job);
+        RodaCoreFactory.getPluginOrchestrator().executeJob(job, true);
+      }
+    } catch (JobAlreadyStartedException | GenericException | RequestNotValidException | NotFoundException
+      | AuthorizationDeniedException e) {
+      LOGGER.error("Error while creating Job for cleaning unfinished jobs", e);
     }
   }
 
   @Override
-  public <T extends IsRODAObject> void updateJob(Plugin<T> plugin, JobPartialUpdate partialUpdate) {
+  public <T extends IsRODAObject> void updateJobAsync(Plugin<T> plugin, JobPartialUpdate partialUpdate) {
     String jobId = PluginHelper.getJobId(plugin);
     if (jobId != null && runningJobs.get(jobId) != null) {
       ActorRef jobStateInfoActor = runningJobs.get(jobId);
@@ -494,7 +492,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public <T extends IsRODAObject> void updateJobInformation(Plugin<T> plugin, JobPluginInfo info) throws JobException {
+  public <T extends IsRODAObject> void updateJobInformationAsync(Plugin<T> plugin, JobPluginInfo info)
+    throws JobException {
     String jobId = PluginHelper.getJobId(plugin);
     if (jobId != null && runningJobs.get(jobId) != null) {
       ActorRef jobStateInfoActor = runningJobs.get(jobId);

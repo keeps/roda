@@ -80,7 +80,7 @@ public class RiskIncidenceRemoverPlugin<T extends IsRODAObject> extends Abstract
 
     try {
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
+      PluginHelper.updateJobInformationAsync(this, jobPluginInfo);
 
       Job job = PluginHelper.getJob(this, model);
       List<T> list = PluginHelper.transformLitesIntoObjects(model, this, pluginReport, jobPluginInfo, liteList, job);
@@ -114,7 +114,7 @@ public class RiskIncidenceRemoverPlugin<T extends IsRODAObject> extends Abstract
 
         jobPluginInfo.incrementObjectsProcessedWithSuccess(list.size());
         jobPluginInfo.finalizeInfo();
-        PluginHelper.updateJobInformation(this, jobPluginInfo);
+        PluginHelper.updateJobInformationAsync(this, jobPluginInfo);
       } catch (GenericException | NotFoundException | AuthorizationDeniedException | RequestNotValidException e) {
         LOGGER.error("Could not delete risk incidence", e);
         jobPluginInfo.incrementObjectsProcessedWithFailure(list.size());

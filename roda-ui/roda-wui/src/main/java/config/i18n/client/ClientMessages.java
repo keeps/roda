@@ -645,6 +645,8 @@ public interface ClientMessages extends Messages {
   String showJobStatusStopping();
 
   String showJobStatusStopped();
+  
+  String showJobStatusToBeCleaned();
 
   SafeHtml showJobProgressCompletionPercentage(int completionPercentage);
 

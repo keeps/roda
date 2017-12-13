@@ -124,7 +124,7 @@ public final class PluginHelper {
 
     try {
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(plugin, liteList.size());
-      PluginHelper.updateJobInformation(plugin, jobPluginInfo);
+      PluginHelper.updateJobInformationAsync(plugin, jobPluginInfo);
 
       Job job = PluginHelper.getJob(plugin, model);
       List<T> list = PluginHelper.transformLitesIntoObjects(model, plugin, report, jobPluginInfo, liteList, job);
@@ -136,7 +136,7 @@ public final class PluginHelper {
       }
 
       jobPluginInfo.finalizeInfo();
-      PluginHelper.updateJobInformation(plugin, jobPluginInfo);
+      PluginHelper.updateJobInformationAsync(plugin, jobPluginInfo);
     } catch (JobException | AuthorizationDeniedException | RequestNotValidException | GenericException
       | NotFoundException e) {
       throw new PluginException("A job exception has occurred", e);
@@ -152,7 +152,7 @@ public final class PluginHelper {
 
     try {
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(plugin, liteList.size());
-      PluginHelper.updateJobInformation(plugin, jobPluginInfo);
+      PluginHelper.updateJobInformationAsync(plugin, jobPluginInfo);
 
       Job job = PluginHelper.getJob(plugin, model);
       List<T> list = PluginHelper.transformLitesIntoObjects(model, plugin, report, jobPluginInfo, liteList, job);
@@ -182,7 +182,7 @@ public final class PluginHelper {
       }
 
       jobPluginInfo.finalizeInfo();
-      PluginHelper.updateJobInformation(plugin, jobPluginInfo);
+      PluginHelper.updateJobInformationAsync(plugin, jobPluginInfo);
     } catch (JobException | AuthorizationDeniedException | RequestNotValidException | GenericException
       | NotFoundException e) {
       throw new PluginException("A job exception has occurred", e);
@@ -221,7 +221,7 @@ public final class PluginHelper {
     try {
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(plugin, 0);
       jobPluginInfo.setSourceObjectsCount(setSourceObjectsCount);
-      PluginHelper.updateJobInformation(plugin, jobPluginInfo);
+      PluginHelper.updateJobInformationAsync(plugin, jobPluginInfo);
 
       Job job = PluginHelper.getJob(plugin, model);
 
@@ -232,7 +232,7 @@ public final class PluginHelper {
       }
 
       jobPluginInfo.finalizeInfo();
-      PluginHelper.updateJobInformation(plugin, jobPluginInfo);
+      PluginHelper.updateJobInformationAsync(plugin, jobPluginInfo);
     } catch (JobException | AuthorizationDeniedException | RequestNotValidException | GenericException
       | NotFoundException e) {
       throw new PluginException("A job exception has occurred", e);
@@ -458,8 +458,18 @@ public final class PluginHelper {
 
   /**
    * Updates the job status for a particular plugin instance
+   * 
+   * @deprecated 201712 hsilva: use/rename to updateJobInformationAsync
    */
   public static <T extends IsRODAObject> void updateJobInformation(Plugin<T> plugin, JobPluginInfo jobPluginInfo)
+    throws JobException {
+    updateJobInformationAsync(plugin, jobPluginInfo);
+  }
+
+  /**
+   * Updates the job status for a particular plugin instance
+   */
+  public static <T extends IsRODAObject> void updateJobInformationAsync(Plugin<T> plugin, JobPluginInfo jobPluginInfo)
     throws JobException {
 
     Map<String, String> parameterValues = plugin.getParameterValues();
@@ -467,7 +477,7 @@ public final class PluginHelper {
     if (!parameterValues.containsKey(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS)
       || (parameterValues.containsKey(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS)
         && parameterValues.get(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS).equals(plugin.getClass().getName()))) {
-      RodaCoreFactory.getPluginOrchestrator().updateJobInformation(plugin, jobPluginInfo);
+      RodaCoreFactory.getPluginOrchestrator().updateJobInformationAsync(plugin, jobPluginInfo);
     }
   }
 
@@ -974,7 +984,7 @@ public final class PluginHelper {
 
     // update Job (with all new ids)
     successOldToNewTransferredResourceIds.putAll(unsuccessOldToNewTransferredResourceIds);
-    updateJobAfterMovingSIPs(plugin, index, successOldToNewTransferredResourceIds);
+    updateJobAfterMovingSIPsAsync(plugin, index, successOldToNewTransferredResourceIds);
   }
 
   private static void updateReportsAfterMovingSIPs(ModelService model, IngestJobPluginInfo jobPluginInfo,
@@ -999,13 +1009,13 @@ public final class PluginHelper {
   /**
    * Update Job source object ids (done asynchronously)
    */
-  private static <T extends IsRODAObject> void updateJobAfterMovingSIPs(Plugin<T> plugin, IndexService index,
+  private static <T extends IsRODAObject> void updateJobAfterMovingSIPsAsync(Plugin<T> plugin, IndexService index,
     Map<String, String> oldToNewTransferredResourceIds) {
     try {
       Job job = getJob(plugin, index);
       SelectedItems<?> sourceObjects = job.getSourceObjects();
       if (sourceObjects instanceof SelectedItemsList) {
-        RodaCoreFactory.getPluginOrchestrator().updateJob(plugin,
+        RodaCoreFactory.getPluginOrchestrator().updateJobAsync(plugin,
           new Messages.JobSourceObjectsUpdated(oldToNewTransferredResourceIds));
       }
     } catch (NotFoundException | GenericException e) {

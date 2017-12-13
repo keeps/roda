@@ -38,7 +38,7 @@ public class Job implements IsModelObject, IsIndexed {
   private static final long serialVersionUID = 615993757726175203L;
 
   public enum JOB_STATE {
-    CREATED, STARTED, COMPLETED, FAILED_DURING_CREATION, FAILED_TO_COMPLETE, STOPPED, STOPPING;
+    CREATED, STARTED, COMPLETED, FAILED_DURING_CREATION, FAILED_TO_COMPLETE, STOPPED, STOPPING, TO_BE_CLEANED;
   }
 
   // job identifier

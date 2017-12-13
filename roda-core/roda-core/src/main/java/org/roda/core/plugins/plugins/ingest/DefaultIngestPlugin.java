@@ -134,7 +134,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       Report pluginReport;
 
       final IngestJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, IngestJobPluginInfo.class);
-      PluginHelper.updateJobInformation(this, jobPluginInfo.setTotalSteps(getTotalSteps()));
+      PluginHelper.updateJobInformationAsync(this, jobPluginInfo.setTotalSteps(getTotalSteps()));
 
       Job job = PluginHelper.getJob(this, model);
       List<TransferredResource> resources = PluginHelper.transformLitesIntoObjects(model, this, report, jobPluginInfo,
@@ -154,7 +154,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       pluginReport = transformTransferredResourceIntoAnAIP(index, model, storage, resources);
       mergeReports(jobPluginInfo, pluginReport);
       final List<AIP> aips = getAIPsFromReports(model, jobPluginInfo);
-      PluginHelper.updateJobInformation(this, jobPluginInfo.incrementStepsCompletedByOne());
+      PluginHelper.updateJobInformationAsync(this, jobPluginInfo.incrementStepsCompletedByOne());
 
       // this event can only be created after AIPs exist and that's why it is
       // performed here, after transformTransferredResourceIntoAnAIP
@@ -166,7 +166,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
         pluginReport = doVirusCheck(index, model, storage, aips);
         mergeReports(jobPluginInfo, pluginReport);
         recalculateAIPsList(model, index, jobPluginInfo, aips, true);
-        PluginHelper.updateJobInformation(this, jobPluginInfo.incrementStepsCompletedByOne());
+        PluginHelper.updateJobInformationAsync(this, jobPluginInfo.incrementStepsCompletedByOne());
       }
 
       // 3) descriptive metadata validation
@@ -175,7 +175,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
         pluginReport = doDescriptiveMetadataValidation(index, model, storage, aips);
         mergeReports(jobPluginInfo, pluginReport);
         recalculateAIPsList(model, index, jobPluginInfo, aips, true);
-        PluginHelper.updateJobInformation(this, jobPluginInfo.incrementStepsCompletedByOne());
+        PluginHelper.updateJobInformationAsync(this, jobPluginInfo.incrementStepsCompletedByOne());
       }
 
       // 4) create file fixity information
@@ -184,7 +184,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
         pluginReport = createFileFixityInformation(index, model, storage, aips);
         mergeReports(jobPluginInfo, pluginReport);
         recalculateAIPsList(model, index, jobPluginInfo, aips, true);
-        PluginHelper.updateJobInformation(this, jobPluginInfo.incrementStepsCompletedByOne());
+        PluginHelper.updateJobInformationAsync(this, jobPluginInfo.incrementStepsCompletedByOne());
       }
 
       // 5) format identification (using Siegfried)
@@ -193,7 +193,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
         pluginReport = doFileFormatIdentification(index, model, storage, aips);
         mergeReports(jobPluginInfo, pluginReport);
         recalculateAIPsList(model, index, jobPluginInfo, aips, false);
-        PluginHelper.updateJobInformation(this, jobPluginInfo.incrementStepsCompletedByOne());
+        PluginHelper.updateJobInformationAsync(this, jobPluginInfo.incrementStepsCompletedByOne());
       }
 
       // 6) Format validation - PDF/A format validator (using VeraPDF)
@@ -204,7 +204,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
         pluginReport = doVeraPDFCheck(index, model, storage, aips, params);
         mergeReports(jobPluginInfo, pluginReport);
         recalculateAIPsList(model, index, jobPluginInfo, aips, false);
-        PluginHelper.updateJobInformation(this, jobPluginInfo.incrementStepsCompletedByOne());
+        PluginHelper.updateJobInformationAsync(this, jobPluginInfo.incrementStepsCompletedByOne());
       }
 
       // 7.1) feature extraction (using Apache Tika)
@@ -221,7 +221,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
         pluginReport = doFeatureAndFullTextExtraction(index, model, storage, aips, params);
         mergeReports(jobPluginInfo, pluginReport);
         recalculateAIPsList(model, index, jobPluginInfo, aips, false);
-        PluginHelper.updateJobInformation(this, jobPluginInfo.incrementStepsCompletedByOne());
+        PluginHelper.updateJobInformationAsync(this, jobPluginInfo.incrementStepsCompletedByOne());
       }
 
       // 8) validation of digital signature
@@ -230,7 +230,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
         pluginReport = doDigitalSignatureValidation(index, model, storage, aips);
         mergeReports(jobPluginInfo, pluginReport);
         recalculateAIPsList(model, index, jobPluginInfo, aips, false);
-        PluginHelper.updateJobInformation(this, jobPluginInfo.incrementStepsCompletedByOne());
+        PluginHelper.updateJobInformationAsync(this, jobPluginInfo.incrementStepsCompletedByOne());
       }
 
       // 9) verify producer authorization
@@ -239,7 +239,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
         pluginReport = verifyProducerAuthorization(index, model, storage, aips);
         mergeReports(jobPluginInfo, pluginReport);
         recalculateAIPsList(model, index, jobPluginInfo, aips, true);
-        PluginHelper.updateJobInformation(this, jobPluginInfo.incrementStepsCompletedByOne());
+        PluginHelper.updateJobInformationAsync(this, jobPluginInfo.incrementStepsCompletedByOne());
       }
 
       // 10) Auto accept
@@ -268,7 +268,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
       // X) final job info update
       jobPluginInfo.finalizeInfo();
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
+      PluginHelper.updateJobInformationAsync(this, jobPluginInfo);
 
       return report;
     } catch (JobException | AuthorizationDeniedException | NotFoundException | GenericException

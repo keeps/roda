@@ -145,7 +145,7 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
 
     try {
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
+      PluginHelper.updateJobInformationAsync(this, jobPluginInfo);
 
       Job job = PluginHelper.getJob(this, model);
       List<T> list = PluginHelper.transformLitesIntoObjects(model, this, pluginReport, jobPluginInfo, liteList, job);
@@ -168,7 +168,7 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
       }
 
       jobPluginInfo.finalizeInfo();
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
+      PluginHelper.updateJobInformationAsync(this, jobPluginInfo);
     } catch (JobException | AuthorizationDeniedException | NotFoundException | GenericException
       | RequestNotValidException e) {
       throw new PluginException("A job exception has occurred", e);

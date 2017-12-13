@@ -115,7 +115,7 @@ public class ReindexPreservationRepositoryEventPlugin extends AbstractPlugin<Voi
     try {
       SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
       jobPluginInfo.setSourceObjectsCount(0);
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
+      PluginHelper.updateJobInformationAsync(this, jobPluginInfo);
       pluginReport.setPluginState(PluginState.SUCCESS);
 
       CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable = model.listPreservationRepositoryEvents();
@@ -136,7 +136,7 @@ public class ReindexPreservationRepositoryEventPlugin extends AbstractPlugin<Voi
       jobPluginInfo.setSourceObjectsCount(eventCounter);
 
       jobPluginInfo.finalizeInfo();
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
+      PluginHelper.updateJobInformationAsync(this, jobPluginInfo);
     } catch (JobException | RequestNotValidException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error reindexing RODA entity", e);
       pluginReport.setPluginState(PluginState.FAILURE)

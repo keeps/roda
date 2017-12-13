@@ -72,6 +72,7 @@ import org.roda.core.common.monitor.TransferUpdateStatus;
 import org.roda.core.common.monitor.TransferredResourcesScanner;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.NodeType;
+import org.roda.core.data.common.RodaConstants.OrchestratorType;
 import org.roda.core.data.common.RodaConstants.PreservationAgentType;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.common.RodaConstants.SolrType;
@@ -175,11 +176,8 @@ public class RodaCoreFactory {
 
   // Orchestrator related objects
   private static PluginManager pluginManager;
-  // FIXME we should have only "one" orchestrator
-  private static PluginOrchestrator pluginOrchestrator;
-  private static AkkaDistributedPluginOrchestrator akkaDistributedPluginOrchestrator;
+  private static PluginOrchestrator pluginOrchestrator = null;
   private static AkkaDistributedPluginWorker akkaDistributedPluginWorker;
-  private static boolean FEATURE_DISTRIBUTED_AKKA = false;
 
   private static LdapUtility ldapUtility;
   private static Path rodaApacheDSDataDirectory = null;
@@ -324,6 +322,13 @@ public class RodaCoreFactory {
         // like Reflections is the blame)
         instantiatePluginManager();
         LOGGER.debug("Finished instantiating plugin manager");
+
+        // now that plugin manager is up, lets do some tasks that can only be
+        // done after it
+        if (nodeType == NodeType.MASTER && pluginOrchestrator != null) {
+          pluginOrchestrator.cleanUnfinishedJobsAsync();
+          LOGGER.debug("Finished clean unfinished jobs operation (doing jobs clean up asynchronously)");
+        }
 
         instantiated = true;
 
@@ -488,8 +493,9 @@ public class RodaCoreFactory {
 
   private static void instantiateDefaultObjects() {
     if (TEST_DEPLOY_DEFAULT_RESOURCES) {
-      try {
-        CloseableIterable<Resource> resources = storage.listResourcesUnderContainer(DefaultStoragePath.parse(""), true);
+      try (CloseableIterable<Resource> resources = storage.listResourcesUnderContainer(DefaultStoragePath.parse(""),
+        true)) {
+
         Iterator<Resource> resourceIterator = resources.iterator();
         boolean hasFileResources = false;
 
@@ -499,7 +505,6 @@ public class RodaCoreFactory {
             hasFileResources = true;
           }
         }
-        IOUtils.closeQuietly(resources);
 
         if (!hasFileResources) {
           copyFilesFromClasspath(RodaConstants.CORE_DEFAULT_FOLDER + "/", rodaHomePath, true);
@@ -515,7 +520,8 @@ public class RodaCoreFactory {
           index.reindexAIPs();
           // reindex other default objects HERE
         }
-      } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
+      } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
+        | IOException e) {
         LOGGER.error("Cannot load default objects", e);
       }
     }
@@ -872,15 +878,16 @@ public class RodaCoreFactory {
   }
 
   private static void instantiateMasterNodeSpecificObjects() {
-    if (FEATURE_DISTRIBUTED_AKKA) {
-      akkaDistributedPluginOrchestrator = new AkkaDistributedPluginOrchestrator(
+    OrchestratorType orchestratorType = getOrchestratorType();
+    if (orchestratorType == OrchestratorType.AKKA_DISTRIBUTED) {
+      pluginOrchestrator = new AkkaDistributedPluginOrchestrator(
         getSystemProperty(RodaConstants.CORE_NODE_HOSTNAME, RodaConstants.DEFAULT_NODE_HOSTNAME),
         getSystemProperty(RodaConstants.CORE_NODE_PORT, RodaConstants.DEFAULT_NODE_PORT));
-      akkaDistributedPluginOrchestrator.cleanUnfinishedJobs();
-    } else {
-      // pluginOrchestrator = new EmbeddedActionOrchestrator();
+    } else if (orchestratorType == OrchestratorType.AKKA) {
       pluginOrchestrator = new AkkaEmbeddedPluginOrchestrator();
-      pluginOrchestrator.cleanUnfinishedJobs();
+    } else {
+      LOGGER.error("Orchestrator type '{}' is invalid or not supported. No plugin orchestrator will be started!",
+        orchestratorType);
     }
 
     startApacheDS();
@@ -888,6 +895,18 @@ public class RodaCoreFactory {
     instantiateTransferredResourcesScanner();
 
     processPreservationEventTypeProperties();
+  }
+
+  private static OrchestratorType getOrchestratorType() {
+    OrchestratorType res = RodaConstants.DEFAULT_ORCHESTRATOR_TYPE;
+    try {
+      res = OrchestratorType.valueOf(RodaCoreFactory.getRodaConfiguration()
+        .getString(RodaConstants.ORCHESTRATOR_TYPE_PROPERTY, RodaConstants.DEFAULT_ORCHESTRATOR_TYPE.name()));
+    } catch (IllegalArgumentException e) {
+      // do nothing & return default value
+    }
+
+    return res;
   }
 
   private static void instantiateWorkerNodeSpecificObjects() {
@@ -1134,10 +1153,6 @@ public class RodaCoreFactory {
 
   public static PluginOrchestrator getPluginOrchestrator() {
     return pluginOrchestrator;
-  }
-
-  public static AkkaDistributedPluginOrchestrator getAkkaDistributedPluginOrchestrator() {
-    return akkaDistributedPluginOrchestrator;
   }
 
   public static TransferredResourcesScanner getTransferredResourcesScanner() {

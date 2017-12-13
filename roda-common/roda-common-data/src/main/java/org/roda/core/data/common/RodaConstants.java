@@ -440,10 +440,11 @@ public final class RodaConstants {
   public static final NodeType DEFAULT_NODE_TYPE = NodeType.MASTER;
 
   public enum OrchestratorType {
-    EMBEDDED, AKKA, AKKA_DISTRIBUTED
+    @Deprecated EMBEDDED, AKKA, AKKA_DISTRIBUTED
   }
 
-  public static final OrchestratorType DEFAULT_ORCHESTRATOR_TYPE = OrchestratorType.EMBEDDED;
+  public static final OrchestratorType DEFAULT_ORCHESTRATOR_TYPE = OrchestratorType.AKKA;
+  public static final String ORCHESTRATOR_TYPE_PROPERTY = "core.orchestrator.type";
 
   public static final int CORE_LDAP_DEFAULT_PORT = 10389;
 

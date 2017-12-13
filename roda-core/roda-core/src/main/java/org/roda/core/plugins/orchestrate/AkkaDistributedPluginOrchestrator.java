@@ -154,12 +154,12 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
   }
 
   @Override
-  public void stopJob(Job job) {
+  public void stopJobAsync(Job job) {
     // do nothing
   }
 
   @Override
-  public void cleanUnfinishedJobs() {
+  public void cleanUnfinishedJobsAsync() {
     // do nothing
   }
 
@@ -169,13 +169,13 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
   }
 
   @Override
-  public <T extends IsRODAObject> void updateJobInformation(Plugin<T> plugin, JobPluginInfo jobPluginInfo)
+  public <T extends IsRODAObject> void updateJobInformationAsync(Plugin<T> plugin, JobPluginInfo jobPluginInfo)
     throws JobException {
     // do nothing
   }
 
   @Override
-  public <T extends IsRODAObject> void updateJob(Plugin<T> plugin, JobPartialUpdate partialUpdate) {
+  public <T extends IsRODAObject> void updateJobAsync(Plugin<T> plugin, JobPartialUpdate partialUpdate) {
     // do nothing
   }
 

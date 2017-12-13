@@ -61,6 +61,7 @@ public final class JobsHelper {
   private static final int DEFAULT_BLOCK_SIZE = 100;
   private static final String SYNC_TIMEOUT_PROPERTY = "core.orchestrator.sync_timeout";
   private static final int DEFAULT_SYNC_TIMEOUT = 600;
+  private static final String MAX_JOBS_IN_PARALLEL_PROPERTY = "core.orchestrator.max_jobs_in_parallel";
 
   private JobsHelper() {
     // do nothing
@@ -69,7 +70,7 @@ public final class JobsHelper {
   public static int getMaxNumberOfJobsInParallel() {
     int defaultMaxNumberOfJobsInParallel = Runtime.getRuntime().availableProcessors() + 1;
 
-    return RodaCoreFactory.getRodaConfiguration().getInt("core.orchestrator.max_jobs_in_parallel",
+    return RodaCoreFactory.getRodaConfiguration().getInt(MAX_JOBS_IN_PARALLEL_PROPERTY,
       defaultMaxNumberOfJobsInParallel);
   }
 
@@ -179,14 +180,16 @@ public final class JobsHelper {
   /**
    * Updates the job state
    */
-  public static <T extends IsRODAObject> void updateJobState(Plugin<T> plugin, JOB_STATE state,
+  public static <T extends IsRODAObject> void updateJobStateAsync(Plugin<T> plugin, JOB_STATE state,
     Optional<String> stateDetails) {
-    RodaCoreFactory.getPluginOrchestrator().updateJob(plugin,
+    RodaCoreFactory.getPluginOrchestrator().updateJobAsync(plugin,
       new Messages.JobStateUpdated(plugin, state, stateDetails));
   }
 
-  public static <T extends IsRODAObject> void updateJobState(Plugin<T> plugin, JOB_STATE state, Throwable throwable) {
-    updateJobState(plugin, state, Optional.ofNullable(throwable.getClass().getName() + ": " + throwable.getMessage()));
+  public static <T extends IsRODAObject> void updateJobStateAsync(Plugin<T> plugin, JOB_STATE state,
+    Throwable throwable) {
+    updateJobStateAsync(plugin, state,
+      Optional.ofNullable(throwable.getClass().getName() + ": " + throwable.getMessage()));
   }
 
   public static Job updateJobInTheStateStartedOrCreated(Job job) {
@@ -369,38 +372,33 @@ public final class JobsHelper {
     throw new GenericException("Error while getting class from string");
   }
 
-  public static void doJobObjectsCleanup(Job job, ModelService model, IndexService index) {
-
-    if (RodaCoreFactory.getNodeType() == NodeType.MASTER) {
-      try {
-        // make sure the index is up to date
-        index.commit(IndexedAIP.class);
-        // find all AIPs that should be removed
-        Filter filter = new Filter();
-        // FIXME 20161128 hsilva: perhaps we should avoid ghosts???
-        // FIXME 20170308 nvieira: it should rollback if job is update
-        filter.add(new SimpleFilterParameter(RodaConstants.INGEST_JOB_ID, job.getId()));
-        filter.add(new OneOfManyFilterParameter(RodaConstants.AIP_STATE,
-          Arrays.asList(AIPState.CREATED.toString(), AIPState.INGEST_PROCESSING.toString())));
-
-        List<String> aipIds = new ArrayList<>();
-        index.findAll(IndexedAIP.class, filter, false, Arrays.asList(RodaConstants.INDEX_UUID))
-          .forEach(e -> aipIds.add(e.getUUID()));
-        ;
-        doJobCleanup(model, aipIds);
-      } catch (GenericException e) {
-        LOGGER.error("Error doing Job cleanup", e);
-      }
-    }
+  public static List<Job> findUnfinishedJobs(IndexService index) {
+    List<Job> unfinishedJobsList = new ArrayList<>();
+    Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.JOB_STATE, Job.nonFinalStateList()));
+    index.findAll(Job.class, filter, new ArrayList<>()).forEach(job -> unfinishedJobsList.add(job));
+    return unfinishedJobsList;
   }
 
-  private static void doJobCleanup(ModelService model, List<String> aipIds) {
-    for (String aipId : aipIds) {
-      try {
-        LOGGER.info("Job cleanup: deleting AIP {}", aipId);
-        model.deleteAIP(aipId);
-      } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-        LOGGER.error("Error doing deleting AIP during Job cleanup", e);
+  public static void cleanJobObjects(Job job, ModelService model, IndexService index) {
+    if (RodaCoreFactory.getNodeType() == NodeType.MASTER) {
+      // find all AIPs that should be removed
+      Filter filter = new Filter();
+      // FIXME 20161128 hsilva: perhaps we should avoid ghosts???
+      // FIXME 20170308 nvieira: it should rollback if job is update
+      filter.add(new SimpleFilterParameter(RodaConstants.INGEST_JOB_ID, job.getId()));
+      filter.add(new OneOfManyFilterParameter(RodaConstants.AIP_STATE,
+        Arrays.asList(AIPState.CREATED.toString(), AIPState.INGEST_PROCESSING.toString())));
+
+      List<String> aipIds = new ArrayList<>();
+      index.findAll(IndexedAIP.class, filter, false, Arrays.asList(RodaConstants.INDEX_UUID))
+        .forEach(e -> aipIds.add(e.getUUID()));
+      for (String aipId : aipIds) {
+        try {
+          LOGGER.info("Deleting AIP {} during job {} cleanup", aipId, job.getId());
+          model.deleteAIP(aipId);
+        } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+          LOGGER.error("Error deleting AIP {} during job {} cleanup", aipId, job.getId(), e);
+        }
       }
     }
   }

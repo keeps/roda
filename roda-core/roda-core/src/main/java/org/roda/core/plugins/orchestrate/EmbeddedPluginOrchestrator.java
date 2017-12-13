@@ -144,22 +144,22 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public void stopJob(Job job) {
+  public void stopJobAsync(Job job) {
     // do nothing
   }
 
   @Override
-  public <T extends IsRODAObject> void updateJobInformation(Plugin<T> plugin, JobPluginInfo jobPluginInfo) {
+  public <T extends IsRODAObject> void updateJobInformationAsync(Plugin<T> plugin, JobPluginInfo jobPluginInfo) {
     // do nothing
   }
 
   @Override
-  public void cleanUnfinishedJobs() {
+  public void cleanUnfinishedJobsAsync() {
     // do nothing
   }
 
   @Override
-  public <T extends IsRODAObject> void updateJob(Plugin<T> plugin, JobPartialUpdate partialUpdate) {
+  public <T extends IsRODAObject> void updateJobAsync(Plugin<T> plugin, JobPartialUpdate partialUpdate) {
     // do nothing
   }
 
