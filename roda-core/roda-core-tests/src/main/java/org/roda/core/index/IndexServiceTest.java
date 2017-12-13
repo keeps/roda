@@ -67,6 +67,7 @@ import org.roda.core.data.v2.log.LogEntryParameter;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.notifications.Notification.NOTIFICATION_STATE;
 import org.roda.core.data.v2.ri.RepresentationInformation;
+import org.roda.core.data.v2.ri.RepresentationInformationSupport;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
@@ -661,6 +662,7 @@ public class IndexServiceTest {
     ri.setDescription("PDF definition");
     ri.setCategories(Arrays.asList("Page Layout Files"));
     ri.setExtras("");
+    ri.setSupport(RepresentationInformationSupport.SUPPORTED);
     model.createRepresentationInformation(ri, RodaConstants.ADMIN, false);
     index.commit(RepresentationInformation.class);
 

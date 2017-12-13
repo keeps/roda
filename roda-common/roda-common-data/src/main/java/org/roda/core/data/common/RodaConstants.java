@@ -610,6 +610,7 @@ public final class RodaConstants {
   public static final String REPRESENTATION_UPDATED_BY = "updatedBy";
 
   public static final String REPRESENTATION_STATES = "representationStates";
+  public static final String REPRESENTATION_EXPIRATION_DATE = "expirationDate";
 
   public static final String REPRESENTATION_SEARCH = "search";
 

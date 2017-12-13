@@ -68,7 +68,6 @@ public class ValidationReport implements Serializable {
   }
 
   public String toHtml(boolean fullHtml, boolean addDefaultCss, boolean addIssueValues, String title) {
-
     StringBuilder sb = new StringBuilder();
     if (fullHtml) {
       sb.append("<html>");

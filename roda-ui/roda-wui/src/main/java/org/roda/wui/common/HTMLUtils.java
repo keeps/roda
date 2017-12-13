@@ -33,14 +33,12 @@ public final class HTMLUtils {
 
   /** Private empty constructor */
   private HTMLUtils() {
-
+    // do nothing
   }
 
   public static String descriptiveMetadataToHtml(Binary binary, String metadataType, String metadataVersion,
     final Locale locale) throws GenericException {
-
     Map<String, String> translations = getTranslations(metadataType, metadataVersion, locale);
-
     Reader reader = RodaUtils.applyMetadataStylesheet(binary, RodaConstants.CROSSWALKS_DISSEMINATION_HTML_PATH,
       metadataType, metadataVersion, translations);
     try {

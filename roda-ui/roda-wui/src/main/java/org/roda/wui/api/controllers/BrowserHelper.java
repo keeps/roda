@@ -339,6 +339,7 @@ public class BrowserHelper {
       try {
         String labelWithoutVersion = messages.getTranslation(
           RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX + descriptiveMetadata.getType().toLowerCase());
+
         if (descriptiveMetadata.getVersion() != null) {
           String labelWithVersion = messages.getTranslation(
             RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX + descriptiveMetadata.getType().toLowerCase()
@@ -348,7 +349,6 @@ public class BrowserHelper {
         } else {
           bundle.setLabel(labelWithoutVersion);
         }
-
       } catch (MissingResourceException e) {
         bundle.setLabel(descriptiveMetadata.getId());
       }
@@ -364,10 +364,10 @@ public class BrowserHelper {
       }
 
       bundle.setHasHistory(!CloseableIterables.isEmpty(model.getStorage().listBinaryVersions(storagePath)));
-
-    } catch (RODAException | RuntimeException t) {
+    } catch (RODAException | RuntimeException e) {
       bundle.setHasHistory(false);
     }
+
     return bundle;
   }
 
