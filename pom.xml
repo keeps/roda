@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<name>RODA - Repositório de Objetos Digitais Autênticos</name>
 	<url>http://roda.keep.pt/</url>
@@ -403,7 +403,7 @@
 						<!-- this is false by default, forces the plugin to generate the file -->
 						<generateGitPropertiesFile>true</generateGitPropertiesFile>
 
-						<!-- The path for the properties file to be generated. See Super Pom
+						<!-- The path for the properties file to be generated. See Super Pom 
 							for default variable reference https://maven.apache.org/guides/introduction/introduction-to-the-pom.html -->
 						<generateGitPropertiesFilename>
 							${project.build.directory}/${project.build.finalName}/version.json
