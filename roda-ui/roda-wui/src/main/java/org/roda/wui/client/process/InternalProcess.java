@@ -113,7 +113,7 @@ public class InternalProcess extends Composite {
       new SimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INTERNAL.toString()));
 
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.JOB_STATE),
-      new SimpleFacetParameter(RodaConstants.JOB_USERNAME), new SimpleFacetParameter(RodaConstants.JOB_PLUGIN_TYPE));
+      new SimpleFacetParameter(RodaConstants.JOB_USERNAME));
 
     jobList = new JobList(filter, facets, messages.jobList(), false);
     producerFacets = new FlowPanel();

@@ -147,6 +147,8 @@ public class ModelService extends ModelObservable {
       createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_RISK);
       createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_RISK_INCIDENCE);
       createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_DIP);
+      createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_REPRESENTATION_INFORMATION);
+      createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_FORMAT);
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error while ensuring that all containers exist", e);
     }

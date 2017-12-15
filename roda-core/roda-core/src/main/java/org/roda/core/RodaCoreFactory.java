@@ -901,6 +901,14 @@ public class RodaCoreFactory {
   private static void instantiateTestNodeSpecificObjects() {
     if (TEST_DEPLOY_LDAP) {
       startApacheDS();
+    } else if (TEST_DEPLOY_SOLR) {
+      try {
+        getIndexService().create(RODAMember.class, new User(RodaConstants.ADMIN));
+        getIndexService().commit(RODAMember.class);
+      } catch (GenericException | RequestNotValidException e) {
+        LOGGER.warn("Could not create user admin in index for test mode", e);
+      }
+
     }
 
     if (TEST_DEPLOY_SCANNER) {
