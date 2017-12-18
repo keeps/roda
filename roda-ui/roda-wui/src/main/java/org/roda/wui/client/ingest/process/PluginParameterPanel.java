@@ -349,12 +349,10 @@ public class PluginParameterPanel extends Composite {
       @Override
       public void onSuccess(List<PluginInfo> pluginsInfo) {
         Label parameterName = new Label(parameter.getName());
-
         layout.add(parameterName);
         addHelp();
 
         FlowPanel radioGroup = new FlowPanel();
-
         PluginUtils.sortByName(pluginsInfo);
 
         for (final PluginInfo pluginInfo : pluginsInfo) {
