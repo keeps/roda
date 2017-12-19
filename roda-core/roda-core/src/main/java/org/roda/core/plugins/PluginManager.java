@@ -9,6 +9,7 @@ package org.roda.core.plugins;
 
 import java.io.IOException;
 import java.lang.reflect.Modifier;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.DirectoryStream;
@@ -63,6 +64,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Rui Castro
  * @author Hélder Silva <hsilva@keep.pt>
+ * @author Luis Faria <lfaria@keep.pt>
  */
 public class PluginManager {
   private static final Logger LOGGER = LoggerFactory.getLogger(PluginManager.class);
@@ -320,40 +322,75 @@ public class PluginManager {
           && !RodaConstants.CORE_PLUGINS_SHARED_FOLDER.equals(path.getFileName().toString())
           && !RodaConstants.CORE_PLUGINS_DISABLED_FOLDER.equals(path.getFileName().toString()))) {
         for (Path pluginFolder : pluginsFolders) {
-          LOGGER.debug("Processing plugin folder '{}'", pluginFolder);
-          List<Path> pluginJarFiles = new ArrayList<>();
-          List<URL> pluginJarURLs = new ArrayList<>();
-          try (DirectoryStream<Path> jarsStream = Files.newDirectoryStream(pluginFolder, "*.jar")) {
-            for (Path jarFile : jarsStream) {
-              LOGGER.debug("   Will process jar '{}'", jarFile);
-              pluginJarFiles.add(jarFile);
-              pluginJarURLs.add(jarFile.toUri().toURL());
-            }
-          } catch (NoSuchFileException e) {
-            // do nothing as folder does not exist
-          }
-
-          try (DirectoryStream<Path> propertiesStream = Files.newDirectoryStream(pluginFolder, "*.properties")) {
-            for (Path propertiesFile : propertiesStream) {
-              try {
-                RodaCoreFactory.addExternalConfiguration(propertiesFile);
-              } catch (ConfigurationException e) {
-                LOGGER.warn("Could not load plugin configuration: " + propertiesFile, e);
-              }
-
-            }
-          }
-
-          pluginJarURLs.addAll(sharedJarURLs);
-          URL[] jars = pluginJarURLs.toArray(new URL[pluginJarURLs.size()]);
-          for (Path jarFile : pluginJarFiles) {
-            processJar(jarFile, jars);
-          }
+          loadExternalPluginFolder(sharedJarURLs, pluginFolder);
         }
       }
 
     } catch (IOException e) {
       LOGGER.error("Error while instantiating external plugins", e);
+    }
+  }
+
+  private void loadExternalPluginFolder(List<URL> sharedJarURLs, Path pluginFolder) {
+    LOGGER.debug("Processing plugin folder '{}'", pluginFolder);
+    List<Path> pluginJarFiles = new ArrayList<>();
+    List<URL> classpath = new ArrayList<>(sharedJarURLs);
+
+    // add dependencies to classpath
+    Path dependenciesFolder = pluginFolder.resolve(RodaConstants.CORE_PLUGINS_DEPENDENCIES_FOLDER);
+    if (Files.exists(dependenciesFolder) && Files.isDirectory(dependenciesFolder)) {
+      try (DirectoryStream<Path> jarsStream = Files.newDirectoryStream(dependenciesFolder, "*.jar")) {
+        jarsStream.forEach(jarFile -> {
+          try {
+            classpath.add(jarFile.toUri().toURL());
+          } catch (MalformedURLException e) {
+            LOGGER.warn("Could not add jar to dependecies of plugin at " + pluginFolder, e);
+          }
+        });
+      } catch (IOException e) {
+        LOGGER.warn("Could not load dependencies of plugin at " + pluginFolder, e);
+      }
+    }
+
+    // list jars to load
+    try (DirectoryStream<Path> jarsStream = Files.newDirectoryStream(pluginFolder, "*.jar")) {
+      jarsStream.forEach(jarFile -> pluginJarFiles.add(jarFile));
+    } catch (NoSuchFileException e) {
+      // do nothing as folder does not exist
+    } catch (IOException e) {
+      LOGGER.warn("Could not load jars of plugin at " + pluginFolder, e);
+    }
+
+    // inject plugin configuration
+    try (DirectoryStream<Path> propertiesStream = Files.newDirectoryStream(pluginFolder, "*.properties")) {
+      for (Path propertiesFile : propertiesStream) {
+        try {
+          RodaCoreFactory.addExternalConfiguration(propertiesFile);
+        } catch (ConfigurationException e) {
+          LOGGER.warn("Could not load plugin configuration: " + propertiesFile, e);
+        }
+
+      }
+    } catch (IOException e) {
+      LOGGER.warn("Could not load properties of plugin at " + pluginFolder, e);
+    }
+
+    for (Path jarFile : pluginJarFiles) {
+      List<URL> jarClasspath = new ArrayList<>(classpath);
+
+      try {
+        // add own jar to classpath
+        jarClasspath.add(jarFile.toUri().toURL());
+
+        // process
+        processJar(jarFile, jarClasspath.toArray(new URL[jarClasspath.size()]));
+
+      } catch (MalformedURLException e) {
+        LOGGER.warn("Could not add own jar to classpath of plugin at " + pluginFolder, e);
+      } catch (IOException e) {
+        LOGGER.error("Could not process jar of plugin at " + pluginFolder, e);
+      }
+
     }
   }
 
@@ -369,7 +406,7 @@ public class PluginManager {
     return sharedJarURLs;
   }
 
-  private void processJar(Path jarFile, URL[] jars) throws IOException {
+  private void processJar(Path jarFile, URL[] classpath) throws IOException {
     BasicFileAttributes attrs = Files.readAttributes(jarFile, BasicFileAttributes.class);
 
     if (jarPluginCache.containsKey(jarFile)
@@ -379,7 +416,7 @@ public class PluginManager {
       // The plugin doesn't exist or the modification date is
       // different. Let's load the Plugin
 
-      List<Plugin<? extends IsRODAObject>> plugins = loadPlugin(jarFile, jars);
+      List<Plugin<? extends IsRODAObject>> plugins = loadPlugin(jarFile, classpath);
       if (!plugins.isEmpty()) {
         LOGGER.info("'{}' (is new? {}) is not loaded or modification dates differ. Inspecting Jar...",
           jarFile.getFileName(), jarPluginCache.containsKey(jarFile));
@@ -498,7 +535,7 @@ public class PluginManager {
 
   }
 
-  private List<Plugin<?>> loadPlugin(Path jarFile, URL[] jars) {
+  private List<Plugin<?>> loadPlugin(Path jarFile, URL[] classpath) {
     List<Plugin<?>> ret = new ArrayList<>();
     Plugin<?> plugin = null;
 
@@ -519,7 +556,7 @@ public class PluginManager {
             LOGGER.trace("Adding jar {} to classpath and loading {} with ClassLoader {}", jarFile.getFileName(),
               pluginClassName, URLClassLoader.class.getSimpleName());
 
-            Object object = ClassLoaderUtility.createObject(jars, pluginClassName);
+            Object object = ClassLoaderUtility.createObject(classpath, pluginClassName);
 
             if (Plugin.class.isAssignableFrom(object.getClass())) {
               plugin = (Plugin<?>) object;

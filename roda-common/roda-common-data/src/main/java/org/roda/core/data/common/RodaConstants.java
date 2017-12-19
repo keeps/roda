@@ -154,6 +154,7 @@ public final class RodaConstants {
   public static final String CORE_REPRESENTATION_FOLDER = "representation";
   public static final String CORE_AIP_FOLDER = "aip";
   public static final String CORE_PLUGINS_FOLDER = "plugins";
+  public static final String CORE_PLUGINS_DEPENDENCIES_FOLDER = "dependencies";
   public static final String CORE_PLUGINS_SHARED_FOLDER = "shared";
   public static final String CORE_PLUGINS_DISABLED_FOLDER = "disabled";
   public static final String CORE_DISSEMINATION_FOLDER = "dissemination";
