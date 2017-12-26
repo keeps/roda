@@ -189,8 +189,8 @@
 			<param-value>ui.filter.cas</param-value>
 		</init-param>
 		<init-param>
-			<param-name>casServerUrlPrefix</param-name>
-			<param-value>https://localhost:8443/cas</param-value>
+			<param-name>casServerLogoutUrl</param-name>
+			<param-value>https://localhost:8443/cas/logout</param-value>
 		</init-param>
 	</filter>
 	<filter-mapping>
