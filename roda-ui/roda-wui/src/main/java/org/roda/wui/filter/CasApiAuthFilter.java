@@ -123,6 +123,7 @@ public class CasApiAuthFilter implements Filter {
       final User user = UserUtility.getLdapUtility().getAuthenticatedUser(username, password);
       user.setIpAddress(request.getRemoteAddr());
       UserUtility.setUser(request, user);
+      filterChain.doFilter(request, response);
     } else {
       // if user is external then try to use CAS
       final String tgt = this.casClient.getTicketGrantingTicket(username, password);
