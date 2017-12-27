@@ -49,8 +49,9 @@ public class CasWebAuthFilter implements Filter {
 
   @Override
   public void init(final FilterConfig config) throws ServletException {
-    casLogoutURL = String.format("%s/logout", config.getInitParameter("casServerLogoutUrl"));
+    casLogoutURL = config.getInitParameter("casServerLogoutUrl");
 
+    LOGGER.info("CAS logout URL = " + casLogoutURL);
     LOGGER.info(getClass().getSimpleName() + " initialized ok");
   }
 
