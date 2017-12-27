@@ -59,19 +59,14 @@
 									ui:field="representationInformationCategoryValue" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
-								<g:Label styleName="label" ui:field="representationInformationExtrasKey">
-									<ui:text from='{messages.representationInformationExtras}' />
-								</g:Label>
-								<g:Label styleName="value"
-									ui:field="representationInformationExtrasValue" />
-							</g:FlowPanel>
-							<g:FlowPanel styleName="field">
 								<g:Label styleName="label" ui:field="representationInformationSupportKey">
 									<ui:text from='{messages.representationInformationSupport}' />
 								</g:Label>
 								<g:Label styleName="value"
 									ui:field="representationInformationSupportValue" />
 							</g:FlowPanel>
+							
+							<g:FlowPanel ui:field="extras"></g:FlowPanel>
 
 							<g:FlowPanel styleName="ri-form-separator" ui:field="additionalSeparator">
 								<g:Label>

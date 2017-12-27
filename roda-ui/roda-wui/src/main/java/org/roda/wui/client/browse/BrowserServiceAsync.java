@@ -46,6 +46,7 @@ import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.browse.bundle.DipBundle;
 import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
+import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
 import org.roda.wui.client.common.search.SearchField;
@@ -260,12 +261,15 @@ public interface BrowserServiceAsync {
 
   void retrieveRepresentationTypeOptions(String locale, AsyncCallback<Pair<Boolean, List<String>>> asyncCallback);
 
-  void createRepresentationInformation(RepresentationInformation ri,
+  void createRepresentationInformation(RepresentationInformation ri, RepresentationInformationExtraBundle bundle,
     AsyncCallback<RepresentationInformation> asyncCallback);
 
-  void updateRepresentationInformation(RepresentationInformation ri, AsyncCallback<Void> asyncCallback);
+  void updateRepresentationInformation(RepresentationInformation ri, RepresentationInformationExtraBundle bundle,
+    AsyncCallback<Void> asyncCallback);
 
-  void updateRepresentationInformationListWithFilter(SelectedItemsList<RepresentationInformation> representationInformationIds, String filterToAdd, AsyncCallback<Void> asyncCallback);
+  void updateRepresentationInformationListWithFilter(
+    SelectedItemsList<RepresentationInformation> representationInformationIds, String filterToAdd,
+    AsyncCallback<Void> asyncCallback);
 
   void deleteRepresentationInformation(SelectedItems<RepresentationInformation> selected,
     AsyncCallback<Void> asyncCallback);
@@ -286,4 +290,7 @@ public interface BrowserServiceAsync {
 
   void retrieveRelationTypeTranslations(String localeString,
     AsyncCallback<RelationTypeTranslationsBundle> asyncCallback);
+
+  void retrieveRepresentationInformationExtraBundle(RepresentationInformation ri, String family, String localeString,
+    AsyncCallback<RepresentationInformationExtraBundle> asyncCallback);
 }

@@ -8,20 +8,20 @@
 
 package org.roda.wui.client.planning;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.ri.RepresentationInformationSupport;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.common.IncrementalFilterList;
 import org.roda.wui.client.common.IncrementalList;
 import org.roda.wui.client.common.IncrementalRelationList;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.common.utils.StringUtils;
+import org.roda.wui.client.common.utils.FormUtilities;
 import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.core.client.GWT;
@@ -38,7 +38,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
@@ -68,10 +68,7 @@ public class RepresentationInformationDataPanel extends Composite
   IncrementalList categories;
 
   @UiField
-  Label extrasLabel;
-
-  @UiField
-  TextBox extras;
+  FlowPanel extras;
 
   @UiField
   ListBox support;
@@ -88,6 +85,7 @@ public class RepresentationInformationDataPanel extends Composite
   private boolean editmode;
   private boolean changed = false;
   private boolean checked = false;
+  private RepresentationInformationExtraBundle extraBundle = null;
 
   /**
    * Create a new user data panel
@@ -114,10 +112,6 @@ public class RepresentationInformationDataPanel extends Composite
     super.setVisible(visible);
     filters.setVisible(false);
 
-    // TODO extras should not be hidden
-    extrasLabel.setVisible(false);
-    extras.setVisible(false);
-
     ChangeHandler changeHandler = new ChangeHandler() {
 
       @Override
@@ -127,7 +121,8 @@ public class RepresentationInformationDataPanel extends Composite
     };
 
     ValueChangeHandler valueChangeHandler = new ValueChangeHandler() {
-      @Override public void onValueChange(ValueChangeEvent event) {
+      @Override
+      public void onValueChange(ValueChangeEvent event) {
         RepresentationInformationDataPanel.this.onChange();
       }
     };
@@ -147,7 +142,6 @@ public class RepresentationInformationDataPanel extends Composite
     family.addChangeHandler(changeHandler);
     family.addKeyUpHandler(keyUpHandler);
     categories.addValueChangeHandler(valueChangeHandler);
-    extras.addChangeHandler(changeHandler);
 
     support.addChangeHandler(changeHandler);
     relations.addChangeHandler(changeHandler);
@@ -195,7 +189,7 @@ public class RepresentationInformationDataPanel extends Composite
               && lastHistory.get(2).equals(RepresentationInformationAssociations.RESOLVER.getHistoryToken())) {
 
               RepresentationInformationDataPanel.this.filters
-                .setFilters(Collections.singletonList(lastHistory.get(lastHistory.size()-1)));
+                .setFilters(Collections.singletonList(lastHistory.get(lastHistory.size() - 1)));
             }
           }
         }
@@ -229,7 +223,6 @@ public class RepresentationInformationDataPanel extends Composite
 
     this.family.setSelectedIndex(index);
     this.categories.setTextBoxList(ri.getCategories());
-    this.extras.setText(ri.getExtras());
 
     for (int i = 0; i < support.getItemCount(); i++) {
       if (support.getValue(i).equals(ri.getSupport().toString())) {
@@ -240,6 +233,22 @@ public class RepresentationInformationDataPanel extends Composite
 
     this.relations.setRelationList(ri.getRelations());
     this.filters.setFilters(ri.getFilters());
+
+    BrowserService.Util.getInstance().retrieveRepresentationInformationExtraBundle(ri, this.family.getSelectedValue(),
+      LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<RepresentationInformationExtraBundle>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
+        }
+
+        @Override
+        public void onSuccess(RepresentationInformationExtraBundle extra) {
+          RepresentationInformationDataPanel.this.extraBundle = extra;
+          extras.clear();
+          FormUtilities.create(extras, extra.getValues(), false);
+        }
+      });
   }
 
   public RepresentationInformation getRepresentationInformation() {
@@ -248,7 +257,6 @@ public class RepresentationInformationDataPanel extends Composite
     ri.setDescription(description.getText());
     ri.setFamily(family.getSelectedValue());
     ri.setCategories(categories.getTextBoxesValue());
-    ri.setExtras(extras.getText());
 
     ri.setSupport(RepresentationInformationSupport.valueOf(support.getSelectedValue()));
     ri.setRelations(relations.getValues());
@@ -262,7 +270,7 @@ public class RepresentationInformationDataPanel extends Composite
     description.setText("");
     family.clear();
     categories.clearTextBoxes();
-    extras.setText("");
+    extras.clear();
     support.clear();
     relations.clear();
     filters.clearFilters();
@@ -301,5 +309,9 @@ public class RepresentationInformationDataPanel extends Composite
 
   public RepresentationInformation getValue() {
     return getRepresentationInformation();
+  }
+
+  public RepresentationInformationExtraBundle getExtras() {
+    return extraBundle;
   }
 }

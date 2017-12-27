@@ -54,6 +54,7 @@ import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.browse.bundle.DipBundle;
 import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
+import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
 import org.roda.wui.client.common.search.SearchField;
@@ -356,13 +357,15 @@ public interface BrowserService extends RemoteService {
 
   Pair<Boolean, List<String>> retrieveRepresentationTypeOptions(String locale);
 
-  RepresentationInformation createRepresentationInformation(RepresentationInformation ri)
+  RepresentationInformation createRepresentationInformation(RepresentationInformation ri,
+    RepresentationInformationExtraBundle extra)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
-  void updateRepresentationInformation(RepresentationInformation ri)
+  void updateRepresentationInformation(RepresentationInformation ri, RepresentationInformationExtraBundle extra)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
-  void updateRepresentationInformationListWithFilter(SelectedItemsList<RepresentationInformation> representationInformationIds, String filterToAdd)
+  void updateRepresentationInformationListWithFilter(
+    SelectedItemsList<RepresentationInformation> representationInformationIds, String filterToAdd)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
   void deleteRepresentationInformation(SelectedItems<RepresentationInformation> selected)
@@ -387,4 +390,7 @@ public interface BrowserService extends RemoteService {
 
   RelationTypeTranslationsBundle retrieveRelationTypeTranslations(String localeString)
     throws AuthorizationDeniedException;
+
+  RepresentationInformationExtraBundle retrieveRepresentationInformationExtraBundle(RepresentationInformation ri,
+    String family, String localeString) throws AuthorizationDeniedException;
 }

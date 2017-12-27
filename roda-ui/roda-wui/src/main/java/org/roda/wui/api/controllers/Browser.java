@@ -88,6 +88,7 @@ import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.browse.bundle.DipBundle;
 import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
+import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
 import org.roda.wui.client.planning.MitigationPropertiesBundle;
@@ -3349,7 +3350,8 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static RepresentationInformation createRepresentationInformation(User user, RepresentationInformation ri)
+  public static RepresentationInformation createRepresentationInformation(User user, RepresentationInformation ri,
+    RepresentationInformationExtraBundle extra)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -3360,7 +3362,7 @@ public class Browser extends RodaWuiController {
 
     try {
       // delegate
-      return BrowserHelper.createRepresentationInformation(ri, user.getName(), true);
+      return BrowserHelper.createRepresentationInformation(ri, extra, user.getName(), true);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;
@@ -3370,7 +3372,8 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static void updateRepresentationInformation(User user, RepresentationInformation ri)
+  public static void updateRepresentationInformation(User user, RepresentationInformation ri,
+    RepresentationInformationExtraBundle extra)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -3380,7 +3383,7 @@ public class Browser extends RodaWuiController {
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
     try {
-      BrowserHelper.updateRepresentationInformation(ri, user.getName(), true);
+      BrowserHelper.updateRepresentationInformation(ri, extra, user.getName(), true);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;
@@ -3526,13 +3529,34 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    boolean resultSucess = BrowserHelper.updateRepresentationInformationListWithFilter(representationInformationIds, filterToAdd,
-      user.getName());
+    boolean resultSuccess = BrowserHelper.updateRepresentationInformationListWithFilter(representationInformationIds,
+      filterToAdd, user.getName());
 
-    LOG_ENTRY_STATE state = resultSucess ? LOG_ENTRY_STATE.SUCCESS : LOG_ENTRY_STATE.FAILURE;
+    LOG_ENTRY_STATE state = resultSuccess ? LOG_ENTRY_STATE.SUCCESS : LOG_ENTRY_STATE.FAILURE;
 
     // register action
     controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_REPRESENTATION_INFORMATION_PARAM,
       representationInformationIds);
+  }
+
+  public static RepresentationInformationExtraBundle retrieveRepresentationInformationExtraBundle(User user,
+    RepresentationInformation ri, String family, Locale locale) throws AuthorizationDeniedException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    RepresentationInformationExtraBundle extra = null;
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    try {
+      extra = BrowserHelper.retrieveRepresentationInformationExtraBundle(ri, family, locale);
+    } catch (Exception e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+    }
+
+    // register action
+    controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_REPRESENTATION_INFORMATION_PARAM, ri,
+      RodaConstants.CONTROLLER_REPRESENTATION_INFORMATION_FAMILY_PARAM, family);
+    return extra;
   }
 }

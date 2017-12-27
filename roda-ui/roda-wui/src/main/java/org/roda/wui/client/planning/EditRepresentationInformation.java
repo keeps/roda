@@ -128,19 +128,20 @@ public class EditRepresentationInformation extends Composite {
       String formatId = ri.getId();
       ri = representationInformationDataPanel.getRepresentationInformation();
       ri.setId(formatId);
-      BrowserService.Util.getInstance().updateRepresentationInformation(ri, new AsyncCallback<Void>() {
+      BrowserService.Util.getInstance().updateRepresentationInformation(ri,
+        this.representationInformationDataPanel.getExtras(), new AsyncCallback<Void>() {
 
-        @Override
-        public void onFailure(Throwable caught) {
-          errorMessage(caught);
-        }
+          @Override
+          public void onFailure(Throwable caught) {
+            errorMessage(caught);
+          }
 
-        @Override
-        public void onSuccess(Void result) {
-          HistoryUtils.newHistory(ShowRepresentationInformation.RESOLVER, ri.getId());
-        }
+          @Override
+          public void onSuccess(Void result) {
+            HistoryUtils.newHistory(ShowRepresentationInformation.RESOLVER, ri.getId());
+          }
 
-      });
+        });
     } else {
       HistoryUtils.newHistory(ShowRepresentationInformation.RESOLVER, ri.getId());
     }

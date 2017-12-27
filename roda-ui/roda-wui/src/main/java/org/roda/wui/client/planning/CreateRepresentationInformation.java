@@ -94,7 +94,7 @@ public class CreateRepresentationInformation extends Composite {
     if (representationInformationDataPanel.isValid()) {
       ri = representationInformationDataPanel.getRepresentationInformation();
       BrowserService.Util.getInstance().createRepresentationInformation(ri,
-        new AsyncCallback<RepresentationInformation>() {
+        this.representationInformationDataPanel.getExtras(), new AsyncCallback<RepresentationInformation>() {
 
           @Override
           public void onFailure(Throwable caught) {

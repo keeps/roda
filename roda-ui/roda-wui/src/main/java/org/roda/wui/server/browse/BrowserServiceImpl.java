@@ -89,6 +89,7 @@ import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.browse.bundle.DipBundle;
 import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
+import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
 import org.roda.wui.client.common.search.SearchField;
@@ -992,22 +993,23 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public RepresentationInformation createRepresentationInformation(RepresentationInformation ri)
+  public RepresentationInformation createRepresentationInformation(RepresentationInformation ri,
+    RepresentationInformationExtraBundle extra)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.createRepresentationInformation(user, ri);
+    return Browser.createRepresentationInformation(user, ri, extra);
   }
 
   @Override
-  public void updateRepresentationInformation(RepresentationInformation ri)
+  public void updateRepresentationInformation(RepresentationInformation ri, RepresentationInformationExtraBundle extra)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.updateRepresentationInformation(user, ri);
+    Browser.updateRepresentationInformation(user, ri, extra);
   }
 
   @Override
-  public void updateRepresentationInformationListWithFilter(SelectedItemsList<RepresentationInformation> representationInformationIds,
-    String filterToAdd)
+  public void updateRepresentationInformationListWithFilter(
+    SelectedItemsList<RepresentationInformation> representationInformationIds, String filterToAdd)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Browser.updateRepresentationInformationListWithFilter(user, representationInformationIds, filterToAdd);
@@ -1073,6 +1075,14 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     Locale locale = ServerTools.parseLocale(localeString);
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
     return Browser.retrieveRelationTypeTranslations(user, messages);
+  }
+
+  @Override
+  public RepresentationInformationExtraBundle retrieveRepresentationInformationExtraBundle(RepresentationInformation ri,
+    String family, String localeString) throws AuthorizationDeniedException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    Locale locale = ServerTools.parseLocale(localeString);
+    return Browser.retrieveRepresentationInformationExtraBundle(user, ri, family, locale);
   }
 
 }

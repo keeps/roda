@@ -368,6 +368,7 @@ public final class RodaConstants {
   public static final String CONTROLLER_JOB_ID_PARAM = "jobId";
   public static final String CONTROLLER_REPRESENTATION_INFORMATION_PARAM = RODA_OBJECT_REPRESENTATION_INFORMATION;
   public static final String CONTROLLER_REPRESENTATION_INFORMATION_ID_PARAM = "representationInformationId";
+  public static final String CONTROLLER_REPRESENTATION_INFORMATION_FAMILY_PARAM = "family";
   public static final String CONTROLLER_FORMAT_PARAM = RODA_OBJECT_FORMAT;
   public static final String CONTROLLER_FORMAT_ID_PARAM = "formatId";
 
@@ -1268,6 +1269,7 @@ public final class RodaConstants {
   public static final String METADATA_TEMPLATE_FOLDER = "templates";
   public static final String METADATA_TEMPLATE_EXTENSION = ".xml.hbs";
   public static final String USERS_TEMPLATE_FOLDER = "users";
+  public static final String METADATA_REPRESENTATION_INFORMATION_TEMPLATE_FOLDER = "ri-templates";
 
   public static final String USER_EXTRA_METADATA_FILE = "user_extra.xml.hbs";
 

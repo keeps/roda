@@ -45,7 +45,7 @@ public class RepresentationInformations extends RodaWuiController {
 
     try {
       // delegate
-      return BrowserHelper.createRepresentationInformation(ri, user.getName(), false);
+      return BrowserHelper.createRepresentationInformation(ri, null, user.getName(), false);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;
@@ -66,7 +66,7 @@ public class RepresentationInformations extends RodaWuiController {
 
     try {
       // delegate
-      return BrowserHelper.updateRepresentationInformation(ri, user.getName(), false);
+      return BrowserHelper.updateRepresentationInformation(ri, null, user.getName(), false);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;

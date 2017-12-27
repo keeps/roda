@@ -205,6 +205,10 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
       new HashSet<>(Arrays.asList(Permissions.PermissionType.CREATE, Permissions.PermissionType.READ,
         Permissions.PermissionType.UPDATE, Permissions.PermissionType.DELETE, Permissions.PermissionType.GRANT)));
 
+    fullPermissions.setGroupPermissions(RodaConstants.ADMINISTRATORS,
+      new HashSet<>(Arrays.asList(Permissions.PermissionType.CREATE, Permissions.PermissionType.READ,
+        Permissions.PermissionType.UPDATE, Permissions.PermissionType.DELETE, Permissions.PermissionType.GRANT)));
+
     return EARKSIPToAIPPluginUtils.earkSIPToAIP(sip, jobUsername, fullPermissions, model, sip.getIds(),
       reportItem.getJobId(), computedParentId);
   }

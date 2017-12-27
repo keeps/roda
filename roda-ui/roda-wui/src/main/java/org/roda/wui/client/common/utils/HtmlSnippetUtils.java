@@ -9,6 +9,7 @@ package org.roda.wui.client.common.utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
@@ -31,17 +32,25 @@ import org.roda.core.data.v2.risks.RiskIncidence.INCIDENCE_STATUS;
 import org.roda.wui.client.browse.BrowseAIP;
 import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.browse.MetadataValue;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.planning.RepresentationInformationAssociations;
 import org.roda.wui.client.planning.ShowRepresentationInformation;
 import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.json.client.JSONException;
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONParser;
+import com.google.gwt.json.client.JSONString;
+import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.UIObject;
@@ -280,15 +289,12 @@ public class HtmlSnippetUtils {
       case SUCCESS:
         labelClass = "label-success";
         break;
-
       case FAILURE:
         labelClass = "label-danger";
         break;
-
       case UNAUTHORIZED:
         labelClass = "label-warning";
         break;
-
       default:
         labelClass = "label-default";
         break;
@@ -304,13 +310,11 @@ public class HtmlSnippetUtils {
       objectLabel.setText(messages.showAIPExtended());
       objectLink.setHref(HistoryUtils.createHistoryHashLink(BrowseAIP.RESOLVER, incidence.getAipId()));
       objectLink.setText(incidence.getAipId());
-
     } else if (Representation.class.getSimpleName().equals(incidence.getObjectClass())) {
       objectLabel.setText(messages.showRepresentationExtended());
       objectLink.setHref(HistoryUtils.createHistoryHashLink(BrowseRepresentation.RESOLVER, incidence.getAipId(),
         incidence.getRepresentationId()));
       objectLink.setText(incidence.getRepresentationId());
-
     } else if (File.class.getSimpleName().equals(incidence.getObjectClass())) {
       objectLabel.setText(messages.showFileExtended());
       objectLink.setHref(HistoryUtils.createHistoryHashLink(HistoryUtils.getHistoryBrowse(incidence.getAipId(),
@@ -329,17 +333,19 @@ public class HtmlSnippetUtils {
               html = fv.getLabel();
               break;
             }
-
           }
         }
+
         if (html != null) {
           break;
         }
       }
     }
+
     if (html == null) {
       html = entry.getActionComponent();
     }
+
     return SafeHtmlUtils.fromSafeConstant(html);
   }
 
@@ -351,4 +357,71 @@ public class HtmlSnippetUtils {
     }
   }
 
+  public static void createExtraShow(FlowPanel panel, Set<MetadataValue> bundle, boolean addStyle) {
+    for (MetadataValue mv : bundle) {
+      boolean mandatory = (mv.get("mandatory") != null && "true".equalsIgnoreCase(mv.get("mandatory"))) ? true : false;
+
+      if (mv.get("hidden") != null && "true".equals(mv.get("hidden"))) {
+        continue;
+      }
+
+      FlowPanel layout = new FlowPanel();
+      layout.addStyleName("field");
+      addField(panel, layout, mv, mandatory);
+    }
+  }
+
+  private static String getFieldLabel(MetadataValue mv) {
+    String result = mv.getId();
+    String rawLabel = mv.get("label");
+    if (rawLabel != null && rawLabel.length() > 0) {
+      String loc = LocaleInfo.getCurrentLocale().getLocaleName();
+      try {
+        JSONObject jsonObject = JSONParser.parseLenient(rawLabel).isObject();
+        JSONValue jsonValue = jsonObject.get(loc);
+        if (jsonValue != null) {
+          JSONString jsonString = jsonValue.isString();
+          if (jsonString != null) {
+            result = jsonString.stringValue();
+          }
+        } else {
+          if (loc.contains("_")) {
+            jsonValue = jsonObject.get(loc.split("_")[0]);
+            if (jsonValue != null) {
+              JSONString jsonString = jsonValue.isString();
+              if (jsonString != null) {
+                result = jsonString.stringValue();
+              }
+            }
+          }
+          // label for the desired language doesn't exist
+          // do nothing
+        }
+      } catch (JSONException e) {
+        // The JSON was malformed
+        // do nothing
+      }
+    }
+    mv.set("l", result);
+    return result;
+  }
+
+  private static void addField(FlowPanel panel, final FlowPanel layout, final MetadataValue mv,
+    final boolean mandatory) {
+    if (StringUtils.isNotBlank(mv.get("value"))) {
+      // Top label
+      Label mvLabel = new Label(getFieldLabel(mv));
+      mvLabel.addStyleName("label");
+
+      // Field
+      final Label mvText = new Label();
+      mvText.setTitle(mvLabel.getText());
+      mvText.addStyleName("value");
+      mvText.setText(mv.get("value"));
+
+      layout.add(mvLabel);
+      layout.add(mvText);
+      panel.add(layout);
+    }
+  }
 }

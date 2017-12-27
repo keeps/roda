@@ -35,11 +35,13 @@ import org.roda.core.data.v2.ri.RelationObjectType;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.ri.RepresentationInformationRelation;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.RepresentationInformationDialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.management.MemberManagement;
@@ -138,9 +140,6 @@ public class ShowRepresentationInformation extends Composite {
   FlowPanel representationInformationCategoryValue;
 
   @UiField
-  Label representationInformationExtrasKey, representationInformationExtrasValue;
-
-  @UiField
   Label representationInformationSupportKey, representationInformationSupportValue;
 
   @UiField
@@ -151,6 +150,9 @@ public class ShowRepresentationInformation extends Composite {
 
   @UiField
   FlowPanel additionalSeparator;
+
+  @UiField
+  FlowPanel extras;
 
   @UiField
   Button buttonEdit;
@@ -225,9 +227,6 @@ public class ShowRepresentationInformation extends Composite {
       }
     }
 
-    representationInformationExtrasValue.setText(ri.getExtras());
-    representationInformationExtrasKey.setVisible(StringUtils.isNotBlank(ri.getExtras()));
-
     if (ri.getSupport() != null) {
       representationInformationSupportValue
         .setText(messages.representationInformationSupportValue(ri.getSupport().toString()));
@@ -235,6 +234,20 @@ public class ShowRepresentationInformation extends Composite {
     } else {
       representationInformationSupportKey.setVisible(false);
     }
+
+    BrowserService.Util.getInstance().retrieveRepresentationInformationExtraBundle(ri, ri.getFamily(),
+      LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<RepresentationInformationExtraBundle>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
+        }
+
+        @Override
+        public void onSuccess(RepresentationInformationExtraBundle extra) {
+          HtmlSnippetUtils.createExtraShow(extras, extra.getValues(), false);
+        }
+      });
 
     initRelations();
   }
@@ -314,24 +327,27 @@ public class ShowRepresentationInformation extends Composite {
           public void onClick(ClickEvent event) {
             RepresentationInformationDialogs.showPromptDialogRepresentationInformation(
               messages.representationInformationAddNewRelation(), messages.cancelButton(), messages.confirmButton(),
-              ShowRepresentationInformation.this.ri, new AsyncCallback<RepresentationInformation>(){
-                @Override public void onFailure(Throwable caught) {
+              ShowRepresentationInformation.this.ri, new AsyncCallback<RepresentationInformation>() {
+                @Override
+                public void onFailure(Throwable caught) {
                   // do nothing
                 }
 
-                @Override public void onSuccess(RepresentationInformation result) {
+                @Override
+                public void onSuccess(RepresentationInformation result) {
                   // result is ri with updated filters
-                  BrowserService.Util.getInstance().updateRepresentationInformation(result, new AsyncCallback<Void>() {
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      AsyncCallbackUtils.defaultFailureTreatment(caught);
-                    }
+                  BrowserService.Util.getInstance().updateRepresentationInformation(result, null,
+                    new AsyncCallback<Void>() {
+                      @Override
+                      public void onFailure(Throwable caught) {
+                        AsyncCallbackUtils.defaultFailureTreatment(caught);
+                      }
 
-                    @Override
-                    public void onSuccess(Void result) {
-                      ShowRepresentationInformation.getInstance().updateLists();
-                    }
-                  });
+                      @Override
+                      public void onSuccess(Void result) {
+                        ShowRepresentationInformation.getInstance().updateLists();
+                      }
+                    });
                 }
               });
           }
@@ -451,7 +467,7 @@ public class ShowRepresentationInformation extends Composite {
         HistoryUtils.createHistoryHashLink(HistoryUtils.getHistoryBrowse(relation.getLink())));
       b.append(SafeHtmlUtils.fromSafeConstant("<a href='"));
       b.append(SafeHtmlUtils.fromString(a.getHref()));
-      b.append(SafeHtmlUtils.fromSafeConstant("' target='_blank'>"));
+      b.append(SafeHtmlUtils.fromSafeConstant("'>"));
       b.append(SafeHtmlUtils.fromString(a.getText()));
       b.append(SafeHtmlUtils.fromSafeConstant("</a>"));
     } else if (relation.getObjectType().equals(RelationObjectType.REPRESENTATION_INFORMATION)) {
@@ -462,7 +478,7 @@ public class ShowRepresentationInformation extends Composite {
       Anchor a = new Anchor(relation.getTitle(), HistoryUtils.createHistoryHashLink(history));
       b.append(SafeHtmlUtils.fromSafeConstant("<a href='"));
       b.append(SafeHtmlUtils.fromString(a.getHref()));
-      b.append(SafeHtmlUtils.fromSafeConstant("' target='_blank'>"));
+      b.append(SafeHtmlUtils.fromSafeConstant("'>"));
       b.append(SafeHtmlUtils.fromString(a.getText()));
       b.append(SafeHtmlUtils.fromSafeConstant("</a>"));
     } else if (relation.getObjectType().equals(RelationObjectType.WEB)) {

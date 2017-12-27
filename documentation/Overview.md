@@ -92,6 +92,10 @@ This page shows a dashboard of statistics concerning several aspects of the repo
 
 Risk register lists all identified risks that may affect the repository. It should be as comprehensive as possible to include all identifiable threats that have probability of occur and generally includes estimated probability of the risk event to occur, severity or possible impact of the risk, probable timing and anticipated frequency. Risk mitigation is the process of defining actions to enhance opportunities and reduce threats to repository objectives.
 
-### Format register
+### Representation network
+
+Representation information is any information required to understand and render both the digital material and the associated metadata. Digital objects are stored as bitstreams, which are not understandable to a human being without further data to interpret them. Representation information is the extra structural or semantic information, which converts raw data into something more meaningful. 
+
+### Format register (deprecated)
 
 The Format registry is a technical registry to support digital preservation services of the repositories.

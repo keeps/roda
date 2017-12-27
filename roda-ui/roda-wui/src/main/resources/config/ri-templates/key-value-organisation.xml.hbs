@@ -1,0 +1,11 @@
+{{~field name="id" 		auto-generate="id" label="{\"en\": \"ID\"}" xpath="//*:field[@name='id']/string()"~}}
+{{~field name="title" 	label="{\"en\": \"Title\"}" auto-generate="title" xpath="//*:field[@name='title']/string()"~}}
+{{~field name="user" 	label="{\"en\": \"Producer\"}" xpath="//*:field[@name='producer']/string()"~}}
+{{~field name="date3" 	type="date" label="{\"en\": \"Date3\"}" auto-generate="now" xpath="//*:field[@name='date3']/string()"~}}
+<?xml version="1.0" encoding="utf-8" ?>
+<metadata>
+	{{~#if id~}}<field name="id">{{id}}</field>{{~/if~}}
+	{{~#if title~}}<field name="title">{{title}}</field>{{~/if~}}
+	{{~#if user~}}<field name="producer">{{user}}</field>{{~/if~}}
+	{{~#if date3~}}<field name="date3">{{date3}}</field>{{~/if~}}
+</metadata>

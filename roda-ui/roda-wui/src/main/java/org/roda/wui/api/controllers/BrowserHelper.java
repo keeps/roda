@@ -158,6 +158,7 @@ import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataViewBundle;
 import org.roda.wui.client.browse.bundle.DipBundle;
 import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
+import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
 import org.roda.wui.client.planning.MitigationPropertiesBundle;
@@ -170,6 +171,9 @@ import org.roda.wui.server.common.XMLSimilarityIgnoreElements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
+
+import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.Template;
 
 /**
  * @author Luis Faria <lfaria@keep.pt>
@@ -405,7 +409,7 @@ public class BrowserHelper {
       String xml = IOUtils.toString(inputStream, "UTF-8");
 
       // Get the supported metadata type with the same type and version
-      // We need this to try to get get the values for the form
+      // We need this to try to get the values for the form
       SupportedMetadataTypeBundle metadataTypeBundle = null;
       List<SupportedMetadataTypeBundle> supportedMetadataTypeBundles = BrowserHelper.retrieveSupportedMetadata(user,
         aip, representation, locale);
@@ -487,9 +491,11 @@ public class BrowserHelper {
     throws GenericException, NotFoundException, RequestNotValidException {
     DipBundle bundle = new DipBundle();
 
-    bundle.setDip(retrieve(IndexedDIP.class, dipUUID,
-      Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID, RodaConstants.DIP_TITLE, RodaConstants.DIP_AIP_IDS,
-        RodaConstants.DIP_AIP_UUIDS, RodaConstants.DIP_FILE_IDS, RodaConstants.DIP_REPRESENTATION_IDS)));
+    bundle
+      .setDip(retrieve(IndexedDIP.class, dipUUID,
+        Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID, RodaConstants.DIP_TITLE,
+          RodaConstants.DIP_AIP_IDS, RodaConstants.DIP_AIP_UUIDS, RodaConstants.DIP_FILE_IDS,
+          RodaConstants.DIP_REPRESENTATION_IDS)));
 
     List<String> dipFileFields = new ArrayList<>();
 
@@ -2738,8 +2744,8 @@ public class BrowserHelper {
   public static String retrieveDescriptiveMetadataPreview(SupportedMetadataTypeBundle bundle) throws GenericException {
     String rawTemplate = bundle.getTemplate();
     String result;
-    if (StringUtils.isNotBlank(rawTemplate)) {
 
+    if (StringUtils.isNotBlank(rawTemplate)) {
       Map<String, String> data = new HashMap<>();
       Set<MetadataValue> values = bundle.getValues();
       if (values != null) {
@@ -2756,10 +2762,10 @@ public class BrowserHelper {
 
       result = HandlebarsUtility.executeHandlebars(rawTemplate, data);
       // result = RodaUtils.indentXML(result);
-
     } else {
       result = rawTemplate;
     }
+
     return result;
   }
 
@@ -3354,12 +3360,20 @@ public class BrowserHelper {
   }
 
   public static RepresentationInformation createRepresentationInformation(RepresentationInformation ri,
-    String createdBy, boolean commit) throws GenericException, RequestNotValidException {
+    RepresentationInformationExtraBundle extra, String createdBy, boolean commit)
+    throws GenericException, RequestNotValidException {
+    if (extra != null) {
+      ri.setExtras(getRepresentationInformationExtra(extra));
+    }
     return RodaCoreFactory.getModelService().createRepresentationInformation(ri, createdBy, commit);
   }
 
   public static RepresentationInformation updateRepresentationInformation(RepresentationInformation ri,
-    String updatedBy, boolean commit) throws GenericException, RequestNotValidException {
+    RepresentationInformationExtraBundle extra, String updatedBy, boolean commit)
+    throws GenericException, RequestNotValidException {
+    if (extra != null) {
+      ri.setExtras(getRepresentationInformationExtra(extra));
+    }
     return RodaCoreFactory.getModelService().updateRepresentationInformation(ri, updatedBy, commit);
   }
 
@@ -3498,7 +3512,7 @@ public class BrowserHelper {
     for (String id : representationInformationIds.getIds()) {
       try {
         RepresentationInformation representationInformation = model.retrieveRepresentationInformation(id);
-        if(!representationInformation.getFilters().contains(filterToAdd)){
+        if (!representationInformation.getFilters().contains(filterToAdd)) {
           representationInformation.getFilters().add(filterToAdd);
         }
         model.updateRepresentationInformation(representationInformation, username, true);
@@ -3508,5 +3522,200 @@ public class BrowserHelper {
       }
     }
     return success;
+  }
+
+  public static RepresentationInformationExtraBundle retrieveRepresentationInformationExtraBundle(
+    RepresentationInformation ri, String family, Locale locale) throws GenericException {
+    RepresentationInformationExtraBundle ret;
+
+    try (InputStream inputStream = IOUtils.toInputStream(ri.getExtras(), "UTF-8")) {
+      String xml = ri.getExtras();
+      List<SupportedMetadataTypeBundle> supportedMetadataTypeBundles = BrowserHelper
+        .retrieveExtraSupportedMetadata(locale);
+      SupportedMetadataTypeBundle metadataTypeBundle = supportedMetadataTypeBundles.get(0);
+
+      // Get the values using XPath
+      Set<MetadataValue> values = null;
+
+      if (metadataTypeBundle != null) {
+        values = metadataTypeBundle.getValues();
+        if (values != null) {
+          for (MetadataValue mv : values) {
+            String xpathRaw = mv.get("xpath");
+            if (xpathRaw != null && xpathRaw.length() > 0) {
+              String[] xpaths = xpathRaw.split("##%##");
+              String value;
+              List<String> allValues = new ArrayList<>();
+              for (String xpath : xpaths) {
+                allValues.addAll(ServerTools.applyXpath(xml, xpath));
+              }
+              // if any of the values is different, concatenate all values in a
+              // string, otherwise return the value
+              boolean allEqual = allValues.stream().allMatch(s -> s.trim().equals(allValues.get(0).trim()));
+              if (allEqual && !allValues.isEmpty()) {
+                value = allValues.get(0);
+              } else {
+                value = String.join(" / ", allValues);
+              }
+              mv.set("value", value.trim());
+            }
+          }
+
+          // Identity check. Test if the original XML is equal to the result of
+          // applying the extracted values to the template
+          metadataTypeBundle.setValues(values);
+          String templateWithValues = retrieveDescriptiveMetadataPreview(metadataTypeBundle);
+
+          if (StringUtils.isNotBlank(templateWithValues)) {
+            try {
+              XMLUnit.setIgnoreComments(true);
+              XMLUnit.setIgnoreWhitespace(true);
+              XMLUnit.setIgnoreAttributeOrder(true);
+              XMLUnit.setCompareUnmatched(false);
+
+              Diff xmlDiff = new Diff(xml, templateWithValues);
+              xmlDiff.overrideDifferenceListener(new XMLSimilarityIgnoreElements("schemaLocation"));
+            } catch (SAXException e) {
+              LOGGER.warn("Could not check if template can loose info", e);
+            }
+          }
+        }
+      }
+
+      ret = new RepresentationInformationExtraBundle(ri, family, values);
+    } catch (IOException e) {
+      throw new GenericException("Error getting representation information extra bundle: " + e.getMessage(), e);
+    }
+
+    return ret;
+  }
+
+  public static List<SupportedMetadataTypeBundle> retrieveExtraSupportedMetadata(Locale locale)
+    throws GenericException {
+    Messages messages = RodaCoreFactory.getI18NMessages(locale);
+    List<String> types = new ArrayList<>();
+    types.add("key-value-file-format");
+    types.add("key-value-software");
+    types.add("key-value-organisation");
+    types.add("key-value-data");
+
+    List<SupportedMetadataTypeBundle> supportedMetadata = new ArrayList<>();
+
+    if (types != null) {
+      for (String id : types) {
+        String type = id;
+        String version = null;
+        if (id.contains(RodaConstants.METADATA_VERSION_SEPARATOR)) {
+          version = id.substring(id.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR) + 1, id.length());
+          type = id.substring(0, id.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR));
+        }
+        String key = RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX + type;
+        if (version != null) {
+          key += RodaConstants.METADATA_VERSION_SEPARATOR + version.toLowerCase();
+        }
+        String label = messages.getTranslation(key, type);
+
+        String template = null;
+        Set<MetadataValue> values = new HashSet<>();
+        try (InputStream templateStream = RodaCoreFactory
+          .getConfigurationFileAsStream(RodaConstants.METADATA_REPRESENTATION_INFORMATION_TEMPLATE_FOLDER + "/"
+            + ((version != null) ? type + RodaConstants.METADATA_VERSION_SEPARATOR + version : type)
+            + RodaConstants.METADATA_TEMPLATE_EXTENSION)) {
+
+          if (templateStream != null) {
+            template = IOUtils.toString(templateStream, RodaConstants.DEFAULT_ENCODING);
+            values = ServerTools.transform(template);
+            for (MetadataValue mv : values) {
+              String generator = mv.get("auto-generate");
+              if (generator != null && generator.length() > 0) {
+                mv.set("value", "");
+              }
+              String labels = mv.get("label");
+              String labelI18N = mv.get("labeli18n");
+              if (labels != null && labelI18N != null) {
+                Map<String, String> labelsMaps = JsonUtils.getMapFromJson(labels);
+                try {
+                  labelsMaps.put(locale.toString(), RodaCoreFactory.getI18NMessages(locale).getTranslation(labelI18N));
+                } catch (MissingResourceException e) {
+                  LOGGER.debug("Missing resource: {}", labelI18N);
+                }
+                labels = JsonUtils.getJsonFromObject(labelsMaps);
+                mv.set("label", labels);
+              }
+
+              String i18nPrefix = mv.get("optionsLabelI18nKeyPrefix");
+              if (i18nPrefix != null) {
+                Map<String, String> terms = messages.getTranslations(i18nPrefix, String.class, false);
+                if (terms.size() > 0) {
+                  try {
+                    String options = mv.get("options");
+                    List<String> optionsList = JsonUtils.getListFromJson(options, String.class);
+
+                    if (optionsList != null) {
+                      Map<String, Map<String, String>> i18nMap = new HashMap<>();
+                      for (int i = 0; i < optionsList.size(); i++) {
+                        String value = optionsList.get(i);
+                        String translation = terms.get(i18nPrefix + "." + value);
+                        if (translation == null) {
+                          translation = value;
+                        }
+                        Map<String, String> term = new HashMap<>();
+                        term.put(locale.toString(), translation);
+                        i18nMap.put(value, term);
+                      }
+                      mv.set("optionsLabels", JsonUtils.getJsonFromObject(i18nMap));
+                    }
+                  } catch (MissingResourceException e) {
+                    LOGGER.error(e.getMessage(), e);
+                  }
+                }
+              }
+
+            }
+          }
+        } catch (IOException e) {
+          LOGGER.error("Error getting the template from the stream", e);
+        }
+
+        supportedMetadata.add(new SupportedMetadataTypeBundle(id, type, version, label, template, values));
+      }
+    }
+    return supportedMetadata;
+  }
+
+  private static String getRepresentationInformationExtra(RepresentationInformationExtraBundle extra)
+    throws GenericException {
+    Handlebars handlebars = new Handlebars();
+    Map<String, String> data = new HashMap<>();
+    handlebars.registerHelper("field", (o, options) -> {
+      return options.fn();
+    });
+
+    try (InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(
+      RodaConstants.METADATA_REPRESENTATION_INFORMATION_TEMPLATE_FOLDER + "/key-value-documentation.xml.hbs")) {
+      String rawTemplate = IOUtils.toString(templateStream, RodaConstants.DEFAULT_ENCODING);
+      Template tmpl = handlebars.compileInline(rawTemplate);
+
+      if (extra != null) {
+        Set<MetadataValue> values = extra.getValues();
+        if (values != null) {
+          values.forEach(metadataValue -> {
+            String val = metadataValue.get("value");
+            if (val != null) {
+              val = val.replaceAll("\\s", "");
+              if (!"".equals(val)) {
+                data.put(metadataValue.get("name"), metadataValue.get("value"));
+              }
+            }
+          });
+        }
+      }
+
+      return tmpl.apply(data);
+    } catch (IOException e) {
+      LOGGER.error("Error getting template from stream", e);
+    }
+
+    return "";
   }
 }

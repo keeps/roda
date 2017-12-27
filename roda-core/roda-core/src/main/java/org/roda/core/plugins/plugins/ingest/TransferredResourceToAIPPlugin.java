@@ -128,6 +128,9 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
       permissions.setUserPermissions(job.getUsername(),
         new HashSet<>(Arrays.asList(Permissions.PermissionType.CREATE, Permissions.PermissionType.READ,
           Permissions.PermissionType.UPDATE, Permissions.PermissionType.DELETE, Permissions.PermissionType.GRANT)));
+      permissions.setGroupPermissions(RodaConstants.ADMINISTRATORS,
+        new HashSet<>(Arrays.asList(Permissions.PermissionType.CREATE, Permissions.PermissionType.READ,
+          Permissions.PermissionType.UPDATE, Permissions.PermissionType.DELETE, Permissions.PermissionType.GRANT)));
 
       boolean notifyCreatedAIP = false;
       String aipType = RodaConstants.AIP_TYPE_MIXED;
