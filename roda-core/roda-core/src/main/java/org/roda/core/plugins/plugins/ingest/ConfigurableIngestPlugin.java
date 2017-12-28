@@ -60,17 +60,17 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
     pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_CREATE_PREMIS_SKELETON));
     pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FILE_FORMAT_IDENTIFICATION));
 
-    if (!deactivatedPlugins.contains(RodaConstants.PLUGIN_CLASS_VERAPDF)) {
-      pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_VERAPDF_CHECK));
+    if (!deactivatedPlugins.contains(DefaultIngestPlugin.PLUGIN_CLASS_VERAPDF)) {
+      pluginParameters.add(getPluginParameter(DefaultIngestPlugin.PLUGIN_PARAMS_DO_VERAPDF_CHECK));
     }
 
-    if (!deactivatedPlugins.contains(RodaConstants.PLUGIN_CLASS_TIKA_FULLTEXT)) {
-      pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION));
-      pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FULL_TEXT_EXTRACTION));
+    if (!deactivatedPlugins.contains(DefaultIngestPlugin.PLUGIN_CLASS_TIKA_FULLTEXT)) {
+      pluginParameters.add(getPluginParameter(DefaultIngestPlugin.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION));
+      pluginParameters.add(getPluginParameter(DefaultIngestPlugin.PLUGIN_PARAMS_DO_FULL_TEXT_EXTRACTION));
     }
 
-    if (!deactivatedPlugins.contains(RodaConstants.PLUGIN_CLASS_DIGITAL_SIGNATURE)) {
-      pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_DIGITAL_SIGNATURE_VALIDATION));
+    if (!deactivatedPlugins.contains(DefaultIngestPlugin.PLUGIN_CLASS_DIGITAL_SIGNATURE)) {
+      pluginParameters.add(getPluginParameter(DefaultIngestPlugin.PLUGIN_PARAMS_DO_DIGITAL_SIGNATURE_VALIDATION));
     }
 
     pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_PRODUCER_AUTHORIZATION_CHECK));
@@ -109,13 +109,13 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
           DescriptiveMetadataValidationPlugin.getStaticDescription()));
 
       PluginManager pluginManager = RodaCoreFactory.getPluginManager();
-      Plugin<?> plugin = pluginManager.getPlugin(RodaConstants.PLUGIN_CLASS_VERAPDF);
+      Plugin<?> plugin = pluginManager.getPlugin(DefaultIngestPlugin.PLUGIN_CLASS_VERAPDF);
       if (plugin != null) {
-        pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_VERAPDF_CHECK,
-          new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_VERAPDF_CHECK, plugin.getName(),
+        pluginParameters.put(DefaultIngestPlugin.PLUGIN_PARAMS_DO_VERAPDF_CHECK,
+          new PluginParameter(DefaultIngestPlugin.PLUGIN_PARAMS_DO_VERAPDF_CHECK, plugin.getName(),
             PluginParameterType.BOOLEAN, "false", true, false, plugin.getDescription()));
       } else {
-        deactivatedPlugins.add(RodaConstants.PLUGIN_CLASS_VERAPDF);
+        deactivatedPlugins.add(DefaultIngestPlugin.PLUGIN_CLASS_VERAPDF);
       }
 
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CREATE_PREMIS_SKELETON,
@@ -131,26 +131,26 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
         new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FILE_FORMAT_IDENTIFICATION, SiegfriedPlugin.getStaticName(),
           PluginParameterType.BOOLEAN, "true", true, false, SiegfriedPlugin.getStaticDescription()));
 
-      plugin = pluginManager.getPlugin(RodaConstants.PLUGIN_CLASS_TIKA_FULLTEXT);
+      plugin = pluginManager.getPlugin(DefaultIngestPlugin.PLUGIN_CLASS_TIKA_FULLTEXT);
       if (plugin != null) {
-        pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION,
-          new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION, "Feature extraction",
+        pluginParameters.put(DefaultIngestPlugin.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION,
+          new PluginParameter(DefaultIngestPlugin.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION, "Feature extraction",
             PluginParameterType.BOOLEAN, "false", true, false, "Extraction of technical metadata using Apache Tika"));
 
-        pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_FULL_TEXT_EXTRACTION,
-          new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FULL_TEXT_EXTRACTION, "Full-text extraction",
+        pluginParameters.put(DefaultIngestPlugin.PLUGIN_PARAMS_DO_FULL_TEXT_EXTRACTION,
+          new PluginParameter(DefaultIngestPlugin.PLUGIN_PARAMS_DO_FULL_TEXT_EXTRACTION, "Full-text extraction",
             PluginParameterType.BOOLEAN, "false", true, false, "Extraction of full-text using Apache Tika"));
       } else {
-        deactivatedPlugins.add(RodaConstants.PLUGIN_CLASS_TIKA_FULLTEXT);
+        deactivatedPlugins.add(DefaultIngestPlugin.PLUGIN_CLASS_TIKA_FULLTEXT);
       }
 
-      plugin = pluginManager.getPlugin(RodaConstants.PLUGIN_CLASS_DIGITAL_SIGNATURE);
+      plugin = pluginManager.getPlugin(DefaultIngestPlugin.PLUGIN_CLASS_DIGITAL_SIGNATURE);
       if (plugin != null) {
-        pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_DIGITAL_SIGNATURE_VALIDATION,
-          new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_DIGITAL_SIGNATURE_VALIDATION, plugin.getName(),
+        pluginParameters.put(DefaultIngestPlugin.PLUGIN_PARAMS_DO_DIGITAL_SIGNATURE_VALIDATION,
+          new PluginParameter(DefaultIngestPlugin.PLUGIN_PARAMS_DO_DIGITAL_SIGNATURE_VALIDATION, plugin.getName(),
             PluginParameterType.BOOLEAN, "false", true, false, plugin.getDescription()));
       } else {
-        deactivatedPlugins.add(RodaConstants.PLUGIN_CLASS_DIGITAL_SIGNATURE);
+        deactivatedPlugins.add(DefaultIngestPlugin.PLUGIN_CLASS_DIGITAL_SIGNATURE);
       }
 
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT,

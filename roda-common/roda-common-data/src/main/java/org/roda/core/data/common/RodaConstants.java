@@ -9,9 +9,7 @@ package org.roda.core.data.common;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 
@@ -771,10 +769,6 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_CREATE_PREMIS_SKELETON = "parameter.create.premis.skeleton";
   public static final String PLUGIN_PARAMS_DO_FILE_FORMAT_IDENTIFICATION = "parameter.do_file_format_identification";
   public static final String PLUGIN_PARAMS_DO_PDFTOPDFA_CONVERSION = "parameter.do_pdf_to_pdfa_conversion";
-  public static final String PLUGIN_PARAMS_DO_VERAPDF_CHECK = "parameter.do_verapdf_check";
-  public static final String PLUGIN_PARAMS_DO_FEATURE_EXTRACTION = "parameter.do_feature_extraction";
-  public static final String PLUGIN_PARAMS_DO_FULL_TEXT_EXTRACTION = "parameter.do_fulltext_extraction";
-  public static final String PLUGIN_PARAMS_DO_DIGITAL_SIGNATURE_VALIDATION = "parameter.do_digital_signature_validation";
   public static final String PLUGIN_PARAMS_DO_PRODUCER_AUTHORIZATION_CHECK = "parameter.do_producer_authorization_check";
   public static final String PLUGIN_PARAMS_DO_AUTO_ACCEPT = "parameter.do_auto_accept";
   public static final String PLUGIN_PARAMS_EMAIL_NOTIFICATION = "parameter.email_notification";
@@ -819,18 +813,6 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_INCLUDE_SUBMISSION = "parameter.include_submission";
   public static final String PLUGIN_PARAMS_INCLUDE_SCHEMAS = "parameter.include_schemas";
   public static final String PLUGIN_PARAMS_INCLUDE_DOCUMENTATION = "parameter.include_documentation";
-
-  public static final String PLUGIN_CLASS_DIGITAL_SIGNATURE = "org.roda.core.plugins.plugins.characterization.DigitalSignaturePlugin";
-  public static final String PLUGIN_CLASS_VERAPDF = "org.roda.core.plugins.plugins.characterization.VeraPDFPlugin";
-  public static final String PLUGIN_CLASS_TIKA_FULLTEXT = "org.roda.core.plugins.plugins.characterization.TikaFullTextPlugin";
-
-  public static final Map<String, String> PLUGIN_PARAMETER_TO_CLASS = new HashMap<>();
-  static {
-    PLUGIN_PARAMETER_TO_CLASS.put(PLUGIN_PARAMS_DO_DIGITAL_SIGNATURE_VALIDATION, PLUGIN_CLASS_DIGITAL_SIGNATURE);
-    PLUGIN_PARAMETER_TO_CLASS.put(PLUGIN_PARAMS_DO_VERAPDF_CHECK, PLUGIN_CLASS_VERAPDF);
-    PLUGIN_PARAMETER_TO_CLASS.put(PLUGIN_PARAMS_DO_FEATURE_EXTRACTION, PLUGIN_CLASS_TIKA_FULLTEXT);
-    PLUGIN_PARAMETER_TO_CLASS.put(PLUGIN_PARAMS_DO_FULL_TEXT_EXTRACTION, PLUGIN_CLASS_TIKA_FULLTEXT);
-  }
 
   public static final String PLUGIN_CATEGORY_CONVERSION = "conversion";
   public static final String PLUGIN_CATEGORY_CHARACTERIZATION = "characterization";

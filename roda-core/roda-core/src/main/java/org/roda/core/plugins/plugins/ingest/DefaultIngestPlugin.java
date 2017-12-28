@@ -88,6 +88,15 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
   protected static final int INITIAL_TOTAL_STEPS = 10;
   protected int totalSteps = INITIAL_TOTAL_STEPS;
 
+  public static final String PLUGIN_CLASS_DIGITAL_SIGNATURE = "org.roda.core.plugins.external.DigitalSignaturePlugin";
+  public static final String PLUGIN_CLASS_VERAPDF = "org.roda.core.plugins.external.VeraPDFPlugin";
+  public static final String PLUGIN_CLASS_TIKA_FULLTEXT = "org.roda.core.plugins.external.TikaFullTextPlugin";
+
+  public static final String PLUGIN_PARAMS_DO_VERAPDF_CHECK = "parameter.do_verapdf_check";
+  public static final String PLUGIN_PARAMS_DO_FEATURE_EXTRACTION = "parameter.do_feature_extraction";
+  public static final String PLUGIN_PARAMS_DO_FULL_TEXT_EXTRACTION = "parameter.do_fulltext_extraction";
+  public static final String PLUGIN_PARAMS_DO_DIGITAL_SIGNATURE_VALIDATION = "parameter.do_digital_signature_validation";
+
   private String successMessage;
   private String failureMessage;
   private PreservationEventType eventType;
@@ -198,7 +207,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
       // 6) Format validation - PDF/A format validator (using VeraPDF)
       if (!aips.isEmpty() && PluginHelper.verifyIfStepShouldBePerformed(this,
-        getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_VERAPDF_CHECK))) {
+        getPluginParameter(PLUGIN_PARAMS_DO_VERAPDF_CHECK), PLUGIN_CLASS_VERAPDF)) {
         Map<String, String> params = new HashMap<>();
         params.put("profile", "1b");
         pluginReport = doVeraPDFCheck(index, model, storage, aips, params);
@@ -210,14 +219,14 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       // 7.1) feature extraction (using Apache Tika)
       // 7.2) full-text extraction (using Apache Tika)
       if (!aips.isEmpty() && (PluginHelper.verifyIfStepShouldBePerformed(this,
-        getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION))
-        || PluginHelper.verifyIfStepShouldBePerformed(this,
-          getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FULL_TEXT_EXTRACTION)))) {
+        getPluginParameter(PLUGIN_PARAMS_DO_FEATURE_EXTRACTION), PLUGIN_CLASS_TIKA_FULLTEXT)
+        || PluginHelper.verifyIfStepShouldBePerformed(this, getPluginParameter(PLUGIN_PARAMS_DO_FULL_TEXT_EXTRACTION),
+          PLUGIN_CLASS_TIKA_FULLTEXT))) {
         Map<String, String> params = new HashMap<>();
-        params.put(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION, PluginHelper.verifyIfStepShouldBePerformed(this,
-          getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION)) ? "true" : "false");
+        params.put(PLUGIN_PARAMS_DO_FEATURE_EXTRACTION, PluginHelper.verifyIfStepShouldBePerformed(this,
+          getPluginParameter(PLUGIN_PARAMS_DO_FEATURE_EXTRACTION), PLUGIN_CLASS_TIKA_FULLTEXT) ? "true" : "false");
         params.put(RodaConstants.PLUGIN_PARAMS_DO_FULLTEXT_EXTRACTION, PluginHelper.verifyIfStepShouldBePerformed(this,
-          getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FULL_TEXT_EXTRACTION)) ? "true" : "false");
+          getPluginParameter(PLUGIN_PARAMS_DO_FULL_TEXT_EXTRACTION), PLUGIN_CLASS_TIKA_FULLTEXT) ? "true" : "false");
         pluginReport = doFeatureAndFullTextExtraction(index, model, storage, aips, params);
         mergeReports(jobPluginInfo, pluginReport);
         recalculateAIPsList(model, index, jobPluginInfo, aips, false);
@@ -226,7 +235,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
       // 8) validation of digital signature
       if (!aips.isEmpty() && PluginHelper.verifyIfStepShouldBePerformed(this,
-        getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_DIGITAL_SIGNATURE_VALIDATION))) {
+        getPluginParameter(PLUGIN_PARAMS_DO_DIGITAL_SIGNATURE_VALIDATION), PLUGIN_CLASS_DIGITAL_SIGNATURE)) {
         pluginReport = doDigitalSignatureValidation(index, model, storage, aips);
         mergeReports(jobPluginInfo, pluginReport);
         recalculateAIPsList(model, index, jobPluginInfo, aips, false);
@@ -497,7 +506,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
   private int calculateEfectiveTotalSteps() {
     List<String> parameterIdsToIgnore = Arrays.asList(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID,
-      RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION, RodaConstants.PLUGIN_PARAMS_DO_FULL_TEXT_EXTRACTION,
+      PLUGIN_PARAMS_DO_FEATURE_EXTRACTION, PLUGIN_PARAMS_DO_FULL_TEXT_EXTRACTION,
       RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT, RodaConstants.PLUGIN_PARAMS_NOTIFICATION_WHEN_FAILED);
     int effectiveTotalSteps = getTotalSteps();
     boolean tikaParameters = false;
@@ -511,13 +520,13 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
         effectiveTotalSteps--;
       }
 
-      if (pluginParameter.getId().equals(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION)) {
+      if (pluginParameter.getId().equals(PLUGIN_PARAMS_DO_FEATURE_EXTRACTION)) {
         tikaParameters = true;
         if (!PluginHelper.verifyIfStepShouldBePerformed(this, pluginParameter)) {
           dontDoFeatureExtraction = true;
         }
       }
-      if (pluginParameter.getId().equals(RodaConstants.PLUGIN_PARAMS_DO_FULL_TEXT_EXTRACTION)) {
+      if (pluginParameter.getId().equals(PLUGIN_PARAMS_DO_FULL_TEXT_EXTRACTION)) {
         tikaParameters = true;
         if (!PluginHelper.verifyIfStepShouldBePerformed(this, pluginParameter)) {
           dontDoFulltext = true;
@@ -581,7 +590,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
   private Report doVeraPDFCheck(IndexService index, ModelService model, StorageService storage, List<AIP> aips,
     Map<String, String> params) {
-    return executePlugin(index, model, storage, aips, RodaConstants.PLUGIN_CLASS_VERAPDF, params);
+    return executePlugin(index, model, storage, aips, PLUGIN_CLASS_VERAPDF, params);
   }
 
   private Report doDescriptiveMetadataValidation(IndexService index, ModelService model, StorageService storage,
@@ -601,12 +610,12 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
   private Report doDigitalSignatureValidation(IndexService index, ModelService model, StorageService storage,
     List<AIP> aips) {
-    return executePlugin(index, model, storage, aips, RodaConstants.PLUGIN_CLASS_DIGITAL_SIGNATURE);
+    return executePlugin(index, model, storage, aips, PLUGIN_CLASS_DIGITAL_SIGNATURE);
   }
 
   private Report doFeatureAndFullTextExtraction(IndexService index, ModelService model, StorageService storage,
     List<AIP> aips, Map<String, String> params) {
-    return executePlugin(index, model, storage, aips, RodaConstants.PLUGIN_CLASS_TIKA_FULLTEXT, params);
+    return executePlugin(index, model, storage, aips, PLUGIN_CLASS_TIKA_FULLTEXT, params);
   }
 
   private Report doAutoAccept(IndexService index, ModelService model, StorageService storage, List<AIP> aips) {

@@ -461,6 +461,7 @@ public final class PluginHelper {
    * 
    * @deprecated 201712 hsilva: use/rename to updateJobInformationAsync
    */
+  @Deprecated
   public static <T extends IsRODAObject> void updateJobInformation(Plugin<T> plugin, JobPluginInfo jobPluginInfo)
     throws JobException {
     updateJobInformationAsync(plugin, jobPluginInfo);
@@ -672,14 +673,16 @@ public final class PluginHelper {
 
   public static <T extends IsRODAObject> boolean verifyIfStepShouldBePerformed(Plugin<T> plugin,
     PluginParameter pluginParameter) {
+    return verifyIfStepShouldBePerformed(plugin, pluginParameter, null);
+  }
+
+  public static <T extends IsRODAObject> boolean verifyIfStepShouldBePerformed(Plugin<T> plugin,
+    PluginParameter pluginParameter, String parameterClass) {
     String paramValue = getStringFromParameters(plugin, pluginParameter);
     boolean perform = Boolean.parseBoolean(paramValue);
 
-    if (perform) {
-      String parameterClass = RodaConstants.PLUGIN_PARAMETER_TO_CLASS.get(pluginParameter.getId());
-      if (parameterClass != null && RodaCoreFactory.getPluginManager().getPlugin(parameterClass) == null) {
-        perform = false;
-      }
+    if (perform && parameterClass != null && RodaCoreFactory.getPluginManager().getPlugin(parameterClass) == null) {
+      perform = false;
     }
 
     return perform;
