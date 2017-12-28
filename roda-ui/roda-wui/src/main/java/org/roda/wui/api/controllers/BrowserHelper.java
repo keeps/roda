@@ -3527,11 +3527,14 @@ public class BrowserHelper {
   public static RepresentationInformationExtraBundle retrieveRepresentationInformationExtraBundle(
     RepresentationInformation ri, String family, Locale locale) throws GenericException {
     RepresentationInformationExtraBundle ret;
+    String xml = "";
+    if (ri.getFamily().equals(family)) {
+      xml = ri.getExtras();
+    }
 
-    try (InputStream inputStream = IOUtils.toInputStream(ri.getExtras(), "UTF-8")) {
-      String xml = ri.getExtras();
+    try (InputStream inputStream = IOUtils.toInputStream(xml, "UTF-8")) {
       List<SupportedMetadataTypeBundle> supportedMetadataTypeBundles = BrowserHelper
-        .retrieveExtraSupportedMetadata(locale);
+        .retrieveExtraSupportedMetadata(family, locale);
       SupportedMetadataTypeBundle metadataTypeBundle = supportedMetadataTypeBundles.get(0);
 
       // Get the values using XPath
@@ -3590,14 +3593,15 @@ public class BrowserHelper {
     return ret;
   }
 
-  public static List<SupportedMetadataTypeBundle> retrieveExtraSupportedMetadata(Locale locale)
+  public static List<SupportedMetadataTypeBundle> retrieveExtraSupportedMetadata(String family, Locale locale)
     throws GenericException {
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
     List<String> types = new ArrayList<>();
-    types.add("key-value-file-format");
-    types.add("key-value-software");
-    types.add("key-value-organisation");
-    types.add("key-value-data");
+    types.add("key-value-" + family.toLowerCase().replace(" ", "-"));
+    /*
+     * types.add("key-value-file-format"); types.add("key-value-software");
+     * types.add("key-value-organisation"); types.add("key-value-data");
+     */
 
     List<SupportedMetadataTypeBundle> supportedMetadata = new ArrayList<>();
 
@@ -3691,8 +3695,9 @@ public class BrowserHelper {
       return options.fn();
     });
 
-    try (InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(
-      RodaConstants.METADATA_REPRESENTATION_INFORMATION_TEMPLATE_FOLDER + "/key-value-documentation.xml.hbs")) {
+    try (InputStream templateStream = RodaCoreFactory
+      .getConfigurationFileAsStream(RodaConstants.METADATA_REPRESENTATION_INFORMATION_TEMPLATE_FOLDER + "/key-value-"
+        + extra.getFamily().toLowerCase().replace(" ", "-") + ".xml.hbs")) {
       String rawTemplate = IOUtils.toString(templateStream, RodaConstants.DEFAULT_ENCODING);
       Template tmpl = handlebars.compileInline(rawTemplate);
 

@@ -139,7 +139,32 @@ public class RepresentationInformationDataPanel extends Composite
     name.addKeyUpHandler(keyUpHandler);
     description.addChangeHandler(changeHandler);
     description.addKeyUpHandler(keyUpHandler);
-    family.addChangeHandler(changeHandler);
+
+    ChangeHandler familyChangeHandler = new ChangeHandler() {
+
+      @Override
+      public void onChange(ChangeEvent event) {
+        RepresentationInformationDataPanel.this.onChange();
+
+        BrowserService.Util.getInstance().retrieveRepresentationInformationExtraBundle(ri, family.getSelectedValue(),
+          LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<RepresentationInformationExtraBundle>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+              AsyncCallbackUtils.defaultFailureTreatment(caught);
+            }
+
+            @Override
+            public void onSuccess(RepresentationInformationExtraBundle extra) {
+              RepresentationInformationDataPanel.this.extraBundle = extra;
+              extras.clear();
+              FormUtilities.create(extras, extra.getValues(), false);
+            }
+          });
+      }
+    };
+
+    family.addChangeHandler(familyChangeHandler);
     family.addKeyUpHandler(keyUpHandler);
     categories.addValueChangeHandler(valueChangeHandler);
 
