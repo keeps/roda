@@ -1251,7 +1251,7 @@ public final class RodaConstants {
   public static final String METADATA_TEMPLATE_FOLDER = "templates";
   public static final String METADATA_TEMPLATE_EXTENSION = ".xml.hbs";
   public static final String USERS_TEMPLATE_FOLDER = "users";
-  public static final String METADATA_REPRESENTATION_INFORMATION_TEMPLATE_FOLDER = "ri-templates";
+  public static final String METADATA_REPRESENTATION_INFORMATION_TEMPLATE_FOLDER = "representation-information/templates";
 
   public static final String USER_EXTRA_METADATA_FILE = "user_extra.xml.hbs";
 

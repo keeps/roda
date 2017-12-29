@@ -366,8 +366,20 @@ public class HtmlSnippetUtils {
       }
 
       FlowPanel layout = new FlowPanel();
-      layout.addStyleName("field");
-      addField(panel, layout, mv, mandatory);
+      String controlType = mv.get("type");
+
+      if (controlType == null) {
+        addField(panel, layout, mv, mandatory);
+      } else {
+        switch (controlType) {
+          case "separator":
+            addSeparator(panel, layout, mv);
+            break;
+          default:
+            addField(panel, layout, mv, mandatory);
+            break;
+        }
+      }
     }
   }
 
@@ -406,8 +418,10 @@ public class HtmlSnippetUtils {
     return result;
   }
 
-  private static void addField(FlowPanel panel, final FlowPanel layout, final MetadataValue mv,
+  private static boolean addField(FlowPanel panel, final FlowPanel layout, final MetadataValue mv,
     final boolean mandatory) {
+    layout.addStyleName("field");
+
     if (StringUtils.isNotBlank(mv.get("value"))) {
       // Top label
       Label mvLabel = new Label(getFieldLabel(mv));
@@ -422,6 +436,17 @@ public class HtmlSnippetUtils {
       layout.add(mvLabel);
       layout.add(mvText);
       panel.add(layout);
+      return true;
+    } else {
+      return false;
     }
+  }
+
+  private static Label addSeparator(FlowPanel panel, final FlowPanel layout, final MetadataValue mv) {
+    layout.addStyleName("form-separator");
+    Label mvLabel = new Label(getFieldLabel(mv));
+    layout.add(mvLabel);
+    panel.add(layout);
+    return mvLabel;
   }
 }

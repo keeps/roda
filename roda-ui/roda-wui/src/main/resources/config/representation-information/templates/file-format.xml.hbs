@@ -1,0 +1,59 @@
+{{! Format description }}
+{{~field name="formatDescription"					order="150"	hidden="false"   type="separator"   labeli18n="ri.data.formatDescription"					label='{"en": "Format description", "pt": "Descrição do formato"}'~}}
+{{~field name="formatCategory" 						order="151"	hidden="false"   type="list" 		labeli18n="ri.data.formatCategory"						label='{"en": "Format category"}' options='["still-image","sound","moving-image","textual","web-archive","dataset","geospatial","other"]' optionsLabels='{"still-image": {"en":"Still image", "pt":"Imagem fixa"},"sound": {"en":"Sound", "pt":"Som"},"moving-image": {"en":"Moving image", "pt":"Imagem em movimento"},"textual": {"en":"Textual", "pt":"Textual"},"web-archive": {"en":"Web archive", "pt":"Arquivo da web"},"dataset": {"en":"Dataset", "pt":"Conjunto de dados"},"geospatial": {"en":"Geospatial", "pt":"Geoespacial"},"other": {"en":"Other", "pt":"Outro"}}' optionsLabelI18nKeyPrefix="ri.data.formatCategory" xpath="//*:field[@name='formatCategory']/string()"~}}
+{{~field name="formatDesignation" 					order="152"	hidden="false"   type="text"	 	labeli18n="ri.data.formatDesignation"					label='{"en": "Format designation"}' xpath="//*:field[@name='formatDesignation']/string()"~}}
+{{~field name="version" 							order="153"	hidden="false"   type="text" 		labeli18n="ri.data.version"								label='{"en": "Version"}' xpath="//*:field[@name='version']/string()"~}}
+
+{{! Sustainability factors }}
+{{~field name="sustainabilityFactors"				order="160"	hidden="false"   type="separator"   labeli18n="ri.data.sustainabilityFactors"				label='{"en": "Sustainability factors", "pt": "Fatores de sustentabilidade"}'~}}
+{{~field name="disclosure" 							order="161"	hidden="false"   type="text-area" 	labeli18n="ri.data.disclosure"							label='{"en": "Disclosure"}' xpath="//*:field[@name='disclosure']/string()"~}}
+{{~field name="documentation" 						order="162"	hidden="false"   type="text-area" 	labeli18n="ri.data.documentation"						label='{"en": "Documentation"}' xpath="//*:field[@name='documentation']/string()"~}}
+{{~field name="adoption" 							order="163"	hidden="false"   type="text-area" 	labeli18n="ri.data.adoption"							label='{"en": "Adoption"}' xpath="//*:field[@name='adoption']/string()"~}}
+{{~field name="licensingAndPatents" 				order="164"	hidden="false"   type="text-area" 	labeli18n="ri.data.licensingAndPatents"					label='{"en": "Licensing and patents"}' xpath="//*:field[@name='licensingAndPatents']/string()"~}}
+{{~field name="transparency" 						order="165"	hidden="false"   type="text-area" 	labeli18n="ri.data.transparency"						label='{"en": "Transparency"}' xpath="//*:field[@name='transparency']/string()"~}}
+{{~field name="selfdocumentation" 					order="166"	hidden="false"   type="text-area" 	labeli18n="ri.data.selfdocumentation"					label='{"en": "Self-documentation"}' xpath="//*:field[@name='selfdocumentation']/string()"~}}
+{{~field name="externalDependencies" 				order="167"	hidden="false"   type="text-area" 	labeli18n="ri.data.externalDependencies"				label='{"en": "External dependencies"}' xpath="//*:field[@name='externalDependencies']/string()"~}}
+{{~field name="technicalProtectionConsiderations" 	order="168"	hidden="false"   type="text-area" 	labeli18n="ri.data.technicalProtectionConsiderations"	label='{"en": "Technical protection considerations"}' xpath="//*:field[@name='technicalProtectionConsiderations']/string()"~}}
+
+{{! Format characteristics }}
+{{~field name="formatCharacteristics"				order="170"	hidden="false"   type="separator"   labeli18n="ri.data.formatCharacteristics"				label='{"en": "Format characteristics", "pt": "Características do formato"}'~}}
+{{~field name="relevantCharacteristics" 			order="171"	hidden="false"   type="text-area" 	labeli18n="ri.data.relevantCharacteristics"				label='{"en": "Relevant characteristics"}' xpath="//*:field[@name='relevantCharacteristics']/string()"~}}
+{{~field name="functionalityBeyondNormalRendering" 	order="172"	hidden="false"   type="text-area"	labeli18n="ri.data.functionalityBeyondNormalRendering"	label='{"en": "Functionality beyond normal rendering"}' xpath="//*:field[@name='functionalityBeyondNormalRendering']/string()"~}}
+
+{{! Format identifiers }}
+{{~field name="formatIdentifiers"					order="180"	hidden="false"   type="separator"   labeli18n="ri.data.formatIdentifiers"					label='{"en": "Format identifiers", "pt": "Identificadores de formato"}'~}}
+{{~field name="filenameExtension" 					order="181"	hidden="false"   type="text-area" 	labeli18n="ri.data.filenameExtension"					label='{"en": "Filename extension"}' xpath="//*:field[@name='filenameExtension']/string()"~}}
+{{~field name="internetMediaType" 					order="182"	hidden="false"   type="text-area"	labeli18n="ri.data.internetMediaType"					label='{"en": "Internet media type"}' xpath="//*:field[@name='internetMediaType']/string()"~}}
+{{~field name="pronomPUID" 							order="183"	hidden="false"   type="text" 		labeli18n="ri.data.pronomPUID"							label='{"en": "Pronom PUID"}' xpath="//*:field[@name='pronomPUID']/string()"~}}
+
+{{! Notes }}
+{{~field name="notes"								order="190"	hidden="false"   type="separator"   labeli18n="ri.data.notes"								label='{"en": "Notes", "pt": "Notas"}'~}}
+{{~field name="general"								order="191"	hidden="false"   type="text-area" 	labeli18n="ri.data.general"								label='{"en": "General"}' xpath="//*:field[@name='general']/string()"~}}
+{{~field name="history"								order="192"	hidden="false"   type="text-area" 	labeli18n="ri.data.history"								label='{"en": "History"}' xpath="//*:field[@name='history']/string()"~}}
+
+<?xml version="1.0" encoding="utf-8"?>
+<metadata>
+	{{! Format description }}
+	{{~#if formatCategory~}}<field name="formatCategory">{{formatCategory}}</field>{{~/if~}}
+	{{~#if formatDesignation~}}<field name="formatDesignation">{{formatDesignation}}</field>{{~/if~}}
+	{{~#if version~}}<field name="version">{{version}}</field>{{~/if~}}
+	{{! Sustainability factors }}
+	{{~#if disclosure~}}<field name="disclosure">{{disclosure}}</field>{{~/if~}}
+	{{~#if documentation~}}<field name="documentation">{{documentation}}</field>{{~/if~}}
+	{{~#if adoption~}}<field name="adoption">{{adoption}}</field>{{~/if~}}
+	{{~#if licensingAndPatents~}}<field name="licensingAndPatents">{{licensingAndPatents}}</field>{{~/if~}}
+	{{~#if transparency~}}<field name="transparency">{{transparency}}</field>{{~/if~}}
+	{{~#if selfdocumentation~}}<field name="selfdocumentation">{{selfdocumentation}}</field>{{~/if~}}
+	{{~#if externalDependencies~}}<field name="externalDependencies">{{externalDependencies}}</field>{{~/if~}}
+	{{~#if technicalProtectionConsiderations~}}<field name="technicalProtectionConsiderations">{{technicalProtectionConsiderations}}</field>{{~/if~}}
+	{{! Format characteristics }}
+	{{~#if relevantCharacteristics~}}<field name="relevantCharacteristics">{{relevantCharacteristics}}</field>{{~/if~}}
+	{{~#if functionalityBeyondNormalRendering~}}<field name="functionalityBeyondNormalRendering">{{functionalityBeyondNormalRendering}}</field>{{~/if~}}
+	{{! Format identifiers }}
+	{{~#if filenameExtension~}}<field name="filenameExtension">{{filenameExtension}}</field>{{~/if~}}
+	{{~#if internetMediaType~}}<field name="internetMediaType">{{internetMediaType}}</field>{{~/if~}}
+	{{~#if pronomPUID~}}<field name="pronomPUID">{{pronomPUID}}</field>{{~/if~}}
+	{{! Notes }}
+	{{~#if general~}}<field name="general">{{general}}</field>{{~/if~}}
+	{{~#if history~}}<field name="history">{{history}}</field>{{~/if~}}
+</metadata>

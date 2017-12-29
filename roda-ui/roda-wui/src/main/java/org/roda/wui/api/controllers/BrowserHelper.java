@@ -3525,83 +3525,56 @@ public class BrowserHelper {
   }
 
   public static RepresentationInformationExtraBundle retrieveRepresentationInformationExtraBundle(
-    RepresentationInformation ri, String family, Locale locale) throws GenericException {
-    RepresentationInformationExtraBundle ret;
+    RepresentationInformation ri, String family, Locale locale) {
     String xml = "";
     if (ri.getFamily().equals(family)) {
       xml = ri.getExtras();
     }
 
-    try (InputStream inputStream = IOUtils.toInputStream(xml, "UTF-8")) {
-      List<SupportedMetadataTypeBundle> supportedMetadataTypeBundles = BrowserHelper
-        .retrieveExtraSupportedMetadata(family, locale);
-      SupportedMetadataTypeBundle metadataTypeBundle = supportedMetadataTypeBundles.get(0);
+    List<SupportedMetadataTypeBundle> supportedMetadataTypeBundles = BrowserHelper
+      .retrieveExtraSupportedMetadata(family, locale);
+    SupportedMetadataTypeBundle metadataTypeBundle = supportedMetadataTypeBundles.get(0);
 
-      // Get the values using XPath
-      Set<MetadataValue> values = null;
+    // Get the values using XPath
+    Set<MetadataValue> values = new HashSet<>();
 
-      if (metadataTypeBundle != null) {
-        values = metadataTypeBundle.getValues();
-        if (values != null) {
-          for (MetadataValue mv : values) {
-            String xpathRaw = mv.get("xpath");
-            if (xpathRaw != null && xpathRaw.length() > 0) {
-              String[] xpaths = xpathRaw.split("##%##");
-              String value;
+    if (metadataTypeBundle != null) {
+      values = metadataTypeBundle.getValues();
+      if (values != null) {
+        for (MetadataValue mv : values) {
+          String xpathRaw = mv.get("xpath");
+          if (xpathRaw != null && xpathRaw.length() > 0) {
+            String[] xpaths = xpathRaw.split("##%##");
+            String value = "";
+
+            if (StringUtils.isNotBlank(xml)) {
               List<String> allValues = new ArrayList<>();
               for (String xpath : xpaths) {
                 allValues.addAll(ServerTools.applyXpath(xml, xpath));
               }
-              // if any of the values is different, concatenate all values in a
-              // string, otherwise return the value
+              // if any of the values is different, concatenate all values in
+              // a string, otherwise return the value
               boolean allEqual = allValues.stream().allMatch(s -> s.trim().equals(allValues.get(0).trim()));
               if (allEqual && !allValues.isEmpty()) {
                 value = allValues.get(0);
               } else {
                 value = String.join(" / ", allValues);
               }
-              mv.set("value", value.trim());
             }
-          }
 
-          // Identity check. Test if the original XML is equal to the result of
-          // applying the extracted values to the template
-          metadataTypeBundle.setValues(values);
-          String templateWithValues = retrieveDescriptiveMetadataPreview(metadataTypeBundle);
-
-          if (StringUtils.isNotBlank(templateWithValues)) {
-            try {
-              XMLUnit.setIgnoreComments(true);
-              XMLUnit.setIgnoreWhitespace(true);
-              XMLUnit.setIgnoreAttributeOrder(true);
-              XMLUnit.setCompareUnmatched(false);
-
-              Diff xmlDiff = new Diff(xml, templateWithValues);
-              xmlDiff.overrideDifferenceListener(new XMLSimilarityIgnoreElements("schemaLocation"));
-            } catch (SAXException e) {
-              LOGGER.warn("Could not check if template can loose info", e);
-            }
+            mv.set("value", value.trim());
           }
         }
       }
-
-      ret = new RepresentationInformationExtraBundle(ri, family, values);
-    } catch (IOException e) {
-      throw new GenericException("Error getting representation information extra bundle: " + e.getMessage(), e);
     }
 
-    return ret;
+    return new RepresentationInformationExtraBundle(ri, family, values);
   }
 
-  public static List<SupportedMetadataTypeBundle> retrieveExtraSupportedMetadata(String family, Locale locale)
-    throws GenericException {
+  public static List<SupportedMetadataTypeBundle> retrieveExtraSupportedMetadata(String family, Locale locale) {
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
     List<String> types = new ArrayList<>();
-    types.add("key-value-" + family.toLowerCase().replace(" ", "-"));
-    /*
-     * types.add("key-value-file-format"); types.add("key-value-software");
-     * types.add("key-value-organisation"); types.add("key-value-data");
-     */
+    types.add(family.toLowerCase().replace(" ", "-"));
 
     List<SupportedMetadataTypeBundle> supportedMetadata = new ArrayList<>();
 
@@ -3669,7 +3642,7 @@ public class BrowserHelper {
                       }
                       mv.set("optionsLabels", JsonUtils.getJsonFromObject(i18nMap));
                     }
-                  } catch (MissingResourceException e) {
+                  } catch (MissingResourceException | GenericException e) {
                     LOGGER.error(e.getMessage(), e);
                   }
                 }
@@ -3696,7 +3669,7 @@ public class BrowserHelper {
     });
 
     try (InputStream templateStream = RodaCoreFactory
-      .getConfigurationFileAsStream(RodaConstants.METADATA_REPRESENTATION_INFORMATION_TEMPLATE_FOLDER + "/key-value-"
+      .getConfigurationFileAsStream(RodaConstants.METADATA_REPRESENTATION_INFORMATION_TEMPLATE_FOLDER + "/"
         + extra.getFamily().toLowerCase().replace(" ", "-") + ".xml.hbs")) {
       String rawTemplate = IOUtils.toString(templateStream, RodaConstants.DEFAULT_ENCODING);
       Template tmpl = handlebars.compileInline(rawTemplate);
