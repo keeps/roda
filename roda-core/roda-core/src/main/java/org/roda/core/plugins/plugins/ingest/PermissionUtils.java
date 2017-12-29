@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.XMLUtility;
 import org.roda.core.data.common.RodaConstants;
@@ -50,10 +51,12 @@ public class PermissionUtils {
       String xpath = RodaCoreFactory.getRodaConfigurationAsString("core", "permissions", "xpath");
       String freeAccessTerm = RodaCoreFactory.getRodaConfigurationAsString("core", "permissions", "freeaccess");
 
-      String useRestrict = XMLUtility.getString(createInputStream, xpath);
-      if (useRestrict.equals(freeAccessTerm)) {
-        readPermissionToUserGroup.add(Permissions.PermissionType.READ);
-        permissions.setGroupPermissions(RodaConstants.OBJECT_PERMISSIONS_USER_GROUP, readPermissionToUserGroup);
+      if (StringUtils.isNotBlank(xpath) && StringUtils.isNotBlank(freeAccessTerm)) {
+        String useRestrict = XMLUtility.getString(createInputStream, xpath);
+        if (useRestrict.equals(freeAccessTerm)) {
+          readPermissionToUserGroup.add(Permissions.PermissionType.READ);
+          permissions.setGroupPermissions(RodaConstants.OBJECT_PERMISSIONS_USER_GROUP, readPermissionToUserGroup);
+        }
       }
     }
 
