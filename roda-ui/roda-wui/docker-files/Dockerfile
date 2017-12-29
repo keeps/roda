@@ -2,7 +2,8 @@ FROM tomcat:8-jre8
 LABEL maintainer="admin@keep.pt" vendor="KEEP SOLUTIONS"
 
 # Install dependencies
-RUN curl -s https://bintray.com/user/downloadSubjectPublicKey?username=bintray | \
+RUN set -ex; \
+    curl -s https://bintray.com/user/downloadSubjectPublicKey?username=bintray | \
     apt-key add - && echo "deb http://dl.bintray.com/siegfried/debian wheezy main" | \
     tee -a /etc/apt/sources.list && apt-get -qq update && \
     apt-get -qq -y --no-install-recommends install clamav clamav-daemon clamdscan siegfried supervisor zip \
@@ -12,7 +13,8 @@ COPY supervisor-roda-dependencies.conf /etc/supervisor/conf.d/supervisor-roda-de
 COPY clamd.conf /etc/clamav/clamd.conf
 
 # setup clamav, siegfried & remove old ROOT folder from tomcat
-RUN mkdir -p /var/run/clamav && chown clamav /var/run/clamav && freshclam ; \
+RUN set -ex; \
+  mkdir -p /var/run/clamav && chown clamav /var/run/clamav && freshclam ; \
 	sf -update ; \
 	rm -rf /usr/local/tomcat/webapps/ROOT
 
@@ -20,7 +22,8 @@ RUN mkdir -p /var/run/clamav && chown clamav /var/run/clamav && freshclam ; \
 COPY /ROOT /usr/local/tomcat/webapps/ROOT
 
 # Fix configuration & do some final cleanup
-RUN unzip -q /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/roda-core-*.jar config/roda-core.properties && \
+RUN set -ex; \
+    unzip -q /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/roda-core-*.jar config/roda-core.properties && \
     sed -i -e 's/^core.plugins.internal.virus_check.clamav/#&/' -e 's/^core.tools.siegfried.mode/#&/' config/roda-core.properties && \
     echo "\n" >> config/roda-core.properties && \
     echo "core.plugins.internal.virus_check.clamav.bin = /usr/bin/clamdscan" >> config/roda-core.properties && \
