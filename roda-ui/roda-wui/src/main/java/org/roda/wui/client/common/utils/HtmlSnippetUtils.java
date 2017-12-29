@@ -358,6 +358,9 @@ public class HtmlSnippetUtils {
   }
 
   public static void createExtraShow(FlowPanel panel, Set<MetadataValue> bundle, boolean addStyle) {
+    FlowPanel lastSeparator = null;
+    boolean hasFields = false;
+
     for (MetadataValue mv : bundle) {
       boolean mandatory = (mv.get("mandatory") != null && "true".equalsIgnoreCase(mv.get("mandatory"))) ? true : false;
 
@@ -370,16 +373,22 @@ public class HtmlSnippetUtils {
 
       if (controlType == null) {
         addField(panel, layout, mv, mandatory);
-      } else {
-        switch (controlType) {
-          case "separator":
-            addSeparator(panel, layout, mv);
-            break;
-          default:
-            addField(panel, layout, mv, mandatory);
-            break;
+      } else if ("separator".equals(controlType)) {
+        if (lastSeparator != null && !hasFields) {
+          lastSeparator.setVisible(false);
         }
+
+        addSeparator(panel, layout, mv);
+        lastSeparator = layout;
+        hasFields = false;
+      } else {
+        boolean addedField = addField(panel, layout, mv, mandatory);
+        hasFields = hasFields || addedField;
       }
+    }
+
+    if (lastSeparator != null && !hasFields) {
+      lastSeparator.setVisible(false);
     }
   }
 
@@ -442,11 +451,10 @@ public class HtmlSnippetUtils {
     }
   }
 
-  private static Label addSeparator(FlowPanel panel, final FlowPanel layout, final MetadataValue mv) {
+  private static void addSeparator(FlowPanel panel, final FlowPanel layout, final MetadataValue mv) {
     layout.addStyleName("form-separator");
     Label mvLabel = new Label(getFieldLabel(mv));
     layout.add(mvLabel);
     panel.add(layout);
-    return mvLabel;
   }
 }
