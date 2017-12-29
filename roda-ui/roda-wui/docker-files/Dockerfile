@@ -9,7 +9,8 @@ RUN set -ex; \
     apt-get -qq -y --no-install-recommends install clamav clamav-daemon clamdscan siegfried supervisor zip \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-COPY supervisor-roda-dependencies.conf /etc/supervisor/conf.d/supervisor-roda-dependencies.conf
+COPY supervisor-conf.d/* /etc/supervisor/conf.d/
+
 COPY clamd.conf /etc/clamav/clamd.conf
 
 # setup clamav, siegfried & remove old ROOT folder from tomcat
