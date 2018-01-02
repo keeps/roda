@@ -2084,6 +2084,7 @@ public class BrowserHelper {
         supportedMetadata.add(new SupportedMetadataTypeBundle(id, type, version, label, template, values));
       }
     }
+
     return supportedMetadata;
   }
 
@@ -3526,13 +3527,8 @@ public class BrowserHelper {
 
   public static RepresentationInformationExtraBundle retrieveRepresentationInformationExtraBundle(
     RepresentationInformation ri, Locale locale) {
-    List<String> families = new ArrayList<>();
-    for (String f : RodaCoreFactory.getRodaConfigurationAsList("core.ri.family")) {
-      families.add(f);
-    }
-
     List<SupportedMetadataTypeBundle> supportedMetadataTypeBundles = BrowserHelper
-      .retrieveExtraSupportedMetadata(families, locale);
+      .retrieveExtraSupportedMetadata(RodaCoreFactory.getRodaConfigurationAsList("core.ri.family"), locale);
     Map<String, Set<MetadataValue>> familyValues = new HashMap<>();
 
     for (SupportedMetadataTypeBundle metadataTypeBundle : supportedMetadataTypeBundles) {
