@@ -3540,7 +3540,7 @@ public class Browser extends RodaWuiController {
   }
 
   public static RepresentationInformationExtraBundle retrieveRepresentationInformationExtraBundle(User user,
-    RepresentationInformation ri, String family, Locale locale) throws AuthorizationDeniedException {
+    RepresentationInformation ri, Locale locale) throws AuthorizationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
     RepresentationInformationExtraBundle extra = null;
@@ -3549,14 +3549,13 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
 
     try {
-      extra = BrowserHelper.retrieveRepresentationInformationExtraBundle(ri, family, locale);
+      extra = BrowserHelper.retrieveRepresentationInformationExtraBundle(ri, locale);
     } catch (Exception e) {
       state = LOG_ENTRY_STATE.FAILURE;
     }
 
     // register action
-    controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_REPRESENTATION_INFORMATION_PARAM, ri,
-      RodaConstants.CONTROLLER_REPRESENTATION_INFORMATION_FAMILY_PARAM, family);
+    controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_REPRESENTATION_INFORMATION_PARAM, ri);
     return extra;
   }
 }

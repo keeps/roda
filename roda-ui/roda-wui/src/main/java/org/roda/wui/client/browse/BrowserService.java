@@ -386,11 +386,13 @@ public interface BrowserService extends RemoteService {
 
   List<String> retrieveRelationTypeOptions();
 
-  List<String> retrieveRepresentationInformationFamilyOptions();
+  Map<String, String> retrieveRepresentationInformationFamilyOptions(String localeString);
+
+  String retrieveRepresentationInformationFamilyOptions(String family, String localeString);
 
   RelationTypeTranslationsBundle retrieveRelationTypeTranslations(String localeString)
     throws AuthorizationDeniedException;
 
   RepresentationInformationExtraBundle retrieveRepresentationInformationExtraBundle(RepresentationInformation ri,
-    String family, String localeString) throws AuthorizationDeniedException;
+    String localeString) throws AuthorizationDeniedException;
 }

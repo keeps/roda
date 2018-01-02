@@ -10,6 +10,8 @@ package org.roda.wui.client.planning;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.ri.RepresentationInformationSupport;
@@ -145,22 +147,8 @@ public class RepresentationInformationDataPanel extends Composite
       @Override
       public void onChange(ChangeEvent event) {
         RepresentationInformationDataPanel.this.onChange();
-
-        BrowserService.Util.getInstance().retrieveRepresentationInformationExtraBundle(ri, family.getSelectedValue(),
-          LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<RepresentationInformationExtraBundle>() {
-
-            @Override
-            public void onFailure(Throwable caught) {
-              AsyncCallbackUtils.defaultFailureTreatment(caught);
-            }
-
-            @Override
-            public void onSuccess(RepresentationInformationExtraBundle extra) {
-              RepresentationInformationDataPanel.this.extraBundle = extra;
-              extras.clear();
-              FormUtilities.create(extras, extra.getValues(), false);
-            }
-          });
+        extras.clear();
+        FormUtilities.create(extras, extraBundle.getFamilyValues().get(family.getSelectedValue()), false);
       }
     };
 
@@ -176,20 +164,21 @@ public class RepresentationInformationDataPanel extends Composite
       support.addItem(messages.representationInformationSupportValue(val.toString()), val.toString());
     }
 
-    BrowserService.Util.getInstance().retrieveRepresentationInformationFamilyOptions(new AsyncCallback<List<String>>() {
+    BrowserService.Util.getInstance().retrieveRepresentationInformationFamilyOptions(
+      LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<Map<String, String>>() {
 
-      @Override
-      public void onFailure(Throwable caught) {
-        AsyncCallbackUtils.defaultFailureTreatment(caught);
-      }
-
-      @Override
-      public void onSuccess(final List<String> familyList) {
-        for (String item : familyList) {
-          family.addItem(item);
+        @Override
+        public void onFailure(Throwable caught) {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
         }
-      }
-    });
+
+        @Override
+        public void onSuccess(final Map<String, String> families) {
+          for (Entry<String, String> item : families.entrySet()) {
+            family.addItem(item.getValue(), item.getKey());
+          }
+        }
+      });
 
     BrowserService.Util.getInstance().retrieveObjectClassFields(LocaleInfo.getCurrentLocale().getLocaleName(),
       new AsyncCallback<RepresentationInformationFilterBundle>() {
@@ -259,7 +248,7 @@ public class RepresentationInformationDataPanel extends Composite
     this.relations.setRelationList(ri.getRelations());
     this.filters.setFilters(ri.getFilters());
 
-    BrowserService.Util.getInstance().retrieveRepresentationInformationExtraBundle(ri, this.family.getSelectedValue(),
+    BrowserService.Util.getInstance().retrieveRepresentationInformationExtraBundle(ri,
       LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<RepresentationInformationExtraBundle>() {
 
         @Override
@@ -271,7 +260,7 @@ public class RepresentationInformationDataPanel extends Composite
         public void onSuccess(RepresentationInformationExtraBundle extra) {
           RepresentationInformationDataPanel.this.extraBundle = extra;
           extras.clear();
-          FormUtilities.create(extras, extra.getValues(), false);
+          FormUtilities.create(extras, extra.getFamilyValues().get(family.getSelectedValue()), false);
         }
       });
   }

@@ -31,20 +31,19 @@
 				<g:TextArea title="{messages.representationInformationDescription}"
 					ui:field="description" addStyleNames="form-textbox metadata-form-text-area" />
 				<g:Label addStyleNames="form-label">
-					<ui:text from='{messages.representationInformationFamily}' />
-				</g:Label>
-				<g:ListBox title="{messages.representationInformationFamily}"
-					ui:field="family" addStyleNames="form-listbox" />
-				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.representationInformationCategories}' />
 				</g:Label>
 				<l:IncrementalList ui:field="categories"></l:IncrementalList>
-
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.representationInformationSupport}' />
 				</g:Label>
 				<g:ListBox title="{messages.representationInformationSupport}"
 					ui:field="support" addStyleNames="form-listbox" />
+					<g:Label addStyleNames="form-label">
+					<ui:text from='{messages.representationInformationFamily}' />
+				</g:Label>
+				<g:ListBox title="{messages.representationInformationFamily}"
+					ui:field="family" addStyleNames="form-listbox" />
 					
 				<g:FlowPanel ui:field="extras"></g:FlowPanel>
 

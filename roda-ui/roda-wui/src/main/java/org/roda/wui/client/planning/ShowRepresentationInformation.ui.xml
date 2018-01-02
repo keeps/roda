@@ -44,14 +44,6 @@
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
 								<g:Label styleName="label"
-									ui:field="representationInformationFamilyKey">
-									<ui:text from='{messages.representationInformationFamily}' />
-								</g:Label>
-								<g:Label styleName="value"
-									ui:field="representationInformationFamilyValue" />
-							</g:FlowPanel>
-							<g:FlowPanel styleName="field">
-								<g:Label styleName="label"
 									ui:field="representationInformationCategoryKey">
 									<ui:text from='{messages.representationInformationCategories}' />
 								</g:Label>
@@ -64,6 +56,14 @@
 								</g:Label>
 								<g:Label styleName="value"
 									ui:field="representationInformationSupportValue" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label"
+									ui:field="representationInformationFamilyKey">
+									<ui:text from='{messages.representationInformationFamily}' />
+								</g:Label>
+								<g:Label styleName="value"
+									ui:field="representationInformationFamilyValue" />
 							</g:FlowPanel>
 							
 							<g:FlowPanel ui:field="extras"></g:FlowPanel>

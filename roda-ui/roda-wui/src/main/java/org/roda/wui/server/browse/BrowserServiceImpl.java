@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -1064,8 +1065,23 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public List<String> retrieveRepresentationInformationFamilyOptions() {
-    return RodaCoreFactory.getRodaConfigurationAsList("core.ri.family");
+  public Map<String, String> retrieveRepresentationInformationFamilyOptions(String localeString) {
+    Locale locale = ServerTools.parseLocale(localeString);
+    Messages messages = RodaCoreFactory.getI18NMessages(locale);
+    List<String> families = RodaCoreFactory.getRodaConfigurationAsList("core.ri.family");
+    Map<String, String> familyAndTranslation = new HashMap<>();
+
+    for (String family : families) {
+      familyAndTranslation.put(family, messages.getTranslation("ri.family." + family));
+    }
+
+    return familyAndTranslation;
+  }
+
+  @Override
+  public String retrieveRepresentationInformationFamilyOptions(String family, String localeString) {
+    Locale locale = ServerTools.parseLocale(localeString);
+    return RodaCoreFactory.getI18NMessages(locale).getTranslation("ri.family." + family, "");
   }
 
   @Override
@@ -1079,10 +1095,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   @Override
   public RepresentationInformationExtraBundle retrieveRepresentationInformationExtraBundle(RepresentationInformation ri,
-    String family, String localeString) throws AuthorizationDeniedException {
+    String localeString) throws AuthorizationDeniedException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Locale locale = ServerTools.parseLocale(localeString);
-    return Browser.retrieveRepresentationInformationExtraBundle(user, ri, family, locale);
+    return Browser.retrieveRepresentationInformationExtraBundle(user, ri, locale);
   }
 
 }

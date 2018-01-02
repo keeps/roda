@@ -286,11 +286,15 @@ public interface BrowserServiceAsync {
 
   void retrieveRelationTypeOptions(AsyncCallback<List<String>> asyncCallback);
 
-  void retrieveRepresentationInformationFamilyOptions(AsyncCallback<List<String>> asyncCallback);
+  void retrieveRepresentationInformationFamilyOptions(String localeString,
+    AsyncCallback<Map<String, String>> asyncCallback);
+
+  void retrieveRepresentationInformationFamilyOptions(String family, String localeString,
+    AsyncCallback<String> asyncCallback);
 
   void retrieveRelationTypeTranslations(String localeString,
     AsyncCallback<RelationTypeTranslationsBundle> asyncCallback);
 
-  void retrieveRepresentationInformationExtraBundle(RepresentationInformation ri, String family, String localeString,
+  void retrieveRepresentationInformationExtraBundle(RepresentationInformation ri, String localeString,
     AsyncCallback<RepresentationInformationExtraBundle> asyncCallback);
 }

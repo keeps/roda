@@ -199,8 +199,20 @@ public class ShowRepresentationInformation extends Composite {
     representationInformationDescriptionValue.setText(ri.getDescription());
     representationInformationDescriptionKey.setVisible(StringUtils.isNotBlank(ri.getDescription()));
 
-    representationInformationFamilyValue.setText(ri.getFamily());
     representationInformationFamilyKey.setVisible(StringUtils.isNotBlank(ri.getFamily()));
+    BrowserService.Util.getInstance().retrieveRepresentationInformationFamilyOptions(ri.getFamily(),
+      LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<String>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
+        }
+
+        @Override
+        public void onSuccess(String familyTranslation) {
+          representationInformationFamilyValue.setText(familyTranslation);
+        }
+      });
 
     List<String> categoryList = ri.getCategories();
     representationInformationCategoryValue.setVisible(categoryList != null && !categoryList.isEmpty());
@@ -235,7 +247,7 @@ public class ShowRepresentationInformation extends Composite {
       representationInformationSupportKey.setVisible(false);
     }
 
-    BrowserService.Util.getInstance().retrieveRepresentationInformationExtraBundle(ri, ri.getFamily(),
+    BrowserService.Util.getInstance().retrieveRepresentationInformationExtraBundle(ri,
       LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<RepresentationInformationExtraBundle>() {
 
         @Override
@@ -245,7 +257,7 @@ public class ShowRepresentationInformation extends Composite {
 
         @Override
         public void onSuccess(RepresentationInformationExtraBundle extra) {
-          HtmlSnippetUtils.createExtraShow(extras, extra.getValues(), false);
+          HtmlSnippetUtils.createExtraShow(extras, extra.getFamilyValues().get(ri.getFamily()), false);
         }
       });
 

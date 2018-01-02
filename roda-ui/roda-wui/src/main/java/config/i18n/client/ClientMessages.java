@@ -645,7 +645,7 @@ public interface ClientMessages extends Messages {
   String showJobStatusStopping();
 
   String showJobStatusStopped();
-  
+
   String showJobStatusToBeCleaned();
 
   SafeHtml showJobProgressCompletionPercentage(int completionPercentage);
@@ -2652,7 +2652,8 @@ public interface ClientMessages extends Messages {
 
   String representationInformationNoAssociations();
 
-  String representationInformationAssociateWith(String object, String field, String value, String representationInformation);
+  String representationInformationAssociateWith(String object, String field, String value,
+    String representationInformation);
 
   String representationInformationAssociationsTitle();
 }
