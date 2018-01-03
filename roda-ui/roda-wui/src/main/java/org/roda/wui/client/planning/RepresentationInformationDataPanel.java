@@ -215,6 +215,22 @@ public class RepresentationInformationDataPanel extends Composite
           }
         }
       });
+
+    BrowserService.Util.getInstance().retrieveRepresentationInformationExtraBundle(ri,
+      LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<RepresentationInformationExtraBundle>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
+        }
+
+        @Override
+        public void onSuccess(RepresentationInformationExtraBundle extra) {
+          RepresentationInformationDataPanel.this.extraBundle = extra;
+          extras.clear();
+          FormUtilities.create(extras, extra.getFamilyValues().get(family.getSelectedValue()), false);
+        }
+      });
   }
 
   public boolean isValid() {
@@ -254,22 +270,6 @@ public class RepresentationInformationDataPanel extends Composite
 
     this.relations.setRelationList(ri.getRelations());
     this.filters.setFilters(ri.getFilters());
-
-    BrowserService.Util.getInstance().retrieveRepresentationInformationExtraBundle(ri,
-      LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<RepresentationInformationExtraBundle>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
-        }
-
-        @Override
-        public void onSuccess(RepresentationInformationExtraBundle extra) {
-          RepresentationInformationDataPanel.this.extraBundle = extra;
-          extras.clear();
-          FormUtilities.create(extras, extra.getFamilyValues().get(family.getSelectedValue()), false);
-        }
-      });
   }
 
   public RepresentationInformation getRepresentationInformation() {

@@ -3543,16 +3543,11 @@ public class Browser extends RodaWuiController {
     RepresentationInformation ri, Locale locale) throws AuthorizationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
-    RepresentationInformationExtraBundle extra = null;
 
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    try {
-      extra = BrowserHelper.retrieveRepresentationInformationExtraBundle(ri, locale);
-    } catch (Exception e) {
-      state = LOG_ENTRY_STATE.FAILURE;
-    }
+    RepresentationInformationExtraBundle extra = BrowserHelper.retrieveRepresentationInformationExtraBundle(ri, locale);
 
     // register action
     controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_REPRESENTATION_INFORMATION_PARAM, ri);
