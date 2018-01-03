@@ -622,7 +622,7 @@ pre code {
     font-weight: 300;
 }
 
-.searchAdvancedPanel .fieldTextBox, .searchAdvancedPanel .form-textbox, .loginPanel .fieldTextBox, .dialog-right-side .form-textbox {
+.searchAdvancedPanel .fieldTextBox, .searchAdvancedPanel .form-textbox, .loginPanel .fieldTextBox, .dialog-right-side .form-textbox, .relation-form-panel .form-textbox {
     border: 1px solid #ccc;
     background-color: #fff;
 }
