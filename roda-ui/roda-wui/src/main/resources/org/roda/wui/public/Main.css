@@ -6160,6 +6160,10 @@ td.datePickerMonth, td.datePickerYear {
 	cursor: pointer;
 }
 
+.representationInformationCard .btn.btn-margin-right {
+    margin-right: 10px;
+}
+
 .ri-category:hover {
 	cursor: pointer;
 }
@@ -6281,6 +6285,10 @@ td.datePickerMonth, td.datePickerYear {
 span.code {
     font-family: "UbuntuMono", "Ubuntu", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: bold;
+}
+
+.h1 span.code, .h2 span.code, .h3 span.code, .h4 span.code, .h5 span.code, .h6 span.code {
+    font-weight: inherit;
 }
 
 .incremental-list-vertical .removable-textbox {

@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.ui.Anchor;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.index.facet.Facets;
@@ -26,7 +24,6 @@ import org.roda.core.data.v2.ri.RepresentationInformationRelation;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.common.IncrementalList;
-import org.roda.wui.client.common.RemovableTextBox;
 import org.roda.wui.client.common.ValuedLabel;
 import org.roda.wui.client.common.lists.RepresentationInformationList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
@@ -53,7 +50,6 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
 
@@ -62,6 +58,16 @@ public class RepresentationInformationDialogs {
 
   private RepresentationInformationDialogs() {
     // do nothing
+  }
+
+  public static String[] breakFilterIntoParts(String filter) {
+    if (StringUtils.isNotBlank(filter)) {
+      String[] splitfilter = filter.split(RepresentationInformationUtils.REPRESENTATION_INFORMATION_FILTER_SEPARATOR);
+      if (splitfilter.length == 3) {
+        return new String[] {splitfilter[1], splitfilter[2], splitfilter[0]};
+      }
+    }
+    return new String[] {"", "", ""};
   }
 
   public static void showPromptDialogRepresentationInformation(String title, String cancelButtonText,
@@ -180,8 +186,8 @@ public class RepresentationInformationDialogs {
               for (String field : values.keySet()) {
                 for (String value : values.get(field)) {
                   if (StringUtils.isNotBlank(value)) {
-                    ri.addFilter(RepresentationInformationUtils.createRepresentationInformationFilter(className,
-                      field, value));
+                    ri.addFilter(
+                      RepresentationInformationUtils.createRepresentationInformationFilter(className, field, value));
                   }
                 }
               }
@@ -210,7 +216,8 @@ public class RepresentationInformationDialogs {
   }
 
   private static void updateAssociationFields(FlowPanel fieldsPanel, Dropdown dropDown, List<String> appropriateFields,
-    RepresentationInformationFilterBundle result, RepresentationInformation ri, final Map<String, List<String>> values) {
+    RepresentationInformationFilterBundle result, RepresentationInformation ri,
+    final Map<String, List<String>> values) {
     fieldsPanel.clear();
     String className = null;
 
@@ -247,12 +254,12 @@ public class RepresentationInformationDialogs {
       IncrementalList incrementalList = new IncrementalList(true);
       incrementalList.setTextBoxList(valuesForThisField);
       incrementalList.addValueChangeHandler(new ValueChangeHandler<List<String>>() {
-        @Override public void onValueChange(ValueChangeEvent<List<String>> event) {
+        @Override
+        public void onValueChange(ValueChangeEvent<List<String>> event) {
           values.put(field, event.getValue());
         }
       });
       fieldPanel.add(incrementalList);
-
 
       fieldsPanel.add(fieldPanel);
     }
@@ -718,7 +725,7 @@ public class RepresentationInformationDialogs {
       });
   }
 
-  public static void showPromptAddRepresentationInformationwithAssociation(String title, final String cancelButtonText,
+  public static void showPromptAddRepresentationInformationWithAssociation(String title, final String cancelButtonText,
     final String addToSelectedRIButtonText, final String addToNewRIButtonText,
     final AsyncCallback<SelectedItemsList<RepresentationInformation>> callback) {
 
@@ -768,7 +775,7 @@ public class RepresentationInformationDialogs {
 
     cancelButton.addStyleName("btn btn-link");
     addToSelectedRIButton.addStyleName("pull-right btn btn-play");
-    addToNewRIButton.addStyleName("pull-right btn btn-play");
+    addToNewRIButton.addStyleName("pull-right btn btn-plus");
 
     dialogBox.center();
     dialogBox.show();

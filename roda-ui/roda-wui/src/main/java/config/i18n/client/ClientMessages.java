@@ -2650,10 +2650,16 @@ public interface ClientMessages extends Messages {
 
   String exportListMessage(int limit);
 
+  String representationInformationAssociationsTitle();
+
   String representationInformationNoAssociations();
 
-  String representationInformationAssociateWith(String object, String field, String value,
-    String representationInformation);
+  SafeHtml representationInformationAssociatedWith(String field, String value, @Select String indexObjectName);
 
-  String representationInformationAssociationsTitle();
+  SafeHtml representationInformationAssociateWith(String field, String value, @Select String indexObjectName);
+
+  SafeHtml representationInformationAssociatedWithDescription(String field, String value,
+    @Select String indexObjectName);
+
+  String representationInformationNameFromAssociation(String field, String value, @Select String indexObjectName);
 }

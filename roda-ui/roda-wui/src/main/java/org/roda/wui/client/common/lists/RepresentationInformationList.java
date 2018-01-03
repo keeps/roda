@@ -79,7 +79,7 @@ public class RepresentationInformationList extends BasicAsyncTableCell<Represent
     addColumn(nameColumn, messages.representationInformationName(), false, false);
 
     // default sorting
-    display.getColumnSortList().push(new ColumnSortInfo(nameColumn, false));
+    display.getColumnSortList().push(new ColumnSortInfo(nameColumn, true));
   }
 
   @Override

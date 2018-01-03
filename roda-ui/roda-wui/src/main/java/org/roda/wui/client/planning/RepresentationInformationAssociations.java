@@ -13,7 +13,6 @@ package org.roda.wui.client.planning;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.facet.Facets;
@@ -33,7 +32,6 @@ import org.roda.wui.client.common.lists.RepresentationInformationList;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -46,7 +44,13 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.SelectionChangeEvent;
 
 import config.i18n.client.ClientMessages;
@@ -92,10 +96,10 @@ public class RepresentationInformationAssociations extends Composite {
   FlowPanel title;
 
   @UiField
-  SimplePanel subtitle;
+  HTML subtitle;
 
   @UiField
-  FlowPanel description;
+  HTML description;
 
   @UiField(provided = true)
   SearchPanel searchPanel;
@@ -107,12 +111,18 @@ public class RepresentationInformationAssociations extends Composite {
   FlowPanel createPanel;
 
   @UiField
-  Button buttonAddWithAssociation;
+  Button buttonAddToExistingRI;
+
+  @UiField
+  Button buttonAddToNewRI;
+
+  private String addWithAssociationDialogTitle;
 
   @UiField
   FlowPanel resultsPanel;
 
-  private String subtitleString = null;
+  @UiField
+  InlineHTML createPanelTitle;
 
   private boolean gettingFilterResults = true;
 
@@ -129,7 +139,7 @@ public class RepresentationInformationAssociations extends Composite {
       new SimpleFacetParameter(RodaConstants.REPRESENTATION_INFORMATION_SUPPORT));
 
     representationInformationList = new RepresentationInformationList(filter, facets,
-      messages.representationInformationTitle(), true);
+      messages.representationInformationTitle(), false);
 
     searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, true,
       messages.representationInformationRegisterSearchPlaceHolder(), false, false, true);
@@ -179,17 +189,11 @@ public class RepresentationInformationAssociations extends Composite {
     InlineHTML badge = new InlineHTML("<span class='label-warning browseRepresentationOriginalIcon'>Beta</span>");
     title.add(badge);
 
-    description.add(new InlineHTML(
-      "Explaining with more words what is associated explaining with more words what is associated explaining with more words what is associated explaining with more words what is associated explaining with more words what is associated explaining with more words what is associated explaining with more words what is associated."));
-
-    buttonAddWithAssociation.addClickHandler(new ClickHandler() {
+    buttonAddToExistingRI.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-
-        String title = subtitleString;
-
-        RepresentationInformationDialogs.showPromptAddRepresentationInformationwithAssociation(title, "Cancel",
-          "Add to existing", "Add to new",
+        RepresentationInformationDialogs.showPromptAddRepresentationInformationWithAssociation(
+          addWithAssociationDialogTitle, "Cancel", "Add to existing", "Add to new",
           new NoAsyncCallback<SelectedItemsList<RepresentationInformation>>() {
             @Override
             public void onSuccess(final SelectedItemsList<RepresentationInformation> selectedItemsList) {
@@ -205,8 +209,6 @@ public class RepresentationInformationAssociations extends Composite {
                         HistoryUtils.newHistory(ShowRepresentationInformation.RESOLVER,
                           selectedItemsList.getIds().get(0));
                       } else {
-                        // HistoryUtils.newHistory(RESOLVER,
-                        // RepresentationInformationNetwork.RESOLVER.getHistoryToken());
                         gettingFilterResults = false;
                         representationInformationList.refresh();
                         createPanel.setVisible(false);
@@ -215,12 +217,17 @@ public class RepresentationInformationAssociations extends Composite {
                     }
                   });
               } else {
-                LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
-                selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
-                HistoryUtils.newHistory(CreateRepresentationInformation.RESOLVER);
+                addToNewClickHandler();
               }
             }
           });
+      }
+    });
+
+    buttonAddToNewRI.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent clickEvent) {
+        addToNewClickHandler();
       }
     });
   }
@@ -252,7 +259,12 @@ public class RepresentationInformationAssociations extends Composite {
     if (historyTokens.size() == 2) {
       filter = createFilterAndSubtitleFromHistoryTokens(historyTokens);
 
-      subtitle.setWidget(new InlineHTML(subtitleString));
+      String[] parts = RepresentationInformationDialogs.breakFilterIntoParts(historyTokens.get(1));
+      createPanelTitle.setHTML(messages.representationInformationNoAssociations());
+      subtitle.setHTML(messages.representationInformationAssociatedWith(parts[0], parts[1], parts[2]));
+      description.setHTML(messages.representationInformationAssociatedWithDescription(parts[0], parts[1], parts[2]));
+      addWithAssociationDialogTitle = messages.representationInformationNameFromAssociation(parts[0], parts[1],
+        parts[2]);
 
       searchPanel.setDefaultFilter(filter, true);
       representationInformationList.setFilter(filter);
@@ -269,31 +281,14 @@ public class RepresentationInformationAssociations extends Composite {
     List<FilterParameter> params = new ArrayList<>();
     if (historyTokens.size() == (2)) {
       params.add(new SimpleFilterParameter(historyTokens.get(0), historyTokens.get(1)));
-
-      String[] filterSplit = historyTokens.get(1).split(":");
-      if (filterSplit.length == 3) {
-        // TODO bferreira 2017-12-05: add i18n and replace switch with something better
-        StringBuilder subtitleStringBuilder = new StringBuilder("Associated with ");
-        switch (filterSplit[0]) {
-          case "AIP":
-            subtitleStringBuilder.append(messages.searchListBoxItems());
-            break;
-          case "Representation":
-            subtitleStringBuilder.append(messages.searchListBoxRepresentations());
-            break;
-          case "File":
-            subtitleStringBuilder.append(messages.searchListBoxFiles());
-            break;
-        }
-
-        subtitleStringBuilder.append(" where field <span class=\"code\">").append(filterSplit[1])
-          .append("</span> is <span class=\"code\">").append(filterSplit[2]).append("</span>");
-
-        subtitleString = subtitleStringBuilder.toString();
-      }
-
     }
 
     return new Filter(new OrFiltersParameters(params));
+  }
+
+  private void addToNewClickHandler() {
+    LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
+    selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
+    HistoryUtils.newHistory(CreateRepresentationInformation.RESOLVER);
   }
 }
