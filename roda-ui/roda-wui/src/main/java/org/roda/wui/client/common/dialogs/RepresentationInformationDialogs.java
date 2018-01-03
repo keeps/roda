@@ -143,6 +143,7 @@ public class RepresentationInformationDialogs {
             @Override
             public void onValueChange(ValueChangeEvent<String> event) {
               updateAssociationFields(fieldsPanel, dropDown, appropriateFields, result, ri, values);
+              dialogBox.center();
             }
           });
 
@@ -161,6 +162,8 @@ public class RepresentationInformationDialogs {
             appropriateFields.addAll(result.getObjectClassFields().get(AIP.class.getSimpleName()));
             dropDown.setSelectedValue(RodaConstants.SEARCH_ITEMS, true);
           }
+
+          dialogBox.center();
 
           confirmButton.addClickHandler(new ClickHandler() {
             @Override

@@ -7,6 +7,7 @@
  */
 package org.roda.wui.client.common.popup;
 
+import com.google.gwt.core.client.GWT;
 import org.roda.core.data.v2.common.Pair;
 
 import com.google.gwt.user.client.Window;
@@ -66,13 +67,15 @@ public class CalloutPopup extends PopupPanel {
 
   private Pair<Integer, Integer> getBottomRight(UIObject target, int offsetWidth, int offsetHeight) {
     int left = target.getAbsoluteLeft() + target.getOffsetWidth() / 2 - offsetWidth + ARROW_OFFSET_PX;
-    int top = target.getAbsoluteTop() + Window.getScrollTop() - offsetHeight - MARGIN_FROM_TARGET_PX;
+    int top = target.getAbsoluteTop() - offsetHeight - MARGIN_FROM_TARGET_PX;
 
     // change top value if popup top disappears of the page (goes to bottom)
     if (top < 0) {
       top = target.getAbsoluteTop() + target.getOffsetHeight() + MARGIN_FROM_TARGET_PX;
+      removeStyleDependentName(CalloutPosition.BOTTOM_RIGHT.name().toLowerCase());
       addStyleDependentName(CalloutPosition.TOP_RIGHT.name().toLowerCase());
     } else {
+      removeStyleDependentName(CalloutPosition.TOP_RIGHT.name().toLowerCase());
       addStyleDependentName(CalloutPosition.BOTTOM_RIGHT.name().toLowerCase());
     }
 
@@ -82,6 +85,7 @@ public class CalloutPopup extends PopupPanel {
   private Pair<Integer, Integer> getTopRight(UIObject target, int offsetWidth, int offsetHeight) {
     int left = target.getAbsoluteLeft() + target.getOffsetWidth() / 2 - offsetWidth + ARROW_OFFSET_PX;
     int top = target.getAbsoluteTop() + target.getOffsetHeight() + Window.getScrollTop() + MARGIN_FROM_TARGET_PX;
+    removeStyleDependentName(CalloutPosition.BOTTOM_RIGHT.name().toLowerCase());
     addStyleDependentName(CalloutPosition.TOP_RIGHT.name().toLowerCase());
     return Pair.of(left, top);
   }
