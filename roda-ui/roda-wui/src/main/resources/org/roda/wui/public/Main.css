@@ -6234,6 +6234,7 @@ td.datePickerMonth, td.datePickerYear {
 .ri-dropdown-listbox {
 	border-bottom: 2px solid #089de3;
     margin-bottom: 20px;
+    background-color: white;
 }
 
 .ri-dropdown-listbox .dropdown-panel {

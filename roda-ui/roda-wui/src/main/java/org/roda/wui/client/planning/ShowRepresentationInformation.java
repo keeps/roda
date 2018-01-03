@@ -331,14 +331,14 @@ public class ShowRepresentationInformation extends Composite {
         ShowRepresentationInformation.this.objectPanel.add(label);
 
         InlineHTML edit = new InlineHTML("<i class='fa fa-pencil' aria-hidden='true'></i>");
-        edit.setTitle("Edit relation rules");
+        edit.setTitle("Edit association rules");
         edit.addStyleName("ri-category link-color");
 
         edit.addClickHandler(new ClickHandler() {
           @Override
           public void onClick(ClickEvent event) {
             RepresentationInformationDialogs.showPromptDialogRepresentationInformation(
-              messages.representationInformationAddNewRelation(), messages.cancelButton(), messages.confirmButton(),
+              messages.representationInformationEditAssociations(), messages.cancelButton(), messages.confirmButton(),
               ShowRepresentationInformation.this.ri, new AsyncCallback<RepresentationInformation>() {
                 @Override
                 public void onFailure(Throwable caught) {
@@ -523,9 +523,9 @@ public class ShowRepresentationInformation extends Composite {
 
   // Java method
   public native boolean isValidUrl(String url) /*-{
-		var pattern = /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
-		return pattern.test(url);
-  }-*/;
+                                               var pattern = /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+                                               return pattern.test(url);
+                                               }-*/;
 
   void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 1) {

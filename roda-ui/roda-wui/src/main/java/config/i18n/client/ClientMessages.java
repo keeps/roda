@@ -1393,6 +1393,8 @@ public interface ClientMessages extends Messages {
 
   String representationInformationAddNewRelation();
 
+  String representationInformationEditAssociations();
+
   String representationInformationIntellectualEntities(@PluralCount int size, String link);
 
   String representationInformationRepresentations(@PluralCount int size, String link);
