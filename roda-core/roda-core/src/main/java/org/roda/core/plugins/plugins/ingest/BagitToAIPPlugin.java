@@ -10,7 +10,6 @@ package org.roda.core.plugins.plugins.ingest;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -20,7 +19,6 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
@@ -117,17 +115,9 @@ public class BagitToAIPPlugin extends SIPToAIPPlugin {
       Optional<String> computedParentId = PluginHelper.getComputedParent(model, index, bagit.getAncestors(),
         computedSearchScope, forceSearchScope, job.getId());
 
-      Permissions permissions = new Permissions();
-      permissions.setUserPermissions(job.getUsername(),
-        new HashSet<>(Arrays.asList(Permissions.PermissionType.CREATE, Permissions.PermissionType.READ,
-          Permissions.PermissionType.UPDATE, Permissions.PermissionType.DELETE, Permissions.PermissionType.GRANT)));
-      permissions.setGroupPermissions(RodaConstants.ADMINISTRATORS,
-        new HashSet<>(Arrays.asList(Permissions.PermissionType.CREATE, Permissions.PermissionType.READ,
-          Permissions.PermissionType.UPDATE, Permissions.PermissionType.DELETE, Permissions.PermissionType.GRANT)));
-
       AIP aipCreated = BagitToAIPPluginUtils.bagitToAip(bagit, model, METADATA_FILE,
         Arrays.asList(transferredResource.getName()), reportItem.getJobId(), computedParentId, job.getUsername(),
-        permissions);
+        PermissionUtils.getIngestPermissions(job.getUsername()));
 
       PluginHelper.createSubmission(model, createSubmission, bagitPath, aipCreated.getId());
 

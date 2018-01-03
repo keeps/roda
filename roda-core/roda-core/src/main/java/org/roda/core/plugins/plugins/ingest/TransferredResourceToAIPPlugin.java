@@ -18,7 +18,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -30,7 +29,6 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
-import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
@@ -123,20 +121,12 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
       Path transferredResourcePath = Paths.get(transferredResource.getFullPath());
       LOGGER.debug("Converting {} to AIP", transferredResourcePath);
       AIPState state = AIPState.INGEST_PROCESSING;
-
-      Permissions permissions = new Permissions();
-      permissions.setUserPermissions(job.getUsername(),
-        new HashSet<>(Arrays.asList(Permissions.PermissionType.CREATE, Permissions.PermissionType.READ,
-          Permissions.PermissionType.UPDATE, Permissions.PermissionType.DELETE, Permissions.PermissionType.GRANT)));
-      permissions.setGroupPermissions(RodaConstants.ADMINISTRATORS,
-        new HashSet<>(Arrays.asList(Permissions.PermissionType.CREATE, Permissions.PermissionType.READ,
-          Permissions.PermissionType.UPDATE, Permissions.PermissionType.DELETE, Permissions.PermissionType.GRANT)));
-
       boolean notifyCreatedAIP = false;
       String aipType = RodaConstants.AIP_TYPE_MIXED;
 
-      final AIP aip = model.createAIP(state, computedSearchScope.orElse(null), aipType, permissions,
-        Arrays.asList(transferredResource.getName()), job.getId(), notifyCreatedAIP, job.getUsername());
+      final AIP aip = model.createAIP(state, computedSearchScope.orElse(null), aipType,
+        PermissionUtils.getIngestPermissions(job.getUsername()), Arrays.asList(transferredResource.getName()),
+        job.getId(), notifyCreatedAIP, job.getUsername());
 
       PluginHelper.createSubmission(model, createSubmission, transferredResourcePath, aip.getId());
 

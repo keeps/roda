@@ -9,6 +9,7 @@ package org.roda.core.plugins.plugins.ingest;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -85,6 +86,17 @@ public class PermissionUtils {
         Permissions.PermissionType.READ, Permissions.PermissionType.UPDATE)
       .collect(Collectors.toSet());
     permissions.setUserPermissions(username, allPermissions);
+    return permissions;
+  }
+
+  public static Permissions getIngestPermissions(String username) {
+    Permissions permissions = new Permissions();
+    permissions.setUserPermissions(username,
+      new HashSet<>(Arrays.asList(Permissions.PermissionType.CREATE, Permissions.PermissionType.READ,
+        Permissions.PermissionType.UPDATE, Permissions.PermissionType.DELETE, Permissions.PermissionType.GRANT)));
+    permissions.setGroupPermissions(RodaConstants.ADMINISTRATORS,
+      new HashSet<>(Arrays.asList(Permissions.PermissionType.CREATE, Permissions.PermissionType.READ,
+        Permissions.PermissionType.UPDATE, Permissions.PermissionType.DELETE, Permissions.PermissionType.GRANT)));
     return permissions;
   }
 }

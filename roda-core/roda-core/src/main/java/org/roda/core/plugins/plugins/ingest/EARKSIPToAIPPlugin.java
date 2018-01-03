@@ -12,7 +12,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -37,7 +36,6 @@ import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
@@ -198,19 +196,8 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
     Optional<String> computedParentId) throws NotFoundException, GenericException, RequestNotValidException,
     AuthorizationDeniedException, AlreadyExistsException, ValidationException, IOException {
     String jobUsername = PluginHelper.getJobUsername(this, index);
-    Permissions fullPermissions = new Permissions();
-
-    // Create the permissions object for the user that created the job
-    fullPermissions.setUserPermissions(jobUsername,
-      new HashSet<>(Arrays.asList(Permissions.PermissionType.CREATE, Permissions.PermissionType.READ,
-        Permissions.PermissionType.UPDATE, Permissions.PermissionType.DELETE, Permissions.PermissionType.GRANT)));
-
-    fullPermissions.setGroupPermissions(RodaConstants.ADMINISTRATORS,
-      new HashSet<>(Arrays.asList(Permissions.PermissionType.CREATE, Permissions.PermissionType.READ,
-        Permissions.PermissionType.UPDATE, Permissions.PermissionType.DELETE, Permissions.PermissionType.GRANT)));
-
-    return EARKSIPToAIPPluginUtils.earkSIPToAIP(sip, jobUsername, fullPermissions, model, sip.getIds(),
-      reportItem.getJobId(), computedParentId);
+    return EARKSIPToAIPPluginUtils.earkSIPToAIP(sip, jobUsername, PermissionUtils.getIngestPermissions(jobUsername),
+      model, sip.getIds(), reportItem.getJobId(), computedParentId);
   }
 
   private AIP processUpdateSIP(IndexService index, ModelService model, StorageService storage, SIP sip,
