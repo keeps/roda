@@ -204,6 +204,31 @@ public class RepresentationInformationDataPanel extends Composite
 
               RepresentationInformationDataPanel.this.filters
                 .setFilters(Collections.singletonList(lastHistory.get(lastHistory.size() - 1)));
+
+              String[] filterSplit = lastHistory.get(lastHistory.size() - 1).split(":");
+              if (filterSplit.length == 3) {
+                // TODO bferreira 2017-12-05: add i18n and replace switch with something better
+                // TODO bferreira 2018-01-03: duplicated with
+                // RepresentationInformationAssociations#createFilterAndSubtitleFromHistoryTokens
+                StringBuilder subtitleStringBuilder = new StringBuilder();
+                switch (filterSplit[0]) {
+                  case "AIP":
+                    subtitleStringBuilder.append(messages.searchListBoxItems());
+                    break;
+                  case "Representation":
+                    subtitleStringBuilder.append(messages.searchListBoxRepresentations());
+                    break;
+                  case "File":
+                    subtitleStringBuilder.append(messages.searchListBoxFiles());
+                    break;
+                }
+
+                subtitleStringBuilder.append(" where field ").append(filterSplit[1]).append(" is ")
+                  .append(filterSplit[2]);
+
+                RepresentationInformationDataPanel.this.name.setText(subtitleStringBuilder.toString());
+              }
+
             }
           }
         }
