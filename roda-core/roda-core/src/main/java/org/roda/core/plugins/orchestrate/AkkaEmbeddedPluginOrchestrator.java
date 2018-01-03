@@ -15,12 +15,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.RodaUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -120,18 +118,14 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   private Config getAkkaConfiguration() {
-    InputStream originStream = RodaCoreFactory
-      .getConfigurationFileAsStream(RodaConstants.CORE_ORCHESTRATOR_FOLDER + "/application.conf");
-
     Config akkaConfig = null;
 
-    try {
+    try (InputStream originStream = RodaCoreFactory
+      .getConfigurationFileAsStream(RodaConstants.CORE_ORCHESTRATOR_FOLDER + "/application.conf")) {
       String configAsString = IOUtils.toString(originStream, RodaConstants.DEFAULT_ENCODING);
       akkaConfig = ConfigFactory.parseString(configAsString);
     } catch (IOException e) {
       LOGGER.error("Could not load Akka configuration", e);
-    } finally {
-      RodaUtils.closeQuietly(originStream);
     }
 
     return akkaConfig;

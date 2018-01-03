@@ -7,13 +7,16 @@
  */
 package org.roda.core.plugins.orchestrate.akka;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.v2.jobs.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +47,11 @@ public class AkkaJobsManager extends AkkaBaseActor {
   private Histogram jobsWaitingToBeExecutedHisto;
   private Histogram jobsTimeInTheQueueInMilis;
 
+  // parallelization
+  private List<String> nonParallelizablePlugins;
+  private boolean nonParallelizableJobIsRunning = false;
+  private int nonParallelizableJobsQueued = 0;
+
   public AkkaJobsManager(int maxNumberOfJobsInParallel) {
     super();
     this.maxNumberOfJobsInParallel = maxNumberOfJobsInParallel;
@@ -54,6 +62,8 @@ public class AkkaJobsManager extends AkkaBaseActor {
     jobsRouter = getContext().actorOf(jobsProps, "JobsRouter");
 
     initMetrics(maxNumberOfJobsInParallel);
+
+    loadParallelizationInformation();
 
     getContext().system().scheduler().schedule(Duration.create(0, TimeUnit.MILLISECONDS),
       Duration.create(2, TimeUnit.SECONDS), () -> {
@@ -66,27 +76,58 @@ public class AkkaJobsManager extends AkkaBaseActor {
   @Override
   public void onReceive(Object msg) throws Throwable {
     if (msg instanceof Job) {
-      Job job = (Job) msg;
-      if (jobsWaitingToBeExecuted.getCount() == 0 && jobsBeingExecuted.getCount() < maxNumberOfJobsInParallel) {
-        sendJobForExecution(msg, job);
-      } else {
-        queueJob(job, getSender());
-      }
+      handleJob((Job) msg);
     } else if (msg instanceof Messages.JobsManagerTick) {
-      if (jobsWaitingToBeExecuted.getCount() > 0 && jobsBeingExecuted.getCount() < maxNumberOfJobsInParallel) {
-        while (jobsWaitingToBeExecuted.getCount() > 0 && jobsBeingExecuted.getCount() < maxNumberOfJobsInParallel) {
-          dequeueJob();
-        }
-      }
-      ticksWaitingToBeProcessed.dec();
+      handleTick();
     } else if (msg instanceof Messages.JobsManagerJobEnded) {
-      updateJobsBeingExecuted(false);
-      sendTick();
-      log("The end for job", ((Messages.JobsManagerJobEnded) msg).getJobId());
+      handleJobEnded((Messages.JobsManagerJobEnded) msg);
     } else {
       LOGGER.error("Received a message that don't know how to process ({})...", msg.getClass().getName());
       unhandled(msg);
     }
+  }
+
+  private void handleJob(Job job) {
+    if (jobIsNotParallelizable(job)) {
+      if (!nonParallelizableJobIsRunning && jobsWaitingToBeExecuted.getCount() == 0
+        && jobsBeingExecuted.getCount() < maxNumberOfJobsInParallel) {
+        nonParallelizableJobIsRunning = true;
+        sendJobForExecution(job);
+      } else {
+        queueJob(job, true);
+      }
+    } else {
+      if (jobsWaitingToBeExecuted.getCount() == 0 && jobsBeingExecuted.getCount() < maxNumberOfJobsInParallel) {
+        sendJobForExecution(job);
+      } else {
+        queueJob(job, false);
+      }
+    }
+  }
+
+  private boolean jobIsNotParallelizable(String plugin) {
+    return nonParallelizablePlugins.contains(plugin);
+  }
+
+  private boolean jobIsNotParallelizable(Job job) {
+    return jobIsNotParallelizable(job.getPlugin());
+  }
+
+  private void handleTick() {
+    if (jobsWaitingToBeExecuted.getCount() > 0 && jobsBeingExecuted.getCount() < maxNumberOfJobsInParallel) {
+      dequeueJobs(
+        Math.min(jobsWaitingToBeExecuted.getCount(), maxNumberOfJobsInParallel - jobsBeingExecuted.getCount()));
+    }
+    ticksWaitingToBeProcessed.dec();
+  }
+
+  private void handleJobEnded(Messages.JobsManagerJobEnded jobEnded) {
+    if (jobIsNotParallelizable(jobEnded.getPlugin())) {
+      nonParallelizableJobIsRunning = false;
+    }
+    updateJobsBeingExecuted(false);
+    sendTick();
+    log("The end for job", jobEnded.getJobId());
   }
 
   private void sendTick() {
@@ -94,13 +135,6 @@ public class AkkaJobsManager extends AkkaBaseActor {
       self().tell(new Messages.JobsManagerTick(), self());
       ticksWaitingToBeProcessed.inc();
     }
-  }
-
-  private void sendJobForExecution(Object msg, Job job) {
-    updateJobsBeingExecuted(true);
-    jobsTimeInTheQueueInMilis.update(0);
-    jobsRouter.tell(msg, getSender());
-    log("Will execute job", job.getId());
   }
 
   private void updateJobsBeingExecuted(boolean increment) {
@@ -121,23 +155,62 @@ public class AkkaJobsManager extends AkkaBaseActor {
     jobsWaitingToBeExecutedHisto.update(jobsWaitingToBeExecuted.getCount());
   }
 
-  private void queueJob(Job job, ActorRef sender) {
+  private void queueJob(Job job, boolean jobIsJobParallelizable) {
+    if (jobIsJobParallelizable) {
+      nonParallelizableJobsQueued++;
+    }
     jobsWaiting.offer(new JobWaiting(job));
-    jobsWaitingCreators.put(job.getId(), sender);
+    jobsWaitingCreators.put(job.getId(), getSender());
     updateJobsWaitingToBeExecuted(true);
     log("Queued job", job.getId());
   }
 
-  private Job dequeueJob() {
-    JobWaiting jobWaiting = jobsWaiting.remove();
-    jobsTimeInTheQueueInMilis.update(jobWaiting.timeInQueue());
-    Job job = jobWaiting.job;
-    ActorRef jobCreator = jobsWaitingCreators.remove(job.getId());
-    jobsRouter.tell(job, jobCreator);
+  private void sendJobForExecution(Job job) {
     updateJobsBeingExecuted(true);
-    updateJobsWaitingToBeExecuted(false);
-    log("Dequeued job", job.getId());
-    return job;
+    jobsTimeInTheQueueInMilis.update(0);
+    jobsRouter.tell(job, getSender());
+    log("Will execute job", job.getId());
+  }
+
+  private void dequeueJobs(long numberOfJobsToDequeue) {
+    List<JobWaiting> jobsToDequeued = new ArrayList<>();
+    boolean dequeueOneNonParallelizableJob = !nonParallelizableJobIsRunning;
+
+    // 20180104 hsilva: Optimization 1 - if one non-parallelizable job is
+    // already running & all waiting are non-parallelizable, there is no point
+    // in doing the for cycle
+    if (nonParallelizableJobIsRunning && jobsWaiting.size() == nonParallelizableJobsQueued) {
+      return;
+    }
+
+    for (JobWaiting jobWaiting : jobsWaiting) {
+      boolean jobIsNotParallelizable = jobIsNotParallelizable(jobWaiting.job);
+      if (jobIsNotParallelizable) {
+        if (dequeueOneNonParallelizableJob) {
+          nonParallelizableJobsQueued--;
+          dequeueOneNonParallelizableJob = false;
+          nonParallelizableJobIsRunning = true;
+          jobsToDequeued.add(jobWaiting);
+        }
+      } else {
+        jobsToDequeued.add(jobWaiting);
+      }
+
+      if (jobsToDequeued.size() == numberOfJobsToDequeue) {
+        break;
+      }
+    }
+
+    for (JobWaiting jobToDequeue : jobsToDequeued) {
+      jobsWaiting.remove(jobToDequeue);
+      jobsTimeInTheQueueInMilis.update(jobToDequeue.timeInQueueInMillis());
+      Job job = jobToDequeue.job;
+      ActorRef jobCreator = jobsWaitingCreators.remove(job.getId());
+      updateJobsBeingExecuted(true);
+      updateJobsWaitingToBeExecuted(false);
+      jobsRouter.tell(job, jobCreator);
+      log("Dequeued job", job.getId());
+    }
   }
 
   private void log(String msg, String jobId) {
@@ -160,6 +233,11 @@ public class AkkaJobsManager extends AkkaBaseActor {
     jobsTimeInTheQueueInMilis = metrics.histogram(MetricRegistry.name(className, "jobsTimeInTheQueueInMilis"));
   }
 
+  private void loadParallelizationInformation() {
+    nonParallelizablePlugins = RodaCoreFactory
+      .getRodaConfigurationAsList("core.orchestrator.non_parallelizable_plugins");
+  }
+
   private class JobWaiting {
     public Job job;
     private long queuedIn;
@@ -169,8 +247,8 @@ public class AkkaJobsManager extends AkkaBaseActor {
       this.queuedIn = new Date().getTime();
     }
 
-    /** Time in miliseconds */
-    public long timeInQueue() {
+    /** Time in milliseconds */
+    public long timeInQueueInMillis() {
       return new Date().getTime() - queuedIn;
     }
   }

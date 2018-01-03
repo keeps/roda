@@ -124,7 +124,7 @@ public interface BrowserService extends RemoteService {
 
   List<SearchField> retrieveSearchFields(String className, String locale) throws GenericException;
 
-  IndexedAIP moveAIPInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, String details)
+  Job moveAIPInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
     AlreadyExistsException, ValidationException;
 

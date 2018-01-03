@@ -124,7 +124,7 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
       // 20160817 hsilva: the following instruction is needed for the "sync"
       // execution of a job (i.e. for testing purposes)
       jobCreator.tell("Done", getSelf());
-      jobsManager.tell(new Messages.JobsManagerJobEnded(jobId), getSelf());
+      jobsManager.tell(new Messages.JobsManagerJobEnded(jobId, plugin.getClass().getName()), getSelf());
       JobsHelper.deleteJobWorkingDirectory(jobId);
       getContext().stop(getSelf());
     }

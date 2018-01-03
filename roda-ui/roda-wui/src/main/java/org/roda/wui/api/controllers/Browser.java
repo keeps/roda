@@ -66,6 +66,7 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Reports;
 import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
@@ -1336,7 +1337,7 @@ public class Browser extends RodaWuiController {
    * ---------------------------------------------------------------------------
    */
 
-  public static IndexedAIP moveAIPInHierarchy(User user, SelectedItems<IndexedAIP> selected, String parentId,
+  public static Job moveAIPInHierarchy(User user, SelectedItems<IndexedAIP> selected, String parentId,
     String details) throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
     AlreadyExistsException, ValidationException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};

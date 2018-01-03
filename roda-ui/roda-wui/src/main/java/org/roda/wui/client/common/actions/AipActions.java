@@ -23,6 +23,7 @@ import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.browse.BrowseAIP;
 import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.browse.BrowserService;
@@ -37,9 +38,11 @@ import org.roda.wui.client.common.dialogs.SelectAipDialog;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
+import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.management.UserLog;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
 import org.roda.wui.client.process.CreateSelectedJob;
+import org.roda.wui.client.process.InternalProcess;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.widgets.Toast;
@@ -245,16 +248,16 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
             @Override
             public void onSuccess(String details) {
               BrowserService.Util.getInstance().moveAIPInHierarchy(selected, parentId, details,
-                new AsyncCallback<IndexedAIP>() {
+                new AsyncCallback<Job>() {
 
                   @Override
-                  public void onSuccess(IndexedAIP result) {
+                  public void onSuccess(Job result) {
                     Toast.showInfo(messages.moveItemTitle(), messages.movingAIP());
 
                     if (result != null) {
-                      HistoryUtils.newHistory(BrowseAIP.RESOLVER, result.getId());
+                      HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
                     } else {
-                      HistoryUtils.newHistory(BrowseAIP.RESOLVER);
+                      HistoryUtils.newHistory(InternalProcess.RESOLVER);
                     }
                   }
 
@@ -320,16 +323,16 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
             @Override
             public void onSuccess(String details) {
               BrowserService.Util.getInstance().moveAIPInHierarchy(selected, parentId, details,
-                new LoadingAsyncCallback<IndexedAIP>() {
+                new LoadingAsyncCallback<Job>() {
 
                   @Override
-                  public void onSuccessImpl(IndexedAIP result) {
+                  public void onSuccessImpl(Job result) {
                     Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
 
                     if (result != null) {
-                      HistoryUtils.newHistory(BrowseAIP.RESOLVER, result.getId());
+                      HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
                     } else {
-                      HistoryUtils.newHistory(BrowseAIP.RESOLVER);
+                      HistoryUtils.newHistory(InternalProcess.RESOLVER);
                     }
                     callback.onSuccess(ActionImpact.UPDATED);
                   }

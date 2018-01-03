@@ -16,6 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -65,6 +66,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LinkingObjectUtils;
 import org.roda.core.data.v2.common.ObjectPermission;
 import org.roda.core.data.v2.common.ObjectPermissionResult;
@@ -491,11 +493,9 @@ public class BrowserHelper {
     throws GenericException, NotFoundException, RequestNotValidException {
     DipBundle bundle = new DipBundle();
 
-    bundle
-      .setDip(retrieve(IndexedDIP.class, dipUUID,
-        Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID, RodaConstants.DIP_TITLE,
-          RodaConstants.DIP_AIP_IDS, RodaConstants.DIP_AIP_UUIDS, RodaConstants.DIP_FILE_IDS,
-          RodaConstants.DIP_REPRESENTATION_IDS)));
+    bundle.setDip(retrieve(IndexedDIP.class, dipUUID,
+      Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID, RodaConstants.DIP_TITLE, RodaConstants.DIP_AIP_IDS,
+        RodaConstants.DIP_AIP_UUIDS, RodaConstants.DIP_FILE_IDS, RodaConstants.DIP_REPRESENTATION_IDS)));
 
     List<String> dipFileFields = new ArrayList<>();
 
@@ -1434,6 +1434,7 @@ public class BrowserHelper {
           printStream.print(htmlEvent);
           printStream.close();
         }
+
       };
       return new StreamResponse(filename, mediaType, stream);
     } else {
@@ -1589,37 +1590,45 @@ public class BrowserHelper {
       fileSuffix, type);
   }
 
-  public static IndexedAIP moveAIPInHierarchy(User user, SelectedItems<IndexedAIP> selected, String parentId,
-    String details) throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException,
+  public static Job moveAIPInHierarchy(User user, SelectedItems<IndexedAIP> selected, String parentId, String details)
+    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException,
     AlreadyExistsException, ValidationException {
-
-    Job job = new Job();
-    job.setId(IdUtils.createUUID());
-    job.setName("Move AIP in hierarchy");
-    job.setSourceObjects(selected);
-    job.setPlugin(MovePlugin.class.getCanonicalName());
-    job.setPluginType(PluginType.INTERNAL);
-    job.setUsername(user.getName());
 
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_ID, parentId);
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
+
+    return createAndExecuteInternalJob("Move AIP in hierarchy", selected, MovePlugin.class, user, pluginParameters,
+      "Could not execute move job");
+  }
+
+  private static <T extends IsRODAObject> Job createAndExecuteInternalJob(String name, SelectedItems<T> sourceObjects,
+    Class<?> plugin, User user, Map<String, String> pluginParameters, String exceptionMessage)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    return createAndExecuteJob(name, sourceObjects, plugin, PluginType.INTERNAL, user, pluginParameters,
+      exceptionMessage);
+  }
+
+  private static <T extends IsRODAObject> Job createAndExecuteJob(String name, SelectedItems<T> sourceObjects,
+    Class<?> plugin, PluginType pluginType, User user, Map<String, String> pluginParameters, String exceptionMessage)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    Job job = new Job();
+    job.setId(IdUtils.createUUID());
+    job.setName(name);
+    job.setSourceObjects(sourceObjects);
+    job.setPlugin(plugin.getCanonicalName());
+    job.setPluginType(pluginType);
+    job.setUsername(user.getName());
     job.setPluginParameters(pluginParameters);
 
-    RodaCoreFactory.getModelService().createJob(job);
     try {
+      RodaCoreFactory.getModelService().createJob(job);
       RodaCoreFactory.getPluginOrchestrator().executeJob(job, true);
     } catch (JobAlreadyStartedException e) {
-      LOGGER.error("Could not execute move job", e);
+      LOGGER.error(exceptionMessage, e);
     }
 
-    IndexService index = RodaCoreFactory.getIndexService();
-    index.commit(IndexedAIP.class);
-    index.commit(IndexedRepresentation.class);
-    index.commit(IndexedFile.class);
-
-    return (parentId != null) ? index.retrieve(IndexedAIP.class, parentId, Arrays.asList(RodaConstants.INDEX_UUID))
-      : null;
+    return job;
   }
 
   public static AIP createAIP(User user, String parentAipId, String type, Permissions permissions)
@@ -1635,70 +1644,31 @@ public class BrowserHelper {
     return model.updateAIP(aip, user.getName());
   }
 
-  public static void deleteAIP(User user, SelectedItems<IndexedAIP> selected, String details)
+  public static Job deleteAIP(User user, SelectedItems<IndexedAIP> selected, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    Job job = new Job();
-    job.setId(IdUtils.createUUID());
-    job.setName("Delete AIP");
-    job.setSourceObjects(selected);
-    job.setPlugin(DeleteRODAObjectPlugin.class.getCanonicalName());
-    job.setPluginType(PluginType.INTERNAL);
-    job.setUsername(user.getName());
-
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
-    job.setPluginParameters(pluginParameters);
 
-    try {
-      RodaCoreFactory.getModelService().createJob(job);
-      RodaCoreFactory.getPluginOrchestrator().executeJob(job, true);
-    } catch (JobAlreadyStartedException e) {
-      LOGGER.error("Could not execute AIP delete action", e);
-    }
+    return createAndExecuteInternalJob("Delete AIP", selected, DeleteRODAObjectPlugin.class, user, pluginParameters,
+      "Could not execute AIP delete action");
   }
 
-  public static void deleteRepresentation(User user, SelectedItems<IndexedRepresentation> selected, String details)
+  public static Job deleteRepresentation(User user, SelectedItems<IndexedRepresentation> selected, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    Job job = new Job();
-    job.setId(IdUtils.createUUID());
-    job.setName("Delete representations");
-    job.setSourceObjects(selected);
-    job.setPlugin(DeleteRODAObjectPlugin.class.getCanonicalName());
-    job.setPluginType(PluginType.INTERNAL);
-    job.setUsername(user.getName());
-
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
-    job.setPluginParameters(pluginParameters);
 
-    try {
-      RodaCoreFactory.getModelService().createJob(job);
-      RodaCoreFactory.getPluginOrchestrator().executeJob(job, true);
-    } catch (JobAlreadyStartedException e) {
-      LOGGER.error("Could not execute representations delete action", e);
-    }
+    return createAndExecuteInternalJob("Delete representations", selected, DeleteRODAObjectPlugin.class, user,
+      pluginParameters, "Could not execute representations delete action");
   }
 
-  public static void deleteFile(User user, SelectedItems<IndexedFile> selected, String details)
+  public static Job deleteFile(User user, SelectedItems<IndexedFile> selected, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    Job job = new Job();
-    job.setId(IdUtils.createUUID());
-    job.setName("Delete files");
-    job.setSourceObjects(selected);
-    job.setPlugin(DeleteRODAObjectPlugin.class.getCanonicalName());
-    job.setPluginType(PluginType.INTERNAL);
-    job.setUsername(user.getName());
-
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
-    job.setPluginParameters(pluginParameters);
 
-    try {
-      RodaCoreFactory.getModelService().createJob(job);
-      RodaCoreFactory.getPluginOrchestrator().executeJob(job, true);
-    } catch (JobAlreadyStartedException e) {
-      LOGGER.error("Could not execute file delete action", e);
-    }
+    return createAndExecuteInternalJob("Delete files", selected, DeleteRODAObjectPlugin.class, user, pluginParameters,
+      "Could not execute file delete action");
   }
 
   public static DescriptiveMetadata createDescriptiveMetadataFile(String aipId, String descriptiveMetadataId,
@@ -2261,7 +2231,7 @@ public class BrowserHelper {
     RodaCoreFactory.getStorageService().deleteBinaryVersion(storagePath, versionId);
   }
 
-  public static void updateAIPPermissions(User user, IndexedAIP indexedAIP, Permissions permissions, String details,
+  public static Job updateAIPPermissions(User user, IndexedAIP indexedAIP, Permissions permissions, String details,
     boolean recursive) throws GenericException, NotFoundException, RequestNotValidException,
     AuthorizationDeniedException, JobAlreadyStartedException {
     final String eventDescription = "The process of updating an object of the repository.";
@@ -2291,24 +2261,18 @@ public class BrowserHelper {
       SelectedItemsFilter<IndexedAIP> selectedItems = new SelectedItemsFilter<>(filter, IndexedAIP.class.getName(),
         Boolean.FALSE);
 
-      Job job = new Job();
-      job.setId(IdUtils.createUUID());
-      job.setName("Update AIP permissions recursively");
-      job.setSourceObjects(selectedItems);
-      job.setPlugin(UpdateAIPPermissionsPlugin.class.getCanonicalName());
-      job.setPluginType(PluginType.INTERNAL);
-      job.setUsername(user.getName());
-
       Map<String, String> pluginParameters = new HashMap<>();
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_AIP_ID, aip.getId());
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_EVENT_DESCRIPTION, eventDescription);
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OUTCOME_TEXT,
         "AIP " + indexedAIP.getId() + " permissions were updated and all sublevels will be too");
-      job.setPluginParameters(pluginParameters);
 
-      RodaCoreFactory.getModelService().createJob(job);
-      RodaCoreFactory.getPluginOrchestrator().executeJob(job, true);
+      return createAndExecuteInternalJob("Update AIP permissions recursively", selectedItems,
+        UpdateAIPPermissionsPlugin.class, user, pluginParameters,
+        "Could not execute AIP permissions recursively action");
+    } else {
+      return null;
     }
   }
 
@@ -2551,23 +2515,11 @@ public class BrowserHelper {
     return new MitigationPropertiesBundle(lowLimit, highLimit, probabilities, impacts);
   }
 
-  public static void deleteRisk(User user, SelectedItems<IndexedRisk> selected)
+  public static Job deleteRisk(User user, SelectedItems<IndexedRisk> selected)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
     InvalidParameterException, JobAlreadyStartedException {
-    Job job = new Job();
-    job.setId(IdUtils.createUUID());
-    job.setName("Delete risks");
-    job.setSourceObjects(selected);
-    job.setPlugin(DeleteRODAObjectPlugin.class.getCanonicalName());
-    job.setPluginType(PluginType.INTERNAL);
-    job.setUsername(user.getName());
-
-    try {
-      RodaCoreFactory.getModelService().createJob(job);
-      RodaCoreFactory.getPluginOrchestrator().executeJob(job, true);
-    } catch (JobAlreadyStartedException e) {
-      LOGGER.error("Could not execute risk delete action", e);
-    }
+    return createAndExecuteInternalJob("Delete risks", selected, DeleteRODAObjectPlugin.class, user,
+      Collections.emptyMap(), "Could not execute risk delete action");
   }
 
   public static void updateRiskCounters() throws GenericException, RequestNotValidException, NotFoundException {
@@ -2819,7 +2771,7 @@ public class BrowserHelper {
     }
   }
 
-  public static void moveFiles(User user, String aipId, String representationId,
+  public static Job moveFiles(User user, String aipId, String representationId,
     SelectedItems<IndexedFile> selectedFiles, IndexedFile toFolder, String details) throws GenericException,
     RequestNotValidException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
 
@@ -2828,56 +2780,29 @@ public class BrowserHelper {
       throw new RequestNotValidException("Cannot move to a file outside defined representation");
     }
 
-    Job job = new Job();
-    job.setId(IdUtils.createUUID());
-    job.setName("Move files");
-    job.setSourceObjects(selectedFiles);
-    job.setPlugin(MovePlugin.class.getCanonicalName());
-    job.setPluginType(PluginType.INTERNAL);
-    job.setUsername(user.getName());
-
     Map<String, String> pluginParameters = new HashMap<>();
     if (toFolder != null) {
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_ID, toFolder.getUUID());
     }
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
-    job.setPluginParameters(pluginParameters);
 
-    try {
-      RodaCoreFactory.getModelService().createJob(job);
-      RodaCoreFactory.getPluginOrchestrator().executeJob(job, true);
-    } catch (JobAlreadyStartedException e) {
-      LOGGER.error("Could not execute move job", e);
-    }
+    return createAndExecuteInternalJob("Move files", selectedFiles, MovePlugin.class, user, Collections.emptyMap(),
+      "Could not execute move job");
   }
 
-  public static void moveTransferredResource(User user, SelectedItems<TransferredResource> selected,
+  public static Job moveTransferredResource(User user, SelectedItems<TransferredResource> selected,
     TransferredResource transferredResource) throws GenericException, RequestNotValidException, AlreadyExistsException,
-    IsStillUpdatingException, NotFoundException {
+    IsStillUpdatingException, NotFoundException, AuthorizationDeniedException {
 
     String resourceRelativePath = "";
     if (transferredResource != null) {
       resourceRelativePath = transferredResource.getRelativePath();
     }
 
-    Job job = new Job();
-    job.setId(IdUtils.createUUID());
-    job.setName("Move transferred resources");
-    job.setSourceObjects(selected);
-    job.setPlugin(MovePlugin.class.getCanonicalName());
-    job.setPluginType(PluginType.INTERNAL);
-    job.setUsername(user.getName());
-
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_ID, resourceRelativePath);
-    job.setPluginParameters(pluginParameters);
-
-    try {
-      RodaCoreFactory.getModelService().createJob(job);
-      RodaCoreFactory.getPluginOrchestrator().executeJob(job, true);
-    } catch (JobAlreadyStartedException | AuthorizationDeniedException e) {
-      LOGGER.error("Could not execute move job", e);
-    }
+    return createAndExecuteInternalJob("Move transferred resources", selected, MovePlugin.class, user, pluginParameters,
+      "Could not execute move transferred resources action");
   }
 
   public static IndexedFile createFolder(User user, String aipId, String representationId, String folderUUID,
@@ -3190,17 +3115,10 @@ public class BrowserHelper {
     RodaCoreFactory.getIndexService().commit(DIPFile.class);
   }
 
-  public static void createFormatIdentificationJob(User user, SelectedItems<?> selected) throws GenericException,
+  public static Job createFormatIdentificationJob(User user, SelectedItems<?> selected) throws GenericException,
     JobAlreadyStartedException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    Job job = new Job();
-    job.setId(IdUtils.createUUID());
-    job.setName("Format identification using Siegfried");
-    job.setSourceObjects(selected);
-    job.setPlugin(SiegfriedPlugin.class.getCanonicalName());
-    job.setPluginType(PluginType.MISC);
-    job.setUsername(user.getName());
-    RodaCoreFactory.getModelService().createJob(job);
-    RodaCoreFactory.getPluginOrchestrator().executeJob(job, true);
+    return createAndExecuteJob("Format identification using Siegfried", selected, SiegfriedPlugin.class,
+      PluginType.MISC, user, Collections.emptyMap(), "Could not execute format identification using Siegfrid action");
   }
 
   public static void changeRepresentationType(User user, SelectedItems<IndexedRepresentation> selected, String newType,
@@ -3383,22 +3301,10 @@ public class BrowserHelper {
     RodaCoreFactory.getModelService().deleteRepresentationInformation(representationInformationId, commit);
   }
 
-  public static void deleteRepresentationInformation(User user, SelectedItems<RepresentationInformation> selected)
+  public static Job deleteRepresentationInformation(User user, SelectedItems<RepresentationInformation> selected)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
-    Job job = new Job();
-    job.setId(IdUtils.createUUID());
-    job.setName("Delete representation information");
-    job.setSourceObjects(selected);
-    job.setPlugin(DeleteRODAObjectPlugin.class.getCanonicalName());
-    job.setPluginType(PluginType.INTERNAL);
-    job.setUsername(user.getName());
-
-    try {
-      RodaCoreFactory.getModelService().createJob(job);
-      RodaCoreFactory.getPluginOrchestrator().executeJob(job, true);
-    } catch (JobAlreadyStartedException e) {
-      LOGGER.error("Could not execute representation information delete action", e);
-    }
+    return createAndExecuteInternalJob("Delete representation information", selected, DeleteRODAObjectPlugin.class,
+      user, Collections.emptyMap(), "Could not execute representation information delete action");
   }
 
   public static Pair<String, Integer> retrieveRepresentationInformationWithFilter(String riFilter)
@@ -3457,22 +3363,10 @@ public class BrowserHelper {
     RodaCoreFactory.getModelService().deleteFormat(formatId, commit);
   }
 
-  public static void deleteFormat(User user, SelectedItems<Format> selected)
+  public static Job deleteFormat(User user, SelectedItems<Format> selected)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
-    Job job = new Job();
-    job.setId(IdUtils.createUUID());
-    job.setName("Delete formats");
-    job.setSourceObjects(selected);
-    job.setPlugin(DeleteRODAObjectPlugin.class.getCanonicalName());
-    job.setPluginType(PluginType.INTERNAL);
-    job.setUsername(user.getName());
-
-    try {
-      RodaCoreFactory.getModelService().createJob(job);
-      RodaCoreFactory.getPluginOrchestrator().executeJob(job, true);
-    } catch (JobAlreadyStartedException e) {
-      LOGGER.error("Could not execute format delete action", e);
-    }
+    return createAndExecuteInternalJob("Delete formats", selected, DeleteRODAObjectPlugin.class, user,
+      Collections.emptyMap(), "Could not execute format delete action");
   }
 
   public static RelationTypeTranslationsBundle retrieveRelationTypeTranslations(Messages messages) {

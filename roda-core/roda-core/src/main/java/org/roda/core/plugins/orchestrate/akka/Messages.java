@@ -78,19 +78,25 @@ public class Messages {
     private static final long serialVersionUID = -2514581679498648676L;
 
     private String jobId;
+    private String plugin;
 
-    public JobsManagerJobEnded(String jobId) {
+    public JobsManagerJobEnded(String jobId, String plugin) {
       super();
       this.jobId = jobId;
+      this.plugin = plugin;
     }
 
     public String getJobId() {
       return jobId;
     }
 
+    public String getPlugin() {
+      return plugin;
+    }
+
     @Override
     public String toString() {
-      return "JobsManagerJobEnded [jobId=" + jobId + "]";
+      return "JobsManagerJobEnded [jobId=" + jobId + ", plugin=" + plugin + "]";
     }
   }
 

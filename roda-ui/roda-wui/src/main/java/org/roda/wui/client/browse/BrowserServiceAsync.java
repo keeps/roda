@@ -77,7 +77,7 @@ public interface BrowserServiceAsync {
   void retrieveSearchFields(String className, String locale, AsyncCallback<List<SearchField>> callback);
 
   void moveAIPInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, String details,
-    AsyncCallback<IndexedAIP> callback);
+    AsyncCallback<Job> callback);
 
   void createAIP(String parentId, String type, AsyncCallback<String> callback);
 

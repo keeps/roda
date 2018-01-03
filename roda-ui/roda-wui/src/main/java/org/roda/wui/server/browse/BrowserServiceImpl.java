@@ -332,7 +332,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public IndexedAIP moveAIPInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, String details)
+  public Job moveAIPInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
     AlreadyExistsException, ValidationException {
     User user = UserUtility.getUser(getThreadLocalRequest());
