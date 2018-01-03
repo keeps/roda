@@ -13,6 +13,6 @@
 
 	<g:FlowPanel addStyleNames="removable-textbox">
 		<g:TextBox title="Removable text box" addStyleNames="form-textbox form-textbox-medium" ui:field="item"></g:TextBox>
-		<g:Anchor addStyleNames="ri-toolbarLink ri-toolbarLink-bg bullet" ui:field="removeDynamicTextBoxButton"><i class="fa fa-close"></i></g:Anchor>
+		<g:Anchor addStyleNames="ri-toolbarLink ri-toolbarLink-bg bullet" ui:field="removeDynamicTextBoxButton"/>
 	</g:FlowPanel>
 </ui:UiBinder>

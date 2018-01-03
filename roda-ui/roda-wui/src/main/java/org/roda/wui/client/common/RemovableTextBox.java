@@ -30,20 +30,35 @@ public class RemovableTextBox extends Composite implements HasHandlers {
   @UiField
   TextBox item;
 
-  @UiField(provided = true)
+  @UiField
   Anchor removeDynamicTextBoxButton;
 
+  // the first removable text box is not removable and has an "add" button
+  private final boolean first;
+
   public RemovableTextBox() {
-    removeDynamicTextBoxButton = new Anchor(SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-remove\"></i>"));
-    initWidget(uiBinder.createAndBindUi(this));
+    this(false);
   }
 
-  public RemovableTextBox(String content) {
-    removeDynamicTextBoxButton = new Anchor(SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-remove\"></i>"));
+  public RemovableTextBox(boolean first) {
+    this.first = first;
     initWidget(uiBinder.createAndBindUi(this));
+    if (first) {
+      removeDynamicTextBoxButton.setHTML(SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-plus\"></i>"));
+    } else {
+      removeDynamicTextBoxButton.setHTML(SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-remove\"></i>"));
+    }
+  }
+
+  public RemovableTextBox(boolean first, String content) {
+    this(first);
     if (content != null) {
       item.setText(content);
     }
+  }
+
+  public RemovableTextBox(String content) {
+    this(false, content);
   }
 
   public String getTextBoxValue() {
@@ -56,5 +71,9 @@ public class RemovableTextBox extends Composite implements HasHandlers {
 
   public HandlerRegistration addChangeHandler(ChangeHandler handler) {
     return addDomHandler(handler, ChangeEvent.getType());
+  }
+
+  public boolean isFirst() {
+    return first;
   }
 }

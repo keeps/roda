@@ -10,20 +10,17 @@ package org.roda.wui.client.common;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import org.roda.wui.client.common.utils.StringUtils;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.DomEvent;
+import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.event.shared.HasHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -32,8 +29,11 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 
+import config.i18n.client.ClientMessages;
+
 public class IncrementalList extends Composite implements HasValueChangeHandlers<List<String>> {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   interface MyUiBinder extends UiBinder<Widget, IncrementalList> {
   }
@@ -48,14 +48,24 @@ public class IncrementalList extends Composite implements HasValueChangeHandlers
   boolean changed = false;
 
   public IncrementalList() {
-    this(false);
+    this(false, null);
   }
 
   public IncrementalList(boolean vertical) {
+    this(vertical, null);
+  }
+
+  public IncrementalList(boolean vertical, List<String> initialValues) {
     initWidget(uiBinder.createAndBindUi(this));
     textBoxes = new ArrayList<>();
     if (vertical) {
       addStyleDependentName("vertical");
+    }
+    if (initialValues == null || initialValues.isEmpty()) {
+      // make sure there is one text box
+      addTextBox(null);
+    } else {
+      setTextBoxList(initialValues);
     }
   }
 
@@ -78,6 +88,7 @@ public class IncrementalList extends Composite implements HasValueChangeHandlers
   public void clearTextBoxes() {
     textBoxPanel.clear();
     textBoxes = new ArrayList<>();
+    addDynamicButton.setVisible(true);
   }
 
   @UiHandler("addDynamicButton")
@@ -86,15 +97,24 @@ public class IncrementalList extends Composite implements HasValueChangeHandlers
   }
 
   private void addTextBox(String element) {
-    final RemovableTextBox box = new RemovableTextBox(element);
+    final RemovableTextBox box = new RemovableTextBox(textBoxes.isEmpty(), element);
     textBoxPanel.add(box);
     textBoxes.add(box);
+    addDynamicButton.setVisible(false);
 
     box.addRemoveClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        textBoxPanel.remove(box);
-        textBoxes.remove(box);
+        if (box.isFirst()) {
+          addTextBox(null);
+        } else {
+          textBoxPanel.remove(box);
+          textBoxes.remove(box);
+          if (textBoxes.isEmpty()) {
+            addDynamicButton.setVisible(true);
+          }
+        }
+
         ValueChangeEvent.fire(IncrementalList.this, getTextBoxesValue());
       }
     });

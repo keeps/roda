@@ -6292,6 +6292,10 @@ span.code {
     font-weight: inherit;
 }
 
+.incremental-list-vertical {
+    margin-bottom: 2rem;
+}
+
 .incremental-list-vertical .removable-textbox {
     display: block;
     position: relative;
@@ -6308,6 +6312,7 @@ span.code {
     margin-right: 0;
 }
 
-.incremental-list-vertical .removable-textbox .ri-toolbarLink:first {
-    background-color: yellow;
+.incremental-list .removable-textbox:first-of-type .ri-toolbarLink {
+    background-color: #089de3;
+    color: white;
 }

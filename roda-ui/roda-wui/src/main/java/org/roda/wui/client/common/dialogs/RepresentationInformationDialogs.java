@@ -253,9 +253,9 @@ public class RepresentationInformationDialogs {
           valuesForThisField.add(RepresentationInformationUtils.getValueFromFilter(filter));
         }
       }
+      values.put(field, valuesForThisField);
 
-      IncrementalList incrementalList = new IncrementalList(true);
-      incrementalList.setTextBoxList(valuesForThisField);
+      IncrementalList incrementalList = new IncrementalList(true, valuesForThisField);
       incrementalList.addValueChangeHandler(new ValueChangeHandler<List<String>>() {
         @Override
         public void onValueChange(ValueChangeEvent<List<String>> event) {
