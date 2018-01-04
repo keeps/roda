@@ -1,1 +1,1 @@
-./ead_2002.xslt
+ead_2002.xslt
