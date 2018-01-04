@@ -388,8 +388,9 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   }
 
   private void remove(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
-    Dialogs.showConfirmDialog(messages.removeConfirmDialogTitle(), messages.removeAllConfirmDialogMessage(),
-      messages.dialogNo(), messages.dialogYes(), new AsyncCallback<Boolean>() {
+    Dialogs.showConfirmDialog(messages.removeConfirmDialogTitle(),
+      messages.removeAllConfirmDialogMessageSingle(aip.getTitle()), messages.dialogNo(), messages.dialogYes(),
+      new AsyncCallback<Boolean>() {
 
         @Override
         public void onFailure(Throwable caught) {

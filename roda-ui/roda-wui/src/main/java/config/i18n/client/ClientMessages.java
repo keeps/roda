@@ -688,6 +688,8 @@ public interface ClientMessages extends Messages {
 
   String removeConfirmDialogTitle();
 
+  String removeAllConfirmDialogMessageSingle(String aipTitle);
+
   String removeAllConfirmDialogMessage();
 
   String removeSelectedConfirmDialogMessage(Long size);
