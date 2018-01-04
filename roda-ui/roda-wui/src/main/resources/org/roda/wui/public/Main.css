@@ -6282,8 +6282,12 @@ span.code {
     font-weight: inherit;
 }
 
+.wui-data-panel .incremental-list-vertical {
+    max-width: 300px;
+}
+
 .incremental-list-vertical {
-    margin-bottom: 2rem;
+    margin-bottom: 10px;
 }
 
 .incremental-list-vertical .removable-textbox {

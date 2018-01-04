@@ -67,7 +67,7 @@ public class RepresentationInformationDataPanel extends Composite
   @UiField
   ListBox family;
 
-  @UiField
+  @UiField(provided = true)
   IncrementalList categories;
 
   @UiField
@@ -109,6 +109,7 @@ public class RepresentationInformationDataPanel extends Composite
   public RepresentationInformationDataPanel(boolean visible, final boolean editmode,
     final RepresentationInformation ri) {
     relations = new IncrementalRelationList(ri);
+    categories = new IncrementalList(true);
     initWidget(uiBinder.createAndBindUi(this));
 
     this.editmode = editmode;
