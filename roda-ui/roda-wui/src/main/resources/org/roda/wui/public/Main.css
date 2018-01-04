@@ -334,7 +334,7 @@ div.inline {
     margin-top: 10px;
 }
 
-.representationInformationCard > .h5 {
+.representationInformationCardCreate > .h5 {
     color: inherit;
 }
 
@@ -6271,16 +6271,6 @@ td.datePickerMonth, td.datePickerYear {
 .relation-form-panel {
 	background-color: #eee;
 	margin-bottom: 10px;
-}
-
-.ri-subtitle {
-    color: #999;
-    font-size: 2rem;
-    display: inline;
-    margin-bottom: 0 !important;
-    line-height: 1.2;
-
-    /*letter-spacing: -.1rem;*/
 }
 
 span.code {

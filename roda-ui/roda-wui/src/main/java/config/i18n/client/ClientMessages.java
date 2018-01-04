@@ -2654,7 +2654,7 @@ public interface ClientMessages extends Messages {
 
   String representationInformationAssociationsTitle();
 
-  String representationInformationNoAssociations();
+  SafeHtml representationInformationNoAssociations(String field, String value, @Select String indexObjectName);
 
   SafeHtml representationInformationAssociatedWith(String field, String value, @Select String indexObjectName);
 

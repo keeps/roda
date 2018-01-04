@@ -41,6 +41,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -96,9 +97,6 @@ public class RepresentationInformationAssociations extends Composite {
   FlowPanel title;
 
   @UiField
-  HTML subtitle;
-
-  @UiField
   HTML description;
 
   @UiField(provided = true)
@@ -116,13 +114,16 @@ public class RepresentationInformationAssociations extends Composite {
   @UiField
   Button buttonAddToNewRI;
 
-  private String addWithAssociationDialogTitle;
+  private SafeHtml addWithAssociationDialogTitle;
 
   @UiField
   FlowPanel resultsPanel;
 
   @UiField
-  InlineHTML createPanelTitle;
+  HTML createPanelTitle;
+
+  @UiField
+  HTML resultsPanelTitle;
 
   private boolean gettingFilterResults = true;
 
@@ -260,11 +261,10 @@ public class RepresentationInformationAssociations extends Composite {
       filter = createFilterAndSubtitleFromHistoryTokens(historyTokens);
 
       String[] parts = RepresentationInformationDialogs.breakFilterIntoParts(historyTokens.get(1));
-      createPanelTitle.setHTML(messages.representationInformationNoAssociations());
-      subtitle.setHTML(messages.representationInformationAssociatedWith(parts[0], parts[1], parts[2]));
+      createPanelTitle.setHTML(messages.representationInformationNoAssociations(parts[0], parts[1], parts[2]));
+      resultsPanelTitle.setHTML(messages.representationInformationAssociatedWith(parts[0], parts[1], parts[2]));
       description.setHTML(messages.representationInformationAssociatedWithDescription(parts[0], parts[1], parts[2]));
-      addWithAssociationDialogTitle = messages.representationInformationNameFromAssociation(parts[0], parts[1],
-        parts[2]);
+      addWithAssociationDialogTitle = messages.representationInformationAssociateWith(parts[0], parts[1], parts[2]);
 
       searchPanel.setDefaultFilter(filter, true);
       representationInformationList.setFilter(filter);

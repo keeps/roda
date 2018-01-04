@@ -17,18 +17,18 @@
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_12 content">
 				<g:FlowPanel ui:field="title"></g:FlowPanel>
-				<g:HTML addStyleNames="ri-subtitle" ui:field="subtitle"></g:HTML>
 				<g:HTML addStyleNames="page-description" ui:field="description"></g:HTML>
 
-				<g:FlowPanel ui:field="createPanel" visible="false" addStyleNames="card representationInformationCard">
-					<g:InlineHTML addStyleNames="h5" ui:field="createPanelTitle" />
+				<g:FlowPanel ui:field="createPanel" visible="false" addStyleNames="card representationInformationCard representationInformationCardCreate">
+					<g:HTML addStyleNames="h5" ui:field="createPanelTitle" />
 					<g:FlowPanel>
 						<g:Button addStyleNames="btn btn-margin-right btn-plus" text="Add to new" ui:field="buttonAddToNewRI"/>
 						<g:Button addStyleNames="btn btn-margin-right btn-play" text="Add to existing" ui:field="buttonAddToExistingRI"/>
 					</g:FlowPanel>
 				</g:FlowPanel>
 
-				<g:FlowPanel ui:field="resultsPanel" visible="false" addStyleNames="card representationInformationCard">
+				<g:FlowPanel ui:field="resultsPanel" visible="false" addStyleNames="card representationInformationCard representationInformationCardList">
+					<g:HTML addStyleNames="h5" ui:field="resultsPanelTitle" />
 					<commonsearch:SearchPanel ui:field="searchPanel" />
 					<lists:RepresentationInformationList addStyleNames="searchResults" ui:field="representationInformationList" />
 				</g:FlowPanel>

@@ -43,6 +43,9 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.user.cellview.client.AbstractHasData;
+import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
@@ -728,8 +731,8 @@ public class RepresentationInformationDialogs {
       });
   }
 
-  public static void showPromptAddRepresentationInformationWithAssociation(String title, final String cancelButtonText,
-    final String addToSelectedRIButtonText, final String addToNewRIButtonText,
+  public static void showPromptAddRepresentationInformationWithAssociation(SafeHtml title,
+    final String cancelButtonText, final String addToSelectedRIButtonText, final String addToNewRIButtonText,
     final AsyncCallback<SelectedItemsList<RepresentationInformation>> callback) {
 
     final List<HandlerRegistration> clickHandlers = new ArrayList<>();
@@ -794,7 +797,18 @@ public class RepresentationInformationDialogs {
       new SimpleFacetParameter(RodaConstants.REPRESENTATION_INFORMATION_SUPPORT));
     Filter defaultFilter = SearchFilters.defaultFilter(RepresentationInformation.class.getName());
     final RepresentationInformationList representationInformationList = new RepresentationInformationList(defaultFilter,
-      facets, messages.representationInformationTitle(), true);
+      facets, messages.representationInformationTitle(), true) {
+      @Override
+      protected void configureDisplay(CellTable<RepresentationInformation> display) {
+        super.configureDisplay(display);
+        display.addRedrawHandler(new AbstractHasData.RedrawEvent.Handler() {
+          @Override
+          public void onRedraw() {
+            dialogBox.center();
+          }
+        });
+      }
+    };
     SearchPanel representationInformationSearch = new SearchPanel(Filter.NULL,
       RodaConstants.REPRESENTATION_INFORMATION_SEARCH, true, messages.searchPlaceHolder(), false, false, true);
     representationInformationSearch.setList(representationInformationList);
