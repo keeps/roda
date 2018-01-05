@@ -33,6 +33,7 @@ import java.util.TimerTask;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.configuration.ConfigurationException;
@@ -323,13 +324,51 @@ public class PluginManager {
 
       // process each folder inside the plugins folder (except shared &
       // disabled)
+
+      List<PluginLoadInfo> pluginLoadInfos = new ArrayList<>();
+
       try (DirectoryStream<Path> pluginsFolders = Files.newDirectoryStream(RODA_PLUGINS_PATH,
         path -> Files.isDirectory(path)
           && !RodaConstants.CORE_PLUGINS_SHARED_FOLDER.equals(path.getFileName().toString())
           && !RodaConstants.CORE_PLUGINS_DISABLED_FOLDER.equals(path.getFileName().toString()))) {
         for (Path pluginFolder : pluginsFolders) {
-          loadExternalPluginFolder(sharedJarURLs, pluginFolder);
+          pluginLoadInfos.addAll(loadExternalPluginFolder(sharedJarURLs, pluginFolder));
         }
+      }
+
+      for (int i = 0; i < LOAD_PLUGINS_MAX_CYCLES && !pluginLoadInfos.isEmpty(); i++) {
+
+        // process plugins that do not have dependencies on other plugins
+        pluginLoadInfos.stream().filter(p -> p.pluginDependencies.isEmpty()).forEach(p -> loadPlugin(p));
+        pluginLoadInfos.removeIf(p -> p.pluginDependencies.isEmpty());
+
+        // load plugins that have dependencies that are all loaded
+        List<PluginLoadInfo> pluginWithDeps = pluginLoadInfos.stream().filter(p -> !p.pluginDependencies.isEmpty())
+          .collect(Collectors.toList());
+        for (PluginLoadInfo pluginLoadInfo : pluginWithDeps) {
+          boolean allLoaded = true;
+          for (String dependency : pluginLoadInfo.pluginDependencies) {
+            if (!isPluginDependencyLoaded(dependency)) {
+              allLoaded = false;
+              break;
+            }
+          }
+
+          if (allLoaded) {
+            loadPlugin(pluginLoadInfo);
+            pluginLoadInfos.remove(pluginLoadInfo);
+          }
+        }
+      }
+
+      if (!pluginLoadInfos.isEmpty()) {
+        for (PluginLoadInfo pluginLoadInfo : pluginLoadInfos) {
+          LOGGER.warn("Could not load the plugin {} due to dependencies not being loaded: {}", pluginLoadInfo.jarPath,
+            pluginLoadInfo.pluginDependencies);
+        }
+
+        LOGGER.info("Loaded dependencies: {}", jarPluginClassloaderCache.keySet());
+
       }
 
     } catch (IOException e) {
@@ -356,10 +395,11 @@ public class PluginManager {
 
   }
 
-  private void loadExternalPluginFolder(List<URL> sharedJarURLs, Path pluginFolder) {
+  private List<PluginLoadInfo> loadExternalPluginFolder(List<URL> sharedJarURLs, Path pluginFolder) {
     LOGGER.debug("Processing plugin folder '{}'", pluginFolder);
     List<Path> pluginJarFiles = new ArrayList<>();
     List<URL> classpath = new ArrayList<>(sharedJarURLs);
+    List<PluginLoadInfo> pluginLoadInfos = new ArrayList<>();
 
     // add dependencies to classpath
     Path dependenciesFolder = pluginFolder.resolve(RodaConstants.CORE_PLUGINS_DEPENDENCIES_FOLDER);
@@ -400,42 +440,11 @@ public class PluginManager {
       LOGGER.warn("Could not load properties of plugin at " + pluginFolder, e);
     }
 
-    List<PluginLoadInfo> pluginLoadInfos = new ArrayList<>();
-
     for (Path jarFile : pluginJarFiles) {
       addJarToPluginToBeLoaded(jarFile, classpath, pluginLoadInfos);
     }
 
-    for (int i = 0; i < LOAD_PLUGINS_MAX_CYCLES && !pluginLoadInfos.isEmpty(); i++) {
-
-      // process plugins that do not have dependencies on other plugins
-      pluginLoadInfos.stream().filter(p -> p.pluginDependencies.isEmpty()).forEach(p -> loadPlugin(p));
-      pluginLoadInfos.removeIf(p -> p.pluginDependencies.isEmpty());
-
-      // load plugins that have dependencies that are all loaded
-      List<PluginLoadInfo> pluginWithDeps = pluginLoadInfos.stream().filter(p -> !p.pluginDependencies.isEmpty())
-        .collect(Collectors.toList());
-      for (PluginLoadInfo pluginLoadInfo : pluginWithDeps) {
-        boolean allLoaded = true;
-        for (String dependency : pluginLoadInfo.pluginDependencies) {
-          if (!jarPluginClassloaderCache.containsKey(dependency)) {
-            allLoaded = false;
-            break;
-          }
-        }
-
-        if (allLoaded) {
-          loadPlugin(pluginLoadInfo);
-          pluginLoadInfos.remove(pluginLoadInfo);
-        }
-      }
-    }
-
-    if (!pluginLoadInfos.isEmpty()) {
-      for (PluginLoadInfo pluginLoadInfo : pluginLoadInfos) {
-        LOGGER.warn("Could not load the plugin {} due to dependencies not being loaded", pluginLoadInfo.jarPath);
-      }
-    }
+    return pluginLoadInfos;
 
   }
 
@@ -486,7 +495,7 @@ public class PluginManager {
       CompoundClassLoader c = new CompoundClassLoader();
       c.addLoader(new URLClassLoader(p.jarClasspath.toArray(new URL[] {}), getClass().getClassLoader()));
 
-      p.pluginDependencies.forEach(d -> c.addLoader(jarPluginClassloaderCache.get(d)));
+      p.pluginDependencies.forEach(d -> c.addLoader(getPluginClassLoader(d)));
 
       classloader = c;
     }
@@ -496,6 +505,25 @@ public class PluginManager {
 
     // add to cache
     jarPluginClassloaderCache.put(getPluginClassLoaderCacheKey(p.jarPath), classloader);
+
+  }
+
+  private boolean isPluginDependencyLoaded(String pluginDependencyRegex) {
+    return getPluginClassLoader(pluginDependencyRegex) != null;
+  }
+
+  private ClassLoader getPluginClassLoader(String pluginDependencyRegex) {
+    String foundIt = null;
+
+    Pattern pattern = Pattern.compile(pluginDependencyRegex);
+    for (String key : jarPluginClassloaderCache.keySet()) {
+      if (pattern.matcher(key).matches()) {
+        foundIt = key;
+        break;
+      }
+    }
+
+    return foundIt != null ? jarPluginClassloaderCache.get(foundIt) : null;
 
   }
 
