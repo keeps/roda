@@ -348,24 +348,24 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void deleteAIP(SelectedItems<IndexedAIP> aips, String details)
+  public Job deleteAIP(SelectedItems<IndexedAIP> aips, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.deleteAIP(user, aips, details);
+    return Browser.deleteAIP(user, aips, details);
   }
 
   @Override
-  public void deleteRepresentation(SelectedItems<IndexedRepresentation> representations, String details)
+  public Job deleteRepresentation(SelectedItems<IndexedRepresentation> representations, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.deleteRepresentation(user, representations, details);
+    return Browser.deleteRepresentation(user, representations, details);
   }
 
   @Override
-  public void deleteFile(SelectedItems<IndexedFile> files, String details)
+  public Job deleteFile(SelectedItems<IndexedFile> files, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.deleteFile(user, files, details);
+    return Browser.deleteFile(user, files, details);
   }
 
   @Override
@@ -689,10 +689,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void deleteRisk(SelectedItems<IndexedRisk> selected) throws AuthorizationDeniedException, GenericException,
+  public Job deleteRisk(SelectedItems<IndexedRisk> selected) throws AuthorizationDeniedException, GenericException,
     RequestNotValidException, NotFoundException, InvalidParameterException, JobAlreadyStartedException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.deleteRisk(user, selected);
+    return Browser.deleteRisk(user, selected);
   }
 
   @Override
@@ -791,11 +791,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void moveFiles(String aipId, String representationId, SelectedItems<IndexedFile> selectedFiles,
+  public Job moveFiles(String aipId, String representationId, SelectedItems<IndexedFile> selectedFiles,
     IndexedFile toFolder, String details) throws AuthorizationDeniedException, GenericException,
     RequestNotValidException, AlreadyExistsException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.moveFiles(user, aipId, representationId, selectedFiles, toFolder, details);
+    return Browser.moveFiles(user, aipId, representationId, selectedFiles, toFolder, details);
   }
 
   @Override
@@ -807,11 +807,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void moveTransferredResource(SelectedItems<TransferredResource> selected,
+  public Job moveTransferredResource(SelectedItems<TransferredResource> selected,
     TransferredResource transferredResource) throws AuthorizationDeniedException, GenericException,
     RequestNotValidException, AlreadyExistsException, IsStillUpdatingException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.moveTransferredResource(user, selected, transferredResource);
+    return Browser.moveTransferredResource(user, selected, transferredResource);
   }
 
   @Override
@@ -1017,10 +1017,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void deleteRepresentationInformation(SelectedItems<RepresentationInformation> selected)
+  public Job deleteRepresentationInformation(SelectedItems<RepresentationInformation> selected)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.deleteRepresentationInformation(user, selected);
+    return Browser.deleteRepresentationInformation(user, selected);
   }
 
   @Override
@@ -1053,10 +1053,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void deleteFormat(SelectedItems<Format> selected)
+  public Job deleteFormat(SelectedItems<Format> selected)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.deleteFormat(user, selected);
+    return Browser.deleteFormat(user, selected);
   }
 
   @Override

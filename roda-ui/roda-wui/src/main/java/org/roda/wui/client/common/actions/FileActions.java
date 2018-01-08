@@ -22,15 +22,18 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.SelectFileDialog;
+import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.planning.Planning;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
 import org.roda.wui.client.process.CreateSelectedJob;
+import org.roda.wui.client.process.InternalProcess;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.widgets.Toast;
@@ -239,34 +242,41 @@ public class FileActions extends AbstractActionable<IndexedFile> {
             @Override
             public void onSuccess(String details) {
               BrowserService.Util.getInstance().moveFiles(aipId, representationId, selectedItems, toFolder, details,
-                new LoadingAsyncCallback<Void>() {
+                new LoadingAsyncCallback<Job>() {
 
                   @Override
-                  public void onSuccessImpl(Void nothing) {
-                    Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+                  public void onSuccessImpl(Job result) {
+                    Dialogs.showJobRedirectDialog(messages.moveJobCreatedMessage(), new AsyncCallback<Void>() {
 
-                    Timer timer = new Timer() {
                       @Override
-                      public void run() {
-                        if (toFolder != null) {
-                          HistoryUtils.openBrowse(toFolder);
-                        } else {
-                          HistoryUtils.openBrowse(aipId, representationId);
-                        }
-                        callback.onSuccess(null);
-                      }
-                    };
+                      public void onFailure(Throwable caught) {
+                        Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
 
-                    timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                        Timer timer = new Timer() {
+                          @Override
+                          public void run() {
+                            if (toFolder != null) {
+                              HistoryUtils.openBrowse(toFolder);
+                            } else {
+                              HistoryUtils.openBrowse(aipId, representationId);
+                            }
+                            callback.onSuccess(null);
+                          }
+                        };
+
+                        timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                      }
+
+                      @Override
+                      public void onSuccess(final Void nothing) {
+                        HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                      }
+                    });
                   }
 
                   @Override
                   public void onFailureImpl(Throwable caught) {
-                    if (caught instanceof NotFoundException) {
-                      Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-                    } else {
-                      callback.onFailure(caught);
-                    }
+                    HistoryUtils.newHistory(InternalProcess.RESOLVER);
                   }
 
                 });
@@ -465,26 +475,38 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
                 @Override
                 public void onSuccess(final String details) {
-                  BrowserService.Util.getInstance().deleteFile(selected, details, new AsyncCallback<Void>() {
+                  BrowserService.Util.getInstance().deleteFile(selected, details, new AsyncCallback<Job>() {
 
                     @Override
-                    public void onSuccess(Void result) {
-                      Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+                    public void onSuccess(Job result) {
+                      Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(), new AsyncCallback<Void>() {
 
-                      Timer timer = new Timer() {
                         @Override
-                        public void run() {
-                          HistoryUtils.newHistory(HistoryUtils.getCurrentHistoryPath());
-                          callback.onSuccess(ActionImpact.DESTROYED);
-                        }
-                      };
+                        public void onFailure(Throwable caught) {
+                          Toast.showInfo(messages.runningInBackgroundTitle(),
+                            messages.runningInBackgroundDescription());
 
-                      timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                          Timer timer = new Timer() {
+                            @Override
+                            public void run() {
+                              HistoryUtils.newHistory(HistoryUtils.getCurrentHistoryPath());
+                              callback.onSuccess(ActionImpact.DESTROYED);
+                            }
+                          };
+
+                          timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                        }
+
+                        @Override
+                        public void onSuccess(final Void nothing) {
+                          HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                        }
+                      });
                     }
 
                     @Override
                     public void onFailure(Throwable caught) {
-                      callback.onFailure(caught);
+                      HistoryUtils.newHistory(InternalProcess.RESOLVER);
                     }
                   });
                 }

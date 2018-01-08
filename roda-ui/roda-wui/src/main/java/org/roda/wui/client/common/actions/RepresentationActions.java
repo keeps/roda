@@ -20,15 +20,18 @@ import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.RepresentationDialogs;
+import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.planning.Planning;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
 import org.roda.wui.client.process.CreateSelectedJob;
+import org.roda.wui.client.process.InternalProcess;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.widgets.Toast;
@@ -171,26 +174,37 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
                 @Override
                 public void onSuccess(String details) {
                   BrowserService.Util.getInstance().deleteRepresentation(selectedList, details,
-                    new AsyncCallback<Void>() {
+                    new AsyncCallback<Job>() {
 
                       @Override
-                      public void onSuccess(Void result) {
-                        Timer timer = new Timer() {
-                          @Override
-                          public void run() {
-                            if (aipId != null) {
-                              HistoryUtils.openBrowse(aipId);
-                            }
-                            callback.onSuccess(ActionImpact.DESTROYED);
-                          }
-                        };
+                      public void onSuccess(Job result) {
+                        Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(), new AsyncCallback<Void>() {
 
-                        timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                          @Override
+                          public void onFailure(Throwable caught) {
+                            Timer timer = new Timer() {
+                              @Override
+                              public void run() {
+                                if (aipId != null) {
+                                  HistoryUtils.openBrowse(aipId);
+                                }
+                                callback.onSuccess(ActionImpact.DESTROYED);
+                              }
+                            };
+
+                            timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                          }
+
+                          @Override
+                          public void onSuccess(final Void nothing) {
+                            HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                          }
+                        });
                       }
 
                       @Override
                       public void onFailure(Throwable caught) {
-                        callback.onFailure(caught);
+                        HistoryUtils.newHistory(InternalProcess.RESOLVER);
                       }
                     });
                 }

@@ -452,6 +452,12 @@ public interface ClientMessages extends Messages {
 
   String copiedToClipboardMessage();
 
+  String jobCreatedRedirectTitle();
+
+  String removeJobCreatedMessage();
+
+  String moveJobCreatedMessage();
+
   /****** INGEST TRANSFER UPLOAD *********/
 
   String ingestTransferUploadTitle();

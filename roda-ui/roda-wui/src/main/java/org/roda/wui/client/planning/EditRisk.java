@@ -13,13 +13,17 @@ import java.util.List;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.management.MemberManagement;
+import org.roda.wui.client.process.InternalProcess;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -162,22 +166,33 @@ public class EditRisk extends Composite {
   void buttonRemoveHandler(ClickEvent e) {
     BrowserService.Util.getInstance().deleteRisk(
       new SelectedItemsList<IndexedRisk>(Arrays.asList(risk.getUUID()), IndexedRisk.class.getName()),
-      new AsyncCallback<Void>() {
+      new AsyncCallback<Job>() {
         @Override
         public void onFailure(Throwable caught) {
-          errorMessage(caught);
+          HistoryUtils.newHistory(InternalProcess.RESOLVER);
         }
 
         @Override
-        public void onSuccess(Void result) {
-          Timer timer = new Timer() {
-            @Override
-            public void run() {
-              HistoryUtils.newHistory(RiskRegister.RESOLVER);
-            }
-          };
+        public void onSuccess(Job result) {
+          Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(), new AsyncCallback<Void>() {
 
-          timer.schedule(RodaConstants.ACTION_TIMEOUT);
+            @Override
+            public void onFailure(Throwable caught) {
+              Timer timer = new Timer() {
+                @Override
+                public void run() {
+                  HistoryUtils.newHistory(RiskRegister.RESOLVER);
+                }
+              };
+
+              timer.schedule(RodaConstants.ACTION_TIMEOUT);
+            }
+
+            @Override
+            public void onSuccess(final Void nothing) {
+              HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+            }
+          });
         }
       });
   }

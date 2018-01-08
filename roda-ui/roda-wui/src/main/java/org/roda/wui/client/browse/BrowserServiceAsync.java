@@ -83,12 +83,12 @@ public interface BrowserServiceAsync {
 
   void createRepresentation(String aipId, String details, AsyncCallback<String> callback);
 
-  void deleteAIP(SelectedItems<IndexedAIP> aips, String details, AsyncCallback<Void> callback);
+  void deleteAIP(SelectedItems<IndexedAIP> aips, String details, AsyncCallback<Job> callback);
 
   void deleteRepresentation(SelectedItems<IndexedRepresentation> representations, String details,
-    AsyncCallback<Void> callback);
+    AsyncCallback<Job> callback);
 
-  void deleteFile(SelectedItems<IndexedFile> representations, String details, AsyncCallback<Void> callback);
+  void deleteFile(SelectedItems<IndexedFile> representations, String details, AsyncCallback<Job> callback);
 
   void updateDescriptiveMetadataFile(String aipId, String representationId, DescriptiveMetadataEditBundle bundle,
     AsyncCallback<Void> callback);
@@ -186,7 +186,7 @@ public interface BrowserServiceAsync {
 
   void retrieveAllMitigationProperties(AsyncCallback<MitigationPropertiesBundle> asyncCallback);
 
-  void deleteRisk(SelectedItems<IndexedRisk> selected, AsyncCallback<Void> asyncCallback);
+  void deleteRisk(SelectedItems<IndexedRisk> selected, AsyncCallback<Job> asyncCallback);
 
   void deleteRiskIncidences(SelectedItems<RiskIncidence> selected, AsyncCallback<Void> asyncCallback);
 
@@ -204,7 +204,7 @@ public interface BrowserServiceAsync {
   void renameTransferredResource(String transferredResourceId, String newName, AsyncCallback<String> asyncCallback);
 
   void moveTransferredResource(SelectedItems<TransferredResource> selected, TransferredResource transferredResource,
-    AsyncCallback<Void> asyncCallback);
+    AsyncCallback<Job> asyncCallback);
 
   void retrieveSelectedTransferredResource(SelectedItems<TransferredResource> selected,
     AsyncCallback<List<TransferredResource>> asyncCallback);
@@ -219,7 +219,7 @@ public interface BrowserServiceAsync {
   void renameFolder(String folderUUID, String newName, String details, AsyncCallback<IndexedFile> asyncCallback);
 
   void moveFiles(String aipId, String representationId, SelectedItems<IndexedFile> selectedFiles, IndexedFile toFolder,
-    String details, AsyncCallback<Void> asyncCallback);
+    String details, AsyncCallback<Job> asyncCallback);
 
   void createFolder(String aipId, String representationId, String folderUUID, String newName, String details,
     AsyncCallback<IndexedFile> asyncCallback);
@@ -272,7 +272,7 @@ public interface BrowserServiceAsync {
     AsyncCallback<Void> asyncCallback);
 
   void deleteRepresentationInformation(SelectedItems<RepresentationInformation> selected,
-    AsyncCallback<Void> asyncCallback);
+    AsyncCallback<Job> asyncCallback);
 
   void retrieveRepresentationInformationWithFilter(String riFilter, AsyncCallback<Pair<String, Integer>> asyncCallback);
 
@@ -282,7 +282,7 @@ public interface BrowserServiceAsync {
 
   void updateFormat(Format f, AsyncCallback<Void> asyncCallback);
 
-  void deleteFormat(SelectedItems<Format> selected, AsyncCallback<Void> asyncCallback);
+  void deleteFormat(SelectedItems<Format> selected, AsyncCallback<Job> asyncCallback);
 
   void retrieveRelationTypeOptions(AsyncCallback<List<String>> asyncCallback);
 

@@ -21,6 +21,7 @@ import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.core.data.v2.index.filter.DateRangeFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
@@ -33,8 +34,10 @@ import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.CreateActionJob;
 import org.roda.wui.client.process.CreateSelectedJob;
+import org.roda.wui.client.process.InternalProcess;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -316,25 +319,35 @@ public class RiskRegister extends Composite {
             @Override
             public void onSuccess(Boolean confirmed) {
               if (confirmed) {
-                BrowserService.Util.getInstance().deleteRisk(selected, new AsyncCallback<Void>() {
+                BrowserService.Util.getInstance().deleteRisk(selected, new AsyncCallback<Job>() {
 
                   @Override
                   public void onFailure(Throwable caught) {
-                    AsyncCallbackUtils.defaultFailureTreatment(caught);
-                    riskList.refresh();
+                    HistoryUtils.newHistory(InternalProcess.RESOLVER);
                   }
 
                   @Override
-                  public void onSuccess(Void result) {
-                    Timer timer = new Timer() {
-                      @Override
-                      public void run() {
-                        Toast.showInfo(messages.riskRemoveSuccessTitle(), messages.riskRemoveSuccessMessage(size));
-                        riskList.refresh();
-                      }
-                    };
+                  public void onSuccess(Job result) {
+                    Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(), new AsyncCallback<Void>() {
 
-                    timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                      @Override
+                      public void onFailure(Throwable caught) {
+                        Timer timer = new Timer() {
+                          @Override
+                          public void run() {
+                            Toast.showInfo(messages.riskRemoveSuccessTitle(), messages.riskRemoveSuccessMessage(size));
+                            riskList.refresh();
+                          }
+                        };
+
+                        timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                      }
+
+                      @Override
+                      public void onSuccess(final Void nothing) {
+                        HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                      }
+                    });
                   }
                 });
               }

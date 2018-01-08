@@ -15,11 +15,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import com.google.gwt.user.client.Window;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationIssue;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
@@ -31,6 +31,8 @@ import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.FormUtilities;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
+import org.roda.wui.client.ingest.process.ShowJob;
+import org.roda.wui.client.process.InternalProcess;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -47,6 +49,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -407,16 +410,27 @@ public class CreateDescriptiveMetadata extends Composite {
       if (representationId == null) {
         SelectedItemsList<IndexedAIP> selected = new SelectedItemsList<>(Arrays.asList(aipId),
           IndexedAIP.class.getName());
-        BrowserService.Util.getInstance().deleteAIP(selected, null, new AsyncCallback<Void>() {
+        BrowserService.Util.getInstance().deleteAIP(selected, null, new AsyncCallback<Job>() {
 
           @Override
           public void onFailure(Throwable caught) {
-            AsyncCallbackUtils.defaultFailureTreatment(caught);
+            HistoryUtils.newHistory(InternalProcess.RESOLVER);
           }
 
           @Override
-          public void onSuccess(Void result) {
-            HistoryUtils.newHistory(LastSelectedItemsSingleton.getInstance().getLastHistory());
+          public void onSuccess(Job result) {
+            Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(), new AsyncCallback<Void>() {
+
+              @Override
+              public void onFailure(Throwable caught) {
+                HistoryUtils.newHistory(LastSelectedItemsSingleton.getInstance().getLastHistory());
+              }
+
+              @Override
+              public void onSuccess(final Void nothing) {
+                HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+              }
+            });
           }
         });
       } else {

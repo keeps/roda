@@ -1337,8 +1337,8 @@ public class Browser extends RodaWuiController {
    * ---------------------------------------------------------------------------
    */
 
-  public static Job moveAIPInHierarchy(User user, SelectedItems<IndexedAIP> selected, String parentId,
-    String details) throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
+  public static Job moveAIPInHierarchy(User user, SelectedItems<IndexedAIP> selected, String parentId, String details)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
     AlreadyExistsException, ValidationException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1468,7 +1468,7 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static void deleteAIP(User user, SelectedItems<IndexedAIP> aips, String details)
+  public static Job deleteAIP(User user, SelectedItems<IndexedAIP> aips, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1479,7 +1479,7 @@ public class Browser extends RodaWuiController {
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
     try {
-      BrowserHelper.deleteAIP(user, aips, details);
+      return BrowserHelper.deleteAIP(user, aips, details);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;
@@ -1489,7 +1489,7 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static void deleteRepresentation(User user, SelectedItems<IndexedRepresentation> representations,
+  public static Job deleteRepresentation(User user, SelectedItems<IndexedRepresentation> representations,
     String details) throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1500,7 +1500,7 @@ public class Browser extends RodaWuiController {
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
     try {
-      BrowserHelper.deleteRepresentation(user, representations, details);
+      return BrowserHelper.deleteRepresentation(user, representations, details);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;
@@ -1510,7 +1510,7 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static void deleteFile(User user, SelectedItems<IndexedFile> files, String details)
+  public static Job deleteFile(User user, SelectedItems<IndexedFile> files, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -1521,7 +1521,7 @@ public class Browser extends RodaWuiController {
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
     try {
-      BrowserHelper.deleteFile(user, files, details);
+      return BrowserHelper.deleteFile(user, files, details);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;
@@ -2481,7 +2481,7 @@ public class Browser extends RodaWuiController {
     return ret;
   }
 
-  public static void deleteRisk(User user, SelectedItems<IndexedRisk> selected)
+  public static Job deleteRisk(User user, SelectedItems<IndexedRisk> selected)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException,
     InvalidParameterException, JobAlreadyStartedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -2493,7 +2493,7 @@ public class Browser extends RodaWuiController {
 
     try {
       // delegate
-      BrowserHelper.deleteRisk(user, selected);
+      return BrowserHelper.deleteRisk(user, selected);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;
@@ -2614,7 +2614,7 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static void moveFiles(User user, String aipId, String representationId,
+  public static Job moveFiles(User user, String aipId, String representationId,
     SelectedItems<IndexedFile> selectedFiles, IndexedFile toFolder, String details) throws AuthorizationDeniedException,
     GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -2626,7 +2626,7 @@ public class Browser extends RodaWuiController {
 
     try {
       // delegate
-      BrowserHelper.moveFiles(user, aipId, representationId, selectedFiles, toFolder, details);
+      return BrowserHelper.moveFiles(user, aipId, representationId, selectedFiles, toFolder, details);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;
@@ -2662,7 +2662,7 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static void moveTransferredResource(User user, SelectedItems<TransferredResource> selected,
+  public static Job moveTransferredResource(User user, SelectedItems<TransferredResource> selected,
     TransferredResource transferredResource) throws AuthorizationDeniedException, GenericException,
     RequestNotValidException, AlreadyExistsException, IsStillUpdatingException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -2674,7 +2674,7 @@ public class Browser extends RodaWuiController {
 
     try {
       // delegate
-      BrowserHelper.moveTransferredResource(user, selected, transferredResource);
+      return BrowserHelper.moveTransferredResource(user, selected, transferredResource);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;
@@ -3395,7 +3395,7 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static void deleteRepresentationInformation(User user, SelectedItems<RepresentationInformation> selected)
+  public static Job deleteRepresentationInformation(User user, SelectedItems<RepresentationInformation> selected)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -3406,7 +3406,7 @@ public class Browser extends RodaWuiController {
 
     try {
       // delegate
-      BrowserHelper.deleteRepresentationInformation(user, selected);
+      return BrowserHelper.deleteRepresentationInformation(user, selected);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;
@@ -3490,7 +3490,7 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static void deleteFormat(User user, SelectedItems<Format> selected)
+  public static Job deleteFormat(User user, SelectedItems<Format> selected)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -3501,7 +3501,7 @@ public class Browser extends RodaWuiController {
 
     try {
       // delegate
-      BrowserHelper.deleteFormat(user, selected);
+      return BrowserHelper.deleteFormat(user, selected);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;

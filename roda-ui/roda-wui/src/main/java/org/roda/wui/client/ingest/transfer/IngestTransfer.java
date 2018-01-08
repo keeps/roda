@@ -26,6 +26,7 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
@@ -38,9 +39,11 @@ import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.Ingest;
+import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.client.process.CreateSelectedJob;
+import org.roda.wui.client.process.InternalProcess;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
@@ -679,29 +682,41 @@ public class IngestTransfer extends Composite {
         final TransferredResource transferredResource = event.getValue();
 
         BrowserService.Util.getInstance().moveTransferredResource(getSelected(), transferredResource,
-          new AsyncCallback<Void>() {
+          new AsyncCallback<Job>() {
 
             @Override
             public void onFailure(Throwable caught) {
               Toast.showInfo(messages.dialogFailure(), messages.moveSIPFailed());
+              HistoryUtils.newHistory(InternalProcess.RESOLVER);
             }
 
             @Override
-            public void onSuccess(Void result) {
-              Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+            public void onSuccess(Job result) {
+              Dialogs.showJobRedirectDialog(messages.moveJobCreatedMessage(), new AsyncCallback<Void>() {
 
-              Timer timer = new Timer() {
                 @Override
-                public void run() {
-                  if (transferredResource.getUUID() != null) {
-                    HistoryUtils.newHistory(IngestTransfer.RESOLVER, transferredResource.getUUID());
-                  } else {
-                    HistoryUtils.newHistory(IngestTransfer.RESOLVER);
-                  }
-                }
-              };
+                public void onFailure(Throwable caught) {
+                  Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
 
-              timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                  Timer timer = new Timer() {
+                    @Override
+                    public void run() {
+                      if (transferredResource.getUUID() != null) {
+                        HistoryUtils.newHistory(IngestTransfer.RESOLVER, transferredResource.getUUID());
+                      } else {
+                        HistoryUtils.newHistory(IngestTransfer.RESOLVER);
+                      }
+                    }
+                  };
+
+                  timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                }
+
+                @Override
+                public void onSuccess(final Void nothing) {
+                  HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                }
+              });
             }
           });
       }

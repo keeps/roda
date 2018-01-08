@@ -10,28 +10,21 @@
  */
 package org.roda.wui.client.planning;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.filter.FilterParameter;
-import org.roda.core.data.v2.index.filter.OrFiltersParameters;
-import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.index.select.SelectedItemsList;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
-import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
-import org.roda.wui.client.common.dialogs.RepresentationInformationDialogs;
 import org.roda.wui.client.common.lists.RepresentationInformationList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
@@ -39,9 +32,9 @@ import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.client.common.utils.StringUtils;
+import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.CreateSelectedJob;
-import org.roda.wui.client.search.Search;
+import org.roda.wui.client.process.InternalProcess;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -51,15 +44,17 @@ import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.SelectionChangeEvent;
 
 import config.i18n.client.ClientMessages;
@@ -273,26 +268,36 @@ public class RepresentationInformationNetwork extends Composite {
             @Override
             public void onSuccess(Boolean confirmed) {
               if (confirmed) {
-                BrowserService.Util.getInstance().deleteRepresentationInformation(selected, new AsyncCallback<Void>() {
+                BrowserService.Util.getInstance().deleteRepresentationInformation(selected, new AsyncCallback<Job>() {
 
                   @Override
                   public void onFailure(Throwable caught) {
-                    AsyncCallbackUtils.defaultFailureTreatment(caught);
-                    representationInformationList.refresh();
+                    HistoryUtils.newHistory(InternalProcess.RESOLVER);
                   }
 
                   @Override
-                  public void onSuccess(Void result) {
-                    Timer timer = new Timer() {
-                      @Override
-                      public void run() {
-                        Toast.showInfo(messages.representationInformationRemoveSuccessTitle(),
-                          messages.representationInformationRemoveSuccessMessage(size));
-                        representationInformationList.refresh();
-                      }
-                    };
+                  public void onSuccess(Job result) {
+                    Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(), new AsyncCallback<Void>() {
 
-                    timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                      @Override
+                      public void onFailure(Throwable caught) {
+                        Timer timer = new Timer() {
+                          @Override
+                          public void run() {
+                            Toast.showInfo(messages.representationInformationRemoveSuccessTitle(),
+                              messages.representationInformationRemoveSuccessMessage(size));
+                            representationInformationList.refresh();
+                          }
+                        };
+
+                        timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                      }
+
+                      @Override
+                      public void onSuccess(final Void nothing) {
+                        HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                      }
+                    });
                   }
                 });
               }

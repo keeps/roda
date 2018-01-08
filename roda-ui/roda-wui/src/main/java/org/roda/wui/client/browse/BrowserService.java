@@ -131,13 +131,13 @@ public interface BrowserService extends RemoteService {
   String createAIP(String parentId, String type) throws AuthorizationDeniedException, GenericException,
     NotFoundException, RequestNotValidException, AlreadyExistsException;
 
-  void deleteAIP(SelectedItems<IndexedAIP> aips, String details)
+  Job deleteAIP(SelectedItems<IndexedAIP> aips, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
-  void deleteRepresentation(SelectedItems<IndexedRepresentation> representations, String details)
+  Job deleteRepresentation(SelectedItems<IndexedRepresentation> representations, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
-  void deleteFile(SelectedItems<IndexedFile> files, String details)
+  Job deleteFile(SelectedItems<IndexedFile> files, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   void deleteDescriptiveMetadataFile(String aipId, String representationId, String descriptiveMetadataId)
@@ -265,7 +265,7 @@ public interface BrowserService extends RemoteService {
 
   MitigationPropertiesBundle retrieveAllMitigationProperties() throws AuthorizationDeniedException;
 
-  void deleteRisk(SelectedItems<IndexedRisk> selected) throws AuthorizationDeniedException, GenericException,
+  Job deleteRisk(SelectedItems<IndexedRisk> selected) throws AuthorizationDeniedException, GenericException,
     RequestNotValidException, NotFoundException, InvalidParameterException, JobAlreadyStartedException;
 
   <T extends IsIndexed> Job createProcess(String jobName, SelectedItems<T> selected, String id,
@@ -286,7 +286,7 @@ public interface BrowserService extends RemoteService {
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException,
     IsStillUpdatingException, NotFoundException;
 
-  void moveTransferredResource(SelectedItems<TransferredResource> selected, TransferredResource transferredResource)
+  Job moveTransferredResource(SelectedItems<TransferredResource> selected, TransferredResource transferredResource)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, AlreadyExistsException,
     IsStillUpdatingException, NotFoundException;
 
@@ -312,7 +312,7 @@ public interface BrowserService extends RemoteService {
   IndexedFile renameFolder(String folderUUID, String newName, String details) throws AuthorizationDeniedException,
     GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException;
 
-  void moveFiles(String aipId, String representationId, SelectedItems<IndexedFile> selectedFiles, IndexedFile toFolder,
+  Job moveFiles(String aipId, String representationId, SelectedItems<IndexedFile> selectedFiles, IndexedFile toFolder,
     String details) throws AuthorizationDeniedException, GenericException, RequestNotValidException,
     AlreadyExistsException, NotFoundException;
 
@@ -368,7 +368,7 @@ public interface BrowserService extends RemoteService {
     SelectedItemsList<RepresentationInformation> representationInformationIds, String filterToAdd)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
-  void deleteRepresentationInformation(SelectedItems<RepresentationInformation> selected)
+  Job deleteRepresentationInformation(SelectedItems<RepresentationInformation> selected)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
   Pair<String, Integer> retrieveRepresentationInformationWithFilter(String riFilter) throws RODAException;
@@ -381,7 +381,7 @@ public interface BrowserService extends RemoteService {
   void updateFormat(Format f)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
-  void deleteFormat(SelectedItems<Format> selected)
+  Job deleteFormat(SelectedItems<Format> selected)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
   List<String> retrieveRelationTypeOptions();

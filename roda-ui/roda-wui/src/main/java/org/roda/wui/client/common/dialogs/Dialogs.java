@@ -342,4 +342,48 @@ public class Dialogs {
     return dialogBox;
   }
 
+  public static DialogBox showJobRedirectDialog(String message, final AsyncCallback<Void> callback) {
+    final DialogBox dialogBox = new DialogBox(false, true);
+    dialogBox.setText(messages.jobCreatedRedirectTitle());
+
+    FlowPanel layout = new FlowPanel();
+    Label messageLabel = new Label(message);
+    Button jobButton = new Button(messages.dialogYes());
+    Button redirectButton = new Button(messages.dialogNo());
+
+    redirectButton.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        dialogBox.hide();
+        callback.onFailure(null);
+      }
+    });
+
+    jobButton.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        dialogBox.hide();
+        callback.onSuccess(null);
+      }
+    });
+
+    layout.add(messageLabel);
+    layout.add(jobButton);
+    layout.add(redirectButton);
+    dialogBox.setWidget(layout);
+
+    dialogBox.setGlassEnabled(true);
+    dialogBox.setAnimationEnabled(false);
+
+    dialogBox.addStyleName("wui-dialog-prompt");
+    layout.addStyleName("wui-dialog-layout");
+    messageLabel.addStyleName("wui-dialog-message");
+    jobButton.addStyleName("pull-right btn btn-play");
+    redirectButton.addStyleName("btn btn-ban");
+
+    dialogBox.center();
+    dialogBox.show();
+    return dialogBox;
+  }
+
 }

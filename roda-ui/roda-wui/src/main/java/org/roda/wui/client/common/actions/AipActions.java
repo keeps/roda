@@ -417,7 +417,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
                   final String parentId = aip.getParentID();
 
                   BrowserService.Util.getInstance().deleteAIP(objectToSelectedItems(aip), details,
-                    new AsyncCallback<Void>() {
+                    new AsyncCallback<Job>() {
 
                       @Override
                       public void onFailure(Throwable caught) {
@@ -425,22 +425,33 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
                       }
 
                       @Override
-                      public void onSuccess(Void result) {
-                        Toast.showInfo(messages.removingSuccessTitle(), messages.removingSuccessMessage(1L));
+                      public void onSuccess(Job result) {
+                        Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(), new AsyncCallback<Void>() {
 
-                        Timer timer = new Timer() {
                           @Override
-                          public void run() {
-                            if (parentId != null) {
-                              HistoryUtils.newHistory(BrowseAIP.RESOLVER, parentId);
-                            } else {
-                              HistoryUtils.newHistory(BrowseAIP.RESOLVER);
-                            }
-                            callback.onSuccess(ActionImpact.DESTROYED);
-                          }
-                        };
+                          public void onFailure(Throwable caught) {
+                            Toast.showInfo(messages.removingSuccessTitle(), messages.removingSuccessMessage(1L));
 
-                        timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                            Timer timer = new Timer() {
+                              @Override
+                              public void run() {
+                                if (parentId != null) {
+                                  HistoryUtils.newHistory(BrowseAIP.RESOLVER, parentId);
+                                } else {
+                                  HistoryUtils.newHistory(BrowseAIP.RESOLVER);
+                                }
+                                callback.onSuccess(ActionImpact.DESTROYED);
+                              }
+                            };
+
+                            timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                          }
+
+                          @Override
+                          public void onSuccess(final Void nothing) {
+                            HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                          }
+                        });
                       }
                     });
                 }
@@ -478,7 +489,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
                     @Override
                     public void onSuccess(final String details) {
-                      BrowserService.Util.getInstance().deleteAIP(selected, details, new LoadingAsyncCallback<Void>() {
+                      BrowserService.Util.getInstance().deleteAIP(selected, details, new LoadingAsyncCallback<Job>() {
 
                         @Override
                         public void onFailureImpl(Throwable caught) {
@@ -486,10 +497,23 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
                         }
 
                         @Override
-                        public void onSuccessImpl(Void result) {
+                        public void onSuccessImpl(Job result) {
                           Toast.showInfo(messages.runningInBackgroundTitle(),
                             messages.runningInBackgroundDescription());
-                          callback.onSuccess(ActionImpact.DESTROYED);
+
+                          Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(), new AsyncCallback<Void>() {
+
+                            @Override
+                            public void onFailure(Throwable caught) {
+                              callback.onSuccess(ActionImpact.DESTROYED);
+                            }
+
+                            @Override
+                            public void onSuccess(final Void nothing) {
+                              HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                            }
+                          });
+
                         }
                       });
                     }
