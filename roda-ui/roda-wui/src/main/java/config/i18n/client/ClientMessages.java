@@ -1379,7 +1379,7 @@ public interface ClientMessages extends Messages {
 
   String representationInformationFamily();
 
-  String representationInformationCategories();
+  String representationInformationTags();
 
   String representationInformationExtras();
 

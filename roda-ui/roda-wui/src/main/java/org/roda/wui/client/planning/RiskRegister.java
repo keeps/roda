@@ -172,7 +172,6 @@ public class RiskRegister extends Composite {
     FacetUtils.bindFacets(riskList, facetPanels);
 
     riskList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
-
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
         IndexedRisk selected = riskList.getSelectionModel().getSelectedObject();
@@ -183,14 +182,12 @@ public class RiskRegister extends Composite {
     });
 
     riskList.addCheckboxSelectionListener(new CheckboxSelectionListener<IndexedRisk>() {
-
       @Override
       public void onSelectionChange(SelectedItems<IndexedRisk> selected) {
         boolean empty = ClientSelectedItemsUtils.isEmpty(selected);
         buttonRemove.setEnabled(!empty);
         startProcess.setEnabled(!empty);
       }
-
     });
 
     initWidget(uiBinder.createAndBindUi(this));

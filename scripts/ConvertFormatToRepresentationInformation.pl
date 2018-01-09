@@ -18,13 +18,13 @@ for my $file (`ls format`) {
 	$representation_information{'relations'} = [];
 	$representation_information{'updatedBy'} = "admin";
 	$representation_information{'updatedOn'} = 1515421588276;
-	$representation_information{'support'} = "SUPPORTED";
+	$representation_information{'support'} = "KNOWN";
 
 	## representation information simple values
 	$representation_information{'id'} = $format->{'id'};
 	$representation_information{'name'} = $format->{'name'};
 	$representation_information{'description'} = $format->{'definition'};
-	$representation_information{'categories'} = \@{$format->{'categories'}};
+	$representation_information{'tags'} = \@{$format->{'categories'}};
 
 	## representation information extra values
 
@@ -49,21 +49,16 @@ for my $file (`ls format`) {
 	}
 	$pronoms = substr $pronoms, 0, -2; 
 
-	# getting open format
-	my $disclosure = "";
-	my $openFormat = "".$format->{'openFormat'};
-	if($openFormat eq "true") {
-		$disclosure = "Is open format.";
-	}
+	my $formatCategory = @{$format->{'categories'}}[0] || "other";
 
-	$representation_information{'extras'} = "<?xml version=\"1.0\" encoding=\"utf-8\"?><metadata><field name=\"disclosure\">$disclosure</field><field name=\"filenameExtension\">$extensions</field><field name=\"internetMediaType\">$mimetypes</field><field name=\"pronomPUID\">$pronoms</field></metadata>";
+	$representation_information{'extras'} = "<?xml version=\"1.0\" encoding=\"utf-8\"?><metadata><field name=\"formatCategory\">$formatCategory</field><field name=\"filenameExtension\">$extensions</field><field name=\"internetMediaType\">$mimetypes</field><field name=\"pronomPUID\">$pronoms</field></metadata>";
 
 	## representation information web relations
 	$representation_information{'relations'}[0] = ();
-	$representation_information{'relations'}[0]->{'link'} = "http://".$format->{'provenanceInformation'};
+	$representation_information{'relations'}[0]->{'link'} = "http://www.digitalpreservation.gov/formats/fdd/";
 	$representation_information{'relations'}[0]->{'objectType'} = "WEB";
-	$representation_information{'relations'}[0]->{'relationType'} = "SPECIFIED_BY";
-	$representation_information{'relations'}[0]->{'title'} = "Provenance information";
+	$representation_information{'relations'}[0]->{'relationType'} = "HAS_SOURCE";
+	$representation_information{'relations'}[0]->{'title'} = "Sustainability of Digital Formats\: Planning for Library of Congress Collections";
 	
 	my $i = 1;
 	for my $website (@{$format->{'websites'}}) {

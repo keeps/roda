@@ -52,9 +52,9 @@
 							</g:Button>
 							<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
 								<g:Label addStyleNames="h4">
-									<ui:text from='{messages.representationInformationCategories}' />
+									<ui:text from='{messages.representationInformationTags}' />
 								</g:Label>
-								<g:FlowPanel ui:field="facetCategories" />
+								<g:FlowPanel ui:field="facetTags" />
 							</g:FlowPanel>
 							<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
 								<g:Label addStyleNames="h4">

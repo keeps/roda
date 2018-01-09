@@ -136,7 +136,7 @@ public class RepresentationInformationAssociations extends Composite {
    * Create a representation information page
    */
   public RepresentationInformationAssociations() {
-    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.REPRESENTATION_INFORMATION_CATEGORIES),
+    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.REPRESENTATION_INFORMATION_TAGS),
       new SimpleFacetParameter(RodaConstants.REPRESENTATION_INFORMATION_SUPPORT));
 
     representationInformationList = new RepresentationInformationList(filter, facets,
@@ -155,7 +155,8 @@ public class RepresentationInformationAssociations extends Composite {
       @Override
       public void onValueChange(ValueChangeEvent<String> valueChangeEvent) {
         // the user is searching. use this flag to avoid showing the options to
-        // associate the filter with RI (if this was not present, those options would
+        // associate the filter with RI (if this was not present, those options
+        // would
         // show up if the search had no results)
         gettingFilterResults = false;
       }

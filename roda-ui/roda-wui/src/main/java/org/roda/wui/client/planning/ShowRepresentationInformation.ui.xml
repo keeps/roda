@@ -44,11 +44,11 @@
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
 								<g:Label styleName="label"
-									ui:field="representationInformationCategoryKey">
-									<ui:text from='{messages.representationInformationCategories}' />
+									ui:field="representationInformationTagKey">
+									<ui:text from='{messages.representationInformationTags}' />
 								</g:Label>
 								<g:FlowPanel styleName="value"
-									ui:field="representationInformationCategoryValue" />
+									ui:field="representationInformationTagValue" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
 								<g:Label styleName="label" ui:field="representationInformationSupportKey">

@@ -35,11 +35,14 @@ public class RepresentationInformationList extends BasicAsyncTableCell<Represent
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private TextColumn<RepresentationInformation> nameColumn;
-  private TextColumn<RepresentationInformation> categoryColumn;
+  private TextColumn<RepresentationInformation> tagColumn;
+  private TextColumn<RepresentationInformation> supportColumn;
+  private TextColumn<RepresentationInformation> familyColumn;
 
   private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
     RodaConstants.REPRESENTATION_INFORMATION_ID, RodaConstants.REPRESENTATION_INFORMATION_NAME,
-    RodaConstants.REPRESENTATION_INFORMATION_CATEGORIES);
+    RodaConstants.REPRESENTATION_INFORMATION_TAGS, RodaConstants.REPRESENTATION_INFORMATION_SUPPORT,
+    RodaConstants.REPRESENTATION_INFORMATION_FAMILY);
 
   public RepresentationInformationList() {
     this(null, null, null, false);
@@ -59,24 +62,39 @@ public class RepresentationInformationList extends BasicAsyncTableCell<Represent
   protected void configureDisplay(CellTable<RepresentationInformation> display) {
 
     nameColumn = new TextColumn<RepresentationInformation>() {
-
       @Override
       public String getValue(RepresentationInformation ri) {
         return ri != null ? ri.getName() : null;
       }
     };
 
-    categoryColumn = new TextColumn<RepresentationInformation>() {
-
+    tagColumn = new TextColumn<RepresentationInformation>() {
       @Override
       public String getValue(RepresentationInformation ri) {
-        return StringUtils.prettyPrint(ri.getCategories());
+        return StringUtils.prettyPrint(ri.getTags());
+      }
+    };
+
+    supportColumn = new TextColumn<RepresentationInformation>() {
+      @Override
+      public String getValue(RepresentationInformation ri) {
+        return messages.representationInformationSupportValue(ri.getSupport().toString());
+      }
+    };
+
+    familyColumn = new TextColumn<RepresentationInformation>() {
+      @Override
+      public String getValue(RepresentationInformation ri) {
+        return ri != null ? ri.getFamily() : null;
       }
     };
 
     nameColumn.setSortable(true);
-    addColumn(categoryColumn, messages.representationInformationCategories(), false, false, 8);
+
     addColumn(nameColumn, messages.representationInformationName(), false, false);
+    addColumn(tagColumn, messages.representationInformationTags(), false, false, 8);
+    addColumn(supportColumn, messages.representationInformationSupport(), false, false, 8.5);
+    addColumn(familyColumn, messages.representationInformationFamily(), false, false, 7);
 
     // default sorting
     display.getColumnSortList().push(new ColumnSortInfo(nameColumn, true));
@@ -85,8 +103,10 @@ public class RepresentationInformationList extends BasicAsyncTableCell<Represent
   @Override
   protected Sorter getSorter(ColumnSortList columnSortList) {
     Map<Column<RepresentationInformation, ?>, List<String>> columnSortingKeyMap = new HashMap<>();
+    columnSortingKeyMap.put(tagColumn, Arrays.asList(RodaConstants.REPRESENTATION_INFORMATION_TAGS));
     columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.REPRESENTATION_INFORMATION_NAME_SORT));
-    columnSortingKeyMap.put(categoryColumn, Arrays.asList(RodaConstants.REPRESENTATION_INFORMATION_CATEGORIES));
+    columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.REPRESENTATION_INFORMATION_SUPPORT));
+    columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.REPRESENTATION_INFORMATION_FAMILY));
     return createSorter(columnSortList, columnSortingKeyMap);
   }
 

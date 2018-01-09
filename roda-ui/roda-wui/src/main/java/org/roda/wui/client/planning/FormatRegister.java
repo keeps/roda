@@ -86,18 +86,6 @@ public class FormatRegister extends Composite {
 
   private static FormatRegister instance = null;
 
-  /**
-   * Get the singleton instance
-   *
-   * @return the instance
-   */
-  public static FormatRegister getInstance() {
-    if (instance == null) {
-      instance = new FormatRegister();
-    }
-    return instance;
-  }
-
   interface MyUiBinder extends UiBinder<Widget, FormatRegister> {
   }
 
@@ -135,14 +123,13 @@ public class FormatRegister extends Composite {
    */
   public FormatRegister() {
     Facets facets = null;
-    formatList = new FormatList(Filter.NULL, facets, messages.formatsTitle(), true);
+    formatList = new FormatList(Filter.ALL, facets, messages.formatsTitle(), true);
 
     searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, true, messages.formatRegisterSearchPlaceHolder(), false,
-      false, false);
+      false, true);
     searchPanel.setList(formatList);
 
     formatList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
-
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
         Format selected = formatList.getSelectionModel().getSelectedObject();
@@ -153,14 +140,12 @@ public class FormatRegister extends Composite {
     });
 
     formatList.addCheckboxSelectionListener(new CheckboxSelectionListener<Format>() {
-
       @Override
       public void onSelectionChange(SelectedItems<Format> selected) {
         boolean empty = ClientSelectedItemsUtils.isEmpty(selected);
         buttonRemove.setEnabled(!empty);
         startProcess.setEnabled(!empty);
       }
-
     });
 
     initWidget(uiBinder.createAndBindUi(this));
@@ -175,6 +160,18 @@ public class FormatRegister extends Composite {
     formatRegisterDescription.add(new HTMLWidgetWrapper("FormatRegisterDescription.html"));
     buttonRemove.setEnabled(false);
     startProcess.setEnabled(false);
+  }
+
+  /**
+   * Get the singleton instance
+   *
+   * @return the instance
+   */
+  public static FormatRegister getInstance() {
+    if (instance == null) {
+      instance = new FormatRegister();
+    }
+    return instance;
   }
 
   @Override

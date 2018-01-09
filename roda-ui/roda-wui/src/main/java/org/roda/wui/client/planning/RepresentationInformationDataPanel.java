@@ -68,7 +68,7 @@ public class RepresentationInformationDataPanel extends Composite
   ListBox family;
 
   @UiField(provided = true)
-  IncrementalList categories;
+  IncrementalList tags;
 
   @UiField
   FlowPanel extras;
@@ -109,7 +109,7 @@ public class RepresentationInformationDataPanel extends Composite
   public RepresentationInformationDataPanel(boolean visible, final boolean editmode,
     final RepresentationInformation ri) {
     relations = new IncrementalRelationList(ri);
-    categories = new IncrementalList(true);
+    tags = new IncrementalList(true);
     initWidget(uiBinder.createAndBindUi(this));
 
     this.editmode = editmode;
@@ -156,7 +156,7 @@ public class RepresentationInformationDataPanel extends Composite
 
     family.addChangeHandler(familyChangeHandler);
     family.addKeyUpHandler(keyUpHandler);
-    categories.addValueChangeHandler(valueChangeHandler);
+    tags.addValueChangeHandler(valueChangeHandler);
 
     support.addChangeHandler(changeHandler);
     relations.addChangeHandler(changeHandler);
@@ -259,7 +259,7 @@ public class RepresentationInformationDataPanel extends Composite
     }
 
     this.family.setSelectedIndex(index);
-    this.categories.setTextBoxList(ri.getCategories());
+    this.tags.setTextBoxList(ri.getTags());
 
     for (int i = 0; i < support.getItemCount(); i++) {
       if (support.getValue(i).equals(ri.getSupport().toString())) {
@@ -277,7 +277,7 @@ public class RepresentationInformationDataPanel extends Composite
     ri.setName(name.getText());
     ri.setDescription(description.getText());
     ri.setFamily(family.getSelectedValue());
-    ri.setCategories(categories.getTextBoxesValue());
+    ri.setTags(tags.getTextBoxesValue());
 
     ri.setSupport(RepresentationInformationSupport.valueOf(support.getSelectedValue()));
     ri.setRelations(relations.getValues());
@@ -290,7 +290,7 @@ public class RepresentationInformationDataPanel extends Composite
     name.setText("");
     description.setText("");
     family.clear();
-    categories.clearTextBoxes();
+    tags.clearTextBoxes();
     extras.clear();
     support.clear();
     relations.clear();

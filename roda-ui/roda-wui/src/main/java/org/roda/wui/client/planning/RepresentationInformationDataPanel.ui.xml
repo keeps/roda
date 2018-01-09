@@ -31,9 +31,9 @@
 				<g:TextArea title="{messages.representationInformationDescription}"
 					ui:field="description" addStyleNames="form-textbox metadata-form-text-area" />
 				<g:Label addStyleNames="form-label">
-					<ui:text from='{messages.representationInformationCategories}' />
+					<ui:text from='{messages.representationInformationTags}' />
 				</g:Label>
-				<l:IncrementalList ui:field="categories"></l:IncrementalList>
+				<l:IncrementalList ui:field="tags"></l:IncrementalList>
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.representationInformationSupport}' />
 				</g:Label>

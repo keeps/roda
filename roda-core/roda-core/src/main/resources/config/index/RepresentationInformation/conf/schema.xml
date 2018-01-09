@@ -110,8 +110,8 @@
    <field name="name_sort" type="string" indexed="true" stored="false" required="false" multiValued="false" />
    <field name="description" type="text_general" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="family" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
-   <field name="categories" type="string" indexed="true" stored="true" required="false" multiValued="true" />
-   <field name="categories_sort" type="string" indexed="true" stored="false" required="false" multiValued="false" />
+   <field name="tags" type="string" indexed="true" stored="true" required="false" multiValued="true" />
+   <field name="tags_sort" type="string" indexed="true" stored="false" required="false" multiValued="false" />
    <field name="extras" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    
    <field name="support" type="string" indexed="true" stored="true" required="false" multiValued="false" />

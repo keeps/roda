@@ -29,7 +29,7 @@ public class RepresentationInformation extends NamedIndexedModel implements IsMo
 
   private String description = null;
   private String family = null;
-  private List<String> categories = null;
+  private List<String> tags = null;
   private String extras = null;
   private RepresentationInformationSupport support = null;
 
@@ -49,7 +49,7 @@ public class RepresentationInformation extends NamedIndexedModel implements IsMo
     super(representationInformation.getId(), representationInformation.getName());
     this.description = representationInformation.getDescription();
     this.family = representationInformation.getFamily();
-    this.categories = representationInformation.getCategories();
+    this.tags = representationInformation.getTags();
     this.extras = representationInformation.getExtras();
     this.support = representationInformation.getSupport();
     this.relations = new ArrayList<>(representationInformation.getRelations());
@@ -82,12 +82,12 @@ public class RepresentationInformation extends NamedIndexedModel implements IsMo
     this.family = family;
   }
 
-  public List<String> getCategories() {
-    return categories;
+  public List<String> getTags() {
+    return tags;
   }
 
-  public void setCategories(List<String> categories) {
-    this.categories = categories;
+  public void setTags(List<String> tags) {
+    this.tags = tags;
   }
 
   public String getExtras() {
@@ -161,19 +161,18 @@ public class RepresentationInformation extends NamedIndexedModel implements IsMo
   @Override
   public String toString() {
     return "RepresentationInformation [id=" + getId() + ", name=" + getName() + ", description=" + description
-      + ", family=" + family + ", categories=" + categories + ", extras=" + extras + ", support=" + support
-      + ", relations=" + relations + ", filters=" + filters + "]";
+      + ", family=" + family + ", tags=" + tags + ", extras=" + extras + ", support=" + support + ", relations="
+      + relations + ", filters=" + filters + "]";
   }
 
   @Override
   public List<String> toCsvHeaders() {
-    return Arrays.asList("id", "name", "description", "family", "categories", "extras", "support", "relations",
-      "filters");
+    return Arrays.asList("id", "name", "description", "family", "tags", "extras", "support", "relations", "filters");
   }
 
   @Override
   public List<Object> toCsvValues() {
-    return Arrays.asList(getId(), getName(), description, family, categories, extras, support, relations, filters);
+    return Arrays.asList(getId(), getName(), description, family, tags, extras, support, relations, filters);
   }
 
   @JsonIgnore

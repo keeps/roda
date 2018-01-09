@@ -134,10 +134,10 @@ public class ShowRepresentationInformation extends Composite {
   Label representationInformationFamilyKey, representationInformationFamilyValue;
 
   @UiField
-  Label representationInformationCategoryKey;
+  Label representationInformationTagKey;
 
   @UiField
-  FlowPanel representationInformationCategoryValue;
+  FlowPanel representationInformationTagValue;
 
   @UiField
   Label representationInformationSupportKey, representationInformationSupportValue;
@@ -214,12 +214,12 @@ public class ShowRepresentationInformation extends Composite {
         }
       });
 
-    List<String> categoryList = ri.getCategories();
-    representationInformationCategoryValue.setVisible(categoryList != null && !categoryList.isEmpty());
-    representationInformationCategoryKey.setVisible(categoryList != null && !categoryList.isEmpty());
+    List<String> tagsList = ri.getTags();
+    representationInformationTagValue.setVisible(tagsList != null && !tagsList.isEmpty());
+    representationInformationTagKey.setVisible(tagsList != null && !tagsList.isEmpty());
 
-    if (categoryList != null) {
-      for (final String category : categoryList) {
+    if (tagsList != null) {
+      for (final String category : tagsList) {
         InlineHTML parPanel = new InlineHTML();
         parPanel.setHTML("<span class='label label-info btn-separator-right ri-category'>"
           + messages.representationInformationListItems(category) + "</span>");
@@ -230,12 +230,12 @@ public class ShowRepresentationInformation extends Composite {
             List<String> history = new ArrayList<>();
             history.addAll(RepresentationInformationNetwork.RESOLVER.getHistoryPath());
             history.add(Search.RESOLVER.getHistoryToken());
-            history.add(RodaConstants.REPRESENTATION_INFORMATION_CATEGORIES);
+            history.add(RodaConstants.REPRESENTATION_INFORMATION_TAGS);
             history.add(category);
             HistoryUtils.newHistory(history);
           }
         });
-        representationInformationCategoryValue.add(parPanel);
+        representationInformationTagValue.add(parPanel);
       }
     }
 

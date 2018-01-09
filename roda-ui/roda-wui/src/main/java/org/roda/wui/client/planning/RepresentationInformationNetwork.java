@@ -109,7 +109,7 @@ public class RepresentationInformationNetwork extends Composite {
   RepresentationInformationList representationInformationList;
 
   @UiField(provided = true)
-  FlowPanel facetCategories;
+  FlowPanel facetTags;
 
   @UiField(provided = true)
   FlowPanel facetSupport;
@@ -141,7 +141,7 @@ public class RepresentationInformationNetwork extends Composite {
    * Create a representation information page
    */
   public RepresentationInformationNetwork() {
-    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.REPRESENTATION_INFORMATION_CATEGORIES),
+    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.REPRESENTATION_INFORMATION_TAGS),
       new SimpleFacetParameter(RodaConstants.REPRESENTATION_INFORMATION_SUPPORT));
 
     representationInformationList = new RepresentationInformationList(filter, facets,
@@ -151,11 +151,11 @@ public class RepresentationInformationNetwork extends Composite {
       messages.representationInformationRegisterSearchPlaceHolder(), false, false, true);
     searchPanel.setList(representationInformationList);
 
-    facetCategories = new FlowPanel();
+    facetTags = new FlowPanel();
     facetSupport = new FlowPanel();
 
     Map<String, FlowPanel> facetPanels = new HashMap<>();
-    facetPanels.put(RodaConstants.REPRESENTATION_INFORMATION_CATEGORIES, facetCategories);
+    facetPanels.put(RodaConstants.REPRESENTATION_INFORMATION_TAGS, facetTags);
     facetPanels.put(RodaConstants.REPRESENTATION_INFORMATION_SUPPORT, facetSupport);
     FacetUtils.bindFacets(representationInformationList, facetPanels);
 

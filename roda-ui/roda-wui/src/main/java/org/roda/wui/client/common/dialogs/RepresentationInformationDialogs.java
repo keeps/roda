@@ -797,7 +797,7 @@ public class RepresentationInformationDialogs {
     container.addStyleName("wui-dialog-message");
 
     // create search box and results list
-    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.REPRESENTATION_INFORMATION_CATEGORIES),
+    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.REPRESENTATION_INFORMATION_TAGS),
       new SimpleFacetParameter(RodaConstants.REPRESENTATION_INFORMATION_SUPPORT));
     Filter defaultFilter = SearchFilters.defaultFilter(RepresentationInformation.class.getName());
     final RepresentationInformationList representationInformationList = new RepresentationInformationList(defaultFilter,

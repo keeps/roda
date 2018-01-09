@@ -960,8 +960,8 @@ public final class RodaConstants {
   public static final String REPRESENTATION_INFORMATION_NAME_SORT = "name_sort";
   public static final String REPRESENTATION_INFORMATION_DESCRIPTION = "description";
   public static final String REPRESENTATION_INFORMATION_FAMILY = "family";
-  public static final String REPRESENTATION_INFORMATION_CATEGORIES = "categories";
-  public static final String REPRESENTATION_INFORMATION_CATEGORIES_SORT = "categories_sort";
+  public static final String REPRESENTATION_INFORMATION_TAGS = "tags";
+  public static final String REPRESENTATION_INFORMATION_TAGS_SORT = "tags_sort";
   public static final String REPRESENTATION_INFORMATION_EXTRAS = "extras";
   public static final String REPRESENTATION_INFORMATION_SUPPORT = "support";
   public static final String REPRESENTATION_INFORMATION_RELATIONS = "relations";

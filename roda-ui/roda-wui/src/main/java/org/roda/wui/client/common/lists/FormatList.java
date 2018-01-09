@@ -57,7 +57,6 @@ public class FormatList extends BasicAsyncTableCell<Format> {
   protected void configureDisplay(CellTable<Format> display) {
 
     nameColumn = new TextColumn<Format>() {
-
       @Override
       public String getValue(Format format) {
         return format != null ? format.getName() : null;
@@ -65,7 +64,6 @@ public class FormatList extends BasicAsyncTableCell<Format> {
     };
 
     categoryColumn = new TextColumn<Format>() {
-
       @Override
       public String getValue(Format format) {
         return StringUtils.prettyPrint(format.getCategories());
@@ -73,7 +71,6 @@ public class FormatList extends BasicAsyncTableCell<Format> {
     };
 
     mimetypeColumn = new TextColumn<Format>() {
-
       @Override
       public String getValue(Format format) {
         return StringUtils.prettyPrint(format.getMimetypes());
@@ -81,7 +78,6 @@ public class FormatList extends BasicAsyncTableCell<Format> {
     };
 
     pronomColumn = new TextColumn<Format>() {
-
       @Override
       public String getValue(Format format) {
         return StringUtils.prettyPrint(format.getPronoms());
@@ -89,6 +85,7 @@ public class FormatList extends BasicAsyncTableCell<Format> {
     };
 
     nameColumn.setSortable(true);
+
     addColumn(categoryColumn, messages.formatCategory(), true, false, 8);
     addColumn(nameColumn, messages.formatName(), false, false);
     addColumn(mimetypeColumn, messages.formatMimetypes(), false, false, 10);
@@ -105,7 +102,6 @@ public class FormatList extends BasicAsyncTableCell<Format> {
     columnSortingKeyMap.put(categoryColumn, Arrays.asList(RodaConstants.FORMAT_CATEGORY));
     columnSortingKeyMap.put(mimetypeColumn, Arrays.asList(RodaConstants.FORMAT_MIMETYPES));
     columnSortingKeyMap.put(pronomColumn, Arrays.asList(RodaConstants.FORMAT_PRONOMS));
-
     return createSorter(columnSortList, columnSortingKeyMap);
   }
 

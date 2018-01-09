@@ -13,8 +13,8 @@
 {{~field name="dateOfEstablishment" 	order="161"	hidden="false"   type="date" 		labeli18n="ri.data.dateOfEstablishment"		label='{"en": "Date of establishment"}' xpath="//*:field[@name='dateOfEstablishment']/string()"~}}
 {{~field name="numberOfEmployees" 		order="162"	hidden="false"   type="text"	 	labeli18n="ri.data.numberOfEmployees"		label='{"en": "Number of employees"}' xpath="//*:field[@name='numberOfEmployees']/string()"~}}
 {{~field name="revenue" 				order="163"	hidden="false"   type="text" 		labeli18n="ri.data.revenue"					label='{"en": "Revenue"}' xpath="//*:field[@name='revenue']/string()"~}}
-{{~field name="operatingIncome" 		order="164"	hidden="false"   type="text" 		labeli18n="ri.data.operatingIncome"			label='{"en": "Operating income"}' xpath="//*:field[@name='operatingIncome']/string()"~}}
-{{~field name="totalAssets" 			order="165"	hidden="false"   type="text" 		labeli18n="ri.data.totalAssets"				label='{"en": "Total assets"}' xpath="//*:field[@name='totalAssets']/string()"~}}
+{{~field name="operatingCosts" 			order="164"	hidden="false"   type="text" 		labeli18n="ri.data.operatingCosts"			label='{"en": "Operating costs"}' xpath="//*:field[@name='operatingCosts']/string()"~}}
+{{~field name="netWorth" 				order="165"	hidden="false"   type="text" 		labeli18n="ri.data.netWorth"				label='{"en": "Net worth"}' xpath="//*:field[@name='netWorth']/string()"~}}
 
 {{! Notes }}
 {{~field name="notes"				order="170"	hidden="false"   type="separator"   labeli18n="ri.data.notes"		label='{"en": "Notes", "pt": "Notas"}'~}}
@@ -35,8 +35,8 @@
 	{{~#if dateOfEstablishment~}}<field name="dateOfEstablishment">{{dateOfEstablishment}}</field>{{~/if~}}
 	{{~#if numberOfEmployees~}}<field name="numberOfEmployees">{{numberOfEmployees}}</field>{{~/if~}}
 	{{~#if revenue~}}<field name="revenue">{{revenue}}</field>{{~/if~}}
-	{{~#if operatingIncome~}}<field name="operatingIncome">{{operatingIncome}}</field>{{~/if~}}
-	{{~#if totalAssets~}}<field name="totalAssets">{{totalAssets}}</field>{{~/if~}}
+	{{~#if operatingCosts~}}<field name="operatingCosts">{{operatingCosts}}</field>{{~/if~}}
+	{{~#if netWorth~}}<field name="netWorth">{{netWorth}}</field>{{~/if~}}
 	{{! Notes }}
 	{{~#if general~}}<field name="general">{{general}}</field>{{~/if~}}
 	{{~#if history~}}<field name="history">{{history}}</field>{{~/if~}}

@@ -2165,9 +2165,9 @@ public class SolrUtils {
     doc.addField(RodaConstants.REPRESENTATION_INFORMATION_NAME_SORT, ri.getName());
     doc.addField(RodaConstants.REPRESENTATION_INFORMATION_DESCRIPTION, ri.getDescription());
     doc.addField(RodaConstants.REPRESENTATION_INFORMATION_FAMILY, ri.getFamily());
-    doc.addField(RodaConstants.REPRESENTATION_INFORMATION_CATEGORIES, ri.getCategories());
-    doc.addField(RodaConstants.REPRESENTATION_INFORMATION_CATEGORIES_SORT,
-      (ri.getCategories() != null && !ri.getCategories().isEmpty()) ? ri.getCategories().get(0) : null);
+    doc.addField(RodaConstants.REPRESENTATION_INFORMATION_TAGS, ri.getTags());
+    doc.addField(RodaConstants.REPRESENTATION_INFORMATION_TAGS_SORT,
+      (ri.getTags() != null && !ri.getTags().isEmpty()) ? ri.getTags().get(0) : null);
     doc.addField(RodaConstants.REPRESENTATION_INFORMATION_EXTRAS, ri.getExtras());
 
     doc.addField(RodaConstants.REPRESENTATION_INFORMATION_SUPPORT, ri.getSupport().toString());
@@ -2193,7 +2193,7 @@ public class SolrUtils {
     ri.setName(objectToString(doc.get(RodaConstants.REPRESENTATION_INFORMATION_NAME), null));
     ri.setDescription(objectToString(doc.get(RodaConstants.REPRESENTATION_INFORMATION_DESCRIPTION), null));
     ri.setFamily(objectToString(doc.get(RodaConstants.REPRESENTATION_INFORMATION_FAMILY), null));
-    ri.setCategories(objectToListString(doc.get(RodaConstants.REPRESENTATION_INFORMATION_CATEGORIES)));
+    ri.setTags(objectToListString(doc.get(RodaConstants.REPRESENTATION_INFORMATION_TAGS)));
     ri.setExtras(objectToString(doc.get(RodaConstants.REPRESENTATION_INFORMATION_EXTRAS), null));
 
     ri.setSupport(objectToEnum(doc.get(RodaConstants.REPRESENTATION_INFORMATION_SUPPORT),
