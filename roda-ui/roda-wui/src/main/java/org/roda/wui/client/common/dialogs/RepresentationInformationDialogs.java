@@ -420,7 +420,8 @@ public class RepresentationInformationDialogs {
               final ListBox select = new ListBox();
               select.addStyleName("form-listbox");
 
-              for (Entry<String, String> type : relationTypes.getTranslations().entrySet()) {
+              for (Entry<String, String> type : relationTypes.getTranslations().get(RelationObjectType.AIP)
+                .entrySet()) {
                 select.addItem(type.getValue(), type.getKey());
               }
               rightSide.add(select);
@@ -524,7 +525,8 @@ public class RepresentationInformationDialogs {
 
               final ListBox select = new ListBox();
               select.addStyleName("form-listbox");
-              for (Entry<String, String> type : relationTypes.getTranslations().entrySet()) {
+              for (Entry<String, String> type : relationTypes.getTranslations()
+                .get(RelationObjectType.REPRESENTATION_INFORMATION).entrySet()) {
                 select.addItem(type.getValue(), type.getKey());
               }
               rightSide.add(select);
@@ -629,7 +631,8 @@ public class RepresentationInformationDialogs {
 
               final ListBox select = new ListBox();
               select.addStyleName("form-listbox");
-              for (Entry<String, String> type : relationTypes.getTranslations().entrySet()) {
+              for (Entry<String, String> type : relationTypes.getTranslations().get(RelationObjectType.TEXT)
+                .entrySet()) {
                 select.addItem(type.getValue(), type.getKey());
               }
               rightSide.add(select);
@@ -685,7 +688,8 @@ public class RepresentationInformationDialogs {
 
               final ListBox select = new ListBox();
               select.addStyleName("form-listbox");
-              for (Entry<String, String> type : relationTypes.getTranslations().entrySet()) {
+              for (Entry<String, String> type : relationTypes.getTranslations().get(RelationObjectType.WEB)
+                .entrySet()) {
                 select.addItem(type.getValue(), type.getKey());
               }
               rightSide.add(select);
@@ -824,7 +828,8 @@ public class RepresentationInformationDialogs {
             SelectedItemsList<RepresentationInformation> list = (SelectedItemsList<RepresentationInformation>) selected;
             addToSelectedRIButton.setEnabled(!list.getIds().isEmpty());
           } else {
-            // TODO bferreira 2017-12-04: add support for SelectedItemsFilter (is it
+            // TODO bferreira 2017-12-04: add support for SelectedItemsFilter
+            // (is it
             // needed?)
             throw new RuntimeException("Only SelectedItemsList is supported on RI, for now");
           }
@@ -841,7 +846,8 @@ public class RepresentationInformationDialogs {
           SelectedItemsList<RepresentationInformation> list = (SelectedItemsList<RepresentationInformation>) selected;
           callback.onSuccess(list);
         } else {
-          // TODO bferreira 2017-12-04: add support for SelectedItemsFilter (is it
+          // TODO bferreira 2017-12-04: add support for SelectedItemsFilter (is
+          // it
           // needed?)
           throw new RuntimeException("Only SelectedItemsList is supported on RI, for now");
         }

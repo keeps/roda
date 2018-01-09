@@ -284,8 +284,6 @@ public interface BrowserServiceAsync {
 
   void deleteFormat(SelectedItems<Format> selected, AsyncCallback<Job> asyncCallback);
 
-  void retrieveRelationTypeOptions(AsyncCallback<List<String>> asyncCallback);
-
   void retrieveRepresentationInformationFamilyOptions(String localeString,
     AsyncCallback<Map<String, String>> asyncCallback);
 

@@ -120,6 +120,7 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.jobs.Reports;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.ri.RelationObjectType;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
@@ -493,9 +494,11 @@ public class BrowserHelper {
     throws GenericException, NotFoundException, RequestNotValidException {
     DipBundle bundle = new DipBundle();
 
-    bundle.setDip(retrieve(IndexedDIP.class, dipUUID,
-      Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID, RodaConstants.DIP_TITLE, RodaConstants.DIP_AIP_IDS,
-        RodaConstants.DIP_AIP_UUIDS, RodaConstants.DIP_FILE_IDS, RodaConstants.DIP_REPRESENTATION_IDS)));
+    bundle
+      .setDip(retrieve(IndexedDIP.class, dipUUID,
+        Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID, RodaConstants.DIP_TITLE,
+          RodaConstants.DIP_AIP_IDS, RodaConstants.DIP_AIP_UUIDS, RodaConstants.DIP_FILE_IDS,
+          RodaConstants.DIP_REPRESENTATION_IDS)));
 
     List<String> dipFileFields = new ArrayList<>();
 
@@ -3371,30 +3374,36 @@ public class BrowserHelper {
 
   public static RelationTypeTranslationsBundle retrieveRelationTypeTranslations(Messages messages) {
     RelationTypeTranslationsBundle bundle = new RelationTypeTranslationsBundle();
-    Map<String, String> translations = new HashMap<>();
+    Map<RelationObjectType, Map<String, String>> allTranslations = new HashMap<>();
     Map<String, String> inverseMap = new HashMap<>();
     Map<String, String> inverseTranslations = new HashMap<>();
 
-    List<String> configs = RodaCoreFactory.getRodaConfigurationAsList("core.ri.relation");
+    for (RelationObjectType relationType : RelationObjectType.values()) {
+      List<String> configs = RodaCoreFactory.getRodaConfigurationAsList("core.ri.relation",
+        relationType.toString().toLowerCase());
+      Map<String, String> translations = new HashMap<>();
 
-    for (String config : configs) {
-      String fieldName = RodaCoreFactory.getRodaConfigurationAsString(config, RodaConstants.SEARCH_FIELD_FIELDS);
-      String translation = messages
-        .getTranslation(RodaCoreFactory.getRodaConfigurationAsString(config, RodaConstants.SEARCH_FIELD_I18N));
-      translations.put(fieldName, translation);
+      for (String config : configs) {
+        String fieldName = RodaCoreFactory.getRodaConfigurationAsString(config, RodaConstants.SEARCH_FIELD_FIELDS);
+        String translation = messages
+          .getTranslation(RodaCoreFactory.getRodaConfigurationAsString(config, RodaConstants.SEARCH_FIELD_I18N));
+        translations.put(fieldName, translation);
 
-      String inverse = RodaCoreFactory.getRodaConfigurationAsString(config, RodaConstants.SEARCH_FIELD_INVERSE,
-        RodaConstants.SEARCH_FIELD_FIELDS);
+        String inverse = RodaCoreFactory.getRodaConfigurationAsString(config, RodaConstants.SEARCH_FIELD_INVERSE,
+          RodaConstants.SEARCH_FIELD_FIELDS);
 
-      if (StringUtils.isNotBlank(inverse)) {
-        String inverseTranslation = messages.getTranslation(RodaCoreFactory.getRodaConfigurationAsString(config,
-          RodaConstants.SEARCH_FIELD_INVERSE, RodaConstants.SEARCH_FIELD_I18N));
-        inverseTranslations.put(inverse, inverseTranslation);
-        inverseMap.put(fieldName, inverse);
+        if (StringUtils.isNotBlank(inverse)) {
+          String inverseTranslation = messages.getTranslation(RodaCoreFactory.getRodaConfigurationAsString(config,
+            RodaConstants.SEARCH_FIELD_INVERSE, RodaConstants.SEARCH_FIELD_I18N));
+          inverseTranslations.put(inverse, inverseTranslation);
+          inverseMap.put(fieldName, inverse);
+        }
       }
+
+      allTranslations.put(relationType, translations);
     }
 
-    bundle.setTranslations(translations);
+    bundle.setTranslations(allTranslations);
     bundle.setInverses(inverseMap);
     bundle.setInverseTranslations(inverseTranslations);
     return bundle;

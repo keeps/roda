@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.roda.core.data.v2.ri.RelationObjectType;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.ri.RepresentationInformationRelation;
 import org.roda.wui.client.browse.BrowserService;
@@ -101,10 +102,10 @@ public class IncrementalRelationList extends Composite implements HasHandlers {
   }
 
   private void addRelation(final RepresentationInformationRelation element, final boolean redesign,
-    final Map<String, String> translations) {
+    final Map<RelationObjectType, Map<String, String>> translations) {
 
     final RemovableRelation relation = new RemovableRelation(element);
-    String relationType = translations.get(element.getRelationType());
+    String relationType = translations.get(element.getObjectType()).get(element.getRelationType());
 
     if (relations.containsKey(relationType)) {
       relations.get(relationType).add(relation);

@@ -11,10 +11,13 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.roda.core.data.v2.ri.RelationObjectType;
+
 public class RelationTypeTranslationsBundle implements Serializable {
   private static final long serialVersionUID = -9071364356622542592L;
 
-  private Map<String, String> translations = new HashMap<>();
+  // RelationType -> <Value, Translation>
+  private Map<RelationObjectType, Map<String, String>> translations = new HashMap<>();
   private Map<String, String> inverses = new HashMap<>();
   private Map<String, String> inverseTranslations = new HashMap<>();
 
@@ -22,19 +25,19 @@ public class RelationTypeTranslationsBundle implements Serializable {
     super();
   }
 
-  public RelationTypeTranslationsBundle(Map<String, String> translations, Map<String, String> inverses,
-    Map<String, String> inverseTranslations) {
+  public RelationTypeTranslationsBundle(Map<RelationObjectType, Map<String, String>> translations,
+    Map<String, String> inverses, Map<String, String> inverseTranslations) {
     super();
     this.translations = translations;
     this.inverses = inverses;
     this.inverseTranslations = inverseTranslations;
   }
 
-  public Map<String, String> getTranslations() {
+  public Map<RelationObjectType, Map<String, String>> getTranslations() {
     return translations;
   }
 
-  public void setTranslations(Map<String, String> translations) {
+  public void setTranslations(Map<RelationObjectType, Map<String, String>> translations) {
     this.translations = translations;
   }
 

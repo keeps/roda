@@ -384,8 +384,6 @@ public interface BrowserService extends RemoteService {
   Job deleteFormat(SelectedItems<Format> selected)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
-  List<String> retrieveRelationTypeOptions();
-
   Map<String, String> retrieveRepresentationInformationFamilyOptions(String localeString);
 
   String retrieveRepresentationInformationFamilyOptions(String family, String localeString);

@@ -1060,11 +1060,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public List<String> retrieveRelationTypeOptions() {
-    return RodaCoreFactory.getRodaConfigurationAsList("core.ri.relation");
-  }
-
-  @Override
   public Map<String, String> retrieveRepresentationInformationFamilyOptions(String localeString) {
     Locale locale = ServerTools.parseLocale(localeString);
     Messages messages = RodaCoreFactory.getI18NMessages(locale);

@@ -392,7 +392,8 @@ public class ShowRepresentationInformation extends Composite {
 
           if (ri.getRelations() != null) {
             for (RepresentationInformationRelation relation : ri.getRelations()) {
-              String relationType = bundle.getTranslations().get(relation.getRelationType());
+              String relationType = bundle.getTranslations().get(relation.getObjectType())
+                .get(relation.getRelationType());
               if (relationTypeToLink.containsKey(relationType)) {
                 relationTypeToLink.get(relationType).add(relation);
               } else {
@@ -523,9 +524,9 @@ public class ShowRepresentationInformation extends Composite {
 
   // Java method
   public native boolean isValidUrl(String url) /*-{
-                                               var pattern = /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
-                                               return pattern.test(url);
-                                               }-*/;
+		var pattern = /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+		return pattern.test(url);
+  }-*/;
 
   void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 1) {
