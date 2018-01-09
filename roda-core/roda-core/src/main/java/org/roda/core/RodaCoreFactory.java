@@ -710,6 +710,11 @@ public class RodaCoreFactory {
     String value = System.getenv(envKey);
     if (value == null) {
       value = getRodaConfiguration().getString(key, defaultValue);
+
+      if (value.startsWith("${env:")) {
+        // if value is a non-interpolated env variable consider default
+        value = defaultValue;
+      }
     }
 
     return value;
