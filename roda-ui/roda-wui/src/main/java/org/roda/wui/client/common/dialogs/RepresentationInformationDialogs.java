@@ -471,8 +471,13 @@ public class RepresentationInformationDialogs {
                       final IndexedAIP aip = event.getValue();
                       button.setVisible(false);
                       linkText.setVisible(true);
-                      linkText.setText(aip.getTitle());
                       linkText.setValue(aip.getId());
+
+                      if (StringUtils.isNotBlank(aip.getTitle())) {
+                        linkText.setText(aip.getTitle());
+                      } else {
+                        linkText.setText(messages.noTitleMessage());
+                      }
 
                       if (titleBox.getText().isEmpty()) {
                         titleBox.setText(aip.getTitle());
@@ -739,7 +744,6 @@ public class RepresentationInformationDialogs {
     final String cancelButtonText, final String addToSelectedRIButtonText, final String addToNewRIButtonText,
     final AsyncCallback<SelectedItemsList<RepresentationInformation>> callback) {
 
-    final List<HandlerRegistration> clickHandlers = new ArrayList<>();
     final DialogBox dialogBox = new DialogBox(true, true);
     dialogBox.addStyleName("ri-dialog");
     dialogBox.setHTML(title);
@@ -813,6 +817,7 @@ public class RepresentationInformationDialogs {
         });
       }
     };
+
     SearchPanel representationInformationSearch = new SearchPanel(Filter.NULL,
       RodaConstants.REPRESENTATION_INFORMATION_SEARCH, true, messages.searchPlaceHolder(), false, false, true);
     representationInformationSearch.setList(representationInformationList);
@@ -829,8 +834,7 @@ public class RepresentationInformationDialogs {
             addToSelectedRIButton.setEnabled(!list.getIds().isEmpty());
           } else {
             // TODO bferreira 2017-12-04: add support for SelectedItemsFilter
-            // (is it
-            // needed?)
+            // (is it needed?)
             throw new RuntimeException("Only SelectedItemsList is supported on RI, for now");
           }
         }
@@ -847,11 +851,9 @@ public class RepresentationInformationDialogs {
           callback.onSuccess(list);
         } else {
           // TODO bferreira 2017-12-04: add support for SelectedItemsFilter (is
-          // it
-          // needed?)
+          // it needed?)
           throw new RuntimeException("Only SelectedItemsList is supported on RI, for now");
         }
-
       }
     });
 

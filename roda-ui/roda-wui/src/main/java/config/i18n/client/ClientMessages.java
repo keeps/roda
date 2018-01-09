@@ -1098,6 +1098,8 @@ public interface ClientMessages extends Messages {
 
   String representationInformationEntitiesOption();
 
+  String noTitleMessage();
+
   /************* Format register ****************/
 
   String getFormatsDialogName();
