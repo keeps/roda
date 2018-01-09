@@ -345,8 +345,8 @@ public class RepresentationInformationDialogs {
           leftSide.add(txtLabel);
 
           final Label helpLabel = new Label();
-          helpLabel.setText("Help");
-          helpLabel.setTitle("Help");
+          helpLabel.setText(messages.title("help"));
+          helpLabel.setTitle(messages.title("help"));
           helpLabel.addStyleName("dialog-left-item-label dialog-left-item-selected");
           leftSide.add(helpLabel);
 
