@@ -13,8 +13,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.roda.wui.client.browse.MetadataValue;
+import org.roda.wui.client.common.RichTextToolbar;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.BlurEvent;
+import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -27,9 +30,11 @@ import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONString;
 import com.google.gwt.json.client.JSONValue;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.RichTextArea;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.datepicker.client.DateBox;
@@ -72,6 +77,9 @@ public class FormUtilities {
           case "big-text":
           case "text-area":
             addTextArea(panel, layout, mv, mandatory);
+            break;
+          case "rich-text-area":
+            addRichTextArea(panel, layout, mv, mandatory);
             break;
           case "list":
             addList(panel, layout, mv, mandatory);
@@ -204,6 +212,62 @@ public class FormUtilities {
 
     layout.add(mvLabel);
     layout.add(mvText);
+
+    // Description
+    String description = mv.get("description");
+    if (description != null && description.length() > 0) {
+      Label mvDescription = new Label(description);
+      mvDescription.addStyleName("form-help");
+      layout.add(mvDescription);
+    }
+
+    if (mv.get("error") != null && !"".equalsIgnoreCase(mv.get("error").trim())) {
+      Label errorLabel = new Label(mv.get("error"));
+      errorLabel.addStyleName("form-label-error");
+      layout.add(errorLabel);
+      mvText.addStyleName("isWrong");
+    }
+    panel.add(layout);
+  }
+
+  private static void addRichTextArea(FlowPanel panel, final FlowPanel layout, final MetadataValue mv,
+    final boolean mandatory) {
+    // Top label
+    Label mvLabel = new Label(getFieldLabel(mv));
+    mvLabel.addStyleName("form-label");
+    if (mandatory) {
+      mvLabel.addStyleName("form-label-mandatory");
+    }
+
+    // Field
+    final FlowPanel fieldLayout = new FlowPanel();
+
+    final RichTextArea mvText = new RichTextArea();
+    mvText.setTitle(mvLabel.getText());
+    mvText.addStyleName("form-textbox metadata-form-text-area");
+
+    if (mv.get("value") != null) {
+      mvText.setHTML(SafeHtmlUtils.fromTrustedString(mv.get("value")));
+    }
+
+    mvText.addBlurHandler(new BlurHandler() {
+      @Override
+      public void onBlur(BlurEvent arg0) {
+        mv.set("value", mvText.getHTML());
+        if (mandatory && (mvText.getHTML() != null && !"".equals(mvText.getHTML().trim()))) {
+          mvText.removeStyleName("isWrong");
+        } else if (mandatory && (mvText.getHTML() == null || "".equalsIgnoreCase(mvText.getHTML().trim()))) {
+          mvText.addStyleName("isWrong");
+        }
+      }
+    });
+
+    RichTextToolbar toolbar = new RichTextToolbar(mvText);
+    fieldLayout.add(toolbar);
+    fieldLayout.add(mvText);
+
+    layout.add(mvLabel);
+    layout.add(fieldLayout);
 
     // Description
     String description = mv.get("description");

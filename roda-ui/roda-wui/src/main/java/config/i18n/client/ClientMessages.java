@@ -2674,4 +2674,12 @@ public interface ClientMessages extends Messages {
     @Select String indexObjectName);
 
   String representationInformationNameFromAssociation(String field, String value, @Select String indexObjectName);
+
+  /******* Rich text toolbar ******************************************/
+
+  String insertImageUrl();
+
+  String insertLinkUrl();
+
+  String editHTMLContent();
 }

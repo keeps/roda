@@ -51,6 +51,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.UIObject;
@@ -381,6 +382,9 @@ public class HtmlSnippetUtils {
         addSeparator(panel, layout, mv);
         lastSeparator = layout;
         hasFields = false;
+      } else if ("text-area".equals(controlType) || "rich-text-area".equals(controlType)) {
+        boolean addedField = addHTML(panel, layout, mv, mandatory);
+        hasFields = hasFields || addedField;
       } else {
         boolean addedField = addField(panel, layout, mv, mandatory);
         hasFields = hasFields || addedField;
@@ -441,6 +445,29 @@ public class HtmlSnippetUtils {
       mvText.setTitle(mvLabel.getText());
       mvText.addStyleName("value");
       mvText.setText(mv.get("value"));
+
+      layout.add(mvLabel);
+      layout.add(mvText);
+      panel.add(layout);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  private static boolean addHTML(FlowPanel panel, final FlowPanel layout, final MetadataValue mv,
+    final boolean mandatory) {
+    layout.addStyleName("field");
+
+    if (StringUtils.isNotBlank(mv.get("value"))) {
+      // Top label
+      Label mvLabel = new Label(getFieldLabel(mv));
+      mvLabel.addStyleName("label");
+
+      // Field
+      final HTML mvText = new HTML();
+      mvText.addStyleName("value");
+      mvText.setHTML(mv.get("value"));
 
       layout.add(mvLabel);
       layout.add(mvText);

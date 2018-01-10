@@ -6310,3 +6310,32 @@ span.code {
     background-color: #089de3;
     color: white;
 }
+
+/** Rich Text Toolbar **/
+
+.fa.gwt-ToggleButton,.fa.gwt-PushButton {
+	padding: 3px 4px;
+    margin: 0 1px;
+}
+
+.fa.gwt-ToggleButton-down,.fa.gwt-ToggleButton-down-hovering,
+.fa.gwt-PushButton-down,.fa.gwt-PushButton-down-hovering {
+    color: #222;
+}
+
+.fa.gwt-ToggleButton-up,.fa.gwt-ToggleButton-up-hovering,
+.fa.gwt-PushButton-up,.fa.gwt-PushButton-up-hovering {
+    color: #999;
+}
+
+.fa.gwt-ToggleButton-down-hovering,.fa.gwt-ToggleButton-up-hovering,
+.fa.gwt-PushButton-down-hovering,.fa.gwt-PushButton-up-hovering {
+	/*background-color: #ddd;*/
+    /*border-radius: 1px;*/
+	cursor: pointer;
+	cursor: hand;
+	box-shadow: 0px 0px 10px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+    transition: all 0.2s cubic-bezier(.25,.8,.25,1);
+}
+
+

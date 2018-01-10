@@ -8,6 +8,7 @@
 package org.roda.wui.client.common.search;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.AIP;
@@ -102,6 +103,8 @@ public class SearchFilters {
       return RodaConstants.DIP_SEARCH;
     } else if (actualClass.equals(DIPFile.class.getName())) {
       return RodaConstants.DIPFILE_SEARCH;
+    } else if (actualClass.equals(Format.class.getName())) {
+      return RodaConstants.FORMAT_SEARCH;
     } else {
       return "";
     }

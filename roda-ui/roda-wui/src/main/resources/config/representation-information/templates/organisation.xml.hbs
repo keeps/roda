@@ -1,25 +1,25 @@
 {{! Organisation description }}
-{{~field name="organisationDescription"	order="150"	hidden="false"   type="separator"   labeli18n="ri.data.organisationDescription"	label='{"en": "Organisation description", "pt": "Descrição da organização"}'~}}
-{{~field name="organisationCategory" 	order="151"	hidden="false"   type="list" 		labeli18n="ri.data.organisationCategory"	label='{"en": "Organisation category"}' options='["private-corporation","public-body","not-for-profit","other"]' optionsLabels='{"private-corporation": {"en":"Private corporation", "pt":"Corporação privada"},"public-body": {"en":"Public body", "pt":"Organismo público"},"not-for-profit": {"en":"Not-for-profit", "pt":"Sem fins lucrativos"},"other": {"en":"Other", "pt":"Outro"}}' optionsLabelI18nKeyPrefix="ri.data.organisationCategory" xpath="//*:field[@name='organisationCategory']/string()"~}}
-{{~field name="organisationDesignation" order="152"	hidden="false"   type="text"	 	labeli18n="ri.data.organisationDesignation"	label='{"en": "Organisation designation"}' xpath="//*:field[@name='organisationDesignation']/string()"~}}
-{{~field name="country" 				order="153"	hidden="false"   type="text" 		labeli18n="ri.data.country"					label='{"en": "Country"}' xpath="//*:field[@name='country']/string()"~}}
-{{~field name="headquarters" 			order="154"	hidden="false"   type="text-area" 	labeli18n="ri.data.headquarters"			label='{"en": "Headquarters"}' xpath="//*:field[@name='headquarters']/string()"~}}
-{{~field name="website" 				order="155"	hidden="false"   type="text" 		labeli18n="ri.data.website"					label='{"en": "Website"}' xpath="//*:field[@name='website']/string()"~}}
-{{~field name="servedArea" 				order="156"	hidden="false"   type="text-area" 	labeli18n="ri.data.servedArea"				label='{"en": "Served area"}' xpath="//*:field[@name='servedArea']/string()"~}}
-{{~field name="services" 				order="157"	hidden="false"   type="text-area" 	labeli18n="ri.data.services"				label='{"en": "Services"}' xpath="//*:field[@name='services']/string()"~}}
+{{~field name="organisationDescription"	order="150"	hidden="false"   type="separator"   	labeli18n="ri.data.organisationDescription"	label='{"en": "Organisation description", "pt": "Descrição da organização"}'~}}
+{{~field name="organisationCategory" 	order="151"	hidden="false"   type="list" 			labeli18n="ri.data.organisationCategory"	label='{"en": "Organisation category"}' options='["private-corporation","public-body","not-for-profit","other"]' optionsLabels='{"private-corporation": {"en":"Private corporation", "pt":"Corporação privada"},"public-body": {"en":"Public body", "pt":"Organismo público"},"not-for-profit": {"en":"Not-for-profit", "pt":"Sem fins lucrativos"},"other": {"en":"Other", "pt":"Outro"}}' optionsLabelI18nKeyPrefix="ri.data.organisationCategory" xpath="//*:field[@name='organisationCategory']/string()"~}}
+{{~field name="organisationDesignation" order="152"	hidden="false"   type="text"	 		labeli18n="ri.data.organisationDesignation"	label='{"en": "Organisation designation"}' xpath="//*:field[@name='organisationDesignation']/string()"~}}
+{{~field name="country" 				order="153"	hidden="false"   type="text" 			labeli18n="ri.data.country"					label='{"en": "Country"}' xpath="//*:field[@name='country']/string()"~}}
+{{~field name="headquarters" 			order="154"	hidden="false"   type="rich-text-area" 	labeli18n="ri.data.headquarters"			label='{"en": "Headquarters"}' xpath="//*:field[@name='headquarters']/string()"~}}
+{{~field name="website" 				order="155"	hidden="false"   type="text" 			labeli18n="ri.data.website"					label='{"en": "Website"}' xpath="//*:field[@name='website']/string()"~}}
+{{~field name="servedArea" 				order="156"	hidden="false"   type="rich-text-area" 	labeli18n="ri.data.servedArea"				label='{"en": "Served area"}' xpath="//*:field[@name='servedArea']/string()"~}}
+{{~field name="services" 				order="157"	hidden="false"   type="rich-text-area" 	labeli18n="ri.data.services"				label='{"en": "Services"}' xpath="//*:field[@name='services']/string()"~}}
 
 {{! Sustainability factors }}
-{{~field name="sustainabilityFactors"	order="160"	hidden="false"   type="separator"   labeli18n="ri.data.sustainabilityFactors"	label='{"en": "Sustainability factors", "pt": "Fatores de sustentabilidade"}'~}}
-{{~field name="dateOfEstablishment" 	order="161"	hidden="false"   type="date" 		labeli18n="ri.data.dateOfEstablishment"		label='{"en": "Date of establishment"}' xpath="//*:field[@name='dateOfEstablishment']/string()"~}}
-{{~field name="numberOfEmployees" 		order="162"	hidden="false"   type="text"	 	labeli18n="ri.data.numberOfEmployees"		label='{"en": "Number of employees"}' xpath="//*:field[@name='numberOfEmployees']/string()"~}}
-{{~field name="revenue" 				order="163"	hidden="false"   type="text" 		labeli18n="ri.data.revenue"					label='{"en": "Revenue"}' xpath="//*:field[@name='revenue']/string()"~}}
-{{~field name="operatingCosts" 			order="164"	hidden="false"   type="text" 		labeli18n="ri.data.operatingCosts"			label='{"en": "Operating costs"}' xpath="//*:field[@name='operatingCosts']/string()"~}}
-{{~field name="netWorth" 				order="165"	hidden="false"   type="text" 		labeli18n="ri.data.netWorth"				label='{"en": "Net worth"}' xpath="//*:field[@name='netWorth']/string()"~}}
+{{~field name="sustainabilityFactors"	order="160"	hidden="false"   type="separator"   	labeli18n="ri.data.sustainabilityFactors"	label='{"en": "Sustainability factors", "pt": "Fatores de sustentabilidade"}'~}}
+{{~field name="dateOfEstablishment" 	order="161"	hidden="false"   type="date" 			labeli18n="ri.data.dateOfEstablishment"		label='{"en": "Date of establishment"}' xpath="//*:field[@name='dateOfEstablishment']/string()"~}}
+{{~field name="numberOfEmployees" 		order="162"	hidden="false"   type="text"	 		labeli18n="ri.data.numberOfEmployees"		label='{"en": "Number of employees"}' xpath="//*:field[@name='numberOfEmployees']/string()"~}}
+{{~field name="revenue" 				order="163"	hidden="false"   type="text" 			labeli18n="ri.data.revenue"					label='{"en": "Revenue"}' xpath="//*:field[@name='revenue']/string()"~}}
+{{~field name="operatingCosts" 			order="164"	hidden="false"   type="text" 			labeli18n="ri.data.operatingCosts"			label='{"en": "Operating costs"}' xpath="//*:field[@name='operatingCosts']/string()"~}}
+{{~field name="netWorth" 				order="165"	hidden="false"   type="text" 			labeli18n="ri.data.netWorth"				label='{"en": "Net worth"}' xpath="//*:field[@name='netWorth']/string()"~}}
 
 {{! Notes }}
-{{~field name="notes"				order="170"	hidden="false"   type="separator"   labeli18n="ri.data.notes"		label='{"en": "Notes", "pt": "Notas"}'~}}
-{{~field name="general"				order="171"	hidden="false"   type="text-area" 	labeli18n="ri.data.general"		label='{"en": "General"}' xpath="//*:field[@name='general']/string()"~}}
-{{~field name="history"				order="172"	hidden="false"   type="text-area" 	labeli18n="ri.data.history"		label='{"en": "History"}' xpath="//*:field[@name='history']/string()"~}}
+{{~field name="notes"					order="170"	hidden="false"   type="separator"   	labeli18n="ri.data.notes"		label='{"en": "Notes", "pt": "Notas"}'~}}
+{{~field name="general"					order="171"	hidden="false"   type="rich-text-area" 	labeli18n="ri.data.general"		label='{"en": "General"}' xpath="//*:field[@name='general']/string()"~}}
+{{~field name="history"					order="172"	hidden="false"   type="rich-text-area" 	labeli18n="ri.data.history"		label='{"en": "History"}' xpath="//*:field[@name='history']/string()"~}}
 
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
