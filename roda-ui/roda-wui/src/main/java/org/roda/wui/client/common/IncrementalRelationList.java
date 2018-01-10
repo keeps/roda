@@ -119,7 +119,8 @@ public class IncrementalRelationList extends Composite implements HasHandlers {
 
       @Override
       public void onClick(ClickEvent event) {
-        relations.get(translations.get(relation.getValue().getRelationType())).remove(relation);
+        relations.get(translations.get(relation.getValue().getObjectType()).get(relation.getValue().getRelationType()))
+          .remove(relation);
         listRelations();
         DomEvent.fireNativeEvent(Document.get().createChangeEvent(), IncrementalRelationList.this);
       }
