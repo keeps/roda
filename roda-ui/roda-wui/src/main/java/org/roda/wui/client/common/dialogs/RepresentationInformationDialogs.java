@@ -12,11 +12,14 @@ import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ri.RelationObjectType;
 import org.roda.core.data.v2.ri.RepresentationInformation;
@@ -25,8 +28,12 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.common.IncrementalList;
 import org.roda.wui.client.common.ValuedLabel;
+import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.RepresentationInformationList;
+import org.roda.wui.client.common.lists.RepresentationList;
+import org.roda.wui.client.common.lists.SimpleFileList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
 import org.roda.wui.client.common.search.Dropdown;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
@@ -74,7 +81,7 @@ public class RepresentationInformationDialogs {
   }
 
   public static void showPromptDialogRepresentationInformation(String title, String cancelButtonText,
-    String confirmButtonText, final RepresentationInformation ri,
+    String confirmButtonText, String listButtonText, final RepresentationInformation ri,
     final AsyncCallback<RepresentationInformation> callback) {
     final DialogBox dialogBox = new DialogBox(true, true);
     dialogBox.addStyleName("wui-dialog-fixed");
@@ -100,12 +107,16 @@ public class RepresentationInformationDialogs {
     final FlowPanel relationFormPanel = new FlowPanel();
     relationFormPanel.addStyleName("relation-form-panel");
     layout.add(relationFormPanel);
+    final FlowPanel listPanel = new FlowPanel();
+    layout.add(listPanel);
 
     final FlowPanel buttonPanel = new FlowPanel();
     final Button cancelButton = new Button(cancelButtonText);
     final Button confirmButton = new Button(confirmButtonText);
+    final Button listButton = new Button(listButtonText);
     buttonPanel.add(cancelButton);
     buttonPanel.add(confirmButton);
+    buttonPanel.add(listButton);
 
     layout.add(buttonPanel);
     dialogBox.setWidget(layout);
@@ -139,7 +150,6 @@ public class RepresentationInformationDialogs {
           relationFormPanel.add(fieldsPanel);
 
           final List<String> appropriateFields = new ArrayList<>();
-
           final Map<String, List<String>> values = new HashMap<>();
 
           dropDown.addValueChangeHandler(new ValueChangeHandler<String>() {
@@ -201,6 +211,66 @@ public class RepresentationInformationDialogs {
               callback.onSuccess(ri);
             }
           });
+
+          listButton.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+              Filter tableFilter = new Filter();
+              for (String field : values.keySet()) {
+                for (String value : values.get(field)) {
+                  if (StringUtils.isNotBlank(value)) {
+                    tableFilter.add(new SimpleFilterParameter(field, value));
+                  }
+                }
+              }
+
+              final AbstractHasData.RedrawEvent.Handler handler = new AbstractHasData.RedrawEvent.Handler() {
+                @Override
+                public void onRedraw() {
+                  dialogBox.center();
+                }
+              };
+
+              BasicAsyncTableCell<?> table;
+              switch (dropDown.getSelectedValue()) {
+                case RodaConstants.SEARCH_ITEMS:
+                  table = new AIPList(tableFilter, true, Facets.NONE, "", false, 5, 5) {
+                    @Override
+                    protected void configureDisplay(CellTable<IndexedAIP> display) {
+                      super.configureDisplay(display);
+                      display.addRedrawHandler(handler);
+                    }
+                  };
+                  break;
+                case RodaConstants.SEARCH_REPRESENTATIONS:
+                  table = new RepresentationList(tableFilter, true, Facets.NONE, "", false, 5, 5) {
+                    @Override
+                    protected void configureDisplay(CellTable<IndexedRepresentation> display) {
+                      super.configureDisplay(display);
+                      display.addRedrawHandler(handler);
+                    }
+                  };
+                  break;
+                case RodaConstants.SEARCH_FILES:
+                  table = new SimpleFileList(tableFilter, true, Facets.NONE, "", false, 5, 5) {
+                    @Override
+                    protected void configureDisplay(CellTable<IndexedFile> display) {
+                      super.configureDisplay(display);
+                      display.addRedrawHandler(handler);
+                    }
+                  };
+                  break;
+                default:
+                  return;
+              }
+
+              Label section = new Label(messages.currentRelationResults());
+              section.addStyleName("ri-form-separator");
+              listPanel.clear();
+              listPanel.add(section);
+              listPanel.add(table);
+            }
+          });
         }
       });
 
@@ -215,7 +285,8 @@ public class RepresentationInformationDialogs {
     dialogBox.addStyleName("wui-dialog-prompt");
     layout.addStyleName("wui-dialog-layout");
     cancelButton.addStyleName("btn btn-link");
-    confirmButton.addStyleName("pull-right btn btn-play");
+    confirmButton.addStyleName("pull-right left-spaced btn btn-play");
+    listButton.addStyleName("pull-right btn btn-search");
 
     dialogBox.center();
     dialogBox.show();
@@ -256,6 +327,7 @@ public class RepresentationInformationDialogs {
           valuesForThisField.add(RepresentationInformationUtils.getValueFromFilter(filter));
         }
       }
+
       values.put(field, valuesForThisField);
 
       IncrementalList incrementalList = new IncrementalList(true, valuesForThisField);
@@ -265,8 +337,8 @@ public class RepresentationInformationDialogs {
           values.put(field, event.getValue());
         }
       });
-      fieldPanel.add(incrementalList);
 
+      fieldPanel.add(incrementalList);
       fieldsPanel.add(fieldPanel);
     }
   }

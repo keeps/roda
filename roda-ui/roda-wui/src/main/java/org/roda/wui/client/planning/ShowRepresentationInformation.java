@@ -339,7 +339,8 @@ public class ShowRepresentationInformation extends Composite {
           public void onClick(ClickEvent event) {
             RepresentationInformationDialogs.showPromptDialogRepresentationInformation(
               messages.representationInformationEditAssociations(), messages.cancelButton(), messages.confirmButton(),
-              ShowRepresentationInformation.this.ri, new AsyncCallback<RepresentationInformation>() {
+              messages.searchButton(), ShowRepresentationInformation.this.ri,
+              new AsyncCallback<RepresentationInformation>() {
                 @Override
                 public void onFailure(Throwable caught) {
                   // do nothing

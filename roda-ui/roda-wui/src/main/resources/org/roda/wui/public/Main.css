@@ -6273,6 +6273,10 @@ td.datePickerMonth, td.datePickerYear {
 	margin-bottom: 10px;
 }
 
+.left-spaced {
+	margin-left: 5px;
+}
+
 span.code {
     font-family: "UbuntuMono", "Ubuntu", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: bold;

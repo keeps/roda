@@ -1100,6 +1100,8 @@ public interface ClientMessages extends Messages {
 
   String noTitleMessage();
 
+  String currentRelationResults();
+
   /************* Format register ****************/
 
   String getFormatsDialogName();
