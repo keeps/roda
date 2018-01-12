@@ -330,6 +330,7 @@ public class UserManagement extends RodaWuiController {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     User user = UserManagementHelper.confirmUserEmail(username, null, emailConfirmationToken);
+    // 20180112 hsilva: need to set ip address for registering the action
     user.setIpAddress(ipAddress);
 
     // register action
@@ -351,6 +352,7 @@ public class UserManagement extends RodaWuiController {
     }
 
     User user = UserManagementHelper.requestPasswordReset(username, email);
+    // 20180112 hsilva: need to set ip address for registering the action
     user.setIpAddress(ipAddress);
     sendRecoverLoginEmail(servletPath, user, localeString);
 
@@ -363,6 +365,7 @@ public class UserManagement extends RodaWuiController {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     User user = UserManagementHelper.resetUserPassword(username, password, resetPasswordToken);
+    // 20180112 hsilva: need to set ip address for registering the action
     user.setIpAddress(ipAddress);
 
     // register action

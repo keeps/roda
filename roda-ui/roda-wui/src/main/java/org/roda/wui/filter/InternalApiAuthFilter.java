@@ -98,7 +98,6 @@ public class InternalApiAuthFilter implements Filter {
     } else {
       final User user = UserUtility.getLdapUtility().getAuthenticatedUser(credentials.getFirst(),
         credentials.getSecond());
-      user.setIpAddress(request.getRemoteAddr());
       return user;
     }
   }

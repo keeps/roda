@@ -137,6 +137,7 @@ public class UserUtility {
   }
 
   public static void setUser(final HttpServletRequest request, final User user) {
+    user.setIpAddress(request.getRemoteAddr());
     request.getSession(true).setAttribute(RODA_USER, user);
   }
 

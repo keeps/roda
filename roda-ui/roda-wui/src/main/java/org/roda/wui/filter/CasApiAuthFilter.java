@@ -121,7 +121,6 @@ public class CasApiAuthFilter implements Filter {
     // check if user is internal
     if (UserUtility.getLdapUtility().isInternal(username)) {
       final User user = UserUtility.getLdapUtility().getAuthenticatedUser(username, password);
-      user.setIpAddress(request.getRemoteAddr());
       UserUtility.setUser(request, user);
       filterChain.doFilter(request, response);
     } else {

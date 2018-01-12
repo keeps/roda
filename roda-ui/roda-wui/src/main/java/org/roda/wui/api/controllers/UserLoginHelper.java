@@ -53,7 +53,6 @@ public class UserLoginHelper {
       }
       throw new InactiveUserException("User is not active.");
     }
-    user.setIpAddress(request.getRemoteAddr());
     UserUtility.setUser(request, user);
     return user;
   }
