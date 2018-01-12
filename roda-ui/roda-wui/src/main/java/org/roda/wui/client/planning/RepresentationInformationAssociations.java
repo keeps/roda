@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
@@ -261,7 +262,7 @@ public class RepresentationInformationAssociations extends Composite {
     if (historyTokens.size() == 2) {
       filter = createFilterAndSubtitleFromHistoryTokens(historyTokens);
 
-      String[] parts = RepresentationInformationDialogs.breakFilterIntoParts(historyTokens.get(1));
+      String[] parts = RepresentationInformationUtils.breakFilterIntoParts(historyTokens.get(1));
       createPanelTitle.setHTML(messages.representationInformationNoAssociations(parts[0], parts[1], parts[2]));
       resultsPanelTitle.setHTML(messages.representationInformationAssociatedWith(parts[0], parts[1], parts[2]));
       description.setHTML(messages.representationInformationAssociatedWithDescription(parts[0], parts[1], parts[2]));

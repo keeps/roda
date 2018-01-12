@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.ri.RepresentationInformationSupport;
 import org.roda.wui.client.browse.BrowserService;
@@ -22,7 +23,6 @@ import org.roda.wui.client.common.IncrementalFilterList;
 import org.roda.wui.client.common.IncrementalList;
 import org.roda.wui.client.common.IncrementalRelationList;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
-import org.roda.wui.client.common.dialogs.RepresentationInformationDialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.FormUtilities;
 import org.roda.wui.common.client.ClientLogger;
@@ -207,7 +207,7 @@ public class RepresentationInformationDataPanel extends Composite
               RepresentationInformationDataPanel.this.filters
                 .setFilters(Collections.singletonList(lastHistory.get(lastHistory.size() - 1)));
 
-              String[] filterParts = RepresentationInformationDialogs
+              String[] filterParts = RepresentationInformationUtils
                 .breakFilterIntoParts(lastHistory.get(lastHistory.size() - 1));
               RepresentationInformationDataPanel.this.name.setText(
                 messages.representationInformationNameFromAssociation(filterParts[0], filterParts[1], filterParts[2]));

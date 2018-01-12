@@ -231,6 +231,9 @@ public class BrowserHelper {
     Long dipCount = RodaCoreFactory.getIndexService().count(IndexedDIP.class, dipsFilter, user, justActive);
     bundle.setDipCount(dipCount);
 
+    List<String> rodaConfigurationAsList = RodaCoreFactory.getRodaConfigurationAsList("core.ri.rule.AIP").stream()
+      .map(r -> RodaCoreFactory.getRodaConfigurationAsString(r, "fields")).collect(Collectors.toList());
+    bundle.setRepresentationInformationFields(rodaConfigurationAsList);
     return bundle;
   }
 
@@ -264,6 +267,9 @@ public class BrowserHelper {
     Long dipCount = RodaCoreFactory.getIndexService().count(IndexedDIP.class, dipsFilter);
     bundle.setDipCount(dipCount);
 
+    List<String> rodaConfigurationAsList = RodaCoreFactory.getRodaConfigurationAsList("core.ri.rule.Representation")
+      .stream().map(r -> RodaCoreFactory.getRodaConfigurationAsString(r, "fields")).collect(Collectors.toList());
+    bundle.setRepresentationInformationFields(rodaConfigurationAsList);
     return bundle;
   }
 
@@ -302,6 +308,10 @@ public class BrowserHelper {
     Filter dipsFilter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, file.getUUID()));
     Long dipCount = RodaCoreFactory.getIndexService().count(IndexedDIP.class, dipsFilter);
     bundle.setDipCount(dipCount);
+
+    List<String> rodaConfigurationAsList = RodaCoreFactory.getRodaConfigurationAsList("core.ri.rule.File").stream()
+      .map(r -> RodaCoreFactory.getRodaConfigurationAsString(r, "fields")).collect(Collectors.toList());
+    bundle.setRepresentationInformationFields(rodaConfigurationAsList);
     return bundle;
   }
 

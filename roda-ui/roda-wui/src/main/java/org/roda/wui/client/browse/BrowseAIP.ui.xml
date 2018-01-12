@@ -39,7 +39,7 @@
 							<g:Label styleName="h4" addStyleNames="browseItemText"
 								ui:field="itemTitle" />
 						</g:FlowPanel>
-						<g:Label addStyleNames="browseItemId" ui:field="itemId"
+						<g:FlowPanel addStyleNames="browseItemId" ui:field="itemId"
 							title="{messages.itemId}" />
 						<g:Label addStyleNames="browseSipId" ui:field="sipId"
 							title="{messages.sipId}" />

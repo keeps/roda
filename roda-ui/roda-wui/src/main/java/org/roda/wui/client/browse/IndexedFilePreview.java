@@ -39,9 +39,9 @@ public class IndexedFilePreview extends BitstreamPreview<IndexedFile> {
   private boolean justActive = true;
 
   public IndexedFilePreview(Viewers viewers, IndexedFile file, boolean justActive, Command onPreviewFailure) {
-    super(viewers, RestUtils.createRepresentationFileDownloadUri(file.getUUID(), CONTENT_DISPOSITION_INLINE), file.getFileFormat(),
-      file.getOriginalName() != null ? file.getOriginalName() : file.getId(), file.getSize(), file.isDirectory(),
-      onPreviewFailure, file);
+    super(viewers, RestUtils.createRepresentationFileDownloadUri(file.getUUID(), CONTENT_DISPOSITION_INLINE),
+      file.getFileFormat(), file.getOriginalName() != null ? file.getOriginalName() : file.getId(), file.getSize(),
+      file.isDirectory(), onPreviewFailure, file);
     this.justActive = justActive;
   }
 

@@ -22,6 +22,7 @@ public class BrowseAIPBundle implements Serializable {
   private Long childAIPCount;
   private Long representationCount;
   private Long dipCount;
+  private List<String> representationInformationFields;
 
   public BrowseAIPBundle() {
     super();
@@ -29,7 +30,7 @@ public class BrowseAIPBundle implements Serializable {
 
   public BrowseAIPBundle(IndexedAIP aip, List<IndexedAIP> aipAncestors,
     List<DescriptiveMetadataViewBundle> descriptiveMetadata, Long childAIPCount, Long representationCount,
-    Long dipCount) {
+    Long dipCount, List<String> representationInformationFields) {
     super();
     this.aip = aip;
     this.setAIPAncestors(aipAncestors);
@@ -37,6 +38,7 @@ public class BrowseAIPBundle implements Serializable {
     this.childAIPCount = childAIPCount;
     this.representationCount = representationCount;
     this.dipCount = dipCount;
+    this.representationInformationFields = representationInformationFields;
   }
 
   public IndexedAIP getAip() {
@@ -87,6 +89,14 @@ public class BrowseAIPBundle implements Serializable {
     this.dipCount = dipCount;
   }
 
+  public List<String> getRepresentationInformationFields() {
+    return representationInformationFields;
+  }
+
+  public void setRepresentationInformationFields(List<String> representationInformationFields) {
+    this.representationInformationFields = representationInformationFields;
+  }
+
   @Override
   public String toString() {
     StringBuilder builder = new StringBuilder();
@@ -119,6 +129,11 @@ public class BrowseAIPBundle implements Serializable {
     if (dipCount != null) {
       builder.append("dipCount=");
       builder.append(dipCount);
+      builder.append(", ");
+    }
+    if (representationInformationFields != null) {
+      builder.append("representationInformationFields=");
+      builder.append(representationInformationFields);
     }
     builder.append("]");
     return builder.toString();

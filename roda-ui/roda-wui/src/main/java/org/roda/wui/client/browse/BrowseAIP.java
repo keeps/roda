@@ -10,7 +10,12 @@
  */
 package org.roda.wui.client.browse;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -45,12 +50,16 @@ import org.roda.wui.client.ingest.transfer.TransferUpload;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
-import org.roda.wui.client.planning.RepresentationInformationAssociations;
-import org.roda.wui.client.planning.ShowRepresentationInformation;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.*;
+import org.roda.wui.common.client.tools.DescriptionLevelUtils;
+import org.roda.wui.common.client.tools.FacetUtils;
+import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.Humanize;
+import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.RestErrorOverlayType;
+import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
 import org.roda.wui.common.client.widgets.wcag.WCAGUtilities;
@@ -58,12 +67,15 @@ import org.roda.wui.common.client.widgets.wcag.WCAGUtilities;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.dom.client.Element;
-import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.http.client.*;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.RequestException;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -73,7 +85,18 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusPanel;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.TabPanel;
+import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
 
@@ -154,7 +177,7 @@ public class BrowseAIP extends Composite {
   // IDENTIFICATION
 
   @UiField
-  Label browseItemHeader, itemTitle, itemId, sipId;
+  Label browseItemHeader, itemTitle, sipId;
 
   @UiField
   FlowPanel ingestJobId, ingestUpdateJobIds;
@@ -163,7 +186,7 @@ public class BrowseAIP extends Composite {
   Label dateCreated, dateUpdated;
 
   @UiField
-  FlowPanel type;
+  FlowPanel itemId, type;
 
   // DESCRIPTIVE METADATA
 
@@ -396,7 +419,7 @@ public class BrowseAIP extends Composite {
     itemTitle.setText(messages.browseLoading());
     itemTitle.removeStyleName("browseTitle-allCollections");
     itemIcon.getParent().removeStyleName("browseTitle-allCollections-wrapper");
-    itemId.setText("");
+    itemId.clear();
     itemId.removeStyleName("browseItemId");
     sipId.setText("");
     sipId.removeStyleName("browseSipId");
@@ -657,7 +680,6 @@ public class BrowseAIP extends Composite {
 
   private void updateSectionIdentification(BrowseAIPBundle bundle) {
     IndexedAIP aip = bundle.getAip();
-
     browseItemHeader.setVisible(true);
 
     breadcrumb.updatePath(BreadcrumbUtils.getAipBreadcrumbs(bundle.getAIPAncestors(), aip));
@@ -669,8 +691,13 @@ public class BrowseAIP extends Composite {
     itemTitle.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());
     itemTitle.removeStyleName("browseTitle-allCollections");
     itemIcon.getParent().removeStyleName("browseTitle-allCollections-wrapper");
-    itemId.setText(messages.itemIdMin(aip.getId()));
+
     itemId.addStyleName("browseItemId");
+    final String idFilter = RepresentationInformationUtils
+      .createRepresentationInformationFilter(RodaConstants.INDEX_AIP, RodaConstants.AIP_ID, aip.getId());
+    RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(
+      SafeHtmlUtils.fromString(messages.itemIdMin(aip.getId())), idFilter, itemId,
+      bundle.getRepresentationInformationFields().contains(RodaConstants.AIP_ID));
 
     if (!aip.getIngestSIPIds().isEmpty()) {
       sipId.setText(messages.sipIdMin(StringUtils.prettyPrint(aip.getIngestSIPIds())));
@@ -725,50 +752,12 @@ public class BrowseAIP extends Composite {
     }
 
     if (StringUtils.isNotBlank(aip.getType())) {
-      InlineHTML html = new InlineHTML();
-      html.setText(messages.aipTypeItem());
-
-      InlineHTML typeText = new InlineHTML();
-      typeText.setText(aip.getType());
-      typeText.getElement().getStyle().setPaddingRight(3, Style.Unit.PX);
-
-      final Anchor anchor = new Anchor();
-      anchor.setHTML(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-info-circle' aria-hidden='true'></i>"));
-
-      final String riFilter = RepresentationInformationUtils.createRepresentationInformationAipFilter(aip.getType());
-
-      BrowserService.Util.getInstance().retrieveRepresentationInformationWithFilter(riFilter,
-        new AsyncCallback<Pair<String, Integer>>() {
-
-          @Override
-          public void onFailure(Throwable caught) {
-            AsyncCallbackUtils.defaultFailureTreatment(caught);
-          }
-
-          @Override
-          public void onSuccess(Pair<String, Integer> pair) {
-            LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
-            selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
-            anchor.removeStyleName("browseIconRed");
-
-            if (pair.getSecond() == 1) {
-              anchor
-                .setHref(HistoryUtils.createHistoryHashLink(ShowRepresentationInformation.RESOLVER, pair.getFirst()));
-            } else if (pair.getSecond() > 1) {
-              anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationAssociations.RESOLVER,
-                RodaConstants.REPRESENTATION_INFORMATION_FILTERS, riFilter));
-            } else {
-              anchor.addStyleName("browseIconRed");
-              anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationAssociations.RESOLVER,
-                RodaConstants.REPRESENTATION_INFORMATION_FILTERS, riFilter));
-            }
-          }
-        });
-
-      type.add(html);
-      type.add(typeText);
-      type.add(anchor);
       type.addStyleName("browseItemId");
+      final String riFilter = RepresentationInformationUtils
+        .createRepresentationInformationFilter(RodaConstants.INDEX_AIP, RodaConstants.AIP_TYPE, aip.getType());
+      RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(
+        SafeHtmlUtils.fromString(messages.aipTypeItem() + " " + aip.getType()), riFilter, type,
+        bundle.getRepresentationInformationFields().contains(RodaConstants.AIP_TYPE));
     }
   }
 

@@ -27,7 +27,7 @@
 						<g:SimplePanel styleName="browseItemIcon" ui:field="representationIcon" />
 						<g:FlowPanel styleName="browseItemPanelText browseItemTextWithoutFontSize" ui:field="representationType">
 						</g:FlowPanel>
-						<g:Label addStyleNames="browseRepresentationId" ui:field="representationId"
+						<g:FlowPanel addStyleNames="browseRepresentationId" ui:field="representationId"
 							title="{messages.representationId}" />
 						<g:Label addStyleNames="browseRepresentationId" ui:field="dateCreated" />
 						<g:Label addStyleNames="browseRepresentationId" ui:field="dateUpdated" />

@@ -108,7 +108,8 @@ public class BrowseFile extends Composite {
 
             @Override
             public void onSuccess(final BrowseFileBundle bundle) {
-              callback.onSuccess(new BrowseFile(viewers, bundle));
+              instance = new BrowseFile(viewers, bundle);
+              callback.onSuccess(instance);
             }
           });
       } else {
@@ -127,6 +128,8 @@ public class BrowseFile extends Composite {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
   static final ClientMessages messages = GWT.create(ClientMessages.class);
+
+  private static BrowseFile instance = null;
 
   public static final Sorter DEFAULT_FILE_SORTER = new Sorter(new SortParameter(RodaConstants.FILE_FILE_ID, false));
   public static final Integer DEFAULT_FILE_INDEX = -1;
@@ -157,19 +160,6 @@ public class BrowseFile extends Composite {
   @UiField
   FlowPanel center;
 
-  /**
-   * Create a new panel to view a file
-   * 
-   * @param viewers
-   * @param index
-   * @param sorter
-   * @param aipId
-   * @param itemBundle
-   * @param representationUUID
-   * @param fileUUID
-   * @param file
-   * 
-   */
   public BrowseFile(Viewers viewers, final BrowseFileBundle bundle) {
     this.bundle = bundle;
     final boolean justActive = AIPState.ACTIVE.equals(bundle.getAip().getState());
@@ -224,7 +214,7 @@ public class BrowseFile extends Composite {
 
     // bind slider buttons
     disseminationsSlider = Sliders.createDisseminationsSlider(center, disseminationsButton, bundle.getFile());
-    Sliders.createInfoSlider(center, infoFileButton, bundle.getFile());
+    Sliders.createFileInfoSlider(center, infoFileButton, bundle);
     Sliders.createOptionsSlider(center, optionsButton, bundle.getFile());
 
     keyboardFocus.setFocus(true);
@@ -244,7 +234,11 @@ public class BrowseFile extends Composite {
   }
 
   private List<BreadcrumbItem> getBreadcrumbs() {
-    return BreadcrumbUtils.getFileBreadcrumbs(bundle);
+    return BreadcrumbUtils.getFileBreadcrumbs(getBundle());
+  }
+
+  public BrowseFileBundle getBundle() {
+    return bundle;
   }
 
 }

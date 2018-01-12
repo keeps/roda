@@ -8,6 +8,7 @@
 package org.roda.wui.client.common.slider;
 
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
@@ -37,6 +38,13 @@ public class Sliders {
     T object) {
     SliderPanel slider = createSlider(container, toggleButton);
     InfoSliderHelper.updateInfoObjectSliderPanel(object, slider);
+    return slider;
+  }
+
+  public static SliderPanel createFileInfoSlider(FlowPanel container, FocusPanel toggleButton,
+    BrowseFileBundle bundle) {
+    SliderPanel slider = createSlider(container, toggleButton);
+    InfoSliderHelper.updateInfoSliderPanel(bundle, slider);
     return slider;
   }
 

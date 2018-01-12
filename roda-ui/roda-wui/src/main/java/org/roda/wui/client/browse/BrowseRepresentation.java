@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
@@ -180,7 +181,7 @@ public class BrowseRepresentation extends Composite {
   FlowPanel representationType;
 
   @UiField
-  Label representationId;
+  FlowPanel representationId;
 
   @UiField
   Label dateCreated, dateUpdated;
@@ -267,7 +268,7 @@ public class BrowseRepresentation extends Composite {
     // INIT
     initWidget(uiBinder.createAndBindUi(this));
 
-    updateLayout(state, justActive);
+    updateLayout(bundle, state, justActive);
 
     breadcrumbItems = BreadcrumbUtils.getRepresentationBreadcrumbs(bundle);
     breadcrumb.updatePath(breadcrumbItems);
@@ -368,7 +369,7 @@ public class BrowseRepresentation extends Composite {
     WCAGUtilities.getInstance().makeAccessible(itemMetadata.getElement());
   }
 
-  private void updateLayout(final AIPState state, final boolean justActive) {
+  private void updateLayout(final BrowseRepresentationBundle bundle, final AIPState state, final boolean justActive) {
     // STATUS
     aipState.setHTML(HtmlSnippetUtils.getAIPStateHTML(state));
     aipState.setVisible(!justActive);
@@ -381,14 +382,15 @@ public class BrowseRepresentation extends Composite {
     representationIcon.setWidget(representationIconHtmlPanel);
 
     String type = representation.getType() != null ? representation.getType() : representation.getId();
-    List<Widget> widgets = HtmlSnippetUtils.getRepresentationTypeHTML(type, representation.getRepresentationStates());
-
     representationType.clear();
-    for (Widget widget : widgets) {
-      representationType.add(widget);
-    }
+    HtmlSnippetUtils.getRepresentationTypeHTML(representationType, type, representation.getRepresentationStates(),
+      bundle.getRepresentationInformationFields().contains(RodaConstants.REPRESENTATION_TYPE));
 
-    representationId.setText(messages.representationId() + ": " + representation.getId());
+    final String riFilter = RepresentationInformationUtils
+      .createRepresentationInformationFilter(RodaConstants.INDEX_REPRESENTATION, RodaConstants.REPRESENTATION_ID, type);
+    RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(
+      SafeHtmlUtils.fromString(messages.representationId() + ": " + representation.getId()), riFilter, representationId,
+      bundle.getRepresentationInformationFields().contains(RodaConstants.REPRESENTATION_ID));
 
     if (!breadcrumbItems.isEmpty()) {
       breadcrumbItems.remove(breadcrumbItems.size() - 1);
@@ -429,7 +431,7 @@ public class BrowseRepresentation extends Composite {
                 @Override
                 public void onSuccess(IndexedRepresentation rep) {
                   representation = rep;
-                  updateLayout(state, justActive);
+                  updateLayout(bundle, state, justActive);
                 }
               });
           }

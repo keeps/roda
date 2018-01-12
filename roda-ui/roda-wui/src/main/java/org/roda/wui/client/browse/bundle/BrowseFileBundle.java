@@ -24,6 +24,7 @@ public class BrowseFileBundle implements Serializable {
   private IndexedFile file;
   private Long totalSiblingCount;
   private Long dipCount;
+  private List<String> representationInformationFields;
 
   public BrowseFileBundle() {
     super();
@@ -75,6 +76,14 @@ public class BrowseFileBundle implements Serializable {
 
   public void setDipCount(Long dipCount) {
     this.dipCount = dipCount;
+  }
+
+  public List<String> getRepresentationInformationFields() {
+    return representationInformationFields;
+  }
+
+  public void setRepresentationInformationFields(List<String> representationInformationFields) {
+    this.representationInformationFields = representationInformationFields;
   }
 
 }

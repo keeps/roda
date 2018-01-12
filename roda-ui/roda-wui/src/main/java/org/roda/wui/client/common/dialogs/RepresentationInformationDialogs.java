@@ -70,16 +70,6 @@ public class RepresentationInformationDialogs {
     // do nothing
   }
 
-  public static String[] breakFilterIntoParts(String filter) {
-    if (StringUtils.isNotBlank(filter)) {
-      String[] splitfilter = filter.split(RepresentationInformationUtils.REPRESENTATION_INFORMATION_FILTER_SEPARATOR);
-      if (splitfilter.length == 3) {
-        return new String[] {splitfilter[1], splitfilter[2], splitfilter[0]};
-      }
-    }
-    return new String[] {"", "", ""};
-  }
-
   public static void showPromptDialogRepresentationInformation(String title, String cancelButtonText,
     String confirmButtonText, String listButtonText, final RepresentationInformation ri,
     final AsyncCallback<RepresentationInformation> callback) {

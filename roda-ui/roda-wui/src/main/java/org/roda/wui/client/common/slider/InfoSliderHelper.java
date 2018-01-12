@@ -8,47 +8,40 @@
 package org.roda.wui.client.common.slider;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map.Entry;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
-import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
-import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.LastSelectedItemsSingleton;
-import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.browse.RepresentationInformationHelper;
+import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.common.utils.StringUtils;
-import org.roda.wui.client.planning.RepresentationInformationAssociations;
-import org.roda.wui.client.planning.ShowRepresentationInformation;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
-import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
 
 public class InfoSliderHelper {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-  private static final String INFO_ICON = "<i class='fa fa-info-circle browseFileInformationIcon' aria-hidden='true'></i>";
 
   private InfoSliderHelper() {
     // do nothing
   }
 
   protected static <T extends IsIndexed> void updateInfoObjectSliderPanel(T object, SliderPanel slider) {
-    if (object instanceof IndexedFile) {
-      updateInfoSliderPanel((IndexedFile) object, slider);
-    } else if (object instanceof IndexedRepresentation) {
+    if (object instanceof IndexedRepresentation) {
       updateInfoSliderPanel((IndexedRepresentation) object, slider);
     } else if (object instanceof IndexedAIP) {
       updateInfoSliderPanel((IndexedAIP) object, slider);
@@ -112,14 +105,15 @@ public class InfoSliderHelper {
     populate(infoSliderPanel, values);
   }
 
-  private static void updateInfoSliderPanel(IndexedFile file, SliderPanel infoSliderPanel) {
+  public static void updateInfoSliderPanel(BrowseFileBundle bundle, SliderPanel infoSliderPanel) {
     HashMap<String, Widget> values = new HashMap<>();
     infoSliderPanel.clear();
     infoSliderPanel.addTitle(new Label(messages.viewRepresentationInfoTitle()));
+    IndexedFile file = bundle.getFile();
 
     if (file != null) {
       String fileName = file.getOriginalName() != null ? file.getOriginalName() : file.getId();
-      values.put(messages.viewRepresentationInfoFilename(), new InlineHTML(SafeHtmlUtils.fromString(fileName)));
+      values.put(messages.viewRepresentationInfoFilename(), createIdHTML(bundle, fileName));
 
       if (file.getSize() > 0) {
         values.put(messages.viewRepresentationInfoSize(),
@@ -130,26 +124,27 @@ public class InfoSliderHelper {
         FileFormat fileFormat = file.getFileFormat();
 
         if (StringUtils.isNotBlank(fileFormat.getMimeType())) {
-          values.put(messages.viewRepresentationInfoMimetype(), createMimetypeHTML(fileFormat.getMimeType()));
+          values.put(messages.viewRepresentationInfoMimetype(), createMimetypeHTML(bundle, fileFormat.getMimeType()));
         }
 
         if (StringUtils.isNotBlank(fileFormat.getFormatDesignationName())) {
-          values.put(messages.viewRepresentationInfoFormat(), createExtensionHTML(fileFormat.getFormatDesignation()));
+          values.put(messages.viewRepresentationInfoFormat(),
+            createExtensionHTML(bundle, fileFormat.getFormatDesignation()));
         }
 
         if (StringUtils.isNotBlank(fileFormat.getPronom())) {
-          values.put(messages.viewRepresentationInfoPronom(), createPronomHTML(fileFormat.getPronom()));
+          values.put(messages.viewRepresentationInfoPronom(), createPronomHTML(bundle, fileFormat.getPronom()));
         }
       }
 
       if (StringUtils.isNotBlank(file.getCreatingApplicationName())) {
         values.put(messages.viewRepresentationInfoCreatingApplicationName(),
-          new InlineHTML(SafeHtmlUtils.fromString(file.getCreatingApplicationName())));
+          createCreatingApplicationNameHTML(bundle, file.getCreatingApplicationName()));
       }
 
       if (StringUtils.isNotBlank(file.getCreatingApplicationVersion())) {
         values.put(messages.viewRepresentationInfoCreatingApplicationVersion(),
-          new InlineHTML(SafeHtmlUtils.fromString(file.getCreatingApplicationVersion())));
+          createCreatingApplicationVersionHTML(bundle, file.getCreatingApplicationVersion()));
       }
 
       if (StringUtils.isNotBlank(file.getDateCreatedByApplication())) {
@@ -203,123 +198,66 @@ public class InfoSliderHelper {
     }
   }
 
-  private static FlowPanel createMimetypeHTML(String mimetype) {
-    FlowPanel mimetypePanel = new FlowPanel();
-    mimetypePanel.add(new InlineHTML(SafeHtmlUtils.fromString(mimetype)));
-
-    final Anchor anchor = new Anchor();
-    anchor.setHTML(SafeHtmlUtils.fromSafeConstant(INFO_ICON));
-    final List<String> filter = RepresentationInformationUtils.createRepresentationInformationFileFilter(null, mimetype,
-      null);
-
-    BrowserService.Util.getInstance().retrieveRepresentationInformationWithFilter(filter.get(0),
-      new AsyncCallback<Pair<String, Integer>>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
-        }
-
-        @Override
-        public void onSuccess(Pair<String, Integer> pair) {
-          LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
-          selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
-          anchor.removeStyleName("browseIconRed");
-
-          if (pair.getSecond() == 1) {
-            anchor.setHref(HistoryUtils.createHistoryHashLink(ShowRepresentationInformation.RESOLVER, pair.getFirst()));
-          } else if (pair.getSecond() > 1) {
-            anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationAssociations.RESOLVER,
-              RodaConstants.REPRESENTATION_INFORMATION_FILTERS, filter.get(0)));
-          } else {
-            anchor.addStyleName("browseIconRed");
-            anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationAssociations.RESOLVER,
-              RodaConstants.REPRESENTATION_INFORMATION_FILTERS, filter.get(0)));
-          }
-        }
-      });
-
-    mimetypePanel.add(anchor);
-    return mimetypePanel;
+  private static FlowPanel createMimetypeHTML(BrowseFileBundle bundle, String mimetype) {
+    FlowPanel panel = new FlowPanel();
+    final String riFilter = RepresentationInformationUtils
+      .createRepresentationInformationFilter(RodaConstants.INDEX_FILE, RodaConstants.FILE_FORMAT_MIMETYPE, mimetype);
+    RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(SafeHtmlUtils.fromString(mimetype),
+      riFilter, panel, bundle.getRepresentationInformationFields().contains(RodaConstants.FILE_FORMAT_MIMETYPE),
+      "browseFileInformationIcon");
+    return panel;
   }
 
-  private static FlowPanel createPronomHTML(String pronom) {
-    FlowPanel pronomPanel = new FlowPanel();
-    pronomPanel.add(new InlineHTML(SafeHtmlUtils.fromString(pronom)));
-
-    final Anchor anchor = new Anchor();
-    anchor.setHTML(SafeHtmlUtils.fromSafeConstant(INFO_ICON));
-    final List<String> filter = RepresentationInformationUtils.createRepresentationInformationFileFilter(pronom, null,
-      null);
-
-    BrowserService.Util.getInstance().retrieveRepresentationInformationWithFilter(filter.get(0),
-      new AsyncCallback<Pair<String, Integer>>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
-        }
-
-        @Override
-        public void onSuccess(Pair<String, Integer> pair) {
-          LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
-          selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
-          anchor.removeStyleName("browseIconRed");
-
-          if (pair.getSecond() == 1) {
-            anchor.setHref(HistoryUtils.createHistoryHashLink(ShowRepresentationInformation.RESOLVER, pair.getFirst()));
-          } else if (pair.getSecond() > 1) {
-            anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationAssociations.RESOLVER,
-              RodaConstants.REPRESENTATION_INFORMATION_FILTERS, filter.get(0)));
-          } else {
-            anchor.addStyleName("browseIconRed");
-            anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationAssociations.RESOLVER,
-              RodaConstants.REPRESENTATION_INFORMATION_FILTERS, filter.get(0)));
-          }
-        }
-      });
-
-    pronomPanel.add(anchor);
-    return pronomPanel;
+  private static FlowPanel createPronomHTML(BrowseFileBundle bundle, String pronom) {
+    FlowPanel panel = new FlowPanel();
+    final String riFilter = RepresentationInformationUtils
+      .createRepresentationInformationFilter(RodaConstants.INDEX_FILE, RodaConstants.FILE_PRONOM, pronom);
+    RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(SafeHtmlUtils.fromString(pronom),
+      riFilter, panel, bundle.getRepresentationInformationFields().contains(RodaConstants.FILE_PRONOM),
+      "browseFileInformationIcon");
+    return panel;
   }
 
-  private static FlowPanel createExtensionHTML(String designation) {
-    FlowPanel pronomPanel = new FlowPanel();
-    pronomPanel.add(new InlineHTML(SafeHtmlUtils.fromString(designation)));
+  private static FlowPanel createExtensionHTML(BrowseFileBundle bundle, String designation) {
+    FlowPanel panel = new FlowPanel();
+    final String riFilter = RepresentationInformationUtils.createRepresentationInformationFilter(
+      RodaConstants.INDEX_FILE, RodaConstants.FILE_FORMAT_DESIGNATION, designation);
+    RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(SafeHtmlUtils.fromString(designation),
+      riFilter, panel, bundle.getRepresentationInformationFields().contains(RodaConstants.FILE_FORMAT_DESIGNATION),
+      "browseFileInformationIcon");
+    return panel;
+  }
 
-    final Anchor anchor = new Anchor();
-    anchor.setHTML(SafeHtmlUtils.fromSafeConstant(INFO_ICON));
-    final List<String> filter = RepresentationInformationUtils.createRepresentationInformationFileFilter(null, null,
-      designation);
+  private static FlowPanel createCreatingApplicationNameHTML(BrowseFileBundle bundle, String createApplicationName) {
+    FlowPanel panel = new FlowPanel();
+    final String riFilter = RepresentationInformationUtils.createRepresentationInformationFilter(
+      RodaConstants.INDEX_FILE, RodaConstants.FILE_CREATING_APPLICATION_NAME, createApplicationName);
+    RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(
+      SafeHtmlUtils.fromString(createApplicationName), riFilter, panel,
+      bundle.getRepresentationInformationFields().contains(RodaConstants.FILE_CREATING_APPLICATION_NAME),
+      "browseFileInformationIcon");
+    return panel;
+  }
 
-    BrowserService.Util.getInstance().retrieveRepresentationInformationWithFilter(filter.get(0),
-      new AsyncCallback<Pair<String, Integer>>() {
+  private static FlowPanel createCreatingApplicationVersionHTML(BrowseFileBundle bundle,
+    String createApplicationVersion) {
+    FlowPanel panel = new FlowPanel();
+    final String riFilter = RepresentationInformationUtils.createRepresentationInformationFilter(
+      RodaConstants.INDEX_FILE, RodaConstants.FILE_CREATING_APPLICATION_VERSION, createApplicationVersion);
+    RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(
+      SafeHtmlUtils.fromString(createApplicationVersion), riFilter, panel,
+      bundle.getRepresentationInformationFields().contains(RodaConstants.FILE_CREATING_APPLICATION_VERSION),
+      "browseFileInformationIcon");
+    return panel;
+  }
 
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
-        }
-
-        @Override
-        public void onSuccess(Pair<String, Integer> pair) {
-          LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
-          selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
-          anchor.removeStyleName("browseIconRed");
-
-          if (pair.getSecond() == 1) {
-            anchor.setHref(HistoryUtils.createHistoryHashLink(ShowRepresentationInformation.RESOLVER, pair.getFirst()));
-          } else if (pair.getSecond() > 1) {
-            anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationAssociations.RESOLVER,
-              RodaConstants.REPRESENTATION_INFORMATION_FILTERS, filter.get(0)));
-          } else {
-            anchor.addStyleName("browseIconRed");
-            anchor.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationAssociations.RESOLVER,
-              RodaConstants.REPRESENTATION_INFORMATION_FILTERS, filter.get(0)));
-          }
-        }
-      });
-
-    pronomPanel.add(anchor);
-    return pronomPanel;
+  private static FlowPanel createIdHTML(BrowseFileBundle bundle, String filename) {
+    FlowPanel panel = new FlowPanel();
+    final String riFilter = RepresentationInformationUtils
+      .createRepresentationInformationFilter(RodaConstants.INDEX_FILE, RodaConstants.FILE_FILE_ID, filename);
+    RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(SafeHtmlUtils.fromString(filename),
+      riFilter, panel, bundle.getRepresentationInformationFields().contains(RodaConstants.FILE_FILE_ID),
+      "browseFileInformationIcon");
+    return panel;
   }
 }

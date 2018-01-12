@@ -32,6 +32,8 @@ import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.RODAMember;
 
+import com.google.gwt.core.shared.GWT;
+
 public class SearchFilters {
 
   private SearchFilters() {
@@ -68,6 +70,8 @@ public class SearchFilters {
       return new Filter(new BasicSearchFilterParameter(RodaConstants.DIP_SEARCH, "*"));
     } else if (actualClass.equals(DIPFile.class.getName())) {
       return new Filter(new BasicSearchFilterParameter(RodaConstants.DIPFILE_SEARCH, "*"));
+    } else if (actualClass.equals(Format.class.getName())) {
+      return new Filter(new BasicSearchFilterParameter(RodaConstants.FORMAT_SEARCH, "*"));
     } else {
       return Filter.NULL;
     }
@@ -106,6 +110,7 @@ public class SearchFilters {
     } else if (actualClass.equals(Format.class.getName())) {
       return RodaConstants.FORMAT_SEARCH;
     } else {
+      GWT.log("The search is failing due to missing search field key on query");
       return "";
     }
   }
