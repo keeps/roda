@@ -6302,6 +6302,7 @@ span.code {
 
 .incremental-list-vertical .removable-textbox .form-textbox {
     width: 100%;
+    height: 27px;
 }
 
 .incremental-list-vertical .removable-textbox .ri-toolbarLink {
