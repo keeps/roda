@@ -6311,7 +6311,7 @@ span.code {
     margin-right: 0;
 }
 
-.incremental-list .removable-textbox:first-of-type .ri-toolbarLink {
+.incremental-list .removable-textbox:last-of-type .ri-toolbarLink {
     background-color: #089de3;
     color: white;
 }
