@@ -8,7 +8,6 @@
 package org.roda.wui.filter;
 
 import java.io.IOException;
-import java.security.Principal;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -20,16 +19,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.jasig.cas.client.util.CommonUtils;
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
-import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.v2.log.LogEntry;
-import org.roda.core.data.v2.user.User;
+import org.roda.wui.api.controllers.UserLogin;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.welcome.Welcome;
-import org.roda.wui.common.ControllerAssistant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,20 +90,16 @@ public class CasWebAuthFilter implements Filter {
     LOGGER.debug("URL: {} ; Request URI: {} ; Context Path: {}; Service: {} ; Hash: {}; Locale: {}", url, requestURI,
       contextPath, service, hash, locale);
 
-    final Principal principal = httpRequest.getUserPrincipal();
-    if (principal != null) {
-      User user = getOrCreateUser(principal.getName());
-      UserUtility.setUser(httpRequest, user);
-
-      if (url.endsWith("/login")) {
-        // register login action
-        ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-        controllerAssistant.registerAction(user, LogEntry.LOG_ENTRY_STATE.SUCCESS,
-          RodaConstants.CONTROLLER_USERNAME_PARAM, principal.getName());
-      }
-    }
-
     if (url.endsWith("/login")) {
+      if (httpRequest.getUserPrincipal() != null) {
+        try {
+          UserLogin.casLogin(httpRequest.getUserPrincipal().getName(), httpRequest);
+        } catch (RODAException e) {
+          httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+          return;
+        }
+      }
+
       final StringBuilder b = new StringBuilder();
       b.append(contextPath + "/");
 
@@ -143,26 +133,4 @@ public class CasWebAuthFilter implements Filter {
     }
 
   }
-
-  private User getOrCreateUser(final String name) {
-    User user;
-
-    try {
-      user = RodaCoreFactory.getModelService().retrieveUserByName(name);
-    } catch (final GenericException e) {
-      user = new User(name);
-      user = createUser(user);
-    }
-    return user;
-  }
-
-  private User createUser(final User user) {
-    try {
-      return RodaCoreFactory.getModelService().createUser(user, true);
-    } catch (final RODAException e) {
-      LOGGER.error("Error while creating and indexing CAS user", e);
-      return user;
-    }
-  }
-
 }

@@ -195,7 +195,11 @@
 	</filter>
 	<filter-mapping>
 		<filter-name>CasWebAuthFilter</filter-name>
-		<url-pattern>/*</url-pattern>
+		<url-pattern>/login</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>CasWebAuthFilter</filter-name>
+		<url-pattern>/logout</url-pattern>
 	</filter-mapping>
 
 	<!-- ************************************ -->
@@ -285,6 +289,11 @@
 	<error-page>
 		<error-code>404</error-code>
 		<location>/error_404.html</location>
+	</error-page>
+
+	<error-page>
+		<error-code>500</error-code>
+		<location>/error_500.html</location>
 	</error-page>
 
 	<error-page>

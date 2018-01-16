@@ -15,6 +15,7 @@ import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.EmailUnverifiedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InactiveUserException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.utils.StringUtils;
 
@@ -57,4 +58,17 @@ public class UserLoginHelper {
     return user;
   }
 
+  public static User casLogin(final String username, final HttpServletRequest request) throws RODAException {
+    User user = RodaCoreFactory.getModelService().retrieveUserByName(username);
+    if (user == null) {
+      user = RodaCoreFactory.getModelService().createUser(new User(username), true);
+    }
+
+    if (!user.isActive()) {
+      throw new InactiveUserException("User is not active.");
+    }
+
+    UserUtility.setUser(request, user);
+    return user;
+  }
 }
