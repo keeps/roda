@@ -10,6 +10,8 @@ package org.roda.wui.client.common.utils;
 import java.util.List;
 import java.util.Set;
 
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
 import org.roda.core.data.v2.index.facet.FacetValue;
 import org.roda.core.data.v2.ip.AIP;
@@ -29,6 +31,7 @@ import org.roda.wui.client.browse.BrowseAIP;
 import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.browse.MetadataValue;
 import org.roda.wui.client.browse.RepresentationInformationHelper;
+import org.roda.wui.client.planning.RepresentationInformationAssociations;
 import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.core.client.GWT;
@@ -44,7 +47,6 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.UIObject;
 
@@ -133,9 +135,9 @@ public class HtmlSnippetUtils {
     return b.toSafeHtml();
   }
 
-  public static void getRepresentationTypeHTML(FlowPanel typePanel, String title, List<String> representationStates) {
+  public static void getRepresentationTypeHTML(FlowPanel panel, String title, List<String> representationStates) {
     RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(
-      SafeHtmlUtils.fromSafeConstant(OPEN_H4_CLASS_LABEL_SUCCESS + title + CLOSE_SPAN), null, typePanel, false);
+      SafeHtmlUtils.fromSafeConstant(OPEN_H4_CLASS_LABEL_SUCCESS + title + CLOSE_SPAN), null, panel, false);
 
     for (String state : representationStates) {
       SafeHtmlBuilder b = new SafeHtmlBuilder();
@@ -143,9 +145,16 @@ public class HtmlSnippetUtils {
       b.append(SafeHtmlUtils.fromString(messages.statusLabel(state)));
       b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
 
-      InlineHTML labelsHTML = new InlineHTML();
-      labelsHTML.setHTML(b.toSafeHtml());
-      typePanel.add(labelsHTML);
+      Anchor icon = new Anchor();
+      icon.setHTML(b.toSafeHtml());
+      icon.addStyleName("representation-information-badge");
+
+      final String filter = RepresentationInformationUtils.createRepresentationInformationFilter(
+        RodaConstants.INDEX_REPRESENTATION, RodaConstants.REPRESENTATION_STATES, state);
+      icon.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationAssociations.RESOLVER,
+        RodaConstants.REPRESENTATION_INFORMATION_FILTERS, filter));
+
+      panel.add(icon);
     }
   }
 

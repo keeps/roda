@@ -6275,6 +6275,12 @@ td.datePickerMonth, td.datePickerYear {
 	margin-left: 3px;
 }
 
+.representation-information-badge:hover {
+    cursor: pointer;
+    cursor: hand;
+    text-decoration: none;
+}
+
 span.code {
     font-family: "UbuntuMono", "Ubuntu", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: bold;
