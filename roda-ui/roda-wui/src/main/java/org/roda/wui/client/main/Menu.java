@@ -104,8 +104,8 @@ public class Menu extends Composite {
 
   private final AcessibleMenuBar planningMenu;
   // private MenuItem planningMonitoring;
-  private MenuItem planningRisk;
   private MenuItem planningRepresentationInformation;
+  private MenuItem planningRisk;
   private MenuItem planningEvent;
   private MenuItem planningAgent;
   private MenuItem planningFormat;
@@ -175,12 +175,12 @@ public class Menu extends Composite {
     // planningMonitoring =
     // planningMenu.addItem(messages.title("planning_monitoring"),
     // createCommand(Planning.RESOLVER.getHistoryPath()));
-    planningRisk = planningMenu.addItem(messages.title("planning_risk"),
-      createCommand(RiskRegister.RESOLVER.getHistoryPath()));
-    planningRisk.addStyleName("planning_risk_item");
     planningRepresentationInformation = planningMenu.addItem(messages.title("planning_representation_information"),
       createCommand(RepresentationInformationNetwork.RESOLVER.getHistoryPath()));
     planningRepresentationInformation.addStyleName("planning_representation_information_item");
+    planningRisk = planningMenu.addItem(messages.title("planning_risk"),
+      createCommand(RiskRegister.RESOLVER.getHistoryPath()));
+    planningRisk.addStyleName("planning_risk_item");
     planningEvent = planningMenu.addItem(messages.title("planning_event"),
       createCommand(PreservationEvents.PLANNING_RESOLVER.getHistoryPath()));
     planningEvent.addStyleName("planning_event_item");
