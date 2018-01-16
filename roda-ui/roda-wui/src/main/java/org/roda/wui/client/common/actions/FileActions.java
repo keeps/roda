@@ -174,7 +174,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
   public void rename(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
     Dialogs.showPromptDialog(messages.renameItemTitle(), null, file.getId(), null, RegExp.compile("^[^/]+$"),
-      messages.cancelButton(), messages.confirmButton(), true, new AsyncCallback<String>() {
+      messages.cancelButton(), messages.confirmButton(), true, false, new AsyncCallback<String>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -184,7 +184,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
         @Override
         public void onSuccess(final String newName) {
           Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-            RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false,
+            RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
             new AsyncCallback<String>() {
 
               @Override
@@ -232,7 +232,8 @@ public class FileActions extends AbstractActionable<IndexedFile> {
         final IndexedFile toFolder = event.getValue();
 
         Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-          RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, new AsyncCallback<String>() {
+          RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+          new AsyncCallback<String>() {
 
             @Override
             public void onFailure(Throwable caught) {
@@ -289,7 +290,8 @@ public class FileActions extends AbstractActionable<IndexedFile> {
   public void uploadFiles(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
     if (file.isDirectory()) {
       Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-        RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, new AsyncCallback<String>() {
+        RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+        new AsyncCallback<String>() {
 
           @Override
           public void onFailure(Throwable caught) {
@@ -310,7 +312,8 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
   public void createFolder(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
     Dialogs.showPromptDialog(messages.createFolderTitle(), null, null, messages.createFolderPlaceholder(),
-      RegExp.compile("^[^/]+$"), messages.cancelButton(), messages.confirmButton(), false, new AsyncCallback<String>() {
+      RegExp.compile("^[^/]+$"), messages.cancelButton(), messages.confirmButton(), false, false,
+      new AsyncCallback<String>() {
         @Override
         public void onFailure(Throwable caught) {
           // do nothing
@@ -319,7 +322,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
         @Override
         public void onSuccess(final String newName) {
           Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-            RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false,
+            RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
             new AsyncCallback<String>() {
 
               @Override
@@ -405,7 +408,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
         public void onSuccess(Boolean confirmed) {
           if (confirmed) {
             Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-              RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false,
+              RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
               new AsyncCallback<String>() {
 
                 @Override
@@ -465,7 +468,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
         public void onSuccess(Boolean confirmed) {
           if (confirmed) {
             Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-              RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false,
+              RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
               new AsyncCallback<String>() {
 
                 @Override

@@ -67,7 +67,7 @@ public class RichTextToolbar extends Composite {
         formatter.setJustification(RichTextArea.Justification.RIGHT);
       } else if (sender == insertImage) {
         Dialogs.showPromptDialog(messages.insertImageUrl(), null, null, "http://", RegExp.compile(".*"),
-          messages.cancelButton(), messages.confirmButton(), true, new AsyncCallback<String>() {
+          messages.cancelButton(), messages.confirmButton(), true, false, new AsyncCallback<String>() {
 
             @Override
             public void onFailure(Throwable caught) {
@@ -83,7 +83,7 @@ public class RichTextToolbar extends Composite {
           });
       } else if (sender == createLink) {
         Dialogs.showPromptDialog(messages.insertLinkUrl(), null, null, "http://", RegExp.compile(".*"),
-          messages.cancelButton(), messages.confirmButton(), true, new AsyncCallback<String>() {
+          messages.cancelButton(), messages.confirmButton(), true, false, new AsyncCallback<String>() {
 
             @Override
             public void onFailure(Throwable caught) {
@@ -107,7 +107,7 @@ public class RichTextToolbar extends Composite {
         formatter.removeFormat();
       } else if (sender == code) {
         Dialogs.showPromptDialog(messages.editHTMLContent(), null, richText.getHTML(), null, RegExp.compile(".*"),
-          messages.cancelButton(), messages.confirmButton(), true, new AsyncCallback<String>() {
+          messages.cancelButton(), messages.confirmButton(), true, true, new AsyncCallback<String>() {
 
             @Override
             public void onFailure(Throwable caught) {

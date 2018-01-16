@@ -31,7 +31,9 @@ import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.TextBoxBase;
 
 import config.i18n.client.ClientMessages;
 
@@ -150,7 +152,7 @@ public class Dialogs {
   }
 
   public static void showPromptDialog(String title, String message, String value, String placeHolder,
-    final RegExp validator, String cancelButtonText, String confirmButtonText, boolean mandatory,
+    final RegExp validator, String cancelButtonText, String confirmButtonText, boolean mandatory, boolean isBigText,
     final AsyncCallback<String> callback) {
     final DialogBox dialogBox = new DialogBox(false, true);
     dialogBox.setText(title);
@@ -163,8 +165,14 @@ public class Dialogs {
       messageLabel.addStyleName("wui-dialog-message");
     }
 
-    final TextBox inputBox = new TextBox();
-    inputBox.setTitle("input box");
+    TextBoxBase inputBox;
+
+    if (!isBigText) {
+      inputBox = new TextBox();
+    } else {
+      inputBox = new TextArea();
+      inputBox.addStyleName("richtoolbar-html-area");
+    }
 
     if (value != null) {
       inputBox.setText(value);
@@ -174,11 +182,12 @@ public class Dialogs {
       inputBox.getElement().setPropertyString("placeholder", placeHolder);
     }
 
+    inputBox.setTitle("input box");
+    layout.add(inputBox);
+
     final Button cancelButton = new Button(cancelButtonText);
     final Button confirmButton = new Button(confirmButtonText);
     confirmButton.setEnabled(!mandatory);
-
-    layout.add(inputBox);
     layout.add(cancelButton);
     layout.add(confirmButton);
 

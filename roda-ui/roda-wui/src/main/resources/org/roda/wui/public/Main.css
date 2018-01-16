@@ -6281,6 +6281,14 @@ td.datePickerMonth, td.datePickerYear {
     text-decoration: none;
 }
 
+.richtoolbar-html-area {
+    height: 300px;
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+    resize: none;
+}
+
 span.code {
     font-family: "UbuntuMono", "Ubuntu", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: bold;

@@ -238,7 +238,8 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
           IndexedAIP.class.getName());
 
         Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-          RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, new AsyncCallback<String>() {
+          RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+          new AsyncCallback<String>() {
 
             @Override
             public void onFailure(Throwable caught) {
@@ -313,7 +314,8 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
         final String parentId = (parentAIP != null) ? parentAIP.getId() : null;
 
         Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-          RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, new AsyncCallback<String>() {
+          RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+          new AsyncCallback<String>() {
 
             @Override
             public void onFailure(Throwable caught) {
@@ -368,7 +370,8 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
   private void addRepresentation(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
     Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-      RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, new AsyncCallback<String>() {
+      RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+      new AsyncCallback<String>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -404,7 +407,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
         public void onSuccess(Boolean confirmed) {
           if (confirmed) {
             Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-              RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false,
+              RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
               new AsyncCallback<String>() {
 
                 @Override
@@ -479,7 +482,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
             public void onSuccess(Boolean confirmed) {
               if (confirmed) {
                 Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-                  RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false,
+                  RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
                   new AsyncCallback<String>() {
 
                     @Override
@@ -590,7 +593,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   private void appraisalReject(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
     final boolean accept = false;
     Dialogs.showPromptDialog(messages.rejectMessage(), messages.rejectQuestion(), null, null, RegExp.compile(".+"),
-      messages.dialogCancel(), messages.dialogOk(), true, new AsyncCallback<String>() {
+      messages.dialogCancel(), messages.dialogOk(), true, false, new AsyncCallback<String>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -616,7 +619,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   private void appraisalReject(final SelectedItems<IndexedAIP> aips, final AsyncCallback<ActionImpact> callback) {
     final boolean accept = false;
     Dialogs.showPromptDialog(messages.rejectMessage(), messages.rejectQuestion(), null, null, RegExp.compile(".+"),
-      messages.dialogCancel(), messages.dialogOk(), true, new AsyncCallback<String>() {
+      messages.dialogCancel(), messages.dialogOk(), true, false, new AsyncCallback<String>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -688,7 +691,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
               @Override
               public void onSuccess(final String newType) {
                 Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-                  RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false,
+                  RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
                   new AsyncCallback<String>() {
 
                     @Override
