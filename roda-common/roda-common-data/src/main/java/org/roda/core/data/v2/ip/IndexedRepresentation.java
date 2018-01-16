@@ -24,6 +24,7 @@ public class IndexedRepresentation extends Representation implements IsIndexed, 
   private static final long serialVersionUID = -950545608880793468L;
 
   private String uuid;
+  private String title;
 
   private long sizeInBytes;
   private long numberOfDataFiles;
@@ -39,10 +40,12 @@ public class IndexedRepresentation extends Representation implements IsIndexed, 
     super();
   }
 
-  public IndexedRepresentation(String uuid, String id, String aipId, boolean original, String type, long sizeInBytes,
-    long totalNumberOfFiles, long numberOfDocumentationFiles, long numberOfSchemaFiles, List<String> ancestors) {
+  public IndexedRepresentation(String uuid, String id, String aipId, boolean original, String type, String title,
+    long sizeInBytes, long totalNumberOfFiles, long numberOfDocumentationFiles, long numberOfSchemaFiles,
+    List<String> ancestors) {
     super(id, aipId, original, type);
     this.uuid = uuid;
+    this.setTitle(title);
     this.sizeInBytes = sizeInBytes;
     this.numberOfDataFiles = totalNumberOfFiles;
     this.numberOfDocumentationFiles = numberOfDocumentationFiles;
@@ -57,6 +60,14 @@ public class IndexedRepresentation extends Representation implements IsIndexed, 
 
   public void setUUID(String uuid) {
     this.uuid = uuid;
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
   }
 
   public long getSizeInBytes() {
@@ -149,22 +160,22 @@ public class IndexedRepresentation extends Representation implements IsIndexed, 
 
   @Override
   public String toString() {
-    return "IndexedRepresentation [uuid=" + uuid + ", sizeInBytes=" + sizeInBytes + ", numberOfDataFiles="
-      + numberOfDataFiles + ", numberOfDocumentationFiles=" + numberOfDocumentationFiles + ", numberOfSchemaFiles="
-      + numberOfSchemaFiles + ", ancestors=" + ancestors + ", createdOn=" + super.getCreatedOn() + ", createdBy="
-      + super.getCreatedBy() + ", updatedOn=" + super.getUpdatedOn() + ", updatedBy=" + super.getUpdatedBy()
-      + ", representationStates=" + super.getRepresentationStates() + ']';
+    return "IndexedRepresentation [uuid=" + uuid + ", title=" + title + ", sizeInBytes=" + sizeInBytes
+      + ", numberOfDataFiles=" + numberOfDataFiles + ", numberOfDocumentationFiles=" + numberOfDocumentationFiles
+      + ", numberOfSchemaFiles=" + numberOfSchemaFiles + ", ancestors=" + ancestors + ", createdOn="
+      + super.getCreatedOn() + ", createdBy=" + super.getCreatedBy() + ", updatedOn=" + super.getUpdatedOn()
+      + ", updatedBy=" + super.getUpdatedBy() + ", representationStates=" + super.getRepresentationStates() + ']';
   }
 
   @Override
   public List<String> toCsvHeaders() {
-    return Arrays.asList("uuid", "sizeInBytes", "numberOfDataFiles", "numberOfDocumentationFiles",
+    return Arrays.asList("uuid", "title", "sizeInBytes", "numberOfDataFiles", "numberOfDocumentationFiles",
       "numberOfSchemaFiles", "ancestors", "createdOn", "createdBy", "updatedOn", "updatedBy", "representationStates");
   }
 
   @Override
   public List<Object> toCsvValues() {
-    return Arrays.asList(uuid, sizeInBytes, numberOfDataFiles, numberOfDocumentationFiles, numberOfSchemaFiles,
+    return Arrays.asList(uuid, title, sizeInBytes, numberOfDataFiles, numberOfDocumentationFiles, numberOfSchemaFiles,
       ancestors, super.getCreatedOn(), super.getCreatedBy(), super.getUpdatedOn(), super.getUpdatedBy(),
       super.getRepresentationStates());
   }

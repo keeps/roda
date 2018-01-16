@@ -1336,6 +1336,7 @@ public class SolrUtils {
     final String aipId = objectToString(doc.get(RodaConstants.REPRESENTATION_AIP_ID), null);
     final Boolean original = objectToBoolean(doc.get(RodaConstants.REPRESENTATION_ORIGINAL), Boolean.FALSE);
     final String type = objectToString(doc.get(RodaConstants.REPRESENTATION_TYPE), null);
+    final String title = objectToString(doc.get(RodaConstants.REPRESENTATION_TITLE), null);
 
     final Long sizeInBytes = objectToLong(doc.get(RodaConstants.REPRESENTATION_SIZE_IN_BYTES), 0L);
     final Long totalNumberOfFiles = objectToLong(doc.get(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES), 0L);
@@ -1346,7 +1347,7 @@ public class SolrUtils {
 
     final List<String> ancestors = objectToListString(doc.get(RodaConstants.AIP_ANCESTORS));
 
-    IndexedRepresentation rep = new IndexedRepresentation(uuid, id, aipId, Boolean.TRUE.equals(original), type,
+    IndexedRepresentation rep = new IndexedRepresentation(uuid, id, aipId, Boolean.TRUE.equals(original), type, title,
       sizeInBytes, totalNumberOfFiles, numberOfDocumentationFiles, numberOfSchemaFiles, ancestors);
     rep.setCreatedOn(objectToDate(doc.get(RodaConstants.REPRESENTATION_CREATED_ON)));
     rep.setCreatedBy(objectToString(doc.get(RodaConstants.REPRESENTATION_CREATED_BY), ""));

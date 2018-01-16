@@ -25,12 +25,14 @@
 							<ui:text from='{messages.catalogueRepresentationTitle}' />
 						</g:Label>
 						<g:SimplePanel styleName="browseItemIcon" ui:field="representationIcon" />
-						<g:FlowPanel styleName="browseItemPanelText browseItemTextWithoutFontSize" ui:field="representationType">
+						<g:FlowPanel styleName="browseItemPanelText browseItemTextWithoutFontSize" ui:field="representationTitle">
 						</g:FlowPanel>
 						<g:FlowPanel addStyleNames="browseRepresentationId" ui:field="representationId"
-							title="{messages.representationId}" />
+							title="{messages.representationId}" />						
 						<g:Label addStyleNames="browseRepresentationId" ui:field="dateCreated" />
 						<g:Label addStyleNames="browseRepresentationId" ui:field="dateUpdated" />
+						<g:FlowPanel addStyleNames="browseRepresentationId" ui:field="representationType"
+							title="{messages.representationType}" />
 					</g:FlowPanel>
 					<m:BreadcrumbPanel ui:field="breadcrumb"
 						addStyleNames="browseBreadcrumb" />

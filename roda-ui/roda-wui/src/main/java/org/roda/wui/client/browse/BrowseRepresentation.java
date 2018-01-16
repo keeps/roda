@@ -178,10 +178,10 @@ public class BrowseRepresentation extends Composite {
   SimplePanel representationIcon;
 
   @UiField
-  FlowPanel representationType;
+  FlowPanel representationTitle;
 
   @UiField
-  FlowPanel representationId;
+  FlowPanel representationId, representationType;
 
   @UiField
   Label dateCreated, dateUpdated;
@@ -381,16 +381,24 @@ public class BrowseRepresentation extends Composite {
     representationIconHtmlPanel.addStyleName("browseItemIcon-other");
     representationIcon.setWidget(representationIconHtmlPanel);
 
-    String type = representation.getType() != null ? representation.getType() : representation.getId();
-    representationType.clear();
-    HtmlSnippetUtils.getRepresentationTypeHTML(representationType, type, representation.getRepresentationStates(),
-      bundle.getRepresentationInformationFields().contains(RodaConstants.REPRESENTATION_TYPE));
+    String title = representation.getTitle() != null ? representation.getTitle() : representation.getType();
+    title = title == null ? representation.getId() : title;
+    representationTitle.clear();
+    HtmlSnippetUtils.getRepresentationTypeHTML(representationTitle, title, representation.getRepresentationStates());
 
-    final String riFilter = RepresentationInformationUtils
-      .createRepresentationInformationFilter(RodaConstants.INDEX_REPRESENTATION, RodaConstants.REPRESENTATION_ID, type);
+    final String idFilter = RepresentationInformationUtils.createRepresentationInformationFilter(
+      RodaConstants.INDEX_REPRESENTATION, RodaConstants.INDEX_UUID, representation.getUUID());
     RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(
-      SafeHtmlUtils.fromString(messages.representationId() + ": " + representation.getId()), riFilter, representationId,
-      bundle.getRepresentationInformationFields().contains(RodaConstants.REPRESENTATION_ID));
+      SafeHtmlUtils.fromString(messages.representationId() + ": " + representation.getId()), idFilter, representationId,
+      bundle.getRepresentationInformationFields().contains(RodaConstants.INDEX_UUID));
+
+    if (representation.getType() != null) {
+      final String typeFilter = RepresentationInformationUtils.createRepresentationInformationFilter(
+        RodaConstants.INDEX_REPRESENTATION, RodaConstants.REPRESENTATION_TYPE, representation.getType());
+      RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(
+        SafeHtmlUtils.fromString(messages.representationType() + ": " + representation.getType()), typeFilter,
+        representationType, bundle.getRepresentationInformationFields().contains(RodaConstants.REPRESENTATION_TYPE));
+    }
 
     if (!breadcrumbItems.isEmpty()) {
       breadcrumbItems.remove(breadcrumbItems.size() - 1);

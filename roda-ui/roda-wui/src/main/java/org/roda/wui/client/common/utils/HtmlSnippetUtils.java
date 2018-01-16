@@ -10,8 +10,6 @@ package org.roda.wui.client.common.utils;
 import java.util.List;
 import java.util.Set;
 
-import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
 import org.roda.core.data.v2.index.facet.FacetValue;
 import org.roda.core.data.v2.ip.AIP;
@@ -135,13 +133,9 @@ public class HtmlSnippetUtils {
     return b.toSafeHtml();
   }
 
-  public static void getRepresentationTypeHTML(FlowPanel typePanel, String type, List<String> representationStates,
-    boolean addRepresentationIcon) {
-    final String riFilter = RepresentationInformationUtils.createRepresentationInformationFilter(
-      RodaConstants.INDEX_REPRESENTATION, RodaConstants.REPRESENTATION_TYPE, type);
+  public static void getRepresentationTypeHTML(FlowPanel typePanel, String title, List<String> representationStates) {
     RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(
-      SafeHtmlUtils.fromSafeConstant(OPEN_H4_CLASS_LABEL_SUCCESS + type + CLOSE_SPAN), riFilter, typePanel,
-      addRepresentationIcon, "browseRepresentationInformationIcon");
+      SafeHtmlUtils.fromSafeConstant(OPEN_H4_CLASS_LABEL_SUCCESS + title + CLOSE_SPAN), null, typePanel, false);
 
     for (String state : representationStates) {
       SafeHtmlBuilder b = new SafeHtmlBuilder();

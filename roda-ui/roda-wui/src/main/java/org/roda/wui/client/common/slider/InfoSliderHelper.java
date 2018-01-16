@@ -113,7 +113,7 @@ public class InfoSliderHelper {
 
     if (file != null) {
       String fileName = file.getOriginalName() != null ? file.getOriginalName() : file.getId();
-      values.put(messages.viewRepresentationInfoFilename(), createIdHTML(bundle, fileName));
+      values.put(messages.viewRepresentationInfoFilename(), createIdHTML(bundle, fileName, file.getUUID()));
 
       if (file.getSize() > 0) {
         values.put(messages.viewRepresentationInfoSize(),
@@ -251,12 +251,12 @@ public class InfoSliderHelper {
     return panel;
   }
 
-  private static FlowPanel createIdHTML(BrowseFileBundle bundle, String filename) {
+  private static FlowPanel createIdHTML(BrowseFileBundle bundle, String filename, String uuid) {
     FlowPanel panel = new FlowPanel();
     final String riFilter = RepresentationInformationUtils
-      .createRepresentationInformationFilter(RodaConstants.INDEX_FILE, RodaConstants.FILE_FILE_ID, filename);
+      .createRepresentationInformationFilter(RodaConstants.INDEX_FILE, RodaConstants.INDEX_UUID, uuid);
     RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(SafeHtmlUtils.fromString(filename),
-      riFilter, panel, bundle.getRepresentationInformationFields().contains(RodaConstants.FILE_FILE_ID),
+      riFilter, panel, bundle.getRepresentationInformationFields().contains(RodaConstants.INDEX_UUID),
       "browseFileInformationIcon");
     return panel;
   }

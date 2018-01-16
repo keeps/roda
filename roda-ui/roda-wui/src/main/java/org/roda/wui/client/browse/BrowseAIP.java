@@ -694,10 +694,10 @@ public class BrowseAIP extends Composite {
 
     itemId.addStyleName("browseItemId");
     final String idFilter = RepresentationInformationUtils
-      .createRepresentationInformationFilter(RodaConstants.INDEX_AIP, RodaConstants.AIP_ID, aip.getId());
+      .createRepresentationInformationFilter(RodaConstants.INDEX_AIP, RodaConstants.INDEX_UUID, aip.getId());
     RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(
       SafeHtmlUtils.fromString(messages.itemIdMin(aip.getId())), idFilter, itemId,
-      bundle.getRepresentationInformationFields().contains(RodaConstants.AIP_ID));
+      bundle.getRepresentationInformationFields().contains(RodaConstants.INDEX_UUID));
 
     if (!aip.getIngestSIPIds().isEmpty()) {
       sipId.setText(messages.sipIdMin(StringUtils.prettyPrint(aip.getIngestSIPIds())));

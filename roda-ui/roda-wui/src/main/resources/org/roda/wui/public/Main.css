@@ -2280,12 +2280,6 @@ td.datePickerMonth, td.datePickerYear {
     vertical-align: super;
 }
 
-.browseRepresentationInformationIcon {
-    margin-left: 10px;
-    vertical-align: super;
-    font-size: 112%;
-}
-
 .browseFileInformationIcon {
     color: white;
     margin-left: 3px;

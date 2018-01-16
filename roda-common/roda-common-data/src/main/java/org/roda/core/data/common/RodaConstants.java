@@ -599,6 +599,7 @@ public final class RodaConstants {
   public static final String REPRESENTATION_AIP_ID = "aipId";
   public static final String REPRESENTATION_ORIGINAL = "original";
   public static final String REPRESENTATION_TYPE = "type";
+  public static final String REPRESENTATION_TITLE = "title";
   public static final String REPRESENTATION_SIZE_IN_BYTES = "sizeInBytes";
   public static final String REPRESENTATION_NUMBER_OF_DATA_FILES = "numberOfDataFiles";
   public static final String REPRESENTATION_NUMBER_OF_DOCUMENTATION_FILES = "numberOfDocumentationFiles";
