@@ -350,22 +350,6 @@ public class RepresentationInformationDialogs {
           final FlowPanel rightSide = new FlowPanel();
           rightSide.addStyleName("dialog-right-side col9");
 
-          HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescriptionHelp.html",
-            new AsyncCallback<Void>() {
-              @Override
-              public void onFailure(Throwable caught) {
-                AsyncCallbackUtils.defaultFailureTreatment(caught);
-              }
-
-              @Override
-              public void onSuccess(Void result) {
-                dialogBox.center();
-              }
-            });
-
-          description.addStyleName("page-description");
-          rightSide.add(description);
-
           final Label aipLabel = new Label();
           aipLabel.setText(messages.representationInformationRelationObjectType(RelationObjectType.AIP.toString()));
           aipLabel.setTitle(messages.representationInformationRelationObjectType(RelationObjectType.AIP.toString()));
@@ -392,12 +376,6 @@ public class RepresentationInformationDialogs {
           txtLabel.addStyleName("dialog-left-item-label");
           leftSide.add(txtLabel);
 
-          final Label helpLabel = new Label();
-          helpLabel.setText(messages.title("help"));
-          helpLabel.setTitle(messages.title("help"));
-          helpLabel.addStyleName("dialog-left-item-label dialog-left-item-selected");
-          leftSide.add(helpLabel);
-
           content.add(leftSide);
           content.add(rightSide);
           layout.add(content);
@@ -406,8 +384,10 @@ public class RepresentationInformationDialogs {
           final Button cancelButton = new Button(cancelButtonText);
           final Button confirmButton = new Button(confirmButtonText);
           confirmButton.setEnabled(false);
+          final Label helpLabel = new Label(messages.title("help"));
           buttonPanel.add(cancelButton);
           buttonPanel.add(confirmButton);
+          buttonPanel.add(helpLabel);
           layout.add(buttonPanel);
           dialogBox.setWidget(layout);
 
@@ -424,6 +404,23 @@ public class RepresentationInformationDialogs {
 
           cancelButton.addStyleName("btn btn-link");
           confirmButton.addStyleName("pull-right btn btn-play");
+          helpLabel.addStyleName("pull-right btn btn-link");
+
+          AsyncCallback<Void> centerDialogBox = new AsyncCallback<Void>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+              dialogBox.center();
+            }
+
+            @Override
+            public void onSuccess(Void result) {
+              dialogBox.center();
+            }
+          };
+
+          showAIPDescription(aipLabel, riLabel, txtLabel, webLabel, rightSide, relationTypes, ri, confirmButton,
+            clickHandlers, dialogBox, callback, centerDialogBox);
 
           dialogBox.center();
           dialogBox.show();
@@ -435,10 +432,9 @@ public class RepresentationInformationDialogs {
               riLabel.removeStyleName("dialog-left-item-selected");
               txtLabel.removeStyleName("dialog-left-item-selected");
               webLabel.removeStyleName("dialog-left-item-selected");
-              helpLabel.addStyleName("dialog-left-item-selected");
               rightSide.clear();
 
-              HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescriptionHelp.html");
+              HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescriptionHelp.html", centerDialogBox);
               description.addStyleName("page-description");
               rightSide.add(description);
 
@@ -449,111 +445,8 @@ public class RepresentationInformationDialogs {
           aipLabel.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-              aipLabel.addStyleName("dialog-left-item-selected");
-              riLabel.removeStyleName("dialog-left-item-selected");
-              txtLabel.removeStyleName("dialog-left-item-selected");
-              webLabel.removeStyleName("dialog-left-item-selected");
-              helpLabel.removeStyleName("dialog-left-item-selected");
-
-              rightSide.clear();
-
-              HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsWithIntellectualEntity.html");
-              description.addStyleName("page-description");
-              rightSide.add(description);
-
-              Label selectLabel = new Label(messages.representationInformationRelationType());
-              selectLabel.addStyleName("form-label");
-              rightSide.add(selectLabel);
-
-              final ListBox select = new ListBox();
-              select.addStyleName("form-listbox");
-
-              for (Entry<String, String> type : relationTypes.getTranslations().get(RelationObjectType.AIP)
-                .entrySet()) {
-                select.addItem(type.getValue(), type.getKey());
-              }
-              rightSide.add(select);
-
-              Label linkLabel = new Label(messages.representationInformationRelationLink());
-              linkLabel.addStyleName("form-label");
-              rightSide.add(linkLabel);
-
-              final Button button = new Button(messages.selectButton());
-              button.addStyleName("btn btn-search");
-              rightSide.add(button);
-
-              final ValuedLabel linkText = new ValuedLabel();
-              linkText.setStyleName("label");
-              linkText.setVisible(false);
-              rightSide.add(linkText);
-
-              Label titleLabel = new Label(messages.representationInformationRelationTitle());
-              titleLabel.addStyleName("form-label");
-              rightSide.add(titleLabel);
-
-              final TextBox titleBox = new TextBox();
-              titleBox.addStyleName("form-textbox");
-              rightSide.add(titleBox);
-
-              button.addClickHandler(new ClickHandler() {
-                @Override
-                public void onClick(ClickEvent event) {
-                  List<String> aipsAlreadyLinked = new ArrayList<>();
-
-                  if (ri != null) {
-                    for (RepresentationInformationRelation r : ri.getRelations()) {
-                      if (r.getObjectType().equals(RelationObjectType.AIP)) {
-                        aipsAlreadyLinked.add(r.getLink());
-                      }
-                    }
-                  }
-
-                  Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, aipsAlreadyLinked));
-                  SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle(), filter, false, false);
-                  selectAipDialog.setSingleSelectionMode();
-                  selectAipDialog.showAndCenter();
-                  selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {
-
-                    @Override
-                    public void onValueChange(ValueChangeEvent<IndexedAIP> event) {
-                      final IndexedAIP aip = event.getValue();
-                      button.setVisible(false);
-                      linkText.setVisible(true);
-                      linkText.setValue(aip.getId());
-
-                      if (StringUtils.isNotBlank(aip.getTitle())) {
-                        linkText.setText(aip.getTitle());
-                      } else {
-                        linkText.setText(messages.noTitleMessage());
-                      }
-
-                      if (titleBox.getText().isEmpty()) {
-                        titleBox.setText(aip.getTitle());
-                      }
-
-                      confirmButton.setEnabled(true);
-                    }
-                  });
-                }
-              });
-
-              for (HandlerRegistration handler : clickHandlers) {
-                handler.removeHandler();
-              }
-
-              clickHandlers.add(confirmButton.addClickHandler(new ClickHandler() {
-                @Override
-                public void onClick(ClickEvent event) {
-                  if (!titleBox.getText().isEmpty() && !linkText.getValue().isEmpty()) {
-                    dialogBox.hide();
-                    callback.onSuccess(new RepresentationInformationRelation(select.getSelectedValue(),
-                      RelationObjectType.AIP, linkText.getValue(), titleBox.getValue()));
-                  } else {
-                    Toast.showError(messages.representationInformationMissingFieldsTitle(),
-                      messages.representationInformationMissingFields());
-                  }
-                }
-              }));
+              showAIPDescription(aipLabel, riLabel, txtLabel, webLabel, rightSide, relationTypes, ri, confirmButton,
+                clickHandlers, dialogBox, callback, centerDialogBox);
             }
           });
 
@@ -564,11 +457,11 @@ public class RepresentationInformationDialogs {
               aipLabel.removeStyleName("dialog-left-item-selected");
               txtLabel.removeStyleName("dialog-left-item-selected");
               webLabel.removeStyleName("dialog-left-item-selected");
-              helpLabel.removeStyleName("dialog-left-item-selected");
 
               rightSide.clear();
 
-              HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescriptionWithRI.html");
+              HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescriptionWithRI.html",
+                centerDialogBox);
               description.addStyleName("page-description");
               rightSide.add(description);
 
@@ -670,11 +563,11 @@ public class RepresentationInformationDialogs {
               aipLabel.removeStyleName("dialog-left-item-selected");
               riLabel.removeStyleName("dialog-left-item-selected");
               webLabel.removeStyleName("dialog-left-item-selected");
-              helpLabel.removeStyleName("dialog-left-item-selected");
 
               rightSide.clear();
 
-              HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescriptionWithText.html");
+              HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescriptionWithText.html",
+                centerDialogBox);
               description.addStyleName("page-description");
               rightSide.add(description);
 
@@ -727,11 +620,11 @@ public class RepresentationInformationDialogs {
               aipLabel.removeStyleName("dialog-left-item-selected");
               riLabel.removeStyleName("dialog-left-item-selected");
               txtLabel.removeStyleName("dialog-left-item-selected");
-              helpLabel.removeStyleName("dialog-left-item-selected");
 
               rightSide.clear();
 
-              HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescriptionWithWeb.html");
+              HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescriptionWithWeb.html",
+                centerDialogBox);
               description.addStyleName("page-description");
               rightSide.add(description);
 
@@ -786,6 +679,115 @@ public class RepresentationInformationDialogs {
           });
         }
       });
+  }
+
+  private static void showAIPDescription(Label aipLabel, Label riLabel, Label txtLabel, Label webLabel,
+    FlowPanel rightSide, RelationTypeTranslationsBundle relationTypes, RepresentationInformation ri,
+    Button confirmButton, List<HandlerRegistration> clickHandlers, DialogBox dialogBox,
+    AsyncCallback<RepresentationInformationRelation> callback, AsyncCallback<Void> centerDialogBox) {
+    aipLabel.addStyleName("dialog-left-item-selected");
+    riLabel.removeStyleName("dialog-left-item-selected");
+    txtLabel.removeStyleName("dialog-left-item-selected");
+    webLabel.removeStyleName("dialog-left-item-selected");
+
+    rightSide.clear();
+
+    HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsWithIntellectualEntity.html", centerDialogBox);
+    description.addStyleName("page-description");
+    rightSide.add(description);
+
+    Label selectLabel = new Label(messages.representationInformationRelationType());
+    selectLabel.addStyleName("form-label");
+    rightSide.add(selectLabel);
+
+    final ListBox select = new ListBox();
+    select.addStyleName("form-listbox");
+
+    for (Entry<String, String> type : relationTypes.getTranslations().get(RelationObjectType.AIP).entrySet()) {
+      select.addItem(type.getValue(), type.getKey());
+    }
+    rightSide.add(select);
+
+    Label linkLabel = new Label(messages.representationInformationRelationLink());
+    linkLabel.addStyleName("form-label");
+    rightSide.add(linkLabel);
+
+    final Button button = new Button(messages.selectButton());
+    button.addStyleName("btn btn-search");
+    rightSide.add(button);
+
+    final ValuedLabel linkText = new ValuedLabel();
+    linkText.setStyleName("label");
+    linkText.setVisible(false);
+    rightSide.add(linkText);
+
+    Label titleLabel = new Label(messages.representationInformationRelationTitle());
+    titleLabel.addStyleName("form-label");
+    rightSide.add(titleLabel);
+
+    final TextBox titleBox = new TextBox();
+    titleBox.addStyleName("form-textbox");
+    rightSide.add(titleBox);
+
+    button.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        List<String> aipsAlreadyLinked = new ArrayList<>();
+
+        if (ri != null) {
+          for (RepresentationInformationRelation r : ri.getRelations()) {
+            if (r.getObjectType().equals(RelationObjectType.AIP)) {
+              aipsAlreadyLinked.add(r.getLink());
+            }
+          }
+        }
+
+        Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, aipsAlreadyLinked));
+        SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle(), filter, false, false);
+        selectAipDialog.setSingleSelectionMode();
+        selectAipDialog.showAndCenter();
+        selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {
+
+          @Override
+          public void onValueChange(ValueChangeEvent<IndexedAIP> event) {
+            final IndexedAIP aip = event.getValue();
+            button.setVisible(false);
+            linkText.setVisible(true);
+            linkText.setValue(aip.getId());
+
+            if (StringUtils.isNotBlank(aip.getTitle())) {
+              linkText.setText(aip.getTitle());
+            } else {
+              linkText.setText(messages.noTitleMessage());
+            }
+
+            if (titleBox.getText().isEmpty()) {
+              titleBox.setText(aip.getTitle());
+            }
+
+            confirmButton.setEnabled(true);
+          }
+        });
+      }
+    });
+
+    for (HandlerRegistration handler : clickHandlers) {
+      handler.removeHandler();
+    }
+
+    clickHandlers.add(confirmButton.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        if (!titleBox.getText().isEmpty() && !linkText.getValue().isEmpty()) {
+          dialogBox.hide();
+          callback.onSuccess(new RepresentationInformationRelation(select.getSelectedValue(), RelationObjectType.AIP,
+            linkText.getValue(), titleBox.getValue()));
+        } else {
+          Toast.showError(messages.representationInformationMissingFieldsTitle(),
+            messages.representationInformationMissingFields());
+        }
+      }
+    }));
   }
 
   public static void showPromptAddRepresentationInformationWithAssociation(SafeHtml title,
