@@ -10,7 +10,6 @@ package org.roda.core.plugins.plugins.characterization;
 import java.io.IOException;
 import java.util.Collection;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.xmlbeans.XmlException;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -42,7 +41,6 @@ public class PremisSkeletonPluginUtils {
   public static void createPremisSkeletonOnRepresentation(ModelService model, String aipId, String representationId,
     Collection<String> fixityAlgorithms) throws IOException, RequestNotValidException, GenericException,
     NotFoundException, AuthorizationDeniedException, XmlException, ValidationException {
-
     gov.loc.premis.v3.Representation representation;
 
     try {
@@ -52,38 +50,35 @@ public class PremisSkeletonPluginUtils {
       representation = PremisV3Utils.createBaseRepresentation(aipId, representationId);
     }
 
-    boolean notifyInSteps = false;
-
-    boolean recursive = true;
-    CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aipId, representationId, recursive);
-    for (OptionalWithCause<File> oFile : allFiles) {
-      if (oFile.isPresent()) {
-        File file = oFile.get();
-        if (!file.isDirectory()) {
-          try {
-            model.retrievePreservationFile(aipId, representationId, file.getPath(), file.getId());
-            // 20170830 hsilva: this log is after the retrieve because the
-            // method in the catch also does the same logging
-            LOGGER.debug("Processing {}", file);
-          } catch (NotFoundException e1) {
-            PremisSkeletonPluginUtils.createPremisSkeletonOnFile(model, file, fixityAlgorithms, representation);
+    try (CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aipId, representationId, true)) {
+      for (OptionalWithCause<File> oFile : allFiles) {
+        if (oFile.isPresent()) {
+          File file = oFile.get();
+          if (!file.isDirectory()) {
+            try {
+              model.retrievePreservationFile(aipId, representationId, file.getPath(), file.getId());
+              // 20170830 hsilva: this log is after the retrieve because the
+              // method in the catch also does the same logging
+              LOGGER.debug("Processing {}", file);
+            } catch (NotFoundException e1) {
+              PremisSkeletonPluginUtils.createPremisSkeletonOnFile(model, file, fixityAlgorithms, representation);
+            }
           }
+        } else {
+          LOGGER.error("Cannot process File", oFile.getCause());
         }
-      } else {
-        LOGGER.error("Cannot process File", oFile.getCause());
       }
     }
-    IOUtils.closeQuietly(allFiles);
 
     ContentPayload representationPayload = PremisV3Utils.representationToBinary(representation);
     try {
       model.createPreservationMetadata(PreservationMetadataType.REPRESENTATION, aipId, representationId,
-        representationPayload, notifyInSteps);
+        representationPayload, false);
     } catch (AlreadyExistsException e1) {
       String pmId = IdUtils.getPreservationId(PreservationMetadataType.REPRESENTATION, aipId, representationId, null,
         null);
       model.updatePreservationMetadata(pmId, PreservationMetadataType.REPRESENTATION, aipId, representationId, null,
-        null, representationPayload, notifyInSteps);
+        null, representationPayload, false);
     }
   }
 
@@ -118,12 +113,12 @@ public class PremisSkeletonPluginUtils {
           PreservationMetadata pm = model.createPreservationMetadata(PreservationMetadataType.FILE, file.getAipId(),
             file.getRepresentationId(), file.getPath(), file.getId(), filePreservation, notifyInSteps);
           pmId = pm.getId();
-          model.notifyFileCreated(file);
+          model.notifyFileCreated(file).failOnError();
         } catch (AlreadyExistsException e1) {
           pmId = IdUtils.getPreservationFileId(file.getId());
           model.updatePreservationMetadata(pmId, PreservationMetadataType.FILE, file.getAipId(),
             file.getRepresentationId(), file.getPath(), file.getId(), filePreservation, notifyInSteps);
-          model.notifyFileUpdated(file);
+          model.notifyFileUpdated(file).failOnError();
         }
 
         PremisV3Utils.linkFileToRepresentation(pmId, RodaConstants.PREMIS_RELATIONSHIP_TYPE_STRUCTURAL,

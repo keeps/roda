@@ -14,13 +14,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.roda.core.common.ReturnWithExceptions;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.ReturnWithExceptions;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.index.select.SelectedItems;
@@ -35,6 +35,7 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.SolrUtils;
+import org.roda.core.model.ModelObserver;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
@@ -138,7 +139,7 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
         LOGGER.trace("Reindexing {} {}", object.getClass().getSimpleName(), object.getId());
       }
 
-      ReturnWithExceptions<Void> exceptions = index.reindex(object);
+      ReturnWithExceptions<Void, ModelObserver> exceptions = index.reindex(object);
       List<Exception> exceptionList = exceptions.getExceptions();
       if (exceptionList.isEmpty()) {
         jobPluginInfo.incrementObjectsProcessedWithSuccess();

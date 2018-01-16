@@ -121,7 +121,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
               LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());
               PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aip.getId(), representation.getId(),
                 algorithms);
-              model.notifyRepresentationUpdated(representation);
+              model.notifyRepresentationUpdated(representation).failOnError();
             }
 
             jobPluginInfo.incrementObjectsProcessedWithSuccess();
@@ -155,7 +155,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
                 LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());
                 PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aip.getId(),
                   representation.getId(), algorithms);
-                model.notifyRepresentationUpdated(representation);
+                model.notifyRepresentationUpdated(representation).failOnError();
               } catch (RODAException | XmlException | IOException e) {
                 state = PluginState.FAILURE;
                 LOGGER.error("Failed to execute premis skeleton plugin on representation {} from AIP {}",
@@ -212,7 +212,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
       try {
         PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, representation.getAipId(),
           representation.getId(), algorithms);
-        model.notifyRepresentationUpdated(representation);
+        model.notifyRepresentationUpdated(representation).failOnError();
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
       } catch (RODAException | XmlException | IOException e) {
         LOGGER.error("Error processing representation {}", representation.getId(), e);

@@ -119,7 +119,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
             for (Representation representation : aip.getRepresentations()) {
               LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
               sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation));
-              model.notifyRepresentationUpdated(representation);
+              model.notifyRepresentationUpdated(representation).failOnError();
             }
 
             jobPluginInfo.incrementObjectsProcessedWithSuccess();
@@ -146,7 +146,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
               try {
                 LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
                 sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation));
-                model.notifyRepresentationUpdated(representation);
+                model.notifyRepresentationUpdated(representation).failOnError();
               } catch (RODAException e) {
                 state = PluginState.FAILURE;
                 LOGGER.error("Error running Siegfried " + aip.getId(), e);
@@ -159,10 +159,8 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
         }
 
         try {
-          List<LinkingIdentifier> outcomes = null;
-          boolean notify = true;
-          PluginHelper.createPluginEvent(this, aip.getId(), model, index, sources, outcomes,
-            reportItem.getPluginState(), "", notify);
+          PluginHelper.createPluginEvent(this, aip.getId(), model, index, sources, null, reportItem.getPluginState(),
+            "", true);
         } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
           | AuthorizationDeniedException | AlreadyExistsException e) {
           LOGGER.error("Error creating event: {}", e.getMessage(), e);
@@ -194,7 +192,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
         sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation));
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
         reportItem.setPluginState(PluginState.SUCCESS);
-        model.notifyRepresentationUpdated(representation);
+        model.notifyRepresentationUpdated(representation).failOnError();
       } catch (PluginException | NotFoundException | GenericException | RequestNotValidException
         | AuthorizationDeniedException | AlreadyExistsException e) {
         LOGGER.error("Error running Siegfried {}: {}", representation.getAipId(), e.getMessage(), e);
@@ -205,10 +203,8 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
       }
 
       try {
-        List<LinkingIdentifier> outcomes = null;
-        boolean notify = true;
         PluginHelper.createPluginEvent(this, representation.getAipId(), representation.getId(), model, index, sources,
-          outcomes, reportItem.getPluginState(), "", notify);
+          null, reportItem.getPluginState(), "", true);
       } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
         | AuthorizationDeniedException | AlreadyExistsException e) {
         LOGGER.error("Error creating event: {}", e.getMessage(), e);

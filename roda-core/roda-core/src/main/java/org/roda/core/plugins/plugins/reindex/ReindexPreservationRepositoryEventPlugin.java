@@ -123,7 +123,7 @@ public class ReindexPreservationRepositoryEventPlugin extends AbstractPlugin<Voi
 
       for (OptionalWithCause<PreservationMetadata> opm : iterable) {
         if (opm.isPresent()) {
-          model.notifyPreservationMetadataCreated(opm.get());
+          model.notifyPreservationMetadataCreated(opm.get()).failOnError();
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
         } else {
           jobPluginInfo.incrementObjectsProcessedWithFailure();

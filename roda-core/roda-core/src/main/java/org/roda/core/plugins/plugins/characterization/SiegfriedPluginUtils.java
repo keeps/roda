@@ -142,7 +142,7 @@ public class SiegfriedPluginUtils {
       file.getRepresentationId(), file.getPath(), file.getId(), filePath);
     IOUtils.closeQuietly(directAccess);
 
-    model.notifyFileUpdated(file);
+    model.notifyFileUpdated(file).failOnError();
     return sources;
   }
 

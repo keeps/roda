@@ -801,7 +801,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
     ValidationException, IOException, XmlException {
     List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
     PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aipId, representation.getId(), algorithms);
-    model.notifyRepresentationUpdated(representation);
+    model.notifyRepresentationUpdated(representation).failOnError();
   }
 
   private void createEvent(ModelService model, IndexService index, String aipId, String representationId,

@@ -226,11 +226,8 @@ public class ModelService extends ModelObservable {
 
   public CloseableIterable<OptionalWithCause<AIP>> listAIPs()
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    final boolean recursive = false;
-
     final CloseableIterable<Resource> resourcesIterable = storage
-      .listResourcesUnderContainer(ModelUtils.getAIPContainerPath(), recursive);
-
+      .listResourcesUnderContainer(ModelUtils.getAIPContainerPath(), false);
     return ResourceParseUtils.convert(getStorage(), resourcesIterable, AIP.class);
   }
 
@@ -278,7 +275,7 @@ public class ModelService extends ModelObservable {
       aip.setUpdatedOn(new Date());
 
       if (notify) {
-        notifyAipCreated(aip);
+        notifyAipCreated(aip).failOnError();
       }
     } else {
       throw new ValidationException(validationReport);
@@ -305,7 +302,7 @@ public class ModelService extends ModelObservable {
     createAIPMetadata(aip);
 
     if (notify) {
-      notifyAipCreated(aip);
+      notifyAipCreated(aip).failOnError();
     }
 
     return aip;
@@ -338,7 +335,7 @@ public class ModelService extends ModelObservable {
     createAIPMetadata(aip);
 
     if (notify) {
-      notifyAipCreated(aip);
+      notifyAipCreated(aip).failOnError();
     }
 
     return aip;
@@ -358,7 +355,7 @@ public class ModelService extends ModelObservable {
     createAIPMetadata(aip);
 
     if (notify) {
-      notifyAipCreated(aip);
+      notifyAipCreated(aip).failOnError();
     }
 
     return aip;
@@ -373,14 +370,14 @@ public class ModelService extends ModelObservable {
   public AIP notifyAipCreated(String aipId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
-    notifyAipCreated(aip);
+    notifyAipCreated(aip).failOnError();
     return aip;
   }
 
   public AIP notifyAipUpdated(String aipId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
-    notifyAipUpdated(aip);
+    notifyAipUpdated(aip).failOnError();
     return aip;
   }
 
@@ -432,7 +429,7 @@ public class ModelService extends ModelObservable {
       aip = ResourceParseUtils.getAIPMetadata(getStorage(), directoryUpdated.getStoragePath());
       aip.setUpdatedBy(updatedBy);
       aip.setUpdatedOn(new Date());
-      notifyAipUpdated(aip);
+      notifyAipUpdated(aip).failOnError();
     } else {
       throw new ValidationException(validationReport);
     }
@@ -445,7 +442,7 @@ public class ModelService extends ModelObservable {
     aip.setUpdatedBy(updatedBy);
     aip.setUpdatedOn(new Date());
     updateAIPMetadata(aip);
-    notifyAipUpdated(aip);
+    notifyAipUpdated(aip).failOnError();
     return aip;
   }
 
@@ -455,7 +452,7 @@ public class ModelService extends ModelObservable {
     aip.setUpdatedOn(new Date());
     updateAIPMetadata(aip);
 
-    notifyAipStateUpdated(aip);
+    notifyAipStateUpdated(aip).failOnError();
     return aip;
   }
 
@@ -474,7 +471,7 @@ public class ModelService extends ModelObservable {
     aip.setUpdatedBy(updatedBy);
     updateAIPMetadata(aip);
 
-    notifyAipMoved(aip, oldParentId, parentId);
+    notifyAipMoved(aip, oldParentId, parentId).failOnError();
 
     return aip;
   }
@@ -483,7 +480,7 @@ public class ModelService extends ModelObservable {
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     StoragePath aipPath = ModelUtils.getAIPStoragePath(aipId);
     storage.deleteResource(aipPath);
-    notifyAipDeleted(aipId);
+    notifyAipDeleted(aipId).failOnError();
   }
 
   private ValidationReport isAIPvalid(ModelService model, Directory directory,
@@ -509,7 +506,7 @@ public class ModelService extends ModelObservable {
     aip.setType(type);
     aip.setUpdatedOn(new Date());
     aip.setUpdatedBy(updatedBy);
-    notifyAipUpdated(aip);
+    notifyAipUpdated(aip).failOnError();
     updateAIPMetadata(aip);
   }
 
@@ -598,7 +595,7 @@ public class ModelService extends ModelObservable {
     updateAIPMetadata(aip);
 
     if (notify) {
-      notifyDescriptiveMetadataCreated(descriptiveMetadata);
+      notifyDescriptiveMetadataCreated(descriptiveMetadata).failOnError();
     }
 
     return descriptiveMetadata;
@@ -635,7 +632,7 @@ public class ModelService extends ModelObservable {
       descriptiveMetadataVersion);
 
     updateAIPMetadata(aip);
-    notifyDescriptiveMetadataUpdated(ret);
+    notifyDescriptiveMetadataUpdated(ret).failOnError();
 
     return ret;
   }
@@ -676,7 +673,7 @@ public class ModelService extends ModelObservable {
     deleteDescriptiveMetadata(aip, representationId, descriptiveMetadataId);
 
     updateAIPMetadata(aip);
-    notifyDescriptiveMetadataDeleted(aipId, representationId, descriptiveMetadataId);
+    notifyDescriptiveMetadataDeleted(aipId, representationId, descriptiveMetadataId).failOnError();
   }
 
   private void deleteDescriptiveMetadata(AIP aip, String representationId, String descriptiveMetadataId) {
@@ -733,7 +730,7 @@ public class ModelService extends ModelObservable {
     BinaryVersion currentVersion = storage.createBinaryVersion(binaryPath, properties);
     storage.revertBinaryVersion(binaryPath, versionId);
 
-    notifyDescriptiveMetadataUpdated(retrieveDescriptiveMetadata(aipId, descriptiveMetadataId));
+    notifyDescriptiveMetadataUpdated(retrieveDescriptiveMetadata(aipId, descriptiveMetadataId)).failOnError();
 
     return currentVersion;
   }
@@ -869,7 +866,7 @@ public class ModelService extends ModelObservable {
     updateAIPMetadata(aip);
 
     if (notify) {
-      notifyRepresentationCreated(representation);
+      notifyRepresentationCreated(representation).failOnError();
     }
 
     return representation;
@@ -902,12 +899,12 @@ public class ModelService extends ModelObservable {
     aip.getRepresentations().add(representation);
     updateAIPMetadata(aip);
 
-    notifyRepresentationCreated(representation);
+    notifyRepresentationCreated(representation).failOnError();
     return representation;
   }
 
-  public Representation updateRepresentationInfo(Representation representation) {
-    notifyRepresentationUpdated(representation);
+  public Representation updateRepresentationInfo(Representation representation) throws GenericException {
+    notifyRepresentationUpdated(representation).failOnError();
     return representation;
   }
 
@@ -922,7 +919,7 @@ public class ModelService extends ModelObservable {
         representation.setType(type);
         representation.setUpdatedOn(new Date());
         representation.setUpdatedBy(updatedBy);
-        notifyRepresentationUpdated(representation);
+        notifyRepresentationUpdated(representation).failOnError();
         break;
       }
     }
@@ -950,7 +947,7 @@ public class ModelService extends ModelObservable {
       representation.get().setUpdatedOn(new Date());
       representation.get().setUpdatedBy(updatedBy);
       updateAIPMetadata(aip);
-      notifyRepresentationUpdated(representation.get());
+      notifyRepresentationUpdated(representation.get()).failOnError();
     }
   }
 
@@ -973,7 +970,7 @@ public class ModelService extends ModelObservable {
     // build return object
     representation = new Representation(representationId, aipId, original, type);
     representation.setUpdatedBy(updatedBy);
-    notifyRepresentationUpdated(representation);
+    notifyRepresentationUpdated(representation).failOnError();
     return representation;
   }
 
@@ -993,7 +990,7 @@ public class ModelService extends ModelObservable {
     }
 
     updateAIPMetadata(aip);
-    notifyRepresentationDeleted(aipId, representationId);
+    notifyRepresentationDeleted(aipId, representationId).failOnError();
   }
 
   public CloseableIterable<OptionalWithCause<File>> listFilesUnder(String aipId, String representationId,
@@ -1065,7 +1062,7 @@ public class ModelService extends ModelObservable {
     File file = ResourceParseUtils.convertResourceToFile(createdBinary);
 
     if (notify) {
-      notifyFileCreated(file);
+      notifyFileCreated(file).failOnError();
     }
 
     return file;
@@ -1080,7 +1077,7 @@ public class ModelService extends ModelObservable {
     File file = ResourceParseUtils.convertResourceToFile(createdDirectory);
 
     if (notify) {
-      notifyFileCreated(file);
+      notifyFileCreated(file).failOnError();
     }
 
     return file;
@@ -1097,7 +1094,7 @@ public class ModelService extends ModelObservable {
     File file = ResourceParseUtils.convertResourceToFile(binaryUpdated);
 
     if (notify) {
-      notifyFileUpdated(file);
+      notifyFileUpdated(file).failOnError();
     }
 
     return file;
@@ -1116,7 +1113,7 @@ public class ModelService extends ModelObservable {
     storage.deleteResource(filePath);
 
     if (notify) {
-      notifyFileDeleted(aipId, representationId, directoryPath, fileId);
+      notifyFileDeleted(aipId, representationId, directoryPath, fileId).failOnError();
     }
   }
 
@@ -1161,9 +1158,9 @@ public class ModelService extends ModelObservable {
     FSUtils.move(fullPath, newFullPath, replaceExisting);
 
     if (reindexResources) {
-      notifyRepresentationUpdated(retrieveRepresentation(newAipId, newRepresentationId));
+      notifyRepresentationUpdated(retrieveRepresentation(newAipId, newRepresentationId)).failOnError();
       if (!newAipId.equals(file.getAipId()) || !newRepresentationId.equals(file.getRepresentationId())) {
-        notifyRepresentationUpdated(retrieveRepresentation(file.getAipId(), file.getRepresentationId()));
+        notifyRepresentationUpdated(retrieveRepresentation(file.getAipId(), file.getRepresentationId())).failOnError();
       }
     }
 
@@ -1323,7 +1320,7 @@ public class ModelService extends ModelObservable {
     storage.createBinary(binaryPath, payload, asReference);
 
     if (notify) {
-      notifyPreservationMetadataCreated(pm);
+      notifyPreservationMetadataCreated(pm).failOnError();
     }
     return pm;
   }
@@ -1343,7 +1340,7 @@ public class ModelService extends ModelObservable {
     storage.updateBinaryContent(binaryPath, payload, false, true);
 
     if (notify) {
-      notifyPreservationMetadataUpdated(pm);
+      notifyPreservationMetadataUpdated(pm).failOnError();
     }
     return pm;
   }
@@ -1361,7 +1358,7 @@ public class ModelService extends ModelObservable {
     storage.deleteResource(binaryPath);
 
     if (notify) {
-      notifyPreservationMetadataDeleted(pm);
+      notifyPreservationMetadataDeleted(pm).failOnError();
     }
   }
 
@@ -1554,7 +1551,7 @@ public class ModelService extends ModelObservable {
     OtherMetadata om = new OtherMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, fileSuffix);
 
     if (notify) {
-      notifyOtherMetadataCreated(om);
+      notifyOtherMetadataCreated(om).failOnError();
     }
 
     return om;
@@ -1672,7 +1669,7 @@ public class ModelService extends ModelObservable {
 
       // emit event
       if (notify) {
-        notifyLogEntryCreated(logEntry);
+        notifyLogEntryCreated(logEntry).failOnError();
       }
     }
   }
@@ -1722,8 +1719,10 @@ public class ModelService extends ModelObservable {
     throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException {
     User registeredUser = UserUtility.getLdapUtility().registerUser(user, password);
     if (notify) {
-      notifyUserCreated(registeredUser);
+      notifyUserCreated(registeredUser).failOnError();
+      ;
     }
+
     return registeredUser;
   }
 
@@ -1738,9 +1737,11 @@ public class ModelService extends ModelObservable {
     if (password != null) {
       UserUtility.getLdapUtility().setUserPassword(createdUser.getId(), password);
     }
+
     if (notify) {
-      notifyUserCreated(createdUser);
+      notifyUserCreated(createdUser).failOnError();
     }
+
     return createdUser;
   }
 
@@ -1753,8 +1754,9 @@ public class ModelService extends ModelObservable {
 
       User updatedUser = UserUtility.getLdapUtility().modifyUser(user);
       if (notify) {
-        notifyUserUpdated(updatedUser);
+        notifyUserUpdated(updatedUser).failOnError();
       }
+
       return updatedUser;
     } catch (IllegalOperationException e) {
       throw new AuthorizationDeniedException("Illegal operation", e);
@@ -1765,10 +1767,10 @@ public class ModelService extends ModelObservable {
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
     try {
       User updatedUser = UserUtility.getLdapUtility().modifySelfUser(user, password);
-
       if (notify) {
-        notifyUserUpdated(updatedUser);
+        notifyUserUpdated(updatedUser).failOnError();
       }
+
       return updatedUser;
     } catch (IllegalOperationException e) {
       throw new AuthorizationDeniedException("Illegal operation", e);
@@ -1780,7 +1782,7 @@ public class ModelService extends ModelObservable {
     try {
       UserUtility.getLdapUtility().removeUser(id);
       if (notify) {
-        notifyUserDeleted(id);
+        notifyUserDeleted(id).failOnError();
       }
     } catch (IllegalOperationException e) {
       throw new AuthorizationDeniedException("Illegal operation", e);
@@ -1817,8 +1819,9 @@ public class ModelService extends ModelObservable {
   public Group createGroup(Group group, boolean notify) throws GenericException, AlreadyExistsException {
     Group createdGroup = UserUtility.getLdapUtility().addGroup(group);
     if (notify) {
-      notifyGroupCreated(createdGroup);
+      notifyGroupCreated(createdGroup).failOnError();
     }
+
     return createdGroup;
   }
 
@@ -1827,8 +1830,9 @@ public class ModelService extends ModelObservable {
     try {
       Group updatedGroup = UserUtility.getLdapUtility().modifyGroup(group);
       if (notify) {
-        notifyGroupUpdated(updatedGroup);
+        notifyGroupUpdated(updatedGroup).failOnError();
       }
+
       return updatedGroup;
     } catch (IllegalOperationException e) {
       throw new AuthorizationDeniedException("Illegal operation", e);
@@ -1840,7 +1844,7 @@ public class ModelService extends ModelObservable {
     try {
       UserUtility.getLdapUtility().removeGroup(id);
       if (notify) {
-        notifyGroupDeleted(id);
+        notifyGroupDeleted(id).failOnError();
       }
     } catch (IllegalOperationException e) {
       throw new AuthorizationDeniedException("Illegal operation", e);
@@ -1857,9 +1861,11 @@ public class ModelService extends ModelObservable {
     if (useModel) {
       user = UserUtility.getLdapUtility().confirmUserEmail(username, email, emailConfirmationToken);
     }
+
     if (user != null && notify) {
-      notifyUserUpdated(user);
+      notifyUserUpdated(user).failOnError();
     }
+
     return user;
   }
 
@@ -1869,9 +1875,11 @@ public class ModelService extends ModelObservable {
     if (useModel) {
       user = UserUtility.getLdapUtility().requestPasswordReset(username, email);
     }
+
     if (user != null && notify) {
-      notifyUserUpdated(user);
+      notifyUserUpdated(user).failOnError();
     }
+
     return user;
   }
 
@@ -1881,9 +1889,11 @@ public class ModelService extends ModelObservable {
     if (useModel) {
       user = UserUtility.getLdapUtility().resetUserPassword(username, password, resetPasswordToken);
     }
+
     if (user != null && notify) {
-      notifyUserUpdated(user);
+      notifyUserUpdated(user).failOnError();
     }
+
     return user;
   }
 
@@ -1912,7 +1922,7 @@ public class ModelService extends ModelObservable {
     storage.updateBinaryContent(jobPath, new StringContentPayload(jobAsJson), false, true);
 
     // index it
-    notifyJobCreatedOrUpdated(job, false);
+    notifyJobCreatedOrUpdated(job, false).failOnError();
   }
 
   public Job retrieveJob(String jobId)
@@ -1941,7 +1951,7 @@ public class ModelService extends ModelObservable {
     storage.deleteResource(jobPath);
 
     // remove it from index
-    notifyJobDeleted(jobId);
+    notifyJobDeleted(jobId).failOnError();
   }
 
   public Report retrieveJobReport(String jobId, String givenId, boolean generateId)
@@ -1976,7 +1986,7 @@ public class ModelService extends ModelObservable {
     }
 
     // index it
-    notifyJobReportCreatedOrUpdated(jobReport, job);
+    notifyJobReportCreatedOrUpdated(jobReport, job).failOnError();
   }
 
   public void deleteJobReport(String jobId, String jobReportId)
@@ -1987,7 +1997,7 @@ public class ModelService extends ModelObservable {
     storage.deleteResource(jobReportPath);
 
     // remove it from index
-    notifyJobReportDeleted(jobReportId);
+    notifyJobReportDeleted(jobReportId).failOnError();
   }
 
   public void updateAIPPermissions(AIP aip, String updatedBy)
@@ -1995,19 +2005,19 @@ public class ModelService extends ModelObservable {
     aip.setUpdatedBy(updatedBy);
     aip.setUpdatedOn(new Date());
     updateAIPMetadata(aip);
-    notifyAipPermissionsUpdated(aip);
+    notifyAipPermissionsUpdated(aip).failOnError();
   }
 
   public void updateDIPPermissions(DIP dip)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
     dip.setLastModified(new Date());
     updateDIPMetadata(dip);
-    notifyDipPermissionsUpdated(dip);
+    notifyDipPermissionsUpdated(dip).failOnError();
   }
 
-  public void deleteTransferredResource(TransferredResource transferredResource) {
+  public void deleteTransferredResource(TransferredResource transferredResource) throws GenericException {
     FSUtils.deletePathQuietly(Paths.get(transferredResource.getFullPath()));
-    notifyTransferredResourceDeleted(transferredResource.getUUID());
+    notifyTransferredResourceDeleted(transferredResource.getUUID()).failOnError();
   }
 
   /***************** Risk related *****************/
@@ -2030,7 +2040,7 @@ public class ModelService extends ModelObservable {
       LOGGER.error("Error creating risk in storage", e);
     }
 
-    notifyRiskCreatedOrUpdated(risk, 0, commit);
+    notifyRiskCreatedOrUpdated(risk, 0, commit).failOnError();
     return risk;
   }
 
@@ -2051,7 +2061,7 @@ public class ModelService extends ModelObservable {
       LOGGER.error("Error updating risk in storage", e);
     }
 
-    notifyRiskCreatedOrUpdated(risk, incidences, commit);
+    notifyRiskCreatedOrUpdated(risk, incidences, commit).failOnError();
     return risk;
   }
 
@@ -2059,7 +2069,7 @@ public class ModelService extends ModelObservable {
     throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
     StoragePath riskPath = ModelUtils.getRiskStoragePath(riskId);
     storage.deleteResource(riskPath);
-    notifyRiskDeleted(riskId, commit);
+    notifyRiskDeleted(riskId, commit).failOnError();
   }
 
   public Risk retrieveRisk(String riskId)
@@ -2104,7 +2114,7 @@ public class ModelService extends ModelObservable {
     BinaryVersion currentVersion = storage.createBinaryVersion(binaryPath, properties);
     storage.revertBinaryVersion(binaryPath, versionId);
 
-    notifyRiskCreatedOrUpdated(retrieveRisk(riskId), incidences, commit);
+    notifyRiskCreatedOrUpdated(retrieveRisk(riskId), incidences, commit).failOnError();
     return currentVersion;
   }
 
@@ -2121,7 +2131,7 @@ public class ModelService extends ModelObservable {
       LOGGER.error("Error creating risk incidence in storage", e);
     }
 
-    notifyRiskIncidenceCreatedOrUpdated(riskIncidence, commit);
+    notifyRiskIncidenceCreatedOrUpdated(riskIncidence, commit).failOnError();
     return riskIncidence;
   }
 
@@ -2135,7 +2145,7 @@ public class ModelService extends ModelObservable {
       LOGGER.error("Error updating risk incidence in storage", e);
     }
 
-    notifyRiskIncidenceCreatedOrUpdated(riskIncidence, commit);
+    notifyRiskIncidenceCreatedOrUpdated(riskIncidence, commit).failOnError();
     return riskIncidence;
   }
 
@@ -2143,7 +2153,7 @@ public class ModelService extends ModelObservable {
     throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
     StoragePath riskIncidencePath = ModelUtils.getRiskIncidenceStoragePath(riskIncidenceId);
     storage.deleteResource(riskIncidencePath);
-    notifyRiskIncidenceDeleted(riskIncidenceId, commit);
+    notifyRiskIncidenceDeleted(riskIncidenceId, commit).failOnError();
   }
 
   public RiskIncidence retrieveRiskIncidence(String incidenceId)
@@ -2178,7 +2188,7 @@ public class ModelService extends ModelObservable {
       String notificationAsJson = JsonUtils.getJsonFromObject(processedNotification);
       StoragePath notificationPath = ModelUtils.getNotificationStoragePath(processedNotification.getId());
       storage.createBinary(notificationPath, new StringContentPayload(notificationAsJson), false);
-      notifyNotificationCreatedOrUpdated(processedNotification);
+      notifyNotificationCreatedOrUpdated(processedNotification).failOnError();
     } catch (NotFoundException | RequestNotValidException | AlreadyExistsException e) {
       LOGGER.error("Error creating notification in storage", e);
       throw new GenericException(e);
@@ -2197,7 +2207,7 @@ public class ModelService extends ModelObservable {
       throw new GenericException(e);
     }
 
-    notifyNotificationCreatedOrUpdated(notification);
+    notifyNotificationCreatedOrUpdated(notification).failOnError();
     return notification;
   }
 
@@ -2206,7 +2216,7 @@ public class ModelService extends ModelObservable {
     try {
       StoragePath notificationPath = ModelUtils.getNotificationStoragePath(notificationId);
       storage.deleteResource(notificationPath);
-      notifyNotificationDeleted(notificationId);
+      notifyNotificationDeleted(notificationId).failOnError();
     } catch (RequestNotValidException e) {
       LOGGER.error("Error deleting notification", e);
       throw new GenericException(e);
@@ -2329,7 +2339,7 @@ public class ModelService extends ModelObservable {
       createDIPMetadata(dip, directory.getStoragePath());
 
       if (notify) {
-        notifyDIPCreated(dip, false);
+        notifyDIPCreated(dip, false).failOnError();
       }
 
       return dip;
@@ -2348,7 +2358,7 @@ public class ModelService extends ModelObservable {
       throw new GenericException(e);
     }
 
-    notifyDIPUpdated(dip, false);
+    notifyDIPUpdated(dip, false).failOnError();
     return dip;
   }
 
@@ -2367,7 +2377,7 @@ public class ModelService extends ModelObservable {
 
       StoragePath dipPath = ModelUtils.getDIPStoragePath(dipId);
       storage.deleteResource(dipPath);
-      notifyDIPDeleted(dipId, false);
+      notifyDIPDeleted(dipId, false).failOnError();
     } catch (RequestNotValidException e) {
       LOGGER.error("Error deleting DIP", e);
       throw new GenericException(e);
@@ -2402,7 +2412,7 @@ public class ModelService extends ModelObservable {
     file.setSize(size);
 
     if (notify) {
-      notifyDIPFileCreated(file);
+      notifyDIPFileCreated(file).failOnError();
     }
 
     return file;
@@ -2417,7 +2427,7 @@ public class ModelService extends ModelObservable {
     DIPFile file = ResourceParseUtils.convertResourceToDIPFile(createdDirectory);
 
     if (notify) {
-      notifyDIPFileCreated(file);
+      notifyDIPFileCreated(file).failOnError();
     }
 
     return file;
@@ -2437,8 +2447,7 @@ public class ModelService extends ModelObservable {
     file = ResourceParseUtils.convertResourceToDIPFile(binary);
 
     if (notify) {
-      notifyDIPFileDeleted(dipId, directoryPath, oldFileId);
-      notifyDIPFileCreated(file);
+      notifyDIPFileUpdated(file).failOnError();
     }
 
     return file;
@@ -2450,7 +2459,7 @@ public class ModelService extends ModelObservable {
     StoragePath filePath = ModelUtils.getDIPFileStoragePath(dipId, directoryPath, fileId);
     storage.deleteResource(filePath);
     if (notify) {
-      notifyDIPFileDeleted(dipId, directoryPath, fileId);
+      notifyDIPFileDeleted(dipId, directoryPath, fileId).failOnError();
     }
   }
 
@@ -2839,7 +2848,7 @@ public class ModelService extends ModelObservable {
       LOGGER.error("Error creating representation information in storage", e);
     }
 
-    notifyRepresentationInformationCreatedOrUpdated(ri, commit);
+    notifyRepresentationInformationCreatedOrUpdated(ri, commit).failOnError();
     return ri;
   }
 
@@ -2856,7 +2865,7 @@ public class ModelService extends ModelObservable {
       LOGGER.error("Error updating format in storage", e);
     }
 
-    notifyRepresentationInformationCreatedOrUpdated(ri, commit);
+    notifyRepresentationInformationCreatedOrUpdated(ri, commit).failOnError();
     return ri;
   }
 
@@ -2866,7 +2875,7 @@ public class ModelService extends ModelObservable {
     StoragePath representationInformationPath = ModelUtils
       .getRepresentationInformationStoragePath(representationInformationId);
     storage.deleteResource(representationInformationPath);
-    notifyRepresentationInformationDeleted(representationInformationId, commit);
+    notifyRepresentationInformationDeleted(representationInformationId, commit).failOnError();
   }
 
   public RepresentationInformation retrieveRepresentationInformation(String representationInformationId)
@@ -2902,7 +2911,7 @@ public class ModelService extends ModelObservable {
       LOGGER.error("Error creating format in storage", e);
     }
 
-    notifyFormatCreatedOrUpdated(format, commit);
+    notifyFormatCreatedOrUpdated(format, commit).failOnError();
     return format;
   }
 
@@ -2915,7 +2924,7 @@ public class ModelService extends ModelObservable {
       LOGGER.error("Error updating format in storage", e);
     }
 
-    notifyFormatCreatedOrUpdated(format, commit);
+    notifyFormatCreatedOrUpdated(format, commit).failOnError();
     return format;
   }
 
@@ -2924,7 +2933,7 @@ public class ModelService extends ModelObservable {
 
     StoragePath formatPath = ModelUtils.getFormatStoragePath(formatId);
     storage.deleteResource(formatPath);
-    notifyFormatDeleted(formatId, commit);
+    notifyFormatDeleted(formatId, commit).failOnError();
   }
 
   public Format retrieveFormat(String formatId)

@@ -25,7 +25,7 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.util.DateUtil;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.ReturnWithExceptions;
+import org.roda.core.common.ReturnWithExceptionsWrapper;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -34,6 +34,7 @@ import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.ReturnWithExceptions;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
@@ -72,6 +73,7 @@ import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.index.utils.SolrUtils;
+import org.roda.core.model.ModelObserver;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
@@ -244,54 +246,56 @@ public class IndexService {
     }
   }
 
-  public ReturnWithExceptions<Void> reindexAIP(AIP aip) {
+  public ReturnWithExceptions<Void, ModelObserver> reindexAIP(AIP aip) {
     return observer.aipCreated(aip);
   }
 
-  public ReturnWithExceptions<Void> reindexRepresentation(Representation rep) {
+  public ReturnWithExceptions<Void, ModelObserver> reindexRepresentation(Representation rep) {
     return observer.representationCreated(rep);
   }
 
-  public ReturnWithExceptions<Void> reindexFile(File file) {
+  public ReturnWithExceptions<Void, ModelObserver> reindexFile(File file) {
     return observer.fileCreated(file);
   }
 
-  public ReturnWithExceptions<Void> reindexDIP(DIP dip) {
+  public ReturnWithExceptions<Void, ModelObserver> reindexDIP(DIP dip) {
     return observer.dipCreated(dip, false);
   }
 
-  public ReturnWithExceptions<Void> reindexDIPFile(DIPFile file) {
+  public ReturnWithExceptions<Void, ModelObserver> reindexDIPFile(DIPFile file) {
     return observer.dipFileCreated(file);
   }
 
-  public ReturnWithExceptions<Void> reindexAIPPreservationEvents(AIP aip)
+  public ReturnWithExceptions<Void, ModelObserver> reindexAIPPreservationEvents(AIP aip)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException {
     return observer.indexPreservationsEvents(aip.getId());
   }
 
-  public void reindexPreservationAgents()
+  public ReturnWithExceptionsWrapper reindexPreservationAgents()
     throws RequestNotValidException, GenericException, AuthorizationDeniedException {
-    CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable = model.listPreservationAgents();
-    reindexPreservationMetadata(iterable);
+    return reindexPreservationMetadata(model.listPreservationAgents());
   }
 
-  public void reindexPreservationMetadata(CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable)
+  public ReturnWithExceptionsWrapper reindexPreservationMetadata(
+    CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (OptionalWithCause<PreservationMetadata> opm : iterable) {
-      observer.preservationMetadataCreated(opm.get());
+      wrapper.addToList(observer.preservationMetadataCreated(opm.get()));
     }
     IOUtils.closeQuietly(iterable);
+    return wrapper;
   }
 
-  public ReturnWithExceptions<Void> reindexJob(Job job) {
+  public ReturnWithExceptions<Void, ModelObserver> reindexJob(Job job) {
     return observer.jobCreatedOrUpdated(job, true);
   }
 
-  public ReturnWithExceptions<Void> reindexJobReport(Report jobReport, Job job) {
+  public ReturnWithExceptions<Void, ModelObserver> reindexJobReport(Report jobReport, Job job) {
     return observer.jobReportCreatedOrUpdated(jobReport, job);
   }
 
-  public ReturnWithExceptions<Void> reindexRisk(Risk risk) {
+  public ReturnWithExceptions<Void, ModelObserver> reindexRisk(Risk risk) {
     return observer.riskCreatedOrUpdated(risk, 0, false);
   }
 
@@ -304,7 +308,7 @@ public class IndexService {
     }
   }
 
-  public ReturnWithExceptions<Void> reindexFormat(Format format) {
+  public ReturnWithExceptions<Void, ModelObserver> reindexFormat(Format format) {
     return observer.formatCreatedOrUpdated(format, false);
   }
 
@@ -317,11 +321,11 @@ public class IndexService {
     }
   }
 
-  public ReturnWithExceptions<Void> reindexRiskIncidence(RiskIncidence riskIncidence) {
+  public ReturnWithExceptions<Void, ModelObserver> reindexRiskIncidence(RiskIncidence riskIncidence) {
     return observer.riskIncidenceCreatedOrUpdated(riskIncidence, false);
   }
 
-  public ReturnWithExceptions<Void> reindexRepresentationInformation(RepresentationInformation ri) {
+  public ReturnWithExceptions<Void, ModelObserver> reindexRepresentationInformation(RepresentationInformation ri) {
     return observer.representationInformationCreatedOrUpdated(ri, false);
   }
 
@@ -334,7 +338,7 @@ public class IndexService {
     }
   }
 
-  public ReturnWithExceptions<Void> reindexNotification(Notification notification) {
+  public ReturnWithExceptions<Void, ModelObserver> reindexNotification(Notification notification) {
     return observer.notificationCreatedOrUpdated(notification);
   }
 
@@ -373,7 +377,7 @@ public class IndexService {
     }
   }
 
-  public ReturnWithExceptions<Void> reindexActionLog(LogEntry entry) {
+  public ReturnWithExceptions<Void, ModelObserver> reindexActionLog(LogEntry entry) {
     return observer.logEntryCreated(entry);
   }
 
@@ -418,7 +422,7 @@ public class IndexService {
     }
   }
 
-  public <T extends Serializable> ReturnWithExceptions<Void> reindex(T object) {
+  public <T extends Serializable> ReturnWithExceptions<Void, ModelObserver> reindex(T object) {
     Class<T> objectClass = (Class<T>) object.getClass();
     if (AIP.class.equals(objectClass) || IndexedAIP.class.equals(objectClass)) {
       return reindexAIP(AIP.class.cast(object));
@@ -446,9 +450,9 @@ public class IndexService {
       return reindexFormat(Format.class.cast(object));
     } else {
       LOGGER.error("Error trying to reindex an unconfigured object class: {}", objectClass.getName());
-      ReturnWithExceptions<Void> exceptions = new ReturnWithExceptions<>();
-      exceptions.addException(
-        new RODAException("Error trying to reindex an unconfigured object class: " + objectClass.getName()));
+      ReturnWithExceptions<Void, ModelObserver> exceptions = new ReturnWithExceptions<>();
+      exceptions
+        .add(new RODAException("Error trying to reindex an unconfigured object class: " + objectClass.getName()));
       return exceptions;
     }
   }

@@ -10,6 +10,7 @@ package org.roda.core.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.roda.core.common.ReturnWithExceptionsWrapper;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
@@ -45,292 +46,393 @@ public abstract class ModelObservable {
     observers.remove(observer);
   }
 
-  public void notifyAipCreated(AIP aip) {
+  public ReturnWithExceptionsWrapper notifyAipCreated(AIP aip) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.aipCreated(aip);
+      wrapper.addToList(observer.aipCreated(aip));
     }
+    return wrapper;
   }
 
-  public void notifyAipUpdated(AIP aip) {
+  public ReturnWithExceptionsWrapper notifyAipUpdated(AIP aip) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.aipUpdated(aip);
+      wrapper.addToList(observer.aipUpdated(aip));
     }
+    return wrapper;
   }
 
-  public void notifyAipMoved(AIP aip, String oldParentId, String newParentId) {
+  public ReturnWithExceptionsWrapper notifyAipMoved(AIP aip, String oldParentId, String newParentId) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.aipMoved(aip, oldParentId, newParentId);
+      wrapper.addToList(observer.aipMoved(aip, oldParentId, newParentId));
     }
+    return wrapper;
   }
 
-  public void notifyAipStateUpdated(AIP aip) {
+  public ReturnWithExceptionsWrapper notifyAipStateUpdated(AIP aip) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.aipStateUpdated(aip);
+      wrapper.addToList(observer.aipStateUpdated(aip));
     }
+    return wrapper;
   }
 
-  public void notifyAipDeleted(String aipId) {
+  public ReturnWithExceptionsWrapper notifyAipDeleted(String aipId) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.aipDeleted(aipId, true);
+      wrapper.addToList(observer.aipDeleted(aipId, true));
     }
+    return wrapper;
   }
 
-  public void notifyDescriptiveMetadataCreated(DescriptiveMetadata descriptiveMetadata) {
+  public ReturnWithExceptionsWrapper notifyDescriptiveMetadataCreated(DescriptiveMetadata descriptiveMetadata) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.descriptiveMetadataCreated(descriptiveMetadata);
+      wrapper.addToList(observer.descriptiveMetadataCreated(descriptiveMetadata));
     }
+    return wrapper;
   }
 
-  public void notifyDescriptiveMetadataUpdated(DescriptiveMetadata descriptiveMetadata) {
+  public ReturnWithExceptionsWrapper notifyDescriptiveMetadataUpdated(DescriptiveMetadata descriptiveMetadata) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.descriptiveMetadataUpdated(descriptiveMetadata);
+      wrapper.addToList(observer.descriptiveMetadataUpdated(descriptiveMetadata));
     }
+    return wrapper;
   }
 
-  public void notifyDescriptiveMetadataDeleted(String aipId, String representationId,
+  public ReturnWithExceptionsWrapper notifyDescriptiveMetadataDeleted(String aipId, String representationId,
     String descriptiveMetadataBinaryId) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.descriptiveMetadataDeleted(aipId, representationId, descriptiveMetadataBinaryId);
+      wrapper.addToList(observer.descriptiveMetadataDeleted(aipId, representationId, descriptiveMetadataBinaryId));
     }
+    return wrapper;
   }
 
-  public void notifyRepresentationCreated(Representation representation) {
+  public ReturnWithExceptionsWrapper notifyRepresentationCreated(Representation representation) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.representationCreated(representation);
+      wrapper.addToList(observer.representationCreated(representation));
     }
+    return wrapper;
   }
 
-  public void notifyRepresentationUpdated(Representation representation) {
+  public ReturnWithExceptionsWrapper notifyRepresentationUpdated(Representation representation) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.representationUpdated(representation);
+      wrapper.addToList(observer.representationUpdated(representation));
     }
+    return wrapper;
   }
 
-  public void notifyRepresentationDeleted(String aipId, String representationId) {
+  public ReturnWithExceptionsWrapper notifyRepresentationDeleted(String aipId, String representationId) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.representationDeleted(aipId, representationId, true);
+      wrapper.addToList(observer.representationDeleted(aipId, representationId, true));
     }
+    return wrapper;
   }
 
-  public void notifyFileCreated(File file) {
+  public ReturnWithExceptionsWrapper notifyFileCreated(File file) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.fileCreated(file);
+      wrapper.addToList(observer.fileCreated(file));
     }
+    return wrapper;
   }
 
-  public void notifyFileUpdated(File file) {
+  public ReturnWithExceptionsWrapper notifyFileUpdated(File file) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.fileUpdated(file);
+      wrapper.addToList(observer.fileUpdated(file));
     }
+    return wrapper;
   }
 
-  public void notifyFileDeleted(String aipId, String representationId, List<String> fileDirectoryPath, String fileId) {
+  public ReturnWithExceptionsWrapper notifyFileDeleted(String aipId, String representationId,
+    List<String> fileDirectoryPath, String fileId) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.fileDeleted(aipId, representationId, fileDirectoryPath, fileId, true);
+      wrapper.addToList(observer.fileDeleted(aipId, representationId, fileDirectoryPath, fileId, true));
     }
+    return wrapper;
   }
 
-  public void notifyLogEntryCreated(LogEntry entry) {
+  public ReturnWithExceptionsWrapper notifyLogEntryCreated(LogEntry entry) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.logEntryCreated(entry);
+      wrapper.addToList(observer.logEntryCreated(entry));
     }
+    return wrapper;
   }
 
-  public void notifyUserCreated(User user) {
+  public ReturnWithExceptionsWrapper notifyUserCreated(User user) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.userCreated(user);
+      wrapper.addToList(observer.userCreated(user));
     }
+    return wrapper;
   }
 
-  public void notifyUserUpdated(User user) {
+  public ReturnWithExceptionsWrapper notifyUserUpdated(User user) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.userUpdated(user);
+      wrapper.addToList(observer.userUpdated(user));
     }
+    return wrapper;
   }
 
-  public void notifyUserDeleted(String userID) {
+  public ReturnWithExceptionsWrapper notifyUserDeleted(String userID) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.userDeleted(userID);
+      wrapper.addToList(observer.userDeleted(userID));
     }
+    return wrapper;
   }
 
-  public void notifyGroupCreated(Group group) {
+  public ReturnWithExceptionsWrapper notifyGroupCreated(Group group) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.groupCreated(group);
+      wrapper.addToList(observer.groupCreated(group));
     }
+    return wrapper;
   }
 
-  public void notifyGroupUpdated(Group group) {
+  public ReturnWithExceptionsWrapper notifyGroupUpdated(Group group) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.groupUpdated(group);
+      wrapper.addToList(observer.groupUpdated(group));
     }
+    return wrapper;
   }
 
-  public void notifyGroupDeleted(String groupID) {
+  public ReturnWithExceptionsWrapper notifyGroupDeleted(String groupID) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.groupDeleted(groupID);
+      wrapper.addToList(observer.groupDeleted(groupID));
     }
+    return wrapper;
   }
 
-  public void notifyPreservationMetadataCreated(PreservationMetadata preservationMetadataBinary) {
+  public ReturnWithExceptionsWrapper notifyPreservationMetadataCreated(
+    PreservationMetadata preservationMetadataBinary) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.preservationMetadataCreated(preservationMetadataBinary);
+      wrapper.addToList(observer.preservationMetadataCreated(preservationMetadataBinary));
     }
+    return wrapper;
   }
 
-  public void notifyPreservationMetadataUpdated(PreservationMetadata preservationMetadataBinary) {
+  public ReturnWithExceptionsWrapper notifyPreservationMetadataUpdated(
+    PreservationMetadata preservationMetadataBinary) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.preservationMetadataUpdated(preservationMetadataBinary);
+      wrapper.addToList(observer.preservationMetadataUpdated(preservationMetadataBinary));
     }
+    return wrapper;
   }
 
-  public void notifyPreservationMetadataDeleted(PreservationMetadata pm) {
+  public ReturnWithExceptionsWrapper notifyPreservationMetadataDeleted(PreservationMetadata pm) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.preservationMetadataDeleted(pm);
+      wrapper.addToList(observer.preservationMetadataDeleted(pm));
     }
+    return wrapper;
   }
 
-  public void notifyOtherMetadataCreated(OtherMetadata otherMetadataBinary) {
+  public ReturnWithExceptionsWrapper notifyOtherMetadataCreated(OtherMetadata otherMetadataBinary) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.otherMetadataCreated(otherMetadataBinary);
+      wrapper.addToList(observer.otherMetadataCreated(otherMetadataBinary));
     }
+    return wrapper;
   }
 
-  public void notifyJobCreatedOrUpdated(Job job, boolean reindexJobReports) {
+  public ReturnWithExceptionsWrapper notifyJobCreatedOrUpdated(Job job, boolean reindexJobReports) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.jobCreatedOrUpdated(job, reindexJobReports);
+      wrapper.addToList(observer.jobCreatedOrUpdated(job, reindexJobReports));
     }
+    return wrapper;
   }
 
-  public void notifyJobDeleted(String jobId) {
+  public ReturnWithExceptionsWrapper notifyJobDeleted(String jobId) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.jobDeleted(jobId);
+      wrapper.addToList(observer.jobDeleted(jobId));
     }
+    return wrapper;
   }
 
-  public void notifyJobReportCreatedOrUpdated(Report jobReport, Job job) {
+  public ReturnWithExceptionsWrapper notifyJobReportCreatedOrUpdated(Report jobReport, Job job) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.jobReportCreatedOrUpdated(jobReport, job);
+      wrapper.addToList(observer.jobReportCreatedOrUpdated(jobReport, job));
     }
+    return wrapper;
   }
 
-  public void notifyJobReportDeleted(String jobReportId) {
+  public ReturnWithExceptionsWrapper notifyJobReportDeleted(String jobReportId) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.jobReportDeleted(jobReportId);
+      wrapper.addToList(observer.jobReportDeleted(jobReportId));
     }
+    return wrapper;
   }
 
-  public void notifyAipPermissionsUpdated(AIP aip) {
+  public ReturnWithExceptionsWrapper notifyAipPermissionsUpdated(AIP aip) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.aipPermissionsUpdated(aip);
+      wrapper.addToList(observer.aipPermissionsUpdated(aip));
     }
+    return wrapper;
   }
 
-  public void notifyDipPermissionsUpdated(DIP dip) {
+  public ReturnWithExceptionsWrapper notifyDipPermissionsUpdated(DIP dip) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.dipPermissionsUpdated(dip);
+      wrapper.addToList(observer.dipPermissionsUpdated(dip));
     }
+    return wrapper;
   }
 
-  public void notifyTransferredResourceDeleted(String transferredResourceID) {
+  public ReturnWithExceptionsWrapper notifyTransferredResourceDeleted(String transferredResourceID) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.transferredResourceDeleted(transferredResourceID);
+      wrapper.addToList(observer.transferredResourceDeleted(transferredResourceID));
     }
+    return wrapper;
   }
 
-  public void notifyRiskCreatedOrUpdated(Risk risk, int incidences, boolean commit) {
+  public ReturnWithExceptionsWrapper notifyRiskCreatedOrUpdated(Risk risk, int incidences, boolean commit) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.riskCreatedOrUpdated(risk, incidences, commit);
+      wrapper.addToList(observer.riskCreatedOrUpdated(risk, incidences, commit));
     }
+    return wrapper;
   }
 
-  public void notifyRiskDeleted(String riskId, boolean commit) {
+  public ReturnWithExceptionsWrapper notifyRiskDeleted(String riskId, boolean commit) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.riskDeleted(riskId, commit);
+      wrapper.addToList(observer.riskDeleted(riskId, commit));
     }
+    return wrapper;
   }
 
-  public void notifyRiskIncidenceCreatedOrUpdated(RiskIncidence riskIncidence, boolean commit) {
+  public ReturnWithExceptionsWrapper notifyRiskIncidenceCreatedOrUpdated(RiskIncidence riskIncidence, boolean commit) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.riskIncidenceCreatedOrUpdated(riskIncidence, commit);
+      wrapper.addToList(observer.riskIncidenceCreatedOrUpdated(riskIncidence, commit));
     }
+    return wrapper;
   }
 
-  public void notifyRiskIncidenceDeleted(String riskIncidenceId, boolean commit) {
+  public ReturnWithExceptionsWrapper notifyRiskIncidenceDeleted(String riskIncidenceId, boolean commit) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.riskIncidenceDeleted(riskIncidenceId, commit);
+      wrapper.addToList(observer.riskIncidenceDeleted(riskIncidenceId, commit));
     }
+    return wrapper;
   }
 
-  public void notifyRepresentationInformationCreatedOrUpdated(RepresentationInformation ri, boolean commit) {
+  public ReturnWithExceptionsWrapper notifyRepresentationInformationCreatedOrUpdated(RepresentationInformation ri,
+    boolean commit) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.representationInformationCreatedOrUpdated(ri, commit);
+      wrapper.addToList(observer.representationInformationCreatedOrUpdated(ri, commit));
     }
+    return wrapper;
   }
 
-  public void notifyRepresentationInformationDeleted(String representationInformationId, boolean commit) {
+  public ReturnWithExceptionsWrapper notifyRepresentationInformationDeleted(String representationInformationId,
+    boolean commit) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.representationInformationDeleted(representationInformationId, commit);
+      wrapper.addToList(observer.representationInformationDeleted(representationInformationId, commit));
     }
+    return wrapper;
   }
 
-  public void notifyFormatCreatedOrUpdated(Format f, boolean commit) {
+  public ReturnWithExceptionsWrapper notifyFormatCreatedOrUpdated(Format f, boolean commit) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.formatCreatedOrUpdated(f, commit);
+      wrapper.addToList(observer.formatCreatedOrUpdated(f, commit));
     }
+    return wrapper;
   }
 
-  public void notifyFormatDeleted(String formatId, boolean commit) {
+  public ReturnWithExceptionsWrapper notifyFormatDeleted(String formatId, boolean commit) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.formatDeleted(formatId, commit);
+      wrapper.addToList(observer.formatDeleted(formatId, commit));
     }
+    return wrapper;
   }
 
-  public void notifyNotificationCreatedOrUpdated(Notification notification) {
+  public ReturnWithExceptionsWrapper notifyNotificationCreatedOrUpdated(Notification notification) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.notificationCreatedOrUpdated(notification);
+      wrapper.addToList(observer.notificationCreatedOrUpdated(notification));
     }
+    return wrapper;
   }
 
-  public void notifyNotificationDeleted(String notificationId) {
+  public ReturnWithExceptionsWrapper notifyNotificationDeleted(String notificationId) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.notificationDeleted(notificationId);
+      wrapper.addToList(observer.notificationDeleted(notificationId));
     }
+    return wrapper;
   }
 
-  public void notifyDIPCreated(DIP dip, boolean commit) {
+  public ReturnWithExceptionsWrapper notifyDIPCreated(DIP dip, boolean commit) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.dipCreated(dip, commit);
+      wrapper.addToList(observer.dipCreated(dip, commit));
     }
+    return wrapper;
   }
 
-  public void notifyDIPUpdated(DIP dip, boolean commit) {
+  public ReturnWithExceptionsWrapper notifyDIPUpdated(DIP dip, boolean commit) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.dipUpdated(dip, commit);
+      wrapper.addToList(observer.dipUpdated(dip, commit));
     }
+    return wrapper;
   }
 
-  public void notifyDIPDeleted(String dipId, boolean commit) {
+  public ReturnWithExceptionsWrapper notifyDIPDeleted(String dipId, boolean commit) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.dipDeleted(dipId, commit);
+      wrapper.addToList(observer.dipDeleted(dipId, commit));
     }
+    return wrapper;
   }
 
-  public void notifyDIPFileCreated(DIPFile file) {
+  public ReturnWithExceptionsWrapper notifyDIPFileCreated(DIPFile file) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.dipFileCreated(file);
+      wrapper.addToList(observer.dipFileCreated(file));
     }
+    return wrapper;
   }
 
-  public void notifyDIPFileUpdated(DIPFile file) {
+  public ReturnWithExceptionsWrapper notifyDIPFileUpdated(DIPFile file) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.dipFileUpdated(file);
+      wrapper.addToList(observer.dipFileUpdated(file));
     }
+    return wrapper;
   }
 
-  public void notifyDIPFileDeleted(String dipId, List<String> path, String fileId) {
+  public ReturnWithExceptionsWrapper notifyDIPFileDeleted(String dipId, List<String> path, String fileId) {
+    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      observer.dipFileDeleted(dipId, path, fileId);
+      wrapper.addToList(observer.dipFileDeleted(dipId, path, fileId));
     }
+    return wrapper;
   }
 }

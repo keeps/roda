@@ -128,13 +128,13 @@ public class ReindexRodaMemberPlugin extends AbstractPlugin<Void> {
 
       for (User ldapUser : users) {
         LOGGER.debug("User to be indexed: {}", ldapUser);
-        RodaCoreFactory.getModelService().notifyUserUpdated(ldapUser);
+        RodaCoreFactory.getModelService().notifyUserUpdated(ldapUser).failOnError();
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
       }
 
       for (Group ldapGroup : groups) {
         LOGGER.debug("Group to be indexed: {}", ldapGroup);
-        RodaCoreFactory.getModelService().notifyGroupUpdated(ldapGroup);
+        RodaCoreFactory.getModelService().notifyGroupUpdated(ldapGroup).failOnError();
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
       }
 

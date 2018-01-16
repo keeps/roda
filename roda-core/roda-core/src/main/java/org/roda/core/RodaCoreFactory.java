@@ -1242,11 +1242,11 @@ public class RodaCoreFactory {
     throws GenericException, IllegalOperationException, NotFoundException, AlreadyExistsException {
     for (User user : model.listUsers()) {
       LOGGER.debug("User to be indexed: {}", user);
-      model.notifyUserUpdated(user);
+      model.notifyUserUpdated(user).failOnError();
     }
     for (Group group : model.listGroups()) {
       LOGGER.debug("Group to be indexed: {}", group);
-      model.notifyGroupUpdated(group);
+      model.notifyGroupUpdated(group).failOnError();
     }
   }
 

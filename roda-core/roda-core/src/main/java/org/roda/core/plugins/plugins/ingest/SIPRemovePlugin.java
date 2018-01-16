@@ -13,6 +13,7 @@ import java.util.List;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
@@ -99,7 +100,7 @@ public class SIPRemovePlugin extends AbstractPlugin<TransferredResource> {
       }
 
       pluginInfo.incrementObjectsProcessedWithSuccess();
-    } catch (RuntimeException e) {
+    } catch (RuntimeException | GenericException e) {
       if (createEvent) {
         model.createRepositoryEvent(PreservationEventType.DELETION,
           "The process of deleting an object of the repository", PluginState.SUCCESS,
@@ -111,6 +112,7 @@ public class SIPRemovePlugin extends AbstractPlugin<TransferredResource> {
       reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
       LOGGER.error("Error removing transferred resource " + transferredResource.getFullPath(), e);
     }
+
     report.addReport(reportItem);
     PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
   }

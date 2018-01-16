@@ -9,7 +9,7 @@ package org.roda.core.model;
 
 import java.util.List;
 
-import org.roda.core.common.ReturnWithExceptions;
+import org.roda.core.data.exceptions.ReturnWithExceptions;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
@@ -31,102 +31,111 @@ import org.roda.core.data.v2.user.User;
 
 public interface ModelObserver {
 
-  public ReturnWithExceptions<Void> aipCreated(AIP aip);
+  public ReturnWithExceptions<Void, ModelObserver> aipCreated(AIP aip);
 
-  public void aipUpdated(AIP aip);
+  public ReturnWithExceptions<Void, ModelObserver> aipUpdated(AIP aip);
 
-  public void aipStateUpdated(AIP aip);
+  public ReturnWithExceptions<Void, ModelObserver> aipStateUpdated(AIP aip);
 
-  public void aipMoved(AIP aip, String oldParentId, String newParentId);
+  public ReturnWithExceptions<Void, ModelObserver> aipMoved(AIP aip, String oldParentId, String newParentId);
 
-  public void aipDeleted(String aipId, boolean deleteIncidences);
+  public ReturnWithExceptions<Void, ModelObserver> aipDeleted(String aipId, boolean deleteIncidences);
 
-  public ReturnWithExceptions<Void> descriptiveMetadataCreated(DescriptiveMetadata descriptiveMetadataBinary);
+  public ReturnWithExceptions<Void, ModelObserver> descriptiveMetadataCreated(
+    DescriptiveMetadata descriptiveMetadataBinary);
 
-  public void descriptiveMetadataUpdated(DescriptiveMetadata descriptiveMetadataBinary);
+  public ReturnWithExceptions<Void, ModelObserver> descriptiveMetadataUpdated(
+    DescriptiveMetadata descriptiveMetadataBinary);
 
-  public void descriptiveMetadataDeleted(String aipId, String representationId, String descriptiveMetadataBinaryId);
+  public ReturnWithExceptions<Void, ModelObserver> descriptiveMetadataDeleted(String aipId, String representationId,
+    String descriptiveMetadataBinaryId);
 
-  public ReturnWithExceptions<Void> representationCreated(Representation representation);
+  public ReturnWithExceptions<Void, ModelObserver> representationCreated(Representation representation);
 
-  public void representationUpdated(Representation representation);
+  public ReturnWithExceptions<Void, ModelObserver> representationUpdated(Representation representation);
 
-  public void representationDeleted(String aipId, String representationId, boolean deleteIncidences);
-
-  public ReturnWithExceptions<Void> fileCreated(File file);
-
-  public void fileUpdated(File file);
-
-  public void fileDeleted(String aipId, String representationId, List<String> fileDirectoryPath, String fileId,
+  public ReturnWithExceptions<Void, ModelObserver> representationDeleted(String aipId, String representationId,
     boolean deleteIncidences);
 
-  public ReturnWithExceptions<Void> logEntryCreated(LogEntry entry);
+  public ReturnWithExceptions<Void, ModelObserver> fileCreated(File file);
 
-  public void userCreated(User user);
+  public ReturnWithExceptions<Void, ModelObserver> fileUpdated(File file);
 
-  public void userUpdated(User user);
+  public ReturnWithExceptions<Void, ModelObserver> fileDeleted(String aipId, String representationId,
+    List<String> fileDirectoryPath, String fileId, boolean deleteIncidences);
 
-  public void userDeleted(String userID);
+  public ReturnWithExceptions<Void, ModelObserver> logEntryCreated(LogEntry entry);
 
-  public void groupCreated(Group group);
+  public ReturnWithExceptions<Void, ModelObserver> userCreated(User user);
 
-  public void groupUpdated(Group group);
+  public ReturnWithExceptions<Void, ModelObserver> userUpdated(User user);
 
-  public void groupDeleted(String groupID);
+  public ReturnWithExceptions<Void, ModelObserver> userDeleted(String userID);
 
-  public ReturnWithExceptions<Void> preservationMetadataCreated(PreservationMetadata preservationMetadataBinary);
+  public ReturnWithExceptions<Void, ModelObserver> groupCreated(Group group);
 
-  public void preservationMetadataUpdated(PreservationMetadata preservationMetadataBinary);
+  public ReturnWithExceptions<Void, ModelObserver> groupUpdated(Group group);
 
-  public void preservationMetadataDeleted(PreservationMetadata preservationMetadataBinary);
+  public ReturnWithExceptions<Void, ModelObserver> groupDeleted(String groupID);
 
-  public void otherMetadataCreated(OtherMetadata otherMetadataBinary);
+  public ReturnWithExceptions<Void, ModelObserver> preservationMetadataCreated(
+    PreservationMetadata preservationMetadataBinary);
 
-  public ReturnWithExceptions<Void> jobCreatedOrUpdated(Job job, boolean reindexJobReports);
+  public ReturnWithExceptions<Void, ModelObserver> preservationMetadataUpdated(
+    PreservationMetadata preservationMetadataBinary);
 
-  public void jobDeleted(String jobId);
+  public ReturnWithExceptions<Void, ModelObserver> preservationMetadataDeleted(
+    PreservationMetadata preservationMetadataBinary);
 
-  public ReturnWithExceptions<Void> jobReportCreatedOrUpdated(Report jobReport, Job job);
+  public ReturnWithExceptions<Void, ModelObserver> otherMetadataCreated(OtherMetadata otherMetadataBinary);
 
-  public void jobReportDeleted(String jobReportId);
+  public ReturnWithExceptions<Void, ModelObserver> jobCreatedOrUpdated(Job job, boolean reindexJobReports);
 
-  public void aipPermissionsUpdated(AIP aip);
+  public ReturnWithExceptions<Void, ModelObserver> jobDeleted(String jobId);
 
-  public void dipPermissionsUpdated(DIP dip);
+  public ReturnWithExceptions<Void, ModelObserver> jobReportCreatedOrUpdated(Report jobReport, Job job);
 
-  public void transferredResourceDeleted(String transferredResourceID);
+  public ReturnWithExceptions<Void, ModelObserver> jobReportDeleted(String jobReportId);
 
-  public ReturnWithExceptions<Void> riskCreatedOrUpdated(Risk risk, int incidences, boolean commit);
+  public ReturnWithExceptions<Void, ModelObserver> aipPermissionsUpdated(AIP aip);
 
-  public void riskDeleted(String riskId, boolean commit);
+  public ReturnWithExceptions<Void, ModelObserver> dipPermissionsUpdated(DIP dip);
 
-  public ReturnWithExceptions<Void> riskIncidenceCreatedOrUpdated(RiskIncidence riskIncidence, boolean commit);
+  public ReturnWithExceptions<Void, ModelObserver> transferredResourceDeleted(String transferredResourceID);
 
-  public void riskIncidenceDeleted(String riskIncidenceId, boolean commit);
+  public ReturnWithExceptions<Void, ModelObserver> riskCreatedOrUpdated(Risk risk, int incidences, boolean commit);
 
-  public ReturnWithExceptions<Void> representationInformationCreatedOrUpdated(RepresentationInformation ri,
+  public ReturnWithExceptions<Void, ModelObserver> riskDeleted(String riskId, boolean commit);
+
+  public ReturnWithExceptions<Void, ModelObserver> riskIncidenceCreatedOrUpdated(RiskIncidence riskIncidence,
     boolean commit);
 
-  public void representationInformationDeleted(String representationInformationId, boolean commit);
+  public ReturnWithExceptions<Void, ModelObserver> riskIncidenceDeleted(String riskIncidenceId, boolean commit);
 
-  public ReturnWithExceptions<Void> formatCreatedOrUpdated(Format f, boolean commit);
+  public ReturnWithExceptions<Void, ModelObserver> representationInformationCreatedOrUpdated(
+    RepresentationInformation ri, boolean commit);
 
-  public void formatDeleted(String formatId, boolean commit);
+  public ReturnWithExceptions<Void, ModelObserver> representationInformationDeleted(String representationInformationId,
+    boolean commit);
 
-  public ReturnWithExceptions<Void> notificationCreatedOrUpdated(Notification notification);
+  public ReturnWithExceptions<Void, ModelObserver> formatCreatedOrUpdated(Format f, boolean commit);
 
-  public void notificationDeleted(String notificationId);
+  public ReturnWithExceptions<Void, ModelObserver> formatDeleted(String formatId, boolean commit);
 
-  public ReturnWithExceptions<Void> dipCreated(DIP dip, boolean commit);
+  public ReturnWithExceptions<Void, ModelObserver> notificationCreatedOrUpdated(Notification notification);
 
-  public void dipUpdated(DIP dip, boolean commit);
+  public ReturnWithExceptions<Void, ModelObserver> notificationDeleted(String notificationId);
 
-  public void dipDeleted(String dipId, boolean commit);
+  public ReturnWithExceptions<Void, ModelObserver> dipCreated(DIP dip, boolean commit);
 
-  public ReturnWithExceptions<Void> dipFileCreated(DIPFile file);
+  public ReturnWithExceptions<Void, ModelObserver> dipUpdated(DIP dip, boolean commit);
 
-  public void dipFileUpdated(DIPFile file);
+  public ReturnWithExceptions<Void, ModelObserver> dipDeleted(String dipId, boolean commit);
 
-  public void dipFileDeleted(String dipId, List<String> path, String fileId);
+  public ReturnWithExceptions<Void, ModelObserver> dipFileCreated(DIPFile file);
+
+  public ReturnWithExceptions<Void, ModelObserver> dipFileUpdated(DIPFile file);
+
+  public ReturnWithExceptions<Void, ModelObserver> dipFileDeleted(String dipId, List<String> path, String fileId);
 
 }
