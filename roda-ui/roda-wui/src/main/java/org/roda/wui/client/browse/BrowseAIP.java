@@ -186,7 +186,7 @@ public class BrowseAIP extends Composite {
   Label dateCreated, dateUpdated;
 
   @UiField
-  FlowPanel itemId, type;
+  FlowPanel itemId, type, level;
 
   // DESCRIPTIVE METADATA
 
@@ -435,6 +435,8 @@ public class BrowseAIP extends Composite {
 
     type.clear();
     type.removeStyleName("browseItemId");
+    level.clear();
+    level.removeStyleName("browseItemId");
 
     breadcrumb.setVisible(false);
 
@@ -758,6 +760,15 @@ public class BrowseAIP extends Composite {
       RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(
         SafeHtmlUtils.fromString(messages.aipTypeItem() + " " + aip.getType()), riFilter, type,
         bundle.getRepresentationInformationFields().contains(RodaConstants.AIP_TYPE));
+    }
+
+    if (StringUtils.isNotBlank(aip.getLevel())) {
+      level.addStyleName("browseItemId");
+      final String riFilter = RepresentationInformationUtils
+        .createRepresentationInformationFilter(RodaConstants.INDEX_AIP, RodaConstants.AIP_LEVEL, aip.getLevel());
+      RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(
+        SafeHtmlUtils.fromString(messages.aipLevelItem() + " " + aip.getLevel()), riFilter, level,
+        bundle.getRepresentationInformationFields().contains(RodaConstants.AIP_LEVEL));
     }
   }
 

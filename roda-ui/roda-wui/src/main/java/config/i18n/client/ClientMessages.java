@@ -731,6 +731,8 @@ public interface ClientMessages extends Messages {
 
   String aipTypeItem();
 
+  String aipLevelItem();
+
   /************* Search ****************/
   String searchListBoxItems();
 
