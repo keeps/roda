@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import org.roda.wui.client.browse.MetadataValue;
 import org.roda.wui.client.common.RichTextToolbar;
@@ -53,6 +54,11 @@ public class FormUtilities {
   }
 
   public static void create(FlowPanel panel, Set<MetadataValue> bundle, boolean addStyle) {
+    create(panel, bundle, addStyle, null);
+  }
+
+  public static void create(FlowPanel panel, Set<MetadataValue> bundle, boolean addStyle,
+    final Callable<Void> onChange) {
     for (MetadataValue mv : bundle) {
       boolean mandatory = (mv.get("mandatory") != null && "true".equalsIgnoreCase(mv.get("mandatory"))) ? true : false;
 
@@ -65,34 +71,35 @@ public class FormUtilities {
       if (addStyle) {
         layout.addStyleName("metadata-form-field");
       }
+
       String controlType = mv.get("type");
       if (controlType == null) {
-        addTextField(panel, layout, mv, mandatory);
+        addTextField(panel, layout, mv, mandatory, onChange);
       } else {
         switch (controlType) {
           case "text":
-            addTextField(panel, layout, mv, mandatory);
+            addTextField(panel, layout, mv, mandatory, onChange);
             break;
           case "textarea":
           case "big-text":
           case "text-area":
-            addTextArea(panel, layout, mv, mandatory);
+            addTextArea(panel, layout, mv, mandatory, onChange);
             break;
           case "rich-text-area":
-            addRichTextArea(panel, layout, mv, mandatory);
+            addRichTextArea(panel, layout, mv, mandatory, onChange);
             break;
           case "list":
-            addList(panel, layout, mv, mandatory);
+            addList(panel, layout, mv, mandatory, onChange);
             break;
           case "date":
-            addDatePicker(panel, layout, mv, mandatory);
+            addDatePicker(panel, layout, mv, mandatory, onChange);
             break;
           case "separator":
             layout.addStyleName("form-separator");
             addSeparator(panel, layout, mv);
             break;
           default:
-            addTextField(panel, layout, mv, mandatory);
+            addTextField(panel, layout, mv, mandatory, onChange);
             break;
         }
       }
@@ -135,7 +142,7 @@ public class FormUtilities {
   }
 
   private static void addTextField(FlowPanel panel, final FlowPanel layout, final MetadataValue mv,
-    final boolean mandatory) {
+    final boolean mandatory, final Callable<Void> onChange) {
     // Top label
     Label mvLabel = new Label(getFieldLabel(mv));
     mvLabel.addStyleName("form-label");
@@ -153,6 +160,7 @@ public class FormUtilities {
     mvText.addChangeHandler(new ChangeHandler() {
       @Override
       public void onChange(ChangeEvent changeEvent) {
+        FormUtilities.callOnChange(onChange);
         mv.set("value", mvText.getValue());
         if (mandatory && (mvText.getValue() != null && !"".equalsIgnoreCase(mvText.getValue().trim()))) {
           mvText.removeStyleName("isWrong");
@@ -179,11 +187,12 @@ public class FormUtilities {
       layout.add(errorLabel);
       mvText.addStyleName("isWrong");
     }
+
     panel.add(layout);
   }
 
   private static void addTextArea(FlowPanel panel, final FlowPanel layout, final MetadataValue mv,
-    final boolean mandatory) {
+    final boolean mandatory, final Callable<Void> onChange) {
     // Top label
     Label mvLabel = new Label(getFieldLabel(mv));
     mvLabel.addStyleName("form-label");
@@ -201,6 +210,7 @@ public class FormUtilities {
     mvText.addChangeHandler(new ChangeHandler() {
       @Override
       public void onChange(ChangeEvent changeEvent) {
+        FormUtilities.callOnChange(onChange);
         mv.set("value", mvText.getValue());
         if (mandatory && (mvText.getValue() != null && !"".equals(mvText.getValue().trim()))) {
           mvText.removeStyleName("isWrong");
@@ -227,11 +237,12 @@ public class FormUtilities {
       layout.add(errorLabel);
       mvText.addStyleName("isWrong");
     }
+
     panel.add(layout);
   }
 
   private static void addRichTextArea(FlowPanel panel, final FlowPanel layout, final MetadataValue mv,
-    final boolean mandatory) {
+    final boolean mandatory, final Callable<Void> onChange) {
     // Top label
     Label mvLabel = new Label(getFieldLabel(mv));
     mvLabel.addStyleName("form-label");
@@ -253,6 +264,7 @@ public class FormUtilities {
     mvText.addBlurHandler(new BlurHandler() {
       @Override
       public void onBlur(BlurEvent arg0) {
+        FormUtilities.callOnChange(onChange);
         mv.set("value", mvText.getHTML());
         if (mandatory && (mvText.getHTML() != null && !"".equals(mvText.getHTML().trim()))) {
           mvText.removeStyleName("isWrong");
@@ -260,6 +272,7 @@ public class FormUtilities {
           mvText.addStyleName("isWrong");
         }
       }
+
     });
 
     RichTextToolbar toolbar = new RichTextToolbar(mvText);
@@ -286,8 +299,8 @@ public class FormUtilities {
     panel.add(layout);
   }
 
-  private static void addList(FlowPanel panel, final FlowPanel layout, final MetadataValue mv,
-    final boolean mandatory) {
+  private static void addList(FlowPanel panel, final FlowPanel layout, final MetadataValue mv, final boolean mandatory,
+    final Callable<Void> onChange) {
     // Top Label
     Label mvLabel = new Label(getFieldLabel(mv));
     mvLabel.addStyleName("form-label");
@@ -388,6 +401,7 @@ public class FormUtilities {
     mvList.addChangeHandler(new ChangeHandler() {
       @Override
       public void onChange(ChangeEvent changeEvent) {
+        FormUtilities.callOnChange(onChange);
         mv.set("value", mvList.getSelectedValue());
         if (mandatory && (mvList.getSelectedValue() != null && !"".equals(mvList.getSelectedValue().trim()))) {
           mvList.removeStyleName("isWrong");
@@ -425,7 +439,7 @@ public class FormUtilities {
   }
 
   private static void addDatePicker(FlowPanel panel, final FlowPanel layout, final MetadataValue mv,
-    final boolean mandatory) {
+    final boolean mandatory, final Callable<Void> onChange) {
     // Top label
     final DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat("yyyy-MM-dd");
     Label mvLabel = new Label(getFieldLabel(mv));
@@ -461,6 +475,7 @@ public class FormUtilities {
     mvDate.addValueChangeHandler(new ValueChangeHandler<Date>() {
       @Override
       public void onValueChange(ValueChangeEvent<Date> valueChangeEvent) {
+        FormUtilities.callOnChange(onChange);
         String newValue = dateTimeFormat.format(mvDate.getValue());
         mv.set("value", newValue);
         if (mandatory && (newValue != null && !"".equals(newValue.trim()))) {
@@ -475,6 +490,7 @@ public class FormUtilities {
 
       @Override
       public void onValueChange(ValueChangeEvent<String> event) {
+        FormUtilities.callOnChange(onChange);
         String value = event.getValue();
         try {
           Date date = dateTimeFormat.parse(value.trim());
@@ -541,7 +557,17 @@ public class FormUtilities {
       }
     }
     extra.clear();
-    create(extra, values, true);
+    create(extra, values, true, null);
     return errors;
+  }
+
+  public static void callOnChange(final Callable<Void> onChange) {
+    try {
+      if (onChange != null) {
+        onChange.call();
+      }
+    } catch (Exception e) {
+      // do nothing
+    }
   }
 }

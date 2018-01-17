@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.Callable;
 
 import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.ri.RepresentationInformation;
@@ -150,7 +151,14 @@ public class RepresentationInformationDataPanel extends Composite
       public void onChange(ChangeEvent event) {
         RepresentationInformationDataPanel.this.onChange();
         extras.clear();
-        FormUtilities.create(extras, extraBundle.getFamilyValues().get(family.getSelectedValue()), false);
+        FormUtilities.create(extras, extraBundle.getFamilyValues().get(family.getSelectedValue()), false,
+          new Callable<Void>() {
+            @Override
+            public Void call() {
+              RepresentationInformationDataPanel.this.onChange();
+              return null;
+            }
+          });
       }
     };
 
@@ -228,7 +236,14 @@ public class RepresentationInformationDataPanel extends Composite
         public void onSuccess(RepresentationInformationExtraBundle extra) {
           RepresentationInformationDataPanel.this.extraBundle = extra;
           extras.clear();
-          FormUtilities.create(extras, extra.getFamilyValues().get(family.getSelectedValue()), false);
+          FormUtilities.create(extras, extra.getFamilyValues().get(family.getSelectedValue()), false,
+            new Callable<Void>() {
+              @Override
+              public Void call() {
+                RepresentationInformationDataPanel.this.onChange();
+                return null;
+              }
+            });
         }
       });
   }
