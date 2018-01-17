@@ -107,7 +107,7 @@ public class RichTextToolbar extends Composite {
         formatter.removeFormat();
       } else if (sender == code) {
         Dialogs.showPromptDialog(messages.editHTMLContent(), null, richText.getHTML(), null, RegExp.compile(".*"),
-          messages.cancelButton(), messages.confirmButton(), true, true, new AsyncCallback<String>() {
+          messages.cancelButton(), messages.confirmButton(), false, true, new AsyncCallback<String>() {
 
             @Override
             public void onFailure(Throwable caught) {

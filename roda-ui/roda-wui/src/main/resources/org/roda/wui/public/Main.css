@@ -6281,12 +6281,24 @@ td.datePickerMonth, td.datePickerYear {
     text-decoration: none;
 }
 
-.richtoolbar-html-area {
+.ri-edit-html-area {
     height: 300px;
     max-width: 100%;
     padding: 0;
     margin: 0;
     resize: none;
+}
+
+.ri-richtextarea {
+    height: 300px;
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+    resize: vertical;
+}
+
+.ri-html-content * {
+	max-width: 100%;
 }
 
 span.code {

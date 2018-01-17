@@ -166,12 +166,11 @@ public class Dialogs {
     }
 
     TextBoxBase inputBox;
-
     if (!isBigText) {
       inputBox = new TextBox();
     } else {
       inputBox = new TextArea();
-      inputBox.addStyleName("richtoolbar-html-area");
+      inputBox.addStyleName("ri-edit-html-area");
     }
 
     if (value != null) {

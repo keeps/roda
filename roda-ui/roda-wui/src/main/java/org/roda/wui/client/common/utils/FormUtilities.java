@@ -255,7 +255,7 @@ public class FormUtilities {
 
     final RichTextArea mvText = new RichTextArea();
     mvText.setTitle(mvLabel.getText());
-    mvText.addStyleName("form-textbox metadata-form-text-area");
+    mvText.addStyleName("form-textbox ri-richtextarea");
 
     if (mv.get("value") != null) {
       mvText.setHTML(SafeHtmlUtils.fromTrustedString(mv.get("value")));
@@ -272,7 +272,6 @@ public class FormUtilities {
           mvText.addStyleName("isWrong");
         }
       }
-
     });
 
     RichTextToolbar toolbar = new RichTextToolbar(mvText);
