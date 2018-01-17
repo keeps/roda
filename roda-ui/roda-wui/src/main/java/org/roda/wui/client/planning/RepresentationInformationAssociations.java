@@ -113,9 +113,7 @@ public class RepresentationInformationAssociations extends Composite {
   Button buttonAddToExistingRI;
 
   @UiField
-  Button buttonAddToNewRI;
-
-  private SafeHtml addWithAssociationDialogTitle;
+  Button buttonCreateNewRI;
 
   @UiField
   FlowPanel resultsPanel;
@@ -126,6 +124,7 @@ public class RepresentationInformationAssociations extends Composite {
   @UiField
   HTML resultsPanelTitle;
 
+  private SafeHtml addWithAssociationDialogTitle;
   private boolean gettingFilterResults = true;
 
   private static final Filter DEFAULT_FILTER = SearchFilters.defaultFilter(RepresentationInformation.class.getName());
@@ -196,7 +195,8 @@ public class RepresentationInformationAssociations extends Composite {
       @Override
       public void onClick(ClickEvent event) {
         RepresentationInformationDialogs.showPromptAddRepresentationInformationWithAssociation(
-          addWithAssociationDialogTitle, "Cancel", "Add to existing", "Add to new",
+          addWithAssociationDialogTitle, messages.cancelButton(), messages.addToExistingRepresentationInformation(),
+          messages.createNewRepresentationInformation(),
           new NoAsyncCallback<SelectedItemsList<RepresentationInformation>>() {
             @Override
             public void onSuccess(final SelectedItemsList<RepresentationInformation> selectedItemsList) {
@@ -227,7 +227,7 @@ public class RepresentationInformationAssociations extends Composite {
       }
     });
 
-    buttonAddToNewRI.addClickHandler(new ClickHandler() {
+    buttonCreateNewRI.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent clickEvent) {
         addToNewClickHandler();

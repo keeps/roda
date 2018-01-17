@@ -1092,8 +1092,6 @@ public interface ClientMessages extends Messages {
 
   String representationInformationMissingFields();
 
-  /*** Representation information dialog ***/
-
   String representationInformationChooseOptionLabel();
 
   String representationInformationChooseOption();
@@ -1103,6 +1101,10 @@ public interface ClientMessages extends Messages {
   String noTitleMessage();
 
   String currentRelationResults();
+
+  String createNewRepresentationInformation();
+
+  String addToExistingRepresentationInformation();
 
   /************* Format register ****************/
 
