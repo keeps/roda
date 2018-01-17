@@ -95,6 +95,7 @@ public class CasWebAuthFilter implements Filter {
         try {
           UserLogin.casLogin(httpRequest.getUserPrincipal().getName(), httpRequest);
         } catch (RODAException e) {
+          LOGGER.error("Error authenticating CAS user", e);
           httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
           return;
         }

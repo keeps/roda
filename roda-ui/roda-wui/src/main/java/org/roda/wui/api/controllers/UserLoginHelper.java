@@ -9,6 +9,8 @@ package org.roda.wui.api.controllers;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.directory.api.ldap.model.exception.LdapException;
+import org.jasig.cas.client.authentication.AttributePrincipal;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
@@ -59,8 +61,28 @@ public class UserLoginHelper {
   }
 
   public static User casLogin(final String username, final HttpServletRequest request) throws RODAException {
-    User user = RodaCoreFactory.getModelService().retrieveUserByName(username);
+    User user = null;
+
+    try {
+      user = RodaCoreFactory.getModelService().retrieveUserByName(username);
+    } catch (GenericException e) {
+      if (!(e.getCause() instanceof LdapException)) {
+        throw e;
+      }
+    }
+
     if (user == null) {
+      User newUser = new User(username);
+
+      // try to set user email from cas principal attributes
+      if (request.getUserPrincipal() instanceof AttributePrincipal) {
+        AttributePrincipal attributePrincipal = (AttributePrincipal) request.getUserPrincipal();
+        Object possibleEmail = attributePrincipal.getAttributes().get("email");
+        if (possibleEmail != null && possibleEmail instanceof String) {
+          newUser.setEmail((String) possibleEmail);
+        }
+      }
+
       user = RodaCoreFactory.getModelService().createUser(new User(username), true);
     }
 
