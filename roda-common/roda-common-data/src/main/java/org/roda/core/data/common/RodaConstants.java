@@ -1151,7 +1151,15 @@ public final class RodaConstants {
     WELLFORMEDNESS_CHECK("wellformedness check"), UNPACKING("unpacking"), METADATA_EXTRACTION("metadata extraction"),
     ACCESSION("accession"), AUTHORIZATION_CHECK("authorization check"), FORMAT_IDENTIFICATION("format identification"),
     FORMAT_VALIDATION("format validation"), INGEST_START("ingest start"), INGEST_END("ingest end"),
-    RISK_MANAGEMENT("risk management"), NONE("none"), DISSEMINATION("dissemination");
+    RISK_MANAGEMENT("risk management"), DISSEMINATION("dissemination"), PACKING("packing"), APPRAISAL("appraisal"),
+    DIGITAL_SIGNATURE_GENERATION("digital signature generation"), ENCRYPTION("encryption"),
+    FILENAME_CHANGE("filename change"), FORENSIC_FEATURE_ANALYSIS("forensic feature analysis"), IMAGING("imaging"),
+    INFORMATION_PACKAGE_CREATION("information package creation"),
+    INFORMATION_PACKAGE_MERGING("information package merging"),
+    INFORMATION_PACKAGE_SPLITTING("information package splitting"), METADATA_MODIFICATION("metadata modification"),
+    MODIFICATION("modification"), POLICY_ASSIGNMENT("policy assignment"), QUARANTINE("quarantine"),
+    RECOVERY("recovery"), REDACTION("redaction"), REFRESHMENT("refreshment"), TRANSFER("transfer"),
+    UNQUARANTINE("unquarantine"), NONE("none");
 
     private String originalText;
     private String text;
