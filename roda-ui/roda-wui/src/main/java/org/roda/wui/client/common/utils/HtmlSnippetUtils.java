@@ -426,7 +426,7 @@ public class HtmlSnippetUtils {
 
       // Field
       final HTML mvText = new HTML();
-      mvText.addStyleName("value ri-html-content");
+      mvText.addStyleName("value ri-html-content rich-text-value");
       mvText.setHTML(mv.get("value"));
 
       layout.add(mvLabel);

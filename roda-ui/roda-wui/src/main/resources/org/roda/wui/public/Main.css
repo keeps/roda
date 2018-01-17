@@ -90,7 +90,12 @@ h6, .h6 {
 }
 
 ul {
-	list-style: inherit;
+    list-style: inherit;
+    padding-left: 2rem;
+}
+
+ol {
+    list-style: decimal;
     padding-left: 2rem;
 }
 
@@ -6338,6 +6343,12 @@ span.code {
 .incremental-list .removable-textbox:last-of-type .ri-toolbarLink {
     background-color: #089de3;
     color: white;
+}
+
+/** Display Rich Text Values **/
+
+.rich-text-value blockquote {
+    margin-left: 1.5em !important;
 }
 
 /** Rich Text Toolbar **/
