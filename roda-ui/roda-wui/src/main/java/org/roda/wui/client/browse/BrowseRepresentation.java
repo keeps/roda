@@ -386,6 +386,7 @@ public class BrowseRepresentation extends Composite {
     representationTitle.clear();
     HtmlSnippetUtils.getRepresentationTypeHTML(representationTitle, title, representation.getRepresentationStates());
 
+    representationId.clear();
     final String idFilter = RepresentationInformationUtils.createRepresentationInformationFilter(
       RodaConstants.INDEX_REPRESENTATION, RodaConstants.INDEX_UUID, representation.getUUID());
     RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(
@@ -393,6 +394,7 @@ public class BrowseRepresentation extends Composite {
       bundle.getRepresentationInformationFields().contains(RodaConstants.INDEX_UUID));
 
     if (representation.getType() != null) {
+      representationType.clear();
       final String typeFilter = RepresentationInformationUtils.createRepresentationInformationFilter(
         RodaConstants.INDEX_REPRESENTATION, RodaConstants.REPRESENTATION_TYPE, representation.getType());
       RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(
