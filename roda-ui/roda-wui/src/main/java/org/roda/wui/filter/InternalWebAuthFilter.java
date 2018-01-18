@@ -18,7 +18,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.roda.core.common.UserUtility;
+import org.roda.wui.api.controllers.UserLogin;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -72,7 +72,7 @@ public class InternalWebAuthFilter implements Filter {
 
       httpResponse.sendRedirect(b.toString());
     } else if (requestURI.endsWith("/logout")) {
-      UserUtility.logout(httpRequest);
+      UserLogin.logout(httpRequest);
 
       final StringBuilder b = new StringBuilder();
       b.append(contextPath + "/");

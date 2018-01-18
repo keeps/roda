@@ -73,6 +73,7 @@ public class UserLoginHelper {
 
     if (user == null) {
       User newUser = new User(username);
+      newUser = UserUtility.resetGroupsAndRoles(newUser);
 
       // try to set user email from cas principal attributes
       if (request.getUserPrincipal() instanceof AttributePrincipal) {

@@ -19,7 +19,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.jasig.cas.client.util.CommonUtils;
-import org.roda.core.common.UserUtility;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.wui.api.controllers.UserLogin;
 import org.roda.wui.client.common.utils.StringUtils;
@@ -116,7 +115,7 @@ public class CasWebAuthFilter implements Filter {
 
     } else if (url.endsWith("/logout")) {
 
-      UserUtility.logout(httpRequest);
+      UserLogin.logout(httpRequest);
 
       final StringBuilder b = new StringBuilder();
       b.append(url.substring(0, url.indexOf("logout")));

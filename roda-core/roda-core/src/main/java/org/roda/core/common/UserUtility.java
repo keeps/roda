@@ -89,6 +89,16 @@ public class UserUtility {
     request.getSession().setAttribute(RODA_USER, user);
   }
 
+  public static void removeUserFromSession(final HttpServletRequest request) {
+    // internal session clean up
+    request.getSession().removeAttribute(RODA_USER);
+
+    // CAS specific clean up
+    // FIXME 2018-01-18 bferreira: CAS/web specific code should be in WUI, not core
+    request.getSession().removeAttribute("edu.yale.its.tp.cas.client.filter.user");
+    request.getSession().removeAttribute("_const_cas_assertion_");
+  }
+
   public static void checkRoles(final User rsu, final List<String> rolesToCheck) throws AuthorizationDeniedException {
     // INFO 20170220 nvieira containsAll changed to set intersection (contain at
     // least one role)
@@ -141,14 +151,6 @@ public class UserUtility {
     request.getSession(true).setAttribute(RODA_USER, user);
   }
 
-  public static void logout(HttpServletRequest servletRequest) {
-    servletRequest.getSession().removeAttribute(RODA_USER);
-
-    // CAS specific clean up
-    servletRequest.getSession().removeAttribute("edu.yale.its.tp.cas.client.filter.user");
-    servletRequest.getSession().removeAttribute("_const_cas_assertion_");
-  }
-
   /**
    * Retrieves guest used
    */
@@ -186,7 +188,6 @@ public class UserUtility {
   public static boolean isAdministrator(User user) {
     return user.getName().equals(RodaConstants.ADMIN);
   }
-  
 
   public static void checkAIPPermissions(User user, IndexedAIP aip, PermissionType permissionType)
     throws AuthorizationDeniedException {

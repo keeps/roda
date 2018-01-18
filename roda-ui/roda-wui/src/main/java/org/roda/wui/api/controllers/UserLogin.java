@@ -26,6 +26,14 @@ public class UserLogin extends RodaWuiController {
     super();
   }
 
+  /**
+   * Logs in the roda user using the provided username and password
+   *
+   * @param request
+   *          the http request
+   * @throws ServletException
+   *           if the roda user info could not be retrieved
+   */
   public static User login(String username, String password, HttpServletRequest request)
     throws AuthenticationDeniedException, GenericException {
     User user;
@@ -79,4 +87,21 @@ public class UserLogin extends RodaWuiController {
     }
   }
 
+  /**
+   * Logs out the user
+   *
+   * @param request
+   *          the http request
+   */
+  public static void logout(HttpServletRequest request) {
+    User user = UserUtility.getUser(request);
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // delegate
+    UserUtility.removeUserFromSession(request);
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_USERNAME_PARAM,
+      user.getName());
+  }
 }
