@@ -18,8 +18,6 @@ import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ri.RelationObjectType;
 import org.roda.core.data.v2.ri.RepresentationInformation;
@@ -99,6 +97,9 @@ public class RepresentationInformationDialogs {
     layout.add(relationFormPanel);
     final FlowPanel listPanel = new FlowPanel();
     layout.add(listPanel);
+
+    final Label section = new Label(messages.currentRelationResults());
+    section.addStyleName("ri-form-separator");
 
     final FlowPanel buttonPanel = new FlowPanel();
     final Button cancelButton = new Button(cancelButtonText);
@@ -214,51 +215,36 @@ public class RepresentationInformationDialogs {
                 }
               }
 
-              final AbstractHasData.RedrawEvent.Handler handler = new AbstractHasData.RedrawEvent.Handler() {
-                @Override
-                public void onRedraw() {
-                  dialogBox.center();
-                }
-              };
-
-              BasicAsyncTableCell<?> table;
-              switch (dropDown.getSelectedValue()) {
-                case RodaConstants.SEARCH_ITEMS:
-                  table = new AIPList(tableFilter, true, Facets.NONE, "", false, 5, 5) {
-                    @Override
-                    protected void configureDisplay(CellTable<IndexedAIP> display) {
-                      super.configureDisplay(display);
-                      display.addRedrawHandler(handler);
-                    }
-                  };
-                  break;
-                case RodaConstants.SEARCH_REPRESENTATIONS:
-                  table = new RepresentationList(tableFilter, true, Facets.NONE, "", false, 5, 5) {
-                    @Override
-                    protected void configureDisplay(CellTable<IndexedRepresentation> display) {
-                      super.configureDisplay(display);
-                      display.addRedrawHandler(handler);
-                    }
-                  };
-                  break;
-                case RodaConstants.SEARCH_FILES:
-                  table = new SimpleFileList(tableFilter, true, Facets.NONE, "", false, 5, 5) {
-                    @Override
-                    protected void configureDisplay(CellTable<IndexedFile> display) {
-                      super.configureDisplay(display);
-                      display.addRedrawHandler(handler);
-                    }
-                  };
-                  break;
-                default:
-                  return;
-              }
-
-              Label section = new Label(messages.currentRelationResults());
-              section.addStyleName("ri-form-separator");
               listPanel.clear();
-              listPanel.add(section);
-              listPanel.add(table);
+
+              if (!tableFilter.getParameters().isEmpty()) {
+                BasicAsyncTableCell<?> table = null;
+                switch (dropDown.getSelectedValue()) {
+                  case RodaConstants.SEARCH_ITEMS:
+                    table = new AIPList(tableFilter, true, Facets.NONE, "", false, 5, 5);
+                    break;
+                  case RodaConstants.SEARCH_REPRESENTATIONS:
+                    table = new RepresentationList(tableFilter, true, Facets.NONE, "", false, 5, 5);
+                    break;
+                  case RodaConstants.SEARCH_FILES:
+                    table = new SimpleFileList(tableFilter, true, Facets.NONE, "", false, 5, 5);
+                    break;
+                  default:
+                    break;
+                }
+
+                if (table != null) {
+                  table.addRedrawHandler(new AbstractHasData.RedrawEvent.Handler() {
+                    @Override
+                    public void onRedraw() {
+                      dialogBox.center();
+                    }
+                  });
+
+                  listPanel.add(section);
+                  listPanel.add(table);
+                }
+              }
             }
           });
         }

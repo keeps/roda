@@ -60,6 +60,7 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.cellview.client.AbstractHasData.RedrawEvent;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.AsyncHandler;
@@ -909,6 +910,10 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
         actionsPopup.showRelativeTo(actionsButton, CalloutPosition.BOTTOM_RIGHT);
       }
     }
+  }
+
+  public void addRedrawHandler(RedrawEvent.Handler handler) {
+    display.addRedrawHandler(handler);
   }
 
 }
