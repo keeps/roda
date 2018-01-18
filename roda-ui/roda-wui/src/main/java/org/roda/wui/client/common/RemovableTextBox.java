@@ -34,14 +34,14 @@ public class RemovableTextBox extends Composite implements HasHandlers {
   Anchor removeDynamicTextBoxButton;
 
   // the first removable text box is not removable and has an "add" button
-  private final boolean first;
+  private final boolean isAddTextBox;
 
   public RemovableTextBox() {
     this(false);
   }
 
   public RemovableTextBox(boolean first) {
-    this.first = first;
+    this.isAddTextBox = first;
     initWidget(uiBinder.createAndBindUi(this));
     if (first) {
       removeDynamicTextBoxButton.setHTML(SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-plus\"></i>"));
@@ -73,7 +73,7 @@ public class RemovableTextBox extends Composite implements HasHandlers {
     return addDomHandler(handler, ChangeEvent.getType());
   }
 
-  public boolean isFirst() {
-    return first;
+  public boolean isAddTextBox() {
+    return isAddTextBox;
   }
 }

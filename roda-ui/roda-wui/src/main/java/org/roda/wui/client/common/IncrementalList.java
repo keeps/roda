@@ -10,6 +10,7 @@ package org.roda.wui.client.common;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gwt.user.client.ui.TextBox;
 import org.roda.wui.client.common.utils.StringUtils;
 
 import com.google.gwt.core.client.GWT;
@@ -17,6 +18,8 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
@@ -34,6 +37,9 @@ import config.i18n.client.ClientMessages;
 public class IncrementalList extends Composite implements HasValueChangeHandlers<List<String>> {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
+
+  private static final char KEY_ENTER = (char) 13;
+  private static final char KEY_BACKSPACE = (char) 8;
 
   interface MyUiBinder extends UiBinder<Widget, IncrementalList> {
   }
@@ -106,20 +112,27 @@ public class IncrementalList extends Composite implements HasValueChangeHandlers
     textBoxes.add(0, box);
     addDynamicButton.setVisible(false);
 
+    // on clicking the button, either add or remove the text box
     box.addRemoveClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        if (box.isFirst()) {
-          addTextBox(null);
-        } else {
-          textBoxPanel.remove(box);
-          textBoxes.remove(box);
-          if (textBoxes.isEmpty()) {
-            addDynamicButton.setVisible(true);
+        addOrRemoveTextBox(box);
+      }
+    });
+
+    // pressing ENTER goes to next text box, or adds a new one if we are on the last
+    box.item.addKeyPressHandler(new KeyPressHandler() {
+      @Override
+      public void onKeyPress(KeyPressEvent keyPressEvent) {
+        if (keyPressEvent.getCharCode() == KEY_ENTER && !keyPressEvent.isAnyModifierKeyDown()) {
+          if (box.isAddTextBox()) {
+            addOrRemoveTextBox(box);
+          }else{
+            TextBox nextItem = textBoxes.get(textBoxes.indexOf(box) + 1).item;
+            nextItem.setFocus(true);
+            nextItem.selectAll();
           }
         }
-
-        ValueChangeEvent.fire(IncrementalList.this, getTextBoxesValue());
       }
     });
 
@@ -131,6 +144,21 @@ public class IncrementalList extends Composite implements HasValueChangeHandlers
     });
 
     shiftValuesDown();
+  }
+
+  private void addOrRemoveTextBox(RemovableTextBox box) {
+    if (box.isAddTextBox()) {
+      addTextBox(null);
+    } else {
+      textBoxPanel.remove(box);
+      textBoxes.remove(box);
+      if (textBoxes.isEmpty()) {
+        addDynamicButton.setVisible(true);
+      }
+    }
+
+    ValueChangeEvent.fire(IncrementalList.this, getTextBoxesValue());
+    textBoxes.get(textBoxes.size() - 1).item.setFocus(true);
   }
 
   @Override
