@@ -25,7 +25,7 @@
 						<g:Button addStyleNames="btn btn-margin-right btn-plus" ui:field="buttonCreateNewRI">
 							<ui:text from='{messages.createNewRepresentationInformation}' />
 						</g:Button>
-						<g:Button addStyleNames="btn btn-margin-right btn-play" ui:field="buttonAddToExistingRI">
+						<g:Button addStyleNames="btn btn-margin-right btn-edit" ui:field="buttonAddToExistingRI">
 							<ui:text from='{messages.addToExistingRepresentationInformation}' />
 						</g:Button>
 					</g:FlowPanel>

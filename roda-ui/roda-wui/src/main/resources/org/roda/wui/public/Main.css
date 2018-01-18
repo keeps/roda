@@ -884,7 +884,7 @@ pre code {
 }
 
 .btn-edit:after {
-    content: "\f14b";;
+    content: "\f14b";
 }
 
 .btn-edit + .btn-edit {

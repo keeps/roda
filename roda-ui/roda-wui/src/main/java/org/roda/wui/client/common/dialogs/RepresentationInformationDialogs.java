@@ -50,7 +50,6 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.cellview.client.AbstractHasData;
-import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
@@ -838,7 +837,7 @@ public class RepresentationInformationDialogs {
     });
 
     cancelButton.addStyleName("btn btn-link");
-    addToSelectedRIButton.addStyleName("pull-right btn btn-play");
+    addToSelectedRIButton.addStyleName("pull-right btn btn-edit");
     addToNewRIButton.addStyleName("pull-right btn btn-plus");
 
     dialogBox.center();
@@ -855,18 +854,13 @@ public class RepresentationInformationDialogs {
       new SimpleFacetParameter(RodaConstants.REPRESENTATION_INFORMATION_SUPPORT));
     Filter defaultFilter = SearchFilters.defaultFilter(RepresentationInformation.class.getName());
     final RepresentationInformationList representationInformationList = new RepresentationInformationList(defaultFilter,
-      facets, messages.representationInformationTitle(), true) {
+      facets, messages.representationInformationTitle(), true, 10, 10);
+    representationInformationList.addRedrawHandler(new AbstractHasData.RedrawEvent.Handler() {
       @Override
-      protected void configureDisplay(CellTable<RepresentationInformation> display) {
-        super.configureDisplay(display);
-        display.addRedrawHandler(new AbstractHasData.RedrawEvent.Handler() {
-          @Override
-          public void onRedraw() {
-            dialogBox.center();
-          }
-        });
+      public void onRedraw() {
+        dialogBox.center();
       }
-    };
+    });
 
     SearchPanel representationInformationSearch = new SearchPanel(Filter.NULL,
       RodaConstants.REPRESENTATION_INFORMATION_SEARCH, true, messages.searchPlaceHolder(), false, false, true);
