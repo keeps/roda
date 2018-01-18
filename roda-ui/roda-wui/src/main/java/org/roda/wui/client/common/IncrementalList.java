@@ -81,8 +81,11 @@ public class IncrementalList extends Composite implements HasValueChangeHandlers
 
   public void setTextBoxList(List<String> list) {
     clearTextBoxes();
-    for (int i = list.size() - 1; i >= 0; i--) {
-      addTextBox(list.get(i));
+    for (int i = 0; i < list.size(); i++) {
+      addTextBox(null);
+    }
+    for (int i = 0; i < list.size(); i++) {
+      textBoxes.get(i).item.setText(list.get(i));
     }
   }
 
