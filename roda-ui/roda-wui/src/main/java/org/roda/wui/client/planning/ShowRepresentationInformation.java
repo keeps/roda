@@ -66,6 +66,7 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Label;
@@ -128,7 +129,10 @@ public class ShowRepresentationInformation extends Composite {
   SimplePanel representationInformationIcon;
 
   @UiField
-  Label representationInformationDescriptionKey, representationInformationDescriptionValue;
+  Label representationInformationDescriptionKey;
+
+  @UiField
+  HTML representationInformationDescriptionValue;
 
   @UiField
   Label representationInformationFamilyKey, representationInformationFamilyValue;
@@ -196,7 +200,7 @@ public class ShowRepresentationInformation extends Composite {
       dateUpdated.setText(messages.dateUpdated(Humanize.formatDateTime(ri.getUpdatedOn()), ri.getUpdatedBy()));
     }
 
-    representationInformationDescriptionValue.setText(ri.getDescription());
+    representationInformationDescriptionValue.setHTML(ri.getDescription());
     representationInformationDescriptionKey.setVisible(StringUtils.isNotBlank(ri.getDescription()));
 
     representationInformationFamilyKey.setVisible(StringUtils.isNotBlank(ri.getFamily()));

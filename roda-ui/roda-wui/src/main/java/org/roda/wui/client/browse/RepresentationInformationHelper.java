@@ -4,6 +4,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.planning.RepresentationInformationAssociations;
 import org.roda.wui.client.planning.ShowRepresentationInformation;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -27,7 +28,7 @@ public class RepresentationInformationHelper {
   }
 
   public static void addFieldWithRepresentationInformationIcon(SafeHtml message, String filter,
-    final FlowPanel fieldPanel, boolean createIcon, String iconCssClass) {
+    final FlowPanel fieldPanel, boolean createIcon, final String iconCssClass) {
     InlineHTML idHtml = new InlineHTML();
     idHtml.setHTML(message);
     fieldPanel.add(idHtml);
@@ -37,6 +38,10 @@ public class RepresentationInformationHelper {
       icon.setHTML(
         SafeHtmlUtils.fromSafeConstant("<i class='fa fa-info-circle " + iconCssClass + "' aria-hidden='true'></i>"));
       icon.addStyleName("icon-left-padding");
+
+      if (StringUtils.isBlank(iconCssClass)) {
+        icon.addStyleName("browseIconBlue");
+      }
 
       BrowserService.Util.getInstance().retrieveRepresentationInformationWithFilter(filter,
         new AsyncCallback<Pair<String, Integer>>() {
@@ -52,6 +57,10 @@ public class RepresentationInformationHelper {
             selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
             icon.removeStyleName("browseIconRed");
 
+            if (StringUtils.isBlank(iconCssClass)) {
+              icon.addStyleName("browseIconBlue");
+            }
+
             if (pair.getSecond() == 1) {
               icon.setHref(HistoryUtils.createHistoryHashLink(ShowRepresentationInformation.RESOLVER, pair.getFirst()));
             } else if (pair.getSecond() > 1) {
@@ -59,6 +68,7 @@ public class RepresentationInformationHelper {
                 RodaConstants.REPRESENTATION_INFORMATION_FILTERS, filter));
             } else {
               icon.addStyleName("browseIconRed");
+              icon.removeStyleName("browseIconBlue");
               icon.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationAssociations.RESOLVER,
                 RodaConstants.REPRESENTATION_INFORMATION_FILTERS, filter));
             }
