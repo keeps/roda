@@ -10,7 +10,6 @@ package org.roda.wui.client.common;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.user.client.ui.TextBox;
 import org.roda.wui.client.common.utils.StringUtils;
 
 import com.google.gwt.core.client.GWT;
@@ -18,6 +17,7 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
@@ -30,6 +30,7 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -37,9 +38,6 @@ import config.i18n.client.ClientMessages;
 public class IncrementalList extends Composite implements HasValueChangeHandlers<List<String>> {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
-  private static final char KEY_ENTER = (char) 13;
-  private static final char KEY_BACKSPACE = (char) 8;
 
   interface MyUiBinder extends UiBinder<Widget, IncrementalList> {
   }
@@ -124,10 +122,10 @@ public class IncrementalList extends Composite implements HasValueChangeHandlers
     box.item.addKeyPressHandler(new KeyPressHandler() {
       @Override
       public void onKeyPress(KeyPressEvent keyPressEvent) {
-        if (keyPressEvent.getCharCode() == KEY_ENTER && !keyPressEvent.isAnyModifierKeyDown()) {
+        if (keyPressEvent.getUnicodeCharCode() == KeyCodes.KEY_ENTER && !keyPressEvent.isAnyModifierKeyDown()) {
           if (box.isAddTextBox()) {
             addOrRemoveTextBox(box);
-          }else{
+          } else {
             TextBox nextItem = textBoxes.get(textBoxes.indexOf(box) + 1).item;
             nextItem.setFocus(true);
             nextItem.selectAll();
