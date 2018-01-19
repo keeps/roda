@@ -56,6 +56,7 @@ import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TextBox;
 
 import config.i18n.client.ClientMessages;
@@ -867,7 +868,10 @@ public class RepresentationInformationDialogs {
     representationInformationSearch.setList(representationInformationList);
 
     container.add(representationInformationSearch);
-    container.add(representationInformationList);
+
+    ScrollPanel representationInformationListScrollPanel = new ScrollPanel(representationInformationList);
+    representationInformationListScrollPanel.addStyleName("ri-dialog-list-scroll");
+    container.add(representationInformationListScrollPanel);
 
     representationInformationList
       .addCheckboxSelectionListener(new AsyncTableCell.CheckboxSelectionListener<RepresentationInformation>() {

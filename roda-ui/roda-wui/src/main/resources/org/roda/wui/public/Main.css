@@ -5766,6 +5766,24 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 /**********************************************
+	    ASSOCIATE WITH REPRESENTATIONS
+************************************************/
+
+.ri-dialog .ri-dialog-list-scroll {
+    width: 800px;
+    height: 400px;
+    overflow-x: scroll;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 800px) {
+    .ri-dialog .ri-dialog-list-scroll {
+        width: 100%;
+    }
+}
+
+/**********************************************
 				NEW CREATE JOB PAGE
 ************************************************/
 
