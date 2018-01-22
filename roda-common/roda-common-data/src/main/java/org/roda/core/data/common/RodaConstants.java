@@ -434,7 +434,7 @@ public final class RodaConstants {
   public static final SolrType DEFAULT_SOLR_TYPE = SolrType.EMBEDDED;
 
   public enum NodeType {
-    MASTER, WORKER, TEST
+    MASTER, WORKER, TEST, CONFIGS
   }
 
   public static final NodeType DEFAULT_NODE_TYPE = NodeType.MASTER;

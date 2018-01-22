@@ -224,9 +224,22 @@ public class RodaCoreFactory {
       instantiateTest();
     } else if (nodeType == RodaConstants.NodeType.WORKER) {
       instantiateWorker();
+    } else if (nodeType == RodaConstants.NodeType.CONFIGS) {
+      instantiateInConfigsMode();
     } else {
       LOGGER.error("Unknown node type '{}'", nodeType);
     }
+  }
+
+  private static void instantiateInConfigsMode() {
+    TEST_DEPLOY_SOLR = false;
+    TEST_DEPLOY_LDAP = false;
+    TEST_DEPLOY_SCANNER = false;
+    TEST_DEPLOY_ORCHESTRATOR = false;
+    TEST_DEPLOY_PLUGIN_MANAGER = true;
+    TEST_DEPLOY_DEFAULT_RESOURCES = false;
+    instantiated = false;
+    instantiate(NodeType.TEST);
   }
 
   public static void instantiateMaster() {
@@ -1736,24 +1749,55 @@ public class RodaCoreFactory {
     }
   }
 
+  private static void mainConfigsTasks(final List<String> args) {
+    if ("generatePluginsMarkdown".equals(args.get(0)) && args.size() == 3 && StringUtils.isNotBlank(args.get(1))
+      && StringUtils.isNotBlank(args.get(2)) && Files.exists(Paths.get(args.get(2)))) {
+      List<String> plugins = Arrays.asList(args.get(1).split(" "));
+      String pluginsMarkdown = PluginManager.getPluginsInformationAsMarkdown(plugins);
+      try {
+        Files.write(Paths.get(args.get(2), "README.md"), pluginsMarkdown.getBytes());
+      } catch (IOException e) {
+        System.err
+          .println("Error while writing plugin/plugins information in markdown format! Reason: " + e.getMessage());
+      }
+    } else {
+      printConfigsUsage();
+    }
+  }
+
+  private static void printConfigsUsage() {
+    System.err.println("Configs command parameters:");
+    System.err.println(
+      "\tgeneratePluginsMarkdown PLUGIN_OR_PLUGINS OUTPUT_FOLDER - generates plugin representation in markdown format.");
+  }
+
   public static void main(final String[] argsArray)
     throws InterruptedException, GenericException, RequestNotValidException {
     final List<String> args = Arrays.asList(argsArray);
+    NodeType nodeType = NodeType
+      .valueOf(getSystemProperty(RodaConstants.CORE_NODE_TYPE, RodaConstants.DEFAULT_NODE_TYPE.name()));
 
     preInstantiateSteps(args);
     instantiate();
-    if (getNodeType() == NodeType.MASTER) {
+    if (nodeType == NodeType.MASTER) {
       if (!args.isEmpty()) {
         mainMasterTasks(args);
       } else {
         printMainUsage();
       }
-    } else if (getNodeType() == NodeType.WORKER) {
+    } else if (nodeType == NodeType.WORKER) {
       Thread.currentThread().join();
+    } else if (nodeType == NodeType.CONFIGS) {
+      if (!args.isEmpty()) {
+        mainConfigsTasks(args);
+      } else {
+        printConfigsUsage();
+      }
     } else {
       printMainUsage();
     }
 
     System.exit(0);
   }
+
 }

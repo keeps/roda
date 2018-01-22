@@ -157,7 +157,7 @@ public class PluginParameter implements Serializable {
    */
   @Override
   public String toString() {
-    return "PluginParameter [id=" + id + ", name=" + name + ", type=" + type + ", value=" + defaultValue
+    return "PluginParameter [id=" + id + ", name=" + name + ", type=" + type + ", defaultValue=" + defaultValue
       + ", possibleValues=" + possibleValues + ", mandatory=" + mandatory + ", readonly=" + readonly + ", description="
       + description + "]";
   }
@@ -300,11 +300,12 @@ public class PluginParameter implements Serializable {
    * @param possibleValues
    *          the possibleValues to set
    */
-  public void setPossibleValues(List<String> possibleValues) {
+  public PluginParameter setPossibleValues(List<String> possibleValues) {
     this.possibleValues.clear();
     if (possibleValues != null) {
       this.possibleValues.addAll(possibleValues);
     }
+    return this;
   }
 
   /**

@@ -51,6 +51,7 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.PluginInfo;
+import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.risks.IndexedRisk;
@@ -742,6 +743,56 @@ public class PluginManager {
       plugins.add(plugin);
       this.lastModified = lastModified;
     }
+  }
+
+  public static String getPluginsInformationAsMarkdown(List<String> plugins) {
+    StringBuilder sb = new StringBuilder();
+    int numberOfPlugins = plugins.size();
+    if (numberOfPlugins > 1) {
+      sb.append(String.format("# Plugins%n%n"));
+    }
+    for (String plugin : plugins) {
+      try {
+        Class<?> pluginClass = Class.forName(plugin);
+        Plugin<? extends IsRODAObject> pluginInstance = (Plugin<? extends IsRODAObject>) pluginClass.newInstance();
+        sb.append(getPluginInformationAsMarkdown(pluginInstance, numberOfPlugins > 1));
+      } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+        sb.append(String.format("#%s %s %n%n", numberOfPlugins > 1 ? "#" : "", plugin));
+        sb.append(String.format("##%s Description %n%n%s%n%n", numberOfPlugins > 1 ? "#" : "",
+          "Couldn't generate plugin info! Exception thrown: " + e.getClass().getSimpleName()));
+      }
+    }
+    return sb.toString();
+  }
+
+  public static String getPluginInformationAsMarkdown(Plugin<? extends IsRODAObject> plugin) {
+    return getPluginInformationAsMarkdown(plugin, false);
+  }
+
+  private static String getPluginInformationAsMarkdown(Plugin<? extends IsRODAObject> plugin, boolean severalPlugins) {
+    StringBuilder sb = new StringBuilder();
+    sb.append(String.format("#%s %s %n%n", severalPlugins ? "#" : "", plugin.getName()));
+    // 2018-01-24 hsilva: having the version usually depends on having the tool
+    // installed, so lets not show that information
+    sb.append(String.format("##%s Description %n%n%s%n%n", severalPlugins ? "#" : "", plugin.getDescription()));
+
+    StringBuilder sbParameters = new StringBuilder();
+    if (plugin.getParameters().isEmpty()) {
+      sbParameters.append("No parameters.");
+    } else {
+      sbParameters.append(String.format("| **%s** | **%s** | **%s** | **%s** | **%s** | **%s** | %n", "Name",
+        "Description", "Type", "Default value", "Possible values", "Mandatory", "Read only"));
+      sbParameters.append(String.format("| --- | --- | --- | --- | --- | --- | --- | %n"));
+      for (PluginParameter pluginParameter : plugin.getParameters()) {
+        sbParameters.append(String.format("| **%s** | %s | %s | %s | %s | %s | %s | %n", pluginParameter.getName(),
+          pluginParameter.getDescription().replaceAll("\n", ""), pluginParameter.getType(),
+          pluginParameter.getDefaultValue(),
+          pluginParameter.getPossibleValues().isEmpty() ? "Not defined." : pluginParameter.getPossibleValues(),
+          pluginParameter.isMandatory(), pluginParameter.isReadonly()));
+      }
+    }
+    sb.append(String.format("##%s Parameters %n%n%s%n%n", severalPlugins ? "#" : "", sbParameters.toString()));
+    return sb.toString();
   }
 
 }
