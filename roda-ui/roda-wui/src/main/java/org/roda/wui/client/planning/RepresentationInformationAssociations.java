@@ -13,11 +13,9 @@ package org.roda.wui.client.planning;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.facet.Facets;
-import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
 import org.roda.core.data.v2.index.filter.OrFiltersParameters;
@@ -130,16 +128,11 @@ public class RepresentationInformationAssociations extends Composite {
   private static final Filter DEFAULT_FILTER = SearchFilters.defaultFilter(RepresentationInformation.class.getName());
   private static final String ALL_FILTER = SearchFilters.allFilter(RepresentationInformation.class.getName());
 
-  private Filter filter = DEFAULT_FILTER;
-
   /**
    * Create a representation information page
    */
   public RepresentationInformationAssociations() {
-    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.REPRESENTATION_INFORMATION_TAGS),
-      new SimpleFacetParameter(RodaConstants.REPRESENTATION_INFORMATION_SUPPORT));
-
-    representationInformationList = new RepresentationInformationList(filter, facets,
+    representationInformationList = new RepresentationInformationList(Filter.NULL, Facets.NONE,
       messages.representationInformationTitle(), false);
 
     searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, true,
@@ -156,8 +149,7 @@ public class RepresentationInformationAssociations extends Composite {
       public void onValueChange(ValueChangeEvent<String> valueChangeEvent) {
         // the user is searching. use this flag to avoid showing the options to
         // associate the filter with RI (if this was not present, those options
-        // would
-        // show up if the search had no results)
+        // would show up if the search had no results)
         gettingFilterResults = false;
       }
     });
@@ -255,12 +247,11 @@ public class RepresentationInformationAssociations extends Composite {
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     gettingFilterResults = true;
-
     createPanel.setVisible(false);
     resultsPanel.setVisible(false);
 
     if (historyTokens.size() == 2) {
-      filter = createFilterAndSubtitleFromHistoryTokens(historyTokens);
+      Filter filter = createFilterAndSubtitleFromHistoryTokens(historyTokens);
 
       String[] parts = RepresentationInformationUtils.breakFilterIntoParts(historyTokens.get(1));
       createPanelTitle.setHTML(messages.representationInformationNoAssociations(parts[0], parts[1], parts[2]));
