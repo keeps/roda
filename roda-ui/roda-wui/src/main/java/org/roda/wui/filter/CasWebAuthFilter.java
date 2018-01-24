@@ -94,6 +94,7 @@ public class CasWebAuthFilter implements Filter {
     Map<String, String[]> parameterMap = new HashMap<>(httpRequest.getParameterMap());
     parameterMap.remove("path");
     parameterMap.remove("hash");
+    parameterMap.remove("ticket");
 
     URIBuilder uri = new URIBuilder();
 
