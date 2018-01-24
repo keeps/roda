@@ -3350,9 +3350,11 @@ public class BrowserHelper {
         String fieldName = RodaCoreFactory.getRodaConfigurationAsString(field, RodaConstants.SEARCH_FIELD_FIELDS);
         fieldsAndTranslations.add(fieldName);
 
-        String translation = messages
-          .getTranslation(RodaCoreFactory.getRodaConfigurationAsString(field, RodaConstants.SEARCH_FIELD_I18N));
-        translationsResult.put(splittedKey[3] + ":" + fieldName, translation);
+        String fieldI18nKey = RodaCoreFactory.getRodaConfigurationAsString(field, RodaConstants.SEARCH_FIELD_I18N);
+        if (StringUtils.isNotBlank(fieldI18nKey)) {
+          String translation = messages.getTranslation(fieldI18nKey);
+          translationsResult.put(splittedKey[3] + ":" + fieldName, translation);
+        }
       }
 
       fieldsResult.put(splittedKey[3], fieldsAndTranslations);
