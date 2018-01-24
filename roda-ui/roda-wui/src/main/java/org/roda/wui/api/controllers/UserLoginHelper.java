@@ -84,7 +84,8 @@ public class UserLoginHelper {
         }
       }
 
-      user = RodaCoreFactory.getModelService().createUser(new User(username), true);
+      user = RodaCoreFactory.getModelService().createUser(newUser, true);
+      
     }
 
     if (!user.isActive()) {
