@@ -30,7 +30,6 @@ import org.roda.wui.common.client.tools.CachedAsynRequest;
 import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.UriUtils;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -154,16 +153,21 @@ public class UserLogin {
    * Login into RODA Core
    */
   public void login() {
-    String currentPath = Window.Location.getPath();
     String hash = Window.Location.getHash();
     if (hash.length() > 0) {
       hash = hash.substring(1);
       hash = UriUtils.encode(hash);
     }
-    String locale = LocaleInfo.getCurrentLocale().getLocaleName();
-    String moduleBaseURL = GWT.getModuleBaseURL();
-    moduleBaseURL = moduleBaseURL.substring(0, moduleBaseURL.length() - 2).substring(0, moduleBaseURL.indexOf('/'));
-    Window.open(moduleBaseURL + "login?service=" + currentPath + "&hash=" + hash + "&locale=" + locale, "_self", "");
+
+    StringBuilder url = new StringBuilder();
+    url.append(GWT.getHostPageBaseURL());
+    url.append("login");
+    url.append(Window.Location.getQueryString());
+    url.append(Window.Location.getQueryString().isEmpty() ? "?" : "&");
+    url.append("path=").append(Window.Location.getPath());
+    url.append("&hash=").append(hash);
+
+    Window.open(url.toString(), "_self", "");
   }
 
   public void login(String username, String password, final AsyncCallback<User> callback) {
@@ -184,14 +188,21 @@ public class UserLogin {
   }
 
   public void logout() {
-    // 2017-06-1 bferreira: this could probably be changed to use getPath() as
-    // the service and pass in a separate hash parameter (similar to what login
-    // does)
-    String currentURL = Window.Location.getHref().replaceAll("#", "%23");
-    String locale = LocaleInfo.getCurrentLocale().getLocaleName();
-    String moduleBaseURL = GWT.getModuleBaseURL();
-    moduleBaseURL = moduleBaseURL.substring(0, moduleBaseURL.length() - 2).substring(0, moduleBaseURL.indexOf('/'));
-    Window.open(moduleBaseURL + "logout?service=" + currentURL + "&locale=" + locale, "_self", "");
+    String hash = Window.Location.getHash();
+    if (hash.length() > 0) {
+      hash = hash.substring(1);
+      hash = UriUtils.encode(hash);
+    }
+
+    StringBuilder url = new StringBuilder();
+    url.append(GWT.getHostPageBaseURL());
+    url.append("logout");
+    url.append(Window.Location.getQueryString());
+    url.append(Window.Location.getQueryString().isEmpty() ? "?" : "&");
+    url.append("path=").append(Window.Location.getPath());
+    url.append("&hash=").append(hash);
+
+    Window.open(url.toString(), "_self", "");
     getUserRequest.clearCache();
   }
 

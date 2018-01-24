@@ -8,6 +8,10 @@
 package org.roda.wui.filter;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -18,6 +22,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.http.client.utils.URIBuilder;
 import org.roda.wui.api.controllers.UserLogin;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.welcome.Welcome;
@@ -29,6 +34,7 @@ import org.slf4j.LoggerFactory;
  * Internal authentication filter for web requests.
  * 
  * @author Hélder Silva <hsilva@keep.pt>
+ * @author Luis Faria <lfaria@keep.pt>
  */
 public class InternalWebAuthFilter implements Filter {
   /** Logger. */
@@ -48,42 +54,58 @@ public class InternalWebAuthFilter implements Filter {
 
     final String url = httpRequest.getRequestURL().toString();
     final String requestURI = httpRequest.getRequestURI();
-    final String service = httpRequest.getParameter("service");
+    final String path = httpRequest.getParameter("path");
     final String hash = httpRequest.getParameter("hash");
-    final String locale = httpRequest.getParameter("locale");
-    final String contextPath = httpRequest.getContextPath();
 
-    LOGGER.debug("URL: {} ; Request URI: {} ; Context Path: {}; Service: {} ; Hash: {}; Locale: {}", url, requestURI,
-      contextPath, service, hash, locale);
+    Map<String, String[]> parameterMap = new HashMap<>(httpRequest.getParameterMap());
+    parameterMap.remove("path");
+    parameterMap.remove("hash");
+
+    URIBuilder uri = new URIBuilder();
+    uri.setPath(path);
+
+    // adding all other parameters
+    parameterMap.forEach((param, values) -> {
+      for (String value : values) {
+        uri.addParameter(param, value);
+      }
+    });
+
+    LOGGER.info("URL: {} ; Request URI: {} ; Path: {} ; Hash: {}; Parameters: {}", url, requestURI, path, hash,
+      parameterMap);
 
     if (requestURI.endsWith("/login")) {
-      final StringBuilder b = new StringBuilder();
-      b.append(contextPath + "/");
+      if (!hash.startsWith("login" + HistoryUtils.HISTORY_SEP)) {
+        StringBuilder b = new StringBuilder();
+        b.append("login");
 
-      if (StringUtils.isNotBlank(locale)) {
-        b.append("?locale=").append(locale);
+        if (StringUtils.isNotBlank(hash)) {
+          b.append(HistoryUtils.HISTORY_SEP).append(hash);
+        }
+
+        uri.setFragment(b.toString());
+      } else {
+        uri.setFragment(hash);
       }
 
-      b.append("#login");
-
-      if (StringUtils.isNotBlank(hash)) {
-        b.append(HistoryUtils.HISTORY_SEP).append(hash);
+      try {
+        httpResponse.sendRedirect(uri.build().toString());
+      } catch (URISyntaxException e) {
+        LOGGER.error("Could not generate service URL, redirecting to base path " + path, e);
+        httpResponse.sendRedirect(path);
       }
-
-      httpResponse.sendRedirect(b.toString());
     } else if (requestURI.endsWith("/logout")) {
       UserLogin.logout(httpRequest);
 
-      final StringBuilder b = new StringBuilder();
-      b.append(contextPath + "/");
+      // discard hash and set it to the welcome page
+      uri.setFragment(Welcome.RESOLVER.getHistoryToken());
 
-      if (StringUtils.isNotBlank(locale)) {
-        b.append("?locale=").append(locale);
+      try {
+        httpResponse.sendRedirect(uri.build().toString());
+      } catch (URISyntaxException e) {
+        LOGGER.error("Could not generate service URL, redirecting to base path " + path, e);
+        httpResponse.sendRedirect(path);
       }
-
-      b.append("#").append(Welcome.RESOLVER.getHistoryToken());
-
-      httpResponse.sendRedirect(b.toString());
 
     } else {
       chain.doFilter(request, response);

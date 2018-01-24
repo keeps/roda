@@ -8,6 +8,10 @@
 package org.roda.wui.filter;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -18,11 +22,14 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.http.client.utils.URIBuilder;
 import org.jasig.cas.client.util.CommonUtils;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.wui.api.controllers.UserLogin;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.welcome.Welcome;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,13 +88,35 @@ public class CasWebAuthFilter implements Filter {
 
     final String url = httpRequest.getRequestURL().toString();
     final String requestURI = httpRequest.getRequestURI();
-    final String service = httpRequest.getParameter("service");
+    final String path = httpRequest.getParameter("path");
     final String hash = httpRequest.getParameter("hash");
-    final String locale = httpRequest.getParameter("locale");
-    final String contextPath = httpRequest.getContextPath();
 
-    LOGGER.debug("URL: {} ; Request URI: {} ; Context Path: {}; Service: {} ; Hash: {}; Locale: {}", url, requestURI,
-      contextPath, service, hash, locale);
+    Map<String, String[]> parameterMap = new HashMap<>(httpRequest.getParameterMap());
+    parameterMap.remove("path");
+    parameterMap.remove("hash");
+
+    URIBuilder uri = new URIBuilder();
+
+    // Setting RODA host via config
+    String rodaServerName = RodaCoreFactory.getRodaConfiguration().getString("ui.filter.cas.serverName", "");
+    if (StringUtils.isNotBlank(rodaServerName)) {
+      URI rodaServerNameUri = URI.create(rodaServerName);
+      uri.setScheme(rodaServerNameUri.getScheme());
+      uri.setHost(rodaServerNameUri.getHost());
+      uri.setPort(rodaServerNameUri.getPort());
+    }
+
+    uri.setPath(path);
+
+    // adding all other parameters
+    parameterMap.forEach((param, values) -> {
+      for (String value : values) {
+        uri.addParameter(param, value);
+      }
+    });
+
+    LOGGER.info("URL: {} ; Request URI: {} ; Path: {} ; Hash: {}; Parameters: {}", url, requestURI, path, hash,
+      parameterMap);
 
     if (url.endsWith("/login")) {
       if (httpRequest.getUserPrincipal() != null) {
@@ -100,33 +129,33 @@ public class CasWebAuthFilter implements Filter {
         }
       }
 
-      final StringBuilder b = new StringBuilder();
-      b.append(contextPath + "/");
+      uri.setFragment(hash);
 
-      if (StringUtils.isNotBlank(locale)) {
-        b.append("?locale=").append(locale);
+      try {
+        httpResponse.sendRedirect(uri.build().toString());
+      } catch (URISyntaxException e) {
+        LOGGER.error("Could not generate service URL, redirecting to base path " + path, e);
+        httpResponse.sendRedirect(path);
       }
-
-      if (StringUtils.isNotBlank(hash)) {
-        b.append("#").append(hash);
-      }
-
-      httpResponse.sendRedirect(b.toString());
 
     } else if (url.endsWith("/logout")) {
 
       UserLogin.logout(httpRequest);
 
-      final StringBuilder b = new StringBuilder();
-      b.append(url.substring(0, url.indexOf("logout")));
+      // TODO add RODA host from config
 
-      if (StringUtils.isNotBlank(locale)) {
-        b.append("?locale=").append(locale);
+      // discard hash and set it to the welcome page
+      uri.setFragment(Welcome.RESOLVER.getHistoryToken());
+
+      String service;
+      try {
+        service = uri.build().toString();
+      } catch (URISyntaxException e) {
+        LOGGER.error("Could not generate service URL, redirecting to base path " + path, e);
+        service = path;
       }
 
-      b.append("#").append(Welcome.RESOLVER.getHistoryToken());
-
-      httpResponse.sendRedirect(CommonUtils.constructRedirectUrl(casLogoutURL, "service", b.toString(), false, false));
+      httpResponse.sendRedirect(CommonUtils.constructRedirectUrl(casLogoutURL, "service", service, false, false));
 
     } else {
       chain.doFilter(request, response);
