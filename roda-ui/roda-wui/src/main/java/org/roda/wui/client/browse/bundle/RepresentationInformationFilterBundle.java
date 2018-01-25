@@ -13,6 +13,7 @@ public class RepresentationInformationFilterBundle implements Serializable {
 
   public RepresentationInformationFilterBundle() {
     this.objectClassFields = new HashMap<>();
+    this.translations = new HashMap<>();
   }
 
   public Map<String, List<String>> getObjectClassFields() {

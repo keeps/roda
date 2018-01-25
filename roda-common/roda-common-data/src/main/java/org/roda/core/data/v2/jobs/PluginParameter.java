@@ -73,7 +73,12 @@ public class PluginParameter implements Serializable {
     /**
      * Interface to select a RODA object
      */
-    RODA_OBJECT;
+    RODA_OBJECT,
+
+    /**
+     * Interface to select a RODA object (AIP, representation, file) fields
+     */
+    AIP_FIELDS, REPRESENTATION_FIELDS, FILE_FIELDS;
   }
 
   private String id = null;

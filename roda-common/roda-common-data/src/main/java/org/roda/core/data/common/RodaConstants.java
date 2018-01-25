@@ -981,6 +981,8 @@ public final class RodaConstants {
   public static final String REPRESENTATION_INFORMATION_FILE_EXTENSION = ".json";
   public static final String REPRESENTATION_INFORMATION_SEARCH = "search";
 
+  public static final String ONE_OF_FORMAT_FIELDS = "oneOfFormatFields";
+
   /* Formats */
   public static final String FORMAT_ID = "id";
   public static final String FORMAT_NAME = "name";

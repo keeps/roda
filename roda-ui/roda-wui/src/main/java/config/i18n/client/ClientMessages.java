@@ -1106,6 +1106,8 @@ public interface ClientMessages extends Messages {
 
   String addToExistingRepresentationInformation();
 
+  String atLeastOneOfAbove();
+
   /************* Format register ****************/
 
   String getFormatsDialogName();

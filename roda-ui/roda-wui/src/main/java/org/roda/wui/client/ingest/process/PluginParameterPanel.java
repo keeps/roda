@@ -7,13 +7,18 @@
  */
 package org.roda.wui.client.ingest.process;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
@@ -21,9 +26,11 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.common.IncrementalAssociativeList;
 import org.roda.wui.client.common.dialogs.SelectAipDialog;
 import org.roda.wui.client.common.utils.PluginUtils;
+import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 
@@ -93,6 +100,12 @@ public class PluginParameterPanel extends Composite {
       createSelectRodaObjectLayout();
     } else if (PluginParameterType.INTEGER.equals(parameter.getType())) {
       createIntegerLayout();
+    } else if (PluginParameterType.AIP_FIELDS.equals(parameter.getType())) {
+      createPluginObjectFieldsLayout(AIP.class.getSimpleName());
+    } else if (PluginParameterType.REPRESENTATION_FIELDS.equals(parameter.getType())) {
+      createPluginObjectFieldsLayout(Representation.class.getSimpleName());
+    } else if (PluginParameterType.FILE_FIELDS.equals(parameter.getType())) {
+      createPluginObjectFieldsLayout(File.class.getSimpleName());
     } else {
       LOGGER
         .warn("Unsupported plugin parameter type: " + parameter.getType() + ". Reverting to default parameter editor.");
@@ -336,8 +349,84 @@ public class PluginParameterPanel extends Composite {
     addHelp();
   }
 
-  private void createPluginSipToAipLayout() {
+  private void createPluginObjectFieldsLayout(final String className) {
+    List<String> defaultValues = Arrays.asList(parameter.getDefaultValue().split(","));
+    GWT.log(defaultValues.toString());
 
+    BrowserService.Util.getInstance().retrieveObjectClassFields(LocaleInfo.getCurrentLocale().getLocaleName(),
+      new AsyncCallback<RepresentationInformationFilterBundle>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          // do nothing
+        }
+
+        @Override
+        public void onSuccess(RepresentationInformationFilterBundle bundle) {
+          final List<String> selectedFields = new ArrayList<>();
+          FlowPanel group = new FlowPanel();
+          Label parameterName = new Label(parameter.getName());
+          layout.add(parameterName);
+          addHelp();
+
+          for (String field : bundle.getObjectClassFields().get(className)) {
+            final String classField = className
+              + RepresentationInformationUtils.REPRESENTATION_INFORMATION_FILTER_SEPARATOR + field;
+            CheckBox box = new CheckBox(bundle.getTranslations().get(classField));
+
+            if (defaultValues.contains(field)) {
+              box.setValue(true);
+              selectedFields.add(field);
+            }
+
+            group.add(box);
+            box.addStyleName("form-radiobutton");
+
+            box.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+              @Override
+              public void onValueChange(ValueChangeEvent<Boolean> event) {
+                if (event.getValue()) {
+                  selectedFields.add(field);
+                } else {
+                  selectedFields.remove(field);
+                }
+                value = StringUtils.join(selectedFields, ",");
+              }
+            });
+          }
+
+          if (File.class.getSimpleName().equals(className)) {
+            CheckBox box = new CheckBox(messages.atLeastOneOfAbove());
+            group.add(box);
+            box.addStyleName("form-radiobutton");
+
+            if (defaultValues.contains(RodaConstants.ONE_OF_FORMAT_FIELDS)) {
+              box.setValue(true);
+              selectedFields.add(RodaConstants.ONE_OF_FORMAT_FIELDS);
+            }
+
+            box.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+              @Override
+              public void onValueChange(ValueChangeEvent<Boolean> event) {
+                if (event.getValue()) {
+                  selectedFields.add(RodaConstants.ONE_OF_FORMAT_FIELDS);
+                } else {
+                  selectedFields.remove(RodaConstants.ONE_OF_FORMAT_FIELDS);
+                }
+                value = StringUtils.join(selectedFields, ",");
+              }
+            });
+          }
+
+          value = StringUtils.join(selectedFields, ",");
+          layout.add(group);
+          group.addStyleName("form-radiogroup");
+          parameterName.addStyleName("form-label");
+        }
+      });
+  }
+
+  private void createPluginSipToAipLayout() {
     List<PluginType> plugins = Arrays.asList(PluginType.SIP_TO_AIP);
     BrowserService.Util.getInstance().retrievePluginsInfo(plugins, new AsyncCallback<List<PluginInfo>>() {
 
@@ -457,9 +546,7 @@ public class PluginParameterPanel extends Composite {
     addHelp();
 
     checkBox.addStyleName("form-checkbox");
-
     checkBox.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-
       @Override
       public void onValueChange(ValueChangeEvent<Boolean> event) {
         value = event.getValue() ? "true" : "false";
@@ -471,9 +558,7 @@ public class PluginParameterPanel extends Composite {
     String pDescription = parameter.getDescription();
     if (pDescription != null && pDescription.length() > 0) {
       Label pHelp = new Label(pDescription);
-
       layout.add(pHelp);
-
       pHelp.addStyleName("form-help");
     }
   }

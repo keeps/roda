@@ -232,7 +232,8 @@ public class BrowserHelper {
     bundle.setDipCount(dipCount);
 
     List<String> rodaConfigurationAsList = RodaCoreFactory.getRodaConfigurationAsList("core.ri.rule.AIP").stream()
-      .map(r -> RodaCoreFactory.getRodaConfigurationAsString(r, "fields")).collect(Collectors.toList());
+      .map(r -> RodaCoreFactory.getRodaConfigurationAsString(r, RodaConstants.SEARCH_FIELD_FIELDS))
+      .collect(Collectors.toList());
     bundle.setRepresentationInformationFields(rodaConfigurationAsList);
     return bundle;
   }
@@ -268,7 +269,8 @@ public class BrowserHelper {
     bundle.setDipCount(dipCount);
 
     List<String> rodaConfigurationAsList = RodaCoreFactory.getRodaConfigurationAsList("core.ri.rule.Representation")
-      .stream().map(r -> RodaCoreFactory.getRodaConfigurationAsString(r, "fields")).collect(Collectors.toList());
+      .stream().map(r -> RodaCoreFactory.getRodaConfigurationAsString(r, RodaConstants.SEARCH_FIELD_FIELDS))
+      .collect(Collectors.toList());
     bundle.setRepresentationInformationFields(rodaConfigurationAsList);
     return bundle;
   }
@@ -310,7 +312,8 @@ public class BrowserHelper {
     bundle.setDipCount(dipCount);
 
     List<String> rodaConfigurationAsList = RodaCoreFactory.getRodaConfigurationAsList("core.ri.rule.File").stream()
-      .map(r -> RodaCoreFactory.getRodaConfigurationAsString(r, "fields")).collect(Collectors.toList());
+      .map(r -> RodaCoreFactory.getRodaConfigurationAsString(r, RodaConstants.SEARCH_FIELD_FIELDS))
+      .collect(Collectors.toList());
     bundle.setRepresentationInformationFields(rodaConfigurationAsList);
     return bundle;
   }
@@ -3339,6 +3342,7 @@ public class BrowserHelper {
     Iterator<String> keys = RodaCoreFactory.getRodaConfiguration().getKeys("core.ri.rule");
     Map<String, List<String>> fieldsResult = new HashMap<>();
     Map<String, String> translationsResult = new HashMap<>();
+    Map<String, List<String>> mandatoryResult = new HashMap<>();
 
     while (keys.hasNext()) {
       String key = keys.next();
