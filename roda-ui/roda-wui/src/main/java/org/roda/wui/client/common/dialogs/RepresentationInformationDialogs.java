@@ -11,7 +11,9 @@ import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.FilterParameter;
 import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
+import org.roda.core.data.v2.index.filter.OrFiltersParameters;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
@@ -206,19 +208,20 @@ public class RepresentationInformationDialogs {
           listButton.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-              Filter tableFilter = new Filter();
+              List<FilterParameter> filterList = new ArrayList<>();
               for (String field : values.keySet()) {
                 for (String value : values.get(field)) {
                   if (StringUtils.isNotBlank(value)) {
-                    tableFilter.add(new SimpleFilterParameter(field, value));
+                    filterList.add(new SimpleFilterParameter(field, value));
                   }
                 }
               }
 
               listPanel.clear();
 
-              if (!tableFilter.getParameters().isEmpty()) {
+              if (!filterList.isEmpty()) {
                 BasicAsyncTableCell<?> table = null;
+                Filter tableFilter = new Filter(new OrFiltersParameters(filterList));
                 switch (dropDown.getSelectedValue()) {
                   case RodaConstants.SEARCH_ITEMS:
                     table = new AIPList(tableFilter, true, Facets.NONE, "", false, 5, 5);
