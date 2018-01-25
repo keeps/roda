@@ -7,6 +7,9 @@
  */
 package org.roda.wui.api.controllers;
 
+import java.util.Map;
+import java.util.function.BiConsumer;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.directory.api.ldap.model.exception.LdapException;
@@ -78,14 +81,14 @@ public class UserLoginHelper {
       // try to set user email from cas principal attributes
       if (request.getUserPrincipal() instanceof AttributePrincipal) {
         AttributePrincipal attributePrincipal = (AttributePrincipal) request.getUserPrincipal();
-        Object possibleEmail = attributePrincipal.getAttributes().get("email");
-        if (possibleEmail != null && possibleEmail instanceof String) {
-          newUser.setEmail((String) possibleEmail);
-        }
+        Map<String, Object> attributes = attributePrincipal.getAttributes();
+
+        mapCasAttribute(newUser, attributes, "fullname", (u, a) -> u.setFullName(a));
+        mapCasAttribute(newUser, attributes, "email", (u, a) -> u.setEmail(a));
       }
 
       user = RodaCoreFactory.getModelService().createUser(newUser, true);
-      
+
     }
 
     if (!user.isActive()) {
@@ -95,4 +98,13 @@ public class UserLoginHelper {
     UserUtility.setUser(request, user);
     return user;
   }
+
+  private static void mapCasAttribute(User user, Map<String, Object> attributes, String attributeKey,
+    BiConsumer<User, String> mapping) {
+    Object attributeValue = attributes.get(attributeKey);
+    if (attributeValue != null && attributeValue instanceof String) {
+      mapping.accept(user, (String) attributeValue);
+    }
+  }
+
 }
