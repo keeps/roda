@@ -116,7 +116,7 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
       Job job = PluginHelper.getJob(p, getIndex());
       LOGGER.info("Setting job '{}' ({}) state to {}. Details: {}", job.getName(), job.getId(), message.getState(),
         message.getStateDatails().orElse("NO DETAILS"));
-    } catch (NotFoundException | GenericException e) {
+    } catch (NotFoundException | GenericException | RequestNotValidException e) {
       LOGGER.warn("Unable to get Job from index to log its state change. Reason: {}", e.getMessage());
     }
     JobsHelper.updateJobState(p, getModel(), message.getState(), message.getStateDatails());
@@ -263,7 +263,7 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
       Job job = PluginHelper.getJob(plugin, indexService);
       JobsHelper.cleanJobObjects(job, super.getModel(), indexService);
       LOGGER.info("Ended doing job cleanup");
-    } catch (NotFoundException | GenericException e) {
+    } catch (NotFoundException | GenericException | RequestNotValidException e) {
       LOGGER.error("Unable to get Job for doing cleanup", e);
     }
     markMessageProcessingAsEnded(message);

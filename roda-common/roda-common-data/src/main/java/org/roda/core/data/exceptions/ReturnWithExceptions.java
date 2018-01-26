@@ -60,6 +60,10 @@ public class ReturnWithExceptions<T, S> {
     ts.add(this);
   }
 
+  public boolean isEmpty() {
+    return this.exceptions.isEmpty();
+  }
+
   public T getReturnedObject() {
     return returnedObject;
   }

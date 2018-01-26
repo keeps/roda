@@ -260,7 +260,7 @@ public class TransferredResourcesScanner {
             } else {
               updateTransferredResources(Optional.empty(), true);
             }
-          } catch (GenericException | NotFoundException e) {
+          } catch (GenericException | NotFoundException | RequestNotValidException e) {
             LOGGER.error("Could not reindex transferred resources after renaming");
           }
         } else {
@@ -276,8 +276,8 @@ public class TransferredResourcesScanner {
   }
 
   public Map<String, String> moveTransferredResource(String newRelativePath, List<String> resourcesUUIDs,
-    boolean replaceExisting)
-    throws AlreadyExistsException, GenericException, IsStillUpdatingException, NotFoundException {
+    boolean replaceExisting) throws AlreadyExistsException, GenericException, IsStillUpdatingException,
+    NotFoundException, RequestNotValidException {
     List<TransferredResource> resources = Collections.emptyList();
     try {
       List<String> resourceFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.TRANSFERRED_RESOURCE_FULLPATH,

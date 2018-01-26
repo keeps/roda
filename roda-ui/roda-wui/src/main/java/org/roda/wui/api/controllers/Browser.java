@@ -395,7 +395,7 @@ public class Browser extends RodaWuiController {
   }
 
   public static <T extends IsIndexed> T retrieve(final User user, final Class<T> classToReturn, final String id,
-    final List<String> fieldsToReturn) throws AuthorizationDeniedException, GenericException, NotFoundException {
+    final List<String> fieldsToReturn) throws RODAException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -1939,8 +1939,7 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static TransferredResource reindexTransferredResource(User user, String path)
-    throws IsStillUpdatingException, AuthorizationDeniedException, NotFoundException, GenericException {
+  public static TransferredResource reindexTransferredResource(User user, String path) throws RODAException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -2072,7 +2071,7 @@ public class Browser extends RodaWuiController {
   }
 
   public static List<SupportedMetadataTypeBundle> retrieveSupportedMetadata(User user, String aipId,
-    String representationId, Locale locale) throws AuthorizationDeniedException, GenericException, NotFoundException {
+    String representationId, Locale locale) throws RODAException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check permissions
@@ -2130,7 +2129,7 @@ public class Browser extends RodaWuiController {
   }
 
   public static PreservationEventViewBundle retrievePreservationEventViewBundle(User user, String eventId)
-    throws AuthorizationDeniedException, NotFoundException, GenericException {
+    throws RODAException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions

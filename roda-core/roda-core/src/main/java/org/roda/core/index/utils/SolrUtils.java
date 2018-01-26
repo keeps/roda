@@ -63,6 +63,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.NotSupportedException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.ReturnWithExceptions;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
@@ -189,7 +190,7 @@ public class SolrUtils {
   }
 
   public static <T extends IsIndexed> T retrieve(SolrClient index, Class<T> classToRetrieve, String id,
-    List<String> fieldsToReturn) throws NotFoundException, GenericException {
+    List<String> fieldsToReturn) throws NotFoundException, GenericException, RequestNotValidException {
     if (id == null) {
       throw new GenericException("Could not retrieve object from a null id");
     }
@@ -204,12 +205,14 @@ public class SolrUtils {
       }
     } catch (SolrServerException | IOException e) {
       throw new GenericException("Could not retrieve object from index", e);
+    } catch (SolrException e) {
+      throw new RequestNotValidException(e);
     }
     return ret;
   }
 
   public static <T extends IsIndexed> List<T> retrieve(SolrClient index, Class<T> classToRetrieve, List<String> id,
-    List<String> fieldsToReturn) throws NotFoundException, GenericException {
+    List<String> fieldsToReturn) throws NotFoundException, GenericException, RequestNotValidException {
     List<T> ret = new ArrayList<>();
     try {
       int block = RodaConstants.DEFAULT_PAGINATION_VALUE;
@@ -222,6 +225,8 @@ public class SolrUtils {
       }
     } catch (SolrServerException | IOException e) {
       throw new GenericException("Could not retrieve object from index", e);
+    } catch (SolrException e) {
+      throw new RequestNotValidException(e);
     }
     return ret;
   }
@@ -298,7 +303,7 @@ public class SolrUtils {
     } catch (SolrServerException | IOException e) {
       throw new GenericException("Could not query index", e);
     } catch (SolrException e) {
-      throw new RequestNotValidException(e.getMessage());
+      throw new RequestNotValidException(e);
     } catch (RuntimeException e) {
       throw new GenericException("Unexpected exception while querying index", e);
     }
@@ -691,8 +696,8 @@ public class SolrUtils {
         ret.add(facetResult);
       }
     }
-    return ret;
 
+    return ret;
   }
 
   public static SolrInputDocument getDescriptiveMetadataFields(Binary binary, String metadataType,
@@ -701,10 +706,9 @@ public class SolrUtils {
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put("prefix", RodaConstants.INDEX_OTHER_DESCRIPTIVE_DATA_PREFIX);
-    Reader transformationResult = RodaUtils.applyMetadataStylesheet(binary, RodaConstants.CORE_CROSSWALKS_INGEST,
-      metadataType, metadataVersion, parameters);
 
-    try {
+    try (Reader transformationResult = RodaUtils.applyMetadataStylesheet(binary, RodaConstants.CORE_CROSSWALKS_INGEST,
+      metadataType, metadataVersion, parameters)) {
       XMLLoader loader = new XMLLoader();
       XMLStreamReader parser = XMLInputFactory.newInstance().createXMLStreamReader(transformationResult);
 
@@ -724,10 +728,8 @@ public class SolrUtils {
         }
       }
 
-    } catch (XMLStreamException | FactoryConfigurationError e) {
+    } catch (XMLStreamException | FactoryConfigurationError | IOException e) {
       throw new GenericException("Could not process descriptive metadata binary " + binary.getStoragePath(), e);
-    } finally {
-      IOUtils.closeQuietly(transformationResult);
     }
 
     return doc == null ? new SolrInputDocument() : validateDescriptiveMetadataFields(doc);
@@ -1164,7 +1166,7 @@ public class SolrUtils {
     for (String collection : collections) {
       try {
         index.commit(collection, waitFlush, waitSearcher, softCommit);
-      } catch (SolrServerException | IOException e) {
+      } catch (SolrServerException | IOException | SolrException e) {
         LOGGER.error("Error commiting into collection: {}", collection, e);
       }
     }
@@ -1184,13 +1186,17 @@ public class SolrUtils {
     commit(index, Arrays.asList(resultClasses));
   }
 
-  public static <T extends IsIndexed> void create(SolrClient index, Class<T> classToCreate, T instance)
-    throws GenericException {
+  public static <T extends IsIndexed> ReturnWithExceptions<Void, ?> create(SolrClient index, Class<T> classToCreate,
+    T instance) {
+    ReturnWithExceptions<Void, ?> ret = new ReturnWithExceptions<>();
     try {
       index.add(getIndexName(classToCreate).get(0), toSolrDocument(classToCreate, instance));
-    } catch (SolrServerException | IOException | NotSupportedException e) {
-      throw new GenericException("Error adding instance to index", e);
+    } catch (SolrServerException | IOException | NotSupportedException | SolrException | GenericException e) {
+      LOGGER.error("Error adding document to index", e);
+      ret.add(e);
     }
+
+    return ret;
   }
 
   /*
@@ -2003,7 +2009,7 @@ public class SolrUtils {
             return objectToString(doc.get(RodaConstants.INDEX_UUID), null);
           }
         }
-      } catch (ClassNotFoundException | GenericException | SolrServerException | IOException e) {
+      } catch (ClassNotFoundException | GenericException | SolrServerException | IOException | SolrException e) {
         LOGGER.error("Could not return object label of {} {}", className, id, e);
       }
     }
@@ -2903,22 +2909,30 @@ public class SolrUtils {
     return doc;
   }
 
-  public static <T extends IsIndexed> void delete(SolrClient index, Class<T> classToDelete, List<String> ids)
-    throws GenericException {
+  public static <T extends IsIndexed> ReturnWithExceptions<Void, ?> delete(SolrClient index, Class<T> classToDelete,
+    List<String> ids) {
+    ReturnWithExceptions<Void, ?> ret = new ReturnWithExceptions<>();
     try {
       index.deleteById(getIndexName(classToDelete).get(0), ids);
-    } catch (SolrServerException | IOException e) {
-      throw new GenericException("Could not delete items", e);
+    } catch (SolrServerException | IOException | SolrException | GenericException e) {
+      LOGGER.error("Error deleting document from index");
+      ret.add(e);
     }
+
+    return ret;
   }
 
-  public static <T extends IsIndexed> void delete(SolrClient index, Class<T> classToDelete, Filter filter)
-    throws GenericException, RequestNotValidException {
+  public static <T extends IsIndexed> ReturnWithExceptions<Void, ?> delete(SolrClient index, Class<T> classToDelete,
+    Filter filter) {
+    ReturnWithExceptions<Void, ?> ret = new ReturnWithExceptions<>();
     try {
       index.deleteByQuery(getIndexName(classToDelete).get(0), parseFilter(filter));
-    } catch (SolrServerException | IOException e) {
-      throw new GenericException("Could not delete items", e);
+    } catch (SolrServerException | IOException | SolrException | GenericException | RequestNotValidException e) {
+      LOGGER.error("Error deleting documents from index");
+      ret.add(e);
     }
+
+    return ret;
   }
 
   public static <T extends IsIndexed> void deleteByQuery(SolrClient index, String classToDelete, Filter filter)
@@ -2927,6 +2941,8 @@ public class SolrUtils {
       index.deleteByQuery(classToDelete, parseFilter(filter));
     } catch (SolrServerException | IOException e) {
       throw new GenericException("Could not delete items", e);
+    } catch (SolrException e) {
+      throw new RequestNotValidException(e);
     }
   }
 }

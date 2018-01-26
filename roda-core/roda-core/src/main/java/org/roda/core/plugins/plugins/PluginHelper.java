@@ -397,9 +397,11 @@ public final class PluginHelper {
   /**
    * 20160329 hsilva: use this method only to get job information that most
    * certainly won't change in time (e.g. username, etc.)
+   * 
+   * @throws RequestNotValidException
    */
   public static <T extends IsRODAObject> Job getJob(Plugin<T> plugin, IndexService index)
-    throws NotFoundException, GenericException {
+    throws NotFoundException, GenericException, RequestNotValidException {
     String jobId = getJobId(plugin);
     if (jobId != null) {
       return index.retrieve(Job.class, jobId, new ArrayList<>());
@@ -635,7 +637,7 @@ public final class PluginHelper {
         IndexedAIP computedParent = index.retrieve(IndexedAIP.class, computedSearchScope.get(),
           Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_ANCESTORS));
         ancestorFilter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, computedParent.getId()));
-      } catch (NotFoundException | GenericException e) {
+      } catch (NotFoundException | GenericException | RequestNotValidException e) {
         // Do nothing
       }
     }
@@ -967,7 +969,7 @@ public final class PluginHelper {
           .moveTransferredResource(successPath, success, true);
         updateReportsAfterMovingSIPs(model, jobPluginInfo, successOldToNewTransferredResourceIds);
       }
-    } catch (AlreadyExistsException | GenericException | NotFoundException e) {
+    } catch (AlreadyExistsException | GenericException | NotFoundException | RequestNotValidException e) {
       LOGGER.error("Error moving successfully ingested SIPs", e);
     } catch (IsStillUpdatingException e) {
       LOGGER.warn("TransferredResources are already being indexed");
@@ -979,7 +981,7 @@ public final class PluginHelper {
           .moveTransferredResource(unsuccessPath, unsuccess, true);
         updateReportsAfterMovingSIPs(model, jobPluginInfo, unsuccessOldToNewTransferredResourceIds);
       }
-    } catch (AlreadyExistsException | GenericException | NotFoundException e) {
+    } catch (AlreadyExistsException | GenericException | NotFoundException | RequestNotValidException e) {
       LOGGER.error("Error moving unsuccessfully ingested SIPs", e);
     } catch (IsStillUpdatingException e) {
       LOGGER.warn("TransferredResources are already being indexed");
@@ -1021,7 +1023,7 @@ public final class PluginHelper {
         RodaCoreFactory.getPluginOrchestrator().updateJobAsync(plugin,
           new Messages.JobSourceObjectsUpdated(oldToNewTransferredResourceIds));
       }
-    } catch (NotFoundException | GenericException e) {
+    } catch (NotFoundException | GenericException | RequestNotValidException e) {
       LOGGER.error("Error retrieving Job", e);
     }
   }

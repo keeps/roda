@@ -172,7 +172,7 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
             index.clearAIPEventIndex();
           }
         }
-      } catch (GenericException | NotFoundException | ClassNotFoundException e) {
+      } catch (GenericException | NotFoundException | ClassNotFoundException | RequestNotValidException e) {
         throw new PluginException("Error clearing index", e);
       }
 
@@ -191,7 +191,7 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
         Job job = PluginHelper.getJob(this, index);
         Class selectedClass = Class.forName(job.getSourceObjects().getSelectedClass());
         index.optimizeIndexes(SolrUtils.getIndexName(selectedClass));
-      } catch (GenericException | NotFoundException | ClassNotFoundException e) {
+      } catch (GenericException | NotFoundException | ClassNotFoundException | RequestNotValidException e) {
         throw new PluginException("Error optimizing index", e);
       }
     }

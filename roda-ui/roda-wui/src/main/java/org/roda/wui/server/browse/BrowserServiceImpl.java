@@ -239,7 +239,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   @Override
   public <T extends IsIndexed> T retrieve(String classNameToReturn, String id, List<String> fieldsToReturn)
-    throws AuthorizationDeniedException, GenericException, NotFoundException {
+    throws RODAException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Class<T> classToReturn = SelectedItemsUtils.parseClass(classNameToReturn);
     return Browser.retrieve(user, classToReturn, id, fieldsToReturn);
@@ -450,8 +450,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public JobBundle retrieveJobBundle(String jobId, List<String> fieldsToReturn)
-    throws AuthorizationDeniedException, GenericException, NotFoundException {
+  public JobBundle retrieveJobBundle(String jobId, List<String> fieldsToReturn) throws RODAException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Job job = Browser.retrieve(user, Job.class, jobId, fieldsToReturn);
 
@@ -565,15 +564,14 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   @Override
   public List<SupportedMetadataTypeBundle> retrieveSupportedMetadata(String aipId, String representationId,
-    String localeString) throws AuthorizationDeniedException, GenericException, NotFoundException {
+    String localeString) throws RODAException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Locale locale = ServerTools.parseLocale(localeString);
     return Browser.retrieveSupportedMetadata(user, aipId, representationId, locale);
   }
 
   @Override
-  public PreservationEventViewBundle retrievePreservationEventViewBundle(String eventId)
-    throws AuthorizationDeniedException, GenericException, NotFoundException {
+  public PreservationEventViewBundle retrievePreservationEventViewBundle(String eventId) throws RODAException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.retrievePreservationEventViewBundle(user, eventId);
   }
@@ -903,8 +901,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public <T extends IsIndexed> T retrieveFromModel(String classNameToReturn, String id)
-    throws AuthorizationDeniedException, GenericException, NotFoundException {
+  public <T extends IsIndexed> T retrieveFromModel(String classNameToReturn, String id) throws RODAException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Class<? extends IsRODAObject> classToReturn = SelectedItemsUtils.parseClass(classNameToReturn);
     Class<T> indexedClassToReturn = IndexUtils.giveRespectiveIndexClass(classToReturn);

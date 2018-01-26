@@ -191,7 +191,7 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
       } else {
         outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has not been manually moved");
       }
-    } catch (NotFoundException | GenericException e1) {
+    } catch (NotFoundException | GenericException | RequestNotValidException e1) {
       if (state.equals(PluginState.SUCCESS)) {
         outcomeText = "Archival Information Package [id: " + aip.getId() + "] has been manually moved";
       } else {
@@ -315,7 +315,7 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
       }
 
       index.commit((Class<? extends IsIndexed>) Class.forName(job.getSourceObjects().getSelectedClass()));
-    } catch (NotFoundException | GenericException | IsStillUpdatingException e) {
+    } catch (NotFoundException | GenericException | IsStillUpdatingException | RequestNotValidException e) {
       LOGGER.error("Could not update new resource parent folder");
     } catch (ClassNotFoundException e) {
       LOGGER.error("Error commiting after move operation");

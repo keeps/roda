@@ -100,11 +100,13 @@ public class IndexService {
     model.addModelObserver(observer);
   }
 
-  public IndexedAIP getParent(IndexedAIP aip, List<String> fieldsToReturn) throws NotFoundException, GenericException {
+  public IndexedAIP getParent(IndexedAIP aip, List<String> fieldsToReturn)
+    throws NotFoundException, GenericException, RequestNotValidException {
     return SolrUtils.retrieve(getSolrClient(), IndexedAIP.class, aip.getParentID(), fieldsToReturn);
   }
 
-  public List<IndexedAIP> retrieveAncestors(IndexedAIP aip, List<String> fieldsToReturn) throws GenericException {
+  public List<IndexedAIP> retrieveAncestors(IndexedAIP aip, List<String> fieldsToReturn)
+    throws GenericException, RequestNotValidException {
     List<IndexedAIP> ancestors = new ArrayList<>();
     IndexedAIP parent;
     IndexedAIP actual = aip;
@@ -187,12 +189,12 @@ public class IndexService {
   }
 
   public <T extends IsIndexed> T retrieve(Class<T> returnClass, String id, List<String> fieldsToReturn)
-    throws NotFoundException, GenericException {
+    throws NotFoundException, GenericException, RequestNotValidException {
     return SolrUtils.retrieve(getSolrClient(), returnClass, id, fieldsToReturn);
   }
 
   public <T extends IsIndexed> List<T> retrieve(Class<T> returnClass, List<String> ids, List<String> fieldsToReturn)
-    throws NotFoundException, GenericException {
+    throws NotFoundException, GenericException, RequestNotValidException {
     return SolrUtils.retrieve(getSolrClient(), returnClass, ids, fieldsToReturn);
   }
 

@@ -182,7 +182,7 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     try {
       item = index.retrieve(IndexedAIP.class, aip.getId(),
         Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_TITLE));
-    } catch (NotFoundException | GenericException e) {
+    } catch (NotFoundException | GenericException | RequestNotValidException e) {
       // do nothing
     }
 
@@ -376,7 +376,7 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     try {
       Job job = PluginHelper.getJob(this, index);
       index.commit((Class<? extends IsIndexed>) Class.forName(job.getSourceObjects().getSelectedClass()));
-    } catch (NotFoundException | GenericException | ClassNotFoundException e) {
+    } catch (NotFoundException | GenericException | ClassNotFoundException | RequestNotValidException e) {
       LOGGER.error("Could not commit after delete operation", e);
     }
 

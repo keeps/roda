@@ -161,7 +161,7 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
       report.addReport(reportItem);
       try {
         PluginHelper.updatePartialJobReport(this, model, reportItem, true, PluginHelper.getJob(this, index));
-      } catch (NotFoundException | GenericException e1) {
+      } catch (NotFoundException | GenericException | RequestNotValidException e1) {
         LOGGER.error("Error when updating job when ancestors fix failed", e1);
       }
     }

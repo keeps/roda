@@ -31,7 +31,9 @@ public class ReturnWithExceptionsWrapper {
   }
 
   public void addToList(ReturnWithExceptions<?, ?> item) {
-    this.list.add(item);
+    if (item != null) {
+      this.list.add(item);
+    }
   }
 
   public String printStackTraces() {

@@ -110,8 +110,12 @@ public class IndexModelObserver implements ModelObserver {
     try {
       List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
       indexAIP(aip, ancestors).addTo(ret);
-      indexRepresentations(aip, ancestors).addTo(ret);
-      indexPreservationsEvents(aip.getId(), null).addTo(ret);
+      if (ret.isEmpty()) {
+        indexRepresentations(aip, ancestors).addTo(ret);
+        if (ret.isEmpty()) {
+          indexPreservationsEvents(aip.getId(), null).addTo(ret);
+        }
+      }
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | SolrException e) {
       LOGGER.error("Error getting ancestors when creating AIP", e);
       ret.add(e);
@@ -172,8 +176,7 @@ public class IndexModelObserver implements ModelObserver {
           ret.add(opm.getCause());
         }
       }
-    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
-      | SolrException e) {
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Cannot index preservation events", e);
       ret.add(e);
     } finally {
@@ -382,7 +385,7 @@ public class IndexModelObserver implements ModelObserver {
       // change Representations, Files & Preservation events
       representationsStateUpdated(aip).addTo(ret);
       preservationEventsStateUpdated(aip).addTo(ret);
-    } catch (SolrServerException | IOException e) {
+    } catch (SolrServerException | IOException | SolrException e) {
       LOGGER.error("Cannot do a partial update", e);
       ret.add(e);
     }
@@ -440,8 +443,7 @@ public class IndexModelObserver implements ModelObserver {
               ret.add(subfile.getCause());
             }
           }
-        } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException
-          | SolrException e) {
+        } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
           LOGGER.error("Cannot index file sub-resources: {}", file, e);
           ret.add(e);
         }
@@ -466,7 +468,7 @@ public class IndexModelObserver implements ModelObserver {
             try {
               preservationEventStateUpdated(pm, aip.getState());
             } catch (SolrServerException | IOException | RequestNotValidException | GenericException | NotFoundException
-              | AuthorizationDeniedException e) {
+              | AuthorizationDeniedException | SolrException e) {
               LOGGER.error("Cannot index premis event", e);
               ret.add(e);
             }
@@ -477,7 +479,7 @@ public class IndexModelObserver implements ModelObserver {
         }
       }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
-      | SolrException | IOException e) {
+      | IOException e) {
       LOGGER.error("Cannot index preservation events", e);
       ret.add(e);
     }
@@ -576,17 +578,14 @@ public class IndexModelObserver implements ModelObserver {
   @Override
   public ReturnWithExceptions<Void, ModelObserver> aipDeleted(String aipId, boolean deleteIncidences) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
-    try {
-      deleteDocumentFromIndex(IndexedAIP.class, aipId);
-      deleteDocumentsFromIndex(IndexedRepresentation.class, RodaConstants.REPRESENTATION_AIP_ID, aipId);
-      deleteDocumentsFromIndex(IndexedFile.class, RodaConstants.FILE_AIP_ID, aipId);
-      deleteDocumentsFromIndex(IndexedPreservationEvent.class, RodaConstants.PRESERVATION_EVENT_AIP_ID, aipId);
 
-      if (deleteIncidences) {
-        deleteDocumentsFromIndex(RiskIncidence.class, RodaConstants.RISK_INCIDENCE_AIP_ID, aipId);
-      }
-    } catch (SolrException | RODAException e) {
-      ret.add(e);
+    deleteDocumentFromIndex(IndexedAIP.class, aipId).addTo(ret);
+    deleteDocumentsFromIndex(IndexedRepresentation.class, RodaConstants.REPRESENTATION_AIP_ID, aipId).addTo(ret);
+    deleteDocumentsFromIndex(IndexedFile.class, RodaConstants.FILE_AIP_ID, aipId).addTo(ret);
+    deleteDocumentsFromIndex(IndexedPreservationEvent.class, RodaConstants.PRESERVATION_EVENT_AIP_ID, aipId).addTo(ret);
+
+    if (deleteIncidences) {
+      deleteDocumentsFromIndex(RiskIncidence.class, RodaConstants.RISK_INCIDENCE_AIP_ID, aipId).addTo(ret);
     }
 
     return ret;
@@ -606,8 +605,7 @@ public class IndexModelObserver implements ModelObserver {
           descriptiveMetadata.getRepresentationId());
         ret = indexRepresentation(aip, representation, ancestors);
       }
-    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
-      | SolrException e) {
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Failed to index AIP or representation when creating descriptive metadata", e);
       ret.add(e);
     }
@@ -629,8 +627,7 @@ public class IndexModelObserver implements ModelObserver {
           descriptiveMetadata.getRepresentationId());
         ret = indexRepresentation(aip, representation, ancestors);
       }
-    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
-      | SolrException e) {
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Failed to index AIP or representation when updating descriptive metadata", e);
       ret.add(e);
     }
@@ -646,9 +643,8 @@ public class IndexModelObserver implements ModelObserver {
       try {
         AIP aip = model.retrieveAIP(aipId);
         List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
-        ret = indexAIP(aip, ancestors);
-      } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
-        | SolrException e) {
+        indexAIP(aip, ancestors).addTo(ret);
+      } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
         LOGGER.error("Error when descriptive metadata deleted on retrieving the full AIP", e);
         ret.add(e);
       }
@@ -665,11 +661,13 @@ public class IndexModelObserver implements ModelObserver {
       List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
 
       indexRepresentation(aip, representation, ancestors).addTo(ret);
-      indexPreservationsEvents(aip.getId(), representation.getId()).addTo(ret);
+      if (ret.isEmpty()) {
+        indexPreservationsEvents(aip.getId(), representation.getId()).addTo(ret);
 
-      if (aip.getRepresentations().size() == 1) {
-        SolrInputDocument doc = SolrUtils.updateAIPHasRepresentations(aip.getId(), true);
-        index.add(RodaConstants.INDEX_AIP, doc);
+        if (aip.getRepresentations().size() == 1) {
+          SolrInputDocument doc = SolrUtils.updateAIPHasRepresentations(aip.getId(), true);
+          index.add(RodaConstants.INDEX_AIP, doc);
+        }
       }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Cannot index representation: {}", representation, e);
@@ -694,30 +692,27 @@ public class IndexModelObserver implements ModelObserver {
   public ReturnWithExceptions<Void, ModelObserver> representationDeleted(String aipId, String representationId,
     boolean deleteIncidences) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
+
+    String representationUUID = IdUtils.getRepresentationId(aipId, representationId);
+    deleteDocumentFromIndex(IndexedRepresentation.class, representationUUID).addTo(ret);
+    deleteDocumentsFromIndex(IndexedFile.class, RodaConstants.FILE_REPRESENTATION_UUID, representationUUID).addTo(ret);
+    deleteDocumentsFromIndex(IndexedPreservationEvent.class, RodaConstants.PRESERVATION_EVENT_REPRESENTATION_UUID,
+      representationUUID).addTo(ret);
+
+    if (deleteIncidences) {
+      deleteDocumentsFromIndex(RiskIncidence.class, RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, representationId)
+        .addTo(ret);
+    }
+
     try {
-      String representationUUID = IdUtils.getRepresentationId(aipId, representationId);
-      deleteDocumentFromIndex(IndexedRepresentation.class, representationUUID);
-      deleteDocumentsFromIndex(IndexedFile.class, RodaConstants.FILE_REPRESENTATION_UUID, representationUUID);
-      deleteDocumentsFromIndex(IndexedPreservationEvent.class, RodaConstants.PRESERVATION_EVENT_REPRESENTATION_UUID,
-        representationUUID);
-
-      if (deleteIncidences) {
-        deleteDocumentsFromIndex(RiskIncidence.class, RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, representationId);
+      AIP aip = model.retrieveAIP(aipId);
+      if (aip.getRepresentations().size() == 0) {
+        SolrInputDocument doc = SolrUtils.updateAIPHasRepresentations(aipId, false);
+        index.add(RodaConstants.INDEX_AIP, doc);
       }
-
-      try {
-        AIP aip = model.retrieveAIP(aipId);
-        if (aip.getRepresentations().size() == 0) {
-          SolrInputDocument doc = SolrUtils.updateAIPHasRepresentations(aipId, false);
-          index.add(RodaConstants.INDEX_AIP, doc);
-        }
-      } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
-        | SolrServerException | IOException e) {
-        LOGGER.error("Cannot update hasRepresentations flag on AIP", e);
-        ret.add(e);
-      }
-    } catch (SolrException | RODAException e) {
-      LOGGER.error("Cannot delete representation from index", e);
+    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
+      | SolrServerException | IOException | SolrException e) {
+      LOGGER.error("Cannot update hasRepresentations flag on AIP", e);
       ret.add(e);
     }
 
@@ -731,8 +726,7 @@ public class IndexModelObserver implements ModelObserver {
       AIP aip = model.retrieveAIP(file.getAipId());
       List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
       indexFile(aip, file, ancestors, true).addTo(ret);
-    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
-      | SolrException e) {
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error indexing file: {}", file, e);
       ret.add(e);
     }
@@ -752,16 +746,12 @@ public class IndexModelObserver implements ModelObserver {
   public ReturnWithExceptions<Void, ModelObserver> fileDeleted(String aipId, String representationId,
     List<String> fileDirectoryPath, String fileId, boolean deleteIncidences) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
-    try {
-      String uuid = IdUtils.getFileId(aipId, representationId, fileDirectoryPath, fileId);
-      deleteDocumentFromIndex(IndexedFile.class, uuid);
 
-      if (deleteIncidences) {
-        deleteDocumentsFromIndex(RiskIncidence.class, RodaConstants.RISK_INCIDENCE_FILE_ID, fileId);
-      }
-    } catch (SolrException | RODAException e) {
-      LOGGER.error("Error deleting file from index", e);
-      ret.add(e);
+    String uuid = IdUtils.getFileId(aipId, representationId, fileDirectoryPath, fileId);
+    deleteDocumentFromIndex(IndexedFile.class, uuid).addTo(ret);
+
+    if (deleteIncidences) {
+      deleteDocumentsFromIndex(RiskIncidence.class, RodaConstants.RISK_INCIDENCE_FILE_ID, fileId).addTo(ret);
     }
 
     return ret;
@@ -784,15 +774,7 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> userCreated(User user) {
-    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
-    try {
-      addDocumentToIndex(RODAMember.class, user);
-    } catch (RODAException | SolrException e) {
-      LOGGER.error("Error adding user on index", e);
-      ret.add(e);
-    }
-
-    return ret;
+    return addDocumentToIndex(RODAMember.class, user);
   }
 
   @Override
@@ -804,28 +786,12 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> userDeleted(String userID) {
-    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
-    try {
-      deleteDocumentFromIndex(RODAMember.class, userID);
-    } catch (RODAException | SolrException e) {
-      LOGGER.error("Error deleting user from index", e);
-      ret.add(e);
-    }
-
-    return ret;
+    return deleteDocumentFromIndex(RODAMember.class, userID);
   }
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> groupCreated(Group group) {
-    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
-    try {
-      addDocumentToIndex(RODAMember.class, group);
-    } catch (RODAException | SolrException e) {
-      LOGGER.error("Error adding group on index", e);
-      ret.add(e);
-    }
-
-    return ret;
+    return addDocumentToIndex(RODAMember.class, group);
   }
 
   @Override
@@ -837,15 +803,7 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> groupDeleted(String groupID) {
-    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
-    try {
-      deleteDocumentFromIndex(RODAMember.class, groupID);
-    } catch (RODAException | SolrException e) {
-      LOGGER.error("Error deleting group from index", e);
-      ret.add(e);
-    }
-
-    return ret;
+    return deleteDocumentFromIndex(RODAMember.class, groupID);
   }
 
   @Override
@@ -894,17 +852,13 @@ public class IndexModelObserver implements ModelObserver {
   public ReturnWithExceptions<Void, ModelObserver> preservationMetadataDeleted(
     PreservationMetadata preservationMetadata) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
-    try {
-      PreservationMetadataType type = preservationMetadata.getType();
-      String preservationMetadataId = preservationMetadata.getId();
-      if (PreservationMetadataType.EVENT.equals(type)) {
-        deleteDocumentFromIndex(IndexedPreservationEvent.class, preservationMetadataId);
-      } else if (PreservationMetadataType.AGENT.equals(type)) {
-        deleteDocumentFromIndex(IndexedPreservationAgent.class, preservationMetadataId);
-      }
-    } catch (RODAException | SolrException e) {
-      LOGGER.error("Error deleting preservation metadata from index", e);
-      ret.add(e);
+
+    PreservationMetadataType type = preservationMetadata.getType();
+    String preservationMetadataId = preservationMetadata.getId();
+    if (PreservationMetadataType.EVENT.equals(type)) {
+      deleteDocumentFromIndex(IndexedPreservationEvent.class, preservationMetadataId).addTo(ret);
+    } else if (PreservationMetadataType.AGENT.equals(type)) {
+      deleteDocumentFromIndex(IndexedPreservationAgent.class, preservationMetadataId).addTo(ret);
     }
 
     return ret;
@@ -958,15 +912,12 @@ public class IndexModelObserver implements ModelObserver {
       if (listResourcesUnderDirectory != null) {
         for (Resource resource : listResourcesUnderDirectory) {
           if (!resource.isDirectory()) {
-            try {
-              Binary binary = storage.getBinary(resource.getStoragePath());
-              InputStream inputStream = binary.getContent().createInputStream();
+            try (
+              InputStream inputStream = storage.getBinary(resource.getStoragePath()).getContent().createInputStream()) {
               Report objectFromJson = JsonUtils.getObjectFromJson(inputStream, Report.class);
-              IOUtils.closeQuietly(inputStream);
-
               jobReportCreatedOrUpdated(objectFromJson, job).addTo(ret);
             } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
-              | IOException | SolrException e) {
+              | IOException e) {
               LOGGER.error("Error getting report json from binary", e);
               ret.add(e);
             }
@@ -974,7 +925,7 @@ public class IndexModelObserver implements ModelObserver {
         }
       }
     } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
-      | SolrException | IOException e) {
+      | IOException e) {
       LOGGER.error("Error reindexing job reports", e);
       ret.add(e);
     }
@@ -984,44 +935,26 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> jobDeleted(String jobId) {
-    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
-    try {
-      deleteDocumentFromIndex(Job.class, jobId);
-    } catch (RODAException e) {
-      LOGGER.error("Error deleting job from index", e);
-      ret.add(e);
-    }
-
-    return ret;
+    return deleteDocumentFromIndex(Job.class, jobId);
   }
 
-  private <T extends IsIndexed> void addDocumentToIndex(Class<T> classToAdd, T instance) throws RODAException {
-    try {
-      SolrUtils.create(index, classToAdd, instance);
-    } catch (GenericException e) {
-      LOGGER.error("Error adding document to index", e);
-      throw e;
-    }
+  private <T extends IsIndexed> ReturnWithExceptions<Void, ModelObserver> addDocumentToIndex(Class<T> classToAdd,
+    T instance) {
+    ReturnWithExceptions<Void, ?> ret = SolrUtils.create(index, classToAdd, instance);
+    return new ReturnWithExceptions<>(ret.getExceptions(), ret.getReturnedObject(), this);
   }
 
-  private <T extends IsIndexed> void deleteDocumentFromIndex(Class<T> classToDelete, String... ids)
-    throws RODAException {
-    try {
-      SolrUtils.delete(index, classToDelete, Arrays.asList(ids));
-    } catch (GenericException e) {
-      LOGGER.error("Error deleting document from index", e);
-      throw e;
-    }
+  private <T extends IsIndexed> ReturnWithExceptions<Void, ModelObserver> deleteDocumentFromIndex(
+    Class<T> classToDelete, String... ids) {
+    ReturnWithExceptions<Void, ?> ret = SolrUtils.delete(index, classToDelete, Arrays.asList(ids));
+    return new ReturnWithExceptions<>(ret.getExceptions(), ret.getReturnedObject(), this);
   }
 
-  private <T extends IsIndexed> void deleteDocumentsFromIndex(Class<T> classToDelete, String fieldName,
-    String fieldValue) throws RODAException {
-    try {
-      SolrUtils.delete(index, classToDelete, new Filter(new SimpleFilterParameter(fieldName, fieldValue)));
-    } catch (GenericException | RequestNotValidException e) {
-      LOGGER.error("Error deleting from index", e);
-      throw e;
-    }
+  private <T extends IsIndexed> ReturnWithExceptions<Void, ModelObserver> deleteDocumentsFromIndex(
+    Class<T> classToDelete, String fieldName, String fieldValue) {
+    ReturnWithExceptions<Void, ?> ret = SolrUtils.delete(index, classToDelete,
+      new Filter(new SimpleFilterParameter(fieldName, fieldValue)));
+    return new ReturnWithExceptions<>(ret.getExceptions(), ret.getReturnedObject(), this);
   }
 
   @Override
@@ -1041,15 +974,7 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> jobReportDeleted(String jobReportId) {
-    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
-    try {
-      deleteDocumentFromIndex(IndexedReport.class, jobReportId);
-    } catch (RODAException | SolrException e) {
-      LOGGER.error("Error deleting job report from index", e);
-      ret.add(e);
-    }
-
-    return ret;
+    return deleteDocumentFromIndex(IndexedReport.class, jobReportId);
   }
 
   @Override
@@ -1061,7 +986,7 @@ public class IndexModelObserver implements ModelObserver {
       index.add(RodaConstants.INDEX_AIP, aipDoc);
 
       // change Representations, Files and Preservation events
-      ret = representationsPermissionsUpdated(aip);
+      representationsPermissionsUpdated(aip).addTo(ret);
       preservationEventsPermissionsUpdated(aip).addTo(ret);
     } catch (SolrServerException | IOException | SolrException e) {
       LOGGER.error("Cannot do a partial update", e);
@@ -1173,7 +1098,7 @@ public class IndexModelObserver implements ModelObserver {
         }
       }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
-      | SolrException | IOException e) {
+      | IOException e) {
       LOGGER.error("Cannot index preservation events", e);
       ret.add(e);
     }
@@ -1215,21 +1140,15 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> riskDeleted(String riskId, boolean commit) {
-    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
-    try {
-      deleteDocumentFromIndex(IndexedRisk.class, riskId);
+    ReturnWithExceptions<Void, ModelObserver> ret = deleteDocumentFromIndex(IndexedRisk.class, riskId);
 
-      if (commit) {
-        try {
-          SolrUtils.commit(index, IndexedRisk.class);
-        } catch (GenericException | SolrException e) {
-          LOGGER.warn("Commit did not run as expected", e);
-          ret.add(e);
-        }
+    if (commit) {
+      try {
+        SolrUtils.commit(index, IndexedRisk.class);
+      } catch (GenericException | SolrException e) {
+        LOGGER.warn("Commit did not run as expected", e);
+        ret.add(e);
       }
-    } catch (RODAException | SolrException e) {
-      LOGGER.warn("Error deleting risk from index", e);
-      ret.add(e);
     }
 
     return ret;
@@ -1238,23 +1157,15 @@ public class IndexModelObserver implements ModelObserver {
   @Override
   public ReturnWithExceptions<Void, ModelObserver> riskIncidenceCreatedOrUpdated(RiskIncidence riskIncidence,
     boolean commit) {
-    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
-    SolrInputDocument incidenceDoc = SolrUtils.riskIncidenceToSolrDocument(riskIncidence);
+    ReturnWithExceptions<Void, ModelObserver> ret = addDocumentToIndex(RiskIncidence.class, riskIncidence);
 
-    try {
-      index.add(RodaConstants.INDEX_RISK_INCIDENCE, incidenceDoc);
-
-      if (commit) {
-        try {
-          SolrUtils.commit(index, RiskIncidence.class);
-        } catch (GenericException | SolrException e) {
-          LOGGER.warn("Commit did not run as expected", e);
-          ret.add(e);
-        }
+    if (commit) {
+      try {
+        SolrUtils.commit(index, RiskIncidence.class);
+      } catch (GenericException | SolrException e) {
+        LOGGER.warn("Commit did not run as expected", e);
+        ret.add(e);
       }
-    } catch (SolrServerException | SolrException | IOException e) {
-      LOGGER.error("Risk incidence document was not added to index", e);
-      ret.add(e);
     }
 
     return ret;
@@ -1262,21 +1173,15 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> riskIncidenceDeleted(String riskIncidenceId, boolean commit) {
-    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
-    try {
-      deleteDocumentFromIndex(RiskIncidence.class, riskIncidenceId);
+    ReturnWithExceptions<Void, ModelObserver> ret = deleteDocumentFromIndex(RiskIncidence.class, riskIncidenceId);
 
-      if (commit) {
-        try {
-          SolrUtils.commit(index, RiskIncidence.class);
-        } catch (GenericException | SolrException e) {
-          LOGGER.warn("Commit did not run as expected", e);
-          ret.add(e);
-        }
+    if (commit) {
+      try {
+        SolrUtils.commit(index, RiskIncidence.class);
+      } catch (GenericException | SolrException e) {
+        LOGGER.warn("Commit did not run as expected", e);
+        ret.add(e);
       }
-    } catch (RODAException | SolrException e) {
-      LOGGER.warn("Error deleting risk incidence from index", e);
-      ret.add(e);
     }
 
     return ret;
@@ -1285,23 +1190,15 @@ public class IndexModelObserver implements ModelObserver {
   @Override
   public ReturnWithExceptions<Void, ModelObserver> representationInformationCreatedOrUpdated(
     RepresentationInformation ri, boolean commit) {
-    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
-    SolrInputDocument doc = SolrUtils.representationInformationToSolrDocument(ri);
+    ReturnWithExceptions<Void, ModelObserver> ret = addDocumentToIndex(RepresentationInformation.class, ri);
 
-    try {
-      index.add(RodaConstants.INDEX_REPRESENTATION_INFORMATION, doc);
-
-      if (commit) {
-        try {
-          SolrUtils.commit(index, RepresentationInformation.class);
-        } catch (GenericException | SolrException e) {
-          LOGGER.warn("Commit did not run as expected", e);
-          ret.add(e);
-        }
+    if (commit) {
+      try {
+        SolrUtils.commit(index, RepresentationInformation.class);
+      } catch (GenericException | SolrException e) {
+        LOGGER.warn("Commit did not run as expected", e);
+        ret.add(e);
       }
-    } catch (SolrServerException | SolrException | IOException e) {
-      LOGGER.error("RepresentationInformation document was not added to index", e);
-      ret.add(e);
     }
 
     return ret;
@@ -1310,45 +1207,32 @@ public class IndexModelObserver implements ModelObserver {
   @Override
   public ReturnWithExceptions<Void, ModelObserver> representationInformationDeleted(String representationInformationId,
     boolean commit) {
-    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
-    try {
-      deleteDocumentFromIndex(RepresentationInformation.class, representationInformationId);
+    ReturnWithExceptions<Void, ModelObserver> ret = deleteDocumentFromIndex(RepresentationInformation.class,
+      representationInformationId);
 
-      if (commit) {
-        try {
-          SolrUtils.commit(index, RepresentationInformation.class);
-        } catch (GenericException | SolrException e) {
-          LOGGER.warn("Commit did not run as expected", e);
-          ret.add(e);
-        }
+    if (commit) {
+      try {
+        SolrUtils.commit(index, RepresentationInformation.class);
+      } catch (GenericException | SolrException e) {
+        LOGGER.warn("Commit did not run as expected", e);
+        ret.add(e);
       }
-    } catch (RODAException | SolrException e) {
-      LOGGER.warn("Error deleting representation information from index", e);
-      ret.add(e);
     }
 
     return ret;
   }
 
   @Override
-  public ReturnWithExceptions<Void, ModelObserver> formatCreatedOrUpdated(Format f, boolean commit) {
-    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
-    SolrInputDocument formatDoc = SolrUtils.formatToSolrDocument(f);
+  public ReturnWithExceptions<Void, ModelObserver> formatCreatedOrUpdated(Format format, boolean commit) {
+    ReturnWithExceptions<Void, ModelObserver> ret = addDocumentToIndex(Format.class, format);
 
-    try {
-      index.add(RodaConstants.INDEX_FORMAT, formatDoc);
-
-      if (commit) {
-        try {
-          SolrUtils.commit(index, Format.class);
-        } catch (GenericException | SolrException e) {
-          LOGGER.warn("Commit did not run as expected", e);
-          ret.add(e);
-        }
+    if (commit) {
+      try {
+        SolrUtils.commit(index, Format.class);
+      } catch (GenericException | SolrException e) {
+        LOGGER.warn("Commit did not run as expected", e);
+        ret.add(e);
       }
-    } catch (SolrServerException | SolrException | IOException e) {
-      LOGGER.error("Format document was not added to index", e);
-      ret.add(e);
     }
 
     return ret;
@@ -1356,21 +1240,15 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> formatDeleted(String formatId, boolean commit) {
-    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
-    try {
-      deleteDocumentFromIndex(Format.class, formatId);
+    ReturnWithExceptions<Void, ModelObserver> ret = deleteDocumentFromIndex(Format.class, formatId);
 
-      if (commit) {
-        try {
-          SolrUtils.commit(index, Format.class);
-        } catch (GenericException | SolrException e) {
-          LOGGER.warn("Commit did not run as expected", e);
-          ret.add(e);
-        }
+    if (commit && ret.isEmpty()) {
+      try {
+        SolrUtils.commit(index, Format.class);
+      } catch (GenericException | SolrException e) {
+        LOGGER.warn("Commit did not run as expected", e);
+        ret.add(e);
       }
-    } catch (RODAException | SolrException e) {
-      LOGGER.warn("Error deleting format from index", e);
-      ret.add(e);
     }
 
     return ret;
@@ -1378,43 +1256,17 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> transferredResourceDeleted(String transferredResourceID) {
-    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
-    try {
-      deleteDocumentFromIndex(TransferredResource.class, transferredResourceID);
-    } catch (RODAException | SolrException e) {
-      LOGGER.error("Error deleting transferred resource from index", e);
-      ret.add(e);
-    }
-
-    return ret;
+    return deleteDocumentFromIndex(TransferredResource.class, transferredResourceID);
   }
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> notificationCreatedOrUpdated(Notification notification) {
-    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
-    SolrInputDocument notificationDoc = SolrUtils.notificationToSolrDocument(notification);
-
-    try {
-      index.add(RodaConstants.INDEX_NOTIFICATION, notificationDoc);
-    } catch (SolrServerException | SolrException | IOException e) {
-      LOGGER.error("Notification document was not added to index", e);
-      ret.add(e);
-    }
-
-    return ret;
+    return addDocumentToIndex(Notification.class, notification);
   }
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> notificationDeleted(String notificationId) {
-    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
-    try {
-      deleteDocumentFromIndex(Notification.class, notificationId);
-    } catch (RODAException | SolrException e) {
-      LOGGER.error("Error deleting notificationfrom index", e);
-      ret.add(e);
-    }
-
-    return ret;
+    return deleteDocumentFromIndex(Notification.class, notificationId);
   }
 
   @Override
@@ -1424,29 +1276,31 @@ public class IndexModelObserver implements ModelObserver {
     try {
       index.add(RodaConstants.INDEX_DIP, dipDocument);
 
-      // index DIP Files
-      try (CloseableIterable<OptionalWithCause<DIPFile>> allFiles = model.listDIPFilesUnder(dip.getId(), true)) {
-        for (OptionalWithCause<DIPFile> file : allFiles) {
-          if (file.isPresent()) {
-            indexDIPFile(dip, file.get(), false).addTo(ret);
-          } else {
-            LOGGER.error("Cannot index DIP file", file.getCause());
-            ret.add(file.getCause());
+      if (ret.isEmpty()) {
+        // index DIP Files
+        try (CloseableIterable<OptionalWithCause<DIPFile>> allFiles = model.listDIPFilesUnder(dip.getId(), true)) {
+          for (OptionalWithCause<DIPFile> file : allFiles) {
+            if (file.isPresent()) {
+              indexDIPFile(dip, file.get(), false).addTo(ret);
+            } else {
+              LOGGER.error("Cannot index DIP file", file.getCause());
+              ret.add(file.getCause());
+            }
           }
-        }
 
-        if (commit) {
-          try {
-            SolrUtils.commit(index, IndexedDIP.class);
-            SolrUtils.commit(index, DIPFile.class);
-          } catch (GenericException | SolrException e) {
-            LOGGER.warn("Commit did not run as expected");
-            ret.add(e);
+          if (commit) {
+            try {
+              SolrUtils.commit(index, IndexedDIP.class);
+              SolrUtils.commit(index, DIPFile.class);
+            } catch (GenericException | SolrException e) {
+              LOGGER.warn("Commit did not run as expected");
+              ret.add(e);
+            }
           }
+        } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+          LOGGER.error("Could not index DIP files", e);
+          ret.add(e);
         }
-      } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
-        LOGGER.error("Could not index DIP files", e);
-        ret.add(e);
       }
     } catch (SolrServerException | SolrException | IOException e) {
       LOGGER.error("Could not index DIP", e);
@@ -1465,11 +1319,10 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> dipDeleted(String dipId, boolean commit) {
-    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
+    ReturnWithExceptions<Void, ModelObserver> ret = deleteDocumentFromIndex(IndexedDIP.class, dipId);
 
-    try {
-      deleteDocumentFromIndex(IndexedDIP.class, dipId);
-      deleteDocumentsFromIndex(DIPFile.class, RodaConstants.DIPFILE_DIP_ID, dipId);
+    if (ret.isEmpty()) {
+      deleteDocumentsFromIndex(DIPFile.class, RodaConstants.DIPFILE_DIP_ID, dipId).addTo(ret);
 
       if (commit) {
         try {
@@ -1480,40 +1333,29 @@ public class IndexModelObserver implements ModelObserver {
           ret.add(e);
         }
       }
-    } catch (RODAException e) {
-      LOGGER.warn("Error deleting DIP and/or its DIP files from index", e);
-      ret.add(e);
     }
 
     return ret;
   }
 
   private ReturnWithExceptions<Void, ModelObserver> indexDIPFile(DIP dip, DIPFile file, boolean recursive) {
-    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
-    SolrInputDocument fileDocument = SolrUtils.dipFileToSolrDocument(dip, file);
+    ReturnWithExceptions<Void, ModelObserver> ret = addDocumentToIndex(DIPFile.class, file);
 
-    try {
-      index.add(RodaConstants.INDEX_DIP_FILE, fileDocument);
-
-      if (recursive && file.isDirectory()) {
-        try (CloseableIterable<OptionalWithCause<DIPFile>> allFiles = model.listDIPFilesUnder(file, true)) {
-          for (OptionalWithCause<DIPFile> subfile : allFiles) {
-            if (subfile.isPresent()) {
-              indexDIPFile(dip, subfile.get(), false).addTo(ret);
-            } else {
-              LOGGER.error("Cannot index DIP file", subfile.getCause());
-              ret.add(subfile.getCause());
-            }
+    if (recursive && file.isDirectory() && ret.isEmpty()) {
+      try (CloseableIterable<OptionalWithCause<DIPFile>> allFiles = model.listDIPFilesUnder(file, true)) {
+        for (OptionalWithCause<DIPFile> subfile : allFiles) {
+          if (subfile.isPresent()) {
+            indexDIPFile(dip, subfile.get(), false).addTo(ret);
+          } else {
+            LOGGER.error("Cannot index DIP file", subfile.getCause());
+            ret.add(subfile.getCause());
           }
-        } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException
-          | SolrException e) {
-          LOGGER.error("Cannot index DIP file sub-resources: {}", file, e);
-          ret.add(e);
         }
+      } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException
+        | IOException e) {
+        LOGGER.error("Cannot index DIP file sub-resources: {}", file, e);
+        ret.add(e);
       }
-    } catch (SolrServerException | SolrException | IOException e) {
-      LOGGER.error("Cannot index DIP file: {}", file, e);
-      ret.add(e);
     }
 
     return ret;
@@ -1525,7 +1367,7 @@ public class IndexModelObserver implements ModelObserver {
     try {
       DIP dip = model.retrieveDIP(file.getDipId());
       indexDIPFile(dip, file, true).addTo(ret);
-    } catch (NotFoundException | GenericException | AuthorizationDeniedException | SolrException e) {
+    } catch (NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error indexing DIP file: {}", file, e);
       ret.add(e);
     }
@@ -1542,16 +1384,7 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> dipFileDeleted(String dipId, List<String> path, String fileId) {
-    ReturnWithExceptions<Void, ModelObserver> exceptions = new ReturnWithExceptions<>(this);
-    String uuid = IdUtils.getDIPFileId(dipId, path, fileId);
-    try {
-      deleteDocumentFromIndex(DIPFile.class, uuid);
-    } catch (RODAException | SolrException e) {
-      LOGGER.error("Error deleting DIP file from index", e);
-      exceptions.add(e);
-    }
-
-    return exceptions;
+    return deleteDocumentFromIndex(DIPFile.class, IdUtils.getDIPFileId(dipId, path, fileId));
   }
 
 }

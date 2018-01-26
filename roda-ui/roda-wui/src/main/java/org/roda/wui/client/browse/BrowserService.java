@@ -175,13 +175,12 @@ public interface BrowserService extends RemoteService {
 
   CreateIngestJobBundle retrieveCreateIngestProcessBundle();
 
-  JobBundle retrieveJobBundle(String jobId, List<String> fieldsToReturn)
-    throws AuthorizationDeniedException, GenericException, NotFoundException;
+  JobBundle retrieveJobBundle(String jobId, List<String> fieldsToReturn) throws RODAException;
 
   Viewers retrieveViewersProperties() throws GenericException;
 
   List<SupportedMetadataTypeBundle> retrieveSupportedMetadata(String aipId, String representationUUID, String locale)
-    throws AuthorizationDeniedException, GenericException, NotFoundException;
+    throws RODAException;
 
   boolean isCookiesMessageActive();
 
@@ -195,8 +194,7 @@ public interface BrowserService extends RemoteService {
    */
   String retrieveGoogleReCAPTCHAAccount();
 
-  PreservationEventViewBundle retrievePreservationEventViewBundle(String eventId)
-    throws AuthorizationDeniedException, GenericException, NotFoundException;
+  PreservationEventViewBundle retrievePreservationEventViewBundle(String eventId) throws RODAException;
 
   DescriptiveMetadataVersionsBundle retrieveDescriptiveMetadataVersionsBundle(String aipId, String representationId,
     String descriptiveMetadataId, String localeString)
@@ -218,7 +216,7 @@ public interface BrowserService extends RemoteService {
     throws AuthorizationDeniedException, GenericException, RequestNotValidException;
 
   <T extends IsIndexed> T retrieve(String classNameToReturn, String id, List<String> fieldsToReturn)
-    throws AuthorizationDeniedException, GenericException, NotFoundException;
+    throws RODAException;
 
   <T extends IsIndexed> List<T> retrieve(String classNameToReturn, SelectedItems<T> selectedItems,
     List<String> fieldsToReturn)
@@ -338,8 +336,7 @@ public interface BrowserService extends RemoteService {
   void deleteDIPs(SelectedItems<IndexedDIP> dips)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
-  <T extends IsIndexed> T retrieveFromModel(String classNameToReturn, String id)
-    throws AuthorizationDeniedException, GenericException, NotFoundException;
+  <T extends IsIndexed> T retrieveFromModel(String classNameToReturn, String id) throws RODAException;
 
   boolean hasDocumentation(String aipId)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException;

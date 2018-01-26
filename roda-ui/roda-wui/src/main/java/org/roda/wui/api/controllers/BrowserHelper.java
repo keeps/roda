@@ -571,7 +571,7 @@ public class BrowserHelper {
   }
 
   protected static List<IndexedAIP> retrieveAncestors(IndexedAIP aip, List<String> fieldsToReturn)
-    throws GenericException, NotFoundException {
+    throws GenericException, NotFoundException, RequestNotValidException {
     return RodaCoreFactory.getIndexService().retrieveAncestors(aip, fieldsToReturn);
   }
 
@@ -594,7 +594,7 @@ public class BrowserHelper {
   }
 
   protected static <T extends IsIndexed> T retrieve(Class<T> returnClass, String id, List<String> fieldsToReturn)
-    throws GenericException, NotFoundException {
+    throws GenericException, NotFoundException, RequestNotValidException {
     return RodaCoreFactory.getIndexService().retrieve(returnClass, id, fieldsToReturn);
   }
 
@@ -2117,7 +2117,7 @@ public class BrowserHelper {
   }
 
   public static PreservationEventViewBundle retrievePreservationEventViewBundle(String eventId)
-    throws NotFoundException, GenericException {
+    throws NotFoundException, GenericException, RequestNotValidException {
     PreservationEventViewBundle eventBundle = new PreservationEventViewBundle();
     Map<String, IndexedAIP> aips = new HashMap<>();
     Map<String, IndexedRepresentation> representations = new HashMap<>();
@@ -2986,7 +2986,7 @@ public class BrowserHelper {
   }
 
   public static TransferredResource reindexTransferredResource(String path)
-    throws IsStillUpdatingException, NotFoundException, GenericException {
+    throws IsStillUpdatingException, NotFoundException, GenericException, RequestNotValidException {
     TransferredResourcesScanner scanner = RodaCoreFactory.getTransferredResourcesScanner();
     scanner.updateTransferredResources(Optional.of(path), true);
     return RodaCoreFactory.getIndexService().retrieve(TransferredResource.class,

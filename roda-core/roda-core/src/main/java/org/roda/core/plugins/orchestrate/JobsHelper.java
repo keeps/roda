@@ -214,7 +214,7 @@ public final class JobsHelper {
   }
 
   public static List<TransferredResource> getTransferredResources(IndexService index, List<String> uuids)
-    throws NotFoundException, GenericException {
+    throws NotFoundException, GenericException, RequestNotValidException {
     List<TransferredResource> ret = index.retrieve(TransferredResource.class, uuids, new ArrayList<>());
     if (ret.isEmpty()) {
       throw new NotFoundException("Could not retrieve the Transferred Resources");
@@ -305,7 +305,7 @@ public final class JobsHelper {
   }
 
   public static <T extends IsRODAObject> List<T> getObjectsFromUUID(ModelService model, IndexService index,
-    Class<T> objectClass, List<String> uuids) throws NotFoundException, GenericException {
+    Class<T> objectClass, List<String> uuids) throws NotFoundException, GenericException, RequestNotValidException {
     if (AIP.class.equals(objectClass)) {
       return (List<T>) getAIPs(model, uuids);
     } else if (Representation.class.equals(objectClass)) {
@@ -332,7 +332,7 @@ public final class JobsHelper {
   }
 
   public static <T extends IsRODAObject> List<T> getObjectsFromIndex(IndexService index, Class<T> objectClass,
-    List<String> uuids) throws NotFoundException, GenericException {
+    List<String> uuids) throws NotFoundException, GenericException, RequestNotValidException {
     List<T> ret = (List<T>) index.retrieve((Class<IsIndexed>) objectClass, uuids, new ArrayList<>());
     if (ret.isEmpty()) {
       throw new NotFoundException("Could not retrieve the " + objectClass.getSimpleName());

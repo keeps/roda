@@ -1691,7 +1691,7 @@ public class RodaCoreFactory {
       for (SolrDocument solrDocument : results) {
         System.out.println(">" + solrDocument);
       }
-    } catch (SolrServerException | IOException e) {
+    } catch (SolrServerException | IOException | SolrException e) {
       e.printStackTrace(System.err);
     }
   }
