@@ -10,6 +10,7 @@ package org.roda.wui.filter;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,7 +30,6 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.wui.api.controllers.UserLogin;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.welcome.Welcome;
-import org.roda.wui.common.client.tools.HistoryUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -141,7 +141,7 @@ public class CasWebAuthFilter implements Filter {
 
     } else if (url.endsWith("/logout")) {
 
-      UserLogin.logout(httpRequest);
+      UserLogin.logout(httpRequest, Arrays.asList("edu.yale.its.tp.cas.client.filter.user", "_const_cas_assertion_"));
 
       // TODO add RODA host from config
 

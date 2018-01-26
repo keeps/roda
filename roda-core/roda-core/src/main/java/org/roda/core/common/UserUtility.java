@@ -45,7 +45,7 @@ import com.google.common.collect.Sets;
 
 public class UserUtility {
   private static final Logger LOGGER = LoggerFactory.getLogger(UserUtility.class);
-  public static final String RODA_USER = "RODA_USER";
+  private static final String RODA_USER = "RODA_USER";
   private static final String REGISTER_ACTIVE_PROPERTY = "ui.register.active";
   private static final String REGISTER_DEFAULT_GROUPS = "ui.register.defaultGroups";
   private static final String REGISTER_DEFAULT_ROLES = "ui.register.defaultRoles";
@@ -63,6 +63,10 @@ public class UserUtility {
 
   public static void setLdapUtility(LdapUtility utility) {
     ldapUtility = utility;
+  }
+
+  public static boolean isUserInSession(final HttpServletRequest request) {
+    return request.getSession().getAttribute(UserUtility.RODA_USER) != null;
   }
 
   public static User getApiUser(final HttpServletRequest request) throws AuthorizationDeniedException {
@@ -89,14 +93,14 @@ public class UserUtility {
     request.getSession().setAttribute(RODA_USER, user);
   }
 
-  public static void removeUserFromSession(final HttpServletRequest request) {
+  public static void removeUserFromSession(final HttpServletRequest request,
+    List<String> extraAttributesToBeRemovedFromSession) {
     // internal session clean up
     request.getSession().removeAttribute(RODA_USER);
 
-    // CAS specific clean up
-    // FIXME 2018-01-18 bferreira: CAS/web specific code should be in WUI, not core
-    request.getSession().removeAttribute("edu.yale.its.tp.cas.client.filter.user");
-    request.getSession().removeAttribute("_const_cas_assertion_");
+    for (String attribute : extraAttributesToBeRemovedFromSession) {
+      request.getSession().removeAttribute(attribute);
+    }
   }
 
   public static void checkRoles(final User rsu, final List<String> rolesToCheck) throws AuthorizationDeniedException {

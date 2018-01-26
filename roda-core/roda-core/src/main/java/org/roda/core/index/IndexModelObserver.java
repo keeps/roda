@@ -91,9 +91,9 @@ import org.xml.sax.SAXException;
  *
  */
 public class IndexModelObserver implements ModelObserver {
+  private static final Logger LOGGER = LoggerFactory.getLogger(IndexModelObserver.class);
 
   private static final int TEN_MB_IN_BYTES = 10485760;
-  private static final Logger LOGGER = LoggerFactory.getLogger(IndexModelObserver.class);
 
   private final SolrClient index;
   private final ModelService model;

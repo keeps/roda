@@ -164,13 +164,16 @@ public class RodaCoreFactory {
   private static SolrClient solr;
   private static boolean FEATURE_OVERRIDE_INDEX_CONFIGS = true;
 
-  private static boolean TEST_DEPLOY_SOLR = true;
-  private static boolean TEST_DEPLOY_LDAP = true;
-  private static boolean TEST_DEPLOY_SCANNER = true;
-  private static boolean TEST_DEPLOY_ORCHESTRATOR = true;
-  private static boolean TEST_DEPLOY_PLUGIN_MANAGER = true;
-  private static boolean TEST_DEPLOY_DEFAULT_RESOURCES = true;
-  private static SolrType TEST_SOLR_TYPE = null;
+  // instantiation toggles, all true by default, disable them in specific cases
+  private static boolean INSTANTIATE_SOLR = true;
+  private static SolrType INSTANTIATE_SOLR_TYPE = null;
+  private static boolean INSTANTIATE_LDAP = true;
+  private static boolean INSTANTIATE_SCANNER = true;
+  private static boolean INSTANTIATE_PLUGIN_ORCHESTRATOR = true;
+  private static boolean INSTANTIATE_PLUGIN_MANAGER = true;
+  private static boolean INSTANTIATE_DEFAULT_RESOURCES = true;
+  private static boolean INSTANTIATE_CONFIGURE_LOGBACK = true;
+  private static boolean INSTANTIATE_EXAMPLE_RESOURCES = true;
 
   // Metrics related objects
   private static MetricRegistry metricsRegistry;
@@ -220,60 +223,76 @@ public class RodaCoreFactory {
     NodeType nodeType = NodeType
       .valueOf(getSystemProperty(RodaConstants.CORE_NODE_TYPE, RodaConstants.DEFAULT_NODE_TYPE.name()));
 
-    if (nodeType == RodaConstants.NodeType.MASTER) {
-      instantiateMaster();
-    } else if (nodeType == RodaConstants.NodeType.TEST) {
+    if (nodeType == NodeType.MASTER) {
+      instantiate(NodeType.MASTER);
+    } else if (nodeType == NodeType.TEST) {
       instantiateTest();
-    } else if (nodeType == RodaConstants.NodeType.WORKER) {
+    } else if (nodeType == NodeType.WORKER) {
       instantiateWorker();
-    } else if (nodeType == RodaConstants.NodeType.CONFIGS) {
+    } else if (nodeType == NodeType.CONFIGS) {
       instantiateInConfigsMode();
+    } else if (nodeType == NodeType.SLAVE) {
+      instantiateSlaveMode();
     } else {
       LOGGER.error("Unknown node type '{}'", nodeType);
     }
   }
 
-  private static void instantiateInConfigsMode() {
-    TEST_DEPLOY_SOLR = false;
-    TEST_DEPLOY_LDAP = false;
-    TEST_DEPLOY_SCANNER = false;
-    TEST_DEPLOY_ORCHESTRATOR = false;
-    TEST_DEPLOY_PLUGIN_MANAGER = true;
-    TEST_DEPLOY_DEFAULT_RESOURCES = false;
-    instantiated = false;
-    instantiate(NodeType.TEST);
-  }
-
-  public static void instantiateMaster() {
-    instantiate(NodeType.MASTER);
-  }
-
-  public static void instantiateWorker() {
-    instantiate(NodeType.WORKER);
-  }
-
   public static void instantiateTest(boolean deploySolr, boolean deployLdap, boolean deployTransferredResourcesScanner,
     boolean deployOrchestrator, boolean deployPluginManager, boolean deployDefaultResources) {
-    TEST_DEPLOY_SOLR = deploySolr;
-    TEST_DEPLOY_LDAP = deployLdap;
-    TEST_DEPLOY_SCANNER = deployTransferredResourcesScanner;
-    TEST_DEPLOY_ORCHESTRATOR = deployOrchestrator;
-    TEST_DEPLOY_PLUGIN_MANAGER = deployPluginManager;
-    TEST_DEPLOY_DEFAULT_RESOURCES = deployDefaultResources;
-    instantiated = false;
-    instantiate(NodeType.TEST);
+    INSTANTIATE_SOLR = deploySolr;
+    INSTANTIATE_LDAP = deployLdap;
+    INSTANTIATE_SCANNER = deployTransferredResourcesScanner;
+    INSTANTIATE_PLUGIN_ORCHESTRATOR = deployOrchestrator;
+    INSTANTIATE_PLUGIN_MANAGER = deployPluginManager;
+    INSTANTIATE_DEFAULT_RESOURCES = deployDefaultResources;
+    instantiateTest();
   }
 
   public static void instantiateTest(boolean deploySolr, boolean deployLdap, boolean deployTransferredResourcesScanner,
     boolean deployOrchestrator, boolean deployPluginManager, boolean deployDefaultResources, SolrType solrType) {
-    TEST_SOLR_TYPE = solrType;
+    INSTANTIATE_SOLR_TYPE = solrType;
     instantiateTest(deploySolr, deployLdap, deployTransferredResourcesScanner, deployOrchestrator, deployPluginManager,
       deployDefaultResources);
   }
 
-  public static void instantiateTest() {
+  private static void instantiateTest() {
+    INSTANTIATE_CONFIGURE_LOGBACK = false;
+    INSTANTIATE_EXAMPLE_RESOURCES = false;
     instantiated = false;
     instantiate(NodeType.TEST);
+  }
+
+  private static void instantiateWorker() {
+    INSTANTIATE_SOLR = false;
+    INSTANTIATE_LDAP = false;
+    INSTANTIATE_SCANNER = false;
+    INSTANTIATE_PLUGIN_ORCHESTRATOR = false;
+    INSTANTIATE_DEFAULT_RESOURCES = false;
+    INSTANTIATE_EXAMPLE_RESOURCES = false;
+    instantiate(NodeType.WORKER);
+  }
+
+  private static void instantiateInConfigsMode() {
+    INSTANTIATE_SOLR = false;
+    INSTANTIATE_LDAP = false;
+    INSTANTIATE_SCANNER = false;
+    INSTANTIATE_PLUGIN_ORCHESTRATOR = false;
+    INSTANTIATE_DEFAULT_RESOURCES = false;
+    INSTANTIATE_CONFIGURE_LOGBACK = false;
+    INSTANTIATE_EXAMPLE_RESOURCES = false;
+    instantiate(NodeType.CONFIGS);
+  }
+
+  private static void instantiateSlaveMode() {
+    INSTANTIATE_SOLR = true;
+    INSTANTIATE_LDAP = true;
+
+    INSTANTIATE_SCANNER = false;
+    INSTANTIATE_PLUGIN_ORCHESTRATOR = false;
+    INSTANTIATE_PLUGIN_MANAGER = false;
+    INSTANTIATE_DEFAULT_RESOURCES = false;
+    instantiate(NodeType.SLAVE);
   }
 
   private static void instantiate(NodeType nodeType) {
@@ -286,7 +305,7 @@ public class RodaCoreFactory {
         LOGGER.debug("RODA HOME is {}", rodaHomePath);
 
         // instantiate essential directories
-        instantiateEssentialDirectories(nodeType);
+        instantiateEssentialDirectories();
         LOGGER.debug("Finished instantiating essential directories");
 
         // load core configurations
@@ -312,7 +331,7 @@ public class RodaCoreFactory {
         LOGGER.debug("Finished instantiating storage & model");
 
         // instantiate solr and index service
-        instantiateSolrAndIndexService();
+        instantiateSolrAndIndexService(nodeType);
         LOGGER.debug("Finished instantiating solr & index");
 
         instantiateNodeSpecificObjects(nodeType);
@@ -433,7 +452,7 @@ public class RodaCoreFactory {
     indexDataPath = getEssentialDirectoryPath(dataPath, RodaConstants.CORE_INDEX_FOLDER);
 
     // configure logback
-    if (nodeType != NodeType.TEST) {
+    if (INSTANTIATE_CONFIGURE_LOGBACK) {
       configureLogback();
     }
 
@@ -466,7 +485,7 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void instantiateEssentialDirectories(NodeType nodeType) {
+  private static void instantiateEssentialDirectories() {
     List<Path> essentialDirectories = new ArrayList<>();
     essentialDirectories.add(configPath);
     essentialDirectories.add(rodaHomePath.resolve(RodaConstants.CORE_LOG_FOLDER));
@@ -487,7 +506,7 @@ public class RodaCoreFactory {
       }
     }
 
-    if (!nodeType.equals(NodeType.TEST)) {
+    if (INSTANTIATE_EXAMPLE_RESOURCES) {
       // copy configs folder from classpath to example folder
       try {
         FSUtils.deletePathQuietly(exampleConfigPath);
@@ -508,7 +527,7 @@ public class RodaCoreFactory {
   }
 
   private static void instantiateDefaultObjects() {
-    if (TEST_DEPLOY_DEFAULT_RESOURCES) {
+    if (INSTANTIATE_DEFAULT_RESOURCES) {
       try (CloseableIterable<Resource> resources = storage.listResourcesUnderContainer(DefaultStoragePath.parse(""),
         true)) {
 
@@ -620,7 +639,7 @@ public class RodaCoreFactory {
   }
 
   private static void instantiatePluginManager() {
-    if (nodeType == NodeType.MASTER || nodeType == NodeType.WORKER || TEST_DEPLOY_PLUGIN_MANAGER) {
+    if (INSTANTIATE_PLUGIN_MANAGER) {
       try {
         pluginManager = PluginManager.instantiatePluginManager(getConfigPath(), getPluginsPath());
       } catch (PluginManagerException e) {
@@ -679,46 +698,53 @@ public class RodaCoreFactory {
    * </p>
    * 
    */
-  private static void instantiateSolrAndIndexService() throws URISyntaxException {
-    if (nodeType == NodeType.MASTER) {
-      tempIndexConfigsPath = Optional.empty();
-      Path solrHome = configPath.resolve(RodaConstants.CORE_INDEX_FOLDER);
-      if (!FSUtils.exists(solrHome) || FEATURE_OVERRIDE_INDEX_CONFIGS) {
+  private static void instantiateSolrAndIndexService(NodeType nodeType) throws URISyntaxException {
+    if (INSTANTIATE_SOLR) {
+      Path solrHome = null;
+
+      if (nodeType == NodeType.MASTER || nodeType == NodeType.SLAVE) {
+        tempIndexConfigsPath = Optional.empty();
+        solrHome = configPath.resolve(RodaConstants.CORE_INDEX_FOLDER);
+        if (!FSUtils.exists(solrHome) || FEATURE_OVERRIDE_INDEX_CONFIGS) {
+          try {
+            Path tempConfig = Files.createTempDirectory(getWorkingDirectory(), RodaConstants.CORE_INDEX_FOLDER);
+            toDeleteDuringShutdown.add(tempConfig);
+            tempIndexConfigsPath = Optional.of(tempConfig);
+            copyFilesFromClasspath(RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_INDEX_FOLDER + "/",
+              tempConfig);
+            solrHome = tempConfig.resolve(RodaConstants.CORE_CONFIG_FOLDER).resolve(RodaConstants.CORE_INDEX_FOLDER);
+            LOGGER.info("Using SOLR home: {}", solrHome);
+          } catch (IOException e) {
+            LOGGER.error("Error creating temporary SOLR home", e);
+            instantiatedWithoutErrors = false;
+          }
+        }
+      } else if (nodeType == NodeType.TEST) {
         try {
-          Path tempConfig = Files.createTempDirectory(getWorkingDirectory(), RodaConstants.CORE_INDEX_FOLDER);
-          toDeleteDuringShutdown.add(tempConfig);
-          tempIndexConfigsPath = Optional.of(tempConfig);
+          solrHome = Files.createTempDirectory(getWorkingDirectory(), RodaConstants.CORE_INDEX_FOLDER);
           copyFilesFromClasspath(RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_INDEX_FOLDER + "/",
-            tempConfig);
-          solrHome = tempConfig.resolve(RodaConstants.CORE_CONFIG_FOLDER).resolve(RodaConstants.CORE_INDEX_FOLDER);
-          LOGGER.info("Using SOLR home: {}", solrHome);
+            solrHome, true);
         } catch (IOException e) {
-          LOGGER.error("Error creating temporary SOLR home", e);
+          LOGGER.error("Unable to instantiate Solr in TEST mode", e);
           instantiatedWithoutErrors = false;
         }
       }
 
-      // instantiate solr
-      solr = instantiateSolr(solrHome);
+      // sanity check
+      if (instantiatedWithoutErrors && solrHome == null) {
+        LOGGER.error("Unable to instantiate Solr because no solrHome has been defined!");
+        instantiatedWithoutErrors = false;
+      }
 
-      // instantiate index related object
-      index = new IndexService(solr, model);
-    } else if (nodeType == NodeType.TEST && TEST_DEPLOY_SOLR) {
-      try {
-        Path tempConfig = Files.createTempDirectory(getWorkingDirectory(), RodaConstants.CORE_INDEX_FOLDER);
-        copyFilesFromClasspath(RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_INDEX_FOLDER + "/",
-          tempConfig, true);
-
+      if (instantiatedWithoutErrors) {
         // instantiate solr
-        solr = instantiateSolr(tempConfig);
+        solr = instantiateSolr(solrHome);
 
         // instantiate index related object
         index = new IndexService(solr, model);
-      } catch (IOException e) {
-        LOGGER.error("Unable to instantiate Solr in TEST mode", e);
-        instantiatedWithoutErrors = false;
       }
     }
+
   }
 
   private static String getConfigurationString(String key, String defaultValue) {
@@ -740,8 +766,8 @@ public class RodaCoreFactory {
     SolrType solrType = SolrType
       .valueOf(getConfigurationString(RodaConstants.CORE_SOLR_TYPE, RodaConstants.DEFAULT_SOLR_TYPE.toString()));
 
-    if (TEST_SOLR_TYPE != null) {
-      solrType = TEST_SOLR_TYPE;
+    if (INSTANTIATE_SOLR_TYPE != null) {
+      solrType = INSTANTIATE_SOLR_TYPE;
     }
 
     if (solrType == RodaConstants.SolrType.HTTP) {
@@ -893,19 +919,33 @@ public class RodaCoreFactory {
   }
 
   private static void instantiateNodeSpecificObjects(NodeType nodeType) {
+    if (INSTANTIATE_LDAP) {
+      startApacheDS();
+    }
+
+    if (INSTANTIATE_SCANNER) {
+      instantiateTransferredResourcesScanner();
+    }
+
+    if (INSTANTIATE_PLUGIN_ORCHESTRATOR) {
+      instantiateOrchestrator();
+    }
+
     if (nodeType == NodeType.MASTER) {
-      instantiateMasterNodeSpecificObjects();
+      processPreservationEventTypeProperties();
     } else if (nodeType == NodeType.WORKER) {
       instantiateWorkerNodeSpecificObjects();
-    } else if (nodeType == NodeType.TEST) {
-      instantiateTestNodeSpecificObjects();
-    } else {
-      LOGGER.error("Unknown node type '{}'", nodeType);
-      instantiatedWithoutErrors = false;
+    } else if (nodeType == NodeType.TEST && !INSTANTIATE_LDAP && INSTANTIATE_SOLR) {
+      try {
+        getIndexService().create(RODAMember.class, new User(RodaConstants.ADMIN));
+        getIndexService().commit(RODAMember.class);
+      } catch (GenericException | RequestNotValidException e) {
+        LOGGER.warn("Could not create user admin in index for test mode", e);
+      }
     }
   }
 
-  private static void instantiateMasterNodeSpecificObjects() {
+  private static void instantiateOrchestrator() {
     OrchestratorType orchestratorType = getOrchestratorType();
     if (orchestratorType == OrchestratorType.AKKA_DISTRIBUTED) {
       pluginOrchestrator = new AkkaDistributedPluginOrchestrator(
@@ -917,12 +957,6 @@ public class RodaCoreFactory {
       LOGGER.error("Orchestrator type '{}' is invalid or not supported. No plugin orchestrator will be started!",
         orchestratorType);
     }
-
-    startApacheDS();
-
-    instantiateTransferredResourcesScanner();
-
-    processPreservationEventTypeProperties();
   }
 
   private static OrchestratorType getOrchestratorType() {
@@ -945,28 +979,6 @@ public class RodaCoreFactory {
       getSystemProperty(RodaConstants.CORE_NODE_PORT, "0"));
   }
 
-  private static void instantiateTestNodeSpecificObjects() {
-    if (TEST_DEPLOY_LDAP) {
-      startApacheDS();
-    } else if (TEST_DEPLOY_SOLR) {
-      try {
-        getIndexService().create(RODAMember.class, new User(RodaConstants.ADMIN));
-        getIndexService().commit(RODAMember.class);
-      } catch (GenericException | RequestNotValidException e) {
-        LOGGER.warn("Could not create user admin in index for test mode", e);
-      }
-
-    }
-
-    if (TEST_DEPLOY_SCANNER) {
-      instantiateTransferredResourcesScanner();
-    }
-
-    if (TEST_DEPLOY_ORCHESTRATOR) {
-      pluginOrchestrator = new AkkaEmbeddedPluginOrchestrator();
-    }
-  }
-
   public static void addLogger(String loggerConfigurationFile) {
     URL loggerConfigurationFileUrl = getConfigurationFile(loggerConfigurationFile);
     if (loggerConfigurationFileUrl != null) {
@@ -985,24 +997,19 @@ public class RodaCoreFactory {
 
   public static void shutdown() throws IOException {
     if (instantiated) {
-
-      if (nodeType == NodeType.MASTER) {
+      if (INSTANTIATE_SOLR) {
         solr.close();
+      }
+      if (INSTANTIATE_LDAP) {
         stopApacheDS();
+      }
+      if (INSTANTIATE_PLUGIN_MANAGER) {
         pluginManager.shutdown();
+      }
+      if (INSTANTIATE_PLUGIN_ORCHESTRATOR) {
         pluginOrchestrator.shutdown();
-      } else if (nodeType == NodeType.WORKER) {
-        pluginManager.shutdown();
-      } else if (nodeType == NodeType.TEST) {
-        if (TEST_DEPLOY_SOLR) {
-          solr.close();
-        }
-        if (TEST_DEPLOY_LDAP) {
-          stopApacheDS();
-        }
-        if (TEST_DEPLOY_ORCHESTRATOR) {
-          pluginOrchestrator.shutdown();
-        }
+      }
+      if (nodeType == NodeType.TEST) {
         // final cleanup
         FSUtils.deletePathQuietly(workingDirectoryPath);
       }

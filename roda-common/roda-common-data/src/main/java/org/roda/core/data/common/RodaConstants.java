@@ -428,19 +428,21 @@ public final class RodaConstants {
   public static final StorageType DEFAULT_STORAGE_TYPE = StorageType.FILESYSTEM;
 
   public enum SolrType {
-    EMBEDDED, HTTP, @Deprecated HTTP_CLOUD, CLOUD
+    EMBEDDED, HTTP, @Deprecated
+    HTTP_CLOUD, CLOUD
   }
 
   public static final SolrType DEFAULT_SOLR_TYPE = SolrType.EMBEDDED;
 
   public enum NodeType {
-    MASTER, WORKER, TEST, CONFIGS
+    MASTER, WORKER, TEST, CONFIGS, SLAVE
   }
 
   public static final NodeType DEFAULT_NODE_TYPE = NodeType.MASTER;
 
   public enum OrchestratorType {
-    @Deprecated EMBEDDED, AKKA, AKKA_DISTRIBUTED
+    @Deprecated
+    EMBEDDED, AKKA, AKKA_DISTRIBUTED
   }
 
   public static final OrchestratorType DEFAULT_ORCHESTRATOR_TYPE = OrchestratorType.AKKA;

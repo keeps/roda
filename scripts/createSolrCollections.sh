@@ -3,7 +3,7 @@
 cd $(dirname $0)
 
 INDEXES_PATH=../roda-core/roda-core/src/main/resources/config/index/
-SOLR_BIN=../solr-5.5.3/bin/solr
+SOLR_BIN=../solr-5.5.5/bin/solr
 for i in $(find $INDEXES_PATH -mindepth 1 -maxdepth 1 -type d);
 do
         COLLECTION="$(basename $i)"

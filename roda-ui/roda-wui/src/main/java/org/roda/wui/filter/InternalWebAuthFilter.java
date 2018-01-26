@@ -9,7 +9,7 @@ package org.roda.wui.filter;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -95,7 +95,7 @@ public class InternalWebAuthFilter implements Filter {
         httpResponse.sendRedirect(path);
       }
     } else if (requestURI.endsWith("/logout")) {
-      UserLogin.logout(httpRequest);
+      UserLogin.logout(httpRequest, Collections.emptyList());
 
       // discard hash and set it to the welcome page
       uri.setFragment(Welcome.RESOLVER.getHistoryToken());

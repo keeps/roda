@@ -7,6 +7,8 @@
  */
 package org.roda.wui.api.controllers;
 
+import java.util.List;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
@@ -93,12 +95,12 @@ public class UserLogin extends RodaWuiController {
    * @param request
    *          the http request
    */
-  public static void logout(HttpServletRequest request) {
+  public static void logout(HttpServletRequest request, List<String> extraAttributesToBeRemovedFromSession) {
     User user = UserUtility.getUser(request);
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // delegate
-    UserUtility.removeUserFromSession(request);
+    UserUtility.removeUserFromSession(request, extraAttributesToBeRemovedFromSession);
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_USERNAME_PARAM,

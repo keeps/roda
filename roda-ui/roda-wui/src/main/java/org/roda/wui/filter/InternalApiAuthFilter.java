@@ -63,13 +63,15 @@ public class InternalApiAuthFilter implements Filter {
     final HttpServletRequest request = (HttpServletRequest) servletRequest;
     final HttpServletResponse response = (HttpServletResponse) servletResponse;
 
-    if (!isRequestUrlExcluded(request) && request.getSession().getAttribute(UserUtility.RODA_USER) == null) {
+    if (!isRequestUrlExcluded(request) && !UserUtility.isUserInSession(request)) {
       // No user yet
       try {
         UserUtility.setUser(request, getBasicAuthUser(request));
         chain.doFilter(servletRequest, servletResponse);
       } catch (final AuthenticationDeniedException | GenericException e) {
-        LOGGER.debug(e.getMessage(), e);
+        if (LOGGER.isDebugEnabled()) {
+          LOGGER.debug(e.getMessage(), e);
+        }
         response.setHeader(RodaConstants.HTTP_HEADERS_WWW_AUTHENTICATE, "Basic realm=\"" + realm + "\"");
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
       }
