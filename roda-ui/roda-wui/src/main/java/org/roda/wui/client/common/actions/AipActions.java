@@ -537,14 +537,14 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     LastSelectedItemsSingleton.getInstance().setSelectedItems(objectToSelectedItems(aip));
     LastSelectedItemsSingleton.getInstance().setLastHistory(HistoryUtils.getCurrentHistoryPath());
     HistoryUtils.newHistory(CreateSelectedJob.RESOLVER, RodaConstants.JOB_PROCESS_ACTION);
-    callback.onSuccess(ActionImpact.UPDATED);
+    callback.onSuccess(ActionImpact.NONE);
   }
 
   private void newProcess(SelectedItems<IndexedAIP> aips, AsyncCallback<ActionImpact> callback) {
     LastSelectedItemsSingleton.getInstance().setSelectedItems(aips);
     LastSelectedItemsSingleton.getInstance().setLastHistory(HistoryUtils.getCurrentHistoryPath());
     HistoryUtils.newHistory(CreateSelectedJob.RESOLVER, RodaConstants.JOB_PROCESS_ACTION);
-    callback.onSuccess(ActionImpact.UPDATED);
+    callback.onSuccess(ActionImpact.NONE);
   }
 
   private void showEvents(IndexedAIP aip, AsyncCallback<ActionImpact> callback) {
