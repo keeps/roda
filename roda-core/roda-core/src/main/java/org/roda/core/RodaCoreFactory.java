@@ -55,9 +55,15 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.CollectionAdminRequest;
 import org.apache.solr.client.solrj.response.CollectionAdminResponse;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.cloud.ZkCLI;
+import org.apache.solr.cloud.ZkController;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrException;
+import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.ZooDefs;
+import org.apache.zookeeper.ZooKeeper;
 import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
 import org.reflections.util.ClasspathHelper;
@@ -749,6 +755,13 @@ public class RodaCoreFactory {
       String solrCloudZooKeeperUrls = getConfigurationString(RodaConstants.CORE_SOLR_CLOUD_URLS, getConfigurationString(
         RodaConstants.CORE_SOLR_HTTP_CLOUD_URLS, "localhost:2181,localhost:2182,localhost:2183"));
       LOGGER.info("Instantiating SOLR Cloud at {}", solrCloudZooKeeperUrls);
+
+      try {
+        ZkController.checkChrootPath(solrCloudZooKeeperUrls, true);
+      } catch (KeeperException | InterruptedException e) {
+        LOGGER.error("Could not check zookeeper chroot path", e);
+      }
+
       CloudSolrClient cloudSolrClient = new CloudSolrClient(solrCloudZooKeeperUrls);
       bootstrap(cloudSolrClient, solrHome);
       return cloudSolrClient;
