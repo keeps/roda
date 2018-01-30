@@ -260,11 +260,9 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
           reportItem.setOutcomeObjectClass(DIP.class.getName());
         }
 
-        try {
+        try (CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
+          representation.getId(), true)) {
           LOGGER.debug("Processing representation {}", representation);
-          boolean recursive = true;
-          CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
-            representation.getId(), recursive);
 
           for (OptionalWithCause<File> oFile : allFiles) {
             if (oFile.isPresent()) {
@@ -293,7 +291,8 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
 
                   LOGGER.debug("Running a ConvertPlugin ({} to {}) on {}", fileFormat, outputFormat, file.getId());
                   try {
-                    Path pluginResult = Files.createTempFile("converted", "." + getOutputFormat());
+                    Path pluginResult = Files.createTempFile(getWorkingDirectory(), "converted",
+                      "." + getOutputFormat());
                     String result = executePlugin(directAccess.getPath(), pluginResult, fileFormat);
 
                     String newFileId = file.getId().replaceFirst("[.][^.]+$", "." + outputFormat);
@@ -376,7 +375,6 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
             }
           }
 
-          IOUtils.closeQuietly(allFiles);
           reportItem.setPluginState(pluginResultState);
 
           if (reportState.equals(PluginState.SUCCESS)) {
@@ -459,11 +457,9 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
       ValidationReport validationReport = new ValidationReport();
       boolean hasNonPdfFiles = false;
 
-      try {
+      try (CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(representation.getAipId(),
+        representation.getId(), true)) {
         LOGGER.debug("Processing representation {}", representation);
-        boolean recursive = true;
-        CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(representation.getAipId(),
-          representation.getId(), recursive);
 
         for (OptionalWithCause<File> oFile : allFiles) {
           if (oFile.isPresent()) {
@@ -492,7 +488,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
 
                 LOGGER.debug("Running a ConvertPlugin ({} to {}) on {}", fileFormat, outputFormat, file.getId());
                 try {
-                  Path pluginResult = Files.createTempFile("converted", "." + getOutputFormat());
+                  Path pluginResult = Files.createTempFile(getWorkingDirectory(), "converted", "." + getOutputFormat());
                   String result = executePlugin(directAccess.getPath(), pluginResult, fileFormat);
                   ContentPayload payload = new FSPathContentPayload(pluginResult);
 
@@ -575,9 +571,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
           }
         }
 
-        IOUtils.closeQuietly(allFiles);
         reportItem.setPluginState(reportState);
-
         if (reportState.equals(PluginState.SUCCESS) && ignoreFiles && !validationReport.getIssues().isEmpty()) {
           reportItem.setHtmlPluginDetails(true)
             .setPluginDetails(validationReport.toHtml(false, false, false, "Ignored files"));
@@ -680,7 +674,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
 
             LOGGER.debug("Running a ConvertPlugin ({} to {}) on {}", fileFormat, outputFormat, file.getId());
             try {
-              Path pluginResult = Files.createTempFile("converted", "." + getOutputFormat());
+              Path pluginResult = Files.createTempFile(getWorkingDirectory(), "converted", "." + getOutputFormat());
               String result = executePlugin(directAccess.getPath(), pluginResult, fileFormat);
 
               ContentPayload payload = new FSPathContentPayload(pluginResult);
@@ -937,6 +931,10 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
   @Override
   public List<String> getCategories() {
     return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_CONVERSION, RodaConstants.PLUGIN_CATEGORY_DISSEMINATION);
+  }
+
+  public Path getWorkingDirectory() {
+    return PluginHelper.getJobWorkingDirectory(this);
   }
 
 }
