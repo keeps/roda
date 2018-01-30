@@ -787,7 +787,7 @@ public class PluginManager {
         sbParameters.append(String.format("| **%s** | %s | %s | %s | %s | %s | %s | %n", pluginParameter.getName(),
           pluginParameter.getDescription().replaceAll("\n", ""), pluginParameter.getType(),
           pluginParameter.getDefaultValue(),
-          pluginParameter.getPossibleValues().isEmpty() ? "Not defined." : pluginParameter.getPossibleValues(),
+          pluginParameter.getPossibleValues().isEmpty() ? "" : pluginParameter.getPossibleValues(),
           pluginParameter.isMandatory(), pluginParameter.isReadonly()));
       }
     }

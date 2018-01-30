@@ -55,15 +55,11 @@ import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.CollectionAdminRequest;
 import org.apache.solr.client.solrj.response.CollectionAdminResponse;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.cloud.ZkCLI;
 import org.apache.solr.cloud.ZkController;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrException;
-import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
-import org.apache.zookeeper.ZooDefs;
-import org.apache.zookeeper.ZooKeeper;
 import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
 import org.reflections.util.ClasspathHelper;
@@ -377,14 +373,15 @@ public class RodaCoreFactory {
 
   private static void initializeWorkingDirectory() {
     try {
+      String systemTmpDir = getSystemProperty("java.io.tmpdir", "tmp");
+      Path defaultRodaWorkingDirectory = Files.createTempDirectory(Paths.get(systemTmpDir), "rodaWorkingDirectory");
       workingDirectoryPath = Paths
-        .get(getRodaConfiguration().getString("core.workingdirectory", getSystemProperty("java.io.tmpdir", "tmp")));
+        .get(getRodaConfiguration().getString("core.workingdirectory", defaultRodaWorkingDirectory.toString()));
       Files.createDirectories(workingDirectoryPath);
     } catch (IOException e) {
       throw new RuntimeException("Unable to create RODA WORKING DIRECTORY " + workingDirectoryPath + ". Aborting...",
         e);
     }
-
   }
 
   private static void initializeReportsDirectory() {
