@@ -923,4 +923,10 @@ public final class FSUtils {
   public static boolean isFile(Path file) {
     return file != null && file.toFile().isFile();
   }
+
+  public static boolean isDirEmpty(Path directory) throws IOException {
+    try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(directory)) {
+      return !dirStream.iterator().hasNext();
+    }
+  }
 }

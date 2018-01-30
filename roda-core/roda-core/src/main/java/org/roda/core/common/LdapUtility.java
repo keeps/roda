@@ -21,7 +21,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.directory.api.ldap.model.constants.LdapSecurityConstants;
 import org.apache.directory.api.ldap.model.cursor.Cursor;
 import org.apache.directory.api.ldap.model.entry.Attribute;
 import org.apache.directory.api.ldap.model.entry.DefaultEntry;
@@ -43,6 +45,7 @@ import org.apache.directory.api.ldap.model.message.AliasDerefMode;
 import org.apache.directory.api.ldap.model.message.ModifyRequestImpl;
 import org.apache.directory.api.ldap.model.message.SearchScope;
 import org.apache.directory.api.ldap.model.name.Dn;
+import org.apache.directory.api.ldap.model.password.PasswordUtil;
 import org.apache.directory.api.ldap.model.schema.SchemaManager;
 import org.apache.directory.api.ldap.model.schema.registries.SchemaLoader;
 import org.apache.directory.api.ldap.schema.extractor.SchemaLdifExtractor;
@@ -56,13 +59,18 @@ import org.apache.directory.server.core.api.CoreSession;
 import org.apache.directory.server.core.api.DirectoryService;
 import org.apache.directory.server.core.api.DnFactory;
 import org.apache.directory.server.core.api.InstanceLayout;
+import org.apache.directory.server.core.api.partition.Partition;
 import org.apache.directory.server.core.api.schema.SchemaPartition;
-import org.apache.directory.server.core.partition.impl.btree.jdbm.JdbmIndex;
+import org.apache.directory.server.core.factory.JdbmPartitionFactory;
+import org.apache.directory.server.core.factory.LdifPartitionFactory;
+import org.apache.directory.server.core.factory.MavibotPartitionFactory;
+import org.apache.directory.server.core.factory.PartitionFactory;
 import org.apache.directory.server.core.partition.impl.btree.jdbm.JdbmPartition;
 import org.apache.directory.server.core.partition.ldif.LdifPartition;
 import org.apache.directory.server.ldap.LdapServer;
 import org.apache.directory.server.protocol.shared.transport.TcpTransport;
-import org.apache.directory.server.xdbm.Index;
+import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
@@ -75,7 +83,6 @@ import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.util.IdUtils;
-import org.roda.core.util.PasswordHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.util.DateParser;
@@ -135,6 +142,11 @@ public class LdapUtility {
   private static final String EMAIL = "email";
 
   private static final String RODA_DUMMY_USER = "cn=roda,ou=system,dc=roda,dc=org";
+
+  private static final int CACHE_SIZE = RodaCoreFactory.getRodaConfiguration().getInt("core.ldap.cacheSize", 100);
+  // for backwards compatibility by default define JDBM backend
+  private static final String LDAP_BACKEND = RodaCoreFactory.getRodaConfiguration().getString("core.ldap.backend",
+    RodaConstants.CORE_LDAP_BACKEND_JDBM);
 
   /** Start the LDAP server? */
   private boolean ldapStartServer = false;
@@ -217,6 +229,8 @@ public class LdapUtility {
   /** The LDAP server. */
   private LdapServer server;
 
+  private PartitionFactory partitionFactory;
+
   /**
    * Constructs a new LdapUtility class with the given parameters.
    *
@@ -285,6 +299,8 @@ public class LdapUtility {
     this.rodaGuestDN = rodaGuestDN;
     this.rodaAdminDN = rodaAdminDN;
     this.dataDirectory = dataDirectory;
+
+    this.partitionFactory = createPartitionFactory();
   }
 
   public void setRODAAdministratorsDN(String rodaAdministratorsDN) {
@@ -330,7 +346,7 @@ public class LdapUtility {
   public void initDirectoryService(final List<String> ldifs) throws Exception {
 
     // Initialize the LDAP service
-    final JdbmPartition rodaPartition = instantiateDirectoryService();
+    final Partition rodaPartition = instantiateDirectoryService();
     final CoreSession session = service.getAdminSession();
 
     // Inject the context entry for dc=roda,dc=org partition
@@ -481,7 +497,7 @@ public class LdapUtility {
 
       if (!user.isActive()) {
         try {
-          setUserPasswordUnchecked(user.getName(), PasswordHandler.generateRandomPassword(RANDOM_PASSWORD_LENGTH));
+          setUserPasswordUnchecked(user.getName(), RandomStringUtils.random(RANDOM_PASSWORD_LENGTH));
         } catch (final NotFoundException e) {
           LOGGER.error("Created user doesn't exist! Notify developers!!!", e);
         }
@@ -1092,7 +1108,7 @@ public class LdapUtility {
    * @throws Exception
    *           if some error occurs.
    */
-  private JdbmPartition instantiateDirectoryService() throws Exception {
+  private Partition instantiateDirectoryService() throws Exception {
     this.service = new DefaultDirectoryService();
     this.service.setInstanceId(INSTANCE_NAME);
     this.service.setInstanceLayout(new InstanceLayout(this.dataDirectory.toFile()));
@@ -1120,12 +1136,8 @@ public class LdapUtility {
     // this is a MANDATORY partition
     // DO NOT add this via addPartition() method, trunk code complains about
     // duplicate partition while initializing
-    final JdbmPartition systemPartition = new JdbmPartition(this.service.getSchemaManager(),
-      this.service.getDnFactory());
-    systemPartition.setId("system");
-    systemPartition.setPartitionPath(systemPartitionPath.toURI());
-    systemPartition.setSuffixDn(new Dn(ServerDNConstants.SYSTEM_DN));
-    systemPartition.setSchemaManager(service.getSchemaManager());
+    Partition systemPartition = createPartition(this.service.getDnFactory(), "system", ServerDNConstants.SYSTEM_DN,
+      systemPartitionPath);
 
     // mandatory to call this method to set the system partition
     // Note: this system partition might be removed from trunk
@@ -1136,7 +1148,7 @@ public class LdapUtility {
     // this.service.setDenormalizeOpAttrsEnabled(true);
 
     // Now we can create as many partitions as we need
-    final JdbmPartition rodaPartition = addPartition(INSTANCE_NAME, this.ldapRootDN, this.service.getDnFactory());
+    final Partition rodaPartition = addPartition(INSTANCE_NAME, this.ldapRootDN);
 
     // Index some attributes on the apache partition
     addIndex(rodaPartition, OBJECT_CLASS, OU, UID);
@@ -1548,8 +1560,16 @@ public class LdapUtility {
    */
   private void modifyUserPassword(final CoreSession session, final String username, final String password)
     throws LdapException, NoSuchAlgorithmException {
-    final PasswordHandler passwordHandler = PasswordHandler.getInstance();
-    final String passwordDigest = passwordHandler.generateDigest(password, null, ldapDigestAlgorithm);
+
+    LdapSecurityConstants algorithm = LdapSecurityConstants.getAlgorithm(ldapDigestAlgorithm);
+
+    if (algorithm == null) {
+      // default to PBKDF2-based encryption method
+      algorithm = LdapSecurityConstants.HASH_METHOD_PKCS5S2;
+    }
+
+    final String passwordDigest = new String(PasswordUtil.createStoragePassword(password, algorithm));
+
     session.modify(new Dn(getUserDN(username)),
       new DefaultModification(ModificationOperation.REPLACE_ATTRIBUTE, USER_PASSWORD, passwordDigest));
   }
@@ -1916,6 +1936,22 @@ public class LdapUtility {
     this.service.setSchemaPartition(schemaPartition);
   }
 
+  private PartitionFactory createPartitionFactory() {
+    PartitionFactory factory;
+
+    if (RodaConstants.CORE_LDAP_BACKEND_JDBM.equals(LDAP_BACKEND)) {
+      factory = new JdbmPartitionFactory();
+    } else if (RodaConstants.CORE_LDAP_BACKEND_LDIF.equals(LDAP_BACKEND)) {
+      factory = new LdifPartitionFactory();
+    } else if (RodaConstants.CORE_LDAP_BACKEND_MAVIBOT.equals(LDAP_BACKEND)) {
+      factory = new MavibotPartitionFactory();
+    } else {
+      throw new IllegalArgumentException(LDAP_BACKEND + " is a not supported LDAP backend");
+    }
+
+    return factory;
+  }
+
   /**
    * Add a new partition to the server.
    *
@@ -1929,15 +1965,22 @@ public class LdapUtility {
    * @throws Exception
    *           If the partition can't be added
    */
-  private JdbmPartition addPartition(final String partitionId, final String partitionDn, final DnFactory dnFactory)
-    throws Exception {
+  private Partition addPartition(final String partitionId, final String partitionDn) throws Exception {
     // Create a new partition with the given partition id
-    final JdbmPartition partition = new JdbmPartition(service.getSchemaManager(), dnFactory);
-    partition.setId(partitionId);
-    partition.setPartitionPath(new File(service.getInstanceLayout().getPartitionsDirectory(), partitionId).toURI());
-    partition.setSuffixDn(new Dn(partitionDn));
+    Partition partition = createPartition(partitionId, partitionDn);
     service.addPartition(partition);
     return partition;
+  }
+
+  private Partition createPartition(final String partitionId, final String partitionDn) throws Exception {
+    return createPartition(this.service.getDnFactory(), partitionId, partitionDn,
+      new File(service.getInstanceLayout().getPartitionsDirectory(), partitionId));
+  }
+
+  private Partition createPartition(final DnFactory dnFactory, final String partitionId, final String partitionDn,
+    File workingDirectory) throws Exception {
+    return partitionFactory.createPartition(service.getSchemaManager(), dnFactory, partitionId, partitionDn, CACHE_SIZE,
+      workingDirectory);
   }
 
   /**
@@ -1968,15 +2011,15 @@ public class LdapUtility {
    * @param attrs
    *          The list of attributes to index
    */
-  private void addIndex(final JdbmPartition partition, final String... attrs) {
+  private void addIndex(final Partition partition, final String... attrs) {
     // Index some attributes on the apache partition
-    final Set<Index<?, String>> indexedAttributes = new HashSet<>();
-
     for (String attribute : attrs) {
-      indexedAttributes.add(new JdbmIndex<String>(attribute, false));
+      try {
+        partitionFactory.addIndex(partition, attribute, CACHE_SIZE);
+      } catch (Exception e) {
+        LOGGER.error("Could not add index to attribute " + attribute, e);
+      }
     }
-
-    partition.setIndexedAttributes(indexedAttributes);
   }
 
   private User getUserByNameOrEmail(final String username, final String email) throws GenericException {

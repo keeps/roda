@@ -447,6 +447,9 @@ public final class RodaConstants {
   public static final String ORCHESTRATOR_TYPE_PROPERTY = "core.orchestrator.type";
 
   public static final int CORE_LDAP_DEFAULT_PORT = 10389;
+  public static final String CORE_LDAP_BACKEND_JDBM = "JDBM";
+  public static final String CORE_LDAP_BACKEND_LDIF = "LDIF";
+  public static final String CORE_LDAP_BACKEND_MAVIBOT = "MAVIBOT";
 
   /*
    * INDEX NAMES
@@ -1385,6 +1388,7 @@ public final class RodaConstants {
   public static final List<String> DIPFILE_FIELDS_TO_RETURN = Arrays.asList(RodaConstants.INDEX_UUID,
     RodaConstants.DIPFILE_ID, RodaConstants.DIPFILE_PATH, RodaConstants.DIPFILE_DIP_ID,
     RodaConstants.DIPFILE_IS_DIRECTORY);
+  
 
   /** Private empty constructor */
   private RodaConstants() {
