@@ -25,6 +25,7 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,6 +37,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -59,6 +62,9 @@ import org.apache.solr.cloud.ZkController;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrException;
+import org.apache.solr.common.cloud.ClusterState;
+import org.apache.solr.common.cloud.Replica;
+import org.apache.solr.common.cloud.Slice;
 import org.apache.zookeeper.KeeperException;
 import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
@@ -697,8 +703,10 @@ public class RodaCoreFactory {
    * soon as that happens, this messages should be deleted as well.
    * </p>
    * 
+   * @throws GenericException
+   * 
    */
-  private static void instantiateSolrAndIndexService(NodeType nodeType) throws URISyntaxException {
+  private static void instantiateSolrAndIndexService(NodeType nodeType) throws URISyntaxException, GenericException {
     if (INSTANTIATE_SOLR) {
       Path solrHome = null;
 
@@ -762,7 +770,7 @@ public class RodaCoreFactory {
     return value;
   }
 
-  private static SolrClient instantiateSolr(Path solrHome) {
+  private static SolrClient instantiateSolr(Path solrHome) throws GenericException {
     SolrType solrType = SolrType
       .valueOf(getConfigurationString(RodaConstants.CORE_SOLR_TYPE, RodaConstants.DEFAULT_SOLR_TYPE.toString()));
 
@@ -786,6 +794,9 @@ public class RodaCoreFactory {
       }
 
       CloudSolrClient cloudSolrClient = new CloudSolrClient(solrCloudZooKeeperUrls);
+
+      waitForSolrCluster(cloudSolrClient);
+
       bootstrap(cloudSolrClient, solrHome);
       return cloudSolrClient;
     } else {
@@ -794,6 +805,96 @@ public class RodaCoreFactory {
       LOGGER.info("Instantiating SOLR Embedded");
       return new EmbeddedSolrServer(solrHome, "test");
     }
+  }
+
+  private static void waitForSolrCluster(CloudSolrClient cloudSolrClient) throws GenericException {
+    int retries = getRodaConfiguration().getInt("core.solr.cloud.healthcheck.retries", 10);
+    long timeout = getRodaConfiguration().getInt("core.solr.cloud.healthcheck.timeout_ms", 10000);
+
+    boolean recovering;
+
+    while (recovering = !checkSolrCluster(cloudSolrClient) && retries > 0) {
+      LOGGER.info("Solr Cluster not yet ready, waiting {}ms, retries: {}", timeout, retries);
+      retries--;
+      try {
+        Thread.sleep(timeout);
+      } catch (InterruptedException e) {
+        LOGGER.warn("Sleep interrupted");
+      }
+    }
+
+    if (recovering) {
+      LOGGER.error("Timeout while waiting for Solr Cluster to recover collections");
+      throw new GenericException("Timeout while waiting for Solr Cluster to recover collections");
+    }
+
+  }
+
+  private static boolean checkSolrCluster(CloudSolrClient cloudSolrClient) throws GenericException {
+    int connectTimeout = getRodaConfiguration().getInt("core.solr.cloud.connect.timeout_ms", 60000);
+
+    try {
+      LOGGER.info("Connecting to Solr Cloud with a timeout of {} ms...", connectTimeout);
+      cloudSolrClient.connect(connectTimeout, TimeUnit.MILLISECONDS);
+      LOGGER.info("Connected to Solr Cloud");
+    } catch (TimeoutException | InterruptedException e) {
+      throw new GenericException("Could not connect to Solr Cloud", e);
+    }
+
+    ClusterState clusterState = cloudSolrClient.getZkStateReader().getClusterState();
+
+    Set<String> allCollections = clusterState.getCollections();
+    Set<String> healthyCollections = new HashSet<>();
+    Set<String> recoveringCollections = new HashSet<>();
+    Set<String> unrecoverableCollections = new HashSet<>();
+
+    boolean healthy;
+
+    for (String col : allCollections) {
+
+      Collection<Slice> slices = clusterState.getSlices(col);
+
+      boolean collectionHealthy = true;
+      boolean collectionRecovering = false;
+
+      for (Slice slice : slices) {
+        for (Replica replica : slice.getReplicas()) {
+          if (!Replica.State.ACTIVE.equals(replica.getState())) {
+            collectionHealthy = false;
+          }
+
+          if (Replica.State.DOWN.equals(replica.getState()) || Replica.State.RECOVERING.equals(replica.getState())) {
+            collectionRecovering = true;
+          }
+        }
+      }
+
+      if (collectionHealthy) {
+        healthyCollections.add(col);
+      }
+
+      if (!collectionHealthy && collectionRecovering) {
+        recoveringCollections.add(col);
+      }
+
+      if (!collectionHealthy && !collectionRecovering) {
+        unrecoverableCollections.add(col);
+      }
+    }
+
+    if (healthyCollections.containsAll(allCollections)) {
+      healthy = true;
+      LOGGER.info("All available Solr Cloud collections are healthy, collections: {}", healthyCollections);
+    } else {
+      healthy = false;
+
+      LOGGER.info("Solr Cloud collections with healthy replicas: " + healthyCollections);
+      LOGGER.info("Solr Cloud collections with recovering replicas: " + recoveringCollections);
+      LOGGER.info("Solr Cloud collections with unrecoverable replicas: " + unrecoverableCollections);
+
+    }
+
+    return healthy;
   }
 
   private static void bootstrap(CloudSolrClient cloudSolrClient, Path solrHome) {
