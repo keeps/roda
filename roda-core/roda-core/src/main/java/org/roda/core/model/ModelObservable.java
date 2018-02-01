@@ -9,8 +9,10 @@ package org.roda.core.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import org.roda.core.common.ReturnWithExceptionsWrapper;
+import org.roda.core.data.exceptions.ReturnWithExceptions;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
@@ -29,13 +31,16 @@ import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
+import org.slf4j.Logger;
 
 public abstract class ModelObservable {
   private final List<ModelObserver> observers;
+  private Logger logger;
 
-  public ModelObservable() {
+  public ModelObservable(Logger logger) {
     super();
     this.observers = new ArrayList<>();
+    this.logger = logger;
   }
 
   public void addModelObserver(ModelObserver observer) {
@@ -46,393 +51,217 @@ public abstract class ModelObservable {
     observers.remove(observer);
   }
 
-  public ReturnWithExceptionsWrapper notifyAipCreated(AIP aip) {
+  private ReturnWithExceptionsWrapper notifyObserversSafely(Function<ModelObserver, ReturnWithExceptions<?, ?>> func) {
     ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.aipCreated(aip));
+      try {
+        wrapper.addToList(func.apply(observer));
+      } catch (Exception e) {
+        logger.error("Error invoking method in observer {}", observer.getClass().getSimpleName(), e);
+        // do nothing, just want to sandbox observer method invocation
+      }
     }
     return wrapper;
+  }
+
+  public ReturnWithExceptionsWrapper notifyAipCreated(AIP aip) {
+    return notifyObserversSafely(observer -> observer.aipCreated(aip));
   }
 
   public ReturnWithExceptionsWrapper notifyAipUpdated(AIP aip) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.aipUpdated(aip));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.aipUpdated(aip));
   }
 
   public ReturnWithExceptionsWrapper notifyAipMoved(AIP aip, String oldParentId, String newParentId) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.aipMoved(aip, oldParentId, newParentId));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.aipMoved(aip, oldParentId, newParentId));
   }
 
   public ReturnWithExceptionsWrapper notifyAipStateUpdated(AIP aip) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.aipStateUpdated(aip));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.aipStateUpdated(aip));
   }
 
   public ReturnWithExceptionsWrapper notifyAipDeleted(String aipId) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.aipDeleted(aipId, true));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.aipDeleted(aipId, true));
   }
 
   public ReturnWithExceptionsWrapper notifyDescriptiveMetadataCreated(DescriptiveMetadata descriptiveMetadata) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.descriptiveMetadataCreated(descriptiveMetadata));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.descriptiveMetadataCreated(descriptiveMetadata));
   }
 
   public ReturnWithExceptionsWrapper notifyDescriptiveMetadataUpdated(DescriptiveMetadata descriptiveMetadata) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.descriptiveMetadataUpdated(descriptiveMetadata));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.descriptiveMetadataUpdated(descriptiveMetadata));
   }
 
   public ReturnWithExceptionsWrapper notifyDescriptiveMetadataDeleted(String aipId, String representationId,
     String descriptiveMetadataBinaryId) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.descriptiveMetadataDeleted(aipId, representationId, descriptiveMetadataBinaryId));
-    }
-    return wrapper;
+    return notifyObserversSafely(
+      observer -> observer.descriptiveMetadataDeleted(aipId, representationId, descriptiveMetadataBinaryId));
   }
 
   public ReturnWithExceptionsWrapper notifyRepresentationCreated(Representation representation) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.representationCreated(representation));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.representationCreated(representation));
   }
 
   public ReturnWithExceptionsWrapper notifyRepresentationUpdated(Representation representation) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.representationUpdated(representation));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.representationUpdated(representation));
   }
 
   public ReturnWithExceptionsWrapper notifyRepresentationDeleted(String aipId, String representationId) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.representationDeleted(aipId, representationId, true));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.representationDeleted(aipId, representationId, true));
   }
 
   public ReturnWithExceptionsWrapper notifyFileCreated(File file) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.fileCreated(file));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.fileCreated(file));
   }
 
   public ReturnWithExceptionsWrapper notifyFileUpdated(File file) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.fileUpdated(file));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.fileUpdated(file));
   }
 
   public ReturnWithExceptionsWrapper notifyFileDeleted(String aipId, String representationId,
     List<String> fileDirectoryPath, String fileId) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.fileDeleted(aipId, representationId, fileDirectoryPath, fileId, true));
-    }
-    return wrapper;
+    return notifyObserversSafely(
+      observer -> observer.fileDeleted(aipId, representationId, fileDirectoryPath, fileId, true));
   }
 
   public ReturnWithExceptionsWrapper notifyLogEntryCreated(LogEntry entry) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.logEntryCreated(entry));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.logEntryCreated(entry));
   }
 
   public ReturnWithExceptionsWrapper notifyUserCreated(User user) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.userCreated(user));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.userCreated(user));
   }
 
   public ReturnWithExceptionsWrapper notifyUserUpdated(User user) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.userUpdated(user));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.userUpdated(user));
   }
 
   public ReturnWithExceptionsWrapper notifyUserDeleted(String userID) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.userDeleted(userID));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.userDeleted(userID));
   }
 
   public ReturnWithExceptionsWrapper notifyGroupCreated(Group group) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.groupCreated(group));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.groupCreated(group));
   }
 
   public ReturnWithExceptionsWrapper notifyGroupUpdated(Group group) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.groupUpdated(group));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.groupUpdated(group));
   }
 
   public ReturnWithExceptionsWrapper notifyGroupDeleted(String groupID) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.groupDeleted(groupID));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.groupDeleted(groupID));
   }
 
   public ReturnWithExceptionsWrapper notifyPreservationMetadataCreated(
     PreservationMetadata preservationMetadataBinary) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.preservationMetadataCreated(preservationMetadataBinary));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.preservationMetadataCreated(preservationMetadataBinary));
   }
 
   public ReturnWithExceptionsWrapper notifyPreservationMetadataUpdated(
     PreservationMetadata preservationMetadataBinary) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.preservationMetadataUpdated(preservationMetadataBinary));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.preservationMetadataUpdated(preservationMetadataBinary));
   }
 
   public ReturnWithExceptionsWrapper notifyPreservationMetadataDeleted(PreservationMetadata pm) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.preservationMetadataDeleted(pm));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.preservationMetadataDeleted(pm));
   }
 
   public ReturnWithExceptionsWrapper notifyOtherMetadataCreated(OtherMetadata otherMetadataBinary) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.otherMetadataCreated(otherMetadataBinary));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.otherMetadataCreated(otherMetadataBinary));
   }
 
   public ReturnWithExceptionsWrapper notifyJobCreatedOrUpdated(Job job, boolean reindexJobReports) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.jobCreatedOrUpdated(job, reindexJobReports));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.jobCreatedOrUpdated(job, reindexJobReports));
   }
 
   public ReturnWithExceptionsWrapper notifyJobDeleted(String jobId) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.jobDeleted(jobId));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.jobDeleted(jobId));
   }
 
   public ReturnWithExceptionsWrapper notifyJobReportCreatedOrUpdated(Report jobReport, Job job) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.jobReportCreatedOrUpdated(jobReport, job));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.jobReportCreatedOrUpdated(jobReport, job));
   }
 
   public ReturnWithExceptionsWrapper notifyJobReportDeleted(String jobReportId) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.jobReportDeleted(jobReportId));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.jobReportDeleted(jobReportId));
   }
 
   public ReturnWithExceptionsWrapper notifyAipPermissionsUpdated(AIP aip) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.aipPermissionsUpdated(aip));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.aipPermissionsUpdated(aip));
   }
 
   public ReturnWithExceptionsWrapper notifyDipPermissionsUpdated(DIP dip) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.dipPermissionsUpdated(dip));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.dipPermissionsUpdated(dip));
   }
 
   public ReturnWithExceptionsWrapper notifyTransferredResourceDeleted(String transferredResourceID) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.transferredResourceDeleted(transferredResourceID));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.transferredResourceDeleted(transferredResourceID));
   }
 
   public ReturnWithExceptionsWrapper notifyRiskCreatedOrUpdated(Risk risk, int incidences, boolean commit) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.riskCreatedOrUpdated(risk, incidences, commit));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.riskCreatedOrUpdated(risk, incidences, commit));
   }
 
   public ReturnWithExceptionsWrapper notifyRiskDeleted(String riskId, boolean commit) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.riskDeleted(riskId, commit));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.riskDeleted(riskId, commit));
   }
 
   public ReturnWithExceptionsWrapper notifyRiskIncidenceCreatedOrUpdated(RiskIncidence riskIncidence, boolean commit) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.riskIncidenceCreatedOrUpdated(riskIncidence, commit));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.riskIncidenceCreatedOrUpdated(riskIncidence, commit));
   }
 
   public ReturnWithExceptionsWrapper notifyRiskIncidenceDeleted(String riskIncidenceId, boolean commit) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.riskIncidenceDeleted(riskIncidenceId, commit));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.riskIncidenceDeleted(riskIncidenceId, commit));
   }
 
   public ReturnWithExceptionsWrapper notifyRepresentationInformationCreatedOrUpdated(RepresentationInformation ri,
     boolean commit) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.representationInformationCreatedOrUpdated(ri, commit));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.representationInformationCreatedOrUpdated(ri, commit));
   }
 
   public ReturnWithExceptionsWrapper notifyRepresentationInformationDeleted(String representationInformationId,
     boolean commit) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.representationInformationDeleted(representationInformationId, commit));
-    }
-    return wrapper;
+    return notifyObserversSafely(
+      observer -> observer.representationInformationDeleted(representationInformationId, commit));
   }
 
   public ReturnWithExceptionsWrapper notifyFormatCreatedOrUpdated(Format f, boolean commit) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.formatCreatedOrUpdated(f, commit));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.formatCreatedOrUpdated(f, commit));
   }
 
   public ReturnWithExceptionsWrapper notifyFormatDeleted(String formatId, boolean commit) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.formatDeleted(formatId, commit));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.formatDeleted(formatId, commit));
   }
 
   public ReturnWithExceptionsWrapper notifyNotificationCreatedOrUpdated(Notification notification) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.notificationCreatedOrUpdated(notification));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.notificationCreatedOrUpdated(notification));
   }
 
   public ReturnWithExceptionsWrapper notifyNotificationDeleted(String notificationId) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.notificationDeleted(notificationId));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.notificationDeleted(notificationId));
   }
 
   public ReturnWithExceptionsWrapper notifyDIPCreated(DIP dip, boolean commit) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.dipCreated(dip, commit));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.dipCreated(dip, commit));
   }
 
   public ReturnWithExceptionsWrapper notifyDIPUpdated(DIP dip, boolean commit) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.dipUpdated(dip, commit));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.dipUpdated(dip, commit));
   }
 
   public ReturnWithExceptionsWrapper notifyDIPDeleted(String dipId, boolean commit) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.dipDeleted(dipId, commit));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.dipDeleted(dipId, commit));
   }
 
   public ReturnWithExceptionsWrapper notifyDIPFileCreated(DIPFile file) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.dipFileCreated(file));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.dipFileCreated(file));
   }
 
   public ReturnWithExceptionsWrapper notifyDIPFileUpdated(DIPFile file) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.dipFileUpdated(file));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.dipFileUpdated(file));
   }
 
   public ReturnWithExceptionsWrapper notifyDIPFileDeleted(String dipId, List<String> path, String fileId) {
-    ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
-    for (ModelObserver observer : observers) {
-      wrapper.addToList(observer.dipFileDeleted(dipId, path, fileId));
-    }
-    return wrapper;
+    return notifyObserversSafely(observer -> observer.dipFileDeleted(dipId, path, fileId));
   }
 }

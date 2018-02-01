@@ -20,7 +20,6 @@ import javax.xml.xpath.XPathExpressionException;
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrInputDocument;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.PremisV3Utils;
@@ -116,7 +115,7 @@ public class IndexModelObserver implements ModelObserver {
           indexPreservationsEvents(aip.getId(), null).addTo(ret);
         }
       }
-    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | SolrException e) {
+    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error getting ancestors when creating AIP", e);
       ret.add(e);
     }
@@ -133,10 +132,9 @@ public class IndexModelObserver implements ModelObserver {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
     try {
       SolrInputDocument aipDoc = SolrUtils.aipToSolrInputDocument(aip, ancestors, model, safemode);
-      index.add(RodaConstants.INDEX_AIP, aipDoc);
       LOGGER.trace("Adding AIP: {}", aipDoc);
-    } catch (SolrException | SolrServerException | IOException | RequestNotValidException | GenericException
-      | NotFoundException | AuthorizationDeniedException e) {
+      SolrUtils.create(index, RodaConstants.INDEX_AIP, aipDoc, (ModelObserver) this).addTo(ret);
+    } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
       ret.add(e);
 
       if (!safemode) {
@@ -157,13 +155,10 @@ public class IndexModelObserver implements ModelObserver {
   public ReturnWithExceptions<Void, ModelObserver> indexPreservationsEvents(final String aipId,
     final String representationId) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
-    CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationMetadata = null;
-    try {
-      if (representationId == null) {
-        preservationMetadata = model.listPreservationMetadata(aipId, true);
-      } else {
-        preservationMetadata = model.listPreservationMetadata(aipId, representationId);
-      }
+
+    try (CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationMetadata = (representationId == null)
+      ? model.listPreservationMetadata(aipId, true)
+      : model.listPreservationMetadata(aipId, representationId);) {
 
       for (OptionalWithCause<PreservationMetadata> opm : preservationMetadata) {
         if (opm.isPresent()) {
@@ -176,11 +171,10 @@ public class IndexModelObserver implements ModelObserver {
           ret.add(opm.getCause());
         }
       }
-    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
+      | IOException e) {
       LOGGER.error("Cannot index preservation events", e);
       ret.add(e);
-    } finally {
-      IOUtils.closeQuietly(preservationMetadata);
     }
 
     return ret;
@@ -205,9 +199,9 @@ public class IndexModelObserver implements ModelObserver {
 
       SolrInputDocument premisEventDocument = SolrUtils.premisToSolr(pm.getType(), aip, representationUUID, fileUUID,
         binary);
-      index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisEventDocument);
-    } catch (SolrException | RequestNotValidException | GenericException | NotFoundException
-      | AuthorizationDeniedException | SolrServerException | IOException e) {
+      SolrUtils.create(index, RodaConstants.INDEX_PRESERVATION_EVENTS, premisEventDocument, (ModelObserver) this)
+        .addTo(ret);
+    } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
       LOGGER.error("Error when indexing preservation event {}", pm.getId(), e);
       ret.add(e);
     }
@@ -234,9 +228,7 @@ public class IndexModelObserver implements ModelObserver {
       representation.getId(), true)) {
       for (OptionalWithCause<File> file : allFiles) {
         if (file.isPresent()) {
-          ReturnWithExceptions<Long, ModelObserver> fileExceptions = indexFile(aip, file.get(), ancestors, false);
-          sizeInBytes += fileExceptions.getReturnedObject();
-          ret.add(fileExceptions.getExceptions());
+          sizeInBytes += indexFile(aip, file.get(), ancestors, false).addTo(ret).getReturnedObject();
         } else {
           LOGGER.error("Cannot index representation file", file.getCause());
           ret.add(file.getCause());
@@ -266,9 +258,10 @@ public class IndexModelObserver implements ModelObserver {
 
       SolrInputDocument representationDocument = SolrUtils.representationToSolrDocument(aip, representation,
         sizeInBytes, numberOfDataFiles, numberOfDocumentationFiles, numberOfSchemaFiles, ancestors, model, false);
-      index.add(RodaConstants.INDEX_REPRESENTATION, representationDocument);
-    } catch (SolrServerException | SolrException | IOException | RequestNotValidException | GenericException
-      | NotFoundException | AuthorizationDeniedException e) {
+      SolrUtils.create(index, RodaConstants.INDEX_REPRESENTATION, representationDocument, (ModelObserver) this)
+        .addTo(ret);
+    } catch (IOException | RequestNotValidException | GenericException | NotFoundException
+      | AuthorizationDeniedException e) {
       LOGGER.error("Cannot index representation", e);
       ret.add(e);
     }
@@ -289,7 +282,7 @@ public class IndexModelObserver implements ModelObserver {
         SolrInputDocument premisSolrDoc = PremisV3Utils.getSolrDocument(premisFile);
         fileDocument.putAll(premisSolrDoc);
         sizeInBytes = SolrUtils.objectToLong(premisSolrDoc.get(RodaConstants.FILE_SIZE).getValue(), 0L);
-      } catch (GenericException | SolrException e) {
+      } catch (GenericException e) {
         LOGGER.warn("Could not index file PREMIS information", e);
         ret.add(e);
       }
@@ -301,31 +294,27 @@ public class IndexModelObserver implements ModelObserver {
       fileDocument.addField(RodaConstants.FILE_FULLTEXT, fulltext);
     }
 
-    try {
-      index.add(RodaConstants.INDEX_FILE, fileDocument);
+    SolrUtils.create(index, RodaConstants.INDEX_FILE, fileDocument, (ModelObserver) this).addTo(ret);
 
+    if (ret.isEmpty()) {
       if (recursive && file.isDirectory()) {
         try (CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(file, true)) {
           for (OptionalWithCause<File> subfile : allFiles) {
             if (subfile.isPresent()) {
-              ReturnWithExceptions<Long, ModelObserver> fileExceptions = indexFile(aip, subfile.get(), ancestors,
-                false);
-              sizeInBytes += fileExceptions.getReturnedObject();
-              ret.add(fileExceptions.getExceptions());
+              sizeInBytes += indexFile(aip, subfile.get(), ancestors, false).addTo(ret).getReturnedObject();
             } else {
               LOGGER.error("Cannot index file", subfile.getCause());
               ret.add(subfile.getCause());
             }
           }
         } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException
-          | SolrException e) {
+          | IOException e) {
           LOGGER.error("Cannot index file sub-resources: {}", file, e);
           ret.add(e);
         }
       }
-    } catch (SolrServerException | SolrException | IOException e) {
-      LOGGER.error("Cannot index file: {}", file, e);
-      ret.add(e);
+    } else {
+      LOGGER.error("Cannot index file: {}", file);
     }
 
     ret.setReturnedObject(sizeInBytes);
@@ -336,8 +325,6 @@ public class IndexModelObserver implements ModelObserver {
     Binary premisFile = null;
     try {
       premisFile = model.retrievePreservationFile(file);
-    } catch (NotFoundException e) {
-      LOGGER.trace("On indexing representations, did not find PREMIS for file: {}", file, e);
     } catch (RODAException e) {
       LOGGER.warn("On indexing representations, error loading PREMIS for file: {}", file, e);
     }
@@ -346,22 +333,20 @@ public class IndexModelObserver implements ModelObserver {
 
   private String getFileFulltext(File file) {
     String fulltext = "";
-    InputStream inputStream = null;
     try {
       Binary fulltextBinary = model.retrieveOtherMetadataBinary(file.getAipId(), file.getRepresentationId(),
         file.getPath(), file.getId(), RodaConstants.TIKA_FILE_SUFFIX_FULLTEXT,
         RodaConstants.OTHER_METADATA_TYPE_APACHE_TIKA);
       if (fulltextBinary.getSizeInBytes() < RodaCoreFactory.getRodaConfigurationAsInt(TEN_MB_IN_BYTES,
         "core.index.fulltext_threshold_in_bytes")) {
-        inputStream = fulltextBinary.getContent().createInputStream();
-        fulltext = IOUtils.toString(inputStream, Charset.forName(RodaConstants.DEFAULT_ENCODING));
+        try (InputStream inputStream = fulltextBinary.getContent().createInputStream();) {
+          fulltext = IOUtils.toString(inputStream, Charset.forName(RodaConstants.DEFAULT_ENCODING));
+        }
       }
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | IOException e) {
       LOGGER.warn("Error getting fulltext for file: {}", file, e);
     } catch (NotFoundException e) {
       LOGGER.trace("Fulltext not found for file: {}", file, e);
-    } finally {
-      IOUtils.closeQuietly(inputStream);
     }
     return fulltext;
   }
@@ -377,17 +362,14 @@ public class IndexModelObserver implements ModelObserver {
   @Override
   public ReturnWithExceptions<Void, ModelObserver> aipStateUpdated(AIP aip) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
-    try {
-      // change AIP
-      SolrInputDocument aipDoc = SolrUtils.aipStateUpdateToSolrDocument(aip);
-      index.add(RodaConstants.INDEX_AIP, aipDoc);
 
+    // change AIP
+    SolrInputDocument aipDoc = SolrUtils.aipStateUpdateToSolrDocument(aip);
+    SolrUtils.create(index, RodaConstants.INDEX_AIP, aipDoc, (ModelObserver) this).addTo(ret);
+    if (ret.isEmpty()) {
       // change Representations, Files & Preservation events
       representationsStateUpdated(aip).addTo(ret);
       preservationEventsStateUpdated(aip).addTo(ret);
-    } catch (SolrServerException | IOException | SolrException e) {
-      LOGGER.error("Cannot do a partial update", e);
-      ret.add(e);
     }
 
     return ret;
@@ -408,18 +390,22 @@ public class IndexModelObserver implements ModelObserver {
     try (CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(representation.getAipId(),
       representation.getId(), true)) {
       SolrInputDocument repDoc = SolrUtils.representationStateUpdateToSolrDocument(representation, aip.getState());
-      index.add(RodaConstants.INDEX_REPRESENTATION, repDoc);
+      SolrUtils.create(index, RodaConstants.INDEX_REPRESENTATION, repDoc, (ModelObserver) this).addTo(ret);
 
-      for (OptionalWithCause<File> file : allFiles) {
-        if (file.isPresent()) {
-          fileStateUpdated(aip, file.get(), false).addTo(ret);
-        } else {
-          LOGGER.error("Cannot do a partial update on File", file.getCause());
-          ret.add(file.getCause());
+      if (ret.isEmpty()) {
+        for (OptionalWithCause<File> file : allFiles) {
+          if (file.isPresent()) {
+            fileStateUpdated(aip, file.get(), false).addTo(ret);
+          } else {
+            LOGGER.error("Cannot do a partial update on File", file.getCause());
+            ret.add(file.getCause());
+          }
         }
+      } else {
+        LOGGER.error("Cannot index representation: {}", representation);
       }
-    } catch (SolrServerException | AuthorizationDeniedException | IOException | NotFoundException | GenericException
-      | RequestNotValidException | SolrException e) {
+    } catch (AuthorizationDeniedException | IOException | NotFoundException | GenericException
+      | RequestNotValidException e) {
       LOGGER.error("Cannot do a partial update", e);
       ret.add(e);
     }
@@ -429,10 +415,10 @@ public class IndexModelObserver implements ModelObserver {
 
   private ReturnWithExceptions<Void, ModelObserver> fileStateUpdated(AIP aip, File file, boolean recursive) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
-    try {
-      SolrInputDocument fileDoc = SolrUtils.fileStateUpdateToSolrDocument(file, aip.getState());
-      index.add(RodaConstants.INDEX_FILE, fileDoc);
 
+    SolrInputDocument fileDoc = SolrUtils.fileStateUpdateToSolrDocument(file, aip.getState());
+    SolrUtils.create(index, RodaConstants.INDEX_FILE, fileDoc, (ModelObserver) this).addTo(ret);
+    if (ret.isEmpty()) {
       if (recursive && file.isDirectory()) {
         try (CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(file, true)) {
           for (OptionalWithCause<File> subfile : allFiles) {
@@ -443,14 +429,14 @@ public class IndexModelObserver implements ModelObserver {
               ret.add(subfile.getCause());
             }
           }
-        } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+        } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException
+          | IOException e) {
           LOGGER.error("Cannot index file sub-resources: {}", file, e);
           ret.add(e);
         }
       }
-    } catch (SolrServerException | IOException | SolrException e) {
-      LOGGER.error("Cannot index file: {}", file, e);
-      ret.add(e);
+    } else {
+      LOGGER.error("Cannot index file: {}", file);
     }
 
     return ret;
@@ -465,13 +451,7 @@ public class IndexModelObserver implements ModelObserver {
         if (opm.isPresent()) {
           PreservationMetadata pm = opm.get();
           if (pm.getType().equals(PreservationMetadataType.EVENT)) {
-            try {
-              preservationEventStateUpdated(pm, aip.getState());
-            } catch (SolrServerException | IOException | RequestNotValidException | GenericException | NotFoundException
-              | AuthorizationDeniedException | SolrException e) {
-              LOGGER.error("Cannot index premis event", e);
-              ret.add(e);
-            }
+            preservationEventStateUpdated(pm, aip.getState()).addTo(ret);
           }
         } else {
           LOGGER.error("Cannot index premis event", opm.getCause());
@@ -487,11 +467,11 @@ public class IndexModelObserver implements ModelObserver {
     return ret;
   }
 
-  private void preservationEventStateUpdated(PreservationMetadata pm, AIPState state) throws RequestNotValidException,
-    GenericException, NotFoundException, AuthorizationDeniedException, SolrServerException, IOException {
+  private ReturnWithExceptions<Void, ModelObserver> preservationEventStateUpdated(PreservationMetadata pm,
+    AIPState state) {
     SolrInputDocument premisEventDocument = SolrUtils.preservationEventStateUpdateToSolrDocument(pm.getId(),
       pm.getAipId(), state);
-    index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisEventDocument);
+    return SolrUtils.create(index, RodaConstants.INDEX_PRESERVATION_EVENTS, premisEventDocument, (ModelObserver) this);
   }
 
   @Override
@@ -501,39 +481,41 @@ public class IndexModelObserver implements ModelObserver {
       LOGGER.debug("Reindexing moved aip {}", aip.getId());
       List<String> topAncestors = SolrUtils.getAncestors(newParentId, model);
       SolrInputDocument aipDoc = SolrUtils.updateAIPParentId(aip.getId(), newParentId, topAncestors);
-      index.add(RodaConstants.INDEX_AIP, aipDoc);
-      updateRepresentationAndFileAncestors(aip, topAncestors).addTo(ret);
+      SolrUtils.create(index, RodaConstants.INDEX_AIP, aipDoc, (ModelObserver) this).addTo(ret);
+      if (ret.isEmpty()) {
+        updateRepresentationAndFileAncestors(aip, topAncestors).addTo(ret);
 
-      LOGGER.debug("Finding descendants of moved aip {}", aip.getId());
-      Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aip.getId()),
-        new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.FALSE.toString()));
-      List<String> aipFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_PARENT_ID,
-        RodaConstants.AIP_HAS_REPRESENTATIONS);
+        LOGGER.debug("Finding descendants of moved aip {}", aip.getId());
+        Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aip.getId()),
+          new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.FALSE.toString()));
+        List<String> aipFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_PARENT_ID,
+          RodaConstants.AIP_HAS_REPRESENTATIONS);
 
-      List<IndexedAIP> items = new ArrayList<>();
-      new IterableIndexResult<>(index, IndexedAIP.class, filter, Sorter.NONE, Facets.NONE, null, false, true, aipFields)
-        .forEach(items::add);
+        List<IndexedAIP> items = new ArrayList<>();
+        new IterableIndexResult<>(index, IndexedAIP.class, filter, Sorter.NONE, Facets.NONE, null, false, true,
+          aipFields).forEach(items::add);
 
-      for (IndexedAIP item : items) {
-        SolrInputDocument descendantDoc;
-        try {
-          LOGGER.debug("Reindexing aip {} descendant {}", aip.getId(), item.getId());
-          List<String> ancestors = SolrUtils.getAncestors(item.getParentID(), model);
-          descendantDoc = SolrUtils.updateAIPAncestors(item.getId(), ancestors);
-          index.add(RodaConstants.INDEX_AIP, descendantDoc);
+        for (IndexedAIP item : items) {
+          SolrInputDocument descendantDoc;
+          try {
+            LOGGER.debug("Reindexing aip {} descendant {}", aip.getId(), item.getId());
+            List<String> ancestors = SolrUtils.getAncestors(item.getParentID(), model);
+            descendantDoc = SolrUtils.updateAIPAncestors(item.getId(), ancestors);
+            SolrUtils.create(index, RodaConstants.INDEX_AIP, descendantDoc, (ModelObserver) this).addTo(ret);
 
-          // update representation and file ancestors information
-          if (item.getHasRepresentations()) {
-            AIP aipModel = model.retrieveAIP(item.getId());
-            updateRepresentationAndFileAncestors(aipModel, ancestors).addTo(ret);
+            // update representation and file ancestors information
+            if (item.getHasRepresentations()) {
+              AIP aipModel = model.retrieveAIP(item.getId());
+              updateRepresentationAndFileAncestors(aipModel, ancestors).addTo(ret);
+            }
+          } catch (SolrServerException | IOException | NotFoundException e) {
+            LOGGER.error("Error indexing moved AIP {} from {} to {}", aip.getId(), oldParentId, newParentId, e);
+            ret.add(e);
           }
-        } catch (SolrServerException | IOException | NotFoundException | SolrException e) {
-          LOGGER.error("Error indexing moved AIP {} from {} to {}", aip.getId(), oldParentId, newParentId, e);
-          ret.add(e);
         }
       }
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | SolrServerException
-      | IOException | NotFoundException | SolrException e) {
+      | IOException | NotFoundException e) {
       LOGGER.error("Error indexing moved AIP {} from {} to {}", aip.getId(), oldParentId, newParentId, e);
       ret.add(e);
     }
@@ -549,25 +531,26 @@ public class IndexModelObserver implements ModelObserver {
       for (Representation representation : aip.getRepresentations()) {
         SolrInputDocument descendantRepresentationDoc = SolrUtils
           .updateRepresentationAncestors(IdUtils.getRepresentationId(representation), ancestors);
-        index.add(RodaConstants.INDEX_REPRESENTATION, descendantRepresentationDoc);
-
-        try (CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
-          representation.getId(), true)) {
-          for (OptionalWithCause<File> oFile : allFiles) {
-            if (oFile.isPresent()) {
-              File file = oFile.get();
-              SolrInputDocument descendantFileDoc = SolrUtils.updateFileAncestors(IdUtils.getFileId(file), ancestors);
-              index.add(RodaConstants.INDEX_FILE, descendantFileDoc);
+        SolrUtils.create(index, RodaConstants.INDEX_REPRESENTATION, descendantRepresentationDoc, (ModelObserver) this)
+          .addTo(ret);
+        if (ret.isEmpty()) {
+          try (CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
+            representation.getId(), true)) {
+            for (OptionalWithCause<File> oFile : allFiles) {
+              if (oFile.isPresent()) {
+                File file = oFile.get();
+                SolrInputDocument descendantFileDoc = SolrUtils.updateFileAncestors(IdUtils.getFileId(file), ancestors);
+                SolrUtils.create(index, RodaConstants.INDEX_FILE, descendantFileDoc, (ModelObserver) this).addTo(ret);
+              }
             }
+          } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | IOException
+            | NotFoundException e) {
+            LOGGER.error("Error updating file ancestors", e);
+            ret.add(e);
           }
-        } catch (SolrException | RequestNotValidException | GenericException | AuthorizationDeniedException
-          | SolrServerException | IOException | NotFoundException e) {
-          LOGGER.error("Error updating file ancestors", e);
-          ret.add(e);
         }
       }
-    } catch (SolrException | RequestNotValidException | GenericException | AuthorizationDeniedException
-      | SolrServerException | IOException e) {
+    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error updating representation ancestors", e);
       ret.add(e);
     }
@@ -599,11 +582,11 @@ public class IndexModelObserver implements ModelObserver {
       List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
 
       if (descriptiveMetadata.isFromAIP()) {
-        ret = indexAIP(aip, ancestors);
+        indexAIP(aip, ancestors).addTo(ret);
       } else {
         Representation representation = model.retrieveRepresentation(descriptiveMetadata.getAipId(),
           descriptiveMetadata.getRepresentationId());
-        ret = indexRepresentation(aip, representation, ancestors);
+        indexRepresentation(aip, representation, ancestors).addTo(ret);
       }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Failed to index AIP or representation when creating descriptive metadata", e);
@@ -621,11 +604,11 @@ public class IndexModelObserver implements ModelObserver {
       List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
 
       if (descriptiveMetadata.isFromAIP()) {
-        ret = indexAIP(aip, ancestors);
+        indexAIP(aip, ancestors).addTo(ret);
       } else {
         Representation representation = model.retrieveRepresentation(descriptiveMetadata.getAipId(),
           descriptiveMetadata.getRepresentationId());
-        ret = indexRepresentation(aip, representation, ancestors);
+        indexRepresentation(aip, representation, ancestors).addTo(ret);
       }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Failed to index AIP or representation when updating descriptive metadata", e);
@@ -666,14 +649,11 @@ public class IndexModelObserver implements ModelObserver {
 
         if (aip.getRepresentations().size() == 1) {
           SolrInputDocument doc = SolrUtils.updateAIPHasRepresentations(aip.getId(), true);
-          index.add(RodaConstants.INDEX_AIP, doc);
+          SolrUtils.create(index, RodaConstants.INDEX_AIP, doc, (ModelObserver) this).addTo(ret);
         }
       }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Cannot index representation: {}", representation, e);
-      ret.add(e);
-    } catch (SolrServerException | IOException | SolrException e) {
-      LOGGER.error("Cannot update hasRepresentations flag on AIP", e);
       ret.add(e);
     }
 
@@ -708,10 +688,9 @@ public class IndexModelObserver implements ModelObserver {
       AIP aip = model.retrieveAIP(aipId);
       if (aip.getRepresentations().size() == 0) {
         SolrInputDocument doc = SolrUtils.updateAIPHasRepresentations(aipId, false);
-        index.add(RodaConstants.INDEX_AIP, doc);
+        SolrUtils.create(index, RodaConstants.INDEX_AIP, doc, (ModelObserver) this).addTo(ret);
       }
-    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
-      | SolrServerException | IOException | SolrException e) {
+    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
       LOGGER.error("Cannot update hasRepresentations flag on AIP", e);
       ret.add(e);
     }
@@ -759,17 +738,8 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> logEntryCreated(LogEntry entry) {
-    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
     SolrInputDocument logDoc = SolrUtils.logEntryToSolrDocument(entry);
-
-    try {
-      index.add(RodaConstants.INDEX_ACTION_LOG, logDoc);
-    } catch (SolrServerException | SolrException | IOException e) {
-      LOGGER.error("Log entry was not added to index");
-      ret.add(e);
-    }
-
-    return ret;
+    return SolrUtils.create(index, RodaConstants.INDEX_ACTION_LOG, logDoc, (ModelObserver) this);
   }
 
   @Override
@@ -829,12 +799,13 @@ public class IndexModelObserver implements ModelObserver {
         binary);
       PreservationMetadataType type = pm.getType();
       if (PreservationMetadataType.EVENT.equals(type)) {
-        index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisFileDocument);
+        SolrUtils.create(index, RodaConstants.INDEX_PRESERVATION_EVENTS, premisFileDocument, (ModelObserver) this)
+          .addTo(ret);
       } else if (PreservationMetadataType.AGENT.equals(type)) {
-        index.add(RodaConstants.INDEX_PRESERVATION_AGENTS, premisFileDocument);
+        SolrUtils.create(index, RodaConstants.INDEX_PRESERVATION_AGENTS, premisFileDocument, (ModelObserver) this)
+          .addTo(ret);
       }
-    } catch (IOException | SolrServerException | SolrException | GenericException | RequestNotValidException
-      | NotFoundException | AuthorizationDeniedException e) {
+    } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
       LOGGER.error("Error when preservation metadata created on retrieving the full AIP", e);
       ret.add(e);
     }
@@ -872,10 +843,10 @@ public class IndexModelObserver implements ModelObserver {
       try {
         SolrInputDocument solrFile = SolrUtils.addOtherPropertiesToIndexedFile("tika_", otherMetadataBinary, model,
           index);
-        index.add(RodaConstants.INDEX_FILE, solrFile);
+        SolrUtils.create(index, RodaConstants.INDEX_FILE, solrFile, (ModelObserver) this).addTo(ret);
       } catch (SolrServerException | RequestNotValidException | GenericException | NotFoundException
         | AuthorizationDeniedException | XPathExpressionException | ParserConfigurationException | SAXException
-        | IOException | SolrException e) {
+        | IOException e) {
         LOGGER.error("Error adding other properties to indexed file", e);
         ret.add(e);
       }
@@ -889,15 +860,10 @@ public class IndexModelObserver implements ModelObserver {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
     SolrInputDocument jobDoc = SolrUtils.jobToSolrDocument(job);
 
-    try {
-      index.add(RodaConstants.INDEX_JOB, jobDoc);
+    SolrUtils.create(index, RodaConstants.INDEX_JOB, jobDoc, (ModelObserver) this).addTo(ret);
 
-      if (reindexJobReports) {
-        indexJobReports(job).addTo(ret);
-      }
-    } catch (SolrServerException | SolrException | IOException e) {
-      LOGGER.error("Job document was not added to index", e);
-      ret.add(e);
+    if (ret.isEmpty() && reindexJobReports) {
+      indexJobReports(job).addTo(ret);
     }
 
     return ret;
@@ -940,36 +906,40 @@ public class IndexModelObserver implements ModelObserver {
 
   private <T extends IsIndexed> ReturnWithExceptions<Void, ModelObserver> addDocumentToIndex(Class<T> classToAdd,
     T instance) {
-    ReturnWithExceptions<Void, ?> ret = SolrUtils.create(index, classToAdd, instance);
-    return new ReturnWithExceptions<>(ret.getExceptions(), ret.getReturnedObject(), this);
+    return addDocumentToIndex(classToAdd, instance, false);
+  }
+
+  private <T extends IsIndexed> ReturnWithExceptions<Void, ModelObserver> addDocumentToIndex(Class<T> classToAdd,
+    T instance, boolean commit) {
+    return SolrUtils.create(index, classToAdd, instance, this, commit);
   }
 
   private <T extends IsIndexed> ReturnWithExceptions<Void, ModelObserver> deleteDocumentFromIndex(
     Class<T> classToDelete, String... ids) {
-    ReturnWithExceptions<Void, ?> ret = SolrUtils.delete(index, classToDelete, Arrays.asList(ids));
-    return new ReturnWithExceptions<>(ret.getExceptions(), ret.getReturnedObject(), this);
+    return deleteDocumentFromIndex(classToDelete, false, ids);
+  }
+
+  private <T extends IsIndexed> ReturnWithExceptions<Void, ModelObserver> deleteDocumentFromIndex(
+    Class<T> classToDelete, boolean commit, String... ids) {
+    return SolrUtils.delete(index, classToDelete, Arrays.asList(ids), this, commit);
   }
 
   private <T extends IsIndexed> ReturnWithExceptions<Void, ModelObserver> deleteDocumentsFromIndex(
     Class<T> classToDelete, String fieldName, String fieldValue) {
-    ReturnWithExceptions<Void, ?> ret = SolrUtils.delete(index, classToDelete,
-      new Filter(new SimpleFilterParameter(fieldName, fieldValue)));
-    return new ReturnWithExceptions<>(ret.getExceptions(), ret.getReturnedObject(), this);
+    return SolrUtils.delete(index, classToDelete, new Filter(new SimpleFilterParameter(fieldName, fieldValue)), this);
+  }
+
+  private <T extends IsIndexed> ReturnWithExceptions<Void, ModelObserver> deleteDocumentsFromIndex(
+    Class<T> classToDelete, String fieldName, String fieldValue, boolean commit) {
+    return SolrUtils.delete(index, classToDelete, new Filter(new SimpleFilterParameter(fieldName, fieldValue)), this,
+      commit);
   }
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> jobReportCreatedOrUpdated(Report jobReport, Job job) {
-    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
     SolrInputDocument jobReportDoc = SolrUtils.jobReportToSolrDocument(jobReport, job, index);
 
-    try {
-      index.add(RodaConstants.INDEX_JOB_REPORT, jobReportDoc);
-    } catch (SolrServerException | SolrException | IOException e) {
-      LOGGER.error("Job report document was not added to index");
-      ret.add(e);
-    }
-
-    return ret;
+    return SolrUtils.create(index, RodaConstants.INDEX_JOB_REPORT, jobReportDoc, this);
   }
 
   @Override
@@ -980,17 +950,15 @@ public class IndexModelObserver implements ModelObserver {
   @Override
   public ReturnWithExceptions<Void, ModelObserver> aipPermissionsUpdated(AIP aip) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
-    try {
-      // change AIP
-      SolrInputDocument aipDoc = SolrUtils.aipPermissionsUpdateToSolrDocument(aip);
-      index.add(RodaConstants.INDEX_AIP, aipDoc);
 
+    // change AIP
+    SolrInputDocument aipDoc = SolrUtils.aipPermissionsUpdateToSolrDocument(aip);
+    SolrUtils.create(index, RodaConstants.INDEX_AIP, aipDoc, (ModelObserver) this).addTo(ret);
+
+    if (ret.isEmpty()) {
       // change Representations, Files and Preservation events
       representationsPermissionsUpdated(aip).addTo(ret);
       preservationEventsPermissionsUpdated(aip).addTo(ret);
-    } catch (SolrServerException | IOException | SolrException e) {
-      LOGGER.error("Cannot do a partial update", e);
-      ret.add(e);
     }
 
     return ret;
@@ -998,17 +966,8 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> dipPermissionsUpdated(DIP dip) {
-    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
-    try {
-      // change DIP
-      SolrInputDocument dipDoc = SolrUtils.dipPermissionsUpdateToSolrDocument(dip);
-      index.add(RodaConstants.INDEX_DIP, dipDoc);
-    } catch (SolrServerException | IOException | SolrException e) {
-      LOGGER.error("Cannot do a partial update", e);
-      ret.add(e);
-    }
-
-    return ret;
+    SolrInputDocument dipDoc = SolrUtils.dipPermissionsUpdateToSolrDocument(dip);
+    return SolrUtils.create(index, RodaConstants.INDEX_DIP, dipDoc, (ModelObserver) this);
   }
 
   private ReturnWithExceptions<Void, ModelObserver> representationsPermissionsUpdated(final AIP aip) {
@@ -1027,18 +986,20 @@ public class IndexModelObserver implements ModelObserver {
       representation.getId(), true)) {
       SolrInputDocument repDoc = SolrUtils.representationPermissionsUpdateToSolrDocument(representation,
         aip.getPermissions());
-      index.add(RodaConstants.INDEX_REPRESENTATION, repDoc);
+      SolrUtils.create(index, RodaConstants.INDEX_REPRESENTATION, repDoc, (ModelObserver) this).addTo(ret);
 
-      for (OptionalWithCause<File> file : allFiles) {
-        if (file.isPresent()) {
-          filePermissionsUpdated(aip, file.get(), false).addTo(ret);
-        } else {
-          LOGGER.error("Cannot do a partial update on file", file.getCause());
-          ret.add(file.getCause());
+      if (ret.isEmpty()) {
+        for (OptionalWithCause<File> file : allFiles) {
+          if (file.isPresent()) {
+            filePermissionsUpdated(aip, file.get(), false).addTo(ret);
+          } else {
+            LOGGER.error("Cannot do a partial update on file", file.getCause());
+            ret.add(file.getCause());
+          }
         }
       }
-    } catch (SolrServerException | AuthorizationDeniedException | IOException | NotFoundException | GenericException
-      | RequestNotValidException | SolrException e) {
+    } catch (AuthorizationDeniedException | IOException | NotFoundException | GenericException
+      | RequestNotValidException e) {
       LOGGER.error("Cannot do a partial update", e);
       ret.add(e);
     }
@@ -1048,28 +1009,24 @@ public class IndexModelObserver implements ModelObserver {
 
   private ReturnWithExceptions<Void, ModelObserver> filePermissionsUpdated(AIP aip, File file, boolean recursive) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
-    try {
-      SolrInputDocument fileDoc = SolrUtils.filePermissionsUpdateToSolrDocument(file, aip.getPermissions());
-      index.add(RodaConstants.INDEX_FILE, fileDoc);
+    SolrInputDocument fileDoc = SolrUtils.filePermissionsUpdateToSolrDocument(file, aip.getPermissions());
+    SolrUtils.create(index, RodaConstants.INDEX_FILE, fileDoc, (ModelObserver) this).addTo(ret);
 
-      if (recursive && file.isDirectory()) {
-        try (CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(file, true)) {
-          for (OptionalWithCause<File> subfile : allFiles) {
-            if (subfile.isPresent()) {
-              filePermissionsUpdated(aip, subfile.get(), false).addTo(ret);
-            } else {
-              LOGGER.error("Cannot index file sub-resources file", subfile.getCause());
-              ret.add(subfile.getCause());
-            }
+    if (ret.isEmpty() && recursive && file.isDirectory()) {
+      try (CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(file, true)) {
+        for (OptionalWithCause<File> subfile : allFiles) {
+          if (subfile.isPresent()) {
+            filePermissionsUpdated(aip, subfile.get(), false).addTo(ret);
+          } else {
+            LOGGER.error("Cannot index file sub-resources file", subfile.getCause());
+            ret.add(subfile.getCause());
           }
-        } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
-          LOGGER.error("Cannot index file sub-resources: {}", file, e);
-          ret.add(e);
         }
+      } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException
+        | IOException e) {
+        LOGGER.error("Cannot index file sub-resources: {}", file, e);
+        ret.add(e);
       }
-    } catch (SolrServerException | IOException | SolrException e) {
-      LOGGER.error("Cannot index file: {}", file, e);
-      ret.add(e);
     }
 
     return ret;
@@ -1084,13 +1041,7 @@ public class IndexModelObserver implements ModelObserver {
         if (opm.isPresent()) {
           PreservationMetadata pm = opm.get();
           if (PreservationMetadataType.EVENT.equals(pm.getType())) {
-            try {
-              preservationEventPermissionsUpdated(pm, aip.getPermissions(), aip.getState());
-            } catch (SolrServerException | IOException | RequestNotValidException | GenericException | NotFoundException
-              | AuthorizationDeniedException | SolrException e) {
-              LOGGER.error("Cannot index premis event", e);
-              ret.add(e);
-            }
+            preservationEventPermissionsUpdated(pm, aip.getPermissions(), aip.getState()).addTo(ret);
           }
         } else {
           LOGGER.error("Cannot index premis event", opm.getCause());
@@ -1106,152 +1057,56 @@ public class IndexModelObserver implements ModelObserver {
     return ret;
   }
 
-  private void preservationEventPermissionsUpdated(PreservationMetadata pm, Permissions permissions, AIPState state)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
-    SolrServerException, IOException {
+  private ReturnWithExceptions<Void, ModelObserver> preservationEventPermissionsUpdated(PreservationMetadata pm,
+    Permissions permissions, AIPState state) {
     SolrInputDocument premisEventDocument = SolrUtils.preservationEventPermissionsUpdateToSolrDocument(pm.getId(),
       pm.getAipId(), permissions, state);
-    index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisEventDocument);
+    return SolrUtils.create(index, RodaConstants.INDEX_PRESERVATION_EVENTS, premisEventDocument, (ModelObserver) this);
   }
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> riskCreatedOrUpdated(Risk risk, int incidences, boolean commit) {
-    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
     SolrInputDocument riskDoc = SolrUtils.riskToSolrDocument(risk, incidences);
-
-    try {
-      index.add(RodaConstants.INDEX_RISK, riskDoc);
-
-      if (commit) {
-        try {
-          SolrUtils.commit(index, IndexedRisk.class);
-        } catch (GenericException | SolrException e) {
-          LOGGER.warn("Commit did not run as expected", e);
-          ret.add(e);
-        }
-      }
-    } catch (SolrServerException | SolrException | IOException e) {
-      LOGGER.error("Risk document was not added to index", e);
-      ret.add(e);
-    }
-
-    return ret;
+    return SolrUtils.create(index, IndexedRisk.class, riskDoc, (ModelObserver) this, commit);
   }
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> riskDeleted(String riskId, boolean commit) {
-    ReturnWithExceptions<Void, ModelObserver> ret = deleteDocumentFromIndex(IndexedRisk.class, riskId);
-
-    if (commit) {
-      try {
-        SolrUtils.commit(index, IndexedRisk.class);
-      } catch (GenericException | SolrException e) {
-        LOGGER.warn("Commit did not run as expected", e);
-        ret.add(e);
-      }
-    }
-
-    return ret;
+    return SolrUtils.delete(index, IndexedRisk.class, Arrays.asList(riskId), this, commit);
   }
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> riskIncidenceCreatedOrUpdated(RiskIncidence riskIncidence,
     boolean commit) {
-    ReturnWithExceptions<Void, ModelObserver> ret = addDocumentToIndex(RiskIncidence.class, riskIncidence);
-
-    if (commit) {
-      try {
-        SolrUtils.commit(index, RiskIncidence.class);
-      } catch (GenericException | SolrException e) {
-        LOGGER.warn("Commit did not run as expected", e);
-        ret.add(e);
-      }
-    }
-
-    return ret;
+    return SolrUtils.create(index, RiskIncidence.class, riskIncidence, this, commit);
   }
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> riskIncidenceDeleted(String riskIncidenceId, boolean commit) {
-    ReturnWithExceptions<Void, ModelObserver> ret = deleteDocumentFromIndex(RiskIncidence.class, riskIncidenceId);
-
-    if (commit) {
-      try {
-        SolrUtils.commit(index, RiskIncidence.class);
-      } catch (GenericException | SolrException e) {
-        LOGGER.warn("Commit did not run as expected", e);
-        ret.add(e);
-      }
-    }
-
-    return ret;
+    return SolrUtils.delete(index, RiskIncidence.class, Arrays.asList(riskIncidenceId), this, commit);
   }
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> representationInformationCreatedOrUpdated(
     RepresentationInformation ri, boolean commit) {
-    ReturnWithExceptions<Void, ModelObserver> ret = addDocumentToIndex(RepresentationInformation.class, ri);
-
-    if (commit) {
-      try {
-        SolrUtils.commit(index, RepresentationInformation.class);
-      } catch (GenericException | SolrException e) {
-        LOGGER.warn("Commit did not run as expected", e);
-        ret.add(e);
-      }
-    }
-
-    return ret;
+    return SolrUtils.create(index, RepresentationInformation.class, ri, this, commit);
   }
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> representationInformationDeleted(String representationInformationId,
     boolean commit) {
-    ReturnWithExceptions<Void, ModelObserver> ret = deleteDocumentFromIndex(RepresentationInformation.class,
-      representationInformationId);
-
-    if (commit) {
-      try {
-        SolrUtils.commit(index, RepresentationInformation.class);
-      } catch (GenericException | SolrException e) {
-        LOGGER.warn("Commit did not run as expected", e);
-        ret.add(e);
-      }
-    }
-
-    return ret;
+    return SolrUtils.delete(index, RepresentationInformation.class, Arrays.asList(representationInformationId), this,
+      commit);
   }
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> formatCreatedOrUpdated(Format format, boolean commit) {
-    ReturnWithExceptions<Void, ModelObserver> ret = addDocumentToIndex(Format.class, format);
-
-    if (commit) {
-      try {
-        SolrUtils.commit(index, Format.class);
-      } catch (GenericException | SolrException e) {
-        LOGGER.warn("Commit did not run as expected", e);
-        ret.add(e);
-      }
-    }
-
-    return ret;
+    return SolrUtils.create(index, Format.class, format, this, commit);
   }
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> formatDeleted(String formatId, boolean commit) {
-    ReturnWithExceptions<Void, ModelObserver> ret = deleteDocumentFromIndex(Format.class, formatId);
-
-    if (commit && ret.isEmpty()) {
-      try {
-        SolrUtils.commit(index, Format.class);
-      } catch (GenericException | SolrException e) {
-        LOGGER.warn("Commit did not run as expected", e);
-        ret.add(e);
-      }
-    }
-
-    return ret;
+    return SolrUtils.delete(index, Format.class, Arrays.asList(formatId), this, commit);
   }
 
   @Override
@@ -1273,38 +1128,35 @@ public class IndexModelObserver implements ModelObserver {
   public ReturnWithExceptions<Void, ModelObserver> dipCreated(DIP dip, boolean commit) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
     SolrInputDocument dipDocument = SolrUtils.dipToSolrDocument(dip);
-    try {
-      index.add(RodaConstants.INDEX_DIP, dipDocument);
 
-      if (ret.isEmpty()) {
-        // index DIP Files
-        try (CloseableIterable<OptionalWithCause<DIPFile>> allFiles = model.listDIPFilesUnder(dip.getId(), true)) {
-          for (OptionalWithCause<DIPFile> file : allFiles) {
-            if (file.isPresent()) {
-              indexDIPFile(dip, file.get(), false).addTo(ret);
-            } else {
-              LOGGER.error("Cannot index DIP file", file.getCause());
-              ret.add(file.getCause());
-            }
-          }
+    SolrUtils.create(index, RodaConstants.INDEX_DIP, dipDocument, (ModelObserver) this).addTo(ret);
 
-          if (commit) {
-            try {
-              SolrUtils.commit(index, IndexedDIP.class);
-              SolrUtils.commit(index, DIPFile.class);
-            } catch (GenericException | SolrException e) {
-              LOGGER.warn("Commit did not run as expected");
-              ret.add(e);
-            }
+    if (ret.isEmpty()) {
+      // index DIP Files
+      try (CloseableIterable<OptionalWithCause<DIPFile>> allFiles = model.listDIPFilesUnder(dip.getId(), true)) {
+        for (OptionalWithCause<DIPFile> file : allFiles) {
+          if (file.isPresent()) {
+            indexDIPFile(dip, file.get(), false).addTo(ret);
+          } else {
+            LOGGER.error("Cannot index DIP file", file.getCause());
+            ret.add(file.getCause());
           }
-        } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
-          LOGGER.error("Could not index DIP files", e);
-          ret.add(e);
         }
+
+        if (commit) {
+          try {
+            SolrUtils.commit(index, IndexedDIP.class);
+            SolrUtils.commit(index, DIPFile.class);
+          } catch (GenericException e) {
+            LOGGER.warn("Commit did not run as expected");
+            ret.add(e);
+          }
+        }
+      } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException
+        | IOException e) {
+        LOGGER.error("Could not index DIP files", e);
+        ret.add(e);
       }
-    } catch (SolrServerException | SolrException | IOException e) {
-      LOGGER.error("Could not index DIP", e);
-      ret.add(e);
     }
 
     return ret;
@@ -1319,22 +1171,10 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> dipDeleted(String dipId, boolean commit) {
-    ReturnWithExceptions<Void, ModelObserver> ret = deleteDocumentFromIndex(IndexedDIP.class, dipId);
-
+    ReturnWithExceptions<Void, ModelObserver> ret = deleteDocumentFromIndex(IndexedDIP.class, commit, dipId);
     if (ret.isEmpty()) {
-      deleteDocumentsFromIndex(DIPFile.class, RodaConstants.DIPFILE_DIP_ID, dipId).addTo(ret);
-
-      if (commit) {
-        try {
-          SolrUtils.commit(index, IndexedDIP.class);
-          SolrUtils.commit(index, DIPFile.class);
-        } catch (GenericException | SolrException e) {
-          LOGGER.warn("Commit did not run as expected", e);
-          ret.add(e);
-        }
-      }
+      deleteDocumentsFromIndex(DIPFile.class, RodaConstants.DIPFILE_DIP_ID, dipId, commit).addTo(ret);
     }
-
     return ret;
   }
 

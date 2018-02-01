@@ -123,15 +123,15 @@ import org.slf4j.LoggerFactory;
  * @author Hélder Silva <hsilva@keep.pt>
  */
 public class ModelService extends ModelObservable {
-
   private static final Logger LOGGER = LoggerFactory.getLogger(ModelService.class);
+
   private static final DateTimeFormatter LOG_NAME_DATE_FORMAT = DateTimeFormat.forPattern("yyyy-MM-dd");
   private static final boolean FAIL_IF_NO_DESCRIPTIVE_METADATA_SCHEMA = false;
   private final StorageService storage;
   private Object logFileLock = new Object();
 
   public ModelService(StorageService storage) {
-    super();
+    super(LOGGER);
     this.storage = storage;
     ensureAllContainersExist();
     ensureAllDiretoriesExist();
@@ -1720,7 +1720,6 @@ public class ModelService extends ModelObservable {
     User registeredUser = UserUtility.getLdapUtility().registerUser(user, password);
     if (notify) {
       notifyUserCreated(registeredUser).failOnError();
-      ;
     }
 
     return registeredUser;

@@ -44,8 +44,9 @@ public class ReturnWithExceptions<T, S> {
     this.exceptions = exceptions;
   }
 
-  public void add(Exception exception) {
+  public ReturnWithExceptions<T, S> add(Exception exception) {
     this.exceptions.add(exception);
+    return this;
   }
 
   public void add(List<Exception> exceptions) {
@@ -56,8 +57,9 @@ public class ReturnWithExceptions<T, S> {
     add(ts.getExceptions());
   }
 
-  public void addTo(ReturnWithExceptions<?, S> ts) {
+  public ReturnWithExceptions<T, S> addTo(ReturnWithExceptions<?, S> ts) {
     ts.add(this);
+    return this;
   }
 
   public boolean isEmpty() {

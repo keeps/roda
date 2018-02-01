@@ -531,7 +531,7 @@ public class IndexService {
 
   public <T extends IsIndexed> void delete(Class<T> classToRetrieve, List<String> ids)
     throws GenericException, RequestNotValidException {
-    SolrUtils.delete(getSolrClient(), classToRetrieve, ids);
+    SolrUtils.delete(getSolrClient(), classToRetrieve, ids, this);
   }
 
   public <T extends IsIndexed> void deleteSilently(Class<T> classToRetrieve, List<String> ids) {
@@ -544,7 +544,7 @@ public class IndexService {
 
   public <T extends IsIndexed> void delete(Class<T> classToRetrieve, Filter filter)
     throws GenericException, RequestNotValidException {
-    SolrUtils.delete(getSolrClient(), classToRetrieve, filter);
+    SolrUtils.delete(getSolrClient(), classToRetrieve, filter, this);
   }
 
   public <T extends IsIndexed> void deleteByQuery(String classToRetrieve, Filter filter)
@@ -554,7 +554,7 @@ public class IndexService {
 
   public <T extends IsIndexed> void create(Class<T> classToCreate, T instance)
     throws GenericException, RequestNotValidException {
-    SolrUtils.create(getSolrClient(), classToCreate, instance);
+    SolrUtils.create(getSolrClient(), classToCreate, instance, this);
   }
 
   public SolrClient getSolrClient() {

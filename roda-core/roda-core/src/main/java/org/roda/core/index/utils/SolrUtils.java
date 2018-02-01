@@ -190,7 +190,7 @@ public class SolrUtils {
   }
 
   public static <T extends IsIndexed> T retrieve(SolrClient index, Class<T> classToRetrieve, String id,
-    List<String> fieldsToReturn) throws NotFoundException, GenericException, RequestNotValidException {
+    List<String> fieldsToReturn) throws NotFoundException, GenericException {
     if (id == null) {
       throw new GenericException("Could not retrieve object from a null id");
     }
@@ -203,16 +203,14 @@ public class SolrUtils {
       } else {
         throw new NotFoundException("Could not find document " + id);
       }
-    } catch (SolrServerException | IOException e) {
+    } catch (SolrServerException | SolrException | IOException e) {
       throw new GenericException("Could not retrieve object from index", e);
-    } catch (SolrException e) {
-      throw new RequestNotValidException(e);
     }
     return ret;
   }
 
   public static <T extends IsIndexed> List<T> retrieve(SolrClient index, Class<T> classToRetrieve, List<String> id,
-    List<String> fieldsToReturn) throws NotFoundException, GenericException, RequestNotValidException {
+    List<String> fieldsToReturn) throws NotFoundException, GenericException {
     List<T> ret = new ArrayList<>();
     try {
       int block = RodaConstants.DEFAULT_PAGINATION_VALUE;
@@ -223,10 +221,8 @@ public class SolrUtils {
           ret.add(solrDocumentTo(classToRetrieve, doc, fieldsToReturn));
         }
       }
-    } catch (SolrServerException | IOException e) {
+    } catch (SolrServerException | SolrException | IOException e) {
       throw new GenericException("Could not retrieve object from index", e);
-    } catch (SolrException e) {
-      throw new RequestNotValidException(e);
     }
     return ret;
   }
@@ -1186,12 +1182,49 @@ public class SolrUtils {
     commit(index, Arrays.asList(resultClasses));
   }
 
-  public static <T extends IsIndexed> ReturnWithExceptions<Void, ?> create(SolrClient index, Class<T> classToCreate,
-    T instance) {
-    ReturnWithExceptions<Void, ?> ret = new ReturnWithExceptions<>();
+  public static <T extends IsIndexed, S extends Object> ReturnWithExceptions<Void, S> create(SolrClient index,
+    String classToCreate, SolrInputDocument instance, S source) {
+    ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<>();
     try {
-      index.add(getIndexName(classToCreate).get(0), toSolrDocument(classToCreate, instance));
-    } catch (SolrServerException | IOException | NotSupportedException | SolrException | GenericException e) {
+      index.add(classToCreate, instance);
+    } catch (SolrServerException | IOException | SolrException e) {
+      LOGGER.error("Error adding document to index", e);
+      ret.add(e);
+    }
+
+    return ret;
+  }
+
+  public static <T extends IsIndexed, S extends Object> ReturnWithExceptions<Void, S> create(SolrClient index,
+    Class<T> classToCreate, SolrInputDocument instance, S source, boolean commit) {
+    ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<>();
+    try {
+      index.add(getIndexName(classToCreate).get(0), instance);
+      if (commit) {
+        commit(index, classToCreate);
+      }
+    } catch (SolrServerException | IOException | GenericException | SolrException e) {
+      LOGGER.error("Error adding document to index", e);
+      ret.add(e);
+    }
+
+    return ret;
+  }
+
+  public static <T extends IsIndexed, S extends Object> ReturnWithExceptions<Void, S> create(SolrClient index,
+    Class<T> classToCreate, T instance, S source) {
+    return create(index, classToCreate, instance, source, false);
+  }
+
+  public static <T extends IsIndexed, S extends Object> ReturnWithExceptions<Void, S> create(SolrClient index,
+    Class<T> classToCreate, T instance, S source, boolean commit) {
+    ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<>();
+    try {
+      create(index, getIndexName(classToCreate).get(0), toSolrDocument(classToCreate, instance), source).addTo(ret);
+      if (commit) {
+        commit(index, classToCreate);
+      }
+    } catch (NotSupportedException | GenericException e) {
       LOGGER.error("Error adding document to index", e);
       ret.add(e);
     }
@@ -2909,11 +2942,19 @@ public class SolrUtils {
     return doc;
   }
 
-  public static <T extends IsIndexed> ReturnWithExceptions<Void, ?> delete(SolrClient index, Class<T> classToDelete,
-    List<String> ids) {
-    ReturnWithExceptions<Void, ?> ret = new ReturnWithExceptions<>();
+  public static <T extends IsIndexed, S extends Object> ReturnWithExceptions<Void, S> delete(SolrClient index,
+    Class<T> classToDelete, List<String> ids, S source) {
+    return delete(index, classToDelete, ids, source, false);
+  }
+
+  public static <T extends IsIndexed, S extends Object> ReturnWithExceptions<Void, S> delete(SolrClient index,
+    Class<T> classToDelete, List<String> ids, S source, boolean commit) {
+    ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<>();
     try {
       index.deleteById(getIndexName(classToDelete).get(0), ids);
+      if (commit) {
+        commit(index, classToDelete);
+      }
     } catch (SolrServerException | IOException | SolrException | GenericException e) {
       LOGGER.error("Error deleting document from index");
       ret.add(e);
@@ -2922,11 +2963,20 @@ public class SolrUtils {
     return ret;
   }
 
-  public static <T extends IsIndexed> ReturnWithExceptions<Void, ?> delete(SolrClient index, Class<T> classToDelete,
-    Filter filter) {
-    ReturnWithExceptions<Void, ?> ret = new ReturnWithExceptions<>();
+  public static <T extends IsIndexed, S extends Object> ReturnWithExceptions<Void, S> delete(SolrClient index,
+    Class<T> classToDelete, Filter filter, S source) {
+    return delete(index, classToDelete, filter, source, false);
+  }
+
+  public static <T extends IsIndexed, S extends Object> ReturnWithExceptions<Void, S> delete(SolrClient index,
+    Class<T> classToDelete, Filter filter, S source, boolean commit) {
+    ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<>();
     try {
       index.deleteByQuery(getIndexName(classToDelete).get(0), parseFilter(filter));
+
+      if (commit) {
+        commit(index, classToDelete);
+      }
     } catch (SolrServerException | IOException | SolrException | GenericException | RequestNotValidException e) {
       LOGGER.error("Error deleting documents from index");
       ret.add(e);
@@ -2939,10 +2989,8 @@ public class SolrUtils {
     throws GenericException, RequestNotValidException {
     try {
       index.deleteByQuery(classToDelete, parseFilter(filter));
-    } catch (SolrServerException | IOException e) {
+    } catch (SolrServerException | SolrException | IOException e) {
       throw new GenericException("Could not delete items", e);
-    } catch (SolrException e) {
-      throw new RequestNotValidException(e);
     }
   }
 }
