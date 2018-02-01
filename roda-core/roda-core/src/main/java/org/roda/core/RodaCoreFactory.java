@@ -808,12 +808,12 @@ public class RodaCoreFactory {
   }
 
   private static void waitForSolrCluster(CloudSolrClient cloudSolrClient) throws GenericException {
-    int retries = getRodaConfiguration().getInt("core.solr.cloud.healthcheck.retries", 10);
+    int retries = getRodaConfiguration().getInt("core.solr.cloud.healthcheck.retries", 100);
     long timeout = getRodaConfiguration().getInt("core.solr.cloud.healthcheck.timeout_ms", 10000);
 
     boolean recovering;
 
-    while (recovering = !checkSolrCluster(cloudSolrClient) && retries > 0) {
+    while ((recovering = !checkSolrCluster(cloudSolrClient)) && retries > 0) {
       LOGGER.info("Solr Cluster not yet ready, waiting {}ms, retries: {}", timeout, retries);
       retries--;
       try {
