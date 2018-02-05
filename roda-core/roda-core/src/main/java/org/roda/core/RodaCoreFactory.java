@@ -549,6 +549,14 @@ public class RodaCoreFactory {
 
         if (!hasFileResources) {
           copyFilesFromClasspath(RodaConstants.CORE_DEFAULT_FOLDER + "/", rodaHomePath, true);
+          Path staticDefaultFolder = configPath.resolve(RodaConstants.CORE_DEFAULT_FOLDER);
+          if (FSUtils.exists(staticDefaultFolder)) {
+            try {
+              FSUtils.copy(staticDefaultFolder, rodaHomePath, true);
+            } catch (AlreadyExistsException e) {
+              LOGGER.error("Cannot load static default objects", e);
+            }
+          }
 
           // 20160712 hsilva: it needs to be this way as the resources are
           // copied to the file system and storage can be of a different type
