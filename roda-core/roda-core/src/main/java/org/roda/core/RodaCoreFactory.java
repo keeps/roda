@@ -845,8 +845,6 @@ public class RodaCoreFactory {
 
     Set<String> allCollections = clusterState.getCollections();
     Set<String> healthyCollections = new HashSet<>();
-    Set<String> recoveringCollections = new HashSet<>();
-    Set<String> unrecoverableCollections = new HashSet<>();
 
     boolean healthy;
 
@@ -855,30 +853,28 @@ public class RodaCoreFactory {
       Collection<Slice> slices = clusterState.getSlices(col);
 
       boolean collectionHealthy = true;
-      boolean collectionRecovering = false;
+      // collection healthy if all slices are healthy
 
       for (Slice slice : slices) {
+        boolean sliceHealthy = false;
+
+        // if at least one replica is active then the slice is healthy
+
         for (Replica replica : slice.getReplicas()) {
           if (!Replica.State.ACTIVE.equals(replica.getState())) {
-            collectionHealthy = false;
-          }
-
-          if (Replica.State.DOWN.equals(replica.getState()) || Replica.State.RECOVERING.equals(replica.getState())) {
-            collectionRecovering = true;
+            sliceHealthy = true;
+            break;
+          } else {
+            LOGGER.info("Replica {} on node {} is {}", replica.getName(), replica.getNodeName(),
+              replica.getState().name());
           }
         }
+
+        collectionHealthy &= sliceHealthy;
       }
 
       if (collectionHealthy) {
         healthyCollections.add(col);
-      }
-
-      if (!collectionHealthy && collectionRecovering) {
-        recoveringCollections.add(col);
-      }
-
-      if (!collectionHealthy && !collectionRecovering) {
-        unrecoverableCollections.add(col);
       }
     }
 
@@ -888,9 +884,11 @@ public class RodaCoreFactory {
     } else {
       healthy = false;
 
-      LOGGER.info("Solr Cloud collections with healthy replicas: " + healthyCollections);
-      LOGGER.info("Solr Cloud collections with recovering replicas: " + recoveringCollections);
-      LOGGER.info("Solr Cloud collections with unrecoverable replicas: " + unrecoverableCollections);
+      Set<String> unhealthyCollections = new HashSet<>(allCollections);
+      unhealthyCollections.removeAll(healthyCollections);
+
+      LOGGER.info("Solr Cloud healthy collections:   " + healthyCollections);
+      LOGGER.info("Solr Cloud unhealthy collections: " + unhealthyCollections);
 
     }
 
