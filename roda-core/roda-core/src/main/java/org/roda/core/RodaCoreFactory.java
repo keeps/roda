@@ -867,9 +867,8 @@ public class RodaCoreFactory {
         boolean sliceHealthy = false;
 
         // if at least one replica is active then the slice is healthy
-
         for (Replica replica : slice.getReplicas()) {
-          if (!Replica.State.ACTIVE.equals(replica.getState())) {
+          if (Replica.State.ACTIVE.equals(replica.getState())) {
             sliceHealthy = true;
             break;
           } else {
