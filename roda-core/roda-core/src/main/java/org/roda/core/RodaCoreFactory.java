@@ -549,10 +549,11 @@ public class RodaCoreFactory {
 
         if (!hasFileResources) {
           copyFilesFromClasspath(RodaConstants.CORE_DEFAULT_FOLDER + "/", rodaHomePath, true);
-          Path staticDefaultFolder = configPath.resolve(RodaConstants.CORE_DEFAULT_FOLDER);
+          Path staticDefaultFolder = rodaHomePath.resolve(RodaConstants.CORE_DEFAULT_FOLDER);
           if (FSUtils.exists(staticDefaultFolder)) {
             try {
-              FSUtils.copy(staticDefaultFolder, rodaHomePath, true);
+              FSUtils.copy(staticDefaultFolder.resolve(RodaConstants.CORE_DATA_FOLDER),
+                rodaHomePath.resolve(RodaConstants.CORE_DATA_FOLDER), true);
             } catch (AlreadyExistsException e) {
               LOGGER.error("Cannot load static default objects", e);
             }
