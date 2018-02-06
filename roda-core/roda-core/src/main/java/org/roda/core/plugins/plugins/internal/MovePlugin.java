@@ -191,7 +191,7 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
       } else {
         outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has not been manually moved");
       }
-    } catch (NotFoundException | GenericException | RequestNotValidException e1) {
+    } catch (NotFoundException | GenericException e1) {
       if (state.equals(PluginState.SUCCESS)) {
         outcomeText = "Archival Information Package [id: " + aip.getId() + "] has been manually moved";
       } else {

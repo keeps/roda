@@ -260,7 +260,7 @@ public class TransferredResourcesScanner {
             } else {
               updateTransferredResources(Optional.empty(), true);
             }
-          } catch (GenericException | NotFoundException | RequestNotValidException e) {
+          } catch (GenericException | NotFoundException e) {
             LOGGER.error("Could not reindex transferred resources after renaming");
           }
         } else {

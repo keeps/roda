@@ -182,7 +182,7 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     try {
       item = index.retrieve(IndexedAIP.class, aip.getId(),
         Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_TITLE));
-    } catch (NotFoundException | GenericException | RequestNotValidException e) {
+    } catch (NotFoundException | GenericException e) {
       // do nothing
     }
 

@@ -549,13 +549,37 @@ public class RodaCoreFactory {
 
         if (!hasFileResources) {
           copyFilesFromClasspath(RodaConstants.CORE_DEFAULT_FOLDER + "/", rodaHomePath, true);
-          Path staticDefaultFolder = rodaHomePath.resolve(RodaConstants.CORE_DEFAULT_FOLDER);
-          if (FSUtils.exists(staticDefaultFolder)) {
+          Path staticDataDefaultFolder = rodaHomePath.resolve(RodaConstants.CORE_DEFAULT_FOLDER)
+            .resolve(RodaConstants.CORE_DATA_FOLDER);
+          Path targetPath = rodaHomePath.resolve(RodaConstants.CORE_DATA_FOLDER);
+
+          if (FSUtils.exists(staticDataDefaultFolder)) {
             try {
-              FSUtils.copy(staticDefaultFolder.resolve(RodaConstants.CORE_DATA_FOLDER),
-                rodaHomePath.resolve(RodaConstants.CORE_DATA_FOLDER), true);
-            } catch (AlreadyExistsException e) {
-              LOGGER.error("Cannot load static default objects", e);
+              Files.walkFileTree(staticDataDefaultFolder, new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs)
+                  throws IOException {
+                  try {
+                    if (dir.equals(staticDataDefaultFolder)
+                      || dir.equals(staticDataDefaultFolder.resolve(RodaConstants.CORE_STORAGE_FOLDER))) {
+                      return FileVisitResult.CONTINUE;
+                    } else {
+                      Path storageDir = targetPath.resolve(staticDataDefaultFolder.relativize(dir));
+                      if (Files.exists(storageDir)) {
+                        FSUtils.deletePath(storageDir);
+                      }
+
+                      FSUtils.copy(dir, storageDir, true);
+                      return FileVisitResult.SKIP_SUBTREE;
+                    }
+                  } catch (NotFoundException | GenericException | AlreadyExistsException e) {
+                    LOGGER.error("Could not copy directory {}", dir.toString(), e);
+                    return FileVisitResult.SKIP_SUBTREE;
+                  }
+                }
+              });
+            } catch (IOException e) {
+              throw new GenericException("Cannot load static default objects", e);
             }
           }
 

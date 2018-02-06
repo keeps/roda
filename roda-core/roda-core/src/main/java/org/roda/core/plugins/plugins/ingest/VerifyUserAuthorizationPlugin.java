@@ -161,7 +161,7 @@ public class VerifyUserAuthorizationPlugin extends AbstractPlugin<AIP> {
           LOGGER.debug("User doesn't have CREATE_TOP_LEVEL_AIP_PERMISSION permission...");
         }
       }
-    } catch (GenericException | NotFoundException | RequestNotValidException e) {
+    } catch (GenericException | NotFoundException e) {
       LOGGER.error("Error processing AIP permissions", e);
       reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
     }

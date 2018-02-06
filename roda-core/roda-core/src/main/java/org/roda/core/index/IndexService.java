@@ -189,12 +189,12 @@ public class IndexService {
   }
 
   public <T extends IsIndexed> T retrieve(Class<T> returnClass, String id, List<String> fieldsToReturn)
-    throws NotFoundException, GenericException, RequestNotValidException {
+    throws NotFoundException, GenericException {
     return SolrUtils.retrieve(getSolrClient(), returnClass, id, fieldsToReturn);
   }
 
   public <T extends IsIndexed> List<T> retrieve(Class<T> returnClass, List<String> ids, List<String> fieldsToReturn)
-    throws NotFoundException, GenericException, RequestNotValidException {
+    throws NotFoundException, GenericException {
     return SolrUtils.retrieve(getSolrClient(), returnClass, ids, fieldsToReturn);
   }
 

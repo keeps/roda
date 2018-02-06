@@ -637,7 +637,7 @@ public final class PluginHelper {
         IndexedAIP computedParent = index.retrieve(IndexedAIP.class, computedSearchScope.get(),
           Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_ANCESTORS));
         ancestorFilter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, computedParent.getId()));
-      } catch (NotFoundException | GenericException | RequestNotValidException e) {
+      } catch (NotFoundException | GenericException e) {
         // Do nothing
       }
     }

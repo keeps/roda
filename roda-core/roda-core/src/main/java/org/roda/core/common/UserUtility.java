@@ -260,7 +260,7 @@ public class UserUtility {
     try {
       aip = RodaCoreFactory.getIndexService().retrieve(IndexedAIP.class, aipId,
         RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
-    } catch (NotFoundException | GenericException | RequestNotValidException e) {
+    } catch (NotFoundException | GenericException e) {
       throw new AuthorizationDeniedException("Could not check permissions of object " + obj, e);
     }
 
@@ -288,7 +288,7 @@ public class UserUtility {
     try {
       dip = RodaCoreFactory.getIndexService().retrieve(IndexedDIP.class, dipId,
         RodaConstants.DIP_PERMISSIONS_FIELDS_TO_RETURN);
-    } catch (NotFoundException | GenericException | RequestNotValidException e) {
+    } catch (NotFoundException | GenericException e) {
       throw new AuthorizationDeniedException("Could not check permissions of object " + obj, e);
     }
 
