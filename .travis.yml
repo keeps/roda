@@ -3,8 +3,22 @@ jdk:
 - oraclejdk8
 sudo: required
 install: true
+services:
+  - docker
+
 env:
-  - MAVEN_OPTS="-Xmx4g -Dmaven.repo.local=$HOME/.m2/repository -Xms1024m -Xmx3072m -XX:PermSize=512m"
+ global:
+ - MAVEN_OPTS="-Xms1024m -Xmx4g -Dmaven.repo.local=$HOME/.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
+ - MAVEN_CLI_OPTS="--batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
+ # DOCKER_USERNAME
+ - secure: "K23OtDvjFOuxGedcv7Y3kiu2XtpGDwLO0FWN0eieFzjlMHZU1k/whRMD41FhN89ocjKMI5pEQFIzPlETzq+ZxZa/YtQL7spcif4Q3ppe9RXfG6uUdgfFHpP5IUnpnDN8jqX3yRc+W371H3726s3s+LzoP/ANILd/WQP9rzXd8Ts="
+ # DOCKER_PASSWORD
+ - secure: "gDM83kopiEhqJfP9bEMSFmqAnbfLU+HInDpvZ8LQBZ2kA/0CjXCmcm4St/R70FJxd2iFo6YRUl6olPCpmuk4XJ9YSaRBtKcP2QV0tcxjLmtGlS3N6fsuLWn87Q/GUAdE30sp71fo47FAmdcfL68UzK0UgQcqZIKeZZ288ScrbIc="
+ # GITLAB_RODA_DEV_TRIGGER
+ - secure: "dLP/ZEzeXx6ABKqLEwEmFDrrVEJSptK1rNgS6u7ijAU+4oxtV9kOlwx1xGCZRZb/tdB+Qx7vY46fnZa6gNGMHnYjUxOnRc9Il2sRqzFBB2t/La3pg1furwlaB4w3RD21hdrhJCLQru/685tMsaqUxohiFGz3+B6EcLyos5iUGsk="
+ # GITLAB_RODA_DEV_TRIGGER_TOKEN
+ - secure: "KkDUuwZOPITPs3A83HK+qpUT3416HRJc5ZNq1w4BQUmQp805+LmW5hCTAzkgdt6+afQzcNn9Jd7YUSPxIItCFmIuwACME7zAhpxCFamEwiQzOZFlu5h7z9mIhQVg2u+TC4+sXEfNgQT4exy5dsVSoaaAHbn0MDV60Llnhm5e3ig="
+
 addons:
   sonarqube:
     organization: "keeps"
@@ -13,6 +27,7 @@ addons:
     branches:
       - master
       - development
+
 before_script:
 - curl https://bintray.com/user/downloadSubjectPublicKey?username=bintray | sudo apt-key add -
 - echo "deb http://dl.bintray.com/siegfried/debian wheezy main" | sudo tee -a /etc/apt/sources.list
@@ -21,17 +36,34 @@ before_script:
 - sudo sf -update
 - sudo apt-get -qq install clamav clamav-daemon -y
 - sudo freshclam
-#before_install:
-#  - sudo rm /etc/mavenrc
-#  - export M2_HOME=/usr/local/maven
-#  - export MAVEN_OPTS="-Dmaven.repo.local=$HOME/.m2/repository -Xms1024m -Xmx3072m -XX:PermSize=512m"
-script: mvn -Dtestng.groups="travis" -Denforcer.skip=true clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
+
+script:
+  - mvn $MAVEN_CLI_OPTS -Dtestng.groups="travis" -Denforcer.skip=true -Proda-wui-docker clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
+
 cache:
   directories:
     - $HOME/.m2/
     - $HOME/.sonar/cache
+
 notifications:
   slack:
     secure: Hg2xvznD2QGhbCHRXN9DFM6dYIfeiZStj0Ud+OBS2swX9YOM77ufbDkMWF/yAAwxNg45QIC3a3okVy6TLzY5hA/PSKlc/5/ClujgRy02HLXlbYZ9psQH22/VFrER3uFkIpvMPhrxh3NLo/UMWfwvmwq26ziFnW4W6UDn/XXCHPE=
+
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+  - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+  - |
+    if [ "$TRAVIS_BRANCH" == "master" ]; then
+      export DOCKER_TAG="latest"
+    elif [ "$TRAVIS_BRANCH" == "staging" ]; then
+      export DOCKER_TAG="$TRAVIS_BRANCH"
+      docker tag keeps/roda:latest keeps/roda:$TRAVIS_BRANCH
+    elif [ "`echo $TRAVIS_BRANCH | egrep "v[2-9]*" | wc -l`" -eq "1" ]; then
+      export DOCKER_TAG="$TRAVIS_BRANCH"
+      docker tag keeps/roda:latest keeps/roda:$TRAVIS_BRANCH
+    fi
+  - |
+    if [ ! -z $DOCKER_TAG ]; then
+      docker push keeps/roda:$DOCKER_TAG
+      curl -L --request POST --form ref=$TRAVIS_BRANCH --form token=$GITLAB_RODA_DEV_TRIGGER_TOKEN $GITLAB_RODA_DEV_TRIGGER >> /dev/null
+    fi
