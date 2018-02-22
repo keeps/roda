@@ -157,8 +157,7 @@ public class IndexModelObserver implements ModelObserver {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
     try (CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationMetadata = (representationId == null)
-      ? model.listPreservationMetadata(aipId, true)
-      : model.listPreservationMetadata(aipId, representationId);) {
+      ? model.listPreservationMetadata(aipId, true) : model.listPreservationMetadata(aipId, representationId);) {
 
       for (OptionalWithCause<PreservationMetadata> opm : preservationMetadata) {
         if (opm.isPresent()) {
@@ -1179,7 +1178,9 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   private ReturnWithExceptions<Void, ModelObserver> indexDIPFile(DIP dip, DIPFile file, boolean recursive) {
-    ReturnWithExceptions<Void, ModelObserver> ret = addDocumentToIndex(DIPFile.class, file);
+    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
+    SolrInputDocument dipFileDocument = SolrUtils.dipFileToSolrDocument(dip, file);
+    SolrUtils.create(index, RodaConstants.INDEX_DIP_FILE, dipFileDocument, (ModelObserver) this).addTo(ret);
 
     if (recursive && file.isDirectory() && ret.isEmpty()) {
       try (CloseableIterable<OptionalWithCause<DIPFile>> allFiles = model.listDIPFilesUnder(file, true)) {

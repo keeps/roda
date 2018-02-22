@@ -21,6 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -356,46 +357,46 @@ public class SolrUtils {
     return ret;
   }
 
-  private static <T> SolrInputDocument toSolrDocument(Class<T> resultClass, T object)
+  private static <T> Optional<SolrInputDocument> toSolrDocument(Class<T> resultClass, T object)
     throws GenericException, NotSupportedException {
+    Optional<SolrInputDocument> ret;
 
-    SolrInputDocument ret;
     if (resultClass.equals(IndexedAIP.class)) {
-      throw new NotSupportedException();
+      ret = Optional.empty();
     } else if (resultClass.equals(IndexedRepresentation.class) || resultClass.equals(Representation.class)) {
-      throw new NotSupportedException();
+      ret = Optional.empty();
     } else if (resultClass.equals(LogEntry.class)) {
-      ret = logEntryToSolrDocument((LogEntry) object);
+      ret = Optional.of(logEntryToSolrDocument((LogEntry) object));
     } else if (resultClass.equals(Report.class) || resultClass.equals(IndexedReport.class)) {
-      throw new NotSupportedException();
+      ret = Optional.empty();
     } else if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class)
       || resultClass.equals(Group.class)) {
-      ret = rodaMemberToSolrDocument((RODAMember) object);
+      ret = Optional.of(rodaMemberToSolrDocument((RODAMember) object));
     } else if (resultClass.equals(TransferredResource.class)) {
-      ret = transferredResourceToSolrDocument((TransferredResource) object);
+      ret = Optional.of(transferredResourceToSolrDocument((TransferredResource) object));
     } else if (resultClass.equals(Job.class)) {
-      ret = jobToSolrDocument((Job) object);
+      ret = Optional.of(jobToSolrDocument((Job) object));
     } else if (resultClass.equals(Risk.class) || resultClass.equals(IndexedRisk.class)) {
-      ret = riskToSolrDocument((Risk) object, 0);
+      ret = Optional.of(riskToSolrDocument((Risk) object, 0));
     } else if (resultClass.equals(RepresentationInformation.class)) {
-      ret = representationInformationToSolrDocument((RepresentationInformation) object);
+      ret = Optional.of(representationInformationToSolrDocument((RepresentationInformation) object));
     } else if (resultClass.equals(Notification.class)) {
-      ret = notificationToSolrDocument((Notification) object);
+      ret = Optional.of(notificationToSolrDocument((Notification) object));
     } else if (resultClass.equals(RiskIncidence.class)) {
-      ret = riskIncidenceToSolrDocument((RiskIncidence) object);
+      ret = Optional.of(riskIncidenceToSolrDocument((RiskIncidence) object));
     } else if (resultClass.equals(DIP.class) || resultClass.equals(IndexedDIP.class)) {
-      ret = dipToSolrDocument((DIP) object);
+      ret = Optional.of(dipToSolrDocument((DIP) object));
     } else if (resultClass.equals(IndexedFile.class) || resultClass.equals(DIPFile.class)) {
-      throw new NotSupportedException();
-    } else if (resultClass.equals(IndexedPreservationEvent.class)) {
-      throw new NotSupportedException();
-    } else if (resultClass.equals(IndexedPreservationAgent.class)) {
-      throw new NotSupportedException();
+      ret = Optional.empty();
+    } else if (resultClass.equals(IndexedPreservationEvent.class)
+      || resultClass.equals(IndexedPreservationAgent.class)) {
+      ret = Optional.empty();
     } else if (resultClass.equals(Format.class)) {
-      ret = formatToSolrDocument((Format) object);
+      ret = Optional.of(formatToSolrDocument((Format) object));
     } else {
       throw new GenericException("Cannot find class index name: " + resultClass.getName());
     }
+
     return ret;
   }
 
@@ -1184,12 +1185,15 @@ public class SolrUtils {
 
   public static <T extends IsIndexed, S extends Object> ReturnWithExceptions<Void, S> create(SolrClient index,
     String classToCreate, SolrInputDocument instance, S source) {
-    ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<>();
-    try {
-      index.add(classToCreate, instance);
-    } catch (SolrServerException | IOException | SolrException e) {
-      LOGGER.error("Error adding document to index", e);
-      ret.add(e);
+    ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<>(source);
+
+    if (instance != null) {
+      try {
+        index.add(classToCreate, instance);
+      } catch (SolrServerException | IOException | SolrException e) {
+        LOGGER.error("Error adding document to index", e);
+        ret.add(e);
+      }
     }
 
     return ret;
@@ -1197,7 +1201,7 @@ public class SolrUtils {
 
   public static <T extends IsIndexed, S extends Object> ReturnWithExceptions<Void, S> create(SolrClient index,
     Class<T> classToCreate, SolrInputDocument instance, S source, boolean commit) {
-    ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<>();
+    ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<>(source);
     try {
       index.add(getIndexName(classToCreate).get(0), instance);
       if (commit) {
@@ -1220,9 +1224,12 @@ public class SolrUtils {
     Class<T> classToCreate, T instance, S source, boolean commit) {
     ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<>();
     try {
-      create(index, getIndexName(classToCreate).get(0), toSolrDocument(classToCreate, instance), source).addTo(ret);
-      if (commit) {
-        commit(index, classToCreate);
+      Optional<SolrInputDocument> solrDocument = toSolrDocument(classToCreate, instance);
+      if (solrDocument.isPresent()) {
+        create(index, getIndexName(classToCreate).get(0), solrDocument.get(), source).addTo(ret);
+        if (commit) {
+          commit(index, classToCreate);
+        }
       }
     } catch (NotSupportedException | GenericException e) {
       LOGGER.error("Error adding document to index", e);
