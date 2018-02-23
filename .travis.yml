@@ -55,15 +55,21 @@ after_success:
   - |
     if [ "$TRAVIS_BRANCH" == "master" ]; then
       export DOCKER_TAG="latest"
+      export RODA_DEV_BRANCH="master"
     elif [ "$TRAVIS_BRANCH" == "staging" ]; then
       export DOCKER_TAG="$TRAVIS_BRANCH"
+      export RODA_DEV_BRANCH="staging"
       docker tag keeps/roda:latest keeps/roda:$TRAVIS_BRANCH
     elif [ "`echo $TRAVIS_BRANCH | egrep "v[2-9]*" | wc -l`" -eq "1" ]; then
       export DOCKER_TAG="$TRAVIS_BRANCH"
+      export RODA_DEV_BRANCH="master"
       docker tag keeps/roda:latest keeps/roda:$TRAVIS_BRANCH
     fi
   - |
     if [ ! -z $DOCKER_TAG ]; then
       docker push keeps/roda:$DOCKER_TAG
-      curl -L --request POST --form ref=$TRAVIS_BRANCH --form token=$GITLAB_RODA_DEV_TRIGGER_TOKEN $GITLAB_RODA_DEV_TRIGGER >> /dev/null
+      curl -L --request POST --form ref=$RODA_DEV_BRANCH \
+        --form token=$GITLAB_RODA_DEV_TRIGGER_TOKEN \
+        --form "variables[DOCKER_TAG]=$DOCKER_TAG" \
+        $GITLAB_RODA_DEV_TRIGGER >> /dev/null
     fi
