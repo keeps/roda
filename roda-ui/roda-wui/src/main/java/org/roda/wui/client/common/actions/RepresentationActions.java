@@ -437,40 +437,41 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
     FlowPanel layout = createLayout();
 
     // MANAGEMENT
-    addTitle(layout, messages.representation(), representation, RepresentationAction.DOWNLOAD,
-      RepresentationAction.CHANGE_TYPE, RepresentationAction.REMOVE);
+    addTitle(layout, "representationSidebarTitle", messages.representation(), representation,
+      RepresentationAction.DOWNLOAD, RepresentationAction.CHANGE_TYPE, RepresentationAction.REMOVE);
 
-    addButton(layout, messages.downloadButton(), RepresentationAction.DOWNLOAD, representation, ActionImpact.NONE,
-      callback, "btn-download");
-    addButton(layout, messages.changeTypeButton(), RepresentationAction.CHANGE_TYPE, representation,
-      ActionImpact.UPDATED, callback, "btn-edit");
-    addButton(layout, messages.changeStatusButton(), RepresentationAction.CHANGE_STATE, representation,
-      ActionImpact.UPDATED, callback, "btn-edit");
-    addButton(layout, messages.removeButton(), RepresentationAction.REMOVE, representation, ActionImpact.DESTROYED,
-      callback, "btn-ban");
+    addButton(layout, "representationDownloadButton", messages.downloadButton(), RepresentationAction.DOWNLOAD,
+      representation, ActionImpact.NONE, callback, "btn-download");
+    addButton(layout, "changeRepresentationTypeButton", messages.changeTypeButton(), RepresentationAction.CHANGE_TYPE,
+      representation, ActionImpact.UPDATED, callback, "btn-edit");
+    addButton(layout, "changeRepresentationStatusButton", messages.changeStatusButton(),
+      RepresentationAction.CHANGE_STATE, representation, ActionImpact.UPDATED, callback, "btn-edit");
+    addButton(layout, "representationRemoveButton", messages.removeButton(), RepresentationAction.REMOVE,
+      representation, ActionImpact.DESTROYED, callback, "btn-ban");
 
     // PRESERVATION
-    addTitle(layout, messages.preservationTitle(), representation, RepresentationAction.NEW_PROCESS,
-      RepresentationAction.IDENTIFY_FORMATS, RepresentationAction.SHOW_EVENTS, RepresentationAction.SHOW_RISKS);
+    addTitle(layout, "representationPreservationTitle", messages.preservationTitle(), representation,
+      RepresentationAction.NEW_PROCESS, RepresentationAction.IDENTIFY_FORMATS, RepresentationAction.SHOW_EVENTS,
+      RepresentationAction.SHOW_RISKS);
 
-    addButton(layout, messages.newProcessPreservation(), RepresentationAction.NEW_PROCESS, representation,
-      ActionImpact.UPDATED, callback, "btn-play");
-    addButton(layout, messages.identifyFormatsButton(), RepresentationAction.IDENTIFY_FORMATS, representation,
-      ActionImpact.UPDATED, callback, "btn-play");
-    addButton(layout, messages.preservationEvents(), RepresentationAction.SHOW_EVENTS, representation,
-      ActionImpact.NONE, callback, "btn-play");
-    addButton(layout, messages.preservationRisks(), RepresentationAction.SHOW_RISKS, representation, ActionImpact.NONE,
-      callback, "btn-play");
+    addButton(layout, "representationNewProcessButton", messages.newProcessPreservation(),
+      RepresentationAction.NEW_PROCESS, representation, ActionImpact.UPDATED, callback, "btn-play");
+    addButton(layout, "representationIdentifyFormatsButton", messages.identifyFormatsButton(),
+      RepresentationAction.IDENTIFY_FORMATS, representation, ActionImpact.UPDATED, callback, "btn-play");
+    addButton(layout, "representationPreservationEventsButton", messages.preservationEvents(),
+      RepresentationAction.SHOW_EVENTS, representation, ActionImpact.NONE, callback, "btn-play");
+    addButton(layout, "representationPreservationRisksButton", messages.preservationRisks(),
+      RepresentationAction.SHOW_RISKS, representation, ActionImpact.NONE, callback, "btn-play");
 
     // Files and folders
-    addTitle(layout, messages.sidebarFoldersFilesTitle(), representation, RepresentationAction.UPLOAD_FILES,
-      RepresentationAction.CREATE_FOLDER);
+    addTitle(layout, "representationFoldersFilesTitle", messages.sidebarFoldersFilesTitle(), representation,
+      RepresentationAction.UPLOAD_FILES, RepresentationAction.CREATE_FOLDER);
 
     // UPLOAD_FILES, CREATE_FOLDER
-    addButton(layout, messages.uploadFilesButton(), RepresentationAction.UPLOAD_FILES, representation,
-      ActionImpact.UPDATED, callback, "btn-upload");
-    addButton(layout, messages.createFolderButton(), RepresentationAction.CREATE_FOLDER, representation,
-      ActionImpact.UPDATED, callback, "btn-plus");
+    addButton(layout, "representationUploadFilesButton", messages.uploadFilesButton(),
+      RepresentationAction.UPLOAD_FILES, representation, ActionImpact.UPDATED, callback, "btn-upload");
+    addButton(layout, "representationCreateFolderButton", messages.createFolderButton(),
+      RepresentationAction.CREATE_FOLDER, representation, ActionImpact.UPDATED, callback, "btn-plus");
 
     return layout;
   }
@@ -481,39 +482,39 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
     FlowPanel layout = createLayout();
 
     // MANAGEMENT
-    addTitle(layout, messages.representation(), representations, RepresentationAction.DOWNLOAD,
-      RepresentationAction.CHANGE_TYPE, RepresentationAction.REMOVE);
+    addTitle(layout, "representationSidebarTitle", messages.representation(), representations,
+      RepresentationAction.DOWNLOAD, RepresentationAction.CHANGE_TYPE, RepresentationAction.REMOVE);
 
-    addButton(layout, messages.downloadButton(), RepresentationAction.DOWNLOAD, representations, ActionImpact.NONE,
-      callback, "btn-download");
-
-    addButton(layout, messages.changeTypeButton(), RepresentationAction.CHANGE_TYPE, representations,
-      ActionImpact.UPDATED, callback, "btn-edit");
-    addButton(layout, messages.removeButton(), RepresentationAction.REMOVE, representations, ActionImpact.DESTROYED,
-      callback, "btn-ban");
+    addButton(layout, "representationDownloadButton", messages.downloadButton(), RepresentationAction.DOWNLOAD,
+      representations, ActionImpact.NONE, callback, "btn-download");
+    addButton(layout, "changeRepresentationTypeButton", messages.changeTypeButton(), RepresentationAction.CHANGE_TYPE,
+      representations, ActionImpact.UPDATED, callback, "btn-edit");
+    addButton(layout, "representationRemoveButton", messages.removeButton(), RepresentationAction.REMOVE,
+      representations, ActionImpact.DESTROYED, callback, "btn-ban");
 
     // PRESERVATION
-    addTitle(layout, messages.preservationTitle(), representations, RepresentationAction.NEW_PROCESS,
-      RepresentationAction.IDENTIFY_FORMATS, RepresentationAction.SHOW_EVENTS, RepresentationAction.SHOW_RISKS);
+    addTitle(layout, "representationPreservationTitle", messages.preservationTitle(), representations,
+      RepresentationAction.NEW_PROCESS, RepresentationAction.IDENTIFY_FORMATS, RepresentationAction.SHOW_EVENTS,
+      RepresentationAction.SHOW_RISKS);
 
-    addButton(layout, messages.newProcessPreservation(), RepresentationAction.NEW_PROCESS, representations,
-      ActionImpact.UPDATED, callback, "btn-play");
-    addButton(layout, messages.identifyFormatsButton(), RepresentationAction.IDENTIFY_FORMATS, representations,
-      ActionImpact.UPDATED, callback, "btn-play");
-    addButton(layout, messages.preservationEvents(), RepresentationAction.SHOW_EVENTS, representations,
-      ActionImpact.NONE, callback, "btn-play");
-    addButton(layout, messages.preservationRisks(), RepresentationAction.SHOW_RISKS, representations, ActionImpact.NONE,
-      callback, "btn-play");
+    addButton(layout, "representationNewProcessButton", messages.newProcessPreservation(),
+      RepresentationAction.NEW_PROCESS, representations, ActionImpact.UPDATED, callback, "btn-play");
+    addButton(layout, "representationIdentifyFormatsButton", messages.identifyFormatsButton(),
+      RepresentationAction.IDENTIFY_FORMATS, representations, ActionImpact.UPDATED, callback, "btn-play");
+    addButton(layout, "representationPreservationEventsButton", messages.preservationEvents(),
+      RepresentationAction.SHOW_EVENTS, representations, ActionImpact.NONE, callback, "btn-play");
+    addButton(layout, "representationPreservationRisksButton", messages.preservationRisks(),
+      RepresentationAction.SHOW_RISKS, representations, ActionImpact.NONE, callback, "btn-play");
 
     // Files and folders
-    addTitle(layout, messages.sidebarFoldersFilesTitle(), representations, RepresentationAction.UPLOAD_FILES,
-      RepresentationAction.CREATE_FOLDER);
+    addTitle(layout, "representationFoldersFilesTitle", messages.sidebarFoldersFilesTitle(), representations,
+      RepresentationAction.UPLOAD_FILES, RepresentationAction.CREATE_FOLDER);
 
     // UPLOAD_FILES, CREATE_FOLDER
-    addButton(layout, messages.uploadFilesButton(), RepresentationAction.UPLOAD_FILES, representations,
-      ActionImpact.UPDATED, callback, "btn-upload");
-    addButton(layout, messages.createFolderButton(), RepresentationAction.CREATE_FOLDER, representations,
-      ActionImpact.UPDATED, callback, "btn-plus");
+    addButton(layout, "representationUploadFilesButton", messages.uploadFilesButton(),
+      RepresentationAction.UPLOAD_FILES, representations, ActionImpact.UPDATED, callback, "btn-upload");
+    addButton(layout, "representationCreateFolderButton", messages.createFolderButton(),
+      RepresentationAction.CREATE_FOLDER, representations, ActionImpact.UPDATED, callback, "btn-plus");
 
     return layout;
   }

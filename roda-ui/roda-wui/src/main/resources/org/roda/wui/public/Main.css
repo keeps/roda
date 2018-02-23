@@ -374,6 +374,22 @@ div.inline {
 	box-shadow: none;
 }
 
+.descriptiveMetadataCard .label {
+    font-size: 1.5rem;
+    font-weight: 300;
+    color: #999;
+    display: inline-block;
+    width: 200px;
+    line-height: 1em;
+}
+
+.descriptiveMetadataCard .value {
+    font-size: 1.5rem;
+    display: inline-block;
+    color: rgb(88, 89, 91);
+    vertical-align: top;
+}
+
 .slider-container {
 	position: relative;
 }
@@ -6048,9 +6064,9 @@ td.datePickerMonth, td.datePickerYear {
 ****************************************/
 
 .actions-popup {
-	background-color: #089DE3;
+	background-color: #f8f8f8;
 	border-radius: 2px;
-    width: 180px;
+    width: 160px;
 	padding: 10px;
 	box-shadow: 0 0px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
 	z-index: 2;
@@ -6065,6 +6081,7 @@ td.datePickerMonth, td.datePickerYear {
     right: 8px;
     bottom: -16px;
     border-top: 8px solid #089DE3;
+    border-color: #f8f8f8 transparent transparent;
 }
 
 .actions-popup-top_right::before {
@@ -6076,6 +6093,7 @@ td.datePickerMonth, td.datePickerYear {
     right: 8px;
     top: -16px;
     border-bottom: 8px solid #089DE3;
+    border-color: transparent transparent #f8f8f8;
 }
 
 .actions-popup-top_left::before {
@@ -6098,8 +6116,21 @@ td.datePickerMonth, td.datePickerYear {
 	margin-top: 10px;
 }
 
+.actions-popup .actions-layout .h4 {
+  font-size: 1.8rem;
+}
+
+.actions-popup .actions-layout > .h4:first-child {
+  margin-top: 0;
+}
+
+.actions-popup .actions-layout-button {
+  font-size: 75%;
+  padding: 5px 25px 5px 8px;
+}
+
 .actions-empty-help {
-	color: white;
+	color: #222;
 }
 
 /***************************************
@@ -6395,5 +6426,3 @@ span.code {
 	box-shadow: 0px 0px 10px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
     transition: all 0.2s cubic-bezier(.25,.8,.25,1);
 }
-
-

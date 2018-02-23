@@ -329,6 +329,7 @@ public class BrowseRepresentation extends Composite {
       }
     });
     addTab.addStyleName("addTab");
+    addTab.getElement().setId("representationNewDescriptiveMetadata");
     addTab.getParent().addStyleName("addTabWrapper");
 
     handlers.add(tabHandler);
@@ -360,6 +361,7 @@ public class BrowseRepresentation extends Composite {
     this.addStyleName("browse");
     this.addStyleName("browse-representation");
     this.addStyleName(state.toString().toLowerCase());
+    newDescriptiveMetadata.getElement().setId("representationNewDescriptiveMetadata");
 
     Element firstElement = this.getElement().getFirstChildElement();
     if ("input".equalsIgnoreCase(firstElement.getTagName())) {
@@ -482,7 +484,8 @@ public class BrowseRepresentation extends Composite {
             // Edit link
             String editLink = HistoryUtils.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId, repId,
               descId);
-            String editLinkHtml = "<a href='" + editLink + "' class='toolbarLink'><i class='fa fa-edit'></i></a>";
+            String editLinkHtml = "<a href='" + editLink
+              + "' class='toolbarLink' id='representationEditDescriptiveMetadata'><i class='fa fa-edit'></i></a>";
             b.append(SafeHtmlUtils.fromSafeConstant(editLinkHtml));
 
             // Download link

@@ -46,9 +46,4 @@ public class RepresentationInformationExtraBundle implements Serializable {
   public void setFamilyValues(Map<String, Set<MetadataValue>> familyValues) {
     this.familyValues = familyValues;
   }
-
-  public void addFamilyValue(String family, Set<MetadataValue> values) {
-    this.familyValues.put(family, values);
-  }
-
 }

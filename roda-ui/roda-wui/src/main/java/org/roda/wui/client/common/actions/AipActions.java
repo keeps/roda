@@ -723,52 +723,56 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     FlowPanel layout = createLayout();
 
     // MANAGEMENT
-    addTitle(layout, messages.intellectualEntity(), aip, AipAction.NEW_CHILD_AIP, AipAction.CHANGE_TYPE,
-      AipAction.MOVE_IN_HIERARCHY, AipAction.UPDATE_PERMISSIONS, AipAction.REMOVE, AipAction.DOWNLOAD);
+    addTitle(layout, "intellectualEntityTitle", messages.intellectualEntity(), aip, AipAction.NEW_CHILD_AIP,
+      AipAction.CHANGE_TYPE, AipAction.MOVE_IN_HIERARCHY, AipAction.UPDATE_PERMISSIONS, AipAction.REMOVE,
+      AipAction.DOWNLOAD);
 
-    addButton(layout, messages.newArchivalPackage(), AipAction.NEW_CHILD_AIP, aip, ActionImpact.UPDATED, callback,
-      "btn-plus");
-    addButton(layout, messages.changeTypeButton(), AipAction.CHANGE_TYPE, aip, ActionImpact.UPDATED, callback,
-      "btn-edit");
-    addButton(layout, messages.moveArchivalPackage(), AipAction.MOVE_IN_HIERARCHY, aip, ActionImpact.UPDATED, callback,
-      "btn-edit");
-    addButton(layout, messages.archivalPackagePermissions(), AipAction.UPDATE_PERMISSIONS, aip, ActionImpact.UPDATED,
-      callback, "btn-edit");
+    addButton(layout, "newArchivalPackageButton", messages.newArchivalPackage(), AipAction.NEW_CHILD_AIP, aip,
+      ActionImpact.UPDATED, callback, "btn-plus");
+    addButton(layout, "changeAipTypeButton", messages.changeTypeButton(), AipAction.CHANGE_TYPE, aip,
+      ActionImpact.UPDATED, callback, "btn-edit");
+    addButton(layout, "moveArchivalPackageButton", messages.moveArchivalPackage(), AipAction.MOVE_IN_HIERARCHY, aip,
+      ActionImpact.UPDATED, callback, "btn-edit");
+    addButton(layout, "archivalPackagePermissionsButton", messages.archivalPackagePermissions(),
+      AipAction.UPDATE_PERMISSIONS, aip, ActionImpact.UPDATED, callback, "btn-edit");
 
-    addButton(layout, messages.removeArchivalPackage(), AipAction.REMOVE, aip, ActionImpact.DESTROYED, callback,
-      "btn-ban");
+    addButton(layout, "removeArchivalPackageButton", messages.removeArchivalPackage(), AipAction.REMOVE, aip,
+      ActionImpact.DESTROYED, callback, "btn-ban");
 
-    addButton(layout, messages.downloadButton(), AipAction.DOWNLOAD, aip, ActionImpact.NONE, callback, "btn-download");
+    addButton(layout, "aipDownloadButton", messages.downloadButton(), AipAction.DOWNLOAD, aip, ActionImpact.NONE,
+      callback, "btn-download");
 
-    addTitle(layout, messages.representation(), aip, AipAction.ADD_REPRESENTATION);
+    addTitle(layout, "representationTitle", messages.representation(), aip, AipAction.ADD_REPRESENTATION);
 
-    addButton(layout, messages.newButton(), AipAction.ADD_REPRESENTATION, aip, ActionImpact.UPDATED, callback,
-      "btn-plus");
+    addButton(layout, "addNewRepresentationButton", messages.newButton(), AipAction.ADD_REPRESENTATION, aip,
+      ActionImpact.UPDATED, callback, "btn-plus");
 
     // PRESERVATION
-    addTitle(layout, messages.preservationTitle(), aip, AipAction.NEW_PROCESS, AipAction.SHOW_EVENTS,
-      AipAction.SHOW_RISKS, AipAction.SHOW_LOGS);
+    addTitle(layout, "aipPreservationTitle", messages.preservationTitle(), aip, AipAction.NEW_PROCESS,
+      AipAction.SHOW_EVENTS, AipAction.SHOW_RISKS, AipAction.SHOW_LOGS);
 
-    addButton(layout, messages.newProcessPreservation(), AipAction.NEW_PROCESS, aip, ActionImpact.UPDATED, callback,
-      "btn-play");
+    addButton(layout, "newAipProcessButton", messages.newProcessPreservation(), AipAction.NEW_PROCESS, aip,
+      ActionImpact.UPDATED, callback, "btn-play");
 
-    addButton(layout, messages.preservationEvents(), AipAction.SHOW_EVENTS, aip, ActionImpact.NONE, callback,
-      "btn-clock");
-    addButton(layout, messages.preservationLogs(), AipAction.SHOW_LOGS, aip, ActionImpact.NONE, callback, "btn-clock");
-    addButton(layout, messages.preservationRisks(), AipAction.SHOW_RISKS, aip, ActionImpact.NONE, callback,
-      "btn-exclamation-triangle");
+    addButton(layout, "aipPreservationEventsButton", messages.preservationEvents(), AipAction.SHOW_EVENTS, aip,
+      ActionImpact.NONE, callback, "btn-clock");
+    addButton(layout, "aipPreservationLogsButton", messages.preservationLogs(), AipAction.SHOW_LOGS, aip,
+      ActionImpact.NONE, callback, "btn-clock");
+    addButton(layout, "aipPreservationRisksButton", messages.preservationRisks(), AipAction.SHOW_RISKS, aip,
+      ActionImpact.NONE, callback, "btn-exclamation-triangle");
 
     // APPRAISAL
-    addTitle(layout, messages.appraisalTitle(), aip, AipAction.APPRAISAL_ACCEPT, AipAction.APPRAISAL_REJECT);
+    addTitle(layout, "aipAppraisalTitle", messages.appraisalTitle(), aip, AipAction.APPRAISAL_ACCEPT,
+      AipAction.APPRAISAL_REJECT);
 
-    addButton(layout, messages.appraisalAccept(), AipAction.APPRAISAL_ACCEPT, aip, ActionImpact.UPDATED, callback,
-      "btn-play");
+    addButton(layout, "aipAppraisalAcceptButton", messages.appraisalAccept(), AipAction.APPRAISAL_ACCEPT, aip,
+      ActionImpact.UPDATED, callback, "btn-play");
 
-    addButton(layout, messages.appraisalReject(), AipAction.APPRAISAL_REJECT, aip, ActionImpact.DESTROYED, callback,
-      "btn-ban");
+    addButton(layout, "aipAppraisalRejectButton", messages.appraisalReject(), AipAction.APPRAISAL_REJECT, aip,
+      ActionImpact.DESTROYED, callback, "btn-ban");
 
-    addButton(layout, messages.downloadDocumentation(), AipAction.DOWNLOAD_DOCUMENTATION, aip, ActionImpact.NONE,
-      callback, "btn-download");
+    addButton(layout, "aipDownloadDocumentationButton", messages.downloadDocumentation(),
+      AipAction.DOWNLOAD_DOCUMENTATION, aip, ActionImpact.NONE, callback, "btn-download");
 
     return layout;
   }
@@ -778,50 +782,54 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     FlowPanel layout = createLayout();
 
     // MANAGEMENT
-    addTitle(layout, messages.intellectualEntity(), aips, AipAction.NEW_CHILD_AIP, AipAction.CHANGE_TYPE,
-      AipAction.MOVE_IN_HIERARCHY, AipAction.UPDATE_PERMISSIONS, AipAction.REMOVE, AipAction.DOWNLOAD);
+    addTitle(layout, "intellectualEntityTitle", messages.intellectualEntity(), aips, AipAction.NEW_CHILD_AIP,
+      AipAction.CHANGE_TYPE, AipAction.MOVE_IN_HIERARCHY, AipAction.UPDATE_PERMISSIONS, AipAction.REMOVE,
+      AipAction.DOWNLOAD);
 
-    addButton(layout, messages.changeTypeButton(), AipAction.CHANGE_TYPE, aips, ActionImpact.UPDATED, callback,
-      "btn-edit");
-    addButton(layout, messages.moveArchivalPackage(), AipAction.MOVE_IN_HIERARCHY, aips, ActionImpact.UPDATED, callback,
-      "btn-edit");
-    addButton(layout, messages.archivalPackagePermissions(), AipAction.UPDATE_PERMISSIONS, aips, ActionImpact.UPDATED,
-      callback, "btn-edit");
+    addButton(layout, "changeAipTypeButton", messages.changeTypeButton(), AipAction.CHANGE_TYPE, aips,
+      ActionImpact.UPDATED, callback, "btn-edit");
+    addButton(layout, "moveArchivalPackageButton", messages.moveArchivalPackage(), AipAction.MOVE_IN_HIERARCHY, aips,
+      ActionImpact.UPDATED, callback, "btn-edit");
+    addButton(layout, "archivalPackagePermissionsButton", messages.archivalPackagePermissions(),
+      AipAction.UPDATE_PERMISSIONS, aips, ActionImpact.UPDATED, callback, "btn-edit");
 
-    addButton(layout, messages.removeArchivalPackage(), AipAction.REMOVE, aips, ActionImpact.DESTROYED, callback,
-      "btn-ban");
+    addButton(layout, "removeArchivalPackageButton", messages.removeArchivalPackage(), AipAction.REMOVE, aips,
+      ActionImpact.DESTROYED, callback, "btn-ban");
 
-    addButton(layout, messages.downloadButton(), AipAction.DOWNLOAD, aips, ActionImpact.NONE, callback, "btn-download");
+    addButton(layout, "downloadAipButton", messages.downloadButton(), AipAction.DOWNLOAD, aips, ActionImpact.NONE,
+      callback, "btn-download");
 
-    addTitle(layout, messages.representation(), aips, AipAction.ADD_REPRESENTATION);
+    addTitle(layout, "representationTitle", messages.representation(), aips, AipAction.ADD_REPRESENTATION);
 
-    addButton(layout, messages.newButton(), AipAction.ADD_REPRESENTATION, aips, ActionImpact.UPDATED, callback,
-      "btn-plus");
+    addButton(layout, "addNewRepresentationButton", messages.newButton(), AipAction.ADD_REPRESENTATION, aips,
+      ActionImpact.UPDATED, callback, "btn-plus");
 
     // PRESERVATION
-    addTitle(layout, messages.preservationTitle(), aips, AipAction.NEW_PROCESS, AipAction.SHOW_EVENTS,
-      AipAction.SHOW_RISKS, AipAction.SHOW_LOGS);
+    addTitle(layout, "aipPreservationTitle", messages.preservationTitle(), aips, AipAction.NEW_PROCESS,
+      AipAction.SHOW_EVENTS, AipAction.SHOW_RISKS, AipAction.SHOW_LOGS);
 
-    addButton(layout, messages.newProcessPreservation(), AipAction.NEW_PROCESS, aips, ActionImpact.UPDATED, callback,
-      "btn-play");
+    addButton(layout, "newAipProcessButton", messages.newProcessPreservation(), AipAction.NEW_PROCESS, aips,
+      ActionImpact.UPDATED, callback, "btn-play");
 
-    addButton(layout, messages.preservationEvents(), AipAction.SHOW_EVENTS, aips, ActionImpact.NONE, callback,
-      "btn-clock");
-    addButton(layout, messages.preservationLogs(), AipAction.SHOW_LOGS, aips, ActionImpact.NONE, callback, "btn-clock");
-    addButton(layout, messages.preservationRisks(), AipAction.SHOW_RISKS, aips, ActionImpact.NONE, callback,
-      "btn-exclamation-triangle");
+    addButton(layout, "aipPreservationEventsButton", messages.preservationEvents(), AipAction.SHOW_EVENTS, aips,
+      ActionImpact.NONE, callback, "btn-clock");
+    addButton(layout, "aipPreservationLogsButton", messages.preservationLogs(), AipAction.SHOW_LOGS, aips,
+      ActionImpact.NONE, callback, "btn-clock");
+    addButton(layout, "aipPreservationRisksButton", messages.preservationRisks(), AipAction.SHOW_RISKS, aips,
+      ActionImpact.NONE, callback, "btn-exclamation-triangle");
 
     // APPRAISAL
-    addTitle(layout, messages.appraisalTitle(), aips, AipAction.APPRAISAL_ACCEPT, AipAction.APPRAISAL_REJECT);
+    addTitle(layout, "aipAppraisalTitle", messages.appraisalTitle(), aips, AipAction.APPRAISAL_ACCEPT,
+      AipAction.APPRAISAL_REJECT);
 
-    addButton(layout, messages.appraisalAccept(), AipAction.APPRAISAL_ACCEPT, aips, ActionImpact.UPDATED, callback,
-      "btn-play");
+    addButton(layout, "aipAppraisalAcceptButton", messages.appraisalAccept(), AipAction.APPRAISAL_ACCEPT, aips,
+      ActionImpact.UPDATED, callback, "btn-play");
 
-    addButton(layout, messages.appraisalReject(), AipAction.APPRAISAL_REJECT, aips, ActionImpact.DESTROYED, callback,
-      "btn-ban");
+    addButton(layout, "aipAppraisalRejectButton", messages.appraisalReject(), AipAction.APPRAISAL_REJECT, aips,
+      ActionImpact.DESTROYED, callback, "btn-ban");
 
-    addButton(layout, messages.downloadDocumentation(), AipAction.DOWNLOAD_DOCUMENTATION, aips, ActionImpact.NONE,
-      callback, "btn-download");
+    addButton(layout, "aipDownloadDocumentationButton", messages.downloadDocumentation(),
+      AipAction.DOWNLOAD_DOCUMENTATION, aips, ActionImpact.NONE, callback, "btn-download");
 
     return layout;
   }

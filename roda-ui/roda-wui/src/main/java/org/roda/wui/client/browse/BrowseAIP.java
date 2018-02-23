@@ -302,6 +302,7 @@ public class BrowseAIP extends Composite {
     browseDescription.add(new HTMLWidgetWrapper("BrowseDescription.html"));
 
     // CSS
+    newDescriptiveMetadata.getElement().setId("aipNewDescriptiveMetadata");
     this.addStyleName("browse");
   }
 
@@ -665,6 +666,7 @@ public class BrowseAIP extends Composite {
       }
     });
     addTab.addStyleName("addTab");
+    addTab.getElement().setId("aipNewDescriptiveMetadata");
     addTab.getParent().addStyleName("addTabWrapper");
 
     handlers.add(tabHandler);
@@ -869,7 +871,8 @@ public class BrowseAIP extends Composite {
             // Edit link
             String editLink = HistoryUtils.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId,
               escapedDescId);
-            String editLinkHtml = "<a href='" + editLink + "' class='toolbarLink'><i class='fa fa-edit'></i></a>";
+            String editLinkHtml = "<a href='" + editLink
+              + "' class='toolbarLink' id='aipEditDescriptiveMetadata'><i class='fa fa-edit'></i></a>";
             b.append(SafeHtmlUtils.fromSafeConstant(editLinkHtml));
 
             // Download link

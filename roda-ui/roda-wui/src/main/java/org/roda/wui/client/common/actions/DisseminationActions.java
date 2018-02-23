@@ -178,25 +178,26 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
     FlowPanel layout = createLayout();
 
     // MANAGEMENT
-    addTitle(layout, messages.viewRepresentationFileDisseminationTitle(), dissemination, DisseminationAction.DOWNLOAD,
-      DisseminationAction.REMOVE);
+    addTitle(layout, "dipRepresentationFileTitle", messages.viewRepresentationFileDisseminationTitle(), dissemination,
+      DisseminationAction.DOWNLOAD, DisseminationAction.REMOVE);
 
     // DOWNLOAD,REMOVE
-    addButton(layout, messages.downloadButton(), DisseminationAction.DOWNLOAD, dissemination, ActionImpact.NONE,
-      callback, "btn-download");
+    addButton(layout, "dipDownloadButton", messages.downloadButton(), DisseminationAction.DOWNLOAD, dissemination,
+      ActionImpact.NONE, callback, "btn-download");
 
-    addButton(layout, messages.removeButton(), DisseminationAction.REMOVE, dissemination, ActionImpact.DESTROYED,
-      callback, "btn-ban");
+    addButton(layout, "dipRemoveButton", messages.removeButton(), DisseminationAction.REMOVE, dissemination,
+      ActionImpact.DESTROYED, callback, "btn-ban");
 
-    addButton(layout, messages.disseminationPermissions(), DisseminationAction.UPDATE_PERMISSIONS, dissemination,
-      ActionImpact.UPDATED, callback, "btn-edit");
+    addButton(layout, "dipPermissionsButton", messages.disseminationPermissions(),
+      DisseminationAction.UPDATE_PERMISSIONS, dissemination, ActionImpact.UPDATED, callback, "btn-edit");
 
     // PRESERVATION
-    addTitle(layout, messages.preservationTitle(), dissemination, DisseminationAction.NEW_PROCESS);
+    addTitle(layout, "dipPreservationTitle", messages.preservationTitle(), dissemination,
+      DisseminationAction.NEW_PROCESS);
 
     // NEW_PROCESS
-    addButton(layout, messages.newProcessPreservation(), DisseminationAction.NEW_PROCESS, dissemination,
-      ActionImpact.UPDATED, callback, "btn-play");
+    addButton(layout, "newDipProcessPreservationButton", messages.newProcessPreservation(),
+      DisseminationAction.NEW_PROCESS, dissemination, ActionImpact.UPDATED, callback, "btn-play");
 
     return layout;
   }
@@ -206,25 +207,26 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
     FlowPanel layout = createLayout();
 
     // MANAGEMENT
-    addTitle(layout, messages.viewRepresentationFileDisseminationTitle(), disseminations, DisseminationAction.DOWNLOAD,
-      DisseminationAction.REMOVE);
+    addTitle(layout, "dipRepresentationFileTitle", messages.viewRepresentationFileDisseminationTitle(), disseminations,
+      DisseminationAction.DOWNLOAD, DisseminationAction.REMOVE);
 
     // DOWNLOAD,REMOVE
-    addButton(layout, messages.downloadButton(), DisseminationAction.DOWNLOAD, disseminations, ActionImpact.NONE,
-      callback, "btn-download");
+    addButton(layout, "dipDownloadButton", messages.downloadButton(), DisseminationAction.DOWNLOAD, disseminations,
+      ActionImpact.NONE, callback, "btn-download");
 
-    addButton(layout, messages.removeButton(), DisseminationAction.REMOVE, disseminations, ActionImpact.DESTROYED,
-      callback, "btn-ban");
+    addButton(layout, "dipRemoveButton", messages.removeButton(), DisseminationAction.REMOVE, disseminations,
+      ActionImpact.DESTROYED, callback, "btn-ban");
 
-    addButton(layout, messages.disseminationPermissions(), DisseminationAction.UPDATE_PERMISSIONS, disseminations,
-      ActionImpact.UPDATED, callback, "btn-edit");
+    addButton(layout, "dipPermissionsButton", messages.disseminationPermissions(),
+      DisseminationAction.UPDATE_PERMISSIONS, disseminations, ActionImpact.UPDATED, callback, "btn-edit");
 
     // PRESERVATION
-    addTitle(layout, messages.preservationTitle(), disseminations, DisseminationAction.NEW_PROCESS);
+    addTitle(layout, "dipPreservationTitle", messages.preservationTitle(), disseminations,
+      DisseminationAction.NEW_PROCESS);
 
     // NEW_PROCESS
-    addButton(layout, messages.newProcessPreservation(), DisseminationAction.NEW_PROCESS, disseminations,
-      ActionImpact.UPDATED, callback, "btn-play");
+    addButton(layout, "newDipProcessPreservationButton", messages.newProcessPreservation(),
+      DisseminationAction.NEW_PROCESS, disseminations, ActionImpact.UPDATED, callback, "btn-play");
 
     return layout;
   }

@@ -95,16 +95,17 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
   }
 
   @SafeVarargs
-  public final void addTitle(FlowPanel layout, String text, T object, Actionable.Action<T>... actions) {
-    addTitle(layout, text, object, null, actions);
+  public final void addTitle(FlowPanel layout, String titleId, String text, T object, Actionable.Action<T>... actions) {
+    addTitle(layout, titleId, text, object, null, actions);
   }
 
   @SafeVarargs
-  public final void addTitle(FlowPanel layout, String text, T object, String extraCssClass,
+  public final void addTitle(FlowPanel layout, String titleId, String text, T object, String extraCssClass,
     Actionable.Action<T>... actions) {
 
     if (canAct(object, actions)) {
       Label title = new Label(text);
+      title.getElement().setId(titleId);
       title.addStyleName("h4");
       if (StringUtils.isNotBlank(extraCssClass)) {
         title.addStyleName(extraCssClass);
@@ -114,16 +115,18 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
   }
 
   @SafeVarargs
-  public final void addTitle(FlowPanel layout, String text, SelectedItems<T> objects, Actionable.Action<T>... actions) {
-    addTitle(layout, text, objects, null, actions);
+  public final void addTitle(FlowPanel layout, String titleId, String text, SelectedItems<T> objects,
+    Actionable.Action<T>... actions) {
+    addTitle(layout, titleId, text, objects, null, actions);
   }
 
   @SafeVarargs
-  public final void addTitle(FlowPanel layout, String text, SelectedItems<T> objects, String extraCssClass,
-    Actionable.Action<T>... actions) {
+  public final void addTitle(FlowPanel layout, String titleId, String text, SelectedItems<T> objects,
+    String extraCssClass, Actionable.Action<T>... actions) {
 
     if (canAct(objects, actions)) {
       Label title = new Label(text);
+      title.getElement().setId(titleId);
       title.addStyleName("h4");
       if (StringUtils.isNotBlank(extraCssClass)) {
         title.addStyleName(extraCssClass);
@@ -132,14 +135,16 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
     }
   }
 
-  public void addButton(FlowPanel layout, final String text, final Actionable.Action<T> action, final T object,
-    final ActionImpact impact, final AsyncCallback<ActionImpact> callback, final String... extraCssClasses) {
+  public void addButton(FlowPanel layout, final String buttonId, final String text, final Actionable.Action<T> action,
+    final T object, final ActionImpact impact, final AsyncCallback<ActionImpact> callback,
+    final String... extraCssClasses) {
 
     if (canAct(action, object)) {
 
       // Construct
       Button button = new Button(text);
       button.setTitle(text);
+      button.getElement().setId(buttonId);
 
       // CSS
       button.setStyleName("actions-layout-button");
@@ -173,7 +178,7 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
     }
   }
 
-  public void addButton(FlowPanel layout, final String text, final Actionable.Action<T> action,
+  public void addButton(FlowPanel layout, final String buttonId, final String text, final Actionable.Action<T> action,
     final SelectedItems<T> objects, final ActionImpact impact, final AsyncCallback<ActionImpact> callback,
     final String... extraCssClasses) {
 
@@ -182,6 +187,7 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
       // Construct
       Button button = new Button(text);
       button.setTitle(text);
+      button.getElement().setId(buttonId);
 
       // CSS
       button.setStyleName("actions-layout-button");
