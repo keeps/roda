@@ -68,8 +68,5 @@ after_success:
   - |
     if [ ! -z $DOCKER_TAG ]; then
       docker push keeps/roda:$DOCKER_TAG
-      curl -L --request POST --form ref=$RODA_DEV_BRANCH \
-        --form token=$GITLAB_RODA_DEV_TRIGGER_TOKEN \
-        --form "variables[DOCKER_TAG]=$DOCKER_TAG" \
-        $GITLAB_RODA_DEV_TRIGGER >> /dev/null
+      curl -# -o /dev/null -L --request POST --form ref=$RODA_DEV_BRANCH --form token=$GITLAB_RODA_DEV_TRIGGER_TOKEN --form "variables[DOCKER_TAG]=$DOCKER_TAG" $GITLAB_RODA_DEV_TRIGGER
     fi
