@@ -329,4 +329,145 @@ public class Risk extends NamedIndexedModel implements IsModelObject {
     return this.getId();
   }
 
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((category == null) ? 0 : category.hashCode());
+    result = prime * result + ((createdBy == null) ? 0 : createdBy.hashCode());
+    result = prime * result + ((createdOn == null) ? 0 : createdOn.hashCode());
+    result = prime * result + ((description == null) ? 0 : description.hashCode());
+    result = prime * result + ((identifiedBy == null) ? 0 : identifiedBy.hashCode());
+    result = prime * result + ((identifiedOn == null) ? 0 : identifiedOn.hashCode());
+    result = prime * result + ((mitigationOwner == null) ? 0 : mitigationOwner.hashCode());
+    result = prime * result + ((mitigationOwnerType == null) ? 0 : mitigationOwnerType.hashCode());
+    result = prime * result
+      + ((mitigationRelatedEventIdentifierType == null) ? 0 : mitigationRelatedEventIdentifierType.hashCode());
+    result = prime * result
+      + ((mitigationRelatedEventIdentifierValue == null) ? 0 : mitigationRelatedEventIdentifierValue.hashCode());
+    result = prime * result + ((mitigationStrategy == null) ? 0 : mitigationStrategy.hashCode());
+    result = prime * result + ((notes == null) ? 0 : notes.hashCode());
+    result = prime * result + postMitigationImpact;
+    result = prime * result + ((postMitigationNotes == null) ? 0 : postMitigationNotes.hashCode());
+    result = prime * result + postMitigationProbability;
+    result = prime * result + postMitigationSeverity;
+    result = prime * result + ((postMitigationSeverityLevel == null) ? 0 : postMitigationSeverityLevel.hashCode());
+    result = prime * result + preMitigationImpact;
+    result = prime * result + ((preMitigationNotes == null) ? 0 : preMitigationNotes.hashCode());
+    result = prime * result + preMitigationProbability;
+    result = prime * result + preMitigationSeverity;
+    result = prime * result + ((preMitigationSeverityLevel == null) ? 0 : preMitigationSeverityLevel.hashCode());
+    result = prime * result + ((updatedBy == null) ? 0 : updatedBy.hashCode());
+    result = prime * result + ((updatedOn == null) ? 0 : updatedOn.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (!super.equals(obj))
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    Risk other = (Risk) obj;
+    if (category == null) {
+      if (other.category != null)
+        return false;
+    } else if (!category.equals(other.category))
+      return false;
+    if (createdBy == null) {
+      if (other.createdBy != null)
+        return false;
+    } else if (!createdBy.equals(other.createdBy))
+      return false;
+    if (createdOn == null) {
+      if (other.createdOn != null)
+        return false;
+    } else if (!createdOn.equals(other.createdOn))
+      return false;
+    if (description == null) {
+      if (other.description != null)
+        return false;
+    } else if (!description.equals(other.description))
+      return false;
+    if (identifiedBy == null) {
+      if (other.identifiedBy != null)
+        return false;
+    } else if (!identifiedBy.equals(other.identifiedBy))
+      return false;
+    if (identifiedOn == null) {
+      if (other.identifiedOn != null)
+        return false;
+    } else if (!identifiedOn.equals(other.identifiedOn))
+      return false;
+    if (mitigationOwner == null) {
+      if (other.mitigationOwner != null)
+        return false;
+    } else if (!mitigationOwner.equals(other.mitigationOwner))
+      return false;
+    if (mitigationOwnerType == null) {
+      if (other.mitigationOwnerType != null)
+        return false;
+    } else if (!mitigationOwnerType.equals(other.mitigationOwnerType))
+      return false;
+    if (mitigationRelatedEventIdentifierType == null) {
+      if (other.mitigationRelatedEventIdentifierType != null)
+        return false;
+    } else if (!mitigationRelatedEventIdentifierType.equals(other.mitigationRelatedEventIdentifierType))
+      return false;
+    if (mitigationRelatedEventIdentifierValue == null) {
+      if (other.mitigationRelatedEventIdentifierValue != null)
+        return false;
+    } else if (!mitigationRelatedEventIdentifierValue.equals(other.mitigationRelatedEventIdentifierValue))
+      return false;
+    if (mitigationStrategy == null) {
+      if (other.mitigationStrategy != null)
+        return false;
+    } else if (!mitigationStrategy.equals(other.mitigationStrategy))
+      return false;
+    if (notes == null) {
+      if (other.notes != null)
+        return false;
+    } else if (!notes.equals(other.notes))
+      return false;
+    if (postMitigationImpact != other.postMitigationImpact)
+      return false;
+    if (postMitigationNotes == null) {
+      if (other.postMitigationNotes != null)
+        return false;
+    } else if (!postMitigationNotes.equals(other.postMitigationNotes))
+      return false;
+    if (postMitigationProbability != other.postMitigationProbability)
+      return false;
+    if (postMitigationSeverity != other.postMitigationSeverity)
+      return false;
+    if (postMitigationSeverityLevel != other.postMitigationSeverityLevel)
+      return false;
+    if (preMitigationImpact != other.preMitigationImpact)
+      return false;
+    if (preMitigationNotes == null) {
+      if (other.preMitigationNotes != null)
+        return false;
+    } else if (!preMitigationNotes.equals(other.preMitigationNotes))
+      return false;
+    if (preMitigationProbability != other.preMitigationProbability)
+      return false;
+    if (preMitigationSeverity != other.preMitigationSeverity)
+      return false;
+    if (preMitigationSeverityLevel != other.preMitigationSeverityLevel)
+      return false;
+    if (updatedBy == null) {
+      if (other.updatedBy != null)
+        return false;
+    } else if (!updatedBy.equals(other.updatedBy))
+      return false;
+    if (updatedOn == null) {
+      if (other.updatedOn != null)
+        return false;
+    } else if (!updatedOn.equals(other.updatedOn))
+      return false;
+    return true;
+  }
+
 }

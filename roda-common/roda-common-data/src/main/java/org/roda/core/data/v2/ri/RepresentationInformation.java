@@ -12,7 +12,11 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
@@ -23,6 +27,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @XmlRootElement(name = RodaConstants.RODA_OBJECT_REPRESENTATION_INFORMATION)
+@XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RepresentationInformation extends NamedIndexedModel implements IsModelObject, IsIndexed {
   private static final long serialVersionUID = 8766448064705416130L;
@@ -30,9 +35,10 @@ public class RepresentationInformation extends NamedIndexedModel implements IsMo
   private String description = null;
   private String family = null;
   private List<String> tags = null;
-  private String extras = null;
-  private RepresentationInformationSupport support = null;
 
+  private String extras = null;
+
+  private RepresentationInformationSupport support = null;
   private List<RepresentationInformationRelation> relations = new ArrayList<>();
   private List<String> filters = new ArrayList<>();
 
@@ -94,6 +100,8 @@ public class RepresentationInformation extends NamedIndexedModel implements IsMo
     return extras;
   }
 
+  @XmlElement(name = "extras")
+  @XmlJavaTypeAdapter(value = ExtrasHandler.class)
   public void setExtras(String extras) {
     this.extras = extras;
   }
@@ -106,6 +114,7 @@ public class RepresentationInformation extends NamedIndexedModel implements IsMo
     this.support = support;
   }
 
+  @XmlElement(name = "relation")
   public List<RepresentationInformationRelation> getRelations() {
     return relations;
   }
@@ -186,4 +195,116 @@ public class RepresentationInformation extends NamedIndexedModel implements IsMo
     return Arrays.asList(RodaConstants.INDEX_UUID);
   }
 
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((createdBy == null) ? 0 : createdBy.hashCode());
+    result = prime * result + ((createdOn == null) ? 0 : createdOn.hashCode());
+    result = prime * result + ((description == null) ? 0 : description.hashCode());
+    result = prime * result + ((extras == null) ? 0 : extras.hashCode());
+    result = prime * result + ((family == null) ? 0 : family.hashCode());
+    result = prime * result + ((filters == null) ? 0 : filters.hashCode());
+    result = prime * result + ((relations == null) ? 0 : relations.hashCode());
+    result = prime * result + ((support == null) ? 0 : support.hashCode());
+    result = prime * result + ((tags == null) ? 0 : tags.hashCode());
+    result = prime * result + ((updatedBy == null) ? 0 : updatedBy.hashCode());
+    result = prime * result + ((updatedOn == null) ? 0 : updatedOn.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (!super.equals(obj))
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    RepresentationInformation other = (RepresentationInformation) obj;
+    if (createdBy == null) {
+      if (other.createdBy != null)
+        return false;
+    } else if (!createdBy.equals(other.createdBy))
+      return false;
+    if (createdOn == null) {
+      if (other.createdOn != null)
+        return false;
+    } else if (!createdOn.equals(other.createdOn))
+      return false;
+    if (description == null) {
+      if (other.description != null)
+        return false;
+    } else if (!description.equals(other.description))
+      return false;
+    if (extras == null) {
+      if (other.extras != null)
+        return false;
+    } else if (!extras.equals(other.extras))
+      return false;
+    if (family == null) {
+      if (other.family != null)
+        return false;
+    } else if (!family.equals(other.family))
+      return false;
+    if (filters == null) {
+      if (other.filters != null)
+        return false;
+    } else if (!filters.equals(other.filters))
+      return false;
+    if (relations == null) {
+      if (other.relations != null)
+        return false;
+    } else if (!relations.equals(other.relations))
+      return false;
+    if (support != other.support)
+      return false;
+    if (tags == null) {
+      if (other.tags != null)
+        return false;
+    } else if (!tags.equals(other.tags))
+      return false;
+    if (updatedBy == null) {
+      if (other.updatedBy != null)
+        return false;
+    } else if (!updatedBy.equals(other.updatedBy))
+      return false;
+    if (updatedOn == null) {
+      if (other.updatedOn != null)
+        return false;
+    } else if (!updatedOn.equals(other.updatedOn))
+      return false;
+    return true;
+  }
+
+  // public static void main(String[] args) throws GenericException {
+  // RepresentationInformation ri = new RepresentationInformation();
+  // ri.setCreatedBy("admin");
+  // ri.setCreatedOn(new Date());
+  // ri.setName("Representation information name");
+  //
+  // ri.setExtras(
+  // "<extras><metadata><field name=\"softwareCategory\">converter</field><field
+  // name=\"softwareDesignation\">as3esdf</field></metadata></extras>");
+  // ri.setRelations(
+  // Arrays
+  // .asList(
+  // new RepresentationInformationRelation("relationType",
+  // RelationObjectType.REPRESENTATION_INFORMATION, "link",
+  // "label"),
+  // new RepresentationInformationRelation("relationType2",
+  // RelationObjectType.AIP, "link2", "label2")));
+  //
+  // String xmlFromObject = XMLUtils.getXMLFromObject(ri);
+  // System.out.println(xmlFromObject);
+  //
+  // System.out.println("--------------------------");
+  //
+  // RepresentationInformation ri2 = XMLUtils.getObjectFromXML(xmlFromObject,
+  // RepresentationInformation.class);
+  // System.out.println(ri);
+  // System.out.println(ri2);
+  // System.out.println("--------------------------");
+  // System.out.println(ri.equals(ri2));
+  // }
 }

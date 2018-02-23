@@ -1,31 +1,30 @@
 {{! Software description }}
-{{~field name="softwareDescription"					order="150"	hidden="false"   type="separator"   	labeli18n="ri.data.softwareDescription"					label='{"en": "Software description", "pt": "Descrição do software"}'~}}
-{{~field name="softwareCategory" 					order="151"	hidden="false"   type="list" 			labeli18n="ri.data.softwareCategory"					label='{"en": "Software category"}' options='["reader","writer","converter","other"]' optionsLabels='{"reader": {"en":"Reader", "pt":"Leitor"},"writer": {"en":"Writer", "pt":"Editor"},"converter": {"en":"Converter", "pt":"Conversor"}, "other": {"en":"Other", "pt":"Outro"}}' optionsLabelI18nKeyPrefix="ri.data.softwareCategory" xpath="//*:field[@name='softwareCategory']/string()"~}}
-{{~field name="softwareDesignation" 				order="152"	hidden="false"   type="text"	 		labeli18n="ri.data.softwareDesignation"					label='{"en": "Software designation"}' xpath="//*:field[@name='softwareDesignation']/string()"~}}
-{{~field name="version" 							order="153"	hidden="false"   type="text" 			labeli18n="ri.data.version"								label='{"en": "Version"}' xpath="//*:field[@name='version']/string()"~}}
+{{~field name="softwareDescription"					order="150"	hidden="false"   type="separator"   labeli18n="ri.data.softwareDescription"					label='{"en": "Software description", "pt": "Descrição do software"}'~}}
+{{~field name="softwareCategory" 					order="151"	hidden="false"   type="list" 		labeli18n="ri.data.softwareCategory"					label='{"en": "Software category"}' options='["reader","writer","converter","other"]' optionsLabels='{"reader": {"en":"Reader", "pt":"Leitor"},"writer": {"en":"Writer", "pt":"Editor"},"converter": {"en":"Converter", "pt":"Conversor"}, "other": {"en":"Other", "pt":"Outro"}}' optionsLabelI18nKeyPrefix="ri.data.softwareCategory" xpath="//*:field[@name='softwareCategory']/string()"~}}
+{{~field name="softwareDesignation" 				order="152"	hidden="false"   type="text"	 	labeli18n="ri.data.softwareDesignation"					label='{"en": "Software designation"}' xpath="//*:field[@name='softwareDesignation']/string()"~}}
+{{~field name="version" 							order="153"	hidden="false"   type="text" 		labeli18n="ri.data.version"								label='{"en": "Version"}' xpath="//*:field[@name='version']/string()"~}}
 
 {{! Sustainability factors }}
-{{~field name="sustainabilityFactors"				order="160"	hidden="false"   type="separator"   	labeli18n="ri.data.sustainabilityFactors"				label='{"en": "Sustainability factors", "pt": "Fatores de sustentabilidade"}'~}}
-{{~field name="platforms" 							order="161"	hidden="false"   type="rich-text-area" 	labeli18n="ri.data.platforms"							label='{"en": "Platforms"}' xpath="//*:field[@name='platforms']/string()"~}}
-{{~field name="documentation" 						order="162"	hidden="false"   type="rich-text-area" 	labeli18n="ri.data.documentation"						label='{"en": "Documentation"}' xpath="//*:field[@name='documentation']/string()"~}}
-{{~field name="adoption" 							order="163"	hidden="false"   type="rich-text-area" 	labeli18n="ri.data.adoption"							label='{"en": "Adoption"}' xpath="//*:field[@name='adoption']/string()"~}}
-{{~field name="licensingAndPatents" 				order="164"	hidden="false"   type="rich-text-area" 	labeli18n="ri.data.licensingAndPatents"					label='{"en": "Licensing and patents"}' xpath="//*:field[@name='licensingAndPatents']/string()"~}}
-{{~field name="transparency" 						order="165"	hidden="false"   type="rich-text-area" 	labeli18n="ri.data.transparency"						label='{"en": "Transparency"}' xpath="//*:field[@name='transparency']/string()"~}}
-{{~field name="externalDependencies" 				order="167"	hidden="false"   type="rich-text-area" 	labeli18n="ri.data.externalDependencies"				label='{"en": "External dependencies"}' xpath="//*:field[@name='externalDependencies']/string()"~}}
-{{~field name="technicalProtectionConsiderations" 	order="168"	hidden="false"   type="rich-text-area" 	labeli18n="ri.data.technicalProtectionConsiderations"	label='{"en": "Technical protection considerations"}' xpath="//*:field[@name='technicalProtectionConsiderations']/string()"~}}
+{{~field name="sustainabilityFactors"				order="160"	hidden="false"   type="separator"   labeli18n="ri.data.sustainabilityFactors"				label='{"en": "Sustainability factors", "pt": "Fatores de sustentabilidade"}'~}}
+{{~field name="platforms" 							order="161"	hidden="false"   type="text-area" 	labeli18n="ri.data.platforms"							label='{"en": "Platforms"}' xpath="//*:field[@name='platforms']/string()"~}}
+{{~field name="documentation" 						order="162"	hidden="false"   type="text-area" 	labeli18n="ri.data.documentation"						label='{"en": "Documentation"}' xpath="//*:field[@name='documentation']/string()"~}}
+{{~field name="adoption" 							order="163"	hidden="false"   type="text-area" 	labeli18n="ri.data.adoption"							label='{"en": "Adoption"}' xpath="//*:field[@name='adoption']/string()"~}}
+{{~field name="licensingAndPatents" 				order="164"	hidden="false"   type="text-area" 	labeli18n="ri.data.licensingAndPatents"					label='{"en": "Licensing and patents"}' xpath="//*:field[@name='licensingAndPatents']/string()"~}}
+{{~field name="transparency" 						order="165"	hidden="false"   type="text-area" 	labeli18n="ri.data.transparency"						label='{"en": "Transparency"}' xpath="//*:field[@name='transparency']/string()"~}}
+{{~field name="externalDependencies" 				order="167"	hidden="false"   type="text-area" 	labeli18n="ri.data.externalDependencies"				label='{"en": "External dependencies"}' xpath="//*:field[@name='externalDependencies']/string()"~}}
+{{~field name="technicalProtectionConsiderations" 	order="168"	hidden="false"   type="text-area" 	labeli18n="ri.data.technicalProtectionConsiderations"	label='{"en": "Technical protection considerations"}' xpath="//*:field[@name='technicalProtectionConsiderations']/string()"~}}
 
 {{! Software characteristics }}
-{{~field name="softwareCharacteristics"				order="170"	hidden="false"   type="separator"   	labeli18n="ri.data.softwareCharacteristics"				label='{"en": "Software characteristics", "pt": "Características do software"}'~}}
-{{~field name="relevantCharacteristics" 			order="171"	hidden="false"   type="rich-text-area" 	labeli18n="ri.data.relevantCharacteristics"				label='{"en": "Relevant characteristics"}' xpath="//*:field[@name='relevantCharacteristics']/string()"~}}
-{{~field name="functionalityBeyondNormalRendering" 	order="172"	hidden="false"   type="rich-text-area"	labeli18n="ri.data.functionalityBeyondNormalRendering"	label='{"en": "Functionality beyond normal rendering"}' xpath="//*:field[@name='functionalityBeyondNormalRendering']/string()"~}}
+{{~field name="softwareCharacteristics"				order="170"	hidden="false"   type="separator"   labeli18n="ri.data.softwareCharacteristics"				label='{"en": "Software characteristics", "pt": "Características do software"}'~}}
+{{~field name="relevantCharacteristics" 			order="171"	hidden="false"   type="text-area" 	labeli18n="ri.data.relevantCharacteristics"				label='{"en": "Relevant characteristics"}' xpath="//*:field[@name='relevantCharacteristics']/string()"~}}
+{{~field name="functionalityBeyondNormalRendering" 	order="172"	hidden="false"   type="text-area"	labeli18n="ri.data.functionalityBeyondNormalRendering"	label='{"en": "Functionality beyond normal rendering"}' xpath="//*:field[@name='functionalityBeyondNormalRendering']/string()"~}}
 
 {{! Notes }}
-{{~field name="notes"								order="180"	hidden="false"   type="separator"   	labeli18n="ri.data.notes"								label='{"en": "Notes", "pt": "Notas"}'~}}
-{{~field name="general"								order="181"	hidden="false"   type="rich-text-area" 	labeli18n="ri.data.general"								label='{"en": "General"}' xpath="//*:field[@name='general']/string()"~}}
-{{~field name="history"								order="182"	hidden="false"   type="rich-text-area" 	labeli18n="ri.data.history"								label='{"en": "History"}' xpath="//*:field[@name='history']/string()"~}}
+{{~field name="notes"								order="180"	hidden="false"   type="separator"  	labeli18n="ri.data.notes"								label='{"en": "Notes", "pt": "Notas"}'~}}
+{{~field name="general"								order="181"	hidden="false"   type="text-area" 	labeli18n="ri.data.general"								label='{"en": "General"}' xpath="//*:field[@name='general']/string()"~}}
+{{~field name="history"								order="182"	hidden="false"   type="text-area" 	labeli18n="ri.data.history"								label='{"en": "History"}' xpath="//*:field[@name='history']/string()"~}}
 
-<?xml version="1.0" encoding="utf-8"?>
-<metadata>
+<extras>
 	{{! Software description }}
 	{{~#if softwareCategory~}}<field name="softwareCategory">{{softwareCategory}}</field>{{~/if~}}
 	{{~#if softwareDesignation~}}<field name="softwareDesignation">{{softwareDesignation}}</field>{{~/if~}}
@@ -44,4 +43,4 @@
 	{{! Notes }}
 	{{~#if general~}}<field name="general">{{general}}</field>{{~/if~}}
 	{{~#if history~}}<field name="history">{{history}}</field>{{~/if~}}
-</metadata>
+</extras>

@@ -56,6 +56,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.utils.URNUtils;
+import org.roda.core.data.utils.XMLUtils;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteRODAObject;
@@ -2839,9 +2840,9 @@ public class ModelService extends ModelObservable {
       ri.setUpdatedBy(createdBy);
       ri.setUpdatedOn(creationDate);
 
-      String riAsJson = JsonUtils.getJsonFromObject(ri);
+      String riAsXML = XMLUtils.getXMLFromObject(ri);
       StoragePath representationInformationPath = ModelUtils.getRepresentationInformationStoragePath(ri.getId());
-      storage.createBinary(representationInformationPath, new StringContentPayload(riAsJson), false);
+      storage.createBinary(representationInformationPath, new StringContentPayload(riAsXML), false);
     } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException
       | AlreadyExistsException e) {
       LOGGER.error("Error creating representation information in storage", e);
@@ -2857,9 +2858,9 @@ public class ModelService extends ModelObservable {
       ri.setUpdatedBy(updatedBy);
       ri.setUpdatedOn(new Date());
 
-      String riAsJson = JsonUtils.getJsonFromObject(ri);
+      String riAsXML = XMLUtils.getXMLFromObject(ri);
       StoragePath representationInformationPath = ModelUtils.getRepresentationInformationStoragePath(ri.getId());
-      storage.updateBinaryContent(representationInformationPath, new StringContentPayload(riAsJson), false, true);
+      storage.updateBinaryContent(representationInformationPath, new StringContentPayload(riAsXML), false, true);
     } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
       LOGGER.error("Error updating format in storage", e);
     }
@@ -2887,7 +2888,7 @@ public class ModelService extends ModelObservable {
     InputStream inputStream = null;
     try {
       inputStream = binary.getContent().createInputStream();
-      ret = JsonUtils.getObjectFromJson(inputStream, RepresentationInformation.class);
+      ret = XMLUtils.getObjectFromXML(inputStream, RepresentationInformation.class);
     } catch (IOException e) {
       throw new GenericException("Error reading representation information", e);
     } finally {

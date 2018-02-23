@@ -444,6 +444,11 @@
 				<version>${jackson.version}</version>
 			</dependency>
 			<dependency>
+			  <groupId>com.fasterxml.jackson.dataformat</groupId>
+			  <artifactId>jackson-dataformat-xml</artifactId>
+			  <version>${jackson.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>com.google.gwt</groupId>
 				<artifactId>gwt-servlet</artifactId>
 				<version>${gwt_version}</version>

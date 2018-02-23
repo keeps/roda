@@ -34,7 +34,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
 public final class JsonUtils {
-
   private static final Logger LOGGER = LoggerFactory.getLogger(JsonUtils.class);
   private static final String JSON_ERROR_MESSAGE = "Error while parsing JSON";
 

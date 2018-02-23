@@ -241,4 +241,116 @@ public class Format extends NamedIndexedModel implements IsModelObject, IsIndexe
     return Arrays.asList(RodaConstants.INDEX_UUID);
   }
 
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((alternativeDesignations == null) ? 0 : alternativeDesignations.hashCode());
+    result = prime * result + ((categories == null) ? 0 : categories.hashCode());
+    result = prime * result + ((definition == null) ? 0 : definition.hashCode());
+    result = prime * result + ((developer == null) ? 0 : developer.hashCode());
+    result = prime * result + ((extensions == null) ? 0 : extensions.hashCode());
+    result = prime * result + ((initialRelease == null) ? 0 : initialRelease.hashCode());
+    result = prime * result + (isOpenFormat ? 1231 : 1237);
+    result = prime * result + ((latestVersion == null) ? 0 : latestVersion.hashCode());
+    result = prime * result + ((mimetypes == null) ? 0 : mimetypes.hashCode());
+    result = prime * result + ((popularity == null) ? 0 : popularity.hashCode());
+    result = prime * result + ((pronoms == null) ? 0 : pronoms.hashCode());
+    result = prime * result + ((provenanceInformation == null) ? 0 : provenanceInformation.hashCode());
+    result = prime * result + ((standard == null) ? 0 : standard.hashCode());
+    result = prime * result + ((utis == null) ? 0 : utis.hashCode());
+    result = prime * result + ((versions == null) ? 0 : versions.hashCode());
+    result = prime * result + ((websites == null) ? 0 : websites.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (!super.equals(obj))
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    Format other = (Format) obj;
+    if (alternativeDesignations == null) {
+      if (other.alternativeDesignations != null)
+        return false;
+    } else if (!alternativeDesignations.equals(other.alternativeDesignations))
+      return false;
+    if (categories == null) {
+      if (other.categories != null)
+        return false;
+    } else if (!categories.equals(other.categories))
+      return false;
+    if (definition == null) {
+      if (other.definition != null)
+        return false;
+    } else if (!definition.equals(other.definition))
+      return false;
+    if (developer == null) {
+      if (other.developer != null)
+        return false;
+    } else if (!developer.equals(other.developer))
+      return false;
+    if (extensions == null) {
+      if (other.extensions != null)
+        return false;
+    } else if (!extensions.equals(other.extensions))
+      return false;
+    if (initialRelease == null) {
+      if (other.initialRelease != null)
+        return false;
+    } else if (!initialRelease.equals(other.initialRelease))
+      return false;
+    if (isOpenFormat != other.isOpenFormat)
+      return false;
+    if (latestVersion == null) {
+      if (other.latestVersion != null)
+        return false;
+    } else if (!latestVersion.equals(other.latestVersion))
+      return false;
+    if (mimetypes == null) {
+      if (other.mimetypes != null)
+        return false;
+    } else if (!mimetypes.equals(other.mimetypes))
+      return false;
+    if (popularity == null) {
+      if (other.popularity != null)
+        return false;
+    } else if (!popularity.equals(other.popularity))
+      return false;
+    if (pronoms == null) {
+      if (other.pronoms != null)
+        return false;
+    } else if (!pronoms.equals(other.pronoms))
+      return false;
+    if (provenanceInformation == null) {
+      if (other.provenanceInformation != null)
+        return false;
+    } else if (!provenanceInformation.equals(other.provenanceInformation))
+      return false;
+    if (standard == null) {
+      if (other.standard != null)
+        return false;
+    } else if (!standard.equals(other.standard))
+      return false;
+    if (utis == null) {
+      if (other.utis != null)
+        return false;
+    } else if (!utis.equals(other.utis))
+      return false;
+    if (versions == null) {
+      if (other.versions != null)
+        return false;
+    } else if (!versions.equals(other.versions))
+      return false;
+    if (websites == null) {
+      if (other.websites != null)
+        return false;
+    } else if (!websites.equals(other.websites))
+      return false;
+    return true;
+  }
+
 }

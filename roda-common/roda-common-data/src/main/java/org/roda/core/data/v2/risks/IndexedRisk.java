@@ -85,4 +85,29 @@ public class IndexedRisk extends Risk implements IsIndexed {
     return Arrays.asList(RodaConstants.INDEX_UUID);
   }
 
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + incidencesCount;
+    result = prime * result + unmitigatedIncidencesCount;
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (!super.equals(obj))
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    IndexedRisk other = (IndexedRisk) obj;
+    if (incidencesCount != other.incidencesCount)
+      return false;
+    if (unmitigatedIncidencesCount != other.unmitigatedIncidencesCount)
+      return false;
+    return true;
+  }
+
 }

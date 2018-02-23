@@ -36,6 +36,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.ReturnWithExceptions;
 import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.utils.XMLUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.formats.Format;
@@ -403,25 +404,28 @@ public class IndexService {
       RodaCoreFactory.getTransferredResourcesScanner().updateTransferredResources(Optional.empty(), true);
     } else {
       StoragePath containerPath = ModelUtils.getContainerPath(objectClass);
-      CloseableIterable<Resource> listResourcesUnderDirectory = null;
-      try {
-        listResourcesUnderDirectory = storage.listResourcesUnderContainer(containerPath, false);
+      try (CloseableIterable<Resource> listResourcesUnderDirectory = storage.listResourcesUnderContainer(containerPath,
+        false)) {
         for (Resource resource : listResourcesUnderDirectory) {
           if (!resource.isDirectory()) {
             Binary binary = (Binary) resource;
             InputStream inputStream = binary.getContent().createInputStream();
-            String jsonString = IOUtils.toString(inputStream, RodaConstants.DEFAULT_ENCODING);
-            T object = JsonUtils.getObjectFromJson(jsonString, objectClass);
+            String objectString = IOUtils.toString(inputStream, RodaConstants.DEFAULT_ENCODING);
+            T object;
+            if (binary.getStoragePath().getName().endsWith(".xml")) {
+              object = XMLUtils.getObjectFromXML(objectString, objectClass);
+            } else {
+              object = JsonUtils.getObjectFromJson(objectString, objectClass);
+            }
             IOUtils.closeQuietly(inputStream);
             reindex(object);
           }
         }
       } catch (NoSuchFileException | NotFoundException e) {
         // do nothing
-      } finally {
-        IOUtils.closeQuietly(listResourcesUnderDirectory);
       }
     }
+
   }
 
   public <T extends Serializable> ReturnWithExceptions<Void, ModelObserver> reindex(T object) {

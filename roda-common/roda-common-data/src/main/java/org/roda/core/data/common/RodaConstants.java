@@ -428,8 +428,7 @@ public final class RodaConstants {
   public static final StorageType DEFAULT_STORAGE_TYPE = StorageType.FILESYSTEM;
 
   public enum SolrType {
-    EMBEDDED, HTTP, @Deprecated
-    HTTP_CLOUD, CLOUD
+    EMBEDDED, HTTP, @Deprecated HTTP_CLOUD, CLOUD
   }
 
   public static final SolrType DEFAULT_SOLR_TYPE = SolrType.EMBEDDED;
@@ -441,8 +440,7 @@ public final class RodaConstants {
   public static final NodeType DEFAULT_NODE_TYPE = NodeType.MASTER;
 
   public enum OrchestratorType {
-    @Deprecated
-    EMBEDDED, AKKA, AKKA_DISTRIBUTED
+    @Deprecated EMBEDDED, AKKA, AKKA_DISTRIBUTED
   }
 
   public static final OrchestratorType DEFAULT_ORCHESTRATOR_TYPE = OrchestratorType.AKKA;
@@ -983,7 +981,7 @@ public final class RodaConstants {
   public static final String REPRESENTATION_INFORMATION_UPDATED_ON = "updatedOn";
   public static final String REPRESENTATION_INFORMATION_UPDATED_BY = "updatedBy";
 
-  public static final String REPRESENTATION_INFORMATION_FILE_EXTENSION = ".json";
+  public static final String REPRESENTATION_INFORMATION_FILE_EXTENSION = ".xml";
   public static final String REPRESENTATION_INFORMATION_SEARCH = "search";
 
   public static final String ONE_OF_FORMAT_FIELDS = "oneOfFormatFields";
@@ -1390,7 +1388,6 @@ public final class RodaConstants {
   public static final List<String> DIPFILE_FIELDS_TO_RETURN = Arrays.asList(RodaConstants.INDEX_UUID,
     RodaConstants.DIPFILE_ID, RodaConstants.DIPFILE_PATH, RodaConstants.DIPFILE_DIP_ID,
     RodaConstants.DIPFILE_IS_DIRECTORY);
-  
 
   /** Private empty constructor */
   private RodaConstants() {

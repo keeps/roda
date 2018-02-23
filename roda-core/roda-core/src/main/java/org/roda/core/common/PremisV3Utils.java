@@ -321,6 +321,7 @@ public final class PremisV3Utils {
         agentIdentifier.setLinkingAgentIdentifierValue(agentId);
       }
     }
+
     EventOutcomeInformationComplexType outcomeInformation = ect.addNewEventOutcomeInformation();
     outcomeInformation.setEventOutcome(getStringPlusAuthority(outcome));
     StringBuilder outcomeDetailNote = new StringBuilder(detailNote);
@@ -331,7 +332,6 @@ public final class PremisV3Utils {
     eodct.setEventOutcomeDetailNote(outcomeDetailNote.toString());
 
     return MetadataUtils.saveToContentPayload(event, true);
-
   }
 
   public static ContentPayload createPremisAgentBinary(String id, String name, PreservationAgentType type,

@@ -164,7 +164,6 @@ public class SolrUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(SolrUtils.class);
 
   private static final String DEFAULT_QUERY_PARSER_OPERATOR = "AND";
-
   private static final Set<String> NON_REPEATABLE_FIELDS = new HashSet<>(Arrays.asList(RodaConstants.AIP_TITLE,
     RodaConstants.AIP_LEVEL, RodaConstants.AIP_DATE_INITIAL, RodaConstants.AIP_DATE_FINAL));
 
@@ -2220,12 +2219,13 @@ public class SolrUtils {
     doc.addField(RodaConstants.REPRESENTATION_INFORMATION_SUPPORT, ri.getSupport().toString());
     doc.addField(RodaConstants.REPRESENTATION_INFORMATION_RELATIONS, JsonUtils.getJsonFromObject(ri.getRelations()));
 
-    doc.addField(RodaConstants.REPRESENTATION_INFORMATION_RELATIONS_WITH_RI,
-      ri.getRelations().stream().filter(r -> RelationObjectType.REPRESENTATION_INFORMATION.equals(r.getObjectType()))
-        .map(r -> r.getLink()).collect(Collectors.toList()));
+    if (ri.getRelations() != null) {
+      doc.addField(RodaConstants.REPRESENTATION_INFORMATION_RELATIONS_WITH_RI,
+        ri.getRelations().stream().filter(r -> RelationObjectType.REPRESENTATION_INFORMATION.equals(r.getObjectType()))
+          .map(r -> r.getLink()).collect(Collectors.toList()));
+    }
 
     doc.addField(RodaConstants.REPRESENTATION_INFORMATION_FILTERS, ri.getFilters());
-
     doc.addField(RodaConstants.REPRESENTATION_INFORMATION_CREATED_ON, ri.getCreatedOn());
     doc.addField(RodaConstants.REPRESENTATION_INFORMATION_CREATED_BY, ri.getCreatedBy());
     doc.addField(RodaConstants.REPRESENTATION_INFORMATION_UPDATED_ON, ri.getUpdatedOn());

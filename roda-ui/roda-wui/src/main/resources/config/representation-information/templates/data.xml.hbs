@@ -1,19 +1,18 @@
 {{! Data description }}
-{{~field name="dataDescription"		order="150"	hidden="false"   type="separator"   	labeli18n="ri.data.dataDescription"		label='{"en": "Data description", "pt": "Descrição dos dados"}'~}}
-{{~field name="strutureInformation" order="151"	hidden="false"   type="rich-text-area" 	labeli18n="ri.data.strutureInformation"	label='{"en": "Structure Information"}' xpath="//*:field[@name='strutureInformation']/string()"~}}
-{{~field name="semanticInformation" order="152"	hidden="false"   type="rich-text-area" 	labeli18n="ri.data.semanticInformation"	label='{"en": "Semantic Information"}' xpath="//*:field[@name='semanticInformation']/string()"~}}
+{{~field name="dataDescription"		order="150"	hidden="false"   type="separator"   labeli18n="ri.data.dataDescription"		label='{"en": "Data description", "pt": "Descrição dos dados"}'~}}
+{{~field name="strutureInformation" order="151"	hidden="false"   type="text-area" 	labeli18n="ri.data.strutureInformation"	label='{"en": "Structure Information"}' xpath="//*:field[@name='strutureInformation']/string()"~}}
+{{~field name="semanticInformation" order="152"	hidden="false"   type="text-area" 	labeli18n="ri.data.semanticInformation"	label='{"en": "Semantic Information"}' xpath="//*:field[@name='semanticInformation']/string()"~}}
 
 {{! Notes }}
-{{~field name="notes"				order="160"	hidden="false"   type="separator"   	labeli18n="ri.data.notes"		label='{"en": "Notes", "pt": "Notas"}'~}}
-{{~field name="general"				order="161"	hidden="false"   type="rich-text-area" 	labeli18n="ri.data.general"		label='{"en": "General"}' xpath="//*:field[@name='general']/string()"~}}
-{{~field name="history"				order="162"	hidden="false"   type="rich-text-area" 	labeli18n="ri.data.history"		label='{"en": "History"}' xpath="//*:field[@name='history']/string()"~}}
+{{~field name="notes"				order="160"	hidden="false"   type="separator"   labeli18n="ri.data.notes"		label='{"en": "Notes", "pt": "Notas"}'~}}
+{{~field name="general"				order="161"	hidden="false"   type="text-area" 	labeli18n="ri.data.general"		label='{"en": "General"}' xpath="//*:field[@name='general']/string()"~}}
+{{~field name="history"				order="162"	hidden="false"   type="text-area" 	labeli18n="ri.data.history"		label='{"en": "History"}' xpath="//*:field[@name='history']/string()"~}}
 
-<?xml version="1.0" encoding="utf-8"?>
-<metadata>
+<extras>
 	{{! Data description }}
 	{{~#if strutureInformation~}}<field name="strutureInformation">{{strutureInformation}}</field>{{~/if~}}
 	{{~#if semanticInformation~}}<field name="semanticInformation">{{semanticInformation}}</field>{{~/if~}}
 	{{! Notes }}
 	{{~#if general~}}<field name="general">{{general}}</field>{{~/if~}}
 	{{~#if history~}}<field name="history">{{history}}</field>{{~/if~}}
-</metadata>
+</extras>

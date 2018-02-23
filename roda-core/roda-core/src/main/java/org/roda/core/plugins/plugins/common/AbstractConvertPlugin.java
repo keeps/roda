@@ -244,7 +244,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
       boolean notify = true;
       PluginState reportState = PluginState.SUCCESS;
       ValidationReport validationReport = new ValidationReport();
-      boolean hasNonPdfFiles = false;
+      boolean hasUnacceptedFormatFiles = false;
       List<File> alteredFiles = new ArrayList<>();
       List<File> newFiles = new ArrayList<>();
       List<DIPFile> newDIPFiles = new ArrayList<>();
@@ -366,7 +366,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                   } else {
                     pluginResultState = PluginState.FAILURE;
                     reportState = pluginResultState;
-                    hasNonPdfFiles = true;
+                    hasUnacceptedFormatFiles = true;
                   }
                 }
               }
@@ -384,8 +384,9 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
             }
           }
 
-          if (hasNonPdfFiles) {
-            reportItem.setPluginDetails("Certain files were not ignored");
+          if (hasUnacceptedFormatFiles) {
+            reportItem.setPluginDetails(
+              "Source files include formats that are not accepted by this plugin and the plugin was not set to ignore these files. The conversion was not run.");
           }
 
           // add unchanged files to the new representation if created
@@ -578,7 +579,8 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
         }
 
         if (hasNonPdfFiles) {
-          reportItem.setPluginDetails("Certain files were not ignored");
+          reportItem.setPluginDetails(
+            "Source files include formats that are not accepted by this plugin and the plugin was not set to ignore these files. The conversion was not run.");
         }
 
         report.addReport(reportItem);
