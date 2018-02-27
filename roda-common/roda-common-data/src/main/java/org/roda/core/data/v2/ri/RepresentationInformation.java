@@ -276,35 +276,4 @@ public class RepresentationInformation extends NamedIndexedModel implements IsMo
       return false;
     return true;
   }
-
-  // public static void main(String[] args) throws GenericException {
-  // RepresentationInformation ri = new RepresentationInformation();
-  // ri.setCreatedBy("admin");
-  // ri.setCreatedOn(new Date());
-  // ri.setName("Representation information name");
-  //
-  // ri.setExtras(
-  // "<extras><metadata><field name=\"softwareCategory\">converter</field><field
-  // name=\"softwareDesignation\">as3esdf</field></metadata></extras>");
-  // ri.setRelations(
-  // Arrays
-  // .asList(
-  // new RepresentationInformationRelation("relationType",
-  // RelationObjectType.REPRESENTATION_INFORMATION, "link",
-  // "label"),
-  // new RepresentationInformationRelation("relationType2",
-  // RelationObjectType.AIP, "link2", "label2")));
-  //
-  // String xmlFromObject = XMLUtils.getXMLFromObject(ri);
-  // System.out.println(xmlFromObject);
-  //
-  // System.out.println("--------------------------");
-  //
-  // RepresentationInformation ri2 = XMLUtils.getObjectFromXML(xmlFromObject,
-  // RepresentationInformation.class);
-  // System.out.println(ri);
-  // System.out.println(ri2);
-  // System.out.println("--------------------------");
-  // System.out.println(ri.equals(ri2));
-  // }
 }
