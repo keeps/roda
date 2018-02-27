@@ -661,7 +661,7 @@ public class IndexServiceTest {
     ri.setName("Portable Document Format");
     ri.setDescription("PDF definition");
     ri.setTags(Arrays.asList("Page Layout Files"));
-    ri.setExtras("");
+    ri.setExtras("<extras></extras>");
     ri.setSupport(RepresentationInformationSupport.SUPPORTED);
     model.createRepresentationInformation(ri, RodaConstants.ADMIN, false);
     index.commit(RepresentationInformation.class);
