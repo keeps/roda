@@ -605,6 +605,7 @@ public final class RodaConstants {
   public static final String REPRESENTATION_TITLE = "title";
   public static final String REPRESENTATION_SIZE_IN_BYTES = "sizeInBytes";
   public static final String REPRESENTATION_NUMBER_OF_DATA_FILES = "numberOfDataFiles";
+  public static final String REPRESENTATION_NUMBER_OF_DATA_FOLDERS = "numberOfDataFolders";
   public static final String REPRESENTATION_NUMBER_OF_DOCUMENTATION_FILES = "numberOfDocumentationFiles";
   public static final String REPRESENTATION_NUMBER_OF_SCHEMA_FILES = "numberOfSchemaFiles";
   public static final String REPRESENTATION_ANCESTORS = "ancestors";

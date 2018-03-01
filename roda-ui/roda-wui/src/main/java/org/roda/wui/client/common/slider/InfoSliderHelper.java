@@ -82,20 +82,19 @@ public class InfoSliderHelper {
     infoSliderPanel.addTitle(new Label(messages.viewRepresentationInfoTitle()));
 
     if (representation != null) {
-
       if (StringUtils.isNotBlank(messages.representationType())) {
         values.put(messages.representationType(),
           new InlineHTML(DescriptionLevelUtils.getRepresentationTypeIcon(representation.getType(), true)));
       }
 
       if (StringUtils.isNotBlank(messages.representationFiles())) {
-        values.put(messages.representationFiles(),
-          new InlineHTML(SafeHtmlUtils.fromString(messages.numberOfFiles(representation.getNumberOfDataFiles()))));
+        values.put(messages.representationFiles(), new InlineHTML(SafeHtmlUtils.fromString(
+          messages.numberOfFiles(representation.getNumberOfDataFiles(), representation.getNumberOfDataFolders()))));
       }
 
-      if (representation.getNumberOfDataFiles() > 0) {
-        values.put(messages.representationFiles(),
-          new InlineHTML(SafeHtmlUtils.fromString(messages.numberOfFiles(representation.getNumberOfDataFiles()))));
+      if (representation.getNumberOfDataFiles() + representation.getNumberOfDataFolders() > 0) {
+        values.put(messages.representationFiles(), new InlineHTML(SafeHtmlUtils.fromString(
+          messages.numberOfFiles(representation.getNumberOfDataFiles(), representation.getNumberOfDataFolders()))));
       }
 
       values.put(messages.representationOriginal(), new InlineHTML(SafeHtmlUtils.fromString(

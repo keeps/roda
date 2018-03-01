@@ -28,6 +28,7 @@ public class IndexedRepresentation extends Representation implements IsIndexed, 
 
   private long sizeInBytes;
   private long numberOfDataFiles;
+  private long numberOfDataFolders;
 
   private long numberOfDocumentationFiles;
   private long numberOfSchemaFiles;
@@ -41,13 +42,14 @@ public class IndexedRepresentation extends Representation implements IsIndexed, 
   }
 
   public IndexedRepresentation(String uuid, String id, String aipId, boolean original, String type, String title,
-    long sizeInBytes, long totalNumberOfFiles, long numberOfDocumentationFiles, long numberOfSchemaFiles,
-    List<String> ancestors) {
+    long sizeInBytes, long totalNumberOfFiles, long totalNumberOfFolders, long numberOfDocumentationFiles,
+    long numberOfSchemaFiles, List<String> ancestors) {
     super(id, aipId, original, type);
     this.uuid = uuid;
     this.setTitle(title);
     this.sizeInBytes = sizeInBytes;
     this.numberOfDataFiles = totalNumberOfFiles;
+    this.setNumberOfDataFolders(totalNumberOfFolders);
     this.numberOfDocumentationFiles = numberOfDocumentationFiles;
     this.numberOfSchemaFiles = numberOfSchemaFiles;
     this.ancestors = ancestors;
@@ -84,6 +86,14 @@ public class IndexedRepresentation extends Representation implements IsIndexed, 
 
   public void setNumberOfDataFiles(long numberOfDataFiles) {
     this.numberOfDataFiles = numberOfDataFiles;
+  }
+
+  public long getNumberOfDataFolders() {
+    return numberOfDataFolders;
+  }
+
+  public void setNumberOfDataFolders(long numberOfDataFolders) {
+    this.numberOfDataFolders = numberOfDataFolders;
   }
 
   public long getNumberOfDocumentationFiles() {
@@ -150,6 +160,8 @@ public class IndexedRepresentation extends Representation implements IsIndexed, 
       return false;
     if (numberOfDataFiles != other.numberOfDataFiles)
       return false;
+    if (numberOfDataFolders != other.numberOfDataFolders)
+      return false;
     if (uuid == null) {
       if (other.uuid != null)
         return false;
@@ -161,23 +173,25 @@ public class IndexedRepresentation extends Representation implements IsIndexed, 
   @Override
   public String toString() {
     return "IndexedRepresentation [uuid=" + uuid + ", title=" + title + ", sizeInBytes=" + sizeInBytes
-      + ", numberOfDataFiles=" + numberOfDataFiles + ", numberOfDocumentationFiles=" + numberOfDocumentationFiles
-      + ", numberOfSchemaFiles=" + numberOfSchemaFiles + ", ancestors=" + ancestors + ", createdOn="
-      + super.getCreatedOn() + ", createdBy=" + super.getCreatedBy() + ", updatedOn=" + super.getUpdatedOn()
-      + ", updatedBy=" + super.getUpdatedBy() + ", representationStates=" + super.getRepresentationStates() + ']';
+      + ", numberOfDataFiles=" + numberOfDataFiles + ", numberOfDataFolders=" + numberOfDataFolders
+      + " numberOfDocumentationFiles=" + numberOfDocumentationFiles + ", numberOfSchemaFiles=" + numberOfSchemaFiles
+      + ", ancestors=" + ancestors + ", createdOn=" + super.getCreatedOn() + ", createdBy=" + super.getCreatedBy()
+      + ", updatedOn=" + super.getUpdatedOn() + ", updatedBy=" + super.getUpdatedBy() + ", representationStates="
+      + super.getRepresentationStates() + ']';
   }
 
   @Override
   public List<String> toCsvHeaders() {
-    return Arrays.asList("uuid", "title", "sizeInBytes", "numberOfDataFiles", "numberOfDocumentationFiles",
-      "numberOfSchemaFiles", "ancestors", "createdOn", "createdBy", "updatedOn", "updatedBy", "representationStates");
+    return Arrays.asList("uuid", "title", "sizeInBytes", "numberOfDataFiles", "numberOfDataFolders",
+      "numberOfDocumentationFiles", "numberOfSchemaFiles", "ancestors", "createdOn", "createdBy", "updatedOn",
+      "updatedBy", "representationStates");
   }
 
   @Override
   public List<Object> toCsvValues() {
-    return Arrays.asList(uuid, title, sizeInBytes, numberOfDataFiles, numberOfDocumentationFiles, numberOfSchemaFiles,
-      ancestors, super.getCreatedOn(), super.getCreatedBy(), super.getUpdatedOn(), super.getUpdatedBy(),
-      super.getRepresentationStates());
+    return Arrays.asList(uuid, title, sizeInBytes, numberOfDataFiles, numberOfDataFolders, numberOfDocumentationFiles,
+      numberOfSchemaFiles, ancestors, super.getCreatedOn(), super.getCreatedBy(), super.getUpdatedOn(),
+      super.getUpdatedBy(), super.getRepresentationStates());
   }
 
   @Override

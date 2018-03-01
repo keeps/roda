@@ -394,9 +394,8 @@ public class BrowserHelper {
   private static DescriptiveMetadataViewBundle retrieveDescriptiveMetadataBundle(String aipId, String representationId,
     String descriptiveMetadataId, final Locale locale)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    ModelService model = RodaCoreFactory.getModelService();
-    DescriptiveMetadata descriptiveMetadata = model.retrieveDescriptiveMetadata(aipId, representationId,
-      descriptiveMetadataId);
+    DescriptiveMetadata descriptiveMetadata = RodaCoreFactory.getModelService().retrieveDescriptiveMetadata(aipId,
+      representationId, descriptiveMetadataId);
     return retrieveDescriptiveMetadataBundle(aipId, representationId, descriptiveMetadata, locale);
   }
 
@@ -544,8 +543,8 @@ public class BrowserHelper {
     List<String> aipFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL,
       RodaConstants.AIP_DATE_FINAL, RodaConstants.AIP_DATE_INITIAL, RodaConstants.AIP_GHOST);
     List<String> representationFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.REPRESENTATION_TYPE,
-      RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES, RodaConstants.REPRESENTATION_ORIGINAL,
-      RodaConstants.REPRESENTATION_AIP_ID, RodaConstants.REPRESENTATION_ID);
+      RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES, RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FOLDERS,
+      RodaConstants.REPRESENTATION_ORIGINAL, RodaConstants.REPRESENTATION_AIP_ID, RodaConstants.REPRESENTATION_ID);
     List<String> fileFields = new ArrayList<>();
 
     // infer from DIP

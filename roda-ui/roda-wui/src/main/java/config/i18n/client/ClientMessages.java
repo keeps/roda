@@ -800,7 +800,7 @@ public interface ClientMessages extends Messages {
 
   String transferredResourceDateCreated();
 
-  String numberOfFiles(long count);
+  String numberOfFiles(long countFiles, long countFolders);
 
   String representationId();
 

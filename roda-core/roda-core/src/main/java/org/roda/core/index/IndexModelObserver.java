@@ -222,18 +222,23 @@ public class IndexModelObserver implements ModelObserver {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
     Long sizeInBytes = 0L;
     Long numberOfDataFiles = 0L;
+    Long numberOfDataFolder = 0L;
 
     try (CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(representation.getAipId(),
       representation.getId(), true)) {
       for (OptionalWithCause<File> file : allFiles) {
         if (file.isPresent()) {
           sizeInBytes += indexFile(aip, file.get(), ancestors, false).addTo(ret).getReturnedObject();
+
+          if (file.get().isDirectory()) {
+            numberOfDataFolder++;
+          } else {
+            numberOfDataFiles++;
+          }
         } else {
           LOGGER.error("Cannot index representation file", file.getCause());
           ret.add(file.getCause());
         }
-
-        numberOfDataFiles++;
       }
 
       // Calculate number of documentation and schema files
@@ -256,7 +261,8 @@ public class IndexModelObserver implements ModelObserver {
       }
 
       SolrInputDocument representationDocument = SolrUtils.representationToSolrDocument(aip, representation,
-        sizeInBytes, numberOfDataFiles, numberOfDocumentationFiles, numberOfSchemaFiles, ancestors, model, false);
+        sizeInBytes, numberOfDataFiles, numberOfDataFolder, numberOfDocumentationFiles, numberOfSchemaFiles, ancestors,
+        model, false);
       SolrUtils.create(index, RodaConstants.INDEX_REPRESENTATION, representationDocument, (ModelObserver) this)
         .addTo(ret);
     } catch (IOException | RequestNotValidException | GenericException | NotFoundException

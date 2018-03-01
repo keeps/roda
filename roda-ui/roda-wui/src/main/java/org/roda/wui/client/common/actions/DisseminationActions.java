@@ -14,7 +14,10 @@ import java.util.Set;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.ip.AIPLink;
+import org.roda.core.data.v2.ip.FileLink;
 import org.roda.core.data.v2.ip.IndexedDIP;
+import org.roda.core.data.v2.ip.RepresentationLink;
 import org.roda.wui.client.browse.BrowseAIP;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.EditPermissions;
@@ -111,8 +114,46 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
     callback.onSuccess(ActionImpact.NONE);
   }
 
-  private void remove(IndexedDIP dissemination, AsyncCallback<ActionImpact> callback) {
-    remove(objectToSelectedItems(dissemination), callback);
+  private void remove(final IndexedDIP dip, AsyncCallback<ActionImpact> callback) {
+    Dialogs.showConfirmDialog(messages.browseFileDipRepresentationConfirmTitle(),
+      messages.browseFileDipRepresentationConfirmMessage(), messages.dialogCancel(), messages.dialogYes(),
+      new AsyncCallback<Boolean>() {
+
+        @Override
+        public void onSuccess(Boolean confirmed) {
+          if (confirmed) {
+            BrowserService.Util.getInstance().deleteDIPs(objectToSelectedItems(dip), new LoadingAsyncCallback<Void>() {
+
+              @Override
+              public void onFailure(Throwable caught) {
+                callback.onFailure(caught);
+              }
+
+              @Override
+              public void onSuccessImpl(Void result) {
+                if (!dip.getFileIds().isEmpty()) {
+                  FileLink link = dip.getFileIds().get(0);
+                  HistoryUtils.openBrowse(link.getAipId(), link.getRepresentationId(), link.getPath(),
+                    link.getFileId());
+                } else if (!dip.getRepresentationIds().isEmpty()) {
+                  RepresentationLink link = dip.getRepresentationIds().get(0);
+                  HistoryUtils.openBrowse(link.getAipId(), link.getRepresentationId());
+                } else if (!dip.getAipIds().isEmpty()) {
+                  AIPLink link = dip.getAipIds().get(0);
+                  HistoryUtils.openBrowse(link.getAipId());
+                } else {
+                  callback.onSuccess(ActionImpact.DESTROYED);
+                }
+              }
+            });
+          }
+        }
+
+        @Override
+        public void onFailure(Throwable caught) {
+          // nothing to do
+        }
+      });
   }
 
   private void remove(final SelectedItems<IndexedDIP> selectedItems, final AsyncCallback<ActionImpact> callback) {

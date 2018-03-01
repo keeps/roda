@@ -55,8 +55,9 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
   private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
     RodaConstants.REPRESENTATION_ID, RodaConstants.REPRESENTATION_AIP_ID, RodaConstants.REPRESENTATION_ORIGINAL,
     RodaConstants.REPRESENTATION_TYPE, RodaConstants.REPRESENTATION_SIZE_IN_BYTES,
-    RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES, RodaConstants.REPRESENTATION_CREATED_ON,
-    RodaConstants.REPRESENTATION_UPDATED_ON, RodaConstants.REPRESENTATION_STATES);
+    RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES, RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FOLDERS,
+    RodaConstants.REPRESENTATION_CREATED_ON, RodaConstants.REPRESENTATION_UPDATED_ON,
+    RodaConstants.REPRESENTATION_STATES);
 
   public RepresentationList() {
     this(null, false, null, null, false);
@@ -110,7 +111,7 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
     numberOfDataFilesColumn = new TextColumn<IndexedRepresentation>() {
       @Override
       public String getValue(IndexedRepresentation rep) {
-        return rep != null ? messages.numberOfFiles(rep.getNumberOfDataFiles()) : null;
+        return rep != null ? messages.numberOfFiles(rep.getNumberOfDataFiles(), rep.getNumberOfDataFolders()) : null;
       }
     };
 

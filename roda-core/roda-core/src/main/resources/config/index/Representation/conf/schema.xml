@@ -114,6 +114,7 @@
    <field name="type" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="sizeInBytes" type="long" indexed="true" stored="true" /> 
    <field name="numberOfDataFiles" type="long" indexed="true" stored="true" />
+   <field name="numberOfDataFolders" type="long" indexed="true" stored="true" />
    <field name="numberOfDocumentationFiles" type="long" indexed="true" stored="true" />
    <field name="numberOfSchemaFiles" type="long" indexed="true" stored="true" />
    <field name="ancestors" type="string" indexed="true" stored="true" required="false" multiValued="true" /> 

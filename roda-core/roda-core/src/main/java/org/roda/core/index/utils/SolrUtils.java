@@ -1385,6 +1385,7 @@ public class SolrUtils {
 
     final Long sizeInBytes = objectToLong(doc.get(RodaConstants.REPRESENTATION_SIZE_IN_BYTES), 0L);
     final Long totalNumberOfFiles = objectToLong(doc.get(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES), 0L);
+    final Long totalNumberOfFolders = objectToLong(doc.get(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FOLDERS), 0L);
 
     final Long numberOfDocumentationFiles = objectToLong(
       doc.get(RodaConstants.REPRESENTATION_NUMBER_OF_DOCUMENTATION_FILES), 0L);
@@ -1393,7 +1394,8 @@ public class SolrUtils {
     final List<String> ancestors = objectToListString(doc.get(RodaConstants.AIP_ANCESTORS));
 
     IndexedRepresentation rep = new IndexedRepresentation(uuid, id, aipId, Boolean.TRUE.equals(original), type, title,
-      sizeInBytes, totalNumberOfFiles, numberOfDocumentationFiles, numberOfSchemaFiles, ancestors);
+      sizeInBytes, totalNumberOfFiles, totalNumberOfFolders, numberOfDocumentationFiles, numberOfSchemaFiles,
+      ancestors);
     rep.setCreatedOn(objectToDate(doc.get(RodaConstants.REPRESENTATION_CREATED_ON)));
     rep.setCreatedBy(objectToString(doc.get(RodaConstants.REPRESENTATION_CREATED_BY), ""));
     rep.setUpdatedOn(objectToDate(doc.get(RodaConstants.REPRESENTATION_UPDATED_ON)));
@@ -1411,8 +1413,8 @@ public class SolrUtils {
   }
 
   public static SolrInputDocument representationToSolrDocument(AIP aip, Representation rep, Long sizeInBytes,
-    Long numberOfDataFiles, Long numberOfDocumentationFiles, Long numberOfSchemaFiles, List<String> ancestors,
-    ModelService model, boolean safemode)
+    Long numberOfDataFiles, Long numberOfDataFolders, Long numberOfDocumentationFiles, Long numberOfSchemaFiles,
+    List<String> ancestors, ModelService model, boolean safemode)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     SolrInputDocument doc = new SolrInputDocument();
     doc.addField(RodaConstants.INDEX_UUID, IdUtils.getRepresentationId(rep));
@@ -1423,6 +1425,7 @@ public class SolrUtils {
 
     doc.addField(RodaConstants.REPRESENTATION_SIZE_IN_BYTES, sizeInBytes);
     doc.addField(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES, numberOfDataFiles);
+    doc.addField(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FOLDERS, numberOfDataFolders);
     doc.addField(RodaConstants.REPRESENTATION_NUMBER_OF_DOCUMENTATION_FILES, numberOfDocumentationFiles);
     doc.addField(RodaConstants.REPRESENTATION_NUMBER_OF_SCHEMA_FILES, numberOfSchemaFiles);
 
