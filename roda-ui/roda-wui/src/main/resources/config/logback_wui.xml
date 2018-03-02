@@ -1,5 +1,5 @@
 <included>
-	<appender name="WUI_FILEOUT" class="ch.qos.logback.core.FileAppender">
+	<appender name="WUI_FILEOUT" class="ch.qos.logback.core.RollingFileAppender">
 		<file>${roda.home}/log/roda-wui.log</file>
 		<encoder>
 			<pattern>%d [%thread] %-5level %logger{36} - %msg%n</pattern>

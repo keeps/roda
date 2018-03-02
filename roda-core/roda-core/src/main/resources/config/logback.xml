@@ -9,21 +9,21 @@
 		</encoder>
 	</appender>
 
-	<appender name="CORE_FILEOUT" class="ch.qos.logback.core.FileAppender">
+	<appender name="CORE_FILEOUT" class="ch.qos.logback.core.RollingFileAppender">
 		<file>${roda.home}/log/roda-core.log</file>
 		<encoder>
 			<pattern>%d [%thread] %-5level %logger{36} - %msg%n</pattern>
 		</encoder>
 	</appender>
 
-	<appender name="CORE_FILEOUT_NO_THREAD" class="ch.qos.logback.core.FileAppender">
+	<appender name="CORE_FILEOUT_NO_THREAD" class="ch.qos.logback.core.RollingFileAppender">
 		<file>${roda.home}/log/roda-core.log</file>
 		<encoder>
 			<pattern>%d %-5level %logger{36} - %msg%n</pattern>
 		</encoder>
 	</appender>
 	
-	<appender name="AKKA_FILE" class="ch.qos.logback.core.FileAppender">
+	<appender name="AKKA_FILE" class="ch.qos.logback.core.RollingFileAppender">
 		<file>${roda.home}/log/roda-core-akka.log</file>
 		<encoder>
 			<pattern>%d [%X{akkaSourceActor} %X{akkaSourceThread}] %-5level %logger{36} - %msg%n</pattern>
