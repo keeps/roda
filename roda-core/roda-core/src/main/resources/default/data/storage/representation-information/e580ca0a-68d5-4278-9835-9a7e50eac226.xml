@@ -1,0 +1,29 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>Digital Orthophotos (Quadrangle and Quarter Quadrangle)</name>
+  <description>A digital image with the properties of an orthographic projection. It is derived from a digitized perspective aerial photograph or other remotely sensed image data.</description>
+  <extras>
+    <field name="formatCategory">still-image</field>
+    <field name="filenameExtension">doq</field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>e580ca0a-68d5-4278-9835-9a7e50eac226</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <relation>
+    <link>http://nationalmap.gov/standards/doqstds.html</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://nationalmap.gov/standards/doqstds.html</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>still-image</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

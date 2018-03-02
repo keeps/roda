@@ -1,0 +1,23 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>Audio Interchange File Format (AIFF) with LPCM Audio</name>
+  <description>AIFF wrapper containing an LPCM sound bitstream.</description>
+  <extras>
+    <field name="formatCategory">sound</field>
+    <field name="filenameExtension">aif</field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>50a05fb2-f727-49cb-88a2-0757cdd66636</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>sound</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

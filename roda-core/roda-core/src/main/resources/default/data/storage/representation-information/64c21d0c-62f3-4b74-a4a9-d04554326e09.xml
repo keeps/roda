@@ -1,0 +1,41 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>Spatial Data Transfer Standard - Topological Vector Profile (SDTS-TVP)</name>
+  <description>A profile of SDTS (Spatial Data Transfer Standard) for use with geographic vector data with planar graph topology.</description>
+  <extras>
+    <field name="formatCategory">dataset</field>
+    <field name="filenameExtension"></field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>64c21d0c-62f3-4b74-a4a9-d04554326e09</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <relation>
+    <link>http://webstore.ansi.org/RecordDetail.aspx?sku=ANSI+INCITS+320-1998+(R2003)</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://webstore.ansi.org/RecordDetail.aspx?sku=ANSI+INCITS+320-1998+(R2003)</title>
+  </relation>
+  <relation>
+    <link>http://mcmcweb.er.usgs.gov/sdts/SDTS_standard_nov97/p4toc.html</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://mcmcweb.er.usgs.gov/sdts/SDTS_standard_nov97/p4toc.html</title>
+  </relation>
+  <relation>
+    <link>http://mcmcweb.er.usgs.gov/sdts/SDTS_standard_oct91/index_4.html</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://mcmcweb.er.usgs.gov/sdts/SDTS_standard_oct91/index_4.html</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>dataset</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

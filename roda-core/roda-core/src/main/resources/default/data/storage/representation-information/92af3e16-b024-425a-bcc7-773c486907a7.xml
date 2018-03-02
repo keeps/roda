@@ -1,0 +1,23 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>MBOXRD Email Format </name>
+  <description>MBOXRD is one of the MBOX family of related file formats used for holding collections of email messages within a single file. MBOXRD files adds one greater-than sign ( &gt; ) to any line that begins with zero or more &quot;&gt;&quot; followed by &quot;From &quot;.</description>
+  <extras>
+    <field name="formatCategory">text</field>
+    <field name="filenameExtension"></field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>92af3e16-b024-425a-bcc7-773c486907a7</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>text</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

@@ -1,0 +1,23 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>Uncompressed YCbCr Video Picture Stream Family (4:2:2)</name>
+  <description>A digital, color-difference component video picture stream in which the two chroma components are sampled at half the rate of luma.  Reducing the horizontal chroma resolution by one-half reduces the bandwidth of the uncompressed video signal by one-third with little visual impact. </description>
+  <extras>
+    <field name="formatCategory">moving-image</field>
+    <field name="filenameExtension"></field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>949f3ebc-d76c-4b9c-b587-954ae8e5722f</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>moving-image</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

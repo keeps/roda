@@ -1,0 +1,35 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>JSON (JavaScript Object Notation); also ECMA-404, JSON Data Interchange Format</name>
+  <description>JSON is a lightweight, text-based, language-independent data interchange format. It was derived from the Javascript/ECMAScript programming language, but is programming language independent. JSON defines a small set of structuring rules for the portable representation of structured data. </description>
+  <extras>
+    <field name="formatCategory">dataset</field>
+    <field name="filenameExtension">json</field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>d35a4d0b-e21b-4ed2-92ec-690d46253635</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <relation>
+    <link>http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf</title>
+  </relation>
+  <relation>
+    <link>http://www.ietf.org/rfc/rfc4627.txt</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://www.ietf.org/rfc/rfc4627.txt</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>dataset</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

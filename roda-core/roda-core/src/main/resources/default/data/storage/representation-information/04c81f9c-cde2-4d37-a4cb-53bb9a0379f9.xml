@@ -1,0 +1,53 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>EPUB, Electronic Publication, Version 3</name>
+  <description>A format for electronic publications with reflowable text in marked up document structure with associated images for illustrations, packaged in a ZIP-based container format (OCF).  EPUB Version 3 also provides for audio, including synchronization of text and audio, and for text-to-speech synthesis.  </description>
+  <extras>
+    <field name="formatCategory">text</field>
+    <field name="filenameExtension">epub</field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>04c81f9c-cde2-4d37-a4cb-53bb9a0379f9</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <relation>
+    <link>http://idpf.org/epub/30</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://idpf.org/epub/30</title>
+  </relation>
+  <relation>
+    <link>http://www.idpf.org/epub/30/spec/epub30-ocf.html</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://www.idpf.org/epub/30/spec/epub30-ocf.html</title>
+  </relation>
+  <relation>
+    <link>http://www.idpf.org/epub/30/spec/epub30-publications.html</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://www.idpf.org/epub/30/spec/epub30-publications.html</title>
+  </relation>
+  <relation>
+    <link>http://www.idpf.org/epub/30/spec/epub30-contentdocs.html</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://www.idpf.org/epub/30/spec/epub30-contentdocs.html</title>
+  </relation>
+  <relation>
+    <link>http://www.idpf.org/epub/30/spec/epub30-mediaoverlays.html</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://www.idpf.org/epub/30/spec/epub30-mediaoverlays.html</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>text</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

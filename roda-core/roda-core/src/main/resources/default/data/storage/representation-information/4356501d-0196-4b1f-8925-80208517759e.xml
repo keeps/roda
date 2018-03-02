@@ -1,0 +1,29 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>OEBF, Open eBook Forum Publication Structure 1.0.1</name>
+  <description>An XML-based specification for the content, structure, and presentation of electronic books, a predecessor to the EPUB format. OEBPS was developed by the Open eBook Forum, a group of organizations involved in electronic publishing and now known as the International Digital Publishing Forum (IDPF).</description>
+  <extras>
+    <field name="formatCategory">text</field>
+    <field name="filenameExtension">opf, xml</field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>4356501d-0196-4b1f-8925-80208517759e</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <relation>
+    <link>http://web.archive.org/web/20101212174804/http://idpf.org/oebps/oebps1.0.1/index.htm</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://web.archive.org/web/20101212174804/http://idpf.org/oebps/oebps1.0.1/index.htm</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>text</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

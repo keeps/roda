@@ -1,0 +1,23 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>QuickTime Video, Apple ProRes 422 Codec Family</name>
+  <description>QuickTime wrapper with Apple ProRes 422 codec video bitstream and other data chunks, e.g., audio. </description>
+  <extras>
+    <field name="formatCategory">moving-image</field>
+    <field name="filenameExtension">mov</field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>30df62d5-6f6d-436e-a071-6e77d464bce5</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>moving-image</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

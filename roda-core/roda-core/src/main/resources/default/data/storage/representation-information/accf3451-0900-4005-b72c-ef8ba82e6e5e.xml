@@ -1,0 +1,40 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>Digital Talking Book.  ANSI/NISO Z39.86-2002</name>
+  <description>NISO Digital Talking Book Standard, ANSI/NISO Z39.86-2002, defines the format and content of the electronic file set that comprises a digital talking book (DTB) and establishes a limited set of requirements for DTB playback devices.</description>
+  <extras>
+    <field name="formatCategory">other</field>
+    <field name="filenameExtension">opf, xml, ncx, aac, mp3, wav</field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>accf3451-0900-4005-b72c-ef8ba82e6e5e</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <relation>
+    <link>http://www.niso.org/workrooms/daisy/Z39-86-2002.html</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://www.niso.org/workrooms/daisy/Z39-86-2002.html</title>
+  </relation>
+  <relation>
+    <link>http://www.loc.gov/nls/niso/dtd.htm</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://www.loc.gov/nls/niso/dtd.htm</title>
+  </relation>
+  <relation>
+    <link>http://www.loc.gov/nls/z3986/v100/dtbook110doc.htm</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://www.loc.gov/nls/z3986/v100/dtbook110doc.htm</title>
+  </relation>
+  <support>KNOWN</support>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

@@ -1,0 +1,22 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>W3C XML Schema Language 1.0</name>
+  <description>A language with which to write schemas that define and describe classes of XML documents.</description>
+  <extras>
+    <field name="formatCategory">other</field>
+    <field name="filenameExtension">xsd</field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>5b116020-be5b-4998-9e6e-111d4920a74e</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <support>KNOWN</support>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

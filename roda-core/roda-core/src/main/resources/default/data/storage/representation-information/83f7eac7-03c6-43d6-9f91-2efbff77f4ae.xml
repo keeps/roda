@@ -1,0 +1,22 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>Extensible Markup Language (XML) </name>
+  <description>Extensible Markup Language (XML) is a simple, very flexible text format derived from SGML (ISO 8879). XML documents fall into two broad categories: data-centric and document-centric. </description>
+  <extras>
+    <field name="formatCategory">other</field>
+    <field name="filenameExtension">xml</field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>83f7eac7-03c6-43d6-9f91-2efbff77f4ae</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <support>KNOWN</support>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

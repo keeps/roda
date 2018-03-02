@@ -1,0 +1,29 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>XML Document Type Definition (DTD)</name>
+  <description>A formal expression (in XML) of the structural constraints for a class of XML documents, consisting of element and attribute-list declarations.</description>
+  <extras>
+    <field name="formatCategory">text</field>
+    <field name="filenameExtension">dtd</field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>8014c0cf-fc8f-403a-a978-4cd04353d479</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <relation>
+    <link>http://www.w3.org/TR/xml/</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://www.w3.org/TR/xml/</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>text</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

@@ -1,0 +1,29 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>Advanced Forensic Framework 4, AFF 4</name>
+  <description>An object-oriented &quot;framework&quot; that manages disk-image data, typically gathered as evidence in legal or investigative activities.</description>
+  <extras>
+    <field name="formatCategory">any</field>
+    <field name="filenameExtension"></field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>7d5a7f7c-fba6-46cc-b3e2-66572f737875</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <relation>
+    <link>http://www.aff4.org/docs/Overview/Introduction.html</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://www.aff4.org/docs/Overview/Introduction.html</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>any</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

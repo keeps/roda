@@ -1,0 +1,29 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>Band Interleaved by Line (BIL) Image File</name>
+  <description>A basic binary raster image file format, used for aerial photography and spectral data. The BIL file is a binary file of raw data that requires additional information, usually represented in an associated ASCII file, to be interpreted correctly.  </description>
+  <extras>
+    <field name="formatCategory">still-image</field>
+    <field name="filenameExtension">bil</field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>ed7cdad0-9dc1-41c6-95d9-9b86cf73ee5d</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <relation>
+    <link>http://downloads.esri.com/support/whitepapers/other_/eximgav.pdf</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://downloads.esri.com/support/whitepapers/other_/eximgav.pdf</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>still-image</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

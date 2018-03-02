@@ -1,0 +1,23 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>ZIP File Format (PKWARE)</name>
+  <description>A de facto industry standard for cross-platform data exchange and efficient data storage, combining data compression and data encryption in a portable archive format for a set of related files.</description>
+  <extras>
+    <field name="formatCategory">aggregate</field>
+    <field name="filenameExtension">zip, ZIP</field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>44c537cf-5724-4a9c-a2a1-42853fbe6358</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>aggregate</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

@@ -1,0 +1,23 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>Apple ProRes 422 Proxy</name>
+  <description>The most compressed of the ProRes codecs, Apple ProRes 422 Proxy is high-quality edit proxy for Final Cut Server software.</description>
+  <extras>
+    <field name="formatCategory">moving-image</field>
+    <field name="filenameExtension"></field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>ab4537e2-24b6-488b-8091-ce6b1ed9a0d1</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>moving-image</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

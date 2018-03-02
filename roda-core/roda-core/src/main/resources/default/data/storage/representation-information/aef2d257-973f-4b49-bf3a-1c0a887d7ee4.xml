@@ -1,0 +1,35 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>MBOX Email Format</name>
+  <description>MBOX is a generic term for a family of related file formats used for storing collections of email messages in a single database file.</description>
+  <extras>
+    <field name="formatCategory">text</field>
+    <field name="filenameExtension">mbox</field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>aef2d257-973f-4b49-bf3a-1c0a887d7ee4</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <relation>
+    <link>http://tools.ietf.org/rfc/rfc4155.txt</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://tools.ietf.org/rfc/rfc4155.txt</title>
+  </relation>
+  <relation>
+    <link>http://qmail.org/qmail-manual-html/man5/mbox.html</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://qmail.org/qmail-manual-html/man5/mbox.html</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>text</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

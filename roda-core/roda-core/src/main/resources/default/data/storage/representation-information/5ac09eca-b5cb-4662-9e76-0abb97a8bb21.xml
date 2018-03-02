@@ -1,0 +1,23 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>Windows Media 9 Video Codec; SMPTE 421M-2006.	Standard for Television: VC-1 Compressed Video Bitstream Format and Decoding Process</name>
+  <description>Video bitstream produced by the Windows Media 9 video codec.</description>
+  <extras>
+    <field name="formatCategory">moving-image</field>
+    <field name="filenameExtension"></field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>5ac09eca-b5cb-4662-9e76-0abb97a8bb21</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>moving-image</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

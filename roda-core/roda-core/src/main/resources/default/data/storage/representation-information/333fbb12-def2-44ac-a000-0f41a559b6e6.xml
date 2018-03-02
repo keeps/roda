@@ -1,0 +1,41 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>Raster Product Format (RPF)</name>
+  <description>RPF is a data structure for geospatial databases composed of rectangular arrays of pixel values (e.g., in digitized images)</description>
+  <extras>
+    <field name="formatCategory">still-image</field>
+    <field name="filenameExtension"></field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>333fbb12-def2-44ac-a000-0f41a559b6e6</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <relation>
+    <link>http://earth-info.nga.mil/publications/specs/printed/2411/2411_RPF.pdf</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://earth-info.nga.mil/publications/specs/printed/2411/2411_RPF.pdf</title>
+  </relation>
+  <relation>
+    <link>http://earth-info.nga.mil/publications/specs/printed/2411/2411_1.pdf</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://earth-info.nga.mil/publications/specs/printed/2411/2411_1.pdf</title>
+  </relation>
+  <relation>
+    <link>http://earth-info.nga.mil/publications/specs/printed/2411/2411_2.pdf</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://earth-info.nga.mil/publications/specs/printed/2411/2411_2.pdf</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>still-image</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

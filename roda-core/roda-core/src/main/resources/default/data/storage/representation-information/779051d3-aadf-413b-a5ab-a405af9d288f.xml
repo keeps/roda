@@ -1,0 +1,23 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>One-bit Delta Sigma (or Sigma Delta) Audio Modulation; Direct Stream Digital (DSD; trade name)</name>
+  <description>System for recreating audible signals using pulse-density modulation encoding known as Direct Stream Digital; the signal is stored as delta-sigma (some say &quot;sigma delta&quot;) modulated digital audio, a sequence of single bit values at a high frequencies.   Used in Super Audio CDs (SACDs), developed by Sony in association with Philips and documented in the 1999 Scarlet Book.</description>
+  <extras>
+    <field name="formatCategory">sound</field>
+    <field name="filenameExtension"></field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>779051d3-aadf-413b-a5ab-a405af9d288f</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>sound</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

@@ -1,0 +1,29 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>BigTIFF</name>
+  <description>A variant TIFF format, BigTIFF  transcends TIFF's 4 GB TIFF limit using 64-bit offsets thereby supporting files up to 18,000 petabytes in size.</description>
+  <extras>
+    <field name="formatCategory">still-image</field>
+    <field name="filenameExtension">btf, tf8, tiff, tif, gtiff</field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>4ff09717-726b-46bc-8d2f-abfa6e2beeec</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <relation>
+    <link>http://www.awaresystems.be/imaging/tiff/bigtiff.html</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://www.awaresystems.be/imaging/tiff/bigtiff.html</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>still-image</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

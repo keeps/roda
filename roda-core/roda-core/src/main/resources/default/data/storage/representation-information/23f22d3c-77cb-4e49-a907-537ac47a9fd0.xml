@@ -1,0 +1,22 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>MXF Operational Pattern 1a (OP1a), with MPEG-2 in Generic Container</name>
+  <description>MXF OP1a file with a video essence encoded as MPEG-2.</description>
+  <extras>
+    <field name="formatCategory">other</field>
+    <field name="filenameExtension"></field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>23f22d3c-77cb-4e49-a907-537ac47a9fd0</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <support>KNOWN</support>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

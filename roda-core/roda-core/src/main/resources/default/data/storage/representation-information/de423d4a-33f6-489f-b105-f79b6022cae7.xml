@@ -1,0 +1,22 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>PDF/X</name>
+  <description>PDF/X is a constrained form of Adobe PDF intended for prepress graphics exchange.</description>
+  <extras>
+    <field name="formatCategory">other</field>
+    <field name="filenameExtension">pdf</field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>de423d4a-33f6-489f-b105-f79b6022cae7</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <support>KNOWN</support>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

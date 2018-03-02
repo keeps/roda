@@ -1,0 +1,35 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>Truevision TGA File format, version 1.0 </name>
+  <description>A simple raster format for individual images first established by Truevision, Inc. in 1984.  Designed for use on systems that use MS-DOS color applications, TGA  is the native format of Truevision's TARGA boards, which were some of the first graphic cards for IBM-compatible PCs to support truecolor display (most often defined as 24-bit RGB color encoding).</description>
+  <extras>
+    <field name="formatCategory">still-image</field>
+    <field name="filenameExtension">tga, vda, icb, vst</field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>06c84fc8-66a5-4bc0-9074-1f4f3381cbea</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <relation>
+    <link>http://www.dca.fee.unicamp.br/~martino/disciplinas/ea978/tgaffs.pdf</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://www.dca.fee.unicamp.br/~martino/disciplinas/ea978/tgaffs.pdf</title>
+  </relation>
+  <relation>
+    <link>http://www.ludorg.net/amnesia/TGA_File_Format_Spec.html</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://www.ludorg.net/amnesia/TGA_File_Format_Spec.html</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>still-image</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

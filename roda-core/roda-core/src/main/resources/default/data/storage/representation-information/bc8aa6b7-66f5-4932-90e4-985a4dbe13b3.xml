@@ -1,0 +1,23 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>MXF Generic Container with Uncompressed Video Essence  UYVY (2vuy)</name>
+  <description>MXF file with the Generic Container implementation for uncompressed video, with a picture essence structure identical to that identified by the FOURCC code UYVY.  In the SMPTE MXF specification (ST 377-1), the structure is identified using the Apple four-character code 2vuy. This picture data is typically associated with soundtrack essences and, as available, timecode, closed captioning, and other elements.</description>
+  <extras>
+    <field name="formatCategory">moving-image</field>
+    <field name="filenameExtension"></field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>bc8aa6b7-66f5-4932-90e4-985a4dbe13b3</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>moving-image</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

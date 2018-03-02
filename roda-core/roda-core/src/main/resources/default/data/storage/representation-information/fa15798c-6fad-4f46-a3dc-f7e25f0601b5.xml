@@ -1,0 +1,22 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>ISO/IEC 14496-12. Information technology -- Coding of audio-visual objects -- Part 12: ISO Base Media File Format (formal name).  ISO/IEC 15444-12.  Information technology -- JPEG 2000 image coding system -- Part 12: ISO base media file format (formal name).  ISO base media file format (common name)</name>
+  <description>Base format for media file formats, designed to contain time-based audio-visual information in a flexible, extensible format that facilitates interchange, management, editing, and presentation of the media. </description>
+  <extras>
+    <field name="formatCategory">other</field>
+    <field name="filenameExtension"></field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>fa15798c-6fad-4f46-a3dc-f7e25f0601b5</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <support>KNOWN</support>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

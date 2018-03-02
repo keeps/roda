@@ -1,0 +1,29 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>Information technology -- Computer graphics and image processing -- Image Processing and Interchange (IPI) -- Functional specification -- Part 5: Basic Image Interchange Format (BIIF)</name>
+  <description>A wrapper for imagery and other forms of content developed to serve military and intelligence-agency interoperability.  Defined in ISO/IEC 12087-5:1998.  The format can wrap up to 999 images and symbols in a single file.</description>
+  <extras>
+    <field name="formatCategory">still-image</field>
+    <field name="filenameExtension"></field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>6123bf15-3f4a-4af2-aada-dc84ec0153ac</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <relation>
+    <link>http://www.gwg.nga.mil/ntb/baseline/docs/biif_5/biifisv1.pdf</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://www.gwg.nga.mil/ntb/baseline/docs/biif_5/biifisv1.pdf</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>still-image</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

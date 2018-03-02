@@ -1,0 +1,23 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>ISO/IEC 10918-1:1994. Information technology -- Digital compression and coding of continuous-tone still images, lossless (formal name); Original lossless JPEG (common name)</name>
+  <description>Lossless compression encoding for full color and grayscale continuous-tone images.  Provides for sequential lossless encoding and decoding. Not based on the DCT [discrete cosine transform] used for regular JPEG.</description>
+  <extras>
+    <field name="formatCategory">still-image</field>
+    <field name="filenameExtension"></field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>e876c1b8-6f05-4f0b-a02c-8cafdc1ddb69</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>still-image</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

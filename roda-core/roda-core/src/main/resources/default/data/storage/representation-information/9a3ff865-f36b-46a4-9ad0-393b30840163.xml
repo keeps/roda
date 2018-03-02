@@ -1,0 +1,35 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>Common Data Format</name>
+  <description>Common Data Format (CDF) is a conceptual data abstraction for storing, manipulating, and accessing multidimensional data sets.  The basic component of CDF is a software programming interface that is a device-independent view of the CDF data model.  The application developer is insulated from the actual physical file format for reasons of conceptual simplicity, device independence, and future expandability.  CDF files created on any given platform can be transported to any other platform onto which CDF is ported and used with any CDF tools or layered applications.</description>
+  <extras>
+    <field name="formatCategory">dataset</field>
+    <field name="filenameExtension">cdf</field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>9a3ff865-f36b-46a4-9ad0-393b30840163</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <relation>
+    <link>http://cdaweb.gsfc.nasa.gov/pub/software/cdf/dist/cdf33_1_2/Documentation/cdf33ifd.pdf</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://cdaweb.gsfc.nasa.gov/pub/software/cdf/dist/cdf33_1_2/Documentation/cdf33ifd.pdf</title>
+  </relation>
+  <relation>
+    <link>http://cdaweb.sci.gsfc.nasa.gov/pub/software/cdf/dist/</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://cdaweb.sci.gsfc.nasa.gov/pub/software/cdf/dist/</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>dataset</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

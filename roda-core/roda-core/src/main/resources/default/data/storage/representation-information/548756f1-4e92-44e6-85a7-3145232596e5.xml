@@ -1,0 +1,35 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>SIARD (Software Independent Archiving of Relational Databases) Version 1.0</name>
+  <description>An open format especially designed for archiving relational databases in a vendor-neutral form.  A SIARD file is a ZIP-based archive of files that capture the structure and content of the database tables in XML, together with any BLOB and CLOB data objects.  </description>
+  <extras>
+    <field name="formatCategory">database</field>
+    <field name="filenameExtension">siard</field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>548756f1-4e92-44e6-85a7-3145232596e5</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <relation>
+    <link>http://www.ech.ch/vechweb/page?p=dossier&amp;documentNumber=eCH-0165&amp;documentVersion=1.0</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://www.ech.ch/vechweb/page?p=dossier&amp;documentNumber=eCH-0165&amp;documentVersion=1.0</title>
+  </relation>
+  <relation>
+    <link>http://www.bar.admin.ch/dienstleistungen/00823/01911/index.html?lang=en</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://www.bar.admin.ch/dienstleistungen/00823/01911/index.html?lang=en</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>database</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

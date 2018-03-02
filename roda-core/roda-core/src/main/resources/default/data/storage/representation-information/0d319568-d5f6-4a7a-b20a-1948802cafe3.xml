@@ -1,0 +1,22 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>CPC (Cartesian Perceptual Compression)</name>
+  <description> Cartesian Perceptual Compression.  CPC specification defines datastream encoding and file format for a compressed, raster (bit-mapped) image, designed for scanned bitonal documents. </description>
+  <extras>
+    <field name="formatCategory">other</field>
+    <field name="filenameExtension">cpc, cpi</field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>0d319568-d5f6-4a7a-b20a-1948802cafe3</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <support>KNOWN</support>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

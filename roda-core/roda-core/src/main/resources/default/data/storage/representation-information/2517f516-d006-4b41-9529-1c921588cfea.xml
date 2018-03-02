@@ -1,0 +1,34 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>PDF (Portable Document Format), version 1.5</name>
+  <description>Version of PDF, developed by Adobe Systems Incorporated and described by Adobe as a general document representation language. Represents a fixed page-layout.  Version 1.5 of the PDF format was associated with Acrobat and Adobe Reader 6.0.</description>
+  <extras>
+    <field name="formatCategory">other</field>
+    <field name="filenameExtension">pdf</field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>2517f516-d006-4b41-9529-1c921588cfea</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <relation>
+    <link>http://www.adobe.com/devnet/pdf/pdf_reference_archive.html</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://www.adobe.com/devnet/pdf/pdf_reference_archive.html</title>
+  </relation>
+  <relation>
+    <link>http://wwwimages.adobe.com/www.adobe.com/content/dam/Adobe/en/devnet/pdf/pdfs/pdf_reference_archives/PDFReference15_v6.pdf</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://wwwimages.adobe.com/www.adobe.com/content/dam/Adobe/en/devnet/pdf/pdfs/pdf_reference_archives/PDFReference15_v6.pdf</title>
+  </relation>
+  <support>KNOWN</support>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

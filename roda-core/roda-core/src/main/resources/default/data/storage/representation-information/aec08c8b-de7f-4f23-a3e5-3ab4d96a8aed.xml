@@ -1,0 +1,23 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>ISO/IEC 14496-1:2001. Information technology -- Coding of audio-visual objects -- Part 1: Systems (formal name);  MPEG-4 file format, version 1 (common name)</name>
+  <description>The first MPEG-4 file format developed by the Moving Picture Experts Group (MPEG).  The format's object-based design defines a set of tools that present binary coded representation of individual audiovisual objects, text, graphics, and synthetic objects.  This format is intended to serve web and other online applications; mobile devices, i.e., cell phones and PDAs; and broadcasting and other professional applications. </description>
+  <extras>
+    <field name="formatCategory">moving-image</field>
+    <field name="filenameExtension">mp4</field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>aec08c8b-de7f-4f23-a3e5-3ab4d96a8aed</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>moving-image</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

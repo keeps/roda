@@ -1,0 +1,35 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>PNG (Portable Network Graphics)</name>
+  <description>Defines both a datastream and an associated file format for a lossless, portable, compressed, raster (bit-mapped) image.  Non-proprietary, open standard from W3C.</description>
+  <extras>
+    <field name="formatCategory">still-image</field>
+    <field name="filenameExtension">png</field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>f94bc658-e0bf-4882-9c7b-6bba6d33702b</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <relation>
+    <link>http://www.libpng.org/pub/png/spec/1.2/PNG-Contents.html</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://www.libpng.org/pub/png/spec/1.2/PNG-Contents.html</title>
+  </relation>
+  <relation>
+    <link>http://www.w3.org/TR/PNG/</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://www.w3.org/TR/PNG/</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>still-image</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

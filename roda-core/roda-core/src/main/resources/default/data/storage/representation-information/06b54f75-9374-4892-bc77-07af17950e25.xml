@@ -1,0 +1,47 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>FLAC (Free Lossless Audio Codec), Version 1.1.2</name>
+  <description>Open source bitstream encoding format designed for lossless compression of LPCM audio data, with many of its default parameters tuned to CD-quality music data.</description>
+  <extras>
+    <field name="formatCategory">sound</field>
+    <field name="filenameExtension">flac, fla</field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>06b54f75-9374-4892-bc77-07af17950e25</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <relation>
+    <link>https://xiph.org/flac/format.html</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>https://xiph.org/flac/format.html</title>
+  </relation>
+  <relation>
+    <link>https://xiph.org/flac/documentation.html</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>https://xiph.org/flac/documentation.html</title>
+  </relation>
+  <relation>
+    <link>https://xiph.org/flac/ogg_mapping.html</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>https://xiph.org/flac/ogg_mapping.html</title>
+  </relation>
+  <relation>
+    <link>https://datatracker.ietf.org/doc/charter-ietf-cellar/</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>https://datatracker.ietf.org/doc/charter-ietf-cellar/</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>sound</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

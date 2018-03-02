@@ -1,0 +1,23 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>ISO/IEC 14496-10:2003.  Information technology -- Coding of audio-visual objects -- Part 10: Advanced Video Coding (formal name); MPEG-4, Advanced Video Coding, Extensions (common name)</name>
+  <description>Extended version of the compression encoding for video documented as Advanced Video Coding (AVC) in part 10 of the ISO/IEC 14496 standard.  The extensions are ones that require the use of MP4_FF_AVCE (MPEG-4 file format for extended AVC) as a wrapper, and they include independent and disposable sample boxes, sample groups, random access recovery points, or new structures in movie fragments.</description>
+  <extras>
+    <field name="formatCategory">other</field>
+    <field name="filenameExtension"></field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>fef19b8d-225b-46ea-896c-585f809fe85a</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>other</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

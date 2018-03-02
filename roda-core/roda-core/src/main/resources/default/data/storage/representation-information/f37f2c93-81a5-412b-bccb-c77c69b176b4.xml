@@ -1,0 +1,23 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>JPEG Image Encoding Family</name>
+  <description>Family of image compression codecs specified in the various parts of ISO/IEC 10918 and ISO/IEC 14495 (and in the parallel ITU-T.81, 83, 84, 86, and 87 standards).  ISO/IEC 10918-1 covers both lossy and lossless compression in several &quot;modes of operation,&quot; not all of which have come into use.  All modes are intended for full color and grayscale continuous-tone images. The lossy compression modes most used employ discrete cosine transforms (DCT). </description>
+  <extras>
+    <field name="formatCategory">still-image</field>
+    <field name="filenameExtension"></field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>f37f2c93-81a5-412b-bccb-c77c69b176b4</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>still-image</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

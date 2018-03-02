@@ -1,0 +1,23 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>ISO/IEC 14496-2:2004. Information technology -- Coding of audio-visual objects -- Part 2: Visual. Simple Scalable Profile (formal name); MPEG-4, Visual Coding, Simple Scalable Profile (common name)</name>
+  <description>Scalable video encoding intended to serve the same applications as the MPEG-4 Simple Profile (mobile audio-visual services, low-complexity video for the Internet, and small camera devices that record to disk or memory chips) with added support for temporal and spatial scalability.</description>
+  <extras>
+    <field name="formatCategory">moving-image</field>
+    <field name="filenameExtension">mp4</field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>c345019b-10fb-45f6-b9a8-cb603b9a07b8</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>moving-image</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

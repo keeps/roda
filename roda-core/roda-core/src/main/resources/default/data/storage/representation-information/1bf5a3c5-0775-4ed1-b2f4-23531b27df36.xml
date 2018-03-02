@@ -1,0 +1,40 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>Advance Authoring Format (AAF) Object Specification, Version 1.1</name>
+  <description>AAF is an object-based file format that wraps metadata together with video, audio, and other bitstreams optimized for the interchange of content by creators across platforms and between applications.  Designed for editing, compare AAF to MXF called the &quot;equivalent to videotape.&quot;</description>
+  <extras>
+    <field name="formatCategory">other</field>
+    <field name="filenameExtension">aaf</field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>1bf5a3c5-0775-4ed1-b2f4-23531b27df36</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <relation>
+    <link>http://www.amwa.tv/downloads/specifications/aafobjectspec-v1.1.pdf</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://www.amwa.tv/downloads/specifications/aafobjectspec-v1.1.pdf</title>
+  </relation>
+  <relation>
+    <link>http://www.amwa.tv/downloads/specifications/aafcontainerspec-v1.0.1.pdf</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://www.amwa.tv/downloads/specifications/aafcontainerspec-v1.0.1.pdf</title>
+  </relation>
+  <relation>
+    <link>http://www.amwa.tv/downloads/specifications/aafstoredformatspec-v1.0.1.pdf</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://www.amwa.tv/downloads/specifications/aafstoredformatspec-v1.0.1.pdf</title>
+  </relation>
+  <support>KNOWN</support>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

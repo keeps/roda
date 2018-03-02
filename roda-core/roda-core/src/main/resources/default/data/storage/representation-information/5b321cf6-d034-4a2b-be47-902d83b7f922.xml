@@ -1,0 +1,59 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>TIFF (Tagged Image File Format), Revision 6.0</name>
+  <description>A tag-based file format for storing and interchanging raster images. TIFF serves as a wrapper for different bitstream encodings for bit-mapped (raster) images. The different encodings may represent different compression schemes and different schemes for color representation (photometric interpretation).</description>
+  <extras>
+    <field name="formatCategory">still-image</field>
+    <field name="filenameExtension">tif, tiff</field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>5b321cf6-d034-4a2b-be47-902d83b7f922</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <relation>
+    <link>http://partners.adobe.com/public/developer/tiff/index.html</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://partners.adobe.com/public/developer/tiff/index.html</title>
+  </relation>
+  <relation>
+    <link>http://partners.adobe.com/public/developer/en/tiff/TIFF6.pdf</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://partners.adobe.com/public/developer/en/tiff/TIFF6.pdf</title>
+  </relation>
+  <relation>
+    <link>http://www.npes.org/pdf/TIFF-v6.pdf</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://www.npes.org/pdf/TIFF-v6.pdf</title>
+  </relation>
+  <relation>
+    <link>http://cool.conservation-us.org/bytopic/imaging/std/tiff5.html</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://cool.conservation-us.org/bytopic/imaging/std/tiff5.html</title>
+  </relation>
+  <relation>
+    <link>http://partners.adobe.com/public/developer/en/tiff/TIFFPM6.pdf</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://partners.adobe.com/public/developer/en/tiff/TIFFPM6.pdf</title>
+  </relation>
+  <relation>
+    <link>http://partners.adobe.com/public/developer/en/tiff/TIFFphotoshop.pdf</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://partners.adobe.com/public/developer/en/tiff/TIFFphotoshop.pdf</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>still-image</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

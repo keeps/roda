@@ -1,0 +1,22 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>Digital Theater Systems (DTS)</name>
+  <description>Format Description for DTS - A family of lossy formats designed for the efficient encoding of surround sound, originally developed to support motion picture presentations in theaters. This Web page provides general, introductory information about the whole family.  DTS compression algorithms do not employ perceptual encoding and have relatively high data rates, e.g., 882 kb/s (4:1 compression) for the theatrical variant, sometimes referred to as apt-X100. In the theater, the sound is played from DVD-ROM disk media and synchronized with the picture by means of a special track printed on the film. A different algorithm called Coherent Acoustics is used to compress sound when DTS is delivered in home systems. </description>
+  <extras>
+    <field name="formatCategory">other</field>
+    <field name="filenameExtension">dts</field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>f2e2ab50-57d8-4783-a16e-12a6f23e8f1e</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <support>KNOWN</support>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

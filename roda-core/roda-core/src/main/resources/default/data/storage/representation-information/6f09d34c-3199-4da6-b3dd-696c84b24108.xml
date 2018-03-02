@@ -1,0 +1,23 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>MBOXO Email Format</name>
+  <description>MBOXO is one of the MBOX family of related file formats used for holding collections of email messages within a single file. MBOXO files add a greater-than sign ( &gt; ) before the &quot;From &quot; at the start of a line ( &gt;From  ).</description>
+  <extras>
+    <field name="formatCategory">text</field>
+    <field name="filenameExtension"></field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>6f09d34c-3199-4da6-b3dd-696c84b24108</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>text</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

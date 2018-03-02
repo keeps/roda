@@ -1,0 +1,23 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>ISO/IEC 8211:1994, Information technology - Specification for a data descriptive file for information interchange.</name>
+  <description>A media-independent interchange format to facilitate the moving of files or parts of files containing data records between computer systems. </description>
+  <extras>
+    <field name="formatCategory">dataset</field>
+    <field name="filenameExtension">ddf</field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>32225ab3-8b47-4733-aba8-6bba179409ee</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>dataset</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

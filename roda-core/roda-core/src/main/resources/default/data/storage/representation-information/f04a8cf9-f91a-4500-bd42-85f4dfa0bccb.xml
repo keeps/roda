@@ -1,0 +1,52 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>dBASE Table File Format (DBF)</name>
+  <description>File format used originally by the dBASE database management system to store tables of data and later adopted by similar DBMS packages and specialist software vendors because of its combination of a simple structure and support for a variety of data types.</description>
+  <extras>
+    <field name="formatCategory">other</field>
+    <field name="filenameExtension">dbf</field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>f04a8cf9-f91a-4500-bd42-85f4dfa0bccb</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <relation>
+    <link>http://www.dbase.com/Knowledgebase/INT/db7_file_fmt.htm</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://www.dbase.com/Knowledgebase/INT/db7_file_fmt.htm</title>
+  </relation>
+  <relation>
+    <link>http://www.dbase.com/dbasesql/dbase-documentation-download/</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://www.dbase.com/dbasesql/dbase-documentation-download/</title>
+  </relation>
+  <relation>
+    <link>http://www.dbase.com/support/knowledgebase/</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://www.dbase.com/support/knowledgebase/</title>
+  </relation>
+  <relation>
+    <link>http://www.clicketyclick.dk/databases/xbase/format/index.html</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://www.clicketyclick.dk/databases/xbase/format/index.html</title>
+  </relation>
+  <relation>
+    <link>http://web.archive.org/web/20150323061445/http://ulisse.elettra.trieste.it/services/doc/dbase/DBFstruct.htm</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://web.archive.org/web/20150323061445/http://ulisse.elettra.trieste.it/services/doc/dbase/DBFstruct.htm</title>
+  </relation>
+  <support>KNOWN</support>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

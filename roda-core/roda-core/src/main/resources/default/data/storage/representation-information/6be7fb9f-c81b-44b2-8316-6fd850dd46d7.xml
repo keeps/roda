@@ -1,0 +1,23 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>MapInfo Data File (DAT)</name>
+  <description>MapInfo dataset file for storage of feature attribute data for a MapInfo table. Based on dBase (III, IV, or V) .dbf format.</description>
+  <extras>
+    <field name="formatCategory">dataset</field>
+    <field name="filenameExtension">dat</field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>6be7fb9f-c81b-44b2-8316-6fd850dd46d7</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>dataset</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

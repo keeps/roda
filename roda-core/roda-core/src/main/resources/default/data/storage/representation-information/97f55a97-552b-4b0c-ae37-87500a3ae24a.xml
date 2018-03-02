@@ -1,0 +1,23 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>MrSID Image Format (Multi-resolution Seamless Image Database), Generation 3</name>
+  <description>A patented, wavelet-based file format designed to enable portability of massive bit-mapped (raster) images.  Used commonly for maps.</description>
+  <extras>
+    <field name="formatCategory">still-image</field>
+    <field name="filenameExtension">sid</field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>97f55a97-552b-4b0c-ae37-87500a3ae24a</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>still-image</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

@@ -1,0 +1,29 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>ZIP File Format, Version 6.2.0 (PKWARE)</name>
+  <description>2004 version of de facto industry standard for cross-platform data exchange used by OOXML (Office Open XML, ISO 29500, 2008-2012) and ODF (Open Document Format).</description>
+  <extras>
+    <field name="formatCategory">aggregate</field>
+    <field name="filenameExtension">zip, ZIP</field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>4069b8be-a392-4d1a-9ad6-0d6d7a34268a</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <relation>
+    <link>http://www.pkware.com/documents/APPNOTE/APPNOTE-6.2.0.txt </link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://www.pkware.com/documents/APPNOTE/APPNOTE-6.2.0.txt </title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>aggregate</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

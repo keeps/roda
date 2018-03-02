@@ -1,0 +1,47 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>EPUB, Electronic Publication, Version 2</name>
+  <description>Published in 2007, a format for electronic publications with reflowable text in marked up document structure with associated images for illustrations, all in a container format.  Reflowable text allows the text display to be optimized for the particular display device, in contrast to documents with pre-determined pagination.  EPUB allows publishers to control document presentation through style-sheets.  </description>
+  <extras>
+    <field name="formatCategory">text</field>
+    <field name="filenameExtension">epub</field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>03322fed-48fb-4b5e-b079-920b43ee1125</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <relation>
+    <link>http://idpf.org/epub/201</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://idpf.org/epub/201</title>
+  </relation>
+  <relation>
+    <link>http://www.idpf.org/epub/20/spec/OCF_2.0.1_draft.doc</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://www.idpf.org/epub/20/spec/OCF_2.0.1_draft.doc</title>
+  </relation>
+  <relation>
+    <link>http://www.idpf.org/epub/20/spec/OPS_2.0.1_draft.htm</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://www.idpf.org/epub/20/spec/OPS_2.0.1_draft.htm</title>
+  </relation>
+  <relation>
+    <link>http://www.idpf.org/epub/20/spec/OPF_2.0.1_draft.htm</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://www.idpf.org/epub/20/spec/OPF_2.0.1_draft.htm</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>text</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

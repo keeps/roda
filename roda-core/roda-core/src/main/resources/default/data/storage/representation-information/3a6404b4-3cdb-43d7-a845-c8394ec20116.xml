@@ -1,0 +1,29 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>PPTX (Office Open XML, Presentation ML) ISO 29500:2008-2012, also ECMA-376, Editions 1-4.</name>
+  <description>A format for presentations in the Open Office XML (ISO 29500) format family, developed originally by Microsoft and used as the default format used by Microsoft PowerPoint 2007 and later versions.  Specified in parts 1 and 4 of ISO/IEC 29500, Information technology -- Document description and processing languages -- Office Open XML File Formats (OOXML).</description>
+  <extras>
+    <field name="formatCategory">presentation</field>
+    <field name="filenameExtension">pptx, ppsx</field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>3a6404b4-3cdb-43d7-a845-c8394ec20116</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <relation>
+    <link>http://www.ecma-international.org/publications/standards/Ecma-376.htm</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://www.ecma-international.org/publications/standards/Ecma-376.htm</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>presentation</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

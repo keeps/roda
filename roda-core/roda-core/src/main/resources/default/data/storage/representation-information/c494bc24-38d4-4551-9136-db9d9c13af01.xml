@@ -1,0 +1,29 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>ISO/IEC 15444-3:2007. Information technology -- JPEG 2000 image coding system -- Motion JPEG 2000 (formal name); Motion JPEG 2000 (common name)</name>
+  <description>Object-oriented file wrapper based on ISO_BMFF, designed for time-based audio-visual information, including video, audio, and other tracks.  </description>
+  <extras>
+    <field name="formatCategory">moving-image</field>
+    <field name="filenameExtension">mj2, mjp2</field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>c494bc24-38d4-4551-9136-db9d9c13af01</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <relation>
+    <link>http://www.jpeg.org/public/fcd15444-3.pdf</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://www.jpeg.org/public/fcd15444-3.pdf</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>moving-image</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

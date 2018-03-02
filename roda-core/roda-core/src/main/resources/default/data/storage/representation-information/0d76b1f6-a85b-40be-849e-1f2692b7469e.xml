@@ -1,0 +1,23 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>XMF, eXtensible Music File Format, Version 1.0</name>
+  <description>Wrapper format for MIDI, Downloadable Sounds (DLS), and WAVE waveform data.  The most popular use of XMF is for mobile phone content, via the Mobile XMF variant.</description>
+  <extras>
+    <field name="formatCategory">sound</field>
+    <field name="filenameExtension">xmf, mxmf </field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>0d76b1f6-a85b-40be-849e-1f2692b7469e</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>sound</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

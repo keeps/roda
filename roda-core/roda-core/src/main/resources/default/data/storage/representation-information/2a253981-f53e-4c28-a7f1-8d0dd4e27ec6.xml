@@ -1,0 +1,34 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>ESRI ArcInfo ASCII Grid</name>
+  <description>An interchange format, used primarily for exchange of a single layer of gridded or raster data between software programs.  The file contents represents a single measure for each cell in a rectangular grid.  All numbers are expressed in ASCII characters.</description>
+  <extras>
+    <field name="formatCategory">other</field>
+    <field name="filenameExtension">asc</field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>2a253981-f53e-4c28-a7f1-8d0dd4e27ec6</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <relation>
+    <link>http://desktop.arcgis.com/en/desktop/latest/manage-data/raster-and-images/esri-ascii-raster-format.htm</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://desktop.arcgis.com/en/desktop/latest/manage-data/raster-and-images/esri-ascii-raster-format.htm</title>
+  </relation>
+  <relation>
+    <link>http://desktop.arcgis.com/en/desktop/latest/tools/conversion-toolbox/raster-to-ascii.htm</link>
+    <objectType>WEB</objectType>
+    <relationType>SPECIFIED_BY</relationType>
+    <title>http://desktop.arcgis.com/en/desktop/latest/tools/conversion-toolbox/raster-to-ascii.htm</title>
+  </relation>
+  <support>KNOWN</support>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

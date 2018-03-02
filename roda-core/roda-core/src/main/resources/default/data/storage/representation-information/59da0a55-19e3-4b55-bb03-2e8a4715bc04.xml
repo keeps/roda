@@ -1,0 +1,23 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>ISO/IEC 10918-3:1997. Information technology -- Digital compression and coding of continuous-tone still images, Extensions (formal name); JPEG extensions (common name)</name>
+  <description>A set of lossy compression encodings for full color and grayscale continuous-tone images that employ discrete cosine transforms (DCT) applied to 8-by-8-pixel Minimum Coded Unit (MCU) blocks, and that extend the capabilities beyond those provided by sequential baseline (JPEG_DCT_BL) and progressive (JPEG_DCT_PRG), and the several other encoding options offered in ISO/IEC 10918-1. </description>
+  <extras>
+    <field name="formatCategory">still-image</field>
+    <field name="filenameExtension"></field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>59da0a55-19e3-4b55-bb03-2e8a4715bc04</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>still-image</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

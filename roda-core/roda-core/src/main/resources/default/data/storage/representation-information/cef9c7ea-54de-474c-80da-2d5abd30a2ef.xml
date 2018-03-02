@@ -1,0 +1,23 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>ISO/IEC 10918-1:1994. Information technology -- Digital compression and coding of continuous-tone still images, progressive DCT-based (formal name); Progressive JPEG (common name)</name>
+  <description>Lossy compression algorithm for full color and grayscale continuous-tone images that employs discrete cosine transforms (DCT) and other processes, and encodes similar-positioned coefficients of all blocks in one action, followed by the next positioned coefficients of all blocks, etc.</description>
+  <extras>
+    <field name="formatCategory">still-image</field>
+    <field name="filenameExtension"></field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>cef9c7ea-54de-474c-80da-2d5abd30a2ef</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>still-image</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>

@@ -1,0 +1,23 @@
+<?xml version='1.0' standalone='yes'?>
+<representation_information>
+  <name>OpenDocument Chart Document Format (ODC), Version 1.2.  Part of OASIS Open Document Format for Office Applications, Version 1.2 and the equivalent ISO 26300-1:2015.</name>
+  <description>An XML-based format for a chart that is editable or dynamically generated from a data source.  File extension .odc is used for a free-standing chart.   May be embedded within other document formats in the OpenDocument Format (ODF) family.  Documented in ODF 1.2 Part 1.  </description>
+  <extras>
+    <field name="formatCategory">still-image</field>
+    <field name="filenameExtension">odc, otc</field>
+    <field name="internetMediaType"></field>
+    <field name="pronomPUID"></field>
+  </extras>
+  <family>fileformat</family>
+  <id>46e96a65-4c60-4825-b20e-bd40ed4c30ea</id>
+  <relation>
+    <link>http://www.digitalpreservation.gov/formats/fdd/</link>
+    <objectType>WEB</objectType>
+    <relationType>HAS_SOURCE</relationType>
+    <title>Sustainability of Digital Formats: Planning for Library of Congress Collections</title>
+  </relation>
+  <support>KNOWN</support>
+  <tags>still-image</tags>
+  <updatedBy>admin</updatedBy>
+  <updatedOn>1516291710443</updatedOn>
+</representation_information>
