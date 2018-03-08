@@ -160,8 +160,12 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
             outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has not been manually deleted");
           }
 
-          model.createRepositoryEvent(PreservationEventType.DELETION, EVENT_DESCRIPTION, state, outcomeText, details,
-            job.getUsername(), true);
+          List<LinkingIdentifier> sources = new ArrayList<>();
+          sources
+            .add(PluginHelper.getLinkingIdentifier(item.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+
+          model.createEvent(item.getId(), null, null, null, PreservationEventType.DELETION, EVENT_DESCRIPTION, sources,
+            null, state, outcomeText, details, job.getUsername(), true);
         }
       }, e -> {
         reportItem.setPluginState(PluginState.FAILURE);
@@ -204,8 +208,11 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
       }
     }
 
-    model.createRepositoryEvent(PreservationEventType.DELETION, EVENT_DESCRIPTION, reportItem.getPluginState(),
-      outcomeText, details, job.getUsername(), true);
+    List<LinkingIdentifier> sources = new ArrayList<>();
+    sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+
+    model.createEvent(aip.getId(), null, null, null, PreservationEventType.DELETION, EVENT_DESCRIPTION, sources, null,
+      reportItem.getPluginState(), outcomeText, details, job.getUsername(), true);
   }
 
   private void processFile(IndexService index, ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo,
@@ -255,11 +262,12 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     }
 
     List<LinkingIdentifier> sources = new ArrayList<>();
-    sources.add(PluginHelper.getLinkingIdentifier(file.getAipId(), file.getRepresentationId(),
-      RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+    sources.add(PluginHelper.getLinkingIdentifier(file.getAipId(), file.getRepresentationId(), file.getPath(),
+      file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
-    model.createRepositoryEvent(PreservationEventType.DELETION, EVENT_DESCRIPTION, sources, null, state, outcomeText,
-      details, job.getUsername(), true);
+    model.createEvent(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
+      PreservationEventType.DELETION, EVENT_DESCRIPTION, sources, null, state, outcomeText, details, job.getUsername(),
+      true);
   }
 
   private void processRepresentation(IndexService index, ModelService model, Report report,
@@ -306,10 +314,11 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     }
 
     List<LinkingIdentifier> sources = new ArrayList<>();
-    sources.add(
-      PluginHelper.getLinkingIdentifier(representation.getAipId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
-    model.createRepositoryEvent(PreservationEventType.DELETION, EVENT_DESCRIPTION, sources, null, state, outcomeText,
-      details, job.getUsername(), true);
+    sources.add(PluginHelper.getLinkingIdentifier(representation.getAipId(), representation.getId(),
+      RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+
+    model.createEvent(representation.getAipId(), representation.getId(), null, null, PreservationEventType.DELETION,
+      EVENT_DESCRIPTION, sources, null, state, outcomeText, details, job.getUsername(), true);
   }
 
   private void processRisk(IndexService index, ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo,

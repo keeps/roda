@@ -344,7 +344,6 @@ public class LdapUtility {
    *           if there were some problems while initializing the system
    */
   public void initDirectoryService(final List<String> ldifs) throws Exception {
-
     // Initialize the LDAP service
     final Partition rodaPartition = instantiateDirectoryService();
     final CoreSession session = service.getAdminSession();
@@ -385,9 +384,7 @@ public class LdapUtility {
    *           if some error occurs.
    */
   public List<User> getUsers() throws GenericException {
-
     try {
-
       final CoreSession session = service.getAdminSession();
       final List<Entry> entries = searchEntries(session, ldapPeopleDN, UID);
       final List<User> users = new ArrayList<>();
@@ -411,7 +408,6 @@ public class LdapUtility {
       }
 
       return users;
-
     } catch (final LdapException e) {
       throw new GenericException("Error getting users", e);
     }

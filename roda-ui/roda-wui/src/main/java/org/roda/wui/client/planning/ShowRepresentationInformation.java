@@ -397,6 +397,8 @@ public class ShowRepresentationInformation extends Composite {
 
           if (ri.getRelations() != null) {
             for (RepresentationInformationRelation relation : ri.getRelations()) {
+              GWT
+                .log(bundle.getTranslations().get(relation.getObjectType()).get(relation.getRelationType()).toString());
               String relationType = bundle.getTranslations().get(relation.getObjectType())
                 .get(relation.getRelationType());
               if (relationTypeToLink.containsKey(relationType)) {
@@ -421,7 +423,7 @@ public class ShowRepresentationInformation extends Composite {
                   for (RepresentationInformation r : result.getResults()) {
                     if (r.getRelations() != null) {
                       for (RepresentationInformationRelation relation : r.getRelations()) {
-                        if (relation.getLink().equals(ri.getId())) {
+                        if (relation.getLink() != null && relation.getLink().equals(ri.getId())) {
                           String inverse = bundle.getInverseTranslations()
                             .get(bundle.getInverses().get(relation.getRelationType()));
 

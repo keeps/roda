@@ -1198,7 +1198,7 @@ public class ModelService extends ModelObservable {
     String agentName, boolean notify) {
     try {
       StringBuilder builder = new StringBuilder(outcomeText);
-      if (StringUtils.isNotBlank(outcomeDetail) && outcomeState.equals(PluginState.SUCCESS)) {
+      if (StringUtils.isNotBlank(outcomeDetail) && !outcomeState.equals(PluginState.SUCCESS)) {
         builder.append("\n").append("The following reason has been reported by the user: ").append(agentName)
           .append("\n").append(outcomeDetail);
       }
@@ -1220,8 +1220,20 @@ public class ModelService extends ModelObservable {
     String id = IdUtils.createPreservationMetadataId(PreservationMetadataType.EVENT);
     ContentPayload premisEvent = PremisV3Utils.createPremisEventBinary(id, new Date(), eventType.toString(),
       eventDescription, sources, targets, outcomeState.toString(), outcomeDetail, outcomeExtension, agentIds);
-    createPreservationMetadata(PreservationMetadataType.EVENT, id, aipId, representationId, filePath, fileId,
-      premisEvent, notify);
+
+    if (eventType.equals(PreservationEventType.DELETION)) {
+      if (aipId != null && representationId == null) {
+        createPreservationMetadata(PreservationMetadataType.EVENT, id, null, null, null, null, premisEvent, notify);
+      } else if (representationId != null && fileId == null) {
+        createPreservationMetadata(PreservationMetadataType.EVENT, id, aipId, null, null, null, premisEvent, notify);
+      } else {
+        createPreservationMetadata(PreservationMetadataType.EVENT, id, aipId, representationId, null, null, premisEvent,
+          notify);
+      }
+    } else {
+      createPreservationMetadata(PreservationMetadataType.EVENT, id, aipId, representationId, filePath, fileId,
+        premisEvent, notify);
+    }
   }
 
   public PreservationMetadata retrievePreservationMetadata(String aipId, String representationId,
@@ -1316,13 +1328,14 @@ public class ModelService extends ModelObservable {
     pm.setFileDirectoryPath(fileDirectoryPath);
     pm.setFileId(fileId);
     pm.setType(type);
+
     StoragePath binaryPath = ModelUtils.getPreservationMetadataStoragePath(pm);
-    boolean asReference = false;
-    storage.createBinary(binaryPath, payload, asReference);
+    storage.createBinary(binaryPath, payload, false);
 
     if (notify) {
       notifyPreservationMetadataCreated(pm).failOnError();
     }
+
     return pm;
   }
 

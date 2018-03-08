@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.user.Group;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.StringUtils;
@@ -140,7 +141,7 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
     this.fullname.setText(group.getFullName());
     this.usersValue.setText(StringUtils.prettyPrint(group.getUsers()));
 
-    this.setPermissions(group.getDirectRoles(), group.getAllRoles());
+    this.setPermissions(group.getName(), group.getDirectRoles(), group.getAllRoles());
 
     // update visibility
     this.usersLabel.setVisible(!group.getUsers().isEmpty());
@@ -148,7 +149,7 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
 
   }
 
-  private void setPermissions(final Set<String> directRoles, final Set<String> allRoles) {
+  private void setPermissions(final String name, final Set<String> directRoles, final Set<String> allRoles) {
     permissionsPanel.init(new AsyncCallback<Boolean>() {
 
       @Override
@@ -156,7 +157,7 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
         Set<String> indirectRoles = new HashSet<>(allRoles);
         indirectRoles.removeAll(directRoles);
 
-        permissionsPanel.checkPermissions(directRoles, false);
+        permissionsPanel.checkPermissions(directRoles, name.equals(RodaConstants.ADMINISTRATORS));
         permissionsPanel.checkPermissions(indirectRoles, true);
         WCAGUtilities.getInstance().makeAccessible(permissionsSelectPanel.getElement());
       }
@@ -179,7 +180,6 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
     group.setName(groupname.getText());
     group.setFullName(fullname.getText());
     group.setDirectRoles(permissionsPanel.getDirectRoles());
-
     return group;
   }
 
