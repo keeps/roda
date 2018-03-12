@@ -20,6 +20,8 @@ public class DateIntervalFilterParameter extends RangeFilterParameter<Date> {
 
   private String toName;
   private DateGranularity granularity = DateGranularity.DAY;
+  @SuppressWarnings("deprecation")
+  private int timeZoneOffset = new Date().getTimezoneOffset();
 
   public DateIntervalFilterParameter() {
     super();
@@ -30,6 +32,7 @@ public class DateIntervalFilterParameter extends RangeFilterParameter<Date> {
     setToName(toName);
     setFromValue(fromValue);
     setToValue(toValue);
+    setTimeZoneOffset(toValue.getTimezoneOffset());
   }
 
   public DateIntervalFilterParameter(String fromName, String toName, Date fromValue, Date toValue,
@@ -38,10 +41,17 @@ public class DateIntervalFilterParameter extends RangeFilterParameter<Date> {
     setGranularity(granularity);
   }
 
+  public DateIntervalFilterParameter(String fromName, String toName, Date fromValue, Date toValue,
+    DateGranularity granularity, int timeZoneOffset) {
+    this(fromName, toName, fromValue, toValue);
+    setGranularity(granularity);
+    setTimeZoneOffset(timeZoneOffset);
+  }
+
   public DateIntervalFilterParameter(DateIntervalFilterParameter dateIntervalFilterParameter) {
     this(dateIntervalFilterParameter.getFromName(), dateIntervalFilterParameter.getToName(),
       dateIntervalFilterParameter.getFromValue(), dateIntervalFilterParameter.getToValue(),
-      dateIntervalFilterParameter.getGranularity());
+      dateIntervalFilterParameter.getGranularity(), dateIntervalFilterParameter.getTimeZoneOffset());
   }
 
   public DateGranularity getGranularity() {
@@ -87,20 +97,50 @@ public class DateIntervalFilterParameter extends RangeFilterParameter<Date> {
     this.toName = toName;
   }
 
+  public int getTimeZoneOffset() {
+    return timeZoneOffset;
+  }
+
+  public void setTimeZoneOffset(int timeZoneOffset) {
+    this.timeZoneOffset = timeZoneOffset;
+  }
+
   @Override
   public int hashCode() {
-    return super.hashCode();
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((granularity == null) ? 0 : granularity.hashCode());
+    result = prime * result + timeZoneOffset;
+    result = prime * result + ((toName == null) ? 0 : toName.hashCode());
+    return result;
   }
 
   @Override
   public boolean equals(Object obj) {
-    return super.equals(obj);
+    if (this == obj)
+      return true;
+    if (!super.equals(obj))
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    DateIntervalFilterParameter other = (DateIntervalFilterParameter) obj;
+    if (granularity != other.granularity)
+      return false;
+    if (timeZoneOffset != other.timeZoneOffset)
+      return false;
+    if (toName == null) {
+      if (other.toName != null)
+        return false;
+    } else if (!toName.equals(other.toName))
+      return false;
+    return true;
   }
 
   @Override
   public String toString() {
     return "DateIntervalFilterParameter [getGranularity()=" + getGranularity() + ", getFromName()=" + getFromName()
-      + ", getToName()=" + getToName() + ", getFromValue()=" + getFromValue() + ", getToValue()=" + getToValue() + "]";
+      + ", getToName()=" + getToName() + ", getFromValue()=" + getFromValue() + ", getToValue()=" + getToValue()
+      + ", getTimeZoneOffset()=" + getTimeZoneOffset() + "]";
   }
 
 }

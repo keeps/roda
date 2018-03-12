@@ -19,6 +19,8 @@ public class DateRangeFilterParameter extends RangeFilterParameter<Date> {
   private static final long serialVersionUID = -8039972534809175118L;
 
   private DateGranularity granularity = DateGranularity.DAY;
+  @SuppressWarnings("deprecation")
+  private int timeZoneOffset = new Date().getTimezoneOffset();
 
   public DateRangeFilterParameter() {
     super();
@@ -30,11 +32,19 @@ public class DateRangeFilterParameter extends RangeFilterParameter<Date> {
 
   public DateRangeFilterParameter(String name, Date fromValue, Date toValue) {
     super(name, fromValue, toValue);
+    this.setTimeZoneOffset(toValue.getTimezoneOffset());
   }
 
   public DateRangeFilterParameter(String name, Date fromValue, Date toValue, DateGranularity granularity) {
+    this(name, fromValue, toValue);
+    this.setGranularity(granularity);
+  }
+
+  public DateRangeFilterParameter(String name, Date fromValue, Date toValue, DateGranularity granularity,
+    int timeZoneOffset) {
     super(name, fromValue, toValue);
     this.setGranularity(granularity);
+    this.setTimeZoneOffset(timeZoneOffset);
   }
 
   public DateGranularity getGranularity() {
@@ -45,14 +55,37 @@ public class DateRangeFilterParameter extends RangeFilterParameter<Date> {
     this.granularity = granularity;
   }
 
+  public int getTimeZoneOffset() {
+    return timeZoneOffset;
+  }
+
+  public void setTimeZoneOffset(int timeZoneOffset) {
+    this.timeZoneOffset = timeZoneOffset;
+  }
+
   @Override
   public int hashCode() {
-    return super.hashCode();
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((granularity == null) ? 0 : granularity.hashCode());
+    result = prime * result + timeZoneOffset;
+    return result;
   }
 
   @Override
   public boolean equals(Object obj) {
-    return super.equals(obj);
+    if (this == obj)
+      return true;
+    if (!super.equals(obj))
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    DateRangeFilterParameter other = (DateRangeFilterParameter) obj;
+    if (granularity != other.granularity)
+      return false;
+    if (timeZoneOffset != other.timeZoneOffset)
+      return false;
+    return true;
   }
 
 }
