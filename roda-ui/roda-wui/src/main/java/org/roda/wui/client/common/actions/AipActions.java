@@ -220,139 +220,181 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   }
 
   private void move(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
-    final String aipId = aip.getId();
-    boolean justActive = AIPState.ACTIVE.equals(aip.getState());
+    Dialogs.showConfirmDialog(messages.moveConfirmDialogTitle(),
+      messages.moveAllConfirmDialogMessageSingle(aip.getTitle()), messages.dialogNo(), messages.dialogYes(),
+      new AsyncCallback<Boolean>() {
 
-    Filter filter = new Filter(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, aipId));
-    SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle(), filter, justActive, false);
-    selectAipDialog.setEmptyParentButtonVisible(true);
-    selectAipDialog.setSingleSelectionMode();
-    selectAipDialog.showAndCenter();
-    selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {
+        @Override
+        public void onFailure(Throwable caught) {
+          // nothing to do
+        }
 
-      @Override
-      public void onValueChange(ValueChangeEvent<IndexedAIP> event) {
-        final IndexedAIP parentAIP = event.getValue();
-        final String parentId = (parentAIP != null) ? parentAIP.getId() : null;
-        final SelectedItemsList<IndexedAIP> selected = new SelectedItemsList<>(Arrays.asList(aipId),
-          IndexedAIP.class.getName());
+        @Override
+        public void onSuccess(Boolean confirmed) {
+          if (confirmed) {
+            final String aipId = aip.getId();
+            boolean justActive = AIPState.ACTIVE.equals(aip.getState());
 
-        Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-          RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
-          new AsyncCallback<String>() {
+            Filter filter = new Filter(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, aipId));
+            SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle() + " " + aip.getTitle(),
+              filter, justActive, false);
+            selectAipDialog.setEmptyParentButtonVisible(true);
+            selectAipDialog.setSingleSelectionMode();
+            selectAipDialog.showAndCenter();
+            selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {
 
-            @Override
-            public void onFailure(Throwable caught) {
-              // do nothing
-            }
+              @Override
+              public void onValueChange(ValueChangeEvent<IndexedAIP> event) {
+                final IndexedAIP parentAIP = event.getValue();
+                final String parentId = (parentAIP != null) ? parentAIP.getId() : null;
+                final SelectedItemsList<IndexedAIP> selected = new SelectedItemsList<>(Arrays.asList(aipId),
+                  IndexedAIP.class.getName());
 
-            @Override
-            public void onSuccess(String details) {
-              BrowserService.Util.getInstance().moveAIPInHierarchy(selected, parentId, details,
-                new AsyncCallback<Job>() {
+                Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
+                  RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+                  new AsyncCallback<String>() {
 
-                  @Override
-                  public void onSuccess(Job result) {
-                    Toast.showInfo(messages.moveItemTitle(), messages.movingAIP());
-
-                    if (result != null) {
-                      HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-                    } else {
-                      HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      // do nothing
                     }
-                  }
 
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    if (caught instanceof NotFoundException) {
-                      Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-                    } else {
-                      callback.onFailure(caught);
+                    @Override
+                    public void onSuccess(String details) {
+                      BrowserService.Util.getInstance().moveAIPInHierarchy(selected, parentId, details,
+                        new AsyncCallback<Job>() {
+
+                          @Override
+                          public void onSuccess(Job result) {
+                            Toast.showInfo(messages.moveItemTitle(), messages.movingAIP());
+
+                            if (result != null) {
+                              HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                            } else {
+                              HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                            }
+                          }
+
+                          @Override
+                          public void onFailure(Throwable caught) {
+                            if (caught instanceof NotFoundException) {
+                              Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
+                            } else {
+                              callback.onFailure(caught);
+                            }
+                          }
+                        });
                     }
-                  }
-                });
-            }
-          });
-      }
-    });
+                  });
+              }
+            });
+          }
+        }
+      });
   }
 
   private void move(final SelectedItems<IndexedAIP> selected, final AsyncCallback<ActionImpact> callback) {
-    int counter = 0;
-    boolean justActive = parentAipState != null ? AIPState.ACTIVE.equals(parentAipState) : true;
-    Filter filter = new Filter();
-
-    if (selected instanceof SelectedItemsList) {
-      SelectedItemsList<IndexedAIP> list = (SelectedItemsList<IndexedAIP>) selected;
-      counter = list.getIds().size();
-      if (counter <= RodaConstants.DIALOG_FILTER_LIMIT_NUMBER) {
-        for (String id : list.getIds()) {
-          filter.add(new NotSimpleFilterParameter(RodaConstants.AIP_ANCESTORS, id));
-          filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, id));
-        }
-      }
-
-      if (parentAipId != null) {
-        filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, parentAipId));
-      }
-    } else if (selected instanceof SelectedItemsFilter && parentAipId != null) {
-      filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, parentAipId));
-    }
-
-    SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle(), filter, justActive, true);
-    selectAipDialog.setEmptyParentButtonVisible(parentAipId != null);
-    selectAipDialog.showAndCenter();
-    if (counter > 0 && counter <= RodaConstants.DIALOG_FILTER_LIMIT_NUMBER) {
-      selectAipDialog.addStyleName("object-dialog");
-    }
-
-    selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {
+    ClientSelectedItemsUtils.size(IndexedAIP.class, selected, new AsyncCallback<Long>() {
 
       @Override
-      public void onValueChange(ValueChangeEvent<IndexedAIP> event) {
-        final IndexedAIP parentAIP = event.getValue();
-        final String parentId = (parentAIP != null) ? parentAIP.getId() : null;
+      public void onFailure(Throwable caught) {
+        AsyncCallbackUtils.defaultFailureTreatment(caught);
+      }
 
-        Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-          RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
-          new AsyncCallback<String>() {
+      @Override
+      public void onSuccess(final Long size) {
+        Dialogs.showConfirmDialog(messages.moveConfirmDialogTitle(), messages.moveSelectedConfirmDialogMessage(size),
+          messages.dialogNo(), messages.dialogYes(), new AsyncCallback<Boolean>() {
 
             @Override
             public void onFailure(Throwable caught) {
-              // do nothing
+              // nothing to do
             }
 
             @Override
-            public void onSuccess(String details) {
-              BrowserService.Util.getInstance().moveAIPInHierarchy(selected, parentId, details,
-                new LoadingAsyncCallback<Job>() {
+            public void onSuccess(Boolean confirmed) {
+              if (confirmed) {
+                int counter = 0;
+                boolean justActive = parentAipState != null ? AIPState.ACTIVE.equals(parentAipState) : true;
+                Filter filter = new Filter();
 
-                  @Override
-                  public void onSuccessImpl(Job result) {
-                    Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
-
-                    if (result != null) {
-                      HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-                    } else {
-                      HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                if (selected instanceof SelectedItemsList) {
+                  SelectedItemsList<IndexedAIP> list = (SelectedItemsList<IndexedAIP>) selected;
+                  counter = list.getIds().size();
+                  if (counter <= RodaConstants.DIALOG_FILTER_LIMIT_NUMBER) {
+                    for (String id : list.getIds()) {
+                      filter.add(new NotSimpleFilterParameter(RodaConstants.AIP_ANCESTORS, id));
+                      filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, id));
                     }
-                    callback.onSuccess(ActionImpact.UPDATED);
                   }
 
+                  if (parentAipId != null) {
+                    filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, parentAipId));
+                  }
+                } else if (selected instanceof SelectedItemsFilter && parentAipId != null) {
+                  filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, parentAipId));
+                }
+
+                SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle(), filter, justActive,
+                  true);
+                selectAipDialog.setEmptyParentButtonVisible(parentAipId != null);
+                selectAipDialog.showAndCenter();
+                if (counter > 0 && counter <= RodaConstants.DIALOG_FILTER_LIMIT_NUMBER) {
+                  selectAipDialog.addStyleName("object-dialog");
+                }
+
+                selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {
+
                   @Override
-                  public void onFailureImpl(Throwable caught) {
-                    if (caught instanceof NotFoundException) {
-                      Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-                    } else {
-                      callback.onFailure(caught);
-                    }
+                  public void onValueChange(ValueChangeEvent<IndexedAIP> event) {
+                    final IndexedAIP parentAIP = event.getValue();
+                    final String parentId = (parentAIP != null) ? parentAIP.getId() : null;
+
+                    Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null,
+                      messages.outcomeDetailPlaceholder(), RegExp.compile(".*"), messages.cancelButton(),
+                      messages.confirmButton(), false, false, new AsyncCallback<String>() {
+
+                        @Override
+                        public void onFailure(Throwable caught) {
+                          // do nothing
+                        }
+
+                        @Override
+                        public void onSuccess(String details) {
+                          BrowserService.Util.getInstance().moveAIPInHierarchy(selected, parentId, details,
+                            new LoadingAsyncCallback<Job>() {
+
+                              @Override
+                              public void onSuccessImpl(Job result) {
+                                Toast.showInfo(messages.runningInBackgroundTitle(),
+                                  messages.runningInBackgroundDescription());
+
+                                if (result != null) {
+                                  HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                                } else {
+                                  HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                                }
+                                callback.onSuccess(ActionImpact.UPDATED);
+                              }
+
+                              @Override
+                              public void onFailureImpl(Throwable caught) {
+                                if (caught instanceof NotFoundException) {
+                                  Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
+                                } else {
+                                  callback.onFailure(caught);
+                                }
+                              }
+                            });
+                        }
+                      });
                   }
                 });
+              }
             }
           });
       }
     });
-
   }
 
   private void updatePermissions(IndexedAIP aip, AsyncCallback<ActionImpact> callback) {

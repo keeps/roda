@@ -429,6 +429,17 @@ public class RestUtils {
     return UriUtils.fromSafeConstant(b.toString());
   }
 
+  public static SafeUri createRepresentationInformationDownloadUri(String riId) {
+    // api/v1/representation_information/{representation_information_id}?acceptFormat=xml
+    StringBuilder b = new StringBuilder();
+    // base uri
+    b.append(RodaConstants.API_REST_V1_REPRESENTATION_INFORMATION).append(riId).append(RodaConstants.API_QUERY_START)
+      .append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT).append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
+      .append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML);
+
+    return UriUtils.fromSafeConstant(b.toString());
+  }
+
   public static SafeUri createThemeResourceUri(String resourceId, String defaultResourceId, boolean inline) {
     // api/v1/theme/?resource_id={resourceId}&default_resource_od={defaultResourceId}
     StringBuilder b = new StringBuilder();

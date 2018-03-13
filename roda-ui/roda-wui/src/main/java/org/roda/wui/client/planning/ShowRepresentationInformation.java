@@ -50,6 +50,7 @@ import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.RestUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -58,9 +59,11 @@ import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
@@ -159,10 +162,7 @@ public class ShowRepresentationInformation extends Composite {
   FlowPanel extras;
 
   @UiField
-  Button buttonEdit;
-
-  @UiField
-  Button buttonCancel;
+  Button buttonEdit, buttonDownload, buttonCancel;
 
   private List<FilterParameter> aipParams = new ArrayList<>();
   private List<FilterParameter> representationParams = new ArrayList<>();
@@ -561,6 +561,12 @@ public class ShowRepresentationInformation extends Composite {
   void handleButtonEdit(ClickEvent e) {
     HistoryUtils.newHistory(RepresentationInformationNetwork.RESOLVER,
       EditRepresentationInformation.RESOLVER.getHistoryToken(), ri.getId());
+  }
+
+  @UiHandler("buttonDownload")
+  void handleButtonDownload(ClickEvent e) {
+    SafeUri downloadUri = RestUtils.createRepresentationInformationDownloadUri(ri.getId());
+    Window.Location.assign(downloadUri.asString());
   }
 
   @UiHandler("buttonCancel")

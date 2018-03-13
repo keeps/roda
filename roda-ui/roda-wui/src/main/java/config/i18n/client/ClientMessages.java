@@ -706,6 +706,14 @@ public interface ClientMessages extends Messages {
 
   String removingSuccessMessage(Long size);
 
+  String moveConfirmDialogTitle();
+
+  String moveAllConfirmDialogMessageSingle(String aipTitle);
+
+  String moveAllConfirmDialogMessage();
+
+  String moveSelectedConfirmDialogMessage(Long size);
+
   /************* Browse ****************/
   String browseLoading();
 

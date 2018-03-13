@@ -95,6 +95,9 @@
 							ui:field="buttonEdit">
 							<ui:text from='{messages.editButton}' />
 						</g:Button>
+						<g:Button addStyleNames="btn btn-block btn-download" ui:field="buttonDownload">
+							<ui:text from='{messages.downloadButton}' />
+						</g:Button>
 						<g:Button addStyleNames="btn btn-block btn-default btn-times-circle"
 							ui:field="buttonCancel">
 							<ui:text from='{messages.cancelButton}' />
