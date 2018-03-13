@@ -184,7 +184,6 @@ public class IngestProcess extends Composite {
     });
 
     jobList.autoUpdate(10000);
-
   }
 
   @Override
