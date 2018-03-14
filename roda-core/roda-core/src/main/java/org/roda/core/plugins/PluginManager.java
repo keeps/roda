@@ -325,7 +325,6 @@ public class PluginManager {
 
       // process each folder inside the plugins folder (except shared &
       // disabled)
-
       List<PluginLoadInfo> pluginLoadInfos = new ArrayList<>();
 
       try (DirectoryStream<Path> pluginsFolders = Files.newDirectoryStream(RODA_PLUGINS_PATH,
@@ -338,6 +337,7 @@ public class PluginManager {
       }
 
       for (int i = 0; i < LOAD_PLUGINS_MAX_CYCLES && !pluginLoadInfos.isEmpty(); i++) {
+        LOGGER.debug("Running cycle for loading plugins & their dependencies (i = {})", i);
 
         // process plugins that do not have dependencies on other plugins
         pluginLoadInfos.stream().filter(p -> p.pluginDependencies.isEmpty()).forEach(p -> loadPlugin(p));
@@ -383,15 +383,17 @@ public class PluginManager {
     List<URL> jarClasspath;
     List<String> pluginClassNames;
     List<String> pluginDependencies;
+    List<Path> pluginProperties;
 
     public PluginLoadInfo(Path jarPath, JarFile jar, List<URL> jarClasspath, List<String> pluginClassNames,
-      List<String> pluginDepends) {
+      List<String> pluginDepends, List<Path> pluginProperties) {
       super();
       this.jarPath = jarPath;
       this.jar = jar;
       this.jarClasspath = jarClasspath;
       this.pluginClassNames = pluginClassNames;
       this.pluginDependencies = pluginDepends;
+      this.pluginProperties = pluginProperties;
     }
 
   }
@@ -401,6 +403,7 @@ public class PluginManager {
     List<Path> pluginJarFiles = new ArrayList<>();
     List<URL> classpath = new ArrayList<>(sharedJarURLs);
     List<PluginLoadInfo> pluginLoadInfos = new ArrayList<>();
+    List<Path> pluginProperties = new ArrayList<>();
 
     // add dependencies to classpath
     Path dependenciesFolder = pluginFolder.resolve(RodaConstants.CORE_PLUGINS_DEPENDENCIES_FOLDER);
@@ -410,11 +413,11 @@ public class PluginManager {
           try {
             classpath.add(jarFile.toUri().toURL());
           } catch (MalformedURLException e) {
-            LOGGER.warn("Could not add jar to dependecies of plugin at " + pluginFolder, e);
+            LOGGER.warn("Could not add jar to dependecies of plugin at {}", pluginFolder, e);
           }
         });
       } catch (IOException e) {
-        LOGGER.warn("Could not load dependencies of plugin at " + pluginFolder, e);
+        LOGGER.warn("Could not load dependencies of plugin at {}", pluginFolder, e);
       }
     }
 
@@ -424,32 +427,26 @@ public class PluginManager {
     } catch (NoSuchFileException e) {
       // do nothing as folder does not exist
     } catch (IOException e) {
-      LOGGER.warn("Could not load jars of plugin at " + pluginFolder, e);
+      LOGGER.warn("Could not load jars of plugin at {}", pluginFolder, e);
     }
 
-    // inject plugin configuration
+    // gather plugin configuration
     try (DirectoryStream<Path> propertiesStream = Files.newDirectoryStream(pluginFolder, "*.properties")) {
-      for (Path propertiesFile : propertiesStream) {
-        try {
-          RodaCoreFactory.addExternalConfiguration(propertiesFile);
-        } catch (ConfigurationException e) {
-          LOGGER.warn("Could not load plugin configuration: " + propertiesFile, e);
-        }
-
-      }
+      propertiesStream.forEach(propertiesFile -> pluginProperties.add(propertiesFile));
     } catch (IOException e) {
-      LOGGER.warn("Could not load properties of plugin at " + pluginFolder, e);
+      LOGGER.warn("Could not gather plugin properties at {}", pluginFolder, e);
     }
 
     for (Path jarFile : pluginJarFiles) {
-      addJarToPluginToBeLoaded(jarFile, classpath, pluginLoadInfos);
+      addJarToPluginToBeLoaded(jarFile, classpath, pluginLoadInfos, pluginProperties);
     }
 
     return pluginLoadInfos;
 
   }
 
-  private void addJarToPluginToBeLoaded(Path jarPath, List<URL> classpath, List<PluginLoadInfo> pluginLoadInfos) {
+  private void addJarToPluginToBeLoaded(Path jarPath, List<URL> classpath, List<PluginLoadInfo> pluginLoadInfos,
+    List<Path> pluginProperties) {
     List<URL> jarClasspath = new ArrayList<>(classpath);
 
     try (JarFile jar = new JarFile(jarPath.toFile())) {
@@ -478,35 +475,13 @@ public class PluginManager {
           pluginDepends.addAll(Arrays.asList(pluginClassNamesDependsString.split("\\s+")));
         }
 
-        pluginLoadInfos.add(new PluginLoadInfo(jarPath, jar, jarClasspath, pluginClassNames, pluginDepends));
+        pluginLoadInfos
+          .add(new PluginLoadInfo(jarPath, jar, jarClasspath, pluginClassNames, pluginDepends, pluginProperties));
 
       }
     } catch (IOException e) {
       LOGGER.error("Error loading plugin from {}", jarPath.getFileName(), e);
     }
-  }
-
-  private void loadPlugin(PluginLoadInfo p) {
-
-    ClassLoader classloader;
-
-    if (p.pluginDependencies.isEmpty()) {
-      classloader = new URLClassLoader(p.jarClasspath.toArray(new URL[] {}), getClass().getClassLoader());
-    } else {
-      CompoundClassLoader c = new CompoundClassLoader();
-      c.addLoader(new URLClassLoader(p.jarClasspath.toArray(new URL[] {}), getClass().getClassLoader()));
-
-      p.pluginDependencies.forEach(d -> c.addLoader(getPluginClassLoader(d)));
-
-      classloader = c;
-    }
-
-    // process
-    processJar(p, classloader);
-
-    // add to cache
-    jarPluginClassloaderCache.put(getPluginClassLoaderCacheKey(p.jarPath), classloader);
-
   }
 
   private boolean isPluginDependencyLoaded(String pluginDependencyRegex) {
@@ -550,7 +525,7 @@ public class PluginManager {
     return sharedJarURLs;
   }
 
-  private void processJar(PluginLoadInfo p, ClassLoader classloader) {
+  private void loadPlugin(PluginLoadInfo p) {
     BasicFileAttributes attrs;
     try {
       attrs = Files.readAttributes(p.jarPath, BasicFileAttributes.class);
@@ -559,9 +534,33 @@ public class PluginManager {
         && attrs.lastModifiedTime().toMillis() == jarPluginCache.get(p.jarPath).lastModified) {
         LOGGER.debug("{} is already loaded", p.jarPath.getFileName());
       } else {
-        // The plugin doesn't exist or the modification date is
-        // different. Let's load the Plugin
+        // The Plugin doesn't exist or the modification date is
+        // different.
 
+        // Let's create Plugin classloader
+        ClassLoader classloader;
+
+        if (p.pluginDependencies.isEmpty()) {
+          classloader = new URLClassLoader(p.jarClasspath.toArray(new URL[] {}), getClass().getClassLoader());
+        } else {
+          CompoundClassLoader c = new CompoundClassLoader();
+          c.addLoader(new URLClassLoader(p.jarClasspath.toArray(new URL[] {}), getClass().getClassLoader()));
+
+          p.pluginDependencies.forEach(d -> c.addLoader(getPluginClassLoader(d)));
+
+          classloader = c;
+        }
+
+        // Let's load Plugin properties
+        for (Path propertiesFile : p.pluginProperties) {
+          try {
+            RodaCoreFactory.addExternalConfiguration(propertiesFile);
+          } catch (ConfigurationException e) {
+            LOGGER.warn("Could not load plugin configuration: " + propertiesFile, e);
+          }
+        }
+
+        // Let's load the Plugin
         List<Plugin<? extends IsRODAObject>> plugins = loadPlugin(p.jarPath, p.pluginClassNames, classloader);
         if (!plugins.isEmpty()) {
           LOGGER.info("'{}' (is new? {}) is not loaded or modification dates differ. Inspecting Jar...",
@@ -592,6 +591,9 @@ public class PluginManager {
             LOGGER.error("Plugin failed to initialize: {}", p.jarPath, e);
           }
         }
+
+        // Let's cache Plugin classloader
+        jarPluginClassloaderCache.put(getPluginClassLoaderCacheKey(p.jarPath), classloader);
       }
     } catch (IOException e1) {
       LOGGER.error("Plugin failed to initialize: {}", p.jarPath, e1);

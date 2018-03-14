@@ -105,16 +105,16 @@
 		<cas.version>4.2.1</cas.version>
 		<cas.client.version>3.4.1</cas.client.version>
 		<jersey.version>2.26</jersey.version>
-		<swagger.version>1.5.17</swagger.version>
-		<jackson.version>2.9.3</jackson.version>
+		<swagger.version>1.5.18</swagger.version>
+		<jackson.version>2.9.4</jackson.version>
 		<fcrepo.version>4.4.0</fcrepo.version>
 		<spring.version>4.1.1.RELEASE</spring.version>
 		<grizzly.version>2.3.16</grizzly.version>
 		<jena.version>2.13.0</jena.version>
 		<solr.version>5.5.5</solr.version>
-		<akka.version>2.5.8</akka.version>
+		<akka.version>2.5.11</akka.version>
 		<apacheds.version>2.0.0-M24</apacheds.version>
-		<httpcomponents.version>4.5.4</httpcomponents.version>
+		<httpcomponents.version>4.5.5</httpcomponents.version>
 		<poi.version>3.17</poi.version>
 		<commons_ip.version>1.0.1</commons_ip.version>
 		<roda_community_url>http://roda-community.org</roda_community_url>
@@ -897,7 +897,7 @@
 			<dependency>
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
-				<version>23.5-jre</version>
+				<version>24.0-jre</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.solr</groupId>
@@ -1093,7 +1093,12 @@
 			<dependency>
 				<groupId>io.dropwizard.metrics</groupId>
 				<artifactId>metrics-core</artifactId>
-				<version>3.2.5</version>
+				<version>4.0.2</version>
+			</dependency>
+			<dependency>
+				<groupId>io.dropwizard.metrics</groupId>
+				<artifactId>metrics-jmx</artifactId>
+				<version>4.0.2</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
