@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.storage.fedora;
+package org.roda.core_disabled.storage.fedora;
 
 import java.io.IOException;
 import java.nio.file.Paths;

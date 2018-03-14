@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.storage.fedora;
+package org.roda.core_disabled.storage.fedora;
 
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertFalse;
@@ -34,6 +34,7 @@ import org.roda.core.storage.Container;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.RandomMockContentPayload;
 import org.roda.core.storage.StorageTestUtils;
+import org.roda.core.storage.fedora.FedoraStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
