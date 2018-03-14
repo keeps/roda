@@ -3059,12 +3059,8 @@ public class BrowserHelper {
 
         @Override
         public void consumeOutputStream(OutputStream out) throws IOException {
-          InputStream fileInputStream = null;
-          try {
-            fileInputStream = representationFileBinary.getContent().createInputStream();
+          try (InputStream fileInputStream = representationFileBinary.getContent().createInputStream()) {
             IOUtils.copy(fileInputStream, out);
-          } finally {
-            IOUtils.closeQuietly(fileInputStream);
           }
         }
       };
@@ -3128,6 +3124,51 @@ public class BrowserHelper {
     }
 
     RodaCoreFactory.getIndexService().commit(DIPFile.class);
+  }
+
+  public static EntityResponse retrieveRepresentationInformation(String representationInformationId,
+    String acceptFormat)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+
+    if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
+      final String filename;
+      final String mediaType;
+      final ConsumesOutputStream stream;
+
+      StorageService storage = RodaCoreFactory.getStorageService();
+      Binary riBinary = storage
+        .getBinary(ModelUtils.getRepresentationInformationStoragePath(representationInformationId));
+      filename = riBinary.getStoragePath().getName();
+      mediaType = RodaConstants.MEDIA_TYPE_WILDCARD;
+
+      stream = new ConsumesOutputStream() {
+
+        @Override
+        public String getMediaType() {
+          return acceptFormat;
+        }
+
+        @Override
+        public String getFileName() {
+          return filename;
+        }
+
+        @Override
+        public void consumeOutputStream(OutputStream out) throws IOException {
+          try (InputStream fileInputStream = riBinary.getContent().createInputStream()) {
+            IOUtils.copy(fileInputStream, out);
+          }
+        }
+      };
+      return new StreamResponse(filename, mediaType, stream);
+    } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
+      || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
+      RepresentationInformation ri = RodaCoreFactory.getModelService()
+        .retrieveRepresentationInformation(representationInformationId);
+      return new ObjectResponse<RepresentationInformation>(acceptFormat, ri);
+    } else {
+      throw new GenericException("Unsupported accept format: " + acceptFormat);
+    }
   }
 
   public static Job createFormatIdentificationJob(User user, SelectedItems<?> selected) throws GenericException,

@@ -39,7 +39,7 @@
 									ui:field="representationInformationDescriptionKey">
 									<ui:text from='{messages.representationInformationDescription}' />
 								</g:Label>
-								<g:HTML styleName="value"
+								<g:HTML styleName="value ri-description"
 									ui:field="representationInformationDescriptionValue" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">

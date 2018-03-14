@@ -6355,6 +6355,14 @@ td.datePickerMonth, td.datePickerYear {
 	max-width: 100%;
 }
 
+.field .value.ri-description {
+ 	white-space: pre-wrap;
+}
+
+.ri-edit-description {
+	min-height: 25rem;
+}
+
 span.code {
     font-family: "UbuntuMono", "Ubuntu", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: bold;

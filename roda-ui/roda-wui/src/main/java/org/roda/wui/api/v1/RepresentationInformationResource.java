@@ -23,6 +23,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.roda.core.common.EntityResponse;
+import org.roda.core.common.StreamResponse;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
@@ -37,6 +39,7 @@ import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
+import org.roda.wui.api.v1.utils.ObjectResponse;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -132,7 +135,7 @@ public class RepresentationInformationResource {
 
   public Response getRepresentationInformation(
     @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_INFORMATION_ID) String representationInformationId,
-    @ApiParam(value = "Choose format in which to get the representation information", allowableValues = RodaConstants.API_GET_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
+    @ApiParam(value = "Choose format in which to get the representation information", allowableValues = RodaConstants.API_GET_FILE_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
@@ -140,9 +143,15 @@ public class RepresentationInformationResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    RepresentationInformation ri = org.roda.wui.api.controllers.Browser.retrieve(user, RepresentationInformation.class,
-      representationInformationId, new ArrayList<>());
-    return Response.ok(ri, mediaType).build();
+    EntityResponse riEntity = Browser.retrieveRepresentationInformation(user, representationInformationId,
+      acceptFormat);
+
+    if (riEntity instanceof ObjectResponse) {
+      ObjectResponse<RepresentationInformation> ri = (ObjectResponse<RepresentationInformation>) riEntity;
+      return Response.ok(ri.getObject(), mediaType).build();
+    } else {
+      return ApiUtils.okResponse((StreamResponse) riEntity);
+    }
   }
 
   @DELETE

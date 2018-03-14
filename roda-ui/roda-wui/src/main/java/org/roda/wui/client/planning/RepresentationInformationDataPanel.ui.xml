@@ -29,7 +29,7 @@
 					<ui:text from='{messages.representationInformationDescription}' />
 				</g:Label>
 				<g:TextArea title="{messages.representationInformationDescription}"
-					ui:field="description" addStyleNames="form-textbox metadata-form-text-area" />
+					ui:field="description" addStyleNames="form-textbox metadata-form-text-area ri-edit-description" />
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.representationInformationTags}' />
 				</g:Label>

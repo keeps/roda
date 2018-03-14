@@ -3114,6 +3114,36 @@ public class Browser extends RodaWuiController {
     }
   }
 
+  public static EntityResponse retrieveRepresentationInformation(User user, String representationInformationId,
+    String acceptFormat)
+    throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // validate input
+    BrowserHelper.validateGetFileParams(acceptFormat);
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+
+    try {
+      RepresentationInformation ri = RodaCoreFactory.getIndexService().retrieve(RepresentationInformation.class,
+        representationInformationId, new ArrayList<>());
+      controllerAssistant.checkObjectPermissions(user, ri, PermissionType.READ);
+
+      // delegate
+      return BrowserHelper.retrieveRepresentationInformation(representationInformationId, acceptFormat);
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.REPRESENTATION_INFORMATION_ID,
+        representationInformationId);
+    }
+  }
+
   public static void createFormatIdentificationJob(User user, SelectedItems<?> selected) throws GenericException,
     AuthorizationDeniedException, JobAlreadyStartedException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
