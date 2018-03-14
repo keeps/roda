@@ -157,7 +157,8 @@ public class IndexModelObserver implements ModelObserver {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
     try (CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationMetadata = (representationId == null)
-      ? model.listPreservationMetadata(aipId, true) : model.listPreservationMetadata(aipId, representationId);) {
+      ? model.listPreservationMetadata(aipId, true)
+      : model.listPreservationMetadata(aipId, representationId);) {
 
       for (OptionalWithCause<PreservationMetadata> opm : preservationMetadata) {
         if (opm.isPresent()) {
@@ -331,7 +332,7 @@ public class IndexModelObserver implements ModelObserver {
     try {
       premisFile = model.retrievePreservationFile(file);
     } catch (RODAException e) {
-      LOGGER.warn("On indexing representations, error loading PREMIS for file: {}", file, e);
+      LOGGER.warn("On indexing representations, error loading PREMIS for file: {}. Reason: {}", file, e.getMessage());
     }
     return premisFile;
   }
