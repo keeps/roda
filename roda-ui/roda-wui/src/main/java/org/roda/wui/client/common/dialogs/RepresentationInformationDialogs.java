@@ -12,6 +12,7 @@ import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
+import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.filter.OrFiltersParameters;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -504,17 +505,7 @@ public class RepresentationInformationDialogs {
               button.addClickHandler(new ClickHandler() {
                 @Override
                 public void onClick(ClickEvent event) {
-                  List<String> riAlreadyLinked = new ArrayList<>();
-
-                  if (ri != null) {
-                    for (RepresentationInformationRelation r : ri.getRelations()) {
-                      if (r.getObjectType().equals(RelationObjectType.REPRESENTATION_INFORMATION)) {
-                        riAlreadyLinked.add(r.getLink());
-                      }
-                    }
-                  }
-
-                  Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, riAlreadyLinked));
+                  Filter filter = new Filter(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, ri.getId()));
                   SelectRepresentationInformationDialog selectDialog = new SelectRepresentationInformationDialog(
                     messages.moveItemTitle(), filter, false);
                   selectDialog.setSingleSelectionMode();
