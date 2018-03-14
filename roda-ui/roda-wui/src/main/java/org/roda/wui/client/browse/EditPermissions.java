@@ -218,10 +218,12 @@ public class EditPermissions extends Composite {
 
   private List<HasPermissions> objects = new ArrayList<>();
   private String objectClass = null;
+  private String objectId = null;
 
   public EditPermissions(String objectClass, HasPermissions object) {
     this.objects.add(object);
     this.objectClass = objectClass;
+    this.objectId = object.getId();
     initWidget(uiBinder.createAndBindUi(this));
     buttonApplyToAll.setVisible(IndexedAIP.class.getName().equals(objectClass));
     createPermissionPanel();
@@ -499,12 +501,15 @@ public class EditPermissions extends Composite {
 
   @UiHandler("buttonClose")
   void buttonCancelHandler(ClickEvent e) {
-    close();
-  }
-
-  public void close() {
-    LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
-    HistoryUtils.newHistory(selectedItems.getLastHistory());
+    if (objectId != null) {
+      if (IndexedAIP.class.getName().equals(objectClass)) {
+        HistoryUtils.openBrowse(objectId);
+      } else {
+        HistoryUtils.openBrowse((IndexedDIP) objects.get(0));
+      }
+    } else {
+      HistoryUtils.newHistory(BrowseAIP.RESOLVER);
+    }
   }
 
   public class PermissionPanel extends Composite {

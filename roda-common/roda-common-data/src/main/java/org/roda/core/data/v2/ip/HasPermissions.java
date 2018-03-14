@@ -12,4 +12,6 @@ public interface HasPermissions extends HasPermissionFilters {
   public Permissions getPermissions();
 
   public void setPermissions(Permissions permissions);
+
+  public String getId();
 }
