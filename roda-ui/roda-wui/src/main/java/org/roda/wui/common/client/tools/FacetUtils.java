@@ -25,7 +25,7 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 
 public class FacetUtils {
-  private static ClientLogger LOGGER = new ClientLogger(FacetUtils.class.getName());
+  private static final ClientLogger LOGGER = new ClientLogger(FacetUtils.class.getName());
 
   private FacetUtils() {
     // do nothing
@@ -102,8 +102,8 @@ public class FacetUtils {
               } else {
                 LOGGER.warn("Haven't found the facet parameter: " + facetField);
               }
-              list.setFacets(facets);
 
+              list.setFacets(facets);
             }
           });
         }

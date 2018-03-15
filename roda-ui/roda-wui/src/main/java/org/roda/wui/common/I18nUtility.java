@@ -8,16 +8,20 @@
 package org.roda.wui.common;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Locale;
 import java.util.MissingResourceException;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
 import org.roda.core.data.v2.index.facet.FacetValue;
 import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.user.RODAMember;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.server.ServerTools;
 import org.slf4j.Logger;
@@ -56,19 +60,27 @@ public class I18nUtility {
   private static <T extends Serializable> String getFacetTranslation(String facetField, String facetValue,
     Locale locale, Class<T> resultClass) {
     String ret;
+    String bundleKey = RodaConstants.I18N_UI_FACETS_PREFIX + resultClass.getSimpleName() + "." + facetField
+      + (facetValue == null || facetValue.trim().length() == 0 ? "" : "." + facetValue.trim());
 
-    if (resultClass.equals(LogEntry.class) && facetField.equals(RodaConstants.LOG_ACTION_METHOD)
-      && facetValue != null) {
-      ret = StringUtils.getPrettifiedActionMethod(facetValue);
-    } else {
-      String bundleKey = RodaConstants.I18N_UI_FACETS_PREFIX + resultClass.getSimpleName() + "." + facetField
-        + (facetValue == null || facetValue.trim().length() == 0 ? "" : "." + facetValue.trim());
-      try {
+    try {
+      if (resultClass.equals(LogEntry.class) && facetField.equals(RodaConstants.LOG_ACTION_METHOD)
+        && facetValue != null) {
+        ret = StringUtils.getPrettifiedActionMethod(facetValue);
+      } else if (resultClass.equals(RODAMember.class) && facetField.equals(RodaConstants.MEMBERS_GROUPS)
+        && facetValue != null) {
+        ArrayList<String> fields = new ArrayList<>();
+        fields.add(RodaConstants.MEMBERS_ID);
+        fields.add(RodaConstants.MEMBERS_GROUPS);
+        fields.add(RodaConstants.MEMBERS_FULLNAME);
+        RODAMember group = RodaCoreFactory.getIndexService().retrieve(RODAMember.class, facetValue, fields);
+        ret = group.getFullName();
+      } else {
         ret = RodaCoreFactory.getI18NMessages(locale).getTranslation(bundleKey);
-      } catch (MissingResourceException e) {
-        ret = facetValue;
-        LOGGER.trace("Translation not found: " + bundleKey + " locale: " + locale);
       }
+    } catch (MissingResourceException | NotFoundException | GenericException e) {
+      ret = facetValue;
+      LOGGER.trace("Translation not found: " + bundleKey + " locale: " + locale, e);
     }
 
     return ret;
