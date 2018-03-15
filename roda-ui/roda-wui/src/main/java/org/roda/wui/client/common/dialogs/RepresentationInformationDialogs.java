@@ -389,8 +389,8 @@ public class RepresentationInformationDialogs {
           final Button confirmButton = new Button(confirmButtonText);
           confirmButton.setEnabled(false);
           final Label helpLabel = new Label(messages.title("help"));
-          buttonPanel.add(cancelButton);
           buttonPanel.add(confirmButton);
+          buttonPanel.add(cancelButton);
           buttonPanel.add(helpLabel);
           layout.add(buttonPanel);
           dialogBox.setWidget(layout);
@@ -406,9 +406,9 @@ public class RepresentationInformationDialogs {
             }
           });
 
-          cancelButton.addStyleName("btn btn-link");
+          cancelButton.addStyleName("pull-right btn btn-link");
           confirmButton.addStyleName("pull-right btn btn-play");
-          helpLabel.addStyleName("pull-right btn btn-link");
+          helpLabel.addStyleName("btn btn-link");
 
           AsyncCallback<Void> centerDialogBox = new AsyncCallback<Void>() {
 
