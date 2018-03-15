@@ -507,7 +507,7 @@ public class RepresentationInformationDialogs {
                 public void onClick(ClickEvent event) {
                   Filter filter = new Filter(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, ri.getId()));
                   SelectRepresentationInformationDialog selectDialog = new SelectRepresentationInformationDialog(
-                    messages.moveItemTitle(), filter, false);
+                    messages.chooseEntityTitle(), filter, false);
                   selectDialog.setSingleSelectionMode();
                   selectDialog.showAndCenter();
                   selectDialog.addValueChangeHandler(new ValueChangeHandler<RepresentationInformation>() {
@@ -737,7 +737,7 @@ public class RepresentationInformationDialogs {
         }
 
         Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, aipsAlreadyLinked));
-        SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle(), filter, false, false);
+        SelectAipDialog selectAipDialog = new SelectAipDialog(messages.chooseEntityTitle(), filter, false, false);
         selectAipDialog.setSingleSelectionMode();
         selectAipDialog.showAndCenter();
         selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {

@@ -164,6 +164,8 @@ public interface ClientMessages extends Messages {
 
   String outcomeDetailFailed();
 
+  String chooseEntityTitle();
+
   /******* SIDEBAR ******************************************/
 
   String sidebarFilterDates();
