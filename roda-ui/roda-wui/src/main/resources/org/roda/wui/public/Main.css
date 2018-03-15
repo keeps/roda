@@ -825,7 +825,6 @@ pre code {
 	background-color: rgba(0,0,0,0.6);
 }
 
-
 .btn-danger {
     background-color: #d9534f;
 }
@@ -5816,6 +5815,9 @@ td.datePickerMonth, td.datePickerYear {
 }
 .btn-separator-right {
 	margin-right: 10px;
+}
+.btn-separator-left {
+	margin-left: 10px;
 }
 
 .plugin-list-item {

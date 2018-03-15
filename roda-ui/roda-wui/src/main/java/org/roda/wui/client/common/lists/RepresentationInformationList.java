@@ -18,9 +18,11 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
-import org.roda.wui.client.common.utils.StringUtils;
 
+import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
@@ -34,8 +36,7 @@ public class RepresentationInformationList extends BasicAsyncTableCell<Represent
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  private TextColumn<RepresentationInformation> nameColumn;
-  private TextColumn<RepresentationInformation> tagColumn;
+  private Column<RepresentationInformation, SafeHtml> nameColumn;
   private TextColumn<RepresentationInformation> supportColumn;
   private TextColumn<RepresentationInformation> familyColumn;
 
@@ -61,17 +62,16 @@ public class RepresentationInformationList extends BasicAsyncTableCell<Represent
   @Override
   protected void configureDisplay(CellTable<RepresentationInformation> display) {
 
-    nameColumn = new TextColumn<RepresentationInformation>() {
+    nameColumn = new Column<RepresentationInformation, SafeHtml>(new SafeHtmlCell()) {
       @Override
-      public String getValue(RepresentationInformation ri) {
-        return ri != null ? ri.getName() : null;
-      }
-    };
-
-    tagColumn = new TextColumn<RepresentationInformation>() {
-      @Override
-      public String getValue(RepresentationInformation ri) {
-        return StringUtils.prettyPrint(ri.getTags());
+      public SafeHtml getValue(RepresentationInformation ri) {
+        StringBuilder nameWithTags = new StringBuilder();
+        nameWithTags.append(ri.getName());
+        for (String tag : ri.getTags()) {
+          nameWithTags.append("<span class='label label-info btn-separator-left ri-category'>")
+            .append(messages.representationInformationListItems(tag)).append("</span>");
+        }
+        return SafeHtmlUtils.fromTrustedString(nameWithTags.toString());
       }
     };
 
@@ -92,7 +92,6 @@ public class RepresentationInformationList extends BasicAsyncTableCell<Represent
     nameColumn.setSortable(true);
 
     addColumn(nameColumn, messages.representationInformationName(), false, false);
-    addColumn(tagColumn, messages.representationInformationTags(), false, false, 8);
     addColumn(supportColumn, messages.representationInformationSupport(), false, false, 8.5);
     addColumn(familyColumn, messages.representationInformationFamily(), false, false, 7);
 
@@ -103,7 +102,6 @@ public class RepresentationInformationList extends BasicAsyncTableCell<Represent
   @Override
   protected Sorter getSorter(ColumnSortList columnSortList) {
     Map<Column<RepresentationInformation, ?>, List<String>> columnSortingKeyMap = new HashMap<>();
-    columnSortingKeyMap.put(tagColumn, Arrays.asList(RodaConstants.REPRESENTATION_INFORMATION_TAGS));
     columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.REPRESENTATION_INFORMATION_NAME_SORT));
     columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.REPRESENTATION_INFORMATION_SUPPORT));
     columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.REPRESENTATION_INFORMATION_FAMILY));
