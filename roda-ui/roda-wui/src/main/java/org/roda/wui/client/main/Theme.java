@@ -13,6 +13,7 @@ package org.roda.wui.client.main;
 import java.util.Arrays;
 import java.util.List;
 
+import com.google.gwt.user.client.Window;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -50,6 +51,7 @@ public class Theme extends Composite {
         HistoryUtils.newHistory(Theme.RESOLVER);
         callback.onSuccess(null);
       }
+      Window.scrollTo(Window.getScrollLeft(), 0);
     }
 
     @Override
