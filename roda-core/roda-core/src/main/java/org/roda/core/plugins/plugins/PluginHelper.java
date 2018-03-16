@@ -701,7 +701,7 @@ public final class PluginHelper {
     AuthorizationDeniedException {
     if (createSubmission) {
       if (FSUtils.isDirectory(submissionPath)) {
-        StorageService submissionStorage = new FileStorageService(submissionPath);
+        StorageService submissionStorage = new FileStorageService(submissionPath, false, null, false);
         StoragePath submissionStoragePath = DefaultStoragePath.empty();
         model.createSubmission(submissionStorage, submissionStoragePath, aipId);
       } else {

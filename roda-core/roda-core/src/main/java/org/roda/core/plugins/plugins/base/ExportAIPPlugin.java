@@ -194,7 +194,7 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
   private Report exportFolders(List<AIP> aips, StorageService storage, ModelService model, IndexService index,
     Report report, SimpleJobPluginInfo jobPluginInfo, Job job) {
     try {
-      FileStorageService localStorage = new FileStorageService(Paths.get(outputFolder));
+      FileStorageService localStorage = new FileStorageService(Paths.get(outputFolder), false, null, false);
       for (AIP aip : aips) {
         LOGGER.debug("Exporting AIP {} to folder", aip.getId());
         String error = null;

@@ -74,7 +74,8 @@ public class FileStorageService implements StorageService {
   private final Path historyMetadataPath;
   private final Path trashPath;
 
-  public FileStorageService(Path basePath, String trashDirName) throws GenericException {
+  public FileStorageService(Path basePath, boolean createTrash, String trashDirName, boolean createHistory)
+    throws GenericException {
     this.basePath = basePath;
     rodaDataPath = this.basePath.getParent();
     historyPath = rodaDataPath.resolve(basePath.getFileName() + HISTORY_SUFFIX);
@@ -83,11 +84,19 @@ public class FileStorageService implements StorageService {
     trashPath = rodaDataPath.resolve(trashDirName == null ? "trash" : trashDirName);
 
     initialize(basePath);
-    initialize(historyPath);
-    initialize(historyDataPath.resolve(RodaConstants.STORAGE_CONTAINER_AIP));
-    initialize(historyMetadataPath.resolve(RodaConstants.STORAGE_CONTAINER_AIP));
-    initialize(trashPath);
+    if (createHistory) {
+      initialize(historyPath);
+      initialize(historyDataPath.resolve(RodaConstants.STORAGE_CONTAINER_AIP));
+      initialize(historyMetadataPath.resolve(RodaConstants.STORAGE_CONTAINER_AIP));
+    }
+    if (createTrash) {
+      initialize(trashPath);
+    }
 
+  }
+
+  public FileStorageService(Path basePath, String trashDirName) throws GenericException {
+    this(basePath, true, trashDirName, true);
   }
 
   public FileStorageService(Path basePath) throws GenericException {
@@ -174,6 +183,10 @@ public class FileStorageService implements StorageService {
   }
 
   private void trash(Path fromPath) throws GenericException, NotFoundException {
+    if (trashPath == null) {
+      LOGGER.warn("Skipping trash '{}' because no trash folder is defined!", fromPath);
+      return;
+    }
     try {
       Path toPath = trashPath.resolve(rodaDataPath.relativize(fromPath));
       LOGGER.debug("Moving to trash: {} to {}", fromPath, toPath);
@@ -490,6 +503,11 @@ public class FileStorageService implements StorageService {
   @Override
   public CloseableIterable<BinaryVersion> listBinaryVersions(StoragePath storagePath)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    if (historyDataPath == null) {
+      LOGGER.warn("Skipping list binary versions because no history folder is defined, so returning empty list!");
+      return new EmptyClosableIterable<>();
+    }
+
     Path fauxPath = FSUtils.getEntityPath(historyDataPath, storagePath);
     Path parent = fauxPath.getParent();
     final String baseName = fauxPath.getFileName().toString();
@@ -557,6 +575,9 @@ public class FileStorageService implements StorageService {
   @Override
   public BinaryVersion getBinaryVersion(StoragePath storagePath, String version)
     throws RequestNotValidException, NotFoundException, GenericException {
+    if (historyDataPath == null) {
+      throw new GenericException("Skipping get binary version because no history folder is defined!");
+    }
     Path binVersionPath = FSUtils.getEntityPath(historyDataPath, storagePath, version);
     return FSUtils.convertPathToBinaryVersion(historyDataPath, historyMetadataPath, binVersionPath);
   }
@@ -564,6 +585,10 @@ public class FileStorageService implements StorageService {
   @Override
   public BinaryVersion createBinaryVersion(StoragePath storagePath, Map<String, String> properties)
     throws RequestNotValidException, NotFoundException, GenericException {
+    if (historyDataPath == null) {
+      throw new GenericException("Skipping create binary version because no history folder is defined!");
+    }
+
     Path binPath = FSUtils.getEntityPath(basePath, storagePath);
 
     String id = IdUtils.createUUID();
@@ -610,6 +635,11 @@ public class FileStorageService implements StorageService {
   @Override
   public void revertBinaryVersion(StoragePath storagePath, String version)
     throws NotFoundException, RequestNotValidException, GenericException {
+    if (historyDataPath == null) {
+      LOGGER.warn("Skipping revert binary version because no history folder is defined!");
+      return;
+    }
+
     Path binPath = FSUtils.getEntityPath(basePath, storagePath);
     Path binVersionPath = FSUtils.getEntityPath(historyDataPath, storagePath, version);
 
@@ -637,6 +667,11 @@ public class FileStorageService implements StorageService {
   @Override
   public void deleteBinaryVersion(StoragePath storagePath, String version)
     throws NotFoundException, GenericException, RequestNotValidException {
+    if (historyDataPath == null) {
+      LOGGER.warn("Skipping delete binary version because no history folder is defined!");
+      return;
+    }
+
     Path dataPath = FSUtils.getEntityPath(historyDataPath, storagePath, version);
     Path metadataPath = FSUtils.getBinaryHistoryMetadataPath(historyDataPath, historyMetadataPath, dataPath);
 
@@ -649,6 +684,11 @@ public class FileStorageService implements StorageService {
   }
 
   private void deleteAllBinaryVersionsUnder(StoragePath storagePath) {
+    if (historyDataPath == null) {
+      LOGGER.warn("Skipping delete all binary versions because no history folder is defined!");
+      return;
+    }
+
     Path resourcePath = FSUtils.getEntityPath(basePath, storagePath);
 
     Path relativePath = basePath.relativize(resourcePath);
