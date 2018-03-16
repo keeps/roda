@@ -178,8 +178,11 @@
 				<field name="type_txt">
 					<xsl:value-of select="text()" />
 				</field>
+				<field name="level"><xsl:value-of select="translate(text(),'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')" /></field>
 			</xsl:if>
 		</xsl:for-each>
-		<field name="level">item</field>
+		<xsl:if test="not(type)">
+			<field name="level">item</field>
+		</xsl:if>
 	</xsl:template>
 </xsl:stylesheet>
