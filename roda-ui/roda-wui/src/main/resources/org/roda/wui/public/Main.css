@@ -3727,10 +3727,6 @@ td.datePickerMonth, td.datePickerYear {
     margin-bottom: 10px;
 }
 
-.wui-dialog-fixed {
-	max-width: 40vw !important;
-}
-
 .pull-right {
     float: right;
 }
@@ -6218,16 +6214,18 @@ td.datePickerMonth, td.datePickerYear {
 	cursor: pointer;
 }
 
-.ri-dialog {
-	max-width: 60vw !important;
-}
-
 .ri-dialog .wui-dialog-layout {
     padding: 15px 15px 15px 10px;
 }
 
 .ri-dialog .pull-right.btn {
     margin-left: 10px;
+}
+
+.ri-dialog .wui-dialog-message,
+.ri-dialog .ri-dialog-list-scroll,
+.ri-dialog .relation-form-panel {
+    min-width: 60vw;
 }
 
 .ri-entity-relation-section {

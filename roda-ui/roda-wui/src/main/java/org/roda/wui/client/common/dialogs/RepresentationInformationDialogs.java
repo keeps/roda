@@ -75,7 +75,7 @@ public class RepresentationInformationDialogs {
     String confirmButtonText, String listButtonText, final RepresentationInformation ri,
     final AsyncCallback<RepresentationInformation> callback) {
     final DialogBox dialogBox = new DialogBox(true, true);
-    dialogBox.addStyleName("wui-dialog-fixed");
+    dialogBox.addStyleName("ri-dialog");
     dialogBox.setText(title);
 
     final FlowPanel layout = new FlowPanel();
