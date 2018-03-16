@@ -73,7 +73,7 @@ public class ShowJobReport extends Composite {
             public void onSuccess(IndexedReport jobReport) {
               ShowJobReport showJob = new ShowJobReport(jobReport);
               callback.onSuccess(showJob);
-              JavascriptUtils.scrollToHeader();
+              JavascriptUtils.scrollToTop();
             }
           });
       } else {

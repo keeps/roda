@@ -102,11 +102,10 @@ public class JavascriptUtils {
 		}, 1000);
   }-*/;
 
-  public static native void scrollToHeader() /*-{
-		var target = $wnd.jQuery('.h1');
+  public static native void scrollToTop() /*-{
 		$wnd.jQuery('html, body').animate({
-			scrollTop : target.offset().top
-		}, 10);
+			scrollTop : 0
+		}, 250);
   }-*/;
 
   public static native void runMiniUploadForm() /*-{

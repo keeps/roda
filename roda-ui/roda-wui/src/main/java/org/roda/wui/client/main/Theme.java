@@ -51,7 +51,6 @@ public class Theme extends Composite {
         HistoryUtils.newHistory(Theme.RESOLVER);
         callback.onSuccess(null);
       }
-      Window.scrollTo(Window.getScrollLeft(), 0);
     }
 
     @Override
@@ -84,6 +83,7 @@ public class Theme extends Composite {
       public void onSuccess(Void result) {
         JavascriptUtils.runHighlighter();
         JavascriptUtils.runTextFill(".textfill");
+        JavascriptUtils.scrollToTop();
       }
     });
     layout.addStyleName("wui-home");
