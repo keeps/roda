@@ -321,18 +321,21 @@ public class UserLogin {
 
       @Override
       public void onSuccess(final String role) {
-        getAuthenticatedUser(new AsyncCallback<User>() {
+        if(StringUtils.isBlank(role)){
+          callback.onSuccess(Boolean.TRUE);
+        }else{
+          getAuthenticatedUser(new AsyncCallback<User>() {
+            @Override
+            public void onFailure(Throwable caught) {
+              callback.onFailure(caught);
+            }
 
-          @Override
-          public void onFailure(Throwable caught) {
-            callback.onFailure(caught);
-          }
-
-          @Override
-          public void onSuccess(User authUser) {
-            callback.onSuccess(authUser.hasRole(role));
-          }
-        });
+            @Override
+            public void onSuccess(User authUser) {
+              callback.onSuccess(authUser.hasRole(role));
+            }
+          });
+        }
       }
 
     });
