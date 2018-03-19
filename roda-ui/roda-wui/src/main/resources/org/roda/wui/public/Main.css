@@ -6434,3 +6434,24 @@ span.code {
 	box-shadow: 0px 0px 10px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
     transition: all 0.2s cubic-bezier(.25,.8,.25,1);
 }
+
+/* Specific fixes for IE 10 and above
+   about the CSS selector hack: https://stackoverflow.com/a/48998808/1483200 */
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+  .btn::after {
+    margin-top:3px;
+  }
+
+  .btn {
+    padding-top: 6px;
+    height: 28px;
+  }
+
+  .searchInputListBox .dropdown-label::after {
+    top: 20px;
+  }
+
+  .search-field-remove {
+    margin-top: 0;
+  }
+}
