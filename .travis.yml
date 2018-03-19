@@ -60,7 +60,7 @@ after_success:
       export DOCKER_TAG="$TRAVIS_BRANCH"
       export RODA_DEV_BRANCH="staging"
       docker tag keeps/roda:latest keeps/roda:$TRAVIS_BRANCH
-    elif [ "`echo $TRAVIS_BRANCH | egrep "v[2-9]*" | wc -l`" -eq "1" ]; then
+    elif [ "`echo $TRAVIS_BRANCH | egrep "^v[2-9]+" | wc -l`" -eq "1" ]; then
       export DOCKER_TAG="$TRAVIS_BRANCH"
       export RODA_DEV_BRANCH="master"
       docker tag keeps/roda:latest keeps/roda:$TRAVIS_BRANCH
