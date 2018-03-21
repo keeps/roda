@@ -33,9 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class HTTPNotificationProcessor implements NotificationProcessor {
-
   private static final Logger LOGGER = LoggerFactory.getLogger(HTTPNotificationProcessor.class);
-
   public static final String JOB_KEY = "job";
 
   private String endpoint;

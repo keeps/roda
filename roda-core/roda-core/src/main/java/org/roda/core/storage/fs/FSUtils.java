@@ -777,11 +777,11 @@ public final class FSUtils {
     return digests;
   }
 
-  public static Path createRandomDirectory(Path parent) throws IOException {
+  public static Path createDirectory(Path parent, String name) throws IOException {
     Path directory;
     do {
       try {
-        directory = Files.createDirectory(parent.resolve(IdUtils.createUUID()));
+        directory = Files.createDirectory(parent.resolve(name));
       } catch (FileAlreadyExistsException e) {
         LOGGER.warn("Got colision when creating random directory", e);
         directory = null;
@@ -791,13 +791,21 @@ public final class FSUtils {
     return directory;
   }
 
+  public static Path createRandomDirectory(Path parent) throws IOException {
+    return createDirectory(parent, IdUtils.createUUID());
+  }
+
   public static Path createRandomFile(Path parent) throws IOException {
+    return createFile(parent, IdUtils.createUUID());
+  }
+
+  public static Path createFile(Path parent, String name) throws IOException {
     Path file;
     do {
       try {
-        file = Files.createFile(parent.resolve(IdUtils.createUUID()));
+        file = Files.createFile(parent.resolve(name));
       } catch (FileAlreadyExistsException e) {
-        LOGGER.warn("Got colision when creating random directory", e);
+        LOGGER.warn("Got colision when creating random file", e);
         file = null;
       }
     } while (file == null);

@@ -2190,23 +2190,26 @@ public class ModelService extends ModelObservable {
   /***************** Notification related *****************/
   /**********************************************************/
 
-  public Notification createNotification(final Notification notification, final NotificationProcessor processor)
+  public Notification createNotification(Notification notification, NotificationProcessor processor)
     throws GenericException, AuthorizationDeniedException {
-
     notification.setId(IdUtils.createUUID());
     notification.setAcknowledgeToken(IdUtils.createUUID());
-    Notification processedNotification = processor.processNotification(this, notification);
+
+    if (processor != null) {
+      notification = processor.processNotification(this, notification);
+    }
 
     try {
-      String notificationAsJson = JsonUtils.getJsonFromObject(processedNotification);
-      StoragePath notificationPath = ModelUtils.getNotificationStoragePath(processedNotification.getId());
+      String notificationAsJson = JsonUtils.getJsonFromObject(notification);
+      StoragePath notificationPath = ModelUtils.getNotificationStoragePath(notification.getId());
       storage.createBinary(notificationPath, new StringContentPayload(notificationAsJson), false);
-      notifyNotificationCreatedOrUpdated(processedNotification).failOnError();
+      notifyNotificationCreatedOrUpdated(notification).failOnError();
     } catch (NotFoundException | RequestNotValidException | AlreadyExistsException e) {
       LOGGER.error("Error creating notification in storage", e);
       throw new GenericException(e);
     }
-    return processedNotification;
+
+    return notification;
   }
 
   public Notification updateNotification(Notification notification)
