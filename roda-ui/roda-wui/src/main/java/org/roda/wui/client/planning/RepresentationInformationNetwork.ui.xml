@@ -46,10 +46,6 @@
 								<ui:text
 									from='{messages.representationInformationRegisterProcessButton}' />
 							</g:Button>
-							<g:Button addStyleNames="btn btn-block btn-default btn-times-circle"
-								ui:field="buttonCancel">
-								<ui:text from='{messages.cancelButton}' />
-							</g:Button>
 							<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
 								<g:Label addStyleNames="h4">
 									<ui:text from='{messages.representationInformationTags}' />

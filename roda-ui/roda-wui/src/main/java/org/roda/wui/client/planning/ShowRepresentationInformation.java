@@ -228,7 +228,6 @@ public class ShowRepresentationInformation extends Composite {
         parPanel.setHTML("<span class='label label-info btn-separator-right ri-category'>"
           + messages.representationInformationListItems(category) + "</span>");
         parPanel.addClickHandler(new ClickHandler() {
-
           @Override
           public void onClick(ClickEvent event) {
             List<String> history = new ArrayList<>();
@@ -397,16 +396,16 @@ public class ShowRepresentationInformation extends Composite {
 
           if (ri.getRelations() != null) {
             for (RepresentationInformationRelation relation : ri.getRelations()) {
-              GWT
-                .log(bundle.getTranslations().get(relation.getObjectType()).get(relation.getRelationType()).toString());
               String relationType = bundle.getTranslations().get(relation.getObjectType())
                 .get(relation.getRelationType());
-              if (relationTypeToLink.containsKey(relationType)) {
-                relationTypeToLink.get(relationType).add(relation);
-              } else {
-                List<RepresentationInformationRelation> newRelations = new ArrayList<>();
-                newRelations.add(relation);
-                relationTypeToLink.put(relationType, newRelations);
+              if (relationType != null) {
+                if (relationTypeToLink.containsKey(relationType)) {
+                  relationTypeToLink.get(relationType).add(relation);
+                } else {
+                  List<RepresentationInformationRelation> newRelations = new ArrayList<>();
+                  newRelations.add(relation);
+                  relationTypeToLink.put(relationType, newRelations);
+                }
               }
             }
           }

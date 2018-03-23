@@ -43,6 +43,8 @@ public class FileNotificationProcessor implements NotificationProcessor {
       Job job = (Job) scope.get(JOB_KEY);
       String content = createNotificationContent(job);
       notification.setBody(content);
+      notification.setState(NOTIFICATION_STATE.FAILED);
+
       if (dropPath != null && dropPath.startsWith("file:///")) {
         LOGGER.debug("Sending notification via drop folder ...");
         Path trimmedDropPath = Paths.get(dropPath.substring(7));
@@ -65,15 +67,12 @@ public class FileNotificationProcessor implements NotificationProcessor {
             notification.setState(NOTIFICATION_STATE.COMPLETED);
           } catch (AlreadyExistsException | GenericException | IOException e) {
             LOGGER.warn("Notification not sent", e);
-            notification.setState(NOTIFICATION_STATE.FAILED);
           }
         } else {
           LOGGER.warn("Drop path is not a folder, cannot send notification.");
-          notification.setState(NOTIFICATION_STATE.FAILED);
         }
       } else {
         LOGGER.warn("No drop path, cannot send notification.");
-        notification.setState(NOTIFICATION_STATE.FAILED);
       }
     }
 

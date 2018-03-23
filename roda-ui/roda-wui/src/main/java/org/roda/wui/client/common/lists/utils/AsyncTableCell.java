@@ -855,6 +855,10 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     return true;
   }
 
+  public void setCsvDownloadButtonVisibility(boolean isVisible) {
+    csvDownloadButton.setVisible(isVisible);
+  }
+
   public Actionable<T> getActionable() {
     return actionable;
   }

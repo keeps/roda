@@ -238,6 +238,7 @@ public class RepresentationInformationDialogs {
                 }
 
                 if (table != null) {
+                  table.setCsvDownloadButtonVisibility(false);
                   table.addRedrawHandler(new AbstractHasData.RedrawEvent.Handler() {
                     @Override
                     public void onRedraw() {
@@ -508,6 +509,7 @@ public class RepresentationInformationDialogs {
                   Filter filter = new Filter(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, ri.getId()));
                   SelectRepresentationInformationDialog selectDialog = new SelectRepresentationInformationDialog(
                     messages.chooseEntityTitle(), filter, false);
+                  selectDialog.getList().setCsvDownloadButtonVisibility(false);
                   selectDialog.setSingleSelectionMode();
                   selectDialog.showAndCenter();
                   selectDialog.addValueChangeHandler(new ValueChangeHandler<RepresentationInformation>() {
@@ -738,6 +740,7 @@ public class RepresentationInformationDialogs {
 
         Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, aipsAlreadyLinked));
         SelectAipDialog selectAipDialog = new SelectAipDialog(messages.chooseEntityTitle(), filter, false, false);
+        selectAipDialog.getList().setCsvDownloadButtonVisibility(false);
         selectAipDialog.setSingleSelectionMode();
         selectAipDialog.showAndCenter();
         selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {
@@ -850,6 +853,7 @@ public class RepresentationInformationDialogs {
     Filter defaultFilter = SearchFilters.defaultFilter(RepresentationInformation.class.getName());
     final RepresentationInformationList representationInformationList = new RepresentationInformationList(defaultFilter,
       facets, messages.representationInformationTitle(), true, 10, 10);
+    representationInformationList.setCsvDownloadButtonVisibility(false);
     representationInformationList.addRedrawHandler(new AbstractHasData.RedrawEvent.Handler() {
       @Override
       public void onRedraw() {

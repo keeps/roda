@@ -124,9 +124,6 @@ public class RepresentationInformationNetwork extends Composite {
   Button startProcess;
 
   @UiField
-  Button buttonCancel;
-
-  @UiField
   FlowPanel sidebar;
 
   @UiField
@@ -313,11 +310,5 @@ public class RepresentationInformationNetwork extends Composite {
     selectedItems.setSelectedItems(representationInformationList.getSelected());
     selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
     HistoryUtils.newHistory(CreateSelectedJob.RESOLVER, RodaConstants.JOB_PROCESS_ACTION);
-  }
-
-  @UiHandler("buttonCancel")
-  void handleButtonCancel(ClickEvent e) {
-    LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
-    HistoryUtils.newHistory(selectedItems.getLastHistory());
   }
 }

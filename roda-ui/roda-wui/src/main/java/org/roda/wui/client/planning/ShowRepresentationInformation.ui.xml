@@ -100,7 +100,7 @@
 						</g:Button>
 						<g:Button addStyleNames="btn btn-block btn-default btn-times-circle"
 							ui:field="buttonCancel">
-							<ui:text from='{messages.cancelButton}' />
+							<ui:text from='{messages.backButton}' />
 						</g:Button>
 					</g:FlowPanel>
 				</g:FlowPanel>
