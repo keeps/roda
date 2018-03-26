@@ -45,7 +45,6 @@ import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.management.MemberManagement;
-import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
@@ -232,7 +231,7 @@ public class ShowRepresentationInformation extends Composite {
           public void onClick(ClickEvent event) {
             List<String> history = new ArrayList<>();
             history.addAll(RepresentationInformationNetwork.RESOLVER.getHistoryPath());
-            history.add(Search.RESOLVER.getHistoryToken());
+            history.add(RepresentationInformationAssociations.RESOLVER.getHistoryToken());
             history.add(RodaConstants.REPRESENTATION_INFORMATION_TAGS);
             history.add(category);
             HistoryUtils.newHistory(history);
