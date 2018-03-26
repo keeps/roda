@@ -249,6 +249,8 @@ public class RepresentationInformationDialogs {
                   listPanel.add(section);
                   listPanel.add(table);
                 }
+              } else {
+                dialogBox.center();
               }
             }
           });

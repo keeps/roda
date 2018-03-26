@@ -6228,6 +6228,10 @@ td.datePickerMonth, td.datePickerYear {
     min-width: 60vw;
 }
 
+.ri-dialog .my-asyncdatagrid-display {
+    table-layout: auto;
+}
+
 .ri-entity-relation-section {
 	color: #999;
     font-size: 90%;
