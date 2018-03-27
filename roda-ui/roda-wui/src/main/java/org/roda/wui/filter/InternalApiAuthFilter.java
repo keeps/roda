@@ -83,7 +83,7 @@ public class InternalApiAuthFilter implements Filter {
 
   /**
    * Return a {@link User} from the HTTP Basic auth header information.
-   * 
+   *
    * @param request
    *          the HTTP request.
    * @return the {@link User}.
@@ -110,8 +110,7 @@ public class InternalApiAuthFilter implements Filter {
    * @param request
    *          the request.
    * 
-   * @return <code>true</code> if it is excluded and <code>false</code>
-   *         otherwise.
+   * @return <code>true</code> if it is excluded and <code>false</code> otherwise.
    */
   private boolean isRequestUrlExcluded(final HttpServletRequest request) {
     for (String exclusion : this.exclusions) {

@@ -845,7 +845,6 @@ public class BrowseAIP extends Composite {
     final DescriptiveMetadataViewBundle bundle, final AsyncCallback<SafeHtml> callback) {
     SafeUri uri = RestUtils.createDescriptiveMetadataHTMLUri(aipId, descId);
     RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri.asString());
-    requestBuilder.setHeader("Authorization", "Custom");
     try {
       requestBuilder.sendRequest(null, new RequestCallback() {
 

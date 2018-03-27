@@ -8,7 +8,6 @@
 package org.roda.wui.api.v1;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -19,17 +18,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.server.JSONP;
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AuthenticationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.ExtraMediaType;
-import org.roda.wui.filter.CasClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,37 +48,6 @@ public class AuthResource {
   /** HTTP request. */
   @Context
   private HttpServletRequest request;
-
-  /**
-   * Create a <strong>Ticket Granting Ticket</strong> for the specified user.
-   * 
-   * @param username
-   *          the user username.
-   * @param password
-   *          the user password.
-   *
-   * @return a {@link Response} with the <strong>Ticket Granting Ticket</strong>
-   *         .
-   * @throws GenericException
-   *           if some error occurred.
-   */
-  @POST
-  @Path("/ticket")
-  @Produces(MediaType.TEXT_PLAIN)
-  @ApiOperation(value = "Create an authorization ticket", response = String.class)
-  public Response create(@FormParam("username") final String username, @FormParam("password") final String password)
-    throws GenericException {
-    final String casServerUrlPrefix = RodaCoreFactory.getRodaConfiguration()
-      .getString("ui.filter.cas.casServerUrlPrefix");
-    final CasClient casClient = new CasClient(casServerUrlPrefix);
-    try {
-      final String tgt = casClient.getTicketGrantingTicket(username, password);
-      return Response.status(Response.Status.CREATED).entity(tgt).build();
-    } catch (final AuthenticationDeniedException e) {
-      LOGGER.debug(e.getMessage(), e);
-      return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
-    }
-  }
 
   @GET
   @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)

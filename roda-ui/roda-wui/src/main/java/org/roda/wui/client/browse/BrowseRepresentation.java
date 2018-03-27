@@ -461,7 +461,6 @@ public class BrowseRepresentation extends Composite {
     final AsyncCallback<SafeHtml> callback) {
     SafeUri uri = RestUtils.createRepresentationDescriptiveMetadataHTMLUri(aipId, repId, descId);
     RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri.asString());
-    requestBuilder.setHeader("Authorization", "Custom");
     try {
       requestBuilder.sendRequest(null, new RequestCallback() {
 

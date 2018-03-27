@@ -43,13 +43,9 @@ public class CasApiAuthFilter implements Filter {
   private static final Logger LOGGER = LoggerFactory.getLogger(CasApiAuthFilter.class);
   /** List of excluded URLs. */
   private final List<String> exclusions = new ArrayList<>();
-  /** CAS client. */
-  private CasClient casClient;
 
   @Override
   public void init(final FilterConfig filterConfig) throws ServletException {
-    this.casClient = new CasClient(filterConfig.getInitParameter("casServerUrlPrefix"));
-
     final String exclusionsParam = filterConfig.getInitParameter("exclusions");
     if (StringUtils.isNotBlank(exclusionsParam)) {
       final String[] listOfExclusions = exclusionsParam.split(",");
@@ -72,27 +68,22 @@ public class CasApiAuthFilter implements Filter {
       return;
     }
 
+    // check CAS auth
     final HttpSession session = request.getSession(false);
     final Assertion assertion = session != null
-      ? (Assertion) session.getAttribute(AbstractCasFilter.CONST_CAS_ASSERTION) : null;
+      ? (Assertion) session.getAttribute(AbstractCasFilter.CONST_CAS_ASSERTION)
+      : null;
 
     if (assertion != null) {
       filterChain.doFilter(request, response);
       return;
     }
 
+    // try basic auth
     try {
-      final String tgt = request.getHeader("TGT");
       final Pair<String, String> credentials = new BasicAuthRequestWrapper(request).getCredentials();
-
-      if (StringUtils.isNotBlank(tgt)) {
-        doFilterWithTGT(request, response, filterChain, tgt);
-      } else if (credentials != null) {
-        // TGT is blank. Try to use username and password
+      if (credentials != null) {
         doFilterWithCredentials(request, response, filterChain, credentials.getFirst(), credentials.getSecond());
-      } else {
-        LOGGER.debug("No username and password");
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No credentials");
       }
     } catch (final AuthenticationDeniedException e) {
       LOGGER.debug(e.getMessage(), e);
@@ -100,18 +91,20 @@ public class CasApiAuthFilter implements Filter {
     } catch (final GenericException e) {
       throw new ServletException(e.getMessage(), e);
     }
+
+    // try the user in session
+    User user = UserUtility.getUser(request);
+    if (user != null) {
+      filterChain.doFilter(request, response);
+      return;
+    }
+
+    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No credentials");
   }
 
   @Override
   public void destroy() {
     // do nothing
-  }
-
-  private void doFilterWithTGT(final HttpServletRequest request, final HttpServletResponse response,
-    final FilterChain filterChain, final String tgt) throws GenericException, IOException, ServletException {
-    final String serviceUrl = constructServiceUrl(request);
-    final String st = this.casClient.getServiceTicket(tgt, serviceUrl);
-    filterChain.doFilter(new ServiceTicketRequestWrapper(request, st), response);
   }
 
   private void doFilterWithCredentials(final HttpServletRequest request, final HttpServletResponse response,
@@ -122,12 +115,9 @@ public class CasApiAuthFilter implements Filter {
     if (UserUtility.getLdapUtility().isInternal(username)) {
       final User user = UserUtility.getLdapUtility().getAuthenticatedUser(username, password);
       UserUtility.setUser(request, user);
-      filterChain.doFilter(request, response);
-    } else {
-      // if user is external then try to use CAS
-      final String tgt = this.casClient.getTicketGrantingTicket(username, password);
-      doFilterWithTGT(request, response, filterChain, tgt);
     }
+
+    filterChain.doFilter(request, response);
   }
 
   private String constructServiceUrl(final HttpServletRequest request) {
@@ -140,8 +130,7 @@ public class CasApiAuthFilter implements Filter {
    * @param request
    *          the request.
    *
-   * @return <code>true</code> if it is excluded and <code>false</code>
-   *         otherwise.
+   * @return <code>true</code> if it is excluded and <code>false</code> otherwise.
    */
   private boolean isRequestUrlExcluded(final HttpServletRequest request) {
     for (String exclusion : this.exclusions) {

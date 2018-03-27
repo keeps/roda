@@ -695,7 +695,6 @@ public class ShowPreservationEvent extends Composite {
       event.getFileUUID(), true, RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML);
 
     RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri.asString());
-    requestBuilder.setHeader("Authorization", "Custom");
     try {
       requestBuilder.sendRequest(null, new RequestCallback() {
 

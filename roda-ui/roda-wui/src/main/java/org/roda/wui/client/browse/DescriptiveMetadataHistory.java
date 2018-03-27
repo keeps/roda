@@ -261,7 +261,6 @@ public class DescriptiveMetadataHistory extends Composite {
       }
     }
     RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri.asString());
-    requestBuilder.setHeader("Authorization", "Custom");
     try {
       requestBuilder.sendRequest(null, new RequestCallback() {
 
