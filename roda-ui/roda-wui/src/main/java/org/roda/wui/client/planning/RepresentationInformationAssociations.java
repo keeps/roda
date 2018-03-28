@@ -251,7 +251,7 @@ public class RepresentationInformationAssociations extends Composite {
     resultsPanel.setVisible(false);
 
     if (historyTokens.size() == 2) {
-      Filter filter = createFilterAndSubtitleFromHistoryTokens(historyTokens);
+      Filter filter = createFilterFromHistoryTokens(historyTokens);
 
       String[] parts = RepresentationInformationUtils.breakFilterIntoParts(historyTokens.get(1));
       createPanelTitle.setHTML(messages.representationInformationNoAssociations(parts[0], parts[1], parts[2]));
@@ -270,7 +270,7 @@ public class RepresentationInformationAssociations extends Composite {
     }
   }
 
-  private Filter createFilterAndSubtitleFromHistoryTokens(List<String> historyTokens) {
+  private Filter createFilterFromHistoryTokens(List<String> historyTokens) {
     List<FilterParameter> params = new ArrayList<>();
     if (historyTokens.size() == (2)) {
       params.add(new SimpleFilterParameter(historyTokens.get(0), historyTokens.get(1)));

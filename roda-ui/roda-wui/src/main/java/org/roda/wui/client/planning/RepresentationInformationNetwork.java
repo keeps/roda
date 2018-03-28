@@ -10,6 +10,7 @@
  */
 package org.roda.wui.client.planning;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,8 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.FilterParameter;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.ri.RepresentationInformation;
@@ -35,6 +38,7 @@ import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.client.process.InternalProcess;
+import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -210,6 +214,7 @@ public class RepresentationInformationNetwork extends Composite {
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.isEmpty()) {
+      filter.setParameters(new ArrayList<>());
       searchPanel.setDefaultFilter(filter, true);
       representationInformationList.setFilter(filter);
       searchPanel.clearSearchInputBox();
@@ -225,11 +230,27 @@ public class RepresentationInformationNetwork extends Composite {
         EditRepresentationInformation.RESOLVER.resolve(historyTokens, callback);
       } else if (RepresentationInformationAssociations.RESOLVER.getHistoryToken().equals(basePage)) {
         RepresentationInformationAssociations.RESOLVER.resolve(historyTokens, callback);
+      } else if (Search.RESOLVER.getHistoryToken().equals(basePage)) {
+        setFilterFromHistoryTokens(historyTokens);
+        searchPanel.setDefaultFilter(filter, true);
+        representationInformationList.setFilter(filter);
+        searchPanel.clearSearchInputBox();
+
+        callback.onSuccess(this);
       } else {
         HistoryUtils.newHistory(RESOLVER);
         callback.onSuccess(null);
       }
     }
+  }
+
+  private void setFilterFromHistoryTokens(List<String> historyTokens) {
+    List<FilterParameter> params = new ArrayList<>();
+    if (historyTokens.size() == (2)) {
+      params.add(new SimpleFilterParameter(historyTokens.get(0), historyTokens.get(1)));
+    }
+
+    filter.setParameters(params);
   }
 
   @UiHandler("buttonAdd")
