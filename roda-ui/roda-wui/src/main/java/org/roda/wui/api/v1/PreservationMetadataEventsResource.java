@@ -8,7 +8,6 @@
 package org.roda.wui.api.v1;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -46,8 +45,7 @@ public class PreservationMetadataEventsResource {
   private HttpServletRequest request;
 
   @GET
-  @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_HTML})
   @ApiOperation(value = "Get events preservation metadata", notes = "Get events preservation metadata", response = String.class)
   @ApiResponses(value = {@ApiResponse(code = 200, message = "Successful response", response = String.class),
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
