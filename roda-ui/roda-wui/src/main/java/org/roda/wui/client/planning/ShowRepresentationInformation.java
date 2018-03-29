@@ -56,9 +56,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.LocaleInfo;
-import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -467,52 +464,52 @@ public class ShowRepresentationInformation extends Composite {
         }
       });
 
-      SafeHtmlBuilder b = new SafeHtmlBuilder();
-      b.append(SafeHtmlUtils.fromSafeConstant("<ul>"));
+      FlowPanel linksPanel = new FlowPanel();
+      allPanel.add(linksPanel);
       for (RepresentationInformationRelation relation : entry.getValue()) {
-        b.append(createRelationViewer(relation));
+        Widget w = createRelationViewer(relation);
+        if (w != null) {
+          w.addStyleName("ri-links-panel");
+          linksPanel.add(w);
+        }
       }
-      b.append(SafeHtmlUtils.fromSafeConstant("</ul>"));
-      allPanel.add(new InlineHTML(b.toSafeHtml().asString()));
     }
   }
 
-  private SafeHtml createRelationViewer(RepresentationInformationRelation relation) {
-    SafeHtmlBuilder b = new SafeHtmlBuilder();
-    b.append(SafeHtmlUtils.fromSafeConstant("<li>"));
+  private Widget createRelationViewer(RepresentationInformationRelation relation) {
+    Widget widgetToAdd = null;
+    String title = StringUtils.isNotBlank(relation.getTitle()) ? relation.getTitle() : relation.getLink();
 
-    if (relation.getObjectType().equals(RelationObjectType.AIP)) {
-      Anchor a = new Anchor(relation.getTitle(),
-        HistoryUtils.createHistoryHashLink(HistoryUtils.getHistoryBrowse(relation.getLink())));
-      b.append(SafeHtmlUtils.fromSafeConstant("<a href='"));
-      b.append(SafeHtmlUtils.fromString(a.getHref()));
-      b.append(SafeHtmlUtils.fromSafeConstant("'>"));
-      b.append(SafeHtmlUtils.fromString(a.getText()));
-      b.append(SafeHtmlUtils.fromSafeConstant("</a>"));
-    } else if (relation.getObjectType().equals(RelationObjectType.REPRESENTATION_INFORMATION)) {
-      List<String> history = new ArrayList<>();
-      history.addAll(ShowRepresentationInformation.RESOLVER.getHistoryPath());
-      history.add(relation.getLink());
+    if (relation.getObjectType().equals(RelationObjectType.TEXT)) {
+      widgetToAdd = new Label(title);
+    } else {
+      Anchor anchor = null;
 
-      Anchor a = new Anchor(relation.getTitle(), HistoryUtils.createHistoryHashLink(history));
-      b.append(SafeHtmlUtils.fromSafeConstant("<a href='"));
-      b.append(SafeHtmlUtils.fromString(a.getHref()));
-      b.append(SafeHtmlUtils.fromSafeConstant("'>"));
-      b.append(SafeHtmlUtils.fromString(a.getText()));
-      b.append(SafeHtmlUtils.fromSafeConstant("</a>"));
-    } else if (relation.getObjectType().equals(RelationObjectType.WEB)) {
-      Anchor a = new Anchor(relation.getTitle(), relation.getLink());
-      b.append(SafeHtmlUtils.fromSafeConstant("<a href='"));
-      b.append(SafeHtmlUtils.fromString(a.getHref()));
-      b.append(SafeHtmlUtils.fromSafeConstant("' target='_blank'>"));
-      b.append(SafeHtmlUtils.fromString(a.getText()));
-      b.append(SafeHtmlUtils.fromSafeConstant("</a>"));
-    } else if (relation.getObjectType().equals(RelationObjectType.TEXT)) {
-      b.append(SafeHtmlUtils.fromString(relation.getTitle()));
+      if (relation.getObjectType().equals(RelationObjectType.AIP)) {
+        anchor = new Anchor(title,
+          HistoryUtils.createHistoryHashLink(HistoryUtils.getHistoryBrowse(relation.getLink())));
+      } else if (relation.getObjectType().equals(RelationObjectType.REPRESENTATION_INFORMATION)) {
+        List<String> history = new ArrayList<>();
+        history.addAll(ShowRepresentationInformation.RESOLVER.getHistoryPath());
+        history.add(relation.getLink());
+        anchor = new Anchor(title, HistoryUtils.createHistoryHashLink(history));
+      } else if (relation.getObjectType().equals(RelationObjectType.WEB)) {
+        anchor = new Anchor(title, relation.getLink());
+      }
+
+      if (anchor != null) {
+        anchor.addClickHandler(new ClickHandler() {
+          @Override
+          public void onClick(ClickEvent event) {
+            JavascriptUtils.scrollToTop();
+          }
+        });
+
+        widgetToAdd = anchor;
+      }
     }
 
-    b.append(SafeHtmlUtils.fromSafeConstant("</li>"));
-    return b.toSafeHtml();
+    return widgetToAdd;
   }
 
   public static ShowRepresentationInformation getInstance() {

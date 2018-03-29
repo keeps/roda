@@ -6367,6 +6367,14 @@ td.datePickerMonth, td.datePickerYear {
 	min-height: 25rem;
 }
 
+.ri-links-panel:before {
+	content: "• ";
+}
+
+.ri-links-panel {
+	display: block;
+}
+
 span.code {
     font-family: "UbuntuMono", "Ubuntu", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-weight: bold;
