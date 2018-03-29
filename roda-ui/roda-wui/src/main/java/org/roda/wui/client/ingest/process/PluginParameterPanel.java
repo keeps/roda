@@ -18,6 +18,7 @@ import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -106,6 +107,8 @@ public class PluginParameterPanel extends Composite {
       createPluginObjectFieldsLayout(Representation.class.getSimpleName());
     } else if (PluginParameterType.FILE_FIELDS.equals(parameter.getType())) {
       createPluginObjectFieldsLayout(File.class.getSimpleName());
+    } else if (PluginParameterType.PERMISSION_TYPES.equals(parameter.getType())) {
+      createPermissionTypesLayout();
     } else {
       LOGGER
         .warn("Unsupported plugin parameter type: " + parameter.getType() + ". Reverting to default parameter editor.");
@@ -351,7 +354,6 @@ public class PluginParameterPanel extends Composite {
 
   private void createPluginObjectFieldsLayout(final String className) {
     List<String> defaultValues = Arrays.asList(parameter.getDefaultValue().split(","));
-    GWT.log(defaultValues.toString());
 
     BrowserService.Util.getInstance().retrieveObjectClassFields(LocaleInfo.getCurrentLocale().getLocaleName(),
       new AsyncCallback<RepresentationInformationFilterBundle>() {
@@ -424,6 +426,40 @@ public class PluginParameterPanel extends Composite {
           parameterName.addStyleName("form-label");
         }
       });
+  }
+
+  private void createPermissionTypesLayout() {
+    final List<String> selectedTypes = new ArrayList<>();
+    FlowPanel group = new FlowPanel();
+    Label parameterName = new Label(parameter.getName());
+    layout.add(parameterName);
+    addHelp();
+
+    for (PermissionType permissionType : PermissionType.values()) {
+      CheckBox box = new CheckBox(permissionType.toString());
+      box.setValue(true);
+      selectedTypes.add(permissionType.toString());
+
+      group.add(box);
+      box.addStyleName("form-radiobutton");
+
+      box.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+        @Override
+        public void onValueChange(ValueChangeEvent<Boolean> event) {
+          if (event.getValue()) {
+            selectedTypes.add(permissionType.toString());
+          } else {
+            selectedTypes.remove(permissionType.toString());
+          }
+          value = StringUtils.join(selectedTypes, ",");
+        }
+      });
+    }
+
+    value = StringUtils.join(selectedTypes, ",");
+    layout.add(group);
+    group.addStyleName("form-radiogroup");
+    parameterName.addStyleName("form-label");
   }
 
   private void createPluginSipToAipLayout() {
