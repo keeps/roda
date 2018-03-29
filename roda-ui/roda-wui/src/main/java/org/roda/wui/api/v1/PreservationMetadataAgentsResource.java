@@ -8,7 +8,6 @@
 package org.roda.wui.api.v1;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -45,7 +44,6 @@ public class PreservationMetadataAgentsResource {
   private HttpServletRequest request;
 
   @GET
-  @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @ApiOperation(value = "Get agent preservation metadata", notes = "Get agent preservation metadata", response = String.class)
   @ApiResponses(value = {@ApiResponse(code = 200, message = "Successful response", response = String.class),

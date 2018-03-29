@@ -10,7 +10,6 @@ package org.roda.wui.api.v1;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -43,7 +42,6 @@ public class MetricsResource {
   private HttpServletRequest request;
 
   @GET
-  @Consumes({MediaType.APPLICATION_JSON})
   @Produces({MediaType.APPLICATION_JSON})
   @ApiOperation(value = "Get list of RODA metrics", notes = "Get a list of RODA metrics", response = String.class)
   @ApiResponses(value = {@ApiResponse(code = 200, message = "Successful response", response = String.class),

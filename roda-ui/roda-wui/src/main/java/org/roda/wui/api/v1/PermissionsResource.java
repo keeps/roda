@@ -8,7 +8,6 @@
 package org.roda.wui.api.v1;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -44,7 +43,6 @@ public class PermissionsResource {
 
   @GET
   @Path("/{" + RodaConstants.API_PATH_PARAM_USERNAME + "}/{" + RodaConstants.API_PATH_PARAM_PERMISSION_TYPE + "}")
-  @Consumes({MediaType.APPLICATION_JSON})
   @Produces({MediaType.APPLICATION_JSON})
   @ApiOperation(value = "Test permissions", notes = "Test if user has permissions.", response = ObjectPermissionResult.class, responseContainer = "List")
   @ApiResponses(value = {

@@ -10,7 +10,6 @@ package org.roda.wui.api.v1;
 import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -60,7 +59,6 @@ public class DipsResource {
   private HttpServletRequest request;
 
   @GET
-  @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @ApiOperation(value = "List DIPs", notes = "Gets a list of DIPs.", response = DIPs.class, responseContainer = "List")
   @ApiResponses(value = {

@@ -54,7 +54,6 @@ public class RiskIncidencesResource {
   private HttpServletRequest request;
 
   @GET
-  @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @ApiOperation(value = "List incidences", notes = "Get a list of incidences.", response = RiskIncidences.class, responseContainer = "List")
   @ApiResponses(value = {

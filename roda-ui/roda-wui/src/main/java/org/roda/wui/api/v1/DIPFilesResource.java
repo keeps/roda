@@ -12,7 +12,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -63,7 +62,6 @@ public class DIPFilesResource {
   private HttpServletRequest request;
 
   @GET
-  @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @ApiOperation(value = "List DIP Files", notes = "Gets a list of DIP files.", response = DIPFiles.class, responseContainer = "List")
   @ApiResponses(value = {

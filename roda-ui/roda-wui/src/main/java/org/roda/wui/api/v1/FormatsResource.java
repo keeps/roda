@@ -54,7 +54,6 @@ public class FormatsResource {
   private HttpServletRequest request;
 
   @GET
-  @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @ApiOperation(value = "List formats", notes = "Get a list of formats.", response = Formats.class, responseContainer = "List")
   @ApiResponses(value = {

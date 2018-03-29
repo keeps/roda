@@ -54,7 +54,6 @@ public class NotificationsResource {
   private HttpServletRequest request;
 
   @GET
-  @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @ApiOperation(value = "List notifications", notes = "Get a list of notifications.", response = Notifications.class, responseContainer = "List")
   @ApiResponses(value = {

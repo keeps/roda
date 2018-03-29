@@ -57,7 +57,6 @@ public class RepresentationInformationResource {
   private HttpServletRequest request;
 
   @GET
-  @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @ApiOperation(value = "List representation information", notes = "Get a list of representation information.", response = RepresentationInformationList.class, responseContainer = "List")
   @ApiResponses(value = {

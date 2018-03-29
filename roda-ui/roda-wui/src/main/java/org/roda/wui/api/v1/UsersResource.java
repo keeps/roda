@@ -55,7 +55,6 @@ public class UsersResource {
   private HttpServletRequest request;
 
   @GET
-  @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @ApiOperation(value = "List users", notes = "Get a list of users.", response = RODAMembers.class, responseContainer = "List")
   @ApiResponses(value = {

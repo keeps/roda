@@ -47,7 +47,6 @@ public class JobsResource {
   private HttpServletRequest request;
 
   @GET
-  @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @ApiOperation(value = "List jobs", notes = "Get a list of jobs.", response = Jobs.class, responseContainer = "List")
   public Response listJobs(@QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
@@ -147,7 +146,6 @@ public class JobsResource {
 
   @GET
   @Path("/{" + RodaConstants.API_PATH_PARAM_JOB_ID + "}/reports")
-  @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @ApiOperation(value = "List job reports", notes = "Get a list of job reports.", response = Reports.class, responseContainer = "List")
   public Response listJobReports(@PathParam(RodaConstants.API_PATH_PARAM_JOB_ID) String jobId,
