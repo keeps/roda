@@ -88,7 +88,7 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
     CSV_FIELD_CHECKSUM_SHA256, CSV_FIELD_CHECKSUM_MD5, CSV_FIELD_CHECKSUM_SHA1), ",");
   public static final String CSV_DEFAULT_OUTPUT = "/tmp/output.csv";
   public static final String CSV_DEFAULT_HEADERS = "true";
-  public static final String CSV_DEFAULT_OTHER_METADATA = "tika,siegfried";
+  public static final String CSV_DEFAULT_OTHER_METADATA = "ApacheTika,Siegfried";
 
   private List<String> fields = null;
   private Path output;
