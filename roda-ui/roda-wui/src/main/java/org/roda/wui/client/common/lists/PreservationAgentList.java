@@ -95,7 +95,7 @@ public class PreservationAgentList extends BasicAsyncTableCell<IndexedPreservati
     typeColumn.setSortable(true);
     versionColumn.setSortable(true);
 
-    addColumn(idColumn, messages.preservationAgentName(), true, false, 11);
+    addColumn(idColumn, messages.preservationAgentId(), true, false, 11);
     addColumn(nameColumn, messages.preservationAgentName(), true, false, 13);
     addColumn(typeColumn, messages.preservationAgentType(), false, false, 11);
     addColumn(versionColumn, messages.preservationAgentVersion(), false, false, 11);
