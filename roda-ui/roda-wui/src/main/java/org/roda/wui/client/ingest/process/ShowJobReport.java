@@ -13,7 +13,6 @@ package org.roda.wui.client.ingest.process;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.wui.client.browse.BrowserService;
@@ -32,7 +31,6 @@ import org.roda.wui.common.client.tools.ListUtils;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -201,9 +199,8 @@ public class ShowJobReport extends Composite {
     outcomeObjectState.setVisible(hasOutcome);
     outcomeObjectLabel.setVisible(hasOutcome);
 
-    DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT);
-    dateCreated.setText(dateTimeFormat.format(jobReport.getDateCreated()));
-    dateUpdated.setText(dateTimeFormat.format(jobReport.getDateUpdated()));
+    dateCreated.setText(Humanize.formatDateTime(jobReport.getDateCreated()));
+    dateUpdated.setText(Humanize.formatDateTime(jobReport.getDateUpdated()));
     duration.setText(Humanize.durationInDHMS(jobReport.getDateCreated(), jobReport.getDateUpdated(), DHMSFormat.LONG));
     status.setHTML(HtmlSnippetUtils.getPluginStateHTML(jobReport.getPluginState()));
     progress.setText(messages.showJobReportProgress(jobReport.getCompletionPercentage(), jobReport.getStepsCompleted(),
@@ -246,14 +243,14 @@ public class ShowJobReport extends Composite {
       attributeLabel = new Label(messages.reportStartDatetime());
       attributeLabel.setStyleName("label");
       panelBody.add(attributeLabel);
-      attributeValue = new Label(dateTimeFormat.format(reportItem.getDateCreated()));
+      attributeValue = new Label(Humanize.formatDateTime(reportItem.getDateCreated()));
       attributeValue.setStyleName("value");
       panelBody.add(attributeValue);
 
       attributeLabel = new Label(messages.reportEndDatetime());
       attributeLabel.setStyleName("label");
       panelBody.add(attributeLabel);
-      attributeValue = new Label(dateTimeFormat.format(reportItem.getDateUpdated()));
+      attributeValue = new Label(Humanize.formatDateTime(reportItem.getDateUpdated()));
       attributeValue.setStyleName("value");
       panelBody.add(attributeValue);
 

@@ -29,7 +29,6 @@ import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
@@ -116,7 +115,7 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
     };
 
     createdOnColumn = new Column<IndexedRepresentation, Date>(
-      new DateCell(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_MEDIUM))) {
+      new DateCell(DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT))) {
       @Override
       public Date getValue(IndexedRepresentation representation) {
         return representation != null ? representation.getCreatedOn() : null;
@@ -124,7 +123,7 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
     };
 
     updatedOnColumn = new Column<IndexedRepresentation, Date>(
-      new DateCell(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_MEDIUM))) {
+      new DateCell(DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT))) {
       @Override
       public Date getValue(IndexedRepresentation representation) {
         return representation != null ? representation.getUpdatedOn() : null;

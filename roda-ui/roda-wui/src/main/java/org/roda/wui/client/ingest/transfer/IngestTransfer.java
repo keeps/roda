@@ -271,7 +271,8 @@ public class IngestTransfer extends Composite {
 
     itemIcon.setWidget(itemIconHtmlPanel);
     itemTitle.setText(r.getName());
-    itemDates.setText(messages.ingestTransferItemInfo(r.getCreationDate(), Humanize.readableFileSize(r.getSize())));
+    itemDates.setText(messages.ingestTransferItemInfo(Humanize.formatDateTime(r.getCreationDate()),
+      Humanize.readableFileSize(r.getSize())));
     itemTitle.removeStyleName("browseTitle-allCollections");
     itemIcon.getParent().removeStyleName("browseTitle-allCollections-wrapper");
 

@@ -73,7 +73,6 @@ import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -240,8 +239,6 @@ public class ShowJob extends Composite {
   @UiField(provided = true)
   FlowPanel jobReportLastAction;
 
-  private final DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT);
-
   public ShowJob(Job job, Map<String, PluginInfo> pluginsInfo) {
     this.job = job;
     this.pluginsInfo = pluginsInfo;
@@ -290,7 +287,7 @@ public class ShowJob extends Composite {
 
     name.setText(job.getName());
     creator.setText(job.getUsername());
-    dateStarted.setText(dateTimeFormat.format(job.getStartDate()));
+    dateStarted.setText(Humanize.formatDateTime(job.getStartDate()));
     update();
 
     SelectedItems<?> selected = job.getSourceObjects();
@@ -516,7 +513,7 @@ public class ShowJob extends Composite {
     dateEndedLabel.setVisible(job.getEndDate() != null);
     dateEnded.setVisible(job.getEndDate() != null);
     if (job.getEndDate() != null) {
-      dateEnded.setText(dateTimeFormat.format(job.getEndDate()));
+      dateEnded.setText(Humanize.formatDateTime(job.getEndDate()));
     }
 
     // set duration

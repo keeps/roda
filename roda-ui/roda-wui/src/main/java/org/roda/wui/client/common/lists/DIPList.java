@@ -24,7 +24,6 @@ import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
@@ -62,7 +61,7 @@ public class DIPList extends BasicAsyncTableCell<IndexedDIP> {
   protected void configureDisplay(CellTable<IndexedDIP> display) {
 
     dateCreated = new Column<IndexedDIP, Date>(
-      new DateCell(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_MEDIUM))) {
+      new DateCell(DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT))) {
       @Override
       public Date getValue(IndexedDIP dip) {
         return dip != null ? dip.getDateCreated() : null;
@@ -70,7 +69,7 @@ public class DIPList extends BasicAsyncTableCell<IndexedDIP> {
     };
 
     lastModified = new Column<IndexedDIP, Date>(
-      new DateCell(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_MEDIUM))) {
+      new DateCell(DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT))) {
       @Override
       public Date getValue(IndexedDIP dip) {
         return dip != null ? dip.getLastModified() : null;
@@ -78,7 +77,6 @@ public class DIPList extends BasicAsyncTableCell<IndexedDIP> {
     };
 
     titleColumn = new TextColumn<IndexedDIP>() {
-
       @Override
       public String getValue(IndexedDIP dip) {
         return dip != null ? dip.getTitle() : null;
@@ -116,7 +114,6 @@ public class DIPList extends BasicAsyncTableCell<IndexedDIP> {
     columnSortingKeyMap.put(titleColumn, Arrays.asList(RodaConstants.DIP_TITLE));
     columnSortingKeyMap.put(dateCreated, Arrays.asList(RodaConstants.DIP_DATE_CREATED));
     columnSortingKeyMap.put(lastModified, Arrays.asList(RodaConstants.DIP_LAST_MODIFIED));
-
     return createSorter(columnSortList, columnSortingKeyMap);
   }
 

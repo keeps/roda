@@ -22,12 +22,11 @@ import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.ListUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -150,8 +149,7 @@ public class ShowNotification extends Composite {
     notificationId.setText(notification.getId());
     notificationSubject.setText(notification.getSubject());
     notificationBody.setHTML(notification.getBody());
-    notificationSentOn
-      .setText(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_MEDIUM).format(notification.getSentOn()));
+    notificationSentOn.setText(Humanize.formatDateTime(notification.getSentOn()));
     notificationFromUser.setText(notification.getFromUser());
     notificationIsAcknowledged
       .setText(messages.isAcknowledged(Boolean.toString(notification.isAcknowledged()).toLowerCase()));

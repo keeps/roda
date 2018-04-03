@@ -27,7 +27,6 @@ import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.CellTable;
@@ -69,7 +68,8 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
 
   @Override
   protected void configureDisplay(CellTable<LogEntry> display) {
-    dateColumn = new Column<LogEntry, Date>(new DateCell(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_MEDIUM))) {
+    dateColumn = new Column<LogEntry, Date>(
+      new DateCell(DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT))) {
       @Override
       public Date getValue(LogEntry logEntry) {
         return logEntry != null ? logEntry.getDatetime() : null;
@@ -135,7 +135,7 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
     addressColumn.setSortable(true);
     stateColumn.setSortable(true);
 
-    addColumn(dateColumn, messages.logEntryDatetimeExtended(), true, false, 14);
+    addColumn(dateColumn, messages.logEntryDate(), true, false, 14);
     addColumn(actionComponentColumn, messages.logEntryComponent(), true, false);
     addColumn(actionMethodColumn, messages.logEntryMethod(), true, false);
     addColumn(usernameColumn, messages.logEntryUser(), true, false);

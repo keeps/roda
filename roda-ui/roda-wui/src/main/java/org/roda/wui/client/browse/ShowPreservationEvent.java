@@ -50,7 +50,6 @@ import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -253,8 +252,7 @@ public class ShowPreservationEvent extends Composite {
     eventIdValue.setText(event.getId());
     eventTypeLabel.setText(event.getEventType());
     eventDetailLabel.setText(event.getEventDetail());
-    eventDatetimeLabel
-      .setText(DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT).format(event.getEventDateTime()));
+    eventDatetimeLabel.setText(Humanize.formatDateTime(event.getEventDateTime()));
 
     // AGENTS
     Map<String, IndexedPreservationAgent> agents = bundle.getAgents();

@@ -386,7 +386,7 @@ public interface ClientMessages extends Messages {
 
   String ingestTransferSearchPlaceHolder();
 
-  String ingestTransferItemInfo(Date creationDate, String readableFileSize);
+  String ingestTransferItemInfo(String creationDate, String readableFileSize);
 
   String ingestTransferRemoveFolderConfirmDialogTitle();
 
@@ -1689,6 +1689,8 @@ public interface ClientMessages extends Messages {
   String logEntryAddress();
 
   String logEntryState();
+
+  String logEntryDate();
 
   String logEntryDatetime();
 

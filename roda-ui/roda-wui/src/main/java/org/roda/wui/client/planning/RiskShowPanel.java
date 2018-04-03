@@ -32,14 +32,13 @@ import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.Humanize;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -226,7 +225,7 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
     riskDescriptionValue.setText(risk.getDescription());
     riskDescriptionKey.setVisible(StringUtils.isNotBlank(risk.getDescription()));
 
-    riskIdentifiedOn.setText(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_FULL).format(risk.getIdentifiedOn()));
+    riskIdentifiedOn.setText(Humanize.formatDate(risk.getIdentifiedOn()));
     riskIdentifiedBy.setText(risk.getIdentifiedBy());
     riskCategory.setText(risk.getCategory());
     riskNotesValue.setText(risk.getNotes());

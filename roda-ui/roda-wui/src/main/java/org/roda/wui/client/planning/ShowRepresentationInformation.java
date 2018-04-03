@@ -227,6 +227,7 @@ public class ShowRepresentationInformation extends Composite {
         parPanel.addClickHandler(new ClickHandler() {
           @Override
           public void onClick(ClickEvent event) {
+            JavascriptUtils.scrollToTop();
             List<String> history = new ArrayList<>();
             history.addAll(RepresentationInformationNetwork.RESOLVER.getHistoryPath());
             history.add(Search.RESOLVER.getHistoryToken());
