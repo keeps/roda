@@ -217,7 +217,7 @@
 			<plugin>
 				<groupId>com.mycila</groupId>
 				<artifactId>license-maven-plugin</artifactId>
-				<version>2.11</version>
+				<version>3.0</version>
 				<configuration>
 					<!--<header>com/mycila/maven/plugin/license/templates/LGPL-3.txt</header> -->
 					<header>LICENSE_HEADER.txt</header>

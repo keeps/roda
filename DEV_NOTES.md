@@ -2,6 +2,10 @@
 
 ## Release new version
 
+* Ensure all classes have license header
+```
+mvn license:format
+```
 * Updating all RODA maven modules
 ```
 mvn versions:set -DnewVersion=2.0.2 -Pall && mvn versions:commit -Pall
