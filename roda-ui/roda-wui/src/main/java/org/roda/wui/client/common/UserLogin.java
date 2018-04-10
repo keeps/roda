@@ -30,6 +30,7 @@ import org.roda.wui.common.client.tools.CachedAsynRequest;
 import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.http.client.URL;
 import com.google.gwt.safehtml.shared.UriUtils;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -131,12 +132,12 @@ public class UserLogin {
   };
 
   /**
-   * Get current authenticated user. User is cached and only refreshed when
-   * login or logout actions are called.
+   * Get current authenticated user. User is cached and only refreshed when login
+   * or logout actions are called.
    * 
    * @param callback
-   *          call back handler that receives error if failed or AuthOfficeUser
-   *          if success.
+   *          call back handler that receives error if failed or AuthOfficeUser if
+   *          success.
    */
   public void getAuthenticatedUser(final AsyncCallback<User> callback) {
     getAuthenticatedUser(callback, false);
@@ -156,7 +157,7 @@ public class UserLogin {
     String hash = Window.Location.getHash();
     if (hash.length() > 0) {
       hash = hash.substring(1);
-      hash = UriUtils.encode(hash);
+      hash = URL.encodeQueryString(hash);
     }
 
     StringBuilder url = new StringBuilder();
@@ -321,9 +322,9 @@ public class UserLogin {
 
       @Override
       public void onSuccess(final String role) {
-        if(StringUtils.isBlank(role)){
+        if (StringUtils.isBlank(role)) {
           callback.onSuccess(Boolean.TRUE);
-        }else{
+        } else {
           getAuthenticatedUser(new AsyncCallback<User>() {
             @Override
             public void onFailure(Throwable caught) {

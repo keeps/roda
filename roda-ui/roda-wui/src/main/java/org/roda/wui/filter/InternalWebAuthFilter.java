@@ -9,6 +9,8 @@ package org.roda.wui.filter;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +26,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.roda.wui.api.controllers.UserLogin;
-import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.slf4j.Logger;
@@ -75,21 +76,15 @@ public class InternalWebAuthFilter implements Filter {
       parameterMap);
 
     if (requestURI.endsWith("/login")) {
+      String safeFragment;
       if (!hash.startsWith("login" + HistoryUtils.HISTORY_SEP)) {
-        StringBuilder b = new StringBuilder();
-        b.append("login");
-
-        if (StringUtils.isNotBlank(hash)) {
-          b.append(HistoryUtils.HISTORY_SEP).append(hash);
-        }
-
-        uri.setFragment(b.toString());
+        safeFragment = "login" + HistoryUtils.HISTORY_SEP + hash;
       } else {
-        uri.setFragment(hash);
+        safeFragment = hash;
       }
 
       try {
-        httpResponse.sendRedirect(uri.build().toString());
+        httpResponse.sendRedirect(uri.build().toString() + "#" + safeFragment);
       } catch (URISyntaxException e) {
         LOGGER.error("Could not generate service URL, redirecting to base path " + path, e);
         httpResponse.sendRedirect(path);

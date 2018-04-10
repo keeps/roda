@@ -89,7 +89,7 @@ public class CasWebAuthFilter implements Filter {
     final String url = httpRequest.getRequestURL().toString();
     final String requestURI = httpRequest.getRequestURI();
     final String path = httpRequest.getParameter("path");
-    final String hash = httpRequest.getParameter("hash");
+    final String safeFragment = httpRequest.getParameter("hash");
 
     Map<String, String[]> parameterMap = new HashMap<>(httpRequest.getParameterMap());
     parameterMap.remove("path");
@@ -116,7 +116,7 @@ public class CasWebAuthFilter implements Filter {
       }
     });
 
-    LOGGER.info("URL: {} ; Request URI: {} ; Path: {} ; Hash: {}; Parameters: {}", url, requestURI, path, hash,
+    LOGGER.info("URL: {} ; Request URI: {} ; Path: {} ; Hash: {}; Parameters: {}", url, requestURI, path, safeFragment,
       parameterMap);
 
     if (url.endsWith("/login")) {
@@ -130,10 +130,8 @@ public class CasWebAuthFilter implements Filter {
         }
       }
 
-      uri.setFragment(hash);
-
       try {
-        httpResponse.sendRedirect(uri.build().toString());
+        httpResponse.sendRedirect(uri.build().toString() + "#" + safeFragment);
       } catch (URISyntaxException e) {
         LOGGER.error("Could not generate service URL, redirecting to base path " + path, e);
         httpResponse.sendRedirect(path);

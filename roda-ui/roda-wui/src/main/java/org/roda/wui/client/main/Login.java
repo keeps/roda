@@ -20,7 +20,6 @@ import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
-import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.management.RecoverLogin;
 import org.roda.wui.client.management.Register;
 import org.roda.wui.client.management.UserManagementService;
@@ -39,7 +38,6 @@ import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -118,7 +116,7 @@ public class Login extends Composite {
   @UiField
   Button resendEmail;
 
-  private String service = null;
+  private List<String> serviceTokens = null;
 
   private Login() {
     initWidget(uiBinder.createAndBindUi(this));
@@ -139,7 +137,7 @@ public class Login extends Composite {
     password.setText("");
     error.setText("");
     resendEmail.setVisible(false);
-    service = StringUtils.join(historyTokens, HistoryUtils.HISTORY_SEP);
+    serviceTokens = historyTokens;
     callback.onSuccess(this);
   }
 
@@ -249,8 +247,8 @@ public class Login extends Composite {
 
         @Override
         public void onSuccess(User user) {
-          if (service != null && service.length() > 0) {
-            History.newItem(service);
+          if (serviceTokens != null && !serviceTokens.isEmpty()) {
+            HistoryUtils.newHistory(serviceTokens);
           } else {
             HistoryUtils.newHistory(Welcome.RESOLVER);
           }

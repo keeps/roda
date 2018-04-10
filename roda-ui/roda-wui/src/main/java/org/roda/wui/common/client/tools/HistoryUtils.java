@@ -119,7 +119,7 @@ public class HistoryUtils {
         builder.append(HISTORY_SEP);
       }
 
-      String encodedToken = URL.encodeQueryString(token).replaceAll(HISTORY_SEP_REGEX, HISTORY_SEP_ESCAPE);
+      String encodedToken = URL.encodeQueryString(token);
       builder.append(encodedToken);
     }
     return builder.toString();
