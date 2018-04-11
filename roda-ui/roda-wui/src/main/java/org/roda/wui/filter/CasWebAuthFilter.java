@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.http.client.utils.URIBuilder;
 import org.jasig.cas.client.util.CommonUtils;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.exceptions.InactiveUserException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.wui.api.controllers.UserLogin;
 import org.roda.wui.client.common.utils.StringUtils;
@@ -120,17 +121,21 @@ public class CasWebAuthFilter implements Filter {
       parameterMap);
 
     if (url.endsWith("/login")) {
-      if (httpRequest.getUserPrincipal() != null) {
-        try {
-          UserLogin.casLogin(httpRequest.getUserPrincipal().getName(), httpRequest);
-        } catch (RODAException e) {
-          LOGGER.error("Error authenticating CAS user", e);
-          httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
-          return;
-        }
-      }
-
       try {
+        if (httpRequest.getUserPrincipal() != null) {
+          try {
+            UserLogin.casLogin(httpRequest.getUserPrincipal().getName(), httpRequest);
+          } catch (InactiveUserException e) {
+            LOGGER.error("Error authenticating CAS user", e);
+            httpResponse.sendRedirect(uri.build().toString() + "#theme/ErrorInactiveAccount.html");
+            return;
+          } catch (RODAException e) {
+            LOGGER.error("Error authenticating CAS user", e);
+            httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+            return;
+          }
+        }
+
         httpResponse.sendRedirect(uri.build().toString() + "#" + safeFragment);
       } catch (URISyntaxException e) {
         LOGGER.error("Could not generate service URL, redirecting to base path " + path, e);
