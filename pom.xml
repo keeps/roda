@@ -23,9 +23,9 @@
 	</prerequisites>
 	<distributionManagement>
 		<repository>
-			<id>keeps_artifactory</id>
+			<id>keeps_artifactory2</id>
 			<name>KEEP SOLUTIONS artifactory</name>
-			<url>http://artifactory.keep.pt/keep</url>
+			<url>https://artifactory2.keep.pt/artifactory/keep-private</url>
 		</repository>
 	</distributionManagement>
 	<repositories>
@@ -339,9 +339,13 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-source-plugin</artifactId>
 					<version>3.0.0</version>
+					<configuration>
+						<excludeResources>true</excludeResources>
+					</configuration>
 					<executions>
 						<execution>
 							<id>attach-sources</id>
+							<phase>install</phase>
 							<goals>
 								<goal>jar</goal>
 							</goals>
@@ -443,9 +447,9 @@
 				<version>${jackson.version}</version>
 			</dependency>
 			<dependency>
-			  <groupId>com.fasterxml.jackson.dataformat</groupId>
-			  <artifactId>jackson-dataformat-xml</artifactId>
-			  <version>${jackson.version}</version>
+				<groupId>com.fasterxml.jackson.dataformat</groupId>
+				<artifactId>jackson-dataformat-xml</artifactId>
+				<version>${jackson.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.google.gwt</groupId>
