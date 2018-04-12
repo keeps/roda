@@ -23,9 +23,9 @@
 	</prerequisites>
 	<distributionManagement>
 		<repository>
-			<id>keeps_artifactory2</id>
+			<id>keeps_artifactory</id>
 			<name>KEEP SOLUTIONS artifactory</name>
-			<url>https://artifactory2.keep.pt/artifactory/keep-private</url>
+			<url>http://artifactory.keep.pt/keep</url>
 		</repository>
 	</distributionManagement>
 	<repositories>
