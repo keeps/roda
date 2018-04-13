@@ -23,6 +23,31 @@ git add -u && git commit -m "Setting version" && git tag -a v2.0.2 -m "2.0.2" &&
 mvn package -Dmaven.test.skip -Denforcer.skip -Proda-wui-docker && docker push keeps/roda:2.0.2
 ```
 
+## How to's in travis
+
+Travis client install process: https://github.com/travis-ci/travis.rb#installation
+
+### Create secure variable
+
+* Generate secure variable called `MY_SECRET_ENV` with the value `super_secret`:
+```
+travis encrypt MY_SECRET_ENV=super_secret
+```
+* Then add it to .travis.yml
+
+### Generate secure file
+
+* Login into travis (supports two-factor authentication)
+```
+travis login --org
+```
+* Generate secure file from file called settings.xml
+```
+travis encrypt-file settings.xml
+```
+* Follow the instructions given as result of the previous command execution, which will add stuff into .travis.yml
+
+
 ## Redeploy on docker
 
 * Delete all stopped containers
