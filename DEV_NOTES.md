@@ -2,26 +2,7 @@
 
 ## Release new version
 
-* Ensure all classes have license header
-```
-mvn license:format
-```
-* Updating all RODA maven modules
-```
-mvn versions:set -DnewVersion=2.0.2 -Pall && mvn versions:commit -Pall
-```
-* Deploy certain artifacts to artifactory (e.g. core artifacts)
-```
-mvn clean package deploy -Pcore
-```
-* Add & commit pom.xml's with new version; Create an annotated tag; Push both to origin (commit & tag)
-```
-git add -u && git commit -m "Setting version" && git tag -a v2.0.2 -m "2.0.2" && git push --follow-tags
-```
-* Create docker images & tags
-```
-mvn package -Dmaven.test.skip -Denforcer.skip -Proda-wui-docker && docker push keeps/roda:2.0.2
-```
+Run `./scripts/release.sh`
 
 ## How to's in travis
 

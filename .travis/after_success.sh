@@ -21,8 +21,6 @@ function on_master(){
 function on_development(){
   echo "Executing on development logic"
   deploy_to_artifactory
-
-  execute_gren
 }
 
 function on_staging(){
@@ -32,18 +30,6 @@ function on_staging(){
   docker tag keeps/roda:latest keeps/roda:$TRAVIS_BRANCH
 }
 
-function execute_gren(){
-  echo "Generating release notes"
-  # install nvm & node
-  curl https://raw.githubusercontent.com/creationix/nvm/v0.33.8/install.sh | bash
-  source ~/.nvm/nvm.sh
-  nvm install v8.11.1
-  npm install github-release-notes -g
-
-  gren release --draft -I question -L closed,task
-  gren changelog --overwrite
-}
-
 function on_tag(){
   echo "Executing on tag logic"
   export DOCKER_TAG="$TRAVIS_BRANCH"
@@ -51,8 +37,6 @@ function on_tag(){
   docker tag keeps/roda:latest keeps/roda:$TRAVIS_BRANCH
 
   deploy_to_artifactory
-
-  execute_gren
 }
 
 ################################################
