@@ -35,8 +35,7 @@ before_script:
   - .travis/before_script.sh
 
 script:
-  - mvn $MAVEN_CLI_OPTS -Dtestng.groups="travis" -Denforcer.skip=true -Pcore clean
-  #- mvn $MAVEN_CLI_OPTS -Dtestng.groups="travis" -Denforcer.skip=true -Proda-wui-docker clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
+  - mvn $MAVEN_CLI_OPTS -Dtestng.groups="travis" -Denforcer.skip=true -Proda-wui-docker clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
 
 cache:
   directories:

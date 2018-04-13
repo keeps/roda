@@ -8,7 +8,6 @@
 
 # Version
 RELEASE_VERSION=$1
-NEXT_VERSION=$2
 
 function syntax {
   echo "Syntax:  $1 RELEASE_VERSION"
@@ -25,6 +24,8 @@ cat << EOF
 # Update changelog
 ################################
 EOF
+
+RELEASE_TAG="v$RELEASE_VERSION"
 
 # Generate changelog
 gren changelog --override
