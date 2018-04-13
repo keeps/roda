@@ -1,0 +1,37 @@
+---
+  dataSource: "issues"
+  ignoreLabels:
+    - "Epic"
+    - "blocked"
+    - "bug"
+    - "code analysis"
+    - "duplicate"
+    - "enhancement"
+    - "feature request"
+    - "has documentation"
+    - "invalid"
+    - "outsourcing"
+    - "question"
+    - "task"
+    - "to review"
+    - "wontfix"
+  ignoreIssuesWith:
+    - "Epic"
+    - "blocked"
+    - "duplicate"
+    - "invalid"
+    - "wontfix"
+  ignoreTagsWith:
+    - "-rc"
+    - "-alpha"
+    - "-beta"
+  onlyMilestones: false
+  groupBy:
+    New features::
+      - "feature request"
+    Enhancements::
+      - "enhancement"
+    Bug Fixes::
+      - "bug"
+  changelogFilename: "CHANGELOG.md"
+  prefix: ""

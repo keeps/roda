@@ -8,8 +8,7 @@ set -ex
 function deploy_to_artifactory(){
   echo "Deploy to artifactory"
   cp settings.xml $HOME/.m2/
-  head -n 6 $HOME/.m2/settings.xml
-  mvn $MAVEN_CLI_OPTS --settings $HOME/.m2/settings.xml clean package deploy -Dmaven.test.skip=true -Denforcer.skip=true -Pcore
+  mvn $MAVEN_CLI_OPTS clean package deploy -Dmaven.test.skip=true -Denforcer.skip=true -Pcore
   rm $HOME/.m2/settings.xml
 }
 
@@ -22,6 +21,8 @@ function on_master(){
 function on_development(){
   echo "Executing on development logic"
   deploy_to_artifactory
+
+  execute_gren
 }
 
 function on_staging(){
