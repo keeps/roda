@@ -2,7 +2,14 @@
 
 ## Release new version
 
-Run `./scripts/release.sh`
+Example release 2.2.0 and prepare for next version 2.3.0.
+
+1. Run `./scripts/release.sh 2.2.0`
+2. `gren release --draft`
+3. Review and accept release
+4. Run `./scripts/update_changelog.sh 2.2.0`
+4. Run `./scripts/prepare_next_version.sh 2.3.0`
+
 
 ## How to's in travis
 

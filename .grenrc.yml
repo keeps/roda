@@ -15,12 +15,16 @@
     - "task"
     - "to review"
     - "wontfix"
+    - "hide from changelog"
+    - "out of scope"
   ignoreIssuesWith:
     - "Epic"
     - "blocked"
     - "duplicate"
     - "invalid"
     - "wontfix"
+    - "hide from changelog"
+    - "out of scope"
   ignoreTagsWith:
     - "-rc"
     - "-alpha"

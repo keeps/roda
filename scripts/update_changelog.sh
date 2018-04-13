@@ -22,24 +22,20 @@ fi
 
 cat << EOF
 ################################
-# Release version
+# Update changelog
 ################################
 EOF
 
-RELEASE_TAG="v$RELEASE_VERSION"
+# Generate changelog
+gren changelog --override
 
-# Ensure all classes have license header
-mvn license:format
+# Commit changelog
+git add CHANGELOG.md
+git commit -m "Updating changelog"
 
-# Updating RODA Maven modules
-mvn versions:set versions:commit -DnewVersion=$RELEASE_VERSION
-
-# Commit Maven version update
-git add -u
-git commit -m "Setting version $RELEASE_VERSION"
-
-# Create tag
+# Updating tag
+git tag -d "$RELEASE_TAG"
 git tag -a "$RELEASE_TAG" -m "Version $RELEASE_VERSION"
 
 # Push tag
-git push origin "$RELEASE_TAG"
+git push --force origin "$RELEASE_TAG"
