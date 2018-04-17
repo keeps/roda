@@ -156,8 +156,7 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
       public void onSuccess(Boolean result) {
         Set<String> indirectRoles = new HashSet<>(allRoles);
         indirectRoles.removeAll(directRoles);
-
-        permissionsPanel.checkPermissions(directRoles, name.equals(RodaConstants.ADMINISTRATORS));
+        permissionsPanel.checkPermissions(directRoles, RodaConstants.ADMINISTRATORS.equals(name));
         permissionsPanel.checkPermissions(indirectRoles, true);
         WCAGUtilities.getInstance().makeAccessible(permissionsSelectPanel.getElement());
       }
