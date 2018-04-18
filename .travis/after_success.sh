@@ -20,6 +20,8 @@ function on_master(){
 
 function on_development(){
   echo "Executing on development logic"
+  export DOCKER_TAG="$TRAVIS_BRANCH"
+  export RODA_DEV_BRANCH="development"
   deploy_to_artifactory
 }
 
