@@ -20,16 +20,16 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jasig.cas.client.util.AbstractCasFilter;
-import org.jasig.cas.client.validation.Assertion;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.InactiveUserException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.user.User;
+import org.roda.wui.api.controllers.UserLogin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,13 +69,17 @@ public class CasApiAuthFilter implements Filter {
     }
 
     // check CAS auth
-    final HttpSession session = request.getSession(false);
-    final Assertion assertion = session != null
-      ? (Assertion) session.getAttribute(AbstractCasFilter.CONST_CAS_ASSERTION)
-      : null;
-
-    if (assertion != null) {
-      filterChain.doFilter(request, response);
+    if (request.getUserPrincipal() != null) {
+      try {
+        UserLogin.casLogin(request.getUserPrincipal().getName(), request);
+        filterChain.doFilter(request, response);
+      } catch (InactiveUserException e) {
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+          "Inactive user '" + request.getUserPrincipal().getName() + "': " + e.getMessage());
+      } catch (RODAException e) {
+        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+          "Error authenticating CAS user '" + request.getUserPrincipal().getName() + "': " + e.getMessage());
+      }
       return;
     }
 

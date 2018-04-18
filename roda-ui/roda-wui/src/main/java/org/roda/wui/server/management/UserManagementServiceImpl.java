@@ -100,7 +100,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
     HttpServletRequest request = getThreadLocalRequest();
     User user = UserUtility.getUser(request);
     User finalModifiedUser = UserManagement.updateMyUser(user, modifiedUser, password, extra);
-    UserUtility.setUser(finalModifiedUser, request);
+    UserUtility.setUser(request, finalModifiedUser);
     return finalModifiedUser;
   }
 

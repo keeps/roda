@@ -89,8 +89,9 @@ public class UserUtility {
     return getUser(request, true);
   }
 
-  public static void setUser(User user, HttpServletRequest request) {
-    request.getSession().setAttribute(RODA_USER, user);
+  public static void setUser(final HttpServletRequest request, final User user) {
+    user.setIpAddress(request.getRemoteAddr());
+    request.getSession(true).setAttribute(RODA_USER, user);
   }
 
   public static void removeUserFromSession(final HttpServletRequest request,
@@ -148,11 +149,6 @@ public class UserUtility {
       throw new AuthorizationDeniedException(
         "Unable to determine which roles the user needs because the config. key '" + configKey + "' is not defined");
     }
-  }
-
-  public static void setUser(final HttpServletRequest request, final User user) {
-    user.setIpAddress(request.getRemoteAddr());
-    request.getSession(true).setAttribute(RODA_USER, user);
   }
 
   /**
