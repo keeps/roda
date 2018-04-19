@@ -9,7 +9,14 @@ sudo apt-get -qq update
 sudo apt-get -qq install siegfried -y
 sudo sf -update
 sudo apt-get -qq install clamav clamav-daemon -y
-sudo freshclam
+
+# Enable cache of clamav databases to improve build time
+sudo mv /usr/bin/clamscan /usr/bin/clamscan-real
+sudo cp .travis/clamscan /usr/bin/clamscan
+sudo chmod a+rx /usr/bin/clamscan
+sudo mkdir -p "$CLAMAV_DATABASE"
+sudo chown clamav:clamav "$CLAMAV_DATABASE"
+sudo freshclam --datadir=$CLAMAV_DATABASE
 
 # decrypt maven setting.xml
 openssl aes-256-cbc -K $encrypted_a8a9ca6bf122_key -iv $encrypted_a8a9ca6bf122_iv -in .travis/settings.xml.enc -out settings.xml -d
