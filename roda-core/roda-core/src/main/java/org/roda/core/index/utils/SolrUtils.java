@@ -2133,7 +2133,7 @@ public class SolrUtils {
       doc.addField(RodaConstants.RISK_POST_MITIGATION_SEVERITY_LEVEL, risk.getPostMitigationSeverityLevel().toString());
     }
 
-    doc.addField(RodaConstants.RISK_CURRENT_SEVERITY_LEVEL, risk.getCurrentSeverityLevel());
+    doc.addField(RodaConstants.RISK_CURRENT_SEVERITY_LEVEL, risk.getCurrentSeverityLevel().toString());
 
     doc.addField(RodaConstants.RISK_POST_MITIGATION_NOTES, risk.getPostMitigationNotes());
 
