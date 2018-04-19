@@ -135,6 +135,23 @@
 	</filter-mapping>
 
 	<filter>
+		<filter-name>CASRequestWrapperFilter</filter-name>
+		<filter-class>org.roda.wui.filter.OnOffFilter</filter-class>
+		<init-param>
+			<param-name>inner-filter-class</param-name>
+			<param-value>org.jasig.cas.client.util.HttpServletRequestWrapperFilter</param-value>
+		</init-param>
+		<init-param>
+			<param-name>config-prefix</param-name>
+			<param-value>ui.filter.cas</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>CASRequestWrapperFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<filter>
 		<filter-name>CasApiAuthFilter</filter-name>
 		<filter-class>org.roda.wui.filter.OnOffFilter</filter-class>
 		<init-param>
@@ -158,23 +175,6 @@
 	<filter-mapping>
 		<filter-name>CasApiAuthFilter</filter-name>
 		<url-pattern>/api/v1/*</url-pattern>
-	</filter-mapping>
-
-	<filter>
-		<filter-name>CASRequestWrapperFilter</filter-name>
-		<filter-class>org.roda.wui.filter.OnOffFilter</filter-class>
-		<init-param>
-			<param-name>inner-filter-class</param-name>
-			<param-value>org.jasig.cas.client.util.HttpServletRequestWrapperFilter</param-value>
-		</init-param>
-		<init-param>
-			<param-name>config-prefix</param-name>
-			<param-value>ui.filter.cas</param-value>
-		</init-param>
-	</filter>
-	<filter-mapping>
-		<filter-name>CASRequestWrapperFilter</filter-name>
-		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
 	<filter>
