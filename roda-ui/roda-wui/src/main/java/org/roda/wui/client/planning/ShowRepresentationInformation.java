@@ -496,13 +496,16 @@ public class ShowRepresentationInformation extends Composite {
         anchor = new Anchor(title, HistoryUtils.createHistoryHashLink(history));
       } else if (relation.getObjectType().equals(RelationObjectType.WEB)) {
         anchor = new Anchor(title, relation.getLink());
+        anchor.getElement().setAttribute("target", "_blank");
       }
 
       if (anchor != null) {
         anchor.addClickHandler(new ClickHandler() {
           @Override
           public void onClick(ClickEvent event) {
-            JavascriptUtils.scrollToTop();
+            if (!relation.getObjectType().equals(RelationObjectType.WEB)) {
+              JavascriptUtils.scrollToTop();
+            }
           }
         });
 
