@@ -149,7 +149,7 @@ public class RepresentationInformationNetwork extends Composite {
       messages.representationInformationTitle(), true);
 
     searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, true,
-      messages.representationInformationRegisterSearchPlaceHolder(), false, false, true);
+      messages.representationInformationRegisterSearchPlaceHolder(), false, false, false);
     searchPanel.setList(representationInformationList);
 
     facetTags = new FlowPanel();
