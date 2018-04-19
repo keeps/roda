@@ -317,54 +317,12 @@ public class User extends RodaPrincipal {
     return true;
   }
 
-  @Override
-  public String toString() {
-    final StringBuilder builder = new StringBuilder();
-    builder.append("User [");
-    if (groups != null) {
-      builder.append("groups=");
-      builder.append(groups);
-      builder.append(", ");
-    }
-    if (email != null) {
-      builder.append("email=");
-      builder.append(email);
-      builder.append(", ");
-    }
-    builder.append("guest=");
-    builder.append(guest);
-    builder.append(", ");
-    if (ipAddress != null) {
-      builder.append("ipAddress=");
-      builder.append(ipAddress);
-      builder.append(", ");
-    }
-    if (resetPasswordToken != null) {
-      builder.append("resetPasswordToken=");
-      builder.append(resetPasswordToken);
-      builder.append(", ");
-    }
-    if (resetPasswordTokenExpirationDate != null) {
-      builder.append("resetPasswordTokenExpirationDate=");
-      builder.append(resetPasswordTokenExpirationDate);
-      builder.append(", ");
-    }
-    if (emailConfirmationToken != null) {
-      builder.append("emailConfirmationToken=");
-      builder.append(emailConfirmationToken);
-      builder.append(", ");
-    }
-    if (emailConfirmationTokenExpirationDate != null) {
-      builder.append("emailConfirmationTokenExpirationDate=");
-      builder.append(emailConfirmationTokenExpirationDate);
-      builder.append(", ");
-    }
-    if (extra != null) {
-      builder.append("extra=");
-      builder.append(extra);
-    }
-    builder.append("]");
-    return builder.toString();
+  @Override public String toString() {
+    return "User{ " + super.toString() + ", groups=" + groups + ", email='" + email + '\'' + ", guest=" + guest + ", ipAddress='" + ipAddress
+      + '\'' + ", resetPasswordToken='" + resetPasswordToken + '\'' + ", resetPasswordTokenExpirationDate='"
+      + resetPasswordTokenExpirationDate + '\'' + ", emailConfirmationToken='" + emailConfirmationToken + '\''
+      + ", emailConfirmationTokenExpirationDate='" + emailConfirmationTokenExpirationDate + '\'' + ", extra='" + extra
+      + "\'}";
   }
 
   @Override
