@@ -1,5 +1,21 @@
 # Changelog
 
+## v2.2.1 (24/04/2018)
+Install for demonstration:
+```
+docker pull keeps/roda:v2.2.1
+```
+
+#### Enhancements:
+
+-  RI search by tags show no feedback [#1202](https://github.com/keeps/roda/issues/1202)
+-  An external link in RI should be opened in another window [#1201](https://github.com/keeps/roda/issues/1201)
+
+#### Bug Fixes:
+
+- CAS API Authentication Filter does not generate user [#1209](https://github.com/keeps/roda/issues/1209)
+---
+
 ## v2.2.0 (13/04/2018)
 Install for demonstration:
 ```
@@ -8,11 +24,12 @@ docker pull keeps/roda:v2.2.0
 
 #### New features:
 
--  Add a way of downloading a RI record (XML) [#1177](https://github.com/keeps/roda/issues/1177)
+-  **Representation Information (RI)** [#331](https://github.com/keeps/roda/issues/331)
+-  Downloading a RI record (XML) [#1177](https://github.com/keeps/roda/issues/1177)
 -  Obtain last report using transferred resource filename [#1076](https://github.com/keeps/roda/issues/1076)
 -  Log sign-off events [#1028](https://github.com/keeps/roda/issues/1028)
 -  Dynamic relationships between AIPs/representation/files and Representation information [#343](https://github.com/keeps/roda/issues/343)
--  Representation Information AIP [#331](https://github.com/keeps/roda/issues/331)
+
 
 #### Enhancements:
 
@@ -110,16 +127,6 @@ docker pull keeps/roda:v2.2.0
 -  Error downloading PREMIS on demo server [#833](https://github.com/keeps/roda/issues/833)
 -  PDF to PDFA conversion plugin reporting is not well [#619](https://github.com/keeps/roda/issues/619)
 
----
-
-## 2.2.0-beta1 (22/11/2017)
-New features:
-* Support for Representation Information
-
-Install for demonstration:
-```
-docker pull keeps/roda:2.2.0-beta1
-```
 ---
 
 ## 2.1.0 (20/09/2017)
