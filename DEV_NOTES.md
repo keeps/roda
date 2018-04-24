@@ -8,10 +8,16 @@ Before releasing:
 Example release 2.2.0 and prepare for next version 2.3.0.
 
 1. Run `./scripts/release.sh 2.2.0`
-2. `gren release --draft -t v2.2.0..v2.1.0`
-3. Review and accept release
-4. Run `./scripts/update_changelog.sh 2.2.0`
-5. Run `./scripts/prepare_next_version.sh 2.3.0`
+2. Wait for [travis tag build](https://travis-ci.org/keeps/roda/) to be finished and successful
+3. Local compile to generate roda-wui.war artifact `mvn clean package -Dmaven.test.skip`
+4. `gren release --draft -t v2.2.0..v2.1.0`
+5. Review release and accept release:
+	1. Review issues
+	2. Add docker run instructions
+	3. Upload roda-wui.war artifact (at `roda-ui/roda-wui/target/`)
+	4. Accept release
+6. Run `./scripts/update_changelog.sh 2.2.0`
+7. Run `./scripts/prepare_next_version.sh 2.3.0`
 
 ## How to's in travis
 
