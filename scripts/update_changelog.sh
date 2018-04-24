@@ -32,7 +32,7 @@ gren changelog --override
 
 # Commit changelog
 git add CHANGELOG.md
-git commit -m "Updating changelog"
+git commit -m "Updating changelog [ci skip]"
 
 # Updating tag
 git tag -d "$RELEASE_TAG"
