@@ -2,6 +2,9 @@
 
 ## Release new version
 
+Before releasing:
+1. Security check: `mvn com.redhat.victims.maven:security-versions:check`
+
 Example release 2.2.0 and prepare for next version 2.3.0.
 
 1. Run `./scripts/release.sh 2.2.0`
