@@ -7,14 +7,14 @@
 		</encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!-- rollover daily -->
-            <fileNamePattern>${roda.home}/log/roda-wui-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>${roda.home}/log/roda-wui-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
             <!-- each file should be at most 1GB -->
             <maxFileSize>1GB</maxFileSize>
         </rollingPolicy>
 	</appender>
 
 	<logger name="org.roda.wui" additivity="false">
-		<!-- Client-side logging must be set in org.roda.wui.common.client.GWTLogger 
+		<!-- Client-side logging must be set in org.roda.wui.common.client.GWTLogger
 			and is also influenced by this logger level -->
 		<level value="INFO" />
 		<appender-ref ref="WUI_FILEOUT" />
