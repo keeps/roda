@@ -16,7 +16,7 @@
 		</encoder>
 		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!-- rollover daily -->
-            <fileNamePattern>${roda.home}/log/roda-core-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>${roda.home}/log/roda-core-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
             <!-- each file should be at most 1GB -->
             <maxFileSize>1GB</maxFileSize>
         </rollingPolicy>
@@ -30,12 +30,12 @@
 		</encoder>
 		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!-- rollover daily -->
-            <fileNamePattern>${roda.home}/log/roda-core-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>${roda.home}/log/roda-core-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
             <!-- each file should be at most 1GB -->
             <maxFileSize>1GB</maxFileSize>
         </rollingPolicy>
 	</appender>
-	
+
 	<appender name="AKKA_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<file>${roda.home}/log/roda-core-akka.log</file>
 		<append>true</append>
@@ -44,7 +44,7 @@
 		</encoder>
 		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!-- rollover daily -->
-            <fileNamePattern>${roda.home}/log/roda-core-akka-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>${roda.home}/log/roda-core-akka-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
             <!-- each file should be at most 1GB -->
             <maxFileSize>1GB</maxFileSize>
         </rollingPolicy>
@@ -53,7 +53,7 @@
 	<appender name="AKKA" class="ch.qos.logback.classic.AsyncAppender">
 		<appender-ref ref="AKKA_FILE" />
 	</appender>
-	
+
 	<logger name="org.roda.core.plugins.orchestrate.akka" additivity="false">
 		<level value="DEBUG" />
 		<!-- <level value="TRACE" /> -->
@@ -80,12 +80,12 @@
 		<level value="INFO" />
 		<appender-ref ref="CORE_FILEOUT" />
 	</logger>
-	
+
 	<logger name="org.roda_project" additivity="false">
 		<level value="WARN" />
 		<appender-ref ref="CORE_FILEOUT" />
 	</logger>
-	
+
 	<logger name="akka" additivity="false">
 		<level value="DEBUG" />
 		<appender-ref ref="AKKA" />
