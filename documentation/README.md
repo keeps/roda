@@ -14,6 +14,7 @@ Among others articles, in this series of documentation you will find information
 	- [Quick start](Quickstart.md)
 	- [Advanced search](Advanced_Search.md)
 	- [Pre-ingest](Pre_Ingest.md)
+	- [Edit descriptive metadata](EditDescriptiveMetadata.md)
 	- [Risk assessment](Risk_Assessment.md)
 	- [Representation Information](Representation_Information.md)
 	- [Format normalization policy](Format_Normalization_Policy.md)
