@@ -301,16 +301,21 @@ div.inline {
 
 .representationsCard > .h5:before {
     content: '\f1b3';
-    font-family: 'FontAwesome';
-    text-rendering: auto;
-    -webkit-font-smoothing: antialiased;
+    font-weight: 900;
+    font-family: "Font Awesome 5 Free";
     -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
     padding-right: 10px;
 }
 
 .filesCard > .h5:before {
     content: '\f0c5';
-    font-family: 'FontAwesome';
+    font-family: 'Font Awesome 5 Free';
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -319,7 +324,7 @@ div.inline {
 
 .disseminationsCard > .h5:before {
     content: '\f144';
-    font-family: 'FontAwesome';
+    font-family: 'Font Awesome 5 Free';
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -328,7 +333,7 @@ div.inline {
 
 .aipChildrenCard > .h5:before {
     content: '\f0e8';
-    font-family: 'FontAwesome';
+    font-family: 'Font Awesome 5 Free';
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -345,7 +350,7 @@ div.inline {
 
 .representationInformationCard > .h5:before {
     content: '\f05a';
-    font-family: 'FontAwesome';
+    font-family: 'Font Awesome 5 Free';
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -547,7 +552,7 @@ pre code {
 
 .error:before {
     content: '\f071';
-    font-family: FontAwesome;
+    font-family: "Font Awesome 5 Free";
     padding-left: 5px;
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
@@ -561,7 +566,7 @@ pre code {
 
 .success:before {
     content: '\f00c';
-    font-family: FontAwesome;
+    font-family: "Font Awesome 5 Free";
     padding-left: 5px;
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
@@ -875,11 +880,15 @@ pre code {
 
 .btn:after {
     display: inline-block;
-    font: normal normal normal 14px/1 FontAwesome;
-    font-size: inherit;
-    text-rendering: auto;
-    -webkit-font-smoothing: antialiased;
+    font-weight: 900;
+    font-family: "Font Awesome 5 Free";
     -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
     float: right;
     margin-top: 1px;
 
@@ -1215,7 +1224,7 @@ pre code {
 
 .description-level {
     display: inline-block;
-    font: normal normal normal 14px/1 FontAwesome;
+    font: normal normal normal 14px/1 "Font Awesome 5 Free";
     font-size: inherit;
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
@@ -1349,11 +1358,14 @@ pre code {
 
 .dropdown-label:after {
     display: inline-block;
-    font: normal normal normal 14px/1 FontAwesome;
+    font-weight: 900;
+    font-family: "Font Awesome 5 Free";
     font-size: inherit;
-    text-rendering: auto;
-    -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
     float: right;
     line-height: 2.5rem;
     padding-left: 5px;
@@ -2625,7 +2637,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .representation .header:before {
     content: '\f1b3';
-    font-family: 'FontAwesome';
+    font-family: 'Font Awesome 5 Free';
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -2697,7 +2709,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .file .header:before {
     content: '\f1b2';
-    font-family: 'FontAwesome';
+    font-family: 'Font Awesome 5 Free';
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -2798,7 +2810,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .event .header:before {
     content: '\f017';
-    font-family: 'FontAwesome';
+    font-family: 'Font Awesome 5 Free';
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -2835,7 +2847,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .agent .header:before {
     content: '\f007';
-    font-family: 'FontAwesome';
+    font-family: 'Font Awesome 5 Free';
 }
 
 .agent .subheader {
@@ -4514,13 +4526,18 @@ td.datePickerMonth, td.datePickerYear {
 
 #upload-list li span.icon:after {
     display: inline-block;
-    font: normal normal normal 14px/1 FontAwesome;
-    font-size: 1.5rem;
-    text-rendering: auto;
-    -webkit-font-smoothing: antialiased;
+    font-weight: 900;
+    font-family: "Font Awesome 5 Free";
+    font-size: 2rem;
+    line-height: 2rem;
+    width: 2rem;
+    height: 2rem;
     -moz-osx-font-smoothing: grayscale;
-    width: 15px;
-    height: 12px;
+    -webkit-font-smoothing: antialiased;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    
     position: absolute;
     top: 20px;
     right: 20px;

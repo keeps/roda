@@ -36,9 +36,9 @@ public class JavascriptUtils {
   }-*/;
 
   public static native void runIframeResizer(JavaScriptObject iframe) /*-{
-    $wnd.jQuery(iframe).iFrameResize({
-      log: false,
-    });
+		$wnd.jQuery(iframe).iFrameResize({
+			log : false,
+		});
   }-*/;
 
   public static native void slideToggle(String selector) /*-{
@@ -186,19 +186,23 @@ public class JavascriptUtils {
 											var progress = parseInt(data.loaded
 													/ data.total * 100, 10);
 
-											if(progress == 100){
+											if (progress == 100) {
 												$wnd.dropzoneUploaded++;
 											}
 
-											var globalProgress = parseInt($wnd.dropzoneUploaded / $wnd.dropzoneUploadTotal * 100, 10);
+											var globalProgress = parseInt(
+													$wnd.dropzoneUploaded
+															/ $wnd.dropzoneUploadTotal
+															* 100, 10);
 
 											// Update the hidden input field and trigger a change
 											// so that the jQuery knob plugin knows to update the dial
 											data.context.find('input').val(
 													progress).change();
 
-											if(progress == 100){
-												data.context.removeClass('working');
+											if (progress == 100) {
+												data.context
+														.removeClass('working');
 											}
 
 											if (globalProgress == 100) {
@@ -219,19 +223,13 @@ public class JavascriptUtils {
 											data.context.addClass('error');
 											data.context[0].setAttribute(
 													"data-toggle", "tooltip");
-											data.context[0]
-													.setAttribute(
-															"title",
-															data.jqXHR.responseJSON.message);
-											data.context
-													.find('span.errorMessage')
-													.text(
-															'('
-																	+ data.jqXHR.responseJSON.message
-																	+ ')');
-											$wnd.console.log("data" + data
-													+ " error thrown: "
-													+ data.errorThrown);
+											var message = data.jqXHR.statusText;
+											if(typeof data.jqXHR.responseJSON !== 'undefined') {
+											  message = data.jqXHR.responseJSON.message;
+											}
+											data.context[0].setAttribute("title", message);
+											data.context.find('span.errorMessage').text('(' + message + ')');
+											$wnd.console.log("data" + data + " error thrown: " + data.errorThrown);
 										},
 									});
 
@@ -379,16 +377,21 @@ public class JavascriptUtils {
   }-*/;
 
   public static native int pdfDipViewerBottomPosition() /*-{
-    var footerTop = Math.floor( $wnd.jQuery('.footer').offset().top );
-    var mainBottom = Math.floor( $wnd.jQuery('.main').offset().top + $wnd.jQuery('.main').outerHeight(true) );
+		var footerTop = Math.floor($wnd.jQuery('.footer').offset().top);
+		var mainBottom = Math.floor($wnd.jQuery('.main').offset().top
+				+ $wnd.jQuery('.main').outerHeight(true));
 
-    var spacing = Math.floor( $wnd.jQuery('div.bitstreamPreview.viewRepresentationFilePreview').outerHeight(true) )
-      - Math.floor( $wnd.jQuery('iframe.viewRepresentationPDFFilePreview').outerHeight(true) );
+		var spacing = Math.floor($wnd.jQuery(
+				'div.bitstreamPreview.viewRepresentationFilePreview')
+				.outerHeight(true))
+				- Math.floor($wnd.jQuery(
+						'iframe.viewRepresentationPDFFilePreview').outerHeight(
+						true));
 
-    if(footerTop < mainBottom){
-      return footerTop - spacing;
-    }else{
-      return mainBottom - spacing;
-    }
+		if (footerTop < mainBottom) {
+			return footerTop - spacing;
+		} else {
+			return mainBottom - spacing;
+		}
   }-*/;
 }

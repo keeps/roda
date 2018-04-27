@@ -17,7 +17,6 @@
 	<set-configuration-property name="locale.searchorder" value="queryparam,cookie,meta,useragent"/>
 
 	<!-- Inherit required libraries -->
-	<inherits name="com.bytebybyte.gwt.fontawesome.FontAwesomeLib" />
 	<inherits name="com.github.nmorel.gwtjackson.GwtJackson" />
 
 	<!-- Inherit sub-projects -->

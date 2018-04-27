@@ -269,10 +269,6 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<dependency>
-			<groupId>com.bytebybyte.gwt</groupId>
-			<artifactId>fontawesome-lib</artifactId>
-		</dependency>
 		<!-- REST API related dependencies - start -->
 		<dependency>
 			<groupId>org.glassfish.jersey.bundles</groupId>
@@ -353,6 +349,79 @@
 			<version>0.14.2</version>
 			<!-- <scope>provided</scope> -->
 		</dependency>
+		<!-- WebJars https://www.webjars.org -->
+		<!-- Global icon font -->
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>font-awesome</artifactId>
+			<version>5.1.0</version>
+		</dependency>
+		<!-- Main dependencies -->
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>jquery</artifactId>
+			<version>3.3.1-1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>respond</artifactId>
+			<version>1.4.2-1</version>
+		</dependency>
+		<!-- DBViewer iframe resize -->
+		<dependency>
+			<groupId>org.webjars.bower</groupId>
+			<artifactId>iframe-resizer</artifactId>
+			<version>3.6.1</version>
+		</dependency>
+		<!-- Sidebar sticky -->
+		<dependency>
+			<groupId>org.webjars.bower</groupId>
+			<artifactId>sticky-kit</artifactId>
+			<version>1.1.2</version>
+		</dependency>
+		<!-- Statistics textfill -->
+		<dependency>
+			<groupId>org.webjars.bower</groupId>
+			<artifactId>github-com-jquery-textfill-jquery-textfill</artifactId>
+			<version>0.6.0</version>
+		</dependency>
+		<!-- Code highlight for viewer and others -->
+		<dependency>
+			<groupId>org.webjars.bower</groupId>
+			<artifactId>highlightjs</artifactId>
+			<version>9.12.0</version>
+		</dependency>
+		<!-- PDF viewer -->
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>pdf-js</artifactId>
+			<version>1.9.426</version>
+		</dependency>
+
+		<!-- File upload -->
+		<dependency>
+			<groupId>org.webjars.bower</groupId>
+			<artifactId>github-com-cuba-platform-jquery-fileupload</artifactId>
+			<version>9.12.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars.bower</groupId>
+			<artifactId>jquery-knob</artifactId>
+			<version>1.2.13</version>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>jquery-ui</artifactId>
+			<version>1.12.1</version>
+		</dependency>
+		<!-- / File upload -->
+		<!-- API docs -->
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>swagger-ui</artifactId>
+			<version>3.17.1</version>
+		</dependency>
+
 	</dependencies>
 	<build>
 		<pluginManagement>
