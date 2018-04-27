@@ -391,7 +391,7 @@ public class EditDescriptiveMetadata extends Composite {
       MetadataValue mvBundle = bundleMap.get(key);
       String bundleValue = mvBundle != null ? bundleMap.get(key).get("value") : "";
 
-      if (!formValue.equals(bundleValue))
+      if ((formValue != null && !formValue.equals(bundleValue)) || (formValue == null && bundleValue != null))
         return true;
     }
     return false;
