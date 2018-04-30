@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>org.roda-project</groupId>
 		<artifactId>roda-common</artifactId>
-		<version>v2.2.2-SNAPSHOT</version>
+		<version>2.2.2</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<build>
