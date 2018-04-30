@@ -1,5 +1,19 @@
 # Changelog
 
+## v2.2.2 (30/04/2018)
+Install for demonstration:
+```
+docker pull keeps/roda:v2.2.2
+```
+
+#### Bug Fixes:
+
+-  Descriptive metadata form with separators gives NPE on clicking raw XML button [#1215](https://github.com/keeps/roda/issues/1215)
+-  Ingest > Process > List Created Packages stopped working [#1213](https://github.com/keeps/roda/issues/1213)
+-  File notification fails to index because recipientUsers is a required field [#1210](https://github.com/keeps/roda/issues/1210)
+
+---
+
 ## v2.2.1 (24/04/2018)
 Install for demonstration:
 ```
