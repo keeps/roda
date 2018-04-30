@@ -29,7 +29,7 @@
  http://wiki.apache.org/solr/SchemaXml
 -->
 
-<schema name="schema-version-5" version="1.5">
+<schema name="schema-version-6" version="1.5">
   <!--
     2 - removed field 'state' default value (it was leftovers from previous field definition);
   -->
@@ -207,6 +207,10 @@
  <copyField source="title" dest="title_sort" />
  <copyField source="id" dest="aipId" />
  <copyField source="*" dest="search" />
+ 
+ <copyField source="ingestJobId" dest="allIngestJobIds" />
+ <copyField source="ingestUpdateJobIds" dest="allIngestJobIds" />
+
     <!--
    <copyField source="title" dest="text"/>
    <copyField source="body" dest="text"/>

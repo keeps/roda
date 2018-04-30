@@ -1322,10 +1322,6 @@ public class SolrUtils {
     doc.addField(RodaConstants.INGEST_JOB_ID, aip.getIngestJobId());
     doc.addField(RodaConstants.INGEST_UPDATE_JOB_IDS, aip.getIngestUpdateJobIds());
 
-    ArrayList<String> allJobIds = new ArrayList<>(aip.getIngestUpdateJobIds());
-    allJobIds.add(aip.getIngestJobId());
-    doc.addField(RodaConstants.ALL_INGEST_JOB_IDS, allJobIds);
-
     doc.addField(RodaConstants.AIP_ANCESTORS, ancestors);
 
     List<String> descriptiveMetadataIds = aip.getDescriptiveMetadata().stream().map(dm -> dm.getId())
