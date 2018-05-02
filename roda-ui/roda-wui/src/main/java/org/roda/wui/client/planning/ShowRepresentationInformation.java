@@ -327,7 +327,14 @@ public class ShowRepresentationInformation extends Composite {
 
         InlineHTML label = new InlineHTML();
         label.addStyleName("ri-form-label-inline");
-        label.setHTML(messages.representationInformationIntellectualEntities(size.intValue(), url));
+
+        if (RodaConstants.SEARCH_ITEMS.equals(searchType)) {
+          label.setHTML(messages.representationInformationIntellectualEntities(size.intValue(), url));
+        } else if (RodaConstants.SEARCH_REPRESENTATIONS.equals(searchType)) {
+          label.setHTML(messages.representationInformationRepresentations(size.intValue(), url));
+        } else if (RodaConstants.SEARCH_FILES.equals(searchType)) {
+          label.setHTML(messages.representationInformationFiles(size.intValue(), url));
+        }
 
         ShowRepresentationInformation.this.objectPanel.add(label);
 
