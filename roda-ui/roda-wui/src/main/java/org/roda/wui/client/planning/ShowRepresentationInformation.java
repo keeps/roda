@@ -292,19 +292,19 @@ public class ShowRepresentationInformation extends Composite {
       Filter aipFilter = new Filter();
       aipFilter.add(new OrFiltersParameters(aipParams));
 
-      BrowserService.Util.getInstance().count(IndexedAIP.class.getName(), aipFilter, false,
+      BrowserService.Util.getInstance().count(IndexedAIP.class.getName(), aipFilter, true,
         initEntityFiltersObjectPanel(RodaConstants.SEARCH_ITEMS));
     } else if (!representationParams.isEmpty()) {
       Filter representationFilter = new Filter();
       representationFilter.add(new OrFiltersParameters(representationParams));
 
-      BrowserService.Util.getInstance().count(IndexedRepresentation.class.getName(), representationFilter, false,
+      BrowserService.Util.getInstance().count(IndexedRepresentation.class.getName(), representationFilter, true,
         initEntityFiltersObjectPanel(RodaConstants.SEARCH_REPRESENTATIONS));
     } else if (!fileParams.isEmpty()) {
       Filter fileFilter = new Filter();
       fileFilter.add(new OrFiltersParameters(fileParams));
 
-      BrowserService.Util.getInstance().count(IndexedFile.class.getName(), fileFilter, false,
+      BrowserService.Util.getInstance().count(IndexedFile.class.getName(), fileFilter, true,
         initEntityFiltersObjectPanel(RodaConstants.SEARCH_FILES));
     } else {
       initEntityFiltersObjectPanel(RodaConstants.SEARCH_ITEMS).onSuccess(0L);
