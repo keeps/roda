@@ -1032,6 +1032,40 @@ public class ModelServiceTest {
     MatcherAssert.assertThat(retrievedUser2.getAllRoles(), Matchers.containsInAnyOrder(ROLE2));
     MatcherAssert.assertThat(retrievedUser2.getAllRoles(), Matchers.not(Matchers.containsInAnyOrder(ROLE1)));
 
+    // cleanup
+    model.deleteUser(user.getId(), true);
+  }
+  
+  
+  @Test
+  public void testUserUpdate() throws RODAException {
+    
+    // create user 1
+    User user = new User("user_1");
+    user.setActive(true);
+    user.setEmail("user1@example.com");
+    user.setGuest(false);
+    user.setFullName("user1");
+    model.createUser(user, true);
+    
+    // create group 1
+    Group group1 = new Group("group_1");
+    group1.setActive(true);
+    group1.setFullName("NAMEGROUP1");
+    group1.setDirectRoles(new HashSet<>(Arrays.asList(ROLE1)));
+    model.createGroup(group1, true);
+    
+    // update user
+    User user2 = model.retrieveUser(user.getId());
+    user2.addGroup(group1.getId());
+    User user3 = model.updateUser(user2, null, true);
+    
+    MatcherAssert.assertThat(user3.getGroups(), Matchers.containsInAnyOrder(group1.getId()));
+    
+    // cleanup
+    model.deleteUser(user.getId(), true);
+    model.deleteGroup(group1.getId(), true);
+    
   }
 
   @Test
