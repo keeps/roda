@@ -370,20 +370,21 @@ public class ResourceParseUtils {
     Binary binary = storage.getBinary(metadataStoragePath);
 
     String json;
-    AIP aip;
+    AIP aip = null;
     InputStream inputStream = null;
     try {
       inputStream = binary.getContent().createInputStream();
       json = IOUtils.toString(inputStream, Charset.forName(RodaConstants.DEFAULT_ENCODING));
       aip = JsonUtils.getObjectFromJson(json, AIP.class);
+
+      // Setting information that does not come in JSON
+      aip.setId(aipId);
     } catch (IOException | GenericException e) {
       throw new GenericException("Could not parse AIP metadata of " + aipId + " at " + metadataStoragePath, e);
     } finally {
       IOUtils.closeQuietly(inputStream);
     }
 
-    // Setting information that does not come in JSON
-    aip.setId(aipId);
     return aip;
   }
 
