@@ -20,7 +20,7 @@
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
-	<g:FlowPanel styleName="wui-ingest-list" addStyleNames="wrapper skip_padding">
+	<g:FlowPanel styleName="wui-job-list" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
 				<g:Label styleName="h1" ui:field="ingestProcessTitle">
@@ -65,7 +65,7 @@
 								addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
 								ui:field="inputDateFinal" />
 						</g:FlowPanel>
-						<g:FlowPanel>
+						<g:FlowPanel addStyleNames="sidebar-group actionProcessActions">
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarActionsTitle}' />
 							</g:Label>

@@ -59,7 +59,7 @@
 								addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
 								ui:field="inputDateFinal" />
 						</g:FlowPanel>
-						<g:FlowPanel>
+						<g:FlowPanel addStyleNames="ingestProcessActions">
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarActionsTitle}' />
 							</g:Label>

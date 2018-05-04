@@ -12,7 +12,7 @@
 	</ui:style>
 
 
-	<g:FlowPanel styleName="wui-management-user" addStyleNames="wrapper skip_padding">
+	<g:FlowPanel styleName="wui-risk-register" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
 				<p:RiskShowPanel ui:field="riskShowPanel"></p:RiskShowPanel>
@@ -36,7 +36,7 @@
 								<ui:text from='{messages.backButton}' />
 							</g:Button>
 						</g:FlowPanel>
-						<g:FlowPanel>
+						<g:FlowPanel addStyleNames="sidebar-group incidenceActions">
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.riskIncidences}' />
 							</g:Label>

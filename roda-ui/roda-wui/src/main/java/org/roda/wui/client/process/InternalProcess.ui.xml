@@ -59,14 +59,6 @@
 								addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
 								ui:field="inputDateFinal" />
 						</g:FlowPanel>
-						<!-- <g:FlowPanel> -->
-						<!-- <g:Label addStyleNames="h4"> -->
-						<!-- <ui:text from='{messages.sidebarActionsTitle}' /> -->
-						<!-- </g:Label> -->
-						<!-- <g:Button addStyleNames="btn btn-block btn-plus" ui:field="newJob"> -->
-						<!-- <ui:text from='{messages.newProcessPreservation}' /> -->
-						<!-- </g:Button> -->
-						<!-- </g:FlowPanel> -->
 					</g:FlowPanel>
 				</g:FlowPanel>
 			</g:FlowPanel>
