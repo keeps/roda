@@ -13,23 +13,24 @@
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
-	<g:FlowPanel styleName="wui-format-register" addStyleNames="wrapper skip_padding">
+	<g:FlowPanel styleName="wui-representation-information-network" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content" ui:field="content">
 				<g:FlowPanel ui:field="title"></g:FlowPanel>
 				<g:FlowPanel addStyleNames="page-description" ui:field="registerDescription"></g:FlowPanel>
 				<commonsearch:SearchPanel ui:field="searchPanel" />
-				<lists:RepresentationInformationList addStyleNames="searchResults" ui:field="representationInformationList" />
+				<lists:RepresentationInformationList
+					addStyleNames="searchResults" ui:field="representationInformationList" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar" ui:field="sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">
 					<g:FlowPanel addStyleNames="sticky-padding">
-						<g:FlowPanel ui:field="formatsSidebar">
+						<g:FlowPanel ui:field="representationInformationSidebar">
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarRepresentationInformationTitle}' />
 							</g:Label>
 							<g:Button addStyleNames="btn btn-block btn-plus"
-									  ui:field="buttonAdd">
+								ui:field="buttonAdd">
 								<ui:text from='{messages.newButton}' />
 							</g:Button>
 							<g:Button addStyleNames="btn btn-block btn-danger btn-ban"
@@ -37,7 +38,7 @@
 								<ui:text from='{messages.removeButton}' />
 							</g:Button>
 						</g:FlowPanel>
-						<g:FlowPanel>
+						<g:FlowPanel addStyleNames="actionsSidebar">
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarActionsTitle}' />
 							</g:Label>
@@ -46,18 +47,18 @@
 								<ui:text
 									from='{messages.representationInformationRegisterProcessButton}' />
 							</g:Button>
-							<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
-								<g:Label addStyleNames="h4">
-									<ui:text from='{messages.representationInformationTags}' />
-								</g:Label>
-								<g:FlowPanel ui:field="facetTags" />
-							</g:FlowPanel>
-							<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
-								<g:Label addStyleNames="h4">
-									<ui:text from='{messages.representationInformationSupport}' />
-								</g:Label>
-								<g:FlowPanel ui:field="facetSupport" />
-							</g:FlowPanel>
+						</g:FlowPanel>
+						<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
+							<g:Label addStyleNames="h4">
+								<ui:text from='{messages.representationInformationTags}' />
+							</g:Label>
+							<g:FlowPanel ui:field="facetTags" />
+						</g:FlowPanel>
+						<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
+							<g:Label addStyleNames="h4">
+								<ui:text from='{messages.representationInformationSupport}' />
+							</g:Label>
+							<g:FlowPanel ui:field="facetSupport" />
 						</g:FlowPanel>
 					</g:FlowPanel>
 				</g:FlowPanel>
