@@ -62,7 +62,7 @@
 								<g:FlowPanel ui:field="facetMimetypes" />
 							</g:FlowPanel>
 						</g:FlowPanel>
-						<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel">
+						<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel ingestAppraisalActions">
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarActionsTitle}' />
 							</g:Label>

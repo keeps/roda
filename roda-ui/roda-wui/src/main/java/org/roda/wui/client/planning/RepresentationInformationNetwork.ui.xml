@@ -25,7 +25,7 @@
 			<g:FlowPanel addStyleNames="col_2 last sidebar" ui:field="sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">
 					<g:FlowPanel addStyleNames="sticky-padding">
-						<g:FlowPanel ui:field="representationInformationSidebar">
+						<g:FlowPanel addStyleNames="representationInformationSidebar">
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarRepresentationInformationTitle}' />
 							</g:Label>

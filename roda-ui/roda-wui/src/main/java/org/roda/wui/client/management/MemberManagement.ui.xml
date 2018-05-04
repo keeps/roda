@@ -47,7 +47,7 @@
 								<g:FlowPanel ui:field="facetGroups" />
 							</g:FlowPanel>
 						</g:FlowPanel>
-						<g:FlowPanel>
+						<g:FlowPanel addStyleNames="memberActions">
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarActionsTitle}' />
 							</g:Label>
