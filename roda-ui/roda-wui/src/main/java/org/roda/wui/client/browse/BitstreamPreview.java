@@ -23,6 +23,7 @@ import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.event.logical.shared.AttachEvent.Handler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -216,12 +217,34 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
   }
 
   private void pdfPreview() {
-    String viewerHtml = GWT.getHostPageBaseURL() + "pdf/viewer.html?file="
+    String viewerPdf = GWT.getHostPageBaseURL() + "pdf/viewer.html?file="
       + encode(GWT.getHostPageBaseURL() + bitstreamDownloadUri.asString());
 
-    Frame frame = new Frame(viewerHtml);
+    final Frame frame = new Frame(viewerPdf);
+    frame.addAttachHandler(new Handler() {
+      private HandlerRegistration handlerRegistration;
+
+      @Override
+      public void onAttachOrDetach(AttachEvent attachEvent) {
+        if (attachEvent.isAttached()) {
+          GWT.log("add handler");
+          adjustPdfPreviewHeight(frame);
+          handlerRegistration = Window.addResizeHandler(resizeEvent -> adjustPdfPreviewHeight(frame));
+        } else if (handlerRegistration != null) {
+          GWT.log("remove handler");
+          handlerRegistration.removeHandler();
+        }
+      }
+    });
     panel.add(frame);
     frame.setStyleName("viewRepresentationPDFFilePreview");
+  }
+
+  private void adjustPdfPreviewHeight(Frame frame) {
+    int top = frame.getAbsoluteTop();
+    int bottom = JavascriptUtils.pdfDipViewerBottomPosition();
+    int height = bottom - top;
+    frame.setHeight(height + "px");
   }
 
   private void textPreview() {
@@ -262,7 +285,7 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
     Frame frame = new Frame();
     frame.setUrl(bitstreamDownloadUri);
     panel.add(frame);
-    frame.setStyleName("viewRepresentationPDFFilePreview");
+    frame.setStyleName("viewRepresentationHtmlFilePreview");
   }
 
   private void audioPreview() {
@@ -292,7 +315,7 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
       videoPlayer.addSource(bitstreamDownloadUri.asString(), getVideoSourceType());
       videoPlayer.setControls(true);
       panel.add(videoPlayer);
-      videoPlayer.addStyleName("viewRepresentationAudioFilePreview");
+      videoPlayer.addStyleName("viewRepresentationVideoFilePreview");
     } else {
       notSupportedPreview();
     }

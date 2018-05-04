@@ -364,4 +364,18 @@ public class JavascriptUtils {
 		$doc.execCommand('copy');
 		selection.removeAllRanges();
   }-*/;
+
+  public static native int pdfDipViewerBottomPosition() /*-{
+    var footerTop = Math.floor( $wnd.jQuery('.footer').offset().top );
+    var mainBottom = Math.floor( $wnd.jQuery('.main').offset().top + $wnd.jQuery('.main').outerHeight(true) );
+
+    var spacing = Math.floor( $wnd.jQuery('div.bitstreamPreview.viewRepresentationFilePreview').outerHeight(true) )
+      - Math.floor( $wnd.jQuery('iframe.viewRepresentationPDFFilePreview').outerHeight(true) );
+
+    if(footerTop < mainBottom){
+      return footerTop - spacing;
+    }else{
+      return mainBottom - spacing;
+    }
+  }-*/;
 }

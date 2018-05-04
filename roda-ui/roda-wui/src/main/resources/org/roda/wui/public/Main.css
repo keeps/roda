@@ -111,7 +111,7 @@ ol {
 }
 
 .col_card {
-	background: #eee; 
+	background: #eee;
 	padding: 0 2em;
 }
 
@@ -604,12 +604,12 @@ pre code {
 
 .form-label-inline {
 	display: inline;
-	margin-right: 10px;	
+	margin-right: 10px;
 }
 
 .ri-form-label-inline {
 	display: inline;
-	margin-right: 5px;	
+	margin-right: 5px;
 }
 
 .panelDescriptiveMetadata .form-separator:first-child {
@@ -779,7 +779,7 @@ pre code {
     text-overflow: ellipsis;
     text-transform: uppercase;
     text-decoration: none;
-    
+
     position: relative;
     white-space: nowrap;
     overflow: hidden;
@@ -881,7 +881,7 @@ pre code {
     -moz-osx-font-smoothing: grayscale;
     float: right;
     margin-top: 1px;
-    
+
     position: absolute;
     right: 10px;
 }
@@ -1037,7 +1037,7 @@ pre code {
 .toolbarLink.active {
     color: white;
     background-color: #089de3;
-    
+
 }
 
 .toolbarLink.disabled, .toolbarLink.disabled:hover {
@@ -1894,7 +1894,7 @@ td.datePickerMonth, td.datePickerYear {
     cursor: pointer;
     cursor: hand;
     font-size: 1.2rem;
-    
+
     max-width: 150px;
     white-space: nowrap;
     overflow: hidden;
@@ -1913,13 +1913,13 @@ td.datePickerMonth, td.datePickerYear {
 .main .wui-breadcrumbPanel .breadcrumb-last {
     color: #404142;
     text-decoration: none;
-    
+
     max-width: 100px;
 }
 
 .viewRepresentationBreadcrumb .breadcrumb-last {
 	max-width: none !important;
-} 
+}
 
 .main .wui-breadcrumbPanel .breadcrumb-last .fa, .main .wui-breadcrumbPanel .breadcrumb-last .description-level {
     color: #404142;
@@ -3708,7 +3708,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .wui-dialog-confirm {
-	
+
 }
 
 .wui-dialog-information {
@@ -4163,7 +4163,20 @@ td.datePickerMonth, td.datePickerYear {
     display: block;
 }
 
-.viewRepresentationPDFFilePreview, .viewDIPPreview {
+.viewRepresentationPDFFilePreview {
+    /*height: 100vh;
+    box-sizing: border-box;*/
+    min-height: 765px;
+    width: 100%;
+    /*
+      This works together with javascript code that
+      dynamically sets margin-top and padding-top
+      to be the sum of the heights of the banner,
+      menu and footer elements.
+    */
+}
+
+.viewRepresentationHtmlFilePreview, .viewDIPPreview {
     width: 100%;
     height: 670px;
 }
@@ -5902,7 +5915,7 @@ td.datePickerMonth, td.datePickerYear {
     white-space: nowrap;
     text-overflow: ellipsis;
     height: 30px;
-    line-height: 30px;    
+    line-height: 30px;
     padding: 0;
     margin: 0;
     display: inherit;
@@ -5994,7 +6007,7 @@ td.datePickerMonth, td.datePickerYear {
 	right: 0;
 }
 .stat_col_card {
-	background: #eee; 
+	background: #eee;
 	padding: 0 2em 4em 2em;
 }
 .statistic {
@@ -6055,7 +6068,7 @@ td.datePickerMonth, td.datePickerYear {
  DOWNLOAD CSV
 ****************************************/
 
-.csvDownloadButton, .actionsButton { 
+.csvDownloadButton, .actionsButton {
 	padding: 7px;
 	float: right;
 }
