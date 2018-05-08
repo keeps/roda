@@ -2186,7 +2186,7 @@ public class BrowserHelper {
             transferredResources.put(idValue, tr);
           }
         } else {
-          LOGGER.warn("No support for linking object type: {}", linkingType);
+          LOGGER.warn("No support for linking object type: {}", idValue);
         }
       } catch (NotFoundException e) {
         // nothing to do

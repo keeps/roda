@@ -273,7 +273,8 @@ public class ShowPreservationEvent extends Composite {
     boolean showSourceObjects = false;
     for (LinkingIdentifier sourceObjectId : event.getSourcesObjectIds()) {
       if (sourceObjectId.getRoles() != null
-        && sourceObjectId.getRoles().contains(RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE)) {
+        && sourceObjectId.getRoles().contains(RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE)
+        && "URN".equalsIgnoreCase(sourceObjectId.getType())) {
         addObjectPanel(sourceObjectId, bundle, sourceObjectsPanel);
         showSourceObjects = true;
       }
@@ -285,7 +286,8 @@ public class ShowPreservationEvent extends Composite {
     boolean showOutcomeObjects = false;
     for (LinkingIdentifier outcomeObjectId : event.getOutcomeObjectIds()) {
       if (outcomeObjectId.getRoles() != null
-        && outcomeObjectId.getRoles().contains(RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME)) {
+        && outcomeObjectId.getRoles().contains(RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME)
+        && "URN".equalsIgnoreCase(outcomeObjectId.getType())) {
         addObjectPanel(outcomeObjectId, bundle, outcomeObjectsPanel);
         showOutcomeObjects = true;
       }
