@@ -1,5 +1,21 @@
 # Changelog
 
+## v2.2.3 (10/05/2018)
+Install for demonstration:
+```
+docker pull keeps/roda:v2.2.3
+```
+
+#### Enhancements:
+
+-  Missing CSS classes in several sidebar components necessary for customization [#1228](https://github.com/keeps/roda/issues/1228)
+
+#### Bug Fixes:
+
+-  Change RI extra bundle permission to read instead of manage [#1221](https://github.com/keeps/roda/issues/1221)
+
+---
+
 ## v2.2.2 (30/04/2018)
 Install for demonstration:
 ```
