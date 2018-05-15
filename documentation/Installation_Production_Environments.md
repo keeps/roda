@@ -86,6 +86,11 @@ sf -update
 NOTE: Please note that the user must have a correct HOME defined, if using a special user (e.g. `roda`), use `sudo -iu roda` to login and test siegfried install.
 NOTE: Please note that the install instruction above include new environment variables that need
 
+### Supervisor
+
+On CentOS, follow [this](https://rayed.com/posts/2013/12/setting-up-python-and-supervisord-on-centos/).
+
+
 ### Format migration tools (optional)
 
 The following dependencies are only needed if support for file formation migration for the following format families are required.
