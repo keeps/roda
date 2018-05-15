@@ -1855,7 +1855,7 @@ public class SolrUtils {
 
     Date d = objectToDate(doc.get(RodaConstants.TRANSFERRED_RESOURCE_DATE));
     if (d == null) {
-      LOGGER.warn("Error parsing transferred resource date. Setting date to current date.");
+      LOGGER.trace("Error parsing transferred resource date. Setting date to current date.");
       d = new Date();
     }
 
