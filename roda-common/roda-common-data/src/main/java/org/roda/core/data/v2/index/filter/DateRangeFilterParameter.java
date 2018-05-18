@@ -32,7 +32,12 @@ public class DateRangeFilterParameter extends RangeFilterParameter<Date> {
 
   public DateRangeFilterParameter(String name, Date fromValue, Date toValue) {
     super(name, fromValue, toValue);
-    this.setTimeZoneOffset(toValue.getTimezoneOffset());
+
+    if (toValue != null) {
+      this.setTimeZoneOffset(toValue.getTimezoneOffset());
+    } else if (fromValue != null) {
+      this.setTimeZoneOffset(fromValue.getTimezoneOffset());
+    }
   }
 
   public DateRangeFilterParameter(String name, Date fromValue, Date toValue, DateGranularity granularity) {

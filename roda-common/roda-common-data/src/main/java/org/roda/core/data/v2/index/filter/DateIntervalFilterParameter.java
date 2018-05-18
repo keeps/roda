@@ -32,7 +32,12 @@ public class DateIntervalFilterParameter extends RangeFilterParameter<Date> {
     setToName(toName);
     setFromValue(fromValue);
     setToValue(toValue);
-    setTimeZoneOffset(toValue.getTimezoneOffset());
+
+    if (toValue != null) {
+      setTimeZoneOffset(toValue.getTimezoneOffset());
+    } else if (fromValue != null) {
+      this.setTimeZoneOffset(fromValue.getTimezoneOffset());
+    }
   }
 
   public DateIntervalFilterParameter(String fromName, String toName, Date fromValue, Date toValue,
