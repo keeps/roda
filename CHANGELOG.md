@@ -1,5 +1,22 @@
 # Changelog
 
+## v2.2.4 (18/05/2018)
+Install for demonstration:
+```
+docker pull keeps/roda:v2.2.4
+```
+
+#### New features:
+
+-  Index representation metadata [#621](https://github.com/keeps/roda/issues/621)
+
+#### Bug Fixes:
+
+-  Error executing tasks defined via index filter when the task alters the result of the search [#1232](https://github.com/keeps/roda/issues/1232)
+-  Advanced search by date interval without latest that gives NPE [#1229](https://github.com/keeps/roda/issues/1229)
+
+---
+
 ## v2.2.3 (10/05/2018)
 Install for demonstration:
 ```
@@ -12,7 +29,11 @@ docker pull keeps/roda:v2.2.3
 
 #### Bug Fixes:
 
+- RI relation count (on bottom) is counting non-active [#1219](https://github.com/keeps/roda/issues/1219)
+- RI relation count translation is not considering Representation and Files [#1220](https://github.com/keeps/roda/issues/1220)
 -  Change RI extra bundle permission to read instead of manage [#1221](https://github.com/keeps/roda/issues/1221)
+
+
 
 ---
 
