@@ -7,23 +7,26 @@
  */
 package org.roda.core.index.utils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.function.Consumer;
 
 import org.apache.solr.client.solrj.SolrClient;
+import org.mapdb.BTreeMap;
+import org.mapdb.DB;
+import org.mapdb.DB.TreeMapSink;
+import org.mapdb.DBMaker;
+import org.mapdb.Serializer;
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.index.facet.FacetFieldResult;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.user.User;
@@ -37,122 +40,96 @@ import org.slf4j.LoggerFactory;
  * @author Hélder Silva <hsilva@keep.pt>
  */
 
-public class IterableIndexResult<T extends IsIndexed> implements Iterable<T> {
-
-  private final class IteratorIndexResult implements Iterator<T> {
-    @Override
-    public boolean hasNext() {
-      return indexResult != null && currentObject < totalObjects;
-    }
-
-    @Override
-    public T next() {
-      try {
-        final T t = indexResultObjects.get(currentObjectInPartialList);
-        currentObject += 1;
-        currentObjectInPartialList += 1;
-        if (LOGGER.isTraceEnabled()) {
-          LOGGER.trace("({} of {}) Returning object of class '{}' with id '{}'", currentObject, totalObjects,
-            returnClass.getSimpleName(), t.getUUID());
-        }
-
-        // see if a new page needs to be obtained
-        if (currentObjectInPartialList == indexResultObjects.size()) {
-          getResults(sublist.setFirstElementIndex(sublist.getFirstElementIndex() + PAGE_SIZE));
-          currentObjectInPartialList = 0;
-        }
-
-        return t;
-      } catch (IndexOutOfBoundsException e) {
-        LOGGER.warn("Error iterating through index result", e);
-        throw new NoSuchElementException(e.getMessage());
-      }
-    }
-  }
+public class IterableIndexResult<T extends IsIndexed> implements CloseableIterable<T> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IterableIndexResult.class);
-  private static final int PAGE_SIZE = RodaConstants.DEFAULT_PAGINATION_VALUE;
+  private static final Sorter SINK_SORTER = new Sorter(new SortParameter(RodaConstants.INDEX_UUID, false));
+  private static final int PAGE_SIZE = 1000;
 
   private SolrClient solrClient;
   private Class<T> returnClass;
   private Filter filter;
-  private Sorter sorter;
-  private Sublist sublist;
-  private Facets facets;
   private User user;
   private boolean justActive;
   private List<String> fieldsToReturn;
+  private DB db;
 
-  private boolean removeDuplicates = true;
-  private Set<String> uniqueUUIDs = new HashSet<>();
-  private IndexResult<T> indexResult = null;
-  private List<T> indexResultObjects;
-  private int currentObject = 0;
-  private int currentObjectInPartialList = 0;
+  private BTreeMap<String, T> indexObjects;
+
   private long totalObjects = -1;
 
-  public IterableIndexResult(final SolrClient solrClient, final Class<T> returnClass, final Filter filter,
-    final Sorter sorter, final Facets facets, final boolean removeDuplicates, final List<String> fieldsToReturn) {
-    this(solrClient, returnClass, filter, sorter, facets, null, true, removeDuplicates, fieldsToReturn);
-  }
-
+  @Deprecated
   public IterableIndexResult(final SolrClient solrClient, final Class<T> returnClass, final Filter filter,
     final Sorter sorter, final Facets facets, final User user, final boolean justActive, final boolean removeDuplicates,
     final List<String> fieldsToReturn) {
+    this(solrClient, returnClass, filter, sorter, user, justActive, fieldsToReturn);
+  }
+
+  public IterableIndexResult(final SolrClient solrClient, final Class<T> returnClass, final Filter filter,
+    final Sorter sorter, final User user, final boolean justActive, final List<String> fieldsToReturn) {
     this.solrClient = solrClient;
     this.returnClass = returnClass;
     this.filter = filter;
-    this.sorter = sorter;
-    this.facets = facets;
-    // 20170512 hsilva: this is the default & non configurable page size to be
-    // used
-    this.sublist = new Sublist(0, PAGE_SIZE);
     this.user = user;
     this.justActive = justActive;
-    this.removeDuplicates = removeDuplicates;
     this.fieldsToReturn = fieldsToReturn;
-    getResults(this.sublist);
-  }
 
-  private void getResults(final Sublist sublist) {
-    try {
-      indexResult = SolrUtils.find(solrClient, returnClass, filter, sorter, sublist, facets, user, justActive,
-        fieldsToReturn);
-      if (totalObjects == -1) {
-        totalObjects = indexResult.getTotalCount();
-      }
-
-      if (removeDuplicates) {
-        indexResultObjects = new ArrayList<>();
-        for (T obj : indexResult.getResults()) {
-          if (!uniqueUUIDs.contains(obj.getUUID())) {
-            indexResultObjects.add(obj);
-            uniqueUUIDs.add(obj.getUUID());
-          } else {
-            totalObjects -= 1;
-          }
-        }
-      } else {
-        indexResultObjects = indexResult.getResults();
-      }
-    } catch (GenericException | RequestNotValidException e) {
-      // just set index result to null & let iterator return proper values
-      indexResult = null;
-      LOGGER.error("Error while retrieving partial list of results", e);
+    if (sorter == null || Sorter.NONE.equals(sorter) || SINK_SORTER.equals(sorter)) {
+      getResults();
+    } else {
+      getResults(sorter);
     }
   }
 
-  public List<FacetFieldResult> getFacetResults() {
-    return indexResult != null ? indexResult.getFacetResults() : Collections.emptyList();
+  @SuppressWarnings("unchecked")
+  private void getResults() {
+    db = DBMaker.tempFileDB().fileMmapEnableIfSupported().cleanerHackEnable().make();
+    TreeMapSink<String, T> sink = db.treeMap("myMap", Serializer.STRING, Serializer.JAVA).createFromSink();
+    this.totalObjects = getResultsImpl(SINK_SORTER, t -> sink.put(t.getUUID(), t));
+    this.indexObjects = sink.create();
+  }
+
+  @SuppressWarnings("unchecked")
+  private void getResults(Sorter sorter) {
+    db = DBMaker.tempFileDB().fileMmapEnableIfSupported().cleanerHackEnable().make();
+    this.indexObjects = db.treeMap("myMap", Serializer.STRING, Serializer.JAVA).create();
+    this.totalObjects = getResultsImpl(sorter, t -> indexObjects.put(t.getUUID(), t));
+  }
+
+  private long getResultsImpl(Sorter sorter, Consumer<T> putFunction) {
+    int startIndex = 0;
+    long totalCount = -1;
+
+    do {
+      // TODO use SOLR export after adding docValues to UUID
+      try {
+        IndexResult<T> result = SolrUtils.find(solrClient, returnClass, filter, sorter,
+          new Sublist(startIndex, PAGE_SIZE), Facets.NONE, user, justActive, fieldsToReturn);
+
+        totalCount = result.getTotalCount();
+        startIndex += result.getResults().size();
+
+        result.getResults().forEach(putFunction);
+      } catch (GenericException | RequestNotValidException e) {
+        LOGGER.error("Error find new Solr page when creating iterable index result", e);
+      }
+    } while (startIndex < totalCount);
+
+    return totalCount;
   }
 
   @Override
   public Iterator<T> iterator() {
-    return new IteratorIndexResult();
+    return indexObjects.valueIterator();
   }
 
   public long getTotalObjects() {
     return totalObjects;
+  }
+
+  @Override
+  public void close() throws IOException {
+    db.close();
   }
 
 }

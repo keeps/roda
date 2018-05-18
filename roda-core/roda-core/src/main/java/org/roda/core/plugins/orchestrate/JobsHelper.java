@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -45,6 +46,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.JobStats;
 import org.roda.core.index.IndexService;
+import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.orchestrate.akka.Messages;
@@ -372,11 +374,9 @@ public final class JobsHelper {
     throw new GenericException("Error while getting class from string");
   }
 
-  public static List<Job> findUnfinishedJobs(IndexService index) {
-    List<Job> unfinishedJobsList = new ArrayList<>();
+  public static IterableIndexResult<Job> findUnfinishedJobs(IndexService index) {
     Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.JOB_STATE, Job.nonFinalStateList()));
-    index.findAll(Job.class, filter, new ArrayList<>()).forEach(job -> unfinishedJobsList.add(job));
-    return unfinishedJobsList;
+    return index.findAll(Job.class, filter, Collections.emptyList());
   }
 
   public static void cleanJobObjects(Job job, ModelService model, IndexService index) {
@@ -389,16 +389,20 @@ public final class JobsHelper {
       filter.add(new OneOfManyFilterParameter(RodaConstants.AIP_STATE,
         Arrays.asList(AIPState.CREATED.toString(), AIPState.INGEST_PROCESSING.toString())));
 
-      List<String> aipIds = new ArrayList<>();
-      index.findAll(IndexedAIP.class, filter, false, Arrays.asList(RodaConstants.INDEX_UUID))
-        .forEach(e -> aipIds.add(e.getUUID()));
-      for (String aipId : aipIds) {
-        try {
-          LOGGER.info("Deleting AIP {} during job {} cleanup", aipId, job.getId());
-          model.deleteAIP(aipId);
-        } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-          LOGGER.error("Error deleting AIP {} during job {} cleanup", aipId, job.getId(), e);
+      try (IterableIndexResult<IndexedAIP> result = index.findAll(IndexedAIP.class, filter, false,
+        Arrays.asList(RodaConstants.INDEX_UUID))) {
+
+        for (IndexedAIP aip : result) {
+          String aipId = aip.getUUID();
+          try {
+            LOGGER.info("Deleting AIP {} during job {} cleanup", aipId, job.getId());
+            model.deleteAIP(aipId);
+          } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+            LOGGER.error("Error deleting AIP {} during job {} cleanup", aipId, job.getId(), e);
+          }
         }
+      } catch (IOException e) {
+        LOGGER.error("Error getting AIP iterator when cleaning job objects", e);
       }
     }
   }

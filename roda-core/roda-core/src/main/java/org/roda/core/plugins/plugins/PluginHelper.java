@@ -7,6 +7,7 @@
  */
 package org.roda.core.plugins.plugins;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -1038,26 +1039,29 @@ public final class PluginHelper {
 
     Filter ghostsFilter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_GHOST, Boolean.TRUE.toString()));
     jobId.ifPresent(id -> ghostsFilter.add(new SimpleFilterParameter(RodaConstants.INGEST_JOB_ID, id)));
-    IterableIndexResult<IndexedAIP> ghosts = index.findAll(IndexedAIP.class, ghostsFilter,
-      Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.INGEST_SIP_IDS, RodaConstants.AIP_GHOST));
+    try (IterableIndexResult<IndexedAIP> ghosts = index.findAll(IndexedAIP.class, ghostsFilter,
+      Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.INGEST_SIP_IDS, RodaConstants.AIP_GHOST))) {
 
-    for (IndexedAIP aip : ghosts) {
-      List<String> temp = new ArrayList<>();
+      for (IndexedAIP aip : ghosts) {
+        List<String> temp = new ArrayList<>();
 
-      if (aip.getIngestSIPIds() != null && !aip.getIngestSIPIds().isEmpty()) {
-        String firstIngestSIPId = aip.getIngestSIPIds().get(0);
-        if (sipIdToGhost.containsKey(firstIngestSIPId)) {
-          temp = sipIdToGhost.get(firstIngestSIPId);
+        if (aip.getIngestSIPIds() != null && !aip.getIngestSIPIds().isEmpty()) {
+          String firstIngestSIPId = aip.getIngestSIPIds().get(0);
+          if (sipIdToGhost.containsKey(firstIngestSIPId)) {
+            temp = sipIdToGhost.get(firstIngestSIPId);
+          }
+          temp.add(aip.getId());
+          sipIdToGhost.put(firstIngestSIPId, temp);
+        } else {
+          if (aipIdToGhost.containsKey(aip.getId())) {
+            temp = aipIdToGhost.get(aip.getId());
+          }
+          temp.add(aip.getId());
+          aipIdToGhost.put(aip.getId(), temp);
         }
-        temp.add(aip.getId());
-        sipIdToGhost.put(firstIngestSIPId, temp);
-      } else {
-        if (aipIdToGhost.containsKey(aip.getId())) {
-          temp = aipIdToGhost.get(aip.getId());
-        }
-        temp.add(aip.getId());
-        aipIdToGhost.put(aip.getId(), temp);
       }
+    } catch (IOException e) {
+      LOGGER.error("Error getting AIPs when fixing parents", e);
     }
 
     for (Map.Entry<String, List<String>> entry : sipIdToGhost.entrySet()) {
@@ -1115,16 +1119,18 @@ public final class PluginHelper {
     Filter parentFilter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aipId));
     searchScope.ifPresent(id -> parentFilter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, id)));
 
-    List<String> aipIds = new ArrayList<>();
-    index.findAll(IndexedAIP.class, parentFilter, false, Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_ID))
-      .forEach(e -> aipIds.add(e.getUUID()));
+    try (IterableIndexResult<IndexedAIP> result = index.findAll(IndexedAIP.class, parentFilter, false,
+      Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_ID))) {
 
-    for (String id : aipIds) {
-      try {
-        model.moveAIP(id, newParentId, updatedBy);
-      } catch (NotFoundException e) {
-        LOGGER.debug("Can't move child. It wasn't found.", e);
+      for (IndexedAIP aip : result) {
+        try {
+          model.moveAIP(aip.getId(), newParentId, updatedBy);
+        } catch (NotFoundException e) {
+          LOGGER.debug("Can't move child. It wasn't found.", e);
+        }
       }
+    } catch (IOException e) {
+      LOGGER.error("Error getting children AIPs when moving and deleting them", e);
     }
 
     try {
@@ -1132,6 +1138,7 @@ public final class PluginHelper {
     } catch (NotFoundException e) {
       LOGGER.debug("Can't delete ghost or move node. It wasn't found.", e);
     }
+
   }
 
   public static void createAndExecuteJob(Job job) throws GenericException, JobAlreadyStartedException,

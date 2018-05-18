@@ -7,6 +7,7 @@
  */
 package org.roda.core.plugins.plugins.ingest;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -411,17 +412,20 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
         Filter filter = new Filter();
         filter.add(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getId()));
         filter.add(new SimpleFilterParameter(RodaConstants.JOB_REPORT_PLUGIN_STATE, PluginState.FAILURE.toString()));
-        IterableIndexResult<IndexedReport> reports = index.findAll(IndexedReport.class, filter,
-          Collections.emptyList());
+        try (IterableIndexResult<IndexedReport> reports = index.findAll(IndexedReport.class, filter,
+          Collections.emptyList())) {
 
-        StringBuilder builder = new StringBuilder();
+          StringBuilder builder = new StringBuilder();
 
-        for (IndexedReport report : reports) {
-          Report last = report.getReports().get(report.getReports().size() - 1);
-          builder.append(last.getPluginDetails() + "\n\n");
+          for (IndexedReport report : reports) {
+            Report last = report.getReports().get(report.getReports().size() - 1);
+            builder.append(last.getPluginDetails() + "\n\n");
+          }
+
+          scopes.put("failures", new Handlebars.SafeString(builder.toString()));
+        } catch (IOException e) {
+          LOGGER.error("Error getting failed reports", e);
         }
-
-        scopes.put("failures", new Handlebars.SafeString(builder.toString()));
       }
 
       SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

@@ -7,6 +7,7 @@
  */
 package org.roda.core.common;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -330,11 +331,14 @@ public class UserUtility {
     IndexService index = RodaCoreFactory.getIndexService();
     if (selected instanceof SelectedItemsFilter) {
       SelectedItemsFilter<IndexedAIP> selectedItems = (SelectedItemsFilter<IndexedAIP>) selected;
-      IterableIndexResult<IndexedAIP> findAll = index.findAll(IndexedAIP.class, selectedItems.getFilter(),
-        RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+      try (IterableIndexResult<IndexedAIP> result = index.findAll(IndexedAIP.class, selectedItems.getFilter(),
+        RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN)) {
 
-      for (IndexedAIP aip : findAll) {
-        checkAIPPermissions(user, aip, permission);
+        for (IndexedAIP aip : result) {
+          checkAIPPermissions(user, aip, permission);
+        }
+      } catch (IOException e) {
+        LOGGER.error("Error getting AIPs to check permissions", e);
       }
     } else if (selected instanceof SelectedItemsList) {
       SelectedItemsList<IndexedAIP> selectedItems = (SelectedItemsList<IndexedAIP>) selected;
@@ -358,11 +362,14 @@ public class UserUtility {
     IndexService index = RodaCoreFactory.getIndexService();
     if (selected instanceof SelectedItemsFilter) {
       SelectedItemsFilter<IndexedDIP> selectedItems = (SelectedItemsFilter<IndexedDIP>) selected;
-      IterableIndexResult<IndexedDIP> findAll = index.findAll(IndexedDIP.class, selectedItems.getFilter(),
-        RodaConstants.DIP_PERMISSIONS_FIELDS_TO_RETURN);
+      try (IterableIndexResult<IndexedDIP> findAll = index.findAll(IndexedDIP.class, selectedItems.getFilter(),
+        RodaConstants.DIP_PERMISSIONS_FIELDS_TO_RETURN)) {
 
-      for (IndexedDIP dip : findAll) {
-        checkDIPPermissions(user, dip, permission);
+        for (IndexedDIP dip : findAll) {
+          checkDIPPermissions(user, dip, permission);
+        }
+      } catch (IOException e) {
+        LOGGER.error("Error getting DIPs to check permissions", e);
       }
     } else if (selected instanceof SelectedItemsList) {
       SelectedItemsList<IndexedDIP> selectedItems = (SelectedItemsList<IndexedDIP>) selected;
@@ -404,20 +411,23 @@ public class UserUtility {
     IndexService index = RodaCoreFactory.getIndexService();
     if (selected instanceof SelectedItemsFilter) {
       SelectedItemsFilter<T> selectedItems = (SelectedItemsFilter<T>) selected;
-      IterableIndexResult<T> findAll = index.findAll(classToReturn, selectedItems.getFilter(), fieldsToRequestIndex);
+      try (IterableIndexResult<T> findAll = index.findAll(classToReturn, selectedItems.getFilter(),
+        fieldsToRequestIndex)) {
 
-      for (T obj : findAll) {
-        String aipId = toAIP.apply(obj);
-        IndexedAIP aip;
-        try {
-          aip = index.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
-          checkAIPPermissions(user, aip, permission);
-        } catch (NotFoundException e) {
-          // conservative approach
-          throw new AuthorizationDeniedException(
-            "Could not verify permissions of object [" + classToReturn.getSimpleName() + "] " + obj.getUUID(), e);
+        for (T obj : findAll) {
+          String aipId = toAIP.apply(obj);
+          IndexedAIP aip;
+          try {
+            aip = index.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+            checkAIPPermissions(user, aip, permission);
+          } catch (NotFoundException e) {
+            // conservative approach
+            throw new AuthorizationDeniedException(
+              "Could not verify permissions of object [" + classToReturn.getSimpleName() + "] " + obj.getUUID(), e);
+          }
         }
-
+      } catch (IOException e) {
+        LOGGER.error("Error getting objects to check permissions", e);
       }
     } else if (selected instanceof SelectedItemsList) {
       SelectedItemsList<T> selectedItems = (SelectedItemsList<T>) selected;

@@ -7,6 +7,7 @@
  */
 package org.roda.wui.api.v1;
 
+import java.io.IOException;
 import java.util.Collections;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,7 +27,6 @@ import javax.ws.rs.core.Response;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
@@ -79,10 +79,13 @@ public class GroupsResource {
     filter.add(new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, Boolean.toString(isUser)));
 
     RODAMembers members = new RODAMembers();
-    IterableIndexResult<RODAMember> findAll = Browser.findAll(RODAMember.class, filter, Sorter.NONE, Facets.NONE, user,
-      justActive, Collections.emptyList());
-    for (RODAMember member : findAll) {
-      members.addObject(member);
+    try (IterableIndexResult<RODAMember> findAll = Browser.findAll(RODAMember.class, filter, Sorter.NONE, user,
+      justActive, Collections.emptyList())) {
+      for (RODAMember member : findAll) {
+        members.addObject(member);
+      }
+    } catch (IOException e) {
+      // do nothing
     }
 
     return Response.ok(members, mediaType).build();

@@ -7,6 +7,7 @@
  */
 package org.roda.core.plugins.plugins.base;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -98,31 +99,35 @@ public class CleanupFailedIngestAIPsPlugin extends AbstractPlugin<Void> {
     activeJobsIds.remove(job.getId());
 
     // find & delete aips
-    IterableIndexResult<IndexedAIP> aipsToDelete = findAipsToDelete(index, activeJobsIds);
-    for (IndexedAIP indexedAIP : aipsToDelete) {
-      String error = "";
-      try {
-        LOGGER.debug("Removing unwanted AIP {}", indexedAIP.getId());
-        model.deleteAIP(indexedAIP.getId());
-      } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-        error = e.getMessage();
+    try (IterableIndexResult<IndexedAIP> aipsToDelete = findAipsToDelete(index, activeJobsIds)) {
+      for (IndexedAIP indexedAIP : aipsToDelete) {
+        String error = "";
+        try {
+          LOGGER.debug("Removing unwanted AIP {}", indexedAIP.getId());
+          model.deleteAIP(indexedAIP.getId());
+        } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+          error = e.getMessage();
+        }
+
+        Report reportItem = PluginHelper.initPluginReportItem(this, indexedAIP.getId(), AIP.class,
+          AIPState.INGEST_PROCESSING);
+        if (StringUtils.isNotBlank(error)) {
+          reportItem.setPluginState(PluginState.FAILURE)
+            .setPluginDetails("Removal of AIP " + indexedAIP.getId() + " did not end successfully: " + error);
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
+        } else {
+          reportItem.setPluginState(PluginState.SUCCESS)
+            .setPluginDetails("Removal of AIP " + indexedAIP.getId() + " ended successfully");
+          jobPluginInfo.incrementObjectsProcessedWithSuccess();
+        }
+        report.addReport(reportItem);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
       }
 
-      Report reportItem = PluginHelper.initPluginReportItem(this, indexedAIP.getId(), AIP.class,
-        AIPState.INGEST_PROCESSING);
-      if (StringUtils.isNotBlank(error)) {
-        reportItem.setPluginState(PluginState.FAILURE)
-          .setPluginDetails("Removal of AIP " + indexedAIP.getId() + " did not end successfully: " + error);
-        jobPluginInfo.incrementObjectsProcessedWithFailure();
-      } else {
-        reportItem.setPluginState(PluginState.SUCCESS)
-          .setPluginDetails("Removal of AIP " + indexedAIP.getId() + " ended successfully");
-        jobPluginInfo.incrementObjectsProcessedWithSuccess();
-      }
-      report.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
+      jobPluginInfo.setSourceObjectsCount((int) aipsToDelete.getTotalObjects());
+    } catch (IOException e) {
+      LOGGER.error("Error getting AIPs to delete", e);
     }
-    jobPluginInfo.setSourceObjectsCount((int) aipsToDelete.getTotalObjects());
   }
 
   private List<String> findActiveJobs(IndexService index) {
@@ -132,9 +137,15 @@ public class CleanupFailedIngestAIPsPlugin extends AbstractPlugin<Void> {
         activeJobsViaStateFilter.add(new NotSimpleFilterParameter(RodaConstants.JOB_STATE, jobState.toString()));
       }
     }
+
     List<String> activeJobsIds = new ArrayList<>();
-    index.findAll(Job.class, activeJobsViaStateFilter, Arrays.asList(RodaConstants.INDEX_UUID))
-      .forEach(e -> activeJobsIds.add(e.getId()));
+    try (IterableIndexResult<Job> result = index.findAll(Job.class, activeJobsViaStateFilter,
+      Arrays.asList(RodaConstants.INDEX_UUID))) {
+      result.forEach(e -> activeJobsIds.add(e.getId()));
+    } catch (IOException e) {
+      LOGGER.error("Error getting jobs when finding active ones", e);
+    }
+
     return activeJobsIds;
   }
 

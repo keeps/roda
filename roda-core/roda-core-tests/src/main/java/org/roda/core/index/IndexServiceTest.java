@@ -74,6 +74,7 @@ import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
+import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.storage.DefaultStoragePath;
@@ -132,17 +133,20 @@ public class IndexServiceTest {
 
   @AfterMethod
   public void cleanUp() throws RODAException {
-    List<String> aipsToDelete = new ArrayList<>();
-    index.findAll(IndexedAIP.class, Filter.ALL, new ArrayList<>()).forEach(e -> aipsToDelete.add(e.getId()));
-    for (String id : aipsToDelete) {
-      try {
-        model.deleteAIP(id);
-      } catch (NotFoundException e) {
-        // do nothing
+    try (
+      IterableIndexResult<IndexedAIP> result = index.findAll(IndexedAIP.class, Filter.ALL, Collections.emptyList())) {
+      for (IndexedAIP aip : result) {
+        try {
+          model.deleteAIP(aip.getId());
+        } catch (NotFoundException e) {
+          // do nothing
+        }
       }
+      // last attempt to delete everything (for model/index inconsistencies)
+      index.clearAIPs();
+    } catch (IOException e) {
+      LOGGER.error("Error getting AIPs when cleaning up", e);
     }
-    // last attempt to delete everything (for model/index inconsistencies)
-    index.clearAIPs();
   }
 
   private void compareAIPWithIndexedAIP(final AIP aip, final IndexedAIP indexedAIP) {

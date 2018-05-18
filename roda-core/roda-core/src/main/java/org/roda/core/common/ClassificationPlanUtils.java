@@ -24,6 +24,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
+import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
@@ -60,11 +61,12 @@ public class ClassificationPlanUtils {
 
       IndexService index = RodaCoreFactory.getIndexService();
       boolean justActive = true;
-      IterableIndexResult<IndexedAIP> res = index.findAll(IndexedAIP.class, allButRepresentationsFilter, null, user,
-        justActive, new ArrayList<>());
-      Iterator<IndexedAIP> it = res.iterator();
-      while (it.hasNext()) {
-        array.add(aipToJSON(it.next()));
+      try (IterableIndexResult<IndexedAIP> res = index.findAll(IndexedAIP.class, allButRepresentationsFilter,
+        Sorter.NONE, user, justActive, new ArrayList<>())) {
+        Iterator<IndexedAIP> it = res.iterator();
+        while (it.hasNext()) {
+          array.add(aipToJSON(it.next()));
+        }
       }
 
       root.set("dos", array);

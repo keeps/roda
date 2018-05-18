@@ -37,12 +37,12 @@ import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
-import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.index.IndexService;
+import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
@@ -176,26 +176,26 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       jobStateInfoActor.tell(new Messages.PluginBeforeAllExecuteIsReady<>(plugin), jobActor);
 
       List<String> liteFields = SolrUtils.getClassLiteFields(classToActOn);
-      Iterator<T1> findAllIterator = index
-        .findAll(classToActOn, filter, new Sorter(new SortParameter(RodaConstants.INDEX_UUID, true)), liteFields)
-        .iterator();
+      try (IterableIndexResult<T1> findAll = index.findAll(classToActOn, filter, Sorter.NONE, liteFields)) {
+        Iterator<T1> findAllIterator = findAll.iterator();
+        List<T1> indexObjects = new ArrayList<>();
 
-      List<T1> indexObjects = new ArrayList<>();
-      while (findAllIterator.hasNext()) {
-        if (indexObjects.size() == blockSize) {
-          innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, modelClassToActOn, blockSize, jobActor);
+        while (findAllIterator.hasNext()) {
+          if (indexObjects.size() == blockSize) {
+            innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, modelClassToActOn, blockSize, jobActor);
+            jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin,
+              LiteRODAObjectFactory.transformIntoLiteWithCause(model, indexObjects)), jobActor);
+            indexObjects = new ArrayList<>();
+          }
+          indexObjects.add(findAllIterator.next());
+        }
+
+        if (!indexObjects.isEmpty()) {
+          innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, modelClassToActOn, indexObjects.size(),
+            jobActor);
           jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin,
             LiteRODAObjectFactory.transformIntoLiteWithCause(model, indexObjects)), jobActor);
-          indexObjects = new ArrayList<>();
         }
-        indexObjects.add(findAllIterator.next());
-      }
-
-      if (!indexObjects.isEmpty()) {
-        innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, modelClassToActOn, indexObjects.size(),
-          jobActor);
-        jobStateInfoActor.tell(new Messages.PluginExecuteIsReady<>(innerPlugin,
-          LiteRODAObjectFactory.transformIntoLiteWithCause(model, indexObjects)), jobActor);
       }
 
       jobStateInfoActor.tell(new Messages.JobInitEnded(), jobActor);
@@ -428,11 +428,10 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
   @Override
   public void cleanUnfinishedJobsAsync() {
-    List<Job> unfinishedJobsList = JobsHelper.findUnfinishedJobs(index);
     List<String> unfinishedJobsIdsList = new ArrayList<>();
-    try {
+    try (IterableIndexResult<Job> result = JobsHelper.findUnfinishedJobs(index)) {
       // set all jobs state to TO_BE_CLEANED
-      for (Job job : unfinishedJobsList) {
+      for (Job job : result) {
         unfinishedJobsIdsList.add(job.getId());
         Job jobToUpdate = model.retrieveJob(job.getId());
         jobToUpdate.setState(JOB_STATE.TO_BE_CLEANED);
@@ -453,7 +452,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
         RodaCoreFactory.getPluginOrchestrator().executeJob(job, true);
       }
     } catch (JobAlreadyStartedException | GenericException | RequestNotValidException | NotFoundException
-      | AuthorizationDeniedException e) {
+      | AuthorizationDeniedException | IOException e) {
       LOGGER.error("Error while creating Job for cleaning unfinished jobs", e);
     }
   }

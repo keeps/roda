@@ -35,7 +35,6 @@ import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
@@ -499,8 +498,10 @@ public class IndexModelObserver implements ModelObserver {
           RodaConstants.AIP_HAS_REPRESENTATIONS);
 
         List<IndexedAIP> items = new ArrayList<>();
-        new IterableIndexResult<>(index, IndexedAIP.class, filter, Sorter.NONE, Facets.NONE, null, false, true,
-          aipFields).forEach(items::add);
+        try (IterableIndexResult<IndexedAIP> childrenResults = new IterableIndexResult<>(index, IndexedAIP.class,
+          filter, Sorter.NONE, null, false, aipFields)) {
+          childrenResults.forEach(items::add);
+        }
 
         for (IndexedAIP item : items) {
           SolrInputDocument descendantDoc;

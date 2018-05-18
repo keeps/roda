@@ -474,5 +474,9 @@
 			<groupId>io.dropwizard.metrics</groupId>
 			<artifactId>metrics-jmx</artifactId>
 		</dependency>
+		<dependency>
+		  	<groupId>org.mapdb</groupId>
+		  	<artifactId>mapdb</artifactId>
+		</dependency>
 	</dependencies>
 </project>

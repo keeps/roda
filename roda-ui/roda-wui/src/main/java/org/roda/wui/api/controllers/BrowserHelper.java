@@ -582,9 +582,8 @@ public class BrowserHelper {
   }
 
   protected static <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
-    final Sorter sorter, final Facets facets, final User user, final boolean justActive, List<String> fieldsToReturn) {
-    return RodaCoreFactory.getIndexService().findAll(returnClass, filter, sorter, facets, user, justActive,
-      fieldsToReturn);
+    final Sorter sorter, final User user, final boolean justActive, List<String> fieldsToReturn) {
+    return RodaCoreFactory.getIndexService().findAll(returnClass, filter, sorter, user, justActive, fieldsToReturn);
   }
 
   protected static <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter, boolean justActive, User user)
@@ -2553,11 +2552,14 @@ public class BrowserHelper {
     Map<String, IndexedRisk> allRisks = new HashMap<>();
 
     // retrieve risks and set default object count to zero
-    IterableIndexResult<IndexedRisk> risks = index.findAll(IndexedRisk.class, Filter.ALL, new ArrayList<>());
-    for (IndexedRisk indexedRisk : risks) {
-      indexedRisk.setIncidencesCount(0);
-      indexedRisk.setUnmitigatedIncidencesCount(0);
-      allRisks.put(indexedRisk.getId(), indexedRisk);
+    try (IterableIndexResult<IndexedRisk> risks = index.findAll(IndexedRisk.class, Filter.ALL, new ArrayList<>())) {
+      for (IndexedRisk indexedRisk : risks) {
+        indexedRisk.setIncidencesCount(0);
+        indexedRisk.setUnmitigatedIncidencesCount(0);
+        allRisks.put(indexedRisk.getId(), indexedRisk);
+      }
+    } catch (IOException e) {
+      LOGGER.error("Error getting risks when updating counters", e);
     }
 
     // update risks from facets (all incidences)
