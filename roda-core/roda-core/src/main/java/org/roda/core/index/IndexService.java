@@ -173,15 +173,14 @@ public class IndexService {
 
   public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
     final Sorter sorter, final User user, final boolean justActive, final List<String> fieldsToReturn) {
-    return new IterableIndexResult<>(getSolrClient(), returnClass, filter, sorter, Facets.NONE, user, justActive, true,
-      fieldsToReturn);
+    return new IterableIndexResult<>(getSolrClient(), returnClass, filter, sorter, user, justActive, fieldsToReturn);
   }
 
+  @Deprecated
   public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
     final Sorter sorter, final Facets facets, final User user, final boolean justActive,
     final List<String> fieldsToReturn) {
-    return new IterableIndexResult<>(getSolrClient(), returnClass, filter, sorter, facets, user, justActive, true,
-      fieldsToReturn);
+    return new IterableIndexResult<>(getSolrClient(), returnClass, filter, sorter, user, justActive, fieldsToReturn);
   }
 
   public <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter, User user, boolean justActive)

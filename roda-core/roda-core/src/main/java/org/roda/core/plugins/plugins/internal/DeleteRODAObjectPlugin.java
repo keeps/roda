@@ -141,36 +141,40 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
 
     try {
       Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aip.getId()));
-      index.execute(IndexedAIP.class, filter, Arrays.asList(RodaConstants.INDEX_UUID), new IndexRunnable<IndexedAIP>() {
-        @Override
-        public void run(IndexedAIP item)
-          throws GenericException, RequestNotValidException, AuthorizationDeniedException {
-          PluginState state = PluginState.SUCCESS;
-          try {
-            model.deleteAIP(item.getId());
-          } catch (NotFoundException e) {
-            state = PluginState.FAILURE;
-            reportItem.addPluginDetails("Could not delete AIP: " + e.getMessage());
-          }
+      index
+        .execute(
+          IndexedAIP.class, filter, Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_ID,
+            RodaConstants.AIP_LEVEL, RodaConstants.AIP_DATE_INITIAL, RodaConstants.AIP_DATE_FINAL),
+          new IndexRunnable<IndexedAIP>() {
+            @Override
+            public void run(IndexedAIP item)
+              throws GenericException, RequestNotValidException, AuthorizationDeniedException {
+              PluginState state = PluginState.SUCCESS;
+              try {
+                model.deleteAIP(item.getId());
+              } catch (NotFoundException e) {
+                state = PluginState.FAILURE;
+                reportItem.addPluginDetails("Could not delete AIP: " + e.getMessage());
+              }
 
-          String outcomeText;
-          if (state.equals(PluginState.SUCCESS)) {
-            outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has been manually deleted");
-          } else {
-            outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has not been manually deleted");
-          }
+              String outcomeText;
+              if (state.equals(PluginState.SUCCESS)) {
+                outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has been manually deleted");
+              } else {
+                outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has not been manually deleted");
+              }
 
-          List<LinkingIdentifier> sources = new ArrayList<>();
-          sources
-            .add(PluginHelper.getLinkingIdentifier(item.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+              List<LinkingIdentifier> sources = new ArrayList<>();
+              sources
+                .add(PluginHelper.getLinkingIdentifier(item.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
-          model.createEvent(item.getId(), null, null, null, PreservationEventType.DELETION, EVENT_DESCRIPTION, sources,
-            null, state, outcomeText, details, job.getUsername(), true);
-        }
-      }, e -> {
-        reportItem.setPluginState(PluginState.FAILURE);
-        reportItem.addPluginDetails("Could not delete sublevel AIPs: " + e.getMessage());
-      });
+              model.createEvent(item.getId(), null, null, null, PreservationEventType.DELETION, EVENT_DESCRIPTION,
+                sources, null, state, outcomeText, details, job.getUsername(), true);
+            }
+          }, e -> {
+            reportItem.setPluginState(PluginState.FAILURE);
+            reportItem.addPluginDetails("Could not delete sublevel AIPs: " + e.getMessage());
+          });
     } catch (GenericException | RequestNotValidException | AuthorizationDeniedException e) {
       reportItem.setPluginState(PluginState.FAILURE);
       reportItem.addPluginDetails("Could not delete sublevel AIPs: " + e.getMessage());

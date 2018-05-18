@@ -36,6 +36,7 @@ public final class CorporaConstants {
   public static final String SOURCE_AIP_PERMISSIONS = "AIP_PERMISSIONS";
   public static final String SOURCE_AIP_WITH_INVALID_METADATA = "AIP_WITH_INVALID_METADATA";
   public static final String SOURCE_AIP_CORRUPTED = "AIP_CORRUPTED";
+  public static final String SOURCE_AIP_EMPTY = "AIP_EMPTY";
   public static final String SOURCE_INVALID_FOLDER = "invalid";
   public static final String DATE_CREATED = "2015-06-06T15:30:00.000+0000";
   public static final String DATE_MODIFIED = "2015-06-06T16:30:00.000+0000";

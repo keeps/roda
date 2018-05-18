@@ -298,7 +298,5 @@ public class SolrUtilsTest {
     assertThat(sortList.get(0).getOrder(), Matchers.equalTo(ORDER.desc));
     assertThat(sortList.get(1).getItem(), Matchers.equalTo(field2));
     assertThat(sortList.get(1).getOrder(), Matchers.equalTo(ORDER.asc));
-
   }
-
 }

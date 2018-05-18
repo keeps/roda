@@ -1855,6 +1855,7 @@ public class SolrUtils {
 
     Date d = objectToDate(doc.get(RodaConstants.TRANSFERRED_RESOURCE_DATE));
     if (d == null) {
+      // Could not have date if getting via lite fields
       LOGGER.trace("Error parsing transferred resource date. Setting date to current date.");
       d = new Date();
     }
@@ -2925,22 +2926,23 @@ public class SolrUtils {
   public static <T extends IsIndexed> void execute(SolrClient index, Class<T> classToRetrieve, Filter filter,
     List<String> fieldsToReturn, IndexRunnable<T> indexRunnable, final Consumer<RODAException> exceptionHandler)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException {
-
     User user = null;
     boolean justActive = false;
-    boolean removeDuplicates = true;
 
-    IterableIndexResult<T> iterableIndexResult = new IterableIndexResult<>(index, classToRetrieve, filter, Sorter.NONE,
-      Facets.NONE, user, justActive, removeDuplicates, fieldsToReturn);
+    try (IterableIndexResult<T> iterableIndexResult = new IterableIndexResult<>(index, classToRetrieve, filter,
+      Sorter.NONE, user, justActive, fieldsToReturn)) {
 
-    if (iterableIndexResult.getTotalObjects() > 0) {
-      iterableIndexResult.forEach(target -> {
-        try {
-          indexRunnable.run(target);
-        } catch (RODAException e) {
-          exceptionHandler.accept(e);
-        }
-      });
+      if (iterableIndexResult.getTotalObjects() > 0) {
+        iterableIndexResult.forEach(target -> {
+          try {
+            indexRunnable.run(target);
+          } catch (RODAException e) {
+            exceptionHandler.accept(e);
+          }
+        });
+      }
+    } catch (IOException e) {
+      throw new GenericException(e);
     }
   }
 

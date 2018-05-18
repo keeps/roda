@@ -1061,6 +1061,11 @@
 				<artifactId>metrics-jmx</artifactId>
 				<version>4.0.2</version>
 			</dependency>
+			<dependency>
+			  	<groupId>org.mapdb</groupId>
+			  	<artifactId>mapdb</artifactId>
+			  	<version>3.0.5</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<reporting>
