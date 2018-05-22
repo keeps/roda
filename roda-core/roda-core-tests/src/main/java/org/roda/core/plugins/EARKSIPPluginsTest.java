@@ -44,6 +44,7 @@ import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
@@ -123,14 +124,28 @@ public class EARKSIPPluginsTest {
     }, e -> Assert.fail("Error cleaning up", e));
   }
 
-  private TransferredResource createCorpora() throws InterruptedException, IOException, NotFoundException,
-    GenericException, RequestNotValidException, IsStillUpdatingException, AlreadyExistsException {
+  private TransferredResource createCorpora(String sipFile) throws InterruptedException, IOException, NotFoundException,
+    GenericException, RequestNotValidException, IsStillUpdatingException {
     TransferredResourcesScanner f = RodaCoreFactory.getTransferredResourcesScanner();
-    Path sip = corporaPath.resolve(CorporaConstants.SIP_FOLDER).resolve(CorporaConstants.EARK_SIP);
-    f.createFile(null, CorporaConstants.EARK_SIP, Files.newInputStream(sip));
+    Path sip = corporaPath.resolve(CorporaConstants.SIP_FOLDER).resolve(sipFile);
+    try {
+      f.createFile(null, sipFile, Files.newInputStream(sip));
+    } catch (AlreadyExistsException e) {
+      // if it exists, move on & just reindex transferred resources
+    }
     f.updateTransferredResources(Optional.empty(), true);
     index.commit(TransferredResource.class);
-    return index.retrieve(TransferredResource.class, IdUtils.createUUID(CorporaConstants.EARK_SIP), new ArrayList<>());
+    return index.retrieve(TransferredResource.class, IdUtils.createUUID(sipFile), new ArrayList<>());
+  }
+
+  private TransferredResource createCorpora() throws InterruptedException, IOException, NotFoundException,
+    GenericException, RequestNotValidException, IsStillUpdatingException, AlreadyExistsException {
+    return createCorpora(CorporaConstants.EARK_SIP);
+  }
+
+  private TransferredResource createUpdateCorpora() throws InterruptedException, IOException, NotFoundException,
+    GenericException, RequestNotValidException, IsStillUpdatingException, AlreadyExistsException {
+    return createCorpora(CorporaConstants.EARK_SIP_UPDATE);
   }
 
   private AIP ingestCorpora() throws RequestNotValidException, NotFoundException, GenericException,
@@ -164,6 +179,30 @@ public class EARKSIPPluginsTest {
     return model.retrieveAIP(indexedAIP.getId());
   }
 
+  private AIP ingestUpdateCorpora(AIP aip) throws RequestNotValidException, NotFoundException, GenericException,
+    AlreadyExistsException, AuthorizationDeniedException, InvalidParameterException, InterruptedException, IOException,
+    SolrServerException, IsStillUpdatingException {
+
+    TransferredResource transferredResource = createUpdateCorpora();
+    Assert.assertNotNull(transferredResource);
+
+    Job job = TestsHelper.executeJob(EARKSIPToAIPPlugin.class, new HashMap<>(), PluginType.SIP_TO_AIP,
+      SelectedItemsList.create(TransferredResource.class, transferredResource.getUUID()));
+
+    TestsHelper.getJobReports(index, job, true);
+
+    index.commitAIPs();
+
+    IndexResult<IndexedAIP> find = index.find(IndexedAIP.class,
+      new Filter(new SimpleFilterParameter(RodaConstants.AIP_ID, aip.getId())), null, new Sublist(0, 10),
+      new ArrayList<>());
+
+    Assert.assertEquals(find.getTotalCount(), 1L);
+    IndexedAIP indexedAIP = find.getResults().get(0);
+
+    return model.retrieveAIP(indexedAIP.getId());
+  }
+
   @Test
   public void testIngestEARKSIP() throws IOException, InterruptedException, RODAException, SolrServerException {
     AIP aip = ingestCorpora();
@@ -177,6 +216,21 @@ public class EARKSIPPluginsTest {
 
     // All folders and files
     Assert.assertEquals(reusableAllFiles.size(), CORPORA_FOLDERS_COUNT + CORPORA_FILES_COUNT);
+  }
+
+  @Test
+  public void testIngestAndUpdateEARKSIP()
+    throws IOException, InterruptedException, RODAException, SolrServerException {
+    AIP aip = ingestCorpora();
+    Assert.assertEquals(aip.getRepresentations().size(), 1);
+    aip.setState(AIPState.ACTIVE);
+    model.updateAIP(aip, CorporaConstants.EARK_SIP_UPDATE_USER);
+
+    index.commitAIPs();
+
+    AIP aipUpdated = ingestUpdateCorpora(aip);
+    Assert.assertEquals(aipUpdated.getRepresentations().size(), 2);
+    Assert.assertEquals(aipUpdated.getIngestSIPIds().size(), 2);
   }
 
   private List<String> createCorporaAncestors() throws InterruptedException, IOException, NotFoundException,

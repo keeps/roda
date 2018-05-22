@@ -136,6 +136,8 @@ public final class CorporaConstants {
 
   public static final String SIP_FOLDER = "SIPs";
   public static final String EARK_SIP = "eark_sip.zip";
+  public static final String EARK_SIP_UPDATE = "eark_sip_update.zip";
+  public static final String EARK_SIP_UPDATE_USER = "admin";
   public static final String BAGIT_SIP = "bagit.zip";
   public static final String TRANSFERRED_RESOURCE = "transferredresource";
   public static final String ANCESTOR_SIP_FOLDER = "ancestorsFolder";
