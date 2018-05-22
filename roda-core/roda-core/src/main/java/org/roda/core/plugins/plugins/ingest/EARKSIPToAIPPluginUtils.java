@@ -107,6 +107,13 @@ public class EARKSIPToAIPPluginUtils {
       aip.setParentId(searchScope.get());
     }
     aip.addIngestUpdateJobId(ingestJobId);
+
+    for (String id : sip.getIds()) {
+      if (!aip.getIngestSIPIds().contains(id)) {
+        aip.getIngestSIPIds().add(id);
+      }
+    }
+
     model.updateAIP(aip, username);
 
     return aip;
