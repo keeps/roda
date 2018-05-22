@@ -92,7 +92,6 @@ import org.testng.annotations.Test;
 
 @Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_TRAVIS})
 public class IndexServiceTest {
-
   private static Path basePath;
   private static Path logPath;
   private static ModelService model;
@@ -142,10 +141,13 @@ public class IndexServiceTest {
           // do nothing
         }
       }
+
       // last attempt to delete everything (for model/index inconsistencies)
       index.clearAIPs();
     } catch (IOException e) {
       LOGGER.error("Error getting AIPs when cleaning up", e);
+    } finally {
+      index.commitAIPs();
     }
   }
 
@@ -288,8 +290,11 @@ public class IndexServiceTest {
 
   @Test
   public void testListCollections() throws RODAException {
+    // generate AIP ID
+    final String aipId = IdUtils.createUUID();
+
     // set up
-    model.createAIP(CorporaConstants.SOURCE_AIP_ID, corporaService,
+    model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
       RodaConstants.ADMIN);
     model.createAIP(CorporaConstants.OTHER_AIP_ID, corporaService,
@@ -308,9 +313,9 @@ public class IndexServiceTest {
       Collections.emptyList());
 
     assertEquals(1, aips.getLimit());
-    assertEquals(CorporaConstants.SOURCE_AIP_ID, aips.getResults().get(0).getId());
+    assertEquals(aipId, aips.getResults().get(0).getId());
 
-    model.deleteAIP(CorporaConstants.SOURCE_AIP_ID);
+    model.deleteAIP(aipId);
     model.deleteAIP(CorporaConstants.OTHER_AIP_ID);
   }
 
@@ -510,7 +515,6 @@ public class IndexServiceTest {
     index.reindexAIPs();
     long count = index.count(IndexedAIP.class, new Filter());
     assertEquals(10L, count);
-
   }
 
   @Test

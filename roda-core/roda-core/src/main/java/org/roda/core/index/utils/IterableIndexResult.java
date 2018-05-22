@@ -37,23 +37,16 @@ import org.slf4j.LoggerFactory;
  * Does search in the index, using the Solr.find() method, and if configured
  * removes duplicate objects (via uuid comparison) thus providing iterator
  * 
- * @author Hélder Silva <hsilva@keep.pt>
+ * @author Luis Faria <lfaria@keep.pt>
  */
 
 public class IterableIndexResult<T extends IsIndexed> implements CloseableIterable<T> {
-
   private static final Logger LOGGER = LoggerFactory.getLogger(IterableIndexResult.class);
   private static final Sorter SINK_SORTER = new Sorter(new SortParameter(RodaConstants.INDEX_UUID, false));
-  private static final int PAGE_SIZE = 1000;
+  private static final int DEFAULT_PAGE_SIZE = 1000;
+  private static int PAGE_SIZE = DEFAULT_PAGE_SIZE;
 
-  private SolrClient solrClient;
-  private Class<T> returnClass;
-  private Filter filter;
-  private User user;
-  private boolean justActive;
-  private List<String> fieldsToReturn;
-  private DB db;
-
+  private final DB db;
   private BTreeMap<String, T> indexObjects;
 
   private long totalObjects = -1;
@@ -67,38 +60,38 @@ public class IterableIndexResult<T extends IsIndexed> implements CloseableIterab
 
   public IterableIndexResult(final SolrClient solrClient, final Class<T> returnClass, final Filter filter,
     final Sorter sorter, final User user, final boolean justActive, final List<String> fieldsToReturn) {
-    this.solrClient = solrClient;
-    this.returnClass = returnClass;
-    this.filter = filter;
-    this.user = user;
-    this.justActive = justActive;
-    this.fieldsToReturn = fieldsToReturn;
+    db = DBMaker.tempFileDB().make();
 
     if (sorter == null || Sorter.NONE.equals(sorter) || SINK_SORTER.equals(sorter)) {
-      getResults();
+      getResults(solrClient, returnClass, filter, user, justActive, fieldsToReturn);
     } else {
-      getResults(sorter);
+      getResults(solrClient, returnClass, filter, sorter, user, justActive, fieldsToReturn);
     }
   }
 
   @SuppressWarnings("unchecked")
-  private void getResults() {
-    db = DBMaker.tempFileDB().fileMmapEnableIfSupported().cleanerHackEnable().make();
+  private void getResults(final SolrClient solrClient, final Class<T> returnClass, final Filter filter, final User user,
+    final boolean justActive, final List<String> fieldsToReturn) {
     TreeMapSink<String, T> sink = db.treeMap("myMap", Serializer.STRING, Serializer.JAVA).createFromSink();
-    this.totalObjects = getResultsImpl(SINK_SORTER, t -> sink.put(t.getUUID(), t));
+    this.totalObjects = getResultsImpl(solrClient, returnClass, filter, SINK_SORTER, user, justActive, fieldsToReturn,
+      t -> sink.put(t.getUUID(), t));
     this.indexObjects = sink.create();
   }
 
   @SuppressWarnings("unchecked")
-  private void getResults(Sorter sorter) {
-    db = DBMaker.tempFileDB().fileMmapEnableIfSupported().cleanerHackEnable().make();
+  private void getResults(final SolrClient solrClient, final Class<T> returnClass, final Filter filter,
+    final Sorter sorter, final User user, final boolean justActive, final List<String> fieldsToReturn) {
     this.indexObjects = db.treeMap("myMap", Serializer.STRING, Serializer.JAVA).create();
-    this.totalObjects = getResultsImpl(sorter, t -> indexObjects.put(t.getUUID(), t));
+    this.totalObjects = getResultsImpl(solrClient, returnClass, filter, sorter, user, justActive, fieldsToReturn,
+      t -> indexObjects.put(t.getUUID(), t));
   }
 
-  private long getResultsImpl(Sorter sorter, Consumer<T> putFunction) {
+  private long getResultsImpl(final SolrClient solrClient, final Class<T> returnClass, final Filter filter,
+    final Sorter sorter, final User user, final boolean justActive, final List<String> fieldsToReturn,
+    Consumer<T> putFunction) {
     int startIndex = 0;
     long totalCount = -1;
+    String lastUuid = "";
 
     do {
       // TODO use SOLR export after adding docValues to UUID
@@ -109,7 +102,16 @@ public class IterableIndexResult<T extends IsIndexed> implements CloseableIterab
         totalCount = result.getTotalCount();
         startIndex += result.getResults().size();
 
-        result.getResults().forEach(putFunction);
+        for (T element : result.getResults()) {
+          if (SINK_SORTER.equals(sorter)) {
+            if (lastUuid.compareTo(element.getUUID()) < 0) {
+              putFunction.accept(element);
+              lastUuid = element.getUUID();
+            }
+          } else {
+            putFunction.accept(element);
+          }
+        }
       } catch (GenericException | RequestNotValidException e) {
         LOGGER.error("Error find new Solr page when creating iterable index result", e);
       }
@@ -130,6 +132,10 @@ public class IterableIndexResult<T extends IsIndexed> implements CloseableIterab
   @Override
   public void close() throws IOException {
     db.close();
+  }
+
+  public static void setPageSize(int pageSize) {
+    PAGE_SIZE = pageSize;
   }
 
 }
