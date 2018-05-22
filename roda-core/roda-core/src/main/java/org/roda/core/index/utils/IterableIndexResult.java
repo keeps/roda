@@ -41,10 +41,10 @@ import org.slf4j.LoggerFactory;
  */
 
 public class IterableIndexResult<T extends IsIndexed> implements CloseableIterable<T> {
-
   private static final Logger LOGGER = LoggerFactory.getLogger(IterableIndexResult.class);
   private static final Sorter SINK_SORTER = new Sorter(new SortParameter(RodaConstants.INDEX_UUID, false));
-  private static final int PAGE_SIZE = 1000;
+  private static final int DEFAULT_PAGE_SIZE = 1000;
+  private static int PAGE_SIZE = DEFAULT_PAGE_SIZE;
 
   private SolrClient solrClient;
   private Class<T> returnClass;
@@ -99,6 +99,7 @@ public class IterableIndexResult<T extends IsIndexed> implements CloseableIterab
   private long getResultsImpl(Sorter sorter, Consumer<T> putFunction) {
     int startIndex = 0;
     long totalCount = -1;
+    String lastUuid = "";
 
     do {
       // TODO use SOLR export after adding docValues to UUID
@@ -109,7 +110,16 @@ public class IterableIndexResult<T extends IsIndexed> implements CloseableIterab
         totalCount = result.getTotalCount();
         startIndex += result.getResults().size();
 
-        result.getResults().forEach(putFunction);
+        for (T element : result.getResults()) {
+          if (SINK_SORTER.equals(sorter)) {
+            if (lastUuid.compareTo(element.getUUID()) < 0) {
+              putFunction.accept(element);
+              lastUuid = element.getUUID();
+            }
+          } else {
+            putFunction.accept(element);
+          }
+        }
       } catch (GenericException | RequestNotValidException e) {
         LOGGER.error("Error find new Solr page when creating iterable index result", e);
       }
@@ -130,6 +140,10 @@ public class IterableIndexResult<T extends IsIndexed> implements CloseableIterab
   @Override
   public void close() throws IOException {
     db.close();
+  }
+
+  public static void setPageSize(int pageSize) {
+    PAGE_SIZE = pageSize;
   }
 
 }
