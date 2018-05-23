@@ -1,5 +1,22 @@
 # Changelog
 
+## v2.2.5 (23/05/2018)
+Install for demonstration:
+```
+docker pull keeps/roda:v2.2.5
+```
+
+#### Enhancements:
+
+-  On SIP update add new SIP ids to the AIP [#1183](https://github.com/keeps/roda/issues/1183)
+-  Parsing transferred resource date warning [#1211](https://github.com/keeps/roda/issues/1211)
+
+#### Bug Fixes:
+
+-  Avoid duplicates when running plugin via filter in large scale [#1235](https://github.com/keeps/roda/issues/1235)
+
+---
+
 ## v2.2.4 (18/05/2018)
 Install for demonstration:
 ```
