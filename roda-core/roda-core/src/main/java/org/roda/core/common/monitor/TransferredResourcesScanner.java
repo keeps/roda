@@ -141,6 +141,11 @@ public class TransferredResourcesScanner {
     return ret;
   }
 
+  public boolean fileExists(String path) {
+    Path p = basePath.resolve(path);
+    return FSUtils.exists(p);
+  }
+
   protected static TransferredResource createTransferredResource(Path resourcePath, BasicFileAttributes attr, long size,
     Path basePath, Date lastScanDate) {
     Date d = new Date(attr.creationTime().toMillis());

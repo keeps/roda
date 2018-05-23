@@ -125,13 +125,11 @@ public class EARKSIPPluginsTest {
   }
 
   private TransferredResource createCorpora(String sipFile) throws InterruptedException, IOException, NotFoundException,
-    GenericException, RequestNotValidException, IsStillUpdatingException {
+    GenericException, RequestNotValidException, IsStillUpdatingException, AlreadyExistsException {
     TransferredResourcesScanner f = RodaCoreFactory.getTransferredResourcesScanner();
     Path sip = corporaPath.resolve(CorporaConstants.SIP_FOLDER).resolve(sipFile);
-    try {
+    if (!f.fileExists(sipFile)) {
       f.createFile(null, sipFile, Files.newInputStream(sip));
-    } catch (AlreadyExistsException e) {
-      // if it exists, move on & just reindex transferred resources
     }
     f.updateTransferredResources(Optional.empty(), true);
     index.commit(TransferredResource.class);
