@@ -1215,7 +1215,7 @@ public final class PluginHelper {
           }
         } else {
           failureMessage = "RODA object conversion from lite has failed because lite object class does not match any of the plugin known object classes "
-            + "(which might be caused by blank lite)";
+            + "(which might be caused by blank lite).";
         }
       } else {
         failureMessage = "Lite object has an error: [" + lite.getExceptionClass() + "] " + lite.getExceptionMessage();
@@ -1230,7 +1230,11 @@ public final class PluginHelper {
           String id = lite.toString();
           if (optionalLite.isPresent()) {
             String[] split = optionalLite.get().getInfo().split(LiteRODAObjectFactory.SEPARATOR_REGEX);
-            id = split[1];
+            try {
+              id = split[1];
+            } catch (ArrayIndexOutOfBoundsException e) {
+              failureMessage += "\nError when getting uuid of lite object " + id + ".";
+            }
           }
 
           Report reportItem = PluginHelper.initPluginReportItem(plugin, id, LiteRODAObject.class);
