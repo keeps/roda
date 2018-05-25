@@ -1014,9 +1014,13 @@ public interface ClientMessages extends Messages {
 
   SafeHtml searchPreFilterEmptyKeyFilterParameter(String searchPreFilterName);
 
+  SafeHtml searchPreFilterOrFiltersParameter(String searchPreFilterNames);
+
   String searchPreFilterName(@Select String name);
 
   String searchPreFilterValue(@Select String name);
+
+  String searchPreFilterOr();
 
   /************* Risk register ****************/
 
