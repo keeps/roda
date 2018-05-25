@@ -598,6 +598,8 @@ public interface ClientMessages extends Messages {
 
   String viewRepresentationInfoSize();
 
+  String viewRepresentationInfoExtension();
+
   String viewRepresentationInfoMimetype();
 
   String viewRepresentationInfoFormat();

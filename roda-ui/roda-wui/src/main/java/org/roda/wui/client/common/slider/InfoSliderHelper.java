@@ -122,13 +122,18 @@ public class InfoSliderHelper {
       if (file.getFileFormat() != null) {
         FileFormat fileFormat = file.getFileFormat();
 
+        if (StringUtils.isNotBlank(fileFormat.getExtension())) {
+          values.put(messages.viewRepresentationInfoExtension(),
+            createExtensionHTML(bundle, fileFormat.getExtension()));
+        }
+
         if (StringUtils.isNotBlank(fileFormat.getMimeType())) {
           values.put(messages.viewRepresentationInfoMimetype(), createMimetypeHTML(bundle, fileFormat.getMimeType()));
         }
 
         if (StringUtils.isNotBlank(fileFormat.getFormatDesignationName())) {
           values.put(messages.viewRepresentationInfoFormat(),
-            createExtensionHTML(bundle, fileFormat.getFormatDesignation()));
+            createFormatDesignationHTML(bundle, fileFormat.getFormatDesignation()));
         }
 
         if (StringUtils.isNotBlank(fileFormat.getPronom())) {
@@ -197,6 +202,16 @@ public class InfoSliderHelper {
     }
   }
 
+  private static FlowPanel createExtensionHTML(BrowseFileBundle bundle, String extension) {
+    FlowPanel panel = new FlowPanel();
+    final String riFilter = RepresentationInformationUtils
+      .createRepresentationInformationFilter(RodaConstants.INDEX_FILE, RodaConstants.FILE_EXTENSION, extension);
+    RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(SafeHtmlUtils.fromString(extension),
+      riFilter, panel, bundle.getRepresentationInformationFields().contains(RodaConstants.FILE_EXTENSION),
+      "browseFileInformationIcon");
+    return panel;
+  }
+
   private static FlowPanel createMimetypeHTML(BrowseFileBundle bundle, String mimetype) {
     FlowPanel panel = new FlowPanel();
     final String riFilter = RepresentationInformationUtils
@@ -217,7 +232,7 @@ public class InfoSliderHelper {
     return panel;
   }
 
-  private static FlowPanel createExtensionHTML(BrowseFileBundle bundle, String designation) {
+  private static FlowPanel createFormatDesignationHTML(BrowseFileBundle bundle, String designation) {
     FlowPanel panel = new FlowPanel();
     final String riFilter = RepresentationInformationUtils.createRepresentationInformationFilter(
       RodaConstants.INDEX_FILE, RodaConstants.FILE_FORMAT_DESIGNATION, designation);
