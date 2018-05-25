@@ -30,8 +30,6 @@ import com.google.gwt.safehtml.shared.SafeHtml;
  */
 public interface ClientMessages extends Messages {
 
-  String moveIllegalOperation(String message);
-
   String moveNoSuchObject(String message);
 
   String of();
@@ -60,8 +58,6 @@ public interface ClientMessages extends Messages {
 
   String showRiskIncidenceTitle();
 
-  String newRepresentationInformationTitle();
-
   String createRepresentationInformationTitle();
 
   String editRepresentationInformationTitle();
@@ -69,8 +65,6 @@ public interface ClientMessages extends Messages {
   String showRepresentationInformationTitle();
 
   String representationInformationTitle();
-
-  String newFormatTitle();
 
   String createFormatTitle();
 
@@ -81,8 +75,6 @@ public interface ClientMessages extends Messages {
   String formatsTitle();
 
   String newRiskTitle();
-
-  String createRiskTitle();
 
   String editRiskTitle();
 
@@ -126,10 +118,6 @@ public interface ClientMessages extends Messages {
 
   String notificationTitle();
 
-  String showDIPTitle();
-
-  String showDIPFileTitle();
-
   String usersAndGroupsTitle();
 
   String usersAndGroupsSearchPlaceHolder();
@@ -137,8 +125,6 @@ public interface ClientMessages extends Messages {
   String logsTitle();
 
   String changeTypeTitle();
-
-  String changeTypePlaceHolder();
 
   String changeStatusTitle();
 
@@ -162,8 +148,6 @@ public interface ClientMessages extends Messages {
 
   String outcomeDetailPlaceholder();
 
-  String outcomeDetailFailed();
-
   String chooseEntityTitle();
 
   /******* SIDEBAR ******************************************/
@@ -182,8 +166,6 @@ public interface ClientMessages extends Messages {
 
   String sidebarActionsTitle();
 
-  String sidebarPreservationTitle();
-
   String sidebarRepresentationInformationTitle();
 
   String sidebarFormatsTitle();
@@ -198,10 +180,6 @@ public interface ClientMessages extends Messages {
 
   String sidebarJobReportLastActionTitle();
 
-  String sidebarGoToTitle();
-
-  String sidebarRelationsTitle();
-
   SafeHtml metadataParseError(int line, int column, String message);
 
   SafeHtml notFoundErrorTitle();
@@ -214,8 +192,6 @@ public interface ClientMessages extends Messages {
 
   SafeHtml descriptiveMetadataTransformToHTMLError();
 
-  SafeHtml preservationMetadataTransformToHTMLError();
-
   SafeHtml preservationEventDetailsTransformToHTMLError();
 
   String notFoundError();
@@ -224,15 +200,7 @@ public interface ClientMessages extends Messages {
 
   String errorLoadingDescriptiveMetadata(String message);
 
-  String errorLoadingPreservationMetadata(String message);
-
   String errorLoadingPreservationEventDetails(String message);
-
-  String downloadRepresentationInfo(@PluralCount int numberOfFiles, String readableFileSize);
-
-  SafeHtml downloadTitleOriginal(String repType);
-
-  SafeHtml downloadTitleDefault(String repType);
 
   String titleDatesEmpty();
 
@@ -250,7 +218,6 @@ public interface ClientMessages extends Messages {
 
   String simpleDates(Date dateInitial, Date dateFinal);
 
-  String featureNotYetImplemented();
 
   String itemWasAccepted();
 
@@ -260,33 +227,21 @@ public interface ClientMessages extends Messages {
 
   String rejectQuestion();
 
-  String rejectSIPQuestion();
-
-  String renameSIPPlaceholder();
-
   String renameSIPFailed();
 
   String renameSIPSuccessful();
 
   String moveSIPFailed();
 
-  String movingSIP();
-
   String movingAIP();
 
   String changeTypeSuccessful();
-
-  String allItemsWereAccepted();
-
-  String allItemsWereRejected();
 
   String jobNotFound();
 
   String updateIsCurrentlyRunning();
 
   String updatedFilesUnderFolder();
-
-  String updateIsBeginning();
 
   String riskRefreshDone();
 
@@ -324,37 +279,13 @@ public interface ClientMessages extends Messages {
 
   String inspectPreservationAgent();
 
-  String allPlugins();
-
   String allIntellectualEntities();
 
   String allRepresentations();
 
   String allFiles();
 
-  String allRisks();
-
-  String allRiskIncidences();
-
-  String allRepresentationInformation();
-
-  String allFormats();
-
-  String allNotifications();
-
-  String allLogEntries();
-
-  String allJobs();
-
-  String allJobReports();
-
-  String allTransferredResources();
-
   String allOfAObject(@Select String objectClass);
-
-  String selectItems();
-
-  String noInputObjects();
 
   String inspectTransferredResource();
 
@@ -392,8 +323,6 @@ public interface ClientMessages extends Messages {
 
   String ingestTransferRemoveFolderConfirmDialogMessage(String folderName);
 
-  String ingestTransferRemoveAllSelectedConfirmDialogMessage();
-
   String ingestTransferRemoveSelectedConfirmDialogMessage(Long size);
 
   String ingestTransferLastScanned(Date lastScanDate);
@@ -420,17 +349,7 @@ public interface ClientMessages extends Messages {
 
   String createJobSelectObject();
 
-  String createJobSelectedAllObject();
-
   String createJobSelectedSIP();
-
-  String createJobSelectedAIP();
-
-  String createJobSelectedRepresentation();
-
-  String createJobSelectedFile();
-
-  String createJobIngestWorkflow();
 
   String createJobCreateTitle();
 
@@ -443,10 +362,6 @@ public interface ClientMessages extends Messages {
   String createJobCategorySelect();
 
   SafeHtml createJobCategoryWorkflow(List<String> categoryLabels);
-
-  String allCategoryItem();
-
-  String emptyAssociativeObjectLabel();
 
   String createJobCurlCommand();
 
@@ -484,8 +399,6 @@ public interface ClientMessages extends Messages {
 
   String dialogYes();
 
-  String dialogSorry();
-
   String dialogDone();
 
   String dialogSuccess();
@@ -508,8 +421,6 @@ public interface ClientMessages extends Messages {
 
   String newButton();
 
-  String createButton();
-
   String editButton();
 
   String saveButton();
@@ -521,8 +432,6 @@ public interface ClientMessages extends Messages {
   String applyAllButton();
 
   String stopButton();
-
-  String viewButton();
 
   String listButton();
 
@@ -566,19 +475,9 @@ public interface ClientMessages extends Messages {
 
   /*** View representation ***/
 
-  String viewRepresentationNextFileButton();
-
-  String viewRepresentationPreviousFileButton();
-
   String viewRepresentationDownloadFileButton();
 
-  String viewRepresentationNewProcessButton();
-
-  String viewRepresentationRemoveFileButton();
-
   String viewRepresentationInfoFileButton();
-
-  String viewRepresentationEmptyPreview();
 
   String viewRepresentationErrorPreview();
 
@@ -586,13 +485,9 @@ public interface ClientMessages extends Messages {
 
   String viewRepresentationNotSupportedPreview();
 
-  String viewRepresentationSearchPlaceHolder();
-
   String viewRepresentationInfoTitle();
 
   String viewRepresentationFileDisseminationTitle();
-
-  String viewRepresentationFileOptionsTitle();
 
   String viewRepresentationInfoFilename();
 
@@ -604,11 +499,7 @@ public interface ClientMessages extends Messages {
 
   String viewRepresentationInfoFormat();
 
-  String viewRepresentationInfoFormatVersion();
-
   String viewRepresentationInfoPronom();
-
-  String viewRepresentationInfoCreatedDate();
 
   String viewRepresentationInfoCreatingApplicationName();
 
@@ -692,19 +583,13 @@ public interface ClientMessages extends Messages {
 
   String removeSuccessTitle();
 
-  String removeAllSuccessMessage();
-
   String removeSuccessMessage(Long size);
 
   String removeConfirmDialogTitle();
 
   String removeAllConfirmDialogMessageSingle(String aipTitle);
 
-  String removeAllConfirmDialogMessage();
-
   String removeSelectedConfirmDialogMessage(Long size);
-
-  String removeAllSelectedConfirmDialogMessage();
 
   String removingSuccessTitle();
 
@@ -713,8 +598,6 @@ public interface ClientMessages extends Messages {
   String moveConfirmDialogTitle();
 
   String moveAllConfirmDialogMessageSingle(String aipTitle);
-
-  String moveAllConfirmDialogMessage();
 
   String moveSelectedConfirmDialogMessage(Long size);
 
@@ -784,10 +667,6 @@ public interface ClientMessages extends Messages {
 
   String aipHasRepresentations();
 
-  String folderId();
-
-  String folderFiles();
-
   String fileId();
 
   String fileName();
@@ -801,8 +680,6 @@ public interface ClientMessages extends Messages {
   String filePronom();
 
   String fileSize();
-
-  String fileLength();
 
   String transferredResourceName();
 
@@ -824,29 +701,17 @@ public interface ClientMessages extends Messages {
 
   String representationFiles();
 
-  String representationDocumentation();
-
-  String representationSchemas();
-
   String objectCreatedDate();
 
   String objectLastModified();
-
-  String openFileAsFolderError();
 
   /************* Preservation Event List ****************/
 
   String preservationEventListHeaderDate();
 
-  String preservationEventListHeaderAgent();
-
   String preservationEventListHeaderType();
 
   String preservationEventListHeaderDetail();
-
-  String preservationEventListHeaderSourceObject();
-
-  String preservationEventListHeaderOutcomeObject();
 
   String preservationEventListHeaderOutcome();
 
@@ -872,21 +737,11 @@ public interface ClientMessages extends Messages {
 
   String preservationEventAgentsHeader();
 
-  String preservationEventAgentRole();
-
   String preservationEventSourceObjectsHeader();
 
   String preservationEventOutcomeObjectsHeader();
 
-  String preservationEventObjectId();
-
-  String preservationEventObjectRole();
-
   String preservationEventOutcomeDetailHeader();
-
-  String preservationEventOutcomeDetailNote();
-
-  String preservationEventOutcomeDetailExtension();
 
   String preservationEventClass();
 
@@ -934,17 +789,11 @@ public interface ClientMessages extends Messages {
 
   String renameItemTitle();
 
-  String renamePlaceholder();
-
-  String renameFailed();
-
   String renameSuccessful();
 
   /************* Move Item ****************/
 
   String moveItemTitle();
-
-  String moveItemFailed();
 
   /************* Select Parent ****************/
 
@@ -1026,8 +875,6 @@ public interface ClientMessages extends Messages {
 
   /************* Risk register ****************/
 
-  String showRiskAIPTitle(String aipId);
-
   String riskRegisterCategory();
 
   String riskRegisterSeverity();
@@ -1040,13 +887,7 @@ public interface ClientMessages extends Messages {
 
   String riskIncidenceRegisterSearchPlaceHolder();
 
-  String showObjectsRiskCounter(@PluralCount @Optional int counter);
-
-  String createRiskFailure(String message);
-
   String editRiskNotFound(String name);
-
-  String editRiskFailure(String message);
 
   String riskRemoveFolderConfirmDialogTitle();
 
@@ -1074,19 +915,13 @@ public interface ClientMessages extends Messages {
 
   /************* RepresentationInformation register ****************/
 
-  String getRepresentationInformationDialogName();
-
   String representationInformationRegisterTitle();
 
   String representationInformationRegisterProcessButton();
 
   String representationInformationRegisterSearchPlaceHolder();
 
-  String createRepresentationInformationFailure(String message);
-
   String editRepresentationInformationNotFound(String name);
-
-  String editRepresentationInformationFailure(String message);
 
   String representationInformationRemoveFolderConfirmDialogTitle();
 
@@ -1108,12 +943,6 @@ public interface ClientMessages extends Messages {
 
   String representationInformationMissingFields();
 
-  String representationInformationChooseOptionLabel();
-
-  String representationInformationChooseOption();
-
-  String representationInformationEntitiesOption();
-
   String noTitleMessage();
 
   String currentRelationResults();
@@ -1126,19 +955,13 @@ public interface ClientMessages extends Messages {
 
   /************* Format register ****************/
 
-  String getFormatsDialogName();
-
   String formatRegisterTitle();
 
   String formatRegisterProcessButton();
 
   String formatRegisterSearchPlaceHolder();
 
-  String createFormatFailure(String message);
-
   String editFormatNotFound(String name);
-
-  String editFormatFailure(String message);
 
   String formatRemoveFolderConfirmDialogTitle();
 
@@ -1161,9 +984,6 @@ public interface ClientMessages extends Messages {
   /************* Common Messages ****************/
 
   String logParameter(String name, String value);
-
-  // Content Panel
-  String pageNotFound(String error);
 
   String windowTitle(String history);
 
@@ -1190,28 +1010,6 @@ public interface ClientMessages extends Messages {
   String editUserEmailAlreadyExists(String email);
 
   String editGroupNotFound(String groupname);
-
-  // Remove
-  String removeUserConfirm(String username);
-
-  String removeUserFailure(String username, String reason);
-
-  String removeUserNotPossible(String name);
-
-  String removeGroupConfirm(String groupname);
-
-  String removeGroupFailure(String groupname, String reason);
-
-  // User/Group Alphabet Sorted List
-  String userCount(int count);
-
-  String groupCount(int count);
-
-  // Action Report Window
-  String actionResportTitle(String username);
-
-  // User log
-  String userLogEntriesTotal(int total);
 
   // Member management
 
@@ -1272,14 +1070,6 @@ public interface ClientMessages extends Messages {
   String jobSuccessCountMessage();
 
   String jobFailureCountMessage();
-
-  String jobProcessingCountMessage();
-
-  String jobWaitingCountMessage();
-
-  String showSIPNotExtended();
-
-  String showAIPNotExtended();
 
   String reportLastUpdatedAt();
 
@@ -1407,15 +1197,9 @@ public interface ClientMessages extends Messages {
 
   String representationInformationTags();
 
-  String representationInformationExtras();
-
   String representationInformationSupport();
 
   String representationInformationSupportValue(@Select String value);
-
-  String representationInformationRelations();
-
-  String representationInformationFilters();
 
   String representationInformationRelationType();
 
@@ -1465,8 +1249,6 @@ public interface ClientMessages extends Messages {
 
   String formatMimetypes();
 
-  String formatMimetype();
-
   String formatPronoms();
 
   String formatPronom();
@@ -1482,8 +1264,6 @@ public interface ClientMessages extends Messages {
   String metadataType();
 
   String metadataFilename();
-
-  String metadataContent();
 
   /*** Browse ****/
 
@@ -1503,8 +1283,6 @@ public interface ClientMessages extends Messages {
 
   String transferredResourcesTitle();
 
-  String archivalPackageTitle();
-
   String newArchivalPackage();
 
   String moveArchivalPackage();
@@ -1517,8 +1295,6 @@ public interface ClientMessages extends Messages {
 
   String removeArchivalPackage();
 
-  String addRepresentation();
-
   String preservationTitle();
 
   String newProcessPreservation();
@@ -1529,15 +1305,7 @@ public interface ClientMessages extends Messages {
 
   String preservationLogs();
 
-  String downloadTitle();
-
-  String downloadArchivalPackage();
-
-  String downloadSubmission();
-
   String downloadDocumentation();
-
-  String downloadSchemas();
 
   String downloadNoDocumentationTitle();
 
@@ -1559,15 +1327,7 @@ public interface ClientMessages extends Messages {
 
   String listOfDisseminations();
 
-  String listOfIntellectualEntities();
-
   String unknownAncestorError();
-
-  String selectAnItemTitle();
-
-  String selectAnItemToRemoveDescription();
-
-  String selectAnItemToMoveDescription();
 
   String searchPrevious();
 
@@ -1596,12 +1356,6 @@ public interface ClientMessages extends Messages {
   String file();
 
   String folder();
-
-  String fileRemoveTitle();
-
-  String fileRemoveMessage();
-
-  String folderRemoveMessage();
 
   String filesRemoveTitle();
 
@@ -1700,8 +1454,6 @@ public interface ClientMessages extends Messages {
 
   String logEntryDatetime();
 
-  String logEntryDatetimeExtended();
-
   String logEntryDuration();
 
   String logEntryRelatedObject();
@@ -1778,55 +1530,15 @@ public interface ClientMessages extends Messages {
 
   String AlphabetSortedListAll();
 
-  // User Info Panel
-
-  String userInfoDetails();
-
-  String userInfoFullname();
-
-  String userInfoBusinessCategory();
-
-  String userInfoOrganization();
-
-  String userInfoEmail();
-
-  String userInfoTelephoneNumber();
-
-  String userInfoFax();
-
-  String userInfoPostalAddress();
-
-  String userInfoPostalCode();
-
-  String userInfoLocality();
-
-  String userInfoCountry();
-
   // Logger
 
   String alertErrorTitle();
-
-  // Report Window
-
-  String reportWindowClose();
-
-  String reportWindowPrintPDF();
-
-  String reportWindowPrintCSV();
-
-  // ID Type
-
-  String simpleID();
-
-  String fullID();
 
   // Redaction Type
 
   String input();
 
   String output();
-
-  String focusPanelTitle();
 
   /** Main constants **/
 
@@ -1862,8 +1574,6 @@ public interface ClientMessages extends Messages {
 
   String authorizationDeniedAlertMessageMissingRoles(List<String> missingRoles);
 
-  String authorizationDeniedAlertMessageException(String message);
-
   String authorizationDeniedAlertMessageExceptionSimple();
 
   String casForwardWarning();
@@ -1876,56 +1586,6 @@ public interface ClientMessages extends Messages {
 
   String cookiesLearnMore();
 
-  /** Metadata editor constants **/
-
-  // Move element
-
-  String moveChooseDestinationTitle();
-
-  String moveChooseDestinationChoose();
-
-  String moveChooseDestinationCancel();
-
-  String moveSuccessful();
-
-  // Edit Producers Panel
-
-  String editProducersTitle();
-
-  String editProducersAddUser();
-
-  String editProducersAddGroup();
-
-  String editProducersDelete();
-
-  String editProducersRodaIn();
-
-  // Edit Object Permissions Panel
-
-  String objectPermissionsApplyRecursivelly();
-
-  String objectPermissionsAddUser();
-
-  String objectPermissionsAddGroup();
-
-  String objectPermissionsSave();
-
-  // Meta permissions
-
-  String permission_object_NoAccess();
-
-  String permission_object_ReadOnly();
-
-  String permission_object_ReadAndEditMetadata();
-
-  String permission_object_FullControl();
-
-  /** User management constants **/
-
-  // Create/Edit User/Group
-  String dataTabTitle();
-
-  String permissionsTabTitle();
 
   // Control Panel
   String list();
@@ -1936,40 +1596,14 @@ public interface ClientMessages extends Messages {
 
   String search();
 
-  String userActions();
-
   String report();
 
   String createUser();
 
-  String editUser();
-
-  String removeUser();
-
-  String setActive();
-
-  String setInactive();
-
-  String groupActions();
-
   String createGroup();
-
-  String editGroup();
-
-  String removeGroup();
 
   String actions();
 
-  // Select User/Group
-  String selectNoUser();
-
-  String selectNoGroup();
-
-  String selectNoActiveUser();
-
-  String selectNoInactiveUser();
-
-  String selectNoUserOrGroup();
 
   // Create User
   String createUserTitle();
@@ -2004,39 +1638,17 @@ public interface ClientMessages extends Messages {
 
   String fullname();
 
-  String jobFunction();
-
-  String getJobFunctions(@Select int index);
-
-  String idTypeAndNumber();
-
-  String id_type(@Select String item);
-
-  String idDateAndLocality();
-
-  String nationality();
-
   String address();
-
-  String postalCodeAndLocality();
 
   String country();
 
-  String nif();
-
   String email();
-
-  String phonenumber();
 
   String fax();
 
   String extra();
 
   String userDataNote();
-
-  String allGroups();
-
-  String memberGroups();
 
   String userGroups();
 
@@ -2076,44 +1688,13 @@ public interface ClientMessages extends Messages {
 
   String preferencesCancel();
 
-  String preferencesEmailAlreadyExists();
-
-  String preferencesSubmitSuccess();
-
   // Roles Description
 
   String role(@Select String role);
 
-  // Action Report Window
-  String actionReportClose();
-
-  String actionReportLogTabTitle();
-
-  // User Log
-  String actionReportLogDateTime();
-
-  String actionReportLogAction();
-
-  String actionReportLogParameters();
-
-  String actionReportLogUser();
-
-  String userlog_initialDate();
-
-  String userlog_finalDate();
-
-  String userlog_setFilter();
-
-  String userlog_actions();
-
-  String userlog_allActions();
 
   // Register
   String registerUserDataTitle();
-
-  String registerDisclaimer();
-
-  String registerCaptchaTitle();
 
   String registerSubmit();
 
@@ -2126,8 +1707,6 @@ public interface ClientMessages extends Messages {
   String registerWrongCaptcha();
 
   String registerFailure();
-
-  String registerSendEmailVerificationFailure();
 
   String registerSuccessDialogTitle();
 
@@ -2144,12 +1723,6 @@ public interface ClientMessages extends Messages {
 
   String verifyEmailToken();
 
-  String verifyEmailVerify();
-
-  String verifyEmailResend();
-
-  String verifyEmailChange();
-
   String verifyEmailSubmit();
 
   String verifyEmailCancel();
@@ -2157,18 +1730,6 @@ public interface ClientMessages extends Messages {
   String verifyEmailNoSuchUser();
 
   String verifyEmailWrongToken();
-
-  String verifyEmailResendSuccess();
-
-  String verifyEmailResendFailure();
-
-  String verifyEmailChangePrompt();
-
-  String verifyEmailChangeFailure();
-
-  String verifyEmailAlreadyExists();
-
-  String verifyEmailChangeSuccess();
 
   String verifyEmailFailure();
 
@@ -2182,8 +1743,6 @@ public interface ClientMessages extends Messages {
   String recoverLoginTitle();
 
   String recoverLoginUsernameOrEmail();
-
-  String recoverLoginCaptchaTitle();
 
   String recoverLoginSubmit();
 
@@ -2228,362 +1787,12 @@ public interface ClientMessages extends Messages {
 
   String resetPasswordSuccessDialogButton();
 
-  // Select User Window
-  String selectUserWindowTitle();
-
-  String selectUserWindowSelect();
-
-  String selectUserWindowCancel();
-
-  // Select Group Window
-  String selectGroupWindowTitle();
-
-  String selectGroupWindowSelect();
-
-  String selectGroupWindowCancel();
-
-  /**** Statistics Constants ***/
-
-  String timeSegmentationLabel();
-
-  // segmentation
-  String segmentation_YEAR();
-
-  String segmentation_MONTH();
-
-  String segmentation_DAY();
-
   // statistic type classes
 
-  String systemStatistics();
-
-  String repositoryStatistics();
-
-  String userStatistics();
-
-  String userActionsStatistics();
-
-  String eventStatistics();
-
-  String ingestStatistics();
-
-  String accessStatistics();
-
-  String actionsStatistics();
-
-  String producersStatistics();
-
-  String chartActual();
-
-  String chartHistory();
-
-  String chartPieTooltip();
-
-  String noDataAvailable();
-
-  String viewImpossibleBcSipNotIngested();
-
-  String dateIntervalPickerWindowTitle();
 
   String dateIntervalLabelInitial();
 
   String dateIntervalLabelFinal();
-
-  String dateIntervalPickerWindowApply();
-
-  // Statistic panel titles
-
-  String descriptiveObjectsCountTitle();
-
-  String descriptiveObjectsCountDesc();
-
-  String fondsCountTitle();
-
-  String fondsCountDesc();
-
-  String presEventCountTitle();
-
-  String presEventCountDesc();
-
-  String presRepCountTitle();
-
-  String presRepCountDesc();
-
-  String representationObjectsCountTitle();
-
-  String representationObjectsCountDesc();
-
-  String representationObjectTypeTitle();
-
-  String representationObjectTypeDesc();
-
-  String representationObjectSubTypeTitle();
-
-  String representationObjectSubTypeDesc();
-
-  String userCountTitle();
-
-  String userCountDesc();
-
-  String groupCountTitle();
-
-  String groupCountDesc();
-
-  String groupTop5Title();
-
-  String groupTop5Desc();
-
-  String logWuiLoginTitle();
-
-  String logWuiLoginDesc();
-
-  String logWuiPageHitsTitle();
-
-  String logWuiPageHitsDesc();
-
-  String logWuiErrorsTitle();
-
-  String logWuiErrorsDesc();
-
-  String logDescriptiveMetadataViewsTitle();
-
-  String logDescriptiveMetadataViewsDesc();
-
-  String logPreservationMetadataViewsTitle();
-
-  String logPreservationMetadataViewsDesc();
-
-  String logBasicSearchTitle();
-
-  String logBasicSearchDesc();
-
-  String logAdvancedSearchTitle();
-
-  String logAdvancedSearchDesc();
-
-  String disseminatorHitsTitle();
-
-  String disseminatorHitsDesc();
-
-  String disseminatorMissTitle();
-
-  String disseminatorMissDesc();
-
-  String logRegisterUserTitle();
-
-  String logRegisterUserDesc();
-
-  String logUserEmailConfirmationTitle();
-
-  String logUserEmailConfirmationDesc();
-
-  String logUserPasswordResetTitle();
-
-  String logUserPasswordResetDesc();
-
-  String taskCountTitle();
-
-  String taskCountDesc();
-
-  String taskStateTitle();
-
-  String taskStateDesc();
-
-  String taskInstanceCountTitle();
-
-  String taskInstanceCountDesc();
-
-  String taskInstanceStateTitle();
-
-  String taskInstanceStateDesc();
-
-  String sipCountTitle();
-
-  String sipCountDesc();
-
-  String sipCompletenessTitle();
-
-  String sipCompletenessDesc();
-
-  String sipStateTitle();
-
-  String sipStateDesc();
-
-  String sipDurationAutoTitle();
-
-  String sipDurationAutoDesc();
-
-  String sipDurationManualTitle();
-
-  String sipDurationManualDesc();
-
-  String sipMinAutomaticProcessingTimeTitle();
-
-  String sipMinAutomaticProcessingTimeDesc();
-
-  String sipMaxAutomaticProcessingTimeTitle();
-
-  String sipMaxAutomaticProcessingTimeDesc();
-
-  String sipMinManualProcessingTimeTitle();
-
-  String sipMinManualProcessingTimeDesc();
-
-  String sipMaxManualProcessingTimeTitle();
-
-  String sipMaxManualProcessingTimeDesc();
-
-  String producerTitle();
-
-  String producerLastSubmissionDate();
-
-  String producerSubmissionStateChartTitle();
-
-  String producerSubmissionStateChartDesc();
-
-  String createDescriptionObjectTitle();
-
-  String createDescriptionObjectDesc();
-
-  String modifyDescriptionObjectTitle();
-
-  String modifyDescriptionObjectDesc();
-
-  String removeDescriptionObjectTitle();
-
-  String removeDescriptionObjectDesc();
-
-  String moveDescriptionObjectTitle();
-
-  String moveDescriptionObjectDesc();
-
-  String addUserTitle();
-
-  String addUserDesc();
-
-  String modifyUserTitle();
-
-  String modifyUserDesc();
-
-  String removeUserTitle();
-
-  String removeUserDesc();
-
-  String addGroupTitle();
-
-  String addGroupDesc();
-
-  String modifyGroupTitle();
-
-  String modifyGroupDesc();
-
-  String removeGroupTitle();
-
-  String removeGroupDesc();
-
-  String setUserPasswordTitle();
-
-  String setUserPasswordDesc();
-
-  String acceptSIPTitle();
-
-  String acceptSIPDesc();
-
-  String addTaskTitle();
-
-  String addTaskDesc();
-
-  String modifyTaskTitle();
-
-  String modifyTaskDesc();
-
-  String removeTaskTitle();
-
-  String removeTaskDesc();
-
-  String systemStatisticsLink();
-
-  // Reports
-  String statisticsReportClose();
-
-  String statisticsReportSegmentationLabel();
-
-  String statisticsReportDateSeparatorLabel();
-
-  String statisticsReportChart();
-
-  String statisticsReportList();
-
-  String statisticsReportListTotal();
-
-  String statisticsReportListHeaderDate();
-
-  String statisticsReportListHeaderType();
-
-  String statisticsReportListHeaderValue();
-
-  // Statistic types
-  String statistic_type_others();
-
-  String tasks_state_running();
-
-  String tasks_state_suspended();
-
-  String instances_state_running();
-
-  String instances_state_paused();
-
-  String instances_state_stopped();
-
-  String sips_complete_true();
-
-  String sips_complete_false();
-
-  String sips_state_DROPED_FTP();
-
-  String sips_state_DROPED_UPLOAD_SERVICE();
-
-  String sips_state_DROPED_LOCAL();
-
-  String sips_state_UNPACKED();
-
-  String sips_state_VIRUS_FREE();
-
-  String sips_state_SIP_VALID();
-
-  String sips_state_AUTHORIZED();
-
-  String sips_state_SIP_INGESTED();
-
-  String sips_state_SIP_NORMALIZED();
-
-  String sips_state_ACCEPTED();
-
-  String sips_state_QUARANTINE();
-
-  String object_representation_type_digitalized_work();
-
-  String object_representation_type_email();
-
-  String object_representation_type_structured_text();
-
-  String object_representation_type_presentation();
-
-  String object_representation_type_spreadsheet();
-
-  String object_representation_type_vector_graphic();
-
-  String object_representation_type_relational_database();
-
-  String object_representation_type_video();
-
-  String object_representation_type_audio();
-
-  String object_representation_type_unknown();
-
-  String users_state_active();
-
-  String users_state_inactive();
 
   /************* Metadata creation and edition ****************/
 
@@ -2652,8 +1861,6 @@ public interface ClientMessages extends Messages {
   String showMore();
 
   String showLess();
-
-  String revertedBy(String userId);
 
   /* Version action */
   String versionAction(@Select String action);
