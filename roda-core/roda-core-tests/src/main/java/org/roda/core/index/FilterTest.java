@@ -212,7 +212,7 @@ public class FilterTest {
       try {
         String id = "file_" + i;
         String uuid = IdUtils.getFileId(aip.getId(), REPRESENTATION_ID, filePath, id);
-        IndexedFile file = index.retrieve(IndexedFile.class, uuid,
+        index.retrieve(IndexedFile.class, uuid,
           Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.FILE_HASH));
 
         // assertTrue("File " + id + " has no hash field", 0 <

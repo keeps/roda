@@ -45,7 +45,7 @@ public class FileNotificationProcessor implements NotificationProcessor {
       notification.setBody(content);
       notification.setState(NOTIFICATION_STATE.FAILED);
 
-      if (dropPath != null && dropPath.startsWith("file:///")) {
+      if (dropPath != null) {
         LOGGER.debug("Sending notification via drop folder ...");
         Path trimmedDropPath = Paths.get(dropPath.substring(7));
 
