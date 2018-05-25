@@ -116,7 +116,7 @@ public class Browser extends RodaWuiController {
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
     try {
-      aipFieldsToReturn.addAll(new ArrayList<String>(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN));
+      aipFieldsToReturn.addAll(new ArrayList<>(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN));
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, aipFieldsToReturn);
       controllerAssistant.checkObjectPermissions(user, aip, PermissionType.READ);
 
@@ -1387,7 +1387,7 @@ public class Browser extends RodaWuiController {
 
     try {
       Permissions permissions = new Permissions();
-      permissions.setUserPermissions(user.getId(), new HashSet<PermissionType>(Arrays.asList(PermissionType.values())));
+      permissions.setUserPermissions(user.getId(), new HashSet<>(Arrays.asList(PermissionType.values())));
 
       // delegate
       return BrowserHelper.createAIP(user, null, type, permissions);
@@ -1429,7 +1429,7 @@ public class Browser extends RodaWuiController {
         throw new RequestNotValidException("Creating AIP that should be below another with a null parentId");
       }
 
-      permissions.setUserPermissions(user.getId(), new HashSet<PermissionType>(Arrays.asList(PermissionType.values())));
+      permissions.setUserPermissions(user.getId(), new HashSet<>(Arrays.asList(PermissionType.values())));
 
       // delegate
       return BrowserHelper.createAIP(user, parentId, type, permissions);
@@ -3570,17 +3570,23 @@ public class Browser extends RodaWuiController {
   }
 
   public static RepresentationInformationExtraBundle retrieveRepresentationInformationExtraBundle(User user,
-    RepresentationInformation ri, Locale locale) throws AuthorizationDeniedException {
+    String representationInformationId, Locale locale) throws AuthorizationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    RepresentationInformationExtraBundle extra = BrowserHelper.retrieveRepresentationInformationExtraBundle(ri, locale);
+    RepresentationInformationExtraBundle extra = null;
+    try {
+      extra = BrowserHelper.retrieveRepresentationInformationExtraBundle(representationInformationId, locale);
+    } catch (NotFoundException | GenericException | RequestNotValidException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+    }
 
     // register action
-    controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_REPRESENTATION_INFORMATION_PARAM, ri);
+    controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_REPRESENTATION_INFORMATION_ID_PARAM,
+      representationInformationId);
     return extra;
   }
 }

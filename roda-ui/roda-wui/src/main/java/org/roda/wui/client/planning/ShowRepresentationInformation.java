@@ -248,7 +248,7 @@ public class ShowRepresentationInformation extends Composite {
       representationInformationSupportKey.setVisible(false);
     }
 
-    BrowserService.Util.getInstance().retrieveRepresentationInformationExtraBundle(ri,
+    BrowserService.Util.getInstance().retrieveRepresentationInformationExtraBundle(ri.getId(),
       LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<RepresentationInformationExtraBundle>() {
 
         @Override
@@ -421,7 +421,7 @@ public class ShowRepresentationInformation extends Composite {
 
             BrowserService.Util.getInstance().find(RepresentationInformation.class.getName(), filter, Sorter.NONE,
               new Sublist(0, 1000), Facets.NONE, LocaleInfo.getCurrentLocale().toString(), true,
-              new ArrayList<String>(), new NoAsyncCallback<IndexResult<RepresentationInformation>>() {
+              new ArrayList<>(), new NoAsyncCallback<IndexResult<RepresentationInformation>>() {
                 @Override
                 public void onSuccess(IndexResult<RepresentationInformation> result) {
                   for (RepresentationInformation r : result.getResults()) {

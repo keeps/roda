@@ -83,7 +83,6 @@ public class RepresentationInformationDataPanel extends Composite
   @UiField
   IncrementalFilterList filters;
 
-  @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
   private boolean editmode;
@@ -224,7 +223,7 @@ public class RepresentationInformationDataPanel extends Composite
         }
       });
 
-    BrowserService.Util.getInstance().retrieveRepresentationInformationExtraBundle(ri,
+    BrowserService.Util.getInstance().retrieveRepresentationInformationExtraBundle(ri.getId(),
       LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<RepresentationInformationExtraBundle>() {
 
         @Override

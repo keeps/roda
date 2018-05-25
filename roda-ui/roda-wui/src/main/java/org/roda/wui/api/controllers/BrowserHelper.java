@@ -672,7 +672,7 @@ public class BrowserHelper {
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
       ModelService model = RodaCoreFactory.getModelService();
       Representation rep = model.retrieveRepresentation(aipId, representationId);
-      return new ObjectResponse<Representation>(acceptFormat, rep);
+      return new ObjectResponse<>(acceptFormat, rep);
     } else {
       throw new GenericException("Unsupported accept format: " + acceptFormat);
     }
@@ -768,7 +768,7 @@ public class BrowserHelper {
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
       int endInt = limitInt == -1 ? metadata.size() : (limitInt > metadata.size() ? metadata.size() : limitInt);
       DescriptiveMetadataList list = new DescriptiveMetadataList(metadata.subList(startInt, endInt));
-      return new ObjectResponse<DescriptiveMetadataList>(acceptFormat, list);
+      return new ObjectResponse<>(acceptFormat, list);
     }
 
     return null;
@@ -868,7 +868,7 @@ public class BrowserHelper {
       List<DescriptiveMetadata> resultList = aip.getDescriptiveMetadata().stream()
         .filter(dm -> dm.getId().equals(metadataId)).collect(Collectors.toList());
 
-      return new ObjectResponse<DescriptiveMetadata>(acceptFormat, resultList.get(0));
+      return new ObjectResponse<>(acceptFormat, resultList.get(0));
 
     } else {
       throw new GenericException("Unsupported accept format: " + acceptFormat);
@@ -949,7 +949,7 @@ public class BrowserHelper {
       List<DescriptiveMetadata> resultList = representation.getDescriptiveMetadata().stream()
         .filter(dm -> dm.getId().equals(metadataId)).collect(Collectors.toList());
 
-      return new ObjectResponse<DescriptiveMetadata>(acceptFormat, resultList.get(0));
+      return new ObjectResponse<>(acceptFormat, resultList.get(0));
 
     } else {
       throw new GenericException("Unsupported accept format: " + acceptFormat);
@@ -1030,7 +1030,7 @@ public class BrowserHelper {
       List<DescriptiveMetadata> resultList = aip.getDescriptiveMetadata().stream()
         .filter(dm -> dm.getId().equals(metadataId)).collect(Collectors.toList());
 
-      return new ObjectResponse<DescriptiveMetadata>(acceptFormat, resultList.get(0));
+      return new ObjectResponse<>(acceptFormat, resultList.get(0));
 
     } else {
       throw new GenericException("Unsupported accept format: " + acceptFormat);
@@ -1116,7 +1116,7 @@ public class BrowserHelper {
         }
       }
 
-      return new ObjectResponse<DescriptiveMetadata>(acceptFormat, resultList.get(0));
+      return new ObjectResponse<>(acceptFormat, resultList.get(0));
 
     } else {
       throw new GenericException("Unsupported accept format: " + acceptFormat);
@@ -1201,7 +1201,7 @@ public class BrowserHelper {
       }
 
       IOUtils.closeQuietly(preservationFiles);
-      return new ObjectResponse<PreservationMetadataList>(acceptFormat, metadataList);
+      return new ObjectResponse<>(acceptFormat, metadataList);
     } else {
       throw new GenericException("Unsupported accept format: " + acceptFormat);
     }
@@ -1277,7 +1277,7 @@ public class BrowserHelper {
     if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP.equals(acceptFormat)) {
       return DownloadUtils.createZipStreamResponse(zipEntries, aipId + "_" + representationId);
     } else {
-      return new ObjectResponse<PreservationMetadataList>(acceptFormat, pms);
+      return new ObjectResponse<>(acceptFormat, pms);
     }
   }
 
@@ -1332,7 +1332,7 @@ public class BrowserHelper {
         type = PreservationMetadataType.FILE;
       }
       PreservationMetadata pm = model.retrievePreservationMetadata(aipId, representationId, filePath, fileId, type);
-      return new ObjectResponse<PreservationMetadata>(acceptFormat, pm);
+      return new ObjectResponse<>(acceptFormat, pm);
     } else {
       throw new GenericException("Unsupported accept format: " + acceptFormat);
     }
@@ -1423,7 +1423,7 @@ public class BrowserHelper {
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
       PreservationMetadata pm = model.retrievePreservationMetadata(aipId, representationId, filePath, fileId,
         PreservationMetadataType.EVENT);
-      return new ObjectResponse<PreservationMetadata>(acceptFormat, pm);
+      return new ObjectResponse<>(acceptFormat, pm);
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
       final Binary binary = model.retrievePreservationEvent(aipId, representationId, filePath, fileId, id);
       final String filename = binary.getStoragePath().getName() + HTML_EXT;
@@ -1487,7 +1487,7 @@ public class BrowserHelper {
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
       PreservationMetadata pm = model.retrievePreservationMetadata(null, null, null, null,
         PreservationMetadataType.AGENT);
-      return new ObjectResponse<PreservationMetadata>(acceptFormat, pm);
+      return new ObjectResponse<>(acceptFormat, pm);
     } else {
       throw new GenericException("Unsupported accept format: " + acceptFormat);
     }
@@ -1531,7 +1531,7 @@ public class BrowserHelper {
       }
 
       IOUtils.closeQuietly(otherFiles);
-      return new ObjectResponse<OtherMetadataList>(acceptFormat, metadataList);
+      return new ObjectResponse<>(acceptFormat, metadataList);
     } else {
       throw new GenericException("Unsupported accept format: " + acceptFormat);
     }
@@ -1576,7 +1576,7 @@ public class BrowserHelper {
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
       OtherMetadata other = RodaCoreFactory.getModelService().retrieveOtherMetadata(aipId, representationId, filePath,
         fileId, suffix, type);
-      return new ObjectResponse<OtherMetadata>(acceptFormat, other);
+      return new ObjectResponse<>(acceptFormat, other);
     } else {
       throw new GenericException("Unsupported accept format: " + acceptFormat);
     }
@@ -1855,7 +1855,7 @@ public class BrowserHelper {
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
       File file = RodaCoreFactory.getModelService().retrieveFile(iFile.getAipId(), iFile.getRepresentationId(),
         iFile.getPath(), iFile.getId());
-      return new ObjectResponse<File>(acceptFormat, file);
+      return new ObjectResponse<>(acceptFormat, file);
     } else {
       throw new GenericException("Unsupported accept format: " + acceptFormat);
     }
@@ -2108,7 +2108,7 @@ public class BrowserHelper {
         stream);
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
-      return new ObjectResponse<TransferredResource>(acceptFormat, transferredResource);
+      return new ObjectResponse<>(acceptFormat, transferredResource);
     } else {
       throw new GenericException("Unsupported accept format: " + acceptFormat);
     }
@@ -3025,7 +3025,7 @@ public class BrowserHelper {
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
       DIP dip = RodaCoreFactory.getModelService().retrieveDIP(dipId);
-      return new ObjectResponse<DIP>(acceptFormat, dip);
+      return new ObjectResponse<>(acceptFormat, dip);
     } else {
       throw new GenericException("Unsupported accept format: " + acceptFormat);
     }
@@ -3076,7 +3076,7 @@ public class BrowserHelper {
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
       DIPFile file = RodaCoreFactory.getModelService().retrieveDIPFile(iFile.getDipId(), iFile.getPath(),
         iFile.getId());
-      return new ObjectResponse<DIPFile>(acceptFormat, file);
+      return new ObjectResponse<>(acceptFormat, file);
     } else {
       throw new GenericException("Unsupported accept format: " + acceptFormat);
     }
@@ -3167,7 +3167,7 @@ public class BrowserHelper {
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
       RepresentationInformation ri = RodaCoreFactory.getModelService()
         .retrieveRepresentationInformation(representationInformationId);
-      return new ObjectResponse<RepresentationInformation>(acceptFormat, ri);
+      return new ObjectResponse<>(acceptFormat, ri);
     } else {
       throw new GenericException("Unsupported accept format: " + acceptFormat);
     }
@@ -3487,10 +3487,14 @@ public class BrowserHelper {
   }
 
   public static RepresentationInformationExtraBundle retrieveRepresentationInformationExtraBundle(
-    RepresentationInformation ri, Locale locale) {
+    String representationInformationId, Locale locale)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     List<SupportedMetadataTypeBundle> supportedMetadataTypeBundles = BrowserHelper
       .retrieveExtraSupportedMetadata(RodaCoreFactory.getRodaConfigurationAsList("core.ri.family"), locale);
     Map<String, Set<MetadataValue>> familyValues = new HashMap<>();
+
+    RepresentationInformation ri = RodaCoreFactory.getModelService()
+      .retrieveRepresentationInformation(representationInformationId);
 
     for (SupportedMetadataTypeBundle metadataTypeBundle : supportedMetadataTypeBundles) {
       String xml = "";

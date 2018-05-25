@@ -950,7 +950,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
       try {
         Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.AIP_TYPE));
         IndexResult<IndexedAIP> result = find(IndexedAIP.class.getName(), Filter.NULL, Sorter.NONE, Sublist.NONE,
-          facets, locale, false, new ArrayList<String>());
+          facets, locale, false, new ArrayList<>());
 
         List<FacetFieldResult> facetResults = result.getFacetResults();
         for (FacetValue facetValue : facetResults.get(0).getValues()) {
@@ -976,7 +976,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
       try {
         Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.REPRESENTATION_TYPE));
         IndexResult<IndexedRepresentation> result = find(IndexedRepresentation.class.getName(), Filter.NULL,
-          Sorter.NONE, Sublist.NONE, facets, locale, false, new ArrayList<String>());
+          Sorter.NONE, Sublist.NONE, facets, locale, false, new ArrayList<>());
 
         List<FacetFieldResult> facetResults = result.getFacetResults();
         for (FacetValue facetValue : facetResults.get(0).getValues()) {
@@ -1086,11 +1086,12 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public RepresentationInformationExtraBundle retrieveRepresentationInformationExtraBundle(RepresentationInformation ri,
+  public RepresentationInformationExtraBundle retrieveRepresentationInformationExtraBundle(
+    String representationInformationId,
     String localeString) throws AuthorizationDeniedException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Locale locale = ServerTools.parseLocale(localeString);
-    return Browser.retrieveRepresentationInformationExtraBundle(user, ri, locale);
+    return Browser.retrieveRepresentationInformationExtraBundle(user, representationInformationId, locale);
   }
 
 }

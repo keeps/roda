@@ -293,6 +293,6 @@ public interface BrowserServiceAsync {
   void retrieveRelationTypeTranslations(String localeString,
     AsyncCallback<RelationTypeTranslationsBundle> asyncCallback);
 
-  void retrieveRepresentationInformationExtraBundle(RepresentationInformation ri, String localeString,
+  void retrieveRepresentationInformationExtraBundle(String representationInformationId, String localeString,
     AsyncCallback<RepresentationInformationExtraBundle> asyncCallback);
 }

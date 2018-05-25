@@ -388,6 +388,6 @@ public interface BrowserService extends RemoteService {
   RelationTypeTranslationsBundle retrieveRelationTypeTranslations(String localeString)
     throws AuthorizationDeniedException;
 
-  RepresentationInformationExtraBundle retrieveRepresentationInformationExtraBundle(RepresentationInformation ri,
+  RepresentationInformationExtraBundle retrieveRepresentationInformationExtraBundle(String representationInformationId,
     String localeString) throws AuthorizationDeniedException;
 }
