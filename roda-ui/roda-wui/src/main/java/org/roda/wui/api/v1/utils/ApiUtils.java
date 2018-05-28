@@ -171,17 +171,21 @@ public class ApiUtils {
   public static Response okResponse(StreamResponse streamResponse, CacheControl cacheControl, Date lastModifiedDate,
     boolean inline) {
     StreamingOutput so = new StreamingOutput() {
-
       @Override
       public void write(OutputStream output) throws IOException, WebApplicationException {
         streamResponse.getStream().consumeOutputStream(output);
-
       }
     };
-    return Response.ok(so, streamResponse.getMediaType())
-      .header(HttpHeaders.CONTENT_DISPOSITION,
-        contentDisposition(inline) + CONTENT_DISPOSITION_FILENAME_ARGUMENT + "\"" + streamResponse.getFilename() + "\"")
-      .cacheControl(cacheControl).lastModified(lastModifiedDate).build();
+
+    Response.ResponseBuilder response = Response.ok(so, streamResponse.getMediaType()).header(
+      HttpHeaders.CONTENT_DISPOSITION,
+      contentDisposition(inline) + CONTENT_DISPOSITION_FILENAME_ARGUMENT + "\"" + streamResponse.getFilename() + "\"");
+
+    if (streamResponse.getFileSize() > 0) {
+      response.header(HttpHeaders.CONTENT_LENGTH, streamResponse.getFileSize());
+    }
+
+    return response.cacheControl(cacheControl).lastModified(lastModifiedDate).build();
   }
 
   public static Response okResponse(StreamResponse streamResponse, CacheControl cacheControl, EntityTag tag) {
@@ -191,17 +195,21 @@ public class ApiUtils {
   public static Response okResponse(StreamResponse streamResponse, CacheControl cacheControl, EntityTag tag,
     boolean inline) {
     StreamingOutput so = new StreamingOutput() {
-
       @Override
       public void write(OutputStream output) throws IOException, WebApplicationException {
         streamResponse.getStream().consumeOutputStream(output);
-
       }
     };
-    return Response.ok(so, streamResponse.getMediaType())
-      .header(HttpHeaders.CONTENT_DISPOSITION,
-        contentDisposition(inline) + CONTENT_DISPOSITION_FILENAME_ARGUMENT + "\"" + streamResponse.getFilename() + "\"")
-      .cacheControl(cacheControl).tag(tag).build();
+
+    Response.ResponseBuilder response = Response.ok(so, streamResponse.getMediaType()).header(
+      HttpHeaders.CONTENT_DISPOSITION,
+      contentDisposition(inline) + CONTENT_DISPOSITION_FILENAME_ARGUMENT + "\"" + streamResponse.getFilename() + "\"");
+
+    if (streamResponse.getFileSize() > 0) {
+      response.header(HttpHeaders.CONTENT_LENGTH, streamResponse.getFileSize());
+    }
+
+    return response.cacheControl(cacheControl).tag(tag).build();
   }
 
   public static Response okResponse(StreamResponse streamResponse) {
@@ -210,17 +218,21 @@ public class ApiUtils {
 
   public static Response okResponse(StreamResponse streamResponse, boolean inline) {
     StreamingOutput so = new StreamingOutput() {
-
       @Override
       public void write(OutputStream output) throws IOException, WebApplicationException {
         streamResponse.getStream().consumeOutputStream(output);
-
       }
     };
-    return Response.ok(so, streamResponse.getMediaType())
-      .header(HttpHeaders.CONTENT_DISPOSITION,
-        contentDisposition(inline) + CONTENT_DISPOSITION_FILENAME_ARGUMENT + "\"" + streamResponse.getFilename() + "\"")
-      .build();
+
+    Response.ResponseBuilder response = Response.ok(so, streamResponse.getMediaType()).header(
+      HttpHeaders.CONTENT_DISPOSITION,
+      contentDisposition(inline) + CONTENT_DISPOSITION_FILENAME_ARGUMENT + "\"" + streamResponse.getFilename() + "\"");
+
+    if (streamResponse.getFileSize() > 0) {
+      response.header(HttpHeaders.CONTENT_LENGTH, streamResponse.getFileSize());
+    }
+
+    return response.build();
   }
 
   private static String contentDisposition(boolean inline) {
@@ -247,7 +259,6 @@ public class ApiUtils {
     }
   }
 
-  @SuppressWarnings("unchecked")
   public static <T extends IsIndexed, R extends IsModelObject> RODAObjectList<R> indexedResultToRODAObjectList(
     Class<T> objectClass, IndexResult<T> result)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
@@ -331,7 +342,7 @@ public class ApiUtils {
       } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
         || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
         AIP aip = RodaCoreFactory.getModelService().retrieveAIP(indexedAIP.getId());
-        representation = new ObjectResponse<AIP>(acceptFormat, aip);
+        representation = new ObjectResponse<>(acceptFormat, aip);
       } else {
         throw new GenericException("Unsupported class: " + acceptFormat);
       }

@@ -1846,7 +1846,8 @@ public class BrowserHelper {
           }
         }
       };
-      return new StreamResponse(filename, mediaType, stream);
+
+      return new StreamResponse(filename, mediaType, iFile.getSize(), stream);
     } else if (iFile.isDirectory() && (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP.equals(acceptFormat)
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat))) {
       Directory directory = RodaCoreFactory.getStorageService().getDirectory(filePath);

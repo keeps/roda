@@ -10,12 +10,21 @@ package org.roda.core.common;
 public class StreamResponse implements EntityResponse {
   private String filename;
   private String mediaType;
+  private long fileSize = -1;
   private ConsumesOutputStream stream;
 
   public StreamResponse(String filename, String mediaType, ConsumesOutputStream stream) {
     super();
     this.filename = filename;
     this.mediaType = mediaType;
+    this.stream = stream;
+  }
+
+  public StreamResponse(String filename, String mediaType, long fileSize, ConsumesOutputStream stream) {
+    super();
+    this.filename = filename;
+    this.mediaType = mediaType;
+    this.fileSize = fileSize;
     this.stream = stream;
   }
 
@@ -37,6 +46,14 @@ public class StreamResponse implements EntityResponse {
     this.mediaType = mediaType;
   }
 
+  public long getFileSize() {
+    return fileSize;
+  }
+
+  public void setFileSize(long fileSize) {
+    this.fileSize = fileSize;
+  }
+
   public ConsumesOutputStream getStream() {
     return stream;
   }
@@ -44,5 +61,6 @@ public class StreamResponse implements EntityResponse {
   public void setStream(ConsumesOutputStream stream) {
     this.stream = stream;
   }
+
 
 }

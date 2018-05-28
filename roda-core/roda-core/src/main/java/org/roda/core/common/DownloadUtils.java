@@ -139,9 +139,7 @@ public class DownloadUtils {
         public String getMediaType() {
           return BIN_MEDIA_TYPE;
         }
-
       };
-
     }
 
     return stream;

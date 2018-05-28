@@ -16,5 +16,4 @@ public interface ConsumesOutputStream {
   String getFileName();
 
   String getMediaType();
-
 }
