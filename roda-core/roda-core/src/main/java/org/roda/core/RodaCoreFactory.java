@@ -931,7 +931,6 @@ public class RodaCoreFactory {
     try {
       CollectionAdminResponse response = req.process(cloudSolrClient);
 
-      @SuppressWarnings("unchecked")
       List<String> existingCollections = (List<String>) response.getResponse().get("collections");
       if (existingCollections == null) {
         existingCollections = new ArrayList<>();
@@ -1169,30 +1168,43 @@ public class RodaCoreFactory {
 
       final boolean ldapStartServer = rodaConfig.getBoolean("core.ldap.startServer",
         rodaConfig.getBoolean("ldap.startServer", false));
+
       final int ldapPort = rodaConfig.getInt("core.ldap.port",
         rodaConfig.getInt("ldap.port", RodaConstants.CORE_LDAP_DEFAULT_PORT));
+
       final String ldapBaseDN = rodaConfig.getString("core.ldap.baseDN",
         rodaConfig.getString("ldap.baseDN", "dc=roda,dc=org"));
+
       final String ldapPeopleDN = rodaConfig.getString("core.ldap.peopleDN",
         rodaConfig.getString("ldap.peopleDN", "ou=users,dc=roda,dc=org"));
+
       final String ldapGroupsDN = rodaConfig.getString("core.ldap.groupsDN",
         rodaConfig.getString("ldap.groupsDN", "ou=groups,dc=roda,dc=org"));
+
       final String ldapRolesDN = rodaConfig.getString("core.ldap.rolesDN",
-        rodaConfig.getString("ldap.rolesDN", "ou=groups,dc=roda,dc=org"));
+        rodaConfig.getString("ldap.rolesDN", "ou=roles,dc=roda,dc=org"));
+
       final String ldapAdminDN = rodaConfig.getString("core.ldap.adminDN",
-        rodaConfig.getString("ldap.adminDN", "ou=groups,dc=roda,dc=org"));
+        rodaConfig.getString("ldap.adminDN", "uid=admin,ou=system"));
+
       final String ldapAdminPassword = rodaConfig.getString("core.ldap.adminPassword",
         rodaConfig.getString("ldap.adminPassword", "roda"));
+
       final String ldapPasswordDigestAlgorithm = rodaConfig.getString("core.ldap.passwordDigestAlgorithm",
-        rodaConfig.getString("ldap.passwordDigestAlgorithm", "MD5"));
+        rodaConfig.getString("ldap.passwordDigestAlgorithm", "PKCS5S2"));
+
       final List<String> ldapProtectedUsers = RodaUtils.copyList(rodaConfig.getList("core.ldap.protectedUsers"));
-      ldapProtectedUsers.addAll(RodaUtils.copyList(rodaConfig.getList("ldap.protectedUsers")));
+      ldapProtectedUsers.addAll(RodaUtils.copyList(rodaConfig.getList("core.ldap.protectedUsers")));
+
       final List<String> ldapProtectedGroups = RodaUtils.copyList(rodaConfig.getList("core.ldap.protectedGroups"));
-      ldapProtectedGroups.addAll(RodaUtils.copyList(rodaConfig.getList("ldap.protectedGroups")));
+      ldapProtectedGroups.addAll(RodaUtils.copyList(rodaConfig.getList("core.ldap.protectedGroups")));
+
       final String rodaGuestDN = rodaConfig.getString("core.ldap.rodaGuestDN",
         rodaConfig.getString("ldap.rodaGuestDN", "uid=guest,ou=users,dc=roda,dc=org"));
+
       final String rodaAdminDN = rodaConfig.getString("core.ldap.rodaAdminDN",
         rodaConfig.getString("ldap.rodaAdminDN", "uid=admin,ou=users,dc=roda,dc=org"));
+
       final String rodaAdministratorsDN = rodaConfig.getString("core.ldap.rodaAdministratorsDN",
         rodaConfig.getString("ldap.rodaAdministratorsDN", "cn=administrators,ou=groups,dc=roda,dc=org"));
 
