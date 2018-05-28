@@ -81,7 +81,6 @@ public class IterableIndexResult<T extends IsIndexed> implements CloseableIterab
     }
   }
 
-  @SuppressWarnings("unchecked")
   private void getResults() {
     db = DBMaker.tempFileDB().fileMmapEnableIfSupported().cleanerHackEnable().make();
     TreeMapSink<String, T> sink = db.treeMap("myMap", Serializer.STRING, Serializer.JAVA).createFromSink();
@@ -89,7 +88,6 @@ public class IterableIndexResult<T extends IsIndexed> implements CloseableIterab
     this.indexObjects = sink.create();
   }
 
-  @SuppressWarnings("unchecked")
   private void getResults(Sorter sorter) {
     db = DBMaker.tempFileDB().fileMmapEnableIfSupported().cleanerHackEnable().make();
     this.indexObjects = db.treeMap("myMap", Serializer.STRING, Serializer.JAVA).create();

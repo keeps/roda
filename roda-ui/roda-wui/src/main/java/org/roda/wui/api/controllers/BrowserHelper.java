@@ -2121,6 +2121,7 @@ public class BrowserHelper {
     Map<String, IndexedRepresentation> representations = new HashMap<>();
     Map<String, IndexedFile> files = new HashMap<>();
     Map<String, TransferredResource> transferredResources = new HashMap<>();
+    List<String> uris = new ArrayList<>();
 
     List<String> eventFields = new ArrayList<>();
     IndexedPreservationEvent ipe = retrieve(IndexedPreservationEvent.class, eventId, eventFields);
@@ -2184,6 +2185,8 @@ public class BrowserHelper {
             TransferredResource tr = retrieve(TransferredResource.class, IdUtils.createUUID(id), resourceFields);
             transferredResources.put(idValue, tr);
           }
+        } else if (RodaConstants.URI_TYPE.equals(identifier.getType())) {
+          uris.add(idValue);
         } else {
           LOGGER.warn("No support for linking object type: {}", idValue);
         }
@@ -2196,7 +2199,7 @@ public class BrowserHelper {
     eventBundle.setRepresentations(representations);
     eventBundle.setFiles(files);
     eventBundle.setTransferredResources(transferredResources);
-
+    eventBundle.setUris(uris);
     return eventBundle;
   }
 
@@ -2206,7 +2209,6 @@ public class BrowserHelper {
     StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(aipId, representationId,
       descriptiveMetadataId);
     return RodaCoreFactory.getStorageService().listBinaryVersions(storagePath);
-
   }
 
   public static DescriptiveMetadataVersionsBundle retrieveDescriptiveMetadataVersionsBundle(String aipId,

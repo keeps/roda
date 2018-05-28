@@ -1191,7 +1191,7 @@ public final class RodaConstants {
   }
 
   public enum ExportType {
-    ZIP, FOLDER;
+    ZIP, FOLDER
   }
 
   public enum PreservationAgentType {
@@ -1295,9 +1295,10 @@ public final class RodaConstants {
   public static final String URN_OTHER = "other";
   public static final String URN_SEPARATOR = ":";
   public static final String URN_TYPE = "URN";
+  public static final String URI_TYPE = "URI";
 
   public enum RODA_TYPE {
-    AIP, REPRESENTATION, FILE, TRANSFERRED_RESOURCE;
+    AIP, REPRESENTATION, FILE, TRANSFERRED_RESOURCE
   }
 
   public static final List<String> SYSTEM_USERS = Arrays.asList("admin", "guest");

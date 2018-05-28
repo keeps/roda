@@ -465,6 +465,8 @@ public interface ClientMessages extends Messages {
 
   String selectButton();
 
+  String inspectButton();
+
   /*** Identify formats ***/
 
   String identifyFormatsButton();
@@ -1861,6 +1863,8 @@ public interface ClientMessages extends Messages {
   String showMore();
 
   String showLess();
+
+  String uriLinkingIdentifierTitle();
 
   /* Version action */
   String versionAction(@Select String action);

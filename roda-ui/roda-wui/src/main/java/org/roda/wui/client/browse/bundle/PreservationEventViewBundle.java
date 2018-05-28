@@ -8,6 +8,7 @@
 package org.roda.wui.client.browse.bundle;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -26,6 +27,7 @@ public class PreservationEventViewBundle implements Serializable {
   private Map<String, IndexedRepresentation> representations;
   private Map<String, IndexedFile> files;
   private Map<String, TransferredResource> transferredResources;
+  private List<String> uris;
 
   public PreservationEventViewBundle() {
     super();
@@ -33,7 +35,7 @@ public class PreservationEventViewBundle implements Serializable {
 
   public PreservationEventViewBundle(IndexedPreservationEvent event, Map<String, IndexedPreservationAgent> agents,
     Map<String, IndexedAIP> aips, Map<String, IndexedRepresentation> representations, Map<String, IndexedFile> files,
-    Map<String, TransferredResource> transferredResources) {
+    Map<String, TransferredResource> transferredResources, List<String> uris) {
     super();
     this.event = event;
     this.agents = agents;
@@ -41,6 +43,7 @@ public class PreservationEventViewBundle implements Serializable {
     this.representations = representations;
     this.files = files;
     this.transferredResources = transferredResources;
+    this.uris = uris;
   }
 
   public IndexedPreservationEvent getEvent() {
@@ -91,11 +94,19 @@ public class PreservationEventViewBundle implements Serializable {
     this.transferredResources = transferredResources;
   }
 
+  public List<String> getUris() {
+    return uris;
+  }
+
+  public void setUris(List<String> uris) {
+    this.uris = uris;
+  }
+
   @Override
   public String toString() {
     return "PreservationEventViewBundle [event=" + event + ", agents=" + agents + ", aips=" + aips
       + ", representations=" + representations + ", files=" + files + ", transferredResources=" + transferredResources
-      + "]";
+      + ", uris=" + uris + "]";
   }
 
 }

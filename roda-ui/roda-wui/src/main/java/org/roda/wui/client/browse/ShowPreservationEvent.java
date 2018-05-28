@@ -54,6 +54,7 @@ import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.safehtml.shared.SafeUri;
+import com.google.gwt.safehtml.shared.UriUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -274,7 +275,8 @@ public class ShowPreservationEvent extends Composite {
     for (LinkingIdentifier sourceObjectId : event.getSourcesObjectIds()) {
       if (sourceObjectId.getRoles() != null
         && sourceObjectId.getRoles().contains(RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE)
-        && "URN".equalsIgnoreCase(sourceObjectId.getType())) {
+        && (RodaConstants.URN_TYPE.equalsIgnoreCase(sourceObjectId.getType())
+          || RodaConstants.URI_TYPE.equalsIgnoreCase(sourceObjectId.getType()))) {
         addObjectPanel(sourceObjectId, bundle, sourceObjectsPanel);
         showSourceObjects = true;
       }
@@ -287,7 +289,8 @@ public class ShowPreservationEvent extends Composite {
     for (LinkingIdentifier outcomeObjectId : event.getOutcomeObjectIds()) {
       if (outcomeObjectId.getRoles() != null
         && outcomeObjectId.getRoles().contains(RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME)
-        && "URN".equalsIgnoreCase(outcomeObjectId.getType())) {
+        && (RodaConstants.URN_TYPE.equalsIgnoreCase(outcomeObjectId.getType())
+          || RodaConstants.URI_TYPE.equalsIgnoreCase(outcomeObjectId.getType()))) {
         addObjectPanel(outcomeObjectId, bundle, outcomeObjectsPanel);
         showOutcomeObjects = true;
       }
@@ -326,12 +329,11 @@ public class ShowPreservationEvent extends Composite {
   }
 
   private void addObjectPanel(LinkingIdentifier object, PreservationEventViewBundle bundle, FlowPanel objectsPanel) {
-
     FlowPanel layout = new FlowPanel();
     layout.addStyleName("panel");
+    String idValue = object.getValue();
 
-    if ("URN".equalsIgnoreCase(object.getType())) {
-      String idValue = object.getValue();
+    if (RodaConstants.URN_TYPE.equalsIgnoreCase(object.getType())) {
       RODA_TYPE type = LinkingObjectUtils.getLinkingIdentifierType(idValue);
 
       if (type == RODA_TYPE.TRANSFERRED_RESOURCE) {
@@ -343,9 +345,33 @@ public class ShowPreservationEvent extends Composite {
       } else if (type == RODA_TYPE.AIP) {
         addAipPanel(bundle, layout, idValue);
       }
-
-      objectsPanel.add(layout);
+    } else if (RodaConstants.URI_TYPE.equalsIgnoreCase(object.getType())) {
+      addUriPanel(layout, idValue);
     }
+
+    objectsPanel.add(layout);
+  }
+
+  private void addUriPanel(FlowPanel layout, String idValue) {
+    FlowPanel heading = new FlowPanel();
+    heading.addStyleName("panel-heading");
+    layout.add(heading);
+    FlowPanel body = new FlowPanel();
+    body.addStyleName("panel-body");
+    layout.add(body);
+
+    Label header = new Label(messages.uriLinkingIdentifierTitle());
+    header.addStyleName("panel-title");
+    header.addStyleName("h5");
+    heading.add(header);
+
+    Label titleLabel = new Label(messages.genericTitle());
+    titleLabel.addStyleName("label");
+    Anchor link = new Anchor(idValue, UriUtils.fromString(idValue).asString());
+    link.getElement().setAttribute("target", "_blank");
+
+    body.add(titleLabel);
+    body.add(link);
   }
 
   private FlowPanel createAgentPanel(LinkingIdentifier agentId, IndexedPreservationAgent agent) {
