@@ -867,13 +867,21 @@ public interface ClientMessages extends Messages {
 
   SafeHtml searchPreFilterEmptyKeyFilterParameter(String searchPreFilterName);
 
-  SafeHtml searchPreFilterOrFiltersParameter(String searchPreFilterNames);
+  SafeHtml searchPreFilterOneOfManyFilterParameterSingle(String searchPreFilterName, String item);
+
+  SafeHtml searchPreFilterOneOfManyFilterParameterWithSize(String searchPreFilterName, int listSize);
+
+  SafeHtml searchPreFilterOneOfManyFilterParameterWithList(String searchPreFilterName, List<String> list);
 
   String searchPreFilterName(@Select String name);
 
   String searchPreFilterValue(@Select String name);
 
-  String searchPreFilterOr();
+  SafeHtml searchPreFilterOr();
+
+  SafeHtml searchPreFilterAnd();
+
+  SafeHtml searchPreFilterWhere();
 
   /************* Risk register ****************/
 

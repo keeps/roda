@@ -6488,3 +6488,13 @@ span.code {
     margin-top: 0;
   }
 }
+
+/*****************************
+  Search pre filter
+ */
+
+.search-prefilter-field, .search-prefilter-value {
+    font-family: UbuntuMono;
+    color: #888;
+    font-weight: 800;
+}

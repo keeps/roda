@@ -1344,7 +1344,6 @@ public final class RodaConstants {
   public static final String TEST_GROUP_PLUGIN = "plugin";
 
   /* List threshold and action timeout */
-  public static final int DEFAULT_LIST_THRESHOLD = 100;
   public static final int ACTION_TIMEOUT = 2000;
   public static final int DEFAULT_LIST_EXPORT_LIMIT = 1000;
 

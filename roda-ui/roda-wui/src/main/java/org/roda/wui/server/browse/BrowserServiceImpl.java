@@ -916,11 +916,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public int getListThreshold() {
-    return RodaCoreFactory.getRodaConfiguration().getInt("ui.list.threshold", RodaConstants.DEFAULT_LIST_THRESHOLD);
-  }
-
-  @Override
   public boolean showDIPEmbedded() {
     return RodaCoreFactory.getRodaConfiguration().getBoolean("ui.dip.externalURL.showEmbedded", false);
   }

@@ -249,8 +249,6 @@ public interface BrowserServiceAsync {
 
   void hasDocumentation(String aipId, AsyncCallback<Boolean> asyncCallback);
 
-  void getListThreshold(AsyncCallback<Integer> asyncCallback);
-
   void showDIPEmbedded(AsyncCallback<Boolean> asyncCallback);
 
   void acknowledgeNotification(String notificationId, String ackToken, AsyncCallback<Notification> asyncCallback);

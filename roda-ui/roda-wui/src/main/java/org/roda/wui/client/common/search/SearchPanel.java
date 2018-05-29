@@ -14,10 +14,8 @@ import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
-import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
-import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.filter.OrFiltersParameters;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
@@ -44,6 +42,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -165,59 +164,27 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
     searchPreFilters.setVisible(defaultFilter != null && !defaultFilter.getParameters().isEmpty());
 
     if (defaultFilter != null) {
-      for (FilterParameter parameter : defaultFilter.getParameters()) {
-        SafeHtml filterHTML = getFilterParameterHTML(parameter);
+      List<FilterParameter> parameters = defaultFilter.getParameters();
+      for (int i = 0; i < parameters.size(); i++) {
+        SafeHtml filterHTML = SearchPreFilterUtils.getFilterParameterHTML(parameters.get(i));
 
         if (filterHTML != null) {
-          HTML html = new HTML(filterHTML);
-          HTML header = new HTML(SafeHtmlUtils.fromSafeConstant(FILTER_ICON));
-          header.addStyleName("inline gray");
-          searchPreFilters.add(header);
+          if (i == 0) {
+            HTML header = new HTML(SafeHtmlUtils.fromSafeConstant(FILTER_ICON));
+            header.addStyleName("inline gray");
+            searchPreFilters.add(header);
+          } else {
+            InlineHTML andSeparator = new InlineHTML(messages.searchPreFilterAnd());
+            andSeparator.addStyleName("xsmall gray");
+            searchPreFilters.add(andSeparator);
+          }
 
+          HTML html = new HTML(filterHTML);
           html.addStyleName("xsmall gray inline nowrap");
           searchPreFilters.add(html);
         }
       }
     }
-  }
-
-  private SafeHtml getFilterParameterHTML(FilterParameter parameter) {
-    if (parameter instanceof SimpleFilterParameter) {
-      SimpleFilterParameter p = (SimpleFilterParameter) parameter;
-      return messages.searchPreFilterSimpleFilterParameter(messages.searchPreFilterName(p.getName()),
-        messages.searchPreFilterValue(p.getValue()));
-    } else if (parameter instanceof BasicSearchFilterParameter) {
-      BasicSearchFilterParameter p = (BasicSearchFilterParameter) parameter;
-      // TODO put '*' in some constant, see Search
-      if (!"*".equals(p.getValue())) {
-        return messages.searchPreFilterBasicSearchFilterParameter(messages.searchPreFilterName(p.getName()),
-          messages.searchPreFilterValue(p.getValue()));
-      }
-    } else if (parameter instanceof NotSimpleFilterParameter) {
-      NotSimpleFilterParameter p = (NotSimpleFilterParameter) parameter;
-      return messages.searchPreFilterNotSimpleFilterParameter(messages.searchPreFilterName(p.getName()),
-        messages.searchPreFilterValue(p.getValue()));
-    } else if (parameter instanceof EmptyKeyFilterParameter) {
-      EmptyKeyFilterParameter p = (EmptyKeyFilterParameter) parameter;
-      return messages.searchPreFilterEmptyKeyFilterParameter(messages.searchPreFilterName(p.getName()));
-    } else if (parameter instanceof OrFiltersParameters) {
-      List<FilterParameter> parameterValues = ((OrFiltersParameters) parameter).getValues();
-      StringBuilder preFilterTranslations = new StringBuilder();
-
-      for (int i = 0; i < parameterValues.size(); i++) {
-        preFilterTranslations.append(getFilterParameterHTML(parameterValues.get(i)).asString());
-
-        if (i != parameterValues.size() - 1) {
-          preFilterTranslations.append(" ").append(messages.searchPreFilterOr()).append(" ");
-        }
-      }
-
-      return messages.searchPreFilterOrFiltersParameter(preFilterTranslations.toString());
-    } else {
-      return SafeHtmlUtils.fromString(parameter.getClass().getSimpleName());
-    }
-
-    return null;
   }
 
   public void doSearch() {

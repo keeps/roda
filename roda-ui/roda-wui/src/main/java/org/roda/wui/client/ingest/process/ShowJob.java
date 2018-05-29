@@ -43,15 +43,12 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
-import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.IngestJobReportList;
-import org.roda.wui.client.common.lists.RepresentationList;
-import org.roda.wui.client.common.lists.SimpleFileList;
 import org.roda.wui.client.common.lists.SimpleJobReportList;
-import org.roda.wui.client.common.lists.TransferredResourceList;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchPanel;
+import org.roda.wui.client.common.search.SearchPreFilterUtils;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -108,7 +105,7 @@ public class ShowJob extends Composite {
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
         String jobId = historyTokens.get(0);
-        BrowserService.Util.getInstance().retrieveJobBundle(jobId, new ArrayList<String>(),
+        BrowserService.Util.getInstance().retrieveJobBundle(jobId, new ArrayList<>(),
           new AsyncCallback<JobBundle>() {
 
             @Override
@@ -396,34 +393,18 @@ public class ShowJob extends Composite {
       selectedListPanel.setVisible(true);
 
       if (ClientSelectedItemsUtils.isEmpty(selected) && isJobInFinalState()) {
-        selectedListPanel.setVisible(false);
+        Label noSourceLabel = new Label(messages.noItemsToDisplay());
+        selectedListPanel.add(noSourceLabel);
       } else if (selected instanceof SelectedItemsList) {
-        BrowserService.Util.getInstance().getListThreshold(new AsyncCallback<Integer>() {
-
-          @Override
-          public void onFailure(Throwable caught) {
-            AsyncCallbackUtils.defaultFailureTreatment(caught);
-          }
-
-          @Override
-          public void onSuccess(Integer threshold) {
-            List<String> ids = ((SelectedItemsList<?>) selected).getIds();
-            if (ids.size() > threshold) {
-              Label thresholdLabel = new Label(messages.thresholdExceeded(ids.size(), threshold));
-              selectedList.add(thresholdLabel);
-            } else {
-              Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, ids));
-              TransferredResourceList list = new TransferredResourceList(filter, null,
-                messages.transferredResourcesTitle(), false, 10, 10);
-              selectedList.add(list);
-            }
-          }
-        });
+        List<String> ids = ((SelectedItemsList<?>) selected).getIds();
+        Label filterLabel = new Label(SearchPreFilterUtils
+          .getFilterParameterHTML(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, ids)).asString());
+        selectedList.add(filterLabel);
       } else if (selected instanceof SelectedItemsFilter) {
         Filter filter = ((SelectedItemsFilter<?>) selected).getFilter();
-        TransferredResourceList list = new TransferredResourceList(filter, null, messages.transferredResourcesTitle(),
-          false, 10, 10);
-        selectedList.add(list);
+        Label filterLabel = new Label(
+          SearchPreFilterUtils.getFilterHTML(filter, selected.getSelectedClass()).asString());
+        selectedList.add(filterLabel);
       } else {
         selectedListPanel.setVisible(false);
       }
@@ -432,65 +413,30 @@ public class ShowJob extends Composite {
 
   private void showActionSourceObjects(final SelectedItems<?> selected) {
     if (selected != null) {
-      final boolean selectable = false;
-      final boolean justActive = true;
       selectedList.clear();
 
       if (selected instanceof SelectedItemsList) {
-        BrowserService.Util.getInstance().getListThreshold(new AsyncCallback<Integer>() {
+        List<String> ids = ((SelectedItemsList<?>) selected).getIds();
 
-          @Override
-          public void onFailure(Throwable caught) {
-            AsyncCallbackUtils.defaultFailureTreatment(caught);
-          }
-
-          @Override
-          public void onSuccess(Integer threshold) {
-            List<String> ids = ((SelectedItemsList<?>) selected).getIds();
-
-            if (ids.isEmpty()) {
-              selectedListPanel.setVisible(false);
-            } else if (ids.size() > threshold) {
-              Label thresholdLabel = new Label(messages.thresholdExceeded(ids.size(), threshold));
-              selectedList.add(thresholdLabel);
-            } else {
-              Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, ids));
-              if (IndexedAIP.class.getName().equals(selected.getSelectedClass())) {
-                AIPList list = new AIPList(filter, justActive, null, messages.aipsTitle(), selectable, 10, 10);
-                selectedList.add(list);
-              } else if (IndexedRepresentation.class.getName().equals(selected.getSelectedClass())) {
-                RepresentationList list = new RepresentationList(filter, justActive, null,
-                  messages.representationsTitle(), selectable, 10, 10);
-                selectedList.add(list);
-              } else if (IndexedFile.class.getName().equals(selected.getSelectedClass())) {
-                SimpleFileList list = new SimpleFileList(filter, justActive, null, messages.filesTitle(), selectable,
-                  10, 10);
-                selectedList.add(list);
-              }
-            }
-          }
-        });
-
+        if (ids.isEmpty()) {
+          Label noSourceLabel = new Label(messages.noItemsToDisplay());
+          selectedListPanel.add(noSourceLabel);
+        } else {
+          Label filterLabel = new Label(SearchPreFilterUtils
+            .getFilterParameterHTML(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, ids)).asString());
+          selectedList.add(filterLabel);
+        }
       } else if (selected instanceof SelectedItemsFilter) {
         Filter filter = ((SelectedItemsFilter<?>) selected).getFilter();
-
-        if (IndexedAIP.class.getName().equals(selected.getSelectedClass())) {
-          AIPList list = new AIPList(filter, justActive, null, messages.aipsTitle(), selectable, 10, 10);
-          selectedList.add(list);
-        } else if (IndexedRepresentation.class.getName().equals(selected.getSelectedClass())) {
-          RepresentationList list = new RepresentationList(filter, justActive, null, messages.representationsTitle(),
-            selectable, 10, 10);
-          selectedList.add(list);
-        } else if (IndexedFile.class.getName().equals(selected.getSelectedClass())) {
-          SimpleFileList list = new SimpleFileList(filter, justActive, null, messages.filesTitle(), selectable, 10, 10);
-          selectedList.add(list);
-        }
-
+        HTML filterHTML = new HTML(SearchPreFilterUtils.getFilterHTML(filter, selected.getSelectedClass()));
+        selectedList.add(filterHTML);
       } else if (selected instanceof SelectedItemsAll || selected instanceof SelectedItemsNone) {
         Label objectLabel = new Label();
         objectLabel.addStyleName("value");
 
-        if (AIP.class.getName().equals(selected.getSelectedClass())
+        if (StringUtils.isBlank(selected.getSelectedClass())) {
+          objectLabel.setText(messages.noItemsToDisplay());
+        } else if (AIP.class.getName().equals(selected.getSelectedClass())
           || IndexedAIP.class.getName().equals(selected.getSelectedClass())) {
           objectLabel.setText(messages.allIntellectualEntities());
         } else if (Representation.class.getName().equals(selected.getSelectedClass())
@@ -499,6 +445,8 @@ public class ShowJob extends Composite {
         } else if (File.class.getName().equals(selected.getSelectedClass())
           || IndexedFile.class.getName().equals(selected.getSelectedClass())) {
           objectLabel.setText(messages.allFiles());
+        } else {
+          objectLabel.setText(messages.allOfAObject(selected.getSelectedClass()));
         }
 
         selectedList.add(objectLabel);

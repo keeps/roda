@@ -341,8 +341,6 @@ public interface BrowserService extends RemoteService {
   boolean hasDocumentation(String aipId)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException;
 
-  int getListThreshold();
-
   boolean showDIPEmbedded();
 
   Notification acknowledgeNotification(String notificationId, String ackToken)
