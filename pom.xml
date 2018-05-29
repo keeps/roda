@@ -315,7 +315,7 @@
 					<executions>
 						<execution>
 							<id>attach-sources</id>
-							<phase>install</phase>
+							<phase>package</phase>
 							<goals>
 								<goal>jar</goal>
 							</goals>
