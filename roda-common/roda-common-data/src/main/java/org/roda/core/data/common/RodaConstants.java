@@ -1390,6 +1390,9 @@ public final class RodaConstants {
   public static final List<String> DIPFILE_FIELDS_TO_RETURN = Arrays.asList(RodaConstants.INDEX_UUID,
     RodaConstants.DIPFILE_ID, RodaConstants.DIPFILE_PATH, RodaConstants.DIPFILE_DIP_ID,
     RodaConstants.DIPFILE_IS_DIRECTORY);
+  
+  
+  public static final String ENV_CONFIG_SYMBOLIC_LINKS_FORBIDDEN = "RODA_CONFIG_SYMBOLIC_LINKS_FORBIDDEN";
 
   /** Private empty constructor */
   private RodaConstants() {

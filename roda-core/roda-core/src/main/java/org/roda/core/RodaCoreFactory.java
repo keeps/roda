@@ -215,6 +215,8 @@ public class RodaCoreFactory {
 
   private static Map<String, Map<String, String>> rodaPropertiesCache = null;
 
+  private static boolean configSymbolicLinksAllowed;
+
   /** Private empty constructor */
   private RodaCoreFactory() {
 
@@ -305,6 +307,10 @@ public class RodaCoreFactory {
 
     if (!instantiated) {
       try {
+        // basic settings
+        configSymbolicLinksAllowed = !Boolean
+          .parseBoolean(System.getenv(RodaConstants.ENV_CONFIG_SYMBOLIC_LINKS_FORBIDDEN));
+
         // determine RODA HOME
         rodaHomePath = determineRodaHomePath();
         LOGGER.debug("RODA HOME is {}", rodaHomePath);
@@ -393,6 +399,14 @@ public class RodaCoreFactory {
           : (instantiatedWithoutErrors ? "with success!"
             : "with some errors!!! See logs because these errors might cause instability in the system."));
     }
+  }
+
+  public static boolean isConfigSymbolicLinksAllowed() {
+    return configSymbolicLinksAllowed;
+  }
+
+  public static void setConfigSymbolicLinksAllowed(boolean configSymbolicLinksAllowed) {
+    RodaCoreFactory.configSymbolicLinksAllowed = configSymbolicLinksAllowed;
   }
 
   private static void initializeWorkingDirectory() {
@@ -1461,7 +1475,36 @@ public class RodaCoreFactory {
     Configuration configuration = propertiesConfiguration.interpolatedConfiguration();
 
     return configuration;
+  }
 
+  private static boolean checkPathIsWithin(Path path, Path folder) {
+    return checkPathIsWithin(path, folder, configSymbolicLinksAllowed);
+  }
+
+  private static boolean checkPathIsWithin(Path path, Path folder, boolean allowSymbolicLinks) {
+    boolean ret = true;
+
+    Path absolutePath = path.toAbsolutePath();
+
+    // check against real path
+    if (!allowSymbolicLinks) {
+      Path realPath;
+      try {
+        realPath = absolutePath.toRealPath();
+        ret &= realPath.isAbsolute();
+        ret &= realPath.startsWith(folder.toAbsolutePath());
+      } catch (IOException e) {
+        LOGGER.warn("Error checking for path transversal", e);
+        ret = false;
+      }
+    }
+
+    // check against normalized path
+    Path normalized = absolutePath.normalize();
+    ret &= normalized.isAbsolute();
+    ret &= normalized.startsWith(folder);
+
+    return ret;
   }
 
   public static URL getConfigurationFile(String configurationFile) {
@@ -1486,30 +1529,6 @@ public class RodaCoreFactory {
     }
 
     return configUri;
-  }
-
-  private static boolean checkPathIsWithin(Path path, Path folder) {
-    boolean ret = true;
-
-    Path absolutePath = path.toAbsolutePath();
-
-    // check against real path
-    Path realPath;
-    try {
-      realPath = absolutePath.toRealPath();
-      ret &= realPath.isAbsolute();
-      ret &= realPath.startsWith(folder.toAbsolutePath());
-    } catch (IOException e) {
-      LOGGER.warn("Error checking for path transversal", e);
-      ret = false;
-    }
-
-    // check against normalized path
-    Path normalized = absolutePath.normalize();
-    ret &= normalized.isAbsolute();
-    ret &= normalized.startsWith(folder);
-
-    return ret;
   }
 
   public static InputStream getScopedConfigurationFileAsStream(Path relativeConfigPath, String untrustedUserPath)

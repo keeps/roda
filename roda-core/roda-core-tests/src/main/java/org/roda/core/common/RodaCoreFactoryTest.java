@@ -1,11 +1,14 @@
 package org.roda.core.common;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
+import org.apache.commons.compress.utils.IOUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
 import org.roda.core.data.common.RodaConstants;
@@ -69,6 +72,7 @@ public class RodaCoreFactoryTest {
 
     String scope = "theme";
     String secret = "secret.txt";
+    String item = "item.txt";
 
     // set up
     Path configPath = RodaCoreFactory.getConfigPath();
@@ -77,6 +81,8 @@ public class RodaCoreFactoryTest {
     Path secretFile = Files.createFile(configPath.resolve(secret));
     Path secretFileLink = Files.createSymbolicLink(configPath.resolve(Paths.get(scope, secret)),
       configPath.resolve(secret));
+    Path publicFile = configPath.resolve(Paths.get(scope, item));
+    Files.copy(new ByteArrayInputStream(item.getBytes()), publicFile);
 
     try {
       RodaCoreFactory.getScopedConfigurationFileAsStream(Paths.get(scope), "../" + secret);
@@ -85,12 +91,18 @@ public class RodaCoreFactoryTest {
       // expected
     }
 
+    // test link
+    RodaCoreFactory.setConfigSymbolicLinksAllowed(false);
     try {
       RodaCoreFactory.getScopedConfigurationFileAsStream(Paths.get(scope), secret);
       Assert.fail("Should have got an exception");
     } catch (GenericException e) {
       // expected
     }
+
+    RodaCoreFactory.setConfigSymbolicLinksAllowed(true);
+    InputStream secretByLink = RodaCoreFactory.getScopedConfigurationFileAsStream(Paths.get(scope), secret);
+    Assert.assertNotNull(secretByLink, "Secret by link should be allowed here");
 
     try {
       RodaCoreFactory.getScopedConfigurationFileAsStream(Paths.get(scope), secretFile.toAbsolutePath().toString());
@@ -99,9 +111,13 @@ public class RodaCoreFactoryTest {
       // expected
     }
 
+    InputStream itemStream = RodaCoreFactory.getScopedConfigurationFileAsStream(Paths.get(scope), item);
+    Assert.assertEquals(new String(IOUtils.toByteArray(itemStream)), item);
+
     // cleanup
     Files.deleteIfExists(secretFile);
     Files.deleteIfExists(secretFileLink);
+    Files.deleteIfExists(publicFile);
   }
 
 }
