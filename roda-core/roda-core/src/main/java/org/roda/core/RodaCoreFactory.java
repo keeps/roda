@@ -70,7 +70,6 @@ import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
-import org.reflections.util.FilterBuilder;
 import org.roda.core.common.LdapUtility;
 import org.roda.core.common.Messages;
 import org.roda.core.common.RodaUtils;
@@ -989,7 +988,6 @@ public class RodaCoreFactory {
     } catch (SolrServerException | SolrException | IOException e) {
       LOGGER.error("Error creating collection {}", collection, e);
     }
-
   }
 
   private static String getEnvString(String name, String defaultValue) {
@@ -1457,8 +1455,7 @@ public class RodaCoreFactory {
   public static URL getConfigurationFile(String configurationFile) {
     Path config = RodaCoreFactory.getConfigPath().resolve(configurationFile);
     URL configUri;
-    if (FSUtils.exists(config) && !FSUtils.isDirectory(config)
-      && config.toAbsolutePath().startsWith(getConfigPath().toAbsolutePath().toString())) {
+    if (FSUtils.exists(config) && !FSUtils.isDirectory(config) && checkPathIsWithin(config, getConfigPath())) {
       try {
         configUri = config.toUri().toURL();
       } catch (MalformedURLException e) {
@@ -1479,12 +1476,62 @@ public class RodaCoreFactory {
     return configUri;
   }
 
+  private static boolean checkPathIsWithin(Path path, Path folder) {
+    boolean ret = true;
+
+    Path absolutePath = path.toAbsolutePath();
+
+    // check against real path
+    Path realPath;
+    try {
+      realPath = absolutePath.toRealPath();
+      ret &= realPath.isAbsolute();
+      ret &= realPath.startsWith(folder.toAbsolutePath());
+    } catch (IOException e) {
+      LOGGER.warn("Error checking for path transversal", e);
+      ret = false;
+    }
+
+    // check against normalized path
+    Path normalized = absolutePath.normalize();
+    ret &= normalized.isAbsolute();
+    ret &= normalized.startsWith(folder);
+
+    return ret;
+  }
+
+  public static InputStream getScopedConfigurationFileAsStream(Path relativeConfigPath, String untrustedUserPath)
+    throws GenericException {
+
+    // security checks
+    if (relativeConfigPath.isAbsolute()) {
+      throw new GenericException("Relative config path must be relative");
+    }
+
+    Path normalizedBasePath = getConfigPath().resolve(relativeConfigPath).normalize();
+
+    if (!normalizedBasePath.startsWith(getConfigPath())) {
+      throw new GenericException(String.format("Relative config path %1$s must be within config path %2$s",
+        normalizedBasePath, getConfigPath()));
+    }
+
+    Path finalPath = normalizedBasePath.resolve(untrustedUserPath).normalize();
+
+    if (!checkPathIsWithin(finalPath, normalizedBasePath)) {
+      throw new GenericException(
+        String.format("Untrusted user path %1$s must be within base path %2$s", finalPath, normalizedBasePath));
+    }
+
+    String configurationFile = relativeConfigPath.resolve(untrustedUserPath).toString();
+
+    return getConfigurationFileAsStream(configurationFile);
+  }
+
   public static InputStream getConfigurationFileAsStream(String configurationFile) {
     Path config = getConfigPath().resolve(configurationFile);
     InputStream inputStream = null;
     try {
-      if (FSUtils.exists(config) && !FSUtils.isDirectory(config)
-        && config.toAbsolutePath().startsWith(getConfigPath().toAbsolutePath().toString())) {
+      if (FSUtils.exists(config) && !FSUtils.isDirectory(config) && checkPathIsWithin(config, getConfigPath())) {
         inputStream = Files.newInputStream(config);
         LOGGER.trace("Loading configuration from file {}", config);
       }
@@ -1512,7 +1559,7 @@ public class RodaCoreFactory {
     InputStream inputStream = null;
     try {
       if (FSUtils.exists(defaultPath) && !FSUtils.isDirectory(defaultPath)
-        && defaultPath.toAbsolutePath().startsWith(getDefaultPath().toAbsolutePath().toString())) {
+        && checkPathIsWithin(defaultPath, getDefaultPath())) {
         inputStream = Files.newInputStream(defaultPath);
         LOGGER.debug("Trying to load default from file {}", defaultPath);
       }
@@ -1616,39 +1663,6 @@ public class RodaCoreFactory {
       algorithms = RodaConstants.DEFAULT_ALGORITHMS;
     }
     return algorithms;
-  }
-
-  public static Set<String> getFilenamesInsideConfigFolder(String folder) throws IOException {
-
-    Set<String> fileNames = new HashSet<>();
-
-    // get from external config
-    Set<String> externalFileNames = new HashSet<>();
-    Path configPath = RodaCoreFactory.getConfigPath().resolve(folder);
-    Files.walkFileTree(configPath, new SimpleFileVisitor<Path>() {
-      @Override
-      public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-        externalFileNames.add(file.getFileName().toString());
-        return FileVisitResult.CONTINUE;
-      }
-    });
-
-    fileNames.addAll(externalFileNames);
-
-    // get from internal config
-    List<ClassLoader> classLoadersList = new LinkedList<>();
-    classLoadersList.add(ClasspathHelper.contextClassLoader());
-    Set<String> internalFilesPath = new Reflections(new ConfigurationBuilder()
-      .filterInputsBy(
-        new FilterBuilder().include(FilterBuilder.prefix("" + RodaConstants.CORE_CONFIG_FOLDER + "/" + folder)))
-      .setScanners(new ResourcesScanner())
-      .setUrls(ClasspathHelper.forClassLoader(classLoadersList.toArray(new ClassLoader[0]))))
-        .getResources(Pattern.compile(".*"));
-    for (String internalFilePath : internalFilesPath) {
-      fileNames.add(Paths.get(internalFilePath).getFileName().toString());
-    }
-
-    return fileNames;
   }
 
   public static Map<String, String> getPropertiesFromCache(String cacheName, List<String> prefixesToCache) {
