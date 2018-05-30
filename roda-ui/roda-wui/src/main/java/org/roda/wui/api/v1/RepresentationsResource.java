@@ -395,8 +395,6 @@ public class RepresentationsResource {
         return ApiUtils.okResponse((StreamResponse) preservationMetadataList);
       }
 
-    } catch (TransformerException e) {
-      return ApiUtils.errorResponse(e);
     } catch (IOException e) {
       return ApiUtils.errorResponse(new TransformerException(e.getMessage()));
     }
