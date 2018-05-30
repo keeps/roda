@@ -192,7 +192,7 @@ public class BrowserHelper {
   }
 
   protected static BrowseAIPBundle retrieveBrowseAipBundle(User user, IndexedAIP aip, Locale locale)
-    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException {
     BrowseAIPBundle bundle = new BrowseAIPBundle();
 
     // set aip
@@ -201,12 +201,8 @@ public class BrowserHelper {
     boolean justActive = aip.getState().equals(AIPState.ACTIVE);
 
     // set aip ancestors
-    try {
-      List<IndexedAIP> ancestors = retrieveAncestors(aip, aipAncestorsFieldsToReturn);
-      bundle.setAIPAncestors(ancestors);
-    } catch (NotFoundException e) {
-      LOGGER.warn("Found an item with invalid ancestors: {}", aip.getId(), e);
-    }
+    List<IndexedAIP> ancestors = retrieveAncestors(aip, aipAncestorsFieldsToReturn);
+    bundle.setAIPAncestors(ancestors);
 
     // set descriptive metadata
     try {
@@ -247,12 +243,8 @@ public class BrowserHelper {
     bundle.setRepresentation(representation);
 
     // set aip ancestors
-    try {
-      List<IndexedAIP> ancestors = retrieveAncestors(aip, aipAncestorsFieldsToReturn);
-      bundle.setAipAncestors(ancestors);
-    } catch (NotFoundException e) {
-      LOGGER.warn("Found an item with invalid ancestors: {}", aip.getId(), e);
-    }
+    List<IndexedAIP> ancestors = retrieveAncestors(aip, aipAncestorsFieldsToReturn);
+    bundle.setAipAncestors(ancestors);
 
     // set representation desc. metadata
     try {
@@ -276,7 +268,7 @@ public class BrowserHelper {
   }
 
   public static BrowseFileBundle retrieveBrowseFileBundle(IndexedAIP aip, IndexedRepresentation representation,
-    IndexedFile file, User user) throws NotFoundException, GenericException, RequestNotValidException {
+    IndexedFile file, User user) throws GenericException, RequestNotValidException {
     BrowseFileBundle bundle = new BrowseFileBundle();
 
     bundle.setAip(aip);
@@ -284,12 +276,8 @@ public class BrowserHelper {
     bundle.setFile(file);
 
     // set aip ancestors
-    try {
-      List<IndexedAIP> ancestors = retrieveAncestors(aip, aipAncestorsFieldsToReturn);
-      bundle.setAipAncestors(ancestors);
-    } catch (NotFoundException e) {
-      LOGGER.warn("Found an item with invalid ancestors: {}", aip.getId(), e);
-    }
+    List<IndexedAIP> ancestors = retrieveAncestors(aip, aipAncestorsFieldsToReturn);
+    bundle.setAipAncestors(ancestors);
 
     // set sibling count
     String parentUUID = bundle.getFile().getParentUUID();
@@ -348,8 +336,7 @@ public class BrowserHelper {
   }
 
   private static DescriptiveMetadataViewBundle retrieveDescriptiveMetadataBundle(String aipId, String representationId,
-    DescriptiveMetadata descriptiveMetadata, final Locale locale)
-    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    DescriptiveMetadata descriptiveMetadata, final Locale locale) {
     ModelService model = RodaCoreFactory.getModelService();
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
     DescriptiveMetadataViewBundle bundle = new DescriptiveMetadataViewBundle();
@@ -506,11 +493,9 @@ public class BrowserHelper {
     throws GenericException, NotFoundException, RequestNotValidException {
     DipBundle bundle = new DipBundle();
 
-    bundle
-      .setDip(retrieve(IndexedDIP.class, dipUUID,
-        Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID, RodaConstants.DIP_TITLE,
-          RodaConstants.DIP_AIP_IDS, RodaConstants.DIP_AIP_UUIDS, RodaConstants.DIP_FILE_IDS,
-          RodaConstants.DIP_REPRESENTATION_IDS)));
+    bundle.setDip(retrieve(IndexedDIP.class, dipUUID,
+      Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID, RodaConstants.DIP_TITLE, RodaConstants.DIP_AIP_IDS,
+        RodaConstants.DIP_AIP_UUIDS, RodaConstants.DIP_FILE_IDS, RodaConstants.DIP_REPRESENTATION_IDS)));
 
     List<String> dipFileFields = new ArrayList<>();
 
@@ -570,7 +555,7 @@ public class BrowserHelper {
   }
 
   protected static List<IndexedAIP> retrieveAncestors(IndexedAIP aip, List<String> fieldsToReturn)
-    throws GenericException, NotFoundException, RequestNotValidException {
+    throws GenericException, RequestNotValidException {
     return RodaCoreFactory.getIndexService().retrieveAncestors(aip, fieldsToReturn);
   }
 
@@ -582,7 +567,8 @@ public class BrowserHelper {
   }
 
   protected static <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
-    final Sorter sorter, final User user, final boolean justActive, List<String> fieldsToReturn) {
+    final Sorter sorter, final User user, final boolean justActive, List<String> fieldsToReturn)
+    throws GenericException, RequestNotValidException {
     return RodaCoreFactory.getIndexService().findAll(returnClass, filter, sorter, user, justActive, fieldsToReturn);
   }
 
@@ -592,11 +578,11 @@ public class BrowserHelper {
   }
 
   protected static <T extends IsIndexed> T retrieve(Class<T> returnClass, String id, List<String> fieldsToReturn)
-    throws GenericException, NotFoundException, RequestNotValidException {
+    throws GenericException, NotFoundException {
     return RodaCoreFactory.getIndexService().retrieve(returnClass, id, fieldsToReturn);
   }
 
-  protected static <T extends IsIndexed> void commit(Class<T> returnClass) throws GenericException, NotFoundException {
+  protected static <T extends IsIndexed> void commit(Class<T> returnClass) throws GenericException {
     RodaCoreFactory.getIndexService().commit(returnClass);
   }
 
@@ -622,7 +608,7 @@ public class BrowserHelper {
   }
 
   protected static <T extends IsIndexed> List<String> suggest(Class<T> returnClass, String field, String query,
-    User user, boolean allowPartial) throws GenericException, NotFoundException {
+    User user, boolean allowPartial) throws GenericException {
     boolean justActive = true;
     return RodaCoreFactory.getIndexService().suggest(returnClass, field, query, user, allowPartial, justActive);
   }
