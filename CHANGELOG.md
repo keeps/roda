@@ -1,5 +1,16 @@
 # Changelog
 
+## v2.2.8 (30/05/2018)
+Install for demonstration:
+```
+docker pull keeps/roda:v2.2.8
+```
+
+#### Enhancements:
+
+-  Implement retries and metrics when using iterable index results [#1242](https://github.com/keeps/roda/issues/1242)
+---
+
 ## v2.2.7 (30/05/2018)
 To be announced.
 
