@@ -1,5 +1,14 @@
 # Changelog
 
+## v2.2.7 (30/05/2018)
+To be announced.
+
+---
+
+## v2.2.6 (29/05/2018)
+To be announced.
+---
+
 ## v2.2.5 (23/05/2018)
 Install for demonstration:
 ```
