@@ -84,8 +84,7 @@ public class EditDescriptiveMetadata extends Composite {
 
             @Override
             public void onSuccess(DescriptiveMetadataEditBundle bundle) {
-              EditDescriptiveMetadata edit = new EditDescriptiveMetadata(aipId, representationId, bundle);
-              callback.onSuccess(edit);
+              callback.onSuccess(new EditDescriptiveMetadata(aipId, representationId, bundle));
             }
           });
       } else {
@@ -179,6 +178,7 @@ public class EditDescriptiveMetadata extends Composite {
         newValues.add(mv.copy());
       }
     }
+
     supportedBundle = new SupportedMetadataTypeBundle(bundle.getId(), bundle.getType(), bundle.getVersion(),
       bundle.getId(), bundle.getRawTemplate(), newValues);
 
@@ -193,13 +193,15 @@ public class EditDescriptiveMetadata extends Composite {
     type.addChangeHandler(new ChangeHandler() {
       @Override
       public void onChange(ChangeEvent changeEvent) {
+        setInXML(false);
         String typeString = null;
         String version = null;
         String value = type.getSelectedValue();
-        if (value.contains(RodaConstants.METADATA_VERSION_SEPARATOR) && bundle.getVersion() != null) {
+        if (value.contains(RodaConstants.METADATA_VERSION_SEPARATOR)) {
           typeString = value.substring(0, value.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR));
           version = value.substring(value.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR) + 1, value.length());
         }
+
         if (typeString == null) {
           typeString = value;
         }
@@ -219,12 +221,14 @@ public class EditDescriptiveMetadata extends Composite {
               Set<MetadataValue> newValues = null;
               if (bundle.getValues() != null) {
                 newValues = new TreeSet<>();
-                for (MetadataValue mv : bundle.getValues())
+                for (MetadataValue mv : bundle.getValues()) {
                   newValues.add(mv.copy());
+                }
               }
 
               supportedBundle = new SupportedMetadataTypeBundle(bundle.getId(), bundle.getType(), bundle.getVersion(),
                 bundle.getId(), bundle.getRawTemplate(), newValues);
+
               updateFormOrXML();
             }
           });
@@ -285,7 +289,6 @@ public class EditDescriptiveMetadata extends Composite {
               type.addItem(messages.otherItem(), "");
               type.setSelectedIndex(types.get(bundle.getType()));
             }
-
           }
         }
       });
@@ -310,13 +313,8 @@ public class EditDescriptiveMetadata extends Composite {
 
   public void setInXML(boolean inXML) {
     this.inXML = inXML;
-    if (inXML) {
-      showXmlIconXML.setVisible(false);
-      showXmlIconForm.setVisible(true);
-    } else {
-      showXmlIconXML.setVisible(true);
-      showXmlIconForm.setVisible(false);
-    }
+    showXmlIconXML.setVisible(!inXML);
+    showXmlIconForm.setVisible(inXML);
   }
 
   @UiHandler("showXml")
@@ -333,6 +331,7 @@ public class EditDescriptiveMetadata extends Composite {
         formSimilarDanger.setVisible(false);
       }
       showXml.setVisible(true);
+
       if (inXML) {
         updateMetadataXML();
       } else {
@@ -361,7 +360,7 @@ public class EditDescriptiveMetadata extends Composite {
         }
       }
     } else {
-      inXML = true;
+      setInXML(true);
       formSimilarDanger.setVisible(false);
       formOrXML.clear();
       if (bundle != null) {
@@ -380,10 +379,12 @@ public class EditDescriptiveMetadata extends Composite {
     for (MetadataValue mv : supportedBundle.getValues()) {
       formMap.put(mv.getId(), mv);
     }
+
     HashMap<String, MetadataValue> bundleMap = new HashMap<>();
     for (MetadataValue mv : bundle.getValues()) {
       bundleMap.put(mv.getId(), mv);
     }
+
     for (Entry<String, MetadataValue> entry : formMap.entrySet()) {
       String key = entry.getKey();
       MetadataValue mvForm = entry.getValue();
@@ -391,8 +392,9 @@ public class EditDescriptiveMetadata extends Composite {
       MetadataValue mvBundle = bundleMap.get(key);
       String bundleValue = mvBundle != null ? bundleMap.get(key).get("value") : "";
 
-      if ((formValue != null && !formValue.equals(bundleValue)) || (formValue == null && bundleValue != null))
+      if ((formValue != null && !formValue.equals(bundleValue)) || (formValue == null && bundleValue != null)) {
         return true;
+      }
     }
     return false;
   }
@@ -489,7 +491,6 @@ public class EditDescriptiveMetadata extends Composite {
       b.append(SafeHtmlUtils.fromSafeConstant("<span class='error'>"));
       b.append(messages.metadataParseError(issue.getLineNumber(), issue.getColumnNumber(), issue.getMessage()));
       b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
-
     }
 
     errors.setHTML(b.toSafeHtml());

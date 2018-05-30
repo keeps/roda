@@ -198,6 +198,7 @@ public class CreateDescriptiveMetadata extends Composite {
         } else {
           id.setText("");
         }
+
         updateFormOrXML();
       }
     });
@@ -225,12 +226,14 @@ public class CreateDescriptiveMetadata extends Composite {
           type.addItem(messages.otherItem(), "");
           type.setSelectedIndex(0);
           selectedBundle = metadataTypes.get(0);
+
           if (selectedBundle.getVersion() != null) {
             id.setText(selectedBundle.getType() + RodaConstants.METADATA_VERSION_SEPARATOR + selectedBundle.getVersion()
               + RodaConstants.PREMIS_SUFFIX);
           } else {
             id.setText(selectedBundle.getType() + RodaConstants.PREMIS_SUFFIX);
           }
+
           updateFormOrXML();
         }
       });
@@ -254,13 +257,8 @@ public class CreateDescriptiveMetadata extends Composite {
 
   public void setInXML(boolean inXML) {
     this.inXML = inXML;
-    if (inXML) {
-      showXmlIconXML.setVisible(false);
-      showXmlIconForm.setVisible(true);
-    } else {
-      showXmlIconXML.setVisible(true);
-      showXmlIconForm.setVisible(false);
-    }
+    showXmlIconXML.setVisible(!inXML);
+    showXmlIconForm.setVisible(inXML);
   }
 
   @UiHandler("showXml")
@@ -270,7 +268,7 @@ public class CreateDescriptiveMetadata extends Composite {
   }
 
   private void updateFormOrXML() {
-    if (selectedBundle != null && selectedBundle.getValues() != null) {
+    if (selectedBundle != null && selectedBundle.getValues() != null && !selectedBundle.getValues().isEmpty()) {
       showXml.setVisible(true);
       if (inXML) {
         updateMetadataXML();
@@ -301,10 +299,11 @@ public class CreateDescriptiveMetadata extends Composite {
       }
     } else {
       formOrXML.clear();
-      if (selectedBundle != null)
+      if (selectedBundle != null) {
         metadataXML.setText(selectedBundle.getTemplate());
-      else
+      } else {
         metadataXML.setText("");
+      }
       formOrXML.add(metadataXML);
       showXml.setVisible(false);
     }
