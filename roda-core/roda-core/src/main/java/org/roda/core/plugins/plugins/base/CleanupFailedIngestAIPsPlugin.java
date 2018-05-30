@@ -142,14 +142,15 @@ public class CleanupFailedIngestAIPsPlugin extends AbstractPlugin<Void> {
     try (IterableIndexResult<Job> result = index.findAll(Job.class, activeJobsViaStateFilter,
       Arrays.asList(RodaConstants.INDEX_UUID))) {
       result.forEach(e -> activeJobsIds.add(e.getId()));
-    } catch (IOException e) {
+    } catch (IOException | GenericException | RequestNotValidException e) {
       LOGGER.error("Error getting jobs when finding active ones", e);
     }
 
     return activeJobsIds;
   }
 
-  private IterableIndexResult<IndexedAIP> findAipsToDelete(IndexService index, List<String> activeJobsIds) {
+  private IterableIndexResult<IndexedAIP> findAipsToDelete(IndexService index, List<String> activeJobsIds)
+    throws GenericException, RequestNotValidException {
     Filter aipsFilter = new Filter();
     // all aips whose job id is not one of the active job ids
     activeJobsIds.forEach(e -> aipsFilter.add(new NotSimpleFilterParameter(RodaConstants.INGEST_JOB_ID, e)));

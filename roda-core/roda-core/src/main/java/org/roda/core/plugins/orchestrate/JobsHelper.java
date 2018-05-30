@@ -374,7 +374,8 @@ public final class JobsHelper {
     throw new GenericException("Error while getting class from string");
   }
 
-  public static IterableIndexResult<Job> findUnfinishedJobs(IndexService index) {
+  public static IterableIndexResult<Job> findUnfinishedJobs(IndexService index)
+    throws GenericException, RequestNotValidException {
     Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.JOB_STATE, Job.nonFinalStateList()));
     return index.findAll(Job.class, filter, Collections.emptyList());
   }
@@ -401,7 +402,7 @@ public final class JobsHelper {
             LOGGER.error("Error deleting AIP {} during job {} cleanup", aipId, job.getId(), e);
           }
         }
-      } catch (IOException e) {
+      } catch (IOException | GenericException | RequestNotValidException e) {
         LOGGER.error("Error getting AIP iterator when cleaning job objects", e);
       }
     }

@@ -556,7 +556,6 @@ public class SolrUtils {
     return ret;
   }
 
-  @SuppressWarnings("unused")
   private static Float objectToFloat(Object object) {
     Float ret;
     if (object instanceof Float) {
@@ -1683,10 +1682,10 @@ public class SolrUtils {
     doc.addField(RodaConstants.MEMBERS_NAME, member.getName());
 
     if (member.getDirectRoles() != null) {
-      doc.addField(RodaConstants.MEMBERS_ROLES_DIRECT, new ArrayList<String>(member.getDirectRoles()));
+      doc.addField(RodaConstants.MEMBERS_ROLES_DIRECT, new ArrayList<>(member.getDirectRoles()));
     }
     if (member.getAllRoles() != null) {
-      doc.addField(RodaConstants.MEMBERS_ROLES_ALL, new ArrayList<String>(member.getAllRoles()));
+      doc.addField(RodaConstants.MEMBERS_ROLES_ALL, new ArrayList<>(member.getAllRoles()));
     }
 
     if (StringUtils.isNotBlank(member.getFullName())) {
@@ -1698,7 +1697,7 @@ public class SolrUtils {
       User user = (User) member;
       doc.addField(RodaConstants.MEMBERS_EMAIL, user.getEmail());
       if (user.getGroups() != null) {
-        doc.addField(RodaConstants.MEMBERS_GROUPS, new ArrayList<String>(user.getGroups()));
+        doc.addField(RodaConstants.MEMBERS_GROUPS, new ArrayList<>(user.getGroups()));
       }
     }
 
@@ -1706,7 +1705,7 @@ public class SolrUtils {
     if (member instanceof Group) {
       Group group = (Group) member;
       if (group.getUsers() != null) {
-        doc.addField(RodaConstants.MEMBERS_USERS, new ArrayList<String>(group.getUsers()));
+        doc.addField(RodaConstants.MEMBERS_USERS, new ArrayList<>(group.getUsers()));
       }
     }
 
@@ -2943,6 +2942,8 @@ public class SolrUtils {
       }
     } catch (IOException e) {
       throw new GenericException(e);
+    } catch (GenericException | RequestNotValidException e) {
+      throw e;
     }
   }
 

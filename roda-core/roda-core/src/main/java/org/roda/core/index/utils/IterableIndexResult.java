@@ -8,6 +8,7 @@
 package org.roda.core.index.utils;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
@@ -33,6 +34,8 @@ import org.roda.core.data.v2.user.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.codahale.metrics.Histogram;
+
 /**
  * Does search in the index, using the Solr.find() method, and if configured
  * removes duplicate objects (via uuid comparison) thus providing iterator
@@ -44,7 +47,9 @@ public class IterableIndexResult<T extends IsIndexed> implements CloseableIterab
   private static final Logger LOGGER = LoggerFactory.getLogger(IterableIndexResult.class);
   private static final Sorter SINK_SORTER = new Sorter(new SortParameter(RodaConstants.INDEX_UUID, false));
   private static final int DEFAULT_PAGE_SIZE = 1000;
+  private static final int RETRIES = 10;
   private static int PAGE_SIZE = DEFAULT_PAGE_SIZE;
+  private static Histogram HISTOGRAM;
 
   private SolrClient solrClient;
   private Class<T> returnClass;
@@ -55,18 +60,11 @@ public class IterableIndexResult<T extends IsIndexed> implements CloseableIterab
   private DB db;
 
   private BTreeMap<String, T> indexObjects;
-
   private long totalObjects = -1;
 
-  @Deprecated
   public IterableIndexResult(final SolrClient solrClient, final Class<T> returnClass, final Filter filter,
-    final Sorter sorter, final Facets facets, final User user, final boolean justActive, final boolean removeDuplicates,
-    final List<String> fieldsToReturn) {
-    this(solrClient, returnClass, filter, sorter, user, justActive, fieldsToReturn);
-  }
-
-  public IterableIndexResult(final SolrClient solrClient, final Class<T> returnClass, final Filter filter,
-    final Sorter sorter, final User user, final boolean justActive, final List<String> fieldsToReturn) {
+    final Sorter sorter, final User user, final boolean justActive, final List<String> fieldsToReturn)
+    throws GenericException, RequestNotValidException {
     this.solrClient = solrClient;
     this.returnClass = returnClass;
     this.filter = filter;
@@ -81,32 +79,37 @@ public class IterableIndexResult<T extends IsIndexed> implements CloseableIterab
     }
   }
 
-  private void getResults() {
+  private void getResults() throws GenericException, RequestNotValidException {
     db = DBMaker.tempFileDB().fileMmapEnableIfSupported().cleanerHackEnable().make();
     TreeMapSink<String, T> sink = db.treeMap("myMap", Serializer.STRING, Serializer.JAVA).createFromSink();
     this.totalObjects = getResultsImpl(SINK_SORTER, t -> sink.put(t.getUUID(), t));
     this.indexObjects = sink.create();
   }
 
-  private void getResults(Sorter sorter) {
+  private void getResults(Sorter sorter) throws GenericException, RequestNotValidException {
     db = DBMaker.tempFileDB().fileMmapEnableIfSupported().cleanerHackEnable().make();
     this.indexObjects = db.treeMap("myMap", Serializer.STRING, Serializer.JAVA).create();
     this.totalObjects = getResultsImpl(sorter, t -> indexObjects.put(t.getUUID(), t));
   }
 
-  private long getResultsImpl(Sorter sorter, Consumer<T> putFunction) {
+  private long getResultsImpl(Sorter sorter, Consumer<T> putFunction)
+    throws GenericException, RequestNotValidException {
     int startIndex = 0;
     long totalCount = -1;
     String lastUuid = "";
+    int availableRetries = RETRIES;
 
     do {
       // TODO use SOLR export after adding docValues to UUID
       try {
+        long initDateInMillis = new Date().getTime();
         IndexResult<T> result = SolrUtils.find(solrClient, returnClass, filter, sorter,
           new Sublist(startIndex, PAGE_SIZE), Facets.NONE, user, justActive, fieldsToReturn);
+        HISTOGRAM.update(new Date().getTime() - initDateInMillis);
 
         totalCount = result.getTotalCount();
         startIndex += result.getResults().size();
+        availableRetries = RETRIES;
 
         for (T element : result.getResults()) {
           if (SINK_SORTER.equals(sorter)) {
@@ -119,7 +122,18 @@ public class IterableIndexResult<T extends IsIndexed> implements CloseableIterab
           }
         }
       } catch (GenericException | RequestNotValidException e) {
-        LOGGER.error("Error find new Solr page when creating iterable index result", e);
+        LOGGER.warn("Error find new Solr page when creating iterable index result, retrying...", e);
+        availableRetries--;
+
+        try {
+          Thread.sleep(10000);
+        } catch (InterruptedException e1) {
+          // do nothing
+        }
+
+        if (availableRetries == 0) {
+          throw e;
+        }
       }
     } while (startIndex < totalCount);
 
@@ -144,4 +158,7 @@ public class IterableIndexResult<T extends IsIndexed> implements CloseableIterab
     PAGE_SIZE = pageSize;
   }
 
+  public static void injectHistogram(Histogram histogram) {
+    HISTOGRAM = histogram;
+  }
 }

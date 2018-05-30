@@ -84,6 +84,9 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.codahale.metrics.Histogram;
+import com.codahale.metrics.MetricRegistry;
+
 public class IndexService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IndexService.class);
@@ -92,13 +95,17 @@ public class IndexService {
   private final ModelService model;
   private final IndexModelObserver observer;
 
-  public IndexService(SolrClient index, ModelService model) {
+  public IndexService(SolrClient index, ModelService model, MetricRegistry metricRegistry) {
     super();
     this.solrClient = index;
     this.model = model;
 
     observer = new IndexModelObserver(this.getSolrClient(), this.model);
     model.addModelObserver(observer);
+
+    Histogram iterableIndexResultHistogram = metricRegistry
+      .histogram(MetricRegistry.name(IterableIndexResult.class.getSimpleName(), "iterableIndexResultHistogram"));
+    IterableIndexResult.injectHistogram(iterableIndexResultHistogram);
   }
 
   public IndexedAIP getParent(IndexedAIP aip, List<String> fieldsToReturn)
@@ -155,31 +162,32 @@ public class IndexService {
   }
 
   public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
-    final List<String> fieldsToReturn) {
+    final List<String> fieldsToReturn) throws GenericException, RequestNotValidException {
     return findAll(returnClass, filter, new Sorter(new SortParameter(RodaConstants.INDEX_UUID, true)), null, true,
       fieldsToReturn);
   }
 
   public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
-    final boolean justActive, final List<String> fieldsToReturn) {
+    final boolean justActive, final List<String> fieldsToReturn) throws GenericException, RequestNotValidException {
     return findAll(returnClass, filter, new Sorter(new SortParameter(RodaConstants.INDEX_UUID, true)), null, justActive,
       fieldsToReturn);
   }
 
   public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
-    final Sorter sorter, final List<String> fieldsToReturn) {
+    final Sorter sorter, final List<String> fieldsToReturn) throws GenericException, RequestNotValidException {
     return findAll(returnClass, filter, sorter, null, true, fieldsToReturn);
   }
 
   public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
-    final Sorter sorter, final User user, final boolean justActive, final List<String> fieldsToReturn) {
+    final Sorter sorter, final User user, final boolean justActive, final List<String> fieldsToReturn)
+    throws GenericException, RequestNotValidException {
     return new IterableIndexResult<>(getSolrClient(), returnClass, filter, sorter, user, justActive, fieldsToReturn);
   }
 
   @Deprecated
   public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
     final Sorter sorter, final Facets facets, final User user, final boolean justActive,
-    final List<String> fieldsToReturn) {
+    final List<String> fieldsToReturn) throws GenericException, RequestNotValidException {
     return new IterableIndexResult<>(getSolrClient(), returnClass, filter, sorter, user, justActive, fieldsToReturn);
   }
 

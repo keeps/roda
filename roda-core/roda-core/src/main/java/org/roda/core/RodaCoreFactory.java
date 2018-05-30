@@ -781,7 +781,7 @@ public class RodaCoreFactory {
         solr = instantiateSolr(solrHome);
 
         // instantiate index related object
-        index = new IndexService(solr, model);
+        index = new IndexService(solr, model, metricsRegistry);
       }
     }
 
