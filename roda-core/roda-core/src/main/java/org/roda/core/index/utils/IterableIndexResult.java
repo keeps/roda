@@ -46,9 +46,15 @@ import com.codahale.metrics.Histogram;
 public class IterableIndexResult<T extends IsIndexed> implements CloseableIterable<T> {
   private static final Logger LOGGER = LoggerFactory.getLogger(IterableIndexResult.class);
   private static final Sorter SINK_SORTER = new Sorter(new SortParameter(RodaConstants.INDEX_UUID, false));
-  private static final int DEFAULT_PAGE_SIZE = 1000;
-  private static final int RETRIES = 10;
-  private static int PAGE_SIZE = DEFAULT_PAGE_SIZE;
+
+  public static final int DEFAULT_PAGE_SIZE = 1000;
+  public static final int DEFAULT_RETRIES = 100;
+  public static final int DEFAULT_SLEEP_BETWEEN_RETRIES = 10000;
+
+  private static int RETRIES;
+  private static int SLEEP_BETWEEN_RETRIES;
+  private static int PAGE_SIZE;
+
   private static Histogram HISTOGRAM;
 
   private SolrClient solrClient;
@@ -126,7 +132,7 @@ public class IterableIndexResult<T extends IsIndexed> implements CloseableIterab
         availableRetries--;
 
         try {
-          Thread.sleep(10000);
+          Thread.sleep(SLEEP_BETWEEN_RETRIES);
         } catch (InterruptedException e1) {
           // do nothing
         }
@@ -154,8 +160,16 @@ public class IterableIndexResult<T extends IsIndexed> implements CloseableIterab
     db.close();
   }
 
-  public static void setPageSize(int pageSize) {
+  public static void injectSearchPageSize(int pageSize) {
     PAGE_SIZE = pageSize;
+  }
+
+  public static void injectNumberOfRetries(int retries) {
+    RETRIES = retries;
+  }
+
+  public static void injectSleepBetweenRetries(int sleepTime) {
+    SLEEP_BETWEEN_RETRIES = sleepTime;
   }
 
   public static void injectHistogram(Histogram histogram) {

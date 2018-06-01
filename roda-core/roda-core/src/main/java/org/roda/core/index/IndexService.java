@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -95,7 +96,8 @@ public class IndexService {
   private final ModelService model;
   private final IndexModelObserver observer;
 
-  public IndexService(SolrClient index, ModelService model, MetricRegistry metricRegistry) {
+  public IndexService(SolrClient index, ModelService model, MetricRegistry metricRegistry,
+    Configuration rodaConfiguration) {
     super();
     this.solrClient = index;
     this.model = model;
@@ -103,13 +105,23 @@ public class IndexService {
     observer = new IndexModelObserver(this.getSolrClient(), this.model);
     model.addModelObserver(observer);
 
+    configIterableIndexResult(metricRegistry, rodaConfiguration);
+  }
+
+  private void configIterableIndexResult(MetricRegistry metricRegistry, Configuration rodaConfiguration) {
     Histogram iterableIndexResultHistogram = metricRegistry
       .histogram(MetricRegistry.name(IterableIndexResult.class.getSimpleName(), "iterableIndexResultHistogram"));
     IterableIndexResult.injectHistogram(iterableIndexResultHistogram);
+    IterableIndexResult.injectSearchPageSize(
+      rodaConfiguration.getInt("core.index_result.page_size", IterableIndexResult.DEFAULT_PAGE_SIZE));
+    IterableIndexResult.injectNumberOfRetries(
+      rodaConfiguration.getInt("core.index_result.retries", IterableIndexResult.DEFAULT_RETRIES));
+    IterableIndexResult.injectSleepBetweenRetries(
+      rodaConfiguration.getInt("core.index_result.sleep", IterableIndexResult.DEFAULT_SLEEP_BETWEEN_RETRIES));
   }
 
   public IndexedAIP getParent(IndexedAIP aip, List<String> fieldsToReturn)
-    throws NotFoundException, GenericException, RequestNotValidException {
+    throws NotFoundException, GenericException {
     return SolrUtils.retrieve(getSolrClient(), IndexedAIP.class, aip.getParentID(), fieldsToReturn);
   }
 

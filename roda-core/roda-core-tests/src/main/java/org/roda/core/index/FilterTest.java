@@ -97,7 +97,7 @@ public class FilterTest {
     model = RodaCoreFactory.getModelService();
     index = RodaCoreFactory.getIndexService();
 
-    IterableIndexResult.setPageSize(PAGE_SIZE);
+    IterableIndexResult.injectSearchPageSize(PAGE_SIZE);
   }
 
   @AfterClass
