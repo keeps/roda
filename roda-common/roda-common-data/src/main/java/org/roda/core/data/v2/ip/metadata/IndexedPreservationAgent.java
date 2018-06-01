@@ -12,8 +12,9 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.ip.HasId;
 
-public class IndexedPreservationAgent implements IsIndexed {
+public class IndexedPreservationAgent implements IsIndexed, HasId {
   private static final long serialVersionUID = 7864328669898523851L;
   private String id;
   private String name;

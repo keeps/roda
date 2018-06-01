@@ -167,7 +167,7 @@ public class PluginReportContentTest {
     AIP root = model.createAIP(null, RodaConstants.AIP_TYPE_MIXED, new Permissions(), AIP_CREATOR);
 
     TransferredResource transferredResource = createCorpora();
-    AssertJUnit.assertEquals(transferredResource == null, false);
+    Assert.assertEquals(transferredResource == null, false);
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());
@@ -180,12 +180,12 @@ public class PluginReportContentTest {
     AssertJUnit.assertEquals(1, jobReports.size());
 
     for (Report report : jobReports) {
-      AssertJUnit.assertEquals(MinimalIngestPlugin.TOTAL_STEPS, report.getReports().size());
+      Assert.assertEquals(report.getReports().size(), MinimalIngestPlugin.TOTAL_STEPS);
       Report first = report.getReports().get(0);
       Report last = report.getReports().get(MinimalIngestPlugin.TOTAL_STEPS - 1);
-      AssertJUnit.assertEquals(false, report.getDateCreated().equals(report.getDateUpdated()));
-      AssertJUnit.assertEquals(true, report.getDateCreated().equals(first.getDateCreated()));
-      AssertJUnit.assertEquals(true, report.getDateUpdated().equals(last.getDateUpdated()));
+      Assert.assertEquals(report.getDateCreated().equals(report.getDateUpdated()), false);
+      Assert.assertEquals(report.getDateCreated().equals(first.getDateCreated()), true);
+      Assert.assertEquals(report.getDateUpdated().equals(last.getDateUpdated()), true);
     }
   }
 
@@ -194,7 +194,7 @@ public class PluginReportContentTest {
     AIP root = model.createAIP(null, RodaConstants.AIP_TYPE_MIXED, new Permissions(), AIP_CREATOR);
 
     TransferredResource transferredResource = createCorpora();
-    AssertJUnit.assertEquals(transferredResource == null, false);
+    Assert.assertEquals(transferredResource == null, false);
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());
@@ -204,14 +204,14 @@ public class PluginReportContentTest {
       SelectedItemsList.create(TransferredResource.class, transferredResource.getUUID()));
 
     List<Report> ingestReports = TestsHelper.getJobReports(index, ingest, true);
-    AssertJUnit.assertEquals(1, ingestReports.size());
+    Assert.assertEquals(ingestReports.size(), 1);
     String aipId = ingestReports.get(0).getOutcomeObjectId();
 
     Job job = TestsHelper.executeJob(SiegfriedPlugin.class, new HashMap<>(), PluginType.MISC,
       SelectedItemsList.create(AIP.class, aipId));
 
     List<Report> jobReports = TestsHelper.getJobReports(index, job, true);
-    AssertJUnit.assertEquals(1, jobReports.size());
+    Assert.assertEquals(jobReports.size(), 1);
 
     Report report = jobReports.get(0);
     AssertJUnit.assertEquals(1, report.getReports().size());

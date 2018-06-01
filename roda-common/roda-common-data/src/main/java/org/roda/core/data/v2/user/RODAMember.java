@@ -11,8 +11,9 @@ import java.util.Set;
 
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.ip.HasId;
 
-public interface RODAMember extends IsIndexed, IsModelObject {
+public interface RODAMember extends IsIndexed, IsModelObject, HasId {
 
   boolean isActive();
 

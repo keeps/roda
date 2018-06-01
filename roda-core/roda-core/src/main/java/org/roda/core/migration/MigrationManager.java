@@ -8,9 +8,8 @@
 package org.roda.core.migration;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Modifier;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,6 +38,8 @@ import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.index.schema.SolrCollectionRegistry;
+import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.migration.model.PreservationMetadataFileToVersion2;
 import org.roda.core.migration.model.RepresentationToVersion2;
 import org.roda.core.migration.model.RiskToVersion2;
@@ -102,7 +103,7 @@ public class MigrationManager {
     migrationIsNecessary = isModelMigrationNecessary();
 
     // check if index migration is necessary
-    migrationIsNecessary = migrationIsNecessary || isIndexMigrationNecessary(solrClient, tempIndexConfigsPath);
+    migrationIsNecessary |= isIndexMigrationNecessary(solrClient, tempIndexConfigsPath);
 
     return migrationIsNecessary;
   }
@@ -246,32 +247,24 @@ public class MigrationManager {
     if (tempIndexConfigsPath.isPresent()) {
       Path indexConfigsFolder = tempIndexConfigsPath.get().resolve(RodaConstants.CORE_CONFIG_FOLDER)
         .resolve(RodaConstants.CORE_INDEX_FOLDER);
-      List<String> solrCollections = getSolrCollections(indexConfigsFolder);
+      List<String> solrCollections = SolrCollectionRegistry.registryIndexNames();
 
-      Map<String, Integer> indexVersionsFromCode = getIndexVersionsFromCode(indexConfigsFolder, solrCollections);
+      Integer baseIndexVersion = getIndexVersionsFromCode();
       Map<String, Integer> indexVersionsInstalled = getIndexVersionsFromSolr(solrClient, solrCollections);
 
-      if (indexVersionsFromCode.isEmpty() || indexVersionsInstalled.isEmpty()) {
+      if (baseIndexVersion == 0 || indexVersionsInstalled.isEmpty()) {
         LOGGER.error("Unable to determine if index migration/migrations is/are needed");
         throw new GenericException("Unable to determine if index migration/migrations is/are needed");
       } else {
-        for (Entry<String, Integer> indexFromCode : indexVersionsFromCode.entrySet()) {
-          String collection = indexFromCode.getKey();
-          Integer collectionVersionFromCode = indexFromCode.getValue();
-          if (indexVersionsInstalled.containsKey(collection)) {
-            Integer collectionVersionInstalled = indexVersionsInstalled.get(collection);
-            if (!collectionVersionFromCode.equals(collectionVersionInstalled)) {
-              LOGGER.warn(
-                "A migration is needed! Collection '{}' version is set to {} in code schema.xml & installed version (Solr deployed) is set to {}",
-                collection, collectionVersionFromCode, collectionVersionInstalled);
-              migrationIsNecessary = true;
-            }
-          } else {
-            LOGGER.warn(
-              "A new collection called '{}' exists & needs to be installed before being able to start RODA properly",
-              collection);
+        for (Entry<String, Integer> installedIndexVersion : indexVersionsInstalled.entrySet()) {
+          String installedCollection = installedIndexVersion.getKey();
+          Integer installedCollectionVersion = installedIndexVersion.getValue();
+          if (!installedCollectionVersion.equals(baseIndexVersion)) {
+            LOGGER.warn("A migration is needed! Collection '{}' version is set to {} but should be {}",
+              installedCollection, installedCollectionVersion, baseIndexVersion);
             migrationIsNecessary = true;
           }
+
         }
       }
     } else {
@@ -282,33 +275,21 @@ public class MigrationManager {
     return migrationIsNecessary;
   }
 
-  private List<String> getSolrCollections(Path indexConfigsFolder) {
-    List<String> solrCollections = new ArrayList<>();
-    try (DirectoryStream<Path> stream = Files.newDirectoryStream(indexConfigsFolder)) {
-      stream.forEach(e -> {
-        if (FSUtils.isDirectory(e)) {
-          solrCollections.add(e.getFileName().toString());
-        }
-      });
-    } catch (IOException e) {
-      // do nothing
-    }
-    return solrCollections;
-  }
+  private Integer getIndexVersionsFromCode() {
 
-  private Map<String, Integer> getIndexVersionsFromCode(Path indexConfigsFolder, List<String> collections) {
-    Map<String, Integer> ret = new HashMap<>();
-    for (String collection : collections) {
-      Path schemaFile = indexConfigsFolder.resolve(collection).resolve("conf").resolve("schema.xml");
-      String version = XMLUtility.getStringFromFile(schemaFile, "/schema/@name").replaceFirst(".*-", "");
-      try {
-        ret.put(collection, Integer.parseInt(version));
-      } catch (NumberFormatException e) {
-        // do nothing
-      }
+    Integer version = 0;
+
+    try (InputStream schema = MigrationManager.class.getResourceAsStream("/" + RodaConstants.CORE_CONFIG_FOLDER + "/"
+      + RodaConstants.CORE_INDEX_FOLDER + "/" + SolrUtils.COMMON + "/" + SolrUtils.CONF + "/" + SolrUtils.SCHEMA)) {
+
+      String versionString = XMLUtility.getString(schema, "/schema/@name").replaceFirst(".*-", "");
+
+      version = Integer.parseInt(versionString);
+    } catch (NumberFormatException | IOException e) {
+      LOGGER.error("Error parsing base Solr schema version", e);
     }
 
-    return ret;
+    return version;
   }
 
   private Map<String, Integer> getIndexVersionsFromSolr(SolrClient solrClient, List<String> collections) {
@@ -325,7 +306,8 @@ public class MigrationManager {
             try {
               ret.put(collection, Integer.parseInt(version));
             } catch (NumberFormatException e) {
-              // do nothing
+              LOGGER.warn("Could not extract version for collection {} from Solr schema name: {}", collection, value,
+                e);
             }
             break;
           }

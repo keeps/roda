@@ -19,10 +19,12 @@ import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.NotSupportedException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.ReturnWithExceptions;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsAll;
 import org.roda.core.data.v2.ip.AIP;
@@ -34,6 +36,7 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.index.IndexService;
+import org.roda.core.index.schema.SolrCollectionRegistry;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelObserver;
 import org.roda.core.model.ModelService;
@@ -166,13 +169,16 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
       try {
         Job job = PluginHelper.getJob(this, index);
         if (job.getSourceObjects() instanceof SelectedItemsAll) {
-          Class selectedClass = Class.forName(job.getSourceObjects().getSelectedClass());
-          index.clearIndexes(SolrUtils.getIndexName(selectedClass));
+          @SuppressWarnings("unchecked")
+          Class<? extends IsIndexed> selectedClass = (Class<? extends IsIndexed>) Class
+            .forName(job.getSourceObjects().getSelectedClass());
+          index.clearIndexes(SolrCollectionRegistry.getCommitIndexNames(selectedClass));
           if (selectedClass.equals(AIP.class) || selectedClass.equals(IndexedAIP.class)) {
             index.clearAIPEventIndex();
           }
         }
-      } catch (GenericException | NotFoundException | ClassNotFoundException | RequestNotValidException e) {
+      } catch (GenericException | NotFoundException | ClassNotFoundException | RequestNotValidException
+        | NotSupportedException e) {
         throw new PluginException("Error clearing index", e);
       }
 
@@ -189,9 +195,12 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
     if (optimizeIndexes) {
       try {
         Job job = PluginHelper.getJob(this, index);
-        Class selectedClass = Class.forName(job.getSourceObjects().getSelectedClass());
-        index.optimizeIndexes(SolrUtils.getIndexName(selectedClass));
-      } catch (GenericException | NotFoundException | ClassNotFoundException | RequestNotValidException e) {
+        @SuppressWarnings("unchecked")
+        Class<? extends IsIndexed> selectedClass = (Class<? extends IsIndexed>) Class
+          .forName(job.getSourceObjects().getSelectedClass());
+        index.optimizeIndexes(SolrCollectionRegistry.getCommitIndexNames(selectedClass));
+      } catch (GenericException | NotFoundException | ClassNotFoundException | RequestNotValidException
+        | NotSupportedException e) {
         throw new PluginException("Error optimizing index", e);
       }
     }

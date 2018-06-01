@@ -23,6 +23,7 @@ import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
+import org.roda.core.data.v2.ip.HasId;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -34,7 +35,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @XmlRootElement(name = RodaConstants.RODA_OBJECT_JOB)
 @JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Job implements IsModelObject, IsIndexed {
+public class Job implements IsModelObject, IsIndexed, HasId {
   private static final long serialVersionUID = 615993757726175203L;
 
   public enum JOB_STATE {
@@ -101,9 +102,8 @@ public class Job implements IsModelObject, IsIndexed {
     return id;
   }
 
-  public Job setId(String id) {
+  public void setId(String id) {
     this.id = id;
-    return this;
   }
 
   public String getName() {

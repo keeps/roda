@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @XmlRootElement(name = RodaConstants.RODA_OBJECT_TRANSFERRED_RESOURCE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class TransferredResource implements IsModelObject, IsIndexed {
+public class TransferredResource implements IsModelObject, IsIndexed, HasId, SetsUUID {
   private static final long serialVersionUID = 7931609057644098879L;
 
   private String uuid;

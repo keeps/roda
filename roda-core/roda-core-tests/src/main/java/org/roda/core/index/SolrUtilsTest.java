@@ -16,7 +16,13 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.ParseException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
@@ -299,4 +305,37 @@ public class SolrUtilsTest {
     assertThat(sortList.get(1).getItem(), Matchers.equalTo(field2));
     assertThat(sortList.get(1).getOrder(), Matchers.equalTo(ORDER.asc));
   }
+
+  @Test
+  public void testDateParser() throws ParseException {
+    String test1 = "2018-06-22T00:00:00Z";
+
+    Date parsedDate = SolrUtils.parseDate(test1);
+    String formatedDate = SolrUtils.formatDate(parsedDate);
+
+    Assert.assertEquals(formatedDate, test1);
+  }
+
+  @Test
+  public void testDateParserOldDates() throws ParseException {
+    String test1 = "1213-01-01T00:00:00Z";
+
+    Date parsedDate = SolrUtils.parseDate(test1);
+
+    Instant dateInitial = parsedDate.toInstant();
+    LocalDateTime ldt = LocalDateTime.ofInstant(dateInitial, ZoneOffset.UTC);;
+    
+    Assert.assertEquals(1213, ldt.getYear());
+
+    Calendar calInitial = Calendar.getInstance();
+    calInitial.setTime(parsedDate);
+    Assert.assertEquals(1213, calInitial.get(Calendar.YEAR));
+    
+    String formatedDate = SolrUtils.formatDate(parsedDate);
+
+    Assert.assertEquals(formatedDate, test1);
+    
+
+  }
+
 }

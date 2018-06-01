@@ -1,10 +1,5 @@
 version: 1
 
-dn: ou=users,dc=roda,dc=org
-objectClass: top
-objectClass: organizationalUnit
-ou: users
-
 dn: uid=admin,ou=users,dc=roda,dc=org
 objectClass: extensibleObject
 objectClass: top

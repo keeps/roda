@@ -56,7 +56,7 @@ public class IngestAppraisal extends Composite {
   private static final ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
   private static final Filter BASE_FILTER = new Filter(
-    new SimpleFilterParameter(RodaConstants.STATE, AIPState.UNDER_APPRAISAL.toString()));
+    new SimpleFilterParameter(RodaConstants.INDEX_STATE, AIPState.UNDER_APPRAISAL.toString()));
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 

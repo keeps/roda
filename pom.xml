@@ -111,12 +111,13 @@
 		<spring.version>4.1.1.RELEASE</spring.version>
 		<grizzly.version>2.3.16</grizzly.version>
 		<jena.version>2.13.0</jena.version>
-		<solr.version>5.5.5</solr.version>
+		<solr.version>7.3.1</solr.version>
 		<akka.version>2.5.13</akka.version>
 		<apacheds.version>2.0.0-M24</apacheds.version>
 		<httpcomponents.version>4.5.5</httpcomponents.version>
 		<poi.version>3.17</poi.version>
 		<commons_ip.version>1.0.1</commons_ip.version>
+		<metrics.version>3.2.6</metrics.version>
 		<roda_community_url>http://roda-community.org</roda_community_url>
 		<testng.groups>all</testng.groups>
 	</properties>
@@ -1076,12 +1077,22 @@
 			<dependency>
 				<groupId>io.dropwizard.metrics</groupId>
 				<artifactId>metrics-core</artifactId>
-				<version>4.0.2</version>
+				<version>${metrics.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>io.dropwizard.metrics</groupId>
-				<artifactId>metrics-jmx</artifactId>
-				<version>4.0.2</version>
+				<artifactId>metrics-graphite</artifactId>
+				<version>${metrics.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.dropwizard.metrics</groupId>
+				<artifactId>metrics-jetty9</artifactId>
+				<version>${metrics.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.dropwizard.metrics</groupId>
+				<artifactId>metrics-jvm</artifactId>
+				<version>${metrics.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.mapdb</groupId>

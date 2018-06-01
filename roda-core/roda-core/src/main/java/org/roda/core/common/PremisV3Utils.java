@@ -717,7 +717,7 @@ public final class PremisV3Utils {
         LinkingIdentifier li = new LinkingIdentifier();
         li.setType(laict.getLinkingAgentIdentifierType().getStringValue());
         li.setValue(laict.getLinkingAgentIdentifierValue());
-        li.setRoles(stringplusArrayToStringList(laict.getLinkingAgentRoleArray()));
+        li.setRoles(toStringList(laict.getLinkingAgentRoleArray()));
         identifiers.add(li);
       }
     }
@@ -733,7 +733,7 @@ public final class PremisV3Utils {
         LinkingIdentifier li = new LinkingIdentifier();
         li.setType(loict.getLinkingObjectIdentifierType().getStringValue());
         li.setValue(loict.getLinkingObjectIdentifierValue());
-        li.setRoles(stringplusArrayToStringList(loict.getLinkingObjectRoleArray()));
+        li.setRoles(toStringList(loict.getLinkingObjectRoleArray()));
         identifiers.add(li);
       }
     }
@@ -763,7 +763,7 @@ public final class PremisV3Utils {
     return l.toArray(new StringPlusAuthority[l.size()]);
   }
 
-  private static List<String> stringplusArrayToStringList(StringPlusAuthority[] source) {
+  public static List<String> toStringList(StringPlusAuthority[] source) {
     List<String> dst = new ArrayList<>();
     if (source != null && source.length > 0) {
       for (StringPlusAuthority spa : source) {
@@ -787,7 +787,7 @@ public final class PremisV3Utils {
       String version = "";
 
       try {
-        RODAMember member = index.retrieve(RODAMember.class, username,
+        RODAMember member = index.retrieve(RODAMember.class, IdUtils.getUserId(username),
           Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.MEMBERS_FULLNAME, RodaConstants.MEMBERS_EMAIL));
         fullName = member.getFullName();
         if (member instanceof User) {

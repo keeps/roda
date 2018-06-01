@@ -270,6 +270,8 @@
 	</servlet>
 
 
+
+
 	<servlet-mapping>
 		<servlet-name>ClientLogger</servlet-name>
 		<url-pattern>/org.roda.wui.RodaWUI/wuilogger</url-pattern>
@@ -288,36 +290,31 @@
 	</servlet-mapping>
 
 
+	<!-- Error handler -->
+
+	<servlet>
+		<servlet-name>ErrorHandler</servlet-name>
+		<servlet-class>org.roda.wui.servlets.ErrorHandler</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>ErrorHandler</servlet-name>
+		<url-pattern>/ErrorHandler</url-pattern>
+	</servlet-mapping>
+
 	<!-- Welcome file -->
 
 	<welcome-file-list>
 		<welcome-file>Main.html</welcome-file>
-		<welcome-file>index.html</welcome-file>
-		<welcome-file>index.php</welcome-file>
 	</welcome-file-list>
 
 
 	<!-- Error page -->
-
 	<error-page>
-		<error-code>401</error-code>
-		<location>/error_unauthorized.html</location>
+		<location>/ErrorHandler</location>
 	</error-page>
-
-	<error-page>
-		<error-code>404</error-code>
-		<location>/error_404.html</location>
-	</error-page>
-
-	<error-page>
-		<error-code>500</error-code>
-		<location>/error_500.html</location>
-	</error-page>
-
-	<error-page>
-		<exception-type>org.roda.wui.servlets.RodaCoreInstantiationException</exception-type>
-		<location>/error_core_inst.html</location>
-	</error-page>
+	
+	<!-- Security -->
 
 	<security-constraint>
 		<web-resource-collection>

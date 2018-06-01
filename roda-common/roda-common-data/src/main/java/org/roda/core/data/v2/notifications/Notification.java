@@ -18,13 +18,14 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.ip.HasId;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @XmlRootElement(name = RodaConstants.RODA_OBJECT_NOTIFICATION)
 @JsonInclude(JsonInclude.Include.ALWAYS)
-public class Notification implements IsModelObject, IsIndexed {
+public class Notification implements IsModelObject, IsIndexed, HasId {
 
   private static final long serialVersionUID = -585753367605901060L;
 

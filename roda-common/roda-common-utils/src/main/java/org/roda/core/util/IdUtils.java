@@ -18,6 +18,7 @@ import org.roda.core.data.v2.ip.FileLink;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.RepresentationLink;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
+import org.roda.core.data.v2.user.RodaPrincipal;
 
 public final class IdUtils {
   private static final String ID_SEPARATOR = "-";
@@ -177,6 +178,14 @@ public final class IdUtils {
 
   public static String getTransferredResourceUUID(String relativeToBase) {
     return IdUtils.createUUID(relativeToBase);
+  }
+
+  public static String getUserId(String username) {
+    return RodaPrincipal.getUserUUID(username);
+  }
+
+  public static String getGroupId(String groupname) {
+    return RodaPrincipal.getGroupUUID(groupname);
   }
 
 }

@@ -28,7 +28,7 @@
 	</logger>
 
 	<logger name="org.apache.solr" additivity="false">
-		<level value="ERROR" />
+		<level value="WARN" />
 		<appender-ref ref="STDOUT" />
 	</logger>
 

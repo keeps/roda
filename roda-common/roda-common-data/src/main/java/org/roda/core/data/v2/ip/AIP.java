@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @XmlRootElement(name = RodaConstants.RODA_OBJECT_AIP)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AIP implements IsModelObject {
+public class AIP implements IsModelObject, HasId, HasState, HasPermissions {
 
   private static final long serialVersionUID = 430629679119752757L;
   private static final int VERSION = 1;

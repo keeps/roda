@@ -103,8 +103,6 @@ public class RepresentationInformationList extends BasicAsyncTableCell<Represent
   protected Sorter getSorter(ColumnSortList columnSortList) {
     Map<Column<RepresentationInformation, ?>, List<String>> columnSortingKeyMap = new HashMap<>();
     columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.REPRESENTATION_INFORMATION_NAME_SORT));
-    columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.REPRESENTATION_INFORMATION_SUPPORT));
-    columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.REPRESENTATION_INFORMATION_FAMILY));
     return createSorter(columnSortList, columnSortingKeyMap);
   }
 

@@ -7,9 +7,6 @@
  */
 package org.roda.core.common.monitor;
 
-import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.AssertJUnit.assertTrue;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -20,10 +17,16 @@ import java.util.Optional;
 import java.util.Random;
 
 import org.apache.commons.io.FileUtils;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.index.IndexService;
@@ -31,7 +34,9 @@ import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.Assert;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -41,7 +46,9 @@ public class MonitorIndexTest {
 
   private static Path basePath;
   private static IndexService index;
-  private static int fileCounter;
+  private static String transferredResourcesFolder;
+
+  private static Path sips;
 
   @BeforeClass
   public static void setUp() throws Exception {
@@ -57,7 +64,9 @@ public class MonitorIndexTest {
       deployPluginManager, deployDefaultResources);
 
     index = RodaCoreFactory.getIndexService();
-    fileCounter = 0;
+    transferredResourcesFolder = RodaCoreFactory.getRodaConfiguration().getString("transferredResources.folder",
+      RodaConstants.CORE_TRANSFERREDRESOURCE_FOLDER);
+    sips = RodaCoreFactory.getDataPath().resolve(transferredResourcesFolder);
 
     LOGGER.info("Running folder monitor tests under storage {}", basePath);
   }
@@ -68,20 +77,29 @@ public class MonitorIndexTest {
     FSUtils.deletePath(basePath);
   }
 
+  @AfterMethod
+  public static void cleanup() throws GenericException, RequestNotValidException, IOException {
+    // cleanup
+    FSUtils.deletePathQuietly(sips);
+    Files.createDirectory(sips);
+    index.delete(TransferredResource.class, Filter.ALL);
+    index.commit(TransferredResource.class);
+  }
+
   @Test
   public void testUpdate() throws Exception {
-    String transferredResourcesFolder = RodaCoreFactory.getRodaConfiguration().getString("transferredResources.folder",
-      RodaConstants.CORE_TRANSFERREDRESOURCE_FOLDER);
-    Path sips = RodaCoreFactory.getDataPath().resolve(transferredResourcesFolder);
+
     TransferredResourcesScanner monitor = new TransferredResourcesScanner(sips, index);
-    populate(sips);
+    int fileCounter = populate(sips);
     monitor.updateTransferredResources(Optional.empty(), true);
+    index.commit(TransferredResource.class);
 
     int folderToIndex = -1;
-    IndexResult<TransferredResource> transferredResources = index.find(TransferredResource.class, null, null,
-      new Sublist(0, fileCounter), new ArrayList<>());
+    IndexResult<TransferredResource> transferredResources = index.find(TransferredResource.class, Filter.ALL,
+      Sorter.NONE, new Sublist(0, fileCounter), new ArrayList<>());
     int result1 = transferredResources.getResults().size();
-    assertTrue(result1 > 0);
+
+    MatcherAssert.assertThat("Has results", result1, Matchers.greaterThan(0));
 
     for (int i = 0; i < result1; i++) {
       TransferredResource tr = transferredResources.getResults().get(i);
@@ -94,32 +112,32 @@ public class MonitorIndexTest {
     TransferredResource resource = transferredResources.getResults().get(folderToIndex);
     Path parent = Paths.get(resource.getFullPath());
     Path p = Files.createFile(parent.resolve(IdUtils.createUUID() + ".txt"));
-    Files.write(p, "NUNCAMAISACABA".getBytes());
+    Files.write(p, "CONTENT".getBytes());
 
     monitor.updateTransferredResources(Optional.of(resource.getRelativePath()), true);
 
     IndexResult<TransferredResource> transferredResources2 = index.find(TransferredResource.class, null, null,
       new Sublist(0, fileCounter + 1), new ArrayList<>());
     int result2 = transferredResources2.getResults().size();
-    assertTrue(result2 == result1 + 1);
+
+    Assert.assertEquals(result2, result1 + 1);
+
   }
 
   @Test
   public void testRemoveFile() throws Exception {
-    String transferredResourcesFolder = RodaCoreFactory.getRodaConfiguration().getString("transferredResources.folder",
-      RodaConstants.CORE_TRANSFERREDRESOURCE_FOLDER);
-    Path sips = RodaCoreFactory.getDataPath().resolve(transferredResourcesFolder);
-    TransferredResourcesScanner monitor = new TransferredResourcesScanner(sips, index);
-    populate(sips);
-    monitor.updateTransferredResources(Optional.empty(), true);
 
+    TransferredResourcesScanner monitor = new TransferredResourcesScanner(sips, index);
+    int fileCounter = populate(sips);
+    monitor.updateTransferredResources(Optional.empty(), true);
+    
     int toRemove1 = -1;
     int toRemove2 = -1;
-    IndexResult<TransferredResource> transferredResources = index.find(TransferredResource.class, null, null,
-      new Sublist(0, fileCounter), new ArrayList<>());
-    int resultBeforeRemoves = transferredResources.getResults().size();
+    IndexResult<TransferredResource> transferredResources = index.find(TransferredResource.class, Filter.ALL,
+      Sorter.NONE, new Sublist(0, fileCounter), new ArrayList<>());
+    long resultBeforeRemoves = transferredResources.getTotalCount();
 
-    for (int i = 0; i < resultBeforeRemoves; i++) {
+    for (int i = 0; i < resultBeforeRemoves && (toRemove1 < 0 || toRemove2 < 0); i++) {
       TransferredResource tr = transferredResources.getResults().get(i);
 
       if (tr.isFile() && toRemove1 == -1) {
@@ -141,21 +159,21 @@ public class MonitorIndexTest {
     secondFileRemoved.delete();
 
     monitor.updateTransferredResources(Optional.empty(), true);
+    index.commit(TransferredResource.class);
 
-    IndexResult<TransferredResource> transferredResources2 = index.find(TransferredResource.class, null, null,
-      new Sublist(0, fileCounter), new ArrayList<>());
-    int resultAfterRemoves = transferredResources2.getResults().size();
+    
+    
+    long resultAfterRemoves = index.count(TransferredResource.class, Filter.ALL);
 
-    assertEquals(resultBeforeRemoves, resultAfterRemoves + 2);
+    Assert.assertEquals(resultAfterRemoves, resultBeforeRemoves - 2);
+
   }
 
   @Test
   public void testRemoveFolder() throws Exception {
-    String transferredResourcesFolder = RodaCoreFactory.getRodaConfiguration().getString("transferredResources.folder",
-      RodaConstants.CORE_TRANSFERREDRESOURCE_FOLDER);
-    Path sips = RodaCoreFactory.getDataPath().resolve(transferredResourcesFolder);
+
     TransferredResourcesScanner monitor = new TransferredResourcesScanner(sips, index);
-    populate(sips);
+    int fileCounter = populate(sips);
     monitor.updateTransferredResources(Optional.empty(), true);
 
     int toRemove = -1;
@@ -179,25 +197,25 @@ public class MonitorIndexTest {
     IndexResult<TransferredResource> transferredResources2 = index.find(TransferredResource.class, null, null,
       new Sublist(0, fileCounter), new ArrayList<>());
     int resultAfterRemoves = transferredResources2.getResults().size();
-    assertTrue(resultBeforeRemoves > resultAfterRemoves);
+
+    MatcherAssert.assertThat("After remove it has less", resultAfterRemoves, Matchers.lessThan(resultBeforeRemoves));
+
   }
 
   @Test
   public void testRemoveFileOnSpecificFolder() throws Exception {
-    String transferredResourcesFolder = RodaCoreFactory.getRodaConfiguration().getString("transferredResources.folder",
-      RodaConstants.CORE_TRANSFERREDRESOURCE_FOLDER);
-    Path sips = RodaCoreFactory.getDataPath().resolve(transferredResourcesFolder);
+
     TransferredResourcesScanner monitor = new TransferredResourcesScanner(sips, index);
-    populate(sips);
+    int fileCounter = populate(sips);
 
     monitor.updateTransferredResources(Optional.empty(), true);
 
     int toRemove = -1;
     String folder = "";
     int folderIndex = -1;
-    IndexResult<TransferredResource> transferredResources = index.find(TransferredResource.class, null, null,
-      new Sublist(0, fileCounter), new ArrayList<>());
-    int resultBeforeRemoves = transferredResources.getResults().size();
+    IndexResult<TransferredResource> transferredResources = index.find(TransferredResource.class, Filter.ALL,
+      Sorter.NONE, new Sublist(0, fileCounter), new ArrayList<>());
+    long resultBeforeRemoves = transferredResources.getTotalCount();
 
     for (int i = 0; i < resultBeforeRemoves; i++) {
       TransferredResource tr = transferredResources.getResults().get(i);
@@ -223,48 +241,50 @@ public class MonitorIndexTest {
 
     TransferredResource transferredResourceFolder = transferredResources.getResults().get(folderIndex);
     monitor.updateTransferredResources(Optional.of(transferredResourceFolder.getRelativePath()), true);
+    index.commit(TransferredResource.class);
 
-    IndexResult<TransferredResource> transferredResources2 = index.find(TransferredResource.class, null, null,
-      new Sublist(0, fileCounter), new ArrayList<>());
-    int resultAfterRemoves = transferredResources2.getResults().size();
+    long resultAfterRemoves = index.count(TransferredResource.class, Filter.ALL);
 
-    assertEquals(resultBeforeRemoves, resultAfterRemoves + 1);
+    Assert.assertEquals(resultAfterRemoves, resultBeforeRemoves - 1);
   }
 
-  private static void populate(Path basePath) throws IOException {
+  private static int populate(Path basePath) throws IOException {
     Random randomno = new Random();
     int numberOfItemsByLevel = nextIntInRange(2, 3, randomno);
     int numberOfLevels = nextIntInRange(2, 3, randomno);
-    populate(basePath, numberOfItemsByLevel, numberOfLevels, 0, randomno);
+    return populate(basePath, numberOfItemsByLevel, numberOfLevels, 0, randomno);
   }
 
-  private static void populate(Path path, int numberOfItemsByLevel, int numberOfLevels, int currentLevel,
+  private static int populate(Path path, int numberOfItemsByLevel, int numberOfLevels, int currentLevel,
     Random randomno) throws IOException {
+    int fileCounter = 0;
     currentLevel++;
     for (int i = 0; i < numberOfItemsByLevel; i++) {
       Path p;
       if (i % 2 == 0) {
         if (currentLevel > 1) {
           p = Files.createFile(path.resolve(IdUtils.createUUID() + ".txt"));
-          Files.write(p, "NUNCAMAISACABA".getBytes());
+          Files.write(p, "CONTENT".getBytes());
           fileCounter++;
         }
       } else {
         p = Files.createDirectory(path.resolve(IdUtils.createUUID()));
         fileCounter++;
         if (currentLevel <= numberOfLevels) {
-          populate(p, numberOfItemsByLevel, numberOfLevels, currentLevel, randomno);
+          fileCounter += populate(p, numberOfItemsByLevel, numberOfLevels, currentLevel, randomno);
         } else {
           if (currentLevel > 1) {
             for (int j = 0; j < numberOfItemsByLevel; j++) {
               Path temp = Files.createFile(p.resolve(IdUtils.createUUID() + ".txt"));
-              Files.write(temp, "NUNCAMAISACABA".getBytes());
+              Files.write(temp, "CONTENT".getBytes());
               fileCounter++;
             }
           }
         }
       }
     }
+
+    return fileCounter;
   }
 
   static int nextIntInRange(int min, int max, Random rng) {

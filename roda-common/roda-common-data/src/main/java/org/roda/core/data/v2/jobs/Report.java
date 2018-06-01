@@ -16,6 +16,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.ip.HasId;
 import org.roda.core.data.v2.ip.SIPUpdateInformation;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -25,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @XmlRootElement(name = RodaConstants.RODA_OBJECT_REPORT)
 @JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Report implements IsModelObject {
+public class Report implements IsModelObject, HasId {
   private static final long serialVersionUID = 4316398565678538090L;
 
   public enum PluginState {
@@ -108,9 +109,8 @@ public class Report implements IsModelObject {
     return id;
   }
 
-  public Report setId(String id) {
+  public void setId(String id) {
     this.id = id;
-    return this;
   }
 
   public String getJobId() {

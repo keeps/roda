@@ -9,7 +9,9 @@ package org.roda.core.data.v2;
 
 import java.io.Serializable;
 
-public abstract class NamedIndexedModel implements Serializable {
+import org.roda.core.data.v2.ip.HasId;
+
+public abstract class NamedIndexedModel implements Serializable, HasId {
 
   private static final long serialVersionUID = 6489779852980849279L;
 

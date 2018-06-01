@@ -24,7 +24,6 @@ import org.apache.commons.configuration.Configuration;
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.common.util.DateUtil;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.ReturnWithExceptionsWrapper;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -38,6 +37,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.ReturnWithExceptions;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.utils.XMLUtils;
+import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.formats.Format;
@@ -404,7 +404,7 @@ public class IndexService {
   }
 
   public void deleteActionLog(Date until) throws SolrServerException, IOException {
-    String dateString = DateUtil.getThreadLocalDateFormat().format(until);
+    String dateString = SolrUtils.formatDate(until);
     String query = RodaConstants.LOG_DATETIME + ":[* TO " + dateString + "]";
     getSolrClient().deleteByQuery(RodaConstants.INDEX_ACTION_LOG, query);
     getSolrClient().commit(RodaConstants.INDEX_ACTION_LOG);
@@ -570,7 +570,7 @@ public class IndexService {
     SolrUtils.deleteByQuery(getSolrClient(), classToRetrieve, filter);
   }
 
-  public <T extends IsIndexed> void create(Class<T> classToCreate, T instance) {
+  public <T extends IsIndexed, M extends IsModelObject> void create(Class<T> classToCreate, M instance) {
     SolrUtils.create(getSolrClient(), classToCreate, instance, this);
   }
 

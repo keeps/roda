@@ -39,8 +39,6 @@ public final class RodaConstants {
   public static final String CORE_STORAGE_FEDORA4_PASSWORD = "core.storage.fedora4.password";
   public static final String CORE_SOLR_TYPE = "core.solr.type";
   public static final String CORE_SOLR_HTTP_URL = "core.solr.http.url";
-  @Deprecated
-  public static final String CORE_SOLR_HTTP_CLOUD_URLS = "core.solr.http_cloud.urls";
   public static final String CORE_SOLR_CLOUD_URLS = "core.solr.cloud.urls";
 
   public static final String CORE_STORAGE_NEW_SERVICE = "core.storage.new_service";
@@ -54,7 +52,13 @@ public final class RodaConstants {
    * Misc
    */
   public static final String INSTALL_FOLDER_ENVIRONEMNT_VARIABLE = "RODA_HOME";
-  public static final String ISO8601 = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+
+  /**
+   * XXX Use DateTimeFormatter.ISO_INSTANT instead when GWT supports Instant
+   */
+  public static final String ISO8601_NO_MILLIS = "yyyy-MM-dd'T'HH:mm:ssX";
+  public static final String ISO8601_WITH_MILLIS = "yyyy-MM-dd'T'HH:mm:ss.SSSX";
+
   public static final String SIMPLE_DATE_FORMATTER = "yyyy-MM-dd";
   public static final String SHA1 = "SHA-1";
   public static final String SHA256 = "SHA-256";
@@ -573,6 +577,8 @@ public final class RodaConstants {
    * Index common fields
    */
   public static final String INDEX_UUID = "uuid";
+  public static final String INDEX_ID = "id";
+  public static final String INDEX_STATE = "state";
 
   /*
    * AIP FIELDS
@@ -584,7 +590,6 @@ public final class RodaConstants {
   public static final String AIP_ID = "id";
   public static final String AIP_PARENT_ID = "parentId";
   public static final String AIP_ANCESTORS = "ancestors";
-  public static final String STATE = "state";
   public static final String INGEST_SIP_IDS = "ingestSIPIds";
   public static final String INGEST_JOB_ID = "ingestJobId";
   public static final String INGEST_UPDATE_JOB_IDS = "ingestUpdateJobIds";
@@ -910,7 +915,8 @@ public final class RodaConstants {
   public static final String FILE_AIP_ID = "aipId";
   public static final String FILE_FORMAT_MIMETYPE = "formatMimetype";
   public static final String FILE_FORMAT_VERSION = "formatVersion";
-  public static final String FILE_FILE_ID = "fileId";
+  @Deprecated
+  public static final String FILE_FILE_ID = INDEX_ID;
   public static final String FILE_REPRESENTATION_UUID = "representationUUID";
   public static final String FILE_REPRESENTATION_ID = "representationId";
   public static final String FILE_STORAGE_PATH = "storagePath";

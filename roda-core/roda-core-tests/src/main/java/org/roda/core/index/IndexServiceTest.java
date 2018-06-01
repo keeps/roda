@@ -16,6 +16,11 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -35,7 +40,6 @@ import org.hamcrest.collection.IsCollectionWithSize;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
-import org.roda.core.common.RodaUtils;
 import org.roda.core.common.notifications.EmailNotificationProcessor;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -73,6 +77,7 @@ import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
+import org.roda.core.index.schema.SolrCollectionRegistry;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
@@ -208,8 +213,8 @@ public class IndexServiceTest {
     assertEquals("fonds", indexedAip.getLevel());
     assertEquals("My example", indexedAip.getTitle());
     assertEquals("This is a very nice example", indexedAip.getDescription());
-    assertEquals(RodaUtils.parseDate("0001-01-01T00:00:00.000+0000"), indexedAip.getDateInitial());
-    assertEquals(RodaUtils.parseDate("0002-01-01T00:00:00.000+0000"), indexedAip.getDateFinal());
+    assertEquals(SolrUtils.parseDate("0001-01-01T00:00:00Z"), indexedAip.getDateInitial());
+    assertEquals(SolrUtils.parseDate("0002-01-01T00:00:00Z"), indexedAip.getDateFinal());
 
     // Retrieve, count and list SRO
     String rep1Id = aip.getRepresentations().get(0).getId();
@@ -257,12 +262,17 @@ public class IndexServiceTest {
     filter.add(new SimpleFilterParameter(RodaConstants.INDEX_UUID, aipId));
     IndexedAIP indexedAip = index.find(IndexedAIP.class, filter, null, new Sublist(0, 10), Collections.emptyList())
       .getResults().get(0);
+
+    Instant dateInitial = indexedAip.getDateInitial().toInstant();
+    LocalDateTime ldt = LocalDateTime.ofInstant(dateInitial, ZoneOffset.UTC);
+    int year = ldt.getYear();
+
     Calendar calInitial = Calendar.getInstance();
     calInitial.setTime(indexedAip.getDateInitial());
-    assertEquals(calInitial.get(Calendar.YEAR), CorporaConstants.YEAR_1213);
+    assertEquals(CorporaConstants.YEAR_1213, calInitial.get(Calendar.YEAR));
     Calendar calFinal = Calendar.getInstance();
     calFinal.setTime(indexedAip.getDateFinal());
-    assertEquals(calFinal.get(Calendar.YEAR), CorporaConstants.YEAR_2003);
+    assertEquals(CorporaConstants.YEAR_2003, calFinal.get(Calendar.YEAR));
 
   }
 
@@ -732,7 +742,7 @@ public class IndexServiceTest {
     Notification message4 = index.retrieve(Notification.class, notification.getId(), new ArrayList<>());
     assertNotNull(message4);
     assertEquals(notification.getId(), message4.getId());
-    assertEquals(message4.getSubject(), "Message New Subject");
+    assertEquals("Message New Subject", message4.getSubject());
 
     model.deleteNotification(notification.getId());
   }
@@ -750,8 +760,8 @@ public class IndexServiceTest {
       aip.setRepresentations(new ArrayList<>());
       aip.setPermissions(new Permissions());
 
-      index.getSolrClient().add(SolrUtils.getIndexName(AIP.class).get(0),
-        SolrUtils.aipToSolrInputDocument(aip, new ArrayList<>(), model, true));
+      index.getSolrClient().add(SolrCollectionRegistry.getIndexName(IndexedAIP.class),
+        SolrCollectionRegistry.toSolrDocument(IndexedAIP.class, aip));
 
       index.commit(IndexedAIP.class);
 

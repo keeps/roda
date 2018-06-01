@@ -7,11 +7,10 @@
  */
 package org.roda.core.data.v2.ip;
 
-public interface HasPermissions extends HasPermissionFilters {
+public interface HasPermissions extends HasPermissionFilters, HasId {
 
-  public Permissions getPermissions();
+  Permissions getPermissions();
 
-  public void setPermissions(Permissions permissions);
+  void setPermissions(Permissions permissions);
 
-  public String getId();
 }

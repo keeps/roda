@@ -119,14 +119,14 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
       index.commit(TransferredResource.class);
 
       Filter filter;
-      String formattedDate = SolrUtils.getLastScanDate(lastScanDate);
       if (!folderRelativePath.isPresent()) {
-        filter = new Filter(
-          new NotSimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_LAST_SCAN_DATE, formattedDate));
+        filter = new Filter(new NotSimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_LAST_SCAN_DATE,
+          SolrUtils.formatDateWithMillis(lastScanDate)));
       } else {
         filter = new Filter(
           new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ANCESTORS, folderRelativePath.get()),
-          new NotSimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_LAST_SCAN_DATE, formattedDate));
+          new NotSimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_LAST_SCAN_DATE,
+            SolrUtils.formatDateWithMillis(lastScanDate)));
       }
 
       index.delete(TransferredResource.class, filter);

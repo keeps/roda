@@ -39,6 +39,7 @@ import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
+import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -141,7 +142,8 @@ public class VerifyUserAuthorizationPlugin extends AbstractPlugin<AIP> {
         try {
           IndexedAIP parentAIP = index.retrieve(IndexedAIP.class, aip.getParentId(),
             RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
-          User user = index.retrieve(User.class, jobCreatorUsername, userFieldsToReturn);
+          User user = (User) index.retrieve(RODAMember.class, IdUtils.getUserId(jobCreatorUsername),
+            userFieldsToReturn);
           UserUtility.checkAIPPermissions(user, parentAIP, PermissionType.CREATE);
         } catch (NotFoundException nfe) {
           reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(PARENT_AIP_NOT_FOUND);
@@ -151,7 +153,7 @@ public class VerifyUserAuthorizationPlugin extends AbstractPlugin<AIP> {
             "The user " + jobCreatorUsername + " doesn't have permission to create under AIP " + aip.getId());
         }
       } else {
-        RODAMember member = index.retrieve(RODAMember.class, jobCreatorUsername,
+        RODAMember member = index.retrieve(RODAMember.class, IdUtils.getUserId(jobCreatorUsername),
           Arrays.asList(RodaConstants.MEMBERS_ROLES_ALL));
         if (member.getAllRoles().contains(RodaConstants.REPOSITORY_PERMISSIONS_AIP_CREATE_TOP)) {
           LOGGER.debug("User have CREATE_TOP_LEVEL_AIP_PERMISSION permission.");

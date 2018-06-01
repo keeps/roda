@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @XmlRootElement(name = RodaConstants.RODA_OBJECT_DIPFILE)
-public class DIPFile implements IsModelObject, IsIndexed, HasPermissionFilters {
+public class DIPFile implements IsModelObject, IsIndexed, HasId, HasPermissionFilters {
 
   private static final long serialVersionUID = 1L;
   private static final int VERSION = 1;

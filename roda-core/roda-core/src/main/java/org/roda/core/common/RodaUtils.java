@@ -148,27 +148,6 @@ public class RodaUtils {
   }
 
   /**
-   * Date as ISO8601 string {@link RodaConstants.ISO8601}. If date provided is
-   * null, then current date will be used
-   */
-  public static String dateToISO8601(final Date date) {
-    Date d = (date == null ? new Date() : date);
-    SimpleDateFormat iso8601DateFormat = new SimpleDateFormat(RodaConstants.ISO8601);
-    return iso8601DateFormat.format(d);
-  }
-
-  public static Date parseDate(String date) throws ParseException {
-    Date ret;
-    if (date != null) {
-      SimpleDateFormat iso8601DateFormat = new SimpleDateFormat(RodaConstants.ISO8601);
-      ret = iso8601DateFormat.parse(date);
-    } else {
-      ret = null;
-    }
-    return ret;
-  }
-
-  /**
    * @deprecated 20160907 hsilva: not seeing any method using it, so it will be
    *             removed soon
    */

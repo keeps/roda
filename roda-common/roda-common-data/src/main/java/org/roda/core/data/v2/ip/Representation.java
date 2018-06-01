@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @XmlRootElement(name = RodaConstants.RODA_OBJECT_REPRESENTATION)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Representation implements IsModelObject {
+public class Representation implements IsModelObject, HasId {
 
   private static final long serialVersionUID = 3658011895150894795L;
 

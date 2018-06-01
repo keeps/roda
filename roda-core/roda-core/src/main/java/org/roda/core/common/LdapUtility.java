@@ -45,6 +45,7 @@ import org.apache.directory.api.ldap.model.message.AliasDerefMode;
 import org.apache.directory.api.ldap.model.message.ModifyRequestImpl;
 import org.apache.directory.api.ldap.model.message.SearchScope;
 import org.apache.directory.api.ldap.model.name.Dn;
+import org.apache.directory.api.ldap.model.name.Rdn;
 import org.apache.directory.api.ldap.model.password.PasswordUtil;
 import org.apache.directory.api.ldap.model.schema.SchemaManager;
 import org.apache.directory.api.ldap.model.schema.registries.SchemaLoader;
@@ -116,6 +117,9 @@ public class LdapUtility {
 
   /** Constant: top. */
   private static final String OBJECT_CLASS_TOP = "top";
+
+  /** Constant: top. */
+  private static final String OBJECT_CLASS_ORGANIZATIONAL_UNIT = "organizationalUnit";
 
   /** Constant: groupOfUniqueNames. */
   private static final String GROUP_OF_UNIQUE_NAMES = "groupOfUniqueNames";
@@ -350,15 +354,20 @@ public class LdapUtility {
 
     // Inject the context entry for dc=roda,dc=org partition
     if (!session.exists(rodaPartition.getSuffixDn())) {
-      final Dn dnRoot = new Dn(this.ldapRootDN);
-      final Entry entryRoda = service.newEntry(dnRoot);
-      entryRoda.add(OBJECT_CLASS, OBJECT_CLASS_TOP, OBJECT_CLASS_DOMAIN, OBJECT_CLASS_EXTENSIBLE_OBJECT);
-      entryRoda.add("dc", getFirstNameFromDN(dnRoot));
-      try {
-        session.add(entryRoda);
-      } catch (LdapEntryAlreadyExistsException e) {
-        LOGGER.warn("Error injecting the context entry for dc=roda,dc=org partition: {}", e.getMessage());
-      }
+
+      // add root DN
+      addEntryIfNotExists(session, this.ldapRootDN, OBJECT_CLASS_TOP, OBJECT_CLASS_DOMAIN,
+        OBJECT_CLASS_EXTENSIBLE_OBJECT);
+
+      // add roles DN
+      addEntryIfNotExists(session, this.ldapRolesDN, OBJECT_CLASS_TOP, OBJECT_CLASS_ORGANIZATIONAL_UNIT);
+
+      // add roles DN
+      addEntryIfNotExists(session, this.ldapPeopleDN, OBJECT_CLASS_TOP, OBJECT_CLASS_ORGANIZATIONAL_UNIT);
+
+      // add roles DN
+      addEntryIfNotExists(session, this.ldapGroupsDN, OBJECT_CLASS_TOP, OBJECT_CLASS_ORGANIZATIONAL_UNIT);
+
     }
 
     if (ldifs != null) {
@@ -372,6 +381,17 @@ public class LdapUtility {
       this.server.setTransports(new TcpTransport(this.ldapPort));
       this.server.setDirectoryService(this.service);
       this.server.start();
+    }
+  }
+
+  private void addEntryIfNotExists(CoreSession session, String dnString, String... objectClasses) throws LdapException {
+    final Dn dn = new Dn(dnString);
+    final Rdn rdn = dn.getRdn();
+    final Entry entryRoda = service.newEntry(dn).add(OBJECT_CLASS, objectClasses).add(rdn.getType(), rdn.getValue());
+    try {
+      session.add(entryRoda);
+    } catch (LdapEntryAlreadyExistsException e) {
+      LOGGER.debug("Error injecting the context entry for {}: {}", dnString, e.getMessage());
     }
   }
 

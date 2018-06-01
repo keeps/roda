@@ -8,7 +8,6 @@
 package org.roda.core;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.Console;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,6 +16,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -35,6 +35,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -57,6 +58,7 @@ import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.CollectionAdminRequest;
+import org.apache.solr.client.solrj.request.CollectionAdminRequest.Create;
 import org.apache.solr.client.solrj.response.CollectionAdminResponse;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.cloud.ZkController;
@@ -64,8 +66,10 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.cloud.ClusterState;
+import org.apache.solr.common.cloud.DocCollection;
 import org.apache.solr.common.cloud.Replica;
 import org.apache.solr.common.cloud.Slice;
+import org.apache.solr.common.cloud.ZkStateReader;
 import org.apache.zookeeper.KeeperException;
 import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
@@ -109,6 +113,8 @@ import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.index.IndexService;
+import org.roda.core.index.schema.SolrBootstrapUtils;
+import org.roda.core.index.schema.SolrCollectionRegistry;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.migration.MigrationManager;
 import org.roda.core.model.ModelService;
@@ -127,8 +133,8 @@ import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.codahale.metrics.JmxReporter;
 import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.jmx.JmxReporter;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -571,7 +577,6 @@ public class RodaCoreFactory {
         Files.createDirectories(exampleConfigPath);
         copyFilesFromClasspath(RodaConstants.CORE_CONFIG_FOLDER + "/", exampleConfigPath, true,
           Arrays.asList(RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_LDAP_FOLDER,
-            RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_INDEX_FOLDER,
             RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_I18N_FOLDER + "/"
               + RodaConstants.CORE_I18N_CLIENT_FOLDER,
             RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_I18N_FOLDER + "/"
@@ -822,8 +827,6 @@ public class RodaCoreFactory {
             Path tempConfig = Files.createTempDirectory(getWorkingDirectory(), RodaConstants.CORE_INDEX_FOLDER);
             toDeleteDuringShutdown.add(tempConfig);
             tempIndexConfigsPath = Optional.of(tempConfig);
-            copyFilesFromClasspath(RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_INDEX_FOLDER + "/",
-              tempConfig);
             solrHome = tempConfig.resolve(RodaConstants.CORE_CONFIG_FOLDER).resolve(RodaConstants.CORE_INDEX_FOLDER);
             LOGGER.info("Using SOLR home: {}", solrHome);
           } catch (IOException e) {
@@ -834,8 +837,6 @@ public class RodaCoreFactory {
       } else if (nodeType == NodeType.TEST) {
         try {
           solrHome = Files.createTempDirectory(getWorkingDirectory(), RodaConstants.CORE_INDEX_FOLDER);
-          copyFilesFromClasspath(RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_INDEX_FOLDER + "/",
-            solrHome, true);
         } catch (IOException e) {
           LOGGER.error("Unable to instantiate Solr in TEST mode", e);
           instantiatedWithoutErrors = false;
@@ -851,6 +852,8 @@ public class RodaCoreFactory {
       if (instantiatedWithoutErrors) {
         // instantiate solr
         solr = instantiateSolr(solrHome);
+
+        SolrBootstrapUtils.bootstrapSchemas(solr);
 
         // instantiate index related object
         index = new IndexService(solr, model, metricsRegistry, rodaConfiguration);
@@ -885,10 +888,11 @@ public class RodaCoreFactory {
     if (solrType == RodaConstants.SolrType.HTTP) {
       String solrBaseUrl = getConfigurationString(RodaConstants.CORE_SOLR_HTTP_URL, "http://localhost:8983/solr/");
       LOGGER.info("Instantiating SOLR HTTP at {}", solrBaseUrl);
-      return new HttpSolrClient(solrBaseUrl);
-    } else if (solrType == RodaConstants.SolrType.HTTP_CLOUD || solrType == RodaConstants.SolrType.CLOUD) {
-      String solrCloudZooKeeperUrls = getConfigurationString(RodaConstants.CORE_SOLR_CLOUD_URLS, getConfigurationString(
-        RodaConstants.CORE_SOLR_HTTP_CLOUD_URLS, "localhost:2181,localhost:2182,localhost:2183"));
+
+      return new HttpSolrClient.Builder(solrBaseUrl).build();
+    } else if (solrType == RodaConstants.SolrType.CLOUD) {
+      String solrCloudZooKeeperUrls = getConfigurationString(RodaConstants.CORE_SOLR_CLOUD_URLS,
+        "localhost:2181,localhost:2182,localhost:2183");
       LOGGER.info("Instantiating SOLR Cloud at {}", solrCloudZooKeeperUrls);
 
       try {
@@ -897,7 +901,19 @@ public class RodaCoreFactory {
         LOGGER.error("Could not check zookeeper chroot path", e);
       }
 
-      CloudSolrClient cloudSolrClient = new CloudSolrClient(solrCloudZooKeeperUrls);
+      List<String> zkHosts;
+      Optional<String> zkChroot;
+
+      // parse config
+      String[] split = solrCloudZooKeeperUrls.split("/");
+      if (split.length == 1 || split.length == 2) {
+        zkHosts = Arrays.asList(split[0].split(","));
+        zkChroot = split.length > 1 && StringUtils.isNotBlank(split[1]) ? Optional.of(split[1]) : Optional.empty();
+      } else {
+        throw new GenericException("Bad solrCloudZooKeeperUrls configuration: " + solrCloudZooKeeperUrls);
+      }
+
+      CloudSolrClient cloudSolrClient = new CloudSolrClient.Builder(zkHosts, zkChroot).build();
 
       waitForSolrCluster(cloudSolrClient);
 
@@ -905,7 +921,34 @@ public class RodaCoreFactory {
       return cloudSolrClient;
     } else {
       // default to Embedded
-      setSolrSystemProperties();
+      System.setProperty("solr.data.dir", indexDataPath.toString());
+
+      try {
+
+        // Create base config for each collection
+        Path commonConf = Files.createTempDirectory("solr-base-config");
+
+        copyFilesFromClasspath(RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_INDEX_FOLDER + "/"
+          + SolrUtils.COMMON + "/" + SolrUtils.CONF + "/", commonConf, true);
+
+        for (String collection : SolrCollectionRegistry.registryIndexNames()) {
+          Path collectionPath = solrHome.resolve(collection);
+          FSUtils.copy(commonConf, collectionPath.resolve(SolrUtils.CONF), true);
+
+          // create core.properties
+          Files.write(collectionPath.resolve("core.properties"),
+            ("name=" + collection).getBytes(StandardCharsets.UTF_8));
+        }
+
+        FSUtils.deletePathQuietly(commonConf);
+
+        // create empty solr.xml
+        Files.write(solrHome.resolve("solr.xml"), "<solr></solr>".getBytes(StandardCharsets.UTF_8));
+
+      } catch (IOException | AlreadyExistsException e) {
+        LOGGER.info("Error instantiating SOLR Embedded", e);
+      }
+
       LOGGER.info("Instantiating SOLR Embedded");
       return new EmbeddedSolrServer(solrHome, "test");
     }
@@ -945,39 +988,47 @@ public class RodaCoreFactory {
       throw new GenericException("Could not connect to Solr Cloud", e);
     }
 
-    ClusterState clusterState = cloudSolrClient.getZkStateReader().getClusterState();
+    ZkStateReader zkStateReader = cloudSolrClient.getZkStateReader();
+    ClusterState clusterState = zkStateReader.getClusterState();
 
-    Set<String> allCollections = clusterState.getCollections();
+    Map<String, DocCollection> collectionStates = clusterState.getCollectionsMap();
+    Set<String> allCollections = new HashSet<>();
     Set<String> healthyCollections = new HashSet<>();
 
     boolean healthy;
 
-    for (String col : allCollections) {
+    for (Entry<String, DocCollection> entry : collectionStates.entrySet()) {
+      String col = entry.getKey();
+      DocCollection docs = entry.getValue();
 
-      Collection<Slice> slices = clusterState.getSlices(col);
+      if (docs != null) {
+        allCollections.add(col);
 
-      boolean collectionHealthy = true;
-      // collection healthy if all slices are healthy
+        Collection<Slice> slices = docs.getActiveSlices();
 
-      for (Slice slice : slices) {
-        boolean sliceHealthy = false;
+        boolean collectionHealthy = true;
+        // collection healthy if all slices are healthy
 
-        // if at least one replica is active then the slice is healthy
-        for (Replica replica : slice.getReplicas()) {
-          if (Replica.State.ACTIVE.equals(replica.getState())) {
-            sliceHealthy = true;
-            break;
-          } else {
-            LOGGER.info("Replica {} on node {} is {}", replica.getName(), replica.getNodeName(),
-              replica.getState().name());
+        for (Slice slice : slices) {
+          boolean sliceHealthy = false;
+
+          // if at least one replica is active then the slice is healthy
+          for (Replica replica : slice.getReplicas()) {
+            if (Replica.State.ACTIVE.equals(replica.getState())) {
+              sliceHealthy = true;
+              break;
+            } else {
+              LOGGER.info("Replica {} on node {} is {}", replica.getName(), replica.getNodeName(),
+                replica.getState().name());
+            }
           }
+
+          collectionHealthy &= sliceHealthy;
         }
 
-        collectionHealthy &= sliceHealthy;
-      }
-
-      if (collectionHealthy) {
-        healthyCollections.add(col);
+        if (collectionHealthy) {
+          healthyCollections.add(col);
+        }
       }
     }
 
@@ -1007,11 +1058,14 @@ public class RodaCoreFactory {
         existingCollections = new ArrayList<>();
       }
 
-      Map<String, Path> defaultCollections = getDefaultCollections(solrHome);
+      Path commonConf = solrHome.resolve(SolrUtils.COMMON).resolve(SolrUtils.CONF);
 
-      for (String defaultCollection : defaultCollections.keySet()) {
-        if (!existingCollections.contains(defaultCollection)) {
-          createCollection(cloudSolrClient, defaultCollection, defaultCollections.get(defaultCollection));
+      copyFilesFromClasspath(RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_INDEX_FOLDER + "/"
+        + SolrUtils.COMMON + "/" + SolrUtils.CONF + "/", commonConf, true);
+
+      for (String collection : SolrCollectionRegistry.registryIndexNames()) {
+        if (!existingCollections.contains(collection)) {
+          createCollection(cloudSolrClient, collection, commonConf);
         }
       }
 
@@ -1020,37 +1074,21 @@ public class RodaCoreFactory {
     }
   }
 
-  private static Map<String, Path> getDefaultCollections(Path solrHome) throws IOException {
-    Map<String, Path> collections = new HashMap<>();
-    Files.list(solrHome).forEach(p -> {
-      if (Files.isDirectory(p)) {
-        collections.put(p.getFileName().toString(), p);
-      }
-    });
-    return collections;
-  }
-
   private static void createCollection(CloudSolrClient cloudSolrClient, String collection, Path configPath) {
-    CollectionAdminRequest.Create req = new CollectionAdminRequest.Create();
+
     try {
       LOGGER.info("Creating SOLR collection {}", collection);
-      Path collectionConf = configPath.resolve("conf");
-      Path solrCoreProperties = collectionConf.resolve("solrcore.properties");
-      try (BufferedWriter solrCorePropertiesWriter = Files.newBufferedWriter(solrCoreProperties)) {
-        IOUtils.write(String.format("name=%1$s\nsolr.data.dir.%2$s=data", collection, collection.toLowerCase()),
-          solrCorePropertiesWriter);
-      }
 
-      cloudSolrClient.uploadConfig(collectionConf, collection);
+      int numShards = getEnvInt("SOLR_NUM_SHARDS", 1);
+      int numReplicas = getEnvInt("SOLR_REPLICATION_FACTOR", 1);
 
-      req.setCollectionName(collection).setConfigName(collection);
+      cloudSolrClient.getZkStateReader().getZkClient().upConfig(configPath, collection);
 
-      req.setNumShards(getEnvInt("SOLR_NUM_SHARDS", 1));
-      req.setMaxShardsPerNode(getEnvInt("SOLR_MAX_SHARDS_PER_NODE", 1));
-      req.setReplicationFactor(getEnvInt("SOLR_REPLICATION_FACTOR", 1));
-      req.setAutoAddReplicas(getEnvBoolean("SOLR_AUTO_ADD_REPLICAS", false));
+      Create createCollection = CollectionAdminRequest.createCollection(collection, collection, numShards, numReplicas);
+      createCollection.setMaxShardsPerNode(getEnvInt("SOLR_MAX_SHARDS_PER_NODE", 1));
+      createCollection.setAutoAddReplicas(getEnvBoolean("SOLR_AUTO_ADD_REPLICAS", false));
 
-      CollectionAdminResponse response = req.process(cloudSolrClient);
+      CollectionAdminResponse response = createCollection.process(cloudSolrClient);
       if (!response.isSuccess()) {
         LOGGER.error("Could not create collection {}: {}", collection, response.getErrorMessages());
       }
@@ -1076,37 +1114,6 @@ public class RodaCoreFactory {
     String envString = System.getenv(name);
     envInt = envString != null ? Boolean.valueOf(envString) : defaultValue;
     return envInt;
-  }
-
-  private static void setSolrSystemProperties() {
-    System.setProperty("solr.data.dir", indexDataPath.toString());
-    System.setProperty("solr.data.dir.aip", indexDataPath.resolve(RodaConstants.CORE_AIP_FOLDER).toString());
-    System.setProperty("solr.data.dir.representations",
-      indexDataPath.resolve(RodaConstants.CORE_REPRESENTATION_FOLDER).toString());
-    System.setProperty("solr.data.dir.file", indexDataPath.resolve(RodaConstants.CORE_FILE_FOLDER).toString());
-    System.setProperty("solr.data.dir.preservationevent",
-      indexDataPath.resolve(RodaConstants.CORE_PRESERVATIONEVENT_FOLDER).toString());
-    System.setProperty("solr.data.dir.preservationagent",
-      indexDataPath.resolve(RodaConstants.CORE_PRESERVATIONAGENT_FOLDER).toString());
-    System.setProperty("solr.data.dir.actionlog",
-      indexDataPath.resolve(RodaConstants.CORE_ACTIONLOG_FOLDER).toString());
-    System.setProperty("solr.data.dir.members", indexDataPath.resolve(RodaConstants.CORE_MEMBERS_FOLDER).toString());
-    System.setProperty("solr.data.dir.transferredresource",
-      indexDataPath.resolve(RodaConstants.CORE_TRANSFERREDRESOURCE_FOLDER).toString());
-    System.setProperty("solr.data.dir.job", indexDataPath.resolve(RodaConstants.CORE_JOB_FOLDER).toString());
-    System.setProperty("solr.data.dir.jobreport",
-      indexDataPath.resolve(RodaConstants.CORE_JOBREPORT_FOLDER).toString());
-    System.setProperty("solr.data.dir.risk", indexDataPath.resolve(RodaConstants.CORE_RISK_FOLDER).toString());
-    System.setProperty("solr.data.dir.format", indexDataPath.resolve(RodaConstants.CORE_FORMAT_FOLDER).toString());
-    System.setProperty("solr.data.dir.agent", indexDataPath.resolve(RodaConstants.CORE_AGENT_FOLDER).toString());
-    System.setProperty("solr.data.dir.notification",
-      indexDataPath.resolve(RodaConstants.CORE_NOTIFICATION_FOLDER).toString());
-    System.setProperty("solr.data.dir.riskincidence",
-      indexDataPath.resolve(RodaConstants.CORE_RISKINCIDENCE_FOLDER).toString());
-    System.setProperty("solr.data.dir.dip", indexDataPath.resolve(RodaConstants.CORE_DIP_FOLDER).toString());
-    System.setProperty("solr.data.dir.dipfile", indexDataPath.resolve(RodaConstants.CORE_DIP_FILE_FOLDER).toString());
-    System.setProperty("solr.data.dir.representation-information",
-      indexDataPath.resolve(RodaConstants.CORE_REPRESENTATION_INFORMATION_FOLDER).toString());
   }
 
   private static void instantiateNodeSpecificObjects(NodeType nodeType) {
@@ -1279,7 +1286,7 @@ public class RodaCoreFactory {
 
       if (!FSUtils.exists(rodaApacheDSDataDirectory) || FSUtils.isDirEmpty(rodaApacheDSDataDirectory)) {
         Files.createDirectories(rodaApacheDSDataDirectory);
-        final List<String> ldifFileNames = Arrays.asList("users.ldif", "groups.ldif", "roles.ldif");
+        final List<String> ldifFileNames = Arrays.asList("users.ldif", "groups.ldif");
         final List<String> ldifs = new ArrayList<>();
         for (String ldifFileName : ldifFileNames) {
           final InputStream ldifInputStream = RodaCoreFactory
@@ -1334,20 +1341,17 @@ public class RodaCoreFactory {
           LOGGER.debug("Created LDAP role {}", role);
         }
       } catch (final RoleAlreadyExistsException e) {
-        LOGGER.debug("Role {} already exists.", role);
-        LOGGER.trace(e.getMessage(), e);
+        LOGGER.trace("Role {} already exists.", role, e);
       }
     }
   }
 
   private static void indexUsersAndGroupsFromLDAP() throws GenericException {
     for (User user : model.listUsers()) {
-      LOGGER.debug("User to be indexed: {}", user);
       model.notifyUserUpdated(user).failOnError();
     }
 
     for (Group group : model.listGroups()) {
-      LOGGER.debug("Group to be indexed: {}", group);
       model.notifyGroupUpdated(group).failOnError();
     }
   }

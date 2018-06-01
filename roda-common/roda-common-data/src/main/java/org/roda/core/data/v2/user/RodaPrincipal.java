@@ -166,8 +166,28 @@ public abstract class RodaPrincipal implements Serializable, RODAMember, IsModel
 
   @Override
   public String getUUID() {
-    // TODO needs prefix to distinguish from user?
-    return getId();
+    return getUUID(isUser(), getId());
+  }
+
+  public static String getUUID(boolean isUser, String id) {
+    StringBuilder b = new StringBuilder();
+    if (isUser) {
+      b.append(User.class.getSimpleName().toLowerCase());
+    } else {
+      b.append(Group.class.getSimpleName().toLowerCase());
+    }
+    b.append("-");
+    b.append(id);
+
+    return b.toString();
+  }
+
+  public static String getUserUUID(String username) {
+    return getUUID(true, username);
+  }
+
+  public static String getGroupUUID(String groupname) {
+    return getUUID(false, groupname);
   }
 
   // TODO: implement validation...

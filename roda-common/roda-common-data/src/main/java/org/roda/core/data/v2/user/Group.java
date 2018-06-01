@@ -139,13 +139,51 @@ public class Group extends RodaPrincipal {
     return true;
   }
 
+
+
+  /* (non-Javadoc)
+   * @see java.lang.Object#toString()
+   */
   @Override
   public String toString() {
-    final StringBuilder builder = new StringBuilder();
+    StringBuilder builder = new StringBuilder();
     builder.append("Group [");
     if (users != null) {
       builder.append("users=");
       builder.append(users);
+      builder.append(", ");
+    }
+    if (getId() != null) {
+      builder.append("getId()=");
+      builder.append(getId());
+      builder.append(", ");
+    }
+    if (getName() != null) {
+      builder.append("getName()=");
+      builder.append(getName());
+      builder.append(", ");
+    }
+    if (getFullName() != null) {
+      builder.append("getFullName()=");
+      builder.append(getFullName());
+      builder.append(", ");
+    }
+    builder.append("isActive()=");
+    builder.append(isActive());
+    builder.append(", ");
+    if (getAllRoles() != null) {
+      builder.append("getAllRoles()=");
+      builder.append(getAllRoles());
+      builder.append(", ");
+    }
+    if (getDirectRoles() != null) {
+      builder.append("getDirectRoles()=");
+      builder.append(getDirectRoles());
+      builder.append(", ");
+    }
+    if (getUUID() != null) {
+      builder.append("getUUID()=");
+      builder.append(getUUID());
     }
     builder.append("]");
     return builder.toString();

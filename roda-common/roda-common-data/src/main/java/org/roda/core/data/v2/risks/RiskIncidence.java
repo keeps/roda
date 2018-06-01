@@ -17,6 +17,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.ip.HasId;
 import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -24,7 +25,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @XmlRootElement(name = RodaConstants.RODA_OBJECT_INCIDENCE)
 @JsonInclude(JsonInclude.Include.ALWAYS)
-public class RiskIncidence implements IsModelObject, IsIndexed {
+public class RiskIncidence implements IsModelObject, IsIndexed, HasId {
   private static final long serialVersionUID = -1089167070045254627L;
 
   public enum INCIDENCE_STATUS {
