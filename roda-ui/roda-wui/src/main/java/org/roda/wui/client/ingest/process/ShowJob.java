@@ -397,13 +397,17 @@ public class ShowJob extends Composite {
         selectedListPanel.add(noSourceLabel);
       } else if (selected instanceof SelectedItemsList) {
         List<String> ids = ((SelectedItemsList<?>) selected).getIds();
-        Label filterLabel = new Label(SearchPreFilterUtils
-          .getFilterParameterHTML(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, ids)).asString());
-        selectedList.add(filterLabel);
+        HTML filterHTML = new HTML(SearchPreFilterUtils
+          .getFilterParameterHTML(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, ids)));
+        selectedList.add(filterHTML);
       } else if (selected instanceof SelectedItemsFilter) {
         Filter filter = ((SelectedItemsFilter<?>) selected).getFilter();
-        Label filterLabel = new Label(
-          SearchPreFilterUtils.getFilterHTML(filter, selected.getSelectedClass()).asString());
+        HTML filterHTML = new HTML(
+          SearchPreFilterUtils.getFilterHTML(filter, selected.getSelectedClass()));
+        selectedList.add(filterHTML);
+      } else if (selected instanceof SelectedItemsAll) {
+        Label filterLabel = new Label(messages.allOfAObject(selected.getSelectedClass()));
+        filterLabel.addStyleName("value");
         selectedList.add(filterLabel);
       } else {
         selectedListPanel.setVisible(false);
@@ -422,9 +426,9 @@ public class ShowJob extends Composite {
           Label noSourceLabel = new Label(messages.noItemsToDisplay());
           selectedListPanel.add(noSourceLabel);
         } else {
-          Label filterLabel = new Label(SearchPreFilterUtils
-            .getFilterParameterHTML(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, ids)).asString());
-          selectedList.add(filterLabel);
+          HTML filterHTML = new HTML(SearchPreFilterUtils
+            .getFilterParameterHTML(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, ids)));
+          selectedList.add(filterHTML);
         }
       } else if (selected instanceof SelectedItemsFilter) {
         Filter filter = ((SelectedItemsFilter<?>) selected).getFilter();
