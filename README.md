@@ -69,11 +69,18 @@ To start developing new components for RODA check the [Developer guide](https://
 - How to contribute
 - etc.
 
+## Browser compatibility
+
+Testing RODA on different browsers is done in an easy way thanks to BrowserStack!
+
+[![BrowserStack website](https://user-images.githubusercontent.com/98429/40908885-f1559ca4-67df-11e8-8a98-8b0b57d3febb.png)](http://browserstack.com/)
+
 ## Translators
 
 Translations are maintained in [Transifex](https://www.transifex.com/roda-1/roda2) and updated using the [Transifex Client](http://docs.transifex.com/client/).
 
 Check our [Translation guide](https://github.com/keeps/roda/blob/master/documentation/Translation_Guide.md) for more information.
+
 ## Specifications
 
 RODA implements a series of specifications and standards. To know more about the OAIS Information Packages that RODA implements, please check out the [DLM Archival Standards Board](http://www.dasboard.eu) repositories at https://github.com/DLMArchivalStandardsBoard
