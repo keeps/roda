@@ -466,12 +466,17 @@ public class RestUtils {
 
   private static FindRequestMapper FIND_REQUEST_MAPPER = GWT.create(FindRequestMapper.class);
 
-  public static <T extends IsIndexed> void requestCSVExport(Class<T> classToReturn, Filter filter, Sorter sorter,
+  public static <T extends IsIndexed> void requestCSVExport(Class<T> classToReturnName, Filter filter, Sorter sorter,
+    Sublist sublist, Facets facets, boolean onlyActive, boolean exportFacets, String filename) {
+    requestCSVExport(classToReturnName.getName(), filter, sorter, sublist, facets, onlyActive, exportFacets, filename);
+  }
+
+  public static <T extends IsIndexed> void requestCSVExport(String classToReturnName, Filter filter, Sorter sorter,
     Sublist sublist, Facets facets, boolean onlyActive, boolean exportFacets, String filename) {
     // api/v1/index/findFORM?type=csv
 
     String url = RodaConstants.API_REST_V1_INDEX + "findFORM";
-    FindRequest request = new FindRequest(classToReturn.getName(), filter, sorter, sublist, facets, onlyActive,
+    FindRequest request = new FindRequest(classToReturnName, filter, sorter, sublist, facets, onlyActive,
       exportFacets, filename);
 
     final FormPanel form = new FormPanel();

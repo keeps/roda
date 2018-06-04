@@ -28,6 +28,8 @@ import org.roda.core.data.v2.index.select.SelectedItemsAll;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.select.SelectedItemsNone;
+import org.roda.core.data.v2.index.sort.Sorter;
+import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -66,10 +68,12 @@ import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.Humanize.DHMSFormat;
 import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -83,6 +87,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.Widget;
@@ -397,9 +402,43 @@ public class ShowJob extends Composite {
         selectedListPanel.add(noSourceLabel);
       } else if (selected instanceof SelectedItemsList) {
         List<String> ids = ((SelectedItemsList<?>) selected).getIds();
-        HTML filterHTML = new HTML(SearchPreFilterUtils
-          .getFilterParameterHTML(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, ids)));
-        selectedList.add(filterHTML);
+        final Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, ids));
+        BrowserService.Util.getInstance().count(selected.getSelectedClass(), filter, true, new AsyncCallback<Long>() {
+          @Override
+          public void onFailure(Throwable caught) {
+            Label noSourceLabel = new Label(messages.noItemsToDisplay());
+            selectedListPanel.add(noSourceLabel);
+          }
+
+          @Override
+          public void onSuccess(Long result) {
+            InlineHTML filterHTML = new InlineHTML(messages.sourceObjectList(result, messages.someOfAObject(selected.getSelectedClass())));
+            selectedList.add(filterHTML);
+
+            Button button = new Button(messages.downloadButton());
+            button.addStyleName("btn btn-separator-left btn-link");
+            button.addClickHandler(new ClickHandler() {
+              @Override
+              public void onClick(ClickEvent event) {
+                BrowserService.Util.getInstance().getExportLimit(new AsyncCallback<Integer>() {
+
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    AsyncCallbackUtils.defaultFailureTreatment(caught);
+                  }
+
+                  @Override
+                  public void onSuccess(Integer result) {
+                    Toast.showInfo(messages.exportListTitle(), messages.exportListMessage(result));
+                    RestUtils.requestCSVExport(selected.getSelectedClass(), filter, Sorter.NONE,
+                            new Sublist(0, result.intValue()), Facets.NONE, true, false, "source_objects.csv");
+                  }
+                });
+              }
+            });
+            selectedList.add(button);
+          }
+        });
       } else if (selected instanceof SelectedItemsFilter) {
         Filter filter = ((SelectedItemsFilter<?>) selected).getFilter();
         HTML filterHTML = new HTML(
@@ -426,9 +465,43 @@ public class ShowJob extends Composite {
           Label noSourceLabel = new Label(messages.noItemsToDisplay());
           selectedListPanel.add(noSourceLabel);
         } else {
-          HTML filterHTML = new HTML(SearchPreFilterUtils
-            .getFilterParameterHTML(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, ids)));
-          selectedList.add(filterHTML);
+          final Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, ids));
+          BrowserService.Util.getInstance().count(selected.getSelectedClass(), filter, true, new AsyncCallback<Long>() {
+            @Override
+            public void onFailure(Throwable caught) {
+              Label noSourceLabel = new Label(messages.noItemsToDisplay());
+              selectedListPanel.add(noSourceLabel);
+            }
+
+            @Override
+            public void onSuccess(Long result) {
+              InlineHTML filterHTML = new InlineHTML(messages.sourceObjectList(result, messages.someOfAObject(selected.getSelectedClass())));
+              selectedList.add(filterHTML);
+
+              Button button = new Button(messages.downloadButton());
+              button.addStyleName("btn btn-separator-left btn-link");
+              button.addClickHandler(new ClickHandler() {
+                @Override
+                public void onClick(ClickEvent event) {
+                  BrowserService.Util.getInstance().getExportLimit(new AsyncCallback<Integer>() {
+
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      AsyncCallbackUtils.defaultFailureTreatment(caught);
+                    }
+
+                    @Override
+                    public void onSuccess(Integer result) {
+                      Toast.showInfo(messages.exportListTitle(), messages.exportListMessage(result));
+                      RestUtils.requestCSVExport(selected.getSelectedClass(), filter, Sorter.NONE,
+                        new Sublist(0, result.intValue()), Facets.NONE, true, false, "source_objects.csv");
+                    }
+                  });
+                }
+              });
+              selectedList.add(button);
+            }
+          });
         }
       } else if (selected instanceof SelectedItemsFilter) {
         Filter filter = ((SelectedItemsFilter<?>) selected).getFilter();

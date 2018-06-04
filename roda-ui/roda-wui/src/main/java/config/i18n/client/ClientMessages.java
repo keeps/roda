@@ -287,6 +287,8 @@ public interface ClientMessages extends Messages {
 
   String allOfAObject(@Select String objectClass);
 
+  String someOfAObject(@Select String objectClass);
+
   String inspectTransferredResource();
 
   String identifierNotFound();
@@ -1893,9 +1895,9 @@ public interface ClientMessages extends Messages {
 
   String jobReportOutcome(@Select String outcomeObjectClass);
 
-  /* Threshold exceed warning */
+  String sourceObjectList(long result, String listCounter);
 
-  String thresholdExceeded(Integer threshold, int size);
+  /* Threshold exceed warning */
 
   String runningInBackgroundTitle();
 
