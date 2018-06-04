@@ -302,7 +302,7 @@ public final class ModelUtils {
     if (directoryPath != null) {
       path.addAll(directoryPath);
     }
-    if (fileId != null) {
+    if (StringUtils.isNotBlank(fileId)) {
       path.add(fileId);
     }
     return DefaultStoragePath.parse(path);

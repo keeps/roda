@@ -35,7 +35,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class ReindexFilePluginTest {
-  private static final Logger LOGGER = LoggerFactory.getLogger(EARKSIPPluginsTest.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ReindexFilePluginTest.class);
 
   private static Path basePath;
 

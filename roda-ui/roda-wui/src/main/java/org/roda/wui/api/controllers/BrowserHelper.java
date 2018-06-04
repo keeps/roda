@@ -2755,7 +2755,7 @@ public class BrowserHelper {
     }
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
 
-    return createAndExecuteInternalJob("Move files", selectedFiles, MovePlugin.class, user, Collections.emptyMap(),
+    return createAndExecuteInternalJob("Move files", selectedFiles, MovePlugin.class, user, pluginParameters,
       "Could not execute move job");
   }
 
