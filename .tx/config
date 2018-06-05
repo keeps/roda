@@ -32,12 +32,6 @@ source_file = documentation/Metadata_Formats.md
 source_lang = en
 type = GITHUBMARKDOWN
 
-[roda2.documentation_Changelog]
-file_filter = documentation/Changelog_<lang>.md
-source_file = documentation/Changelog.md
-source_lang = en
-type = GITHUBMARKDOWN
-
 [roda2.documentation_Format_Normalization_Policy]
 file_filter = documentation/Format_Normalization_Policy_<lang>.md
 source_file = documentation/Format_Normalization_Policy.md
@@ -331,4 +325,3 @@ file_filter = roda-ui/roda-wui/src/main/resources/config/theme/IngestProcessDesc
 source_file = roda-ui/roda-wui/src/main/resources/config/theme/IngestProcessDescription.html
 source_lang = en
 type = HTML
-
