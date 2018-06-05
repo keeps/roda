@@ -48,7 +48,7 @@ Para compilar, vá até à pasta de fontes do RODA e execute o comando:
 $ mvn clean package
 ```
 
-Use o seguinte comando para saltar os Testes de unidades (mais rápido).
+Use o seguinte comando para ignorar os testes unitários (mais rápido).
 
 ```bash
 $ mvn clean package -Dmaven.test.skip=true
@@ -123,13 +123,13 @@ O RODA está estruturado da seguinte maneira:
 
 Para aumentar a quantidade de alterações ao seu código que serão aceites e adicionadas à fonte do RODA, aqui está uma lista de coisas que deve examinar antes de submeter uma contribuição. Por exemplo:
 
-* Ter testes de unidades (que cubram pelo menos 80% do código)
-* Ter documentação (pelo menos 90% do API público)
-* Concordar com o contrato de licença do contribuidor, que certifica que qualquer código contribuído é trabalho original e que os direitos de autor são transferidos para o projeto
+* Ter testes unitários (que cubram pelo menos 80% do código)
+* Ter documentação (pelo menos 90% da API pública)
+* Concordar com o acordo de licença do contribuidor, que certifica que qualquer código contribuído é trabalho original e que os direitos de autor são transferidos para o projeto
 
 ### Traduções
 
-Se gostaria de traduzir o RODA para uma nova língua, por favor, leia o [Guia de Tradução](Translation_Guide.md).
+Se gostaria de traduzir o RODA para um novo idioma, por favor, leia o [Guia de Tradução](Translation_Guide.md).
 
 ### Plugins externos
 

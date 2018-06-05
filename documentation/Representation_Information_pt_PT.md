@@ -7,10 +7,10 @@
 
 A Informação de Representação é um conceito crucial, uma vez que é através da Informação de Representação que um dado objeto consegue ser compreendido, aberto e visualizado. A própria Informação de Representação apenas pode ser interpretada se existir uma base de conhecimento adequada.
 
-O conceito de Informação de Representação também está inextricavelmente ligado ao conceito de Comunidade Designada, porque a maneira como definimos a Comunidade Designada (e a sua Base de Conhecimento associada) determina a quantidade de Informação de Representação que é necessária. “O OAIS deve compreender a Base de Conhecimento da sua Comunidade Designada para compreender a Informação de Representação mínima que deve ser mantida... Ao longo do tempo, a evolução da Base de Conhecimento da Comunidade Designada pode necessitar de atualizações à Informação de Representação para garantir a compreensão contínua” (2.2.1).
+O conceito de Informação de Representação também está inextricavelmente ligado ao conceito de Comunidade Designada, porque a maneira como definimos a Comunidade Designada (e a sua Base de Conhecimento associada) determina a quantidade de Informação de Representação que é necessária. "O OAIS deve compreender a Base de Conhecimento da sua Comunidade Designada para compreender a Informação de Representação mínima que deve ser mantida... Ao longo do tempo, a evolução da Base de Conhecimento da Comunidade Designada pode necessitar de atualizações à Informação de Representação para garantir a compreensão contínua" (2.2.1).
 
 
-O próprio Objeto de Dados, num repositório digital, é simplesmente uma string de bits. O que a Informação de Representação faz é converter (ou dizer-nos como converter) estes bits em algo mais significativo. Descreve os conceitos de formato ou de estrutura dos dados que devem ser aplicados às sequências de bits que, por sua vez, resultam em valores mais significativos, como caracteres, pixéis, tabelas, etc.
+O próprio Objeto de Dados, num repositório digital, é simplesmente uma sequência de bits. O que a Informação de Representação faz é converter (ou dizer-nos como converter) estes bits em algo mais significativo. Descreve os conceitos de formato ou de estrutura dos dados que devem ser aplicados às sequências de bits que, por sua vez, resultam em valores mais significativos, como caracteres, pixéis, tabelas, etc.
 
 Isto é denominado de **informação de estrutura**. Idealmente, a Informação de Representação também deve conter **informação semântica**, por exemplo, em que língua humana está escrito o texto, o que qualquer terminologia científica significa, e assim por diante (4.2.1.3.1). Ao incluir tanto a estrutura como a informação semântica, estamos a preparar-nos o melhor possível para o futuro.
 
@@ -26,7 +26,7 @@ A Informação de Representação pode conter referências para outra Informaç�
 
 ## Informação de Representação na ingestão
 
-Um SIP pode aparecer com Informação de Representação muito pobre - talvez apenas um ou dois manuais impressos ou alguns PDFs na pasta da documentação (ver a especificação E-ARK SIP). 
+Um SIP pode aparecer com Informação de Representação muito pobre - talvez apenas um ou dois manuais impressos ou alguns PDFs na pasta da documentação (ver a especificação E-ARK SIP).
 
 O OAIS precisa de muito mais. Mas isto não deve impedir um OAIS de aceitar algo. É possível ser demasiado técnico em relação à Rede de Representação. Só porque um SIP chegou com apenas 4 dos 700 campos de metadados obrigatórios não é uma razão válida o suficiente para o rejeitar, se for um registo de valor permanente.
 

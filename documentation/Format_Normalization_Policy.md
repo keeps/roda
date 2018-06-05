@@ -1,13 +1,15 @@
+***NOTE: The information in this page is outdated. Please contact the project administrators for more information.***
+
 # Format normalization policy
 
-RODA supports any file format, but only has tools to automatically convert formats into preservation formats (normalization) to a limited set of file formats and object classes. 
+RODA supports any file format, but only has tools to automatically convert formats into preservation formats (normalization) to a limited set of file formats and object classes.
 
 In this page you will find the default mapping between formats and object classes, and a table of recommendations for a normalization policy.
 
 ## Default mapping of ingested formats into object classes
 
 | *Class* | *Format* | *Identification (MIME, PRONOM, Extensions)* |
-| --------- |---------- | ------------- | 
+| --------- |---------- | ------------- |
 | Text | PDF | application/pdf<br>fmt/14, fmt/15, fmt/16, fmt/17, fmt/18, fmt/19, fmt/20, fmt/276, fmt/95, fmt/354, fmt/476, fmt/477, fmt/478, fmt/479, fmt/480, fmt/481, fmt/493, fmt/144, fmt/145, fmt/146, fmt/147, fmt/148, fmt/157, fmt/488, fmt/489, fmt/490, fmt/491<br>.pdf |
 | Text | Microsoft Word | application/msword<br>fmt/40, fmt/609, fmt/39, x-fmt/2, x-fmt/129, x-fmt/273, x-fmt/274, x-fmt/275, x-fmt/276, fmt/37, fmt/38<br>.doc |
 | Text | Microsoft Word Open XML document | application/vnd.openxmlformats-officedocument.wordprocessingml.document<br>fmt/412<br>.docx |

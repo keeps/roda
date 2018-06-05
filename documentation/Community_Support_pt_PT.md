@@ -4,11 +4,11 @@ Pode encontrar apoio numa variedade de fontes:
 
 ## Documentação técnica
 
-Se estiver pendurado num problema, provavelmente alguém já o deve ter encontrado. Dê uma olhada na [documentação oficial](README.md).
+Se estiver bloqueado num problema, provavelmente alguém já o deve ter encontrado. Dê uma olhada na [documentação oficial](README.md).
 
 ## Fórum online
 
-Use a funcionalidade [GitHub issues](https://github.com/keeps/roda/issues/new?labels=question&title=I+have+a+question+about+RODA) para colocar as suas questões ao suporte. Alguém da comunidade de fonte aberta irá responder à sua questão. Mantenha a sua questão ativa até receber uma resposta ou navegue e procure questões e respostas históricas.
+Use a funcionalidade [GitHub issues](https://github.com/keeps/roda/issues/new?labels=question&title=I+have+a+question+about+RODA) para colocar as suas questões ao suporte. Alguém da comunidade de *open source* irá responder à sua questão. Mantenha a sua questão ativa até receber uma resposta ou navegue e procure questões e respostas na história de conversação.
 
 ## Suporte profissional
 

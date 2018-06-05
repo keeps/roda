@@ -1,13 +1,16 @@
+
+***NOTA: A informação desta página está desatualizada. Para mais informação contacte dos administradores do projeto.***
+
 # Política de normalização de formatos
 
-O RODA suporta qualquer formato de ficheiros, mas apenas tem ferramentas para converter automaticamente formatos para formatos de preservação (normalização) para um conjunto limitado de formatos de ficheiro e classes de objetos. 
+O RODA suporta qualquer formato de ficheiro, mas apenas tem ferramentas para converter automaticamente para formatos de preservação (normalização) num conjunto limitado de formatos de ficheiro e classes de objetos.
 
 Nesta página, poderá encontrar o mapeamento predefinido entre formatos e classes de objetos, e uma tabela de recomendações para uma política de normalização.
 
 ## Mapeamento predefinido de formatos de ingestão para classes de objetos
 
 | *Class* | *Format* | *Identification (MIME, PRONOM, Extensions)* |
-| --------- |---------- | ------------- | 
+| --------- |---------- | ------------- |
 | Text | PDF | application/pdf<br>fmt/14, fmt/15, fmt/16, fmt/17, fmt/18, fmt/19, fmt/20, fmt/276, fmt/95, fmt/354, fmt/476, fmt/477, fmt/478, fmt/479, fmt/480, fmt/481, fmt/493, fmt/144, fmt/145, fmt/146, fmt/147, fmt/148, fmt/157, fmt/488, fmt/489, fmt/490, fmt/491<br>.pdf |
 | Text | Microsoft Word | application/msword<br>fmt/40, fmt/609, fmt/39, x-fmt/2, x-fmt/129, x-fmt/273, x-fmt/274, x-fmt/275, x-fmt/276, fmt/37, fmt/38<br>.doc |
 | Text | Microsoft Word Open XML document | application/vnd.openxmlformats-officedocument.wordprocessingml.document<br>fmt/412<br>.docx |

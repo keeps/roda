@@ -1,6 +1,6 @@
 # Troubleshooting
 
-O Troubleshooting é uma forma de resolução de problemas, frequentemente aplicado para reparar produtos fracassados. É uma procura lógica e sistemática pela fonte de um problema de modo a resolvê-lo e tornar o produto ou processo operacional outra vez.
+O Troubleshooting é uma forma de resolução de problemas, frequentemente aplicado para reparar produtos com falhas. É uma procura lógica e sistemática pela fonte de um problema de modo a resolvê-lo e tornar o produto ou processo operacional outra vez.
 
 Nesta secção, encontrará problemas comuns que afetam este produto e potenciais soluções sobre como resolvê-los.
 
@@ -13,7 +13,7 @@ RODA_HOME/logs/roda-wui.log:pt.gov.dgarq.roda.core.common.RODAClientException: E
 RODA_HOME/logs/roda-wui.log:Caused by: java.net.SocketException: Too many open files
 ```
 
-Isto pode acontecer quando o servidor tem muitos ficheiros. Para ver quantos ficheiros o servidor tem abertos, adquira o PID do processo, e depois execute lsof | grep <PID> | wc. Em muitos computadores, o número máximo de ficheiros predefinido que um processo pode abrir é baixo (ex. 1024). 
+Isto pode acontecer quando o servidor tem muitos ficheiros abertos. Para ver quantos ficheiros o servidor tem abertos, adquira o PID do processo, e depois execute lsof | grep <PID> | wc. Em muitos computadores, o número máximo de ficheiros predefinido que um processo pode abrir é baixo (ex. 1024).
 
 Para modificar este limite, edite `/etc/security/limits.conf` adicionando o seguinte:
 
