@@ -156,7 +156,19 @@ public class UserUtility {
    * Retrieves guest used
    */
   public static User getGuest(String ipAddress) {
-    return new User("guest", "guest", true).setIpAddress(ipAddress);
+    User guest = null;
+    try {
+      guest = ldapUtility.getUser("guest").setIpAddress(ipAddress);
+    } catch (GenericException e) {
+      LOGGER.warn("Could not get user 'guest' from ldap", e);
+    }
+
+    if (guest == null) {
+      guest = new User("guest", "guest", true).setIpAddress(ipAddress);
+    }
+
+    guest.setGuest(true);
+    return guest;
   }
 
   private static boolean iterativeDisjoint(Set<String> set1, Set<String> set2) {
