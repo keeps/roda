@@ -18,9 +18,11 @@ import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AcquireLockTimeoutException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
@@ -28,7 +30,9 @@ import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.JobInErrorException;
 import org.roda.core.data.exceptions.JobIsStoppingException;
+import org.roda.core.data.exceptions.LockingException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.NotLockableAtTheTimeException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
@@ -347,7 +351,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     Class<T> pluginClass, int objectsCount, ActorRef jobActor)
     throws InvalidParameterException, JobIsStoppingException, JobInErrorException {
     Plugin<T> innerPlugin = RodaCoreFactory.getPluginManager().getPlugin(plugin.getClass().getName(), pluginClass);
-    innerPlugin.setParameterValues(plugin.getParameterValues());
+    innerPlugin.setParameterValues(new HashMap<>(plugin.getParameterValues()));
 
     // keep track of each job/plugin relation
     String jobId = PluginHelper.getJobId(innerPlugin);
@@ -491,6 +495,36 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   @Override
   public void setJobInError(String jobId) {
     inErrorJobs.add(jobId);
+  }
+
+  @Override
+  public void acquireObjectLock(List<String> lites, int timeoutInSeconds, boolean waitForLockIfLocked,
+    String requestUuid) throws LockingException {
+    Timeout timeout = new Timeout(Duration.create(timeoutInSeconds, "seconds"));
+
+    if (StringUtils.isBlank(requestUuid)) {
+      throw new LockingException("One must provide valid (i.e. non blank) request uuid!");
+    }
+
+    Object result = null;
+    Future<Object> future = Patterns.ask(jobsManager,
+      new Messages.JobsManagerAcquireLock(lites, waitForLockIfLocked, timeoutInSeconds, requestUuid), timeout);
+    try {
+      result = Await.result(future, timeout.duration());
+    } catch (Exception e) {
+      LOGGER.error("Unable to acquire locks for the objects being processed '{}'", lites, e);
+      throw new AcquireLockTimeoutException("Unable to acquire locks for the objects being processed '" + lites + "'");
+    }
+
+    if (result != null && result instanceof Messages.JobsManagerNotLockableAtTheTime) {
+      throw new NotLockableAtTheTimeException(
+        "Not lockable at the time due to requester not willing to await to obtain the lock!");
+    }
+  }
+
+  @Override
+  public void releaseObjectLockAsync(List<String> lites, String requestUuid) {
+    jobsManager.tell(new Messages.JobsManagerReleaseLock(lites, requestUuid), ActorRef.noSender());
   }
 
 }

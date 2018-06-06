@@ -37,6 +37,7 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions {
 
   private List<Representation> representations;
 
+  private String ingestSIPUUID = "";
   private List<String> ingestSIPIds;
   private String ingestJobId = "";
   private List<String> ingestUpdateJobIds = new ArrayList<>();
@@ -186,6 +187,15 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions {
 
   public List<String> getIngestSIPIds() {
     return ingestSIPIds;
+  }
+
+  public String getIngestSIPUUID() {
+    return ingestSIPUUID;
+  }
+
+  public AIP setIngestSIPUUID(String ingestSIPUUID) {
+    this.ingestSIPUUID = ingestSIPUUID;
+    return this;
   }
 
   public AIP setIngestSIPIds(List<String> ingestSIPIds) {

@@ -29,18 +29,23 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class Report implements IsModelObject, HasId {
   private static final long serialVersionUID = 4316398565678538090L;
 
+  public static final String NO_SOURCE_OBJECT_ID = "NO_SOURCE_ID";
+  public static final String NO_SOURCE_OBJECT_CLASS = "NO_SOURCE_CLASS";
+  public static final String NO_OUTCOME_OBJECT_ID = "NO_OUTCOME_ID";
+  public static final String NO_OUTCOME_OBJECT_CLASS = "NO_OUTCOME_CLASS";
+
   public enum PluginState {
     SUCCESS, PARTIAL_SUCCESS, FAILURE, RUNNING
   }
 
   private String id = "";
   private String jobId = "";
-  private String sourceObjectId = "";
-  private String sourceObjectClass = "";
+  private String sourceObjectId = NO_SOURCE_OBJECT_ID;
+  private String sourceObjectClass = NO_SOURCE_OBJECT_CLASS;
   private List<String> sourceObjectOriginalIds = new ArrayList<>();
   private String sourceObjectOriginalName = "";
-  private String outcomeObjectId = "";
-  private String outcomeObjectClass = "";
+  private String outcomeObjectId = NO_OUTCOME_OBJECT_ID;
+  private String outcomeObjectClass = NO_OUTCOME_OBJECT_CLASS;
   private AIPState outcomeObjectState = AIPState.getDefault();
 
   private String title = "";
@@ -126,6 +131,12 @@ public class Report implements IsModelObject, HasId {
     return sourceObjectId;
   }
 
+  /**
+   * 20180713 hsilva: to ensure that both source & outcome object ids are set,
+   * this method should only be used for PluginHelper & POJO related operations
+   * like marshalling, etc...
+   */
+  @Deprecated
   public Report setSourceObjectId(String sourceObjectId) {
     this.sourceObjectId = sourceObjectId;
     return this;
@@ -135,6 +146,12 @@ public class Report implements IsModelObject, HasId {
     return sourceObjectClass;
   }
 
+  /**
+   * 20180713 hsilva: to ensure that both source & outcome object ids class are
+   * this method should only be used for PluginHelper & POJO related operations
+   * like marshalling, etc...
+   */
+  @Deprecated
   public Report setSourceObjectClass(String sourceObjectClass) {
     this.sourceObjectClass = sourceObjectClass;
     return this;
@@ -162,7 +179,19 @@ public class Report implements IsModelObject, HasId {
     return outcomeObjectId;
   }
 
+  /**
+   * 20180713 hsilva: to ensure that both source & outcome object ids are set,
+   * this method should only be used for PluginHelper & POJO related operations
+   * like marshalling, etc...
+   */
+  @Deprecated
   public Report setOutcomeObjectId(String outcomeObjectId) {
+    this.outcomeObjectId = outcomeObjectId;
+    return this;
+  }
+
+  public Report setSourceAndOutcomeObjectId(String sourceObjectId, String outcomeObjectId) {
+    this.sourceObjectId = sourceObjectId;
     this.outcomeObjectId = outcomeObjectId;
     return this;
   }
@@ -171,7 +200,19 @@ public class Report implements IsModelObject, HasId {
     return outcomeObjectClass;
   }
 
+  /**
+   * 20180713 hsilva: to ensure that both source & outcome object ids class are
+   * this method should only be used for PluginHelper & POJO related operations
+   * like marshalling, etc...
+   */
+  @Deprecated
   public Report setOutcomeObjectClass(String outcomeObjectClass) {
+    this.outcomeObjectClass = outcomeObjectClass;
+    return this;
+  }
+
+  public Report setSourceAndOutcomeObjectClass(String sourceObjectClass, String outcomeObjectClass) {
+    this.sourceObjectClass = sourceObjectClass;
     this.outcomeObjectClass = outcomeObjectClass;
     return this;
   }
@@ -352,6 +393,10 @@ public class Report implements IsModelObject, HasId {
 
   public void injectLineSeparator(String lineSeparator) {
     this.lineSeparator = lineSeparator;
+  }
+
+  public String getLineSeparator() {
+    return lineSeparator;
   }
 
   @Override

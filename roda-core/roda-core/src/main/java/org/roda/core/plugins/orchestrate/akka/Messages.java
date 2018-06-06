@@ -8,6 +8,7 @@
 package org.roda.core.plugins.orchestrate.akka;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -21,6 +22,8 @@ import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import akka.actor.ActorRef;
 
 public class Messages {
   private static final Logger LOGGER = LoggerFactory.getLogger(Messages.class);
@@ -98,6 +101,146 @@ public class Messages {
     public String toString() {
       return "JobsManagerJobEnded [jobId=" + jobId + ", plugin=" + plugin + "]";
     }
+  }
+
+  public static final class JobsManagerAcquireLock extends AbstractMessage {
+    private static final long serialVersionUID = 4924002662559968741L;
+
+    private List<String> lites;
+    private boolean waitForLockIfLocked;
+    private Date expireDate;
+    private ActorRef sender;
+    private String requestUuid;
+
+    public JobsManagerAcquireLock(List<String> lites, boolean waitForLockIfLocked, int secondsToExpire,
+      String requestUuid) {
+      super();
+      this.lites = lites;
+      this.waitForLockIfLocked = waitForLockIfLocked;
+      this.expireDate = new Date(new Date().getTime() + (secondsToExpire * 1000L));
+      this.requestUuid = requestUuid;
+    }
+
+    public List<String> getLites() {
+      return lites;
+    }
+
+    public ActorRef getSender() {
+      return sender;
+    }
+
+    public JobsManagerAcquireLock setSender(ActorRef sender) {
+      this.sender = sender;
+      return this;
+    }
+
+    public boolean isWaitForLockIfLocked() {
+      return waitForLockIfLocked;
+    }
+
+    public Date getExpireDate() {
+      return expireDate;
+    }
+
+    public String getRequestUuid() {
+      return requestUuid;
+    }
+
+    @Override
+    public String toString() {
+      return "JobsManagerAcquireLock [lites=" + lites + ", waitForLockIfLocked=" + waitForLockIfLocked + ", expireDate="
+        + expireDate + ", requestUuid=" + requestUuid + "]";
+    }
+
+  }
+
+  public static final class JobsManagerReleaseLock extends AbstractMessage {
+    private static final long serialVersionUID = 4924002662559968741L;
+
+    private List<String> lites;
+    private String requestUuid;
+
+    public JobsManagerReleaseLock(List<String> lites, String requestUuid) {
+      super();
+      this.lites = lites;
+      this.requestUuid = requestUuid;
+    }
+
+    public List<String> getLites() {
+      return lites;
+    }
+
+    public String getRequestUuid() {
+      return requestUuid;
+    }
+
+    @Override
+    public String toString() {
+      return "JobsManagerReleaseLock [lites=" + lites + ", requestUuid=" + requestUuid + "]";
+    }
+
+  }
+
+  public static final class JobsManagerReplyToAcquireLock extends AbstractMessage {
+    private static final long serialVersionUID = 4924002662559968741L;
+
+    private List<String> lites;
+
+    public JobsManagerReplyToAcquireLock(List<String> lites) {
+      super();
+      this.lites = lites;
+    }
+
+    public List<String> getLites() {
+      return lites;
+    }
+
+    @Override
+    public String toString() {
+      return "JobsManagerReplyToAcquireLock [lites=" + lites + "]";
+    }
+  }
+
+  public static final class JobsManagerReplyToReleaseLock extends AbstractMessage {
+    private static final long serialVersionUID = 4924002662559968741L;
+
+    private List<String> lites;
+
+    public JobsManagerReplyToReleaseLock(List<String> lites) {
+      super();
+      this.lites = lites;
+    }
+
+    public List<String> getLites() {
+      return lites;
+    }
+
+    @Override
+    public String toString() {
+      return "JobsManagerReplyToReleaseLock [lites=" + lites + "]";
+    }
+  }
+
+  public static final class JobsManagerNotLockableAtTheTime extends AbstractMessage {
+    private static final long serialVersionUID = -2313831907910175641L;
+
+    private String msg;
+
+    public JobsManagerNotLockableAtTheTime() {
+      super();
+      this.msg = "";
+    }
+
+    public JobsManagerNotLockableAtTheTime(String msg) {
+      super();
+      this.msg = msg;
+    }
+
+    @Override
+    public String toString() {
+      return "JobsManagerUnlockableAtTheTime [msg=" + msg + "]";
+    }
+
   }
 
   /*-------------------- JOB STATE RELATED STATIC CLASSES --------------------*/

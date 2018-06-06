@@ -8,7 +8,11 @@
 package org.roda.core.plugins;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
@@ -19,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
 import org.roda.core.common.monitor.TransferredResourcesScanner;
@@ -47,6 +52,7 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.plugins.characterization.SiegfriedPlugin;
+import org.roda.core.plugins.plugins.ingest.EARKSIPToAIPPlugin;
 import org.roda.core.plugins.plugins.ingest.MinimalIngestPlugin;
 import org.roda.core.plugins.plugins.ingest.TransferredResourceToAIPPlugin;
 import org.roda.core.storage.fs.FSUtils;
@@ -66,6 +72,7 @@ public class PluginReportContentTest {
   private static Path basePath;
   private static ModelService model;
   private static IndexService index;
+  private static Path corporaPath;
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PluginReportContentTest.class);
 
@@ -93,6 +100,9 @@ public class PluginReportContentTest {
 
     model = RodaCoreFactory.getModelService();
     index = RodaCoreFactory.getIndexService();
+
+    URL corporaURL = EARKSIPPluginsTest.class.getResource("/corpora");
+    corporaPath = Paths.get(corporaURL.toURI());
 
     LOGGER.debug("Running index tests under storage {}", basePath);
   }
@@ -289,5 +299,47 @@ public class PluginReportContentTest {
     AssertJUnit.assertEquals(false, report.getDateCreated().equals(report.getDateUpdated()));
     AssertJUnit.assertEquals(true, report.getDateCreated().equals(innerReport.getDateCreated()));
     AssertJUnit.assertEquals(true, report.getDateUpdated().equals(innerReport.getDateUpdated()));
+  }
+
+  @Test
+  public void testIngestReportsInNto1Scenario() throws RODAException, URISyntaxException, IOException {
+    // create & ingest SIP
+    TransferredResource transferredResource = EARKSIPPluginsTest.createIngestCorpora(corporaPath, index);
+    AssertJUnit.assertNotNull("Transferred resource cannot be null", transferredResource);
+
+    Map<String, String> parameters = new HashMap<>();
+    parameters.put(RodaConstants.PLUGIN_PARAMS_SIP_TO_AIP_CLASS, EARKSIPToAIPPlugin.class.getName());
+
+    Job ingest = TestsHelper.executeJob(MinimalIngestPlugin.class, parameters, PluginType.SIP_TO_AIP,
+      SelectedItemsList.create(TransferredResource.class, transferredResource.getUUID()));
+
+    List<Report> ingestReports = TestsHelper.getJobReports(index, ingest, true);
+    AssertJUnit.assertEquals(1, ingestReports.size());
+
+    // create & ingest 2 SIP updates
+    transferredResource = EARKSIPPluginsTest.createIngestUpdateCorpora(corporaPath, index, null);
+    AssertJUnit.assertNotNull("Transferred resource cannot be null", transferredResource);
+    TransferredResource transferredResource2 = EARKSIPPluginsTest.createIngestUpdateCorpora(corporaPath, index,
+      CorporaConstants.EARK_SIP_UPDATE.replaceFirst("\\.zip", "2.zip"));
+    AssertJUnit.assertNotNull("Transferred resource cannot be null", transferredResource2);
+
+    parameters = new HashMap<>();
+    parameters.put(RodaConstants.PLUGIN_PARAMS_SIP_TO_AIP_CLASS, EARKSIPToAIPPlugin.class.getName());
+    ingest = TestsHelper.executeJob(MinimalIngestPlugin.class, parameters, PluginType.SIP_TO_AIP, SelectedItemsList
+      .create(TransferredResource.class, transferredResource.getUUID(), transferredResource2.getUUID()));
+
+    // ensure that reports & inner reports are well formed (#, ids, etc)
+    ingestReports = TestsHelper.getJobReports(index, ingest, true);
+    AssertJUnit.assertEquals(2, ingestReports.size());
+    for (Report report : ingestReports) {
+      AssertJUnit.assertEquals(MinimalIngestPlugin.TOTAL_STEPS, report.getReports().size());
+
+      String jobId = report.getJobId();
+      String sourceObjectId = report.getSourceObjectId();
+      String outcomeObjectId = report.getOutcomeObjectId();
+      for (Report innerReport : report.getReports()) {
+        AssertJUnit.assertEquals(IdUtils.getJobReportId(jobId, sourceObjectId, outcomeObjectId), innerReport.getId());
+      }
+    }
   }
 }

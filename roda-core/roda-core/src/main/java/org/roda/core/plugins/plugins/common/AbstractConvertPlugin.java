@@ -85,11 +85,10 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INPUT_FORMAT,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_INPUT_FORMAT, "Input format", PluginParameterType.STRING, "",
-        true, false,
-        "Input file format to be converted (check documentation for list of supported formats). If the input file format is not specified, the task will"
-          + " run on all supported formats (check roda-core-formats.properties for list of supported formats)."));
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INPUT_FORMAT, new PluginParameter(
+      RodaConstants.PLUGIN_PARAMS_INPUT_FORMAT, "Input format", PluginParameterType.STRING, "", true, false,
+      "Input file format to be converted (check documentation for list of supported formats). If the input file format is not specified, the task will"
+        + " run on all supported formats (check roda-core-formats.properties for list of supported formats)."));
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OUTPUT_FORMAT,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_OUTPUT_FORMAT, "Output format", PluginParameterType.STRING, "",
@@ -326,7 +325,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
 
                         model.createRepresentation(aip.getId(), newRepresentationID, original, newRepresentationType,
                           notify, job.getUsername());
-                        reportItem.setOutcomeObjectId(
+                        reportItem.setSourceAndOutcomeObjectId(reportItem.getSourceObjectId(),
                           IdUtils.getRepresentationId(representation.getAipId(), newRepresentationID));
                       }
 
@@ -520,7 +519,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
 
                       model.createRepresentation(aipId, newRepresentationID, original, newRepresentationType, notify,
                         job.getUsername());
-                      reportItem.setOutcomeObjectId(
+                      reportItem.setSourceAndOutcomeObjectId(reportItem.getSourceObjectId(),
                         IdUtils.getRepresentationId(representation.getAipId(), newRepresentationID));
                     }
                   }
@@ -722,7 +721,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                 File f = model.createFile(file.getAipId(), newRepresentationID, file.getPath(), newFileId, payload,
                   notify);
                 newFiles.add(f);
-                reportItem.setOutcomeObjectId(IdUtils.getFileId(f));
+                reportItem.setSourceAndOutcomeObjectId(reportItem.getSourceObjectId(), IdUtils.getFileId(f));
                 changedRepresentationsOnAIPs.put(file.getRepresentationId(), file.getAipId());
               }
 

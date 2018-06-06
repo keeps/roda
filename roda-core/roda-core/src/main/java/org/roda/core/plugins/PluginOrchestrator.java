@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.JobException;
+import org.roda.core.data.exceptions.LockingException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -65,5 +66,10 @@ public interface PluginOrchestrator {
 
   /** 201712 hsilva: this method was known as updateJob */
   public <T extends IsRODAObject> void updateJobAsync(Plugin<T> plugin, JobPartialUpdate partialUpdate);
+
+  public void acquireObjectLock(List<String> lites, int timeoutInSeconds, boolean waitForLockIfLocked,
+    String requestUuid) throws LockingException;
+
+  public void releaseObjectLockAsync(List<String> lites, String requestUuid);
 
 }

@@ -8,8 +8,10 @@
 package org.roda.core.plugins.orchestrate.akka;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +20,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.plugins.orchestrate.akka.Messages.JobsManagerAcquireLock;
+import org.roda.core.plugins.orchestrate.akka.Messages.JobsManagerReleaseLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,19 +37,32 @@ import scala.concurrent.duration.Duration;
 public class AkkaJobsManager extends AkkaBaseActor {
   private static final Logger LOGGER = LoggerFactory.getLogger(AkkaJobsManager.class);
 
+  public static final String LOCK_REQUESTS_WAITING_TO_ACQUIRE_LOCK = "lockRequestsWaitingToAcquireLock";
+
+  private static final String LOCK_TIMEOUT = "core.orchestrator.lock_timeout";
+  private static final int DEFAULT_LOCK_TIMEOUT = 600;
+
   // state
   private int maxNumberOfJobsInParallel;
   private Queue<JobWaiting> jobsWaiting;
   private Map<String, ActorRef> jobsWaitingCreators;
   private ActorRef jobsRouter;
+  // <Lite,Acquire date>
+  private Map<String, LockInfo> objectsLocked;
+  private List<JobsManagerAcquireLock> waitingToAcquireLockRequests;
 
   // metrics
+  private Counter ticksWaitingToBeProcessed;
   private Counter jobsBeingExecuted;
   private Counter jobsWaitingToBeExecuted;
-  private Counter ticksWaitingToBeProcessed;
   private Histogram jobsBeingExecutedHisto;
   private Histogram jobsWaitingToBeExecutedHisto;
   private Histogram jobsTimeInTheQueueInMilis;
+  private Counter lockRequestsWaitingToAcquireLock;
+  private Histogram lockRequestsWaitingToAcquireLockHisto;
+  private Counter objectsWaitingToAcquireLock;
+  private Histogram objectsWaitingToAcquireLockHisto;
+  private Histogram messagesProcessingTimeInMilis;
 
   // parallelization
   private List<String> nonParallelizablePlugins;
@@ -57,6 +74,8 @@ public class AkkaJobsManager extends AkkaBaseActor {
     this.maxNumberOfJobsInParallel = maxNumberOfJobsInParallel;
     this.jobsWaiting = new LinkedList<>();
     this.jobsWaitingCreators = new HashMap<>();
+    this.objectsLocked = new HashMap<>();
+    this.waitingToAcquireLockRequests = new ArrayList<>();
 
     Props jobsProps = new RoundRobinPool(maxNumberOfJobsInParallel).props(Props.create(AkkaJobActor.class, getSelf()));
     jobsRouter = getContext().actorOf(jobsProps, "JobsRouter");
@@ -67,7 +86,8 @@ public class AkkaJobsManager extends AkkaBaseActor {
 
     getContext().system().scheduler().schedule(Duration.create(0, TimeUnit.MILLISECONDS),
       Duration.create(2, TimeUnit.SECONDS), () -> {
-        if (jobsWaitingToBeExecuted.getCount() > 0) {
+        if (jobsWaitingToBeExecuted.getCount() > 0 || !waitingToAcquireLockRequests.isEmpty()
+          || !objectsLocked.isEmpty()) {
           sendTick();
         }
       }, getContext().system().dispatcher());
@@ -75,15 +95,29 @@ public class AkkaJobsManager extends AkkaBaseActor {
 
   @Override
   public void onReceive(Object msg) throws Throwable {
-    if (msg instanceof Job) {
-      handleJob((Job) msg);
-    } else if (msg instanceof Messages.JobsManagerTick) {
-      handleTick();
-    } else if (msg instanceof Messages.JobsManagerJobEnded) {
-      handleJobEnded((Messages.JobsManagerJobEnded) msg);
-    } else {
-      LOGGER.error("Received a message that don't know how to process ({})...", msg.getClass().getName());
-      unhandled(msg);
+    Date messageProcessingStart = new Date();
+    boolean doPostProcessingTasks = true;
+    try {
+      if (msg instanceof Job) {
+        handleJob((Job) msg);
+      } else if (msg instanceof Messages.JobsManagerTick) {
+        doPostProcessingTasks = false;
+        handleTick(true);
+      } else if (msg instanceof Messages.JobsManagerJobEnded) {
+        handleJobEnded((Messages.JobsManagerJobEnded) msg);
+      } else if (msg instanceof Messages.JobsManagerAcquireLock) {
+        handleAcquireLock(((Messages.JobsManagerAcquireLock) msg).setSender(getSender()));
+      } else if (msg instanceof Messages.JobsManagerReleaseLock) {
+        handleReleaseLock((Messages.JobsManagerReleaseLock) msg);
+      } else {
+        LOGGER.error("Received a message that don't know how to process ({})...", msg.getClass().getName());
+        unhandled(msg);
+      }
+    } finally {
+      if (doPostProcessingTasks) {
+        handleTick(false);
+      }
+      registerMessageProcessingTime(messageProcessingStart);
     }
   }
 
@@ -105,36 +139,19 @@ public class AkkaJobsManager extends AkkaBaseActor {
     }
   }
 
-  private boolean jobIsNotParallelizable(String plugin) {
-    return nonParallelizablePlugins.contains(plugin);
-  }
-
   private boolean jobIsNotParallelizable(Job job) {
     return jobIsNotParallelizable(job.getPlugin());
   }
 
-  private void handleTick() {
-    if (jobsWaitingToBeExecuted.getCount() > 0 && jobsBeingExecuted.getCount() < maxNumberOfJobsInParallel) {
-      dequeueJobs(
-        Math.min(jobsWaitingToBeExecuted.getCount(), maxNumberOfJobsInParallel - jobsBeingExecuted.getCount()));
-    }
-    ticksWaitingToBeProcessed.dec();
+  private boolean jobIsNotParallelizable(String plugin) {
+    return nonParallelizablePlugins.contains(plugin);
   }
 
-  private void handleJobEnded(Messages.JobsManagerJobEnded jobEnded) {
-    if (jobIsNotParallelizable(jobEnded.getPlugin())) {
-      nonParallelizableJobIsRunning = false;
-    }
-    updateJobsBeingExecuted(false);
-    sendTick();
-    log("The end for job", jobEnded.getJobId());
-  }
-
-  private void sendTick() {
-    if (ticksWaitingToBeProcessed.getCount() == 0) {
-      self().tell(new Messages.JobsManagerTick(), self());
-      ticksWaitingToBeProcessed.inc();
-    }
+  private void sendJobForExecution(Job job) {
+    updateJobsBeingExecuted(true);
+    jobsTimeInTheQueueInMilis.update(0);
+    jobsRouter.tell(job, getSender());
+    log("Will execute job", job.getId());
   }
 
   private void updateJobsBeingExecuted(boolean increment) {
@@ -144,15 +161,6 @@ public class AkkaJobsManager extends AkkaBaseActor {
       jobsBeingExecuted.dec();
     }
     jobsBeingExecutedHisto.update(jobsBeingExecuted.getCount());
-  }
-
-  private void updateJobsWaitingToBeExecuted(boolean increment) {
-    if (increment) {
-      jobsWaitingToBeExecuted.inc();
-    } else {
-      jobsWaitingToBeExecuted.dec();
-    }
-    jobsWaitingToBeExecutedHisto.update(jobsWaitingToBeExecuted.getCount());
   }
 
   private void queueJob(Job job, boolean jobIsJobParallelizable) {
@@ -165,11 +173,31 @@ public class AkkaJobsManager extends AkkaBaseActor {
     log("Queued job", job.getId());
   }
 
-  private void sendJobForExecution(Job job) {
-    updateJobsBeingExecuted(true);
-    jobsTimeInTheQueueInMilis.update(0);
-    jobsRouter.tell(job, getSender());
-    log("Will execute job", job.getId());
+  private void updateJobsWaitingToBeExecuted(boolean increment) {
+    if (increment) {
+      jobsWaitingToBeExecuted.inc();
+    } else {
+      jobsWaitingToBeExecuted.dec();
+    }
+    jobsWaitingToBeExecutedHisto.update(jobsWaitingToBeExecuted.getCount());
+  }
+
+  private void handleTick(boolean decrementTicksWaitingCounter) {
+    // jobs related
+    if (jobsWaitingToBeExecuted.getCount() > 0 && jobsBeingExecuted.getCount() < maxNumberOfJobsInParallel) {
+      dequeueJobs(
+        Math.min(jobsWaitingToBeExecuted.getCount(), maxNumberOfJobsInParallel - jobsBeingExecuted.getCount()));
+    }
+
+    // lock requests waiting related
+    processWaitingToAcquireLockRequests();
+
+    // locks acquired timeout related
+    processAcquiredLocksTimeout();
+
+    if (decrementTicksWaitingCounter) {
+      ticksWaitingToBeProcessed.dec();
+    }
   }
 
   private void dequeueJobs(long numberOfJobsToDequeue) {
@@ -213,6 +241,145 @@ public class AkkaJobsManager extends AkkaBaseActor {
     }
   }
 
+  private void processWaitingToAcquireLockRequests() {
+    for (Iterator<JobsManagerAcquireLock> iterator = waitingToAcquireLockRequests.iterator(); iterator.hasNext();) {
+      JobsManagerAcquireLock acquireLockRequest = iterator.next();
+
+      if (expireDateAlreadyExpired(acquireLockRequest)) {
+        LOGGER.warn("Deleting lock request for objects '{}' due to expire ({})", acquireLockRequest.getLites(),
+          acquireLockRequest.getExpireDate());
+        iterator.remove();
+        // FIXME 20180605 hsilva: send message?
+      } else {
+        if (areObjectsLockable(acquireLockRequest)) {
+          lock(acquireLockRequest, true);
+          iterator.remove();
+        }
+      }
+    }
+  }
+
+  private boolean expireDateAlreadyExpired(JobsManagerAcquireLock acquireLockRequest) {
+    return new Date().after(acquireLockRequest.getExpireDate());
+  }
+
+  private boolean areObjectsLockable(JobsManagerAcquireLock msg) {
+    boolean allLockable = true;
+
+    for (String lite : msg.getLites()) {
+      if (!objectsLocked.containsKey(lite)) {
+        continue;
+      }
+
+      LockInfo lockInfo = objectsLocked.get(lite);
+      if (!lockInfo.requestUuid.equals(msg.getRequestUuid())) {
+        allLockable = false;
+        break;
+      }
+    }
+    return allLockable;
+  }
+
+  private void lock(JobsManagerAcquireLock msg, boolean decreaseWaiting) {
+    for (String lite : msg.getLites()) {
+      objectsLocked.put(lite, new LockInfo(msg.getRequestUuid()));
+    }
+    // 20180606 hsilva: not sending any list to the sender as it will most
+    // certainly end up in deadletters
+    msg.getSender().tell(new Messages.JobsManagerReplyToAcquireLock(Collections.emptyList()), getSelf());
+
+    if (decreaseWaiting) {
+      updateLockRequestsWaitingToAcquireLock(false);
+      updateObjectsWaitingToAcquireLock(msg.getLites().size(), false);
+    }
+  }
+
+  private void updateLockRequestsWaitingToAcquireLock(boolean increment) {
+    if (increment) {
+      lockRequestsWaitingToAcquireLock.inc();
+    } else {
+      lockRequestsWaitingToAcquireLock.dec();
+    }
+    lockRequestsWaitingToAcquireLockHisto.update(lockRequestsWaitingToAcquireLock.getCount());
+  }
+
+  private void updateObjectsWaitingToAcquireLock(long value, boolean increment) {
+    if (increment) {
+      objectsWaitingToAcquireLock.inc(value);
+    } else {
+      objectsWaitingToAcquireLock.dec(value);
+    }
+    objectsWaitingToAcquireLockHisto.update(objectsWaitingToAcquireLock.getCount());
+  }
+
+  private void unlock(JobsManagerReleaseLock msg) {
+    for (String lite : msg.getLites()) {
+      LockInfo lockInfo = objectsLocked.get(lite);
+      if (lockInfo == null || !lockInfo.requestUuid.equals(msg.getRequestUuid())) {
+        LOGGER.warn("Trying to remove lock from object '{}' whose lock wasn't created by this requester (uuid={})",
+          lite, msg.getRequestUuid());
+      } else {
+        objectsLocked.remove(lite);
+      }
+    }
+    // 20180606 hsilva: not sending any list to the sender as it will most
+    // certainly end up in deadletters
+    getSender().tell(new Messages.JobsManagerReplyToReleaseLock(Collections.emptyList()), getSelf());
+  }
+
+  private void processAcquiredLocksTimeout() {
+    int lockTimeout = RodaCoreFactory.getRodaConfiguration().getInt(LOCK_TIMEOUT, DEFAULT_LOCK_TIMEOUT);
+    for (Iterator<Map.Entry<String, LockInfo>> it = objectsLocked.entrySet().iterator(); it.hasNext();) {
+      Map.Entry<String, LockInfo> lock = it.next();
+      if (lock.getValue().releaseLockDueToExpire(lockTimeout)) {
+        LOGGER.warn("Releasing lock for object '{}' due to lock timeout ({} seconds; no lock release was issued)",
+          lock.getKey(), lockTimeout);
+        it.remove();
+      }
+    }
+  }
+
+  private void handleJobEnded(Messages.JobsManagerJobEnded jobEnded) {
+    if (jobIsNotParallelizable(jobEnded.getPlugin())) {
+      nonParallelizableJobIsRunning = false;
+    }
+    updateJobsBeingExecuted(false);
+    log("The end for job", jobEnded.getJobId());
+  }
+
+  private void sendTick() {
+    if (ticksWaitingToBeProcessed.getCount() == 0) {
+      self().tell(new Messages.JobsManagerTick(), self());
+      ticksWaitingToBeProcessed.inc();
+    }
+  }
+
+  private void handleAcquireLock(JobsManagerAcquireLock msg) {
+    msg.logProcessingStarted();
+
+    boolean areLockable = areObjectsLockable(msg);
+    if (areLockable) {
+      lock(msg.setSender(getSender()), false);
+    } else if (msg.isWaitForLockIfLocked()) {
+      waitingToAcquireLockRequests.add(msg);
+      updateLockRequestsWaitingToAcquireLock(true);
+      updateObjectsWaitingToAcquireLock(msg.getLites().size(), true);
+    } else {
+      // 20180530 hsilva: message stating that lock was not possible
+      // (in order to avoid spending timeout to realize that)
+      getSender().tell(new Messages.JobsManagerNotLockableAtTheTime(
+        "Unable to acquire lock & configured to not wait for lock if already locked"), getSelf());
+    }
+
+    msg.logProcessingEnded();
+  }
+
+  private void handleReleaseLock(JobsManagerReleaseLock msg) {
+    msg.logProcessingStarted();
+    unlock(msg);
+    msg.logProcessingEnded();
+  }
+
   private void log(String msg, String jobId) {
     LOGGER.info("{} '{}' (max: {}| exec: {}| wait: {})", msg, jobId, maxNumberOfJobsInParallel,
       jobsBeingExecuted.getCount(), jobsWaitingToBeExecuted.getCount());
@@ -221,21 +388,37 @@ public class AkkaJobsManager extends AkkaBaseActor {
   private void initMetrics(int maxNumberOfJobsInParallel) {
     MetricRegistry metrics = getMetricRegistry();
     String className = AkkaJobsManager.class.getSimpleName();
+    // general metrics
+    ticksWaitingToBeProcessed = metrics.counter(MetricRegistry.name(className, "ticksWaitingToBeProcessed"));
+    // jobs related metrics
     Counter maxNumberOfJobsInParallelCounter = metrics
       .counter(MetricRegistry.name(className, "maxNumberOfJobsInParallel"));
     maxNumberOfJobsInParallelCounter.inc(maxNumberOfJobsInParallel);
     jobsBeingExecuted = metrics.counter(MetricRegistry.name(className, "jobsBeingExecuted"));
     jobsWaitingToBeExecuted = metrics.counter(MetricRegistry.name(className, "jobsWaitingToBeExecuted"));
-    ticksWaitingToBeProcessed = metrics.counter(MetricRegistry.name(className, "ticksWaitingToBeProcessed"));
     jobsBeingExecutedHisto = metrics.histogram(MetricRegistry.name(className, "jobsBeingExecutedHistogram"));
     jobsWaitingToBeExecutedHisto = metrics
       .histogram(MetricRegistry.name(className, "jobsWaitingToBeExecutedHistogram"));
     jobsTimeInTheQueueInMilis = metrics.histogram(MetricRegistry.name(className, "jobsTimeInTheQueueInMilis"));
+    // locks related metrics
+    lockRequestsWaitingToAcquireLock = metrics
+      .counter(MetricRegistry.name(className, LOCK_REQUESTS_WAITING_TO_ACQUIRE_LOCK));
+    lockRequestsWaitingToAcquireLockHisto = metrics
+      .histogram(MetricRegistry.name(className, "lockRequestsWaitingToAcquireLockHisto"));
+    objectsWaitingToAcquireLock = metrics.counter(MetricRegistry.name(className, "objectsWaitingToAcquireLock"));
+    objectsWaitingToAcquireLockHisto = metrics
+      .histogram(MetricRegistry.name(className, "objectsWaitingToAcquireLockHisto"));
+
+    messagesProcessingTimeInMilis = metrics.histogram(MetricRegistry.name(className, "messagesProcessingTimeInMilis"));
   }
 
   private void loadParallelizationInformation() {
     nonParallelizablePlugins = RodaCoreFactory
       .getRodaConfigurationAsList("core.orchestrator.non_parallelizable_plugins");
+  }
+
+  private void registerMessageProcessingTime(Date messageProcessingStart) {
+    messagesProcessingTimeInMilis.update(new Date().getTime() - messageProcessingStart.getTime());
   }
 
   private class JobWaiting {
@@ -250,6 +433,20 @@ public class AkkaJobsManager extends AkkaBaseActor {
     /** Time in milliseconds */
     public long timeInQueueInMillis() {
       return new Date().getTime() - queuedIn;
+    }
+  }
+
+  private class LockInfo {
+    public Date lockDate;
+    public String requestUuid;
+
+    public LockInfo(String requestUuid) {
+      lockDate = new Date();
+      this.requestUuid = requestUuid;
+    }
+
+    public boolean releaseLockDueToExpire(long lockTimeout) {
+      return new Date().after(new Date(lockDate.getTime() + (lockTimeout * 1000)));
     }
   }
 

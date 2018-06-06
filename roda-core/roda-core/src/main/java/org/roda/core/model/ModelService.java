@@ -344,16 +344,16 @@ public class ModelService extends ModelObservable {
     return aip;
   }
 
-  public AIP createAIP(AIPState state, String parentId, String type, Permissions permissions, List<String> ingestSIPIds,
-    String ingestJobId, boolean notify, String createdBy) throws RequestNotValidException, NotFoundException,
-    GenericException, AlreadyExistsException, AuthorizationDeniedException {
+  public AIP createAIP(AIPState state, String parentId, String type, Permissions permissions, String ingestSIPUUID,
+    List<String> ingestSIPIds, String ingestJobId, boolean notify, String createdBy) throws RequestNotValidException,
+    NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException {
 
     Directory directory = storage.createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP));
     String id = directory.getStoragePath().getName();
     Permissions inheritedPermissions = this.addParentPermissions(permissions, parentId);
 
     AIP aip = new AIP(id, parentId, type, state, inheritedPermissions, createdBy).setIngestSIPIds(ingestSIPIds)
-      .setIngestJobId(ingestJobId);
+      .setIngestJobId(ingestJobId).setIngestSIPUUID(ingestSIPUUID);
 
     createAIPMetadata(aip);
 
@@ -1955,13 +1955,9 @@ public class ModelService extends ModelObservable {
     notifyJobDeleted(jobId).failOnError();
   }
 
-  public Report retrieveJobReport(String jobId, String givenId, boolean generateId)
+  public Report retrieveJobReport(String jobId, String jobReportId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    String id = givenId;
-    if (generateId) {
-      id = IdUtils.getJobReportId(jobId, givenId);
-    }
-    StoragePath jobReportPath = ModelUtils.getJobReportStoragePath(jobId, id);
+    StoragePath jobReportPath = ModelUtils.getJobReportStoragePath(jobId, jobReportId);
     Binary binary = storage.getBinary(jobReportPath);
     Report ret;
 
@@ -1972,6 +1968,12 @@ public class ModelService extends ModelObservable {
     }
 
     return ret;
+  }
+
+  public Report retrieveJobReport(String jobId, String sourceObjectId, String outcomeObjectId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    String jobReportId = IdUtils.getJobReportId(jobId, sourceObjectId, outcomeObjectId);
+    return retrieveJobReport(jobId, jobReportId);
   }
 
   public void createOrUpdateJobReport(Report jobReport, Job job) throws GenericException {

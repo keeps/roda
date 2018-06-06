@@ -117,12 +117,13 @@ public class BagitToAIPPlugin extends SIPToAIPPlugin {
 
       AIP aipCreated = BagitToAIPPluginUtils.bagitToAip(bagit, model, METADATA_FILE,
         Arrays.asList(transferredResource.getName()), reportItem.getJobId(), computedParentId, job.getUsername(),
-        PermissionUtils.getIngestPermissions(job.getUsername()));
+        PermissionUtils.getIngestPermissions(job.getUsername()), transferredResource.getUUID());
 
       PluginHelper.createSubmission(model, createSubmission, bagitPath, aipCreated.getId());
 
       createUnpackingEventSuccess(model, index, transferredResource, aipCreated, UNPACK_DESCRIPTION);
-      reportItem.setOutcomeObjectId(aipCreated.getId()).setPluginState(PluginState.SUCCESS);
+      reportItem.setSourceAndOutcomeObjectId(reportItem.getSourceObjectId(), aipCreated.getId())
+        .setPluginState(PluginState.SUCCESS);
 
       if (aipCreated.getParentId() == null && computedParentId.isPresent()) {
         reportItem.setPluginDetails(String.format("Parent with id '%s' not found", computedParentId.get()));

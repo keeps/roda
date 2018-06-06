@@ -123,26 +123,29 @@ public class EARKSIPPluginsTest {
     }, e -> Assert.fail("Error cleaning up", e));
   }
 
-  private TransferredResource createCorpora(String sipFile)
+  private static TransferredResource createIngestCorpora(Path corporaPath, IndexService index, String sipFileInCorpora,
+    String renameSipFileTo)
     throws IOException, NotFoundException, GenericException, IsStillUpdatingException, AlreadyExistsException {
     TransferredResourcesScanner f = RodaCoreFactory.getTransferredResourcesScanner();
-    Path sip = corporaPath.resolve(CorporaConstants.SIP_FOLDER).resolve(sipFile);
-    if (!f.fileExists(sipFile)) {
-      f.createFile(null, sipFile, Files.newInputStream(sip));
+    Path sip = corporaPath.resolve(CorporaConstants.SIP_FOLDER).resolve(sipFileInCorpora);
+    String filename = renameSipFileTo == null ? sipFileInCorpora : renameSipFileTo;
+    if (!f.fileExists(filename)) {
+      f.createFile(null, filename, Files.newInputStream(sip));
     }
     f.updateTransferredResources(Optional.empty(), true);
     index.commit(TransferredResource.class);
-    return index.retrieve(TransferredResource.class, IdUtils.createUUID(sipFile), new ArrayList<>());
+    return index.retrieve(TransferredResource.class, IdUtils.createUUID(filename), new ArrayList<>());
   }
 
-  private TransferredResource createCorpora() throws IOException, NotFoundException, GenericException,
-    RequestNotValidException, IsStillUpdatingException, AlreadyExistsException {
-    return createCorpora(CorporaConstants.EARK_SIP);
+  public static TransferredResource createIngestCorpora(Path corporaPath, IndexService index) throws IOException,
+    NotFoundException, GenericException, RequestNotValidException, IsStillUpdatingException, AlreadyExistsException {
+    return createIngestCorpora(corporaPath, index, CorporaConstants.EARK_SIP, null);
   }
 
-  private TransferredResource createUpdateCorpora() throws IOException, NotFoundException, GenericException,
-    RequestNotValidException, IsStillUpdatingException, AlreadyExistsException {
-    return createCorpora(CorporaConstants.EARK_SIP_UPDATE);
+  public static TransferredResource createIngestUpdateCorpora(Path corporaPath, IndexService index,
+    String renameSipFileTo) throws IOException, NotFoundException, GenericException, RequestNotValidException,
+    IsStillUpdatingException, AlreadyExistsException {
+    return createIngestCorpora(corporaPath, index, CorporaConstants.EARK_SIP_UPDATE, renameSipFileTo);
   }
 
   private AIP ingestCorpora() throws RequestNotValidException, NotFoundException, GenericException,
@@ -155,7 +158,7 @@ public class EARKSIPPluginsTest {
     parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());
     parameters.put(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID, "true");
 
-    TransferredResource transferredResource = createCorpora();
+    TransferredResource transferredResource = createIngestCorpora(corporaPath, index);
     Assert.assertNotNull(transferredResource);
 
     Job job = TestsHelper.executeJob(EARKSIPToAIPPlugin.class, parameters, PluginType.SIP_TO_AIP,
@@ -177,7 +180,7 @@ public class EARKSIPPluginsTest {
   private AIP ingestUpdateCorpora(AIP aip) throws RequestNotValidException, NotFoundException, GenericException,
     AuthorizationDeniedException, IOException, IsStillUpdatingException, AlreadyExistsException {
 
-    TransferredResource transferredResource = createUpdateCorpora();
+    TransferredResource transferredResource = createIngestUpdateCorpora(corporaPath, index, null);
     Assert.assertNotNull(transferredResource);
 
     Job job = TestsHelper.executeJob(EARKSIPToAIPPlugin.class, new HashMap<>(), PluginType.SIP_TO_AIP,

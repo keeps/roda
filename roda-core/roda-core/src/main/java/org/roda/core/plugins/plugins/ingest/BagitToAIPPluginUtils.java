@@ -41,8 +41,8 @@ public class BagitToAIPPluginUtils {
   }
 
   public static AIP bagitToAip(SIP bagit, ModelService model, String metadataFilename, List<String> ingestSIPIds,
-    String ingestJobId, Optional<String> computedParentId, String createdBy, Permissions permissions)
-    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
+    String ingestJobId, Optional<String> computedParentId, String createdBy, Permissions permissions,
+    String ingestSIPUUID) throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException {
 
     String metadataAsString = BagitUtils
@@ -54,8 +54,8 @@ public class BagitToAIPPluginUtils {
     String aipType = RodaConstants.AIP_TYPE_MIXED;
     boolean notify = false;
 
-    AIP aip = model.createAIP(state, computedParentId.orElse(null), aipType, permissions, ingestSIPIds, ingestJobId,
-      notify, createdBy);
+    AIP aip = model.createAIP(state, computedParentId.orElse(null), aipType, permissions, ingestSIPUUID, ingestSIPIds,
+      ingestJobId, notify, createdBy);
 
     model.createDescriptiveMetadata(aip.getId(), metadataFilename, metadataAsPayload, METADATA_TYPE, METADATA_VERSION,
       notify);

@@ -323,7 +323,7 @@ public final class LiteRODAObjectFactory {
           ret = getPreservationMetadata(model, split);
         } else if (Report.class.getName().equals(clazz) || IndexedReport.class.getName().equals(clazz)) {
           if (split.length == 3) {
-            ret = (T) model.retrieveJobReport(firstId, decodeId(split[2]), false);
+            ret = (T) model.retrieveJobReport(firstId, decodeId(split[2]));
           }
         } else if (Risk.class.getName().equals(clazz) || IndexedRisk.class.getName().equals(clazz)) {
           ret = (T) model.retrieveRisk(firstId);

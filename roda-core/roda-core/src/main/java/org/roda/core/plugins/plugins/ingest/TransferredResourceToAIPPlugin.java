@@ -124,8 +124,8 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
       String aipType = RodaConstants.AIP_TYPE_MIXED;
 
       final AIP aip = model.createAIP(state, computedSearchScope.orElse(null), aipType,
-        PermissionUtils.getIngestPermissions(job.getUsername()), Arrays.asList(transferredResource.getName()),
-        job.getId(), false, job.getUsername());
+        PermissionUtils.getIngestPermissions(job.getUsername()), transferredResource.getUUID(),
+        Arrays.asList(transferredResource.getName()), job.getId(), false, job.getUsername());
 
       PluginHelper.createSubmission(model, createSubmission, transferredResourcePath, aip.getId());
 
@@ -152,7 +152,8 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
 
       model.notifyAipCreated(aip.getId());
 
-      reportItem.setOutcomeObjectId(aip.getId()).setPluginState(PluginState.SUCCESS);
+      reportItem.setSourceAndOutcomeObjectId(reportItem.getSourceObjectId(), aip.getId())
+        .setPluginState(PluginState.SUCCESS);
       createWellformedEventSuccess(model, index, transferredResource, aip);
       LOGGER.debug("Done with converting {} to AIP {}", transferredResourcePath, aip.getId());
     } catch (RODAException | IOException | RuntimeException e) {

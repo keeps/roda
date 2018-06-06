@@ -132,14 +132,15 @@ public class JobReportCollection extends AbstractSolrCollection<IndexedReport, R
     final IndexedReport jobReport = super.fromSolrDocument(doc, fieldsToReturn);
 
     jobReport.setJobId(SolrUtils.objectToString(doc.get(RodaConstants.JOB_REPORT_JOB_ID), null));
-    jobReport.setSourceObjectId(SolrUtils.objectToString(doc.get(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ID), null));
+    String sourceObjectId = SolrUtils.objectToString(doc.get(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ID), null);
+    String outcomeObjectId = SolrUtils.objectToString(doc.get(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID), null);
+    jobReport.setSourceAndOutcomeObjectId(sourceObjectId, outcomeObjectId);
     jobReport
       .setSourceObjectClass(SolrUtils.objectToString(doc.get(RodaConstants.JOB_REPORT_SOURCE_OBJECT_CLASS), null));
     jobReport.setSourceObjectOriginalIds(
       SolrUtils.objectToListString(doc.get(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ORIGINAL_IDS)));
     jobReport.setSourceObjectOriginalName(
       SolrUtils.objectToString(doc.get(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ORIGINAL_NAME), null));
-    jobReport.setOutcomeObjectId(SolrUtils.objectToString(doc.get(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID), null));
     jobReport
       .setOutcomeObjectClass(SolrUtils.objectToString(doc.get(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_CLASS), null));
     if (doc.containsKey(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_STATE)) {

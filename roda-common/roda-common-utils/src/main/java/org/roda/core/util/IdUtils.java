@@ -104,8 +104,8 @@ public final class IdUtils {
     return getFileId(aipId, representationId, fileDirectoryPath, fileId, ID_SEPARATOR);
   }
 
-  public static String getJobReportId(String jobId, String aipId) {
-    return jobId + ID_SEPARATOR + aipId;
+  public static String getJobReportId(String jobId, String sourceObjectId, String outcomeObjectId) {
+    return jobId + ID_SEPARATOR + sourceObjectId + ID_SEPARATOR + outcomeObjectId;
   }
 
   // FIXME 20160809 hsilva: type is not being used. but should it???

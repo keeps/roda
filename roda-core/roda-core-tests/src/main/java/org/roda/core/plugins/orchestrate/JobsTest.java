@@ -9,6 +9,7 @@ package org.roda.core.plugins.orchestrate;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,12 +29,15 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.DummyPlugin;
 import org.roda.core.plugins.plugins.PluginThatFailsDuringInit;
 import org.roda.core.plugins.plugins.PluginThatFailsDuringXMethod;
 import org.roda.core.plugins.plugins.PluginThatStopsItself;
+import org.roda.core.plugins.plugins.PluginThatTestsLocking;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +58,7 @@ public class JobsTest {
 
     boolean deploySolr = true;
     boolean deployLdap = true;
-    boolean deployFolderMonitor = true;
+    boolean deployFolderMonitor = false;
     boolean deployOrchestrator = true;
     boolean deployPluginManager = true;
     boolean deployDefaultResources = false;
@@ -164,6 +168,78 @@ public class JobsTest {
     TestsHelper.executeJob(DummyPlugin.class, PluginType.MISC, SelectedItemsNone.create(), JOB_STATE.COMPLETED);
 
     JobsHelper.setSyncTimeout(originalSyncTimeout);
+  }
+
+  @Test
+  public void testPluginProcessingTheSameObjectInSeveralThreadsWithAutoLocking() throws RequestNotValidException,
+    GenericException, NotFoundException, AuthorizationDeniedException, AlreadyExistsException {
+    // set block size to 1 in order to have several "threads" when using list of
+    // objects of size 2 or greater
+    JobsHelper.setBlockSize(1);
+
+    ModelService modelService = RodaCoreFactory.getModelService();
+    IndexService indexService = RodaCoreFactory.getIndexService();
+    AIP aip = modelService.createAIP(null, RodaConstants.REPRESENTATION_TYPE_MIXED, new Permissions(),
+      RodaConstants.ADMIN);
+
+    Map<String, String> parameters = new HashMap<>();
+    parameters.put(PluginThatTestsLocking.PLUGIN_PARAM_AUTO_LOCKING, "true");
+    // execute plugin via list in the same object (two ids, the same object)
+    Job job = TestsHelper.executeJob(PluginThatTestsLocking.class, parameters, PluginType.MISC,
+      SelectedItemsList.create(AIP.class, aip.getId(), aip.getId()), JOB_STATE.COMPLETED);
+
+    // asserts
+    List<Report> jobReports = TestsHelper.getJobReports(indexService, job);
+    Assert.assertEquals(jobReports.size(), 1);
+    String pluginDetails = jobReports.get(0).getPluginDetails();
+    String[] pluginDetailsSplitted = pluginDetails.split(System.lineSeparator());
+    Assert.assertEquals(pluginDetailsSplitted.length, 5);
+    Assert.assertTrue(pluginDetails.contains(PluginThatTestsLocking.PLUGIN_DETAILS_AT_LEAST_ONE_LOCK_REQUEST_WAITING));
+    int dates = 0;
+    String year = Calendar.getInstance().get(Calendar.YEAR) + "";
+    for (String details : pluginDetailsSplitted) {
+      if (details.contains(year)) {
+        dates++;
+      }
+    }
+    // details are not overwritten
+    Assert.assertEquals(dates, 4);
+  }
+
+  @Test
+  public void testPluginProcessingTheSameObjectInSeveralThreadsWithoutAutoLocking() throws RequestNotValidException,
+    GenericException, NotFoundException, AuthorizationDeniedException, AlreadyExistsException {
+    // set block size to 1 in order to have several "threads" when using list of
+    // objects of size 2 or greater
+    JobsHelper.setBlockSize(1);
+
+    ModelService modelService = RodaCoreFactory.getModelService();
+    IndexService indexService = RodaCoreFactory.getIndexService();
+    AIP aip = modelService.createAIP(null, RodaConstants.REPRESENTATION_TYPE_MIXED, new Permissions(),
+      RodaConstants.ADMIN);
+
+    Map<String, String> parameters = new HashMap<>();
+    parameters.put(PluginThatTestsLocking.PLUGIN_PARAM_AUTO_LOCKING, "false");
+    // execute plugin via list in the same object (two ids, the same object)
+    Job job = TestsHelper.executeJob(PluginThatTestsLocking.class, parameters, PluginType.MISC,
+      SelectedItemsList.create(AIP.class, aip.getId(), aip.getId()), JOB_STATE.COMPLETED);
+
+    // asserts
+    List<Report> jobReports = TestsHelper.getJobReports(indexService, job);
+    Assert.assertEquals(jobReports.size(), 1);
+    String pluginDetails = jobReports.get(0).getPluginDetails();
+    String[] pluginDetailsSplitted = pluginDetails.split(System.lineSeparator());
+    Assert.assertEquals(pluginDetailsSplitted.length, 2);
+    Assert.assertFalse(pluginDetails.contains(PluginThatTestsLocking.PLUGIN_DETAILS_AT_LEAST_ONE_LOCK_REQUEST_WAITING));
+    int dates = 0;
+    String year = Calendar.getInstance().get(Calendar.YEAR) + "";
+    for (String details : pluginDetailsSplitted) {
+      if (details.contains(year)) {
+        dates++;
+      }
+    }
+    // details are overwritten
+    Assert.assertEquals(dates, 2);
   }
 
 }

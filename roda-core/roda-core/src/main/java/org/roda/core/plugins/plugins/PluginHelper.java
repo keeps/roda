@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
@@ -34,6 +35,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.JobException;
+import org.roda.core.data.exceptions.LockingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -113,6 +115,9 @@ import org.slf4j.LoggerFactory;
 public final class PluginHelper {
   private static final Logger LOGGER = LoggerFactory.getLogger(PluginHelper.class);
 
+  private static final String LOCK_REQUEST_TIMEOUT = "core.orchestrator.lock_request_timeout";
+  private static final int DEFAULT_LOCK_REQUEST_TIMEOUT = 600;
+
   private PluginHelper() {
     // do nothing
   }
@@ -120,14 +125,21 @@ public final class PluginHelper {
   public static <T extends IsRODAObject> Report processObjects(Plugin<T> plugin,
     RODAObjectsProcessingLogic<T> objectsLogic, IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> liteList) throws PluginException {
+    return processObjects(plugin, objectsLogic, index, model, storage, liteList, true);
+  }
+
+  public static <T extends IsRODAObject> Report processObjects(Plugin<T> plugin,
+    RODAObjectsProcessingLogic<T> objectsLogic, IndexService index, ModelService model, StorageService storage,
+    List<LiteOptionalWithCause> liteList, boolean autoLocking) throws PluginException {
     Report report = PluginHelper.initPluginReport(plugin);
+    List<T> list = new ArrayList<>();
 
     try {
       JobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(plugin, liteList.size());
       PluginHelper.updateJobInformationAsync(plugin, jobPluginInfo);
 
       Job job = PluginHelper.getJob(plugin, model);
-      List<T> list = PluginHelper.transformLitesIntoObjects(model, plugin, report, jobPluginInfo, liteList, job);
+      list = PluginHelper.transformLitesIntoObjects(model, plugin, report, jobPluginInfo, liteList, job, autoLocking);
 
       try {
         objectsLogic.process(index, model, storage, report, job, jobPluginInfo, plugin, list);
@@ -140,6 +152,15 @@ public final class PluginHelper {
     } catch (JobException | AuthorizationDeniedException | RequestNotValidException | GenericException
       | NotFoundException e) {
       throw new PluginException("A job exception has occurred", e);
+    } catch (LockingException e) {
+      throw new PluginException("Unable to acquire locks for the objects being processed", e);
+    } finally {
+      if (autoLocking) {
+        String requestUuid = plugin.getParameterValues().getOrDefault(RodaConstants.PLUGIN_PARAMS_LOCK_REQUEST_UUID,
+          IdUtils.createUUID());
+        PluginHelper.releaseObjectLock(liteList.stream().filter(obj -> obj.getLite().isPresent())
+          .map(obj -> obj.getLite().get().getInfo()).collect(Collectors.toList()), requestUuid);
+      }
     }
 
     return report;
@@ -148,14 +169,22 @@ public final class PluginHelper {
   public static <T extends IsRODAObject> Report processObjects(Plugin<T> plugin, RODAProcessingLogic<T> beforeLogic,
     RODAObjectProcessingLogic<T> perObjectLogic, RODAProcessingLogic<T> afterLogic, IndexService index,
     ModelService model, StorageService storage, List<LiteOptionalWithCause> liteList) throws PluginException {
+    return processObjects(plugin, beforeLogic, perObjectLogic, afterLogic, index, model, storage, liteList, true);
+  }
+
+  public static <T extends IsRODAObject> Report processObjects(Plugin<T> plugin, RODAProcessingLogic<T> beforeLogic,
+    RODAObjectProcessingLogic<T> perObjectLogic, RODAProcessingLogic<T> afterLogic, IndexService index,
+    ModelService model, StorageService storage, List<LiteOptionalWithCause> liteList, boolean autoLocking)
+    throws PluginException {
     Report report = PluginHelper.initPluginReport(plugin);
+    List<T> list = new ArrayList<>();
 
     try {
       JobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(plugin, liteList.size());
       PluginHelper.updateJobInformationAsync(plugin, jobPluginInfo);
 
       Job job = PluginHelper.getJob(plugin, model);
-      List<T> list = PluginHelper.transformLitesIntoObjects(model, plugin, report, jobPluginInfo, liteList, job);
+      list = PluginHelper.transformLitesIntoObjects(model, plugin, report, jobPluginInfo, liteList, job, autoLocking);
 
       if (beforeLogic != null) {
         try {
@@ -186,6 +215,15 @@ public final class PluginHelper {
     } catch (JobException | AuthorizationDeniedException | RequestNotValidException | GenericException
       | NotFoundException e) {
       throw new PluginException("A job exception has occurred", e);
+    } catch (LockingException e) {
+      throw new PluginException("Unable to acquire locks for the objects being processed", e);
+    } finally {
+      if (autoLocking) {
+        String requestUuid = plugin.getParameterValues().getOrDefault(RodaConstants.PLUGIN_PARAMS_LOCK_REQUEST_UUID,
+          IdUtils.createUUID());
+        PluginHelper.releaseObjectLock(liteList.stream().filter(obj -> obj.getLite().isPresent())
+          .map(obj -> obj.getLite().get().getInfo()).collect(Collectors.toList()), requestUuid);
+      }
     }
 
     return report;
@@ -245,30 +283,44 @@ public final class PluginHelper {
   /******************************************************/
 
   public static <T extends IsRODAObject> Report initPluginReport(Plugin<T> plugin) {
-    return initPluginReportItem(plugin, "", "");
+    return initPluginReportItem(plugin, Report.NO_OUTCOME_OBJECT_ID, Report.NO_SOURCE_OBJECT_ID);
   }
 
   public static <T extends IsRODAObject> Report initPluginReportItem(Plugin<T> plugin,
     TransferredResource transferredResource) {
-    return initPluginReportItem(plugin, "", transferredResource.getUUID())
+    return initPluginReportItem(plugin, Report.NO_OUTCOME_OBJECT_ID, transferredResource.getUUID())
       .setSourceObjectClass(TransferredResource.class.getName()).setOutcomeObjectClass(AIP.class.getName())
       .setOutcomeObjectState(AIPState.INGEST_PROCESSING).setSourceObjectOriginalName(transferredResource.getName());
   }
 
-  public static <T extends IsRODAObject> Report initPluginReportItem(Plugin<T> plugin, String outcomeObjectId,
-    AIPState initialOutcomeObjectState) {
-    return initPluginReportItem(plugin, outcomeObjectId, "").setOutcomeObjectState(initialOutcomeObjectState);
+  private static <T extends IsRODAObject> List<String> getSourceObjectIdsToInitPluginReportItem(Plugin<T> plugin,
+    String outcomeObjectId, String defaultSourceObjectId) {
+    Map<String, List<String>> objectFromJson;
+    try {
+      objectFromJson = JsonUtils.getObjectFromJson(plugin.getParameterValues()
+        .getOrDefault(RodaConstants.PLUGIN_PARAMS_OUTCOMEOBJECTID_TO_SOURCEOBJECTID_MAP, "{}"), HashMap.class);
+    } catch (GenericException e) {
+      objectFromJson = Collections.emptyMap();
+    }
+    return objectFromJson.getOrDefault(outcomeObjectId, Arrays.asList(defaultSourceObjectId));
+  }
+
+  private static <T extends IsRODAObject> String getSourceObjectIdToInitPluginReportItem(Plugin<T> plugin,
+    String outcomeObjectId, String defaultSourceObjectId) {
+    return getSourceObjectIdsToInitPluginReportItem(plugin, outcomeObjectId, defaultSourceObjectId).get(0);
   }
 
   public static <T extends IsRODAObject> Report initPluginReportItem(Plugin<T> plugin, String objectId,
     Class<?> clazz) {
-    return initPluginReportItem(plugin, objectId, objectId).setSourceObjectClass(clazz.getName())
+    String sourceObjectId = getSourceObjectIdToInitPluginReportItem(plugin, objectId, objectId);
+    return initPluginReportItem(plugin, objectId, sourceObjectId).setSourceObjectClass(clazz.getName())
       .setOutcomeObjectClass(clazz.getName());
   }
 
   public static <T extends IsRODAObject> Report initPluginReportItem(Plugin<T> plugin, String objectId, Class<?> clazz,
     AIPState initialOutcomeObjectState) {
-    return initPluginReportItem(plugin, objectId, objectId).setSourceObjectClass(clazz.getName())
+    String sourceObjectId = getSourceObjectIdToInitPluginReportItem(plugin, objectId, objectId);
+    return initPluginReportItem(plugin, objectId, sourceObjectId).setSourceObjectClass(clazz.getName())
       .setOutcomeObjectClass(clazz.getName()).setOutcomeObjectState(initialOutcomeObjectState);
   }
 
@@ -278,22 +330,14 @@ public final class PluginHelper {
       .setOutcomeObjectClass(clazz.getName()).setOutcomeObjectState(initialOutcomeObjectState);
   }
 
-  private static <T extends IsRODAObject> Report initPluginReportItem(Plugin<T> plugin, String outcomeObjectId,
+  public static <T extends IsRODAObject> Report initPluginReportItem(Plugin<T> plugin, String outcomeObjectId,
     String sourceObjectId) {
     String jobId = getJobId(plugin);
     Report reportItem = new Report();
     reportItem.injectLineSeparator(System.lineSeparator());
-    String jobReportPartialId = outcomeObjectId;
-    // FIXME 20160516 hsilva: this has problems when doing one to many SIP > AIP
-    // operation
-    if (StringUtils.isBlank(jobReportPartialId)) {
-      jobReportPartialId = sourceObjectId;
-    }
-
-    reportItem.setId(IdUtils.getJobReportId(jobId, jobReportPartialId));
+    reportItem.setId(IdUtils.getJobReportId(jobId, sourceObjectId, outcomeObjectId));
     reportItem.setJobId(jobId);
-    reportItem.setSourceObjectId(sourceObjectId);
-    reportItem.setOutcomeObjectId(outcomeObjectId);
+    reportItem.setSourceAndOutcomeObjectId(sourceObjectId, outcomeObjectId);
     reportItem.setTitle(plugin.getName());
     reportItem.setPlugin(plugin.getClass().getName());
     reportItem.setPluginName(plugin.getName());
@@ -307,13 +351,7 @@ public final class PluginHelper {
     String jobId = getJobId(plugin);
     Report report = new Report(reportItem);
     report.injectLineSeparator(System.lineSeparator());
-    String reportPartialId = reportItem.getOutcomeObjectId();
-    // FIXME 20160516 hsilva: this has problems when doing one to many SIP > AIP
-    // operation
-    if (StringUtils.isBlank(reportPartialId)) {
-      reportPartialId = reportItem.getSourceObjectId();
-    }
-    reportItem.setId(IdUtils.getJobReportId(jobId, reportPartialId));
+    reportItem.setId(IdUtils.getJobReportId(jobId, reportItem.getSourceObjectId(), reportItem.getOutcomeObjectId()));
     report.setId(reportItem.getId());
     report.setJobId(jobId);
     if (reportItem.getTotalSteps() != 0) {
@@ -331,51 +369,60 @@ public final class PluginHelper {
     }
   }
 
-  public static <T extends IsRODAObject> void updateJobReportState(Plugin<T> plugin, ModelService model, String aipId,
-    AIPState newState) {
-    try {
-      String jobId = getJobId(plugin);
-      Report jobReport = model.retrieveJobReport(jobId, aipId, true);
-      jobReport.setOutcomeObjectState(newState);
-      Job job = model.retrieveJob(jobId);
-      model.createOrUpdateJobReport(jobReport, job);
-    } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
-      LOGGER.error("Error while updating Job Report", e);
+  public static <T extends IsRODAObject> void updateJobReportState(Plugin<T> plugin, ModelService model,
+    String sourceObjectId, String outcomeObjectId, AIPState newState) {
+    for (String sourceObjectIdCalculated : getSourceObjectIdsToInitPluginReportItem(plugin, outcomeObjectId,
+      sourceObjectId)) {
+      try {
+        String jobId = getJobId(plugin);
+        Report jobReport = model.retrieveJobReport(jobId, sourceObjectIdCalculated, outcomeObjectId);
+        jobReport.setOutcomeObjectState(newState);
+        Job job = model.retrieveJob(jobId);
+        model.createOrUpdateJobReport(jobReport, job);
+      } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
+        LOGGER.error("Error while updating Job Report", e);
+      }
     }
   }
 
   public static <T extends IsRODAObject> void updatePartialJobReport(Plugin<T> plugin, ModelService model,
     Report reportItem, boolean replaceLastReportItemIfTheSame, Job cachedJob) {
     String jobId = getJobId(plugin);
-    try {
-      Report jobReport;
+    for (String sourceObjectId : getSourceObjectIdsToInitPluginReportItem(plugin, reportItem.getOutcomeObjectId(),
+      reportItem.getSourceObjectId())) {
+      // lets ensure that job report id & source object id is correct
+      reportItem.setSourceObjectId(sourceObjectId);
+      reportItem.setId(IdUtils.getJobReportId(jobId, sourceObjectId, reportItem.getOutcomeObjectId()));
       try {
-        jobReport = model.retrieveJobReport(jobId, reportItem.getOutcomeObjectId(), true);
+        Report jobReport;
+        try {
+          jobReport = model.retrieveJobReport(jobId, sourceObjectId, reportItem.getOutcomeObjectId());
 
-        if (!replaceLastReportItemIfTheSame) {
-          jobReport.addReport(reportItem);
-        } else {
-          List<Report> reportItems = jobReport.getReports();
-          Report report = reportItems.get(reportItems.size() - 1);
-          if (report.getPlugin().equalsIgnoreCase(reportItem.getPlugin())) {
-            reportItems.remove(reportItems.size() - 1);
-            jobReport.setStepsCompleted(jobReport.getStepsCompleted() - 1);
+          if (!replaceLastReportItemIfTheSame) {
             jobReport.addReport(reportItem);
+          } else {
+            List<Report> reportItems = jobReport.getReports();
+            Report report = reportItems.get(reportItems.size() - 1);
+            if (report.getPlugin().equalsIgnoreCase(reportItem.getPlugin())) {
+              reportItems.remove(reportItems.size() - 1);
+              jobReport.setStepsCompleted(jobReport.getStepsCompleted() - 1);
+              jobReport.addReport(reportItem);
+            }
           }
+        } catch (NotFoundException e) {
+          jobReport = initPluginReportItem(plugin, reportItem.getOutcomeObjectId(), reportItem.getSourceObjectId())
+            .setSourceObjectClass(reportItem.getSourceObjectClass())
+            .setOutcomeObjectClass(reportItem.getOutcomeObjectClass());
+
+          jobReport.setId(reportItem.getId());
+          jobReport.setDateCreated(reportItem.getDateCreated());
+          jobReport.addReport(reportItem);
         }
-      } catch (NotFoundException e) {
-        jobReport = initPluginReportItem(plugin, reportItem.getOutcomeObjectId(), reportItem.getSourceObjectId())
-          .setSourceObjectClass(reportItem.getSourceObjectClass())
-          .setOutcomeObjectClass(reportItem.getOutcomeObjectClass());
 
-        jobReport.setId(reportItem.getId());
-        jobReport.setDateCreated(reportItem.getDateCreated());
-        jobReport.addReport(reportItem);
+        model.createOrUpdateJobReport(jobReport, cachedJob);
+      } catch (GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+        LOGGER.error("Error while updating Job Report", e);
       }
-
-      model.createOrUpdateJobReport(jobReport, cachedJob);
-    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException e) {
-      LOGGER.error("Error while updating Job Report", e);
     }
   }
 
@@ -467,23 +514,31 @@ public final class PluginHelper {
     updateJobInformationAsync(plugin, jobPluginInfo);
   }
 
+  public static <T extends IsRODAObject> boolean shouldPluginReportForItself(Plugin<T> plugin) throws JobException {
+    Map<String, String> parameterValues = plugin.getParameterValues();
+
+    return (!parameterValues.containsKey(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS)
+      || plugin.getClass().getName().equals(parameterValues.get(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS)));
+  }
+
   /**
    * Updates the job status for a particular plugin instance
    */
   public static <T extends IsRODAObject> void updateJobInformationAsync(Plugin<T> plugin, JobPluginInfo jobPluginInfo)
     throws JobException {
-    Map<String, String> parameterValues = plugin.getParameterValues();
-
-    if (!parameterValues.containsKey(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS)
-      || (parameterValues.containsKey(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS)
-        && parameterValues.get(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS).equals(plugin.getClass().getName()))) {
+    if (shouldPluginReportForItself(plugin)) {
       RodaCoreFactory.getPluginOrchestrator().updateJobInformationAsync(plugin, jobPluginInfo);
     }
   }
 
   public static <T extends IsRODAObject> JobPluginInfo getInitialJobInformation(Plugin<T> plugin,
     int sourceObjectsBeingProcess) {
-    JobPluginInfo jobPluginInfo = plugin.getJobPluginInfo(JobPluginInfo.class);
+    JobPluginInfo jobPluginInfo;
+    try {
+      jobPluginInfo = plugin.getJobPluginInfo(SimpleJobPluginInfo.class);
+    } catch (ClassCastException e) {
+      jobPluginInfo = plugin.getJobPluginInfo(IngestJobPluginInfo.class);
+    }
     if (jobPluginInfo != null) {
       jobPluginInfo.setSourceObjectsBeingProcessed(sourceObjectsBeingProcess).setSourceObjectsWaitingToBeProcessed(0);
       return jobPluginInfo;
@@ -492,6 +547,11 @@ public final class PluginHelper {
     }
   }
 
+  /**
+   * 20180525 hsilva: not in use in RODA base source code, so this will be
+   * removed in a near future
+   */
+  @Deprecated
   public static <T extends IsRODAObject, T1 extends JobPluginInfo> T1 getInitialJobInformation(Plugin<T> plugin,
     Class<T1> jobPluginInfoClass) throws JobException {
     T1 jobPluginInfo = plugin.getJobPluginInfo(jobPluginInfoClass);
@@ -528,6 +588,11 @@ public final class PluginHelper {
   public static <T extends IsRODAObject> boolean getBooleanFromParameters(Plugin<T> plugin,
     PluginParameter pluginParameter) {
     return verifyIfStepShouldBePerformed(plugin, pluginParameter);
+  }
+
+  public static <T extends IsRODAObject> String getStringFromParameters(Plugin<T> plugin, String pluginParameterId,
+    String defaultValue) {
+    return plugin.getParameterValues().getOrDefault(pluginParameterId, defaultValue);
   }
 
   public static <T extends IsRODAObject> String getStringFromParameters(Plugin<T> plugin,
@@ -688,6 +753,69 @@ public final class PluginHelper {
 
   /***************** Plugin related *****************/
   /**************************************************/
+  /**
+   * 
+   * @param requestUuid
+   *          uniq identifier of this request
+   */
+  public static <T extends IsRODAObject> void acquireObjectLock(String lite, Plugin<T> plugin) throws LockingException {
+    String requestUuid = plugin.getParameterValues().getOrDefault(RodaConstants.PLUGIN_PARAMS_LOCK_REQUEST_UUID,
+      IdUtils.createUUID());
+    acquireObjectLock(Arrays.asList(lite), requestUuid);
+  }
+
+  /**
+   * 
+   * @param requestUuid
+   *          uniq identifier of this request
+   */
+  public static void acquireObjectLock(String lite, String requestUuid) throws LockingException {
+    acquireObjectLock(Arrays.asList(lite), requestUuid);
+  }
+
+  /**
+   * 
+   * @param requestUuid
+   *          uniq identifier of this request
+   */
+  public static void acquireObjectLock(List<String> lites, String requestUuid) throws LockingException {
+    RodaCoreFactory.getPluginOrchestrator().acquireObjectLock(lites, PluginHelper.getLockRequestTimeout(), true,
+      requestUuid);
+  }
+
+  private static int getLockRequestTimeout() {
+    return RodaCoreFactory.getRodaConfiguration().getInt(LOCK_REQUEST_TIMEOUT, DEFAULT_LOCK_REQUEST_TIMEOUT);
+  }
+
+  /**
+   * 
+   * @param requestUuid
+   *          uniq identifier of this request
+   */
+  public static <T extends IsRODAObject> void releaseObjectLock(String lite, Plugin<T> plugin) throws LockingException {
+    String requestUuid = plugin.getParameterValues().getOrDefault(RodaConstants.PLUGIN_PARAMS_LOCK_REQUEST_UUID,
+      IdUtils.createUUID());
+    releaseObjectLock(Arrays.asList(lite), requestUuid);
+  }
+
+  /**
+   * 
+   * @param requestUuid
+   *          uniq identifier of this request
+   */
+  public static void releaseObjectLock(String lite, String requestUuid) {
+    releaseObjectLock(Arrays.asList(lite), requestUuid);
+  }
+
+  /**
+   * 
+   * @param requestUuid
+   *          uniq identifier of this request
+   */
+  public static void releaseObjectLock(List<String> lites, String requestUuid) {
+    RodaCoreFactory.getPluginOrchestrator().releaseObjectLockAsync(lites, requestUuid);
+  }
+
   public static <T extends IsRODAObject> String getPluginAgentId(Plugin<T> plugin) {
     return IdUtils.getPluginAgentId(plugin.getClass().getName(), plugin.getVersion());
   }
@@ -904,7 +1032,7 @@ public final class PluginHelper {
   private static LinkingIdentifier getLinkingIdentifier(RODA_TYPE type, String uuid, String role) {
     LinkingIdentifier li = new LinkingIdentifier();
     li.setValue(LinkingObjectUtils.getLinkingIdentifierId(type, uuid));
-    li.setType("URN");
+    li.setType(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN);
     li.setRoles(Arrays.asList(role));
     return li;
   }
@@ -985,9 +1113,9 @@ public final class PluginHelper {
       String oldSIPId = oldToNewId.getKey();
       String newSIPId = oldToNewId.getValue();
       for (Report report : jobPluginInfo.getAllReports().getOrDefault(oldSIPId, Collections.emptyMap()).values()) {
-        report.setSourceObjectId(newSIPId);
+        report.setSourceAndOutcomeObjectId(newSIPId, report.getOutcomeObjectId());
         if (!report.getReports().isEmpty()) {
-          report.getReports().get(0).setSourceObjectId(newSIPId);
+          report.getReports().get(0).setSourceAndOutcomeObjectId(newSIPId, report.getOutcomeObjectId());
         }
 
         // update in model
@@ -1164,9 +1292,21 @@ public final class PluginHelper {
     }
   }
 
+  /**
+   * 20180525 hsilva: autoLocking=true should only be used by
+   * PluginHelper.processObjects methods
+   * 
+   * @throws LockingException
+   * 
+   * @deprecated 20180525 hsilva: this methods should not be used directly, but
+   *             instead one should use PluginHelper.processObjects methods,
+   *             that is why this method will become private in a near future
+   */
   public static <T extends IsRODAObject> List<T> transformLitesIntoObjects(ModelService model, Plugin<T> plugin,
-    Report report, JobPluginInfo pluginInfo, List<LiteOptionalWithCause> lites, Job job) {
+    Report report, JobPluginInfo pluginInfo, List<LiteOptionalWithCause> lites, Job job, boolean autoLocking)
+    throws LockingException {
     List<T> finalObjects = new ArrayList<>();
+    List<LiteRODAObject> objectsToLock = new ArrayList<>();
 
     for (LiteOptionalWithCause lite : lites) {
       String failureMessage = "";
@@ -1184,17 +1324,21 @@ public final class PluginHelper {
         }
 
         if (objectMatchPluginKnownObjectsClass) {
-          OptionalWithCause<T> retrievedObject = (OptionalWithCause<T>) model
-            .retrieveObjectFromLite(optionalLite.get());
-          if (retrievedObject.isPresent()) {
-            finalObjects.add(retrievedObject.get());
+          if (autoLocking) {
+            objectsToLock.add(optionalLite.get());
           } else {
-            RODAException exception = retrievedObject.getCause();
-            if (exception != null) {
-              failureMessage = "RODA object conversion from lite throwed an error: [" + exception.getClass().getName()
-                + "] " + exception.getMessage();
+            OptionalWithCause<T> retrievedObject = (OptionalWithCause<T>) model
+              .retrieveObjectFromLite(optionalLite.get());
+            if (retrievedObject.isPresent()) {
+              finalObjects.add(retrievedObject.get());
             } else {
-              failureMessage = "RODA object conversion from lite throwed an error.";
+              RODAException exception = retrievedObject.getCause();
+              if (exception != null) {
+                failureMessage = "RODA object conversion from lite throwed an error: [" + exception.getClass().getName()
+                  + "] " + exception.getMessage();
+              } else {
+                failureMessage = "RODA object conversion from lite throwed an error.";
+              }
             }
           }
         } else {
@@ -1205,31 +1349,66 @@ public final class PluginHelper {
         failureMessage = "Lite object has an error: [" + lite.getExceptionClass() + "] " + lite.getExceptionMessage();
       }
 
-      if (StringUtils.isNotBlank(failureMessage)) {
-        if (pluginInfo != null) {
-          pluginInfo.incrementObjectsProcessedWithFailure();
-        }
+      reportFailureTransformingLiteInObject(model, plugin, report, pluginInfo, job, lite, failureMessage, optionalLite);
+    }
 
-        if (report != null) {
-          String id = lite.toString();
-          if (optionalLite.isPresent()) {
-            String[] split = optionalLite.get().getInfo().split(LiteRODAObjectFactory.SEPARATOR_REGEX);
-            try {
-              id = split[1];
-            } catch (ArrayIndexOutOfBoundsException e) {
-              failureMessage += "\nError when getting uuid of lite object " + id + ".";
-            }
+    if (autoLocking) {
+      // in order to allow reentrant locking in sub plugins invocations (if any)
+      String requestUuid = plugin.getParameterValues().getOrDefault(RodaConstants.PLUGIN_PARAMS_LOCK_REQUEST_UUID,
+        IdUtils.createUUID());
+      plugin.getParameterValues().put(RodaConstants.PLUGIN_PARAMS_LOCK_REQUEST_UUID, requestUuid);
+      PluginHelper.acquireObjectLock(objectsToLock.stream().map(obj -> obj.getInfo()).collect(Collectors.toList()),
+        requestUuid);
+
+      String failureMessage = "";
+      for (LiteRODAObject object : objectsToLock) {
+        OptionalWithCause<T> retrievedObject = (OptionalWithCause<T>) model.retrieveObjectFromLite(object);
+        if (retrievedObject.isPresent()) {
+          finalObjects.add(retrievedObject.get());
+        } else {
+          RODAException exception = retrievedObject.getCause();
+          if (exception != null) {
+            failureMessage = "RODA object conversion from lite throwed an error: [" + exception.getClass().getName()
+              + "] " + exception.getMessage();
+          } else {
+            failureMessage = "RODA object conversion from lite throwed an error.";
           }
-
-          Report reportItem = PluginHelper.initPluginReportItem(plugin, id, LiteRODAObject.class);
-          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(failureMessage);
-          report.addReport(reportItem);
-          PluginHelper.updatePartialJobReport(plugin, model, reportItem, true, job);
         }
+
+        reportFailureTransformingLiteInObject(model, plugin, report, pluginInfo, job, LiteOptionalWithCause.of(object),
+          failureMessage, Optional.of(object));
       }
+
     }
 
     return finalObjects;
+  }
+
+  private static <T extends IsRODAObject> void reportFailureTransformingLiteInObject(ModelService model,
+    Plugin<T> plugin, Report report, JobPluginInfo pluginInfo, Job job, LiteOptionalWithCause lite,
+    String failureMessage, Optional<LiteRODAObject> optionalLite) {
+    if (StringUtils.isNotBlank(failureMessage)) {
+      if (pluginInfo != null) {
+        pluginInfo.incrementObjectsProcessedWithFailure();
+      }
+
+      if (report != null) {
+        String id = lite.toString();
+        if (optionalLite.isPresent()) {
+          String[] split = optionalLite.get().getInfo().split(LiteRODAObjectFactory.SEPARATOR_REGEX);
+          try {
+            id = split[1];
+          } catch (ArrayIndexOutOfBoundsException e) {
+            failureMessage += "\nError when getting uuid of lite object " + id + ".";
+          }
+        }
+
+        Report reportItem = PluginHelper.initPluginReportItem(plugin, id, LiteRODAObject.class);
+        reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(failureMessage);
+        report.addReport(reportItem);
+        PluginHelper.updatePartialJobReport(plugin, model, reportItem, true, job);
+      }
+    }
   }
 
   public static String createOutcomeTextForAIP(IndexedAIP item, String actionMessage) {

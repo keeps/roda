@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.JobException;
+import org.roda.core.data.exceptions.LockingException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -193,6 +194,19 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
   @Override
   public void setJobInError(String jobId) {
     // do nothing
+  }
+
+  @Override
+  public void acquireObjectLock(List<String> lites, int timeoutInSeconds, boolean waitForLockIfLocked,
+    String requestUuid) throws LockingException {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void releaseObjectLockAsync(List<String> lites, String requestUuid) {
+    // TODO Auto-generated method stub
+
   }
 
 }

@@ -22,10 +22,12 @@ import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.LockingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
+import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
@@ -42,6 +44,7 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
+import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
@@ -144,6 +147,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
     String jobId, Optional<String> computedSearchScope, boolean forceSearchScope, Path jobWorkingDirectory) {
     SIP sip = null;
     AIP aip;
+    LiteRODAObject aipLiteObject = null;
     try {
       sip = EARKSIP.parse(earkSIPPath, FSUtils.createRandomDirectory(jobWorkingDirectory));
       reportItem.setSourceObjectOriginalIds(sip.getIds());
@@ -154,9 +158,9 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
         if (IPEnums.IPStatus.NEW == sip.getStatus()) {
           parentId = PluginHelper.getComputedParent(model, index, sip.getAncestors(), computedSearchScope,
             forceSearchScope, jobId);
-          aip = processNewSIP(index, model, reportItem, sip, parentId);
+          aip = processNewSIP(index, model, reportItem, sip, parentId, transferredResource.getUUID());
         } else if (IPEnums.IPStatus.UPDATE == sip.getStatus()) {
-          aip = processUpdateSIP(index, model, storage, sip, computedSearchScope, forceSearchScope);
+          aip = processUpdateSIP(index, model, storage, sip, computedSearchScope, forceSearchScope, aipLiteObject);
         } else {
           throw new GenericException("Unknown IP Status: " + sip.getStatus());
         }
@@ -165,7 +169,8 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
         PluginHelper.createSubmission(model, createSubmission, earkSIPPath, aip.getId());
 
         createUnpackingEventSuccess(model, index, transferredResource, aip, UNPACK_DESCRIPTION);
-        reportItem.setOutcomeObjectId(aip.getId()).setPluginState(PluginState.SUCCESS);
+        reportItem.setSourceAndOutcomeObjectId(reportItem.getSourceObjectId(), aip.getId())
+          .setPluginState(PluginState.SUCCESS);
 
         if (sip.getAncestors() != null && !sip.getAncestors().isEmpty() && aip.getParentId() == null) {
           reportItem.setPluginDetails(String.format("Parent with id '%s' not found", parentId));
@@ -189,20 +194,28 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
           FSUtils.deletePathQuietly(sip.getBasePath());
         }
       }
+      if (aipLiteObject != null) {
+        try {
+          PluginHelper.releaseObjectLock(aipLiteObject.getInfo(), this);
+        } catch (LockingException e) {
+          // do nothing
+        }
+      }
     }
   }
 
   private AIP processNewSIP(IndexService index, ModelService model, Report reportItem, SIP sip,
-    Optional<String> computedParentId) throws NotFoundException, GenericException, RequestNotValidException,
-    AuthorizationDeniedException, AlreadyExistsException, ValidationException, IOException {
+    Optional<String> computedParentId, String ingestSIPUUID) throws NotFoundException, GenericException,
+    RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, ValidationException, IOException {
     String jobUsername = PluginHelper.getJobUsername(this, index);
     return EARKSIPToAIPPluginUtils.earkSIPToAIP(sip, jobUsername, PermissionUtils.getIngestPermissions(jobUsername),
-      model, sip.getIds(), reportItem.getJobId(), computedParentId);
+      model, sip.getIds(), reportItem.getJobId(), computedParentId, ingestSIPUUID);
   }
 
   private AIP processUpdateSIP(IndexService index, ModelService model, StorageService storage, SIP sip,
-    Optional<String> searchScope, boolean forceSearchScope) throws GenericException, RequestNotValidException,
-    NotFoundException, AuthorizationDeniedException, AlreadyExistsException, ValidationException {
+    Optional<String> searchScope, boolean forceSearchScope, LiteRODAObject aipLiteObject)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException,
+    AlreadyExistsException, ValidationException, LockingException {
     String searchScopeString = searchScope.orElse(null);
 
     List<FilterParameter> possibleStates = new ArrayList<>();
@@ -219,7 +232,8 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
       Arrays.asList(RodaConstants.INDEX_UUID));
     IndexedAIP indexedAIP;
 
-    if (result.getTotalCount() == 1) {
+    long amountOfAipsFoundById = result.getTotalCount();
+    if (amountOfAipsFoundById == 1) {
       indexedAIP = result.getResults().get(0);
     } else {
       filter = new Filter(new SimpleFilterParameter(RodaConstants.INDEX_UUID, sip.getId()));
@@ -232,13 +246,26 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
         indexedAIP = result.getResults().get(0);
       } else {
         // Fail to update since there's no AIP
-        throw new NotFoundException("Unable to find AIP created with SIP ID or AIP ID " + sip.getId()
-          + (searchScopeString != null ? " under AIP " + searchScopeString : ""));
+        throw new NotFoundException("Unable to find one & only one AIP created with SIP ID or AIP ID " + sip.getId()
+          + (searchScopeString != null ? " under AIP " + searchScopeString : "") + " (found " + amountOfAipsFoundById
+          + " when searching by id and " + result.getTotalCount() + " when searching by SIP id or anscestor id)");
       }
     }
 
     String jobUsername = PluginHelper.getJobUsername(this, index);
     String jobId = PluginHelper.getJobId(this);
+
+    // Try to acquire lock for this AIP
+    Optional<LiteRODAObject> liteOptionl = LiteRODAObjectFactory.get(indexedAIP);
+    if (liteOptionl.isPresent()) {
+      aipLiteObject = liteOptionl.get();
+      PluginHelper.acquireObjectLock(aipLiteObject.getInfo(), this);
+    } else {
+      LOGGER.error(
+        "Error getting lite from IndexedAIP with ID '{}' in order to obtain lock; Will continue update unsafely without object lock...",
+        indexedAIP.getId());
+    }
+
     // Update the AIP
     return EARKSIPToAIPPluginUtils.earkSIPToAIPUpdate(sip, indexedAIP, model, jobUsername, searchScope, jobId, null);
   }

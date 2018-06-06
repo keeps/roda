@@ -2371,6 +2371,7 @@ public class BrowserHelper {
     for (String aipId : listOfIds) {
       AIP aip = model.retrieveAIP(aipId);
       String jobId = aip.getIngestJobId();
+      String ingestSIPUUID = aip.getIngestSIPUUID();
       if (accept) {
         // Accept AIP
         aip.setState(AIPState.ACTIVE);
@@ -2406,7 +2407,7 @@ public class BrowserHelper {
 
       // create job report
       Job job = model.retrieveJob(jobId);
-      Report report = model.retrieveJobReport(jobId, aipId, true);
+      Report report = model.retrieveJobReport(jobId, ingestSIPUUID, aipId);
 
       Report reportItem = new Report();
       Messages messages = RodaCoreFactory.getI18NMessages(locale);

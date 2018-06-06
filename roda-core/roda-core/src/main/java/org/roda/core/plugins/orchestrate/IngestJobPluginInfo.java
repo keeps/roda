@@ -42,8 +42,8 @@ public class IngestJobPluginInfo extends JobPluginInfo {
   private Map<String, Map<String, Report>> reportsFromBeingProcessed = new HashMap<>();
   // transferredResourceId > list<aipId>
   private Map<String, List<String>> transferredResourceToAipIds = new HashMap<>();
-  // aipId > transferredResourceId
-  private Map<String, String> aipIdToTransferredResourceId = new HashMap<>();
+  // aipId > list<transferredResourceId>
+  private Map<String, List<String>> aipIdToTransferredResourceIds = new HashMap<>();
 
   public IngestJobPluginInfo() {
     super();
@@ -142,49 +142,46 @@ public class IngestJobPluginInfo extends JobPluginInfo {
     return transferredResourceToAipIds;
   }
 
+  /** Ordered list with no duplicates */
   public List<String> getAipIds() {
-    return transferredResourceToAipIds.values().stream().flatMap(l -> l.stream()).collect(Collectors.toList());
+    return transferredResourceToAipIds.values().stream().flatMap(l -> l.stream()).distinct()
+      .collect(Collectors.toList());
   }
 
   public List<String> getAipIds(String transferredResource) {
     return transferredResourceToAipIds.get(transferredResource);
   }
 
-  public Map<String, String> getAipIdToTransferredResourceId() {
-    return aipIdToTransferredResourceId;
+  public Map<String, List<String>> getAipIdToTransferredResourceIds() {
+    return aipIdToTransferredResourceIds;
   }
 
   public int getBeingProcessedCounter() {
     return transferredResourceToAipIds.size();
   }
 
-  public void addReport(String sourceObjectId, String outcomeObjectId, Report report) {
-    if (StringUtils.isNotBlank(sourceObjectId) && StringUtils.isNotBlank(outcomeObjectId)) {
-      aipIdToTransferredResourceId.put(outcomeObjectId, sourceObjectId);
-      if (transferredResourceToAipIds.get(sourceObjectId) != null) {
-        transferredResourceToAipIds.get(sourceObjectId).add(outcomeObjectId);
+  public void addReport(Report report, boolean reportIsAnReportItem) {
+    if (reportIsAnReportItem) {
+      reportsFromBeingProcessed.get(report.getSourceObjectId()).get(report.getOutcomeObjectId()).addReport(report,
+        false);
+    } else {
+      String sourceObjectId = report.getSourceObjectId();
+      String outcomeObjectId = report.getOutcomeObjectId();
+      if (StringUtils.isNotBlank(sourceObjectId) && StringUtils.isNotBlank(outcomeObjectId)) {
+        aipIdToTransferredResourceIds.computeIfAbsent(outcomeObjectId, key -> new ArrayList<>()).add(sourceObjectId);
+        transferredResourceToAipIds.computeIfAbsent(sourceObjectId, key -> new ArrayList<>()).add(outcomeObjectId);
+      }
+
+      if (reportsFromBeingProcessed.get(sourceObjectId) != null) {
+        reportsFromBeingProcessed.get(sourceObjectId).put(outcomeObjectId, report);
+        allReports.get(sourceObjectId).put(outcomeObjectId, report);
       } else {
-        List<String> aipIds = new ArrayList<>();
-        aipIds.add(outcomeObjectId);
-        transferredResourceToAipIds.put(sourceObjectId, aipIds);
+        Map<String, Report> innerReports = new HashMap<>();
+        innerReports.put(outcomeObjectId, report);
+        reportsFromBeingProcessed.put(sourceObjectId, innerReports);
+        allReports.put(sourceObjectId, innerReports);
       }
     }
-
-    if (reportsFromBeingProcessed.get(sourceObjectId) != null) {
-      reportsFromBeingProcessed.get(sourceObjectId).put(outcomeObjectId, report);
-      allReports.get(sourceObjectId).put(outcomeObjectId, report);
-    } else {
-      Map<String, Report> innerReports = new HashMap<>();
-      innerReports.put(outcomeObjectId, report);
-      reportsFromBeingProcessed.put(sourceObjectId, innerReports);
-      allReports.put(sourceObjectId, innerReports);
-    }
-  }
-
-  public void addReport(Report report) {
-    String outcomeObjectId = report.getOutcomeObjectId();
-    reportsFromBeingProcessed.get(aipIdToTransferredResourceId.get(outcomeObjectId)).get(outcomeObjectId)
-      .addReport(report, false);
   }
 
   public void remove(String transferredResourceId) {

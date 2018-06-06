@@ -793,6 +793,7 @@ public final class RodaConstants {
   public static final String JOB_SEARCH = "search";
 
   /* Plugins related parameters */
+  public static final String PLUGIN_PARAMS_LOCK_REQUEST_UUID = "parameter.lock_request_uuid";
   public static final String PLUGIN_PARAMS_JOB_ID = "job.id";
   public static final String PLUGIN_PARAMS_OTHER_JOB_ID = "other_job.id";
   public static final String PLUGIN_PARAMS_DO_FULLTEXT_EXTRACTION = "parameter.do_fulltext_extraction";
@@ -849,6 +850,7 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS = "parameter.delete_older_than_x_days";
   public static final String PLUGIN_PARAMS_SIP_UPDATE_INFORMATION = "parameter.sip_update_information";
   public static final String PLUGIN_PARAMS_REPRESENTATION_TYPE = "parameter.representation_type";
+  public static final String PLUGIN_PARAMS_OUTCOMEOBJECTID_TO_SOURCEOBJECTID_MAP = "parameter.outcomeobjectid_to_sourceobjectid_map";
 
   public static final String PLUGIN_PARAMS_INCLUDE_SELECTED_DESCRIPTIVE_METADATA = "parameter.include_selected_descriptive_metadata";
   public static final String PLUGIN_PARAMS_SELECTED_DESCRIPTIVE_METADATA = "parameter.selected_descriptive_metadata";

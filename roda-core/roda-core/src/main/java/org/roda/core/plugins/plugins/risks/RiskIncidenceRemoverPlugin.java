@@ -16,6 +16,7 @@ import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.JobException;
+import org.roda.core.data.exceptions.LockingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
@@ -83,7 +84,8 @@ public class RiskIncidenceRemoverPlugin<T extends IsRODAObject> extends Abstract
       PluginHelper.updateJobInformationAsync(this, jobPluginInfo);
 
       Job job = PluginHelper.getJob(this, model);
-      List<T> list = PluginHelper.transformLitesIntoObjects(model, this, pluginReport, jobPluginInfo, liteList, job);
+      List<T> list = PluginHelper.transformLitesIntoObjects(model, this, pluginReport, jobPluginInfo, liteList, job,
+        false);
 
       try {
         Filter filter = new Filter();
@@ -120,7 +122,7 @@ public class RiskIncidenceRemoverPlugin<T extends IsRODAObject> extends Abstract
         jobPluginInfo.incrementObjectsProcessedWithFailure(list.size());
       }
     } catch (JobException | AuthorizationDeniedException | NotFoundException | GenericException
-      | RequestNotValidException e) {
+      | RequestNotValidException | LockingException e) {
       throw new PluginException("A job exception has occurred", e);
     }
 

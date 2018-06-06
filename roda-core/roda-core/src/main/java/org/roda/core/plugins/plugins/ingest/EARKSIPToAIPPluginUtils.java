@@ -47,7 +47,7 @@ public class EARKSIPToAIPPluginUtils {
   }
 
   public static AIP earkSIPToAIP(SIP sip, String username, Permissions fullPermissions, ModelService model,
-    List<String> ingestSIPIds, String ingestJobId, Optional<String> parentId)
+    List<String> ingestSIPIds, String ingestJobId, Optional<String> parentId, String ingestSIPUUID)
     throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException, ValidationException, IOException {
 
@@ -57,8 +57,8 @@ public class EARKSIPToAIPPluginUtils {
 
     String aipType = IngestHelper.getType(sip);
 
-    AIP aip = model.createAIP(state, parentId.orElse(null), aipType, permissions, ingestSIPIds, ingestJobId, notify,
-      username);
+    AIP aip = model.createAIP(state, parentId.orElse(null), aipType, permissions, ingestSIPUUID, ingestSIPIds,
+      ingestJobId, notify, username);
 
     // process IP information
     processIPInformation(model, sip, aip.getId(), notify, false);

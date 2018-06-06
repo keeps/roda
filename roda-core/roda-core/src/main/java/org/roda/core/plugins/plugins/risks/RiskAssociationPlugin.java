@@ -21,6 +21,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobException;
+import org.roda.core.data.exceptions.LockingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
@@ -148,7 +149,8 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
       PluginHelper.updateJobInformationAsync(this, jobPluginInfo);
 
       Job job = PluginHelper.getJob(this, model);
-      List<T> list = PluginHelper.transformLitesIntoObjects(model, this, pluginReport, jobPluginInfo, liteList, job);
+      List<T> list = PluginHelper.transformLitesIntoObjects(model, this, pluginReport, jobPluginInfo, liteList, job,
+        false);
 
       if (!list.isEmpty() && riskIds != null) {
         List<String> risks = Arrays.asList(riskIds.split(","));
@@ -170,7 +172,7 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformationAsync(this, jobPluginInfo);
     } catch (JobException | AuthorizationDeniedException | NotFoundException | GenericException
-      | RequestNotValidException e) {
+      | RequestNotValidException | LockingException e) {
       throw new PluginException("A job exception has occurred", e);
     }
 
