@@ -37,8 +37,8 @@ import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAObjectsProcessingLogic;
+import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.orchestrate.JobsHelper;
-import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
@@ -80,14 +80,14 @@ public class CleanUnfinishedJobsPlugin extends AbstractPlugin<Job> {
     return PluginHelper.processObjects(this, new RODAObjectsProcessingLogic<Job>() {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-        SimpleJobPluginInfo jobPluginInfo, Plugin<Job> plugin, List<Job> objects) {
+        JobPluginInfo jobPluginInfo, Plugin<Job> plugin, List<Job> objects) {
         cleanUnfinishedJobs(model, index, objects, plugin, report, jobPluginInfo);
       }
     }, index, model, storage, liteList);
   }
 
   private void cleanUnfinishedJobs(ModelService model, IndexService index, List<Job> unfinishedJobsList,
-    Plugin<Job> plugin, Report pluginReport, SimpleJobPluginInfo jobPluginInfo) {
+    Plugin<Job> plugin, Report pluginReport, JobPluginInfo jobPluginInfo) {
     Report reportItem = null;
 
     List<String> jobsToBeDeletedFromIndex = new ArrayList<>();

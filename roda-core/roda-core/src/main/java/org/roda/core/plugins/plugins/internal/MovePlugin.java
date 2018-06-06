@@ -52,7 +52,7 @@ import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAObjectsProcessingLogic;
-import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
+import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
@@ -126,7 +126,7 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
     return PluginHelper.processObjects(this, new RODAObjectsProcessingLogic<T>() {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-        SimpleJobPluginInfo jobPluginInfo, Plugin<T> plugin, List<T> objects) {
+        JobPluginInfo jobPluginInfo, Plugin<T> plugin, List<T> objects) {
         if (!objects.isEmpty()) {
           if (objects.get(0) instanceof AIP) {
             for (T object : objects) {
@@ -144,8 +144,8 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
     }, index, model, storage, liteList);
   }
 
-  private void processAIP(ModelService model, IndexService index, Report report, SimpleJobPluginInfo jobPluginInfo,
-    Job job, AIP aip) {
+  private void processAIP(ModelService model, IndexService index, Report report, JobPluginInfo jobPluginInfo, Job job,
+    AIP aip) {
     PluginState state = PluginState.SUCCESS;
 
     if (!aip.getId().equals(destinationId)) {
@@ -204,8 +204,8 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
       outcomeText, details, job.getUsername(), true);
   }
 
-  private void processFile(IndexService index, ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo,
-    Job job, File file) {
+  private void processFile(IndexService index, ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job,
+    File file) {
     PluginState state = PluginState.SUCCESS;
     StringBuilder outcomeText = new StringBuilder();
 
@@ -256,7 +256,7 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
   }
 
   @SuppressWarnings("unchecked")
-  private void processTransferredResource(ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo, Job job,
+  private void processTransferredResource(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job,
     List<TransferredResource> resources) {
     if (destinationId == null) {
       destinationId = "";
@@ -283,7 +283,7 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
     }
   }
 
-  private void addFailedReport(ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo, Job job,
+  private void addFailedReport(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job,
     String resourceId, Class<T> objectClass) {
     jobPluginInfo.incrementObjectsProcessedWithFailure();
     Report reportItem = PluginHelper.initPluginReportItem(this, resourceId, objectClass);

@@ -37,7 +37,7 @@ import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAObjectProcessingLogic;
-import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
+import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 
@@ -74,7 +74,7 @@ public class DummyListPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
     return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<T>() {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-        SimpleJobPluginInfo jobPluginInfo, Plugin<T> plugin, T object) {
+        JobPluginInfo jobPluginInfo, Plugin<T> plugin, T object) {
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
       }
     }, index, model, storage, liteList);

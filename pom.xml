@@ -112,7 +112,7 @@
 		<grizzly.version>2.3.16</grizzly.version>
 		<jena.version>2.13.0</jena.version>
 		<solr.version>5.5.5</solr.version>
-		<akka.version>2.5.11</akka.version>
+		<akka.version>2.5.13</akka.version>
 		<apacheds.version>2.0.0-M24</apacheds.version>
 		<httpcomponents.version>4.5.5</httpcomponents.version>
 		<poi.version>3.17</poi.version>

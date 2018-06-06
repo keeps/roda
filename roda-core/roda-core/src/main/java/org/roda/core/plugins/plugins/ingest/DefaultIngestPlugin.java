@@ -55,13 +55,16 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.orchestrate.IngestJobPluginInfo;
+import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.plugins.plugins.antivirus.AntivirusPlugin;
 import org.roda.core.plugins.plugins.base.DescriptiveMetadataValidationPlugin;
 import org.roda.core.plugins.plugins.characterization.PremisSkeletonPlugin;
 import org.roda.core.plugins.plugins.characterization.SiegfriedPlugin;
 import org.roda.core.storage.StorageService;
+import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -138,17 +141,24 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> liteList) throws PluginException {
+    return PluginHelper.processObjects(this, new RODAObjectsProcessingLogic<TransferredResource>() {
+      @Override
+      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+        JobPluginInfo jobPluginInfo, Plugin<TransferredResource> plugin, List<TransferredResource> objects) {
+        processObjects(index, model, storage, report, jobPluginInfo, cachedJob, objects);
+      }
+    }, index, model, storage, liteList);
+
+  }
+
+  protected void processObjects(IndexService index, ModelService model, StorageService storage, Report report,
+    JobPluginInfo outerJobPluginInfo, Job cachedJob, List<TransferredResource> resources) {
     try {
       Date startDate = new Date();
-      Report report = PluginHelper.initPluginReport(this);
       Report pluginReport;
 
-      final IngestJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, IngestJobPluginInfo.class);
+      final IngestJobPluginInfo jobPluginInfo = (IngestJobPluginInfo) outerJobPluginInfo;
       PluginHelper.updateJobInformationAsync(this, jobPluginInfo.setTotalSteps(getTotalSteps()));
-
-      Job job = PluginHelper.getJob(this, model);
-      List<TransferredResource> resources = PluginHelper.transformLitesIntoObjects(model, this, report, jobPluginInfo,
-        liteList, job);
 
       // 0) process "parent id" and "force parent id" info. (because we might
       // need to fallback to default values)
@@ -279,13 +289,9 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       // X) final job info update
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformationAsync(this, jobPluginInfo);
-
-      return report;
-    } catch (JobException | AuthorizationDeniedException | NotFoundException | GenericException
-      | RequestNotValidException e) {
-      throw new PluginException("A job exception has occurred", e);
+    } catch (JobException e) {
+      // throw new PluginException("A job exception has occurred", e);
     }
-
   }
 
   @Override

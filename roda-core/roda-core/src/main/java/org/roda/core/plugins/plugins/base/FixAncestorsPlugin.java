@@ -39,7 +39,7 @@ import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAProcessingLogic;
-import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
+import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
@@ -117,7 +117,7 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
     return PluginHelper.processVoids(this, new RODAProcessingLogic<Void>() {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-        SimpleJobPluginInfo jobPluginInfo, Plugin<Void> plugin) {
+        JobPluginInfo jobPluginInfo, Plugin<Void> plugin) {
         fixAncestors(index, model, report, jobPluginInfo, jobPluginInfo.getSourceObjectsCount());
       }
     }, index, model, storage, counter);
@@ -141,7 +141,7 @@ public class FixAncestorsPlugin extends AbstractPlugin<Void> {
     return count;
   }
 
-  private void fixAncestors(IndexService index, ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo,
+  private void fixAncestors(IndexService index, ModelService model, Report report, JobPluginInfo jobPluginInfo,
     int counter) {
     try {
       Optional<String> computedSearchScope = PluginHelper.getSearchScopeFromParameters(this, model);

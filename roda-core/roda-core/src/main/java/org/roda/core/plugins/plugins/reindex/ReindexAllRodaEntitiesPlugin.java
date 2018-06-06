@@ -35,7 +35,7 @@ import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAProcessingLogic;
-import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
+import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.roda.core.util.IdUtils;
@@ -80,13 +80,13 @@ public class ReindexAllRodaEntitiesPlugin extends AbstractPlugin<Void> {
     return PluginHelper.processVoids(this, new RODAProcessingLogic<Void>() {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-        SimpleJobPluginInfo jobPluginInfo, Plugin<Void> plugin) {
+        JobPluginInfo jobPluginInfo, Plugin<Void> plugin) {
         reindexAll(model, report, jobPluginInfo, cachedJob, classes);
       }
     }, index, model, storage, classes.size());
   }
 
-  private void reindexAll(ModelService model, Report pluginReport, SimpleJobPluginInfo jobPluginInfo, Job job,
+  private void reindexAll(ModelService model, Report pluginReport, JobPluginInfo jobPluginInfo, Job job,
     List<Class<? extends IsRODAObject>> classes) {
 
     for (Class<? extends IsRODAObject> reindexClass : classes) {
@@ -101,7 +101,7 @@ public class ReindexAllRodaEntitiesPlugin extends AbstractPlugin<Void> {
   }
 
   private Report reindexRODAObject(ModelService model, Class<? extends IsRODAObject> reindexClass,
-    SimpleJobPluginInfo jobPluginInfo) {
+    JobPluginInfo jobPluginInfo) {
     LOGGER.debug("Creating job to reindexing all {}", reindexClass.getSimpleName());
     Report report = null;
 

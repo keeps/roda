@@ -53,7 +53,7 @@ import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAObjectProcessingLogic;
-import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
+import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
@@ -118,7 +118,7 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<T>() {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-        SimpleJobPluginInfo jobPluginInfo, Plugin<T> plugin, T object) {
+        JobPluginInfo jobPluginInfo, Plugin<T> plugin, T object) {
         if (object instanceof AIP) {
           processAIP(index, model, report, jobPluginInfo, cachedJob, (AIP) object);
         } else if (object instanceof File) {
@@ -134,8 +134,8 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     }, index, model, storage, liteList);
   }
 
-  private void processAIP(IndexService index, ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo,
-    Job job, AIP aip) {
+  private void processAIP(IndexService index, ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job,
+    AIP aip) {
     Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
     reportItem.setPluginState(PluginState.SUCCESS);
 
@@ -219,8 +219,8 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
       reportItem.getPluginState(), outcomeText, details, job.getUsername(), true);
   }
 
-  private void processFile(IndexService index, ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo,
-    Job job, File file) {
+  private void processFile(IndexService index, ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job,
+    File file) {
     PluginState state = PluginState.SUCCESS;
     Report reportItem = PluginHelper.initPluginReportItem(this, file.getId(), File.class);
 
@@ -274,8 +274,8 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
       true);
   }
 
-  private void processRepresentation(IndexService index, ModelService model, Report report,
-    SimpleJobPluginInfo jobPluginInfo, Job job, Representation representation) {
+  private void processRepresentation(IndexService index, ModelService model, Report report, JobPluginInfo jobPluginInfo,
+    Job job, Representation representation) {
     PluginState state = PluginState.SUCCESS;
     Report reportItem = PluginHelper.initPluginReportItem(this, representation.getId(), Representation.class);
 
@@ -325,8 +325,8 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
       EVENT_DESCRIPTION, sources, null, state, outcomeText, details, job.getUsername(), true);
   }
 
-  private void processRisk(IndexService index, ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo,
-    Job job, Risk risk) {
+  private void processRisk(IndexService index, ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job,
+    Risk risk) {
     Report reportItem = PluginHelper.initPluginReportItem(this, risk.getId(), Risk.class);
     PluginState state = PluginState.SUCCESS;
 
@@ -350,8 +350,8 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     jobPluginInfo.incrementObjectsProcessed(state);
   }
 
-  private void processRepresentationInformation(ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo,
-    Job job, RepresentationInformation ri) {
+  private void processRepresentationInformation(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job,
+    RepresentationInformation ri) {
     Report reportItem = PluginHelper.initPluginReportItem(this, ri.getId(), RepresentationInformation.class);
     PluginState state = PluginState.SUCCESS;
 

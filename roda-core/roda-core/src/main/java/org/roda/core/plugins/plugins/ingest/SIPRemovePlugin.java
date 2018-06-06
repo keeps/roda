@@ -26,7 +26,7 @@ import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAObjectProcessingLogic;
-import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
+import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
@@ -76,13 +76,13 @@ public class SIPRemovePlugin extends AbstractPlugin<TransferredResource> {
     return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<TransferredResource>() {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-        SimpleJobPluginInfo jobPluginInfo, Plugin<TransferredResource> plugin, TransferredResource object) {
+        JobPluginInfo jobPluginInfo, Plugin<TransferredResource> plugin, TransferredResource object) {
         processTransferredResource(model, report, jobPluginInfo, cachedJob, object);
       }
     }, index, model, storage, liteList);
   }
 
-  private void processTransferredResource(ModelService model, Report report, SimpleJobPluginInfo pluginInfo, Job job,
+  private void processTransferredResource(ModelService model, Report report, JobPluginInfo pluginInfo, Job job,
     TransferredResource transferredResource) {
     Report reportItem = PluginHelper.initPluginReportItem(this, transferredResource);
     PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);

@@ -30,7 +30,7 @@ import org.testng.Assert;
 import org.testng.AssertJUnit;
 import org.testng.annotations.Test;
 
-@Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_TRAVIS})
+@Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_DEV, RodaConstants.TEST_GROUP_TRAVIS})
 public class MetadataFileUtilsEscapeTest {
 
   @Test
@@ -89,7 +89,7 @@ public class MetadataFileUtilsEscapeTest {
     }
   }
 
-  public static InputStream documentToPrettyInputStream(Document document) throws IOException {
+  private static InputStream documentToPrettyInputStream(Document document) throws IOException {
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     XMLWriter xmlWriter = new XMLWriter(outputStream, OutputFormat.createPrettyPrint());
     xmlWriter.write(document);

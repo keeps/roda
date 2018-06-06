@@ -41,7 +41,7 @@ import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAObjectsProcessingLogic;
-import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
+import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
@@ -112,13 +112,13 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
     return PluginHelper.processObjects(this, new RODAObjectsProcessingLogic<T>() {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-        SimpleJobPluginInfo jobPluginInfo, Plugin<T> plugin, List<T> objects) {
+        JobPluginInfo jobPluginInfo, Plugin<T> plugin, List<T> objects) {
         reindex(index, model, report, jobPluginInfo, cachedJob, objects);
       }
     }, index, model, storage, liteList);
   }
 
-  private void reindex(IndexService index, ModelService model, Report pluginReport, SimpleJobPluginInfo jobPluginInfo,
+  private void reindex(IndexService index, ModelService model, Report pluginReport, JobPluginInfo jobPluginInfo,
     Job job, List<T> list) {
     pluginReport.setPluginState(PluginState.SUCCESS);
 

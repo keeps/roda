@@ -35,7 +35,7 @@ import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAProcessingLogic;
-import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
+import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.roda.core.util.IdUtils;
@@ -132,14 +132,14 @@ public class ReindexActionLogPlugin extends AbstractPlugin<Void> {
     return PluginHelper.processVoids(this, new RODAProcessingLogic<Void>() {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-        SimpleJobPluginInfo jobPluginInfo, Plugin<Void> plugin) {
+        JobPluginInfo jobPluginInfo, Plugin<Void> plugin) {
         reindexActionLogs(index, model, report, cachedJob, jobPluginInfo);
       }
     }, index, model, storage);
   }
 
   private void reindexActionLogs(IndexService index, ModelService model, Report report, Job job,
-    SimpleJobPluginInfo jobPluginInfo) {
+    JobPluginInfo jobPluginInfo) {
     report.setPluginState(PluginState.SUCCESS);
 
     for (OptionalWithCause<LogEntry> logEntry : model.listLogEntries(dontReindexOlderThanXDays)) {

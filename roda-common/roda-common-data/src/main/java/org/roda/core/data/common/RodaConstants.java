@@ -1340,6 +1340,7 @@ public final class RodaConstants {
 
   /* Test groups */
   public static final String TEST_GROUP_ALL = "all";
+  public static final String TEST_GROUP_DEV = "dev";
   public static final String TEST_GROUP_TRAVIS = "travis";
   public static final String TEST_GROUP_PLUGIN = "plugin";
 

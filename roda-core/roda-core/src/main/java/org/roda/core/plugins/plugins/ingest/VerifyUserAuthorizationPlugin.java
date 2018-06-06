@@ -36,7 +36,7 @@ import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAObjectProcessingLogic;
-import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
+import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
@@ -90,14 +90,14 @@ public class VerifyUserAuthorizationPlugin extends AbstractPlugin<AIP> {
     return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<AIP>() {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-        SimpleJobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {
+        JobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {
         processAIP(index, model, report, cachedJob, jobPluginInfo, object);
       }
     }, index, model, storage, liteList);
   }
 
   private void processAIP(IndexService index, ModelService model, Report report, Job currentJob,
-    SimpleJobPluginInfo jobPluginInfo, AIP aip) {
+    JobPluginInfo jobPluginInfo, AIP aip) {
     LOGGER.debug("Checking user authorization for creating AIP {}", aip.getId());
 
     Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);

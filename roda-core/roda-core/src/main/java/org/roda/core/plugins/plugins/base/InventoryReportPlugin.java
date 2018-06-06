@@ -24,7 +24,6 @@ import java.util.Map;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
@@ -43,8 +42,7 @@ import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAObjectProcessingLogic;
-import org.roda.core.plugins.RODAProcessingLogic;
-import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
+import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
@@ -211,22 +209,13 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
     Path csvTempFile = jobCSVTempFolder.resolve(IdUtils.createUUID() + ".csv");
 
     CSVFormat csvFileFormat = CSVFormat.DEFAULT.withRecordSeparator("\n");
-    try {
-      // this writer is closed on the afterLogic method
-      BufferedWriter fileWriter = Files.newBufferedWriter(csvTempFile);
-      CSVPrinter csvFilePrinter = new CSVPrinter(fileWriter, csvFileFormat);
-
+    try (BufferedWriter fileWriter = Files.newBufferedWriter(csvTempFile);
+      CSVPrinter csvFilePrinter = new CSVPrinter(fileWriter, csvFileFormat)) {
       return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<AIP>() {
         @Override
-        public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-          SimpleJobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {
+        public void process(IndexService index, ModelService model, StorageService storage, Report report,
+          Job cachedJob, JobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {
           processAIP(model, storage, jobPluginInfo, csvFilePrinter, object);
-        }
-      }, new RODAProcessingLogic<AIP>() {
-        @Override
-        public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-          SimpleJobPluginInfo jobPluginInfo, Plugin<AIP> plugin) {
-          IOUtils.closeQuietly(csvFilePrinter);
         }
       }, index, model, storage, liteList);
     } catch (IOException e) {
@@ -234,7 +223,7 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
     }
   }
 
-  private void processAIP(ModelService model, StorageService storage, SimpleJobPluginInfo jobPluginInfo,
+  private void processAIP(ModelService model, StorageService storage, JobPluginInfo jobPluginInfo,
     CSVPrinter csvFilePrinter, AIP aip) {
     if (csvFilePrinter == null) {
       LOGGER.warn("CSVPrinter is NULL! Skipping...");

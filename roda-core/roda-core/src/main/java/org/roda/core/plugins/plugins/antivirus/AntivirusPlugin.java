@@ -36,7 +36,7 @@ import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAObjectProcessingLogic;
-import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
+import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.StorageService;
@@ -107,14 +107,14 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
     return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<AIP>() {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-        SimpleJobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {
+        JobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {
         processAIP(index, model, storage, report, jobPluginInfo, cachedJob, object);
       }
     }, index, model, storage, liteList);
   }
 
   private void processAIP(IndexService index, ModelService model, StorageService storage, Report report,
-    SimpleJobPluginInfo jobPluginInfo, Job job, AIP aip) {
+    JobPluginInfo jobPluginInfo, Job job, AIP aip) {
     Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
     PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
     PluginState reportState = PluginState.SUCCESS;

@@ -37,7 +37,7 @@ import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAProcessingLogic;
-import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
+import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
@@ -114,13 +114,13 @@ public class ReindexPreservationAgentPlugin extends AbstractPlugin<Void> {
     return PluginHelper.processVoids(this, new RODAProcessingLogic<Void>() {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-        SimpleJobPluginInfo jobPluginInfo, Plugin<Void> plugin) {
+        JobPluginInfo jobPluginInfo, Plugin<Void> plugin) {
         reindexPreservationAgents(model, report, jobPluginInfo);
       }
     }, index, model, storage);
   }
 
-  private void reindexPreservationAgents(ModelService model, Report pluginReport, SimpleJobPluginInfo jobPluginInfo) {
+  private void reindexPreservationAgents(ModelService model, Report pluginReport, JobPluginInfo jobPluginInfo) {
     pluginReport.setPluginState(PluginState.SUCCESS);
 
     CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable = null;

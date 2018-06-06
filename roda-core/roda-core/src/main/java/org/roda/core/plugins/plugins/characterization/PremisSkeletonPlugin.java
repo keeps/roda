@@ -41,6 +41,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractAIPComponentsPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
@@ -105,7 +106,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
 
   @Override
   public Report executeOnAIP(IndexService index, ModelService model, StorageService storage, Report report,
-    SimpleJobPluginInfo jobPluginInfo, List<AIP> list, Job job) throws PluginException {
+    JobPluginInfo jobPluginInfo, List<AIP> list, Job job) throws PluginException {
 
     try {
       List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
@@ -199,7 +200,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
 
   @Override
   public Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage, Report report,
-    SimpleJobPluginInfo jobPluginInfo, List<Representation> list, Job job) throws PluginException {
+    JobPluginInfo jobPluginInfo, List<Representation> list, Job job) throws PluginException {
 
     List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
     for (Representation representation : list) {
@@ -238,7 +239,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
 
   @Override
   public Report executeOnFile(IndexService index, ModelService model, StorageService storage, Report report,
-    SimpleJobPluginInfo jobPluginInfo, List<File> list, Job job) throws PluginException {
+    JobPluginInfo jobPluginInfo, List<File> list, Job job) throws PluginException {
 
     List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
     for (File file : list) {

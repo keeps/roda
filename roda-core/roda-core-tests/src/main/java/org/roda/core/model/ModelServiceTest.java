@@ -98,7 +98,7 @@ import jersey.repackaged.com.google.common.collect.Lists;
  * @see ModelService
  */
 // @PrepareForTest({})
-@Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_TRAVIS})
+@Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_DEV, RodaConstants.TEST_GROUP_TRAVIS})
 public class ModelServiceTest {
   private static final Logger LOGGER = LoggerFactory.getLogger(ModelServiceTest.class);
   private static final String ROLE1 = RodaConstants.REPOSITORY_PERMISSIONS_DESCRIPTIVE_METADATA_UPDATE;

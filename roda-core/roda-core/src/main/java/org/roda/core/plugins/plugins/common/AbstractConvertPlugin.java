@@ -58,7 +58,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractAIPComponentsPlugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
+import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.plugins.plugins.characterization.PremisSkeletonPluginUtils;
 import org.roda.core.storage.Binary;
@@ -85,11 +85,10 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INPUT_FORMAT,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_INPUT_FORMAT, "Input format", PluginParameterType.STRING, "",
-        true, false,
-        "Input file format to be converted (check documentation for list of supported formats). If the input file format is not specified, the task will"
-          + " run on all supported formats (check roda-core-formats.properties for list of supported formats)."));
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INPUT_FORMAT, new PluginParameter(
+      RodaConstants.PLUGIN_PARAMS_INPUT_FORMAT, "Input format", PluginParameterType.STRING, "", true, false,
+      "Input file format to be converted (check documentation for list of supported formats). If the input file format is not specified, the task will"
+        + " run on all supported formats (check roda-core-formats.properties for list of supported formats)."));
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OUTPUT_FORMAT,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_OUTPUT_FORMAT, "Output format", PluginParameterType.STRING, "",
@@ -236,7 +235,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
 
   @Override
   protected Report executeOnAIP(IndexService index, ModelService model, StorageService storage, Report report,
-    SimpleJobPluginInfo jobPluginInfo, List<AIP> list, Job job) throws PluginException {
+    JobPluginInfo jobPluginInfo, List<AIP> list, Job job) throws PluginException {
     for (AIP aip : list) {
       LOGGER.debug("Processing AIP {}", aip.getId());
       List<String> newRepresentations = new ArrayList<>();
@@ -435,7 +434,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
 
   @Override
   protected Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage,
-    Report report, SimpleJobPluginInfo jobPluginInfo, List<Representation> list, Job job) throws PluginException {
+    Report report, JobPluginInfo jobPluginInfo, List<Representation> list, Job job) throws PluginException {
     List<String> newRepresentations = new ArrayList<>();
     String aipId = null;
 
@@ -632,7 +631,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
 
   @Override
   protected Report executeOnFile(IndexService index, ModelService model, StorageService storage, Report report,
-    SimpleJobPluginInfo jobPluginInfo, List<File> list, Job job) throws PluginException {
+    JobPluginInfo jobPluginInfo, List<File> list, Job job) throws PluginException {
 
     Map<String, String> changedRepresentationsOnAIPs = new HashMap<>();
     boolean notify = true;

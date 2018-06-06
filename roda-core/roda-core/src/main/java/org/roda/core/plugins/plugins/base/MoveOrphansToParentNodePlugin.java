@@ -32,7 +32,7 @@ import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAObjectsProcessingLogic;
-import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
+import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
@@ -99,13 +99,13 @@ public class MoveOrphansToParentNodePlugin extends AbstractPlugin<AIP> {
     return PluginHelper.processObjects(this, new RODAObjectsProcessingLogic<AIP>() {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-        SimpleJobPluginInfo jobPluginInfo, Plugin<AIP> plugin, List<AIP> objects) {
+        JobPluginInfo jobPluginInfo, Plugin<AIP> plugin, List<AIP> objects) {
         processAIPs(model, jobPluginInfo, cachedJob, objects);
       }
     }, index, model, storage, liteList);
   }
 
-  private void processAIPs(ModelService model, SimpleJobPluginInfo jobPluginInfo, Job cachedJob, List<AIP> list) {
+  private void processAIPs(ModelService model, JobPluginInfo jobPluginInfo, Job cachedJob, List<AIP> list) {
     for (AIP aip : list) {
       try {
         LOGGER.debug("Processing AIP {}", aip.getId());

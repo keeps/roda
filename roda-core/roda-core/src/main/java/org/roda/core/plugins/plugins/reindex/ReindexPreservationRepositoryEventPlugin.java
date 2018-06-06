@@ -36,7 +36,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
+import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
@@ -113,7 +113,7 @@ public class ReindexPreservationRepositoryEventPlugin extends AbstractPlugin<Voi
     Report pluginReport = PluginHelper.initPluginReport(this);
 
     try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
+      JobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, list.size());
       jobPluginInfo.setSourceObjectsCount(0);
       PluginHelper.updateJobInformationAsync(this, jobPluginInfo);
       pluginReport.setPluginState(PluginState.SUCCESS);

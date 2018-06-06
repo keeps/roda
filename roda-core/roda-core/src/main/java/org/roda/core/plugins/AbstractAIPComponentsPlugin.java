@@ -25,7 +25,7 @@ import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
-import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
+import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
@@ -40,7 +40,7 @@ public abstract class AbstractAIPComponentsPlugin<T extends IsRODAObject> extend
     return PluginHelper.processObjects(this, new RODAObjectsProcessingLogic<T>() {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-        SimpleJobPluginInfo jobPluginInfo, Plugin<T> plugin, List<T> objects) {
+        JobPluginInfo jobPluginInfo, Plugin<T> plugin, List<T> objects) {
         if (!objects.isEmpty()) {
           try {
             if (objects.get(0) instanceof AIP) {
@@ -65,16 +65,16 @@ public abstract class AbstractAIPComponentsPlugin<T extends IsRODAObject> extend
   }
 
   protected abstract Report executeOnAIP(IndexService index, ModelService model, StorageService storage, Report report,
-    SimpleJobPluginInfo jobPluginInfo, List<AIP> list, Job job) throws PluginException;
+    JobPluginInfo jobPluginInfo, List<AIP> list, Job job) throws PluginException;
 
   protected abstract Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage,
-    Report report, SimpleJobPluginInfo jobPluginInfo, List<Representation> list, Job job) throws PluginException;
+    Report report, JobPluginInfo jobPluginInfo, List<Representation> list, Job job) throws PluginException;
 
   protected abstract Report executeOnFile(IndexService index, ModelService model, StorageService storage, Report report,
-    SimpleJobPluginInfo jobPluginInfo, List<File> list, Job job) throws PluginException;
+    JobPluginInfo jobPluginInfo, List<File> list, Job job) throws PluginException;
 
   protected Report executeOnIncidence(IndexService index, ModelService model, StorageService storage, Report report,
-    SimpleJobPluginInfo jobPluginInfo, List<RiskIncidence> list, Job job) throws PluginException {
+    JobPluginInfo jobPluginInfo, List<RiskIncidence> list, Job job) throws PluginException {
 
     List<File> fileList = new ArrayList<>();
     List<Representation> representationList = new ArrayList<>();

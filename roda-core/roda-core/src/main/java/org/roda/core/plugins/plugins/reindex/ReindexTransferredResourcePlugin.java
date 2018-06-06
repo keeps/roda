@@ -37,7 +37,7 @@ import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAProcessingLogic;
-import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
+import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
@@ -116,13 +116,13 @@ public class ReindexTransferredResourcePlugin extends AbstractPlugin<Void> {
     return PluginHelper.processVoids(this, new RODAProcessingLogic<Void>() {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-        SimpleJobPluginInfo jobPluginInfo, Plugin<Void> plugin) {
+        JobPluginInfo jobPluginInfo, Plugin<Void> plugin) {
         reindexTransferredResources(report, jobPluginInfo);
       }
     }, index, model, storage);
   }
 
-  private void reindexTransferredResources(Report report, SimpleJobPluginInfo jobPluginInfo) {
+  private void reindexTransferredResources(Report report, JobPluginInfo jobPluginInfo) {
     report.setPluginState(PluginState.SUCCESS);
     jobPluginInfo.setSourceObjectsCount(resourceCounter);
     try {

@@ -49,6 +49,8 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.RODAObjectsProcessingLogic;
+import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.DefaultStoragePath;
@@ -147,52 +149,42 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> liteList) throws PluginException {
-    // FIXME 20170113 hsilva: see how to put this plugin using
-    // PluginHelper.processObjects
-    Report report = PluginHelper.initPluginReport(this);
-    try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(this, liteList.size());
-      PluginHelper.updateJobInformationAsync(this, jobPluginInfo);
+    return PluginHelper.processObjects(this, new RODAObjectsProcessingLogic<AIP>() {
 
-      Job job = PluginHelper.getJob(this, model);
-      List<AIP> aips = PluginHelper.transformLitesIntoObjects(model, this, report, jobPluginInfo, liteList, job);
-
-      Path outputPath = Paths.get(outputFolder);
-      String error = null;
-      try {
-        if (!FSUtils.exists(outputPath)) {
-          Files.createDirectories(outputPath);
+      @Override
+      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+        JobPluginInfo jobPluginInfo, Plugin<AIP> plugin, List<AIP> aips) {
+        Path outputPath = Paths.get(outputFolder);
+        String error = null;
+        try {
+          if (!FSUtils.exists(outputPath)) {
+            Files.createDirectories(outputPath);
+          }
+          if (!Files.isWritable(outputPath)) {
+            error = "No permissions to write to " + outputPath.toString();
+          }
+        } catch (IOException e) {
+          LOGGER.error("Error creating base folder: " + e.getMessage());
+          error = e.getMessage();
         }
-        if (!Files.isWritable(outputPath)) {
-          error = "No permissions to write to " + outputPath.toString();
+
+        if (error == null && exportType == ExportType.ZIP) {
+          report = exportMultiZip(aips, outputPath, report, model, index, storage, jobPluginInfo, cachedJob);
+        } else if (error == null && exportType == ExportType.FOLDER) {
+          report = exportFolders(aips, storage, model, index, report, jobPluginInfo, cachedJob);
+        } else if (error != null) {
+          jobPluginInfo.incrementObjectsProcessedWithFailure(aips.size());
+          report.setCompletionPercentage(100);
+          report.setPluginState(PluginState.FAILURE);
+          report.setPluginDetails("Error exporting AIPs: " + error);
         }
-      } catch (IOException e) {
-        LOGGER.error("Error creating base folder: " + e.getMessage());
-        error = e.getMessage();
       }
+    }, index, model, storage, liteList);
 
-      if (error == null && exportType == ExportType.ZIP) {
-        report = exportMultiZip(aips, outputPath, report, model, index, storage, jobPluginInfo, job);
-      } else if (error == null && exportType == ExportType.FOLDER) {
-        report = exportFolders(aips, storage, model, index, report, jobPluginInfo, job);
-      } else if (error != null) {
-        jobPluginInfo.incrementObjectsProcessedWithFailure(aips.size());
-        report.setCompletionPercentage(100);
-        report.setPluginState(PluginState.FAILURE);
-        report.setPluginDetails("Error exporting AIPs: " + error);
-      }
-
-      jobPluginInfo.finalizeInfo();
-      PluginHelper.updateJobInformationAsync(this, jobPluginInfo);
-    } catch (JobException | AuthorizationDeniedException | NotFoundException | GenericException
-      | RequestNotValidException e) {
-      LOGGER.error("Could not update Job information");
-    }
-    return report;
   }
 
   private Report exportFolders(List<AIP> aips, StorageService storage, ModelService model, IndexService index,
-    Report report, SimpleJobPluginInfo jobPluginInfo, Job job) {
+    Report report, JobPluginInfo jobPluginInfo, Job job) {
     try {
       FileStorageService localStorage = new FileStorageService(Paths.get(outputFolder), false, null, false);
       for (AIP aip : aips) {
@@ -241,7 +233,7 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
   }
 
   private Report exportMultiZip(List<AIP> aips, Path outputPath, Report report, ModelService model, IndexService index,
-    StorageService storage, SimpleJobPluginInfo jobPluginInfo, Job job) {
+    StorageService storage, JobPluginInfo jobPluginInfo, Job job) {
     for (AIP aip : aips) {
       LOGGER.debug("Exporting AIP {} to ZIP", aip.getId());
       OutputStream os = null;

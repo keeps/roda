@@ -38,7 +38,7 @@ import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAProcessingLogic;
-import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
+import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
@@ -80,7 +80,7 @@ public class CleanupFailedIngestAIPsPlugin extends AbstractPlugin<Void> {
     return PluginHelper.processVoids(this, new RODAProcessingLogic<Void>() {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-        SimpleJobPluginInfo jobPluginInfo, Plugin<Void> plugin) {
+        JobPluginInfo jobPluginInfo, Plugin<Void> plugin) {
         try {
           processAIPs(index, model, report, cachedJob, jobPluginInfo);
         } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
@@ -90,8 +90,7 @@ public class CleanupFailedIngestAIPsPlugin extends AbstractPlugin<Void> {
     }, index, model, storage);
   }
 
-  private void processAIPs(IndexService index, ModelService model, Report report, Job job,
-    SimpleJobPluginInfo jobPluginInfo)
+  private void processAIPs(IndexService index, ModelService model, Report report, Job job, JobPluginInfo jobPluginInfo)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
     // jobs that are running
     List<String> activeJobsIds = findActiveJobs(index);

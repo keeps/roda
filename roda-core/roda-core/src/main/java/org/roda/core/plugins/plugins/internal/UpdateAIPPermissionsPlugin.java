@@ -40,7 +40,7 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.RODAProcessingLogic;
-import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
+import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 
@@ -142,7 +142,7 @@ public class UpdateAIPPermissionsPlugin extends AbstractPlugin<AIP> {
 
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-        SimpleJobPluginInfo jobPluginInfo, Plugin<AIP> plugin) {
+        JobPluginInfo jobPluginInfo, Plugin<AIP> plugin) {
         if (StringUtils.isNotBlank(permissionJson)) {
           try {
             permissions = JsonUtils.getObjectFromJson(permissionJson, Permissions.class);
@@ -162,13 +162,13 @@ public class UpdateAIPPermissionsPlugin extends AbstractPlugin<AIP> {
     }, new RODAObjectProcessingLogic<AIP>() {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-        SimpleJobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {
+        JobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {
         processAIP(model, report, jobPluginInfo, cachedJob, object);
       }
     }, index, model, storage, liteList);
   }
 
-  private void processAIP(ModelService model, Report report, SimpleJobPluginInfo jobPluginInfo, Job job, AIP aip) {
+  private void processAIP(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job, AIP aip) {
     PluginState state = PluginState.SUCCESS;
     aip.setPermissions(permissions);
 
