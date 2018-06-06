@@ -51,7 +51,6 @@ public class TransferUpdateStatus {
           String ancestorRelativePath = StringUtils.join(split, "/");
           ret = isUpdatingFolderStatus.contains(ancestorRelativePath);
         }
-
       }
     }
 

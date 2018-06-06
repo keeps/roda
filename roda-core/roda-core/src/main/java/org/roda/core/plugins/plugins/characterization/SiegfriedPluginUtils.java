@@ -7,6 +7,7 @@
  */
 package org.roda.core.plugins.plugins.characterization;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -15,12 +16,10 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -91,7 +90,7 @@ public class SiegfriedPluginUtils {
       String siegfriedPath = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "siegfried", "binary");
       List<String> command = new ArrayList<>(Arrays.asList(siegfriedPath, "--version"));
       String siegfriedOutput = CommandUtility.execute(command);
-      StringBuilder result = new StringBuilder("");
+      StringBuilder result = new StringBuilder();
 
       if (siegfriedOutput.contains("\n")) {
         result.append(siegfriedOutput.split("\\n")[0].split(" ")[1]);
@@ -111,39 +110,41 @@ public class SiegfriedPluginUtils {
     } catch (CommandException ce) {
       LOGGER.error("Error getting Siegfried version: " + ce.getMessage(), ce);
     }
+
     return null;
   }
 
   public static <T extends IsRODAObject> List<LinkingIdentifier> runSiegfriedOnRepresentation(ModelService model,
-    Representation representation) throws GenericException, RequestNotValidException, AlreadyExistsException,
-    NotFoundException, AuthorizationDeniedException, PluginException {
-
+    Representation representation) throws GenericException, RequestNotValidException, NotFoundException,
+    AuthorizationDeniedException, PluginException {
     StoragePath representationDataPath = ModelUtils.getRepresentationDataStoragePath(representation.getAipId(),
       representation.getId());
-    DirectResourceAccess directAccess = model.getStorage().getDirectAccess(representationDataPath);
 
-    Path representationFsPath = directAccess.getPath();
-    List<LinkingIdentifier> sources = runSiegfriedOnRepresentationOrFile(model, representation.getAipId(),
-      representation.getId(), new ArrayList<>(), null, representationFsPath);
+    try (DirectResourceAccess directAccess = model.getStorage().getDirectAccess(representationDataPath)) {
+      Path representationFsPath = directAccess.getPath();
+      List<LinkingIdentifier> sources = runSiegfriedOnRepresentationOrFile(model, representation.getAipId(),
+        representation.getId(), new ArrayList<>(), null, representationFsPath);
 
-    IOUtils.closeQuietly(directAccess);
-    return sources;
+      return sources;
+    } catch (IOException e) {
+      throw new GenericException(e);
+    }
   }
 
   public static <T extends IsRODAObject> List<LinkingIdentifier> runSiegfriedOnFile(ModelService model, File file)
-    throws GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException,
-    AuthorizationDeniedException, PluginException {
-
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException,
+    PluginException {
     StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
-    DirectResourceAccess directAccess = model.getStorage().getDirectAccess(fileStoragePath);
 
-    Path filePath = directAccess.getPath();
-    List<LinkingIdentifier> sources = runSiegfriedOnRepresentationOrFile(model, file.getAipId(),
-      file.getRepresentationId(), file.getPath(), file.getId(), filePath);
-    IOUtils.closeQuietly(directAccess);
-
-    model.notifyFileUpdated(file).failOnError();
-    return sources;
+    try (DirectResourceAccess directAccess = model.getStorage().getDirectAccess(fileStoragePath)) {
+      Path filePath = directAccess.getPath();
+      List<LinkingIdentifier> sources = runSiegfriedOnRepresentationOrFile(model, file.getAipId(),
+        file.getRepresentationId(), file.getPath(), file.getId(), filePath);
+      model.notifyFileUpdated(file).failOnError();
+      return sources;
+    } catch (IOException e) {
+      throw new GenericException(e);
+    }
   }
 
   private static <T extends IsRODAObject> List<LinkingIdentifier> runSiegfriedOnRepresentationOrFile(ModelService model,
@@ -154,24 +155,24 @@ public class SiegfriedPluginUtils {
 
     if (FSUtils.exists(path)) {
       String siegfriedOutput = SiegfriedPluginUtils.runSiegfriedOnPath(path);
-
       final JsonNode jsonObject = JsonUtils.parseJson(siegfriedOutput);
       final JsonNode files = jsonObject.get("files");
 
       for (JsonNode file : files) {
         Path fullFsPath = Paths.get(file.get("filename").asText());
         Path relativeFsPath = path.relativize(fullFsPath);
-
         String jsonFileId = fullFsPath.getFileName().toString();
 
         List<String> jsonFilePath = new ArrayList<>(fileDirectoryPath);
         if (fileId != null) {
           jsonFilePath.add(fileId);
         }
+
         for (int j = 0; j < relativeFsPath.getNameCount()
           && StringUtils.isNotBlank(relativeFsPath.getName(j).toString()); j++) {
           jsonFilePath.add(relativeFsPath.getName(j).toString());
         }
+
         jsonFilePath.remove(jsonFilePath.size() - 1);
 
         ContentPayload payload = new StringContentPayload(file.toString());
@@ -216,5 +217,4 @@ public class SiegfriedPluginUtils {
 
     return sources;
   }
-
 }

@@ -15,12 +15,10 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.xmlbeans.XmlException;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
@@ -57,7 +55,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-@Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_TRAVIS})
+@Test(groups = {RodaConstants.TEST_GROUP_TRAVIS})
 public class FilterTest {
   private static final Logger LOGGER = LoggerFactory.getLogger(FilterTest.class);
 
@@ -74,7 +72,7 @@ public class FilterTest {
   private static final String REPRESENTATION_ID = CorporaConstants.REPRESENTATION_1_ID;
 
   @BeforeClass
-  public static void setUp() throws IOException, URISyntaxException, GenericException {
+  public static void setUp() throws URISyntaxException, GenericException {
     URL corporaURL = ModelServiceTest.class.getResource("/corpora");
     corporaPath = Paths.get(corporaURL.toURI());
     corporaService = new FileStorageService(corporaPath);
@@ -82,7 +80,7 @@ public class FilterTest {
   }
 
   @BeforeClass
-  public void init() throws IOException, GenericException {
+  public void init() throws IOException {
     basePath = TestsHelper.createBaseTempDir(getClass(), true);
 
     boolean deploySolr = true;
@@ -107,7 +105,7 @@ public class FilterTest {
   }
 
   @Test
-  public void testFiltersWhenDeletingAIPRecursively() throws RODAException, ParseException, IOException, XmlException {
+  public void testFiltersWhenDeletingAIPRecursively() throws RODAException {
     AIP aip = model.createAIP(IdUtils.createUUID(), corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_EMPTY),
       RodaConstants.ADMIN);
@@ -131,7 +129,7 @@ public class FilterTest {
   }
 
   @Test
-  public void testRunFromFilter() throws RODAException, ParseException, IOException, XmlException {
+  public void testRunFromFilter() throws RODAException {
     AIP aip = model.createAIP(IdUtils.createUUID(), corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
       RodaConstants.ADMIN);
@@ -161,7 +159,7 @@ public class FilterTest {
   }
 
   @Test
-  public void testRunFromFilterWithDeleteThread() throws RODAException, ParseException, IOException, XmlException {
+  public void testRunFromFilterWithDeleteThread() throws RODAException {
     AIP aip = model.createAIP(IdUtils.createUUID(), corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
       RodaConstants.ADMIN);
@@ -212,8 +210,7 @@ public class FilterTest {
       try {
         String id = "file_" + i;
         String uuid = IdUtils.getFileId(aip.getId(), REPRESENTATION_ID, filePath, id);
-        index.retrieve(IndexedFile.class, uuid,
-          Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.FILE_HASH));
+        index.retrieve(IndexedFile.class, uuid, Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.FILE_HASH));
 
         // assertTrue("File " + id + " has no hash field", 0 <
         // file.getHash().size());
@@ -227,7 +224,7 @@ public class FilterTest {
   }
 
   @Test
-  public void testRunFromFilterWithCreateThread() throws RODAException, ParseException, IOException, XmlException {
+  public void testRunFromFilterWithCreateThread() throws RODAException {
     AIP aip = model.createAIP(IdUtils.createUUID(), corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
       RodaConstants.ADMIN);

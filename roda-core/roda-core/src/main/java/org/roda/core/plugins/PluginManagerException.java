@@ -25,8 +25,7 @@ public class PluginManagerException extends RODAException {
   }
 
   /**
-   * Constructs a new {@link PluginManagerException} with the given error
-   * message.
+   * Constructs a new {@link PluginManagerException} with the given error message.
    * 
    * @param message
    *          the error message.
@@ -47,8 +46,8 @@ public class PluginManagerException extends RODAException {
   }
 
   /**
-   * Constructs a new {@link PluginManagerException} with the given error
-   * message and cause exception.
+   * Constructs a new {@link PluginManagerException} with the given error message
+   * and cause exception.
    * 
    * @param message
    *          the error message.

@@ -15,10 +15,8 @@ import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.jobs.Job;
@@ -111,24 +109,15 @@ public class ReindexPreservationAIPEventPlugin extends AbstractPlugin<AIP> {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {
-        processAIP(index, storage, report, jobPluginInfo, cachedJob, object);
+        processAIP(index, report, jobPluginInfo, object);
       }
     }, index, model, storage, liteList);
   }
 
-  public Report processAIP(IndexService index, StorageService storage, Report report, JobPluginInfo jobPluginInfo,
-    Job job, AIP aip) {
+  public Report processAIP(IndexService index, Report report, JobPluginInfo jobPluginInfo, AIP aip) {
     report.setPluginState(PluginState.SUCCESS);
-
-    try {
-      index.reindexAIPPreservationEvents(aip);
-      jobPluginInfo.incrementObjectsProcessedWithSuccess();
-    } catch (AuthorizationDeniedException | RequestNotValidException | GenericException e) {
-      LOGGER.error("Error reindexing preservation events");
-      jobPluginInfo.incrementObjectsProcessedWithFailure();
-      report.setPluginState(PluginState.FAILURE).addPluginDetails("Could not add preservation events: " + e.getCause());
-    }
-
+    index.reindexAIPPreservationEvents(aip);
+    jobPluginInfo.incrementObjectsProcessedWithSuccess();
     return report;
   }
 

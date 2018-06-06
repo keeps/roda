@@ -447,7 +447,7 @@ public class SeleniumUtils {
     Thread.sleep(1000);
   }
 
-  private static void sendPostRequest(String source) throws UnsupportedEncodingException {
+  private static void sendPostRequest(String source) {
     CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 
     MultipartEntityBuilder builder = MultipartEntityBuilder.create();

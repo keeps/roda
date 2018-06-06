@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.xmlbeans.XmlException;
 import org.roda.core.common.PremisV3Utils;
@@ -53,8 +52,9 @@ public class InventoryReportPluginUtils {
     try (FileChannel out = FileChannel.open(mergedFile, StandardOpenOption.APPEND, StandardOpenOption.WRITE)) {
       for (Path path : files) {
         try (FileChannel in = FileChannel.open(path, StandardOpenOption.READ)) {
-          for (long p = 0, l = in.size(); p < l;)
+          for (long p = 0, l = in.size(); p < l;) {
             p += in.transferTo(p, l - p, out);
+          }
         }
       }
     } catch (IOException e) {
@@ -67,9 +67,8 @@ public class InventoryReportPluginUtils {
     List<List<String>> dataInformation = new ArrayList<>();
     for (Representation representation : aip.getRepresentations()) {
       boolean recursive = true;
-      try {
-        CloseableIterable<OptionalWithCause<File>> representationFiles = model.listFilesUnder(aip.getId(),
-          representation.getId(), recursive);
+      try (CloseableIterable<OptionalWithCause<File>> representationFiles = model.listFilesUnder(aip.getId(),
+        representation.getId(), recursive)) {
         for (OptionalWithCause<File> subfile : representationFiles) {
           if (subfile.isPresent()) {
             dataInformation.add(retrieveFileInfo(fields, subfile.get(), aip, model, storage));
@@ -77,8 +76,8 @@ public class InventoryReportPluginUtils {
             LOGGER.error("Cannot retrieve file information", subfile.getCause());
           }
         }
-        IOUtils.closeQuietly(representationFiles);
-      } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException
+        | IOException e) {
         LOGGER.error("Error retrieving files of representation '{}' of AIP '{}': " + e.getMessage(),
           representation.getId(), aip.getId());
       }
@@ -92,6 +91,7 @@ public class InventoryReportPluginUtils {
     for (DescriptiveMetadata dm : aip.getDescriptiveMetadata()) {
       descriptiveMetadataInformation.add(retrieveDescriptiveMetadataInfo(fields, aip, dm, storage));
     }
+
     if (aip.getRepresentations() != null) {
       for (Representation r : aip.getRepresentations()) {
         for (DescriptiveMetadata dm : r.getDescriptiveMetadata()) {
@@ -99,8 +99,8 @@ public class InventoryReportPluginUtils {
         }
       }
     }
-    return descriptiveMetadataInformation;
 
+    return descriptiveMetadataInformation;
   }
 
   private static List<String> retrieveDescriptiveMetadataInfo(List<String> fields, AIP aip, DescriptiveMetadata dm,
@@ -219,9 +219,9 @@ public class InventoryReportPluginUtils {
   public static List<List<String>> getOtherMetadataInformation(List<String> fields, String otherMetadataType, AIP aip,
     ModelService model, StorageService storage) {
     List<List<String>> otherMetadataInformation = new ArrayList<>();
-    try {
-      CloseableIterable<OptionalWithCause<OtherMetadata>> otherMetadatas = model.listOtherMetadata(aip.getId(),
-        otherMetadataType, true);
+
+    try (CloseableIterable<OptionalWithCause<OtherMetadata>> otherMetadatas = model.listOtherMetadata(aip.getId(),
+      otherMetadataType, true)) {
       for (OptionalWithCause<OtherMetadata> otherMetadata : otherMetadatas) {
         if (otherMetadata.isPresent()) {
           otherMetadataInformation.add(retrieveOtherMetadataInfo(fields, otherMetadata.get(), aip, storage));
@@ -229,10 +229,11 @@ public class InventoryReportPluginUtils {
           LOGGER.error("Cannot retrieve other metadata information", otherMetadata.getCause());
         }
       }
-      IOUtils.closeQuietly(otherMetadatas);
-    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
+      | IOException e) {
       LOGGER.error("Error retrieving other metadata.", e);
     }
+
     return otherMetadataInformation;
   }
 

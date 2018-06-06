@@ -10,7 +10,6 @@ package org.roda.core.index;
 import static org.testng.AssertJUnit.assertEquals;
 
 import java.nio.file.Path;
-import java.text.ParseException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -74,7 +73,7 @@ public class PermissionsRecursiveTest {
   }
 
   @Test
-  public void testUpdatePermissionsRecursively() throws RODAException, ParseException {
+  public void testUpdatePermissionsRecursively() throws RODAException {
     AIP parent = model.createAIP(null, "", new Permissions(), RodaConstants.ADMIN);
     AIP firstChild = model.createAIP(parent.getId(), "", new Permissions(), RodaConstants.ADMIN);
     AIP otherChild = model.createAIP(parent.getId(), "", new Permissions(), RodaConstants.ADMIN);

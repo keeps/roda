@@ -20,7 +20,6 @@ import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
-import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,7 +85,7 @@ public class PluginThatFailsDuringXMethod extends AbstractPlugin<Void> {
   }
 
   @Override
-  public void init() throws PluginException {
+  public void init() {
     LOGGER.info("Doing nothing during init");
   }
 
@@ -96,8 +95,7 @@ public class PluginThatFailsDuringXMethod extends AbstractPlugin<Void> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
+  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage) {
     if (getParameterValues().get(BEFORE_ALL_EXECUTE) != null) {
       // 20170123 hsilva: must test an exception that extend Throwable (besides
       // the ones that extend RuntimeException)
@@ -110,7 +108,7 @@ public class PluginThatFailsDuringXMethod extends AbstractPlugin<Void> {
 
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
-    List<LiteOptionalWithCause> list) throws PluginException {
+    List<LiteOptionalWithCause> list) {
     if (getParameterValues().get(ON_EXECUTE) != null) {
       // 20170123 hsilva: must test an exception that extend Throwable (besides
       // the ones that extend RuntimeException)
@@ -122,7 +120,7 @@ public class PluginThatFailsDuringXMethod extends AbstractPlugin<Void> {
   }
 
   @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) {
     if (getParameterValues().get(AFTER_ALL_EXECUTE) != null) {
       // 20170123 hsilva: must test an exception that extend Throwable (besides
       // the ones that extend RuntimeException)

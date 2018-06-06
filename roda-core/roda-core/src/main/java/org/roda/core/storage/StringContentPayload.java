@@ -30,7 +30,7 @@ public class StringContentPayload implements ContentPayload {
   }
 
   @Override
-  public InputStream createInputStream() throws IOException {
+  public InputStream createInputStream() {
     return new ByteArrayInputStream(content.getBytes());
   }
 

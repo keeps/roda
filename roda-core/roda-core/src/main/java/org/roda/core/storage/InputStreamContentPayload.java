@@ -14,7 +14,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
-import org.apache.commons.io.IOUtils;
 import org.roda.core.common.ProvidesInputStream;
 
 public class InputStreamContentPayload implements ContentPayload {
@@ -33,13 +32,13 @@ public class InputStreamContentPayload implements ContentPayload {
 
   @Override
   public void writeToPath(Path path) throws IOException {
-    InputStream inputStream = createInputStream();
-    Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
-    IOUtils.closeQuietly(inputStream);
+    try (InputStream inputStream = createInputStream()) {
+      Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
+    }
   }
 
   @Override
-  public URI getURI() throws IOException, UnsupportedOperationException {
+  public URI getURI() throws UnsupportedOperationException {
     throw new UnsupportedOperationException();
   }
 

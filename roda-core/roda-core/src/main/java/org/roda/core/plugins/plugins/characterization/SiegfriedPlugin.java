@@ -104,7 +104,8 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
 
   @Override
   public Report executeOnAIP(IndexService index, ModelService model, StorageService storage, Report report,
-    JobPluginInfo jobPluginInfo, List<AIP> list, Job job) throws PluginException {
+    JobPluginInfo jobPluginInfo, List<AIP> list, Job job) {
+
     try {
       for (AIP aip : list) {
         Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
@@ -125,7 +126,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
             jobPluginInfo.incrementObjectsProcessedWithSuccess();
             reportItem.setPluginState(PluginState.SUCCESS);
           } catch (PluginException | NotFoundException | GenericException | RequestNotValidException
-            | AuthorizationDeniedException | AlreadyExistsException e) {
+            | AuthorizationDeniedException e) {
             LOGGER.error("Error running Siegfried {}: {}", aip.getId(), e.getMessage(), e);
 
             jobPluginInfo.incrementObjectsProcessedWithFailure();
@@ -179,7 +180,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
 
   @Override
   public Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage, Report report,
-    JobPluginInfo jobPluginInfo, List<Representation> list, Job job) throws PluginException {
+    JobPluginInfo jobPluginInfo, List<Representation> list, Job job) {
 
     for (Representation representation : list) {
       List<LinkingIdentifier> sources = new ArrayList<>();
@@ -194,7 +195,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
         reportItem.setPluginState(PluginState.SUCCESS);
         model.notifyRepresentationUpdated(representation).failOnError();
       } catch (PluginException | NotFoundException | GenericException | RequestNotValidException
-        | AuthorizationDeniedException | AlreadyExistsException e) {
+        | AuthorizationDeniedException e) {
         LOGGER.error("Error running Siegfried {}: {}", representation.getAipId(), e.getMessage(), e);
 
         jobPluginInfo.incrementObjectsProcessedWithFailure();
@@ -219,7 +220,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
 
   @Override
   public Report executeOnFile(IndexService index, ModelService model, StorageService storage, Report report,
-    JobPluginInfo jobPluginInfo, List<File> list, Job job) throws PluginException {
+    JobPluginInfo jobPluginInfo, List<File> list, Job job) {
 
     for (File file : list) {
       List<LinkingIdentifier> sources = new ArrayList<>();
@@ -234,7 +235,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
         reportItem.setPluginState(PluginState.SUCCESS);
       } catch (PluginException | NotFoundException | GenericException | RequestNotValidException
-        | AuthorizationDeniedException | AlreadyExistsException e) {
+        | AuthorizationDeniedException e) {
         LOGGER.error("Error running Siegfried on file {}: {}", file.getId(), e.getMessage(), e);
 
         jobPluginInfo.incrementObjectsProcessedWithFailure();

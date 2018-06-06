@@ -58,7 +58,7 @@ public class FedoraStorageServiceTestDelegate extends AbstractStorageServiceTest
   }
 
   public static int determineOpenDoorAndSetFedoraProperty(int defaultDoor) {
-    int openDoor = defaultDoor;
+    int openDoor;
     try {
       ServerSocket s = new ServerSocket(0);
       openDoor = s.getLocalPort();
@@ -82,7 +82,7 @@ public class FedoraStorageServiceTestDelegate extends AbstractStorageServiceTest
   }
 
   @Override
-  public void testClassInstantiation() throws RODAException {
+  public void testClassInstantiation() {
     final HttpClient client = HttpClientBuilder.create().setMaxConnPerRoute(Integer.MAX_VALUE)
       .setMaxConnTotal(Integer.MAX_VALUE).build();
     final HttpGet request = new HttpGet(SERVER_ADDRESS);

@@ -156,7 +156,8 @@ public class IndexModelObserver implements ModelObserver {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
     try (CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationMetadata = (representationId == null)
-      ? model.listPreservationMetadata(aipId, true) : model.listPreservationMetadata(aipId, representationId);) {
+      ? model.listPreservationMetadata(aipId, true)
+      : model.listPreservationMetadata(aipId, representationId)) {
 
       for (OptionalWithCause<PreservationMetadata> opm : preservationMetadata) {
         if (opm.isPresent()) {
@@ -345,7 +346,7 @@ public class IndexModelObserver implements ModelObserver {
         RodaConstants.OTHER_METADATA_TYPE_APACHE_TIKA);
       if (fulltextBinary.getSizeInBytes() < RodaCoreFactory.getRodaConfigurationAsInt(TEN_MB_IN_BYTES,
         "core.index.fulltext_threshold_in_bytes")) {
-        try (InputStream inputStream = fulltextBinary.getContent().createInputStream();) {
+        try (InputStream inputStream = fulltextBinary.getContent().createInputStream()) {
           fulltext = IOUtils.toString(inputStream, Charset.forName(RodaConstants.DEFAULT_ENCODING));
         }
       }
@@ -516,14 +517,13 @@ public class IndexModelObserver implements ModelObserver {
               AIP aipModel = model.retrieveAIP(item.getId());
               updateRepresentationAndFileAncestors(aipModel, ancestors).addTo(ret);
             }
-          } catch (SolrServerException | IOException | NotFoundException e) {
+          } catch (NotFoundException e) {
             LOGGER.error("Error indexing moved AIP {} from {} to {}", aip.getId(), oldParentId, newParentId, e);
             ret.add(e);
           }
         }
       }
-    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | SolrServerException
-      | IOException | NotFoundException e) {
+    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | IOException e) {
       LOGGER.error("Error indexing moved AIP {} from {} to {}", aip.getId(), oldParentId, newParentId, e);
       ret.add(e);
     }
@@ -532,8 +532,7 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   private ReturnWithExceptions<Void, ModelObserver> updateRepresentationAndFileAncestors(AIP aip,
-    List<String> ancestors) throws RequestNotValidException, GenericException, AuthorizationDeniedException,
-    SolrServerException, IOException, NotFoundException {
+    List<String> ancestors) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
     try {
       for (Representation representation : aip.getRepresentations()) {
@@ -747,7 +746,7 @@ public class IndexModelObserver implements ModelObserver {
   @Override
   public ReturnWithExceptions<Void, ModelObserver> logEntryCreated(LogEntry entry) {
     SolrInputDocument logDoc = SolrUtils.logEntryToSolrDocument(entry);
-    return SolrUtils.create(index, RodaConstants.INDEX_ACTION_LOG, logDoc, (ModelObserver) this);
+    return SolrUtils.create(index, RodaConstants.INDEX_ACTION_LOG, logDoc, this);
   }
 
   @Override

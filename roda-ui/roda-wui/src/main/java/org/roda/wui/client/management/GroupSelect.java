@@ -118,29 +118,36 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Lis
 
     @Override
     public boolean equals(Object obj) {
-      if (this == obj)
+      if (this == obj) {
         return true;
-      if (obj == null)
+      }
+      if (obj == null) {
         return false;
-      if (getClass() != obj.getClass())
+      }
+      if (getClass() != obj.getClass()) {
         return false;
+      }
       GroupCheckbox other = (GroupCheckbox) obj;
-      if (!getOuterType().equals(other.getOuterType()))
+      if (!getOuterType().equals(other.getOuterType())) {
         return false;
+      }
       if (group == null) {
-        if (other.group != null)
+        if (other.group != null) {
           return false;
-      } else if (!group.equals(other.group))
+        }
+      } else if (!group.equals(other.group)) {
         return false;
+      }
       if (sortingkeyword == null) {
-        if (other.sortingkeyword != null)
+        if (other.sortingkeyword != null) {
           return false;
-      } else if (!sortingkeyword.equals(other.sortingkeyword))
+        }
+      } else if (!sortingkeyword.equals(other.sortingkeyword)) {
         return false;
+      }
       return true;
     }
 
-    @SuppressWarnings("unused")
     public String getSortingkeyword() {
       return sortingkeyword;
     }
@@ -163,7 +170,6 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Lis
     }
   }
 
-  @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
   private final List<String> blacklist;
@@ -191,13 +197,11 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Lis
     boolean isUser = false;
     boolean justActive = true;
     Filter filter = new Filter();
-
     filter.add(new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, Boolean.toString(isUser)));
-
     Sorter sorter = new Sorter(new SortParameter(RodaConstants.MEMBERS_FULLNAME, false));
 
     BrowserService.Util.getInstance().find(RODAMember.class.getName(), filter, sorter, Sublist.ALL, Facets.NONE,
-      LocaleInfo.getCurrentLocale().getLocaleName(), justActive, new ArrayList<String>(),
+      LocaleInfo.getCurrentLocale().getLocaleName(), justActive, new ArrayList<>(),
       new AsyncCallback<IndexResult<RODAMember>>() {
 
         @Override

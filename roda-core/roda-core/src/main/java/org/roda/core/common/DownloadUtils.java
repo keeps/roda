@@ -56,11 +56,10 @@ public class DownloadUtils {
 
         @Override
         public void consumeOutputStream(OutputStream out) throws IOException {
-          CloseableIterable<Resource> resources;
           BufferedOutputStream bos = new BufferedOutputStream(out);
           ZipOutputStream zos = new ZipOutputStream(bos);
-          try {
-            resources = storage.listResourcesUnderDirectory(storagePath, true);
+
+          try (CloseableIterable<Resource> resources = storage.listResourcesUnderDirectory(storagePath, true)) {
             int basePathSize = storagePath.asList().size();
 
             for (Resource r : resources) {
@@ -78,15 +77,12 @@ public class DownloadUtils {
                 ZipEntry entry = new ZipEntry(entryPath);
                 zos.putNextEntry(entry);
                 Binary binary = storage.getBinary(r.getStoragePath());
-                InputStream inputStream = binary.getContent().createInputStream();
-                IOUtils.copy(inputStream, zos);
-                IOUtils.closeQuietly(inputStream);
+                try (InputStream inputStream = binary.getContent().createInputStream()) {
+                  IOUtils.copy(inputStream, zos);
+                }
                 zos.closeEntry();
               }
             }
-
-            IOUtils.closeQuietly(resources);
-
           } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
             throw new IOException(e);
           } finally {
@@ -94,7 +90,6 @@ public class DownloadUtils {
             IOUtils.closeQuietly(bos);
             IOUtils.closeQuietly(out);
           }
-
         }
 
         @Override
@@ -115,19 +110,14 @@ public class DownloadUtils {
         @Override
         public void consumeOutputStream(OutputStream out) throws IOException {
           BufferedOutputStream bos = new BufferedOutputStream(out);
-          Binary binary;
-          try {
-            binary = storage.getBinary(storagePath);
-            InputStream inputStream = binary.getContent().createInputStream();
+          try (InputStream inputStream = storage.getBinary(storagePath).getContent().createInputStream()) {
             IOUtils.copy(inputStream, bos);
-            IOUtils.closeQuietly(inputStream);
           } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
             throw new IOException(e);
           } finally {
             IOUtils.closeQuietly(bos);
             IOUtils.closeQuietly(out);
           }
-
         }
 
         @Override

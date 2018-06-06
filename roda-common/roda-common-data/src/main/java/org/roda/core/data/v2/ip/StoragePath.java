@@ -12,24 +12,24 @@ import java.util.List;
 
 public interface StoragePath extends Serializable {
 
-  public String getContainerName();
+  String getContainerName();
 
-  public boolean isFromAContainer();
+  boolean isFromAContainer();
 
-  public List<String> getDirectoryPath();
+  List<String> getDirectoryPath();
 
-  public String getName();
+  String getName();
 
-  public List<String> asList();
+  List<String> asList();
 
   // Force re-declaration of #hashCode() and #equals(Object)
 
   @Override
-  public int hashCode();
+  int hashCode();
 
   @Override
-  public boolean equals(Object obj);
+  boolean equals(Object obj);
 
-  public String asString(String separator, String replaceAllRegex, String replaceAllReplacement, boolean skipContainer);
+  String asString(String separator, String replaceAllRegex, String replaceAllReplacement, boolean skipContainer);
 
 }

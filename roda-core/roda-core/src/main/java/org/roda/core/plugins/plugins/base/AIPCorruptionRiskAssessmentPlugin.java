@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.xmlbeans.XmlException;
 import org.roda.core.common.PremisV3Utils;
@@ -134,10 +133,7 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
     for (Representation r : aip.getRepresentations()) {
       LOGGER.debug("Checking fixity for files in representation {} of AIP {}", r.getId(), aip.getId());
 
-      try {
-        boolean recursive = true;
-        CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(), r.getId(), recursive);
-
+      try (CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(), r.getId(), true)) {
         for (OptionalWithCause<File> oFile : allFiles) {
           if (oFile.isPresent()) {
             File file = oFile.get();
@@ -236,8 +232,6 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
             }
           }
         }
-
-        IOUtils.closeQuietly(allFiles);
       } catch (IOException | RODAException | XmlException e) {
         LOGGER.error("Error processing representation {}", r.getId(), e);
       }
@@ -267,8 +261,8 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
   }
 
   private void createIncidence(ModelService model, IndexService index, String aipId, String representationId,
-    List<String> filePath, String fileId, String riskId) throws RequestNotValidException, GenericException,
-    AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
+    List<String> filePath, String fileId, String riskId)
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException {
     List<RiskIncidence> results = getUnmitigatedIncidences(index, aipId, representationId, filePath, fileId, riskId);
 
     if (results.isEmpty()) {
@@ -279,12 +273,12 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
       incidence.setRiskId(riskId);
       incidence.setAipId(aipId);
       incidence.setRepresentationId(representationId);
+
       if (filePath != null) {
         incidence.setFilePath(filePath);
       }
-      if (fileId != null) {
-        incidence.setFileId(fileId);
-      }
+
+      incidence.setFileId(fileId);
       incidence.setObjectClass(AIP.class.getSimpleName());
       incidence.setStatus(INCIDENCE_STATUS.UNMITIGATED);
       incidence.setSeverity(risk.getPreMitigationSeverityLevel());

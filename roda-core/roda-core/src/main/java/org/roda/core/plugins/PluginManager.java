@@ -207,8 +207,7 @@ public class PluginManager {
   }
 
   /**
-   * Returns an instance of the {@link Plugin} with the specified ID
-   * (classname).
+   * Returns an instance of the {@link Plugin} with the specified ID (classname).
    * 
    * @param pluginID
    *          the ID (classname) of the {@link Plugin}.
@@ -600,7 +599,6 @@ public class PluginManager {
     }
   }
 
-  @SuppressWarnings("rawtypes")
   private void loadInternalPlugins() {
     Reflections reflections = new Reflections(
       RodaCoreFactory.getRodaConfigurationAsString("core", "plugins", "internal", "package"));

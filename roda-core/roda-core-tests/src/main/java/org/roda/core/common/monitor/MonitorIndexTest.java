@@ -265,7 +265,6 @@ public class MonitorIndexTest {
         }
       }
     }
-
   }
 
   static int nextIntInRange(int min, int max, Random rng) {

@@ -37,7 +37,7 @@ public interface Plugin<T extends IsRODAObject> {
    * 
    * @return a {@link String} with the name of this {@link Plugin}.
    */
-  public String getName();
+  String getName();
 
   /**
    * Returns the version of this {@link Plugin}.
@@ -45,14 +45,14 @@ public interface Plugin<T extends IsRODAObject> {
    * @return a <code>String</code> with the version number for this
    *         {@link Plugin}.
    */
-  public String getVersion();
+  String getVersion();
 
   /**
    * Returns description of this {@link Plugin}.
    * 
    * @return a {@link String} with the description of this {@link Plugin}.
    */
-  public String getDescription();
+  String getDescription();
 
   /**
    * Returns the type of the agent linked to this {@link Plugin}.
@@ -60,25 +60,25 @@ public interface Plugin<T extends IsRODAObject> {
    * @return a {@link PreservationAgentType} with the type of the agent of this
    *         {@link Plugin}.
    */
-  public PreservationAgentType getAgentType();
+  PreservationAgentType getAgentType();
 
   /**
    * Returns the type of the execution preservation event linked to this
    * {@link Plugin}.
    * 
-   * @return a {@link PreservationEventType} with the type of the execution
-   *         event of this {@link Plugin}.
+   * @return a {@link PreservationEventType} with the type of the execution event
+   *         of this {@link Plugin}.
    */
-  public PreservationEventType getPreservationEventType();
+  PreservationEventType getPreservationEventType();
 
   /**
    * Returns the description of the execution preservation event linked to this
    * {@link Plugin}.
    * 
-   * @return a {@link String} with the description of the execution event of
-   *         this {@link Plugin}.
+   * @return a {@link String} with the description of the execution event of this
+   *         {@link Plugin}.
    */
-  public String getPreservationEventDescription();
+  String getPreservationEventDescription();
 
   /**
    * Returns the success message of the execution preservation event linked to
@@ -87,7 +87,7 @@ public interface Plugin<T extends IsRODAObject> {
    * @return a {@link String} with the success message of the execution event of
    *         this {@link Plugin}.
    */
-  public String getPreservationEventSuccessMessage();
+  String getPreservationEventSuccessMessage();
 
   /**
    * Returns the failure message of the execution preservation event linked to
@@ -96,7 +96,7 @@ public interface Plugin<T extends IsRODAObject> {
    * @return a {@link String} with the failure message of the execution event of
    *         this {@link Plugin}.
    */
-  public String getPreservationEventFailureMessage();
+  String getPreservationEventFailureMessage();
 
   /**
    * Returns the {@link List} of {@link PluginParameter}s necessary to run this
@@ -104,7 +104,7 @@ public interface Plugin<T extends IsRODAObject> {
    * 
    * @return a {@link List} of {@link PluginParameter} with the parameters.
    */
-  public List<PluginParameter> getParameters();
+  List<PluginParameter> getParameters();
 
   /**
    * Gets the parameter values inside a {@link Map} with attribute names and
@@ -112,7 +112,7 @@ public interface Plugin<T extends IsRODAObject> {
    * 
    * @return a {@link Map} with the parameters name and value.
    */
-  public Map<String, String> getParameterValues();
+  Map<String, String> getParameterValues();
 
   /**
    * Sets the parameters returned by a previous call to
@@ -123,30 +123,30 @@ public interface Plugin<T extends IsRODAObject> {
    * 
    * @throws InvalidParameterException
    */
-  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException;
+  void setParameterValues(Map<String, String> parameters) throws InvalidParameterException;
 
   /**
    * Method to return Plugin type (so it can be grouped for different purposes)
    */
-  public PluginType getType();
+  PluginType getType();
 
   /**
    * Method to return Plugin categories
    */
-  public List<String> getCategories();
+  List<String> getCategories();
 
   /**
    * Method used by PluginManager to obtain a new instance of a plugin, from the
    * current loaded Plugin, to provide to PluginOrchestrator
    */
-  public Plugin<T> cloneMe();
+  Plugin<T> cloneMe();
 
   /**
    * Method that validates the parameters provided to the Plugin
    * 
    * FIXME this should be changed to return a report
    */
-  public boolean areParameterValuesValid();
+  boolean areParameterValuesValid();
 
   /*
    * "Working methods"
@@ -159,20 +159,20 @@ public interface Plugin<T extends IsRODAObject> {
    * 
    * @throws PluginException
    */
-  public void init() throws PluginException;
+  void init() throws PluginException;
 
-  public List<Class<T>> getObjectClasses();
+  List<Class<T>> getObjectClasses();
 
   /**
-   * Method to be invoked by the PluginOrchestrator to inject the job plugin
-   * info to be used by the plugin
+   * Method to be invoked by the PluginOrchestrator to inject the job plugin info
+   * to be used by the plugin
    */
-  public void injectJobPluginInfo(JobPluginInfo jobPluginInfo);
+  void injectJobPluginInfo(JobPluginInfo jobPluginInfo);
 
   /**
    * Method retrieve job plugin info of a certain class
    */
-  public <T1 extends JobPluginInfo> T1 getJobPluginInfo(Class<T1> jobPluginInfoClass);
+  <T1 extends JobPluginInfo> T1 getJobPluginInfo(Class<T1> jobPluginInfoClass);
 
   /**
    * Method executed by {@link PluginOrchestrator} before splitting the workload
@@ -180,7 +180,7 @@ public interface Plugin<T extends IsRODAObject> {
    * 
    * @throws PluginException
    */
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException;
+  Report beforeAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException;
 
   /**
    * Executes the {@link Plugin}.
@@ -189,21 +189,21 @@ public interface Plugin<T extends IsRODAObject> {
    * 
    * @throws PluginException
    */
-  public Report execute(IndexService index, ModelService model, StorageService storage,
-    List<LiteOptionalWithCause> list) throws PluginException;
+  Report execute(IndexService index, ModelService model, StorageService storage, List<LiteOptionalWithCause> list)
+    throws PluginException;
 
   /**
-   * Method executed by {@link PluginOrchestrator} after all workers have
-   * finished their work
+   * Method executed by {@link PluginOrchestrator} after all workers have finished
+   * their work
    * 
    * @throws PluginException
    */
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException;
+  Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException;
 
   /**
    * Stops all {@link Plugin} activity. This is the last method to be called by
    * {@link PluginManager} on the {@link Plugin}.
    */
-  public void shutdown();
+  void shutdown();
 
 }

@@ -22,7 +22,6 @@ import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StringContentPayload;
@@ -34,7 +33,7 @@ import org.testng.annotations.Test;
 public class MetadataFileUtilsEscapeTest {
 
   @Test
-  public void testGetMetadataPayload() throws GenericException, IOException {
+  public void testGetMetadataPayload() throws IOException {
     TransferredResource resource = new TransferredResource();
     resource.setName("a&b.csv");
 
@@ -45,7 +44,7 @@ public class MetadataFileUtilsEscapeTest {
   }
 
   @Test
-  public void testEscape() throws GenericException {
+  public void testEscape() {
     int total = (int) Math.pow(2, 20);
     StringBuilder temp = new StringBuilder();
     Map<String, String> values = new HashMap<>();

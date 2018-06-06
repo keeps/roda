@@ -124,7 +124,7 @@ public class UserManagementHelper {
     return newUser;
   }
 
-  private static String getUserExtra(UserExtraBundle extra) throws GenericException {
+  private static String getUserExtra(UserExtraBundle extra) {
     Handlebars handlebars = new Handlebars();
     Map<String, String> data = new HashMap<>();
     handlebars.registerHelper("field", (o, options) -> {

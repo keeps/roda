@@ -78,8 +78,8 @@ public class ValidationUtils {
 
   public static Pair<ValidationReport, List<Pair<String, String>>> isAIPMetadataValid(
     boolean forceDescriptiveMetadataType, boolean validateDescriptiveMetadata, String fallbackMetadataType,
-    String fallbackMetadataVersion, ModelService model, String aipId) throws GenericException, RequestNotValidException,
-    AuthorizationDeniedException, NotFoundException, ValidationException {
+    String fallbackMetadataVersion, ModelService model, String aipId)
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     ValidationReport report = new ValidationReport();
     report.setValid(true);
     List<DescriptiveMetadata> descriptiveMetadata = model.retrieveAIP(aipId).getDescriptiveMetadata();
@@ -197,8 +197,8 @@ public class ValidationUtils {
   }
 
   /**
-   * Validates descriptive medatada (e.g. against its schema, but other
-   * strategies may be used)
+   * Validates descriptive medatada (e.g. against its schema, but other strategies
+   * may be used)
    * 
    * @param failIfNoSchema
    * @throws AuthorizationDeniedException
@@ -255,19 +255,17 @@ public class ValidationUtils {
   }
 
   /**
-   * Validates descriptive medatada (e.g. against its schema, but other
-   * strategies may be used)
+   * Validates descriptive medatada (e.g. against its schema, but other strategies
+   * may be used)
    * 
    * @param descriptiveMetadataType
-   * 
    * @param failIfNoSchema
-   * @throws ValidationException
    */
   public static ValidationReport validateDescriptiveBinary(ContentPayload descriptiveMetadataPayload,
     String descriptiveMetadataType, String descriptiveMetadataVersion, boolean failIfNoSchema) {
     ValidationReport ret = new ValidationReport();
-    InputStream inputStream = null;
     Optional<Schema> xmlSchema = RodaCoreFactory.getRodaSchema(descriptiveMetadataType, descriptiveMetadataVersion);
+
     try {
       if (xmlSchema.isPresent()) {
         RodaErrorHandler errorHandler = new RodaErrorHandler();
@@ -312,8 +310,6 @@ public class ValidationUtils {
       LOGGER.error("Error validating descriptive metadata", e);
       ret.setValid(false);
       ret.setMessage(e.getMessage());
-    } finally {
-      IOUtils.closeQuietly(inputStream);
     }
 
     return ret;
@@ -323,13 +319,9 @@ public class ValidationUtils {
   /**
    * Validates preservation medatada (e.g. against its schema, but other
    * strategies may be used)
-   * 
+   *
+   * @param binary
    * @param failIfNoSchema
-   * 
-   * @param descriptiveMetadataId
-   * 
-   * @param failIfNoSchema
-   * @throws ValidationException
    */
   public static ValidationReport validatePreservationBinary(Binary binary, boolean failIfNoSchema) {
     ValidationReport report = new ValidationReport();
@@ -396,7 +388,6 @@ public class ValidationUtils {
       return errors;
     }
 
-    @SuppressWarnings("unused")
     public void setErrors(List<SAXParseException> errors) {
       this.errors = errors;
     }

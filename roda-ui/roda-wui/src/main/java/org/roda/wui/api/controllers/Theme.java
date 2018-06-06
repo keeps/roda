@@ -22,17 +22,10 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.ConsumesOutputStream;
 import org.roda.core.common.StreamResponse;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.wui.common.RodaWuiController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Theme extends RodaWuiController {
-
-  @SuppressWarnings("unused")
-  private static final Logger LOGGER = LoggerFactory.getLogger(Theme.class);
-
   private static final Date INITIAL_DATE = new Date();
 
   private Theme() {
@@ -53,8 +46,8 @@ public class Theme extends RodaWuiController {
     return Pair.of(resourceId, themeResourceInputstream);
   }
 
-  public static StreamResponse getThemeResourceStreamResponse(final Pair<String, InputStream> themeResourceInputstream)
-    throws IOException, NotFoundException {
+  public static StreamResponse getThemeResourceStreamResponse(
+    final Pair<String, InputStream> themeResourceInputstream) {
     String resourceId = themeResourceInputstream.getFirst();
     String mimeType = MimeTypeHelper.getContentType(resourceId);
 

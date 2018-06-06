@@ -35,7 +35,7 @@ public class RepresentationInformations extends RodaWuiController {
    * ---------------------------------------------------------------------------
    */
   public static RepresentationInformation createRepresentationInformation(User user, RepresentationInformation ri)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    throws AuthorizationDeniedException, GenericException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -56,7 +56,7 @@ public class RepresentationInformations extends RodaWuiController {
   }
 
   public static RepresentationInformation updateRepresentationInformation(User user, RepresentationInformation ri)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    throws AuthorizationDeniedException, GenericException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions

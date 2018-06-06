@@ -62,9 +62,7 @@ public class RiskToVersion2 implements MigrationAction<Risk> {
   }
 
   private void migrate(StorageService storage, Binary binary) {
-    InputStream inputStream = null;
-    try {
-      inputStream = binary.getContent().createInputStream();
+    try (InputStream inputStream = binary.getContent().createInputStream()) {
       JsonNode json = JsonUtils.parseJson(inputStream);
       if (json instanceof ObjectNode) {
         ObjectNode obj = (ObjectNode) json;
@@ -80,10 +78,7 @@ public class RiskToVersion2 implements MigrationAction<Risk> {
 
     } catch (IOException | RODAException e) {
       LOGGER.error("Could not migrate risk {}", binary.getStoragePath(), e);
-    } finally {
-      IOUtils.closeQuietly(inputStream);
     }
-
   }
 
   @Override

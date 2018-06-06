@@ -81,7 +81,7 @@ public class FileStorageService implements StorageService {
     historyPath = rodaDataPath.resolve(basePath.getFileName() + HISTORY_SUFFIX);
     historyDataPath = historyPath.resolve(HISTORY_DATA_FOLDER);
     historyMetadataPath = historyPath.resolve(HISTORY_METADATA_FOLDER);
-    trashPath = rodaDataPath.resolve(trashDirName == null ? "trash" : trashDirName);
+    trashPath = rodaDataPath.resolve(trashDirName == null ? RodaConstants.TRASH_CONTAINER : trashDirName);
 
     initialize(basePath);
     if (createHistory) {
@@ -123,6 +123,11 @@ public class FileStorageService implements StorageService {
   }
 
   @Override
+  public boolean exists(StoragePath storagePath) {
+    return FSUtils.exists(FSUtils.getEntityPath(basePath, storagePath));
+  }
+
+  @Override
   public CloseableIterable<Container> listContainers() throws GenericException {
     return FSUtils.listContainers(basePath);
   }
@@ -156,8 +161,7 @@ public class FileStorageService implements StorageService {
   }
 
   @Override
-  public Container getContainer(StoragePath storagePath)
-    throws GenericException, RequestNotValidException, NotFoundException {
+  public Container getContainer(StoragePath storagePath) throws RequestNotValidException, NotFoundException {
     if (!storagePath.isFromAContainer()) {
       throw new RequestNotValidException("Storage path is not from a container");
     }
@@ -494,7 +498,7 @@ public class FileStorageService implements StorageService {
       }
 
       @Override
-      public void close() throws IOException {
+      public void close() {
         // nothing to do
       }
     };
@@ -502,7 +506,7 @@ public class FileStorageService implements StorageService {
 
   @Override
   public CloseableIterable<BinaryVersion> listBinaryVersions(StoragePath storagePath)
-    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    throws GenericException, NotFoundException {
     if (historyDataPath == null) {
       LOGGER.warn("Skipping list binary versions because no history folder is defined, so returning empty list!");
       return new EmptyClosableIterable<>();
@@ -523,7 +527,7 @@ public class FileStorageService implements StorageService {
         new DirectoryStream.Filter<Path>() {
 
           @Override
-          public boolean accept(Path entry) throws IOException {
+          public boolean accept(Path entry) {
             return entry.getFileName().toString().startsWith(baseName);
           }
         });
@@ -717,7 +721,7 @@ public class FileStorageService implements StorageService {
           directoryStream = Files.newDirectoryStream(parent, new DirectoryStream.Filter<Path>() {
 
             @Override
-            public boolean accept(Path entry) throws IOException {
+            public boolean accept(Path entry) {
               return entry.getFileName().toString().startsWith(baseName);
             }
           });
@@ -760,4 +764,15 @@ public class FileStorageService implements StorageService {
     }
   }
 
+  @Override
+  public String getStoragePathAsString(StoragePath storagePath, boolean skipStoragePathContainer,
+    StoragePath anotherStoragePath, boolean skipAnotherStoragePathContainer) {
+    return FSUtils.getStoragePathAsString(storagePath, skipStoragePathContainer, anotherStoragePath,
+      skipAnotherStoragePathContainer);
+  }
+
+  @Override
+  public String getStoragePathAsString(StoragePath storagePath, boolean skipContainer) {
+    return FSUtils.getStoragePathAsString(storagePath, skipContainer);
+  }
 }

@@ -45,8 +45,7 @@ public class UserManagement extends RodaWuiController {
     super();
   }
 
-  public static User retrieveUser(User user, String username)
-    throws AuthorizationDeniedException, GenericException, NotFoundException {
+  public static User retrieveUser(User user, String username) throws AuthorizationDeniedException, GenericException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -430,8 +429,7 @@ public class UserManagement extends RodaWuiController {
     }
   }
 
-  public static UserExtraBundle retrieveUserExtraBundle(User user, String name)
-    throws AuthorizationDeniedException, GenericException, NotFoundException {
+  public static UserExtraBundle retrieveUserExtraBundle(User user, String name) throws AuthorizationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check permissions

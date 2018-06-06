@@ -514,7 +514,7 @@ public class Browser extends RodaWuiController {
    * @throws IOException
    */
   public static StreamResponse exportAIP(User user, SelectedItems<IndexedAIP> selected, String acceptFormat)
-    throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException, IOException {
+    throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // validate input
@@ -1695,7 +1695,7 @@ public class Browser extends RodaWuiController {
   public static DescriptiveMetadata updateRepresentationDescriptiveMetadataFile(User user, String aipId,
     String representationId, String metadataId, String metadataType, String metadataVersion, InputStream is)
     throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException,
-    AlreadyExistsException, ValidationException {
+    AlreadyExistsException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions

@@ -16,33 +16,31 @@ public interface Binary extends Resource {
    * 
    * @return
    */
-  public ContentPayload getContent();
+  ContentPayload getContent();
 
   /**
    * The total number of bytes of content of this resource.
    * 
    * @return
    */
-  public Long getSizeInBytes();
+  Long getSizeInBytes();
 
   /**
    * The binary is a reference to the real content, which is managed externally.
    * 
    * @return
    */
-  public boolean isReference();
+  boolean isReference();
 
   /**
    * Get the checksums of the binary content.
    * 
-   * @return A map with all the checksums where the key is the checksum
-   *         algorithm and the value is the value of the checksum for that
-   *         algorithm.
+   * @return A map with all the checksums where the key is the checksum algorithm
+   *         and the value is the value of the checksum for that algorithm.
    * 
    *         Example: {("md5", "1234abc..."), ("sha1", "1234567890abc...")}
    * 
    */
-  public Map<String, String> getContentDigest();
-
+  Map<String, String> getContentDigest();
 
 }

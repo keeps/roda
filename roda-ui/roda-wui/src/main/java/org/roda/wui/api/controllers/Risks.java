@@ -35,8 +35,7 @@ public class Risks extends RodaWuiController {
    * ---------------- REST related methods - start -----------------------------
    * ---------------------------------------------------------------------------
    */
-  public static Risk createRisk(User user, Risk risk)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+  public static Risk createRisk(User user, Risk risk) throws AuthorizationDeniedException, GenericException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -56,8 +55,7 @@ public class Risks extends RodaWuiController {
     }
   }
 
-  public static Risk updateRisk(User user, Risk risk)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+  public static Risk updateRisk(User user, Risk risk) throws AuthorizationDeniedException, GenericException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -99,7 +97,7 @@ public class Risks extends RodaWuiController {
   }
 
   public static RiskIncidence createRiskIncidence(User user, RiskIncidence incidence)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    throws AuthorizationDeniedException, GenericException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -120,7 +118,7 @@ public class Risks extends RodaWuiController {
   }
 
   public static RiskIncidence updateRiskIncidence(User user, RiskIncidence incidence)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    throws AuthorizationDeniedException, GenericException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions

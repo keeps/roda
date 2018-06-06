@@ -15,8 +15,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
-import org.apache.commons.io.IOUtils;
-
 public class JsonContentPayload implements ContentPayload {
   private String content;
   private Path contentPath;
@@ -26,15 +24,15 @@ public class JsonContentPayload implements ContentPayload {
   }
 
   @Override
-  public InputStream createInputStream() throws IOException {
+  public InputStream createInputStream() {
     return new ByteArrayInputStream(content.getBytes());
   }
 
   @Override
   public void writeToPath(Path path) throws IOException {
-    InputStream inputStream = createInputStream();
-    Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
-    IOUtils.closeQuietly(inputStream);
+    try (InputStream inputStream = createInputStream()) {
+      Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
+    }
   }
 
   @Override

@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.configuration.ConfigurationException;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
@@ -391,8 +390,8 @@ public class IndexServiceTest {
   }
 
   @Test
-  public void testGetLogEntriesCount() throws GenericException, RequestNotValidException, AuthorizationDeniedException,
-    NotFoundException, InterruptedException {
+  public void testGetLogEntriesCount()
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     // cleaning up action log entries on index (if any)
     index.deleteAllActionLog();
 
@@ -424,8 +423,8 @@ public class IndexServiceTest {
   }
 
   @Test
-  public void testFindLogEntry() throws GenericException, RequestNotValidException, AuthorizationDeniedException,
-    NotFoundException, InterruptedException {
+  public void testFindLogEntry()
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     LogEntry entry = new LogEntry();
     entry.setActionComponent(RodaConstants.LOG_ACTION_COMPONENT);
     entry.setActionMethod("Method");
@@ -461,8 +460,8 @@ public class IndexServiceTest {
   }
 
   @Test
-  public void testReindexLogEntry() throws GenericException, RequestNotValidException, AuthorizationDeniedException,
-    NotFoundException, InterruptedException {
+  public void testReindexLogEntry()
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     Long number = 10L;
 
     for (int i = 0; i < number; i++) {
@@ -501,8 +500,8 @@ public class IndexServiceTest {
   }
 
   @Test
-  public void testReindexAIP() throws ParseException, RequestNotValidException, GenericException,
-    AuthorizationDeniedException, AlreadyExistsException, NotFoundException, ValidationException {
+  public void testReindexAIP() throws RequestNotValidException, GenericException, AuthorizationDeniedException,
+    AlreadyExistsException, NotFoundException, ValidationException {
     index.clearIndex(RodaConstants.INDEX_AIP);
 
     for (int i = 0; i < 10; i++) {
@@ -700,7 +699,7 @@ public class IndexServiceTest {
   }
 
   @Test
-  public void testMessageIndex() throws ConfigurationException, RODAException {
+  public void testMessageIndex() throws RODAException {
     Notification notification = new Notification();
     notification.setSubject("Message subject");
     notification.setBody("Message body");
@@ -736,7 +735,6 @@ public class IndexServiceTest {
     assertEquals(message4.getSubject(), "Message New Subject");
 
     model.deleteNotification(notification.getId());
-
   }
 
   @Test
@@ -784,6 +782,5 @@ public class IndexServiceTest {
     Set<String> set = new HashSet<>();
     set.addAll(results);
     Assert.assertEquals(results.size(), set.size());
-
   }
 }

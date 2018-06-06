@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Iterator;
 
-import org.apache.commons.io.IOUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -140,25 +139,32 @@ public class StorageRecursiveListingUtils {
   public static Long countAllUnderDirectory(StorageService storage, StoragePath storagePath)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
     Long ret = 0L;
-    CloseableIterable<Resource> iterable = listAllUnderDirectory(storage, storagePath);
-    Iterator<Resource> it = iterable.iterator();
-    while (it.hasNext()) {
-      ret++;
+
+    try (CloseableIterable<Resource> iterable = listAllUnderDirectory(storage, storagePath)) {
+      Iterator<Resource> it = iterable.iterator();
+      while (it.hasNext()) {
+        ret++;
+      }
+    } catch (IOException e) {
+      throw new GenericException(e);
     }
-    IOUtils.closeQuietly(iterable);
+
     return ret;
   }
 
   public static Long countAllUnderContainer(StorageService storage, StoragePath storagePath)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
     Long ret = 0L;
-    CloseableIterable<Resource> iterable = listAllUnderContainer(storage, storagePath);
-    Iterator<Resource> it = iterable.iterator();
-    while (it.hasNext()) {
-      ret++;
+
+    try (CloseableIterable<Resource> iterable = listAllUnderContainer(storage, storagePath)) {
+      Iterator<Resource> it = iterable.iterator();
+      while (it.hasNext()) {
+        ret++;
+      }
+    } catch (IOException e) {
+      throw new GenericException(e);
     }
-    IOUtils.closeQuietly(iterable);
+
     return ret;
   }
-
 }

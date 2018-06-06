@@ -33,5 +33,4 @@ public class MimeTypeHelper {
 
     return ret;
   }
-
 }

@@ -15,14 +15,11 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.Date;
 
-import org.apache.commons.io.IOUtils;
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.ip.AIP;
@@ -36,7 +33,6 @@ import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StringContentPayload;
-import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,12 +40,9 @@ public class RepresentationToVersion2 implements MigrationAction<Representation>
   private static final Logger LOGGER = LoggerFactory.getLogger(RepresentationToVersion2.class);
 
   @Override
-  public void migrate(StorageService storage) throws RODAException {
-    CloseableIterable<Resource> aips = null;
-
-    try {
-      aips = storage.listResourcesUnderDirectory(ModelUtils.getAIPContainerPath(), false);
-
+  public void migrate(StorageService storage) {
+    try (
+      CloseableIterable<Resource> aips = storage.listResourcesUnderDirectory(ModelUtils.getAIPContainerPath(), false)) {
       for (Resource aipResorce : aips) {
         try {
           StoragePath aipJsonPath = DefaultStoragePath.parse(aipResorce.getStoragePath(),
@@ -61,8 +54,7 @@ public class RepresentationToVersion2 implements MigrationAction<Representation>
           for (Representation representation : aip.getRepresentations()) {
             DefaultStoragePath representationStoragePath = DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP,
               aip.getId(), RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS, representation.getId());
-            Path representationPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(),
-              representationStoragePath);
+            Path representationPath = storage.getDirectAccess(representationStoragePath).getPath();
 
             BasicFileAttributes attr = Files.readAttributes(representationPath, BasicFileAttributes.class);
             Date createDate = new Date(attr.creationTime().toMillis());
@@ -86,10 +78,9 @@ public class RepresentationToVersion2 implements MigrationAction<Representation>
           LOGGER.warn("Could not get AIP json file of AIP " + aipResorce.getStoragePath().toString(), e);
         }
       }
-    } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
+    } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
+      | IOException e) {
       LOGGER.warn("Could not find AIPs", e);
-    } finally {
-      IOUtils.closeQuietly(aips);
     }
   }
 

@@ -24,7 +24,6 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.xmlbeans.XmlException;
@@ -106,41 +105,40 @@ public final class PremisV3Utils {
   public static List<Fixity> calculateFixities(Binary binary, Collection<String> algorithms, String originator)
     throws IOException, NoSuchAlgorithmException {
     List<Fixity> ret = new ArrayList<>();
-    InputStream stream = binary.getContent().createInputStream();
+    try (InputStream stream = binary.getContent().createInputStream()) {
+      Map<String, String> checksums = FileUtility.checksums(stream, algorithms);
 
-    Map<String, String> checksums = FileUtility.checksums(stream, algorithms);
-
-    for (Entry<String, String> entry : checksums.entrySet()) {
-      String algorithm = entry.getKey();
-      String checksum = entry.getValue();
-      ret.add(new Fixity(algorithm, checksum, originator));
+      for (Entry<String, String> entry : checksums.entrySet()) {
+        String algorithm = entry.getKey();
+        String checksum = entry.getValue();
+        ret.add(new Fixity(algorithm, checksum, originator));
+      }
     }
 
-    IOUtils.closeQuietly(stream);
     return ret;
   }
 
   public static boolean isPremisV2(Binary binary) throws IOException, SAXException {
     boolean premisV2 = true;
-    InputStream inputStream = binary.getContent().createInputStream();
-    InputStream schemaStream = RodaCoreFactory.getConfigurationFileAsStream("schemas/premis-v2-0.xsd");
-    Source xmlFile = new StreamSource(inputStream);
-    SchemaFactory schemaFactory = SchemaFactory.newInstance(W3C_XML_SCHEMA_NS_URI);
-    Schema schema = schemaFactory.newSchema(new StreamSource(schemaStream));
-    Validator validator = schema.newValidator();
-    RodaErrorHandler errorHandler = new RodaErrorHandler();
-    validator.setErrorHandler(errorHandler);
-    try {
-      validator.validate(xmlFile);
-      List<SAXParseException> errors = errorHandler.getErrors();
-      if (!errors.isEmpty()) {
+    try (InputStream inputStream = binary.getContent().createInputStream();
+      InputStream schemaStream = RodaCoreFactory.getConfigurationFileAsStream("schemas/premis-v2-0.xsd")) {
+      Source xmlFile = new StreamSource(inputStream);
+      SchemaFactory schemaFactory = SchemaFactory.newInstance(W3C_XML_SCHEMA_NS_URI);
+      Schema schema = schemaFactory.newSchema(new StreamSource(schemaStream));
+      Validator validator = schema.newValidator();
+      RodaErrorHandler errorHandler = new RodaErrorHandler();
+      validator.setErrorHandler(errorHandler);
+      try {
+        validator.validate(xmlFile);
+        List<SAXParseException> errors = errorHandler.getErrors();
+        if (!errors.isEmpty()) {
+          premisV2 = false;
+        }
+      } catch (SAXException e) {
         premisV2 = false;
       }
-    } catch (SAXException e) {
-      premisV2 = false;
     }
-    IOUtils.closeQuietly(inputStream);
-    IOUtils.closeQuietly(schemaStream);
+
     return premisV2;
   }
 
@@ -152,17 +150,17 @@ public final class PremisV3Utils {
     }
 
     @Override
-    public void warning(SAXParseException e) throws SAXException {
+    public void warning(SAXParseException e) {
       errors.add(e);
     }
 
     @Override
-    public void error(SAXParseException e) throws SAXException {
+    public void error(SAXParseException e) {
       errors.add(e);
     }
 
     @Override
-    public void fatalError(SAXParseException e) throws SAXException {
+    public void fatalError(SAXParseException e) {
       errors.add(e);
     }
 
@@ -439,41 +437,43 @@ public final class PremisV3Utils {
 
   public static List<Fixity> extractFixities(Binary premisFile) throws GenericException, XmlException, IOException {
     List<Fixity> fixities = new ArrayList<>();
-    InputStream inputStream = premisFile.getContent().createInputStream();
-    gov.loc.premis.v3.File f = binaryToFile(inputStream);
-    if (f.getObjectCharacteristicsArray() != null && f.getObjectCharacteristicsArray().length > 0) {
-      ObjectCharacteristicsComplexType occt = f.getObjectCharacteristicsArray(0);
-      if (occt.getFixityArray() != null && occt.getFixityArray().length > 0) {
-        for (FixityComplexType fct : occt.getFixityArray()) {
-          Fixity fix = new Fixity();
-          fix.setMessageDigest(fct.getMessageDigest());
-          fix.setMessageDigestAlgorithm(fct.getMessageDigestAlgorithm().getStringValue());
-          fix.setMessageDigestOriginator(fct.getMessageDigestOriginator().getStringValue());
-          fixities.add(fix);
+    try (InputStream inputStream = premisFile.getContent().createInputStream()) {
+      gov.loc.premis.v3.File f = binaryToFile(inputStream);
+      if (f.getObjectCharacteristicsArray() != null && f.getObjectCharacteristicsArray().length > 0) {
+        ObjectCharacteristicsComplexType occt = f.getObjectCharacteristicsArray(0);
+        if (occt.getFixityArray() != null && occt.getFixityArray().length > 0) {
+          for (FixityComplexType fct : occt.getFixityArray()) {
+            Fixity fix = new Fixity();
+            fix.setMessageDigest(fct.getMessageDigest());
+            fix.setMessageDigestAlgorithm(fct.getMessageDigestAlgorithm().getStringValue());
+            fix.setMessageDigestOriginator(fct.getMessageDigestOriginator().getStringValue());
+            fixities.add(fix);
+          }
         }
       }
     }
-    IOUtils.closeQuietly(inputStream);
+
     return fixities;
   }
 
   public static String extractFixity(Binary premisFile, String fixityType)
     throws IOException, GenericException, XmlException {
     String fixityValue = null;
-    InputStream inputStream = premisFile.getContent().createInputStream();
-    gov.loc.premis.v3.File f = binaryToFile(inputStream);
-    if (f.getObjectCharacteristicsArray() != null && f.getObjectCharacteristicsArray().length > 0) {
-      ObjectCharacteristicsComplexType occt = f.getObjectCharacteristicsArray(0);
-      if (occt.getFixityArray() != null && occt.getFixityArray().length > 0) {
-        for (FixityComplexType fct : occt.getFixityArray()) {
-          if (fct.getMessageDigestAlgorithm().getStringValue().equalsIgnoreCase(fixityType)) {
-            fixityValue = fct.getMessageDigest();
-            break;
+    try (InputStream inputStream = premisFile.getContent().createInputStream()) {
+      gov.loc.premis.v3.File f = binaryToFile(inputStream);
+      if (f.getObjectCharacteristicsArray() != null && f.getObjectCharacteristicsArray().length > 0) {
+        ObjectCharacteristicsComplexType occt = f.getObjectCharacteristicsArray(0);
+        if (occt.getFixityArray() != null && occt.getFixityArray().length > 0) {
+          for (FixityComplexType fct : occt.getFixityArray()) {
+            if (fct.getMessageDigestAlgorithm().getStringValue().equalsIgnoreCase(fixityType)) {
+              fixityValue = fct.getMessageDigest();
+              break;
+            }
           }
         }
       }
     }
-    IOUtils.closeQuietly(inputStream);
+
     return fixityValue;
   }
 
@@ -512,9 +512,8 @@ public final class PremisV3Utils {
   public static gov.loc.premis.v3.Representation binaryToRepresentation(ContentPayload payload, boolean validate)
     throws ValidationException, GenericException {
     Representation representation;
-    InputStream inputStream = null;
-    try {
-      inputStream = payload.createInputStream();
+
+    try (InputStream inputStream = payload.createInputStream()) {
       representation = binaryToRepresentation(inputStream);
 
       List<XmlValidationError> validationErrors = new ArrayList<>();
@@ -526,8 +525,6 @@ public final class PremisV3Utils {
       }
     } catch (XmlException | IOException e) {
       throw new GenericException("Error loading representation premis file", e);
-    } finally {
-      IOUtils.closeQuietly(inputStream);
     }
 
     return representation;
@@ -537,9 +534,8 @@ public final class PremisV3Utils {
     throws ValidationException, GenericException {
     gov.loc.premis.v3.File file;
     List<XmlValidationError> validationErrors = new ArrayList<>();
-    InputStream inputStream = null;
-    try {
-      inputStream = payload.createInputStream();
+
+    try (InputStream inputStream = payload.createInputStream()) {
       file = binaryToFile(inputStream);
 
       XmlOptions validationOptions = new XmlOptions();
@@ -554,8 +550,6 @@ public final class PremisV3Utils {
       throw exception;
     } catch (IOException e) {
       throw new GenericException("Error loading representation premis file", e);
-    } finally {
-      IOUtils.closeQuietly(inputStream);
     }
 
     return file;
@@ -577,9 +571,8 @@ public final class PremisV3Utils {
   public static EventComplexType binaryToEvent(ContentPayload payload, boolean validate)
     throws ValidationException, GenericException {
     EventComplexType event;
-    InputStream inputStream = null;
-    try {
-      inputStream = payload.createInputStream();
+
+    try (InputStream inputStream = payload.createInputStream()) {
       event = binaryToEvent(inputStream);
 
       List<XmlValidationError> validationErrors = new ArrayList<>();
@@ -591,8 +584,6 @@ public final class PremisV3Utils {
       }
     } catch (XmlException | IOException e) {
       throw new GenericException("Error loading representation premis file", e);
-    } finally {
-      IOUtils.closeQuietly(inputStream);
     }
 
     return event;
@@ -601,9 +592,8 @@ public final class PremisV3Utils {
   public static AgentComplexType binaryToAgent(ContentPayload payload, boolean validate)
     throws ValidationException, GenericException {
     AgentComplexType agent;
-    InputStream inputStream = null;
-    try {
-      inputStream = payload.createInputStream();
+
+    try (InputStream inputStream = payload.createInputStream()) {
       agent = binaryToAgent(inputStream);
 
       List<XmlValidationError> validationErrors = new ArrayList<>();
@@ -615,8 +605,6 @@ public final class PremisV3Utils {
       }
     } catch (XmlException | IOException e) {
       throw new GenericException("Error loading representation premis file", e);
-    } finally {
-      IOUtils.closeQuietly(inputStream);
     }
 
     return agent;
@@ -624,10 +612,8 @@ public final class PremisV3Utils {
 
   public static SolrInputDocument getSolrDocument(Binary premisBinary) throws GenericException {
     SolrInputDocument doc = new SolrInputDocument();
-    InputStream inputStream = null;
 
-    try {
-      inputStream = premisBinary.getContent().createInputStream();
+    try (InputStream inputStream = premisBinary.getContent().createInputStream()) {
       gov.loc.premis.v3.File premisFile = binaryToFile(inputStream);
       if (premisFile.getOriginalName() != null) {
         doc.setField(RodaConstants.FILE_ORIGINALNAME, premisFile.getOriginalName().getStringValue());
@@ -698,9 +684,8 @@ public final class PremisV3Utils {
 
     } catch (XmlException | IOException e) {
       LOGGER.error("Error updating Solr document", e);
-    } finally {
-      IOUtils.closeQuietly(inputStream);
     }
+
     return doc;
   }
 
@@ -715,9 +700,7 @@ public final class PremisV3Utils {
   }
 
   public static void linkFileToRepresentation(String fileId, String relationshipType, String relationshipSubType,
-    Representation r) throws GenericException, RequestNotValidException, NotFoundException,
-    AuthorizationDeniedException, XmlException, IOException, ValidationException {
-
+    Representation r) {
     RelationshipComplexType relationship = r.addNewRelationship();
     relationship.setRelationshipType(getStringPlusAuthority(relationshipType));
     relationship.setRelationshipSubType(getStringPlusAuthority(relationshipSubType));
@@ -835,12 +818,14 @@ public final class PremisV3Utils {
       } catch (NotFoundException e) {
         LOGGER.debug("PREMIS object skeleton does not exist yet. Creating PREMIS object!");
         List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
+
         if (fileId == null) {
           PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aipId, representationId, algorithms);
         } else {
           File file = model.retrieveFile(aipId, representationId, fileDirectoryPath, fileId);
           PremisSkeletonPluginUtils.createPremisSkeletonOnFile(model, file, algorithms);
         }
+
         premisBin = model.retrievePreservationFile(aipId, representationId, fileDirectoryPath, fileId);
         LOGGER.debug("PREMIS object skeleton created");
       }

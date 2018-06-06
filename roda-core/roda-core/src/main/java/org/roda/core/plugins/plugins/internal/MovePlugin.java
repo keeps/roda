@@ -233,7 +233,7 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
         toRepresentation = file.getRepresentationId();
       }
 
-      File movedFile = model.moveFile(file, toAIP, toRepresentation, toPath, file.getId(), true, true);
+      File movedFile = model.moveFile(file, toAIP, toRepresentation, toPath, file.getId(), true);
       outcomeText.append("The file '").append(ModelUtils.getFileStoragePath(file).toString())
         .append("' has been manually moved to '").append(ModelUtils.getFileStoragePath(movedFile).toString())
         .append("'");
@@ -363,7 +363,6 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
     return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE);
   }
 
-  @SuppressWarnings({"unchecked", "rawtypes"})
   @Override
   public List<Class<T>> getObjectClasses() {
     List<Class<? extends IsRODAObject>> list = new ArrayList<>();

@@ -12,6 +12,7 @@ import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -23,7 +24,6 @@ import java.util.Optional;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -52,6 +52,7 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
     long start = System.currentTimeMillis();
     Date lastScanDate = new Date();
     RodaCoreFactory.setTransferredResourcesScannerUpdateStatus(folderRelativePath, true);
+
     try {
       EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
       Path path;
@@ -68,7 +69,7 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
         ArrayDeque<Long> fileSizeStack = new ArrayDeque<>();
 
         @Override
-        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
           actualDirectoryAttributesStack.push(attrs);
           fileSizeStack.push(0L);
           return FileVisitResult.CONTINUE;
@@ -83,20 +84,20 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
             TransferredResource resource = TransferredResourcesScanner.createTransferredResource(file, attrs, size,
               basePath, lastScanDate);
             index.create(TransferredResource.class, resource);
-          } catch (GenericException | RequestNotValidException e) {
-            LOGGER.error("Error adding path to Transferred Resources index", e);
+          } catch (NoSuchFileException e) {
+            // can be a broken symlink (do nothing)
           }
 
           return FileVisitResult.CONTINUE;
         }
 
         @Override
-        public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+        public FileVisitResult visitFileFailed(Path file, IOException exc) {
           return FileVisitResult.CONTINUE;
         }
 
         @Override
-        public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+        public FileVisitResult postVisitDirectory(Path dir, IOException exc) {
           if (!dir.equals(basePath)) {
             BasicFileAttributes actualDirectoryAttributes = actualDirectoryAttributesStack.pop();
             long fileSize = fileSizeStack.pop();
@@ -108,12 +109,9 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
               fileSizeStack.push(actualSize + fileSize);
             }
 
-            try {
-              index.create(TransferredResource.class, resource);
-            } catch (GenericException | RequestNotValidException e) {
-              LOGGER.error("Error adding path to Transferred Resources index", e);
-            }
+            index.create(TransferredResource.class, resource);
           }
+
           return FileVisitResult.CONTINUE;
         }
       });
@@ -136,7 +134,7 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
       LOGGER.info("End indexing Transferred Resources. Time elapsed: {} seconds",
         (System.currentTimeMillis() - start) / 1000);
       RodaCoreFactory.setTransferredResourcesScannerUpdateStatus(folderRelativePath, false);
-    } catch (IOException | GenericException | RequestNotValidException | RuntimeException e) {
+    } catch (IOException | GenericException | RuntimeException e) {
       LOGGER.error("Error reindexing Transferred Resources", e);
     }
   }

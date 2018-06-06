@@ -24,7 +24,7 @@ import com.google.common.collect.UnmodifiableIterator;
 public final class CloseableIterables {
 
   private CloseableIterables() {
-
+    // do nothing
   }
 
   public static <T> CloseableIterable<T> concat(List<CloseableIterable<T>> list) {
@@ -32,7 +32,7 @@ public final class CloseableIterables {
     return new CloseableIterable<T>() {
 
       @Override
-      public void close() throws IOException {
+      public void close() {
         closeAll(list);
       }
 
@@ -172,7 +172,6 @@ public final class CloseableIterables {
     }
   }
 
-  @SuppressWarnings("unchecked")
   public static <T> CloseableIterable<T> concat(CloseableIterable<T>... iterables) {
     return concat(Arrays.asList(iterables));
   }
@@ -208,7 +207,7 @@ public final class CloseableIterables {
     return new CloseableIterable<T>() {
 
       @Override
-      public void close() throws IOException {
+      public void close() {
         // do nothing
       }
 
@@ -223,7 +222,7 @@ public final class CloseableIterables {
     return new CloseableIterable<T>() {
 
       @Override
-      public void close() throws IOException {
+      public void close() {
         // nothing to do
       }
 

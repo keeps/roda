@@ -85,7 +85,7 @@ public class AIPCorruptionRiskAssessmentTest {
   }
 
   @Test
-  public void testAIPCorruption() throws IOException, InterruptedException, RODAException, SolrServerException {
+  public void testAIPCorruption() throws RODAException {
     String aipId = IdUtils.createUUID();
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_CORRUPTED),

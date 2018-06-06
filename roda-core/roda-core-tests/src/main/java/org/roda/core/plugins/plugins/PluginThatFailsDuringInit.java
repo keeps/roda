@@ -20,7 +20,6 @@ import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
-import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,7 +81,7 @@ public class PluginThatFailsDuringInit extends AbstractPlugin<Void> {
   }
 
   @Override
-  public void init() throws PluginException {
+  public void init() {
     // 20170123 hsilva: must test an exception that extend Throwable (besides
     // the ones that extend RuntimeException)
     throw new Error();
@@ -94,21 +93,20 @@ public class PluginThatFailsDuringInit extends AbstractPlugin<Void> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
+  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage) {
     LOGGER.info("Doing nothing during beforeAllExecute");
     return null;
   }
 
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
-    List<LiteOptionalWithCause> list) throws PluginException {
+    List<LiteOptionalWithCause> list) {
     LOGGER.info("Doing nothing during execute");
     return null;
   }
 
   @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) {
     LOGGER.info("Doing nothing during afterAllExecute");
     return null;
   }

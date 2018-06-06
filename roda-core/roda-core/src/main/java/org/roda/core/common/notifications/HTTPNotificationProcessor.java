@@ -13,7 +13,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -107,9 +106,7 @@ public class HTTPNotificationProcessor implements NotificationProcessor {
   private String processEntity(HttpEntity entity) {
     String responseTxt = null;
     if (entity != null) {
-      InputStream is = null;
-      try {
-        is = entity.getContent();
+      try (InputStream is = entity.getContent()) {
         StringBuilder sb = new StringBuilder();
         String line;
 
@@ -124,8 +121,6 @@ public class HTTPNotificationProcessor implements NotificationProcessor {
         responseTxt = sb.toString();
       } catch (UnsupportedOperationException | IOException e1) {
         // do nothing
-      } finally {
-        IOUtils.closeQuietly(is);
       }
     }
     return responseTxt;

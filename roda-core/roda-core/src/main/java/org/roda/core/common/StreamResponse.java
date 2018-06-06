@@ -62,5 +62,4 @@ public class StreamResponse implements EntityResponse {
     this.stream = stream;
   }
 
-
 }

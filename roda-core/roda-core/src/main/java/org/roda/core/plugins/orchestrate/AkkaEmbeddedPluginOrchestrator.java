@@ -48,7 +48,6 @@ import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
-import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginOrchestrator;
 import org.roda.core.plugins.orchestrate.akka.AkkaJobsManager;
 import org.roda.core.plugins.orchestrate.akka.DeadLetterActor;
@@ -253,12 +252,12 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
   @Override
   public <T extends IsRODAObject> void runPluginOnAllObjects(Object context, Plugin<T> plugin, Class<T> objectClass) {
-    try {
-      LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
-      ActorRef jobActor = (ActorRef) context;
-      ActorRef jobStateInfoActor = getJobContextInformation(PluginHelper.getJobId(plugin));
-      int blockSize = JobsHelper.getBlockSize();
-      CloseableIterable<OptionalWithCause<LiteRODAObject>> objects = model.listLite(objectClass);
+    LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
+    ActorRef jobActor = (ActorRef) context;
+    ActorRef jobStateInfoActor = getJobContextInformation(PluginHelper.getJobId(plugin));
+    int blockSize = JobsHelper.getBlockSize();
+
+    try (CloseableIterable<OptionalWithCause<LiteRODAObject>> objects = model.listLite(objectClass)) {
       Iterator<OptionalWithCause<LiteRODAObject>> iter = objects.iterator();
       Plugin<T> innerPlugin;
 
@@ -286,15 +285,12 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       }
 
       jobStateInfoActor.tell(new Messages.JobInitEnded(), jobActor);
-      IOUtils.closeQuietly(objects);
-
     } catch (JobIsStoppingException | JobInErrorException e) {
       // do nothing
     } catch (Exception e) {
       LOGGER.error("Error running plugin on all objects", e);
       JobsHelper.updateJobStateAsync(plugin, JOB_STATE.FAILED_TO_COMPLETE, e);
     }
-
   }
 
   @Override
@@ -318,7 +314,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   private <T extends IsRODAObject> void initJobPluginInfo(Plugin<T> plugin, int objectsCount, ActorRef jobActor)
-    throws InvalidParameterException, PluginException, JobIsStoppingException, JobInErrorException {
+    throws JobIsStoppingException, JobInErrorException {
 
     // keep track of each job/plugin relation
     String jobId = PluginHelper.getJobId(plugin);
@@ -345,12 +341,11 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     } else {
       LOGGER.error("Error while trying to init plugin. Cause: unable to find out job id");
     }
-
   }
 
   private <T extends IsRODAObject> Plugin<T> getNewPluginInstanceAndInitJobPluginInfo(Plugin<T> plugin,
     Class<T> pluginClass, int objectsCount, ActorRef jobActor)
-    throws InvalidParameterException, PluginException, JobIsStoppingException, JobInErrorException {
+    throws InvalidParameterException, JobIsStoppingException, JobInErrorException {
     Plugin<T> innerPlugin = RodaCoreFactory.getPluginManager().getPlugin(plugin.getClass().getName(), pluginClass);
     innerPlugin.setParameterValues(plugin.getParameterValues());
 
@@ -381,7 +376,6 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     }
 
     return innerPlugin;
-
   }
 
   private <T extends IsRODAObject> void initJobPluginInfo(Plugin<T> innerPlugin, ActorRef jobActor,
@@ -413,7 +407,6 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       }
       LOGGER.info("Success adding job '{}' ({}) to be executed", job.getName(), job.getId());
     }
-
   }
 
   @Override
@@ -472,7 +465,6 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     } else {
       LOGGER.error("Got job id or job information null when updating Job state");
     }
-
   }
 
   @Override

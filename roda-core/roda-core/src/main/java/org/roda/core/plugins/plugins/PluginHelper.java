@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.PremisV3Utils;
@@ -409,7 +408,6 @@ public final class PluginHelper {
     } else {
       throw new NotFoundException("Job not found");
     }
-
   }
 
   public static <T extends IsRODAObject> Job getJob(Plugin<T> plugin, ModelService model)
@@ -452,7 +450,6 @@ public final class PluginHelper {
     } else {
       throw new NotFoundException("Job not found");
     }
-
   }
 
   public static <T extends IsRODAObject> Path getJobWorkingDirectory(Plugin<T> plugin) {
@@ -505,6 +502,7 @@ public final class PluginHelper {
     } else {
       throw new JobException("Cannot obtain job plugin info (that supposedly was set by plugin orchestrator)");
     }
+
     return jobPluginInfo;
   }
 
@@ -565,9 +563,7 @@ public final class PluginHelper {
 
   /*********************************/
   public static Optional<String> getComputedParent(ModelService model, IndexService index, List<String> ancestors,
-    Optional<String> computedSearchScope, boolean forceSearchScope, String jobId)
-    throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException,
-    AlreadyExistsException, ValidationException {
+    Optional<String> computedSearchScope, boolean forceSearchScope, String jobId) {
     if (ancestors.isEmpty()) {
       return computedSearchScope;
     }
@@ -712,8 +708,7 @@ public final class PluginHelper {
   }
 
   public static Risk createRiskIfNotExists(ModelService model, String riskId, ClassLoader pluginClassLoader)
-    throws RequestNotValidException, GenericException, AuthorizationDeniedException, AlreadyExistsException,
-    NotFoundException {
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException {
     try {
       return model.retrieveRisk(riskId);
     } catch (NotFoundException e) {
@@ -722,32 +717,22 @@ public final class PluginHelper {
   }
 
   private static Risk createDefaultRisk(ModelService model, String riskId, ClassLoader pluginClassLoader)
-    throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
-    AuthorizationDeniedException {
-
+    throws GenericException {
     String defaultFile = RodaConstants.CORE_DATA_FOLDER + '/' + RodaConstants.CORE_STORAGE_FOLDER + '/'
       + RodaConstants.CORE_RISK_FOLDER + '/' + riskId + ".json";
 
-    InputStream inputStream = RodaCoreFactory.getDefaultFileAsStream(defaultFile, pluginClassLoader);
+    try (InputStream inputStream = RodaCoreFactory.getDefaultFileAsStream(defaultFile, pluginClassLoader)) {
+      if (inputStream == null) {
+        throw new GenericException("Could not create a default risk because resource was not found: " + defaultFile);
+      }
 
-    if (inputStream == null) {
-      throw new GenericException("Could not create a default risk because resource was not found: " + defaultFile);
-    }
-
-    Risk risk = null;
-
-    try {
-      risk = JsonUtils.getObjectFromJson(inputStream, Risk.class);
+      Risk risk = JsonUtils.getObjectFromJson(inputStream, Risk.class);
       risk.setId(riskId);
-      model.createRisk(risk, false);
-    } catch (GenericException e) {
+      return model.createRisk(risk, false);
+    } catch (GenericException | IOException e) {
       LOGGER.error("Could not create a default risk", e);
-      throw e;
-    } finally {
-      IOUtils.closeQuietly(inputStream);
+      throw new GenericException(e);
     }
-
-    return risk;
   }
 
   /***************** Preservation events related *****************/
@@ -899,7 +884,7 @@ public final class PluginHelper {
   public static LinkingIdentifier getLinkingIdentifier(TransferredResource transferredResource, String role) {
     LinkingIdentifier li = new LinkingIdentifier();
     li.setValue(LinkingObjectUtils.getLinkingIdentifierId(transferredResource));
-    li.setType("URN");
+    li.setType(RodaConstants.URN_TYPE);
     li.setRoles(Arrays.asList(role));
     return li;
   }
@@ -970,7 +955,7 @@ public final class PluginHelper {
           .moveTransferredResource(successPath, success, true);
         updateReportsAfterMovingSIPs(model, jobPluginInfo, successOldToNewTransferredResourceIds);
       }
-    } catch (AlreadyExistsException | GenericException | NotFoundException | RequestNotValidException e) {
+    } catch (GenericException | NotFoundException e) {
       LOGGER.error("Error moving successfully ingested SIPs", e);
     } catch (IsStillUpdatingException e) {
       LOGGER.warn("TransferredResources are already being indexed");
@@ -982,7 +967,7 @@ public final class PluginHelper {
           .moveTransferredResource(unsuccessPath, unsuccess, true);
         updateReportsAfterMovingSIPs(model, jobPluginInfo, unsuccessOldToNewTransferredResourceIds);
       }
-    } catch (AlreadyExistsException | GenericException | NotFoundException | RequestNotValidException e) {
+    } catch (GenericException | NotFoundException e) {
       LOGGER.error("Error moving unsuccessfully ingested SIPs", e);
     } catch (IsStillUpdatingException e) {
       LOGGER.warn("TransferredResources are already being indexed");
@@ -1271,5 +1256,4 @@ public final class PluginHelper {
     outcomeText.append("] ").append(actionMessage);
     return outcomeText.toString();
   }
-
 }

@@ -37,8 +37,8 @@ import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.index.IndexService;
+import org.roda.core.index.utils.IndexUtils;
 import org.roda.core.index.utils.IterableIndexResult;
-import org.roda.core.model.utils.ModelUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,7 +70,7 @@ public class UserUtility {
     return request.getSession().getAttribute(UserUtility.RODA_USER) != null;
   }
 
-  public static User getApiUser(final HttpServletRequest request) throws AuthorizationDeniedException {
+  public static User getApiUser(final HttpServletRequest request) {
     return getUser(request, false);
   }
 
@@ -191,9 +191,8 @@ public class UserUtility {
    *
    * @param user
    * @param ids
-   * @throws AuthorizationDeniedException
    */
-  public static void checkTransferredResourceAccess(User user, List<String> ids) throws AuthorizationDeniedException {
+  public static void checkTransferredResourceAccess(User user, List<String> ids) {
     // do nothing
   }
 
@@ -357,7 +356,7 @@ public class UserUtility {
       }
     } else if (selected instanceof SelectedItemsList) {
       SelectedItemsList<IndexedAIP> selectedItems = (SelectedItemsList<IndexedAIP>) selected;
-      List<IndexedAIP> aips = ModelUtils.getIndexedAIPsFromObjectIds(selectedItems);
+      List<IndexedAIP> aips = IndexUtils.getIndexedAIPsFromObjectIds(selectedItems);
       for (IndexedAIP aip : aips) {
         checkAIPPermissions(user, aip, permission);
       }
@@ -388,7 +387,7 @@ public class UserUtility {
       }
     } else if (selected instanceof SelectedItemsList) {
       SelectedItemsList<IndexedDIP> selectedItems = (SelectedItemsList<IndexedDIP>) selected;
-      List<IndexedDIP> dips = ModelUtils.getIndexedDIPsFromObjectIds(selectedItems);
+      List<IndexedDIP> dips = IndexUtils.getIndexedDIPsFromObjectIds(selectedItems);
       for (IndexedDIP dip : dips) {
         checkDIPPermissions(user, dip, permission);
       }
@@ -398,7 +397,6 @@ public class UserUtility {
     }
   }
 
-  @SuppressWarnings("unchecked")
   public static <T extends IsIndexed> void checkObjectPermissions(User user, SelectedItems<T> selected,
     PermissionType permissionType) throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     Class<T> classToReturn = SelectedItemsUtils.parseClass(selected.getSelectedClass());
@@ -488,14 +486,14 @@ public class UserUtility {
     List<Object> defaultGroups = RodaCoreFactory.getRodaConfiguration().getList(REGISTER_DEFAULT_GROUPS);
 
     if (defaultRoles != null && !defaultRoles.isEmpty()) {
-      user.setDirectRoles(new HashSet<String>(RodaUtils.copyList(defaultRoles)));
+      user.setDirectRoles(new HashSet<>(RodaUtils.copyList(defaultRoles)));
     } else {
-      user.setDirectRoles(new HashSet<String>());
+      user.setDirectRoles(new HashSet<>());
     }
     if (defaultGroups != null && !defaultGroups.isEmpty()) {
-      user.setGroups(new HashSet<String>(RodaUtils.copyList(defaultGroups)));
+      user.setGroups(new HashSet<>(RodaUtils.copyList(defaultGroups)));
     } else {
-      user.setGroups(new HashSet<String>());
+      user.setGroups(new HashSet<>());
     }
     user.setActive(RodaCoreFactory.getRodaConfiguration().getBoolean(REGISTER_ACTIVE_PROPERTY));
     return user;

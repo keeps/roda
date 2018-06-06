@@ -23,7 +23,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -36,7 +35,6 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.xmlbeans.XmlException;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.hamcrest.core.Is;
@@ -149,7 +147,7 @@ public class ModelServiceTest {
   }
 
   @Test
-  public void testCreateAIP() throws RODAException, ParseException, IOException, XmlException {
+  public void testCreateAIP() throws RODAException, IOException {
 
     // generate AIP ID
     final String aipId = CorporaConstants.SOURCE_AIP_ID;
@@ -299,7 +297,7 @@ public class ModelServiceTest {
   }
 
   @Test
-  public void testCreateAIPVersionEAD3() throws RODAException, ParseException, IOException, XmlException {
+  public void testCreateAIPVersionEAD3() throws RODAException, IOException {
 
     // generate AIP ID
     final String aipId = IdUtils.createUUID();
@@ -345,7 +343,7 @@ public class ModelServiceTest {
   }
 
   @Test
-  public void testCreateAIPVersionUnknown() throws RODAException, ParseException, IOException, XmlException {
+  public void testCreateAIPVersionUnknown() throws RODAException, IOException {
 
     // generate AIP ID
     final String aipId = IdUtils.createUUID();
@@ -391,7 +389,7 @@ public class ModelServiceTest {
   }
 
   @Test
-  public void testCreateAIPWithSubFolders() throws RODAException, ParseException, IOException {
+  public void testCreateAIPWithSubFolders() throws RODAException, IOException {
 
     // generate AIP ID
     final String aipId = IdUtils.createUUID();
@@ -508,7 +506,6 @@ public class ModelServiceTest {
     model.deleteAIP(aip1Id);
     model.deleteAIP(aip2Id);
     model.deleteAIP(aip3Id);
-
   }
 
   @Test
@@ -698,7 +695,6 @@ public class ModelServiceTest {
 
     // cleanup
     model.deleteAIP(aipId);
-
   }
 
   @Test
@@ -1035,11 +1031,10 @@ public class ModelServiceTest {
     // cleanup
     model.deleteUser(user.getId(), true);
   }
-  
-  
+
   @Test
   public void testUserUpdate() throws RODAException {
-    
+
     // create user 1
     User user = new User("user_1");
     user.setActive(true);
@@ -1047,25 +1042,25 @@ public class ModelServiceTest {
     user.setGuest(false);
     user.setFullName("user1");
     model.createUser(user, true);
-    
+
     // create group 1
     Group group1 = new Group("group_1");
     group1.setActive(true);
     group1.setFullName("NAMEGROUP1");
     group1.setDirectRoles(new HashSet<>(Arrays.asList(ROLE1)));
     model.createGroup(group1, true);
-    
+
     // update user
     User user2 = model.retrieveUser(user.getId());
     user2.addGroup(group1.getId());
     User user3 = model.updateUser(user2, null, true);
-    
+
     MatcherAssert.assertThat(user3.getGroups(), Matchers.containsInAnyOrder(group1.getId()));
-    
+
     // cleanup
     model.deleteUser(user.getId(), true);
     model.deleteGroup(group1.getId(), true);
-    
+
   }
 
   @Test

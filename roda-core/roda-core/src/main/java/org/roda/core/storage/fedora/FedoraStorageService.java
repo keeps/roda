@@ -130,6 +130,11 @@ public class FedoraStorageService implements StorageService {
   }
 
   @Override
+  public boolean exists(StoragePath storagePath) {
+    return hasBinary(storagePath) || hasDirectory(storagePath);
+  }
+
+  @Override
   public CloseableIterable<Container> listContainers()
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     return new IterableContainer(fedoraRepository);
@@ -137,7 +142,7 @@ public class FedoraStorageService implements StorageService {
 
   @Override
   public Container createContainer(StoragePath storagePath)
-    throws AuthorizationDeniedException, AlreadyExistsException, RequestNotValidException, GenericException {
+    throws AuthorizationDeniedException, AlreadyExistsException, GenericException {
 
     try {
       fedoraRepository.createObject(FedoraUtils.storagePathToFedoraPath(storagePath));
@@ -614,9 +619,9 @@ public class FedoraStorageService implements StorageService {
             path = temp.resolve(entity.getName());
             Binary binary = getBinary(storagePath);
             ContentPayload payload = binary.getContent();
-            InputStream inputStream = payload.createInputStream();
-            Files.copy(inputStream, path);
-            IOUtils.closeQuietly(inputStream);
+            try (InputStream inputStream = payload.createInputStream()) {
+              Files.copy(inputStream, path);
+            }
           }
         } catch (IOException | AlreadyExistsException e) {
           throw new GenericException(e);
@@ -764,7 +769,7 @@ public class FedoraStorageService implements StorageService {
 
   @Override
   public BinaryVersion createBinaryVersion(StoragePath storagePath, Map<String, String> properties)
-    throws RequestNotValidException, NotFoundException, GenericException {
+    throws RequestNotValidException, GenericException {
     try {
       String id = IdUtils.createUUID();
       FedoraDatastream binary = fedoraRepository.getDatastream(FedoraUtils.storagePathToFedoraPath(storagePath));
@@ -777,8 +782,7 @@ public class FedoraStorageService implements StorageService {
   }
 
   @Override
-  public void revertBinaryVersion(StoragePath storagePath, String version)
-    throws NotFoundException, RequestNotValidException, GenericException {
+  public void revertBinaryVersion(StoragePath storagePath, String version) throws GenericException {
     try {
       FedoraDatastream binary = fedoraRepository.getDatastream(FedoraUtils.storagePathToFedoraPath(storagePath));
       String fullVersionID = getFullVersionID(binary, version);
@@ -789,8 +793,7 @@ public class FedoraStorageService implements StorageService {
   }
 
   @Override
-  public void deleteBinaryVersion(StoragePath storagePath, String version)
-    throws NotFoundException, GenericException, RequestNotValidException {
+  public void deleteBinaryVersion(StoragePath storagePath, String version) throws GenericException {
     try {
       FedoraDatastream binary = fedoraRepository.getDatastream(FedoraUtils.storagePathToFedoraPath(storagePath));
       String fullVersionID = getFullVersionID(binary, version);
@@ -840,4 +843,14 @@ public class FedoraStorageService implements StorageService {
     }
   }
 
+  @Override
+  public String getStoragePathAsString(StoragePath storagePath, boolean skipStoragePathContainer,
+    StoragePath anotherStoragePath, boolean skipAnotherStoragePathContainer) {
+    return getStoragePathAsString(storagePath, false);
+  }
+
+  @Override
+  public String getStoragePathAsString(StoragePath storagePath, boolean skipContainer) {
+    return FedoraUtils.storagePathToFedoraPath(storagePath);
+  }
 }

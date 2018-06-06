@@ -13,7 +13,6 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.User;
@@ -36,7 +35,7 @@ public class Notifications extends RodaWuiController {
    * ---------------------------------------------------------------------------
    */
   public static Notification createNotification(User user, Notification notification, String template)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    throws AuthorizationDeniedException, GenericException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     String tmpl = template;
 
@@ -62,7 +61,7 @@ public class Notifications extends RodaWuiController {
   }
 
   public static Notification updateNotification(User user, Notification notification)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    throws AuthorizationDeniedException, NotFoundException, GenericException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -84,7 +83,7 @@ public class Notifications extends RodaWuiController {
   }
 
   public static void deleteNotification(User user, String notificationId)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    throws GenericException, NotFoundException, AuthorizationDeniedException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions

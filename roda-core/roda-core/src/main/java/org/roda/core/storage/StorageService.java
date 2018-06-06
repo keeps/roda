@@ -40,6 +40,12 @@ import org.roda.core.data.v2.ip.StoragePath;
 public interface StorageService {
 
   /**
+   * Test if file/folder exists.
+   *
+   */
+  boolean exists(StoragePath storagePath);
+
+  /**
    * List all existing containers.
    * 
    * @throws GenericException
@@ -47,7 +53,7 @@ public interface StorageService {
    * @throws RequestNotValidException
    * @throws AuthorizationDeniedException
    */
-  public CloseableIterable<Container> listContainers()
+  CloseableIterable<Container> listContainers()
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
 
   /**
@@ -62,7 +68,7 @@ public interface StorageService {
    * @throws RequestNotValidException
    * 
    */
-  public Container createContainer(StoragePath storagePath)
+  Container createContainer(StoragePath storagePath)
     throws GenericException, AlreadyExistsException, AuthorizationDeniedException, RequestNotValidException;
 
   /**
@@ -76,7 +82,7 @@ public interface StorageService {
    * @throws NotFoundException
    * @throws AuthorizationDeniedException
    */
-  public Container getContainer(StoragePath storagePath)
+  Container getContainer(StoragePath storagePath)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException;
 
   /**
@@ -89,7 +95,7 @@ public interface StorageService {
    * @throws NotFoundException
    * @throws AuthorizationDeniedException
    */
-  public void deleteContainer(StoragePath storagePath)
+  void deleteContainer(StoragePath storagePath)
     throws NotFoundException, GenericException, AuthorizationDeniedException;
 
   /**
@@ -103,7 +109,7 @@ public interface StorageService {
    * @throws RequestNotValidException
    * @throws AuthorizationDeniedException
    */
-  public CloseableIterable<Resource> listResourcesUnderContainer(StoragePath storagePath, boolean recursive)
+  CloseableIterable<Resource> listResourcesUnderContainer(StoragePath storagePath, boolean recursive)
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException;
 
   /**
@@ -117,7 +123,7 @@ public interface StorageService {
    * @throws NotFoundException
    * @throws RequestNotValidException
    */
-  public Long countResourcesUnderContainer(StoragePath storagePath, boolean recursive)
+  Long countResourcesUnderContainer(StoragePath storagePath, boolean recursive)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
 
   /**
@@ -131,7 +137,7 @@ public interface StorageService {
    * @throws AuthorizationDeniedException
    * 
    */
-  public Directory createDirectory(StoragePath storagePath)
+  Directory createDirectory(StoragePath storagePath)
     throws AlreadyExistsException, GenericException, AuthorizationDeniedException;
 
   /**
@@ -147,8 +153,8 @@ public interface StorageService {
    * @throws AuthorizationDeniedException
    * 
    */
-  public Directory createRandomDirectory(StoragePath parentStoragePath) throws RequestNotValidException,
-    GenericException, NotFoundException, AlreadyExistsException, AuthorizationDeniedException;
+  Directory createRandomDirectory(StoragePath parentStoragePath) throws RequestNotValidException, GenericException,
+    NotFoundException, AlreadyExistsException, AuthorizationDeniedException;
 
   /**
    * Get an existing directory.
@@ -161,7 +167,7 @@ public interface StorageService {
    * @throws NotFoundException
    * @throws AuthorizationDeniedException
    */
-  public Directory getDirectory(StoragePath storagePath)
+  Directory getDirectory(StoragePath storagePath)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException;
 
   /**
@@ -171,7 +177,7 @@ public interface StorageService {
    *          storage path that identifies the directory
    * 
    */
-  public boolean hasDirectory(StoragePath storagePath);
+  boolean hasDirectory(StoragePath storagePath);
 
   /**
    * List all resources, container or binaries, under this directory.
@@ -184,7 +190,7 @@ public interface StorageService {
    * @throws RequestNotValidException
    * @throws AuthorizationDeniedException
    */
-  public CloseableIterable<Resource> listResourcesUnderDirectory(StoragePath storagePath, boolean recursive)
+  CloseableIterable<Resource> listResourcesUnderDirectory(StoragePath storagePath, boolean recursive)
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException;
 
   /**
@@ -198,7 +204,7 @@ public interface StorageService {
    * @throws AuthorizationDeniedException
    * @throws RequestNotValidException
    */
-  public Long countResourcesUnderDirectory(StoragePath storagePath, boolean recursive)
+  Long countResourcesUnderDirectory(StoragePath storagePath, boolean recursive)
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException;
 
   /**
@@ -219,9 +225,8 @@ public interface StorageService {
    * @throws AuthorizationDeniedException
    * @throws NotFoundException
    */
-  public Binary createBinary(StoragePath storagePath, ContentPayload payload, boolean asReference)
-    throws GenericException, AlreadyExistsException, RequestNotValidException, AuthorizationDeniedException,
-    NotFoundException;
+  Binary createBinary(StoragePath storagePath, ContentPayload payload, boolean asReference) throws GenericException,
+    AlreadyExistsException, RequestNotValidException, AuthorizationDeniedException, NotFoundException;
 
   /**
    * Create a binary resource with a defined content with a generated id.
@@ -240,7 +245,7 @@ public interface StorageService {
    * @throws AuthorizationDeniedException
    * @throws NotFoundException
    */
-  public Binary createRandomBinary(StoragePath parentStoragePath, ContentPayload payload, boolean asReference)
+  Binary createRandomBinary(StoragePath parentStoragePath, ContentPayload payload, boolean asReference)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException;
 
   /**
@@ -254,7 +259,7 @@ public interface StorageService {
    * @throws AuthorizationDeniedException
    * 
    */
-  public Binary getBinary(StoragePath storagePath)
+  Binary getBinary(StoragePath storagePath)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException;
 
   /**
@@ -264,7 +269,7 @@ public interface StorageService {
    *          storage path that identifies the binary
    * 
    */
-  public boolean hasBinary(StoragePath storagePath);
+  boolean hasBinary(StoragePath storagePath);
 
   /**
    * Replace existing binary content with given one, not changing any associated
@@ -289,7 +294,7 @@ public interface StorageService {
    * @throws RequestNotValidException
    * @throws AuthorizationDeniedException
    */
-  public Binary updateBinaryContent(StoragePath storagePath, ContentPayload payload, boolean asReference,
+  Binary updateBinaryContent(StoragePath storagePath, ContentPayload payload, boolean asReference,
     boolean createIfNotExists)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException;
 
@@ -303,8 +308,7 @@ public interface StorageService {
    * @throws NotFoundException
    * @throws AuthorizationDeniedException
    */
-  public void deleteResource(StoragePath storagePath)
-    throws NotFoundException, GenericException, AuthorizationDeniedException;
+  void deleteResource(StoragePath storagePath) throws NotFoundException, GenericException, AuthorizationDeniedException;
 
   /**
    * Get entity class
@@ -317,7 +321,7 @@ public interface StorageService {
    * @throws AuthorizationDeniedException
    * @throws RequestNotValidException
    */
-  public Class<? extends Entity> getEntity(StoragePath storagePath)
+  Class<? extends Entity> getEntity(StoragePath storagePath)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException;
 
   /**
@@ -333,7 +337,7 @@ public interface StorageService {
    * @throws RequestNotValidException
    * @throws AuthorizationDeniedException
    */
-  public void copy(StorageService fromService, StoragePath fromStoragePath, StoragePath toStoragePath)
+  void copy(StorageService fromService, StoragePath fromStoragePath, StoragePath toStoragePath)
     throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException;
 
@@ -350,25 +354,29 @@ public interface StorageService {
    * @throws RequestNotValidException
    * @throws AuthorizationDeniedException
    */
-  public void move(StorageService fromService, StoragePath fromStoragePath, StoragePath toStoragePath)
+  void move(StorageService fromService, StoragePath fromStoragePath, StoragePath toStoragePath)
     throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException;
 
-  public DirectResourceAccess getDirectAccess(StoragePath storagePath);
+  DirectResourceAccess getDirectAccess(StoragePath storagePath);
 
-  public CloseableIterable<BinaryVersion> listBinaryVersions(StoragePath storagePath)
+  CloseableIterable<BinaryVersion> listBinaryVersions(StoragePath storagePath)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException;
 
-  public BinaryVersion getBinaryVersion(StoragePath storagePath, String version)
+  BinaryVersion getBinaryVersion(StoragePath storagePath, String version)
     throws RequestNotValidException, NotFoundException, GenericException;
 
-  public BinaryVersion createBinaryVersion(StoragePath storagePath, Map<String, String> properties)
+  BinaryVersion createBinaryVersion(StoragePath storagePath, Map<String, String> properties)
     throws RequestNotValidException, NotFoundException, GenericException;
 
-  public void revertBinaryVersion(StoragePath storagePath, String version)
+  void revertBinaryVersion(StoragePath storagePath, String version)
     throws NotFoundException, RequestNotValidException, GenericException;
 
-  public void deleteBinaryVersion(StoragePath storagePath, String version)
+  void deleteBinaryVersion(StoragePath storagePath, String version)
     throws NotFoundException, GenericException, RequestNotValidException;
 
+  String getStoragePathAsString(StoragePath storagePath, boolean skipStoragePathContainer,
+    StoragePath anotherStoragePath, boolean skipAnotherStoragePathContainer);
+
+  String getStoragePathAsString(StoragePath storagePath, boolean skipContainer);
 }

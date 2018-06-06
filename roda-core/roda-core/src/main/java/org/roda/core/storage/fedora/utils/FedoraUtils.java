@@ -100,10 +100,10 @@ public final class FedoraUtils {
   }
 
   /**
-   * Method for creating a SPARQL update query using the prefix "roda:". Query
-   * is built by doing the concatenation of RODA prefix/namespace declaration,
-   * <code>DELETE DATA</code> instruction using <code>metadataToDelete</code>
-   * data (if not null) and <code>INSERT DATA</code> instruction using
+   * Method for creating a SPARQL update query using the prefix "roda:". Query is
+   * built by doing the concatenation of RODA prefix/namespace declaration,
+   * <code>DELETE DATA</code> instruction using <code>metadataToDelete</code> data
+   * (if not null) and <code>INSERT DATA</code> instruction using
    * <code>metadataToAdd</code> data (if not null).
    * 
    * @param metadataToAdd
@@ -171,7 +171,6 @@ public final class FedoraUtils {
         sb.append(" ; ");
       }
     }
-
   }
 
   public static StoragePath doubleURLDecode(StoragePath storagePath) {

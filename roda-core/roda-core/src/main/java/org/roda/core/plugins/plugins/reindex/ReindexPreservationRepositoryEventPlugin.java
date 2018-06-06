@@ -7,13 +7,13 @@
  */
 package org.roda.core.plugins.plugins.reindex;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
@@ -118,26 +118,29 @@ public class ReindexPreservationRepositoryEventPlugin extends AbstractPlugin<Voi
       PluginHelper.updateJobInformationAsync(this, jobPluginInfo);
       pluginReport.setPluginState(PluginState.SUCCESS);
 
-      CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable = model.listPreservationRepositoryEvents();
-      int eventCounter = 0;
+      try (CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable = model
+        .listPreservationRepositoryEvents()) {
+        int eventCounter = 0;
 
-      for (OptionalWithCause<PreservationMetadata> opm : iterable) {
-        if (opm.isPresent()) {
-          model.notifyPreservationMetadataCreated(opm.get()).failOnError();
-          jobPluginInfo.incrementObjectsProcessedWithSuccess();
-        } else {
-          jobPluginInfo.incrementObjectsProcessedWithFailure();
-          pluginReport.setPluginState(PluginState.FAILURE)
-            .addPluginDetails("Could not add preservation repository event: " + opm.getCause());
+        for (OptionalWithCause<PreservationMetadata> opm : iterable) {
+          if (opm.isPresent()) {
+            model.notifyPreservationMetadataCreated(opm.get()).failOnError();
+            jobPluginInfo.incrementObjectsProcessedWithSuccess();
+          } else {
+            jobPluginInfo.incrementObjectsProcessedWithFailure();
+            pluginReport.setPluginState(PluginState.FAILURE)
+              .addPluginDetails("Could not add preservation repository event: " + opm.getCause());
+          }
+          eventCounter++;
         }
-        eventCounter++;
+
+        jobPluginInfo.setSourceObjectsCount(eventCounter);
       }
-      IOUtils.closeQuietly(iterable);
-      jobPluginInfo.setSourceObjectsCount(eventCounter);
 
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformationAsync(this, jobPluginInfo);
-    } catch (JobException | RequestNotValidException | GenericException | AuthorizationDeniedException e) {
+    } catch (JobException | RequestNotValidException | GenericException | AuthorizationDeniedException
+      | IOException e) {
       LOGGER.error("Error reindexing RODA entity", e);
       pluginReport.setPluginState(PluginState.FAILURE)
         .setPluginDetails("Could not list preservation repository events");

@@ -72,8 +72,8 @@ public class MovePluginTest {
   }
 
   @Test
-  public void testMoveFileToRootAndBackToFolder() throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
-    AuthorizationDeniedException {
+  public void testMoveFileToRootAndBackToFolder() throws RequestNotValidException, NotFoundException, GenericException,
+    AlreadyExistsException, AuthorizationDeniedException {
 
     // create AIP and rep
     AIP aip = model.createAIP(null, "", new Permissions(), RodaConstants.ADMIN);

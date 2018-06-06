@@ -38,7 +38,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.exceptions.AlreadyExistsException;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -64,19 +63,16 @@ import org.slf4j.LoggerFactory;
  * @author Luis Faria <lfaria@keep.pt>
  * @author Hélder Silva <hsilva@keep.pt>
  */
-public final class FSUtils {
+public class FSUtils {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(FSUtils.class);
-  private static final char VERSION_SEP = '_';
-  private static final String METADATA_SUFFIX = ".json";
-  private static final String SEPARATOR = "/";
-  private static final String SEPARATOR_REGEX = "/";
-  private static final String SEPARATOR_REPLACEMENT = "%2F";
+  public static final Logger LOGGER = LoggerFactory.getLogger(FSUtils.class);
+  public static final char VERSION_SEP = '_';
+  public static final String METADATA_SUFFIX = ".json";
+  public static final String SEPARATOR = "/";
+  public static final String SEPARATOR_REGEX = "/";
+  public static final String SEPARATOR_REPLACEMENT = "%2F";
 
-  /**
-   * Private empty constructor
-   */
-  private FSUtils() {
+  public FSUtils() {
     // do nothing
   }
 
@@ -170,7 +166,7 @@ public final class FSUtils {
     }
   }
 
-  private static void moveRecursively(final Path sourcePath, final Path targetPath, final boolean replaceExisting)
+  public static void moveRecursively(final Path sourcePath, final Path targetPath, final boolean replaceExisting)
     throws GenericException {
     final CopyOption[] copyOptions = replaceExisting ? new CopyOption[] {StandardCopyOption.REPLACE_EXISTING}
       : new CopyOption[] {};
@@ -258,16 +254,13 @@ public final class FSUtils {
       }
     } else {
       try {
-
         CopyOption[] copyOptions = replaceExisting ? new CopyOption[] {StandardCopyOption.REPLACE_EXISTING}
           : new CopyOption[] {};
         Files.copy(sourcePath, targetPath, copyOptions);
       } catch (IOException e) {
         throw new GenericException("Error while copying one file into another", e);
       }
-
     }
-
   }
 
   public static void deletePathQuietly(Path path) {
@@ -323,11 +316,11 @@ public final class FSUtils {
     }
   }
 
-  private static String encodePathPartial(String pathPartial) {
+  public static String encodePathPartial(String pathPartial) {
     return pathPartial.replaceAll(SEPARATOR_REGEX, SEPARATOR_REPLACEMENT);
   }
 
-  private static String decodePathPartial(String pathPartial) {
+  public static String decodePathPartial(String pathPartial) {
     return pathPartial.replaceAll(SEPARATOR_REPLACEMENT, SEPARATOR);
   }
 
@@ -455,22 +448,17 @@ public final class FSUtils {
 
   public static Long countPath(Path directoryPath) throws NotFoundException, GenericException {
     Long count = 0L;
-    DirectoryStream<Path> directoryStream = null;
-    try {
-      directoryStream = Files.newDirectoryStream(directoryPath);
 
+    try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(directoryPath)) {
       final Iterator<Path> pathIterator = directoryStream.iterator();
       while (pathIterator.hasNext()) {
         count++;
         pathIterator.next();
       }
-
     } catch (NoSuchFileException e) {
       throw new NotFoundException("Could not list contents of entity because it doesn't exist: " + directoryPath);
     } catch (IOException e) {
       throw new GenericException("Could not list contents of entity at: " + directoryPath, e);
-    } finally {
-      IOUtils.closeQuietly(directoryStream);
     }
 
     return count;
@@ -535,7 +523,7 @@ public final class FSUtils {
         }
 
         @Override
-        public void close() throws IOException {
+        public void close() {
           walk.close();
         }
       };
@@ -619,12 +607,12 @@ public final class FSUtils {
 
     // TODO support binary reference
 
-    if (!FSUtils.exists(path)) {
+    if (!exists(path)) {
       throw new NotFoundException("Cannot find file or directory at " + path);
     }
 
     // storage path
-    StoragePath storagePath = FSUtils.getStoragePath(basePath, path);
+    StoragePath storagePath = getStoragePath(basePath, path);
 
     // construct
     if (FSUtils.isDirectory(path)) {
@@ -759,24 +747,6 @@ public final class FSUtils {
     }
   }
 
-  /**
-   * Method for computing one or more file content digests (a.k.a. hash's)
-   * 
-   * @param path
-   *          file which digests will be computed
-   * @throws GenericException
-   */
-  public static Map<String, String> generateContentDigest(Path path, String... algorithms) throws GenericException {
-    Map<String, String> digests = new HashMap<>();
-
-    for (String algorithm : algorithms) {
-      String digest = computeContentDigest(path, algorithm);
-      digests.put(algorithm, digest);
-    }
-
-    return digests;
-  }
-
   public static Path createDirectory(Path parent, String name) throws IOException {
     Path directory;
     do {
@@ -814,8 +784,7 @@ public final class FSUtils {
   }
 
   public static CloseableIterable<BinaryVersion> listBinaryVersions(final Path historyDataPath,
-    final Path historyMetadataPath, final StoragePath storagePath)
-    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    final Path historyMetadataPath, final StoragePath storagePath) throws GenericException, NotFoundException {
     Path fauxPath = getEntityPath(historyDataPath, storagePath);
     final Path parent = fauxPath.getParent();
     final String baseName = fauxPath.getFileName().toString();
@@ -827,7 +796,7 @@ public final class FSUtils {
         new DirectoryStream.Filter<Path>() {
 
           @Override
-          public boolean accept(Path entry) throws IOException {
+          public boolean accept(Path entry) {
             String fileName = entry.getFileName().toString();
             int lastIndexOfDot = fileName.lastIndexOf(VERSION_SEP);
 
@@ -850,17 +819,13 @@ public final class FSUtils {
             @Override
             public BinaryVersion next() {
               Path next = pathIterator.next();
-              BinaryVersion ret;
               try {
-                ret = convertPathToBinaryVersion(historyDataPath, historyMetadataPath, next);
+                return convertPathToBinaryVersion(historyDataPath, historyMetadataPath, next);
               } catch (GenericException | NotFoundException | RequestNotValidException e) {
                 LOGGER.error("Error while list path " + parent + " while parsing resource " + next, e);
-                ret = null;
+                return null;
               }
-
-              return ret;
             }
-
           };
         }
 

@@ -175,7 +175,7 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
             reportItem.setPluginState(PluginState.FAILURE);
             reportItem.addPluginDetails("Could not delete sublevel AIPs: " + e.getMessage());
           });
-    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+    } catch (GenericException | RequestNotValidException e) {
       reportItem.setPluginState(PluginState.FAILURE);
       reportItem.addPluginDetails("Could not delete sublevel AIPs: " + e.getMessage());
     }
@@ -436,7 +436,6 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE);
   }
 
-  @SuppressWarnings({"unchecked", "rawtypes"})
   @Override
   public List<Class<T>> getObjectClasses() {
     List<Class<? extends IsRODAObject>> list = new ArrayList<>();

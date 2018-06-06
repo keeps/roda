@@ -121,41 +121,32 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
       Path transferredResourcePath = Paths.get(transferredResource.getFullPath());
       LOGGER.debug("Converting {} to AIP", transferredResourcePath);
       AIPState state = AIPState.INGEST_PROCESSING;
-      boolean notifyCreatedAIP = false;
       String aipType = RodaConstants.AIP_TYPE_MIXED;
 
       final AIP aip = model.createAIP(state, computedSearchScope.orElse(null), aipType,
         PermissionUtils.getIngestPermissions(job.getUsername()), Arrays.asList(transferredResource.getName()),
-        job.getId(), notifyCreatedAIP, job.getUsername());
+        job.getId(), false, job.getUsername());
 
       PluginHelper.createSubmission(model, createSubmission, transferredResourcePath, aip.getId());
 
       final String representationId = IdUtils.createUUID();
-      final boolean original = true;
-      boolean notifyRepresentationCreated = false;
       String representationType = RodaConstants.REPRESENTATION_TYPE_MIXED;
-
-      model.createRepresentation(aip.getId(), representationId, original, representationType,
-        notifyRepresentationCreated, job.getUsername());
+      model.createRepresentation(aip.getId(), representationId, true, representationType, false, job.getUsername());
 
       // create files
       if (transferredResource.isFile()) {
         String fileId = transferredResource.getName();
         List<String> directoryPath = new ArrayList<>();
         ContentPayload payload = new FSPathContentPayload(transferredResourcePath);
-        boolean notifyFileCreated = false;
-
-        model.createFile(aip.getId(), representationId, directoryPath, fileId, payload, notifyFileCreated);
+        model.createFile(aip.getId(), representationId, directoryPath, fileId, payload, false);
       } else {
         processTransferredResourceDirectory(model, transferredResourcePath, aip, representationId);
       }
 
       createUnpackingEventSuccess(model, index, transferredResource, aip, UNPACK_DESCRIPTION);
       ContentPayload metadataPayload = MetadataFileUtils.getMetadataPayload(transferredResource);
-      boolean notifyDescriptiveMetadataCreated = false;
-
       model.createDescriptiveMetadata(aip.getId(), METADATA_FILE, metadataPayload, METADATA_TYPE, METADATA_VERSION,
-        notifyDescriptiveMetadataCreated);
+        false);
 
       // FIXME 20160516 hsilva: put "SIP" inside the AIP???
 
@@ -183,12 +174,12 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
     EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
     Files.walkFileTree(transferredResourcePath, opts, Integer.MAX_VALUE, new FileVisitor<Path>() {
       @Override
-      public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+      public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
         return FileVisitResult.CONTINUE;
       }
 
       @Override
-      public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+      public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
         String fileId = file.getFileName().toString();
         List<String> directoryPath = extractDirectoryPath(transferredResourcePath, file);
         try {
@@ -203,12 +194,12 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
       }
 
       @Override
-      public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+      public FileVisitResult visitFileFailed(Path file, IOException exc) {
         return FileVisitResult.CONTINUE;
       }
 
       @Override
-      public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+      public FileVisitResult postVisitDirectory(Path dir, IOException exc) {
         return FileVisitResult.CONTINUE;
       }
     });

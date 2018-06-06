@@ -9,5 +9,4 @@ package org.roda.core.storage;
 
 public interface Directory extends Resource {
 
-
 }

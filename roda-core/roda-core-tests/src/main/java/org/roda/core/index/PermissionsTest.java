@@ -12,7 +12,6 @@ import static org.testng.AssertJUnit.assertEquals;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.ParseException;
 import java.util.ArrayList;
 
 import org.roda.core.CorporaConstants;
@@ -79,7 +78,7 @@ public class PermissionsTest {
   }
 
   @Test
-  public void testAIP() throws RODAException, ParseException {
+  public void testAIP() throws RODAException {
     // Generate AIP Id
     final String aipId = IdUtils.createUUID();
 
@@ -133,7 +132,7 @@ public class PermissionsTest {
   }
 
   @Test
-  public void testRepresentation() throws RODAException, ParseException {
+  public void testRepresentation() throws RODAException {
     // Generate AIP Id
     final String aipId = IdUtils.createUUID();
 
@@ -186,7 +185,7 @@ public class PermissionsTest {
   }
 
   @Test
-  public void testFiles() throws RODAException, ParseException {
+  public void testFiles() throws RODAException {
     // Generate AIP Id
     final String aipId = IdUtils.createUUID();
 
@@ -239,7 +238,7 @@ public class PermissionsTest {
   }
 
   @Test
-  public void testPreservationEvents() throws RODAException, ParseException {
+  public void testPreservationEvents() throws RODAException {
     // Generate AIP Id
     final String aipId = IdUtils.createUUID();
 

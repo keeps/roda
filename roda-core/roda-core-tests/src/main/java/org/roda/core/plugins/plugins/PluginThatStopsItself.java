@@ -26,7 +26,6 @@ import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
-import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,7 +87,7 @@ public class PluginThatStopsItself extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public void init() throws PluginException {
+  public void init() {
     LOGGER.info("Doing nothing during init");
   }
 
@@ -98,15 +97,14 @@ public class PluginThatStopsItself extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
+  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage) {
     LOGGER.info("Doing nothing during beforeAllExecute");
     return null;
   }
 
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
-    List<LiteOptionalWithCause> list) throws PluginException {
+    List<LiteOptionalWithCause> list) {
     long sleepTime = 1000;
     LOGGER.info("Going to request to stop job executing me (after sleeping for {} miliseconds)", sleepTime);
     try {
@@ -122,7 +120,7 @@ public class PluginThatStopsItself extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) {
     LOGGER.info("Doing nothing during afterAllExecute");
     return null;
   }

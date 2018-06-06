@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.apache.solr.client.solrj.SolrServerException;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
@@ -28,7 +27,6 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -101,8 +99,8 @@ public class BagitSIPPluginsTest {
     FSUtils.deletePath(basePath);
   }
 
-  private TransferredResource createCorpora() throws InterruptedException, IOException, NotFoundException,
-    GenericException, RequestNotValidException, AlreadyExistsException {
+  private TransferredResource createCorpora()
+    throws IOException, NotFoundException, GenericException, RequestNotValidException, AlreadyExistsException {
     TransferredResourcesScanner f = RodaCoreFactory.getTransferredResourcesScanner();
 
     Path sip = corporaPath.resolve(CorporaConstants.SIP_FOLDER).resolve(CorporaConstants.BAGIT_SIP);
@@ -114,9 +112,8 @@ public class BagitSIPPluginsTest {
     return index.retrieve(TransferredResource.class, transferredResourceCreated.getUUID(), new ArrayList<>());
   }
 
-  private AIP ingestCorpora()
-    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
-    AuthorizationDeniedException, InvalidParameterException, InterruptedException, IOException, SolrServerException {
+  private AIP ingestCorpora() throws RequestNotValidException, NotFoundException, GenericException,
+    AlreadyExistsException, AuthorizationDeniedException, IOException {
     String parentId = null;
     String aipType = RodaConstants.AIP_TYPE_MIXED;
 
@@ -147,7 +144,7 @@ public class BagitSIPPluginsTest {
   }
 
   @Test
-  public void testIngestBagitSIP() throws IOException, InterruptedException, RODAException, SolrServerException {
+  public void testIngestBagitSIP() throws IOException, RODAException {
     AIP aip = ingestCorpora();
     AssertJUnit.assertEquals(1, aip.getRepresentations().size());
 

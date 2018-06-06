@@ -112,6 +112,7 @@ public class IndexService {
     Histogram iterableIndexResultHistogram = metricRegistry
       .histogram(MetricRegistry.name(IterableIndexResult.class.getSimpleName(), "iterableIndexResultHistogram"));
     IterableIndexResult.injectHistogram(iterableIndexResultHistogram);
+
     IterableIndexResult.injectSearchPageSize(
       rodaConfiguration.getInt("core.index_result.page_size", IterableIndexResult.DEFAULT_PAGE_SIZE));
     IterableIndexResult.injectNumberOfRetries(
@@ -120,13 +121,11 @@ public class IndexService {
       rodaConfiguration.getInt("core.index_result.sleep", IterableIndexResult.DEFAULT_SLEEP_BETWEEN_RETRIES));
   }
 
-  public IndexedAIP getParent(IndexedAIP aip, List<String> fieldsToReturn)
-    throws NotFoundException, GenericException {
+  public IndexedAIP getParent(IndexedAIP aip, List<String> fieldsToReturn) throws NotFoundException, GenericException {
     return SolrUtils.retrieve(getSolrClient(), IndexedAIP.class, aip.getParentID(), fieldsToReturn);
   }
 
-  public List<IndexedAIP> retrieveAncestors(IndexedAIP aip, List<String> fieldsToReturn)
-    throws GenericException, RequestNotValidException {
+  public List<IndexedAIP> retrieveAncestors(IndexedAIP aip, List<String> fieldsToReturn) throws GenericException {
     List<IndexedAIP> ancestors = new ArrayList<>();
     IndexedAIP parent;
     IndexedAIP actual = aip;
@@ -220,11 +219,10 @@ public class IndexService {
 
   public void reindexAIPs()
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    CloseableIterable<OptionalWithCause<AIP>> aips = null;
-    try {
-      clearAIPs();
-      LOGGER.info("{} > Listing AIPs", new Date().getTime());
-      aips = model.listAIPs();
+    clearAIPs();
+    LOGGER.info("{} > Listing AIPs", new Date().getTime());
+
+    try (CloseableIterable<OptionalWithCause<AIP>> aips = model.listAIPs()) {
       for (OptionalWithCause<AIP> aip : aips) {
         if (aip.isPresent()) {
           LOGGER.info("{} > Reindexing AIP {}", new Date().getTime(), aip.get().getId());
@@ -238,8 +236,8 @@ public class IndexService {
       commitAIPs();
       optimizeAIPs();
       LOGGER.info("{} > Done", new Date().getTime());
-    } finally {
-      IOUtils.closeQuietly(aips);
+    } catch (IOException e) {
+      throw new GenericException(e);
     }
   }
 
@@ -288,8 +286,7 @@ public class IndexService {
     return observer.dipFileCreated(file);
   }
 
-  public ReturnWithExceptions<Void, ModelObserver> reindexAIPPreservationEvents(AIP aip)
-    throws RequestNotValidException, GenericException, AuthorizationDeniedException {
+  public ReturnWithExceptions<Void, ModelObserver> reindexAIPPreservationEvents(AIP aip) {
     return observer.indexPreservationsEvents(aip.getId());
   }
 
@@ -299,8 +296,7 @@ public class IndexService {
   }
 
   public ReturnWithExceptionsWrapper reindexPreservationMetadata(
-    CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable)
-    throws RequestNotValidException, GenericException, AuthorizationDeniedException {
+    CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable) {
     ReturnWithExceptionsWrapper wrapper = new ReturnWithExceptionsWrapper();
     for (OptionalWithCause<PreservationMetadata> opm : iterable) {
       wrapper.addToList(observer.preservationMetadataCreated(opm.get()));
@@ -548,7 +544,7 @@ public class IndexService {
 
   public <T extends IsIndexed> void execute(Class<T> classToRetrieve, Filter filter, List<String> fieldsToReturn,
     IndexRunnable<T> indexRunnable, Consumer<RODAException> exceptionHandler)
-    throws GenericException, RequestNotValidException, AuthorizationDeniedException {
+    throws GenericException, RequestNotValidException {
     SolrUtils.execute(getSolrClient(), classToRetrieve, filter, fieldsToReturn, indexRunnable, exceptionHandler);
   }
 
@@ -565,8 +561,7 @@ public class IndexService {
     }
   }
 
-  public <T extends IsIndexed> void delete(Class<T> classToRetrieve, Filter filter)
-    throws GenericException, RequestNotValidException {
+  public <T extends IsIndexed> void delete(Class<T> classToRetrieve, Filter filter) {
     SolrUtils.delete(getSolrClient(), classToRetrieve, filter, this);
   }
 
@@ -575,8 +570,7 @@ public class IndexService {
     SolrUtils.deleteByQuery(getSolrClient(), classToRetrieve, filter);
   }
 
-  public <T extends IsIndexed> void create(Class<T> classToCreate, T instance)
-    throws GenericException, RequestNotValidException {
+  public <T extends IsIndexed> void create(Class<T> classToCreate, T instance) {
     SolrUtils.create(getSolrClient(), classToCreate, instance, this);
   }
 
@@ -585,9 +579,7 @@ public class IndexService {
   }
 
   public <T extends IsIndexed> CloseableIterable<OptionalWithCause<T>> list(Class<T> listClass,
-    List<String> fieldsToReturn)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-
+    List<String> fieldsToReturn) throws RequestNotValidException, GenericException {
     int counter = RodaCoreFactory.getIndexService().count(listClass, Filter.ALL).intValue();
     IndexResult<T> resources = RodaCoreFactory.getIndexService().find(listClass, Filter.ALL, Sorter.NONE,
       new Sublist(0, counter), fieldsToReturn);
@@ -611,7 +603,7 @@ public class IndexService {
       }
 
       @Override
-      public void close() throws IOException {
+      public void close() {
         // do nothing
       }
     };

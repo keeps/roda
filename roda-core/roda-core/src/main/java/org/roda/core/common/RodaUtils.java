@@ -101,9 +101,9 @@ public class RodaUtils {
   }
 
   /**
-   * Closes an input stream quietly (i.e. no exception is thrown) while
-   * inspecting its class. The inspection is done to avoid closing streams
-   * associates with jar files that may cause later errors like
+   * Closes an input stream quietly (i.e. no exception is thrown) while inspecting
+   * its class. The inspection is done to avoid closing streams associates with
+   * jar files that may cause later errors like
    * 
    * <pre>
    * Caused by: java.io.IOException: Stream closed
@@ -123,9 +123,9 @@ public class RodaUtils {
   }
 
   /**
-   * Closes an input stream while inspecting its class. The inspection is done
-   * to avoid closing streams associates with jar files that may cause later
-   * errors like
+   * Closes an input stream while inspecting its class. The inspection is done to
+   * avoid closing streams associates with jar files that may cause later errors
+   * like
    * 
    * <pre>
    * Caused by: java.io.IOException: Stream closed
@@ -341,8 +341,7 @@ public class RodaUtils {
   }
 
   protected static XsltExecutable createEventTransformer(String path) throws SaxonApiException, GenericException {
-    InputStream transformerStream = RodaCoreFactory.getConfigurationFileAsStream(path);
-    try {
+    try (InputStream transformerStream = RodaCoreFactory.getConfigurationFileAsStream(path)) {
       if (transformerStream == null) {
         throw new GenericException("Could not find stylesheet nor fallback at path=" + path);
       }
@@ -350,8 +349,8 @@ public class RodaUtils {
       XsltCompiler compiler = PROCESSOR.newXsltCompiler();
       compiler.setURIResolver(new RodaURIFileResolver());
       return compiler.compile(new StreamSource(transformerStream));
-    } finally {
-      IOUtils.closeQuietly(transformerStream);
+    } catch (IOException e) {
+      throw new GenericException(e);
     }
   }
 
@@ -397,13 +396,13 @@ public class RodaUtils {
 
     Files.walkFileTree(startPath, new SimpleFileVisitor<Path>() {
       @Override
-      public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+      public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
         size.addAndGet(attrs.size());
         return FileVisitResult.CONTINUE;
       }
 
       @Override
-      public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+      public FileVisitResult visitFileFailed(Path file, IOException exc) {
         // Skip folders that can't be traversed
         return FileVisitResult.CONTINUE;
       }

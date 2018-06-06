@@ -213,6 +213,7 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
       CSVPrinter csvFilePrinter = new CSVPrinter(fileWriter, csvFileFormat)) {
       return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<AIP>() {
         @Override
+
         public void process(IndexService index, ModelService model, StorageService storage, Report report,
           Job cachedJob, JobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {
           processAIP(model, storage, jobPluginInfo, csvFilePrinter, object);
@@ -289,7 +290,7 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
       List<Path> partials = new ArrayList<>();
       try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(csvTempFolder);
         FileWriter fileWriter = new FileWriter(output.toFile());
-        CSVPrinter csvFilePrinter = new CSVPrinter(fileWriter, csvFileFormat);) {
+        CSVPrinter csvFilePrinter = new CSVPrinter(fileWriter, csvFileFormat)) {
         if (enableHeaders) {
           csvFilePrinter.printRecord(fields);
         }

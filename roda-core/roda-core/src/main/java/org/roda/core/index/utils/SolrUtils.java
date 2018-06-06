@@ -52,6 +52,7 @@ import org.apache.solr.common.SolrInputField;
 import org.apache.solr.common.params.FacetParams;
 import org.apache.solr.common.util.DateUtil;
 import org.apache.solr.handler.loader.XMLLoader;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.MetadataFileUtils;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.RodaUtils;
@@ -147,7 +148,6 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.Directory;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1506,7 +1506,8 @@ public class SolrUtils {
     // extra-fields
     try {
       StoragePath filePath = ModelUtils.getFileStoragePath(file);
-      doc.addField(RodaConstants.FILE_STORAGEPATH, FSUtils.getStoragePathAsString(filePath, false));
+      doc.addField(RodaConstants.FILE_STORAGEPATH,
+        RodaCoreFactory.getStorageService().getStoragePathAsString(filePath, false));
     } catch (RequestNotValidException e) {
       LOGGER.warn("Could not index file storage path", e);
     }
@@ -2539,7 +2540,8 @@ public class SolrUtils {
     // extra-fields
     try {
       StoragePath filePath = ModelUtils.getDIPFileStoragePath(file);
-      doc.addField(RodaConstants.DIPFILE_STORAGE_PATH, FSUtils.getStoragePathAsString(filePath, false));
+      doc.addField(RodaConstants.DIPFILE_STORAGE_PATH,
+        RodaCoreFactory.getStorageService().getStoragePathAsString(filePath, false));
     } catch (RequestNotValidException e) {
       LOGGER.warn("Could not index DIP file storage path", e);
     }
@@ -2924,7 +2926,7 @@ public class SolrUtils {
 
   public static <T extends IsIndexed> void execute(SolrClient index, Class<T> classToRetrieve, Filter filter,
     List<String> fieldsToReturn, IndexRunnable<T> indexRunnable, final Consumer<RODAException> exceptionHandler)
-    throws GenericException, RequestNotValidException, AuthorizationDeniedException {
+    throws GenericException, RequestNotValidException {
     User user = null;
     boolean justActive = false;
 
@@ -2942,8 +2944,6 @@ public class SolrUtils {
       }
     } catch (IOException e) {
       throw new GenericException(e);
-    } catch (GenericException | RequestNotValidException e) {
-      throw e;
     }
   }
 

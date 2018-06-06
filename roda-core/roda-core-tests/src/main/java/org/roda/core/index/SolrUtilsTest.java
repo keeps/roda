@@ -67,7 +67,7 @@ public class SolrUtilsTest {
   }
 
   @BeforeMethod
-  public void init() throws IOException, GenericException {
+  public void init() {
     boolean deploySolr = false;
     boolean deployLdap = false;
     boolean deployFolderMonitor = false;

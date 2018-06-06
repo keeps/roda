@@ -34,8 +34,7 @@ public class Formats extends RodaWuiController {
    * ---------------- REST related methods - start -----------------------------
    * ---------------------------------------------------------------------------
    */
-  public static Format createFormat(User user, Format format)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+  public static Format createFormat(User user, Format format) throws AuthorizationDeniedException, GenericException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -55,8 +54,7 @@ public class Formats extends RodaWuiController {
     }
   }
 
-  public static Format updateFormat(User user, Format format)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+  public static Format updateFormat(User user, Format format) throws AuthorizationDeniedException, GenericException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions

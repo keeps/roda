@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -62,7 +63,6 @@ import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -124,7 +124,7 @@ public final class ModelUtils {
   }
 
   private static List<String> getSubmissionPath(String aipId) {
-    return build(getAIPPath(aipId), RodaConstants.STORAGE_DIRECTORY_SUBMISSION, RodaUtils.dateToISO8601(new Date()));
+    return build(getAIPPath(aipId), RodaConstants.STORAGE_DIRECTORY_SUBMISSION);
   }
 
   public static StoragePath getSubmissionStoragePath(String aipId) throws RequestNotValidException {
@@ -181,7 +181,7 @@ public final class ModelUtils {
   }
 
   public static List<String> getOtherMetadataStoragePath(String aipId, String representationId, List<String> filePath,
-    String fileId, String type) throws RequestNotValidException {
+    String fileId, String type) {
     List<String> path;
     if (type == null) {
       path = getRepresentationOtherMetadataFolderPath(aipId, representationId);
@@ -328,38 +328,31 @@ public final class ModelUtils {
     return getDIPFileStoragePath(f.getDipId(), f.getPath(), f.getId());
   }
 
-  public static String extractAipId(StoragePath path) {
+  public static Optional<String> extractAipId(StoragePath path) {
     // AIP/[aipId]/...
 
     String container = path.getContainerName();
     List<String> directoryPath = path.getDirectoryPath();
 
     if (container.equals(RodaConstants.STORAGE_CONTAINER_AIP) && !directoryPath.isEmpty()) {
-      return directoryPath.get(0);
-    } else {
-      return null;
+      return Optional.of(directoryPath.get(0));
     }
+
+    return Optional.empty();
   }
 
-  public static String extractRepresentationId(StoragePath path) {
+  public static Optional<String> extractRepresentationId(StoragePath path) {
     // AIP/[aipId]/representations/[representationId]/...
 
     String container = path.getContainerName();
     List<String> directoryPath = path.getDirectoryPath();
 
-    if (container.equals(RodaConstants.STORAGE_CONTAINER_AIP) && directoryPath.size() > 1
+    if (container.equals(RodaConstants.STORAGE_CONTAINER_AIP) && directoryPath.size() > 2
       && directoryPath.get(1).equals(RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS)) {
-      String representationId;
-      if (directoryPath.size() > 2) {
-        representationId = directoryPath.get(2);
-      } else {
-        representationId = path.getName();
-      }
-
-      return representationId;
-    } else {
-      return null;
+      return Optional.of(directoryPath.get(2));
     }
+
+    return Optional.empty();
   }
 
   public static List<String> extractFilePathFromRepresentationData(StoragePath path) {
@@ -367,26 +360,27 @@ public final class ModelUtils {
 
     String container = path.getContainerName();
     List<String> directoryPath = path.getDirectoryPath();
+
     if (container.equals(RodaConstants.STORAGE_CONTAINER_AIP) && directoryPath.size() > 3
       && directoryPath.get(1).equals(RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS)
       && directoryPath.get(3).equals(RodaConstants.STORAGE_DIRECTORY_DATA)) {
       return directoryPath.subList(4, directoryPath.size());
-    } else {
-      return new ArrayList<>();
     }
+
+    return new ArrayList<>();
   }
 
-  public static String extractDipId(StoragePath path) {
+  public static Optional<String> extractDipId(StoragePath path) {
     // DIP/[dipId]/...
 
     String container = path.getContainerName();
     List<String> directoryPath = path.getDirectoryPath();
 
     if (container.equals(RodaConstants.STORAGE_CONTAINER_DIP) && !directoryPath.isEmpty()) {
-      return directoryPath.get(0);
-    } else {
-      return null;
+      return Optional.of(directoryPath.get(0));
     }
+
+    return Optional.empty();
   }
 
   public static List<String> extractFilePathFromDIPData(StoragePath path) {
@@ -394,12 +388,13 @@ public final class ModelUtils {
 
     String container = path.getContainerName();
     List<String> directoryPath = path.getDirectoryPath();
+
     if (container.equals(RodaConstants.STORAGE_CONTAINER_DIP) && directoryPath.size() > 1
       && directoryPath.get(1).equals(RodaConstants.STORAGE_DIRECTORY_DATA)) {
       return directoryPath.subList(2, directoryPath.size());
-    } else {
-      return new ArrayList<>();
     }
+
+    return new ArrayList<>();
   }
 
   public static List<String> extractFilePathFromAipPreservationMetadata(StoragePath path) {
@@ -407,13 +402,14 @@ public final class ModelUtils {
 
     String container = path.getContainerName();
     List<String> directoryPath = path.getDirectoryPath();
+
     if (container.equals(RodaConstants.STORAGE_CONTAINER_AIP) && directoryPath.size() > 2
       && directoryPath.get(1).equals(RodaConstants.STORAGE_DIRECTORY_METADATA)
       && directoryPath.get(2).equals(RodaConstants.STORAGE_DIRECTORY_PRESERVATION)) {
       return directoryPath.subList(3, directoryPath.size());
-    } else {
-      return new ArrayList<>();
     }
+
+    return new ArrayList<>();
   }
 
   public static List<String> extractFilePathFromRepresentationPreservationMetadata(StoragePath path) {
@@ -421,35 +417,30 @@ public final class ModelUtils {
 
     String container = path.getContainerName();
     List<String> directoryPath = path.getDirectoryPath();
+
     if (container.equals(RodaConstants.STORAGE_CONTAINER_AIP) && directoryPath.size() > 4
       && directoryPath.get(1).equals(RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS)
       && directoryPath.get(3).equals(RodaConstants.STORAGE_DIRECTORY_METADATA)
       && directoryPath.get(4).equals(RodaConstants.STORAGE_DIRECTORY_PRESERVATION)) {
       return directoryPath.subList(5, directoryPath.size());
-    } else {
-      return new ArrayList<>();
     }
+
+    return new ArrayList<>();
   }
 
-  public static String extractTypeFromAipOtherMetadata(StoragePath path) {
+  public static Optional<String> extractTypeFromAipOtherMetadata(StoragePath path) {
     // AIP/[aipId]/metadata/other/[type]/...
 
     String container = path.getContainerName();
     List<String> directoryPath = path.getDirectoryPath();
-    if (container.equals(RodaConstants.STORAGE_CONTAINER_AIP) && directoryPath.size() > 2
+
+    if (container.equals(RodaConstants.STORAGE_CONTAINER_AIP) && directoryPath.size() > 3
       && directoryPath.get(1).equals(RodaConstants.STORAGE_DIRECTORY_METADATA)
       && directoryPath.get(2).equals(RodaConstants.STORAGE_DIRECTORY_OTHER)) {
-      String type;
-      if (directoryPath.size() > 3) {
-        type = directoryPath.get(3);
-      } else {
-        type = path.getName();
-      }
-
-      return type;
-    } else {
-      return null;
+      return Optional.of(directoryPath.get(3));
     }
+
+    return Optional.empty();
   }
 
   public static List<String> extractFilePathFromAipOtherMetadata(StoragePath path) {
@@ -457,35 +448,30 @@ public final class ModelUtils {
 
     String container = path.getContainerName();
     List<String> directoryPath = path.getDirectoryPath();
+
     if (container.equals(RodaConstants.STORAGE_CONTAINER_AIP) && directoryPath.size() > 3
       && directoryPath.get(1).equals(RodaConstants.STORAGE_DIRECTORY_METADATA)
       && directoryPath.get(2).equals(RodaConstants.STORAGE_DIRECTORY_OTHER)) {
       return directoryPath.subList(4, directoryPath.size());
-    } else {
-      return new ArrayList<>();
     }
+
+    return new ArrayList<>();
   }
 
-  public static String extractTypeFromRepresentationOtherMetadata(StoragePath path) {
+  public static Optional<String> extractTypeFromRepresentationOtherMetadata(StoragePath path) {
     // AIP/[aipId]/representations/[representationId]/metadata/other/[type]/...
 
     String container = path.getContainerName();
     List<String> directoryPath = path.getDirectoryPath();
-    if (container.equals(RodaConstants.STORAGE_CONTAINER_AIP) && directoryPath.size() > 4
+
+    if (container.equals(RodaConstants.STORAGE_CONTAINER_AIP) && directoryPath.size() > 5
       && directoryPath.get(1).equals(RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS)
       && directoryPath.get(3).equals(RodaConstants.STORAGE_DIRECTORY_METADATA)
       && directoryPath.get(4).equals(RodaConstants.STORAGE_DIRECTORY_OTHER)) {
-      String type;
-      if (directoryPath.size() > 5) {
-        type = directoryPath.get(5);
-      } else {
-        type = path.getName();
-      }
-
-      return type;
-    } else {
-      return null;
+      return Optional.of(directoryPath.get(5));
     }
+
+    return Optional.empty();
   }
 
   public static List<String> extractFilePathFromRepresentationOtherMetadata(StoragePath path) {
@@ -493,14 +479,15 @@ public final class ModelUtils {
 
     String container = path.getContainerName();
     List<String> directoryPath = path.getDirectoryPath();
+
     if (container.equals(RodaConstants.STORAGE_CONTAINER_AIP) && directoryPath.size() > 5
       && directoryPath.get(1).equals(RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS)
       && directoryPath.get(3).equals(RodaConstants.STORAGE_DIRECTORY_METADATA)
       && directoryPath.get(4).equals(RodaConstants.STORAGE_DIRECTORY_OTHER)) {
       return directoryPath.subList(6, directoryPath.size());
-    } else {
-      return new ArrayList<>();
     }
+
+    return new ArrayList<>();
   }
 
   public static StoragePath getPreservationMetadataStoragePath(PreservationMetadata pm)
@@ -812,7 +799,7 @@ public final class ModelUtils {
     if (!file.isDirectory()) {
       StoragePath filePath = ModelUtils.getFileStoragePath(file);
       Binary binary = storage.getBinary(filePath);
-      ZipEntryInfo info = new ZipEntryInfo(flat ? filePath.getName() : FSUtils.getStoragePathAsString(filePath, true),
+      ZipEntryInfo info = new ZipEntryInfo(flat ? filePath.getName() : storage.getStoragePathAsString(filePath, true),
         binary.getContent());
       zipEntries.add(info);
     } else {
@@ -824,9 +811,8 @@ public final class ModelUtils {
    * @deprecated use DownloadUtils instead.
    */
   @Deprecated
-  public static void addToZip(List<ZipEntryInfo> zipEntries, Binary binary)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    String path = FSUtils.getStoragePathAsString(binary.getStoragePath(), true);
+  public static void addToZip(List<ZipEntryInfo> zipEntries, Binary binary) {
+    String path = RodaCoreFactory.getStorageService().getStoragePathAsString(binary.getStoragePath(), true);
     ZipEntryInfo info = new ZipEntryInfo(path, binary.getContent());
     zipEntries.add(info);
   }

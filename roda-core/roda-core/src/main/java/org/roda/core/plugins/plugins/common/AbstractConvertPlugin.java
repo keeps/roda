@@ -85,10 +85,11 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INPUT_FORMAT, new PluginParameter(
-      RodaConstants.PLUGIN_PARAMS_INPUT_FORMAT, "Input format", PluginParameterType.STRING, "", true, false,
-      "Input file format to be converted (check documentation for list of supported formats). If the input file format is not specified, the task will"
-        + " run on all supported formats (check roda-core-formats.properties for list of supported formats)."));
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INPUT_FORMAT,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_INPUT_FORMAT, "Input format", PluginParameterType.STRING, "",
+        true, false,
+        "Input file format to be converted (check documentation for list of supported formats). If the input file format is not specified, the task will"
+          + " run on all supported formats (check roda-core-formats.properties for list of supported formats)."));
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OUTPUT_FORMAT,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_OUTPUT_FORMAT, "Output format", PluginParameterType.STRING, "",
@@ -151,11 +152,6 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
   @Override
   public void shutdown() {
     // do nothing
-  }
-
-  public boolean hasPartialSuccessOnOutcome() {
-    return Boolean.parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "convert", "allplugins",
-      "hasPartialSuccessOnOutcome"));
   }
 
   public abstract List<String> getApplicableTo();
@@ -235,7 +231,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
 
   @Override
   protected Report executeOnAIP(IndexService index, ModelService model, StorageService storage, Report report,
-    JobPluginInfo jobPluginInfo, List<AIP> list, Job job) throws PluginException {
+    JobPluginInfo jobPluginInfo, List<AIP> list, Job job) {
     for (AIP aip : list) {
       LOGGER.debug("Processing AIP {}", aip.getId());
       List<String> newRepresentations = new ArrayList<>();
@@ -765,7 +761,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
         }
 
       } catch (RuntimeException | NotFoundException | GenericException | RequestNotValidException
-        | AuthorizationDeniedException | ValidationException | IOException | AlreadyExistsException e) {
+        | AuthorizationDeniedException | IOException | AlreadyExistsException e) {
         LOGGER.error("Error processing File {}: {}", file.getId(), e.getMessage(), e);
         reportState = PluginState.FAILURE;
         reportItem.setPluginDetails(e.getMessage());

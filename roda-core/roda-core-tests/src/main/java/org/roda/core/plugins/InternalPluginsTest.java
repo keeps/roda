@@ -20,9 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.xmlbeans.XmlException;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
@@ -37,7 +35,6 @@ import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -80,7 +77,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import org.w3c.util.InvalidDateException;
 
 import com.google.common.collect.Iterables;
 
@@ -156,8 +152,7 @@ public class InternalPluginsTest {
     index.execute(TransferredResource.class, Filter.ALL, new ArrayList<>(), new IndexRunnable<TransferredResource>() {
 
       @Override
-      public void run(TransferredResource item)
-        throws GenericException, RequestNotValidException, AuthorizationDeniedException {
+      public void run(TransferredResource item) throws GenericException {
         model.deleteTransferredResource(item);
       }
     }, e -> Assert.fail("Error cleaning up", e));
@@ -167,8 +162,8 @@ public class InternalPluginsTest {
     return new ByteArrayInputStream(RandomStringUtils.randomAscii(GENERATED_FILE_SIZE).getBytes());
   }
 
-  private TransferredResource createCorpora() throws InterruptedException, IOException, NotFoundException,
-    GenericException, RequestNotValidException, AlreadyExistsException {
+  private TransferredResource createCorpora()
+    throws NotFoundException, GenericException, RequestNotValidException, AlreadyExistsException {
     TransferredResourcesScanner f = RodaCoreFactory.getTransferredResourcesScanner();
 
     String parentUUID = f.createFolder(null, "test").getUUID();
@@ -198,9 +193,8 @@ public class InternalPluginsTest {
     return transferredResource;
   }
 
-  private AIP ingestCorpora()
-    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
-    AuthorizationDeniedException, InvalidParameterException, InterruptedException, IOException, SolrServerException {
+  private AIP ingestCorpora() throws RequestNotValidException, NotFoundException, GenericException,
+    AlreadyExistsException, AuthorizationDeniedException {
     String parentId = null;
     String aipType = RodaConstants.AIP_TYPE_MIXED;
     AIP root = model.createAIP(parentId, aipType, new Permissions(), RodaConstants.ADMIN);
@@ -229,8 +223,7 @@ public class InternalPluginsTest {
   }
 
   @Test
-  public void testIngestTransferredResource()
-    throws IOException, InterruptedException, RODAException, SolrServerException {
+  public void testIngestTransferredResource() throws RODAException {
     AIP aip = ingestCorpora();
     AssertJUnit.assertEquals(1, aip.getRepresentations().size());
 
@@ -245,8 +238,7 @@ public class InternalPluginsTest {
   }
 
   @Test
-  public void testVirusCheck()
-    throws RODAException, InterruptedException, IOException, SolrServerException, XmlException {
+  public void testVirusCheck() throws RODAException, IOException, XmlException {
     AIP aip = ingestCorpora();
 
     Job job = TestsHelper.executeJob(AntivirusPlugin.class, PluginType.AIP_TO_AIP,
@@ -260,33 +252,34 @@ public class InternalPluginsTest {
       .getPlugin(AntivirusPlugin.class.getName());
     String agentID = PluginHelper.getPluginAgentId(plugin);
     boolean found = false;
-    CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationMetadataList = model
-      .listPreservationMetadata(aip.getId(), true);
-    for (OptionalWithCause<PreservationMetadata> opm : preservationMetadataList) {
-      if (opm.isPresent()) {
-        PreservationMetadata pm = opm.get();
-        if (pm.getType().equals(PreservationMetadataType.EVENT)) {
-          EventComplexType event = PremisV3Utils
-            .binaryToEvent(model.retrievePreservationEvent(pm.getAipId(), pm.getRepresentationId(),
-              pm.getFileDirectoryPath(), pm.getFileId(), pm.getId()).getContent().createInputStream());
-          if (event.getLinkingAgentIdentifierArray() != null && event.getLinkingAgentIdentifierArray().length > 0) {
-            for (LinkingAgentIdentifierComplexType laict : event.getLinkingAgentIdentifierArray()) {
-              if (laict.getLinkingAgentIdentifierValue() != null
-                && laict.getLinkingAgentIdentifierValue().equalsIgnoreCase(agentID)) {
-                found = true;
+
+    try (CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationMetadataList = model
+      .listPreservationMetadata(aip.getId(), true)) {
+      for (OptionalWithCause<PreservationMetadata> opm : preservationMetadataList) {
+        if (opm.isPresent()) {
+          PreservationMetadata pm = opm.get();
+          if (pm.getType().equals(PreservationMetadataType.EVENT)) {
+            EventComplexType event = PremisV3Utils
+              .binaryToEvent(model.retrievePreservationEvent(pm.getAipId(), pm.getRepresentationId(),
+                pm.getFileDirectoryPath(), pm.getFileId(), pm.getId()).getContent().createInputStream());
+            if (event.getLinkingAgentIdentifierArray() != null && event.getLinkingAgentIdentifierArray().length > 0) {
+              for (LinkingAgentIdentifierComplexType laict : event.getLinkingAgentIdentifierArray()) {
+                if (laict.getLinkingAgentIdentifierValue() != null
+                  && laict.getLinkingAgentIdentifierValue().equalsIgnoreCase(agentID)) {
+                  found = true;
+                  break;
+                }
+              }
+              if (found) {
                 break;
               }
-            }
-            if (found) {
-              break;
             }
           }
         }
       }
     }
-    IOUtils.closeQuietly(preservationMetadataList);
-    AssertJUnit.assertTrue(found);
 
+    AssertJUnit.assertTrue(found);
     index.commitAIPs();
 
     Filter filter = new Filter();
@@ -298,9 +291,8 @@ public class InternalPluginsTest {
     AssertJUnit.assertEquals(1, events.getTotalCount());
   }
 
-  @SuppressWarnings("unchecked")
   @Test
-  public void testPremisSkeleton() throws RODAException, InterruptedException, IOException, SolrServerException {
+  public void testPremisSkeleton() throws RODAException, IOException {
     AIP aip = ingestCorpora();
 
     TestsHelper.executeJob(PremisSkeletonPlugin.class, PluginType.AIP_TO_AIP,
@@ -341,10 +333,8 @@ public class InternalPluginsTest {
     AssertJUnit.assertEquals(CORPORA_TEST1_TXT, originalName);
   }
 
-  @SuppressWarnings("unchecked")
   @Test
-  public void testSiegfried()
-    throws RODAException, InterruptedException, IOException, SolrServerException, XmlException {
+  public void testSiegfried() throws RODAException, IOException, XmlException {
     AIP aip = ingestCorpora();
 
     // ensure PREMIS objects are created
@@ -406,31 +396,33 @@ public class InternalPluginsTest {
     String agentID = PluginHelper.getPluginAgentId(plugin);
 
     boolean found = false;
-    CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationMetadataList = model
-      .listPreservationMetadata(aip.getId(), true);
-    for (OptionalWithCause<PreservationMetadata> opm : preservationMetadataList) {
-      if (opm.isPresent()) {
-        PreservationMetadata pm = opm.get();
-        if (pm.getType().equals(PreservationMetadataType.EVENT)) {
-          EventComplexType event = PremisV3Utils
-            .binaryToEvent(model.retrievePreservationEvent(pm.getAipId(), pm.getRepresentationId(),
-              pm.getFileDirectoryPath(), pm.getFileId(), pm.getId()).getContent().createInputStream());
-          if (event.getLinkingAgentIdentifierArray() != null && event.getLinkingAgentIdentifierArray().length > 0) {
-            for (LinkingAgentIdentifierComplexType laict : event.getLinkingAgentIdentifierArray()) {
-              if (laict.getLinkingAgentIdentifierValue() != null
-                && laict.getLinkingAgentIdentifierValue().equalsIgnoreCase(agentID)) {
-                found = true;
+
+    try (CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationMetadataList = model
+      .listPreservationMetadata(aip.getId(), true)) {
+      for (OptionalWithCause<PreservationMetadata> opm : preservationMetadataList) {
+        if (opm.isPresent()) {
+          PreservationMetadata pm = opm.get();
+          if (pm.getType().equals(PreservationMetadataType.EVENT)) {
+            EventComplexType event = PremisV3Utils
+              .binaryToEvent(model.retrievePreservationEvent(pm.getAipId(), pm.getRepresentationId(),
+                pm.getFileDirectoryPath(), pm.getFileId(), pm.getId()).getContent().createInputStream());
+            if (event.getLinkingAgentIdentifierArray() != null && event.getLinkingAgentIdentifierArray().length > 0) {
+              for (LinkingAgentIdentifierComplexType laict : event.getLinkingAgentIdentifierArray()) {
+                if (laict.getLinkingAgentIdentifierValue() != null
+                  && laict.getLinkingAgentIdentifierValue().equalsIgnoreCase(agentID)) {
+                  found = true;
+                  break;
+                }
+              }
+              if (found) {
                 break;
               }
-            }
-            if (found) {
-              break;
             }
           }
         }
       }
     }
-    IOUtils.closeQuietly(preservationMetadataList);
+
     AssertJUnit.assertTrue(found);
 
     Filter filter = new Filter();
@@ -443,8 +435,7 @@ public class InternalPluginsTest {
   }
 
   @Test
-  public void testAutoAccept()
-    throws RODAException, InterruptedException, IOException, InvalidDateException, SolrServerException {
+  public void testAutoAccept() throws RODAException {
     AIP aip = ingestCorpora();
 
     TestsHelper.executeJob(AutoAcceptSIPPlugin.class, PluginType.AIP_TO_AIP,
@@ -453,5 +444,4 @@ public class InternalPluginsTest {
     aip = model.retrieveAIP(aip.getId());
     MatcherAssert.assertThat(aip.getState(), Is.is(AIPState.ACTIVE));
   }
-
 }

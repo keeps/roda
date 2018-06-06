@@ -13,8 +13,9 @@ import java.io.Console;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -87,7 +88,6 @@ import org.roda.core.data.common.RodaConstants.StorageType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.RoleAlreadyExistsException;
@@ -141,7 +141,6 @@ import ch.qos.logback.core.joran.spi.JoranException;
  * @author Hélder Silva <hsilva@keep.pt>
  */
 public class RodaCoreFactory {
-
   private static final Logger LOGGER = LoggerFactory.getLogger(RodaCoreFactory.class);
 
   private static boolean instantiated = false;
@@ -423,9 +422,6 @@ public class RodaCoreFactory {
       } catch (ConfigurationException e) {
         LOGGER.error("Error loading roda properties", e);
         instantiatedWithoutErrors = false;
-      } catch (URISyntaxException e) {
-        LOGGER.error("Error instantiating solr/index model", e);
-        instantiatedWithoutErrors = false;
       } catch (GenericException e) {
         if (!migrationMode) {
           LOGGER.error("Error instantiating storage model", e);
@@ -613,8 +609,7 @@ public class RodaCoreFactory {
             try {
               Files.walkFileTree(staticDataDefaultFolder, new SimpleFileVisitor<Path>() {
                 @Override
-                public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs)
-                  throws IOException {
+                public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) {
                   try {
                     if (dir.equals(staticDataDefaultFolder)
                       || dir.equals(staticDataDefaultFolder.resolve(RodaConstants.CORE_STORAGE_FOLDER))) {
@@ -752,6 +747,23 @@ public class RodaCoreFactory {
   }
 
   private static StorageService instantiateStorage() throws GenericException {
+    String newStorageService = getRodaConfiguration().getString(RodaConstants.CORE_STORAGE_NEW_SERVICE);
+    if (StringUtils.isNotBlank(newStorageService)) {
+      try {
+        Class<?> storageClass = Class.forName(newStorageService);
+        Constructor<?> constructor = storageClass.getConstructor(Path.class, String.class);
+
+        LOGGER.debug("Going to instantiate '{}' on '{}'", storageClass.getSimpleName(), storagePath);
+        String trashDirName = getRodaConfiguration().getString("core.storage.filesystem.trash",
+          RodaConstants.TRASH_CONTAINER);
+
+        return (StorageService) constructor.newInstance(storagePath, trashDirName);
+      } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException
+        | InvocationTargetException e) {
+        LOGGER.warn("Error instantiating storage service defined on properties, falling back to a default service", e);
+      }
+    }
+
     StorageType storageType = StorageType.valueOf(
       getRodaConfiguration().getString(RodaConstants.CORE_STORAGE_TYPE, RodaConstants.DEFAULT_STORAGE_TYPE.toString()));
     if (storageType == RodaConstants.StorageType.FEDORA4) {
@@ -770,12 +782,15 @@ public class RodaCoreFactory {
       }
     } else if (storageType == RodaConstants.StorageType.FILESYSTEM) {
       LOGGER.debug("Going to instantiate Filesystem on '{}'", storagePath);
-      String trashDirName = getRodaConfiguration().getString("core.storage.filesystem.trash", "trash");
-      return new FileStorageService(storagePath, trashDirName);
+      String trashDirName = getRodaConfiguration().getString("core.storage.filesystem.trash",
+        RodaConstants.TRASH_CONTAINER);
+      StorageService fileStorageService = new FileStorageService(storagePath, trashDirName);
+      return fileStorageService;
     } else {
       LOGGER.error("Unknown storage service '{}'", storageType.name());
       throw new GenericException();
     }
+
   }
 
   /**
@@ -795,7 +810,7 @@ public class RodaCoreFactory {
    * @throws GenericException
    * 
    */
-  private static void instantiateSolrAndIndexService(NodeType nodeType) throws URISyntaxException, GenericException {
+  private static void instantiateSolrAndIndexService(NodeType nodeType) throws GenericException {
     if (INSTANTIATE_SOLR) {
       Path solrHome = null;
 
@@ -977,7 +992,6 @@ public class RodaCoreFactory {
 
       LOGGER.info("Solr Cloud healthy collections:   " + healthyCollections);
       LOGGER.info("Solr Cloud unhealthy collections: " + unhealthyCollections);
-
     }
 
     return healthy;
@@ -1019,7 +1033,6 @@ public class RodaCoreFactory {
   private static void createCollection(CloudSolrClient cloudSolrClient, String collection, Path configPath) {
     CollectionAdminRequest.Create req = new CollectionAdminRequest.Create();
     try {
-
       LOGGER.info("Creating SOLR collection {}", collection);
       Path collectionConf = configPath.resolve("conf");
       Path solrCoreProperties = collectionConf.resolve("solrcore.properties");
@@ -1046,11 +1059,6 @@ public class RodaCoreFactory {
     }
   }
 
-  private static String getEnvString(String name, String defaultValue) {
-    String envString = System.getenv(name);
-    return StringUtils.isNotBlank(envString) ? envString : defaultValue;
-  }
-
   private static Integer getEnvInt(String name, Integer defaultValue) {
     Integer envInt;
     try {
@@ -1065,10 +1073,8 @@ public class RodaCoreFactory {
 
   private static Boolean getEnvBoolean(String name, Boolean defaultValue) {
     Boolean envInt;
-
     String envString = System.getenv(name);
     envInt = envString != null ? Boolean.valueOf(envString) : defaultValue;
-
     return envInt;
   }
 
@@ -1124,7 +1130,7 @@ public class RodaCoreFactory {
       try {
         getIndexService().create(RODAMember.class, new User(RodaConstants.ADMIN));
         getIndexService().commit(RODAMember.class);
-      } catch (GenericException | RequestNotValidException e) {
+      } catch (GenericException e) {
         LOGGER.warn("Could not create user admin in index for test mode", e);
       }
     }
@@ -1206,7 +1212,6 @@ public class RodaCoreFactory {
 
       // delete resources that are no longer needed
       toDeleteDuringShutdown.forEach(e -> FSUtils.deletePathQuietly(e));
-
     }
   }
 
@@ -1291,12 +1296,10 @@ public class RodaCoreFactory {
 
       createRoles(rodaConfig);
       indexUsersAndGroupsFromLDAP();
-
     } catch (final Exception e) {
       LOGGER.error("Error starting up embedded ApacheDS", e);
       instantiatedWithoutErrors = false;
     }
-
   }
 
   private static void stopApacheDS() {
@@ -1319,9 +1322,11 @@ public class RodaCoreFactory {
   private static void createRoles(final Configuration rodaConfig) throws GenericException {
     final Iterator<String> keys = rodaConfig.getKeys("core.roles");
     final Set<String> roles = new HashSet<>();
+
     while (keys.hasNext()) {
       roles.addAll(Arrays.asList(rodaConfig.getStringArray(keys.next())));
     }
+
     for (final String role : roles) {
       try {
         if (StringUtils.isNotBlank(role)) {
@@ -1335,12 +1340,12 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void indexUsersAndGroupsFromLDAP()
-    throws GenericException, IllegalOperationException, NotFoundException, AlreadyExistsException {
+  private static void indexUsersAndGroupsFromLDAP() throws GenericException {
     for (User user : model.listUsers()) {
       LOGGER.debug("User to be indexed: {}", user);
       model.notifyUserUpdated(user).failOnError();
     }
+
     for (Group group : model.listGroups()) {
       LOGGER.debug("Group to be indexed: {}", group);
       model.notifyGroupUpdated(group).failOnError();
@@ -1445,14 +1450,6 @@ public class RodaCoreFactory {
     return configPath.resolve(RodaConstants.CORE_PLUGINS_FOLDER);
   }
 
-  public static void closeSolrServer() {
-    try {
-      solr.close();
-    } catch (IOException e) {
-      LOGGER.error("Error while shutting down solr", e);
-    }
-  }
-
   /*
    * Configuration related functionalities
    */
@@ -1469,7 +1466,6 @@ public class RodaCoreFactory {
 
   private static Configuration getConfiguration(String configurationFile) throws ConfigurationException {
     Path config = RodaCoreFactory.getConfigPath().resolve(configurationFile);
-
     Configuration configuration;
 
     if (FSUtils.exists(config)) {
@@ -1844,7 +1840,7 @@ public class RodaCoreFactory {
       if ("users_and_groups".equalsIgnoreCase(entity)) {
         try {
           indexUsersAndGroupsFromLDAP();
-        } catch (IllegalOperationException | GenericException | NotFoundException | AlreadyExistsException e) {
+        } catch (GenericException e) {
           LOGGER.error("Unable to reindex users & groups from LDAP.", e);
         }
       }

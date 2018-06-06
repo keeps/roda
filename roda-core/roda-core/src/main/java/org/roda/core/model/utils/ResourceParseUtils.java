@@ -73,10 +73,7 @@ public class ResourceParseUtils {
     // do nothing
   }
 
-  public static File convertResourceToFile(Resource resource)
-    throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
-    File ret;
-
+  public static File convertResourceToFile(Resource resource) throws GenericException, RequestNotValidException {
     if (resource == null) {
       throw new RequestNotValidException(RESOURCE_CANNOT_BE_NULL);
     }
@@ -84,25 +81,21 @@ public class ResourceParseUtils {
     StoragePath resourcePath = resource.getStoragePath();
 
     String id = resourcePath.getName();
-    String aipId = ModelUtils.extractAipId(resourcePath);
-    String representationId = ModelUtils.extractRepresentationId(resourcePath);
+    String aipId = ModelUtils.extractAipId(resourcePath).orElse(null);
+    String representationId = ModelUtils.extractRepresentationId(resourcePath).orElse(null);
     List<String> filePath = ModelUtils.extractFilePathFromRepresentationData(resourcePath);
 
     if (resource instanceof DefaultBinary) {
-      boolean isDirectory = false;
-      ret = new File(id, aipId, representationId, filePath, isDirectory);
+      return new File(id, aipId, representationId, filePath, false);
     } else if (resource instanceof DefaultDirectory) {
-      boolean isDirectory = true;
-      ret = new File(id, aipId, representationId, filePath, isDirectory);
+      return new File(id, aipId, representationId, filePath, true);
     } else {
       throw new GenericException(
         "Error while trying to convert something that it isn't a Binary into a representation file");
     }
-    return ret;
   }
 
-  public static DIPFile convertResourceToDIPFile(Resource resource)
-    throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
+  public static DIPFile convertResourceToDIPFile(Resource resource) throws GenericException, RequestNotValidException {
     DIPFile ret;
 
     if (resource == null) {
@@ -111,7 +104,7 @@ public class ResourceParseUtils {
 
     StoragePath resourcePath = resource.getStoragePath();
     String id = resourcePath.getName();
-    String dipId = ModelUtils.extractDipId(resourcePath);
+    String dipId = ModelUtils.extractDipId(resourcePath).orElse(null);
     List<String> filePath = ModelUtils.extractFilePathFromDIPData(resourcePath);
 
     if (resource instanceof DefaultBinary) {
@@ -140,8 +133,8 @@ public class ResourceParseUtils {
     PreservationMetadata pm = new PreservationMetadata();
 
     String id;
-    String aipId = ModelUtils.extractAipId(resourcePath);
-    String representationId = ModelUtils.extractRepresentationId(resourcePath);
+    String aipId = ModelUtils.extractAipId(resourcePath).orElse(null);
+    String representationId = ModelUtils.extractRepresentationId(resourcePath).orElse(null);
     List<String> fileDirectoryPath = null;
     String fileId = null;
 
@@ -191,7 +184,6 @@ public class ResourceParseUtils {
   }
 
   private static OtherMetadata convertResourceToOtherMetadata(Resource resource) throws RequestNotValidException {
-
     if (resource == null) {
       throw new RequestNotValidException(RESOURCE_CANNOT_BE_NULL);
     }
@@ -199,10 +191,11 @@ public class ResourceParseUtils {
     StoragePath resourcePath = resource.getStoragePath();
     String filename = resourcePath.getName();
 
-    String aipId = ModelUtils.extractAipId(resourcePath);
-    String representationId = ModelUtils.extractRepresentationId(resourcePath);
-    String type = representationId != null ? ModelUtils.extractTypeFromRepresentationOtherMetadata(resourcePath)
-      : ModelUtils.extractTypeFromAipOtherMetadata(resourcePath);
+    String aipId = ModelUtils.extractAipId(resourcePath).orElse(null);
+    String representationId = ModelUtils.extractRepresentationId(resourcePath).orElse(null);
+    String type = representationId != null
+      ? ModelUtils.extractTypeFromRepresentationOtherMetadata(resourcePath).orElse(null)
+      : ModelUtils.extractTypeFromAipOtherMetadata(resourcePath).orElse(null);
     List<String> fileDirectoryPath = representationId != null
       ? ModelUtils.extractFilePathFromRepresentationOtherMetadata(resourcePath)
       : ModelUtils.extractFilePathFromAipOtherMetadata(resourcePath);
@@ -222,14 +215,13 @@ public class ResourceParseUtils {
 
   public static Representation convertResourceToRepresentation(Resource resource)
     throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
-
     if (resource == null) {
       throw new RequestNotValidException(RESOURCE_CANNOT_BE_NULL);
     }
 
     StoragePath resourcePath = resource.getStoragePath();
     String id = resourcePath.getName();
-    String aipId = ModelUtils.extractAipId(resourcePath);
+    String aipId = ModelUtils.extractAipId(resourcePath).orElse(null);
     AIP aip = RodaCoreFactory.getModelService().retrieveAIP(aipId);
     Optional<Representation> rep = aip.getRepresentations().stream().filter(r -> r.getId().equals(id)).findFirst();
     if (rep.isPresent()) {
@@ -240,17 +232,17 @@ public class ResourceParseUtils {
   }
 
   public static <T extends Serializable> T convertResourceToObject(Resource resource, Class<T> objectClass)
-    throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException, IOException {
+    throws GenericException, RequestNotValidException, IOException {
     if (resource == null) {
       throw new RequestNotValidException(RESOURCE_CANNOT_BE_NULL);
     }
 
     Binary binary = (Binary) resource;
-    InputStream inputStream = binary.getContent().createInputStream();
-    String jsonString = IOUtils.toString(inputStream, RodaConstants.DEFAULT_ENCODING);
-    T ret = JsonUtils.getObjectFromJson(jsonString, objectClass);
-    IOUtils.closeQuietly(inputStream);
-    return ret;
+    try (InputStream inputStream = binary.getContent().createInputStream()) {
+      String jsonString = IOUtils.toString(inputStream, RodaConstants.DEFAULT_ENCODING);
+      T ret = JsonUtils.getObjectFromJson(jsonString, objectClass);
+      return ret;
+    }
   }
 
   public static <T extends IsRODAObject> OptionalWithCause<T> convertResourceTo(StorageService storage,
@@ -293,19 +285,19 @@ public class ResourceParseUtils {
     if (classToReturn.equals(AIP.class) || classToReturn.equals(DIP.class)) {
       ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, fileName));
     } else if (classToReturn.equals(Representation.class)) {
-      String aipId = ModelUtils.extractAipId(storagePath);
-      String repId = ModelUtils.extractRepresentationId(storagePath);
+      String aipId = ModelUtils.extractAipId(storagePath).orElse(null);
+      String repId = ModelUtils.extractRepresentationId(storagePath).orElse(null);
       ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, aipId, repId));
     } else if (classToReturn.equals(File.class)) {
       List<String> ids = new ArrayList<>();
-      ids.add(ModelUtils.extractAipId(storagePath));
-      ids.add(ModelUtils.extractRepresentationId(storagePath));
+      ids.add(ModelUtils.extractAipId(storagePath).orElse(null));
+      ids.add(ModelUtils.extractRepresentationId(storagePath).orElse(null));
       ids.addAll(ModelUtils.extractFilePathFromRepresentationData(storagePath));
       ids.add(fileName);
       ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, ids));
     } else if (classToReturn.equals(DIPFile.class)) {
       List<String> ids = new ArrayList<>();
-      ids.add(ModelUtils.extractDipId(storagePath));
+      ids.add(ModelUtils.extractDipId(storagePath).orElse(null));
       ids.addAll(ModelUtils.extractFilePathFromDIPData(storagePath));
       ids.add(fileName);
       ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, ids));
@@ -326,8 +318,8 @@ public class ResourceParseUtils {
       ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, ModelUtils.getJobAndReportIds(storagePath)));
     } else if (classToReturn.equals(DescriptiveMetadata.class)) {
       List<String> ids = new ArrayList<>();
-      ids.add(ModelUtils.extractAipId(storagePath));
-      String representationId = ModelUtils.extractRepresentationId(storagePath);
+      ids.add(ModelUtils.extractAipId(storagePath).orElse(null));
+      String representationId = ModelUtils.extractRepresentationId(storagePath).orElse(null);
       if (representationId != null) {
         ids.add(representationId);
       }
@@ -335,11 +327,11 @@ public class ResourceParseUtils {
       ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, ids));
     } else if (classToReturn.equals(PreservationMetadata.class)) {
       List<String> ids = new ArrayList<>();
-      String aipId = ModelUtils.extractAipId(storagePath);
+      String aipId = ModelUtils.extractAipId(storagePath).orElse(null);
       if (aipId != null) {
         ids.add(aipId);
       }
-      String representationId = ModelUtils.extractRepresentationId(storagePath);
+      String representationId = ModelUtils.extractRepresentationId(storagePath).orElse(null);
       if (representationId != null) {
         ids.add(representationId);
       }
@@ -371,9 +363,7 @@ public class ResourceParseUtils {
 
     String json;
     AIP aip = null;
-    InputStream inputStream = null;
-    try {
-      inputStream = binary.getContent().createInputStream();
+    try (InputStream inputStream = binary.getContent().createInputStream()) {
       json = IOUtils.toString(inputStream, Charset.forName(RodaConstants.DEFAULT_ENCODING));
       aip = JsonUtils.getObjectFromJson(json, AIP.class);
 
@@ -381,8 +371,6 @@ public class ResourceParseUtils {
       aip.setId(aipId);
     } catch (IOException | GenericException e) {
       throw new GenericException("Could not parse AIP metadata of " + aipId + " at " + metadataStoragePath, e);
-    } finally {
-      IOUtils.closeQuietly(inputStream);
     }
 
     return aip;
@@ -402,15 +390,11 @@ public class ResourceParseUtils {
 
     String json;
     DIP dip;
-    InputStream inputStream = null;
-    try {
-      inputStream = binary.getContent().createInputStream();
+    try (InputStream inputStream = binary.getContent().createInputStream()) {
       json = IOUtils.toString(inputStream, Charset.forName(RodaConstants.DEFAULT_ENCODING));
       dip = JsonUtils.getObjectFromJson(json, DIP.class);
     } catch (IOException | GenericException e) {
       throw new GenericException("Could not parse DIP metadata of " + dipId + " at " + metadataStoragePath, e);
-    } finally {
-      IOUtils.closeQuietly(inputStream);
     }
 
     // Setting information that does not come in JSON

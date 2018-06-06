@@ -43,6 +43,13 @@ public final class RodaConstants {
   public static final String CORE_SOLR_HTTP_CLOUD_URLS = "core.solr.http_cloud.urls";
   public static final String CORE_SOLR_CLOUD_URLS = "core.solr.cloud.urls";
 
+  public static final String CORE_STORAGE_NEW_SERVICE = "core.storage.new_service";
+  public static final String TRASH_CONTAINER = "trash";
+
+  public static final String TRANSFERRED_RESOURCES_PROCESSED_FOLDER = "PROCESSED";
+  public static final String TRANSFERRED_RESOURCES_SUCCESSFULLY_INGESTED_FOLDER = "SUCCESSFULLY_INGESTED";
+  public static final String TRANSFERRED_RESOURCES_UNSUCCESSFULLY_INGESTED_FOLDER = "UNSUCCESSFULLY_INGESTED";
+
   /*
    * Misc
    */

@@ -8,11 +8,9 @@
 package org.roda.core.plugins;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -21,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
 import org.roda.core.common.monitor.TransferredResourcesScanner;
@@ -29,7 +26,6 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -126,8 +122,7 @@ public class PluginReportContentTest {
     index.execute(TransferredResource.class, Filter.ALL, new ArrayList<>(), new IndexRunnable<TransferredResource>() {
 
       @Override
-      public void run(TransferredResource item)
-        throws GenericException, RequestNotValidException, AuthorizationDeniedException {
+      public void run(TransferredResource item) throws GenericException {
         model.deleteTransferredResource(item);
       }
     }, e -> Assert.fail("Error cleaning up", e));
@@ -137,8 +132,8 @@ public class PluginReportContentTest {
     return new ByteArrayInputStream(RandomStringUtils.randomAscii(GENERATED_FILE_SIZE).getBytes());
   }
 
-  private TransferredResource createCorpora() throws InterruptedException, IOException, NotFoundException,
-    GenericException, RequestNotValidException, AlreadyExistsException {
+  private TransferredResource createCorpora()
+    throws NotFoundException, GenericException, RequestNotValidException, AlreadyExistsException {
     TransferredResourcesScanner f = RodaCoreFactory.getTransferredResourcesScanner();
 
     String parentUUID = f.createFolder(null, "test").getUUID();
@@ -167,9 +162,8 @@ public class PluginReportContentTest {
   }
 
   @Test
-  private void ingestCorporaTest()
-    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
-    AuthorizationDeniedException, InvalidParameterException, InterruptedException, IOException, SolrServerException {
+  public void ingestCorporaTest() throws RequestNotValidException, NotFoundException, GenericException,
+    AlreadyExistsException, AuthorizationDeniedException {
     AIP root = model.createAIP(null, RodaConstants.AIP_TYPE_MIXED, new Permissions(), AIP_CREATOR);
 
     TransferredResource transferredResource = createCorpora();
@@ -196,7 +190,7 @@ public class PluginReportContentTest {
   }
 
   @Test
-  public void siegfriedCorporaTestAIP() throws RODAException, ParseException, InterruptedException, IOException {
+  public void siegfriedCorporaTestAIP() throws RODAException {
     AIP root = model.createAIP(null, RodaConstants.AIP_TYPE_MIXED, new Permissions(), AIP_CREATOR);
 
     TransferredResource transferredResource = createCorpora();
@@ -213,7 +207,7 @@ public class PluginReportContentTest {
     AssertJUnit.assertEquals(1, ingestReports.size());
     String aipId = ingestReports.get(0).getOutcomeObjectId();
 
-    Job job = TestsHelper.executeJob(SiegfriedPlugin.class, new HashMap<String, String>(), PluginType.MISC,
+    Job job = TestsHelper.executeJob(SiegfriedPlugin.class, new HashMap<>(), PluginType.MISC,
       SelectedItemsList.create(AIP.class, aipId));
 
     List<Report> jobReports = TestsHelper.getJobReports(index, job, true);
@@ -228,8 +222,7 @@ public class PluginReportContentTest {
   }
 
   @Test
-  public void siegfriedCorporaTestRepresentation()
-    throws RODAException, ParseException, InterruptedException, IOException {
+  public void siegfriedCorporaTestRepresentation() throws RODAException {
     AIP root = model.createAIP(null, RodaConstants.AIP_TYPE_MIXED, new Permissions(), AIP_CREATOR);
 
     TransferredResource transferredResource = createCorpora();
@@ -246,10 +239,10 @@ public class PluginReportContentTest {
     AssertJUnit.assertEquals(1, ingestReports.size());
 
     IndexResult<IndexedRepresentation> reps = index.find(IndexedRepresentation.class, Filter.ALL, Sorter.NONE,
-      new Sublist(0, 1), new ArrayList<String>());
+      new Sublist(0, 1), new ArrayList<>());
     String representationUUID = reps.getResults().get(0).getUUID();
 
-    Job job = TestsHelper.executeJob(SiegfriedPlugin.class, new HashMap<String, String>(), PluginType.MISC,
+    Job job = TestsHelper.executeJob(SiegfriedPlugin.class, new HashMap<>(), PluginType.MISC,
       SelectedItemsList.create(IndexedRepresentation.class, representationUUID));
 
     List<Report> jobReports = TestsHelper.getJobReports(index, job, true);
@@ -264,7 +257,7 @@ public class PluginReportContentTest {
   }
 
   @Test
-  public void siegfriedCorporaTestFile() throws RODAException, ParseException, InterruptedException, IOException {
+  public void siegfriedCorporaTestFile() throws RODAException {
     AIP root = model.createAIP(null, RodaConstants.AIP_TYPE_MIXED, new Permissions(), AIP_CREATOR);
 
     TransferredResource transferredResource = createCorpora();
@@ -281,10 +274,10 @@ public class PluginReportContentTest {
     AssertJUnit.assertEquals(1, ingestReports.size());
 
     IndexResult<IndexedFile> files = index.find(IndexedFile.class, Filter.ALL, Sorter.NONE, new Sublist(0, 1),
-      new ArrayList<String>());
+      new ArrayList<>());
     String fileUUID = files.getResults().get(0).getUUID();
 
-    Job job = TestsHelper.executeJob(SiegfriedPlugin.class, new HashMap<String, String>(), PluginType.MISC,
+    Job job = TestsHelper.executeJob(SiegfriedPlugin.class, new HashMap<>(), PluginType.MISC,
       SelectedItemsList.create(IndexedFile.class, fileUUID));
 
     List<Report> jobReports = TestsHelper.getJobReports(index, job, true);

@@ -71,7 +71,7 @@ public class TransferredResourcesScanner {
   }
 
   public TransferredResource createFolder(String parentUUID, String folderName)
-    throws GenericException, RequestNotValidException, NotFoundException {
+    throws GenericException, NotFoundException {
     Path parentPath;
     if (parentUUID != null) {
       TransferredResource parent = index.retrieve(TransferredResource.class, parentUUID, fieldsToReturn);
@@ -93,7 +93,7 @@ public class TransferredResourcesScanner {
   }
 
   public TransferredResource createFile(String parentUUID, String fileName, InputStream inputStream)
-    throws GenericException, RequestNotValidException, NotFoundException, AlreadyExistsException {
+    throws GenericException, NotFoundException, AlreadyExistsException {
     Path parentPath;
     if (StringUtils.isNotBlank(parentUUID)) {
       TransferredResource parent = index.retrieve(TransferredResource.class, parentUUID, fieldsToReturn);
@@ -154,7 +154,6 @@ public class TransferredResourcesScanner {
     tr.setSize(size);
     tr.setCreationDate(d);
     tr.setLastScanDate(lastScanDate);
-
     return tr;
   }
 
@@ -207,6 +206,7 @@ public class TransferredResourcesScanner {
         throw new NotFoundException("Path does not exist: " + fullPath);
       }
     }
+
     index.delete(TransferredResource.class, ids);
     index.commit(TransferredResource.class);
   }
@@ -281,8 +281,7 @@ public class TransferredResourcesScanner {
   }
 
   public Map<String, String> moveTransferredResource(String newRelativePath, List<String> resourcesUUIDs,
-    boolean replaceExisting) throws AlreadyExistsException, GenericException, IsStillUpdatingException,
-    NotFoundException, RequestNotValidException {
+    boolean replaceExisting) throws GenericException, IsStillUpdatingException, NotFoundException {
     List<TransferredResource> resources = Collections.emptyList();
     try {
       List<String> resourceFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.TRANSFERRED_RESOURCE_FULLPATH,
@@ -309,11 +308,12 @@ public class TransferredResourcesScanner {
     boolean notFoundResources = false;
 
     String baseFolder = RodaCoreFactory.getRodaConfiguration().getString("core.ingest.processed.base_folder",
-      "PROCESSED");
-    String successFolder = RodaCoreFactory.getRodaConfiguration()
-      .getString("core.ingest.processed.successfully_ingested", "SUCCESSFULLY_INGESTED");
-    String unsuccessFolder = RodaCoreFactory.getRodaConfiguration()
-      .getString("core.ingest.processed.unsuccessfully_ingested", "UNSUCCESSFULLY_INGESTED");
+      RodaConstants.TRANSFERRED_RESOURCES_PROCESSED_FOLDER);
+    String successFolder = RodaCoreFactory.getRodaConfiguration().getString(
+      "core.ingest.processed.successfully_ingested", RodaConstants.TRANSFERRED_RESOURCES_SUCCESSFULLY_INGESTED_FOLDER);
+    String unsuccessFolder = RodaCoreFactory.getRodaConfiguration().getString(
+      "core.ingest.processed.unsuccessfully_ingested",
+      RodaConstants.TRANSFERRED_RESOURCES_UNSUCCESSFULLY_INGESTED_FOLDER);
 
     for (TransferredResource resource : resources) {
       try {
@@ -331,22 +331,17 @@ public class TransferredResourcesScanner {
 
           // create & index transferred resource in the new location
           TransferredResource newResource = instantiateTransferredResource(newResourcePath, basePath);
-          Date creationDate = resource.getCreationDate();
+
           try {
             BasicFileAttributes attr = Files.readAttributes(newResourcePath, BasicFileAttributes.class);
-            creationDate = new Date(attr.creationTime().toMillis());
+            newResource.setCreationDate(new Date(attr.creationTime().toMillis()));
           } catch (IOException e) {
-            creationDate = new Date();
+            newResource.setCreationDate(new Date());
           }
 
-          newResource.setCreationDate(creationDate);
           newResource.setSize(resource.getSize());
           newResource.setLastScanDate(new Date());
-          try {
-            index.create(TransferredResource.class, newResource);
-          } catch (RequestNotValidException e) {
-            // do nothing
-          }
+          index.create(TransferredResource.class, newResource);
 
           oldToNewTransferredResourceIds.put(resource.getUUID(), newResource.getUUID());
           resourcesToIndex.add(resource);
@@ -374,9 +369,7 @@ public class TransferredResourcesScanner {
     return oldToNewTransferredResourceIds;
   }
 
-  public void reindexOldResourcesParentsAfterMove(List<TransferredResource> resources)
-    throws IsStillUpdatingException, GenericException {
-
+  public void reindexOldResourcesParentsAfterMove(List<TransferredResource> resources) throws GenericException {
     try {
       List<String> resourceUUIDs = resources.stream().map(tr -> tr.getUUID()).collect(Collectors.toList());
       index.delete(TransferredResource.class, resourceUUIDs);
@@ -395,7 +388,7 @@ public class TransferredResourcesScanner {
 
       resources = new CloseableIterable<OptionalWithCause<LiteRODAObject>>() {
         @Override
-        public void close() throws IOException {
+        public void close() {
           files.close();
         }
 
@@ -424,5 +417,4 @@ public class TransferredResourcesScanner {
 
     return resources;
   }
-
 }
