@@ -63,6 +63,32 @@
 		<url-pattern>/api/*</url-pattern>
 	</filter-mapping>
 
+	<!-- Filter to handle logout requests sent directly by the CAS server -->
+	<filter>
+		<filter-name>CASSingleSignOutFilter</filter-name>
+		<filter-class>org.roda.wui.filter.OnOffFilter</filter-class>
+		<init-param>
+			<param-name>inner-filter-class</param-name>
+			<param-value>org.jasig.cas.client.session.SingleSignOutFilter</param-value>
+		</init-param>
+		<init-param>
+			<param-name>config-prefix</param-name>
+			<param-value>ui.filter.cas</param-value>
+		</init-param>
+		<init-param>
+			<param-name>casServerUrlPrefix</param-name>
+			<param-value>http://localhost:8888/cas</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>CASSingleSignOutFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<listener>
+		<!-- Listener to clean sessions -->
+		<listener-class>org.jasig.cas.client.session.SingleSignOutHttpSessionListener</listener-class>
+	</listener>
+
 	<!-- validation filter must appear before the authentication filter -->
 	<filter>
 		<filter-name>CASValidationFilter</filter-name>
