@@ -1,5 +1,17 @@
 # Changelog
 
+## v2.2.9 (13/06/2018)
+Install for demonstration:
+```
+docker pull keeps/roda:v2.2.9
+```
+
+#### Bug Fixes:
+
+-  Unauthenticated users should have the same permissions as the user 'guest'  [#1249](https://github.com/keeps/roda/issues/1249)
+
+---
+
 ## v2.2.8 (30/05/2018)
 Install for demonstration:
 ```
