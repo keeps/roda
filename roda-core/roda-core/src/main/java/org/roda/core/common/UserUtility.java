@@ -77,7 +77,10 @@ public class UserUtility {
   public static User getUser(final HttpServletRequest request, final boolean returnGuestIfNoUserInSession) {
     User user = (User) request.getSession().getAttribute(RODA_USER);
     if (user == null) {
-      user = returnGuestIfNoUserInSession ? getGuest(request.getRemoteAddr()) : null;
+      if(returnGuestIfNoUserInSession){
+        user = getGuest(request.getRemoteAddr());
+        request.getSession().setAttribute(RODA_USER, user);
+      }
     } else {
       if (user.isGuest()) {
         user = getGuest(request.getRemoteAddr());
