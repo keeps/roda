@@ -121,12 +121,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   static final String FONDLIST_PAGESIZE = "10";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(BrowserServiceImpl.class);
-  private static final String COOKIES_ACTIVE_PROPERTY = "ui.cookies.active";
-  private static final String GANALYTICS_CODE_PROPERTY = "ui.google.analytics.code";
-  private static final String GRECAPTCHA_CODE_PROPERTY = "ui.google.recaptcha.code";
-
-  private static String GANALYTICS_ACCOUNT_CODE = null;
-  private static String GRECAPTCHA_ACCOUNT_CODE = null;
 
   /**
    * Create a new BrowserService Implementation instance
@@ -143,26 +137,9 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public boolean isCookiesMessageActive() {
-    return RodaCoreFactory.getRodaConfiguration().getBoolean(COOKIES_ACTIVE_PROPERTY, false);
-  }
-
-  @Override
-  public String retrieveGoogleAnalyticsAccount() {
-    if (GANALYTICS_ACCOUNT_CODE == null) {
-      GANALYTICS_ACCOUNT_CODE = RodaCoreFactory.getRodaConfiguration().getString(GANALYTICS_CODE_PROPERTY, "");
-      LOGGER.debug("Google Analytics Account Code: {}", GANALYTICS_ACCOUNT_CODE);
-    }
-    return GANALYTICS_ACCOUNT_CODE;
-  }
-
-  @Override
-  public String retrieveGoogleReCAPTCHAAccount() {
-    if (GRECAPTCHA_ACCOUNT_CODE == null) {
-      GRECAPTCHA_ACCOUNT_CODE = RodaCoreFactory.getRodaConfiguration().getString(GRECAPTCHA_CODE_PROPERTY, "");
-      LOGGER.debug("Google ReCAPTCHA Account Code: {}", GRECAPTCHA_ACCOUNT_CODE);
-    }
-    return GRECAPTCHA_ACCOUNT_CODE;
+  public Map<String, List<String>> retrieveSharedProperties(String localeString) {
+    Locale locale = ServerTools.parseLocale(localeString);
+    return RodaCoreFactory.getRodaSharedProperties(locale);
   }
 
   @Override
@@ -1082,11 +1059,9 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   @Override
   public RepresentationInformationExtraBundle retrieveRepresentationInformationExtraBundle(
-    String representationInformationId,
-    String localeString) throws AuthorizationDeniedException {
+    String representationInformationId, String localeString) throws AuthorizationDeniedException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Locale locale = ServerTools.parseLocale(localeString);
     return Browser.retrieveRepresentationInformationExtraBundle(user, representationInformationId, locale);
   }
-
 }

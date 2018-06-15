@@ -60,6 +60,10 @@ public class Messages {
     return ret;
   }
 
+  public boolean containsTranslation(String key) {
+    return resourceBundle.containsKey(key);
+  }
+
   /**
    * 
    * prefix will be replaced by "i18n." for simplicity purposes

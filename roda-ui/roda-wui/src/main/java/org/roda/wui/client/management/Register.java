@@ -13,20 +13,22 @@ package org.roda.wui.client.management;
 import java.util.Arrays;
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.user.User;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.bundle.UserExtraBundle;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.main.Login;
 import org.roda.wui.client.management.recaptcha.RecaptchaException;
 import org.roda.wui.client.management.recaptcha.RecaptchaWidget;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -135,23 +137,13 @@ public class Register extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
 
-    BrowserService.Util.getInstance().retrieveGoogleReCAPTCHAAccount(new AsyncCallback<String>() {
-
-      @Override
-      public void onSuccess(String result) {
-        if (result != null && !result.isEmpty()) {
-          recaptchaWidget = new RecaptchaWidget(result);
-          registerPanel.add(recaptchaWidget);
-        } else {
-          recaptchaActive = false;
-        }
-      }
-
-      @Override
-      public void onFailure(Throwable caught) {
-        recaptchaActive = false;
-      }
-    });
+    String recaptchakey = ConfigurationManager.getString(RodaConstants.UI_GOOGLE_RECAPTCHA_CODE_PROPERTY);
+    if (StringUtils.isNotBlank(recaptchakey)) {
+      recaptchaWidget = new RecaptchaWidget(recaptchakey);
+      registerPanel.add(recaptchaWidget);
+    } else {
+      recaptchaActive = false;
+    }
   }
 
   @Override

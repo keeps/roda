@@ -182,18 +182,6 @@ public interface BrowserService extends RemoteService {
   List<SupportedMetadataTypeBundle> retrieveSupportedMetadata(String aipId, String representationUUID, String locale)
     throws RODAException;
 
-  boolean isCookiesMessageActive();
-
-  /**
-   * Get Google Analytics account id
-   */
-  String retrieveGoogleAnalyticsAccount();
-
-  /**
-   * Get Google reCAPTCHA account id
-   */
-  String retrieveGoogleReCAPTCHAAccount();
-
   PreservationEventViewBundle retrievePreservationEventViewBundle(String eventId) throws RODAException;
 
   DescriptiveMetadataVersionsBundle retrieveDescriptiveMetadataVersionsBundle(String aipId, String representationId,
@@ -388,4 +376,6 @@ public interface BrowserService extends RemoteService {
 
   RepresentationInformationExtraBundle retrieveRepresentationInformationExtraBundle(String representationInformationId,
     String localeString) throws AuthorizationDeniedException;
+
+  Map<String, List<String>> retrieveSharedProperties(String localeName);
 }

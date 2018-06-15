@@ -11,12 +11,14 @@
 package org.roda.wui.client.main;
 
 import java.util.List;
+import java.util.Map;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
-import org.roda.wui.common.client.tools.DescriptionLevelUtils;
+import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
@@ -30,6 +32,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Command;
@@ -78,37 +81,21 @@ public class Main extends Composite implements EntryPoint {
 
       @Override
       public void execute() {
-        DescriptionLevelUtils.load(new AsyncCallback<Void>() {
+        BrowserService.Util.getInstance().retrieveSharedProperties(LocaleInfo.getCurrentLocale().getLocaleName(),
+          new AsyncCallback<Map<String, List<String>>>() {
+            @Override
+            public void onFailure(Throwable caught) {
+              logger.error("Failed loading initial data", caught);
+            }
 
-          @Override
-          public void onFailure(Throwable caught) {
-            logger.error("Failed loading initial data", caught);
-          }
-
-          @Override
-          public void onSuccess(Void result) {
-            init();
-          }
-        });
+            @Override
+            public void onSuccess(Map<String, List<String>> sharedProperties) {
+              ConfigurationManager.initialize(sharedProperties);
+              init();
+            }
+          });
       }
     });
-
-    BrowserService.Util.getInstance().isCookiesMessageActive(new AsyncCallback<Boolean>() {
-
-      @Override
-      public void onSuccess(Boolean result) {
-        if (result) {
-          JavascriptUtils.setCookieOptions(messages.cookiesMessage(), messages.cookiesDismisse(),
-            messages.cookiesLearnMore(), "#" + Theme.RESOLVER.getHistoryToken() + "/CookiesPolicy.html");
-        }
-      }
-
-      @Override
-      public void onFailure(Throwable caught) {
-        logger.error("Error checking if cookies message is active!!", caught);
-      }
-    });
-
   }
 
   interface Binder extends UiBinder<Widget, Main> {
@@ -146,25 +133,18 @@ public class Main extends Composite implements EntryPoint {
   public void init() {
     contentPanel.init();
     onHistoryChanged(History.getToken());
-    History.addValueChangeHandler(new ValueChangeHandler<String>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<String> event) {
-        onHistoryChanged(event.getValue());
-      }
-    });
+    History.addValueChangeHandler(event -> onHistoryChanged(event.getValue()));
 
     bannerLogo.add(new HTMLWidgetWrapper("Banner.html"));
 
-    homeLinkArea.addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        HistoryUtils.newHistory(Welcome.RESOLVER);
-      }
-    });
+    homeLinkArea.addClickHandler(event -> HistoryUtils.newHistory(Welcome.RESOLVER));
 
     homeLinkArea.setTitle(messages.homeTitle());
+
+    if (ConfigurationManager.getBoolean(false, RodaConstants.UI_COOKIES_ACTIVE_PROPERTY)) {
+      JavascriptUtils.setCookieOptions(messages.cookiesMessage(), messages.cookiesDismisse(),
+        messages.cookiesLearnMore(), "#" + Theme.RESOLVER.getHistoryToken() + "/CookiesPolicy.html");
+    }
   }
 
   private void onHistoryChanged(String historyToken) {

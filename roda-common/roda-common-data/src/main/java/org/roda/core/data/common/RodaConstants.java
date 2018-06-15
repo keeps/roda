@@ -74,6 +74,16 @@ public final class RodaConstants {
   public static final String I18N_UI_FACETS_PREFIX = "ui.facets.";
   public static final String I18N_UI_APPRAISAL = "ui.appraisal";
 
+  public static final String UI_DATE_FORMAT_TITLE = "ui.date.format.title";
+  public static final String UI_DATE_FORMAT_SIMPLE = "ui.date.format.simple";
+  public static final String UI_DATE_TIME_FORMAT_SIMPLE = "ui.dateTime.format.simple";
+  public static final String UI_DATE_TIME_MS_FORMAT_SIMPLE = "ui.dateTimeMs.format.simple";
+  public static final String UI_DATE_TIME_FORMAT_TIMEZONE_SIMPLE = "ui.dateTimeTimezone.format.simple";
+
+  public static final String UI_COOKIES_ACTIVE_PROPERTY = "ui.cookies.active";
+  public static final String UI_GOOGLE_ANALYTICS_CODE_PROPERTY = "ui.google.analytics.code";
+  public static final String UI_GOOGLE_RECAPTCHA_CODE_PROPERTY = "ui.google.recaptcha.code";
+
   /*
    * RODA objects
    */

@@ -132,7 +132,7 @@ public class AIPList extends BasicAsyncTableCell<IndexedAIP> {
     display.getColumnSortList().push(new ColumnSortInfo(datesColumn, true));
 
     display.setColumnWidth(levelColumn, 7.0, Unit.EM);
-    display.setColumnWidth(datesColumn, 13.0, Unit.EM);
+    display.setColumnWidth(datesColumn, 14.0, Unit.EM);
     display.setColumnWidth(hasRepresentationsColumn, 3.0, Unit.EM);
 
     levelColumn.setCellStyleNames("nowrap");

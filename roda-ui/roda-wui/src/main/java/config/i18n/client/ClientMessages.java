@@ -204,19 +204,19 @@ public interface ClientMessages extends Messages {
 
   String titleDatesEmpty();
 
-  String titleDatesNoFinal(Date dateInitial);
+  String titleDatesNoFinal(String dateInitial);
 
-  String titleDatesNoInitial(Date dateFinal);
+  String titleDatesNoInitial(String dateFinal);
 
-  String titleDates(Date dateInitial, Date dateFinal);
+  String titleDates(String dateInitial, String dateFinal);
 
   String simpleDatesEmpty();
 
-  String simpleDatesNoFinal(Date dateInitial);
+  String simpleDatesNoFinal(String dateInitial);
 
-  String simpleDatesNoInitial(Date dateFinal);
+  String simpleDatesNoInitial(String dateFinal);
 
-  String simpleDates(Date dateInitial, Date dateFinal);
+  String simpleDates(String dateInitial, String dateFinal);
 
 
   String itemWasAccepted();

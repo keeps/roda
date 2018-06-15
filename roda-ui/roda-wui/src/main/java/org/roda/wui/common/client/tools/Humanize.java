@@ -9,6 +9,8 @@ package org.roda.wui.common.client.tools;
 
 import java.util.Date;
 
+import org.roda.core.data.common.RodaConstants;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
@@ -92,11 +94,18 @@ public class Humanize {
     if (dateInitial == null && dateFinal == null) {
       return extendedDate ? messages.titleDatesEmpty() : messages.simpleDatesEmpty();
     } else if (dateInitial != null && dateFinal == null) {
-      return extendedDate ? messages.titleDatesNoFinal(dateInitial) : messages.simpleDatesNoFinal(dateInitial);
+      String dateInitialString = formatDate(dateInitial, extendedDate);
+      return extendedDate ? messages.titleDatesNoFinal(dateInitialString)
+        : messages.simpleDatesNoFinal(dateInitialString);
     } else if (dateInitial == null) {
-      return extendedDate ? messages.titleDatesNoInitial(dateFinal) : messages.simpleDatesNoInitial(dateFinal);
+      String dateFinalString = formatDate(dateFinal, extendedDate);
+      return extendedDate ? messages.titleDatesNoInitial(dateFinalString)
+        : messages.simpleDatesNoInitial(dateFinalString);
     } else {
-      return extendedDate ? messages.titleDates(dateInitial, dateFinal) : messages.simpleDates(dateInitial, dateFinal);
+      String dateInitialString = formatDate(dateInitial, extendedDate);
+      String dateFinalString = formatDate(dateFinal, extendedDate);
+      return extendedDate ? messages.titleDates(dateInitialString, dateFinalString)
+        : messages.simpleDates(dateInitialString, dateFinalString);
     }
   }
 
@@ -138,8 +147,8 @@ public class Humanize {
   }
 
   /**
-   * converts time (in milliseconds) to human-readable format "<w> days,
-   * <x> hours, <y> minutes and (z) seconds"
+   * converts time (in milliseconds) to human-readable format "<w> days, <x>
+   * hours, <y> minutes and (z) seconds"
    */
   public static String durationMillisToLongDHMS(long duration) {
     long d = duration;
@@ -187,15 +196,44 @@ public class Humanize {
   }
 
   public static String formatDate(Date date) {
-    return DATE_FORMAT.format(date);
+    return formatDate(date, false);
+  }
+
+  public static String formatDate(Date date, boolean extended) {
+    String formatPropertyName = extended ? RodaConstants.UI_DATE_FORMAT_TITLE : RodaConstants.UI_DATE_FORMAT_SIMPLE;
+    return applyDateTimeFormat(date, ConfigurationManager.getString(formatPropertyName), DATE_FORMAT);
   }
 
   public static String formatDateTime(Date date) {
-    return DATE_TIME_FORMAT_TIMEZONE.format(date);
+    return applyDateTimeFormat(date, ConfigurationManager.getString(RodaConstants.UI_DATE_TIME_FORMAT_TIMEZONE_SIMPLE),
+      DATE_TIME_FORMAT_TIMEZONE);
   }
 
   public static String formatDateTimeMs(Date date) {
-    return DATE_TIME_MS_FORMAT.format(date);
+    return applyDateTimeFormat(date, ConfigurationManager.getString(RodaConstants.UI_DATE_TIME_MS_FORMAT_SIMPLE),
+      DATE_TIME_MS_FORMAT);
   }
 
+  private static String applyDateTimeFormat(Date date, String stringFormat, DateTimeFormat defaultValue) {
+    DateTimeFormat format;
+
+    if (stringFormat != null) {
+      try {
+        if (stringFormat.startsWith("predef:")) {
+          DateTimeFormat.PredefinedFormat predefinedFormat = DateTimeFormat.PredefinedFormat
+            .valueOf(stringFormat.substring(7));
+          format = DateTimeFormat.getFormat(predefinedFormat);
+        } else {
+          format = DateTimeFormat.getFormat(stringFormat);
+        }
+      } catch (IllegalArgumentException e) {
+        format = defaultValue;
+        GWT.log("Could not parse date/time format '" + stringFormat + "', using default", e);
+      }
+    } else {
+      format = defaultValue;
+    }
+
+    return format.format(date);
+  }
 }

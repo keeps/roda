@@ -7,19 +7,12 @@
  */
 package org.roda.wui.common.client.tools;
 
-import java.util.Map;
-
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.descriptionlevels.DescriptionLevel;
-import org.roda.wui.client.main.DescriptionLevelConfiguration;
-import org.roda.wui.client.main.DescriptionLevelServiceAsync;
-import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HTMLPanel;
 
 import config.i18n.client.ClientMessages;
@@ -27,66 +20,43 @@ import config.i18n.client.ClientMessages;
 public class DescriptionLevelUtils {
 
   @SuppressWarnings("unused")
-  private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
+  private static ClientMessages messages = GWT.create(ClientMessages.class);
 
   private static final String TOP_ICON = "<span class='roda-logo'></span>";
-  private static ClientLogger logger = new ClientLogger(DescriptionLevelUtils.class.getName());
-  private static DescriptionLevelConfiguration levelsConfiguration;
 
   private DescriptionLevelUtils() {
-    super();
-  }
-
-  public static void load(final AsyncCallback<Void> callback) {
-    DescriptionLevelServiceAsync.INSTANCE.getDescriptionLevelConfiguration(
-      LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<DescriptionLevelConfiguration>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          logger.error("Error getting the description level configuration!", caught);
-          callback.onFailure(caught);
-        }
-
-        @Override
-        public void onSuccess(DescriptionLevelConfiguration result) {
-          levelsConfiguration = result;
-          callback.onSuccess(null);
-        }
-      });
   }
 
   public static DescriptionLevel getDescriptionLevel(String levelString) {
-    if (levelsConfiguration == null) {
-      logger.error("Requiring a description level while their are not yet loaded");
-      return null;
-    }
-
     DescriptionLevel level = new DescriptionLevel();
-    if (levelString == null) {
-      level.setIconClass(levelsConfiguration.getDefaultClass());
-    } else {
-      if (levelsConfiguration.getLevelIcons().containsKey(levelString)) {
-        level.setIconClass(levelsConfiguration.getLevelIcons().get(levelString));
+
+    // try to set a specific icon
+    if (levelString != null) {
+      if (ConfigurationManager.getString(RodaConstants.LEVELS_ICONS_PREFIX, levelString) != null) {
+        level.setIconClass(ConfigurationManager.getString(RodaConstants.LEVELS_ICONS_PREFIX, levelString));
       } else if (levelString.equalsIgnoreCase(RodaConstants.AIP_GHOST)) {
-        level.setIconClass(levelsConfiguration.getGhostClass());
+        level.setIconClass(ConfigurationManager.getString(RodaConstants.LEVELS_ICONS_GHOST));
       } else if (levelString.equalsIgnoreCase(RodaConstants.VIEW_REPRESENTATION_REPRESENTATION)) {
-        level.setIconClass(levelsConfiguration.getRepresentationClass());
+        level.setIconClass(ConfigurationManager.getString(RodaConstants.LEVELS_ICONS_REPRESENTATION));
       } else if (levelString.equalsIgnoreCase(RodaConstants.VIEW_REPRESENTATION_FOLDER)) {
-        level.setIconClass(levelsConfiguration.getRepresentationFolderClass());
+        level.setIconClass(ConfigurationManager.getString(RodaConstants.LEVELS_ICONS_REPRESENTATION_FOLDER));
       } else if (levelString.equalsIgnoreCase(RodaConstants.VIEW_REPRESENTATION_FILE)) {
-        level.setIconClass(levelsConfiguration.getRepresentationFileClass());
-      } else {
-        level.setIconClass(levelsConfiguration.getDefaultClass());
+        level.setIconClass(ConfigurationManager.getString(RodaConstants.LEVELS_ICONS_REPRESENTATION_FILE));
       }
     }
 
-    Map<String, String> translations = levelsConfiguration.getTranslations();
-    String label = translations.get(levelString);
+    // fallback to default icon
+    if (level.getIconClass() == null) {
+      level.setIconClass(ConfigurationManager.getString(RodaConstants.LEVELS_ICONS_DEFAULT));
+    }
+
+    // set the label, falling back to the levelString
+    String label = ConfigurationManager.getTranslation(RodaConstants.LEVEL_I18N_PREFIX, levelString);
     if (label == null) {
       label = levelString;
     }
-
     level.setLabel(label);
+
     return level;
   }
 
@@ -103,19 +73,15 @@ public class DescriptionLevelUtils {
   }
 
   public static SafeHtml getElementLevelIconSafeHtml(String levelString, boolean showText) {
-    SafeHtml ret = null;
-
     DescriptionLevel level = getDescriptionLevel(levelString);
-    if (level != null) {
-      StringBuilder b = new StringBuilder();
-      b.append("<i class='");
-      b.append(level.getIconClass());
-      b.append("'></i>");
-      appendLevel(b, showText, level.getLabel());
-      ret = SafeHtmlUtils.fromSafeConstant(b.toString());
-    }
 
-    return ret;
+    StringBuilder b = new StringBuilder();
+    b.append("<i class='");
+    b.append(level.getIconClass());
+    b.append("'></i>");
+    appendLevel(b, showText, level.getLabel());
+
+    return SafeHtmlUtils.fromSafeConstant(b.toString());
   }
 
   private static void appendLevel(StringBuilder b, boolean showText, String level) {
@@ -126,20 +92,19 @@ public class DescriptionLevelUtils {
   }
 
   public static SafeHtml getRepresentationTypeIcon(String representationType, boolean showText) {
-    if (levelsConfiguration == null) {
-      logger.error("Requiring a description level while their are not yet loaded");
-      return null;
+    String representationTypeKey = representationType.toLowerCase();
+
+    // try to set a specific icon
+    String icon = ConfigurationManager.getString(RodaConstants.LEVELS_ICONS_REPRESENTATION_TYPES_PREFIX,
+      representationTypeKey);
+    if (icon == null) {
+      icon = ConfigurationManager.getString(RodaConstants.LEVELS_ICONS_REPRESENTATION_TYPES_PREFIX,
+        RodaConstants.REPRESENTATION_TYPE_DEFAULT);
     }
 
-    String representationTypeKey = representationType.toLowerCase();
-    String icon;
-    if (levelsConfiguration.getRepresentationTypesIcons().containsKey(representationTypeKey)) {
-      icon = levelsConfiguration.getRepresentationTypesIcons().get(representationTypeKey);
-    } else if (levelsConfiguration.getRepresentationTypesIcons()
-      .containsKey(RodaConstants.REPRESENTATION_TYPE_DEFAULT)) {
-      icon = levelsConfiguration.getRepresentationTypesIcons().get(RodaConstants.REPRESENTATION_TYPE_DEFAULT);
-    } else {
-      icon = levelsConfiguration.getRepresentationClass();
+    // fallback to default representation icon
+    if (icon == null) {
+      ConfigurationManager.getString(RodaConstants.LEVELS_ICONS_REPRESENTATION);
     }
 
     StringBuilder b = new StringBuilder();

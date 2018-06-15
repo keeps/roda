@@ -206,14 +206,57 @@ public class RodaCoreFactory {
 
   private static LoadingCache<Locale, Messages> I18N_CACHE = CacheBuilder.newBuilder()
     .build(new CacheLoader<Locale, Messages>() {
-
       @Override
       public Messages load(Locale locale) throws Exception {
         return new Messages(locale, getConfigPath().resolve(RodaConstants.CORE_I18N_FOLDER));
       }
     });
 
+  /**
+   * Shared configuration and message properties (cache). Includes properties from
+   * {@code rodaConfiguration} and translations from ServerMessages, filtered by
+   * the {@code ui.sharedProperties.*} properties in {@code roda-wui.properties}.
+   *
+   * This cache provides the complete set of properties to be shared with the
+   * client browser.
+   */
+  private static LoadingCache<Locale, Map<String, List<String>>> SHARED_PROPERTIES_CACHE = CacheBuilder.newBuilder()
+    .build(new CacheLoader<Locale, Map<String, List<String>>>() {
+      @Override
+      public Map<String, List<String>> load(Locale locale) throws Exception {
+        Map<String, List<String>> sharedProperties = getRodaSharedConfigurationProperties();
+        Messages messages = getI18NMessages(locale);
+        List<String> prefixes = RodaCoreFactory
+          .getRodaConfigurationAsList("ui.sharedProperties.whitelist.messages.prefix");
+        for (String prefix : prefixes) {
+          Map<String, String> translations = messages.getTranslations(prefix, String.class, false);
+          for (Map.Entry<String, String> translationEntry : translations.entrySet()) {
+            sharedProperties.put("i18n." + translationEntry.getKey(),
+              Collections.singletonList(translationEntry.getValue()));
+          }
+        }
+
+        List<String> properties = RodaCoreFactory
+          .getRodaConfigurationAsList("ui.sharedProperties.whitelist.messages.property");
+        for (String propertyKey : properties) {
+          if (messages.containsTranslation(propertyKey)) {
+            sharedProperties.put("i18n." + propertyKey,
+              Collections.singletonList(messages.getTranslation(propertyKey)));
+          }
+        }
+
+        return sharedProperties;
+      }
+    });
+
   private static Map<String, Map<String, String>> rodaPropertiesCache = null;
+
+  /**
+   * Cache of shared configuration properties
+   *
+   * @see RodaCoreFactory#getRodaSharedConfigurationProperties
+   */
+  private static Map<String, List<String>> rodaSharedConfigurationPropertiesCache = null;
 
   private static boolean configSymbolicLinksAllowed;
 
@@ -1620,8 +1663,10 @@ public class RodaCoreFactory {
 
   public static void clearRodaCachableObjectsAfterConfigurationChange() {
     rodaPropertiesCache.clear();
+    rodaSharedConfigurationPropertiesCache = null;
     RODA_SCHEMAS_CACHE.invalidateAll();
     I18N_CACHE.invalidateAll();
+    SHARED_PROPERTIES_CACHE.invalidateAll();
     processPreservationEventTypeProperties();
 
     LOGGER.info("Reloaded roda configurations after file change!");
@@ -1681,7 +1726,57 @@ public class RodaCoreFactory {
 
   public static List<String> getRodaConfigurationAsList(String... keyParts) {
     String[] array = rodaConfiguration.getStringArray(getConfigurationKey(keyParts));
-    return Arrays.asList(array).stream().filter(v -> StringUtils.isNotBlank(v)).collect(Collectors.toList());
+    return Arrays.stream(array).filter(StringUtils::isNotBlank).collect(Collectors.toList());
+  }
+
+  /**
+   * Gets (with caching) the shared configuration properties from
+   * {@code rodaConfiguration}.
+   *
+   * The properties that should be shared with the client browser are defined by
+   * the {@code ui.sharedProperties.*} properties in {@code roda-wui.properties}.
+   *
+   * @return The configuration properties that should be shared with the client
+   *         browser.
+   */
+  private static Map<String, List<String>> getRodaSharedConfigurationProperties() {
+    if (rodaSharedConfigurationPropertiesCache == null) {
+      rodaSharedConfigurationPropertiesCache = new HashMap<>();
+      Configuration configuration = RodaCoreFactory.getRodaConfiguration();
+
+      List<String> prefixes = RodaCoreFactory
+        .getRodaConfigurationAsList("ui.sharedProperties.whitelist.configuration.prefix");
+
+      Iterator<String> keys = configuration.getKeys();
+      while (keys.hasNext()) {
+        String key = keys.next();
+        for (String prefix : prefixes) {
+          if (key.startsWith(prefix + ".")) {
+            rodaSharedConfigurationPropertiesCache.put(key, getRodaConfigurationAsList(key));
+            break;
+          }
+        }
+      }
+
+      List<String> properties = RodaCoreFactory
+        .getRodaConfigurationAsList("ui.sharedProperties.whitelist.configuration.property");
+      for (String propertyKey : properties) {
+        if (configuration.containsKey(propertyKey)) {
+          rodaSharedConfigurationPropertiesCache.put(propertyKey, getRodaConfigurationAsList(propertyKey));
+        }
+      }
+    }
+    return rodaSharedConfigurationPropertiesCache;
+  }
+
+  public static Map<String, List<String>> getRodaSharedProperties(Locale locale) {
+    checkForChangesInI18N();
+    try {
+      return SHARED_PROPERTIES_CACHE.get(locale);
+    } catch (ExecutionException e) {
+      LOGGER.debug("Could not load shared properties", e);
+      return Collections.emptyMap();
+    }
   }
 
   public static int getRodaConfigurationAsInt(String... keyParts) {
@@ -2005,5 +2100,4 @@ public class RodaCoreFactory {
 
     System.exit(0);
   }
-
 }

@@ -125,12 +125,6 @@ public interface BrowserServiceAsync {
   void retrieveSupportedMetadata(String aipId, String representationUUID, String locale,
     AsyncCallback<List<SupportedMetadataTypeBundle>> callback);
 
-  void isCookiesMessageActive(AsyncCallback<Boolean> callback);
-
-  void retrieveGoogleAnalyticsAccount(AsyncCallback<String> callback);
-
-  void retrieveGoogleReCAPTCHAAccount(AsyncCallback<String> callback);
-
   void retrievePreservationEventViewBundle(String eventId, AsyncCallback<PreservationEventViewBundle> asyncCallback);
 
   void retrieveDescriptiveMetadataVersionsBundle(String aipId, String representationId, String descriptiveMetadataId,
@@ -293,4 +287,6 @@ public interface BrowserServiceAsync {
 
   void retrieveRepresentationInformationExtraBundle(String representationInformationId, String localeString,
     AsyncCallback<RepresentationInformationExtraBundle> asyncCallback);
+
+  void retrieveSharedProperties(String localeName, AsyncCallback<Map<String, List<String>>> asyncCallback);
 }
