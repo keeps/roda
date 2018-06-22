@@ -11,13 +11,9 @@
 package org.roda.wui.client.planning;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.facet.Facets;
-import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.core.data.v2.index.filter.DateRangeFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
@@ -115,15 +111,6 @@ public class RiskRegister extends Composite {
   @UiField(provided = true)
   RiskList riskList;
 
-  @UiField(provided = true)
-  FlowPanel facetCategories;
-
-  @UiField(provided = true)
-  FlowPanel facetSeverities;
-
-  @UiField(provided = true)
-  FlowPanel facetOwner;
-
   @UiField
   DateBox inputDateInitial;
 
@@ -142,6 +129,9 @@ public class RiskRegister extends Composite {
   @UiField
   Button buttonRefresh;
 
+  @UiField(provided = true)
+  FlowPanel facetsPanel;
+
   private static final Filter DEFAULT_FILTER = SearchFilters.defaultFilter(IndexedRisk.class.getName());
   private static final String ALL_FILTER = SearchFilters.allFilter(IndexedRisk.class.getName());
 
@@ -151,25 +141,14 @@ public class RiskRegister extends Composite {
    * @param user
    */
   public RiskRegister() {
-    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.RISK_CATEGORY),
-      new SimpleFacetParameter(RodaConstants.RISK_CURRENT_SEVERITY_LEVEL),
-      new SimpleFacetParameter(RodaConstants.RISK_MITIGATION_OWNER));
-
-    riskList = new RiskList(Filter.NULL, facets, messages.risksTitle(), true);
+    riskList = new RiskList("RiskRegister_risks", Filter.NULL, messages.risksTitle(), true);
 
     searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, true, messages.riskRegisterSearchPlaceHolder(), false,
       false, false);
     searchPanel.setList(riskList);
 
-    facetCategories = new FlowPanel();
-    facetSeverities = new FlowPanel();
-    facetOwner = new FlowPanel();
-
-    Map<String, FlowPanel> facetPanels = new HashMap<>();
-    facetPanels.put(RodaConstants.RISK_CATEGORY, facetCategories);
-    facetPanels.put(RodaConstants.RISK_CURRENT_SEVERITY_LEVEL, facetSeverities);
-    facetPanels.put(RodaConstants.RISK_MITIGATION_OWNER, facetOwner);
-    FacetUtils.bindFacets(riskList, facetPanels);
+    facetsPanel = new FlowPanel();
+    FacetUtils.bindFacets(riskList, facetsPanel);
 
     riskList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
       @Override

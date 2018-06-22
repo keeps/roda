@@ -10,13 +10,9 @@
  */
 package org.roda.wui.client.planning;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.facet.Facets;
-import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.wui.client.common.UserLogin;
@@ -92,16 +88,14 @@ public class PreservationAgents extends Composite {
   PreservationAgentList agentList;
 
   @UiField(provided = true)
-  FlowPanel facetClasses;
+  FlowPanel facetsPanel;
 
   public PreservationAgents() {
-    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.PRESERVATION_AGENT_TYPE));
-    agentList = new PreservationAgentList(Filter.ALL, facets, messages.preservationAgentsTitle(), false);
+    agentList = new PreservationAgentList("PreservationAgents_agents", Filter.ALL, messages.preservationAgentsTitle(),
+      false);
 
-    facetClasses = new FlowPanel();
-    Map<String, FlowPanel> facetPanels = new HashMap<>();
-    facetPanels.put(RodaConstants.PRESERVATION_AGENT_TYPE, facetClasses);
-    FacetUtils.bindFacets(agentList, facetPanels);
+    facetsPanel = new FlowPanel();
+    FacetUtils.bindFacets(agentList, facetsPanel);
 
     agentList.getSelectionModel().addSelectionChangeHandler(new Handler() {
       @Override

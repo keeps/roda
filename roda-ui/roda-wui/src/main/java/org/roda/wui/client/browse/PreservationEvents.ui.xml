@@ -49,19 +49,8 @@
 								<ui:text from='{messages.preservationEventsBackButton}' />
 							</g:Button>
 						</g:FlowPanel>
-						<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
-							<g:Label addStyleNames="h4">
-								<ui:text from='{messages.preservationEventClass}' />
-							</g:Label>
-							<g:FlowPanel ui:field="facetClasses" />
-							<g:Label addStyleNames="h4">
-								<ui:text from='{messages.preservationEventType}' />
-							</g:Label>
-							<g:FlowPanel ui:field="facetType" />
-							<g:Label addStyleNames="h4">
-								<ui:text from='{messages.preservationEventOutcome}' />
-							</g:Label>
-							<g:FlowPanel ui:field="facetOutcome" />
+						<g:FlowPanel addStyleNames="sidebar-group" ui:field="facetsPanel" />
+						<g:FlowPanel addStyleNames="sidebar-group">
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarFilterDates}' />
 							</g:Label>

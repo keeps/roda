@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.jobs.Job;
@@ -61,16 +60,17 @@ public class JobList extends BasicAsyncTableCell<Job> {
 
   private static final List<String> fieldsToReturn = new ArrayList<>();
 
-  public JobList() {
-    this(null, null, null, false);
+  public JobList(String listId) {
+    this(listId, null, null, false);
   }
 
-  public JobList(Filter filter, Facets facets, String summary, boolean selectable) {
-    super(Job.class, filter, true, facets, summary, selectable, fieldsToReturn);
+  public JobList(String listId, Filter filter, String summary, boolean selectable) {
+    super(Job.class, listId, filter, true, summary, selectable, fieldsToReturn);
   }
 
-  public JobList(Filter filter, Facets facets, String summary, boolean selectable, int pageSize, int incrementPage) {
-    super(Job.class, filter, true, facets, summary, selectable, pageSize, incrementPage, fieldsToReturn);
+  public JobList(String listId, Filter filter, String summary, boolean selectable, int pageSize,
+    int incrementPage) {
+    super(Job.class, listId, filter, true, summary, selectable, pageSize, incrementPage, fieldsToReturn);
   }
 
   @Override

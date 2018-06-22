@@ -11,13 +11,9 @@
 package org.roda.wui.client.process;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.facet.Facets;
-import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.core.data.v2.index.filter.DateRangeFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -95,34 +91,24 @@ public class InternalProcess extends Composite {
   @UiField(provided = true)
   JobList jobList;
 
-  @UiField(provided = true)
-  FlowPanel stateFacets;
-
-  @UiField(provided = true)
-  FlowPanel producerFacets;
-
   @UiField
   DateBox inputDateInitial;
 
   @UiField
   DateBox inputDateFinal;
 
+  @UiField(provided = true)
+  FlowPanel facetsPanel;
+
   private InternalProcess() {
 
     Filter filter = new Filter(
       new SimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INTERNAL.toString()));
 
-    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.JOB_STATE),
-      new SimpleFacetParameter(RodaConstants.JOB_USERNAME));
+    jobList = new JobList("InternalProcess_jobs", filter, messages.jobList(), false);
 
-    jobList = new JobList(filter, facets, messages.jobList(), false);
-    producerFacets = new FlowPanel();
-    stateFacets = new FlowPanel();
-
-    Map<String, FlowPanel> facetPanels = new HashMap<>();
-    facetPanels.put(RodaConstants.JOB_STATE, stateFacets);
-    facetPanels.put(RodaConstants.JOB_USERNAME, producerFacets);
-    FacetUtils.bindFacets(jobList, facetPanels);
+    facetsPanel = new FlowPanel();
+    FacetUtils.bindFacets(jobList, facetsPanel);
 
     initWidget(uiBinder.createAndBindUi(this));
 

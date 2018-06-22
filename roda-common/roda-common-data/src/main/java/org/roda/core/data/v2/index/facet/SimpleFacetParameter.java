@@ -30,6 +30,11 @@ public class SimpleFacetParameter extends FacetParameter {
     this.limit = limit;
   }
 
+  public SimpleFacetParameter(String name, SORT sort) {
+    super(name);
+    this.setSort(sort);
+  }
+
   public SimpleFacetParameter(String name, int limit, SORT sort) {
     super(name);
     this.limit = limit;

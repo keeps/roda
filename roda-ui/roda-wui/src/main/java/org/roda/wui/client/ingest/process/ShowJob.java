@@ -19,7 +19,6 @@ import java.util.Map;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.index.facet.Facets;
-import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -236,33 +235,28 @@ public class ShowJob extends Composite {
   Button buttonAppraisal, buttonBack, buttonStop, buttonProcess;
 
   @UiField(provided = true)
-  FlowPanel jobReportStatus;
-
-  @UiField(provided = true)
-  FlowPanel jobReportLastAction;
+  FlowPanel facetsPanel;
 
   public ShowJob(Job job, Map<String, PluginInfo> pluginsInfo) {
     this.job = job;
     this.pluginsInfo = pluginsInfo;
     boolean isIngest = false;
 
-    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.JOB_REPORT_PLUGIN_STATE),
-      new SimpleFacetParameter(RodaConstants.JOB_REPORT_PLUGIN_NAME));
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getUUID()));
 
     if (job.getPluginType().equals(PluginType.INGEST)) {
-      ingestJobReports = new IngestJobReportList(
-        new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getId())), facets,
-        messages.reportList(), pluginsInfo, false);
+      ingestJobReports = new IngestJobReportList("ShowJob_reports",
+        new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getId())), messages.reportList(),
+        pluginsInfo, false);
       ListSelectionUtils.bindBrowseOpener(ingestJobReports);
-      simpleJobReports = new SimpleJobReportList();
+      simpleJobReports = new SimpleJobReportList("ShowJob_reports_hidden");
       isIngest = true;
     } else {
-      simpleJobReports = new SimpleJobReportList(
-        new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getId())), facets,
-        messages.reportList(), pluginsInfo, false);
+      simpleJobReports = new SimpleJobReportList("ShowJob_reports",
+        new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getId())), messages.reportList(),
+        pluginsInfo, false);
       ListSelectionUtils.bindBrowseOpener(simpleJobReports);
-      ingestJobReports = new IngestJobReportList();
+      ingestJobReports = new IngestJobReportList("ShowJob_reports_hidden");
     }
 
     ingestJobReportsSearchPanel = new SearchPanel(filter, RodaConstants.JOB_REPORT_SEARCH, true,
@@ -273,12 +267,7 @@ public class ShowJob extends Composite {
       messages.jobProcessedSearchPlaceHolder(), false, false, false);
     simpleJobReportsSearchPanel.setList(simpleJobReports);
 
-    jobReportStatus = new FlowPanel();
-    jobReportLastAction = new FlowPanel();
-
-    Map<String, FlowPanel> facetPanels = new HashMap<>();
-    facetPanels.put(RodaConstants.JOB_REPORT_PLUGIN_STATE, jobReportStatus);
-    facetPanels.put(RodaConstants.JOB_REPORT_PLUGIN_NAME, jobReportLastAction);
+    facetsPanel = new FlowPanel();
 
     initWidget(uiBinder.createAndBindUi(this));
     simpleJobReportsSearchPanel.setVisible(!isIngest);
@@ -296,7 +285,7 @@ public class ShowJob extends Composite {
     selectedListPanel.setVisible(true);
 
     if (isIngest) {
-      FacetUtils.bindFacets(ingestJobReports, facetPanels);
+      FacetUtils.bindFacets(ingestJobReports, facetsPanel);
 
       if (isJobRunning()) {
         ingestJobReports.autoUpdate(PERIOD_MILLIS);
@@ -314,7 +303,7 @@ public class ShowJob extends Composite {
 
       showIngestSourceObjects(selected);
     } else {
-      FacetUtils.bindFacets(simpleJobReports, facetPanels);
+      FacetUtils.bindFacets(ingestJobReports, facetsPanel);
 
       if (isJobRunning()) {
         simpleJobReports.autoUpdate(PERIOD_MILLIS);

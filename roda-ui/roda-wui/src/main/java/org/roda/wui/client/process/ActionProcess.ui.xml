@@ -33,24 +33,7 @@
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">
 					<g:FlowPanel addStyleNames="sticky-padding">
-						<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
-							<g:Label addStyleNames="h4">
-								<ui:text from='{messages.processJobTypes}' />
-							</g:Label>
-							<g:FlowPanel ui:field="jobTypeFacets" />
-						</g:FlowPanel>
-						<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
-							<g:Label addStyleNames="h4">
-								<ui:text from='{messages.processStatus}' />
-							</g:Label>
-							<g:FlowPanel ui:field="stateFacets" />
-						</g:FlowPanel>
-						<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
-							<g:Label addStyleNames="h4">
-								<ui:text from='{messages.processCreators}' />
-							</g:Label>
-							<g:FlowPanel ui:field="producerFacets" />
-						</g:FlowPanel>
+						<g:FlowPanel addStyleNames="sidebar-group" ui:field="facetsPanel" />
 						<!-- <g:Label addStyleNames="{style.other-producer-label}">Other producer:</g:Label> 
 							<g:TextBox addStyleNames="fieldTextBox {style.other-producer-input}" /> -->
 						<g:FlowPanel addStyleNames="sidebar-group">

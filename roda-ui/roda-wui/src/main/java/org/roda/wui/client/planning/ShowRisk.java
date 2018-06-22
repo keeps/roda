@@ -120,7 +120,7 @@ public class ShowRisk extends Composite {
   Button buttonEditIncidence;
 
   @UiField(provided = true)
-  FlowPanel facetIncidenceStatus;
+  FlowPanel facetsPanel;
 
   /**
    * Create a new panel to view a risk
@@ -130,7 +130,7 @@ public class ShowRisk extends Composite {
   public ShowRisk() {
     this.risk = new Risk();
     this.riskShowPanel = new RiskShowPanel();
-    this.facetIncidenceStatus = this.riskShowPanel.getFacetIncidenceStatus();
+    this.facetsPanel = this.riskShowPanel.getFacetsPanel();
     initWidget(uiBinder.createAndBindUi(this));
     buttonProcess.setEnabled(false);
     buttonEditIncidence.setEnabled(false);
@@ -140,7 +140,7 @@ public class ShowRisk extends Composite {
   public ShowRisk(Risk risk) {
     this.risk = risk;
     this.riskShowPanel = new RiskShowPanel(risk, true);
-    this.facetIncidenceStatus = this.riskShowPanel.getFacetIncidenceStatus();
+    this.facetsPanel = this.riskShowPanel.getFacetsPanel();
     initWidget(uiBinder.createAndBindUi(this));
     buttonProcess.setEnabled(false);
     buttonEditIncidence.setEnabled(false);

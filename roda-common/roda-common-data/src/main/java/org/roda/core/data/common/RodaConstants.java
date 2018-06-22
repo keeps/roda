@@ -71,7 +71,7 @@ public final class RodaConstants {
   public static final String I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX = "ui.browse.metadata.descriptive.type.";
   public static final String I18N_CROSSWALKS_DISSEMINATION_HTML_PREFIX = "crosswalks.dissemination.html.";
   public static final String I18N_CROSSWALKS_DISSEMINATION_HTML_PREFIX_EVENT = "crosswalks.dissemination.html.event.";
-  public static final String I18N_UI_FACETS_PREFIX = "ui.facets.";
+  public static final String I18N_UI_FACETS_PREFIX = "ui.facets";
   public static final String I18N_UI_APPRAISAL = "ui.appraisal";
 
   public static final String UI_DATE_FORMAT_TITLE = "ui.date.format.title";
@@ -83,6 +83,20 @@ public final class RodaConstants {
   public static final String UI_COOKIES_ACTIVE_PROPERTY = "ui.cookies.active";
   public static final String UI_GOOGLE_ANALYTICS_CODE_PROPERTY = "ui.google.analytics.code";
   public static final String UI_GOOGLE_RECAPTCHA_CODE_PROPERTY = "ui.google.recaptcha.code";
+
+  public static final String UI_LISTS_PROPERTY = "ui.lists";
+  public static final String UI_LISTS_FACETS_QUERY_PROPERTY = "facets.query";
+  public static final String UI_LISTS_FACETS_PARAMETERS_PROPERTY = "facets.parameters";
+  public static final String UI_LISTS_FACETS_PARAMETERS_TYPE_PROPERTY = "type";
+  public static final String UI_LISTS_FACETS_PARAMETERS_ARGS_PROPERTY = "args";
+  public static final String UI_LISTS_FACETS_PARAMETERS_ARGS_NAME_PROPERTY = "name";
+  public static final String UI_LISTS_FACETS_PARAMETERS_ARGS_START_PROPERTY = "start";
+  public static final String UI_LISTS_FACETS_PARAMETERS_ARGS_END_PROPERTY = "end";
+  public static final String UI_LISTS_FACETS_PARAMETERS_ARGS_GAP_PROPERTY = "gap";
+  public static final String UI_LISTS_FACETS_PARAMETERS_ARGS_LIMIT_PROPERTY = "limit";
+  public static final String UI_LISTS_FACETS_PARAMETERS_ARGS_SORT_PROPERTY = "sort";
+  public static final String UI_LISTS_FACETS_PARAMETERS_ARGS_VALUES_PROPERTY = "values";
+  public static final String UI_LISTS_FACETS_PARAMETERS_ARGS_MINCOUNT_PROPERTY = "minCount";
 
   /*
    * RODA objects
@@ -439,7 +453,8 @@ public final class RodaConstants {
   public static final StorageType DEFAULT_STORAGE_TYPE = StorageType.FILESYSTEM;
 
   public enum SolrType {
-    EMBEDDED, HTTP, @Deprecated HTTP_CLOUD, CLOUD
+    EMBEDDED, HTTP, @Deprecated
+    HTTP_CLOUD, CLOUD
   }
 
   public static final SolrType DEFAULT_SOLR_TYPE = SolrType.EMBEDDED;
@@ -451,7 +466,8 @@ public final class RodaConstants {
   public static final NodeType DEFAULT_NODE_TYPE = NodeType.MASTER;
 
   public enum OrchestratorType {
-    @Deprecated EMBEDDED, AKKA, AKKA_DISTRIBUTED
+    @Deprecated
+    EMBEDDED, AKKA, AKKA_DISTRIBUTED
   }
 
   public static final OrchestratorType DEFAULT_ORCHESTRATOR_TYPE = OrchestratorType.AKKA;
@@ -1401,8 +1417,7 @@ public final class RodaConstants {
   public static final List<String> DIPFILE_FIELDS_TO_RETURN = Arrays.asList(RodaConstants.INDEX_UUID,
     RodaConstants.DIPFILE_ID, RodaConstants.DIPFILE_PATH, RodaConstants.DIPFILE_DIP_ID,
     RodaConstants.DIPFILE_IS_DIRECTORY);
-  
-  
+
   public static final String ENV_CONFIG_SYMBOLIC_LINKS_FORBIDDEN = "RODA_CONFIG_SYMBOLIC_LINKS_FORBIDDEN";
 
   /** Private empty constructor */

@@ -8,15 +8,10 @@
 package org.roda.wui.client.common.search;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.index.facet.FacetParameter;
-import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
 import org.roda.core.data.v2.index.filter.OrFiltersParameters;
@@ -88,33 +83,33 @@ public class MainSearch extends Composite {
   String selectedItem = AIP.class.getName();
 
   FlowPanel itemsFacets;
-  Map<FacetParameter, FlowPanel> itemsFacetsMap;
+  String itemsListId;
   FlowPanel representationsFacets;
-  Map<FacetParameter, FlowPanel> representationsFacetsMap;
+  String representationsListId;
   FlowPanel filesFacets;
-  Map<FacetParameter, FlowPanel> filesFacetsMap;
+  String filesListId;
 
   // state
   final String parentAipId;
   final AIPState parentAipState;
 
   public MainSearch(boolean justActive, boolean itemsSelectable, boolean representationsSelectable,
-    boolean filesSelectable, FlowPanel itemsFacets, Map<FacetParameter, FlowPanel> itemsFacetsMap,
-    FlowPanel representationsFacets, Map<FacetParameter, FlowPanel> representationsFacetsMap, FlowPanel filesFacets,
-    Map<FacetParameter, FlowPanel> filesFacetsMap, String parentAipId, AIPState parentAipState) {
+    boolean filesSelectable, FlowPanel itemsFacets, String itemsListId, FlowPanel representationsFacets,
+    String representationsListId, FlowPanel filesFacets, String filesListId, String parentAipId,
+    AIPState parentAipState) {
     this.justActive = justActive;
     this.itemsSelectable = itemsSelectable;
     this.representationsSelectable = representationsSelectable;
     this.filesSelectable = filesSelectable;
 
     this.itemsFacets = itemsFacets;
-    this.itemsFacetsMap = itemsFacetsMap;
+    this.itemsListId = itemsListId;
 
     this.representationsFacets = representationsFacets;
-    this.representationsFacetsMap = representationsFacetsMap;
+    this.representationsListId = representationsListId;
 
     this.filesFacets = filesFacets;
-    this.filesFacetsMap = filesFacetsMap;
+    this.filesListId = filesListId;
 
     this.parentAipId = parentAipId;
     this.parentAipState = parentAipState;
@@ -241,59 +236,42 @@ public class MainSearch extends Composite {
   }
 
   private void createItemsSearchResultPanel(boolean isVisible) {
-    Facets facets = new Facets(itemsFacetsMap.keySet());
     if (isVisible) {
-      itemsSearchResultPanel = new AIPList(filterAips, justActive, facets, messages.searchResults(), itemsSelectable);
+      itemsSearchResultPanel = new AIPList(itemsListId, filterAips, justActive, messages.searchResults(),
+        itemsSelectable);
     } else {
-      itemsSearchResultPanel = new AIPList(Filter.NULL, false, facets, null, true);
+      itemsSearchResultPanel = new AIPList(itemsListId, Filter.NULL, false, null, true);
     }
 
-    Map<String, FlowPanel> facetPanels = new HashMap<>();
-    for (Entry<FacetParameter, FlowPanel> entry : itemsFacetsMap.entrySet()) {
-      facetPanels.put(entry.getKey().getName(), entry.getValue());
-    }
-
-    FacetUtils.bindFacets(itemsSearchResultPanel, facetPanels);
+    FacetUtils.bindFacets(itemsSearchResultPanel, itemsFacets);
     ListSelectionUtils.bindBrowseOpener(itemsSearchResultPanel);
     LastSelectedItemsSingleton.getInstance().setSelectedJustActive(justActive);
     itemsSearchResultPanel.setActionable(AipActions.get(parentAipId, parentAipState));
   }
 
   private void createRepresentationsSearchResultPanel(boolean isVisible) {
-    Facets facets = new Facets(representationsFacetsMap.keySet());
     if (isVisible) {
-      representationsSearchResultPanel = new RepresentationList(filterRepresentations, justActive, facets,
-        messages.searchResults(), representationsSelectable);
+      representationsSearchResultPanel = new RepresentationList(representationsListId, filterRepresentations,
+        justActive, messages.searchResults(), representationsSelectable);
     } else {
-      representationsSearchResultPanel = new RepresentationList(null, false, null, null, true);
+      representationsSearchResultPanel = new RepresentationList(representationsListId, null, false, null, true);
     }
 
-    Map<String, FlowPanel> facetPanels = new HashMap<>();
-    for (Entry<FacetParameter, FlowPanel> entry : representationsFacetsMap.entrySet()) {
-      facetPanels.put(entry.getKey().getName(), entry.getValue());
-    }
-
-    FacetUtils.bindFacets(representationsSearchResultPanel, facetPanels);
+    FacetUtils.bindFacets(representationsSearchResultPanel, representationsFacets);
     ListSelectionUtils.bindBrowseOpener(representationsSearchResultPanel);
     representationsSearchResultPanel.setActionable(RepresentationActions.get());
   }
 
   private void createFilesSearchResultPanel(boolean isVisible) {
-    Facets facets = new Facets(filesFacetsMap.keySet());
     if (isVisible) {
       boolean showFilesPath = true;
-      filesSearchResultPanel = new SearchFileList(filterFiles, justActive, facets, messages.searchResults(),
+      filesSearchResultPanel = new SearchFileList(filesListId, filterFiles, justActive, messages.searchResults(),
         filesSelectable, showFilesPath);
     } else {
-      filesSearchResultPanel = new SearchFileList(null, false, null, null, true, true);
+      filesSearchResultPanel = new SearchFileList(filesListId, null, false, null, true, true);
     }
 
-    Map<String, FlowPanel> facetPanels = new HashMap<>();
-    for (Entry<FacetParameter, FlowPanel> entry : filesFacetsMap.entrySet()) {
-      facetPanels.put(entry.getKey().getName(), entry.getValue());
-    }
-
-    FacetUtils.bindFacets(filesSearchResultPanel, facetPanels);
+    FacetUtils.bindFacets(filesSearchResultPanel, filesFacets);
     ListSelectionUtils.bindBrowseOpener(filesSearchResultPanel);
     LastSelectedItemsSingleton.getInstance().setSelectedJustActive(justActive);
     filesSearchResultPanel.setActionable(FileActions.get());

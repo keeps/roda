@@ -13,13 +13,9 @@ package org.roda.wui.client.browse;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.facet.Facets;
-import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.core.data.v2.index.filter.DateRangeFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -141,15 +137,6 @@ public class PreservationEvents extends Composite {
       RodaConstants.FILE_ANCESTORS_PATH, RodaConstants.FILE_ORIGINALNAME, RodaConstants.FILE_FILE_ID,
       RodaConstants.FILE_AIP_ID, RodaConstants.FILE_REPRESENTATION_ID, RodaConstants.FILE_ISDIRECTORY));
 
-  @UiField(provided = true)
-  FlowPanel facetClasses;
-
-  @UiField(provided = true)
-  FlowPanel facetType;
-
-  @UiField(provided = true)
-  FlowPanel facetOutcome;
-
   @UiField
   DateBox inputDateInitial;
 
@@ -180,6 +167,9 @@ public class PreservationEvents extends Composite {
   @UiField
   Button backButton;
 
+  @UiField(provided = true)
+  FlowPanel facetsPanel;
+
   private String aipId;
   private String representationUUID;
   private String fileUUID;
@@ -207,9 +197,6 @@ public class PreservationEvents extends Composite {
     this.representationUUID = representationUUID;
     this.fileUUID = fileUUID;
 
-    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS),
-      new SimpleFacetParameter(RodaConstants.PRESERVATION_EVENT_TYPE),
-      new SimpleFacetParameter(RodaConstants.PRESERVATION_EVENT_OUTCOME));
     Filter filter = new Filter();
 
     if (aipId != null) {
@@ -222,17 +209,11 @@ public class PreservationEvents extends Composite {
       filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_FILE_UUID, fileUUID));
     }
 
-    eventList = new PreservationEventList(filter, facets, messages.preservationEventsTitle(), false);
+    eventList = new PreservationEventList("PreservationEvents_events", filter, messages.preservationEventsTitle(),
+      false);
 
-    facetClasses = new FlowPanel();
-    facetType = new FlowPanel();
-    facetOutcome = new FlowPanel();
-
-    Map<String, FlowPanel> facetPanels = new HashMap<>();
-    facetPanels.put(RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS, facetClasses);
-    facetPanels.put(RodaConstants.PRESERVATION_EVENT_TYPE, facetType);
-    facetPanels.put(RodaConstants.PRESERVATION_EVENT_OUTCOME, facetOutcome);
-    FacetUtils.bindFacets(eventList, facetPanels);
+    facetsPanel = new FlowPanel();
+    FacetUtils.bindFacets(eventList, facetsPanel);
 
     eventList.getSelectionModel().addSelectionChangeHandler(new Handler() {
 

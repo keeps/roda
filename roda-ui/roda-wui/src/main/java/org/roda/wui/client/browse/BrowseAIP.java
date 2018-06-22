@@ -21,8 +21,6 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.index.facet.Facets;
-import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -53,6 +51,7 @@ import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -140,8 +139,6 @@ public class BrowseAIP extends Composite {
   private static BrowseAIP instance = null;
 
   private static final Filter COLLECTIONS_FILTER = new Filter(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID));
-  private static Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.AIP_LEVEL),
-    new SimpleFacetParameter(RodaConstants.AIP_HAS_REPRESENTATIONS));
 
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
@@ -243,14 +240,8 @@ public class BrowseAIP extends Composite {
   @UiField
   Button searchAIP;
 
-  @UiField
+  @UiField(provided = true)
   FlowPanel itemsFacets;
-
-  @UiField(provided = true)
-  FlowPanel facetDescriptionLevels;
-
-  @UiField(provided = true)
-  FlowPanel facetHasRepresentations;
 
   private List<HandlerRegistration> handlers;
 
@@ -261,8 +252,8 @@ public class BrowseAIP extends Composite {
     boolean selectable = true;
 
     // REPRESENTATIONS
-    representationsList = new RepresentationList(Filter.NULL, justActive, Facets.NONE, messages.listOfRepresentations(),
-      true);
+    representationsList = new RepresentationList("BrowseAIP_representations", Filter.NULL, justActive,
+      messages.listOfRepresentations(), true);
     ListSelectionUtils.bindBrowseOpener(representationsList);
 
     representationsSearch = new SearchPanel(Filter.NULL, RodaConstants.REPRESENTATION_SEARCH, true,
@@ -270,7 +261,7 @@ public class BrowseAIP extends Composite {
     representationsSearch.setList(representationsList);
 
     // DISSEMINATIONS
-    disseminationsList = new DIPList(Filter.NULL, Facets.NONE, messages.listOfDisseminations(), true);
+    disseminationsList = new DIPList("BrowseAIP_disseminations", Filter.NULL, messages.listOfDisseminations(), true);
     disseminationsList.setActionable(DisseminationActions.get());
     ListSelectionUtils.bindBrowseOpener(disseminationsList);
 
@@ -279,21 +270,15 @@ public class BrowseAIP extends Composite {
     disseminationsSearch.setList(disseminationsList);
 
     // AIP CHILDREN
-    aipChildrenList = new AIPList(Filter.NULL, justActive, facets, messages.listOfAIPs(), selectable);
+    aipChildrenList = new AIPList("BrowseAIP_aipChildren", Filter.NULL, justActive, messages.listOfAIPs(), selectable);
     ListSelectionUtils.bindBrowseOpener(aipChildrenList);
 
     aipChildrenSearch = new SearchPanel(COLLECTIONS_FILTER, RodaConstants.AIP_SEARCH, true,
       messages.searchPlaceHolder(), false, false, true);
     aipChildrenSearch.setList(aipChildrenList);
 
-    facetDescriptionLevels = new FlowPanel();
-    facetHasRepresentations = new FlowPanel();
-
-    Map<String, FlowPanel> facetPanels = new HashMap<>();
-    facetPanels.put(RodaConstants.AIP_LEVEL, facetDescriptionLevels);
-    facetPanels.put(RodaConstants.AIP_HAS_REPRESENTATIONS, facetHasRepresentations);
-
-    FacetUtils.bindFacets(aipChildrenList, facetPanels);
+    itemsFacets = new FlowPanel();
+    FacetUtils.bindFacets(aipChildrenList, itemsFacets);
 
     // INIT
     initWidget(uiBinder.createAndBindUi(this));
@@ -478,8 +463,7 @@ public class BrowseAIP extends Composite {
     }
 
     if (clearFacets) {
-      facets = new Facets(new SimpleFacetParameter(RodaConstants.AIP_LEVEL),
-        new SimpleFacetParameter(RodaConstants.AIP_HAS_REPRESENTATIONS));
+      aipChildrenList.setFacets(ConfigurationManager.FacetFactory.getFacets(aipChildrenList.getListId()));
     }
   }
 
@@ -542,7 +526,7 @@ public class BrowseAIP extends Composite {
         Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aip.getId()));
         representationsSearch.setDefaultFilter(filter, true);
         representationsSearch.clearSearchInputBox();
-        representationsList.set(filter, justActive, Facets.NONE);
+        representationsList.set(filter, justActive);
         representationsList.setActionable(RepresentationActions.get(aipId));
       }
 
@@ -556,7 +540,7 @@ public class BrowseAIP extends Composite {
         Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_AIP_UUIDS, aip.getId()));
         disseminationsSearch.setDefaultFilter(filter, true);
         disseminationsSearch.clearSearchInputBox();
-        disseminationsList.set(filter, justActive, Facets.NONE);
+        disseminationsList.set(filter, justActive);
       }
 
       disseminationsTitle.setVisible(bundle.getDipCount() > 0);
@@ -569,7 +553,7 @@ public class BrowseAIP extends Composite {
         Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aip.getId()));
         aipChildrenSearch.setDefaultFilter(filter, true);
         aipChildrenSearch.clearSearchInputBox();
-        aipChildrenList.set(filter, justActive, facets);
+        aipChildrenList.set(filter, justActive);
         LastSelectedItemsSingleton.getInstance().setSelectedJustActive(justActive);
         aipChildrenList.setActionable(AipActions.get(aip.getId(), aip.getState()));
       }
@@ -797,7 +781,7 @@ public class BrowseAIP extends Composite {
     itemIcon.getParent().addStyleName("browseTitle-allCollections-wrapper");
 
     aipChildrenSearch.setDefaultFilter(COLLECTIONS_FILTER, true);
-    aipChildrenList.set(COLLECTIONS_FILTER, justActive, facets);
+    aipChildrenList.set(COLLECTIONS_FILTER, justActive);
     LastSelectedItemsSingleton.getInstance().setSelectedJustActive(justActive);
     aipChildrenList.setActionable(AipActions.get());
 

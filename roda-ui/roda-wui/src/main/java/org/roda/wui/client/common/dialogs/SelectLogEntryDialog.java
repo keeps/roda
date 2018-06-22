@@ -26,7 +26,9 @@ public class SelectLogEntryDialog extends DefaultSelectDialog<LogEntry, Void> {
   }
 
   public SelectLogEntryDialog(String title, Filter filter, boolean selectable) {
-    super(title, filter, RodaConstants.LOG_SEARCH, new LogEntryList(filter, null, title, selectable), false);
+    super(title, filter, RodaConstants.LOG_SEARCH,
+      new LogEntryList("SelectLogEntryDialog_logEntries", filter, title, selectable),
+      false);
   }
 
 }

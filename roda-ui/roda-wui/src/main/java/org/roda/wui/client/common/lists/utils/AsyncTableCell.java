@@ -94,6 +94,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
   private final Class<T> classToReturn;
   private final O object;
+  private final String listId;
 
   private final MyAsyncDataProvider<T> dataProvider;
   private final SingleSelectionModel<T> selectionModel;
@@ -134,24 +135,25 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
   private Actionable<T> actionable = null;
   private final CalloutPopup actionsPopup = new CalloutPopup();
 
-  public AsyncTableCell(Class<T> classToReturn, List<String> fieldsToReturn) {
-    this(classToReturn, null, false, null, null, false, 20, 100, null, fieldsToReturn);
+  public AsyncTableCell(Class<T> classToReturn, String listId, List<String> fieldsToReturn) {
+    this(classToReturn, listId, null, false, null, null, false, 20, 100, null, fieldsToReturn);
   }
 
-  public AsyncTableCell(Class<T> classToReturn, Filter filter, boolean justActive, Facets facets, String summary,
-    boolean selectable, O object, List<String> fieldsToReturn) {
-    this(classToReturn, filter, justActive, facets, summary, selectable, 20, 100, object, fieldsToReturn);
+  public AsyncTableCell(Class<T> classToReturn, String listId, Filter filter, boolean justActive, Facets facets,
+    String summary, boolean selectable, O object, List<String> fieldsToReturn) {
+    this(classToReturn, listId, filter, justActive, facets, summary, selectable, 20, 100, object, fieldsToReturn);
   }
 
-  public AsyncTableCell(final Class<T> classToReturn, final Filter filter, final boolean justActive,
-    final Facets facets, final String summary, final boolean selectable, final int initialPageSize,
-    final int pageSizeIncrement, final O object, List<String> fieldsToReturn) {
+  public AsyncTableCell(final Class<T> classToReturn, final String listId, final Filter filter,
+    final boolean justActive, final Facets facets, final String summary, final boolean selectable,
+    final int initialPageSize, final int pageSizeIncrement, final O object, List<String> fieldsToReturn) {
     super();
 
     this.classToReturn = classToReturn;
     this.initialPageSize = initialPageSize;
     this.pageSizeIncrement = pageSizeIncrement;
     this.object = object;
+    this.listId = listId;
 
     final String notNullSummary = StringUtils.isNotBlank(summary) ? summary : "summary" + Random.nextInt(1000);
 
@@ -528,9 +530,13 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
   }
 
   public void set(Filter filter, boolean justActive, Facets facets) {
+    this.facets = facets;
+    set(filter, justActive);
+  }
+
+  public void set(Filter filter, boolean justActive) {
     this.filter = filter;
     this.justActive = justActive;
-    this.facets = facets;
     refresh();
   }
 
@@ -769,6 +775,10 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
   public O getObject() {
     return object;
+  }
+
+  public String getListId() {
+    return listId;
   }
 
   public int getRowCount() {

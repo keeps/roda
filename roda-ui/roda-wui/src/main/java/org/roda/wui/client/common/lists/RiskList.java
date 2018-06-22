@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.risks.IndexedRisk;
@@ -60,17 +59,18 @@ public class RiskList extends BasicAsyncTableCell<IndexedRisk> {
     RodaConstants.RISK_UNMITIGATED_INCIDENCES_COUNT, RodaConstants.RISK_POST_MITIGATION_SEVERITY_LEVEL,
     RodaConstants.RISK_PRE_MITIGATION_SEVERITY_LEVEL);
 
-  public RiskList() {
-    this(null, null, null, false);
+  public RiskList(String listId) {
+    this(listId, null, null, false);
   }
 
-  public RiskList(Filter filter, Facets facets, String summary, boolean selectable) {
-    super(IndexedRisk.class, filter, facets, summary, selectable, fieldsToReturn);
+  public RiskList(String listId, Filter filter, String summary, boolean selectable) {
+    super(IndexedRisk.class, listId, filter, summary, selectable, fieldsToReturn);
     this.filter = filter;
   }
 
-  public RiskList(Filter filter, Facets facets, String summary, boolean selectable, int pageSize, int incrementPage) {
-    super(IndexedRisk.class, filter, facets, summary, selectable, pageSize, incrementPage, fieldsToReturn);
+  public RiskList(String listId, Filter filter, String summary, boolean selectable, int pageSize,
+    int incrementPage) {
+    super(IndexedRisk.class, listId, filter, summary, selectable, pageSize, incrementPage, fieldsToReturn);
     this.filter = filter;
   }
 

@@ -10,13 +10,9 @@
  */
 package org.roda.wui.client.ingest.appraisal;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.facet.FacetParameter;
-import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
@@ -100,20 +96,7 @@ public class IngestAppraisal extends Composite {
 
   // FILTERS
   @UiField(provided = true)
-  FlowPanel itemsFacets;
-  @UiField(provided = true)
-  FlowPanel facetDescriptionLevels;
-  @UiField(provided = true)
-  FlowPanel facetHasRepresentations;
-
-  @UiField(provided = true)
-  FlowPanel filesFacets;
-  @UiField(provided = true)
-  FlowPanel facetFormats;
-  @UiField(provided = true)
-  FlowPanel facetPronoms;
-  @UiField(provided = true)
-  FlowPanel facetMimetypes;
+  FlowPanel itemsFacets, representationsFacets, filesFacets;
 
   @UiField(provided = true)
   Button acceptButton, rejectButton;
@@ -127,33 +110,16 @@ public class IngestAppraisal extends Composite {
   private IngestAppraisal() {
     // Variables
     itemsFacets = new FlowPanel();
-    facetDescriptionLevels = new FlowPanel();
-    facetHasRepresentations = new FlowPanel();
-
+    representationsFacets = new FlowPanel();
     filesFacets = new FlowPanel();
-    facetFormats = new FlowPanel();
-    facetPronoms = new FlowPanel();
-    facetMimetypes = new FlowPanel();
 
     acceptButton = new Button();
     rejectButton = new Button();
 
-    // Define facets and facets panels
-    Map<FacetParameter, FlowPanel> itemsFacetsMap = new HashMap<>();
-    Map<FacetParameter, FlowPanel> representationsFacetsMap = new HashMap<>();
-    Map<FacetParameter, FlowPanel> filesFacetsMap = new HashMap<>();
-
-    itemsFacetsMap.put(new SimpleFacetParameter(RodaConstants.AIP_LEVEL), facetDescriptionLevels);
-    itemsFacetsMap.put(new SimpleFacetParameter(RodaConstants.AIP_HAS_REPRESENTATIONS), facetHasRepresentations);
-
-    filesFacetsMap.put(new SimpleFacetParameter(RodaConstants.FILE_FILEFORMAT), facetFormats);
-    filesFacetsMap.put(new SimpleFacetParameter(RodaConstants.FILE_PRONOM), facetPronoms);
-    filesFacetsMap.put(new SimpleFacetParameter(RodaConstants.FILE_FORMAT_MIMETYPE), facetMimetypes);
-
     // Create main search
     mainSearch = new MainSearch(justActive, itemsSelectable, representationsSelectable, filesSelectable, itemsFacets,
-      itemsFacetsMap, new FlowPanel(), representationsFacetsMap, filesFacets, filesFacetsMap, null,
-      AIPState.UNDER_APPRAISAL);
+      "IngestAppraisal_searchAIPs", representationsFacets, "IngestAppraisal_searchRepresentations", filesFacets,
+      "IngestAppraisal_searchFiles", null, AIPState.UNDER_APPRAISAL);
 
     initWidget(uiBinder.createAndBindUi(this));
 

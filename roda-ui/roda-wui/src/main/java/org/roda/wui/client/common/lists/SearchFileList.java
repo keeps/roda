@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -54,16 +53,20 @@ public class SearchFileList extends BasicAsyncTableCell<IndexedFile> {
     RodaConstants.FILE_ORIGINALNAME, RodaConstants.FILE_FILE_ID, RodaConstants.FILE_PATH, RodaConstants.FILE_SIZE,
     RodaConstants.FILE_FORMAT_VERSION, RodaConstants.FILE_FILEFORMAT);
 
-  public SearchFileList(Filter filter, boolean justActive, Facets facets, String summary, boolean selectable,
-    boolean showFilePath) {
-    super(IndexedFile.class, filter, justActive, facets, summary, selectable, fieldsToReturn);
+  public SearchFileList(String listId) {
+    this(listId, null, false, null, false, false);
+  }
+
+  public SearchFileList(String listId, Filter filter, boolean justActive, String summary,
+    boolean selectable, boolean showFilePath) {
+    super(IndexedFile.class, listId, filter, justActive, summary, selectable, fieldsToReturn);
     this.showFilePath = showFilePath;
   }
 
-  public SearchFileList(Filter filter, boolean justActive, Facets facets, String summary, boolean selectable,
-    boolean showFilePath, int initialPageSize, int pageSizeIncrement) {
-    super(IndexedFile.class, filter, justActive, facets, summary, selectable, initialPageSize, pageSizeIncrement,
-      fieldsToReturn);
+  public SearchFileList(String listId, Filter filter, boolean justActive, String summary,
+    boolean selectable, boolean showFilePath, int initialPageSize, int pageSizeIncrement) {
+    super(IndexedFile.class, listId, filter, justActive, summary, selectable, initialPageSize,
+      pageSizeIncrement, fieldsToReturn);
     this.showFilePath = showFilePath;
   }
 

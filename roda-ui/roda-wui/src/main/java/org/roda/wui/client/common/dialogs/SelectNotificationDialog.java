@@ -26,7 +26,8 @@ public class SelectNotificationDialog extends DefaultSelectDialog<Notification, 
   }
 
   public SelectNotificationDialog(String title, Filter filter, boolean selectable) {
-    super(title, filter, RodaConstants.NOTIFICATION_SEARCH, new NotificationList(filter, null, title, selectable),
+    super(title, filter, RodaConstants.NOTIFICATION_SEARCH,
+      new NotificationList("SelectNotificationDialog_notifications", filter, title, selectable),
       false);
   }
 

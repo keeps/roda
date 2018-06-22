@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.TransferredResource;
@@ -58,31 +57,31 @@ public class TransferredResourceList extends BasicAsyncTableCell<TransferredReso
     RodaConstants.TRANSFERRED_RESOURCE_NAME, RodaConstants.TRANSFERRED_RESOURCE_SIZE,
     RodaConstants.TRANSFERRED_RESOURCE_DATE, RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH);
 
-  public TransferredResourceList() {
-    this(null, null, null, false);
+  public TransferredResourceList(String listId) {
+    this(listId, null, null, false);
   }
 
-  public TransferredResourceList(Filter filter, Facets facets, String summary, boolean selectable) {
-    super(TransferredResource.class, filter, facets, summary, selectable, fieldsToReturn);
+  public TransferredResourceList(String listId, Filter filter, String summary, boolean selectable) {
+    super(TransferredResource.class, listId, filter, summary, selectable, fieldsToReturn);
     this.addParentPath = false;
   }
 
-  public TransferredResourceList(Filter filter, Facets facets, String summary, boolean selectable,
+  public TransferredResourceList(String listId, Filter filter, String summary, boolean selectable,
     boolean addParentPath) {
-    super(TransferredResource.class, filter, facets, summary, selectable, fieldsToReturn);
+    super(TransferredResource.class, listId, filter, summary, selectable, fieldsToReturn);
     this.addParentPath = addParentPath;
   }
 
-  public TransferredResourceList(Filter filter, Facets facets, String summary, boolean selectable, int initialPageSize,
-    int pageSizeIncrement) {
-    super(TransferredResource.class, filter, facets, summary, selectable, initialPageSize, pageSizeIncrement,
+  public TransferredResourceList(String listId, Filter filter, String summary, boolean selectable,
+    int initialPageSize, int pageSizeIncrement) {
+    super(TransferredResource.class, listId, filter, summary, selectable, initialPageSize, pageSizeIncrement,
       fieldsToReturn);
     this.addParentPath = false;
   }
 
-  public TransferredResourceList(Filter filter, Facets facets, String summary, boolean selectable, int initialPageSize,
-    int pageSizeIncrement, boolean addParentPath) {
-    super(TransferredResource.class, filter, facets, summary, selectable, initialPageSize, pageSizeIncrement,
+  public TransferredResourceList(String listId, Filter filter, String summary, boolean selectable,
+    int initialPageSize, int pageSizeIncrement, boolean addParentPath) {
+    super(TransferredResource.class, listId, filter, summary, selectable, initialPageSize, pageSizeIncrement,
       fieldsToReturn);
     this.addParentPath = addParentPath;
   }

@@ -15,8 +15,6 @@ import java.util.Map.Entry;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
-import org.roda.core.data.v2.index.facet.Facets;
-import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
@@ -232,13 +230,15 @@ public class RepresentationInformationDialogs {
                 Filter tableFilter = new Filter(new OrFiltersParameters(filterList));
                 switch (dropDown.getSelectedValue()) {
                   case RodaConstants.SEARCH_ITEMS:
-                    table = new AIPList(tableFilter, true, Facets.NONE, "", false, 5, 5);
+                    table = new AIPList("RepresentationInformationDialogs_AIPs", tableFilter, true, "", false, 5, 5);
                     break;
                   case RodaConstants.SEARCH_REPRESENTATIONS:
-                    table = new RepresentationList(tableFilter, true, Facets.NONE, "", false, 5, 5);
+                    table = new RepresentationList("RepresentationInformationDialogs_representations", tableFilter,
+                      true, "", false, 5, 5);
                     break;
                   case RodaConstants.SEARCH_FILES:
-                    table = new SimpleFileList(tableFilter, true, Facets.NONE, "", false, 5, 5);
+                    table = new SimpleFileList("RepresentationInformationDialogs_files", tableFilter, true, "", false,
+                      5, 5);
                     break;
                   default:
                     break;
@@ -857,11 +857,9 @@ public class RepresentationInformationDialogs {
     container.addStyleName("wui-dialog-message");
 
     // create search box and results list
-    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.REPRESENTATION_INFORMATION_TAGS),
-      new SimpleFacetParameter(RodaConstants.REPRESENTATION_INFORMATION_SUPPORT));
     Filter defaultFilter = SearchFilters.defaultFilter(RepresentationInformation.class.getName());
-    final RepresentationInformationList representationInformationList = new RepresentationInformationList(defaultFilter,
-      facets, messages.representationInformationTitle(), true, 10, 10);
+    final RepresentationInformationList representationInformationList = new RepresentationInformationList(
+      "RepresentationInformationDialogs_RI", defaultFilter, messages.representationInformationTitle(), true, 10, 10);
     representationInformationList.setCsvDownloadButtonVisibility(false);
     representationInformationList.addRedrawHandler(new AbstractHasData.RedrawEvent.Handler() {
       @Override

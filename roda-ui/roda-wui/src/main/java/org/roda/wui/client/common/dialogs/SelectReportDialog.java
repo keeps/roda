@@ -26,7 +26,8 @@ public class SelectReportDialog extends DefaultSelectDialog<IndexedReport, Void>
   }
 
   public SelectReportDialog(String title, Filter filter, boolean selectable) {
-    super(title, filter, RodaConstants.JOB_REPORT_SEARCH, new SimpleJobReportList(filter, null, title, selectable),
+    super(title, filter, RodaConstants.JOB_REPORT_SEARCH,
+      new SimpleJobReportList("SelectReportDialog_simpleJobReports", filter, title, selectable),
       false);
   }
 

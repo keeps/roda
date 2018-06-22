@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.IndexedDIP;
@@ -44,17 +43,18 @@ public class DIPList extends BasicAsyncTableCell<IndexedDIP> {
   private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID,
     RodaConstants.DIP_DATE_CREATED, RodaConstants.DIP_LAST_MODIFIED, RodaConstants.DIP_TITLE);
 
-  public DIPList() {
-    this(null, null, null, false);
+  public DIPList(String listId) {
+    this(listId, null, null, false);
   }
 
-  public DIPList(Filter filter, Facets facets, String summary, boolean selectable) {
-    super(IndexedDIP.class, filter, facets, summary, selectable, fieldsToReturn);
+  public DIPList(String listId, Filter filter, String summary, boolean selectable) {
+    super(IndexedDIP.class, listId, filter, summary, selectable, fieldsToReturn);
   }
 
-  public DIPList(Filter filter, Facets facets, String summary, boolean selectable, int initialPageSize,
+  public DIPList(String listId, Filter filter, String summary, boolean selectable, int initialPageSize,
     int pageSizeIncrement) {
-    super(IndexedDIP.class, filter, facets, summary, selectable, initialPageSize, pageSizeIncrement, fieldsToReturn);
+    super(IndexedDIP.class, listId, filter, summary, selectable, initialPageSize, pageSizeIncrement,
+      fieldsToReturn);
   }
 
   @Override

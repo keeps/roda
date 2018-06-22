@@ -51,24 +51,7 @@
 								<ui:text from='{messages.riskRegisterProcessButton}' />
 							</g:Button>
 						</g:FlowPanel>
-						<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
-							<g:Label addStyleNames="h4">
-								<ui:text from='{messages.riskRegisterCategory}' />
-							</g:Label>
-							<g:FlowPanel ui:field="facetCategories" />
-						</g:FlowPanel>
-						<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
-							<g:Label addStyleNames="h4">
-								<ui:text from='{messages.riskRegisterSeverity}' />
-							</g:Label>
-							<g:FlowPanel ui:field="facetSeverities" />
-						</g:FlowPanel>
-						<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
-							<g:Label addStyleNames="h4">
-								<ui:text from='{messages.riskRegisterOwner}' />
-							</g:Label>
-							<g:FlowPanel ui:field="facetOwner" />
-						</g:FlowPanel>
+						<g:FlowPanel addStyleNames="sidebar-group" ui:field="facetsPanel" />
 						<g:FlowPanel addStyleNames="sidebar-group">
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarFilterDates}' />

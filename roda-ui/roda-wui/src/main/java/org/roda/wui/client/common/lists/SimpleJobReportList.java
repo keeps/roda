@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.jobs.IndexedReport;
@@ -70,28 +69,28 @@ public class SimpleJobReportList extends BasicAsyncTableCell<IndexedReport> {
   @SuppressWarnings("unused")
   private String outcomeClass;
 
-  public SimpleJobReportList() {
-    this(null, null, null, new HashMap<String, PluginInfo>(), false);
+  public SimpleJobReportList(String listId) {
+    this(listId, null, null, new HashMap<String, PluginInfo>(), false);
   }
 
-  public SimpleJobReportList(Filter filter, Facets facets, String summary, boolean selectable) {
-    this(filter, facets, summary, new HashMap<String, PluginInfo>(), selectable);
+  public SimpleJobReportList(String listId, Filter filter, String summary, boolean selectable) {
+    this(listId, filter, summary, new HashMap<String, PluginInfo>(), selectable);
   }
 
-  public SimpleJobReportList(Filter filter, Facets facets, String summary, boolean selectable, int pageSize,
-    int incrementPage) {
-    this(filter, facets, summary, new HashMap<String, PluginInfo>(), selectable, pageSize, incrementPage);
+  public SimpleJobReportList(String listId, Filter filter, String summary, boolean selectable,
+    int pageSize, int incrementPage) {
+    this(listId, filter, summary, new HashMap<String, PluginInfo>(), selectable, pageSize, incrementPage);
   }
 
-  public SimpleJobReportList(Filter filter, Facets facets, String summary, Map<String, PluginInfo> pluginsInfo,
-    boolean selectable) {
-    super(IndexedReport.class, filter, facets, summary, selectable, fieldsToReturn);
+  public SimpleJobReportList(String listId, Filter filter, String summary,
+    Map<String, PluginInfo> pluginsInfo, boolean selectable) {
+    super(IndexedReport.class, listId, filter, summary, selectable, fieldsToReturn);
     this.pluginsInfo = pluginsInfo;
   }
 
-  public SimpleJobReportList(Filter filter, Facets facets, String summary, Map<String, PluginInfo> pluginsInfo,
-    boolean selectable, int pageSize, int incrementPage) {
-    super(IndexedReport.class, filter, facets, summary, selectable, pageSize, incrementPage, fieldsToReturn);
+  public SimpleJobReportList(String listId, Filter filter, String summary,
+    Map<String, PluginInfo> pluginsInfo, boolean selectable, int pageSize, int incrementPage) {
+    super(IndexedReport.class, listId, filter, summary, selectable, pageSize, incrementPage, fieldsToReturn);
     this.pluginsInfo = pluginsInfo;
   }
 

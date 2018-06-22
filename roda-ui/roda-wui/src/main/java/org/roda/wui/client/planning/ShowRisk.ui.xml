@@ -21,7 +21,7 @@
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">
 					<g:FlowPanel addStyleNames="sticky-padding">
-						<g:FlowPanel>
+						<g:FlowPanel addStyleNames="sidebar-group">
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarActionsTitle}' />
 							</g:Label>
@@ -51,12 +51,7 @@
 								<ui:text from='{messages.newProcessPreservation}' />
 							</g:Button>
 						</g:FlowPanel>
-						<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
-							<g:Label addStyleNames="h4">
-								<ui:text from='{messages.riskIncidenceStatusTitle}' />
-							</g:Label>
-							<g:FlowPanel ui:field="facetIncidenceStatus" />
-						</g:FlowPanel>
+						<g:FlowPanel addStyleNames="sidebar-group" ui:field="facetsPanel" />
 					</g:FlowPanel>
 				</g:FlowPanel>
 			</g:FlowPanel>

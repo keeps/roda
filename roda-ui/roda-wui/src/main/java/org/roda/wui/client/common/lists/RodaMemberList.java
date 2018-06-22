@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.user.RODAMember;
@@ -49,17 +48,17 @@ public class RodaMemberList extends BasicAsyncTableCell<RODAMember> {
     RodaConstants.MEMBERS_IS_USER, RodaConstants.MEMBERS_NAME, RodaConstants.MEMBERS_FULLNAME,
     RodaConstants.MEMBERS_GROUPS, RodaConstants.MEMBERS_IS_ACTIVE);
 
-  public RodaMemberList() {
-    this(null, null, null, false);
+  public RodaMemberList(String listId) {
+    this(listId, null, null, false);
   }
 
-  public RodaMemberList(Filter filter, Facets facets, String summary, boolean selectable) {
-    super(RODAMember.class, filter, facets, summary, selectable, fieldsToReturn);
+  public RodaMemberList(String listId, Filter filter, String summary, boolean selectable) {
+    super(RODAMember.class, listId, filter, summary, selectable, fieldsToReturn);
   }
 
-  public RodaMemberList(Filter filter, Facets facets, String summary, boolean selectable, int pageSize,
+  public RodaMemberList(String listId, Filter filter, String summary, boolean selectable, int pageSize,
     int incrementPage) {
-    super(RODAMember.class, filter, facets, summary, selectable, pageSize, incrementPage, fieldsToReturn);
+    super(RODAMember.class, listId, filter, summary, selectable, pageSize, incrementPage, fieldsToReturn);
   }
 
   @Override
@@ -105,8 +104,9 @@ public class RodaMemberList extends BasicAsyncTableCell<RODAMember> {
     activeColumn = new Column<RODAMember, SafeHtml>(new SafeHtmlCell()) {
       @Override
       public SafeHtml getValue(RODAMember member) {
-        return SafeHtmlUtils.fromSafeConstant(member != null
-          ? (member.isActive() ? "<i class='fa fa-check-circle'></i>" : "<i class='fa fa-ban'></i>") : "");
+        return SafeHtmlUtils.fromSafeConstant(
+          member != null ? (member.isActive() ? "<i class='fa fa-check-circle'></i>" : "<i class='fa fa-ban'></i>")
+            : "");
 
       }
     };

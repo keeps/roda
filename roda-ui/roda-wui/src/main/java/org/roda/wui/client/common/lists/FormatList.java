@@ -14,7 +14,6 @@ import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.formats.Format;
-import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
@@ -48,16 +47,17 @@ public class FormatList extends BasicAsyncTableCell<Format> {
     RodaConstants.FORMAT_NAME, RodaConstants.FORMAT_CATEGORY, RodaConstants.FORMAT_MIMETYPES,
     RodaConstants.FORMAT_PRONOMS);
 
-  public FormatList() {
-    this(null, null, null, false);
+  public FormatList(String listId) {
+    this(listId, null, null, false);
   }
 
-  public FormatList(Filter filter, Facets facets, String summary, boolean selectable) {
-    super(Format.class, filter, facets, summary, selectable, fieldsToReturn);
+  public FormatList(String listId, Filter filter, String summary, boolean selectable) {
+    super(Format.class, listId, filter, summary, selectable, fieldsToReturn);
   }
 
-  public FormatList(Filter filter, Facets facets, String summary, boolean selectable, int pageSize, int incrementPage) {
-    super(Format.class, filter, facets, summary, selectable, pageSize, incrementPage, fieldsToReturn);
+  public FormatList(String listId, Filter filter, String summary, boolean selectable, int pageSize,
+    int incrementPage) {
+    super(Format.class, listId, filter, summary, selectable, pageSize, incrementPage, fieldsToReturn);
   }
 
   @Override

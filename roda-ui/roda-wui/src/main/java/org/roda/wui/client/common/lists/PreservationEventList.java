@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
@@ -54,18 +53,18 @@ public class PreservationEventList extends BasicAsyncTableCell<IndexedPreservati
     RodaConstants.PRESERVATION_EVENT_TYPE, RodaConstants.PRESERVATION_EVENT_DETAIL,
     RodaConstants.PRESERVATION_EVENT_OUTCOME);
 
-  public PreservationEventList() {
-    this(null, null, null, false);
+  public PreservationEventList(String listId) {
+    this(listId, null, null, false);
   }
 
-  public PreservationEventList(Filter filter, Facets facets, String summary, boolean selectable) {
-    super(IndexedPreservationEvent.class, filter, facets, summary, selectable, fieldsToReturn);
+  public PreservationEventList(String listId, Filter filter, String summary, boolean selectable) {
+    super(IndexedPreservationEvent.class, listId, filter, summary, selectable, fieldsToReturn);
   }
 
-  public PreservationEventList(Filter filter, Facets facets, String summary, boolean selectable, int initialPageSize,
-    int pageSizeIncrement) {
-    super(IndexedPreservationEvent.class, filter, facets, summary, selectable, initialPageSize, pageSizeIncrement,
-      fieldsToReturn);
+  public PreservationEventList(String listId, Filter filter, String summary, boolean selectable,
+    int initialPageSize, int pageSizeIncrement) {
+    super(IndexedPreservationEvent.class, listId, filter, summary, selectable, initialPageSize,
+      pageSizeIncrement, fieldsToReturn);
   }
 
   @Override

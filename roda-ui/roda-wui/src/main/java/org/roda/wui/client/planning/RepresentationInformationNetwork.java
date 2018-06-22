@@ -11,13 +11,9 @@
 package org.roda.wui.client.planning;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.facet.Facets;
-import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -112,12 +108,6 @@ public class RepresentationInformationNetwork extends Composite {
   @UiField(provided = true)
   RepresentationInformationList representationInformationList;
 
-  @UiField(provided = true)
-  FlowPanel facetTags;
-
-  @UiField(provided = true)
-  FlowPanel facetSupport;
-
   @UiField
   Button buttonAdd;
 
@@ -133,6 +123,9 @@ public class RepresentationInformationNetwork extends Composite {
   @UiField
   FlowPanel content;
 
+  @UiField
+  FlowPanel facetsPanel;
+
   private static final Filter DEFAULT_FILTER = SearchFilters.defaultFilter(RepresentationInformation.class.getName());
   private static final String ALL_FILTER = SearchFilters.allFilter(RepresentationInformation.class.getName());
 
@@ -142,25 +135,16 @@ public class RepresentationInformationNetwork extends Composite {
    * Create a representation information page
    */
   public RepresentationInformationNetwork() {
-    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.REPRESENTATION_INFORMATION_TAGS),
-      new SimpleFacetParameter(RodaConstants.REPRESENTATION_INFORMATION_SUPPORT));
-
-    representationInformationList = new RepresentationInformationList(filter, facets,
+    representationInformationList = new RepresentationInformationList("RepresentationInformationNetwork_RI", filter,
       messages.representationInformationTitle(), true);
 
     searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, true,
       messages.representationInformationRegisterSearchPlaceHolder(), false, false, false);
     searchPanel.setList(representationInformationList);
 
-    facetTags = new FlowPanel();
-    facetSupport = new FlowPanel();
-
-    Map<String, FlowPanel> facetPanels = new HashMap<>();
-    facetPanels.put(RodaConstants.REPRESENTATION_INFORMATION_TAGS, facetTags);
-    facetPanels.put(RodaConstants.REPRESENTATION_INFORMATION_SUPPORT, facetSupport);
-    FacetUtils.bindFacets(representationInformationList, facetPanels);
-
     initWidget(uiBinder.createAndBindUi(this));
+
+    FacetUtils.bindFacets(representationInformationList, facetsPanel);
 
     representationInformationList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
       @Override

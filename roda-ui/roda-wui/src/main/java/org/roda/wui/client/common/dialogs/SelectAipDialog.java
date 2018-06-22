@@ -8,7 +8,6 @@
 package org.roda.wui.client.common.dialogs;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.common.lists.AIPList;
@@ -25,7 +24,6 @@ public class SelectAipDialog extends DefaultSelectDialog<IndexedAIP, Void> {
   private static final Filter DEFAULT_FILTER_AIP = SearchFilters.defaultFilter(IndexedAIP.class.getName());
 
   private static final Boolean DEFAULT_JUST_ACTIVE = Boolean.TRUE;
-  private static final Facets DEFAULT_FACETS = null;
   private static final Boolean SELECTABLE = Boolean.FALSE;
 
   public SelectAipDialog(String title, boolean hidePreFilters) {
@@ -38,6 +36,7 @@ public class SelectAipDialog extends DefaultSelectDialog<IndexedAIP, Void> {
 
   public SelectAipDialog(String title, Filter filter, boolean justActive, boolean hidePreFilters, boolean selectable) {
     super(title, filter, RodaConstants.AIP_SEARCH,
-      new AIPList(filter, justActive, DEFAULT_FACETS, messages.selectAipSearchResults(), selectable), hidePreFilters);
+      new AIPList("SelectAipDialog_AIPs", filter, justActive, messages.selectAipSearchResults(), selectable),
+      hidePreFilters);
   }
 }

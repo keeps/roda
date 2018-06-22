@@ -17,7 +17,6 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
@@ -186,8 +185,8 @@ public class IngestTransfer extends Composite {
   Button move;
 
   private IngestTransfer() {
-    Facets facets = null;
-    transferredResourceList = new TransferredResourceList(Filter.NULL, facets, messages.ingestTransferList(), true);
+    transferredResourceList = new TransferredResourceList("IngestTransfer_transferredResources", Filter.NULL,
+      messages.ingestTransferList(), true);
 
     searchPanel = new SearchPanel(Filter.NULL, RodaConstants.TRANSFERRED_RESOURCE_SEARCH, true,
       messages.ingestTransferSearchPlaceHolder(), false, false, false);

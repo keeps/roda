@@ -11,14 +11,9 @@
 package org.roda.wui.client.search;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.index.facet.FacetParameter;
-import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.wui.client.common.UserLogin;
@@ -80,13 +75,7 @@ public class Search extends Composite {
 
   // FILTERS
   @UiField(provided = true)
-  FlowPanel itemsFacets, facetDescriptionLevels, facetHasRepresentations;
-
-  @UiField(provided = true)
-  FlowPanel representationsFacets, facetRepresentationType, facetRepresentationOriginal, facetRepresentationStates;
-
-  @UiField(provided = true)
-  FlowPanel filesFacets, facetFormats, facetPronoms, facetMimetypes, facetFileType;
+  FlowPanel itemsFacets, representationsFacets, filesFacets;
 
   boolean justActive = true;
   boolean itemsSelectable = true;
@@ -96,43 +85,13 @@ public class Search extends Composite {
   private Search() {
     // initialize (needed before initWidget())
     itemsFacets = new FlowPanel();
-    facetDescriptionLevels = new FlowPanel();
-    facetHasRepresentations = new FlowPanel();
-
     representationsFacets = new FlowPanel();
-    facetRepresentationType = new FlowPanel();
-    facetRepresentationOriginal = new FlowPanel();
-    facetRepresentationStates = new FlowPanel();
-
     filesFacets = new FlowPanel();
-    facetFormats = new FlowPanel();
-    facetPronoms = new FlowPanel();
-    facetMimetypes = new FlowPanel();
-    facetFileType = new FlowPanel();
-
-    // Define facets and facets panels
-    Map<FacetParameter, FlowPanel> itemsFacetsMap = new HashMap<>();
-    Map<FacetParameter, FlowPanel> representationsFacetsMap = new HashMap<>();
-    Map<FacetParameter, FlowPanel> filesFacetsMap = new HashMap<>();
-
-    itemsFacetsMap.put(new SimpleFacetParameter(RodaConstants.AIP_LEVEL), facetDescriptionLevels);
-    itemsFacetsMap.put(new SimpleFacetParameter(RodaConstants.AIP_HAS_REPRESENTATIONS), facetHasRepresentations);
-
-    representationsFacetsMap.put(new SimpleFacetParameter(RodaConstants.REPRESENTATION_TYPE), facetRepresentationType);
-    representationsFacetsMap.put(new SimpleFacetParameter(RodaConstants.REPRESENTATION_ORIGINAL),
-      facetRepresentationOriginal);
-    representationsFacetsMap.put(new SimpleFacetParameter(RodaConstants.REPRESENTATION_STATES),
-      facetRepresentationStates);
-
-    filesFacetsMap.put(new SimpleFacetParameter(RodaConstants.FILE_FILEFORMAT), facetFormats);
-    filesFacetsMap.put(new SimpleFacetParameter(RodaConstants.FILE_PRONOM), facetPronoms);
-    filesFacetsMap.put(new SimpleFacetParameter(RodaConstants.FILE_FORMAT_MIMETYPE), facetMimetypes);
-    filesFacetsMap.put(new SimpleFacetParameter(RodaConstants.FILE_ISDIRECTORY), facetFileType);
 
     // Create main search
     String parentAipId = null;
     mainSearch = new MainSearch(justActive, itemsSelectable, representationsSelectable, filesSelectable, itemsFacets,
-      itemsFacetsMap, representationsFacets, representationsFacetsMap, filesFacets, filesFacetsMap, parentAipId,
+      "Search_AIPs", representationsFacets, "Search_representations", filesFacets, "Search_files", parentAipId,
       AIPState.ACTIVE);
 
     initWidget(uiBinder.createAndBindUi(this));

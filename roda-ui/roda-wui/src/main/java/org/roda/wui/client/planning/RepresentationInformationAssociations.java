@@ -15,7 +15,6 @@ import java.util.List;
 
 import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
 import org.roda.core.data.v2.index.filter.OrFiltersParameters;
@@ -132,7 +131,8 @@ public class RepresentationInformationAssociations extends Composite {
    * Create a representation information page
    */
   public RepresentationInformationAssociations() {
-    representationInformationList = new RepresentationInformationList(Filter.NULL, Facets.NONE,
+    representationInformationList = new RepresentationInformationList("RepresentationInformationAssociations_RI",
+      Filter.NULL,
       messages.representationInformationTitle(), false);
 
     searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, true,

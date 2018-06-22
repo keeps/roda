@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.log.LogEntry;
@@ -53,17 +52,17 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
     RodaConstants.LOG_DATETIME, RodaConstants.LOG_ACTION_COMPONENT, RodaConstants.LOG_ACTION_METHOD,
     RodaConstants.LOG_USERNAME, RodaConstants.LOG_DURATION, RodaConstants.LOG_ADDRESS, RodaConstants.LOG_STATE);
 
-  public LogEntryList() {
-    this(null, null, null, false);
+  public LogEntryList(String listId) {
+    this(listId, null, null, false);
   }
 
-  public LogEntryList(Filter filter, Facets facets, String summary, boolean selectable) {
-    super(LogEntry.class, filter, facets, summary, selectable, fieldsToReturn);
+  public LogEntryList(String listId, Filter filter, String summary, boolean selectable) {
+    super(LogEntry.class, listId, filter, summary, selectable, fieldsToReturn);
   }
 
-  public LogEntryList(Filter filter, Facets facets, String summary, boolean selectable, int pageSize,
+  public LogEntryList(String listId, Filter filter, String summary, boolean selectable, int pageSize,
     int incrementPage) {
-    super(LogEntry.class, filter, facets, summary, selectable, pageSize, incrementPage, fieldsToReturn);
+    super(LogEntry.class, listId, filter, summary, selectable, pageSize, incrementPage, fieldsToReturn);
   }
 
   @Override

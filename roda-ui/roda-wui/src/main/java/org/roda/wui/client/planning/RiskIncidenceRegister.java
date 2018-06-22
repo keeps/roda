@@ -13,13 +13,9 @@ package org.roda.wui.client.planning;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.facet.Facets;
-import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.core.data.v2.index.filter.DateRangeFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -176,9 +172,6 @@ public class RiskIncidenceRegister extends Composite {
   @UiField(provided = true)
   RiskIncidenceList riskIncidenceList;
 
-  @UiField(provided = true)
-  FlowPanel facetDetectedBy, facetStatus;
-
   @UiField
   DateBox inputDateInitial;
 
@@ -187,6 +180,9 @@ public class RiskIncidenceRegister extends Composite {
 
   @UiField
   Button buttonRemove, buttonCancel;
+
+  @UiField(provided = true)
+  FlowPanel facetsPanel;
 
   private static final String ALL_FILTER = SearchFilters.allFilter(RiskIncidence.class.getName());
 
@@ -208,22 +204,15 @@ public class RiskIncidenceRegister extends Composite {
     this.filePath = filePath;
     this.fileId = fileId;
 
-    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.RISK_INCIDENCE_DETECTED_BY),
-      new SimpleFacetParameter(RodaConstants.RISK_INCIDENCE_STATUS));
-
-    riskIncidenceList = new RiskIncidenceList(filter, facets, messages.riskIncidencesTitle(), true);
+    riskIncidenceList = new RiskIncidenceList("RiskIncidenceRegister_risks", filter, messages.riskIncidencesTitle(),
+      true);
 
     searchPanel = new SearchPanel(filter, ALL_FILTER, true, messages.riskIncidenceRegisterSearchPlaceHolder(), false,
       false, false);
     searchPanel.setList(riskIncidenceList);
 
-    facetDetectedBy = new FlowPanel();
-    facetStatus = new FlowPanel();
-
-    Map<String, FlowPanel> facetPanels = new HashMap<>();
-    facetPanels.put(RodaConstants.RISK_INCIDENCE_DETECTED_BY, facetDetectedBy);
-    facetPanels.put(RodaConstants.RISK_INCIDENCE_STATUS, facetStatus);
-    FacetUtils.bindFacets(riskIncidenceList, facetPanels);
+    facetsPanel = new FlowPanel();
+    FacetUtils.bindFacets(riskIncidenceList, facetsPanel);
 
     riskIncidenceList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
       @Override

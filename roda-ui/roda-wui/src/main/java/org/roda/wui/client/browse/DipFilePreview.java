@@ -8,7 +8,6 @@
 package org.roda.wui.client.browse;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.DIPFile;
@@ -52,8 +51,8 @@ public class DipFilePreview extends BitstreamPreview<DIPFile> {
     final SearchPanel dipFileSearch = new SearchPanel(filter, RodaConstants.DIPFILE_SEARCH, true,
       messages.searchPlaceHolder(), false, false, true);
 
-    final DIPFileList folderList = new DIPFileList(filter, Facets.NONE, messages.allOfAObject(DIPFile.class.getName()),
-      false);
+    final DIPFileList folderList = new DIPFileList("DipFilePreview_files", filter,
+      messages.allOfAObject(DIPFile.class.getName()), false);
     dipFileSearch.setList(folderList);
 
     layout.add(dipFileSearch);

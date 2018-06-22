@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.notifications.Notification;
@@ -53,17 +52,18 @@ public class NotificationList extends BasicAsyncTableCell<Notification> {
     RodaConstants.NOTIFICATION_SENT_ON, RodaConstants.NOTIFICATION_SUBJECT, RodaConstants.NOTIFICATION_IS_ACKNOWLEDGED,
     RodaConstants.NOTIFICATION_STATE);
 
-  public NotificationList() {
-    this(null, null, null, false);
+  public NotificationList(String listId) {
+    this(listId, null, null, false);
   }
 
-  public NotificationList(Filter filter, Facets facets, String summary, boolean selectable) {
-    super(Notification.class, filter, false, facets, summary, selectable, fieldsToReturn);
+  public NotificationList(String listId, Filter filter, String summary, boolean selectable) {
+    super(Notification.class, listId, filter, false, summary, selectable, fieldsToReturn);
   }
 
-  public NotificationList(Filter filter, Facets facets, String summary, boolean selectable, int pageSize,
+  public NotificationList(String listId, Filter filter, String summary, boolean selectable, int pageSize,
     int incrementPage) {
-    super(Notification.class, filter, false, facets, summary, selectable, pageSize, incrementPage, fieldsToReturn);
+    super(Notification.class, listId, filter, false, summary, selectable, pageSize, incrementPage,
+      fieldsToReturn);
   }
 
   @Override

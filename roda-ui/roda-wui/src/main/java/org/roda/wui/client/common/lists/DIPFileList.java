@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.DIPFile;
@@ -45,17 +44,18 @@ public class DIPFileList extends BasicAsyncTableCell<DIPFile> {
   private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
     RodaConstants.DIPFILE_IS_DIRECTORY, RodaConstants.DIPFILE_ID, RodaConstants.DIPFILE_DIP_ID);
 
-  public DIPFileList() {
-    this(null, null, null, false);
+  public DIPFileList(String listId) {
+    this(listId, null, null, false);
   }
 
-  public DIPFileList(Filter filter, Facets facets, String summary, boolean selectable) {
-    super(DIPFile.class, filter, facets, summary, selectable, fieldsToReturn);
+  public DIPFileList(String listId, Filter filter, String summary, boolean selectable) {
+    super(DIPFile.class, listId, filter, summary, selectable, fieldsToReturn);
   }
 
-  public DIPFileList(Filter filter, Facets facets, String summary, boolean selectable, int initialPageSize,
-    int pageSizeIncrement) {
-    super(DIPFile.class, filter, facets, summary, selectable, initialPageSize, pageSizeIncrement, fieldsToReturn);
+  public DIPFileList(String listId, Filter filter, String summary, boolean selectable,
+    int initialPageSize, int pageSizeIncrement) {
+    super(DIPFile.class, listId, filter, summary, selectable, initialPageSize, pageSizeIncrement,
+      fieldsToReturn);
   }
 
   @Override

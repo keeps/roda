@@ -7,13 +7,8 @@
  */
 package org.roda.wui.client.management;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.facet.Facets;
-import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.wui.client.common.UserLogin;
@@ -98,44 +93,28 @@ public class MemberManagement extends Composite {
   @UiField(provided = true)
   RodaMemberList list;
 
-  @UiField(provided = true)
-  FlowPanel facetIsActive;
-
-  @UiField(provided = true)
-  FlowPanel facetIsUser;
-
-  @UiField(provided = true)
-  FlowPanel facetGroups;
-
   @UiField
   Button buttonAddUser;
 
   @UiField
   Button buttonAddGroup;
 
+  @UiField(provided = true)
+  FlowPanel facetsPanel;
+
   private static final Filter DEFAULT_FILTER = SearchFilters.defaultFilter(RODAMember.class.getName());
   private static final String ALL_FILTER = SearchFilters.allFilter(RODAMember.class.getName());
 
   public MemberManagement() {
-    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.MEMBERS_IS_ACTIVE),
-      new SimpleFacetParameter(RodaConstants.MEMBERS_IS_USER), new SimpleFacetParameter(RodaConstants.MEMBERS_GROUPS));
-
-    list = new RodaMemberList(DEFAULT_FILTER, facets, messages.usersAndGroupsTitle(), false);
+    list = new RodaMemberList("MemberManagement_rodaMembers", DEFAULT_FILTER, messages.usersAndGroupsTitle(), false);
 
     searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, true, messages.usersAndGroupsSearchPlaceHolder(), false,
       false, false);
     searchPanel.setList(list);
 
-    facetIsActive = new FlowPanel();
-    facetIsUser = new FlowPanel();
-    facetGroups = new FlowPanel();
+    facetsPanel = new FlowPanel();
+    FacetUtils.bindFacets(list, facetsPanel);
 
-    Map<String, FlowPanel> facetPanels = new HashMap<>();
-    facetPanels.put(RodaConstants.MEMBERS_IS_ACTIVE, facetIsActive);
-    facetPanels.put(RodaConstants.MEMBERS_IS_USER, facetIsUser);
-    facetPanels.put(RodaConstants.MEMBERS_GROUPS, facetGroups);
-
-    FacetUtils.bindFacets(list, facetPanels);
     initWidget(uiBinder.createAndBindUi(this));
     memberManagementDescription.add(new HTMLWidgetWrapper("MemberManagementDescription.html"));
 

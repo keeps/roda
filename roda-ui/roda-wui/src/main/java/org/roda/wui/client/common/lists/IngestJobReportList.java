@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.jobs.IndexedReport;
@@ -66,13 +65,13 @@ public class IngestJobReportList extends BasicAsyncTableCell<IndexedReport> {
 
   private final Map<String, PluginInfo> pluginsInfo;
 
-  public IngestJobReportList() {
-    this(null, null, null, new HashMap<String, PluginInfo>(), false);
+  public IngestJobReportList(String listId) {
+    this(listId, null, null, new HashMap<String, PluginInfo>(), false);
   }
 
-  public IngestJobReportList(Filter filter, Facets facets, String summary, Map<String, PluginInfo> pluginsInfo,
-    boolean selectable) {
-    super(IndexedReport.class, filter, facets, summary, selectable, fieldsToReturn);
+  public IngestJobReportList(String listId, Filter filter, String summary,
+    Map<String, PluginInfo> pluginsInfo, boolean selectable) {
+    super(IndexedReport.class, listId, filter, summary, selectable, fieldsToReturn);
     this.pluginsInfo = pluginsInfo;
   }
 

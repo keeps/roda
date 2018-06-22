@@ -10,7 +10,6 @@ package org.roda.wui.client.browse;
 import java.util.Arrays;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
@@ -57,7 +56,8 @@ public class IndexedFilePreview extends BitstreamPreview<IndexedFile> {
     boolean selectable = true;
     boolean showFilesPath = false;
 
-    this.folderList = new SearchFileList(filter, justActive, Facets.NONE, messages.representationListOfFiles(),
+    this.folderList = new SearchFileList("IndexedFilePreview_files", filter, justActive,
+      messages.representationListOfFiles(),
       selectable, showFilesPath);
 
     LastSelectedItemsSingleton.getInstance().setSelectedJustActive(justActive);

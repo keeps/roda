@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
@@ -45,17 +44,19 @@ public class PreservationAgentList extends BasicAsyncTableCell<IndexedPreservati
     RodaConstants.PRESERVATION_AGENT_ID, RodaConstants.PRESERVATION_AGENT_NAME, RodaConstants.PRESERVATION_AGENT_TYPE,
     RodaConstants.PRESERVATION_AGENT_VERSION);
 
-  public PreservationAgentList() {
-    this(null, null, null, false);
+  public PreservationAgentList(String listId) {
+    this(listId, null, null, false);
   }
 
-  public PreservationAgentList(Filter filter, Facets facets, String summary, boolean selectable) {
-    super(IndexedPreservationAgent.class, filter, facets, summary, selectable, fieldsToReturn);
+  public PreservationAgentList(String listId, Filter filter, String summary, boolean selectable) {
+    super(IndexedPreservationAgent.class, listId, filter, summary, selectable, fieldsToReturn);
   }
 
-  public PreservationAgentList(Filter filter, Facets facets, String summary, boolean selectable, int initialPageSize,
+  public PreservationAgentList(String listId, Filter filter, String summary, boolean selectable,
+    int initialPageSize,
     int pageSizeIncrement) {
-    super(IndexedPreservationAgent.class, filter, facets, summary, selectable, initialPageSize, pageSizeIncrement,
+    super(IndexedPreservationAgent.class, listId, filter, summary, selectable, initialPageSize,
+      pageSizeIncrement,
       fieldsToReturn);
   }
 

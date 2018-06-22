@@ -8,7 +8,6 @@
 package org.roda.wui.client.common.dialogs;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.common.lists.TransferredResourceList;
@@ -24,7 +23,6 @@ public class SelectTransferResourceDialog extends DefaultSelectDialog<Transferre
 
   private static final Filter DEFAULT_FILTER = SearchFilters.defaultFilter(TransferredResource.class.getName());
 
-  private static final Facets DEFAULT_FACETS = null;
   private static final Boolean SELECTABLE = Boolean.FALSE;
 
   public SelectTransferResourceDialog(String title) {
@@ -36,7 +34,8 @@ public class SelectTransferResourceDialog extends DefaultSelectDialog<Transferre
   }
 
   public SelectTransferResourceDialog(String title, Filter filter, boolean selectable) {
-    super(title, filter, RodaConstants.TRANSFERRED_RESOURCE_SEARCH, new TransferredResourceList(filter, DEFAULT_FACETS,
+    super(title, filter, RodaConstants.TRANSFERRED_RESOURCE_SEARCH, new TransferredResourceList(
+      "SelectTransferResourceDialog_transferredResources", filter,
       messages.selectTransferredResourcesSearchResults(), selectable, true), false);
   }
 }

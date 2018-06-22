@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
@@ -58,17 +57,18 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
     RodaConstants.REPRESENTATION_CREATED_ON, RodaConstants.REPRESENTATION_UPDATED_ON,
     RodaConstants.REPRESENTATION_STATES);
 
-  public RepresentationList() {
-    this(null, false, null, null, false);
+  public RepresentationList(String listId) {
+    this(listId, null, false, null, false);
   }
 
-  public RepresentationList(Filter filter, boolean justActive, Facets facets, String summary, boolean selectable) {
-    super(IndexedRepresentation.class, filter, justActive, facets, summary, selectable, fieldsToReturn);
+  public RepresentationList(String listId, Filter filter, boolean justActive, String summary,
+    boolean selectable) {
+    super(IndexedRepresentation.class, listId, filter, justActive, summary, selectable, fieldsToReturn);
   }
 
-  public RepresentationList(Filter filter, boolean justActive, Facets facets, String summary, boolean selectable,
-    int initialPageSize, int pageSizeIncrement) {
-    super(IndexedRepresentation.class, filter, justActive, facets, summary, selectable, initialPageSize,
+  public RepresentationList(String listId, Filter filter, boolean justActive, String summary,
+    boolean selectable, int initialPageSize, int pageSizeIncrement) {
+    super(IndexedRepresentation.class, listId, filter, justActive, summary, selectable, initialPageSize,
       pageSizeIncrement, fieldsToReturn);
   }
 

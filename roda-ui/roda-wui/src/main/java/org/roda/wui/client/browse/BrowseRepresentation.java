@@ -247,7 +247,8 @@ public class BrowseRepresentation extends Composite {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_UUID, repUUID),
       new EmptyKeyFilterParameter(RodaConstants.FILE_PARENT_UUID));
 
-    filesList = new SearchFileList(filter, justActive, Facets.NONE, summary, selectable, showFilesPath);
+    filesList = new SearchFileList("BrowseRepresentation_files", filter, justActive, summary, selectable,
+      showFilesPath);
     LastSelectedItemsSingleton.getInstance().setSelectedJustActive(justActive);
     filesList.setActionable(FileActions.get(aipId, repId));
 
@@ -257,7 +258,8 @@ public class BrowseRepresentation extends Composite {
     filesSearch.setList(filesList);
 
     // DISSEMINATIONS
-    disseminationsList = new DIPList(Filter.NULL, Facets.NONE, messages.listOfDisseminations(), true);
+    disseminationsList = new DIPList("BrowseRepresentation_disseminations", Filter.NULL,
+      messages.listOfDisseminations(), true);
     disseminationsList.setActionable(DisseminationActions.get());
     ListSelectionUtils.bindBrowseOpener(disseminationsList);
 

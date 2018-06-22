@@ -7,9 +7,11 @@
  */
 package org.roda.wui.common.client.tools;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
@@ -23,6 +25,7 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Label;
 
 public class FacetUtils {
   private static final ClientLogger LOGGER = new ClientLogger(FacetUtils.class.getName());
@@ -32,14 +35,14 @@ public class FacetUtils {
   }
 
   public static <T extends IsIndexed> void bindFacets(final AsyncTableCell<T, ?> list,
-    final Map<String, FlowPanel> facetPanels) {
-    bindFacets(list, facetPanels, false);
+    final FlowPanel facetsPanel) {
+    bindFacets(list, facetsPanel, false);
   }
 
   public static <T extends IsIndexed> void bindFacets(final AsyncTableCell<T, ?> list,
-    final Map<String, FlowPanel> facetPanels, final boolean hideDisabled) {
+    final FlowPanel facetsPanel, final boolean hideDisabled) {
+    Map<String, FlowPanel> facetPanels = createFacetPanels(list, facetsPanel);
     list.addValueChangeHandler(new ValueChangeHandler<IndexResult<T>>() {
-
       @Override
       public void onValueChange(ValueChangeEvent<IndexResult<T>> event) {
         FacetUtils.updateFacetPanels(list, facetPanels, event.getValue().getFacetResults(), hideDisabled);
@@ -47,12 +50,40 @@ public class FacetUtils {
     });
   }
 
+  private static <T extends IsIndexed> Map<String, FlowPanel> createFacetPanels(final AsyncTableCell<T, ?> list,
+    final FlowPanel parentPanel) {
+    Facets facets = list.getFacets();
+
+    Map<String, FlowPanel> result = new HashMap<>();
+    for (FacetParameter facetParameter : facets.getParameters().values()) {
+
+      FlowPanel facetAndTitle = new FlowPanel();
+      facetAndTitle.addStyleName("sidebar-facet-panel");
+
+      String title = ConfigurationManager.getTranslation(RodaConstants.I18N_UI_FACETS_PREFIX,
+        list.getClassToReturn().getSimpleName(), facetParameter.getName());
+
+      Label titleLabel = new Label(title);
+      titleLabel.addStyleName("h4");
+
+      FlowPanel facetPanel = new FlowPanel();
+
+      facetAndTitle.add(titleLabel);
+      facetAndTitle.add(facetPanel);
+      parentPanel.add(facetAndTitle);
+
+      result.put(facetParameter.getName(), facetPanel);
+    }
+
+    return result;
+  }
+
   private static <T extends IsIndexed> void updateFacetPanels(final AsyncTableCell<T, ?> list,
     final Map<String, FlowPanel> facetPanels, final List<FacetFieldResult> facetResults, final boolean hideDisabled) {
 
     for (FacetFieldResult facetResult : facetResults) {
       final String facetField = facetResult.getField();
-      FlowPanel facetPanel = facetPanels.get(facetResult.getField());
+      FlowPanel facetPanel = facetPanels.get(facetField);
       if (facetPanel != null) {
         facetPanel.clear();
         if (facetResult.getTotalCount() == 0) {

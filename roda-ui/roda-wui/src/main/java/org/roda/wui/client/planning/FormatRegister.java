@@ -14,7 +14,6 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.formats.Format;
-import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.jobs.Job;
@@ -122,8 +121,7 @@ public class FormatRegister extends Composite {
    * @param user
    */
   public FormatRegister() {
-    Facets facets = null;
-    formatList = new FormatList(Filter.ALL, facets, messages.formatsTitle(), true);
+    formatList = new FormatList("FormatRegister_formats", Filter.ALL, messages.formatsTitle(), true);
 
     searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, true, messages.formatRegisterSearchPlaceHolder(), false,
       false, true);

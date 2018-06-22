@@ -28,6 +28,6 @@ public class SelectRepresentationInformationDialog extends DefaultSelectDialog<R
 
   public SelectRepresentationInformationDialog(String title, Filter filter, boolean selectable) {
     super(title, filter, RodaConstants.REPRESENTATION_INFORMATION_SEARCH,
-      new RepresentationInformationList(filter, null, title, selectable), false);
+      new RepresentationInformationList("SelectRepresentationInformationDialog_RI", filter, title, selectable), false);
   }
 }

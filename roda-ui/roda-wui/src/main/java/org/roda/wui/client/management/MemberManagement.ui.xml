@@ -27,27 +27,8 @@
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">
 					<g:FlowPanel addStyleNames="sticky-padding">
-						<g:FlowPanel>
-							<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
-								<g:Label addStyleNames="h4">
-									<ui:text from='{messages.userStatus}' />
-								</g:Label>
-								<g:FlowPanel ui:field="facetIsActive" />
-							</g:FlowPanel>
-							<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
-								<g:Label addStyleNames="h4">
-									<ui:text from='{messages.userType}' />
-								</g:Label>
-								<g:FlowPanel ui:field="facetIsUser" />
-							</g:FlowPanel>
-							<g:FlowPanel addStyleNames="sidebar-group sidebar-facet-panel facet-empty">
-								<g:Label addStyleNames="h4">
-									<ui:text from='{messages.userGroups}' />
-								</g:Label>
-								<g:FlowPanel ui:field="facetGroups" />
-							</g:FlowPanel>
-						</g:FlowPanel>
-						<g:FlowPanel addStyleNames="memberActions">
+						<g:FlowPanel addStyleNames="sidebar-group" ui:field="facetsPanel" />
+						<g:FlowPanel addStyleNames="sidebar-group memberActions">
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarActionsTitle}' />
 							</g:Label>

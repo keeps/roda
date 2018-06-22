@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.risks.RiskIncidence;
@@ -52,13 +51,17 @@ public class RiskIncidenceList extends BasicAsyncTableCell<RiskIncidence> {
     RodaConstants.RISK_INCIDENCE_DETECTED_ON, RodaConstants.RISK_INCIDENCE_DETECTED_BY,
     RodaConstants.RISK_INCIDENCE_STATUS);
 
-  public RiskIncidenceList(Filter filter, Facets facets, String summary, boolean selectable) {
-    super(RiskIncidence.class, filter, true, facets, summary, selectable, fieldsToReturn);
+  public RiskIncidenceList(String listId) {
+    this(listId, null, null, false);
   }
 
-  public RiskIncidenceList(Filter filter, Facets facets, String summary, boolean selectable, int initialPageSize,
-    int pageSizeIncrement) {
-    super(RiskIncidence.class, filter, true, facets, summary, selectable, initialPageSize, pageSizeIncrement,
+  public RiskIncidenceList(String listId, Filter filter, String summary, boolean selectable) {
+    super(RiskIncidence.class, listId, filter, true, summary, selectable, fieldsToReturn);
+  }
+
+  public RiskIncidenceList(String listId, Filter filter, String summary, boolean selectable,
+    int initialPageSize, int pageSizeIncrement) {
+    super(RiskIncidence.class, listId, filter, true, summary, selectable, initialPageSize, pageSizeIncrement,
       fieldsToReturn);
   }
 

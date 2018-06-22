@@ -55,37 +55,42 @@ public class ListFactory {
   public BasicAsyncTableCell<?> getList(String actualClass, String title, Filter filter, boolean selectable,
     int pageSize, int incrementPage) {
     if (actualClass.equals(AIP.class.getName()) || actualClass.equals(IndexedAIP.class.getName())) {
-      return new AIPList(filter, LastSelectedItemsSingleton.getInstance().isSelectedJustActive(), null,
+      return new AIPList("ListFactory_AIP", filter, LastSelectedItemsSingleton.getInstance().isSelectedJustActive(),
         messages.selectAipSearchResults(), selectable, pageSize, incrementPage);
     } else if (actualClass.equals(Representation.class.getName())
       || actualClass.equals(IndexedRepresentation.class.getName())) {
-      return new RepresentationList(filter, LastSelectedItemsSingleton.getInstance().isSelectedJustActive(), null,
+      return new RepresentationList("ListFactory_representation", filter,
+        LastSelectedItemsSingleton.getInstance().isSelectedJustActive(),
         messages.selectRepresentationSearchResults(), selectable, pageSize, incrementPage);
     } else if (actualClass.equals(File.class.getName()) || actualClass.equals(IndexedFile.class.getName())) {
-      return new SimpleFileList(filter, LastSelectedItemsSingleton.getInstance().isSelectedJustActive(), null,
+      return new SimpleFileList("ListFactory_simpleFile", filter,
+        LastSelectedItemsSingleton.getInstance().isSelectedJustActive(),
         messages.selectFileSearchResults(), selectable, pageSize, incrementPage);
     } else if (actualClass.equals(RepresentationInformation.class.getName())) {
-      return new RepresentationInformationList(filter, null, title, selectable, pageSize, incrementPage);
+      return new RepresentationInformationList("ListFactory_representationInformation", filter, title, selectable,
+        pageSize,
+        incrementPage);
     } else if (actualClass.equals(IndexedRisk.class.getName()) || actualClass.equals(Risk.class.getName())) {
-      return new RiskList(filter, null, title, selectable, pageSize, incrementPage);
+      return new RiskList("ListFactory_risk", filter, title, selectable, pageSize, incrementPage);
     } else if (actualClass.equals(RiskIncidence.class.getName())) {
-      return new RiskIncidenceList(filter, null, title, selectable, pageSize, incrementPage);
+      return new RiskIncidenceList("ListFactory_riskIncidence", filter, title, selectable, pageSize, incrementPage);
     } else if (actualClass.equals(Job.class.getName())) {
-      return new JobList(filter, null, title, selectable, pageSize, incrementPage);
+      return new JobList("ListFactory_job", filter, title, selectable, pageSize, incrementPage);
     } else if (actualClass.equals(Report.class.getName()) || actualClass.equals(IndexedReport.class.getName())) {
-      return new SimpleJobReportList(filter, null, title, selectable, pageSize, incrementPage);
+      return new SimpleJobReportList("ListFactory_simpleJob", filter, title, selectable, pageSize, incrementPage);
     } else if (actualClass.equals(TransferredResource.class.getName())) {
-      return new TransferredResourceList(filter, null, title, selectable, pageSize, incrementPage);
+      return new TransferredResourceList("ListFactory_transferredResource", filter, title, selectable, pageSize,
+        incrementPage);
     } else if (actualClass.equals(Notification.class.getName())) {
-      return new NotificationList(filter, null, title, selectable, pageSize, incrementPage);
+      return new NotificationList("ListFactory_notification", filter, title, selectable, pageSize, incrementPage);
     } else if (actualClass.equals(LogEntry.class.getName())) {
-      return new LogEntryList(filter, null, title, selectable, pageSize, incrementPage);
+      return new LogEntryList("ListFactory_logEntry", filter, title, selectable, pageSize, incrementPage);
     } else if (actualClass.equals(RODAMember.class.getName())) {
-      return new RodaMemberList(filter, null, title, selectable, pageSize, incrementPage);
+      return new RodaMemberList("ListFactory_rodaMember", filter, title, selectable, pageSize, incrementPage);
     } else if (actualClass.equals(DIP.class.getName()) || actualClass.equals(IndexedDIP.class.getName())) {
-      return new DIPList(filter, null, title, selectable, pageSize, incrementPage);
+      return new DIPList("ListFactory_DIP", filter, title, selectable, pageSize, incrementPage);
     } else if (actualClass.equals(DIPFile.class.getName())) {
-      return new DIPFileList(filter, null, title, selectable, pageSize, incrementPage);
+      return new DIPFileList("ListFactory_DIPFile", filter, title, selectable, pageSize, incrementPage);
     } else {
       return null;
     }

@@ -26,7 +26,8 @@ public class SelectJobDialog extends DefaultSelectDialog<Job, Void> {
   }
 
   public SelectJobDialog(String title, Filter filter, boolean selectable) {
-    super(title, filter, RodaConstants.JOB_SEARCH, new JobList(filter, null, title, selectable), false);
+    super(title, filter, RodaConstants.JOB_SEARCH, new JobList("SelectJobDialog_jobs", filter, title, selectable),
+      false);
   }
 
 }

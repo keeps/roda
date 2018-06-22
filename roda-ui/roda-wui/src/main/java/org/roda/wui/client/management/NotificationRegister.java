@@ -11,13 +11,9 @@
 package org.roda.wui.client.management;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.facet.Facets;
-import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.core.data.v2.index.filter.DateRangeFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.notifications.Notification;
@@ -113,41 +109,21 @@ public class NotificationRegister extends Composite {
   NotificationList notificationList;
 
   @UiField(provided = true)
-  FlowPanel facetRecipientUsers;
-
-  @UiField(provided = true)
-  FlowPanel facetState;
-
-  @UiField(provided = true)
-  FlowPanel facetAcknowledged;
+  FlowPanel facetsPanel;
 
   private static final Filter DEFAULT_FILTER = SearchFilters.defaultFilter(Notification.class.getName());
   private static final String ALL_FILTER = SearchFilters.allFilter(Notification.class.getName());
 
-  /**
-   * Create a new notification
-   *
-   * @param user
-   */
   public NotificationRegister() {
-    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.NOTIFICATION_RECIPIENT_USERS),
-      new SimpleFacetParameter(RodaConstants.NOTIFICATION_IS_ACKNOWLEDGED),
-      new SimpleFacetParameter(RodaConstants.NOTIFICATION_STATE));
-    notificationList = new NotificationList(Filter.NULL, facets, messages.notificationsTitle(), false);
+    notificationList = new NotificationList("NotificationRegister_notifications", Filter.NULL,
+      messages.notificationsTitle(), false);
 
     searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, true, messages.messageSearchPlaceHolder(), false, false,
       false);
     searchPanel.setList(notificationList);
 
-    facetRecipientUsers = new FlowPanel();
-    facetAcknowledged = new FlowPanel();
-    facetState = new FlowPanel();
-
-    Map<String, FlowPanel> facetPanels = new HashMap<>();
-    facetPanels.put(RodaConstants.NOTIFICATION_STATE, facetState);
-    facetPanels.put(RodaConstants.NOTIFICATION_IS_ACKNOWLEDGED, facetAcknowledged);
-    facetPanels.put(RodaConstants.NOTIFICATION_RECIPIENT_USERS, facetRecipientUsers);
-    FacetUtils.bindFacets(notificationList, facetPanels);
+    facetsPanel = new FlowPanel();
+    FacetUtils.bindFacets(notificationList, facetsPanel);
 
     notificationList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
 

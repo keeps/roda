@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ri.RepresentationInformation;
@@ -45,17 +44,18 @@ public class RepresentationInformationList extends BasicAsyncTableCell<Represent
     RodaConstants.REPRESENTATION_INFORMATION_TAGS, RodaConstants.REPRESENTATION_INFORMATION_SUPPORT,
     RodaConstants.REPRESENTATION_INFORMATION_FAMILY);
 
-  public RepresentationInformationList() {
-    this(null, null, null, false);
+  public RepresentationInformationList(String listId) {
+    this(listId, null, null, false);
   }
 
-  public RepresentationInformationList(Filter filter, Facets facets, String summary, boolean selectable) {
-    super(RepresentationInformation.class, filter, facets, summary, selectable, fieldsToReturn);
+  public RepresentationInformationList(String listId, Filter filter, String summary,
+    boolean selectable) {
+    super(RepresentationInformation.class, listId, filter, summary, selectable, fieldsToReturn);
   }
 
-  public RepresentationInformationList(Filter filter, Facets facets, String summary, boolean selectable, int pageSize,
-    int incrementPage) {
-    super(RepresentationInformation.class, filter, facets, summary, selectable, pageSize, incrementPage,
+  public RepresentationInformationList(String listId, Filter filter, String summary, boolean selectable,
+    int pageSize, int incrementPage) {
+    super(RepresentationInformation.class, listId, filter, summary, selectable, pageSize, incrementPage,
       fieldsToReturn);
   }
 

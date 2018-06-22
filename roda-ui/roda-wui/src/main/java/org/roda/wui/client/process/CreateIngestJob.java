@@ -63,15 +63,15 @@ public class CreateIngestJob extends CreateSelectedJob<TransferredResource> {
       if (selected instanceof SelectedItemsList) {
         List<String> ids = ((SelectedItemsList) selected).getIds();
         Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, ids));
-        TransferredResourceList list = new TransferredResourceList(filter, null, messages.transferredResourcesTitle(),
-          false, 10, 10);
+        TransferredResourceList list = new TransferredResourceList("CreateIngestJob_transferredResources", filter,
+          messages.transferredResourcesTitle(), false, 10, 10);
         getTargetPanel().clear();
         getTargetPanel().add(list);
         isEmpty = ids.isEmpty();
       } else if (selected instanceof SelectedItemsFilter) {
         Filter filter = ((SelectedItemsFilter) selected).getFilter();
-        TransferredResourceList list = new TransferredResourceList(filter, null, messages.transferredResourcesTitle(),
-          false, 10, 10);
+        TransferredResourceList list = new TransferredResourceList("CreateIngestJob_transferredResources", filter,
+          messages.transferredResourcesTitle(), false, 10, 10);
         getTargetPanel().clear();
         getTargetPanel().add(list);
       } else {

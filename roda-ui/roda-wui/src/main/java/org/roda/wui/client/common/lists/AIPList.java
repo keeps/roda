@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -53,17 +52,17 @@ public class AIPList extends BasicAsyncTableCell<IndexedAIP> {
     RodaConstants.AIP_TITLE, RodaConstants.AIP_DATE_INITIAL, RodaConstants.AIP_DATE_FINAL,
     RodaConstants.AIP_HAS_REPRESENTATIONS);
 
-  public AIPList() {
-    this(null, false, null, null, false);
+  public AIPList(String listId) {
+    this(listId, null, false, null, false);
   }
 
-  public AIPList(Filter filter, boolean justActive, Facets facets, String summary, boolean selectable) {
-    super(IndexedAIP.class, filter, justActive, facets, summary, selectable, fieldsToReturn);
+  public AIPList(String listId, Filter filter, boolean justActive, String summary, boolean selectable) {
+    super(IndexedAIP.class, listId, filter, justActive, summary, selectable, fieldsToReturn);
   }
 
-  public AIPList(Filter filter, boolean justActive, Facets facets, String summary, boolean selectable,
+  public AIPList(String listId, Filter filter, boolean justActive, String summary, boolean selectable,
     int initialPageSize, int pageSizeIncrement) {
-    super(IndexedAIP.class, filter, justActive, facets, summary, selectable, initialPageSize, pageSizeIncrement,
+    super(IndexedAIP.class, listId, filter, justActive, summary, selectable, initialPageSize, pageSizeIncrement,
       fieldsToReturn);
   }
 
