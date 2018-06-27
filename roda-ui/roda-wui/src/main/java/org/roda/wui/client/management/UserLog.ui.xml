@@ -21,14 +21,12 @@
 				<g:FlowPanel addStyleNames="page-description" ui:field="userLogDescription">
 				</g:FlowPanel>
 				<commonsearch:SearchPanel ui:field="searchPanel" />
-				<lists:LogEntryList addStyleNames="searchResults"
-					ui:field="logList" />
+				<lists:LogEntryList addStyleNames="searchResults" ui:field="logList" />
 			</g:FlowPanel>
 
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">
 					<g:FlowPanel addStyleNames="sticky-padding">
-						<g:FlowPanel addStyleNames="sidebar-group" ui:field="facetsPanel" />
 						<g:FlowPanel addStyleNames="sidebar-group">
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarFilterDates}' />

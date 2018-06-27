@@ -70,8 +70,7 @@
 							<ui:text from='{messages.representationsTitle}' />
 						</g:Label>
 						<commonsearch:SearchPanel ui:field="representationsSearch" />
-						<lists:RepresentationList addStyleNames="searchResults"
-							ui:field="representationsList" />
+						<lists:RepresentationList addStyleNames="searchResults" ui:field="representationsList" />
 					</g:FlowPanel>
 
 					<!-- DIPs -->
@@ -80,8 +79,7 @@
 							<ui:text from='{messages.disseminationsTitle}' />
 						</g:Label>
 						<commonsearch:SearchPanel ui:field="disseminationsSearch" />
-						<lists:DIPList addStyleNames="searchResults"
-							ui:field="disseminationsList" />
+						<lists:DIPList addStyleNames="searchResults" ui:field="disseminationsList" />
 					</g:FlowPanel>
 
 					<!-- AIP CHILDREN -->
@@ -90,8 +88,7 @@
 							<ui:text from='{messages.sublevels}' />
 						</g:Label>
 						<commonsearch:SearchPanel ui:field="aipChildrenSearch" />
-						<lists:AIPList addStyleNames="searchResults"
-							ui:field="aipChildrenList" />
+						<lists:AIPList addStyleNames="searchResults" ui:field="aipChildrenList" />
 					</g:FlowPanel>
 				</g:FlowPanel>
 				<g:FlowPanel addStyleNames="col_2 last sidebar">
@@ -120,7 +117,6 @@
 									<ui:text from='{messages.searchAIP}' />
 								</g:Button>
 							</g:FlowPanel>
-							<g:FlowPanel addStyleNames="sidebar-group" ui:field="itemsFacets" />
 						</g:FlowPanel>
 					</g:FlowPanel>
 				</g:FlowPanel>

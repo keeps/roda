@@ -21,13 +21,11 @@
 				<g:FlowPanel addStyleNames="page-description" ui:field="memberManagementDescription">
 				</g:FlowPanel>
 				<commonsearch:SearchPanel ui:field="searchPanel" />
-				<lists:RodaMemberList addStyleNames="searchResults"
-					ui:field="list" />
+				<lists:RodaMemberList addStyleNames="searchResults" ui:field="list" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">
 					<g:FlowPanel addStyleNames="sticky-padding">
-						<g:FlowPanel addStyleNames="sidebar-group" ui:field="facetsPanel" />
 						<g:FlowPanel addStyleNames="sidebar-group memberActions">
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarActionsTitle}' />

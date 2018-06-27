@@ -19,8 +19,7 @@
 				<g:FlowPanel ui:field="title"></g:FlowPanel>
 				<g:FlowPanel addStyleNames="page-description" ui:field="registerDescription"></g:FlowPanel>
 				<commonsearch:SearchPanel ui:field="searchPanel" />
-				<lists:RepresentationInformationList
-					addStyleNames="searchResults" ui:field="representationInformationList" />
+				<lists:RepresentationInformationList addStyleNames="searchResults" ui:field="representationInformationList" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar" ui:field="sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">
@@ -48,8 +47,6 @@
 									from='{messages.representationInformationRegisterProcessButton}' />
 							</g:Button>
 						</g:FlowPanel>
-
-						<g:FlowPanel addStyleNames="sidebar-group" ui:field="facetsPanel" />
 					</g:FlowPanel>
 				</g:FlowPanel>
 			</g:FlowPanel>

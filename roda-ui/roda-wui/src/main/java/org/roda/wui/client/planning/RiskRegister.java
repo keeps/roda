@@ -35,7 +35,6 @@ import org.roda.wui.client.process.CreateActionJob;
 import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.client.process.InternalProcess;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
@@ -129,9 +128,6 @@ public class RiskRegister extends Composite {
   @UiField
   Button buttonRefresh;
 
-  @UiField(provided = true)
-  FlowPanel facetsPanel;
-
   private static final Filter DEFAULT_FILTER = SearchFilters.defaultFilter(IndexedRisk.class.getName());
   private static final String ALL_FILTER = SearchFilters.allFilter(IndexedRisk.class.getName());
 
@@ -146,9 +142,6 @@ public class RiskRegister extends Composite {
     searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, true, messages.riskRegisterSearchPlaceHolder(), false,
       false, false);
     searchPanel.setList(riskList);
-
-    facetsPanel = new FlowPanel();
-    FacetUtils.bindFacets(riskList, facetsPanel);
 
     riskList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
       @Override

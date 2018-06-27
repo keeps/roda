@@ -14,7 +14,7 @@
 
 	<g:FlowPanel styleName="preservationEvents" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
-			<g:FlowPanel addStyleNames="col_10 content">
+			<g:FlowPanel addStyleNames="col_12 content">
 				<g:FlowPanel styleName="browseItemPanel">
 					<g:SimplePanel styleName="browseItemIcon" ui:field="itemIcon" />
 					<g:HTML styleName="browseItemIcon-other">
@@ -29,14 +29,7 @@
 				</g:FlowPanel>
 
 				<commonsearch:SearchPanel ui:field="agentSearch" />
-				<lists:PreservationAgentList ui:field="agentList" />
-			</g:FlowPanel>
-			<g:FlowPanel addStyleNames="col_2 last sidebar">
-				<g:FlowPanel addStyleNames="sticky-flow">
-					<g:FlowPanel addStyleNames="sticky-padding">
-						<g:FlowPanel addStyleNames="sidebar-group" ui:field="facetsPanel" />
-					</g:FlowPanel>
-				</g:FlowPanel>
+				<lists:PreservationAgentList addStyleNames="searchResults" ui:field="agentList" />
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>

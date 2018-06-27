@@ -94,10 +94,6 @@ public class IngestAppraisal extends Composite {
   @UiField(provided = true)
   MainSearch mainSearch;
 
-  // FILTERS
-  @UiField(provided = true)
-  FlowPanel itemsFacets, representationsFacets, filesFacets;
-
   @UiField(provided = true)
   Button acceptButton, rejectButton;
 
@@ -108,18 +104,13 @@ public class IngestAppraisal extends Composite {
   boolean justActive = false;
 
   private IngestAppraisal() {
-    // Variables
-    itemsFacets = new FlowPanel();
-    representationsFacets = new FlowPanel();
-    filesFacets = new FlowPanel();
-
     acceptButton = new Button();
     rejectButton = new Button();
 
     // Create main search
-    mainSearch = new MainSearch(justActive, itemsSelectable, representationsSelectable, filesSelectable, itemsFacets,
-      "IngestAppraisal_searchAIPs", representationsFacets, "IngestAppraisal_searchRepresentations", filesFacets,
-      "IngestAppraisal_searchFiles", null, AIPState.UNDER_APPRAISAL);
+    mainSearch = new MainSearch(justActive, itemsSelectable, representationsSelectable, filesSelectable,
+      "IngestAppraisal_searchAIPs", "IngestAppraisal_searchRepresentations", "IngestAppraisal_searchFiles", null,
+      AIPState.UNDER_APPRAISAL);
 
     initWidget(uiBinder.createAndBindUi(this));
 

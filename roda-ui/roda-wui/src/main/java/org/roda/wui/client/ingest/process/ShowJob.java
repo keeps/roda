@@ -62,7 +62,6 @@ import org.roda.wui.client.process.Process;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
-import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.Humanize.DHMSFormat;
@@ -234,9 +233,6 @@ public class ShowJob extends Composite {
   @UiField
   Button buttonAppraisal, buttonBack, buttonStop, buttonProcess;
 
-  @UiField(provided = true)
-  FlowPanel facetsPanel;
-
   public ShowJob(Job job, Map<String, PluginInfo> pluginsInfo) {
     this.job = job;
     this.pluginsInfo = pluginsInfo;
@@ -267,8 +263,6 @@ public class ShowJob extends Composite {
       messages.jobProcessedSearchPlaceHolder(), false, false, false);
     simpleJobReportsSearchPanel.setList(simpleJobReports);
 
-    facetsPanel = new FlowPanel();
-
     initWidget(uiBinder.createAndBindUi(this));
     simpleJobReportsSearchPanel.setVisible(!isIngest);
     simpleJobReports.setVisible(!isIngest);
@@ -285,8 +279,6 @@ public class ShowJob extends Composite {
     selectedListPanel.setVisible(true);
 
     if (isIngest) {
-      FacetUtils.bindFacets(ingestJobReports, facetsPanel);
-
       if (isJobRunning()) {
         ingestJobReports.autoUpdate(PERIOD_MILLIS);
       }
@@ -303,8 +295,6 @@ public class ShowJob extends Composite {
 
       showIngestSourceObjects(selected);
     } else {
-      FacetUtils.bindFacets(ingestJobReports, facetsPanel);
-
       if (isJobRunning()) {
         simpleJobReports.autoUpdate(PERIOD_MILLIS);
       }

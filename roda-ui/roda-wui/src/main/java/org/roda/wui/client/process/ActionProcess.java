@@ -25,7 +25,6 @@ import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.management.Management;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
@@ -101,16 +100,10 @@ public class ActionProcess extends Composite {
   @UiField
   Button newJob;
 
-  @UiField(provided = true)
-  FlowPanel facetsPanel;
-
   private static ActionProcess instance = null;
 
   private ActionProcess() {
     jobList = new JobList("ActionProcess_jobs", filter, messages.jobList(), false);
-    facetsPanel = new FlowPanel();
-
-    FacetUtils.bindFacets(jobList, facetsPanel);
 
     initWidget(uiBinder.createAndBindUi(this));
 

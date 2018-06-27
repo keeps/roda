@@ -73,26 +73,16 @@ public class Search extends Composite {
   @UiField(provided = true)
   MainSearch mainSearch;
 
-  // FILTERS
-  @UiField(provided = true)
-  FlowPanel itemsFacets, representationsFacets, filesFacets;
-
   boolean justActive = true;
   boolean itemsSelectable = true;
   boolean representationsSelectable = true;
   boolean filesSelectable = true;
 
   private Search() {
-    // initialize (needed before initWidget())
-    itemsFacets = new FlowPanel();
-    representationsFacets = new FlowPanel();
-    filesFacets = new FlowPanel();
-
     // Create main search
     String parentAipId = null;
-    mainSearch = new MainSearch(justActive, itemsSelectable, representationsSelectable, filesSelectable, itemsFacets,
-      "Search_AIPs", representationsFacets, "Search_representations", filesFacets, "Search_files", parentAipId,
-      AIPState.ACTIVE);
+    mainSearch = new MainSearch(justActive, itemsSelectable, representationsSelectable, filesSelectable, "Search_AIPs",
+      "Search_representations", "Search_files", parentAipId, AIPState.ACTIVE);
 
     initWidget(uiBinder.createAndBindUi(this));
     searchDescription.add(new HTMLWidgetWrapper("SearchDescription.html"));

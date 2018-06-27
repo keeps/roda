@@ -36,7 +36,6 @@ import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.client.process.InternalProcess;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
@@ -123,9 +122,6 @@ public class RepresentationInformationNetwork extends Composite {
   @UiField
   FlowPanel content;
 
-  @UiField
-  FlowPanel facetsPanel;
-
   private static final Filter DEFAULT_FILTER = SearchFilters.defaultFilter(RepresentationInformation.class.getName());
   private static final String ALL_FILTER = SearchFilters.allFilter(RepresentationInformation.class.getName());
 
@@ -143,8 +139,6 @@ public class RepresentationInformationNetwork extends Composite {
     searchPanel.setList(representationInformationList);
 
     initWidget(uiBinder.createAndBindUi(this));
-
-    FacetUtils.bindFacets(representationInformationList, facetsPanel);
 
     representationInformationList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
       @Override

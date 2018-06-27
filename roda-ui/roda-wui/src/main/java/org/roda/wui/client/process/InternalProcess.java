@@ -25,7 +25,6 @@ import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.management.Management;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
@@ -97,18 +96,12 @@ public class InternalProcess extends Composite {
   @UiField
   DateBox inputDateFinal;
 
-  @UiField(provided = true)
-  FlowPanel facetsPanel;
-
   private InternalProcess() {
 
     Filter filter = new Filter(
       new SimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INTERNAL.toString()));
 
     jobList = new JobList("InternalProcess_jobs", filter, messages.jobList(), false);
-
-    facetsPanel = new FlowPanel();
-    FacetUtils.bindFacets(jobList, facetsPanel);
 
     initWidget(uiBinder.createAndBindUi(this));
 

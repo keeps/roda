@@ -53,7 +53,6 @@ import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
-import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -240,9 +239,6 @@ public class BrowseAIP extends Composite {
   @UiField
   Button searchAIP;
 
-  @UiField(provided = true)
-  FlowPanel itemsFacets;
-
   private List<HandlerRegistration> handlers;
 
   boolean justActive = true;
@@ -276,9 +272,6 @@ public class BrowseAIP extends Composite {
     aipChildrenSearch = new SearchPanel(COLLECTIONS_FILTER, RodaConstants.AIP_SEARCH, true,
       messages.searchPlaceHolder(), false, false, true);
     aipChildrenSearch.setList(aipChildrenList);
-
-    itemsFacets = new FlowPanel();
-    FacetUtils.bindFacets(aipChildrenList, itemsFacets);
 
     // INIT
     initWidget(uiBinder.createAndBindUi(this));
@@ -564,7 +557,6 @@ public class BrowseAIP extends Composite {
       aipChildrenList.getParent().setVisible(bundle.getChildAIPCount() > 0);
 
       // SIDEBAR
-      itemsFacets.setVisible(false);
       actionsSidebar.setVisible(true);
       actionsSidebar.setWidget(AipActions.get().createActionsLayout(aip, new AsyncCallback<Actionable.ActionImpact>() {
 
@@ -810,7 +802,6 @@ public class BrowseAIP extends Composite {
 
     // Set button visibility
     searchSection.setVisible(false);
-    itemsFacets.setVisible(true);
 
     this.removeStyleName("inactive");
     aipState.setVisible(false);

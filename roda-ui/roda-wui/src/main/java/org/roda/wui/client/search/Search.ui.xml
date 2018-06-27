@@ -15,7 +15,7 @@
 
 	<g:FlowPanel styleName="search" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
-			<g:FlowPanel addStyleNames="col_10 content">
+			<g:FlowPanel addStyleNames="col_12 content">
 				<g:HTML>
 					<h1>
 						<ui:text from='{messages.searchTitle}' />
@@ -24,15 +24,6 @@
 				<g:FlowPanel addStyleNames="page-description" ui:field="searchDescription">
 				</g:FlowPanel>
 				<commonsearch:MainSearch ui:field="mainSearch" />
-			</g:FlowPanel>
-			<g:FlowPanel addStyleNames="col_2 last sidebar">
-				<g:FlowPanel addStyleNames="sticky-flow">
-					<g:FlowPanel addStyleNames="sticky-padding">
-						<g:FlowPanel addStyleNames="sidebar-group" ui:field="itemsFacets" />
-						<g:FlowPanel addStyleNames="sidebar-group" ui:field="representationsFacets" />
-						<g:FlowPanel addStyleNames="sidebar-group" ui:field="filesFacets" />
-					</g:FlowPanel>
-				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>

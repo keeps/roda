@@ -22,8 +22,7 @@
 				<g:FlowPanel addStyleNames="page-description" ui:field="riskRegisterDescription">
 				</g:FlowPanel>
 				<commonsearch:SearchPanel ui:field="searchPanel" />
-				<lists:RiskList addStyleNames="searchResults"
-					ui:field="riskList" />
+				<lists:RiskList addStyleNames="searchResults" ui:field="riskList" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">
@@ -51,7 +50,6 @@
 								<ui:text from='{messages.riskRegisterProcessButton}' />
 							</g:Button>
 						</g:FlowPanel>
-						<g:FlowPanel addStyleNames="sidebar-group" ui:field="facetsPanel" />
 						<g:FlowPanel addStyleNames="sidebar-group">
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarFilterDates}' />

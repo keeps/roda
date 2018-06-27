@@ -35,7 +35,6 @@ import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.client.planning.Planning;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.RestUtils;
@@ -167,9 +166,6 @@ public class PreservationEvents extends Composite {
   @UiField
   Button backButton;
 
-  @UiField(provided = true)
-  FlowPanel facetsPanel;
-
   private String aipId;
   private String representationUUID;
   private String fileUUID;
@@ -211,9 +207,6 @@ public class PreservationEvents extends Composite {
 
     eventList = new PreservationEventList("PreservationEvents_events", filter, messages.preservationEventsTitle(),
       false);
-
-    facetsPanel = new FlowPanel();
-    FacetUtils.bindFacets(eventList, facetsPanel);
 
     eventList.getSelectionModel().addSelectionChangeHandler(new Handler() {
 

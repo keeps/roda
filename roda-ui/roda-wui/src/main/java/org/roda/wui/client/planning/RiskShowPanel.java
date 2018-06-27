@@ -25,7 +25,6 @@ import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.ClientLogger;
-import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
 
@@ -38,7 +37,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
@@ -148,8 +146,6 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private FlowPanel facetsPanel;
-
   private static final Filter DEFAULT_FILTER = SearchFilters.defaultFilter(RiskIncidence.class.getName());
   private static final String ALL_FILTER = SearchFilters.allFilter(RiskIncidence.class.getName());
 
@@ -159,9 +155,6 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
     searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, true, messages.riskIncidenceRegisterSearchPlaceHolder(),
       false, false, false);
     searchPanel.setList(incidenceList);
-
-    facetsPanel = new FlowPanel();
-    FacetUtils.bindFacets(incidenceList, facetsPanel);
 
     initWidget(uiBinder.createAndBindUi(this));
   }
@@ -176,9 +169,6 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
     searchPanel = new SearchPanel(incidenceFilter, ALL_FILTER, true, messages.riskIncidenceRegisterSearchPlaceHolder(),
       false, false, false);
     searchPanel.setList(incidenceList);
-
-    facetsPanel = new FlowPanel();
-    FacetUtils.bindFacets(incidenceList, facetsPanel);
 
     incidenceList.addCheckboxSelectionListener(new CheckboxSelectionListener<RiskIncidence>() {
 
@@ -379,9 +369,5 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
 
   public void refreshList() {
     incidenceList.refresh();
-  }
-
-  public FlowPanel getFacetsPanel() {
-    return this.facetsPanel;
   }
 }

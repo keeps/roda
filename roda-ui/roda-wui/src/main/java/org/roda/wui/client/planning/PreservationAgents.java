@@ -20,7 +20,6 @@ import org.roda.wui.client.common.lists.PreservationAgentList;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 
@@ -29,7 +28,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -87,15 +85,9 @@ public class PreservationAgents extends Composite {
   @UiField(provided = true)
   PreservationAgentList agentList;
 
-  @UiField(provided = true)
-  FlowPanel facetsPanel;
-
   public PreservationAgents() {
     agentList = new PreservationAgentList("PreservationAgents_agents", Filter.ALL, messages.preservationAgentsTitle(),
       false);
-
-    facetsPanel = new FlowPanel();
-    FacetUtils.bindFacets(agentList, facetsPanel);
 
     agentList.getSelectionModel().addSelectionChangeHandler(new Handler() {
       @Override

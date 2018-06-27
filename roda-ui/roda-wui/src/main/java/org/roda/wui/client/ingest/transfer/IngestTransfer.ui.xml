@@ -32,8 +32,7 @@
 				<m:BreadcrumbPanel ui:field="breadcrumb"
 					addStyleNames="browseBreadcrumb" />
 				<commonsearch:SearchPanel ui:field="searchPanel" />
-				<lists:TransferredResourceList
-					addStyleNames="transferredResourceList" ui:field="transferredResourceList" />
+				<lists:TransferredResourceList addStyleNames="searchResults" ui:field="transferredResourceList" />
 				<g:Button addStyleNames="btn btn-download" ui:field="download">
 					<ui:text from='{messages.downloadButton}' />
 				</g:Button>

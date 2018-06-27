@@ -20,8 +20,7 @@
 				<g:FlowPanel addStyleNames="page-description" ui:field="formatRegisterDescription">
 				</g:FlowPanel>
 				<commonsearch:SearchPanel ui:field="searchPanel" />
-				<lists:FormatList addStyleNames="searchResults"
-					ui:field="formatList" />
+				<lists:FormatList addStyleNames="searchResults" ui:field="formatList" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">

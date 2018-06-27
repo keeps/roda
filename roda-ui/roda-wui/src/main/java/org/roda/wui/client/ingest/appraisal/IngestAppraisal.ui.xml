@@ -28,10 +28,7 @@
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">
 					<g:FlowPanel addStyleNames="sticky-padding">
-						<g:FlowPanel ui:field="itemsFacets" />
-						<g:FlowPanel ui:field="representationsFacets" />
-						<g:FlowPanel ui:field="filesFacets" />
-						<g:FlowPanel addStyleNames="sidebar-facet-panel ingestAppraisalActions">
+						<g:FlowPanel addStyleNames="ingestAppraisalActions">
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarActionsTitle}' />
 							</g:Label>

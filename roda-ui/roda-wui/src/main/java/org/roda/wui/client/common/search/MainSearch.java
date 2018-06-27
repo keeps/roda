@@ -30,7 +30,6 @@ import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.RepresentationList;
 import org.roda.wui.client.common.lists.SearchFileList;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
-import org.roda.wui.common.client.tools.FacetUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -82,11 +81,8 @@ public class MainSearch extends Composite {
   boolean filesSelectable = true;
   String selectedItem = AIP.class.getName();
 
-  FlowPanel itemsFacets;
   String itemsListId;
-  FlowPanel representationsFacets;
   String representationsListId;
-  FlowPanel filesFacets;
   String filesListId;
 
   // state
@@ -94,21 +90,15 @@ public class MainSearch extends Composite {
   final AIPState parentAipState;
 
   public MainSearch(boolean justActive, boolean itemsSelectable, boolean representationsSelectable,
-    boolean filesSelectable, FlowPanel itemsFacets, String itemsListId, FlowPanel representationsFacets,
-    String representationsListId, FlowPanel filesFacets, String filesListId, String parentAipId,
+    boolean filesSelectable, String itemsListId, String representationsListId, String filesListId, String parentAipId,
     AIPState parentAipState) {
     this.justActive = justActive;
     this.itemsSelectable = itemsSelectable;
     this.representationsSelectable = representationsSelectable;
     this.filesSelectable = filesSelectable;
 
-    this.itemsFacets = itemsFacets;
     this.itemsListId = itemsListId;
-
-    this.representationsFacets = representationsFacets;
     this.representationsListId = representationsListId;
-
-    this.filesFacets = filesFacets;
     this.filesListId = filesListId;
 
     this.parentAipId = parentAipId;
@@ -186,10 +176,6 @@ public class MainSearch extends Composite {
     searchResultPanel.clear();
     searchResultPanel.add(itemsSearchResultPanel);
     selectedItem = AIP.class.getName();
-
-    itemsFacets.setVisible(isVisible);
-    representationsFacets.setVisible(false);
-    filesFacets.setVisible(false);
   }
 
   public void showRepresentationsSearchAdvancedFieldsPanel(boolean isVisible) {
@@ -208,10 +194,6 @@ public class MainSearch extends Composite {
     searchResultPanel.clear();
     searchResultPanel.add(representationsSearchResultPanel);
     selectedItem = Representation.class.getName();
-
-    itemsFacets.setVisible(false);
-    representationsFacets.setVisible(isVisible);
-    filesFacets.setVisible(false);
   }
 
   public void showFilesSearchAdvancedFieldsPanel(boolean isVisible) {
@@ -229,10 +211,6 @@ public class MainSearch extends Composite {
     searchResultPanel.clear();
     searchResultPanel.add(filesSearchResultPanel);
     selectedItem = File.class.getName();
-
-    itemsFacets.setVisible(false);
-    representationsFacets.setVisible(false);
-    filesFacets.setVisible(isVisible);
   }
 
   private void createItemsSearchResultPanel(boolean isVisible) {
@@ -243,7 +221,6 @@ public class MainSearch extends Composite {
       itemsSearchResultPanel = new AIPList(itemsListId, Filter.NULL, false, null, true);
     }
 
-    FacetUtils.bindFacets(itemsSearchResultPanel, itemsFacets);
     ListSelectionUtils.bindBrowseOpener(itemsSearchResultPanel);
     LastSelectedItemsSingleton.getInstance().setSelectedJustActive(justActive);
     itemsSearchResultPanel.setActionable(AipActions.get(parentAipId, parentAipState));
@@ -257,7 +234,6 @@ public class MainSearch extends Composite {
       representationsSearchResultPanel = new RepresentationList(representationsListId, null, false, null, true);
     }
 
-    FacetUtils.bindFacets(representationsSearchResultPanel, representationsFacets);
     ListSelectionUtils.bindBrowseOpener(representationsSearchResultPanel);
     representationsSearchResultPanel.setActionable(RepresentationActions.get());
   }
@@ -271,7 +247,6 @@ public class MainSearch extends Composite {
       filesSearchResultPanel = new SearchFileList(filesListId, null, false, null, true, true);
     }
 
-    FacetUtils.bindFacets(filesSearchResultPanel, filesFacets);
     ListSelectionUtils.bindBrowseOpener(filesSearchResultPanel);
     LastSelectedItemsSingleton.getInstance().setSelectedJustActive(justActive);
     filesSearchResultPanel.setActionable(FileActions.get());

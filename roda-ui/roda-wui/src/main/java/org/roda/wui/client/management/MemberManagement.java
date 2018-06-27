@@ -17,7 +17,6 @@ import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
@@ -99,9 +98,6 @@ public class MemberManagement extends Composite {
   @UiField
   Button buttonAddGroup;
 
-  @UiField(provided = true)
-  FlowPanel facetsPanel;
-
   private static final Filter DEFAULT_FILTER = SearchFilters.defaultFilter(RODAMember.class.getName());
   private static final String ALL_FILTER = SearchFilters.allFilter(RODAMember.class.getName());
 
@@ -111,9 +107,6 @@ public class MemberManagement extends Composite {
     searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, true, messages.usersAndGroupsSearchPlaceHolder(), false,
       false, false);
     searchPanel.setList(list);
-
-    facetsPanel = new FlowPanel();
-    FacetUtils.bindFacets(list, facetsPanel);
 
     initWidget(uiBinder.createAndBindUi(this));
     memberManagementDescription.add(new HTMLWidgetWrapper("MemberManagementDescription.html"));

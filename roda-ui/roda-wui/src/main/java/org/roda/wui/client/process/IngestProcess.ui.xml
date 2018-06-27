@@ -33,7 +33,6 @@
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">
 					<g:FlowPanel addStyleNames="sticky-padding">
-						<g:FlowPanel addStyleNames="sidebar-group" ui:field="facetsPanel" />
 						<!-- <g:Label addStyleNames="{style.other-producer-label}">Other producer:</g:Label> 
 							<g:TextBox addStyleNames="fieldTextBox {style.other-producer-input}" /> -->
 						<g:FlowPanel styleName="sidebar-group">

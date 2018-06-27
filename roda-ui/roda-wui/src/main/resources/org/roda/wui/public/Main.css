@@ -271,7 +271,7 @@ div.inline {
     background: linear-gradient(-90deg, #fff 30%, rgba(255, 255, 255, 0) 100%);
 }
 
-.sidebar .fade-out:after {
+.my-asyncdatagrid-side-panel .fade-out:after, .sidebar .fade-out:after {
     background: -webkit-linear-gradient(right, #eee 30%, rgba(255, 255, 255, 0) 100%);
     background: linear-gradient(-90deg, #eee 30%, rgba(255, 255, 255, 0) 100%);
 }
@@ -282,7 +282,7 @@ div.inline {
     box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
     transition: all 0.3s cubic-bezier(.25,.8,.25,1);
     border-radius: 2px;
-    padding: 14px 16px;
+    padding: 15px;
 }
 
 .card:hover {
@@ -668,6 +668,7 @@ pre code {
 
 .form-listbox-job {
 	border: none !important;
+    margin-bottom: 2em;
 }
 
 .form-checkbox-job {
@@ -1120,6 +1121,43 @@ pre code {
 	text-align: left;
 }
 
+.my-asyncdatagrid-main-panel {
+    vertical-align: top;
+    overflow: hidden;
+}
+
+.my-asyncdatagrid-main-panel-full {
+    width: 100%;
+}
+
+.my-asyncdatagrid-side-panel {
+    vertical-align: top;
+    float: right;
+    margin-left: 20px;
+    background-color: #eee;
+    padding: 1rem 1.5rem 0 1.5rem;
+}
+
+.col_12 .my-asyncdatagrid-side-panel {
+    margin-left: 30px;
+}
+
+.my-asyncdatagrid-side-panel .sidebar-facet-panel {
+    width: 225px;
+}
+
+.my-asyncdatagrid-side-panel-hidden {
+    display:none;
+}
+
+.my-asyncdatagrid-side-panel .h5 {
+    margin-top: 0;
+    font-size: 1.4rem;
+    font-weight: 500;
+    margin-bottom: 0.2rem;
+    color: #4b4a4a;
+}
+
 .my-asyncdatagrid-pager-results {
     display: inline-block;
     line-height: 1;
@@ -1156,6 +1194,7 @@ pre code {
 .my-asyncdatagrid-display {
     width: 100%;
     table-layout: fixed;
+    margin-top: 0.6rem;
 }
 
 .my-asyncdatagrid .panel {
@@ -1970,15 +2009,19 @@ td.datePickerMonth, td.datePickerYear {
     font-size: 1.8rem;
 }
 
-.sidebar-facet-panel + .sidebar-facet-panel {
-	margin-top: 15px;
-}
-
 .sidebar-facet-label {
     display: block;
     white-space: nowrap;
     margin-bottom: 5px;
     font-size: 1.2rem;
+}
+
+.sidebar-facet-label label {
+    vertical-align: top;
+}
+
+.facet-input-panel {
+    margin-bottom: 1rem;
 }
 
 .sidebar-facet-input {
@@ -3525,6 +3568,10 @@ td.datePickerMonth, td.datePickerYear {
 .searchResults {
     margin-top: 20px;
     clear: both;
+}
+
+.col_12 .searchResults {
+    margin-top: 30px;
 }
 
 .searchApplyFilters {
@@ -5940,7 +5987,6 @@ td.datePickerMonth, td.datePickerYear {
 .clearfix {
 	overflow: hidden;
 	clear: both;
-	margin-top: 2em;
 }
 .plugin-details .fieldTextBox, .plugin-details .form-textbox {
 	border: none;

@@ -131,7 +131,7 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
     };
 
     /* add sortable */
-    statesColumn.setSortable(true);
+    statesColumn.setSortable(false);
     typeColumn.setSortable(true);
     sizeInBytesColumn.setSortable(true);
     numberOfDataFilesColumn.setSortable(true);

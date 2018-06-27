@@ -32,7 +32,7 @@
 					addStyleNames="browseBreadcrumb" />
 
 				<commonsearch:SearchPanel ui:field="eventSearch" />
-				<lists:PreservationEventList ui:field="eventList" />
+				<lists:PreservationEventList addStyleNames="searchResults" ui:field="eventList" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">
@@ -49,7 +49,6 @@
 								<ui:text from='{messages.preservationEventsBackButton}' />
 							</g:Button>
 						</g:FlowPanel>
-						<g:FlowPanel addStyleNames="sidebar-group" ui:field="facetsPanel" />
 						<g:FlowPanel addStyleNames="sidebar-group">
 							<g:Label addStyleNames="h4">
 								<ui:text from='{messages.sidebarFilterDates}' />

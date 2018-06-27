@@ -26,7 +26,6 @@ import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
@@ -117,9 +116,6 @@ public class IngestProcess extends Composite {
   @UiField
   Button newJob;
 
-  @UiField
-  FlowPanel facetsPanel;
-
   private IngestProcess() {
 
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INGEST.toString()));
@@ -127,8 +123,6 @@ public class IngestProcess extends Composite {
     jobList = new JobList("IngestProcess_jobs", filter, messages.ingestJobList(), false);
 
     initWidget(uiBinder.createAndBindUi(this));
-
-    FacetUtils.bindFacets(jobList, facetsPanel);
 
     ingestProcessDescription.add(new HTMLWidgetWrapper("IngestProcessDescription.html"));
 

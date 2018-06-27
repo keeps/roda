@@ -21,12 +21,12 @@ import org.roda.core.data.v2.log.LogEntry;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.LogEntryList;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
@@ -115,19 +115,12 @@ public class UserLog extends Composite {
   @UiField(provided = true)
   LogEntryList logList;
 
-  @UiField
-  FlowPanel facetsPanel;
-
   private static final Filter DEFAULT_FILTER = SearchFilters.defaultFilter(LogEntry.class.getName());
   private static final String ALL_FILTER = SearchFilters.allFilter(LogEntry.class.getName());
 
-  /**
-   * Create a new user log
-   *
-   * @param user
-   */
   public UserLog() {
-    logList = new LogEntryList("UserLog_logEntries", Filter.NULL, messages.logsTitle(), false);
+    logList = new LogEntryList("UserLog_logEntries", Filter.NULL, messages.logsTitle(), false, 50,
+      AsyncTableCell.DEFAULT_PAGE_SIZE_INCREMENT);
 
     searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, true, messages.userLogSearchPlaceHolder(), false, false,
       false);
@@ -146,8 +139,6 @@ public class UserLog extends Composite {
     });
 
     initWidget(uiBinder.createAndBindUi(this));
-
-    FacetUtils.bindFacets(logList, facetsPanel);
 
     userLogDescription.add(new HTMLWidgetWrapper("UserLogDescription.html"));
 

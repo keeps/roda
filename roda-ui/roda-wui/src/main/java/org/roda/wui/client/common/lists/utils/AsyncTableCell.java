@@ -9,6 +9,7 @@ package org.roda.wui.client.common.lists.utils;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,7 @@ import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.ClientLogger;
-import org.roda.wui.common.client.tools.FacetUtils;
+import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.widgets.MyCellTableResources;
 import org.roda.wui.common.client.widgets.Toast;
@@ -78,6 +79,7 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.view.client.CellPreviewEvent;
 import com.google.gwt.view.client.CellPreviewEvent.Handler;
 import com.google.gwt.view.client.DefaultSelectionEventManager;
@@ -90,11 +92,18 @@ import config.i18n.client.ClientMessages;
 public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
   implements HasValueChangeHandlers<IndexResult<T>> {
 
+  public static final Integer DEFAULT_INITIAL_PAGE_SIZE = 20;
+  public static final Integer DEFAULT_PAGE_SIZE_INCREMENT = 100;
+
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
+  private static final ClientLogger LOGGER = new ClientLogger(AsyncTableCell.class.getName());
 
   private final Class<T> classToReturn;
   private final O object;
   private final String listId;
+
+  private final FlowPanel mainPanel;
+  private final FlowPanel sidePanel;
 
   private final MyAsyncDataProvider<T> dataProvider;
   private final SingleSelectionModel<T> selectionModel;
@@ -136,12 +145,14 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
   private final CalloutPopup actionsPopup = new CalloutPopup();
 
   public AsyncTableCell(Class<T> classToReturn, String listId, List<String> fieldsToReturn) {
-    this(classToReturn, listId, null, false, null, null, false, 20, 100, null, fieldsToReturn);
+    this(classToReturn, listId, null, false, null, null, false, DEFAULT_INITIAL_PAGE_SIZE, DEFAULT_PAGE_SIZE_INCREMENT,
+      null, fieldsToReturn);
   }
 
   public AsyncTableCell(Class<T> classToReturn, String listId, Filter filter, boolean justActive, Facets facets,
     String summary, boolean selectable, O object, List<String> fieldsToReturn) {
-    this(classToReturn, listId, filter, justActive, facets, summary, selectable, 20, 100, object, fieldsToReturn);
+    this(classToReturn, listId, filter, justActive, facets, summary, selectable, DEFAULT_INITIAL_PAGE_SIZE,
+      DEFAULT_PAGE_SIZE_INCREMENT, object, fieldsToReturn);
   }
 
   public AsyncTableCell(final Class<T> classToReturn, final String listId, final Filter filter,
@@ -224,12 +235,26 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
     createSelectAllPanel();
 
-    add(selectAllPanel);
-    add(display);
-    add(resultsPager);
-    add(pageSizePager);
-    add(csvDownloadButton);
-    add(actionsButton);
+    sidePanel = new FlowPanel();
+    sidePanel.addStyleName("my-asyncdatagrid-side-panel");
+    add(sidePanel);
+
+    mainPanel = new FlowPanel();
+    mainPanel.addStyleName("my-asyncdatagrid-main-panel");
+    add(mainPanel);
+
+    mainPanel.add(selectAllPanel);
+    mainPanel.add(display);
+    mainPanel.add(resultsPager);
+    mainPanel.add(pageSizePager);
+    mainPanel.add(csvDownloadButton);
+    mainPanel.add(actionsButton);
+
+    SimplePanel clearfix = new SimplePanel();
+    clearfix.addStyleName("clearfix");
+    add(clearfix);
+
+    toggleSidePanel(createAndBindFacets(sidePanel));
 
     csvDownloadButton.addClickHandler(new ClickHandler() {
 
@@ -288,8 +313,18 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     updateEmptyTableWidget();
   }
 
+  private void toggleSidePanel(boolean toggle) {
+    if (toggle) {
+      mainPanel.removeStyleName("my-asyncdatagrid-main-panel-full");
+      sidePanel.removeStyleName("my-asyncdatagrid-side-panel-hidden");
+    } else {
+      mainPanel.addStyleName("my-asyncdatagrid-main-panel-full");
+      sidePanel.addStyleName("my-asyncdatagrid-side-panel-hidden");
+    }
+  }
+
   private void updateEmptyTableWidget() {
-    if (FacetUtils.hasSelected(getFacets())) {
+    if (hasSelectedFacets()) {
       FlowPanel layout = new FlowPanel();
       Label l = new Label(messages.noItemsToDisplayButFacetsActive());
       Button resetFacets = new Button(messages.disableFacets());
@@ -300,7 +335,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
       resetFacets.addClickHandler(new ClickHandler() {
         @Override
         public void onClick(ClickEvent event) {
-          FacetUtils.clearFacets(getFacets());
+          clearSelectedFacets();
           refresh();
         }
       });
@@ -527,11 +562,13 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
   public void setFacets(Facets facets) {
     this.facets = facets;
     refresh();
+    toggleSidePanel(createAndBindFacets(sidePanel));
   }
 
   public void set(Filter filter, boolean justActive, Facets facets) {
     this.facets = facets;
     set(filter, justActive);
+    toggleSidePanel(createAndBindFacets(sidePanel));
   }
 
   public void set(Filter filter, boolean justActive) {
@@ -930,4 +967,115 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     display.addRedrawHandler(handler);
   }
 
+  private boolean createAndBindFacets(FlowPanel facetsPanel) {
+    facetsPanel.clear();
+
+    Map<String, FlowPanel> facetPanels = createInnerFacetPanels(facetsPanel);
+    addValueChangeHandler(listValueChangedEvent -> {
+      List<FacetFieldResult> facetResults = listValueChangedEvent.getValue().getFacetResults();
+
+      boolean allFacetsAreEmpty = true;
+      for (FacetFieldResult facetResult : facetResults) {
+        final String facetField = facetResult.getField();
+        FlowPanel facetPanel = facetPanels.get(facetField);
+        if (facetPanel != null) {
+          facetPanel.clear();
+          if (facetResult.getTotalCount() == 0) {
+            facetPanel.getParent().addStyleName("facet-empty");
+          } else {
+            allFacetsAreEmpty = false;
+            facetPanel.getParent().removeStyleName("facet-empty");
+          }
+
+          for (FacetValue facetValue : facetResult.getValues()) {
+            final String value = facetValue.getValue();
+            final String label = facetValue.getLabel();
+            long count = facetValue.getCount();
+            boolean facetIsSelected = facetResult.getSelectedValues().contains(value);
+            StringBuilder checkboxLabel = new StringBuilder();
+            checkboxLabel.append(label);
+            if (count > 0 || facetResult.getSelectedValues().isEmpty() || facetIsSelected) {
+              checkboxLabel.append(" (").append(count).append(")");
+            }
+
+            CheckBox facetValuePanel = new CheckBox(checkboxLabel.toString());
+            facetValuePanel.setTitle(checkboxLabel.toString());
+            facetValuePanel.addStyleName("sidebar-facet-label");
+            facetValuePanel.addStyleName("fade-out");
+
+            boolean enabled = count > 0 || !facetResult.getSelectedValues().isEmpty();
+            facetValuePanel.setEnabled(enabled);
+
+            facetPanel.add(facetValuePanel);
+            facetValuePanel.setValue(facetIsSelected);
+
+            facetValuePanel.addValueChangeHandler(facetValueChangedEvent -> {
+              FacetParameter selectedFacetParameter = getFacets().getParameters().get(facetField);
+
+              if (selectedFacetParameter != null) {
+                if (facetValueChangedEvent.getValue()) {
+                  selectedFacetParameter.getValues().add(value);
+                } else {
+                  selectedFacetParameter.getValues().remove(value);
+                }
+              } else {
+                LOGGER.warn("Haven't found the facet parameter: " + facetField);
+              }
+
+              refresh();
+            });
+          }
+        } else {
+          LOGGER.warn("Got a facet but haven't got a panel for it: " + facetField);
+        }
+      }
+
+      facetsPanel.setVisible(!allFacetsAreEmpty);
+    });
+    return !facetPanels.isEmpty();
+  }
+
+  private Map<String, FlowPanel> createInnerFacetPanels(final FlowPanel facetsPanel) {
+    Map<String, FlowPanel> innerFacetPanels = new HashMap<>();
+    for (FacetParameter facetParameter : getFacets().getParameters().values()) {
+      FlowPanel facetAndTitle = new FlowPanel();
+      facetAndTitle.addStyleName("sidebar-facet-panel");
+
+      String title = ConfigurationManager.getTranslation(RodaConstants.I18N_UI_FACETS_PREFIX,
+        getClassToReturn().getSimpleName(), facetParameter.getName());
+
+      Label titleLabel = new Label(title);
+      titleLabel.addStyleName("h5");
+
+      FlowPanel facetPanel = new FlowPanel();
+      facetPanel.addStyleName("facet-input-panel");
+
+      facetAndTitle.add(titleLabel);
+      facetAndTitle.add(facetPanel);
+      facetsPanel.add(facetAndTitle);
+
+      innerFacetPanels.put(facetParameter.getName(), facetPanel);
+    }
+
+    return innerFacetPanels;
+  }
+
+  private boolean hasSelectedFacets() {
+    boolean hasSelectedFacets = false;
+    if (getFacets() != null) {
+      for (FacetParameter facetParameter : getFacets().getParameters().values()) {
+        if (!facetParameter.getValues().isEmpty()) {
+          hasSelectedFacets = true;
+          break;
+        }
+      }
+    }
+    return hasSelectedFacets;
+  }
+
+  private void clearSelectedFacets() {
+    for (Map.Entry<String, FacetParameter> entry : getFacets().getParameters().entrySet()) {
+      entry.getValue().getValues().clear();
+    }
+  }
 }

@@ -41,7 +41,6 @@ import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
@@ -181,9 +180,6 @@ public class RiskIncidenceRegister extends Composite {
   @UiField
   Button buttonRemove, buttonCancel;
 
-  @UiField(provided = true)
-  FlowPanel facetsPanel;
-
   private static final String ALL_FILTER = SearchFilters.allFilter(RiskIncidence.class.getName());
 
   private String aipId = null;
@@ -210,9 +206,6 @@ public class RiskIncidenceRegister extends Composite {
     searchPanel = new SearchPanel(filter, ALL_FILTER, true, messages.riskIncidenceRegisterSearchPlaceHolder(), false,
       false, false);
     searchPanel.setList(riskIncidenceList);
-
-    facetsPanel = new FlowPanel();
-    FacetUtils.bindFacets(riskIncidenceList, facetsPanel);
 
     riskIncidenceList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
       @Override

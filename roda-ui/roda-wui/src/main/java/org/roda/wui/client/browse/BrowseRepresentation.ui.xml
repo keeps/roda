@@ -51,8 +51,7 @@
 							<ui:text from='{messages.representationFiles}' />
 						</g:Label>
 						<commonsearch:SearchPanel ui:field="filesSearch" />
-						<lists:SearchFileList addStyleNames="searchResults"
-							ui:field="filesList" />
+						<lists:SearchFileList addStyleNames="searchResults" ui:field="filesList" />
 					</g:FlowPanel>
 
 					<!-- DIPs -->
@@ -61,8 +60,7 @@
 							<ui:text from='{messages.disseminationsTitle}' />
 						</g:Label>
 						<commonsearch:SearchPanel ui:field="disseminationsSearch" />
-						<lists:DIPList addStyleNames="searchResults"
-							ui:field="disseminationsList" />
+						<lists:DIPList addStyleNames="searchResults" ui:field="disseminationsList" />
 					</g:FlowPanel>
 
 				</g:FlowPanel>

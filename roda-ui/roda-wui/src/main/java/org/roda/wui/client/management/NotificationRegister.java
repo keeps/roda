@@ -23,7 +23,6 @@ import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
@@ -108,9 +107,6 @@ public class NotificationRegister extends Composite {
   @UiField(provided = true)
   NotificationList notificationList;
 
-  @UiField(provided = true)
-  FlowPanel facetsPanel;
-
   private static final Filter DEFAULT_FILTER = SearchFilters.defaultFilter(Notification.class.getName());
   private static final String ALL_FILTER = SearchFilters.allFilter(Notification.class.getName());
 
@@ -121,9 +117,6 @@ public class NotificationRegister extends Composite {
     searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, true, messages.messageSearchPlaceHolder(), false, false,
       false);
     searchPanel.setList(notificationList);
-
-    facetsPanel = new FlowPanel();
-    FacetUtils.bindFacets(notificationList, facetsPanel);
 
     notificationList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
 
