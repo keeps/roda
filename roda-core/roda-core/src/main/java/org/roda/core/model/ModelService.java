@@ -16,6 +16,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -29,12 +33,8 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.PremisV3Utils;
-import org.roda.core.common.RodaUtils;
 import org.roda.core.common.UserUtility;
 import org.roda.core.common.dips.DIPUtils;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -127,7 +127,7 @@ import org.slf4j.LoggerFactory;
 public class ModelService extends ModelObservable {
   private static final Logger LOGGER = LoggerFactory.getLogger(ModelService.class);
 
-  private static final DateTimeFormatter LOG_NAME_DATE_FORMAT = DateTimeFormat.forPattern("yyyy-MM-dd");
+  private static final DateTimeFormatter LOG_NAME_DATE_FORMAT = DateTimeFormatter.ISO_LOCAL_DATE;
   private static final boolean FAIL_IF_NO_DESCRIPTIVE_METADATA_SCHEMA = false;
   private final StorageService storage;
   private Object logFileLock = new Object();
@@ -243,8 +243,8 @@ public class ModelService extends ModelObservable {
    * 
    * @param aipId
    *          Suggested ID for the AIP, if <code>null</code> then an ID will be
-   *          automatically generated. If ID cannot be allowed because it already
-   *          exists or is not valid, another ID will be provided.
+   *          automatically generated. If ID cannot be allowed because it
+   *          already exists or is not valid, another ID will be provided.
    * @param sourceStorage
    * @param sourcePath
    * @return
@@ -2463,14 +2463,14 @@ public class ModelService extends ModelObservable {
   public void createSubmission(StorageService submissionStorage, StoragePath submissionStoragePath, String aipId)
     throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException {
-    storage.copy(submissionStorage, submissionStoragePath,
-      DefaultStoragePath.parse(ModelUtils.getSubmissionStoragePath(aipId), RodaUtils.dateToISO8601(new Date())));
+    storage.copy(submissionStorage, submissionStoragePath, DefaultStoragePath
+      .parse(ModelUtils.getSubmissionStoragePath(aipId), DateTimeFormatter.ISO_INSTANT.format(Instant.now())));
   }
 
   public void createSubmission(Path submissionPath, String aipId) throws AlreadyExistsException, GenericException,
     RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     StoragePath submissionStoragePath = DefaultStoragePath.parse(ModelUtils.getSubmissionStoragePath(aipId),
-      RodaUtils.dateToISO8601(new Date()), submissionPath.getFileName().toString());
+      DateTimeFormatter.ISO_INSTANT.format(Instant.now()), submissionPath.getFileName().toString());
     storage.createBinary(submissionStoragePath, new FSPathContentPayload(submissionPath), false);
   }
 
@@ -2712,9 +2712,9 @@ public class ModelService extends ModelObservable {
     String fileNameWithoutExtension = fileName.replaceFirst(".log$", "");
 
     try {
-      DateTime dt = LOG_NAME_DATE_FORMAT.parseDateTime(fileNameWithoutExtension);
+      TemporalAccessor dt = LOG_NAME_DATE_FORMAT.parse(fileNameWithoutExtension);
 
-      if (dt.plusDays(daysToIndex + 1).isAfterNow()) {
+      if (Instant.from(dt).plus(daysToIndex + 1, ChronoUnit.DAYS).isAfter(Instant.now())) {
         isToIndex = true;
       }
 
