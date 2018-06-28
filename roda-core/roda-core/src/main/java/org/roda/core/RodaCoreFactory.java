@@ -217,6 +217,9 @@ public class RodaCoreFactory {
       }
     });
 
+  private static List<String> CONFIGURATIONS = new ArrayList<>(
+    Arrays.asList("roda-core.properties", "roda-roles.properties"));
+
   /**
    * Shared configuration and message properties (cache). Includes properties from
    * {@code rodaConfiguration} and translations from ServerMessages, filtered by
@@ -267,7 +270,12 @@ public class RodaCoreFactory {
 
   /** Private empty constructor */
   private RodaCoreFactory() {
+    // do nothing
+  }
 
+  public static void addDefaultConfiguration(String configuration) {
+    CONFIGURATIONS.add(configuration);
+    LOGGER.info("Added configuration: '{}'", configuration);
   }
 
   public static boolean instantiatedWithoutErrors() {
@@ -371,10 +379,11 @@ public class RodaCoreFactory {
         rodaConfiguration = new CompositeConfiguration();
         configurationFiles = new ArrayList<>();
         rodaPropertiesCache = new HashMap<>();
-        addConfiguration("roda-core.properties");
-        LOGGER.debug("Finished loading roda-core.properties");
-        addConfiguration("roda-roles.properties");
-        LOGGER.debug("Finished loading roda-roles.properties");
+
+        for (String configuration : CONFIGURATIONS) {
+          addConfiguration(configuration);
+          LOGGER.debug("Loaded {}", configuration);
+        }
 
         // initialize working directory
         initializeWorkingDirectory();
