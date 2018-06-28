@@ -123,7 +123,7 @@ public final class PluginHelper {
     Report report = PluginHelper.initPluginReport(plugin);
 
     try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(plugin, liteList.size());
+      JobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(plugin, liteList.size());
       PluginHelper.updateJobInformationAsync(plugin, jobPluginInfo);
 
       Job job = PluginHelper.getJob(plugin, model);
@@ -151,7 +151,7 @@ public final class PluginHelper {
     Report report = PluginHelper.initPluginReport(plugin);
 
     try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(plugin, liteList.size());
+      JobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(plugin, liteList.size());
       PluginHelper.updateJobInformationAsync(plugin, jobPluginInfo);
 
       Job job = PluginHelper.getJob(plugin, model);
@@ -219,7 +219,7 @@ public final class PluginHelper {
     Report report = PluginHelper.initPluginReport(plugin);
 
     try {
-      SimpleJobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(plugin, 0);
+      JobPluginInfo jobPluginInfo = PluginHelper.getInitialJobInformation(plugin, 0);
       jobPluginInfo.setSourceObjectsCount(setSourceObjectsCount);
       PluginHelper.updateJobInformationAsync(plugin, jobPluginInfo);
 
@@ -482,9 +482,9 @@ public final class PluginHelper {
     }
   }
 
-  public static <T extends IsRODAObject> SimpleJobPluginInfo getInitialJobInformation(Plugin<T> plugin,
+  public static <T extends IsRODAObject> JobPluginInfo getInitialJobInformation(Plugin<T> plugin,
     int sourceObjectsBeingProcess) throws JobException {
-    SimpleJobPluginInfo jobPluginInfo = plugin.getJobPluginInfo(SimpleJobPluginInfo.class);
+    JobPluginInfo jobPluginInfo = plugin.getJobPluginInfo(JobPluginInfo.class);
     if (jobPluginInfo != null) {
       jobPluginInfo.setSourceObjectsBeingProcessed(sourceObjectsBeingProcess).setSourceObjectsWaitingToBeProcessed(0);
       return jobPluginInfo;
