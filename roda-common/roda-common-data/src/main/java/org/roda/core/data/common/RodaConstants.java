@@ -1116,9 +1116,9 @@ public final class RodaConstants {
 
   /* View representation */
   public static final String VIEW_REPRESENTATION_DESCRIPTION_LEVEL = "description-level-representation";
-  public static final String VIEW_REPRESENTATION_REPRESENTATION = "representation";
-  public static final String VIEW_REPRESENTATION_FOLDER = "folder";
-  public static final String VIEW_REPRESENTATION_FILE = "file";
+  public static final String VIEW_REPRESENTATION_REPRESENTATION = "representation_representation";
+  public static final String VIEW_REPRESENTATION_FOLDER = "representation_folder";
+  public static final String VIEW_REPRESENTATION_FILE = "representation_file";
 
   /*
    * PREMIS
