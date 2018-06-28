@@ -14,6 +14,7 @@ import java.util.Set;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.user.client.Random;
+import com.google.gwt.user.client.ui.CheckBox;
 
 public class WCAGUtilities {
 
@@ -69,5 +70,38 @@ public class WCAGUtilities {
     if (element.getAttribute(attributeName) == null || "".equals(element.getAttribute(attributeName))) {
       element.setAttribute(attributeName, attributeValue);
     }
+  }
+
+  public static void addTitleToCheckbox(CheckBox checkBox, String title) {
+    addTitleToFirstInputChild(checkBox.getElement(), title);
+  }
+
+  /**
+   * Sets the title of the first input element found in the children of this
+   * element. Depth-first traversal.
+   * 
+   * @param element
+   *          element and children to search
+   * @param title
+   *          title attribute to set
+   * @return true if the title attribute was set, false otherwise
+   */
+  private static boolean addTitleToFirstInputChild(Element element, String title) {
+    if (INPUT_TAGNAMES.contains(element.getTagName())) {
+      addAttributeIfNonExistent(element, "title", title);
+      return true;
+    }
+
+    if (element.getChildCount() > 0) {
+      for (int i = 0; i < element.getChildCount(); i++) {
+        if (element.getChild(i).getNodeType() == Node.ELEMENT_NODE) {
+          if (addTitleToFirstInputChild((Element) element.getChild(i), title)) {
+            return true;
+          }
+        }
+      }
+    }
+
+    return false;
   }
 }

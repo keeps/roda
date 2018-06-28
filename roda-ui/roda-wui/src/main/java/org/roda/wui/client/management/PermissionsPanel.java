@@ -24,6 +24,7 @@ import java.util.Vector;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.widgets.LoadingPopup;
+import org.roda.wui.common.client.widgets.wcag.WCAGUtilities;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -85,6 +86,7 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
       });
 
       this.addStyleName("permission");
+      WCAGUtilities.addTitleToCheckbox(checkbox, description);
       checkbox.addStyleName("permission-checkbox");
       descriptionLabel.setStylePrimaryName("permission-description");
     }
