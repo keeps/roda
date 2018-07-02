@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>org.roda-project</groupId>
 		<artifactId>roda</artifactId>
-		<version>2.2.10-SNAPSHOT</version>
+		<version>2.2.10</version>
 		<relativePath>../..</relativePath>
 	</parent>
 	<profiles>
