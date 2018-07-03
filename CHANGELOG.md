@@ -1,5 +1,22 @@
 # Changelog
 
+## v2.2.10 (03/07/2018)
+Install for demonstration:
+```
+docker pull keeps/roda:v2.2.10
+```
+
+#### Enhancements:
+
+-  Support CAS single sign out [#1250](https://github.com/keeps/roda/issues/1250)
+
+#### Bug Fixes:
+
+-  Unauthenticated API requests are not working [#1265](https://github.com/keeps/roda/issues/1265)
+-  Wrong icon when viewing a file [#1253](https://github.com/keeps/roda/issues/1253)
+
+---
+
 ## v2.2.9 (13/06/2018)
 Install for demonstration:
 ```
