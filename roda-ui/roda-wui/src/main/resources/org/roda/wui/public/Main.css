@@ -484,6 +484,10 @@ div.inline {
     color: white;
 }
 
+#keeps-logo {
+    width: 11rem;
+}
+
 .page-description p {
     margin-bottom: 1em;
     font-size: 1.3rem;
