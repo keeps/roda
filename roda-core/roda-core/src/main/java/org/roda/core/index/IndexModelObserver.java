@@ -36,7 +36,6 @@ import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
-import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.DIP;
@@ -465,7 +464,7 @@ public class IndexModelObserver implements ModelObserver {
 
         List<IndexedAIP> items = new ArrayList<>();
         try (IterableIndexResult<IndexedAIP> childrenResults = new IterableIndexResult<>(index, IndexedAIP.class,
-          filter, Sorter.NONE, null, false, aipFields)) {
+          filter, null, false, aipFields)) {
           childrenResults.forEach(items::add);
         }
 

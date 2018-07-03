@@ -46,7 +46,6 @@ import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
@@ -73,6 +72,7 @@ import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.index.utils.IndexResultIterator;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelObserver;
@@ -114,11 +114,11 @@ public class IndexService {
     IterableIndexResult.injectHistogram(iterableIndexResultHistogram);
 
     IterableIndexResult.injectSearchPageSize(
-      rodaConfiguration.getInt("core.index_result.page_size", IterableIndexResult.DEFAULT_PAGE_SIZE));
+      rodaConfiguration.getInt("core.index_result.page_size", IndexResultIterator.DEFAULT_PAGE_SIZE));
     IterableIndexResult.injectNumberOfRetries(
-      rodaConfiguration.getInt("core.index_result.retries", IterableIndexResult.DEFAULT_RETRIES));
+      rodaConfiguration.getInt("core.index_result.retries", IndexResultIterator.DEFAULT_RETRIES));
     IterableIndexResult.injectSleepBetweenRetries(
-      rodaConfiguration.getInt("core.index_result.sleep", IterableIndexResult.DEFAULT_SLEEP_BETWEEN_RETRIES));
+      rodaConfiguration.getInt("core.index_result.sleep", IndexResultIterator.DEFAULT_SLEEP_BETWEEN_RETRIES));
   }
 
   public IndexedAIP getParent(IndexedAIP aip, List<String> fieldsToReturn) throws NotFoundException, GenericException {
@@ -174,32 +174,18 @@ public class IndexService {
 
   public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
     final List<String> fieldsToReturn) throws GenericException, RequestNotValidException {
-    return findAll(returnClass, filter, new Sorter(new SortParameter(RodaConstants.INDEX_UUID, true)), null, true,
-      fieldsToReturn);
+    return findAll(returnClass, filter, null, true, fieldsToReturn);
   }
 
   public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
-    final boolean justActive, final List<String> fieldsToReturn) throws GenericException, RequestNotValidException {
-    return findAll(returnClass, filter, new Sorter(new SortParameter(RodaConstants.INDEX_UUID, true)), null, justActive,
-      fieldsToReturn);
+    boolean justActive, final List<String> fieldsToReturn) throws GenericException, RequestNotValidException {
+    return findAll(returnClass, filter, null, justActive, fieldsToReturn);
   }
 
   public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
-    final Sorter sorter, final List<String> fieldsToReturn) throws GenericException, RequestNotValidException {
-    return findAll(returnClass, filter, sorter, null, true, fieldsToReturn);
-  }
-
-  public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
-    final Sorter sorter, final User user, final boolean justActive, final List<String> fieldsToReturn)
+    final User user, final boolean justActive, final List<String> fieldsToReturn)
     throws GenericException, RequestNotValidException {
-    return new IterableIndexResult<>(getSolrClient(), returnClass, filter, sorter, user, justActive, fieldsToReturn);
-  }
-
-  @Deprecated
-  public <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
-    final Sorter sorter, final Facets facets, final User user, final boolean justActive,
-    final List<String> fieldsToReturn) throws GenericException, RequestNotValidException {
-    return new IterableIndexResult<>(getSolrClient(), returnClass, filter, sorter, user, justActive, fieldsToReturn);
+    return new IterableIndexResult<>(getSolrClient(), returnClass, filter, user, justActive, fieldsToReturn);
   }
 
   public <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter, User user, boolean justActive)

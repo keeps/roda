@@ -123,7 +123,7 @@ public class CleanupFailedIngestAIPsPlugin extends AbstractPlugin<Void> {
         PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
       }
 
-      jobPluginInfo.setSourceObjectsCount((int) aipsToDelete.getTotalObjects());
+      jobPluginInfo.setSourceObjectsCount((int) aipsToDelete.getTotalCount());
     } catch (IOException e) {
       LOGGER.error("Error getting AIPs to delete", e);
     }

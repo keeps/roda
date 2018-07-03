@@ -8,31 +8,16 @@
 package org.roda.core.index.utils;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.function.Consumer;
 
 import org.apache.solr.client.solrj.SolrClient;
-import org.mapdb.BTreeMap;
-import org.mapdb.DB;
-import org.mapdb.DB.TreeMapSink;
-import org.mapdb.DBMaker;
-import org.mapdb.Serializer;
 import org.roda.core.common.iterables.CloseableIterable;
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.sort.SortParameter;
-import org.roda.core.data.v2.index.sort.Sorter;
-import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.user.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.codahale.metrics.Histogram;
 
@@ -44,120 +29,47 @@ import com.codahale.metrics.Histogram;
  */
 
 public class IterableIndexResult<T extends IsIndexed> implements CloseableIterable<T> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(IterableIndexResult.class);
-  private static final Sorter SINK_SORTER = new Sorter(new SortParameter(RodaConstants.INDEX_UUID, false));
 
-  public static final int DEFAULT_PAGE_SIZE = 1000;
-  public static final int DEFAULT_RETRIES = 100;
-  public static final int DEFAULT_SLEEP_BETWEEN_RETRIES = 10000;
-
-  private static int RETRIES;
-  private static int SLEEP_BETWEEN_RETRIES;
-  private static int PAGE_SIZE;
+  private static int PAGE_SIZE = -1;
+  private static int RETRIES = -1;
+  private static int SLEEP_BETWEEN_RETRIES = -1;
 
   private static Histogram HISTOGRAM;
 
-  private SolrClient solrClient;
-  private Class<T> returnClass;
-  private Filter filter;
-  private User user;
-  private boolean justActive;
-  private List<String> fieldsToReturn;
-  private DB db;
-
-  private BTreeMap<String, T> indexObjects;
-  private long totalObjects = -1;
+  private final IndexResultIterator<T> iterator;
 
   public IterableIndexResult(final SolrClient solrClient, final Class<T> returnClass, final Filter filter,
-    final Sorter sorter, final User user, final boolean justActive, final List<String> fieldsToReturn)
+    final User user, final boolean justActive, final List<String> fieldsToReturn)
     throws GenericException, RequestNotValidException {
-    this.solrClient = solrClient;
-    this.returnClass = returnClass;
-    this.filter = filter;
-    this.user = user;
-    this.justActive = justActive;
-    this.fieldsToReturn = fieldsToReturn;
 
-    if (sorter == null || Sorter.NONE.equals(sorter) || SINK_SORTER.equals(sorter)) {
-      getResults();
-    } else {
-      getResults(sorter);
+    iterator = new IndexResultIterator<>(solrClient, returnClass, filter, user, justActive, fieldsToReturn);
+
+    if (PAGE_SIZE > 0) {
+      iterator.setPageSize(PAGE_SIZE);
     }
-  }
 
-  private void getResults() throws GenericException, RequestNotValidException {
-    db = DBMaker.tempFileDB().fileMmapEnableIfSupported().cleanerHackEnable().make();
-    TreeMapSink<String, T> sink = db.treeMap("myMap", Serializer.STRING, Serializer.JAVA).createFromSink();
-    this.totalObjects = getResultsImpl(SINK_SORTER, t -> sink.put(t.getUUID(), t));
-    this.indexObjects = sink.create();
-  }
+    if (RETRIES > 0) {
+      iterator.setRetries(RETRIES);
+    }
 
-  private void getResults(Sorter sorter) throws GenericException, RequestNotValidException {
-    db = DBMaker.tempFileDB().fileMmapEnableIfSupported().cleanerHackEnable().make();
-    this.indexObjects = db.treeMap("myMap", Serializer.STRING, Serializer.JAVA).create();
-    this.totalObjects = getResultsImpl(sorter, t -> indexObjects.put(t.getUUID(), t));
-  }
+    if (SLEEP_BETWEEN_RETRIES > 0) {
+      iterator.setSleepBetweenRetries(SLEEP_BETWEEN_RETRIES);
+    }
 
-  private long getResultsImpl(Sorter sorter, Consumer<T> putFunction)
-    throws GenericException, RequestNotValidException {
-    int startIndex = 0;
-    long totalCount = -1;
-    String lastUuid = "";
-    int availableRetries = RETRIES;
+    if (HISTOGRAM != null) {
+      iterator.setHistogram(HISTOGRAM);
+    }
 
-    do {
-      // TODO use SOLR export after adding docValues to UUID
-      try {
-        long initDateInMillis = new Date().getTime();
-        IndexResult<T> result = SolrUtils.find(solrClient, returnClass, filter, sorter,
-          new Sublist(startIndex, PAGE_SIZE), Facets.NONE, user, justActive, fieldsToReturn);
-        HISTOGRAM.update(new Date().getTime() - initDateInMillis);
-
-        totalCount = result.getTotalCount();
-        startIndex += result.getResults().size();
-        availableRetries = RETRIES;
-
-        for (T element : result.getResults()) {
-          if (SINK_SORTER.equals(sorter)) {
-            if (lastUuid.compareTo(element.getUUID()) < 0) {
-              putFunction.accept(element);
-              lastUuid = element.getUUID();
-            }
-          } else {
-            putFunction.accept(element);
-          }
-        }
-      } catch (GenericException | RequestNotValidException e) {
-        LOGGER.warn("Error find new Solr page when creating iterable index result, retrying...", e);
-        availableRetries--;
-
-        try {
-          Thread.sleep(SLEEP_BETWEEN_RETRIES);
-        } catch (InterruptedException e1) {
-          // do nothing
-        }
-
-        if (availableRetries == 0) {
-          throw e;
-        }
-      }
-    } while (startIndex < totalCount);
-
-    return totalCount;
   }
 
   @Override
   public Iterator<T> iterator() {
-    return indexObjects.valueIterator();
-  }
-
-  public long getTotalObjects() {
-    return totalObjects;
+    return iterator;
   }
 
   @Override
   public void close() throws IOException {
-    db.close();
+    // do nothing
   }
 
   public static void injectSearchPageSize(int pageSize) {
@@ -175,4 +87,12 @@ public class IterableIndexResult<T extends IsIndexed> implements CloseableIterab
   public static void injectHistogram(Histogram histogram) {
     HISTOGRAM = histogram;
   }
+
+  /**
+   * @see IndexResultIterator#getTotalCount()
+   */
+  public long getTotalCount() {
+    return iterator.getTotalCount();
+  }
+
 }

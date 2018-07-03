@@ -568,9 +568,9 @@ public class BrowserHelper {
   }
 
   protected static <T extends IsIndexed> IterableIndexResult<T> findAll(final Class<T> returnClass, final Filter filter,
-    final Sorter sorter, final User user, final boolean justActive, List<String> fieldsToReturn)
+    final User user, final boolean justActive, List<String> fieldsToReturn)
     throws GenericException, RequestNotValidException {
-    return RodaCoreFactory.getIndexService().findAll(returnClass, filter, sorter, user, justActive, fieldsToReturn);
+    return RodaCoreFactory.getIndexService().findAll(returnClass, filter, user, justActive, fieldsToReturn);
   }
 
   protected static <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter, boolean justActive, User user)

@@ -175,7 +175,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       jobStateInfoActor.tell(new Messages.PluginBeforeAllExecuteIsReady<>(plugin), jobActor);
 
       List<String> liteFields = SolrUtils.getClassLiteFields(classToActOn);
-      try (IterableIndexResult<T1> findAll = index.findAll(classToActOn, filter, Sorter.NONE, liteFields)) {
+      try (IterableIndexResult<T1> findAll = index.findAll(classToActOn, filter, liteFields)) {
         Iterator<T1> findAllIterator = findAll.iterator();
         List<T1> indexObjects = new ArrayList<>();
 

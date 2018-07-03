@@ -54,6 +54,7 @@ import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
+import org.apache.solr.common.params.CursorMarkParams;
 import org.apache.solr.common.params.FacetParams;
 import org.apache.solr.handler.loader.XMLLoader;
 import org.roda.core.common.MetadataFileUtils;
@@ -70,6 +71,7 @@ import org.roda.core.data.exceptions.ReturnWithExceptions;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.LiteRODAObject;
+import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -222,6 +224,54 @@ public class SolrUtils {
     try {
       QueryResponse response = index.query(SolrCollectionRegistry.getIndexName(classToRetrieve), query);
       ret = queryResponseToIndexResult(response, classToRetrieve, facets, fieldsToReturn);
+    } catch (SolrServerException | IOException | NotSupportedException e) {
+      throw new GenericException("Could not query index", e);
+    } catch (SolrException e) {
+      throw new RequestNotValidException(e);
+    } catch (RuntimeException e) {
+      throw new GenericException("Unexpected exception while querying index", e);
+    }
+
+    return ret;
+  }
+
+  /**
+   * Find using cursors. Set initial cursor to
+   * {@link CursorMarkParams#CURSOR_MARK_START}.
+   * 
+   * @param index
+   * @param classToRetrieve
+   * @param filter
+   * @param cursorMark
+   * @param fieldsToReturn
+   * @return
+   * @throws GenericException
+   * @throws RequestNotValidException
+   */
+  public static <T extends IsIndexed> Pair<IndexResult<T>, String> find(SolrClient index, Class<T> classToRetrieve,
+    Filter filter, int pageSize, String cursorMark, User user, boolean justActive, List<String> fieldsToReturn)
+    throws GenericException, RequestNotValidException {
+
+    Pair<IndexResult<T>, String> ret;
+    SolrQuery query = new SolrQuery();
+    query.setParam("q.op", DEFAULT_QUERY_PARSER_OPERATOR);
+    query.setQuery(parseFilter(filter));
+    if (hasPermissionFilters(classToRetrieve)) {
+      query.addFilterQuery(getFilterQueries(user, justActive, classToRetrieve));
+    }
+
+    query.set(CursorMarkParams.CURSOR_MARK_PARAM, cursorMark);
+    query.setRows(pageSize);
+    query.setSorts(Arrays.asList(SortClause.asc(RodaConstants.INDEX_UUID)));
+
+    if (!fieldsToReturn.isEmpty()) {
+      query.setFields(fieldsToReturn.toArray(new String[fieldsToReturn.size()]));
+    }
+
+    try {
+      QueryResponse response = index.query(SolrCollectionRegistry.getIndexName(classToRetrieve), query);
+      IndexResult<T> result = queryResponseToIndexResult(response, classToRetrieve, Facets.NONE, fieldsToReturn);
+      ret = Pair.of(result, response.getNextCursorMark());
     } catch (SolrServerException | IOException | NotSupportedException e) {
       throw new GenericException("Could not query index", e);
     } catch (SolrException e) {
@@ -1572,18 +1622,17 @@ public class SolrUtils {
     User user = null;
     boolean justActive = false;
 
-    try (IterableIndexResult<T> iterableIndexResult = new IterableIndexResult<>(index, classToRetrieve, filter,
-      Sorter.NONE, user, justActive, fieldsToReturn)) {
+    try (IterableIndexResult<T> iterableIndexResult = new IterableIndexResult<>(index, classToRetrieve, filter, user,
+      justActive, fieldsToReturn)) {
 
-      if (iterableIndexResult.getTotalObjects() > 0) {
-        iterableIndexResult.forEach(target -> {
-          try {
-            indexRunnable.run(target);
-          } catch (RODAException e) {
-            exceptionHandler.accept(e);
-          }
-        });
-      }
+      iterableIndexResult.forEach(target -> {
+        try {
+          indexRunnable.run(target);
+        } catch (RODAException e) {
+          exceptionHandler.accept(e);
+        }
+      });
+
     } catch (IOException e) {
       throw new GenericException(e);
     }

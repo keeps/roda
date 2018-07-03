@@ -61,8 +61,8 @@ public class ClassificationPlanUtils {
 
       IndexService index = RodaCoreFactory.getIndexService();
       boolean justActive = true;
-      try (IterableIndexResult<IndexedAIP> res = index.findAll(IndexedAIP.class, allButRepresentationsFilter,
-        Sorter.NONE, user, justActive, new ArrayList<>())) {
+      try (IterableIndexResult<IndexedAIP> res = index.findAll(IndexedAIP.class, allButRepresentationsFilter, user,
+        justActive, new ArrayList<>())) {
         Iterator<IndexedAIP> it = res.iterator();
         while (it.hasNext()) {
           array.add(aipToJSON(it.next()));

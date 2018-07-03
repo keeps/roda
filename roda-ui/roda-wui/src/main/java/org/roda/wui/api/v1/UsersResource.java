@@ -78,8 +78,8 @@ public class UsersResource {
     filter.add(new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, Boolean.toString(isUser)));
 
     RODAMembers members = new RODAMembers();
-    try (IterableIndexResult<RODAMember> findAll = Browser.findAll(RODAMember.class, filter, Sorter.NONE, user,
-      justActive, Collections.emptyList())) {
+    try (IterableIndexResult<RODAMember> findAll = Browser.findAll(RODAMember.class, filter, user, justActive,
+      Collections.emptyList())) {
       for (RODAMember member : findAll) {
         members.addObject(member);
       }
