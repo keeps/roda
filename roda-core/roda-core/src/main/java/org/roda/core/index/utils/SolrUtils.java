@@ -1253,6 +1253,33 @@ public class SolrUtils {
     return ret;
   }
 
+  public static <T extends IsIndexed, S extends Object> ReturnWithExceptions<Void, S> update(SolrClient index,
+    Class<T> classToCreate, String uuid, Map<String, Object> fields, S source) {
+    ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<>();
+    SolrInputDocument doc = new SolrInputDocument();
+    doc.addField(RodaConstants.INDEX_UUID, uuid);
+    fields.entrySet().forEach(e -> doc.addField(e.getKey(), set(e.getValue())));
+    try {
+      create(index, SolrCollectionRegistry.getIndexName(classToCreate), doc, source).addTo(ret);
+    } catch (NotSupportedException e) {
+      LOGGER.error("Error adding document to index", e);
+      ret.add(e);
+    }
+    return ret;
+  }
+
+  private static Map<String, Object> set(Object value) {
+    Map<String, Object> fieldModifier = new HashMap<>(1);
+    // 20160511 this workaround fixes solr wrong behaviour with partial update
+    // of empty lists
+    if (value instanceof List && ((List<?>) value).isEmpty()) {
+      fieldModifier.put("set", null);
+    } else {
+      fieldModifier.put("set", value);
+    }
+    return fieldModifier;
+  }
+
   /*
    * Common mappings of RODA objects
    * ____________________________________________________________________________________________________________________
@@ -1355,143 +1382,6 @@ public class SolrUtils {
     }
 
     return null;
-  }
-
-  /*
-   * Partial updates of RODA objects
-   * ____________________________________________________________________________________________________________________
-   */
-
-  public static SolrInputDocument aipStateUpdateToSolrDocument(AIP aip) {
-    return stateUpdateToSolrDocument(aip.getId(), aip.getState());
-  }
-
-  public static SolrInputDocument representationStateUpdateToSolrDocument(Representation representation,
-    AIPState state) {
-    return stateUpdateToSolrDocument(IdUtils.getRepresentationId(representation), state);
-  }
-
-  public static SolrInputDocument fileStateUpdateToSolrDocument(File file, AIPState state) {
-    return stateUpdateToSolrDocument(IdUtils.getFileId(file), state);
-  }
-
-  public static SolrInputDocument preservationEventStateUpdateToSolrDocument(String preservationEventID,
-    String preservationEventAipId, AIPState state) {
-    SolrInputDocument document = stateUpdateToSolrDocument(preservationEventID, state);
-    document.addField(RodaConstants.PRESERVATION_EVENT_AIP_ID, preservationEventAipId);
-    return document;
-
-  }
-
-  private static SolrInputDocument stateUpdateToSolrDocument(String uuid, AIPState state) {
-    SolrInputDocument doc = new SolrInputDocument();
-    doc.addField(RodaConstants.INDEX_UUID, uuid);
-    doc.addField(RodaConstants.INDEX_STATE, set(SolrUtils.formatEnum(state)));
-    return doc;
-  }
-
-  public static SolrInputDocument aipPermissionsUpdateToSolrDocument(AIP aip) {
-    SolrInputDocument document = new SolrInputDocument();
-    document.addField(RodaConstants.INDEX_UUID, aip.getId());
-    return permissionsUpdateToSolrDocument(document, aip.getPermissions());
-  }
-
-  public static SolrInputDocument dipPermissionsUpdateToSolrDocument(DIP dip) {
-    SolrInputDocument document = new SolrInputDocument();
-    document.addField(RodaConstants.INDEX_UUID, dip.getId());
-    return permissionsUpdateToSolrDocument(document, dip.getPermissions());
-  }
-
-  public static SolrInputDocument representationPermissionsUpdateToSolrDocument(Representation representation,
-    Permissions permissions) {
-    SolrInputDocument document = new SolrInputDocument();
-    document.addField(RodaConstants.INDEX_UUID, IdUtils.getRepresentationId(representation));
-    return permissionsUpdateToSolrDocument(document, permissions);
-  }
-
-  public static SolrInputDocument filePermissionsUpdateToSolrDocument(File file, Permissions permissions) {
-    SolrInputDocument document = new SolrInputDocument();
-    document.addField(RodaConstants.INDEX_UUID, IdUtils.getFileId(file));
-    return permissionsUpdateToSolrDocument(document, permissions);
-  }
-
-  public static SolrInputDocument preservationEventPermissionsUpdateToSolrDocument(String preservationEventID,
-    String preservationEventAipId, Permissions permissions, AIPState state) {
-    SolrInputDocument document = new SolrInputDocument();
-    document.addField(RodaConstants.INDEX_UUID, preservationEventID);
-    document = permissionsUpdateToSolrDocument(document, permissions);
-    document.addField(RodaConstants.INDEX_STATE, SolrUtils.formatEnum(state));
-    document.addField(RodaConstants.PRESERVATION_EVENT_AIP_ID, preservationEventAipId);
-    return document;
-  }
-
-  private static SolrInputDocument permissionsUpdateToSolrDocument(SolrInputDocument doc, Permissions permissions) {
-    for (Entry<PermissionType, Set<String>> entry : permissions.getUsers().entrySet()) {
-      String key = RodaConstants.INDEX_PERMISSION_USERS_PREFIX + entry.getKey();
-      List<String> value = new ArrayList<>(entry.getValue());
-      doc.addField(key, set(value));
-    }
-
-    for (Entry<PermissionType, Set<String>> entry : permissions.getGroups().entrySet()) {
-      String key = RodaConstants.INDEX_PERMISSION_GROUPS_PREFIX + entry.getKey();
-      List<String> value = new ArrayList<>(entry.getValue());
-      doc.addField(key, set(value));
-    }
-
-    return doc;
-  }
-
-  public static SolrInputDocument updateAIPParentId(String aipId, String parentId, List<String> ancestors)
-    throws RequestNotValidException, GenericException, AuthorizationDeniedException {
-    SolrInputDocument doc = new SolrInputDocument();
-    doc.addField(RodaConstants.INDEX_UUID, aipId);
-    doc.addField(RodaConstants.AIP_PARENT_ID, set(parentId));
-    doc.addField(RodaConstants.AIP_ANCESTORS, set(ancestors));
-    return doc;
-  }
-
-  public static SolrInputDocument updateAIPAncestors(String aipId, List<String> ancestors)
-    throws RequestNotValidException, GenericException, AuthorizationDeniedException {
-    SolrInputDocument doc = new SolrInputDocument();
-    doc.addField(RodaConstants.INDEX_UUID, aipId);
-    doc.addField(RodaConstants.AIP_ANCESTORS, set(ancestors));
-    return doc;
-  }
-
-  public static SolrInputDocument updateAIPHasRepresentations(String aipId, boolean hasRepresentations)
-    throws RequestNotValidException, GenericException, AuthorizationDeniedException {
-    SolrInputDocument doc = new SolrInputDocument();
-    doc.addField(RodaConstants.INDEX_UUID, aipId);
-    doc.addField(RodaConstants.AIP_HAS_REPRESENTATIONS, set(hasRepresentations));
-    return doc;
-  }
-
-  public static SolrInputDocument updateRepresentationAncestors(String representationUUID, List<String> ancestors)
-    throws RequestNotValidException, GenericException, AuthorizationDeniedException {
-    SolrInputDocument doc = new SolrInputDocument();
-    doc.addField(RodaConstants.INDEX_UUID, representationUUID);
-    doc.addField(RodaConstants.REPRESENTATION_ANCESTORS, set(ancestors));
-    return doc;
-  }
-
-  public static SolrInputDocument updateFileAncestors(String fileUUID, List<String> ancestors)
-    throws RequestNotValidException, GenericException, AuthorizationDeniedException {
-    SolrInputDocument doc = new SolrInputDocument();
-    doc.addField(RodaConstants.INDEX_UUID, fileUUID);
-    doc.addField(RodaConstants.FILE_ANCESTORS, set(ancestors));
-    return doc;
-  }
-
-  public static Map<String, Object> set(Object value) {
-    Map<String, Object> fieldModifier = new HashMap<>(1);
-    // 20160511 this workaround fixes solr wrong behaviour with partial update
-    // of empty lists
-    if (value instanceof List && ((List<?>) value).isEmpty()) {
-      fieldModifier.put("set", null);
-    } else {
-      fieldModifier.put("set", value);
-    }
-    return fieldModifier;
   }
 
   public static Permissions getPermissions(SolrDocument doc) {

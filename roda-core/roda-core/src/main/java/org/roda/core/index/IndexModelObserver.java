@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -335,8 +336,11 @@ public class IndexModelObserver implements ModelObserver {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
     // change AIP
-    SolrInputDocument aipDoc = SolrUtils.aipStateUpdateToSolrDocument(aip);
-    SolrUtils.create(index, RodaConstants.INDEX_AIP, aipDoc, (ModelObserver) this).addTo(ret);
+    SolrUtils
+      .update(index, IndexedAIP.class, aip.getId(),
+        Collections.singletonMap(RodaConstants.INDEX_STATE, SolrUtils.formatEnum(aip.getState())), (ModelObserver) this)
+      .addTo(ret);
+
     if (ret.isEmpty()) {
       // change Representations, Files & Preservation events
       representationsStateUpdated(aip).addTo(ret);
@@ -360,8 +364,9 @@ public class IndexModelObserver implements ModelObserver {
 
     try (CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(representation.getAipId(),
       representation.getId(), true)) {
-      SolrInputDocument repDoc = SolrUtils.representationStateUpdateToSolrDocument(representation, aip.getState());
-      SolrUtils.create(index, RodaConstants.INDEX_REPRESENTATION, repDoc, (ModelObserver) this).addTo(ret);
+      SolrUtils.update(index, IndexedRepresentation.class, IdUtils.getRepresentationId(representation),
+        Collections.singletonMap(RodaConstants.INDEX_STATE, SolrUtils.formatEnum(aip.getState())), (ModelObserver) this)
+        .addTo(ret);
 
       if (ret.isEmpty()) {
         for (OptionalWithCause<File> file : allFiles) {
@@ -387,8 +392,11 @@ public class IndexModelObserver implements ModelObserver {
   private ReturnWithExceptions<Void, ModelObserver> fileStateUpdated(AIP aip, File file, boolean recursive) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
-    SolrInputDocument fileDoc = SolrUtils.fileStateUpdateToSolrDocument(file, aip.getState());
-    SolrUtils.create(index, RodaConstants.INDEX_FILE, fileDoc, (ModelObserver) this).addTo(ret);
+    SolrUtils
+      .update(index, IndexedFile.class, IdUtils.getFileId(file),
+        Collections.singletonMap(RodaConstants.INDEX_STATE, SolrUtils.formatEnum(aip.getState())), (ModelObserver) this)
+      .addTo(ret);
+
     if (ret.isEmpty()) {
       if (recursive && file.isDirectory()) {
         try (CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(file, true)) {
@@ -440,9 +448,11 @@ public class IndexModelObserver implements ModelObserver {
 
   private ReturnWithExceptions<Void, ModelObserver> preservationEventStateUpdated(PreservationMetadata pm,
     AIPState state) {
-    SolrInputDocument premisEventDocument = SolrUtils.preservationEventStateUpdateToSolrDocument(pm.getId(),
-      pm.getAipId(), state);
-    return SolrUtils.create(index, RodaConstants.INDEX_PRESERVATION_EVENTS, premisEventDocument, (ModelObserver) this);
+    Map<String, Object> fieldsToUpdate = new HashMap<>();
+    fieldsToUpdate.put(RodaConstants.INDEX_STATE, SolrUtils.formatEnum(state));
+    fieldsToUpdate.put(RodaConstants.PRESERVATION_EVENT_AIP_ID, pm.getAipId());
+    return SolrUtils.update(index, IndexedPreservationEvent.class, IdUtils.getPreservationId(pm), fieldsToUpdate,
+      (ModelObserver) this);
   }
 
   @Override
@@ -451,8 +461,12 @@ public class IndexModelObserver implements ModelObserver {
     try {
       LOGGER.debug("Reindexing moved aip {}", aip.getId());
       List<String> topAncestors = SolrUtils.getAncestors(newParentId, model);
-      SolrInputDocument aipDoc = SolrUtils.updateAIPParentId(aip.getId(), newParentId, topAncestors);
-      SolrUtils.create(index, RodaConstants.INDEX_AIP, aipDoc, (ModelObserver) this).addTo(ret);
+
+      Map<String, Object> updatedFields = new HashMap<>();
+      updatedFields.put(RodaConstants.AIP_PARENT_ID, newParentId);
+      updatedFields.put(RodaConstants.AIP_ANCESTORS, topAncestors);
+      SolrUtils.update(index, IndexedAIP.class, aip.getId(), updatedFields, (ModelObserver) this).addTo(ret);
+
       if (ret.isEmpty()) {
         updateRepresentationAndFileAncestors(aip, topAncestors).addTo(ret);
 
@@ -469,12 +483,11 @@ public class IndexModelObserver implements ModelObserver {
         }
 
         for (IndexedAIP item : items) {
-          SolrInputDocument descendantDoc;
           try {
             LOGGER.debug("Reindexing aip {} descendant {}", aip.getId(), item.getId());
             List<String> ancestors = SolrUtils.getAncestors(item.getParentID(), model);
-            descendantDoc = SolrUtils.updateAIPAncestors(item.getId(), ancestors);
-            SolrUtils.create(index, RodaConstants.INDEX_AIP, descendantDoc, (ModelObserver) this).addTo(ret);
+            SolrUtils.update(index, IndexedAIP.class, aip.getId(),
+              Collections.singletonMap(RodaConstants.AIP_ANCESTORS, ancestors), (ModelObserver) this).addTo(ret);
 
             // update representation and file ancestors information
             if (item.getHasRepresentations()) {
@@ -498,32 +511,27 @@ public class IndexModelObserver implements ModelObserver {
   private ReturnWithExceptions<Void, ModelObserver> updateRepresentationAndFileAncestors(AIP aip,
     List<String> ancestors) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
-    try {
-      for (Representation representation : aip.getRepresentations()) {
-        SolrInputDocument descendantRepresentationDoc = SolrUtils
-          .updateRepresentationAncestors(IdUtils.getRepresentationId(representation), ancestors);
-        SolrUtils.create(index, RodaConstants.INDEX_REPRESENTATION, descendantRepresentationDoc, (ModelObserver) this)
-          .addTo(ret);
-        if (ret.isEmpty()) {
-          try (CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
-            representation.getId(), true)) {
-            for (OptionalWithCause<File> oFile : allFiles) {
-              if (oFile.isPresent()) {
-                File file = oFile.get();
-                SolrInputDocument descendantFileDoc = SolrUtils.updateFileAncestors(IdUtils.getFileId(file), ancestors);
-                SolrUtils.create(index, RodaConstants.INDEX_FILE, descendantFileDoc, (ModelObserver) this).addTo(ret);
-              }
+
+    for (Representation representation : aip.getRepresentations()) {
+      SolrUtils.update(index, IndexedRepresentation.class, IdUtils.getRepresentationId(representation),
+        Collections.singletonMap(RodaConstants.REPRESENTATION_ANCESTORS, ancestors), (ModelObserver) this).addTo(ret);
+
+      if (ret.isEmpty()) {
+        try (CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
+          representation.getId(), true)) {
+          for (OptionalWithCause<File> oFile : allFiles) {
+            if (oFile.isPresent()) {
+              File file = oFile.get();
+              SolrUtils.update(index, IndexedFile.class, IdUtils.getFileId(file),
+                Collections.singletonMap(RodaConstants.FILE_ANCESTORS, ancestors), (ModelObserver) this).addTo(ret);
             }
-          } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | IOException
-            | NotFoundException e) {
-            LOGGER.error("Error updating file ancestors", e);
-            ret.add(e);
           }
+        } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | IOException
+          | NotFoundException e) {
+          LOGGER.error("Error updating file ancestors", e);
+          ret.add(e);
         }
       }
-    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
-      LOGGER.error("Error updating representation ancestors", e);
-      ret.add(e);
     }
 
     return ret;
@@ -619,8 +627,8 @@ public class IndexModelObserver implements ModelObserver {
         indexPreservationsEvents(aip.getId(), representation.getId()).addTo(ret);
 
         if (aip.getRepresentations().size() == 1) {
-          SolrInputDocument doc = SolrUtils.updateAIPHasRepresentations(aip.getId(), true);
-          SolrUtils.create(index, RodaConstants.INDEX_AIP, doc, (ModelObserver) this).addTo(ret);
+          SolrUtils.update(index, IndexedAIP.class, aip.getId(),
+            Collections.singletonMap(RodaConstants.AIP_HAS_REPRESENTATIONS, true), (ModelObserver) this).addTo(ret);
         }
       }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
@@ -658,8 +666,8 @@ public class IndexModelObserver implements ModelObserver {
     try {
       AIP aip = model.retrieveAIP(aipId);
       if (aip.getRepresentations().size() == 0) {
-        SolrInputDocument doc = SolrUtils.updateAIPHasRepresentations(aipId, false);
-        SolrUtils.create(index, RodaConstants.INDEX_AIP, doc, (ModelObserver) this).addTo(ret);
+        SolrUtils.update(index, IndexedAIP.class, aip.getId(),
+          Collections.singletonMap(RodaConstants.AIP_HAS_REPRESENTATIONS, false), (ModelObserver) this).addTo(ret);
       }
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
       LOGGER.error("Cannot update hasRepresentations flag on AIP", e);
@@ -908,8 +916,8 @@ public class IndexModelObserver implements ModelObserver {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
     // change AIP
-    SolrInputDocument aipDoc = SolrUtils.aipPermissionsUpdateToSolrDocument(aip);
-    SolrUtils.create(index, RodaConstants.INDEX_AIP, aipDoc, (ModelObserver) this).addTo(ret);
+    SolrUtils.update(index, IndexedAIP.class, aip.getId(),
+      SolrUtils.getPermissionsAsPreCalculatedFields(aip.getPermissions()), (ModelObserver) this).addTo(ret);
 
     if (ret.isEmpty()) {
       // change Representations, Files and Preservation events
@@ -922,8 +930,8 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> dipPermissionsUpdated(DIP dip) {
-    SolrInputDocument dipDoc = SolrUtils.dipPermissionsUpdateToSolrDocument(dip);
-    return SolrUtils.create(index, RodaConstants.INDEX_DIP, dipDoc, (ModelObserver) this);
+    return SolrUtils.update(index, IndexedDIP.class, dip.getId(),
+      SolrUtils.getPermissionsAsPreCalculatedFields(dip.getPermissions()), (ModelObserver) this);
   }
 
   private ReturnWithExceptions<Void, ModelObserver> representationsPermissionsUpdated(final AIP aip) {
@@ -940,9 +948,9 @@ public class IndexModelObserver implements ModelObserver {
 
     try (CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(representation.getAipId(),
       representation.getId(), true)) {
-      SolrInputDocument repDoc = SolrUtils.representationPermissionsUpdateToSolrDocument(representation,
-        aip.getPermissions());
-      SolrUtils.create(index, RodaConstants.INDEX_REPRESENTATION, repDoc, (ModelObserver) this).addTo(ret);
+
+      SolrUtils.update(index, IndexedRepresentation.class, IdUtils.getRepresentationId(representation),
+        SolrUtils.getPermissionsAsPreCalculatedFields(aip.getPermissions()), (ModelObserver) this).addTo(ret);
 
       if (ret.isEmpty()) {
         for (OptionalWithCause<File> file : allFiles) {
@@ -965,8 +973,9 @@ public class IndexModelObserver implements ModelObserver {
 
   private ReturnWithExceptions<Void, ModelObserver> filePermissionsUpdated(AIP aip, File file, boolean recursive) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
-    SolrInputDocument fileDoc = SolrUtils.filePermissionsUpdateToSolrDocument(file, aip.getPermissions());
-    SolrUtils.create(index, RodaConstants.INDEX_FILE, fileDoc, (ModelObserver) this).addTo(ret);
+
+    SolrUtils.update(index, IndexedFile.class, IdUtils.getFileId(file),
+      SolrUtils.getPermissionsAsPreCalculatedFields(aip.getPermissions()), (ModelObserver) this).addTo(ret);
 
     if (ret.isEmpty() && recursive && file.isDirectory()) {
       try (CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(file, true)) {
@@ -1015,9 +1024,12 @@ public class IndexModelObserver implements ModelObserver {
 
   private ReturnWithExceptions<Void, ModelObserver> preservationEventPermissionsUpdated(PreservationMetadata pm,
     Permissions permissions, AIPState state) {
-    SolrInputDocument premisEventDocument = SolrUtils.preservationEventPermissionsUpdateToSolrDocument(pm.getId(),
-      pm.getAipId(), permissions, state);
-    return SolrUtils.create(index, RodaConstants.INDEX_PRESERVATION_EVENTS, premisEventDocument, (ModelObserver) this);
+    Map<String, Object> updateFields = new HashMap<>();
+    updateFields.putAll(SolrUtils.getPermissionsAsPreCalculatedFields(permissions));
+    updateFields.put(RodaConstants.INDEX_STATE, SolrUtils.formatEnum(state));
+    updateFields.put(RodaConstants.PRESERVATION_EVENT_AIP_ID, pm.getAipId());
+    return SolrUtils.update(index, IndexedPreservationEvent.class, IdUtils.getPreservationId(pm), updateFields, this);
+
   }
 
   @Override
