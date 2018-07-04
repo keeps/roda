@@ -232,7 +232,7 @@ public class RodaCoreFactory {
     .build(new CacheLoader<Locale, Map<String, List<String>>>() {
       @Override
       public Map<String, List<String>> load(Locale locale) throws Exception {
-        Map<String, List<String>> sharedProperties = getRodaSharedConfigurationProperties();
+        Map<String, List<String>> sharedProperties = new HashMap<>(getRodaSharedConfigurationProperties());
         Messages messages = getI18NMessages(locale);
         List<String> prefixes = RodaCoreFactory
           .getRodaConfigurationAsList("ui.sharedProperties.whitelist.messages.prefix");

@@ -6,9 +6,16 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.compress.utils.IOUtils;
+import org.apache.commons.configuration.ConfigurationException;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
 import org.roda.core.data.common.RodaConstants;
@@ -20,15 +27,18 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import com.google.common.collect.ImmutableMap;
+
 @Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_TRAVIS})
 public class RodaCoreFactoryTest {
 
   private static Path basePath;
 
   @BeforeClass
-  public static void setUp() throws IOException {
+  public static void setUp() throws IOException, ConfigurationException {
     basePath = TestsHelper.createBaseTempDir(RodaCoreFactoryTest.class, true);
     RodaCoreFactory.instantiateTest(false, false, false, false, false, false);
+    RodaCoreFactory.addConfiguration("roda-wui.properties");
   }
 
   @AfterClass
@@ -120,4 +130,36 @@ public class RodaCoreFactoryTest {
     Files.deleteIfExists(publicFile);
   }
 
+  @Test(invocationCount = 2)
+  public void testSharedProperties() throws GenericException {
+    // invocationCount of 2 is needed to make the tests fail when the cached
+    // properties map is being shared between locales (resulting in the next
+    // un-cached locale overwriting the previous values)
+
+    Locale enLocale = Locale.ENGLISH;
+    Locale ptLocale = new Locale("pt", "PT");
+
+    // shared properties expected to be present in roda-wui
+    final Map<String, List<String>> baseProperties = ImmutableMap.<String, List<String>> builder()
+      .put("testing.prefix.string", Collections.singletonList("string"))
+      .put("testing.prefix.array", Arrays.asList("first", "second"))
+      .put("testing.property.thisOne", Collections.singletonList("value")).build();
+
+    // add shared properties expected to be present in ServerMessages_locale
+    Map<String, List<String>> enProperties = new HashMap<>(baseProperties);
+    enProperties.put("i18n.testing.language", Collections.singletonList("english"));
+
+    Map<String, List<String>> ptProperties = new HashMap<>(baseProperties);
+    ptProperties.put("i18n.testing.language", Collections.singletonList("portuguese"));
+
+    // check english properties
+    Map<String, List<String>> rodaEnProperties = RodaCoreFactory.getRodaSharedProperties(enLocale);
+    assert enProperties.equals(rodaEnProperties) : "shared properties for locale '" + enLocale + "' are "
+      + rodaEnProperties + " when they should be " + enProperties;
+
+    // check portuguese properties
+    Map<String, List<String>> rodaPtProperties = RodaCoreFactory.getRodaSharedProperties(ptLocale);
+    assert ptProperties.equals(rodaPtProperties) : "shared properties for locale '" + ptLocale + "' are "
+      + rodaPtProperties + " when they should be " + ptProperties;
+  }
 }
