@@ -37,6 +37,7 @@ import org.roda.wui.client.common.dialogs.RepresentationDialogs;
 import org.roda.wui.client.common.dialogs.SelectAipDialog;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.management.UserLog;
@@ -229,7 +230,8 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
   private void move(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
     Dialogs.showConfirmDialog(messages.moveConfirmDialogTitle(),
-      messages.moveAllConfirmDialogMessageSingle(aip.getTitle()), messages.dialogNo(), messages.dialogYes(),
+      messages.moveAllConfirmDialogMessageSingle(StringUtils.isNotBlank(aip.getTitle()) ? aip.getTitle() : aip.getId()),
+      messages.dialogNo(), messages.dialogYes(),
       new AsyncCallback<Boolean>() {
 
         @Override
@@ -244,7 +246,8 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
             boolean justActive = AIPState.ACTIVE.equals(aip.getState());
 
             Filter filter = new Filter(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, aipId));
-            SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle() + " " + aip.getTitle(),
+            SelectAipDialog selectAipDialog = new SelectAipDialog(
+              messages.moveItemTitle() + " " + (StringUtils.isNotBlank(aip.getTitle()) ? aip.getTitle() : aip.getId()),
               filter, justActive, false);
             selectAipDialog.setEmptyParentButtonVisible(true);
             selectAipDialog.setSingleSelectionMode();
@@ -445,7 +448,9 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
   private void remove(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
     Dialogs.showConfirmDialog(messages.removeConfirmDialogTitle(),
-      messages.removeAllConfirmDialogMessageSingle(aip.getTitle()), messages.dialogNo(), messages.dialogYes(),
+      messages
+        .removeAllConfirmDialogMessageSingle(StringUtils.isNotBlank(aip.getTitle()) ? aip.getTitle() : aip.getId()),
+      messages.dialogNo(), messages.dialogYes(),
       new AsyncCallback<Boolean>() {
 
         @Override
