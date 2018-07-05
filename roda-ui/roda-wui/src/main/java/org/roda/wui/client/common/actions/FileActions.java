@@ -46,8 +46,6 @@ import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
 
@@ -91,7 +89,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
   }
 
   @Override
-  public boolean canAct(Actionable.Action<IndexedFile> action, IndexedFile file) {
+  public boolean canAct(Action<IndexedFile> action, IndexedFile file) {
     boolean ret;
     if (file.isDirectory()) {
       ret = POSSIBLE_ACTIONS_ON_SINGLE_FILE_DIRECTORY.contains(action);
@@ -102,7 +100,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
   }
 
   @Override
-  public boolean canAct(Actionable.Action<IndexedFile> action, SelectedItems<IndexedFile> selectedItems) {
+  public boolean canAct(Action<IndexedFile> action, SelectedItems<IndexedFile> selectedItems) {
     boolean ret;
     if (aipId != null && representationId != null) {
       ret = POSSIBLE_ACTIONS_ON_MULTIPLE_FILES_FROM_THE_SAME_REPRESENTATION.contains(action);
@@ -545,79 +543,37 @@ public class FileActions extends AbstractActionable<IndexedFile> {
   }
 
   @Override
-  public Widget createActionsLayout(IndexedFile file, AsyncCallback<ActionImpact> callback) {
-    FlowPanel layout = createLayout();
+  public ActionsBundle<IndexedFile> createActionsBundle() {
+    ActionsBundle<IndexedFile> fileActionableBundle = new ActionsBundle<>();
 
     // MANAGEMENT
-    addTitle(layout, "foldersFilesTitle", messages.sidebarFoldersFilesTitle(), file, FileAction.DOWNLOAD,
-      FileAction.RENAME, FileAction.MOVE, FileAction.UPLOAD_FILES, FileAction.CREATE_FOLDER, FileAction.REMOVE);
-
-    // DOWNLOAD, RENAME, MOVE, REMOVE, UPLOAD_FILES, CREATE_FOLDER
-    addButton(layout, "fileDownloadButton", messages.downloadButton(), FileAction.DOWNLOAD, file, ActionImpact.NONE,
-      callback, "btn-download", "fileDownloadButton");
-    addButton(layout, "fileRenameButton", messages.renameButton(), FileAction.RENAME, file, ActionImpact.UPDATED,
-      callback, "btn-edit", "fileRenameButton");
-    addButton(layout, "fileMoveButton", messages.moveButton(), FileAction.MOVE, file, ActionImpact.UPDATED, callback,
-      "btn-edit", "fileMoveButton");
-    addButton(layout, "uploadFilesButton", messages.uploadFilesButton(), FileAction.UPLOAD_FILES, file,
-      ActionImpact.UPDATED, callback, "btn-upload", "fileUploadButton");
-    addButton(layout, "createFolderButton", messages.createFolderButton(), FileAction.CREATE_FOLDER, file,
-      ActionImpact.UPDATED, callback, "btn-plus", "fileCreateFolderButton");
-    addButton(layout, "fileRemoveButton", messages.removeButton(), FileAction.REMOVE, file, ActionImpact.DESTROYED,
-      callback, "btn-ban", "fileRemoveButton");
+    ActionsGroup<IndexedFile> managementGroup = new ActionsGroup<>(messages.sidebarFoldersFilesTitle());
+    managementGroup.addButton(messages.downloadButton(), FileAction.DOWNLOAD, ActionImpact.NONE, "btn-download",
+      "fileDownloadButton");
+    managementGroup.addButton(messages.renameButton(), FileAction.RENAME, ActionImpact.UPDATED, "btn-edit",
+      "fileRenameButton");
+    managementGroup.addButton(messages.moveButton(), FileAction.MOVE, ActionImpact.UPDATED, "btn-edit",
+      "fileMoveButton");
+    managementGroup.addButton(messages.uploadFilesButton(), FileAction.UPLOAD_FILES, ActionImpact.UPDATED, "btn-upload",
+      "fileUploadButton");
+    managementGroup.addButton(messages.createFolderButton(), FileAction.CREATE_FOLDER, ActionImpact.UPDATED, "btn-plus",
+      "fileCreateFolderButton");
+    managementGroup.addButton(messages.removeButton(), FileAction.REMOVE, ActionImpact.DESTROYED, "btn-ban",
+      "fileRemoveButton");
 
     // PRESERVATION
-    addTitle(layout, "filePreservationTitle", messages.preservationTitle(), file, "preservationTitleLabel",
-      FileAction.NEW_PROCESS, FileAction.IDENTIFY_FORMATS, FileAction.SHOW_EVENTS, FileAction.SHOW_RISKS);
+    ActionsGroup<IndexedFile> preservationGroup = new ActionsGroup<>(messages.preservationTitle());
+    preservationGroup.addButton(messages.newProcessPreservation(), FileAction.NEW_PROCESS, ActionImpact.UPDATED,
+      "btn-play", "fileNewProcessButton");
+    preservationGroup.addButton(messages.identifyFormatsButton(), FileAction.IDENTIFY_FORMATS, ActionImpact.UPDATED,
+      "btn-play", "fileIdentifyFormatsButton");
+    preservationGroup.addButton(messages.preservationEvents(), FileAction.SHOW_EVENTS, ActionImpact.NONE, "btn-play",
+      "fileShowEventsButton");
+    preservationGroup.addButton(messages.preservationRisks(), FileAction.SHOW_RISKS, ActionImpact.NONE, "btn-play",
+      "fileShowRisksButton");
 
-    addButton(layout, "fileNewProcessButton", messages.newProcessPreservation(), FileAction.NEW_PROCESS, file,
-      ActionImpact.UPDATED, callback, "btn-play", "fileNewProcessButton");
-    addButton(layout, "fileIdentifyFormatsButton", messages.identifyFormatsButton(), FileAction.IDENTIFY_FORMATS, file,
-      ActionImpact.UPDATED, callback, "btn-play", "fileIdentifyFormatsButton");
-    addButton(layout, "filePreservationEventsButton", messages.preservationEvents(), FileAction.SHOW_EVENTS, file,
-      ActionImpact.NONE, callback, "btn-play", "fileShowEventsButton");
-    addButton(layout, "filePreservationRisksButton", messages.preservationRisks(), FileAction.SHOW_RISKS, file,
-      ActionImpact.NONE, callback, "btn-play", "fileShowRisksButton");
+    fileActionableBundle.addGroup(managementGroup).addGroup(preservationGroup);
 
-    return layout;
+    return fileActionableBundle;
   }
-
-  @Override
-  public Widget createActionsLayout(SelectedItems<IndexedFile> files, AsyncCallback<ActionImpact> callback) {
-    FlowPanel layout = createLayout();
-
-    // MANAGEMENT
-    addTitle(layout, "foldersFilesTitle", messages.sidebarFoldersFilesTitle(), files, FileAction.DOWNLOAD,
-      FileAction.RENAME, FileAction.MOVE, FileAction.UPLOAD_FILES, FileAction.CREATE_FOLDER, FileAction.REMOVE);
-
-    // DOWNLOAD, RENAME, MOVE, REMOVE, UPLOAD_FILES, CREATE_FOLDER
-    addButton(layout, "fileDownloadButton", messages.downloadButton(), FileAction.DOWNLOAD, files, ActionImpact.NONE,
-      callback, "btn-download", "fileDownloadButton");
-    addButton(layout, "fileRenameButton", messages.renameButton(), FileAction.RENAME, files, ActionImpact.UPDATED,
-      callback, "btn-edit", "fileRenameButton");
-    addButton(layout, "fileMoveButton", messages.moveButton(), FileAction.MOVE, files, ActionImpact.UPDATED, callback,
-      "btn-edit", "fileMoveButton");
-    addButton(layout, "uploadFilesButton", messages.uploadFilesButton(), FileAction.UPLOAD_FILES, files,
-      ActionImpact.UPDATED, callback, "btn-upload", "fileUploadButton");
-    addButton(layout, "createFolderButton", messages.createFolderButton(), FileAction.CREATE_FOLDER, files,
-      ActionImpact.UPDATED, callback, "btn-plus", "fileCreateFolderButton");
-    addButton(layout, "fileRemoveButton", messages.removeButton(), FileAction.REMOVE, files, ActionImpact.DESTROYED,
-      callback, "btn-ban", "fileRemoveButton");
-
-    // PRESERVATION
-    addTitle(layout, "filePreservationTitle", messages.preservationTitle(), files, "preservationTitleLabel",
-      FileAction.NEW_PROCESS, FileAction.IDENTIFY_FORMATS, FileAction.SHOW_EVENTS, FileAction.SHOW_RISKS);
-
-    addButton(layout, "fileNewProcessButton", messages.newProcessPreservation(), FileAction.NEW_PROCESS, files,
-      ActionImpact.UPDATED, callback, "btn-play", "fileNewProcessButton");
-    addButton(layout, "fileIdentifyFormatsButton", messages.identifyFormatsButton(), FileAction.IDENTIFY_FORMATS, files,
-      ActionImpact.UPDATED, callback, "btn-play", "fileIdentifyFormatsButton");
-    addButton(layout, "filePreservationEventsButton", messages.preservationEvents(), FileAction.SHOW_EVENTS, files,
-      ActionImpact.NONE, callback, "btn-play", "fileShowEventsButton");
-    addButton(layout, "filePreservationRisksButton", messages.preservationRisks(), FileAction.SHOW_RISKS, files,
-      ActionImpact.NONE, callback, "btn-play", "fileShowRisksButton");
-
-    return layout;
-  }
-
 }

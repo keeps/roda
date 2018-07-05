@@ -29,8 +29,11 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataViewBundle;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
+import org.roda.wui.client.common.actions.ActionableObject;
+import org.roda.wui.client.common.actions.ActionableWidgetBuilder;
 import org.roda.wui.client.common.actions.AipActions;
 import org.roda.wui.client.common.actions.DisseminationActions;
 import org.roda.wui.client.common.actions.RepresentationActions;
@@ -147,6 +150,8 @@ public class BrowseAIP extends Composite {
 
   private String aipId;
 
+  private ActionableWidgetBuilder<IndexedAIP> actionableWidgetBuilder;
+
   // Focus
   @UiField
   FocusPanel keyboardFocus;
@@ -246,6 +251,7 @@ public class BrowseAIP extends Composite {
   private BrowseAIP() {
     handlers = new ArrayList<>();
     boolean selectable = true;
+    actionableWidgetBuilder = new ActionableWidgetBuilder<>(AipActions.get());
 
     // REPRESENTATIONS
     representationsList = new RepresentationList("BrowseAIP_representations", Filter.NULL, justActive,
@@ -558,13 +564,8 @@ public class BrowseAIP extends Composite {
 
       // SIDEBAR
       actionsSidebar.setVisible(true);
-      actionsSidebar.setWidget(AipActions.get().createActionsLayout(aip, new AsyncCallback<Actionable.ActionImpact>() {
 
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
-        }
-
+      actionsSidebar.setWidget(actionableWidgetBuilder.withCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
         @Override
         public void onSuccess(Actionable.ActionImpact impact) {
           if (Actionable.ActionImpact.UPDATED.equals(impact)) {
@@ -573,7 +574,7 @@ public class BrowseAIP extends Composite {
             viewAction(aipId);
           }
         }
-      }));
+      }).buildWithObjects(new ActionableObject<>(aip)));
 
       // Set button visibility
       keyboardFocus.setFocus(true);
@@ -782,23 +783,17 @@ public class BrowseAIP extends Composite {
     aipChildrenList.getParent().setVisible(true);
 
     actionsSidebar.setVisible(true);
-    actionsSidebar.setWidget(
-      AipActions.get().createActionsLayout(AipActions.NO_AIP_OBJECT, new AsyncCallback<Actionable.ActionImpact>() {
 
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
+    actionsSidebar.setWidget(actionableWidgetBuilder.withCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
+      @Override
+      public void onSuccess(Actionable.ActionImpact impact) {
+        if (Actionable.ActionImpact.UPDATED.equals(impact)) {
+          // reload
+          clear(true);
+          viewAction(aipId);
         }
-
-        @Override
-        public void onSuccess(Actionable.ActionImpact impact) {
-          if (Actionable.ActionImpact.UPDATED.equals(impact)) {
-            // reload
-            clear(true);
-            viewAction(aipId);
-          }
-        }
-      }));
+      }
+    }).buildWithObjects(new ActionableObject<>(IndexedAIP.class)));
 
     // Set button visibility
     searchSection.setVisible(false);

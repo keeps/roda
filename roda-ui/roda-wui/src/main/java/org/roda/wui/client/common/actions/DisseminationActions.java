@@ -33,8 +33,6 @@ import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
 
@@ -61,12 +59,12 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
   }
 
   @Override
-  public boolean canAct(Actionable.Action<IndexedDIP> action, IndexedDIP dip) {
+  public boolean canAct(Action<IndexedDIP> action, IndexedDIP dip) {
     return POSSIBLE_ACTIONS_ON_SINGLE_DISSEMINATION.contains(action);
   }
 
   @Override
-  public boolean canAct(Actionable.Action<IndexedDIP> action, SelectedItems<IndexedDIP> selectedItems) {
+  public boolean canAct(Action<IndexedDIP> action, SelectedItems<IndexedDIP> selectedItems) {
     return POSSIBLE_ACTIONS_ON_MULTIPLE_DISSEMINATIONS.contains(action);
   }
 
@@ -122,7 +120,8 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
         @Override
         public void onSuccess(Boolean confirmed) {
           if (confirmed) {
-            BrowserService.Util.getInstance().deleteDIPs(objectToSelectedItems(dip), new LoadingAsyncCallback<Void>() {
+            BrowserService.Util.getInstance().deleteDIPs(objectToSelectedItems(dip, IndexedDIP.class),
+              new LoadingAsyncCallback<Void>() {
 
               @Override
               public void onFailure(Throwable caught) {
@@ -188,7 +187,7 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
   }
 
   private void newProcess(IndexedDIP dissemination, AsyncCallback<ActionImpact> callback) {
-    newProcess(objectToSelectedItems(dissemination), callback);
+    newProcess(objectToSelectedItems(dissemination, IndexedDIP.class), callback);
   }
 
   private void newProcess(SelectedItems<IndexedDIP> selected, AsyncCallback<ActionImpact> callback) {
@@ -215,61 +214,24 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
   }
 
   @Override
-  public Widget createActionsLayout(IndexedDIP dissemination, AsyncCallback<ActionImpact> callback) {
-    FlowPanel layout = createLayout();
+  public ActionsBundle<IndexedDIP> createActionsBundle() {
+    ActionsBundle<IndexedDIP> dipActionsBundle = new ActionsBundle<>();
 
     // MANAGEMENT
-    addTitle(layout, "dipRepresentationFileTitle", messages.viewRepresentationFileDisseminationTitle(), dissemination,
-      DisseminationAction.DOWNLOAD, DisseminationAction.REMOVE);
-
-    // DOWNLOAD,REMOVE
-    addButton(layout, "dipDownloadButton", messages.downloadButton(), DisseminationAction.DOWNLOAD, dissemination,
-      ActionImpact.NONE, callback, "btn-download");
-
-    addButton(layout, "dipRemoveButton", messages.removeButton(), DisseminationAction.REMOVE, dissemination,
-      ActionImpact.DESTROYED, callback, "btn-ban");
-
-    addButton(layout, "dipPermissionsButton", messages.disseminationPermissions(),
-      DisseminationAction.UPDATE_PERMISSIONS, dissemination, ActionImpact.UPDATED, callback, "btn-edit");
+    ActionsGroup<IndexedDIP> managementGroup = new ActionsGroup<>(messages.viewRepresentationFileDisseminationTitle());
+    managementGroup.addButton(messages.downloadButton(), DisseminationAction.DOWNLOAD, ActionImpact.NONE,
+      "btn-download");
+    managementGroup.addButton(messages.removeButton(), DisseminationAction.REMOVE, ActionImpact.DESTROYED, "btn-ban");
+    managementGroup.addButton(messages.disseminationPermissions(), DisseminationAction.UPDATE_PERMISSIONS,
+      ActionImpact.UPDATED, "btn-edit");
 
     // PRESERVATION
-    addTitle(layout, "dipPreservationTitle", messages.preservationTitle(), dissemination,
-      DisseminationAction.NEW_PROCESS);
+    ActionsGroup<IndexedDIP> preservationGroup = new ActionsGroup<>(messages.preservationTitle());
+    preservationGroup.addButton(messages.newProcessPreservation(), DisseminationAction.NEW_PROCESS,
+      ActionImpact.UPDATED, "btn-play");
 
-    // NEW_PROCESS
-    addButton(layout, "newDipProcessPreservationButton", messages.newProcessPreservation(),
-      DisseminationAction.NEW_PROCESS, dissemination, ActionImpact.UPDATED, callback, "btn-play");
+    dipActionsBundle.addGroup(managementGroup).addGroup(preservationGroup);
 
-    return layout;
+    return dipActionsBundle;
   }
-
-  @Override
-  public Widget createActionsLayout(SelectedItems<IndexedDIP> disseminations, AsyncCallback<ActionImpact> callback) {
-    FlowPanel layout = createLayout();
-
-    // MANAGEMENT
-    addTitle(layout, "dipRepresentationFileTitle", messages.viewRepresentationFileDisseminationTitle(), disseminations,
-      DisseminationAction.DOWNLOAD, DisseminationAction.REMOVE);
-
-    // DOWNLOAD,REMOVE
-    addButton(layout, "dipDownloadButton", messages.downloadButton(), DisseminationAction.DOWNLOAD, disseminations,
-      ActionImpact.NONE, callback, "btn-download");
-
-    addButton(layout, "dipRemoveButton", messages.removeButton(), DisseminationAction.REMOVE, disseminations,
-      ActionImpact.DESTROYED, callback, "btn-ban");
-
-    addButton(layout, "dipPermissionsButton", messages.disseminationPermissions(),
-      DisseminationAction.UPDATE_PERMISSIONS, disseminations, ActionImpact.UPDATED, callback, "btn-edit");
-
-    // PRESERVATION
-    addTitle(layout, "dipPreservationTitle", messages.preservationTitle(), disseminations,
-      DisseminationAction.NEW_PROCESS);
-
-    // NEW_PROCESS
-    addButton(layout, "newDipProcessPreservationButton", messages.newProcessPreservation(),
-      DisseminationAction.NEW_PROCESS, disseminations, ActionImpact.UPDATED, callback, "btn-play");
-
-    return layout;
-  }
-
 }

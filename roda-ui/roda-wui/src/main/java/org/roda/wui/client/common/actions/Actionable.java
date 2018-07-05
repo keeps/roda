@@ -11,7 +11,6 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.select.SelectedItems;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Widget;
 
 public interface Actionable<T extends IsIndexed> {
 
@@ -23,6 +22,22 @@ public interface Actionable<T extends IsIndexed> {
     NONE, UPDATED, DESTROYED;
   }
 
+  // Generic, implemented in AbstractActionable
+
+  boolean canAct(Action<T> action, ActionableObject<T> object);
+
+  void act(Action<T> action, ActionableObject<T> object);
+
+  void act(Action<T> action, ActionableObject<T> object, AsyncCallback<ActionImpact> callback);
+
+  // NO OBJECT
+
+  boolean canAct(Action<T> action);
+
+  void act(Action<T> action);
+
+  void act(Action<T> action, AsyncCallback<ActionImpact> callback);
+
   // SINGLE OBJECT
 
   boolean canAct(Action<T> action, T object);
@@ -33,15 +48,12 @@ public interface Actionable<T extends IsIndexed> {
 
   // MULTIPLE OBJECTS
 
-  boolean canAct(Action<T> action, SelectedItems<T> object);
+  boolean canAct(Action<T> action, SelectedItems<T> objects);
 
   void act(Action<T> action, SelectedItems<T> objects);
 
   void act(Action<T> action, SelectedItems<T> objects, AsyncCallback<ActionImpact> callback);
 
   // Layout
-
-  Widget createActionsLayout(T object, AsyncCallback<ActionImpact> callback);
-
-  Widget createActionsLayout(SelectedItems<T> objects, AsyncCallback<ActionImpact> callback);
+  ActionsBundle<T> createActionsBundle();
 }

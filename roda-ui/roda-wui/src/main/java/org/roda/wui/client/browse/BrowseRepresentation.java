@@ -29,8 +29,11 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataViewBundle;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
+import org.roda.wui.client.common.actions.ActionableObject;
+import org.roda.wui.client.common.actions.ActionableWidgetBuilder;
 import org.roda.wui.client.common.actions.DisseminationActions;
 import org.roda.wui.client.common.actions.FileActions;
 import org.roda.wui.client.common.actions.RepresentationActions;
@@ -155,6 +158,7 @@ public class BrowseRepresentation extends Composite {
   private String aipId;
   private String repId;
   private String repUUID;
+  private ActionableWidgetBuilder<IndexedRepresentation> actionableWidgetBuilder;
 
   private List<BreadcrumbItem> breadcrumbItems = new ArrayList<>();
 
@@ -233,6 +237,8 @@ public class BrowseRepresentation extends Composite {
     this.aipId = representation.getAipId();
     this.repId = representation.getId();
     this.repUUID = representation.getUUID();
+
+    actionableWidgetBuilder = new ActionableWidgetBuilder<>(RepresentationActions.get(aipId));
 
     handlers = new ArrayList<>();
     String summary = messages.representationListOfFiles();
@@ -423,34 +429,28 @@ public class BrowseRepresentation extends Composite {
     }
 
     // SIDEBAR
-    actionsSidebar.setWidget(RepresentationActions.get(aipId).createActionsLayout(representation,
-      new AsyncCallback<Actionable.ActionImpact>() {
+    actionableWidgetBuilder.withCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
+      @Override
+      public void onSuccess(Actionable.ActionImpact impact) {
+        if (Actionable.ActionImpact.UPDATED.equals(impact)) {
+          BrowserService.Util.getInstance().retrieve(IndexedRepresentation.class.getName(), representation.getUUID(),
+            representationFields, new AsyncCallback<IndexedRepresentation>() {
 
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
+              @Override
+              public void onFailure(Throwable caught) {
+                AsyncCallbackUtils.defaultFailureTreatment(caught);
+              }
+
+              @Override
+              public void onSuccess(IndexedRepresentation rep) {
+                representation = rep;
+                updateLayout(bundle, state, justActive);
+              }
+            });
         }
-
-        @Override
-        public void onSuccess(Actionable.ActionImpact impact) {
-          if (Actionable.ActionImpact.UPDATED.equals(impact)) {
-            BrowserService.Util.getInstance().retrieve(IndexedRepresentation.class.getName(), representation.getUUID(),
-              representationFields, new AsyncCallback<IndexedRepresentation>() {
-
-                @Override
-                public void onFailure(Throwable caught) {
-                  AsyncCallbackUtils.defaultFailureTreatment(caught);
-                }
-
-                @Override
-                public void onSuccess(IndexedRepresentation rep) {
-                  representation = rep;
-                  updateLayout(bundle, state, justActive);
-                }
-              });
-          }
-        }
-      }));
+      }
+    });
+    actionsSidebar.setWidget(actionableWidgetBuilder.buildWithObjects(new ActionableObject<>(representation)));
   }
 
   @Override

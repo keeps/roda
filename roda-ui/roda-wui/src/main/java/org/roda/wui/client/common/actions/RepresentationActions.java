@@ -43,8 +43,6 @@ import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
 
@@ -80,13 +78,12 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
   }
 
   @Override
-  public boolean canAct(Actionable.Action<IndexedRepresentation> action, IndexedRepresentation representation) {
+  public boolean canAct(Action<IndexedRepresentation> action, IndexedRepresentation representation) {
     return POSSIBLE_ACTIONS_ON_SINGLE_REPRESENTATION.contains(action);
   }
 
   @Override
-  public boolean canAct(Actionable.Action<IndexedRepresentation> action,
-    SelectedItems<IndexedRepresentation> selectedItems) {
+  public boolean canAct(Action<IndexedRepresentation> action, SelectedItems<IndexedRepresentation> selectedItems) {
     return POSSIBLE_ACTIONS_ON_MULTIPLE_REPRESENTATIONS.contains(action);
   }
 
@@ -150,7 +147,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
   }
 
   public void remove(final IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
-    remove(objectToSelectedItems(representation), callback);
+    remove(objectToSelectedItems(representation, IndexedRepresentation.class), callback);
   }
 
   public void remove(final SelectedItems<IndexedRepresentation> selectedList,
@@ -220,7 +217,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
   }
 
   public void changeType(final IndexedRepresentation representations, final AsyncCallback<ActionImpact> callback) {
-    changeType(objectToSelectedItems(representations), callback);
+    changeType(objectToSelectedItems(representations, IndexedRepresentation.class), callback);
   }
 
   public void changeType(final SelectedItems<IndexedRepresentation> representations,
@@ -275,7 +272,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
   }
 
   public void newProcess(IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
-    newProcess(objectToSelectedItems(representation), callback);
+    newProcess(objectToSelectedItems(representation, IndexedRepresentation.class), callback);
   }
 
   public void newProcess(SelectedItems<IndexedRepresentation> selected, final AsyncCallback<ActionImpact> callback) {
@@ -287,7 +284,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
   }
 
   public void identifyFormats(IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
-    identifyFormats(objectToSelectedItems(representation), callback);
+    identifyFormats(objectToSelectedItems(representation, IndexedRepresentation.class), callback);
   }
 
   public void identifyFormats(SelectedItems<IndexedRepresentation> selected,
@@ -432,91 +429,41 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
       });
   }
 
-  @Override
-  public Widget createActionsLayout(IndexedRepresentation representation, AsyncCallback<ActionImpact> callback) {
-    FlowPanel layout = createLayout();
-
-    // MANAGEMENT
-    addTitle(layout, "representationSidebarTitle", messages.representation(), representation,
-      RepresentationAction.DOWNLOAD, RepresentationAction.CHANGE_TYPE, RepresentationAction.REMOVE);
-
-    addButton(layout, "representationDownloadButton", messages.downloadButton(), RepresentationAction.DOWNLOAD,
-      representation, ActionImpact.NONE, callback, "btn-download");
-    addButton(layout, "changeRepresentationTypeButton", messages.changeTypeButton(), RepresentationAction.CHANGE_TYPE,
-      representation, ActionImpact.UPDATED, callback, "btn-edit");
-    addButton(layout, "changeRepresentationStatusButton", messages.changeStatusButton(),
-      RepresentationAction.CHANGE_STATE, representation, ActionImpact.UPDATED, callback, "btn-edit");
-    addButton(layout, "representationRemoveButton", messages.removeButton(), RepresentationAction.REMOVE,
-      representation, ActionImpact.DESTROYED, callback, "btn-ban");
-
-    // PRESERVATION
-    addTitle(layout, "representationPreservationTitle", messages.preservationTitle(), representation,
-      RepresentationAction.NEW_PROCESS, RepresentationAction.IDENTIFY_FORMATS, RepresentationAction.SHOW_EVENTS,
-      RepresentationAction.SHOW_RISKS);
-
-    addButton(layout, "representationNewProcessButton", messages.newProcessPreservation(),
-      RepresentationAction.NEW_PROCESS, representation, ActionImpact.UPDATED, callback, "btn-play");
-    addButton(layout, "representationIdentifyFormatsButton", messages.identifyFormatsButton(),
-      RepresentationAction.IDENTIFY_FORMATS, representation, ActionImpact.UPDATED, callback, "btn-play");
-    addButton(layout, "representationPreservationEventsButton", messages.preservationEvents(),
-      RepresentationAction.SHOW_EVENTS, representation, ActionImpact.NONE, callback, "btn-play");
-    addButton(layout, "representationPreservationRisksButton", messages.preservationRisks(),
-      RepresentationAction.SHOW_RISKS, representation, ActionImpact.NONE, callback, "btn-play");
-
-    // Files and folders
-    addTitle(layout, "representationFoldersFilesTitle", messages.sidebarFoldersFilesTitle(), representation,
-      RepresentationAction.UPLOAD_FILES, RepresentationAction.CREATE_FOLDER);
-
-    // UPLOAD_FILES, CREATE_FOLDER
-    addButton(layout, "representationUploadFilesButton", messages.uploadFilesButton(),
-      RepresentationAction.UPLOAD_FILES, representation, ActionImpact.UPDATED, callback, "btn-upload");
-    addButton(layout, "representationCreateFolderButton", messages.createFolderButton(),
-      RepresentationAction.CREATE_FOLDER, representation, ActionImpact.UPDATED, callback, "btn-plus");
-
-    return layout;
-  }
 
   @Override
-  public Widget createActionsLayout(SelectedItems<IndexedRepresentation> representations,
-    AsyncCallback<ActionImpact> callback) {
-    FlowPanel layout = createLayout();
+  public ActionsBundle<IndexedRepresentation> createActionsBundle() {
+    ActionsBundle<IndexedRepresentation> representationActionableBundle = new ActionsBundle<>();
 
     // MANAGEMENT
-    addTitle(layout, "representationSidebarTitle", messages.representation(), representations,
-      RepresentationAction.DOWNLOAD, RepresentationAction.CHANGE_TYPE, RepresentationAction.REMOVE);
-
-    addButton(layout, "representationDownloadButton", messages.downloadButton(), RepresentationAction.DOWNLOAD,
-      representations, ActionImpact.NONE, callback, "btn-download");
-    addButton(layout, "changeRepresentationTypeButton", messages.changeTypeButton(), RepresentationAction.CHANGE_TYPE,
-      representations, ActionImpact.UPDATED, callback, "btn-edit");
-    addButton(layout, "representationRemoveButton", messages.removeButton(), RepresentationAction.REMOVE,
-      representations, ActionImpact.DESTROYED, callback, "btn-ban");
+    ActionsGroup<IndexedRepresentation> managementGroup = new ActionsGroup<>(messages.representation());
+    managementGroup.addButton(messages.downloadButton(), RepresentationAction.DOWNLOAD, ActionImpact.NONE,
+      "btn-download");
+    managementGroup.addButton(messages.changeTypeButton(), RepresentationAction.CHANGE_TYPE, ActionImpact.UPDATED,
+      "btn-edit");
+    managementGroup.addButton(messages.changeStatusButton(), RepresentationAction.CHANGE_STATE, ActionImpact.UPDATED,
+      "btn-edit");
+    managementGroup.addButton(messages.removeButton(), RepresentationAction.REMOVE, ActionImpact.DESTROYED, "btn-ban");
 
     // PRESERVATION
-    addTitle(layout, "representationPreservationTitle", messages.preservationTitle(), representations,
-      RepresentationAction.NEW_PROCESS, RepresentationAction.IDENTIFY_FORMATS, RepresentationAction.SHOW_EVENTS,
-      RepresentationAction.SHOW_RISKS);
+    ActionsGroup<IndexedRepresentation> preservationGroup = new ActionsGroup<>(messages.preservationTitle());
+    preservationGroup.addButton(messages.newProcessPreservation(), RepresentationAction.NEW_PROCESS,
+      ActionImpact.UPDATED, "btn-play");
+    preservationGroup.addButton(messages.identifyFormatsButton(), RepresentationAction.IDENTIFY_FORMATS,
+      ActionImpact.UPDATED, "btn-play");
+    preservationGroup.addButton(messages.preservationEvents(), RepresentationAction.SHOW_EVENTS, ActionImpact.NONE,
+      "btn-play");
+    preservationGroup.addButton(messages.preservationRisks(), RepresentationAction.SHOW_RISKS, ActionImpact.NONE,
+      "btn-play");
 
-    addButton(layout, "representationNewProcessButton", messages.newProcessPreservation(),
-      RepresentationAction.NEW_PROCESS, representations, ActionImpact.UPDATED, callback, "btn-play");
-    addButton(layout, "representationIdentifyFormatsButton", messages.identifyFormatsButton(),
-      RepresentationAction.IDENTIFY_FORMATS, representations, ActionImpact.UPDATED, callback, "btn-play");
-    addButton(layout, "representationPreservationEventsButton", messages.preservationEvents(),
-      RepresentationAction.SHOW_EVENTS, representations, ActionImpact.NONE, callback, "btn-play");
-    addButton(layout, "representationPreservationRisksButton", messages.preservationRisks(),
-      RepresentationAction.SHOW_RISKS, representations, ActionImpact.NONE, callback, "btn-play");
+    // FILES AND FOLDERS
+    ActionsGroup<IndexedRepresentation> filesAndFoldersGroup = new ActionsGroup<>(messages.sidebarFoldersFilesTitle());
+    filesAndFoldersGroup.addButton(messages.uploadFilesButton(), RepresentationAction.UPLOAD_FILES,
+      ActionImpact.UPDATED, "btn-upload");
+    filesAndFoldersGroup.addButton(messages.createFolderButton(), RepresentationAction.CREATE_FOLDER,
+      ActionImpact.UPDATED, "btn-plus");
 
-    // Files and folders
-    addTitle(layout, "representationFoldersFilesTitle", messages.sidebarFoldersFilesTitle(), representations,
-      RepresentationAction.UPLOAD_FILES, RepresentationAction.CREATE_FOLDER);
+    representationActionableBundle.addGroup(managementGroup).addGroup(preservationGroup).addGroup(filesAndFoldersGroup);
 
-    // UPLOAD_FILES, CREATE_FOLDER
-    addButton(layout, "representationUploadFilesButton", messages.uploadFilesButton(),
-      RepresentationAction.UPLOAD_FILES, representations, ActionImpact.UPDATED, callback, "btn-upload");
-    addButton(layout, "representationCreateFolderButton", messages.createFolderButton(),
-      RepresentationAction.CREATE_FOLDER, representations, ActionImpact.UPDATED, callback, "btn-plus");
-
-    return layout;
+    return representationActionableBundle;
   }
-
 }

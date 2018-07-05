@@ -223,6 +223,7 @@ public class MainSearch extends Composite {
 
     ListSelectionUtils.bindBrowseOpener(itemsSearchResultPanel);
     LastSelectedItemsSingleton.getInstance().setSelectedJustActive(justActive);
+
     itemsSearchResultPanel.setActionable(AipActions.get(parentAipId, parentAipState));
   }
 

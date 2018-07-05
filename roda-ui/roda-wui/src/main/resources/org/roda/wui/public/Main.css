@@ -6194,7 +6194,7 @@ td.datePickerMonth, td.datePickerYear {
 	margin-bottom: 5px;
 }
 
-.actions-layout-button + .actions-layout-title {
+.actions-group-button + .actions-layout-title {
 	margin-top: 10px;
 }
 
@@ -6206,7 +6206,7 @@ td.datePickerMonth, td.datePickerYear {
   margin-top: 0;
 }
 
-.actions-popup .actions-layout-button {
+.actions-popup .actions-group-button {
   font-size: 75%;
   padding: 5px 25px 5px 8px;
 }
@@ -6560,4 +6560,17 @@ span.code {
     font-family: UbuntuMono;
     color: #888;
     font-weight: 800;
+}
+
+
+
+
+
+/*****************************
+  Actionable
+ */
+.actionable-group-title {}
+
+.actionable-group-title-empty {
+    display: none;
 }

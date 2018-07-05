@@ -13,6 +13,9 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.wui.client.common.actions.ActionableObject;
+import org.roda.wui.client.common.actions.ActionableWidgetBuilder;
+import org.roda.wui.client.common.actions.AipActions;
 import org.roda.wui.client.common.actions.DisseminationActions;
 import org.roda.wui.client.common.actions.DisseminationFileActions;
 import org.roda.wui.client.common.actions.FileActions;
@@ -42,27 +45,31 @@ public class OptionsSliderHelper {
 
   private static void updateOptionsSliderPanel(IndexedAIP aip, SliderPanel slider) {
     slider.clear();
-    // TODO slider.addContent(AipActions.get().createActionsLayout(aip));
+    slider.addContent(new ActionableWidgetBuilder<>(AipActions.get()).buildWithObjects(new ActionableObject<>(aip)));
   }
 
   private static void updateOptionsSliderPanel(IndexedRepresentation representation, SliderPanel slider) {
     slider.clear();
-    slider.addContent(RepresentationActions.get().createActionsLayout(representation));
+    slider.addContent(new ActionableWidgetBuilder<>(RepresentationActions.get())
+      .buildWithObjects(new ActionableObject<>(representation)));
   }
 
   private static void updateOptionsSliderPanel(final IndexedFile file, final SliderPanel slider) {
     slider.clear();
-    slider.addContent(FileActions.get().createActionsLayout(file));
+    slider
+      .addContent(new ActionableWidgetBuilder<>(FileActions.get()).buildWithObjects(new ActionableObject<>((file))));
   }
 
   private static void updateOptionsSliderPanel(final IndexedDIP dip, final SliderPanel slider) {
     slider.clear();
-    slider.addContent(DisseminationActions.get().createActionsLayout(dip));
+    slider.addContent(
+      new ActionableWidgetBuilder<>(DisseminationActions.get()).buildWithObjects(new ActionableObject<>((dip))));
   }
 
   private static void updateOptionsSliderPanel(final DIPFile file, final SliderPanel slider) {
     slider.clear();
-    slider.addContent(DisseminationFileActions.get().createActionsLayout(file));
+    slider.addContent(
+      new ActionableWidgetBuilder<>(DisseminationFileActions.get()).buildWithObjects(new ActionableObject<>((file))));
   }
 
 }

@@ -20,8 +20,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
 
@@ -47,12 +45,12 @@ public class DisseminationFileActions extends AbstractActionable<DIPFile> {
   }
 
   @Override
-  public boolean canAct(Actionable.Action<DIPFile> action, DIPFile dip) {
+  public boolean canAct(Action<DIPFile> action, DIPFile dip) {
     return POSSIBLE_ACTIONS_ON_SINGLE_DISSEMINATION_FILE.contains(action);
   }
 
   @Override
-  public boolean canAct(Actionable.Action<DIPFile> action, SelectedItems<DIPFile> selectedItems) {
+  public boolean canAct(Action<DIPFile> action, SelectedItems<DIPFile> selectedItems) {
     return POSSIBLE_ACTIONS_ON_MULTIPLE_DISSEMINATION_FILES.contains(action);
   }
 
@@ -86,26 +84,16 @@ public class DisseminationFileActions extends AbstractActionable<DIPFile> {
   }
 
   @Override
-  public Widget createActionsLayout(DIPFile disseminationFile, AsyncCallback<ActionImpact> callback) {
-    FlowPanel layout = createLayout();
+  public ActionsBundle<DIPFile> createActionsBundle() {
+    ActionsBundle<DIPFile> dipFileActionableBundle = new ActionsBundle<>();
 
     // MANAGEMENT
-    addTitle(layout, "disseminationFileTitle", messages.disseminationFile(), disseminationFile,
-      DisseminationFileAction.DOWNLOAD);
+    ActionsGroup<DIPFile> managementGroup = new ActionsGroup<>(messages.disseminationFile());
+    managementGroup.addButton(messages.downloadButton(), DisseminationFileAction.DOWNLOAD, ActionImpact.NONE,
+      "btn-download");
 
-    // DOWNLOAD,REMOVE
-    addButton(layout, "dipDownloadButton", messages.downloadButton(), DisseminationFileAction.DOWNLOAD,
-      disseminationFile, ActionImpact.NONE, callback, "btn-download");
+    dipFileActionableBundle.addGroup(managementGroup);
 
-    return layout;
+    return dipFileActionableBundle;
   }
-
-  @Override
-  public Widget createActionsLayout(SelectedItems<DIPFile> disseminationFiles, AsyncCallback<ActionImpact> callback) {
-    // MANAGEMENT
-    // addTitle(layout, messages.disseminationFile());
-
-    return createLayout();
-  }
-
 }

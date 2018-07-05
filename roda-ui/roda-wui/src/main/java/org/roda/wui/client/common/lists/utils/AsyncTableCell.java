@@ -31,7 +31,10 @@ import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.actions.Actionable;
+import org.roda.wui.client.common.actions.ActionableObject;
+import org.roda.wui.client.common.actions.ActionableWidgetBuilder;
 import org.roda.wui.client.common.lists.pagination.ListSelectionState;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.popup.CalloutPopup;
@@ -141,7 +144,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
   private IndexResult<T> result;
 
-  private Actionable<T> actionable = null;
+  private ActionableWidgetBuilder<T> actionableBuilder = null;
   private final CalloutPopup actionsPopup = new CalloutPopup();
 
   public AsyncTableCell(Class<T> classToReturn, String listId, List<String> fieldsToReturn) {
@@ -231,7 +234,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
     actionsButton = new Button(messages.tableAction());
     actionsButton.addStyleName("btn btn-link actionsButton");
-    actionsButton.setVisible(actionable != null);
+    actionsButton.setVisible(actionableBuilder != null);
 
     createSelectAllPanel();
 
@@ -906,27 +909,18 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     csvDownloadButton.setVisible(isVisible);
   }
 
-  public Actionable<T> getActionable() {
-    return actionable;
-  }
-
   public void setActionable(Actionable<T> actionable) {
-    this.actionable = actionable;
-    actionsButton.setVisible(actionable != null);
+    this.actionableBuilder = new ActionableWidgetBuilder<>(actionable);
+    actionsButton.setVisible(true);
   }
 
   protected void showActions() {
-    if (actionable != null) {
+    if (actionableBuilder != null) {
       if (actionsPopup.isShowing()) {
         actionsPopup.hide();
       } else {
-        AsyncCallback<Actionable.ActionImpact> callback = new AsyncCallback<Actionable.ActionImpact>() {
 
-          @Override
-          public void onFailure(Throwable caught) {
-            AsyncCallbackUtils.defaultFailureTreatment(caught);
-          }
-
+        actionableBuilder.withCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
           @Override
           public void onSuccess(Actionable.ActionImpact impact) {
             if (Actionable.ActionImpact.DESTROYED.equals(impact)) {
@@ -943,15 +937,16 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
             }
             actionsPopup.hide();
           }
-        };
+        });
 
         if (isAllSelected()) {
-          actionsPopup.setWidget(actionable.createActionsLayout(getSelected(), callback));
+          actionsPopup.setWidget(actionableBuilder.buildWithObjects(new ActionableObject<>(getSelected())));
         } else if (selected.size() == 1) {
-          actionsPopup.setWidget(actionable.createActionsLayout(selected.iterator().next(), callback));
+          actionsPopup
+            .setWidget(actionableBuilder.buildWithObjects(new ActionableObject<>(selected.iterator().next())));
         } else if (selected.size() > 1) {
           // TODO create action layout based on selected set
-          actionsPopup.setWidget(actionable.createActionsLayout(getSelected(), callback));
+          actionsPopup.setWidget(actionableBuilder.buildWithObjects(new ActionableObject<>(getSelected())));
         } else {
           Label emptyHelpText = new Label(messages.tableActionEmptyHelp());
           emptyHelpText.addStyleName("actions-empty-help");

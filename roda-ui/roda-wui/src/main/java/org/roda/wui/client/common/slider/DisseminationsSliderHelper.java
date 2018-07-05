@@ -25,6 +25,8 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.actions.Actionable;
+import org.roda.wui.client.common.actions.ActionableObject;
+import org.roda.wui.client.common.actions.ActionableWidgetBuilder;
 import org.roda.wui.client.common.actions.DisseminationActions;
 import org.roda.wui.client.common.popup.CalloutPopup;
 import org.roda.wui.client.common.popup.CalloutPopup.CalloutPosition;
@@ -218,7 +220,8 @@ public class DisseminationsSliderHelper {
         }
       };
 
-      actionsPopup.setWidget(DisseminationActions.get().createActionsLayout(dip, callback));
+      actionsPopup.setWidget(new ActionableWidgetBuilder<>(DisseminationActions.get()).withCallback(callback)
+        .buildWithObjects(new ActionableObject<>(dip)));
       actionsPopup.showRelativeTo(actionsButton, CalloutPosition.TOP_RIGHT);
     }
 
