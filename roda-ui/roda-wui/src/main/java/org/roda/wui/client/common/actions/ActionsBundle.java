@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.jetbrains.annotations.NotNull;
 import org.roda.core.data.v2.index.IsIndexed;
 
 /**
@@ -22,9 +21,8 @@ public class ActionsBundle<T extends IsIndexed> implements Iterable<ActionsGroup
     return this;
   }
 
-  @NotNull
   @Override
-  public Iterator iterator() {
+  public Iterator<ActionsGroup<T>> iterator() {
     return groups.iterator();
   }
 }
