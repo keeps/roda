@@ -15,16 +15,18 @@ import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.LoadingAsyncCallback;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.RepresentationDialogs;
 import org.roda.wui.client.ingest.process.ShowJob;
@@ -47,9 +49,11 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import config.i18n.client.ClientMessages;
 
 public class RepresentationActions extends AbstractActionable<IndexedRepresentation> {
-
   private static final RepresentationActions GENERAL_INSTANCE = new RepresentationActions(null);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
+
+  private static final Set<RepresentationAction> POSSIBLE_ACTIONS_WITHOUT_REPRESENTATION = new HashSet<>(
+    Arrays.asList(RepresentationAction.NEW));
 
   private static final Set<RepresentationAction> POSSIBLE_ACTIONS_ON_SINGLE_REPRESENTATION = new HashSet<>(
     Arrays.asList(RepresentationAction.values()));
@@ -58,23 +62,28 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
     Arrays.asList(RepresentationAction.CHANGE_TYPE, RepresentationAction.REMOVE, RepresentationAction.NEW_PROCESS,
       RepresentationAction.IDENTIFY_FORMATS));
 
-  private final String aipId;
+  private final IndexedAIP parentAip;
 
-  private RepresentationActions(String aipId) {
-    this.aipId = aipId;
+  private RepresentationActions(IndexedAIP parentAip) {
+    this.parentAip = parentAip;
   }
 
   public enum RepresentationAction implements Actionable.Action<IndexedRepresentation> {
-    DOWNLOAD, CHANGE_TYPE, REMOVE, NEW_PROCESS, IDENTIFY_FORMATS, SHOW_EVENTS, SHOW_RISKS, UPLOAD_FILES, CREATE_FOLDER,
-    CHANGE_STATE;
+    NEW, DOWNLOAD, CHANGE_TYPE, REMOVE, NEW_PROCESS, IDENTIFY_FORMATS, SHOW_EVENTS, SHOW_RISKS, UPLOAD_FILES,
+    CREATE_FOLDER, CHANGE_STATE
   }
 
   public static RepresentationActions get() {
     return GENERAL_INSTANCE;
   }
 
-  public static RepresentationActions get(String aipId) {
-    return new RepresentationActions(aipId);
+  public static RepresentationActions get(IndexedAIP aip) {
+    return new RepresentationActions(aip);
+  }
+
+  @Override
+  public boolean canAct(Action<IndexedRepresentation> action) {
+    return POSSIBLE_ACTIONS_WITHOUT_REPRESENTATION.contains(action) && parentAip != null;
   }
 
   @Override
@@ -85,6 +94,33 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
   @Override
   public boolean canAct(Action<IndexedRepresentation> action, SelectedItems<IndexedRepresentation> selectedItems) {
     return POSSIBLE_ACTIONS_ON_MULTIPLE_REPRESENTATIONS.contains(action);
+  }
+
+  @Override
+  public void act(Action<IndexedRepresentation> action, AsyncCallback<ActionImpact> callback) {
+    if (RepresentationAction.NEW.equals(action)) {
+      create(callback);
+    } else {
+      unsupportedAction(action, callback);
+    }
+  }
+
+  private void create(AsyncCallback<ActionImpact> callback) {
+    Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
+      RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+      new NoAsyncCallback<String>() {
+        @Override
+        public void onSuccess(String details) {
+          BrowserService.Util.getInstance().createRepresentation(parentAip.getId(), details,
+            new LoadingAsyncCallback<String>() {
+              @Override
+              public void onSuccessImpl(String representationId) {
+                HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, parentAip.getId(), representationId);
+                callback.onSuccess(ActionImpact.UPDATED);
+              }
+            });
+        }
+      });
   }
 
   @Override
@@ -111,7 +147,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
     } else if (RepresentationAction.CHANGE_STATE.equals(action)) {
       changeState(representation, callback);
     } else {
-      callback.onFailure(new RequestNotValidException("Unsupported action in this context: " + action));
+      unsupportedAction(action, callback);
     }
   }
 
@@ -130,7 +166,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
     } else if (RepresentationAction.IDENTIFY_FORMATS.equals(action)) {
       identifyFormats(selectedItems, callback);
     } else {
-      callback.onFailure(new RequestNotValidException("Unsupported action in this context: " + action));
+      unsupportedAction(action, callback);
     }
   }
 
@@ -154,19 +190,14 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
     final AsyncCallback<ActionImpact> callback) {
 
     Dialogs.showConfirmDialog(messages.representationRemoveTitle(), messages.representationRemoveMessage(),
-      messages.dialogCancel(), messages.dialogYes(), new AsyncCallback<Boolean>() {
+      messages.dialogCancel(), messages.dialogYes(), new NoAsyncCallback<Boolean>() {
 
         @Override
         public void onSuccess(Boolean confirmed) {
           if (confirmed) {
             Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
               RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
-              new AsyncCallback<String>() {
-
-                @Override
-                public void onFailure(Throwable caught) {
-                  // do nothing
-                }
+              new NoAsyncCallback<String>() {
 
                 @Override
                 public void onSuccess(String details) {
@@ -175,17 +206,18 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
 
                       @Override
                       public void onSuccess(Job result) {
-                        Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(), new AsyncCallback<Void>() {
+                        Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(),
+                          new ActionAsyncCallback<Void>(callback) {
 
                           @Override
                           public void onFailure(Throwable caught) {
                             Timer timer = new Timer() {
                               @Override
                               public void run() {
-                                if (aipId != null) {
-                                  HistoryUtils.openBrowse(aipId);
+                                  if (parentAip != null) {
+                                    HistoryUtils.openBrowse(parentAip);
                                 }
-                                callback.onSuccess(ActionImpact.DESTROYED);
+                                  doActionCallbackDestroyed();
                               }
                             };
 
@@ -208,11 +240,6 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
               });
           }
         }
-
-        @Override
-        public void onFailure(Throwable caught) {
-          // nothing to do
-        }
       });
   }
 
@@ -224,33 +251,19 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
     final AsyncCallback<ActionImpact> callback) {
 
     BrowserService.Util.getInstance().retrieveRepresentationTypeOptions(LocaleInfo.getCurrentLocale().getLocaleName(),
-      new AsyncCallback<Pair<Boolean, List<String>>>() {
-        @Override
-        public void onFailure(Throwable caught) {
-          // do nothing
-        }
+      new NoAsyncCallback<Pair<Boolean, List<String>>>() {
 
         @Override
         public void onSuccess(Pair<Boolean, List<String>> result) {
           RepresentationDialogs.showPromptDialogRepresentationTypes(messages.changeTypeTitle(), null,
             messages.cancelButton(), messages.confirmButton(), result.getSecond(), result.getFirst(),
-            new AsyncCallback<String>() {
-
-              @Override
-              public void onFailure(Throwable caught) {
-                // do nothing
-              }
+            new NoAsyncCallback<String>() {
 
               @Override
               public void onSuccess(final String newType) {
                 Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
                   RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
-                  new AsyncCallback<String>() {
-
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      // do nothing
-                    }
+                  new NoAsyncCallback<String>() {
 
                     @Override
                     public void onSuccess(String details) {
@@ -289,11 +302,11 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
 
   public void identifyFormats(SelectedItems<IndexedRepresentation> selected,
     final AsyncCallback<ActionImpact> callback) {
-    BrowserService.Util.getInstance().createFormatIdentificationJob(selected, new AsyncCallback<Void>() {
+    BrowserService.Util.getInstance().createFormatIdentificationJob(selected, new ActionAsyncCallback<Void>(callback) {
       @Override
       public void onSuccess(Void object) {
         Toast.showInfo(messages.identifyingFormatsTitle(), messages.identifyingFormatsDescription());
-        callback.onSuccess(ActionImpact.NONE);
+        doActionCallbackNone();
       }
 
       @Override
@@ -301,7 +314,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
         if (caught instanceof NotFoundException) {
           Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
         } else {
-          callback.onFailure(caught);
+          super.onFailure(caught);
         }
       }
     });
@@ -327,22 +340,13 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
   public void createFolder(final IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
     Dialogs.showPromptDialog(messages.createFolderTitle(), null, null, messages.createFolderPlaceholder(),
       RegExp.compile("^[^/]+$"), messages.cancelButton(), messages.confirmButton(), true, false,
-      new AsyncCallback<String>() {
-        @Override
-        public void onFailure(Throwable caught) {
-          // do nothing
-        }
+      new NoAsyncCallback<String>() {
 
         @Override
         public void onSuccess(final String newName) {
           Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
             RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
-            new AsyncCallback<String>() {
-
-              @Override
-              public void onFailure(Throwable caught) {
-                // do nothing
-              }
+            new NoAsyncCallback<String>() {
 
               @Override
               public void onSuccess(final String details) {
@@ -374,12 +378,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
   public void uploadFiles(final IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
     Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
       RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
-      new AsyncCallback<String>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          // do nothing
-        }
+      new NoAsyncCallback<String>() {
 
         @Override
         public void onSuccess(String details) {
@@ -392,25 +391,14 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
   }
 
   public void changeState(final IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
-    GWT.log(representation.toString());
     RepresentationDialogs.showPromptDialogRepresentationStates(messages.changeStatusTitle(), messages.cancelButton(),
-      messages.confirmButton(), representation.getRepresentationStates(), new AsyncCallback<List<String>>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          // do nothing
-        }
+      messages.confirmButton(), representation.getRepresentationStates(), new NoAsyncCallback<List<String>>() {
 
         @Override
         public void onSuccess(final List<String> newStates) {
           Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
             RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
-            new AsyncCallback<String>() {
-
-              @Override
-              public void onFailure(Throwable caught) {
-                // do nothing
-              }
+            new NoAsyncCallback<String>() {
 
               @Override
               public void onSuccess(String details) {
@@ -436,6 +424,8 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
 
     // MANAGEMENT
     ActionsGroup<IndexedRepresentation> managementGroup = new ActionsGroup<>(messages.representation());
+    managementGroup.addButton(messages.newRepresentationButton(), RepresentationAction.NEW, ActionImpact.UPDATED,
+      "btn-plus");
     managementGroup.addButton(messages.downloadButton(), RepresentationAction.DOWNLOAD, ActionImpact.NONE,
       "btn-download");
     managementGroup.addButton(messages.changeTypeButton(), RepresentationAction.CHANGE_TYPE, ActionImpact.UPDATED,

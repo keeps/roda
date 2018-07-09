@@ -10,44 +10,31 @@
  */
 package org.roda.wui.client.planning;
 
-import java.util.Date;
 import java.util.List;
 
-import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.filter.DateRangeFilterParameter;
-import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.risks.IndexedRisk;
-import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.LastSelectedItemsSingleton;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.dialogs.Dialogs;
-import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
-import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.common.actions.Actionable;
+import org.roda.wui.client.common.actions.ActionableObject;
+import org.roda.wui.client.common.actions.ActionableWidgetBuilder;
+import org.roda.wui.client.common.actions.RiskActions;
 import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.CreateActionJob;
-import org.roda.wui.client.process.CreateSelectedJob;
-import org.roda.wui.client.process.InternalProcess;
 import org.roda.wui.client.search.RiskSearch;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
-import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -99,26 +86,27 @@ public class RiskRegister extends Composite {
   RiskSearch riskSearch;
 
   @UiField
-  Button buttonAdd;
-
-  @UiField
-  Button buttonRemove;
-
-  @UiField
-  Button startProcess;
-
-  @UiField
-  Button buttonRefresh;
+  SimplePanel actionsSidebar;
 
   /**
    * Create a risk register page
-   *
    */
   public RiskRegister() {
     riskSearch = new RiskSearch("RiskRegister_risks", "RiskRegister_riskIncidences");
     riskSearch.defaultFilters();
+    riskSearch.getList().setActionable(RiskActions.get());
+
     initWidget(uiBinder.createAndBindUi(this));
     riskRegisterDescription.add(new HTMLWidgetWrapper("RiskRegisterDescription.html"));
+    actionsSidebar.setWidget(
+      new ActionableWidgetBuilder<>(RiskActions.get()).withCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
+        @Override
+        public void onSuccess(Actionable.ActionImpact result) {
+          if (result.equals(Actionable.ActionImpact.DESTROYED)) {
+            HistoryUtils.newHistory(RiskRegister.RESOLVER);
+          }
+        }
+      }).buildListWithObjects(new ActionableObject<>(IndexedRisk.class)));
   }
 
   /**
@@ -156,102 +144,5 @@ public class RiskRegister extends Composite {
       HistoryUtils.newHistory(RESOLVER);
       callback.onSuccess(null);
     }
-  }
-
-  @UiHandler("buttonAdd")
-  void buttonAddRiskHandler(ClickEvent e) {
-    HistoryUtils.newHistory(RESOLVER, CreateRisk.RESOLVER.getHistoryToken());
-  }
-
-  @UiHandler("buttonRefresh")
-  void buttonRefreshRiskHandler(ClickEvent e) {
-    BrowserService.Util.getInstance().updateRiskCounters(new AsyncCallback<Void>() {
-
-      @Override
-      public void onFailure(Throwable caught) {
-        AsyncCallbackUtils.defaultFailureTreatment(caught);
-        if (riskSearch.getList() != null) {
-          riskSearch.refresh();
-        }
-      }
-
-      @Override
-      public void onSuccess(Void result) {
-        Toast.showInfo(messages.dialogRefresh(), messages.riskRefreshDone());
-        if (riskSearch.getList() != null) {
-          riskSearch.refresh();
-        }
-      }
-    });
-  }
-
-  @UiHandler("buttonRemove")
-  void buttonRemoveRiskHandler(ClickEvent e) {
-    final SelectedItems<IndexedRisk> selected = (SelectedItems<IndexedRisk>) riskSearch.getSelected();
-
-    ClientSelectedItemsUtils.size(IndexedRisk.class, selected, new AsyncCallback<Long>() {
-      @Override
-      public void onFailure(Throwable caught) {
-        AsyncCallbackUtils.defaultFailureTreatment(caught);
-      }
-
-      @Override
-      public void onSuccess(final Long size) {
-        Dialogs.showConfirmDialog(messages.riskRemoveFolderConfirmDialogTitle(),
-          messages.riskRemoveSelectedConfirmDialogMessage(size), messages.riskRemoveFolderConfirmDialogCancel(),
-          messages.riskRemoveFolderConfirmDialogOk(), new AsyncCallback<Boolean>() {
-
-            @Override
-            public void onFailure(Throwable caught) {
-              AsyncCallbackUtils.defaultFailureTreatment(caught);
-            }
-
-            @Override
-            public void onSuccess(Boolean confirmed) {
-              if (confirmed) {
-                BrowserService.Util.getInstance().deleteRisk(selected, new AsyncCallback<Job>() {
-
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                  }
-
-                  @Override
-                  public void onSuccess(Job result) {
-                    Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(), new AsyncCallback<Void>() {
-
-                      @Override
-                      public void onFailure(Throwable caught) {
-                        Timer timer = new Timer() {
-                          @Override
-                          public void run() {
-                            Toast.showInfo(messages.riskRemoveSuccessTitle(), messages.riskRemoveSuccessMessage(size));
-                            riskSearch.refresh();
-                          }
-                        };
-
-                        timer.schedule(RodaConstants.ACTION_TIMEOUT);
-                      }
-
-                      @Override
-                      public void onSuccess(final Void nothing) {
-                        HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-                      }
-                    });
-                  }
-                });
-              }
-            }
-          });
-      }
-    });
-  }
-
-  @UiHandler("startProcess")
-  void handleButtonProcess(ClickEvent e) {
-    LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
-    selectedItems.setSelectedItems(riskSearch.getSelected());
-    selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
-    HistoryUtils.newHistory(CreateSelectedJob.RESOLVER, RodaConstants.JOB_PROCESS_ACTION);
   }
 }

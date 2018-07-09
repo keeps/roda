@@ -9,6 +9,7 @@ package org.roda.wui.client.common.actions;
 
 import java.util.Collections;
 
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
@@ -20,6 +21,10 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
 
   private static AsyncCallback<ActionImpact> createDefaultAsyncCallback() {
     return new NoAsyncCallback<>();
+  }
+
+  protected static void unsupportedAction(Actionable.Action action, AsyncCallback<ActionImpact> callback) {
+    callback.onFailure(new RequestNotValidException("Unsupported action in this context: " + action));
   }
 
   SelectedItemsList<T> objectToSelectedItems(T object, Class<T> objectClass) {
@@ -71,14 +76,14 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
   public void act(Action<T> action, ActionableObject<T> object, AsyncCallback<ActionImpact> callback) {
     switch (object.getType()) {
       case MULTIPLE:
-        act(action, object.getObjects());
+        act(action, object.getObjects(), callback);
         break;
       case SINGLE:
-        act(action, object.getObject());
+        act(action, object.getObject(), callback);
         break;
       case NONE:
       default:
-        act(action);
+        act(action, callback);
     }
   }
 
@@ -91,6 +96,7 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
   @Override
   public void act(Action<T> action, AsyncCallback<ActionImpact> callback) {
     // by default the actionable can not act
+    unsupportedAction(action, callback);
   }
 
   @Override
@@ -102,6 +108,7 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
   @Override
   public void act(Action<T> action, T object, AsyncCallback<ActionImpact> callback) {
     // by default the actionable can not act
+    unsupportedAction(action, callback);
   }
 
   @Override
@@ -113,5 +120,6 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
   @Override
   public void act(Action<T> action, SelectedItems<T> objects, AsyncCallback<ActionImpact> callback) {
     // by default the actionable can not act
+    unsupportedAction(action, callback);
   }
 }

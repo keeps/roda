@@ -19,9 +19,12 @@ import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.InvalidTokenException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
+import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.Group;
+import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.UserManagement;
 import org.roda.wui.client.browse.bundle.UserExtraBundle;
@@ -196,4 +199,18 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
     return UserManagement.retrieveUserExtraBundle(user);
   }
 
+  @Override
+  public void deleteRODAMembers(SelectedItems<RODAMember> members)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    UserManagement.deleteMembers(user, members);
+  }
+
+  @Override
+  public void changeActiveRODAMembers(SelectedItems<RODAMember> members, boolean active)
+    throws AuthorizationDeniedException, AlreadyExistsException, NotFoundException, GenericException,
+    RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    UserManagement.changeActiveMembers(user, members, active);
+  }
 }

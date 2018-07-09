@@ -17,26 +17,22 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.browse.ShowPreservationEvent;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.actions.ActionableObject;
+import org.roda.wui.client.common.actions.ActionableWidgetBuilder;
+import org.roda.wui.client.common.actions.PreservationAgentActions;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
-import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -110,10 +106,8 @@ public class ShowPreservationAgent extends Composite {
   FlowPanel agentVersionPanel, agentNotePanel, agentExtensionPanel;
 
   @UiField
-  Button backButton;
-
-  @UiField
-  Button downloadButton;
+  SimplePanel actionsSidebar;
+  ActionableWidgetBuilder<IndexedPreservationAgent> actionableWidgetBuilder;
 
   private IndexedPreservationAgent agent = null;
   private String eventId = null;
@@ -125,6 +119,8 @@ public class ShowPreservationAgent extends Composite {
 
   public ShowPreservationAgent(final String agentId) {
     initWidget(uiBinder.createAndBindUi(this));
+
+    actionableWidgetBuilder = new ActionableWidgetBuilder<>(PreservationAgentActions.get());
 
     BrowserService.Util.getInstance().retrieve(IndexedPreservationAgent.class.getName(), agentId, fieldsToReturn,
       new AsyncCallback<IndexedPreservationAgent>() {
@@ -170,21 +166,7 @@ public class ShowPreservationAgent extends Composite {
 
     agentExtensionPanel.setVisible(StringUtils.isNotBlank(agent.getExtension()));
     agentExtension.setText(agent.getExtension());
-  }
 
-  @UiHandler("backButton")
-  void buttonBackHandler(ClickEvent e) {
-    if (StringUtils.isNotBlank(eventId)) {
-      HistoryUtils.newHistory(ShowPreservationEvent.RESOLVER, eventId);
-    } else {
-      HistoryUtils.newHistory(PreservationAgents.RESOLVER);
-    }
-  }
-
-  @UiHandler("downloadButton")
-  void buttonDownloadHandler(ClickEvent e) {
-    SafeUri downloadUri = RestUtils.createPreservationAgentUri(agent.getId(),
-      RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN);
-    Window.Location.assign(downloadUri.asString());
+    actionsSidebar.setWidget(actionableWidgetBuilder.buildListWithObjects(new ActionableObject<>(agent)));
   }
 }

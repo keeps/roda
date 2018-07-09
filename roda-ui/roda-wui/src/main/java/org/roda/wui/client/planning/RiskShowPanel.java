@@ -18,9 +18,8 @@ import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
+import org.roda.wui.client.common.actions.RiskIncidenceActions;
 import org.roda.wui.client.common.lists.RiskIncidenceList;
-import org.roda.wui.client.common.lists.utils.AsyncTableCell.CheckboxSelectionListener;
-import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
@@ -41,7 +40,6 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.SelectionChangeEvent;
 
 import config.i18n.client.ClientMessages;
 
@@ -149,6 +147,7 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
 
   public RiskShowPanel() {
     incidenceList = new RiskIncidenceList("RiskShowPanel_riskIncidences", Filter.NULL, messages.riskIncidences(), true);
+    incidenceList.setActionable(RiskIncidenceActions.getForMultipleEdit());
 
     searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, true, messages.riskIncidenceRegisterSearchPlaceHolder(),
       false, false, false);
@@ -160,6 +159,7 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
   public RiskShowPanel(Risk risk, boolean hasTitle) {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISK_ID, risk.getId()));
     incidenceList = new RiskIncidenceList("RiskShowPanel_riskIncidences", filter, messages.riskIncidences(), hasTitle);
+    incidenceList.setActionable(RiskIncidenceActions.getForMultipleEdit());
 
     Filter incidenceFilter = new Filter(new BasicSearchFilterParameter(RodaConstants.RISK_INCIDENCE_SEARCH, "*"),
       new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISK_ID, risk.getId()));
@@ -168,25 +168,12 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
       false, false, false);
     searchPanel.setList(incidenceList);
 
-    incidenceList.addCheckboxSelectionListener(new CheckboxSelectionListener<RiskIncidence>() {
-
-      @Override
-      public void onSelectionChange(SelectedItems<RiskIncidence> selected) {
-        ShowRisk.getInstance().enableProcessButton(!(ClientSelectedItemsUtils.isEmpty(selected)));
-        ShowRisk.getInstance().enableEditIncidenceButton(!(ClientSelectedItemsUtils.isEmpty(selected)));
-        ShowRisk.getInstance().enableRemoveButton(!(ClientSelectedItemsUtils.isEmpty(selected)));
-      }
-    });
-
-    incidenceList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
-      @Override
-      public void onSelectionChange(SelectionChangeEvent event) {
-        final RiskIncidence selected = incidenceList.getSelectionModel().getSelectedObject();
-        if (selected != null) {
-          LastSelectedItemsSingleton.getInstance().setLastHistory(HistoryUtils.getCurrentHistoryPath());
-          HistoryUtils.newHistory(RiskIncidenceRegister.RESOLVER, ShowRiskIncidence.RESOLVER.getHistoryToken(),
-            selected.getId());
-        }
+    incidenceList.getSelectionModel().addSelectionChangeHandler(event -> {
+      final RiskIncidence selected = incidenceList.getSelectionModel().getSelectedObject();
+      if (selected != null) {
+        LastSelectedItemsSingleton.getInstance().setLastHistory(HistoryUtils.getCurrentHistoryPath());
+        HistoryUtils.newHistory(RiskIncidenceRegister.RESOLVER, ShowRiskIncidence.RESOLVER.getHistoryToken(),
+          selected.getId());
       }
     });
 

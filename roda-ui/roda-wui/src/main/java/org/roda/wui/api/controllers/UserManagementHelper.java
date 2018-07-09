@@ -10,6 +10,7 @@ package org.roda.wui.api.controllers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,11 +27,17 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.InvalidTokenException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.index.select.SelectedItemsFilter;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.notifications.Notification.NOTIFICATION_STATE;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
+import org.roda.core.data.v2.user.RodaPrincipal;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.MetadataValue;
 import org.roda.wui.client.browse.bundle.UserExtraBundle;
@@ -96,6 +103,34 @@ public class UserManagementHelper {
     return addedUser;
   }
 
+  private static List<String> getMemberUuidFromSelectedItems(SelectedItems<RODAMember> members)
+    throws GenericException, RequestNotValidException {
+    List<String> uuids = new ArrayList<>();
+
+    if (members instanceof SelectedItemsFilter) {
+      Filter filter = ((SelectedItemsFilter) members).getFilter();
+      Iterable<RODAMember> all = RodaCoreFactory.getIndexService().findAll(RODAMember.class, filter,
+        Collections.singletonList(RodaConstants.INDEX_UUID));
+      for (RODAMember rodaMember : all) {
+        uuids.add(rodaMember.getId());
+      }
+    } else if (members instanceof SelectedItemsList) {
+      uuids.addAll(((SelectedItemsList<RODAMember>) members).getIds());
+    }
+    return uuids;
+  }
+
+  public static void changeActiveMembers(SelectedItems<RODAMember> members, boolean active) throws GenericException,
+    RequestNotValidException, AuthorizationDeniedException, NotFoundException, AlreadyExistsException {
+    List<String> uuids = getMemberUuidFromSelectedItems(members);
+    for (String uuid : uuids) {
+      if (RodaPrincipal.isUser(uuid)) {
+        RodaCoreFactory.getModelService().deActivateUser(RodaPrincipal.getId(uuid), active, true);
+      }
+    }
+    RodaCoreFactory.getIndexService().commit(RODAMember.class);
+  }
+
   public static User updateUser(User user, String password, UserExtraBundle extra)
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
     user.setExtra(getUserExtra(extra));
@@ -158,6 +193,20 @@ public class UserManagementHelper {
     }
 
     return "";
+  }
+
+  public static void deleteMembers(SelectedItems<RODAMember> members)
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException {
+    List<String> uuids = getMemberUuidFromSelectedItems(members);
+    for (String uuid : uuids) {
+      String id = RodaPrincipal.getId(uuid);
+      if (RodaPrincipal.isUser(uuid)) {
+        RodaCoreFactory.getModelService().deleteUser(id, true);
+      } else {
+        RodaCoreFactory.getModelService().deleteGroup(id, true);
+      }
+    }
+    RodaCoreFactory.getIndexService().commit(RODAMember.class);
   }
 
   public static void deleteUser(String username) throws GenericException, AuthorizationDeniedException {

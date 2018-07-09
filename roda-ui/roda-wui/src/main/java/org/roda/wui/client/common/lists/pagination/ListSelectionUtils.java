@@ -207,34 +207,39 @@ public class ListSelectionUtils {
 
   public static <T extends IsIndexed> void hasPreviousOrNext(final T object,
     final AsyncCallback<Pair<Boolean, Boolean>> callback) {
-    @SuppressWarnings("unchecked")
-    Class<T> objectClass = (Class<T>) object.getClass();
-    final ListSelectionState<T> last = last(objectClass);
-    if (last != null) {
-      if (last.getSelected().getUUID().equals(object.getUUID())) {
+    if (object != null) {
+      @SuppressWarnings("unchecked")
+      Class<T> objectClass = (Class<T>) object.getClass();
+      final ListSelectionState<T> last = last(objectClass);
+      if (last != null) {
+        if (last.getSelected().getUUID().equals(object.getUUID())) {
 
-        BrowserService.Util.getInstance().count(objectClass.getName(), last.getFilter(), last.getJustActive(),
-          new AsyncCallback<Long>() {
+          BrowserService.Util.getInstance().count(objectClass.getName(), last.getFilter(), last.getJustActive(),
+            new AsyncCallback<Long>() {
 
-            @Override
-            public void onFailure(Throwable caught) {
-              callback.onFailure(caught);
-            }
+              @Override
+              public void onFailure(Throwable caught) {
+                callback.onFailure(caught);
+              }
 
-            @Override
-            public void onSuccess(Long totalCount) {
-              Integer lastIndex = last.getIndex();
-              Boolean hasPrevious = lastIndex > 0;
-              Boolean hasNext = lastIndex < totalCount - 1;
-              callback.onSuccess(Pair.of(hasPrevious, hasNext));
-            }
-          });
+              @Override
+              public void onSuccess(Long totalCount) {
+                Integer lastIndex = last.getIndex();
+                Boolean hasPrevious = lastIndex > 0;
+                Boolean hasNext = lastIndex < totalCount - 1;
+                callback.onSuccess(Pair.of(hasPrevious, hasNext));
+              }
+            });
+        } else {
+          callback.onSuccess(Pair.of(Boolean.FALSE, Boolean.FALSE));
+        }
       } else {
         callback.onSuccess(Pair.of(Boolean.FALSE, Boolean.FALSE));
       }
     } else {
       callback.onSuccess(Pair.of(Boolean.FALSE, Boolean.FALSE));
     }
+
   }
 
   public static <T extends IsIndexed> void bindBrowseOpener(final AsyncTableCell<T, ?> list) {

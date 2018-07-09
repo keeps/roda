@@ -24,6 +24,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
+import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -129,6 +130,8 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
           processRisk(index, model, report, jobPluginInfo, cachedJob, (Risk) object);
         } else if (object instanceof RepresentationInformation) {
           processRepresentationInformation(model, report, jobPluginInfo, cachedJob, (RepresentationInformation) object);
+        } else if (object instanceof Format) {
+          processFormat(index, model, report, jobPluginInfo, cachedJob, (Format) object);
         }
       }
     }, index, model, storage, liteList);
@@ -350,6 +353,22 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     jobPluginInfo.incrementObjectsProcessed(state);
   }
 
+  private void processFormat(IndexService index, ModelService model, Report report, JobPluginInfo jobPluginInfo,
+    Job job, Format format) {
+    Report reportItem = PluginHelper.initPluginReportItem(this, format.getId(), Format.class);
+    PluginState state = PluginState.SUCCESS;
+
+    try {
+      model.deleteFormat(format.getId(), true);
+    } catch (GenericException | NotFoundException | AuthorizationDeniedException | RequestNotValidException e) {
+      state = PluginState.FAILURE;
+    }
+
+    report.addReport(reportItem.setPluginState(state));
+    PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
+    jobPluginInfo.incrementObjectsProcessed(state);
+  }
+
   private void processRepresentationInformation(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job,
     RepresentationInformation ri) {
     Report reportItem = PluginHelper.initPluginReportItem(this, ri.getId(), RepresentationInformation.class);
@@ -444,6 +463,7 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     list.add(File.class);
     list.add(Risk.class);
     list.add(RepresentationInformation.class);
+    list.add(Format.class);
     return (List) list;
   }
 }

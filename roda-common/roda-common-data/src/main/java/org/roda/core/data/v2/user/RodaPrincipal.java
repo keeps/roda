@@ -182,6 +182,14 @@ public abstract class RodaPrincipal implements Serializable, RODAMember, IsModel
     return b.toString();
   }
 
+  public static String getId(String uuid) {
+    return uuid.substring(uuid.indexOf('-') + 1);
+  }
+
+  public static boolean isUser(String uuid) {
+    return uuid.startsWith(User.class.getSimpleName().toLowerCase() + "-");
+  }
+
   public static String getUserUUID(String username) {
     return getUUID(true, username);
   }

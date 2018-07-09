@@ -14,33 +14,27 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.LastSelectedItemsSingleton;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.actions.Actionable;
+import org.roda.wui.client.common.actions.ActionableObject;
+import org.roda.wui.client.common.actions.ActionableWidgetBuilder;
+import org.roda.wui.client.common.actions.TransferredResourceActions;
 import org.roda.wui.client.common.dialogs.Dialogs;
-import org.roda.wui.client.common.dialogs.SelectTransferResourceDialog;
-import org.roda.wui.client.common.lists.utils.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.Ingest;
-import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
-import org.roda.wui.client.process.CreateSelectedJob;
-import org.roda.wui.client.process.InternalProcess;
 import org.roda.wui.client.search.TransferredResourceSearch;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
@@ -49,18 +43,13 @@ import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
-import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
@@ -124,6 +113,7 @@ public class IngestTransfer extends Composite {
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
   private TransferredResource resource;
+  private ActionableWidgetBuilder<TransferredResource> actionableWidgetBuilder;
 
   @UiField
   Label ingestTransferTitle;
@@ -152,66 +142,50 @@ public class IngestTransfer extends Composite {
   @UiField
   Label itemDates;
 
-  // BUTTONS
   @UiField
-  Button refresh;
-
-  @UiField
-  Button uploadFiles;
-
-  @UiField
-  Button createFolder;
-
-  @UiField
-  Button remove;
-
-  @UiField
-  Button startIngest;
-
-  @UiField
-  Button rename;
-
-  @UiField
-  Button move;
+  SimplePanel actionsSidebar;
 
   private IngestTransfer() {
     resourceSearch = new TransferredResourceSearch("IngestTransfer_transferredResources");
     resourceSearch.defaultFilters(new Filter(new EmptyKeyFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID)));
+    resourceSearch.getList().setActionable(TransferredResourceActions.get(null));
+
+    actionableWidgetBuilder = new ActionableWidgetBuilder<>(TransferredResourceActions.get(null));
 
     initWidget(uiBinder.createAndBindUi(this));
 
     ingestTransferDescription.add(new HTMLWidgetWrapper("IngestTransferDescription.html"));
 
-    resourceSearch.getList().addValueChangeHandler(new ValueChangeHandler<IndexResult<TransferredResource>>() {
+    actionableWidgetBuilder.withCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
+
       @Override
-      public void onValueChange(ValueChangeEvent<IndexResult<TransferredResource>> event) {
-        updateVisibles();
+      public void onFailure(Throwable caught) {
+        super.onFailure(caught);
+        resourceSearch.getList().refresh();
       }
-    });
 
-    resourceSearch.getList().addCheckboxSelectionListener(new CheckboxSelectionListener<TransferredResource>() {
       @Override
-      public void onSelectionChange(SelectedItems<TransferredResource> selected) {
-        boolean empty = ClientSelectedItemsUtils.isEmpty(selected);
-
-        remove.setText(empty ? messages.removeWholeFolderButton() : messages.removeSelectedItemsButton());
-        startIngest.setText(empty ? messages.ingestWholeFolderButton() : messages.ingestSelectedItemsButton());
-        updateVisibles();
-
-        if (selected instanceof SelectedItemsList) {
-          SelectedItemsList<TransferredResource> selectedList = (SelectedItemsList<TransferredResource>) selected;
-          int size = selectedList.getIds().size();
-          move.setEnabled(size > 0);
-          rename.setEnabled(size == 1 || (size == 0 && resource != null));
-        } else if (selected instanceof SelectedItemsFilter) {
-          move.setEnabled(true);
-          rename.setEnabled(false);
+      public void onSuccess(Actionable.ActionImpact impact) {
+        if (Actionable.ActionImpact.UPDATED.equals(impact)) {
+          if (resource != null) {
+            updateView(resource.getUUID(), new NoAsyncCallback<>());
+          } else {
+            view();
+          }
+          resourceSearch.getList().refresh();
+        } else if (Actionable.ActionImpact.DESTROYED.equals(impact)) {
+          String parentUUID = resource != null ? resource.getParentUUID() : null;
+          if (parentUUID != null) {
+            HistoryUtils.newHistory(RESOLVER, parentUUID);
+          } else {
+            HistoryUtils.newHistory(RESOLVER);
+          }
         }
       }
     });
 
-    rename.setEnabled(resource != null);
-    move.setEnabled(false);
+    actionsSidebar
+      .setWidget(actionableWidgetBuilder.buildListWithObjects(new ActionableObject<>(TransferredResource.class)));
   }
 
   /**
@@ -235,6 +209,9 @@ public class IngestTransfer extends Composite {
   protected void view(TransferredResource r) {
     resource = r;
 
+    actionableWidgetBuilder.changeActionable(TransferredResourceActions.get(resource));
+    actionsSidebar.setWidget(actionableWidgetBuilder.buildListWithObjects(new ActionableObject<>(resource)));
+
     ingestTransferTitle.setVisible(false);
     ingestTransferDescription.setVisible(false);
 
@@ -253,7 +230,6 @@ public class IngestTransfer extends Composite {
     if (r.isFile()) {
       resourceSearch.setVisible(false);
       download.setVisible(true);
-      move.setEnabled(true);
     } else {
       Filter filter = new Filter(
         new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID, r.getRelativePath()));
@@ -262,19 +238,18 @@ public class IngestTransfer extends Composite {
       download.setVisible(false);
     }
 
-    move.setEnabled(resource != null);
-    rename.setEnabled(resource != null);
     breadcrumb.updatePath(BreadcrumbUtils.getTransferredResourceBreadcrumbs(r));
     breadcrumb.setVisible(true);
 
     lastScanned.setText(messages.ingestTransferLastScanned(resource.getLastScanDate()));
-    refresh.setTitle(messages.ingestTransferLastScanned(resource.getLastScanDate()));
-
-    updateVisibles();
   }
 
   protected void view() {
     resource = null;
+
+    actionableWidgetBuilder.changeActionable(TransferredResourceActions.get(null));
+    actionsSidebar
+      .setWidget(actionableWidgetBuilder.buildListWithObjects(new ActionableObject<>(TransferredResource.class)));
 
     ingestTransferTitle.setVisible(true);
     ingestTransferDescription.setVisible(true);
@@ -288,8 +263,6 @@ public class IngestTransfer extends Composite {
     itemTitle.addStyleName("browseTitle-allCollections");
     itemIcon.getParent().addStyleName("browseTitle-allCollections-wrapper");
 
-    move.setEnabled(resource != null);
-    rename.setEnabled(resource != null);
     resourceSearch.setVisible(true);
     download.setVisible(false);
 
@@ -297,236 +270,60 @@ public class IngestTransfer extends Composite {
     breadcrumb.setVisible(false);
 
     lastScanned.setText("");
-    refresh.setTitle("");
-
-    updateVisibles();
   }
 
   public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
     if (historyTokens.isEmpty()) {
       view();
       callback.onSuccess(this);
-    } else if (!historyTokens.isEmpty()
-      && historyTokens.get(0).equals(TransferUpload.INGEST_RESOLVER.getHistoryToken())) {
+    } else if (historyTokens.get(0).equals(TransferUpload.INGEST_RESOLVER.getHistoryToken())) {
       TransferUpload.INGEST_RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else {
       String transferredResourceUUID = historyTokens.get(0);
       if (transferredResourceUUID != null) {
-        BrowserService.Util.getInstance().retrieve(TransferredResource.class.getName(), transferredResourceUUID,
-          fieldsToReturn, new AsyncCallback<TransferredResource>() {
-
-            @Override
-            public void onFailure(Throwable caught) {
-              if (caught instanceof NotFoundException) {
-                Dialogs.showInformationDialog(messages.ingestTransferNotFoundDialogTitle(),
-                  messages.ingestTransferNotFoundDialogMessage(), messages.ingestTransferNotFoundDialogButton(), false,
-                  new AsyncCallback<Void>() {
-
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      // do nothing
-                    }
-
-                    @Override
-                    public void onSuccess(Void result) {
-                      HistoryUtils.newHistory(IngestTransfer.RESOLVER);
-                    }
-                  });
-              } else {
-                AsyncCallbackUtils.defaultFailureTreatment(caught);
-                HistoryUtils.newHistory(IngestTransfer.RESOLVER);
-              }
-
-              callback.onSuccess(null);
-            }
-
-            @Override
-            public void onSuccess(TransferredResource r) {
-              view(r);
-              callback.onSuccess(IngestTransfer.this);
-            }
-          });
+        updateView(transferredResourceUUID, callback);
       } else {
         view();
         callback.onSuccess(this);
       }
-
-    }
-
-  }
-
-  protected void updateVisibles() {
-    uploadFiles.setEnabled(resource == null || !resource.isFile());
-    createFolder.setEnabled(resource == null || !resource.isFile());
-    boolean empty = ClientSelectedItemsUtils.isEmpty(resourceSearch.getSelected());
-    remove.setEnabled(resource != null || !empty);
-    startIngest.setEnabled(resource != null || !empty);
-  }
-
-  @UiHandler("refresh")
-  void buttonRefreshHandler(ClickEvent e) {
-    String relativePath = resource != null ? resource.getRelativePath() : null;
-    refresh.setEnabled(false);
-
-    BrowserService.Util.getInstance().transferScanRequestUpdate(relativePath, new AsyncCallback<Void>() {
-
-      @Override
-      public void onFailure(Throwable caught) {
-        if (caught instanceof IsStillUpdatingException) {
-          Toast.showInfo(messages.dialogRefresh(), messages.updateIsCurrentlyRunning());
-        } else {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
-        }
-
-        resourceSearch.refresh();
-        refresh.setEnabled(true);
-      }
-
-      @Override
-      public void onSuccess(Void result) {
-        Toast.showInfo(messages.dialogRefresh(), messages.updatedFilesUnderFolder());
-        resourceSearch.refresh();
-        refresh.setEnabled(true);
-      }
-    });
-  }
-
-  @UiHandler("uploadFiles")
-  void buttonUploadFilesHandler(ClickEvent e) {
-    if (resource != null) {
-      HistoryUtils.newHistory(TransferUpload.INGEST_RESOLVER, resource.getUUID());
-    } else {
-      HistoryUtils.newHistory(TransferUpload.INGEST_RESOLVER);
     }
   }
 
-  @UiHandler("createFolder")
-  void buttonCreateFolderHandler(ClickEvent e) {
-    Dialogs.showPromptDialog(messages.ingestTransferCreateFolderTitle(), messages.ingestTransferCreateFolderMessage(),
-      null, null, RegExp.compile("^[^/]+$"), messages.dialogCancel(), messages.dialogOk(), true, false,
-      new AsyncCallback<String>() {
+  private void updateView(String transferredResourceUUID, AsyncCallback<Widget> callback) {
+    BrowserService.Util.getInstance().retrieve(TransferredResource.class.getName(), transferredResourceUUID,
+      fieldsToReturn, new AsyncCallback<TransferredResource>() {
 
         @Override
         public void onFailure(Throwable caught) {
-          // do nothing
-        }
+          if (caught instanceof NotFoundException) {
+            Dialogs.showInformationDialog(messages.ingestTransferNotFoundDialogTitle(),
+              messages.ingestTransferNotFoundDialogMessage(), messages.ingestTransferNotFoundDialogButton(), false,
+              new AsyncCallback<Void>() {
 
-        @Override
-        public void onSuccess(String folderName) {
-          String parent = resource != null ? resource.getUUID() : null;
-          BrowserService.Util.getInstance().createTransferredResourcesFolder(parent, folderName, true,
-            new AsyncCallback<String>() {
-
-              @Override
-              public void onFailure(Throwable caught) {
-                AsyncCallbackUtils.defaultFailureTreatment(caught);
-              }
-
-              @Override
-              public void onSuccess(String newResourceUUID) {
-                HistoryUtils.newHistory(RESOLVER, newResourceUUID);
-              }
-            });
-        }
-      });
-  }
-
-  @UiHandler("remove")
-  void buttonRemoveHandler(ClickEvent e) {
-    final SelectedItems<TransferredResource> selected = resourceSearch.getSelected();
-
-    if (ClientSelectedItemsUtils.isEmpty(selected)) {
-      // Remove the whole folder
-
-      if (resource != null) {
-        Dialogs.showConfirmDialog(messages.ingestTransferRemoveFolderConfirmDialogTitle(),
-          messages.ingestTransferRemoveFolderConfirmDialogMessage(resource.getName()), messages.dialogNo(),
-          messages.dialogYes(), new AsyncCallback<Boolean>() {
-
-            @Override
-            public void onFailure(Throwable caught) {
-              AsyncCallbackUtils.defaultFailureTreatment(caught);
-            }
-
-            @Override
-            public void onSuccess(Boolean confirmed) {
-              if (confirmed) {
-                SelectedItems<TransferredResource> s = new SelectedItemsList<>(Arrays.asList(resource.getUUID()),
-                  TransferredResource.class.getName());
-                BrowserService.Util.getInstance().deleteTransferredResources(s, new AsyncCallback<Void>() {
-
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    AsyncCallbackUtils.defaultFailureTreatment(caught);
-                  }
-
-                  @Override
-                  public void onSuccess(Void result) {
-                    Toast.showInfo(messages.removeSuccessTitle(), messages.removeSuccessMessage(1L));
-                    HistoryUtils.newHistory(RESOLVER, resource.getParentUUID());
-                  }
-                });
-              }
-            }
-          });
-      }
-      // else do nothing
-
-    } else {
-      // Remove all selected resources
-      ClientSelectedItemsUtils.size(TransferredResource.class, selected, new AsyncCallback<Long>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
-        }
-
-        @Override
-        public void onSuccess(final Long size) {
-          Dialogs.showConfirmDialog(messages.ingestTransferRemoveFolderConfirmDialogTitle(),
-            messages.ingestTransferRemoveSelectedConfirmDialogMessage(size), messages.dialogNo(), messages.dialogYes(),
-            new AsyncCallback<Boolean>() {
-
-              @Override
-              public void onFailure(Throwable caught) {
-                AsyncCallbackUtils.defaultFailureTreatment(caught);
-              }
-
-              @Override
-              public void onSuccess(Boolean confirmed) {
-                if (confirmed) {
-                  BrowserService.Util.getInstance().deleteTransferredResources(selected, new AsyncCallback<Void>() {
-
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      AsyncCallbackUtils.defaultFailureTreatment(caught);
-                      resourceSearch.refresh();
-                    }
-
-                    @Override
-                    public void onSuccess(Void result) {
-                      Toast.showInfo(messages.removeSuccessTitle(), messages.removeSuccessMessage(size));
-                      resourceSearch.refresh();
-                      move.setEnabled(false);
-                      rename.setEnabled(false);
-                    }
-                  });
+                @Override
+                public void onFailure(Throwable caught) {
+                  // do nothing
                 }
-              }
-            });
+
+                @Override
+                public void onSuccess(Void result) {
+                  HistoryUtils.newHistory(IngestTransfer.RESOLVER);
+                }
+              });
+          } else {
+            AsyncCallbackUtils.defaultFailureTreatment(caught);
+            HistoryUtils.newHistory(IngestTransfer.RESOLVER);
+          }
+
+          callback.onSuccess(null);
+        }
+
+        @Override
+        public void onSuccess(TransferredResource r) {
+          view(r);
+          callback.onSuccess(IngestTransfer.this);
         }
       });
-
-    }
-
-  }
-
-  @UiHandler("startIngest")
-  void buttonStartIngestHandler(ClickEvent e) {
-    LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
-    selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
-    selectedItems.setSelectedItems(getSelected());
-    HistoryUtils.newHistory(CreateSelectedJob.RESOLVER, RodaConstants.JOB_PROCESS_INGEST);
   }
 
   public SelectedItems<TransferredResource> getSelected() {
@@ -545,140 +342,5 @@ public class IngestTransfer extends Composite {
       SafeUri downloadUri = RestUtils.createTransferredResourceDownloadUri(resource.getUUID());
       Window.Location.assign(downloadUri.asString());
     }
-  }
-
-  @UiHandler("rename")
-  void buttonRenameHandler(ClickEvent e) {
-    if (!ClientSelectedItemsUtils.isEmpty(getSelected()) && getSelected() instanceof SelectedItemsList) {
-      SelectedItemsList<TransferredResource> resourceList = (SelectedItemsList<TransferredResource>) getSelected();
-
-      BrowserService.Util.getInstance().retrieve(TransferredResource.class.getName(), resourceList.getIds().get(0),
-        Arrays.asList(RodaConstants.TRANSFERRED_RESOURCE_ID, RodaConstants.TRANSFERRED_RESOURCE_NAME),
-        new AsyncCallback<TransferredResource>() {
-
-          @Override
-          public void onFailure(Throwable caught) {
-            Toast.showInfo(messages.dialogFailure(), messages.renameSIPFailed());
-          }
-
-          @Override
-          public void onSuccess(final TransferredResource resultResource) {
-            Dialogs.showPromptDialog(messages.renameTransferredResourcesDialogTitle(), null, resultResource.getName(),
-              null, RegExp.compile("^[^/]*$"), messages.cancelButton(), messages.confirmButton(), true, false,
-              new AsyncCallback<String>() {
-
-                @Override
-                public void onFailure(Throwable caught) {
-                  // do nothing
-                }
-
-                @Override
-                public void onSuccess(String result) {
-                  BrowserService.Util.getInstance().renameTransferredResource(resultResource.getUUID(), result,
-                    new AsyncCallback<String>() {
-
-                      @Override
-                      public void onFailure(Throwable caught) {
-                        Toast.showInfo(messages.dialogFailure(), messages.renameSIPFailed());
-                      }
-
-                      @Override
-                      public void onSuccess(String result) {
-                        Toast.showInfo(messages.dialogSuccess(), messages.renameSIPSuccessful());
-                        HistoryUtils.newHistory(IngestTransfer.RESOLVER, result);
-                      }
-                    });
-                }
-              });
-          }
-        });
-    } else {
-      return;
-    }
-  }
-
-  @UiHandler("move")
-  void buttonMoveHandler(ClickEvent e) {
-    SelectedItems<TransferredResource> selected = getSelected();
-
-    if (ClientSelectedItemsUtils.isEmpty(selected) && resource != null) {
-      selected = SelectedItemsList.create(TransferredResource.class.getName(), resource.getUUID());
-    }
-
-    BrowserService.Util.getInstance().retrieveSelectedTransferredResource(selected,
-      new AsyncCallback<List<TransferredResource>>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          Toast.showInfo(messages.dialogFailure(), messages.moveSIPFailed());
-        }
-
-        @Override
-        public void onSuccess(List<TransferredResource> result) {
-          doTransferredResourceMove(result);
-        }
-      });
-  }
-
-  private void doTransferredResourceMove(List<TransferredResource> resources) {
-    Filter filter = new Filter();
-    filter.add(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, Boolean.FALSE.toString()));
-
-    if (resource != null && resource.isFile()) {
-      filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, resources.get(0).getParentUUID()));
-    }
-
-    SelectTransferResourceDialog dialog = new SelectTransferResourceDialog(messages.selectParentTitle(), filter);
-    if (resources.size() <= RodaConstants.DIALOG_FILTER_LIMIT_NUMBER) {
-      dialog.addStyleName("object-dialog");
-    }
-    dialog.setEmptyParentButtonVisible(true);
-    dialog.showAndCenter();
-    dialog.addValueChangeHandler(new ValueChangeHandler<TransferredResource>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<TransferredResource> event) {
-        final TransferredResource transferredResource = event.getValue();
-
-        BrowserService.Util.getInstance().moveTransferredResource(getSelected(), transferredResource,
-          new AsyncCallback<Job>() {
-
-            @Override
-            public void onFailure(Throwable caught) {
-              Toast.showInfo(messages.dialogFailure(), messages.moveSIPFailed());
-              HistoryUtils.newHistory(InternalProcess.RESOLVER);
-            }
-
-            @Override
-            public void onSuccess(Job result) {
-              Dialogs.showJobRedirectDialog(messages.moveJobCreatedMessage(), new AsyncCallback<Void>() {
-
-                @Override
-                public void onFailure(Throwable caught) {
-                  Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
-
-                  Timer timer = new Timer() {
-                    @Override
-                    public void run() {
-                      if (transferredResource.getUUID() != null) {
-                        HistoryUtils.newHistory(IngestTransfer.RESOLVER, transferredResource.getUUID());
-                      } else {
-                        HistoryUtils.newHistory(IngestTransfer.RESOLVER);
-                      }
-                    }
-                  };
-
-                  timer.schedule(RodaConstants.ACTION_TIMEOUT);
-                }
-
-                @Override
-                public void onSuccess(final Void nothing) {
-                  HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-                }
-              });
-            }
-          });
-      }
-    });
   }
 }

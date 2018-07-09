@@ -34,38 +34,7 @@
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">
 					<g:FlowPanel addStyleNames="sticky-padding">
-						<g:FlowPanel>
-							<g:Label addStyleNames="h4">
-								<ui:text from='{messages.sidebarFoldersFilesTitle}' />
-							</g:Label>
-							<g:Button addStyleNames="btn btn-block btn-refresh" ui:field="refresh">
-								<ui:text from='{messages.refreshButton}' />
-							</g:Button>
-							<g:Button addStyleNames="btn btn-block btn-edit" ui:field="rename">
-								<ui:text from='{messages.renameButton}' />
-							</g:Button>
-							<g:Button addStyleNames="btn btn-block btn-edit" ui:field="move">
-								<ui:text from='{messages.moveButton}' />
-							</g:Button>
-							<g:Button addStyleNames="btn btn-block btn-upload" ui:field="uploadFiles">
-								<ui:text from='{messages.uploadFilesButton}' />
-							</g:Button>
-							<g:Button addStyleNames="btn btn-block btn-plus" ui:field="createFolder">
-								<ui:text from='{messages.createFolderButton}' />
-							</g:Button>
-							<g:Button addStyleNames="btn btn-block btn-danger btn-ban"
-								ui:field="remove">
-								<ui:text from='{messages.removeWholeFolderButton}' />
-							</g:Button>
-						</g:FlowPanel>
-						<g:FlowPanel addStyleNames="ingestSidebar">
-							<g:Label addStyleNames="h4">
-								<ui:text from='{messages.sidebarIngestTitle}' />
-							</g:Label>
-							<g:Button addStyleNames="btn btn-block btn-play" ui:field="startIngest">
-								<ui:text from='{messages.ingestWholeFolderButton}' />
-							</g:Button>
-						</g:FlowPanel>
+						<g:SimplePanel addStyleNames="sidebar-group" ui:field="actionsSidebar" />
 					</g:FlowPanel>
 				</g:FlowPanel>
 			</g:FlowPanel>

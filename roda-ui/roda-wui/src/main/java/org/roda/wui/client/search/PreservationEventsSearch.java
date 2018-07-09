@@ -159,4 +159,8 @@ public class PreservationEventsSearch extends Composite {
   public void setFilter(Filter filter) {
     eventsSearchResultPanel.setFilter(filter);
   }
+
+  public PreservationEventList getList(){
+    return eventsSearchResultPanel;
+  }
 }

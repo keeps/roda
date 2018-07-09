@@ -11,8 +11,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.wui.common.client.tools.RestUtils;
 
@@ -29,8 +27,6 @@ public class DisseminationFileActions extends AbstractActionable<DIPFile> {
 
   private static final Set<DisseminationFileAction> POSSIBLE_ACTIONS_ON_SINGLE_DISSEMINATION_FILE = new HashSet<>(
     Arrays.asList(DisseminationFileAction.values()));
-
-  private static final Set<DisseminationFileAction> POSSIBLE_ACTIONS_ON_MULTIPLE_DISSEMINATION_FILES = new HashSet<>();
 
   private DisseminationFileActions() {
     // do nothing
@@ -50,26 +46,12 @@ public class DisseminationFileActions extends AbstractActionable<DIPFile> {
   }
 
   @Override
-  public boolean canAct(Action<DIPFile> action, SelectedItems<DIPFile> selectedItems) {
-    return POSSIBLE_ACTIONS_ON_MULTIPLE_DISSEMINATION_FILES.contains(action);
-  }
-
-  @Override
   public void act(Actionable.Action<DIPFile> action, DIPFile disseminationFile, AsyncCallback<ActionImpact> callback) {
     if (DisseminationFileAction.DOWNLOAD.equals(action)) {
       download(disseminationFile, callback);
     } else {
-      callback.onFailure(new RequestNotValidException("Unsupported action in this context: " + action));
+      unsupportedAction(action, callback);
     }
-  }
-
-  /**
-   * Act on multiple files from different representations
-   */
-  @Override
-  public void act(Actionable.Action<DIPFile> action, SelectedItems<DIPFile> selectedItems,
-    AsyncCallback<ActionImpact> callback) {
-    callback.onFailure(new RequestNotValidException("Unsupported action in this context: " + action));
   }
 
   // ACTIONS

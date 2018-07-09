@@ -940,15 +940,15 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
         });
 
         if (isAllSelected()) {
-          actionsPopup.setWidget(actionableBuilder.buildWithObjects(new ActionableObject<>(getSelected())));
+          actionsPopup.setWidget(actionableBuilder.buildListWithObjects(new ActionableObject<>(getSelected())));
         } else if (selected.size() == 1) {
           actionsPopup
-            .setWidget(actionableBuilder.buildWithObjects(new ActionableObject<>(selected.iterator().next())));
+            .setWidget(actionableBuilder.buildListWithObjects(new ActionableObject<>(selected.iterator().next())));
         } else if (selected.size() > 1) {
           // TODO create action layout based on selected set
-          actionsPopup.setWidget(actionableBuilder.buildWithObjects(new ActionableObject<>(getSelected())));
+          actionsPopup.setWidget(actionableBuilder.buildListWithObjects(new ActionableObject<>(getSelected())));
         } else {
-          Label emptyHelpText = new Label(messages.tableActionEmptyHelp());
+          Label emptyHelpText = new Label(messages.actionableEmptyHelp(ActionableObject.ActionableObjectType.NONE));
           emptyHelpText.addStyleName("actions-empty-help");
           actionsPopup.setWidget(emptyHelpText);
         }

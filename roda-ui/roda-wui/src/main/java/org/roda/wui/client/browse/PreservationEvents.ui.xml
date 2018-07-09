@@ -9,7 +9,7 @@
 
 	<g:FlowPanel styleName="preservationEvents" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
-			<g:FlowPanel addStyleNames="col_10 content">
+			<g:FlowPanel addStyleNames="col_12 content">
 				<g:FlowPanel styleName="browseItemPanel">
 					<g:SimplePanel styleName="browseItemIcon" ui:field="itemIcon" />
 					<g:HTML styleName="browseItemIcon-other">
@@ -24,24 +24,6 @@
 				</g:FlowPanel>
 				<m:BreadcrumbPanel ui:field="breadcrumb" addStyleNames="browseBreadcrumb" />
 				<search:PreservationEventsSearch ui:field="eventSearch" addStyleNames="searchResults" />
-			</g:FlowPanel>
-			<g:FlowPanel addStyleNames="col_2 last sidebar">
-				<g:FlowPanel addStyleNames="sticky-flow">
-					<g:FlowPanel addStyleNames="sticky-padding">
-						<g:FlowPanel addStyleNames="sidebar-group" ui:field="actionsPanel">
-							<g:Label addStyleNames="h4">
-								<ui:text from='{messages.sidebarActionsTitle}' />
-							</g:Label>
-							<g:Button addStyleNames="btn btn-block btn-download" ui:field="downloadButton">
-								<ui:text from='{messages.preservationEventsDownloadButton}' />
-							</g:Button>
-							<g:Button addStyleNames="btn btn-block btn-default btn-back"
-								ui:field="backButton">
-								<ui:text from='{messages.preservationEventsBackButton}' />
-							</g:Button>
-						</g:FlowPanel>
-					</g:FlowPanel>
-				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>

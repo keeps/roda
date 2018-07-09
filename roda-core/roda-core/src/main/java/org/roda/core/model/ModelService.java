@@ -1762,6 +1762,26 @@ public class ModelService extends ModelObservable {
     }
   }
 
+  public User deActivateUser(String id, boolean activate, boolean notify)
+    throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
+    try {
+      User user = UserUtility.getLdapUtility().getUser(id);
+
+      if (user.isActive() != activate) {
+        user.setActive(activate);
+        User updatedUser = UserUtility.getLdapUtility().modifyUser(user);
+        if (notify) {
+          notifyUserUpdated(updatedUser).failOnError();
+        }
+        return updatedUser;
+      } else {
+        return user;
+      }
+    } catch (IllegalOperationException e) {
+      throw new AuthorizationDeniedException("Illegal operation", e);
+    }
+  }
+
   public User updateMyUser(User user, String password, boolean notify)
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
     try {

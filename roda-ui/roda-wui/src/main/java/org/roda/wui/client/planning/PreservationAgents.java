@@ -16,6 +16,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.actions.PreservationAgentActions;
 import org.roda.wui.client.common.lists.PreservationAgentList;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -87,7 +88,8 @@ public class PreservationAgents extends Composite {
 
   public PreservationAgents() {
     agentList = new PreservationAgentList("PreservationAgents_agents", Filter.ALL, messages.preservationAgentsTitle(),
-      false);
+      true);
+    agentList.setActionable(PreservationAgentActions.get());
 
     agentList.getSelectionModel().addSelectionChangeHandler(new Handler() {
       @Override

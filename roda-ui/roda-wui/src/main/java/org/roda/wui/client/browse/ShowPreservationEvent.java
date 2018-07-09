@@ -29,6 +29,9 @@ import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.actions.ActionableObject;
+import org.roda.wui.client.common.actions.ActionableWidgetBuilder;
+import org.roda.wui.client.common.actions.PreservationEventActions;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
@@ -44,7 +47,6 @@ import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JsonUtils;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -57,11 +59,8 @@ import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.safehtml.shared.UriUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -179,10 +178,8 @@ public class ShowPreservationEvent extends Composite {
   HTML eventOutcomeDetails;
 
   @UiField
-  Button backButton;
-
-  @UiField
-  Button downloadButton;
+  SimplePanel actionsSidebar;
+  private ActionableWidgetBuilder<IndexedPreservationEvent> actionableWidgetBuilder;
 
   private String aipId;
   private String representationUUID;
@@ -191,14 +188,6 @@ public class ShowPreservationEvent extends Composite {
 
   private PreservationEventViewBundle bundle;
 
-  /**
-   * Create a new panel to edit a user
-   * 
-   * @param eventId
-   * 
-   * @param itemBundle
-   * 
-   */
   public ShowPreservationEvent(final String eventId) {
     this(null, eventId);
   }
@@ -219,6 +208,8 @@ public class ShowPreservationEvent extends Composite {
     this.eventId = eventId;
 
     initWidget(uiBinder.createAndBindUi(this));
+
+    actionableWidgetBuilder = new ActionableWidgetBuilder<>(PreservationEventActions.get());
 
     BrowserService.Util.getInstance().retrievePreservationEventViewBundle(eventId,
       new AsyncCallback<PreservationEventViewBundle>() {
@@ -326,6 +317,8 @@ public class ShowPreservationEvent extends Composite {
         outcomeDetailHeader.setVisible(result.asString().length() > 0);
       }
     });
+
+    actionsSidebar.setWidget(actionableWidgetBuilder.buildListWithObjects(new ActionableObject<>(event)));
   }
 
   private void addObjectPanel(LinkingIdentifier object, PreservationEventViewBundle bundle, FlowPanel objectsPanel) {
@@ -768,26 +761,5 @@ public class ShowPreservationEvent extends Composite {
     } catch (RequestException e) {
       callback.onFailure(e);
     }
-  }
-
-  @UiHandler("backButton")
-  void buttonBackHandler(ClickEvent e) {
-    if (fileUUID != null) {
-      HistoryUtils.newHistory(PreservationEvents.BROWSE_RESOLVER, aipId, representationUUID, fileUUID);
-    } else if (representationUUID != null) {
-      HistoryUtils.newHistory(PreservationEvents.BROWSE_RESOLVER, aipId, representationUUID);
-    } else if (aipId != null) {
-      HistoryUtils.newHistory(PreservationEvents.BROWSE_RESOLVER, aipId);
-    } else {
-      HistoryUtils.newHistory(PreservationEvents.PLANNING_RESOLVER);
-    }
-  }
-
-  @UiHandler("downloadButton")
-  void buttonDownloadHandler(ClickEvent e) {
-    IndexedPreservationEvent event = bundle.getEvent();
-    SafeUri downloadUri = RestUtils.createPreservationEventDetailsUri(eventId, event.getAipID(),
-      event.getRepresentationUUID(), event.getFileUUID(), false, RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN);
-    Window.Location.assign(downloadUri.asString());
   }
 }

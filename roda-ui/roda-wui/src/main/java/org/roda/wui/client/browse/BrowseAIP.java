@@ -13,22 +13,22 @@ package org.roda.wui.client.browse;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataViewBundle;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
+import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
@@ -42,16 +42,16 @@ import org.roda.wui.client.common.lists.DIPList;
 import org.roda.wui.client.common.lists.RepresentationList;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.search.SearchPanel;
+import org.roda.wui.client.common.slider.SliderPanel;
+import org.roda.wui.client.common.slider.Sliders;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
-import org.roda.wui.client.ingest.process.ShowJobReport;
 import org.roda.wui.client.ingest.transfer.TransferUpload;
 import org.roda.wui.client.main.BreadcrumbItem;
-import org.roda.wui.client.main.BreadcrumbPanel;
-import org.roda.wui.client.main.BreadcrumbUtils;
-import org.roda.wui.client.search.Search;
+import org.roda.wui.client.management.UserLog;
+import org.roda.wui.client.planning.RiskIncidenceRegister;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.ConfigurationManager;
@@ -92,8 +92,6 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TabPanel;
@@ -106,7 +104,6 @@ import config.i18n.client.ClientMessages;
  * 
  */
 public class BrowseAIP extends Composite {
-
   private static final String BROWSE_TOP_CSS = "browse_top";
   private static final String BROWSE_AIP_CSS = "browse_aip";
 
@@ -151,6 +148,7 @@ public class BrowseAIP extends Composite {
   private String aipId;
 
   private ActionableWidgetBuilder<IndexedAIP> actionableWidgetBuilder;
+  private SliderPanel aipDetailsSlider;
 
   // Focus
   @UiField
@@ -159,16 +157,16 @@ public class BrowseAIP extends Composite {
   // HEADER
 
   @UiField
-  Label browseTitle;
+  NavigationToolbar<IndexedAIP> navigationToolbar;
 
   @UiField
   FlowPanel browseDescription;
 
   @UiField
-  BreadcrumbPanel breadcrumb;
+  SimplePanel bigTitle;
 
   @UiField
-  SimplePanel itemIcon;
+  SimplePanel smallTitle;
 
   // STATUS
 
@@ -178,16 +176,10 @@ public class BrowseAIP extends Composite {
   // IDENTIFICATION
 
   @UiField
-  Label browseItemHeader, itemTitle, sipId;
+  Label browseItemHeader;
 
   @UiField
-  FlowPanel ingestJobId, ingestUpdateJobIds;
-
-  @UiField
-  Label dateCreated, dateUpdated;
-
-  @UiField
-  FlowPanel itemId, type, level;
+  FlowPanel identificationPanel;
 
   // DESCRIPTIVE METADATA
 
@@ -200,7 +192,7 @@ public class BrowseAIP extends Composite {
   // REPRESENTATIONS
 
   @UiField
-  Label representationsTitle;
+  SimplePanel representationsTitle;
 
   @UiField(provided = true)
   SearchPanel representationsSearch;
@@ -222,7 +214,7 @@ public class BrowseAIP extends Composite {
   // AIP CHILDREN
 
   @UiField
-  Label aipChildrenTitle;
+  SimplePanel aipChildrenTitle;
 
   @UiField(provided = true)
   SearchPanel aipChildrenSearch;
@@ -230,19 +222,13 @@ public class BrowseAIP extends Composite {
   @UiField(provided = true)
   AIPList aipChildrenList;
 
-  // SIDEBAR
+  @UiField
+  FlowPanel risksEventsLogs;
 
   @UiField
-  SimplePanel actionsSidebar;
-
+  FlowPanel center;
   @UiField
-  FlowPanel searchSection;
-
-  @UiField
-  Button searchPrevious, searchNext, searchContext;
-
-  @UiField
-  Button searchAIP;
+  Label dateCreatedAndModified;
 
   private List<HandlerRegistration> handlers;
 
@@ -395,35 +381,18 @@ public class BrowseAIP extends Composite {
 
     justActive = true;
     browseItemHeader.setVisible(false);
-    browseTitle.setVisible(false);
+    bigTitle.setVisible(false);
     browseDescription.setVisible(false);
 
-    HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getTopIconHTMLPanel();
-    itemIconHtmlPanel.addStyleName("browseItemIcon-all");
-    itemIcon.setWidget(itemIconHtmlPanel);
-    itemTitle.setText(messages.browseLoading());
-    itemTitle.removeStyleName("browseTitle-allCollections");
-    itemIcon.getParent().removeStyleName("browseTitle-allCollections-wrapper");
-    itemId.clear();
-    itemId.removeStyleName("browseItemId");
-    sipId.setText("");
-    sipId.removeStyleName("browseSipId");
-    ingestJobId.clear();
-    ingestJobId.removeStyleName("browseIngestJobId");
-    ingestUpdateJobIds.clear();
-    ingestUpdateJobIds.removeStyleName("browseIngestJobId");
+    identificationPanel.removeStyleName("browseTitle-allCollections-wrapper");
+    smallTitle.setWidget(actionableWidgetBuilder.withTitleLoading().buildTitleWithoutActions());
 
-    dateCreated.setText("");
-    dateCreated.removeStyleName("browseItemId");
-    dateUpdated.setText("");
-    dateUpdated.removeStyleName("browseItemId");
-
-    type.clear();
-    type.removeStyleName("browseItemId");
-    level.clear();
-    level.removeStyleName("browseItemId");
-
-    breadcrumb.setVisible(false);
+    dateCreatedAndModified.setText("");
+    if (aipDetailsSlider != null) {
+      aipDetailsSlider.dispose();
+    }
+    navigationToolbar.clearBreadcrumb();
+    navigationToolbar.hide();
 
     descriptiveMetadata.setVisible(false);
     descriptiveMetadata.clear();
@@ -432,7 +401,6 @@ public class BrowseAIP extends Composite {
     newDescriptiveMetadata.setVisible(false);
 
     // Representations list
-    representationsTitle.setVisible(false);
     representationsSearch.setVisible(false);
     representationsSearch.clearSearchInputBox();
     representationsList.setVisible(false);
@@ -446,15 +414,10 @@ public class BrowseAIP extends Composite {
     disseminationsList.getParent().setVisible(false);
 
     // AIP children list
-    aipChildrenTitle.setVisible(false);
     aipChildrenSearch.setVisible(false);
     aipChildrenSearch.clearSearchInputBox();
     aipChildrenList.setVisible(false);
     aipChildrenList.getParent().setVisible(false);
-
-    actionsSidebar.setVisible(false);
-
-    searchSection.setVisible(true);
 
     // Set button visibility
     for (AIPState state : AIPState.values()) {
@@ -467,12 +430,11 @@ public class BrowseAIP extends Composite {
   }
 
   protected void showError(String id, Throwable caught) {
-    breadcrumb.updatePath(new ArrayList<BreadcrumbItem>());
+    navigationToolbar.clearBreadcrumb();
+    navigationToolbar.hide();
 
-    HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(null);
-    itemIconHtmlPanel.addStyleName("browseItemIcon-other");
-    itemIcon.setWidget(itemIconHtmlPanel);
-    itemTitle.setText(id);
+    smallTitle.setWidget(actionableWidgetBuilder
+      .withTitleSmall(id, DescriptionLevelUtils.getElementLevelIconCssClass(null)).buildTitleWithoutActions());
 
     SafeHtml title;
     SafeHtml message;
@@ -514,6 +476,10 @@ public class BrowseAIP extends Composite {
       aipState.setHTML(HtmlSnippetUtils.getAIPStateHTML(state));
       aipState.setVisible(!justActive);
 
+      // NAVIGATION TOOLBAR
+      navigationToolbar.setObject(aip);
+      navigationToolbar.show();
+
       // IDENTIFICATION
       updateSectionIdentification(bundle);
 
@@ -521,18 +487,22 @@ public class BrowseAIP extends Composite {
       updateSectionDescriptiveMetadata(bundle);
 
       // REPRESENTATIONS
+      RepresentationActions representationActions = RepresentationActions.get(bundle.getAip());
       if (bundle.getRepresentationCount() > 0) {
         Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aip.getId()));
         representationsSearch.setDefaultFilter(filter, true);
         representationsSearch.clearSearchInputBox();
         representationsList.set(filter, justActive);
-        representationsList.setActionable(RepresentationActions.get(aipId));
+        representationsList.setActionable(representationActions);
       }
 
-      representationsTitle.setVisible(bundle.getRepresentationCount() > 0);
+      representationsTitle.setWidget(new ActionableWidgetBuilder<>(representationActions)
+        .withTitleForCard(messages.representationsTitle(),
+          DescriptionLevelUtils.getRepresentationTypeIconCssClass(null))
+        .buildTitleWithObjects(new ActionableObject<>(IndexedRepresentation.class)));
       representationsSearch.setVisible(bundle.getRepresentationCount() > 0);
       representationsList.setVisible(bundle.getRepresentationCount() > 0);
-      representationsList.getParent().setVisible(bundle.getRepresentationCount() > 0);
+      representationsList.getParent().setVisible(true);
 
       // DISSEMINATIONS
       if (bundle.getDipCount() > 0) {
@@ -548,37 +518,26 @@ public class BrowseAIP extends Composite {
       disseminationsList.getParent().setVisible(bundle.getDipCount() > 0);
 
       // AIP CHILDREN
+      AipActions aipActions = AipActions.get(aip.getId(), aip.getState());
       if (bundle.getChildAIPCount() > 0) {
         Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aip.getId()));
         aipChildrenSearch.setDefaultFilter(filter, true);
         aipChildrenSearch.clearSearchInputBox();
         aipChildrenList.set(filter, justActive);
         LastSelectedItemsSingleton.getInstance().setSelectedJustActive(justActive);
-        aipChildrenList.setActionable(AipActions.get(aip.getId(), aip.getState()));
+        aipChildrenList.setActionable(aipActions);
       }
 
-      aipChildrenTitle.setVisible(bundle.getChildAIPCount() > 0);
+      aipChildrenTitle.setWidget(new ActionableWidgetBuilder<>(aipActions)
+        .withTitleForCard(messages.sublevels(),
+          DescriptionLevelUtils.getElementLevelIconCssClass(RodaConstants.AIP_CHILDREN))
+        .buildTitleWithObjects(new ActionableObject<>(IndexedAIP.class)));
       aipChildrenSearch.setVisible(bundle.getChildAIPCount() > 0);
       aipChildrenList.setVisible(bundle.getChildAIPCount() > 0);
-      aipChildrenList.getParent().setVisible(bundle.getChildAIPCount() > 0);
-
-      // SIDEBAR
-      actionsSidebar.setVisible(true);
-
-      actionsSidebar.setWidget(actionableWidgetBuilder.withCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
-        @Override
-        public void onSuccess(Actionable.ActionImpact impact) {
-          if (Actionable.ActionImpact.UPDATED.equals(impact)) {
-            // reload
-            clear(true);
-            viewAction(aipId);
-          }
-        }
-      }).buildWithObjects(new ActionableObject<>(aip)));
+      aipChildrenList.getParent().setVisible(true);
 
       // Set button visibility
       keyboardFocus.setFocus(true);
-      ListSelectionUtils.bindLayout(aip, searchPrevious, searchNext, keyboardFocus, true, false, false);
 
     } else {
       viewAction();
@@ -661,100 +620,71 @@ public class BrowseAIP extends Composite {
 
   private void updateSectionIdentification(BrowseAIPBundle bundle) {
     IndexedAIP aip = bundle.getAip();
+
+    actionableWidgetBuilder
+      .withTitleSmall(aip.getTitle() != null ? aip.getTitle() : aip.getId(),
+        DescriptionLevelUtils.getElementLevelIconCssClass(aip.getLevel()))
+      .withCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
+        @Override
+        public void onSuccess(Actionable.ActionImpact impact) {
+          if (Actionable.ActionImpact.UPDATED.equals(impact)) {
+            // reload
+            clear(true);
+            viewAction(aipId);
+          }
+        }
+      });
+
+    smallTitle.setWidget(actionableWidgetBuilder.buildTitleWithObjects(new ActionableObject<>(aip)));
+
     browseItemHeader.setVisible(true);
 
-    breadcrumb.updatePath(BreadcrumbUtils.getAipBreadcrumbs(bundle.getAIPAncestors(), aip));
-    breadcrumb.setVisible(true);
-
-    HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(aip.getLevel());
-    itemIconHtmlPanel.addStyleName("browseItemIcon-other");
-    itemIcon.setWidget(itemIconHtmlPanel);
-    itemTitle.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());
-    itemTitle.removeStyleName("browseTitle-allCollections");
-    itemIcon.getParent().removeStyleName("browseTitle-allCollections-wrapper");
-
-    itemId.addStyleName("browseItemId");
-    final String idFilter = RepresentationInformationUtils
-      .createRepresentationInformationFilter(RodaConstants.INDEX_AIP, RodaConstants.INDEX_UUID, aip.getId());
-    RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(
-      SafeHtmlUtils.fromString(messages.itemIdMin(aip.getId())), idFilter, itemId,
-      bundle.getRepresentationInformationFields().contains(RodaConstants.INDEX_UUID));
-
-    if (!aip.getIngestSIPIds().isEmpty()) {
-      sipId.setText(messages.sipIdMin(StringUtils.prettyPrint(aip.getIngestSIPIds())));
-      sipId.addStyleName("browseSipId");
+    if (aipDetailsSlider != null) {
+      aipDetailsSlider.dispose();
     }
+    aipDetailsSlider = Sliders.createAipInfoSlider(center, navigationToolbar.getSidebarButton(), bundle);
 
-    if (StringUtils.isNotBlank(aip.getIngestJobId())) {
-      InlineHTML html = new InlineHTML();
-      html.setText(messages.processId());
+    Anchor risksLink = new Anchor(messages.aipRiskIncidences(bundle.getRiskIncidenceCount()),
+      HistoryUtils.createHistoryHashLink(RiskIncidenceRegister.RESOLVER, aip.getId()));
+    Anchor eventsLink = new Anchor(messages.aipEvents(bundle.getPreservationEventCount()),
+      HistoryUtils.createHistoryHashLink(PreservationEvents.BROWSE_RESOLVER, aip.getId()));
+    Anchor logsLink = new Anchor(messages.aipLogs(bundle.getLogCount()),
+      HistoryUtils.createHistoryHashLink(UserLog.RESOLVER, aip.getId()));
 
-      Anchor anchor = new Anchor();
-      anchor.setText(aip.getIngestJobId());
-      anchor
-        .setHref(HistoryUtils.createHistoryHashLink(ShowJobReport.RESOLVER, aip.getIngestJobId() + '-' + aip.getId()));
+    risksEventsLogs.clear();
+    risksEventsLogs.add(risksLink);
+    risksEventsLogs.add(new Label(", "));
+    risksEventsLogs.add(eventsLink);
+    risksEventsLogs.add(new Label(" " + messages.and() + " "));
+    risksEventsLogs.add(logsLink);
 
-      ingestJobId.add(html);
-      ingestJobId.add(anchor);
-      ingestJobId.addStyleName("browseIngestJobId");
-    }
+    navigationToolbar.updateBreadcrumb(bundle);
 
-    if (!aip.getIngestUpdateJobIds().isEmpty()) {
-      final String id = aip.getId();
+    identificationPanel.removeStyleName("browseTitle-allCollections-wrapper");
 
-      InlineHTML html = new InlineHTML();
-      html.setText(messages.updateProcessId());
-      ingestUpdateJobIds.add(html);
-      ingestUpdateJobIds.addStyleName("browseIngestJobId");
-      Iterator<String> jobIterator = aip.getIngestUpdateJobIds().iterator();
-
-      while (jobIterator.hasNext()) {
-        String updateJobId = jobIterator.next();
-
-        Anchor anchor = new Anchor();
-        anchor.setText(updateJobId);
-        anchor.setHref(HistoryUtils.createHistoryHashLink(ShowJobReport.RESOLVER, updateJobId + '-' + id));
-        ingestUpdateJobIds.add(anchor);
-
-        if (jobIterator.hasNext()) {
-          ingestUpdateJobIds.add(new InlineHTML(", "));
-        }
-      }
-    }
-
-    if (aip.getCreatedOn() != null && StringUtils.isNotBlank(aip.getCreatedBy())) {
-      dateCreated.setText(messages.dateCreated(Humanize.formatDateTime(aip.getCreatedOn()), aip.getCreatedBy()));
-      dateCreated.addStyleName("browseItemId");
-    }
-
-    if (aip.getUpdatedOn() != null && StringUtils.isNotBlank(aip.getUpdatedBy())) {
-      dateUpdated.setText(messages.dateUpdated(Humanize.formatDateTime(aip.getUpdatedOn()), aip.getUpdatedBy()));
-      dateUpdated.addStyleName("browseItemId");
-    }
-
-    if (StringUtils.isNotBlank(aip.getType())) {
-      type.addStyleName("browseItemId");
-      final String riFilter = RepresentationInformationUtils
-        .createRepresentationInformationFilter(RodaConstants.INDEX_AIP, RodaConstants.AIP_TYPE, aip.getType());
-      RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(
-        SafeHtmlUtils.fromString(messages.aipTypeItem() + " " + aip.getType()), riFilter, type,
-        bundle.getRepresentationInformationFields().contains(RodaConstants.AIP_TYPE));
-    }
-
-    if (StringUtils.isNotBlank(aip.getLevel())) {
-      level.addStyleName("browseItemId");
-      final String riFilter = RepresentationInformationUtils
-        .createRepresentationInformationFilter(RodaConstants.INDEX_AIP, RodaConstants.AIP_LEVEL, aip.getLevel());
-      RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(
-        SafeHtmlUtils.fromString(messages.aipLevelItem() + " " + aip.getLevel()), riFilter, level,
-        bundle.getRepresentationInformationFields().contains(RodaConstants.AIP_LEVEL));
+    if (aip.getCreatedOn() != null && StringUtils.isNotBlank(aip.getCreatedBy()) && aip.getUpdatedOn() != null
+      && StringUtils.isNotBlank(aip.getUpdatedBy())) {
+      dateCreatedAndModified.setText(messages.dateCreatedAndUpdated(Humanize.formatDate(aip.getCreatedOn()),
+        aip.getCreatedBy(), Humanize.formatDate(aip.getUpdatedOn()), aip.getUpdatedBy()));
+    } else if (aip.getCreatedOn() != null && StringUtils.isNotBlank(aip.getCreatedBy())) {
+      dateCreatedAndModified
+        .setText(messages.dateCreated(Humanize.formatDateTime(aip.getCreatedOn()), aip.getCreatedBy()));
+    } else if (aip.getUpdatedOn() != null && StringUtils.isNotBlank(aip.getUpdatedBy())) {
+      dateCreatedAndModified
+        .setText(messages.dateUpdated(Humanize.formatDateTime(aip.getUpdatedOn()), aip.getUpdatedBy()));
+    } else {
+      dateCreatedAndModified.setText("");
     }
   }
 
   protected void viewAction() {
     aipId = null;
 
-    browseTitle.setVisible(true);
+    actionableWidgetBuilder.withCallback(new NoAsyncCallback<>());
+
+    bigTitle.setWidget(actionableWidgetBuilder.withTitle(messages.allCollectionsTitle())
+      .buildTitleWithObjects(new ActionableObject<>(IndexedAIP.class)));
+    bigTitle.setVisible(true);
     browseDescription.setVisible(true);
     addStyleName(BROWSE_TOP_CSS);
 
@@ -763,15 +693,13 @@ public class BrowseAIP extends Composite {
       firstElement.setAttribute("title", "browse input");
     }
 
-    breadcrumb.updatePath(
-      Arrays.asList(new BreadcrumbItem(DescriptionLevelUtils.getTopIconSafeHtml(), "", RESOLVER.getHistoryPath())));
+    if (aipDetailsSlider != null) {
+      aipDetailsSlider.dispose();
+    }
+    navigationToolbar.updateBreadcrumbPath(
+      new BreadcrumbItem(DescriptionLevelUtils.getTopIconSafeHtml(), "", RESOLVER.getHistoryPath()));
 
-    HTMLPanel topIcon = DescriptionLevelUtils.getTopIconHTMLPanel();
-    topIcon.addStyleName("browseItemIcon-all");
-    itemIcon.setWidget(topIcon);
-    itemTitle.setText(messages.allCollectionsTitle());
-    itemTitle.addStyleName("browseTitle-allCollections");
-    itemIcon.getParent().addStyleName("browseTitle-allCollections-wrapper");
+    identificationPanel.addStyleName("browseTitle-allCollections-wrapper");
 
     aipChildrenSearch.setDefaultFilter(COLLECTIONS_FILTER, true);
     aipChildrenList.set(COLLECTIONS_FILTER, justActive);
@@ -781,22 +709,6 @@ public class BrowseAIP extends Composite {
     aipChildrenSearch.setVisible(true);
     aipChildrenList.setVisible(true);
     aipChildrenList.getParent().setVisible(true);
-
-    actionsSidebar.setVisible(true);
-
-    actionsSidebar.setWidget(actionableWidgetBuilder.withCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
-      @Override
-      public void onSuccess(Actionable.ActionImpact impact) {
-        if (Actionable.ActionImpact.UPDATED.equals(impact)) {
-          // reload
-          clear(true);
-          viewAction(aipId);
-        }
-      }
-    }).buildWithObjects(new ActionableObject<>(IndexedAIP.class)));
-
-    // Set button visibility
-    searchSection.setVisible(false);
 
     this.removeStyleName("inactive");
     aipState.setVisible(false);
@@ -939,16 +851,4 @@ public class BrowseAIP extends Composite {
         RodaConstants.RODA_OBJECT_AIP, aipId);
     }
   }
-
-  @UiHandler("searchContext")
-  void searchContextHandler(ClickEvent e) {
-    HistoryUtils.newHistory(Search.RESOLVER, RodaConstants.SEARCH_ITEMS, RodaConstants.AIP_ANCESTORS, aipId);
-  }
-
-  @UiHandler("searchAIP")
-  void searchAIPHandler(ClickEvent e) {
-    HistoryUtils.newHistory(Search.RESOLVER, RodaConstants.SEARCH_REPRESENTATIONS, RodaConstants.REPRESENTATION_AIP_ID,
-      aipId);
-  }
-
 }

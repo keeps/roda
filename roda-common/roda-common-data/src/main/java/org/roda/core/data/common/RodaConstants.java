@@ -453,6 +453,7 @@ public final class RodaConstants {
   public static final String CONTROLLER_NAME_PARAM = "name";
   public static final String CONTROLLER_STATES_PARAM = "states";
   public static final String CONTROLLER_REPRESENTATION_INFORMATION_FILTER_PARAM = "filter";
+  public static final String CONTROLLER_ACTIVATE_PARAM = "activate";
 
   /*
    * Core (storage, index, orchestrator, etc.)
@@ -599,6 +600,7 @@ public final class RodaConstants {
   public static final String AIP_REPRESENTATION_ID = "representationId";
   public static final String AIP_HAS_REPRESENTATIONS = "hasRepresentations";
   public static final String AIP_GHOST = "ghost";
+  public static final String AIP_CHILDREN = "aip_children";
 
   public static final String AIP_DESCRIPTIVE_METADATA = "descriptiveMetadata";
   public static final String AIP_REPRESENTATIONS = "representations";
@@ -1357,9 +1359,10 @@ public final class RodaConstants {
   /* Description level configuration Constants */
   public static final String LEVELS_CLASSIFICATION_PLAN = "levels.classificationplan";
   public static final String LEVELS_ICONS_PREFIX = "levels.icon";
-  public static final String LEVELS_ICONS_GHOST = "levels.internal.icon.ghost";
-  public static final String LEVELS_ICONS_DEFAULT = "levels.internal.icon.default";
-  public static final String LEVELS_ICONS_REPRESENTATION = "levels.internal.icon.representation";
+  public static final String LEVELS_ICONS_AIP_GHOST = "levels.internal.icon.aip.ghost";
+  public static final String LEVELS_ICONS_AIP_CHILDREN = "levels.internal.icon.aip.children";
+  public static final String LEVELS_ICONS_AIP_DEFAULT = "levels.internal.icon.aip.default";
+  public static final String LEVELS_ICONS_REPRESENTATION = "levels.internal.icon.representation.type.default";
   public static final String LEVELS_ICONS_REPRESENTATION_FOLDER = "levels.internal.icon.representation.folder";
   public static final String LEVELS_ICONS_REPRESENTATION_FILE = "levels.internal.icon.representation.file";
   public static final String LEVELS_ICONS_REPRESENTATION_TYPES_PREFIX = "levels.internal.icon.representation.type";

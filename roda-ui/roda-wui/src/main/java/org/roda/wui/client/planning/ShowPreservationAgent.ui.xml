@@ -71,19 +71,7 @@
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">
 					<g:FlowPanel addStyleNames="sticky-padding">
-						<g:FlowPanel>
-							<g:Label addStyleNames="h4">
-								<ui:text from='{messages.sidebarActionsTitle}' />
-							</g:Label>
-							<g:Button addStyleNames="btn btn-block btn-download"
-								ui:field="downloadButton">
-								<ui:text from='{messages.downloadButton}' />
-							</g:Button>
-							<g:Button addStyleNames="btn btn-block btn-default btn-back"
-								ui:field="backButton">
-								<ui:text from='{messages.backButton}' />
-							</g:Button>
-						</g:FlowPanel>
+						<g:SimplePanel addStyleNames="sidebar-group" ui:field="actionsSidebar" />
 					</g:FlowPanel>
 				</g:FlowPanel>
 			</g:FlowPanel>

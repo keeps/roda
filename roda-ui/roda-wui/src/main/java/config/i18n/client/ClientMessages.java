@@ -20,6 +20,7 @@ import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.notifications.Notification.NOTIFICATION_STATE;
 import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
 import org.roda.core.data.v2.risks.RiskIncidence.INCIDENCE_STATUS;
+import org.roda.wui.client.common.actions.ActionableObject;
 
 import com.google.gwt.i18n.client.Messages;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -31,6 +32,8 @@ import com.google.gwt.safehtml.shared.SafeHtml;
 public interface ClientMessages extends Messages {
 
   String moveNoSuchObject(String message);
+
+  String and();
 
   String of();
 
@@ -422,6 +425,8 @@ public interface ClientMessages extends Messages {
 
   String newButton();
 
+  String newRepresentationButton();
+
   String editButton();
 
   String saveButton();
@@ -623,9 +628,19 @@ public interface ClientMessages extends Messages {
 
   String sipIdMin(String sipId);
 
+  String aipCreated();
+
+  String aipUpdated();
+
   String dateCreated(String date, String person);
 
   String dateUpdated(String date, String person);
+
+  String dateCreatedOrUpdated(String date, String person);
+
+  String dateCreatedAndUpdated(String createdDate, String createdPerson, String updatedDate, String updatedPerson);
+
+  String aipType();
 
   String aipTypeItem();
 
@@ -685,6 +700,12 @@ public interface ClientMessages extends Messages {
   String aipDates();
 
   String aipHasRepresentations();
+
+  String aipRiskIncidences(Long amount);
+
+  String aipEvents(Long amount);
+
+  String aipLogs(Long amount);
 
   String fileId();
 
@@ -1364,6 +1385,8 @@ public interface ClientMessages extends Messages {
 
   String searchAIP();
 
+  String aipPermissionDetails();
+
   /***** Representation ****/
 
   String representation();
@@ -1879,8 +1902,6 @@ public interface ClientMessages extends Messages {
 
   SafeHtml tableAction();
 
-  String tableActionEmptyHelp();
-
   String showMore();
 
   String showLess();
@@ -1940,4 +1961,6 @@ public interface ClientMessages extends Messages {
   String insertLinkUrl();
 
   String editHTMLContent();
+
+  String actionableEmptyHelp(@Select ActionableObject.ActionableObjectType action);
 }

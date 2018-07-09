@@ -132,16 +132,7 @@
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">
 					<g:FlowPanel addStyleNames="sticky-padding">
-						<g:Label addStyleNames="h4">
-							<ui:text from='{messages.sidebarActionsTitle}' />
-						</g:Label>
-						<g:Button addStyleNames="btn btn-block btn-edit" ui:field="buttonEdit">
-							<ui:text from='{messages.editButton}' />
-						</g:Button>
-						<g:Button addStyleNames="btn btn-block btn-default btn-times-circle"
-							ui:field="buttonCancel">
-							<ui:text from='{messages.cancelButton}' />
-						</g:Button>
+						<g:SimplePanel addStyleNames="sidebar-group" ui:field="actionsSidebar" />
 					</g:FlowPanel>
 				</g:FlowPanel>
 			</g:FlowPanel>

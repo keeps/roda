@@ -10,15 +10,18 @@
  */
 package org.roda.wui.client.planning;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.LastSelectedItemsSingleton;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.actions.Actionable;
+import org.roda.wui.client.common.actions.ActionableObject;
+import org.roda.wui.client.common.actions.ActionableWidgetBuilder;
+import org.roda.wui.client.common.actions.RiskIncidenceActions;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
@@ -28,17 +31,15 @@ import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -88,7 +89,6 @@ public class ShowRiskIncidence extends Composite {
     RodaConstants.RISK_INCIDENCE_MITIGATED_DESCRIPTION);
 
   private RiskIncidence incidence;
-  private String relatedObject = "";
 
   @UiField
   Label incidenceId;
@@ -127,26 +127,29 @@ public class ShowRiskIncidence extends Composite {
   Label mitigatedDescriptionKey, mitigatedDescriptionValue;
 
   @UiField
-  Button buttonEdit;
+  SimplePanel actionsSidebar;
 
-  @UiField
-  Button buttonCancel;
-
-  /**
-   * Create a new panel to view a risk incidence
-   *
-   *
-   */
-
-  public ShowRiskIncidence() {
+  private ShowRiskIncidence() {
     this.incidence = new RiskIncidence();
     initWidget(uiBinder.createAndBindUi(this));
   }
 
-  public ShowRiskIncidence(String relatedObject, RiskIncidence incidence) {
+  /**
+   * Create a new panel to view a risk incidence
+   */
+  public ShowRiskIncidence(RiskIncidence incidence) {
     initWidget(uiBinder.createAndBindUi(this));
     this.incidence = incidence;
-    this.relatedObject = relatedObject;
+
+    actionsSidebar.setWidget(new ActionableWidgetBuilder<>(RiskIncidenceActions.get())
+      .withCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
+        @Override
+        public void onSuccess(Actionable.ActionImpact result) {
+          if (result.equals(Actionable.ActionImpact.DESTROYED)) {
+            HistoryUtils.newHistory(ShowRisk.RESOLVER, incidence.getRiskId());
+          }
+        }
+      }).buildListWithObjects(new ActionableObject<>(incidence)));
 
     incidenceId.setText(incidence.getId());
     HtmlSnippetUtils.addRiskIncidenceObjectLinks(incidence, objectLabel, objectLink);
@@ -224,7 +227,7 @@ public class ShowRiskIncidence extends Composite {
 
           @Override
           public void onSuccess(RiskIncidence result) {
-            ShowRiskIncidence incidencePanel = new ShowRiskIncidence(relatedObject, result);
+            ShowRiskIncidence incidencePanel = new ShowRiskIncidence(result);
             callback.onSuccess(incidencePanel);
           }
         });
@@ -233,18 +236,4 @@ public class ShowRiskIncidence extends Composite {
       callback.onSuccess(null);
     }
   }
-
-  @UiHandler("buttonEdit")
-  void handleButtonEdit(ClickEvent e) {
-    HistoryUtils.newHistory(RiskIncidenceRegister.RESOLVER, EditRiskIncidence.RESOLVER.getHistoryToken(),
-      incidence.getId());
-  }
-
-  @UiHandler("buttonCancel")
-  void handleButtonCancel(ClickEvent e) {
-    List<String> lastHistory = new ArrayList<>(LastSelectedItemsSingleton.getInstance().getLastHistory());
-    LastSelectedItemsSingleton.getInstance().clearLastHistory();
-    HistoryUtils.newHistory(lastHistory);
-  }
-
 }

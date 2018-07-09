@@ -7,6 +7,7 @@
  */
 package org.roda.wui.client.common.lists.utils;
 
+import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
@@ -32,6 +33,7 @@ import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.DIPFileList;
 import org.roda.wui.client.common.lists.DIPList;
+import org.roda.wui.client.common.lists.FormatList;
 import org.roda.wui.client.common.lists.JobList;
 import org.roda.wui.client.common.lists.LogEntryList;
 import org.roda.wui.client.common.lists.NotificationList;
@@ -72,6 +74,8 @@ public class ListFactory {
         incrementPage);
     } else if (actualClass.equals(IndexedRisk.class.getName()) || actualClass.equals(Risk.class.getName())) {
       return new RiskList("ListFactory_risk", filter, title, selectable, pageSize, incrementPage);
+    } else if (actualClass.equals(Format.class.getName())) {
+      return new FormatList("ListFactory_format", filter, title, selectable, pageSize, incrementPage);
     } else if (actualClass.equals(RiskIncidence.class.getName())) {
       return new RiskIncidenceList("ListFactory_riskIncidence", filter, title, selectable, pageSize, incrementPage);
     } else if (actualClass.equals(Job.class.getName())) {

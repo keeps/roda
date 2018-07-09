@@ -7,7 +7,7 @@ import org.roda.core.data.v2.index.select.SelectedItems;
  * @author Bruno Ferreira <bferreira@keep.pt>
  */
 public class ActionableObject<T extends IsIndexed> {
-  protected enum ActionableObjectType {
+  public enum ActionableObjectType {
     NONE, SINGLE, MULTIPLE
   }
 

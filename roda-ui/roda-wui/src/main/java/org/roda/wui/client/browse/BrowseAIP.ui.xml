@@ -4,19 +4,17 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:m="urn:import:org.roda.wui.client.main"
 	xmlns:commonsearch="urn:import:org.roda.wui.client.common.search"
-	xmlns:lists="urn:import:org.roda.wui.client.common.lists">
+	xmlns:lists="urn:import:org.roda.wui.client.common.lists" xmlns:common="urn:import:org.roda.wui.client.common">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
 	<g:FocusPanel ui:field="keyboardFocus">
 		<g:FlowPanel styleName="browse" addStyleNames="wrapper skip_padding">
-			<g:FlowPanel addStyleNames="row full_width skip_padding">
-				<g:FlowPanel addStyleNames="col_10 content">
+			<common:NavigationToolbar ui:field="navigationToolbar" header="{messages.catalogueItemTitle}" />
+			<g:FlowPanel addStyleNames="row full_width skip_padding" ui:field="center">
+				<g:FlowPanel addStyleNames="col_12 content">
 					<!-- HEADER -->
-					<g:Label styleName="h1" addStyleNames="browseTitle"
-						ui:field="browseTitle">
-						<ui:text from='{messages.catalogueTitle}' />
-					</g:Label>
+					<g:SimplePanel ui:field="bigTitle" />
 					<g:FlowPanel addStyleNames="page-description" ui:field="browseDescription">
 					</g:FlowPanel>
 
@@ -24,25 +22,13 @@
 					<g:HTML ui:field="aipState" />
 
 					<!-- IDENTIFICATION -->
-					<g:FlowPanel styleName="browseItemPanel browseTitle-allCollections-wrapper">
+					<g:FlowPanel styleName="browseItemPanel browseTitle-allCollections-wrapper" ui:field="identificationPanel">
 						<g:Label addStyleNames="browseItemHeader" ui:field="browseItemHeader">
 							<ui:text from='{messages.catalogueItemTitle}' />
 						</g:Label>
-						<g:SimplePanel styleName="browseItemIcon" ui:field="itemIcon" />
-						<g:FlowPanel styleName="browseItemPanelText">
-							<g:Label styleName="h4" addStyleNames="browseItemText"
-								ui:field="itemTitle" />
-						</g:FlowPanel>
-						<g:FlowPanel addStyleNames="browseItemId" ui:field="itemId"
-							title="{messages.itemId}" />
-						<g:Label addStyleNames="browseSipId" ui:field="sipId"
-							title="{messages.sipId}" />
-						<g:FlowPanel ui:field="ingestJobId" title="{messages.processIdTitle}" />
-						<g:FlowPanel ui:field="ingestUpdateJobIds" title="{messages.updateProcessIdTitle}" />
-						<g:Label addStyleNames="browseItemId" ui:field="dateCreated"/>
-						<g:Label addStyleNames="browseItemId" ui:field="dateUpdated"/>
-						<g:FlowPanel addStyleNames="browseItemId" ui:field="type"/>
-						<g:FlowPanel addStyleNames="browseItemId" ui:field="level"/>
+						<g:SimplePanel ui:field="smallTitle" />
+						<g:FlowPanel addStyleNames="browseItemPanelRisksEventsLogs" ui:field="risksEventsLogs" />
+						<g:Label addStyleNames="browseItemId" ui:field="dateCreatedAndModified" />
 					</g:FlowPanel>
 					<m:BreadcrumbPanel ui:field="breadcrumb"
 						addStyleNames="browseBreadcrumb" />
@@ -59,10 +45,8 @@
 					</g:FlowPanel>
 
 					<!-- REPRESENTATIONS -->
-					<g:FlowPanel addStyleNames="card representationsCard">
-						<g:Label addStyleNames="h5" ui:field="representationsTitle">
-							<ui:text from='{messages.representationsTitle}' />
-						</g:Label>
+					<g:FlowPanel addStyleNames="card">
+						<g:SimplePanel ui:field="representationsTitle" />
 						<commonsearch:SearchPanel ui:field="representationsSearch" />
 						<lists:RepresentationList addStyleNames="searchResults" ui:field="representationsList" />
 					</g:FlowPanel>
@@ -78,40 +62,9 @@
 
 					<!-- AIP CHILDREN -->
 					<g:FlowPanel addStyleNames="card aipChildrenCard">
-						<g:Label addStyleNames="h5" ui:field="aipChildrenTitle">
-							<ui:text from='{messages.sublevels}' />
-						</g:Label>
+						<g:SimplePanel ui:field="aipChildrenTitle" />
 						<commonsearch:SearchPanel ui:field="aipChildrenSearch" />
 						<lists:AIPList addStyleNames="searchResults" ui:field="aipChildrenList" />
-					</g:FlowPanel>
-				</g:FlowPanel>
-				<g:FlowPanel addStyleNames="col_2 last sidebar">
-					<g:FlowPanel addStyleNames="sticky-flow">
-						<g:FlowPanel addStyleNames="sticky-padding">
-							<g:SimplePanel addStyleNames="sidebar-group"
-								ui:field="actionsSidebar" />
-							<g:FlowPanel addStyleNames="sidebar-group" ui:field="searchSection">
-								<g:Label addStyleNames="h4">
-									<ui:text from='{messages.searchTitle}' />
-								</g:Label>
-								<g:Button addStyleNames="btn btn-block btn-default btn-chevron-left"
-									ui:field="searchPrevious">
-									<ui:text from='{messages.searchPrevious}' />
-								</g:Button>
-								<g:Button addStyleNames="btn btn-block btn-default btn-chevron-right"
-									ui:field="searchNext">
-									<ui:text from='{messages.searchNext}' />
-								</g:Button>
-								<g:Button addStyleNames="btn btn-block btn-default btn-search"
-									ui:field="searchContext">
-									<ui:text from='{messages.searchContext}' />
-								</g:Button>
-								<g:Button addStyleNames="btn btn-block btn-default btn-search"
-									ui:field="searchAIP">
-									<ui:text from='{messages.searchAIP}' />
-								</g:Button>
-							</g:FlowPanel>
-						</g:FlowPanel>
 					</g:FlowPanel>
 				</g:FlowPanel>
 			</g:FlowPanel>

@@ -221,7 +221,7 @@ public class DisseminationsSliderHelper {
       };
 
       actionsPopup.setWidget(new ActionableWidgetBuilder<>(DisseminationActions.get()).withCallback(callback)
-        .buildWithObjects(new ActionableObject<>(dip)));
+        .buildListWithObjects(new ActionableObject<>(dip)));
       actionsPopup.showRelativeTo(actionsButton, CalloutPosition.TOP_RIGHT);
     }
 

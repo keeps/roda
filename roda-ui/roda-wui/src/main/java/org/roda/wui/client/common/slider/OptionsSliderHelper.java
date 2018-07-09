@@ -45,31 +45,34 @@ public class OptionsSliderHelper {
 
   private static void updateOptionsSliderPanel(IndexedAIP aip, SliderPanel slider) {
     slider.clear();
-    slider.addContent(new ActionableWidgetBuilder<>(AipActions.get()).buildWithObjects(new ActionableObject<>(aip)));
+    slider
+      .addContent(new ActionableWidgetBuilder<>(AipActions.get()).buildListWithObjects(new ActionableObject<>(aip)));
   }
 
   private static void updateOptionsSliderPanel(IndexedRepresentation representation, SliderPanel slider) {
     slider.clear();
     slider.addContent(new ActionableWidgetBuilder<>(RepresentationActions.get())
-      .buildWithObjects(new ActionableObject<>(representation)));
+      .buildListWithObjects(new ActionableObject<>(representation)));
   }
 
   private static void updateOptionsSliderPanel(final IndexedFile file, final SliderPanel slider) {
     slider.clear();
     slider
-      .addContent(new ActionableWidgetBuilder<>(FileActions.get()).buildWithObjects(new ActionableObject<>((file))));
+      .addContent(
+        new ActionableWidgetBuilder<>(FileActions.get()).buildListWithObjects(new ActionableObject<>((file))));
   }
 
   private static void updateOptionsSliderPanel(final IndexedDIP dip, final SliderPanel slider) {
     slider.clear();
     slider.addContent(
-      new ActionableWidgetBuilder<>(DisseminationActions.get()).buildWithObjects(new ActionableObject<>((dip))));
+      new ActionableWidgetBuilder<>(DisseminationActions.get()).buildListWithObjects(new ActionableObject<>((dip))));
   }
 
   private static void updateOptionsSliderPanel(final DIPFile file, final SliderPanel slider) {
     slider.clear();
     slider.addContent(
-      new ActionableWidgetBuilder<>(DisseminationFileActions.get()).buildWithObjects(new ActionableObject<>((file))));
+      new ActionableWidgetBuilder<>(DisseminationFileActions.get())
+        .buildListWithObjects(new ActionableObject<>((file))));
   }
 
 }

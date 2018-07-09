@@ -238,7 +238,7 @@ public class BrowseRepresentation extends Composite {
     this.repId = representation.getId();
     this.repUUID = representation.getUUID();
 
-    actionableWidgetBuilder = new ActionableWidgetBuilder<>(RepresentationActions.get(aipId));
+    actionableWidgetBuilder = new ActionableWidgetBuilder<>(RepresentationActions.get(bundle.getAip()));
 
     handlers = new ArrayList<>();
     String summary = messages.representationListOfFiles();
@@ -450,7 +450,7 @@ public class BrowseRepresentation extends Composite {
         }
       }
     });
-    actionsSidebar.setWidget(actionableWidgetBuilder.buildWithObjects(new ActionableObject<>(representation)));
+    actionsSidebar.setWidget(actionableWidgetBuilder.buildListWithObjects(new ActionableObject<>(representation)));
   }
 
   @Override

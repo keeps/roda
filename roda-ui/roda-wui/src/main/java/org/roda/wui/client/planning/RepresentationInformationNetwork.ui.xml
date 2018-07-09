@@ -18,29 +18,7 @@
 			<g:FlowPanel addStyleNames="col_2 last sidebar" ui:field="sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">
 					<g:FlowPanel addStyleNames="sticky-padding">
-						<g:FlowPanel addStyleNames="sidebar-group representationInformationSidebar">
-							<g:Label addStyleNames="h4">
-								<ui:text from='{messages.sidebarRepresentationInformationTitle}' />
-							</g:Label>
-							<g:Button addStyleNames="btn btn-block btn-plus"
-								ui:field="buttonAdd">
-								<ui:text from='{messages.newButton}' />
-							</g:Button>
-							<g:Button addStyleNames="btn btn-block btn-danger btn-ban"
-								ui:field="buttonRemove">
-								<ui:text from='{messages.removeButton}' />
-							</g:Button>
-						</g:FlowPanel>
-						<g:FlowPanel addStyleNames="sidebar-group actionsSidebar">
-							<g:Label addStyleNames="h4">
-								<ui:text from='{messages.sidebarActionsTitle}' />
-							</g:Label>
-							<g:Button addStyleNames="btn btn-block btn-play"
-								ui:field="startProcess">
-								<ui:text
-									from='{messages.representationInformationRegisterProcessButton}' />
-							</g:Button>
-						</g:FlowPanel>
+						<g:SimplePanel addStyleNames="sidebar-group" ui:field="actionsSidebar" />
 					</g:FlowPanel>
 				</g:FlowPanel>
 			</g:FlowPanel>

@@ -12,7 +12,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.AIPLink;
 import org.roda.core.data.v2.ip.FileLink;
@@ -23,6 +22,7 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.EditPermissions;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.LoadingAsyncCallback;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -80,7 +80,7 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
     } else if (DisseminationAction.UPDATE_PERMISSIONS.equals(action)) {
       updatePermissions(dissemination, callback);
     } else {
-      callback.onFailure(new RequestNotValidException("Unsupported action in this context: " + action));
+      unsupportedAction(action, callback);
     }
   }
 
@@ -97,7 +97,7 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
     } else if (DisseminationAction.UPDATE_PERMISSIONS.equals(action)) {
       updatePermissions(selectedItems, callback);
     } else {
-      callback.onFailure(new RequestNotValidException("Unsupported action in this context: " + action));
+      unsupportedAction(action, callback);
     }
   }
 
@@ -115,7 +115,7 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
   private void remove(final IndexedDIP dip, AsyncCallback<ActionImpact> callback) {
     Dialogs.showConfirmDialog(messages.browseFileDipRepresentationConfirmTitle(),
       messages.browseFileDipRepresentationConfirmMessage(), messages.dialogCancel(), messages.dialogYes(),
-      new AsyncCallback<Boolean>() {
+      new NoAsyncCallback<Boolean>() {
 
         @Override
         public void onSuccess(Boolean confirmed) {
@@ -147,18 +147,13 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
             });
           }
         }
-
-        @Override
-        public void onFailure(Throwable caught) {
-          // nothing to do
-        }
       });
   }
 
   private void remove(final SelectedItems<IndexedDIP> selectedItems, final AsyncCallback<ActionImpact> callback) {
     Dialogs.showConfirmDialog(messages.browseFileDipRepresentationConfirmTitle(),
       messages.browseFileDipRepresentationConfirmMessage(), messages.dialogCancel(), messages.dialogYes(),
-      new AsyncCallback<Boolean>() {
+      new NoAsyncCallback<Boolean>() {
 
         @Override
         public void onSuccess(Boolean confirmed) {
@@ -177,11 +172,6 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
               }
             });
           }
-        }
-
-        @Override
-        public void onFailure(Throwable caught) {
-          // nothing to do
         }
       });
   }

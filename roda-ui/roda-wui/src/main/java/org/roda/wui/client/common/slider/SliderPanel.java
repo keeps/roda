@@ -35,6 +35,8 @@ public class SliderPanel extends Composite implements HasChangeHandlers {
   private FlowPanel contentLayout;
 
   private FocusPanel toggleButton = null;
+  private HandlerRegistration toggleButtonHandlerRegistration = null;
+  private boolean disposed = false;
 
   public SliderPanel() {
     super();
@@ -49,11 +51,27 @@ public class SliderPanel extends Composite implements HasChangeHandlers {
     this.addStyleName("slider");
   }
 
+  /**
+   * Destroys this slider, making it unusable. Trying to use the slider after this
+   * will cause errors.
+   */
+  public void dispose() {
+    if (!disposed) {
+      closeAll();
+      if (toggleButtonHandlerRegistration != null) {
+        toggleButtonHandlerRegistration.removeHandler();
+      }
+      clear();
+      getElement().removeFromParent();
+      disposed = true;
+    }
+  }
+
   public void setToggleButton(FocusPanel toggleButton) {
     this.toggleButton = toggleButton;
 
     // bind toggle button events
-    toggleButton.addClickHandler(new ClickHandler() {
+    toggleButtonHandlerRegistration = toggleButton.addClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {

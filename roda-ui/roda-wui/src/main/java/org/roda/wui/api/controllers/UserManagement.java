@@ -27,10 +27,13 @@ import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.InvalidTokenException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
+import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.Group;
+import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.util.IdUtils;
 import org.roda.wui.client.browse.bundle.UserExtraBundle;
@@ -459,4 +462,45 @@ public class UserManagement extends RodaWuiController {
     return extraBudle;
   }
 
+  public static void deleteMembers(User user, SelectedItems<RODAMember> members)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    try {
+      // delegate
+      UserManagementHelper.deleteMembers(members);
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, members);
+    }
+  }
+
+  public static void changeActiveMembers(User user, SelectedItems<RODAMember> members, boolean activate)
+    throws GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException,
+    AuthorizationDeniedException {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    try {
+      // delegate
+      UserManagementHelper.changeActiveMembers(members, activate);
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, members,
+        RodaConstants.CONTROLLER_ACTIVATE_PARAM, activate);
+    }
+  }
 }

@@ -12,6 +12,9 @@ import java.util.List;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.actions.ActionableObject;
+import org.roda.wui.client.common.actions.ActionableWidgetBuilder;
+import org.roda.wui.client.common.actions.RODAMemberActions;
 import org.roda.wui.client.common.lists.RodaMemberList;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
@@ -22,21 +25,19 @@ import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.SelectionChangeEvent;
 
 import config.i18n.client.ClientMessages;
 
 public class MemberManagement extends Composite {
-  private static final String EDIT_GROUP_HISTORY_TOKEN = "edit_group";
+  private static final String EDIT_GROUP_HISTORY_TOKEN = EditGroup.RESOLVER.getHistoryToken();
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
@@ -63,6 +64,7 @@ public class MemberManagement extends Composite {
   };
 
   private static MemberManagement instance = null;
+  private ActionableWidgetBuilder<RODAMember> actionableWidgetBuilder;
 
   /**
    * Get the singleton instance
@@ -93,22 +95,23 @@ public class MemberManagement extends Composite {
   RodaMemberList list;
 
   @UiField
-  Button buttonAddUser;
-
-  @UiField
-  Button buttonAddGroup;
+  SimplePanel actionsSidebar;
 
   private static final Filter DEFAULT_FILTER = SearchFilters.defaultFilter(RODAMember.class.getName());
   private static final String ALL_FILTER = SearchFilters.allFilter(RODAMember.class.getName());
 
   public MemberManagement() {
-    list = new RodaMemberList("MemberManagement_rodaMembers", DEFAULT_FILTER, messages.usersAndGroupsTitle(), false);
+    actionableWidgetBuilder = new ActionableWidgetBuilder<>(RODAMemberActions.get());
+    list = new RodaMemberList("MemberManagement_rodaMembers", DEFAULT_FILTER, messages.usersAndGroupsTitle(), true);
+    list.setActionable(RODAMemberActions.get());
 
     searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, true, messages.usersAndGroupsSearchPlaceHolder(), false,
       false, false);
     searchPanel.setList(list);
 
     initWidget(uiBinder.createAndBindUi(this));
+
+    actionsSidebar.setWidget(actionableWidgetBuilder.buildListWithObjects(new ActionableObject<>(RODAMember.class)));
     memberManagementDescription.add(new HTMLWidgetWrapper("MemberManagementDescription.html"));
 
     list.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
@@ -159,15 +162,5 @@ public class MemberManagement extends Composite {
       HistoryUtils.newHistory(RESOLVER);
       callback.onSuccess(null);
     }
-  }
-
-  @UiHandler("buttonAddUser")
-  void buttonAddUserHandler(ClickEvent e) {
-    HistoryUtils.newHistory(RESOLVER, "create_user");
-  }
-
-  @UiHandler("buttonAddGroup")
-  void buttonAddGroupHandler(ClickEvent e) {
-    HistoryUtils.newHistory(RESOLVER, "create_group");
   }
 }

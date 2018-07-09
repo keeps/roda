@@ -7,10 +7,8 @@
  */
 package org.roda.wui.client.common.popup;
 
-import com.google.gwt.core.client.GWT;
 import org.roda.core.data.v2.common.Pair;
 
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.UIObject;
 
@@ -84,7 +82,7 @@ public class CalloutPopup extends PopupPanel {
 
   private Pair<Integer, Integer> getTopRight(UIObject target, int offsetWidth, int offsetHeight) {
     int left = target.getAbsoluteLeft() + target.getOffsetWidth() / 2 - offsetWidth + ARROW_OFFSET_PX;
-    int top = target.getAbsoluteTop() + target.getOffsetHeight() + Window.getScrollTop() + MARGIN_FROM_TARGET_PX;
+    int top = target.getAbsoluteTop() + target.getOffsetHeight() + MARGIN_FROM_TARGET_PX;
     removeStyleDependentName(CalloutPosition.BOTTOM_RIGHT.name().toLowerCase());
     addStyleDependentName(CalloutPosition.TOP_RIGHT.name().toLowerCase());
     return Pair.of(left, top);

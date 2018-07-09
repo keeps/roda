@@ -16,7 +16,12 @@ import java.util.List;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.actions.Actionable;
+import org.roda.wui.client.common.actions.ActionableObject;
+import org.roda.wui.client.common.actions.ActionableWidgetBuilder;
+import org.roda.wui.client.common.actions.FormatActions;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.management.MemberManagement;
@@ -25,19 +30,17 @@ import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -168,25 +171,30 @@ public class ShowFormat extends Composite {
   FlowPanel formatAlternativesValue;
 
   @UiField
-  Button buttonEdit;
-
-  @UiField
-  Button buttonCancel;
+  SimplePanel actionsSidebar;
+  private ActionableWidgetBuilder<Format> actionableWidgetBuilder = new ActionableWidgetBuilder<>(FormatActions.get())
+    .withCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
+      @Override
+      public void onSuccess(Actionable.ActionImpact result) {
+        if (result.equals(Actionable.ActionImpact.DESTROYED)) {
+          HistoryUtils.newHistory(FormatRegister.RESOLVER);
+        }
+      }
+    });
 
   /**
    * Create a new panel to view a format
-   *
-   *
    */
-
   public ShowFormat() {
     this.format = new Format();
     initWidget(uiBinder.createAndBindUi(this));
+    actionsSidebar.setWidget(actionableWidgetBuilder.buildListWithObjects(new ActionableObject<>(format)));
   }
 
   public ShowFormat(Format format) {
     initWidget(uiBinder.createAndBindUi(this));
     this.format = format;
+    actionsSidebar.setWidget(actionableWidgetBuilder.buildListWithObjects(new ActionableObject<>(format)));
 
     formatId.setText(format.getId());
     formatName.setText(format.getName());
@@ -363,19 +371,4 @@ public class ShowFormat extends Composite {
       callback.onSuccess(null);
     }
   }
-
-  @UiHandler("buttonEdit")
-  void handleButtonEdit(ClickEvent e) {
-    HistoryUtils.newHistory(FormatRegister.RESOLVER, EditFormat.RESOLVER.getHistoryToken(), format.getId());
-  }
-
-  @UiHandler("buttonCancel")
-  void handleButtonCancel(ClickEvent e) {
-    cancel();
-  }
-
-  private void cancel() {
-    HistoryUtils.newHistory(FormatRegister.RESOLVER);
-  }
-
 }

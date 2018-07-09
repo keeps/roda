@@ -23,6 +23,9 @@ public class BrowseAIPBundle implements Serializable {
   private Long representationCount;
   private Long dipCount;
   private List<String> representationInformationFields;
+  private Long riskIncidenceCount;
+  private Long preservationEventCount;
+  private Long logCount;
 
   public BrowseAIPBundle() {
     super();
@@ -30,9 +33,13 @@ public class BrowseAIPBundle implements Serializable {
 
   public BrowseAIPBundle(IndexedAIP aip, List<IndexedAIP> aipAncestors,
     List<DescriptiveMetadataViewBundle> descriptiveMetadata, Long childAIPCount, Long representationCount,
-    Long dipCount, List<String> representationInformationFields) {
+    Long dipCount, List<String> representationInformationFields, Long riskIncidenceCount, Long preservationEventCount,
+    Long logCount) {
     super();
     this.aip = aip;
+    this.riskIncidenceCount = riskIncidenceCount;
+    this.preservationEventCount = preservationEventCount;
+    this.logCount = logCount;
     this.setAIPAncestors(aipAncestors);
     this.descriptiveMetadata = descriptiveMetadata;
     this.childAIPCount = childAIPCount;
@@ -87,6 +94,30 @@ public class BrowseAIPBundle implements Serializable {
 
   public void setDipCount(Long dipCount) {
     this.dipCount = dipCount;
+  }
+
+  public Long getRiskIncidenceCount() {
+    return riskIncidenceCount;
+  }
+
+  public void setRiskIncidenceCount(Long riskIncidenceCount) {
+    this.riskIncidenceCount = riskIncidenceCount;
+  }
+
+  public Long getPreservationEventCount() {
+    return preservationEventCount;
+  }
+
+  public void setPreservationEventCount(Long preservationEventCount) {
+    this.preservationEventCount = preservationEventCount;
+  }
+
+  public Long getLogCount() {
+    return logCount;
+  }
+
+  public void setLogCount(Long logCount) {
+    this.logCount = logCount;
   }
 
   public List<String> getRepresentationInformationFields() {

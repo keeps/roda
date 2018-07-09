@@ -14,7 +14,6 @@ import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
@@ -25,23 +24,19 @@ import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.browse.BrowseAIP;
-import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.CreateDescriptiveMetadata;
 import org.roda.wui.client.browse.EditPermissions;
-import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.LoadingAsyncCallback;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.RepresentationDialogs;
 import org.roda.wui.client.common.dialogs.SelectAipDialog;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
-import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.ingest.process.ShowJob;
-import org.roda.wui.client.management.UserLog;
-import org.roda.wui.client.planning.RiskIncidenceRegister;
 import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.client.process.InternalProcess;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -72,10 +67,9 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   private static final Set<AipAction> POSSIBLE_ACTIONS_ON_NO_AIP = new HashSet<>(
     Arrays.asList(AipAction.NEW_CHILD_AIP));
 
-  private static final Set<AipAction> POSSIBLE_ACTIONS_ON_SINGLE_AIP = new HashSet<>(Arrays.asList(
-    AipAction.NEW_CHILD_AIP, AipAction.DOWNLOAD, AipAction.MOVE_IN_HIERARCHY, AipAction.UPDATE_PERMISSIONS,
-    AipAction.ADD_REPRESENTATION, AipAction.REMOVE, AipAction.NEW_PROCESS, AipAction.SHOW_EVENTS, AipAction.SHOW_RISKS,
-    AipAction.SHOW_LOGS, AipAction.DOWNLOAD_DOCUMENTATION, AipAction.CHANGE_TYPE));
+  private static final Set<AipAction> POSSIBLE_ACTIONS_ON_SINGLE_AIP = new HashSet<>(
+    Arrays.asList(AipAction.DOWNLOAD, AipAction.MOVE_IN_HIERARCHY, AipAction.UPDATE_PERMISSIONS, AipAction.REMOVE,
+      AipAction.NEW_PROCESS, AipAction.DOWNLOAD_EVENTS, AipAction.DOWNLOAD_DOCUMENTATION, AipAction.CHANGE_TYPE));
 
   private static final Set<AipAction> POSSIBLE_ACTIONS_ON_MULTIPLE_AIPS = new HashSet<>(
     Arrays.asList(AipAction.MOVE_IN_HIERARCHY, AipAction.UPDATE_PERMISSIONS, AipAction.REMOVE, AipAction.NEW_PROCESS,
@@ -93,8 +87,8 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   }
 
   public enum AipAction implements Actionable.Action<IndexedAIP> {
-    NEW_CHILD_AIP, DOWNLOAD, MOVE_IN_HIERARCHY, UPDATE_PERMISSIONS, ADD_REPRESENTATION, REMOVE, NEW_PROCESS,
-    SHOW_EVENTS, SHOW_RISKS, SHOW_LOGS, APPRAISAL_ACCEPT, APPRAISAL_REJECT, DOWNLOAD_DOCUMENTATION, CHANGE_TYPE;
+    NEW_CHILD_AIP, DOWNLOAD, MOVE_IN_HIERARCHY, UPDATE_PERMISSIONS, REMOVE, NEW_PROCESS, DOWNLOAD_EVENTS,
+    APPRAISAL_ACCEPT, APPRAISAL_REJECT, DOWNLOAD_DOCUMENTATION, CHANGE_TYPE
   }
 
   public static AipActions get() {
@@ -138,34 +132,26 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   @Override
   public void act(Actionable.Action<IndexedAIP> action, AsyncCallback<ActionImpact> callback) {
     if (AipAction.NEW_CHILD_AIP.equals(action)) {
-      newChildAip(null, callback);
+      newChildAip(callback);
     } else {
-      callback.onFailure(new RequestNotValidException("Unsupported action in this context: " + action));
+      unsupportedAction(action, callback);
     }
   }
 
   @Override
   public void act(Actionable.Action<IndexedAIP> action, IndexedAIP aip, AsyncCallback<ActionImpact> callback) {
-    if (AipAction.NEW_CHILD_AIP.equals(action)) {
-      newChildAip(aip, callback);
-    } else if (AipAction.DOWNLOAD.equals(action)) {
+    if (AipAction.DOWNLOAD.equals(action)) {
       download(aip, callback);
     } else if (AipAction.MOVE_IN_HIERARCHY.equals(action)) {
       move(aip, callback);
     } else if (AipAction.UPDATE_PERMISSIONS.equals(action)) {
       updatePermissions(aip, callback);
-    } else if (AipAction.ADD_REPRESENTATION.equals(action)) {
-      addRepresentation(aip, callback);
     } else if (AipAction.REMOVE.equals(action)) {
       remove(aip, callback);
     } else if (AipAction.NEW_PROCESS.equals(action)) {
       newProcess(aip, callback);
-    } else if (AipAction.SHOW_EVENTS.equals(action)) {
-      showEvents(aip, callback);
-    } else if (AipAction.SHOW_RISKS.equals(action)) {
-      showRisks(aip, callback);
-    } else if (AipAction.SHOW_LOGS.equals(action)) {
-      showLogs(aip, callback);
+    } else if (AipAction.DOWNLOAD_EVENTS.equals(action)) {
+      downloadEvents(aip, callback);
     } else if (AipAction.APPRAISAL_ACCEPT.equals(action)) {
       appraisalAccept(aip, callback);
     } else if (AipAction.APPRAISAL_REJECT.equals(action)) {
@@ -175,7 +161,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     } else if (AipAction.CHANGE_TYPE.equals(action)) {
       changeType(aip, callback);
     } else {
-      callback.onFailure(new RequestNotValidException("Unsupported action in this context: " + action));
+      unsupportedAction(action, callback);
     }
   }
 
@@ -197,31 +183,25 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     } else if (AipAction.CHANGE_TYPE.equals(action)) {
       changeType(aips, callback);
     } else {
-      callback.onFailure(new RequestNotValidException("Unsupported action in this context: " + action));
+      unsupportedAction(action, callback);
     }
   }
 
   // ACTIONS
-  private void newChildAip(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
-    String newChildParentAipId = aip != null ? aip.getId() : null;
+  private void newChildAip(final AsyncCallback<ActionImpact> callback) {
     String aipType = RodaConstants.AIP_TYPE_MIXED;
-    BrowserService.Util.getInstance().createAIP(newChildParentAipId, aipType, new AsyncCallback<String>() {
 
-      @Override
-      public void onFailure(Throwable caught) {
-        callback.onFailure(caught);
-      }
-
-      @Override
-      public void onSuccess(String itemAIPId) {
+    BrowserService.Util.getInstance().createAIP(parentAipId, aipType,
+      new ActionAsyncCallback<String>(callback) {
+        @Override
+        public void onSuccess(String itemAIPId) {
         LastSelectedItemsSingleton.getInstance().setLastHistory(HistoryUtils.getCurrentHistoryPath());
         HistoryUtils.newHistory(CreateDescriptiveMetadata.RESOLVER, RodaConstants.RODA_OBJECT_AIP, itemAIPId,
           CreateDescriptiveMetadata.NEW);
-        callback.onSuccess(ActionImpact.UPDATED);
+          doActionCallbackUpdated();
       }
     });
   }
-
   private void download(IndexedAIP aip, AsyncCallback<ActionImpact> callback) {
     SafeUri downloadUri = RestUtils.createAIPDownloadUri(aip.getId());
     Window.Location.assign(downloadUri.asString());
@@ -232,13 +212,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     Dialogs.showConfirmDialog(messages.moveConfirmDialogTitle(),
       messages.moveAllConfirmDialogMessageSingle(StringUtils.isNotBlank(aip.getTitle()) ? aip.getTitle() : aip.getId()),
       messages.dialogNo(), messages.dialogYes(),
-      new AsyncCallback<Boolean>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          // nothing to do
-        }
-
+      new NoAsyncCallback<Boolean>() {
         @Override
         public void onSuccess(Boolean confirmed) {
           if (confirmed) {
@@ -263,17 +237,11 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
                 Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
                   RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
-                  new AsyncCallback<String>() {
-
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      // do nothing
-                    }
-
+                  new NoAsyncCallback<String>() {
                     @Override
                     public void onSuccess(String details) {
                       BrowserService.Util.getInstance().moveAIPInHierarchy(selected, parentId, details,
-                        new AsyncCallback<Job>() {
+                        new ActionAsyncCallback<Job>(callback) {
 
                           @Override
                           public void onSuccess(Job result) {
@@ -291,7 +259,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
                             if (caught instanceof NotFoundException) {
                               Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
                             } else {
-                              callback.onFailure(caught);
+                              super.onFailure(caught);
                             }
                           }
                         });
@@ -305,22 +273,12 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   }
 
   private void move(final SelectedItems<IndexedAIP> selected, final AsyncCallback<ActionImpact> callback) {
-    ClientSelectedItemsUtils.size(IndexedAIP.class, selected, new AsyncCallback<Long>() {
-
-      @Override
-      public void onFailure(Throwable caught) {
-        AsyncCallbackUtils.defaultFailureTreatment(caught);
-      }
+    ClientSelectedItemsUtils.size(IndexedAIP.class, selected, new NoAsyncCallback<Long>() {
 
       @Override
       public void onSuccess(final Long size) {
         Dialogs.showConfirmDialog(messages.moveConfirmDialogTitle(), messages.moveSelectedConfirmDialogMessage(size),
-          messages.dialogNo(), messages.dialogYes(), new AsyncCallback<Boolean>() {
-
-            @Override
-            public void onFailure(Throwable caught) {
-              // nothing to do
-            }
+          messages.dialogNo(), messages.dialogYes(), new NoAsyncCallback<Boolean>() {
 
             @Override
             public void onSuccess(Boolean confirmed) {
@@ -363,12 +321,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
                     Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null,
                       messages.outcomeDetailPlaceholder(), RegExp.compile(".*"), messages.cancelButton(),
-                      messages.confirmButton(), false, false, new AsyncCallback<String>() {
-
-                        @Override
-                        public void onFailure(Throwable caught) {
-                          // do nothing
-                        }
+                      messages.confirmButton(), false, false, new NoAsyncCallback<String>() {
 
                         @Override
                         public void onSuccess(String details) {
@@ -421,66 +374,26 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     callback.onSuccess(ActionImpact.UPDATED);
   }
 
-  private void addRepresentation(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
-    Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-      RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
-      new AsyncCallback<String>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          // do nothing
-        }
-
-        @Override
-        public void onSuccess(String details) {
-          BrowserService.Util.getInstance().createRepresentation(aip.getId(), details,
-            new LoadingAsyncCallback<String>() {
-
-              @Override
-              public void onSuccessImpl(String representationId) {
-                HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, aip.getId(), representationId);
-                callback.onSuccess(ActionImpact.UPDATED);
-              }
-            });
-        }
-      });
-  }
-
   private void remove(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
     Dialogs.showConfirmDialog(messages.removeConfirmDialogTitle(),
       messages
         .removeAllConfirmDialogMessageSingle(StringUtils.isNotBlank(aip.getTitle()) ? aip.getTitle() : aip.getId()),
       messages.dialogNo(), messages.dialogYes(),
-      new AsyncCallback<Boolean>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          // nothing to do
-        }
+      new NoAsyncCallback<Boolean>() {
 
         @Override
         public void onSuccess(Boolean confirmed) {
           if (confirmed) {
             Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
               RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
-              new AsyncCallback<String>() {
-
-                @Override
-                public void onFailure(Throwable caught) {
-                  // do nothing
-                }
+              new NoAsyncCallback<String>() {
 
                 @Override
                 public void onSuccess(final String details) {
                   final String parentId = aip.getParentID();
 
                   BrowserService.Util.getInstance().deleteAIP(objectToSelectedItems(aip, IndexedAIP.class), details,
-                    new AsyncCallback<Job>() {
-
-                      @Override
-                      public void onFailure(Throwable caught) {
-                        callback.onFailure(caught);
-                      }
+                    new ActionAsyncCallback<Job>(callback) {
 
                       @Override
                       public void onSuccess(Job result) {
@@ -498,7 +411,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
                                 } else {
                                   HistoryUtils.newHistory(BrowseAIP.RESOLVER);
                                 }
-                                callback.onSuccess(ActionImpact.DESTROYED);
+                                doActionCallbackDestroyed();
                               }
                             };
 
@@ -520,30 +433,20 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   }
 
   private void remove(final SelectedItems<IndexedAIP> selected, final AsyncCallback<ActionImpact> callback) {
-    ClientSelectedItemsUtils.size(IndexedAIP.class, selected, new AsyncCallback<Long>() {
-
-      @Override
-      public void onFailure(Throwable caught) {
-        AsyncCallbackUtils.defaultFailureTreatment(caught);
-      }
+    ClientSelectedItemsUtils.size(IndexedAIP.class, selected, new NoAsyncCallback<Long>() {
 
       @Override
       public void onSuccess(final Long size) {
         Dialogs.showConfirmDialog(messages.removeConfirmDialogTitle(),
           messages.removeSelectedConfirmDialogMessage(size), messages.dialogNo(), messages.dialogYes(),
-          new AsyncCallback<Boolean>() {
+          new NoAsyncCallback<Boolean>() {
 
             @Override
             public void onSuccess(Boolean confirmed) {
               if (confirmed) {
                 Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
                   RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
-                  new AsyncCallback<String>() {
-
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      // do nothing
-                    }
+                  new NoAsyncCallback<String>() {
 
                     @Override
                     public void onSuccess(final String details) {
@@ -578,11 +481,6 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
                   });
               }
             }
-
-            @Override
-            public void onFailure(Throwable caught) {
-              // do nothing
-            }
           });
       }
     });
@@ -602,18 +500,9 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     callback.onSuccess(ActionImpact.NONE);
   }
 
-  private void showEvents(IndexedAIP aip, AsyncCallback<ActionImpact> callback) {
-    HistoryUtils.newHistory(BrowseAIP.RESOLVER, PreservationEvents.BROWSE_RESOLVER.getHistoryToken(), aip.getId());
-    callback.onSuccess(ActionImpact.NONE);
-  }
-
-  private void showRisks(IndexedAIP aip, AsyncCallback<ActionImpact> callback) {
-    HistoryUtils.newHistory(RiskIncidenceRegister.RESOLVER, aip.getId());
-    callback.onSuccess(ActionImpact.NONE);
-  }
-
-  private void showLogs(IndexedAIP aip, AsyncCallback<ActionImpact> callback) {
-    HistoryUtils.newHistory(UserLog.RESOLVER, aip.getId());
+  private void downloadEvents(IndexedAIP aip, AsyncCallback<ActionImpact> callback) {
+    SafeUri downloadUri = RestUtils.createPreservationMetadataDownloadUri(aip.getId());
+    Window.Location.assign(downloadUri.asString());
     callback.onSuccess(ActionImpact.NONE);
   }
 
@@ -648,12 +537,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   private void appraisalReject(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
     final boolean accept = false;
     Dialogs.showPromptDialog(messages.rejectMessage(), messages.rejectQuestion(), null, null, RegExp.compile(".+"),
-      messages.dialogCancel(), messages.dialogOk(), true, false, new AsyncCallback<String>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          // nothing to do
-        }
+      messages.dialogCancel(), messages.dialogOk(), true, false, new NoAsyncCallback<String>() {
 
         @Override
         public void onSuccess(final String rejectReason) {
@@ -675,12 +559,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   private void appraisalReject(final SelectedItems<IndexedAIP> aips, final AsyncCallback<ActionImpact> callback) {
     final boolean accept = false;
     Dialogs.showPromptDialog(messages.rejectMessage(), messages.rejectQuestion(), null, null, RegExp.compile(".+"),
-      messages.dialogCancel(), messages.dialogOk(), true, false, new AsyncCallback<String>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          // nothing to do
-        }
+      messages.dialogCancel(), messages.dialogOk(), true, false, new NoAsyncCallback<String>() {
 
         @Override
         public void onSuccess(final String rejectReason) {
@@ -699,12 +578,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   }
 
   private void downloadDocumentation(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
-    BrowserService.Util.getInstance().hasDocumentation(aip.getId(), new AsyncCallback<Boolean>() {
-
-      @Override
-      public void onFailure(Throwable caught) {
-        callback.onFailure(caught);
-      }
+    BrowserService.Util.getInstance().hasDocumentation(aip.getId(), new ActionAsyncCallback<Boolean>(callback) {
 
       @Override
       public void onSuccess(Boolean result) {
@@ -716,7 +590,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
           Toast.showInfo(messages.downloadNoDocumentationTitle(), messages.downloadNoDocumentationDescription());
         }
 
-        callback.onSuccess(ActionImpact.NONE);
+        doActionCallbackNone();
       }
     });
   }
@@ -727,33 +601,19 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
   private void changeType(final SelectedItems<IndexedAIP> aips, final AsyncCallback<ActionImpact> callback) {
     BrowserService.Util.getInstance().retrieveAIPTypeOptions(LocaleInfo.getCurrentLocale().getLocaleName(),
-      new AsyncCallback<Pair<Boolean, List<String>>>() {
-        @Override
-        public void onFailure(Throwable caught) {
-          // do nothing
-        }
+      new NoAsyncCallback<Pair<Boolean, List<String>>>() {
 
         @Override
         public void onSuccess(Pair<Boolean, List<String>> result) {
           RepresentationDialogs.showPromptDialogRepresentationTypes(messages.changeTypeTitle(), null,
             messages.cancelButton(), messages.confirmButton(), result.getSecond(), result.getFirst(),
-            new AsyncCallback<String>() {
-
-              @Override
-              public void onFailure(Throwable caught) {
-                // do nothing
-              }
+            new NoAsyncCallback<String>() {
 
               @Override
               public void onSuccess(final String newType) {
                 Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
                   RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
-                  new AsyncCallback<String>() {
-
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      // do nothing
-                    }
+                  new NoAsyncCallback<String>() {
 
                     @Override
                     public void onSuccess(String details) {
@@ -789,18 +649,12 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     managementGroup.addButton(messages.removeArchivalPackage(), AipAction.REMOVE, ActionImpact.DESTROYED, "btn-ban");
     managementGroup.addButton(messages.downloadButton(), AipAction.DOWNLOAD, ActionImpact.NONE, "btn-download");
 
-    // REPRESENTATION
-    ActionsGroup<IndexedAIP> representationGroup = new ActionsGroup<>(messages.representation());
-    representationGroup.addButton(messages.newButton(), AipAction.ADD_REPRESENTATION, ActionImpact.UPDATED, "btn-plus");
-
     // PRESERVATION
     ActionsGroup<IndexedAIP> preservationGroup = new ActionsGroup<>(messages.preservationTitle());
     preservationGroup.addButton(messages.newProcessPreservation(), AipAction.NEW_PROCESS, ActionImpact.UPDATED,
       "btn-play");
-    preservationGroup.addButton(messages.preservationEvents(), AipAction.SHOW_EVENTS, ActionImpact.NONE, "btn-clock");
-    preservationGroup.addButton(messages.preservationLogs(), AipAction.SHOW_LOGS, ActionImpact.NONE, "btn-clock");
-    preservationGroup.addButton(messages.preservationRisks(), AipAction.SHOW_RISKS, ActionImpact.NONE,
-      "btn-exclamation-triangle");
+    preservationGroup.addButton(messages.preservationEventsDownloadButton(), AipAction.DOWNLOAD_EVENTS,
+      ActionImpact.NONE, "btn-download");
 
     // APPRAISAL
     ActionsGroup<IndexedAIP> appraisalGroup = new ActionsGroup<>(messages.appraisalTitle());
@@ -809,7 +663,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     appraisalGroup.addButton(messages.downloadDocumentation(), AipAction.DOWNLOAD_DOCUMENTATION, ActionImpact.NONE,
       "btn-download");
 
-    aipActionsBundle.addGroup(managementGroup).addGroup(representationGroup).addGroup(preservationGroup)
+    aipActionsBundle.addGroup(managementGroup).addGroup(preservationGroup)
       .addGroup(appraisalGroup);
 
     return aipActionsBundle;

@@ -8,7 +8,7 @@
 
 	<g:FlowPanel styleName="wui-risk-register" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
-			<g:FlowPanel addStyleNames="col_10 content">
+			<g:FlowPanel addStyleNames="col_12 content">
 				<g:Label styleName="h1" ui:field="riskRegisterTitle">
 					<ui:text from='{messages.riskRegisterTitle}' />
 				</g:Label>
@@ -19,29 +19,7 @@
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">
 					<g:FlowPanel addStyleNames="sticky-padding">
-						<g:FlowPanel addStyleNames="sidebar-group" ui:field="risksSidebar">
-							<g:Label addStyleNames="h4">
-								<ui:text from='{messages.sidebarRisksTitle}' />
-							</g:Label>
-							<g:Button addStyleNames="btn btn-block btn-refresh" ui:field="buttonRefresh">
-								<ui:text from='{messages.refreshButton}' />
-							</g:Button>
-							<g:Button addStyleNames="btn btn-block btn-plus" ui:field="buttonAdd">
-								<ui:text from='{messages.newButton}' />
-							</g:Button>
-							<g:Button addStyleNames="btn btn-block btn-danger btn-ban"
-								ui:field="buttonRemove">
-								<ui:text from='{messages.removeButton}' />
-							</g:Button>
-						</g:FlowPanel>
-						<g:FlowPanel addStyleNames="sidebar-group riskActions">
-							<g:Label addStyleNames="h4">
-								<ui:text from='{messages.sidebarActionsTitle}' />
-							</g:Label>
-							<g:Button addStyleNames="btn btn-block btn-play" ui:field="startProcess">
-								<ui:text from='{messages.riskRegisterProcessButton}' />
-							</g:Button>
-						</g:FlowPanel>
+						<g:SimplePanel addStyleNames="sidebar-group" ui:field="actionsSidebar" />
 					</g:FlowPanel>
 				</g:FlowPanel>
 			</g:FlowPanel>

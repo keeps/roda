@@ -119,6 +119,7 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.jobs.Reports;
+import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.ri.RelationObjectType;
 import org.roda.core.data.v2.ri.RepresentationInformation;
@@ -228,6 +229,21 @@ public class BrowserHelper {
     Filter dipsFilter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_AIP_UUIDS, aip.getId()));
     Long dipCount = RodaCoreFactory.getIndexService().count(IndexedDIP.class, dipsFilter, user, justActive);
     bundle.setDipCount(dipCount);
+
+    Filter riskIncidenceFilter = new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, aipId));
+    Long riskIncidenceCount = RodaCoreFactory.getIndexService().count(RiskIncidence.class, riskIncidenceFilter, user,
+      justActive);
+    bundle.setRiskIncidenceCount(riskIncidenceCount);
+
+    Filter preservationEventFilter = new Filter(
+      new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, aipId));
+    Long preservationEventCount = RodaCoreFactory.getIndexService().count(IndexedPreservationEvent.class,
+      preservationEventFilter, user, justActive);
+    bundle.setPreservationEventCount(preservationEventCount);
+
+    Filter logFilter = new Filter(new SimpleFilterParameter(RodaConstants.LOG_RELATED_OBJECT_ID, aipId));
+    Long logCount = RodaCoreFactory.getIndexService().count(LogEntry.class, logFilter, user, justActive);
+    bundle.setLogCount(logCount);
 
     List<String> rodaConfigurationAsList = RodaCoreFactory.getRodaConfigurationAsList("core.ri.rule.AIP").stream()
       .map(r -> RodaCoreFactory.getRodaConfigurationAsString(r, RodaConstants.SEARCH_FIELD_FIELDS))
@@ -1626,7 +1642,7 @@ public class BrowserHelper {
     return transferredResource;
   }
 
-  private static <T extends IsIndexed> List<String> consolidate(User user, Class<T> classToReturn,
+  protected static <T extends IsIndexed> List<String> consolidate(User user, Class<T> classToReturn,
     SelectedItems<T> selected) throws GenericException, RequestNotValidException {
     List<String> ret;
 

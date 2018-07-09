@@ -36,9 +36,12 @@ import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.ri.RepresentationInformationRelation;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
-import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.actions.Actionable;
+import org.roda.wui.client.common.actions.ActionableObject;
+import org.roda.wui.client.common.actions.ActionableWidgetBuilder;
+import org.roda.wui.client.common.actions.RepresentationInformationActions;
 import org.roda.wui.client.common.dialogs.RepresentationInformationDialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
@@ -50,20 +53,15 @@ import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.ListUtils;
-import org.roda.wui.common.client.tools.RestUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.LocaleInfo;
-import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -159,7 +157,8 @@ public class ShowRepresentationInformation extends Composite {
   FlowPanel extras;
 
   @UiField
-  Button buttonEdit, buttonDownload, buttonCancel;
+  SimplePanel actionsSidebar;
+  private ActionableWidgetBuilder<RepresentationInformation> actionableWidgetBuilder;
 
   private List<FilterParameter> aipParams = new ArrayList<>();
   private List<FilterParameter> representationParams = new ArrayList<>();
@@ -261,6 +260,17 @@ public class ShowRepresentationInformation extends Composite {
           HtmlSnippetUtils.createExtraShow(extras, extra.getFamilyValues().get(ri.getFamily()), false);
         }
       });
+
+    actionableWidgetBuilder = new ActionableWidgetBuilder<>(RepresentationInformationActions.get())
+      .withCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
+        @Override
+        public void onSuccess(Actionable.ActionImpact result) {
+          if (result.equals(Actionable.ActionImpact.DESTROYED)) {
+            HistoryUtils.newHistory(RepresentationInformationNetwork.RESOLVER);
+          }
+        }
+      });
+    actionsSidebar.setWidget(actionableWidgetBuilder.buildListWithObjects(new ActionableObject<>(ri)));
 
     initRelations();
   }
@@ -563,27 +573,4 @@ public class ShowRepresentationInformation extends Composite {
       callback.onSuccess(null);
     }
   }
-
-  @UiHandler("buttonEdit")
-  void handleButtonEdit(ClickEvent e) {
-    HistoryUtils.newHistory(RepresentationInformationNetwork.RESOLVER,
-      EditRepresentationInformation.RESOLVER.getHistoryToken(), ri.getId());
-  }
-
-  @UiHandler("buttonDownload")
-  void handleButtonDownload(ClickEvent e) {
-    SafeUri downloadUri = RestUtils.createRepresentationInformationDownloadUri(ri.getId());
-    Window.Location.assign(downloadUri.asString());
-  }
-
-  @UiHandler("buttonCancel")
-  void handleButtonCancel(ClickEvent e) {
-    cancel();
-  }
-
-  private void cancel() {
-    LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
-    HistoryUtils.newHistory(selectedItems.getLastHistory());
-  }
-
 }

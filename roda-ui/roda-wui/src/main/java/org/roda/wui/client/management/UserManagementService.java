@@ -18,9 +18,12 @@ import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.InvalidTokenException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
+import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.Group;
+import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.bundle.UserExtraBundle;
 import org.roda.wui.client.management.recaptcha.RecaptchaException;
@@ -267,4 +270,10 @@ public interface UserManagementService extends RemoteService {
   public UserExtraBundle retrieveUserExtraBundle(String name)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
 
+  public void deleteRODAMembers(SelectedItems<RODAMember> members)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
+
+  public void changeActiveRODAMembers(SelectedItems<RODAMember> members, boolean active)
+    throws AuthorizationDeniedException, AlreadyExistsException, NotFoundException, GenericException,
+    RequestNotValidException;
 }

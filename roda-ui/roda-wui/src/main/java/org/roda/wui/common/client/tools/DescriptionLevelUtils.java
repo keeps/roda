@@ -35,7 +35,9 @@ public class DescriptionLevelUtils {
       if (ConfigurationManager.getString(RodaConstants.LEVELS_ICONS_PREFIX, levelString) != null) {
         level.setIconClass(ConfigurationManager.getString(RodaConstants.LEVELS_ICONS_PREFIX, levelString));
       } else if (levelString.equalsIgnoreCase(RodaConstants.AIP_GHOST)) {
-        level.setIconClass(ConfigurationManager.getString(RodaConstants.LEVELS_ICONS_GHOST));
+        level.setIconClass(ConfigurationManager.getString(RodaConstants.LEVELS_ICONS_AIP_GHOST));
+      } else if (levelString.equalsIgnoreCase(RodaConstants.AIP_CHILDREN)) {
+        level.setIconClass(ConfigurationManager.getString(RodaConstants.LEVELS_ICONS_AIP_CHILDREN));
       } else if (levelString.equalsIgnoreCase(RodaConstants.VIEW_REPRESENTATION_REPRESENTATION)) {
         level.setIconClass(ConfigurationManager.getString(RodaConstants.LEVELS_ICONS_REPRESENTATION));
       } else if (levelString.equalsIgnoreCase(RodaConstants.VIEW_REPRESENTATION_FOLDER)) {
@@ -47,7 +49,7 @@ public class DescriptionLevelUtils {
 
     // fallback to default icon
     if (level.getIconClass() == null) {
-      level.setIconClass(ConfigurationManager.getString(RodaConstants.LEVELS_ICONS_DEFAULT));
+      level.setIconClass(ConfigurationManager.getString(RodaConstants.LEVELS_ICONS_AIP_DEFAULT));
     }
 
     // set the label, falling back to the levelString
@@ -84,6 +86,14 @@ public class DescriptionLevelUtils {
     return SafeHtmlUtils.fromSafeConstant(b.toString());
   }
 
+  public static String getElementLevelIconCssClass(String levelString) {
+    return getDescriptionLevel(levelString).getIconClass();
+  }
+
+  public static String getElementLevelLabel(String levelString) {
+    return getDescriptionLevel(levelString).getLabel();
+  }
+
   private static void appendLevel(StringBuilder b, boolean showText, String level) {
     if (showText && level != null && level.length() > 0) {
       b.append("&nbsp;");
@@ -91,21 +101,28 @@ public class DescriptionLevelUtils {
     }
   }
 
-  public static SafeHtml getRepresentationTypeIcon(String representationType, boolean showText) {
-    String representationTypeKey = representationType.toLowerCase();
+  public static String getRepresentationTypeIconCssClass(String representationType) {
+    String icon = null;
 
-    // try to set a specific icon
-    String icon = ConfigurationManager.getString(RodaConstants.LEVELS_ICONS_REPRESENTATION_TYPES_PREFIX,
-      representationTypeKey);
+    if (representationType != null) {
+      String representationTypeKey = representationType.toLowerCase();
+
+      // try to set a specific icon
+      icon = ConfigurationManager.getString(RodaConstants.LEVELS_ICONS_REPRESENTATION_TYPES_PREFIX,
+        representationTypeKey);
+    }
+
+    // fallback to default representation icon
     if (icon == null) {
       icon = ConfigurationManager.getString(RodaConstants.LEVELS_ICONS_REPRESENTATION_TYPES_PREFIX,
         RodaConstants.REPRESENTATION_TYPE_DEFAULT);
     }
 
-    // fallback to default representation icon
-    if (icon == null) {
-      ConfigurationManager.getString(RodaConstants.LEVELS_ICONS_REPRESENTATION);
-    }
+    return icon;
+  }
+
+  public static SafeHtml getRepresentationTypeIcon(String representationType, boolean showText) {
+    String icon = getRepresentationTypeIconCssClass(representationType);
 
     StringBuilder b = new StringBuilder();
     b.append("<i class='");

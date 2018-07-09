@@ -7,8 +7,13 @@
  */
 package org.roda.wui.client.common.slider;
 
+import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
@@ -16,20 +21,31 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.wui.client.browse.RepresentationInformationHelper;
+import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.common.utils.StringUtils;
+import org.roda.wui.client.ingest.process.ShowJobReport;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
 
+import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style;
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.ListDataProvider;
 
 import config.i18n.client.ClientMessages;
 
@@ -102,6 +118,181 @@ public class InfoSliderHelper {
     }
 
     populate(infoSliderPanel, values);
+  }
+
+  public static void updateInfoSliderPanel(BrowseAIPBundle bundle, SliderPanel infoSliderPanel) {
+    IndexedAIP aip = bundle.getAip();
+
+    HashMap<String, Widget> values = new HashMap<>();
+    infoSliderPanel.clear();
+    infoSliderPanel.addTitle(new Label(messages.viewRepresentationInfoTitle()));
+
+    values.put(messages.itemId(), createIdHTML(bundle));
+
+    if (aip.getCreatedOn() != null && StringUtils.isNotBlank(aip.getCreatedBy())) {
+      values.put(messages.aipCreated(),
+        new InlineHTML(messages.dateCreatedOrUpdated(Humanize.formatDateTime(aip.getCreatedOn()), aip.getCreatedBy())));
+    }
+
+    if (aip.getUpdatedOn() != null && StringUtils.isNotBlank(aip.getUpdatedBy())) {
+      values.put(messages.aipUpdated(),
+        new InlineHTML(messages.dateCreatedOrUpdated(Humanize.formatDateTime(aip.getUpdatedOn()), aip.getUpdatedBy())));
+    }
+
+    if (StringUtils.isNotBlank(aip.getLevel())) {
+      values.put(messages.aipLevel(), createAipLevelHTML(bundle));
+    }
+
+    if (StringUtils.isNotBlank(aip.getType())) {
+      values.put(messages.aipType(), createAipTypeHTML(bundle));
+    }
+
+    if (!aip.getIngestSIPIds().isEmpty()) {
+      values.put(messages.sipId(), new InlineHTML(StringUtils.prettyPrint(aip.getIngestSIPIds())));
+    }
+
+    if (StringUtils.isNotBlank(aip.getIngestJobId())) {
+      Anchor anchor = new Anchor();
+      anchor.setText(aip.getIngestJobId());
+      anchor
+        .setHref(HistoryUtils.createHistoryHashLink(ShowJobReport.RESOLVER, aip.getIngestJobId() + '-' + aip.getId()));
+
+      values.put(messages.processIdTitle(), anchor);
+    }
+
+    if (!aip.getIngestUpdateJobIds().isEmpty()) {
+      FlowPanel jobIdsList = new FlowPanel();
+      jobIdsList.addStyleName("slider-info-entry-value-aip-ingest-jobs");
+
+      for (String updateJobId : aip.getIngestUpdateJobIds()) {
+        Anchor anchor = new Anchor();
+        anchor.setText(updateJobId);
+        anchor.setHref(HistoryUtils.createHistoryHashLink(ShowJobReport.RESOLVER, updateJobId + '-' + aip.getId()));
+        jobIdsList.add(anchor);
+      }
+
+      values.put(messages.updateProcessIdTitle(), jobIdsList);
+    }
+
+    if (!bundle.getAip().getPermissions().getUsers().isEmpty()
+      || !bundle.getAip().getPermissions().getGroups().isEmpty()) {
+      values.put(messages.aipPermissionDetails(), createAipPermissionDetailsHTML(bundle));
+    }
+
+    populate(infoSliderPanel, values);
+  }
+
+  private static Widget createAipPermissionDetailsHTML(BrowseAIPBundle bundle) {
+    Permissions permissions = bundle.getAip().getPermissions();
+
+    List<Entry<String, Set<Permissions.PermissionType>>> entryList = new ArrayList<>();
+    for (String username : new TreeSet<>(permissions.getUsernames())) {
+      entryList.add(new AbstractMap.SimpleEntry<>("u-" + username, permissions.getUserPermissions(username)));
+    }
+    for (String groupname : new TreeSet<>(permissions.getGroupnames())) {
+      entryList.add(new AbstractMap.SimpleEntry<>("g-" + groupname, permissions.getUserPermissions(groupname)));
+    }
+
+    CellTable<Entry<String, Set<Permissions.PermissionType>>> table = new CellTable<>();
+    table.addStyleName("slider-aip-permissions-table");
+
+    Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml> userGroupIconColumn = new Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml>(
+      new SafeHtmlCell()) {
+      @Override
+      public SafeHtml getValue(Entry<String, Set<Permissions.PermissionType>> object) {
+        if (object.getKey().startsWith("u-")) {
+          return SafeHtmlUtils.fromSafeConstant("<i class='fa fa-user'></i>");
+        } else {
+          return SafeHtmlUtils.fromSafeConstant("<i class='fa fa-users'></i>");
+        }
+      }
+    };
+
+    Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml> nameColumn = new Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml>(
+      new SafeHtmlCell()) {
+      @Override
+      public SafeHtml getValue(Entry<String, Set<Permissions.PermissionType>> object) {
+        String name = object.getKey().substring(2);
+        return SafeHtmlUtils.fromSafeConstant(
+          "<span title='" + SafeHtmlUtils.htmlEscape(name) + "'>" + SafeHtmlUtils.htmlEscape(name) + "</span>");
+      }
+    };
+
+    Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml> iconCreateColumn = new Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml>(
+      new SafeHtmlCell()) {
+      @Override
+      public SafeHtml getValue(Entry<String, Set<Permissions.PermissionType>> object) {
+        if (object.getValue().contains(Permissions.PermissionType.READ)
+          && object.getValue().contains(Permissions.PermissionType.CREATE)) {
+          return SafeHtmlUtils.fromSafeConstant("<i title='"
+            + messages.objectPermissionDescription(Permissions.PermissionType.CREATE) + "' class='fa fa-sitemap'></i>");
+        } else {
+          return SafeHtmlUtils.EMPTY_SAFE_HTML;
+        }
+      }
+    };
+
+    Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml> iconEditColumn = new Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml>(
+      new SafeHtmlCell()) {
+      @Override
+      public SafeHtml getValue(Entry<String, Set<Permissions.PermissionType>> object) {
+        if (object.getValue().contains(Permissions.PermissionType.READ)
+          && object.getValue().contains(Permissions.PermissionType.UPDATE)) {
+          return SafeHtmlUtils.fromSafeConstant("<i title='"
+            + messages.objectPermissionDescription(Permissions.PermissionType.UPDATE) + "' class='fa fa-edit'></i>");
+        } else {
+          return SafeHtmlUtils.EMPTY_SAFE_HTML;
+        }
+      }
+    };
+
+    Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml> iconDeleteColumn = new Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml>(
+      new SafeHtmlCell()) {
+      @Override
+      public SafeHtml getValue(Entry<String, Set<Permissions.PermissionType>> object) {
+        if (object.getValue().contains(Permissions.PermissionType.READ)
+          && object.getValue().contains(Permissions.PermissionType.DELETE)) {
+          return SafeHtmlUtils.fromSafeConstant("<i title='"
+            + messages.objectPermissionDescription(Permissions.PermissionType.DELETE) + "' class='fa fa-ban'></i>");
+        } else {
+          return SafeHtmlUtils.EMPTY_SAFE_HTML;
+        }
+      }
+    };
+
+    Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml> iconGrantColumn = new Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml>(
+      new SafeHtmlCell()) {
+      @Override
+      public SafeHtml getValue(Entry<String, Set<Permissions.PermissionType>> object) {
+        if (object.getValue().contains(Permissions.PermissionType.READ)
+          && object.getValue().contains(Permissions.PermissionType.GRANT)) {
+          return SafeHtmlUtils.fromSafeConstant("<i title='"
+            + messages.objectPermissionDescription(Permissions.PermissionType.GRANT) + "' class='fa fa-unlock'></i>");
+        } else {
+          return SafeHtmlUtils.EMPTY_SAFE_HTML;
+        }
+      }
+    };
+
+    table.addColumn(userGroupIconColumn);
+    table.addColumn(nameColumn);
+    table.addColumn(iconCreateColumn);
+    table.addColumn(iconEditColumn);
+    table.addColumn(iconDeleteColumn);
+    table.addColumn(iconGrantColumn);
+
+    table.setColumnWidth(userGroupIconColumn, 23, Style.Unit.PX);
+    table.setColumnWidth(iconCreateColumn, 23, Style.Unit.PX);
+    table.setColumnWidth(iconEditColumn, 23, Style.Unit.PX);
+    table.setColumnWidth(iconDeleteColumn, 23, Style.Unit.PX);
+    table.setColumnWidth(iconGrantColumn, 23, Style.Unit.PX);
+
+    nameColumn.setCellStyleNames("nowrap slider-aip-permissions-table-name");
+
+    ListDataProvider<Entry<String, Set<Permissions.PermissionType>>> dataProvider = new ListDataProvider<>(entryList);
+    dataProvider.addDataDisplay(table);
+
+    return table;
   }
 
   public static void updateInfoSliderPanel(BrowseFileBundle bundle, SliderPanel infoSliderPanel) {
@@ -196,9 +387,9 @@ public class InfoSliderHelper {
       entryPanel.add(valueLabel);
       infoSliderPanel.addContent(entryPanel);
 
-      keyLabel.addStyleName("infoFileEntryKey");
-      valueLabel.addStyleName("infoFileEntryValue");
-      entryPanel.addStyleName("infoFileEntry");
+      keyLabel.addStyleName("slider-info-entry-key");
+      valueLabel.addStyleName("slider-info-entry-value");
+      entryPanel.addStyleName("slider-info-entry");
     }
   }
 
@@ -272,6 +463,41 @@ public class InfoSliderHelper {
     RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(SafeHtmlUtils.fromString(filename),
       riFilter, panel, bundle.getRepresentationInformationFields().contains(RodaConstants.INDEX_UUID),
       "browseFileInformationIcon");
+    return panel;
+  }
+
+  private static FlowPanel createIdHTML(BrowseAIPBundle bundle) {
+    IndexedAIP aip = bundle.getAip();
+    FlowPanel panel = new FlowPanel();
+    final String riFilter = RepresentationInformationUtils
+      .createRepresentationInformationFilter(RodaConstants.INDEX_AIP, RodaConstants.INDEX_UUID, aip.getId());
+
+    RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(SafeHtmlUtils.fromString(aip.getId()),
+      riFilter, panel, bundle.getRepresentationInformationFields().contains(RodaConstants.INDEX_UUID),
+      "browseFileInformationIcon");
+    return panel;
+  }
+
+  private static FlowPanel createAipTypeHTML(BrowseAIPBundle bundle) {
+    IndexedAIP aip = bundle.getAip();
+    FlowPanel panel = new FlowPanel();
+    final String riFilter = RepresentationInformationUtils
+      .createRepresentationInformationFilter(RodaConstants.INDEX_AIP, RodaConstants.AIP_TYPE, aip.getType());
+    RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(SafeHtmlUtils.fromString(aip.getType()),
+      riFilter, panel, bundle.getRepresentationInformationFields().contains(RodaConstants.AIP_TYPE));
+    return panel;
+  }
+
+  private static FlowPanel createAipLevelHTML(BrowseAIPBundle bundle) {
+    IndexedAIP aip = bundle.getAip();
+    FlowPanel panel = new FlowPanel();
+
+    final String riFilter = RepresentationInformationUtils
+      .createRepresentationInformationFilter(RodaConstants.INDEX_AIP, RodaConstants.AIP_LEVEL, aip.getLevel());
+    RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(
+      SafeHtmlUtils.fromString(DescriptionLevelUtils.getElementLevelLabel(aip.getLevel())), riFilter, panel,
+      bundle.getRepresentationInformationFields().contains(RodaConstants.AIP_LEVEL));
+
     return panel;
   }
 }

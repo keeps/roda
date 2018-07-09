@@ -16,7 +16,6 @@ import java.util.Set;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
@@ -27,6 +26,7 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.LoadingAsyncCallback;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.SelectFileDialog;
 import org.roda.wui.client.ingest.process.ShowJob;
@@ -134,7 +134,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
     } else if (FileAction.SHOW_RISKS.equals(action)) {
       showRisks(file, callback);
     } else {
-      callback.onFailure(new RequestNotValidException("Unsupported action in this context: " + action));
+      unsupportedAction(action, callback);
     }
   }
 
@@ -153,7 +153,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
     } else if (FileAction.IDENTIFY_FORMATS.equals(action)) {
       identifyFormats(selectedItems, callback);
     } else {
-      Toast.showError("Unsupported action in this context: " + action);
+      unsupportedAction(action, callback);
     }
   }
 
@@ -172,23 +172,13 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
   public void rename(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
     Dialogs.showPromptDialog(messages.renameItemTitle(), null, file.getId(), null, RegExp.compile("^[^/]+$"),
-      messages.cancelButton(), messages.confirmButton(), true, false, new AsyncCallback<String>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          // do nothing
-        }
+      messages.cancelButton(), messages.confirmButton(), true, false, new NoAsyncCallback<String>() {
 
         @Override
         public void onSuccess(final String newName) {
           Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
             RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
-            new AsyncCallback<String>() {
-
-              @Override
-              public void onFailure(Throwable caught) {
-                // do nothing
-              }
+            new NoAsyncCallback<String>() {
 
               @Override
               public void onSuccess(String details) {
@@ -231,12 +221,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
         Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
           RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
-          new AsyncCallback<String>() {
-
-            @Override
-            public void onFailure(Throwable caught) {
-              // do nothing
-            }
+          new NoAsyncCallback<String>() {
 
             @Override
             public void onSuccess(String details) {
@@ -289,12 +274,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
     if (file.isDirectory()) {
       Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
         RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
-        new AsyncCallback<String>() {
-
-          @Override
-          public void onFailure(Throwable caught) {
-            // do nothing
-          }
+        new NoAsyncCallback<String>() {
 
           @Override
           public void onSuccess(String details) {
@@ -311,22 +291,13 @@ public class FileActions extends AbstractActionable<IndexedFile> {
   public void createFolder(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
     Dialogs.showPromptDialog(messages.createFolderTitle(), null, null, messages.createFolderPlaceholder(),
       RegExp.compile("^[^/]+$"), messages.cancelButton(), messages.confirmButton(), false, false,
-      new AsyncCallback<String>() {
-        @Override
-        public void onFailure(Throwable caught) {
-          // do nothing
-        }
+      new NoAsyncCallback<String>() {
 
         @Override
         public void onSuccess(final String newName) {
           Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
             RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
-            new AsyncCallback<String>() {
-
-              @Override
-              public void onFailure(Throwable caught) {
-                // do nothing
-              }
+            new NoAsyncCallback<String>() {
 
               @Override
               public void onSuccess(String details) {
@@ -379,11 +350,11 @@ public class FileActions extends AbstractActionable<IndexedFile> {
   }
 
   public void identifyFormats(SelectedItems<IndexedFile> selected, final AsyncCallback<ActionImpact> callback) {
-    BrowserService.Util.getInstance().createFormatIdentificationJob(selected, new AsyncCallback<Void>() {
+    BrowserService.Util.getInstance().createFormatIdentificationJob(selected, new ActionAsyncCallback<Void>(callback) {
       @Override
       public void onSuccess(Void object) {
         Toast.showInfo(messages.identifyingFormatsTitle(), messages.identifyingFormatsDescription());
-        callback.onSuccess(ActionImpact.UPDATED);
+        doActionCallbackUpdated();
       }
 
       @Override
@@ -391,7 +362,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
         if (caught instanceof NotFoundException) {
           Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
         } else {
-          callback.onFailure(caught);
+          super.onFailure(caught);
         }
       }
     });
@@ -400,23 +371,19 @@ public class FileActions extends AbstractActionable<IndexedFile> {
   public void remove(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
     Dialogs.showConfirmDialog(messages.viewRepresentationRemoveFileTitle(),
       messages.viewRepresentationRemoveFileMessage(), messages.dialogCancel(), messages.dialogYes(),
-      new AsyncCallback<Boolean>() {
+      new NoAsyncCallback<Boolean>() {
 
         @Override
         public void onSuccess(Boolean confirmed) {
           if (confirmed) {
             Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
               RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
-              new AsyncCallback<String>() {
-
-                @Override
-                public void onFailure(Throwable caught) {
-                  // do nothing
-                }
+              new NoAsyncCallback<String>() {
 
                 @Override
                 public void onSuccess(String details) {
-                  BrowserService.Util.getInstance().deleteFile(file.getUUID(), details, new AsyncCallback<Void>() {
+                  BrowserService.Util.getInstance().deleteFile(file.getUUID(), details,
+                    new ActionAsyncCallback<Void>(callback) {
 
                     @Override
                     public void onSuccess(Void result) {
@@ -434,45 +401,30 @@ public class FileActions extends AbstractActionable<IndexedFile> {
                             String parentId = path.get(lastIndex);
                             HistoryUtils.openBrowse(file.getAipId(), file.getRepresentationId(), parentPath, parentId);
                           }
-                          callback.onSuccess(ActionImpact.DESTROYED);
+                            doActionCallbackDestroyed();
                         }
                       };
 
                       timer.schedule(RodaConstants.ACTION_TIMEOUT);
-                    }
-
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      callback.onFailure(caught);
                     }
                   });
                 }
               });
           }
         }
-
-        @Override
-        public void onFailure(Throwable caught) {
-          // nothing to do
-        }
       });
   }
 
   public void remove(final SelectedItems<IndexedFile> selected, final AsyncCallback<ActionImpact> callback) {
     Dialogs.showConfirmDialog(messages.filesRemoveTitle(), messages.selectedFileRemoveMessage(),
-      messages.dialogCancel(), messages.dialogYes(), new AsyncCallback<Boolean>() {
+      messages.dialogCancel(), messages.dialogYes(), new NoAsyncCallback<Boolean>() {
 
         @Override
         public void onSuccess(Boolean confirmed) {
           if (confirmed) {
             Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
               RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
-              new AsyncCallback<String>() {
-
-                @Override
-                public void onFailure(Throwable caught) {
-                  // do nothing
-                }
+              new NoAsyncCallback<String>() {
 
                 @Override
                 public void onSuccess(final String details) {
@@ -480,7 +432,8 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
                     @Override
                     public void onSuccess(Job result) {
-                      Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(), new AsyncCallback<Void>() {
+                      Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(),
+                        new ActionAsyncCallback<Void>(callback) {
 
                         @Override
                         public void onFailure(Throwable caught) {
@@ -491,7 +444,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
                             @Override
                             public void run() {
                               HistoryUtils.newHistory(HistoryUtils.getCurrentHistoryPath());
-                              callback.onSuccess(ActionImpact.DESTROYED);
+                                doActionCallbackDestroyed();
                             }
                           };
 
@@ -513,11 +466,6 @@ public class FileActions extends AbstractActionable<IndexedFile> {
                 }
               });
           }
-        }
-
-        @Override
-        public void onFailure(Throwable caught) {
-          // nothing to do
         }
       });
   }

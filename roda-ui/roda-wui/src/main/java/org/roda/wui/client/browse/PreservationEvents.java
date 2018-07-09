@@ -12,11 +12,9 @@ package org.roda.wui.client.browse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.filter.DateRangeFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -25,6 +23,7 @@ import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.actions.PreservationEventActions;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
@@ -35,28 +34,16 @@ import org.roda.wui.client.search.PreservationEventsSearch;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
-import org.roda.wui.common.client.tools.RestUtils;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.LocaleInfo;
-import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.user.datepicker.client.DateBox;
-import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
 
 import config.i18n.client.ClientMessages;
 
@@ -144,25 +131,10 @@ public class PreservationEvents extends Composite {
   @UiField(provided = true)
   PreservationEventsSearch eventSearch;
 
-  @UiField
-  FlowPanel actionsPanel;
-
-  @UiField
-  Button downloadButton;
-
-  @UiField
-  Button backButton;
-
   private String aipId;
   private String representationUUID;
   private String fileUUID;
 
-  /**
-   * Create a new panel to edit a user
-   * 
-   * @param itemBundle
-   * 
-   */
   public PreservationEvents() {
     this(null);
   }
@@ -194,9 +166,9 @@ public class PreservationEvents extends Composite {
 
     eventSearch = new PreservationEventsSearch("PreservationEvents_events");
     eventSearch.defaultFilters(filter);
+    eventSearch.getList().setActionable(PreservationEventActions.get(aipId, representationUUID, fileUUID));
 
     initWidget(uiBinder.createAndBindUi(this));
-    actionsPanel.setVisible(aipId != null);
 
     // create breadcrumbs
     if (fileUUID != null) {
@@ -304,30 +276,6 @@ public class PreservationEvents extends Composite {
             });
         }
       });
-  }
-
-  @UiHandler("downloadButton")
-  void buttonDownloadHandler(ClickEvent e) {
-    if (aipId != null) {
-      SafeUri downloadUri = RestUtils.createPreservationMetadataDownloadUri(aipId);
-      if (downloadUri != null) {
-        Window.Location.assign(downloadUri.asString());
-      }
-    }
-  }
-
-  @UiHandler("backButton")
-  void buttonBackHandler(ClickEvent e) {
-    if (fileUUID != null) {
-      HistoryUtils.newHistory(HistoryUtils.getHistoryUuidResolver(IndexedFile.class.getName(), fileUUID));
-    } else if (representationUUID != null) {
-      HistoryUtils
-        .newHistory(HistoryUtils.getHistoryUuidResolver(IndexedRepresentation.class.getName(), representationUUID));
-    } else if (aipId != null) {
-      HistoryUtils.newHistory(HistoryUtils.getHistoryBrowse(aipId));
-    } else {
-      // button not visible
-    }
   }
 
   private void browseResolve(List<String> historyTokens, AsyncCallback<Widget> callback) {

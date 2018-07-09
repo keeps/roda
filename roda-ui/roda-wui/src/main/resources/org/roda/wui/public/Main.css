@@ -293,24 +293,12 @@ div.inline {
     margin-top: 20px;
 }
 
-.card > .h5 {
+.card > .h5,
+.card .actionable-header {
     margin-top: 0;
     color: #089de3;
     font-weight: 300;
-}
-
-.representationsCard > .h5:before {
-    content: '\f1b3';
-    font-weight: 900;
-    font-family: "Font Awesome 5 Free";
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-    display: inline-block;
-    font-style: normal;
-    font-variant: normal;
-    text-rendering: auto;
-    line-height: 1;
-    padding-right: 10px;
+    margin-bottom: 1rem;
 }
 
 .filesCard > .h5:before {
@@ -325,16 +313,6 @@ div.inline {
 
 .disseminationsCard > .h5:before {
     content: '\f144';
-    font-family: 'Font Awesome 5 Free';
-    text-rendering: auto;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    padding-right: 10px;
-    font-weight: 900;
-}
-
-.aipChildrenCard > .h5:before {
-    content: '\f0e8';
     font-family: 'Font Awesome 5 Free';
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
@@ -366,6 +344,10 @@ div.inline {
 	box-shadow: none;
 	padding: 0;
 	transition: none;
+}
+
+.browse_top .aipChildrenCard .actionable-header-focus-panel {
+    display: none;
 }
 
 .browse_top .aipChildrenCard:hover {
@@ -405,7 +387,7 @@ div.inline {
 
 .slider {
     height: 100%;
-    width: 300px;
+    width: 340px;
     background: #089de3;
     display: none;
     color: white;

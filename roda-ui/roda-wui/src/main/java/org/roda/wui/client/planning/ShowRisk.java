@@ -14,35 +14,26 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.risks.IndexedRisk;
-import org.roda.core.data.v2.risks.Risk;
-import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.LastSelectedItemsSingleton;
-import org.roda.wui.client.common.LoadingAsyncCallback;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.dialogs.EditMultipleRiskIncidenceDialog;
-import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
-import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.common.actions.Actionable;
+import org.roda.wui.client.common.actions.ActionableObject;
+import org.roda.wui.client.common.actions.ActionableWidgetBuilder;
+import org.roda.wui.client.common.actions.RiskActions;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.management.MemberManagement;
-import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
-import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -95,28 +86,22 @@ public class ShowRisk extends Composite {
     RodaConstants.RISK_MITIGATION_OWNER_TYPE, RodaConstants.RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_TYPE,
     RodaConstants.RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_VALUE);
 
-  private Risk risk;
+  private static final AsyncCallback<Actionable.ActionImpact> actionCallback = new NoAsyncCallback<Actionable.ActionImpact>() {
+    @Override
+    public void onSuccess(Actionable.ActionImpact result) {
+      if (result.equals(Actionable.ActionImpact.DESTROYED)) {
+        HistoryUtils.newHistory(RiskRegister.RESOLVER);
+      }
+    }
+  };
+
+  private IndexedRisk risk;
 
   @UiField(provided = true)
   RiskShowPanel riskShowPanel;
 
   @UiField
-  Button buttonHistory;
-
-  @UiField
-  Button buttonEdit;
-
-  @UiField
-  Button buttonCancel;
-
-  @UiField
-  Button buttonRemove;
-
-  @UiField
-  Button buttonProcess;
-
-  @UiField
-  Button buttonEditIncidence;
+  SimplePanel actionsSidebar;
 
   /**
    * Create a new panel to view a risk
@@ -124,34 +109,16 @@ public class ShowRisk extends Composite {
    *
    */
   public ShowRisk() {
-    this.risk = new Risk();
+    this.risk = new IndexedRisk();
     this.riskShowPanel = new RiskShowPanel();
     initWidget(uiBinder.createAndBindUi(this));
-    buttonProcess.setEnabled(false);
-    buttonEditIncidence.setEnabled(false);
-    buttonRemove.setEnabled(false);
   }
 
-  public ShowRisk(Risk risk) {
+  public ShowRisk(IndexedRisk risk) {
     this.risk = risk;
     this.riskShowPanel = new RiskShowPanel(risk, true);
     initWidget(uiBinder.createAndBindUi(this));
-    buttonProcess.setEnabled(false);
-    buttonEditIncidence.setEnabled(false);
-    buttonRemove.setEnabled(false);
-
-    BrowserService.Util.getInstance().hasRiskVersions(risk.getId(), new AsyncCallback<Boolean>() {
-
-      @Override
-      public void onFailure(Throwable caught) {
-        buttonHistory.setVisible(false);
-      }
-
-      @Override
-      public void onSuccess(Boolean bundle) {
-        buttonHistory.setVisible(bundle.booleanValue());
-      }
-    });
+    // actionsSidebar is set in the resolve callback
   }
 
   public static ShowRisk getInstance() {
@@ -181,7 +148,29 @@ public class ShowRisk extends Composite {
           @Override
           public void onSuccess(IndexedRisk result) {
             instance = new ShowRisk(result);
-            callback.onSuccess(instance);
+
+            BrowserService.Util.getInstance().hasRiskVersions(result.getId(), new AsyncCallback<Boolean>() {
+
+              @Override
+              public void onFailure(Throwable caught) {
+                instance.actionsSidebar.setWidget(new ActionableWidgetBuilder<>(RiskActions.get())
+                  .withCallback(actionCallback).buildListWithObjects(new ActionableObject<>(result)));
+                callback.onSuccess(instance);
+              }
+
+              @Override
+              public void onSuccess(Boolean hasHistory) {
+                if (hasHistory) {
+                  instance.actionsSidebar.setWidget(new ActionableWidgetBuilder<>(RiskActions.getWithHistory())
+                    .withCallback(actionCallback).buildListWithObjects(new ActionableObject<>(result)));
+                } else {
+                  instance.actionsSidebar.setWidget(new ActionableWidgetBuilder<>(RiskActions.get())
+                    .withCallback(actionCallback).buildListWithObjects(new ActionableObject<>(result)));
+                }
+
+                callback.onSuccess(instance);
+              }
+            });
           }
         });
     } else {
@@ -189,100 +178,4 @@ public class ShowRisk extends Composite {
       callback.onSuccess(null);
     }
   }
-
-  @UiHandler("buttonHistory")
-  void handleButtonHistory(ClickEvent e) {
-    HistoryUtils.newHistory(RiskRegister.RESOLVER, RiskHistory.RESOLVER.getHistoryToken(), risk.getId());
-  }
-
-  @UiHandler("buttonEdit")
-  void handleButtonEdit(ClickEvent e) {
-    HistoryUtils.newHistory(RiskRegister.RESOLVER, EditRisk.RESOLVER.getHistoryToken(), risk.getId());
-  }
-
-  @UiHandler("buttonCancel")
-  void handleButtonCancel(ClickEvent e) {
-    HistoryUtils.newHistory(RiskRegister.RESOLVER);
-  }
-
-  @UiHandler("buttonRemove")
-  void handleButtonRemove(ClickEvent e) {
-    final SelectedItems<RiskIncidence> incidences = riskShowPanel.getSelectedIncidences();
-
-    ClientSelectedItemsUtils.size(RiskIncidence.class, incidences, new AsyncCallback<Long>() {
-
-      @Override
-      public void onFailure(Throwable caught) {
-        AsyncCallbackUtils.defaultFailureTreatment(caught);
-      }
-
-      @Override
-      public void onSuccess(final Long result) {
-        BrowserService.Util.getInstance().deleteRiskIncidences(incidences, new AsyncCallback<Void>() {
-
-          @Override
-          public void onFailure(Throwable caught) {
-            AsyncCallbackUtils.defaultFailureTreatment(caught);
-          }
-
-          @Override
-          public void onSuccess(Void nothing) {
-            riskShowPanel.refreshList();
-            Toast.showInfo(messages.removeSuccessTitle(), messages.removeSuccessMessage(result));
-          }
-        });
-      }
-    });
-  }
-
-  @UiHandler("buttonProcess")
-  void handleButtonProcess(ClickEvent e) {
-    LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
-    selectedItems.setSelectedItems(riskShowPanel.getSelectedIncidences());
-    selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
-    HistoryUtils.newHistory(CreateSelectedJob.RESOLVER, RodaConstants.JOB_PROCESS_ACTION);
-  }
-
-  @SuppressWarnings({"unchecked", "rawtypes"})
-  @UiHandler("buttonEditIncidence")
-  void handleButtonEditIncidence(ClickEvent e) {
-    final SelectedItems<RiskIncidence> selected = riskShowPanel.getSelectedIncidences();
-    EditMultipleRiskIncidenceDialog dialog = new EditMultipleRiskIncidenceDialog();
-    dialog.showAndCenter();
-    dialog.addValueChangeHandler(new ValueChangeHandler<RiskIncidence>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<RiskIncidence> event) {
-        EditMultipleRiskIncidenceDialog editDialog = (EditMultipleRiskIncidenceDialog) event.getSource();
-
-        BrowserService.Util.getInstance().updateMultipleIncidences(selected, editDialog.getStatus(),
-          editDialog.getSeverity(), editDialog.getMitigatedOn(), editDialog.getMitigatedBy(),
-          editDialog.getMitigatedDescription(), new LoadingAsyncCallback<Void>() {
-
-            @Override
-            public void onSuccessImpl(Void result) {
-              riskShowPanel.incidenceList.refresh();
-            }
-
-            @Override
-            public void onFailureImpl(Throwable caught) {
-              AsyncCallbackUtils.defaultFailureTreatment(caught);
-            }
-          });
-      }
-    });
-  }
-
-  public void enableProcessButton(boolean enable) {
-    buttonProcess.setEnabled(enable);
-  }
-
-  public void enableEditIncidenceButton(boolean enable) {
-    buttonEditIncidence.setEnabled(enable);
-  }
-
-  public void enableRemoveButton(boolean enable) {
-    buttonRemove.setEnabled(enable);
-  }
-
 }

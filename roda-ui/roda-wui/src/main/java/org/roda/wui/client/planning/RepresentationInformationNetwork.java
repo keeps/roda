@@ -13,46 +13,34 @@ package org.roda.wui.client.planning;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
-import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.ri.RepresentationInformation;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.common.actions.ActionableObject;
+import org.roda.wui.client.common.actions.ActionableWidgetBuilder;
+import org.roda.wui.client.common.actions.RepresentationInformationActions;
 import org.roda.wui.client.common.lists.RepresentationInformationList;
-import org.roda.wui.client.common.lists.utils.AsyncTableCell.CheckboxSelectionListener;
-import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchPanel;
-import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.client.ingest.process.ShowJob;
-import org.roda.wui.client.process.CreateSelectedJob;
-import org.roda.wui.client.process.InternalProcess;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
-import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.SelectionChangeEvent;
 
@@ -108,19 +96,13 @@ public class RepresentationInformationNetwork extends Composite {
   RepresentationInformationList representationInformationList;
 
   @UiField
-  Button buttonAdd;
-
-  @UiField
-  Button buttonRemove;
-
-  @UiField
-  Button startProcess;
-
-  @UiField
   FlowPanel sidebar;
 
   @UiField
   FlowPanel content;
+
+  @UiField
+  SimplePanel actionsSidebar;
 
   private static final Filter DEFAULT_FILTER = SearchFilters.defaultFilter(RepresentationInformation.class.getName());
   private static final String ALL_FILTER = SearchFilters.allFilter(RepresentationInformation.class.getName());
@@ -133,12 +115,16 @@ public class RepresentationInformationNetwork extends Composite {
   public RepresentationInformationNetwork() {
     representationInformationList = new RepresentationInformationList("RepresentationInformationNetwork_RI", filter,
       messages.representationInformationTitle(), true);
+    representationInformationList.setActionable(RepresentationInformationActions.get());
 
     searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, true,
       messages.representationInformationRegisterSearchPlaceHolder(), false, false, false);
     searchPanel.setList(representationInformationList);
 
     initWidget(uiBinder.createAndBindUi(this));
+
+    actionsSidebar.setWidget(new ActionableWidgetBuilder<>(RepresentationInformationActions.get())
+      .buildListWithObjects(new ActionableObject<>(RepresentationInformation.class)));
 
     representationInformationList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
       @Override
@@ -151,16 +137,6 @@ public class RepresentationInformationNetwork extends Composite {
         }
       }
     });
-
-    representationInformationList
-      .addCheckboxSelectionListener(new CheckboxSelectionListener<RepresentationInformation>() {
-        @Override
-        public void onSelectionChange(SelectedItems<RepresentationInformation> selected) {
-          boolean empty = ClientSelectedItemsUtils.isEmpty(selected);
-          buttonRemove.setEnabled(!empty);
-          startProcess.setEnabled(!empty);
-        }
-      });
 
     Label titleLabel = new Label(messages.representationInformationRegisterTitle());
     titleLabel.addStyleName("h1 browseItemText");
@@ -229,85 +205,5 @@ public class RepresentationInformationNetwork extends Composite {
     }
 
     filter.setParameters(params);
-  }
-
-  @UiHandler("buttonAdd")
-  void buttonAddHandler(ClickEvent e) {
-    LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
-    selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
-    HistoryUtils.newHistory(RESOLVER, CreateRepresentationInformation.RESOLVER.getHistoryToken());
-  }
-
-  @UiHandler("buttonRemove")
-  void buttonRemoveHandler(ClickEvent e) {
-    final SelectedItems<RepresentationInformation> selected = representationInformationList.getSelected();
-
-    ClientSelectedItemsUtils.size(RepresentationInformation.class, selected, new AsyncCallback<Long>() {
-
-      @Override
-      public void onFailure(Throwable caught) {
-        AsyncCallbackUtils.defaultFailureTreatment(caught);
-      }
-
-      @Override
-      public void onSuccess(final Long size) {
-        Dialogs.showConfirmDialog(messages.representationInformationRemoveFolderConfirmDialogTitle(),
-          messages.representationInformationRemoveSelectedConfirmDialogMessage(size),
-          messages.representationInformationRemoveFolderConfirmDialogCancel(),
-          messages.representationInformationRemoveFolderConfirmDialogOk(), new AsyncCallback<Boolean>() {
-
-            @Override
-            public void onFailure(Throwable caught) {
-              AsyncCallbackUtils.defaultFailureTreatment(caught);
-            }
-
-            @Override
-            public void onSuccess(Boolean confirmed) {
-              if (confirmed) {
-                BrowserService.Util.getInstance().deleteRepresentationInformation(selected, new AsyncCallback<Job>() {
-
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                  }
-
-                  @Override
-                  public void onSuccess(Job result) {
-                    Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(), new AsyncCallback<Void>() {
-
-                      @Override
-                      public void onFailure(Throwable caught) {
-                        Timer timer = new Timer() {
-                          @Override
-                          public void run() {
-                            Toast.showInfo(messages.representationInformationRemoveSuccessTitle(),
-                              messages.representationInformationRemoveSuccessMessage(size));
-                            representationInformationList.refresh();
-                          }
-                        };
-
-                        timer.schedule(RodaConstants.ACTION_TIMEOUT);
-                      }
-
-                      @Override
-                      public void onSuccess(final Void nothing) {
-                        HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-                      }
-                    });
-                  }
-                });
-              }
-            }
-          });
-      }
-    });
-  }
-
-  @UiHandler("startProcess")
-  void handleButtonProcess(ClickEvent e) {
-    LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
-    selectedItems.setSelectedItems(representationInformationList.getSelected());
-    selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
-    HistoryUtils.newHistory(CreateSelectedJob.RESOLVER, RodaConstants.JOB_PROCESS_ACTION);
   }
 }
