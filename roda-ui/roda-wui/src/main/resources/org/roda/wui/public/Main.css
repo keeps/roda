@@ -5068,6 +5068,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .permission-clear {
 	margin-right: 10px;
+    width: 80px;
 }
 
 @media only screen and (max-width: 999px)  {

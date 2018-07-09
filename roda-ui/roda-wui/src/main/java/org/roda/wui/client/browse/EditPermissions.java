@@ -526,7 +526,7 @@ public class EditPermissions extends Composite {
     private boolean isUser;
 
     public PermissionPanel(RODAMember member) {
-      this(member.getName(), member.isUser(), new HashSet<PermissionType>());
+      this(member.getName(), member.isUser(), new HashSet<>());
     }
 
     public PermissionPanel(String name, boolean isUser, Set<PermissionType> permissions) {

@@ -57,7 +57,6 @@ public class IncrementalRelationList extends Composite implements HasHandlers {
   Button addDynamicButton;
 
   private Map<String, List<RemovableRelation>> relations;
-  boolean changed = false;
   private RepresentationInformation ri;
 
   public IncrementalRelationList(RepresentationInformation ri) {
