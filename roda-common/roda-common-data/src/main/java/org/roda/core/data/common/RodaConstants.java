@@ -1210,7 +1210,7 @@ public final class RodaConstants {
     private String originalText;
     private String text;
 
-    private PreservationEventType(final String text) {
+    PreservationEventType(final String text) {
       this.text = text;
       this.originalText = text;
     }

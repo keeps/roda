@@ -153,8 +153,9 @@ public class EditRepresentationInformation extends Composite {
 
   @UiHandler("buttonRemove")
   void buttonRemoveHandler(ClickEvent e) {
-    BrowserService.Util.getInstance().deleteRepresentationInformation(new SelectedItemsList<RepresentationInformation>(
-      Arrays.asList(ri.getUUID()), RepresentationInformation.class.getName()), new AsyncCallback<Job>() {
+    BrowserService.Util.getInstance().deleteRepresentationInformation(
+      new SelectedItemsList<>(Arrays.asList(ri.getUUID()), RepresentationInformation.class.getName()),
+      new AsyncCallback<Job>() {
         @Override
         public void onFailure(Throwable caught) {
           HistoryUtils.newHistory(InternalProcess.RESOLVER);
@@ -201,9 +202,5 @@ public class EditRepresentationInformation extends Composite {
     } else {
       AsyncCallbackUtils.defaultFailureTreatment(caught);
     }
-  }
-
-  protected void enableApplyButton(boolean enabled) {
-    buttonApply.setVisible(enabled);
   }
 }

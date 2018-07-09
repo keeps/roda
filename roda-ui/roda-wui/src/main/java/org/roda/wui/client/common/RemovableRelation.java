@@ -10,9 +10,9 @@ package org.roda.wui.client.common;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.user.client.ui.InlineLabel;
 import org.roda.core.data.v2.ri.RelationObjectType;
 import org.roda.core.data.v2.ri.RepresentationInformationRelation;
+import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.planning.ShowRepresentationInformation;
 import org.roda.wui.common.client.tools.HistoryUtils;
 
@@ -29,7 +29,7 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
-import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class RemovableRelation extends Composite implements HasHandlers {
@@ -59,8 +59,13 @@ public class RemovableRelation extends Composite implements HasHandlers {
     bullet.addStyleName("bullet");
     link.add(bullet);
 
+    String title = riRelation.getTitle();
+    if (StringUtils.isBlank(title)) {
+      title = riRelation.getLink();
+    }
+
     if (riRelation.getObjectType().equals(RelationObjectType.AIP)) {
-      Anchor a = new Anchor(riRelation.getTitle(),
+      Anchor a = new Anchor(title,
         HistoryUtils.createHistoryHashLink(HistoryUtils.getHistoryBrowse(riRelation.getLink())), "_blank");
       link.add(a);
     } else if (riRelation.getObjectType().equals(RelationObjectType.REPRESENTATION_INFORMATION)) {
@@ -68,12 +73,12 @@ public class RemovableRelation extends Composite implements HasHandlers {
       history.addAll(ShowRepresentationInformation.RESOLVER.getHistoryPath());
       history.add(riRelation.getLink());
 
-      Anchor a = new Anchor(riRelation.getTitle(), HistoryUtils.createHistoryHashLink(history), "_blank");
+      Anchor a = new Anchor(title, HistoryUtils.createHistoryHashLink(history), "_blank");
       link.add(a);
     } else if (riRelation.getObjectType().equals(RelationObjectType.WEB)) {
-      link.add(new Anchor(riRelation.getTitle(), riRelation.getLink(), "_blank"));
+      link.add(new Anchor(title, riRelation.getLink(), "_blank"));
     } else if (riRelation.getObjectType().equals(RelationObjectType.TEXT)) {
-      link.add(new InlineLabel(riRelation.getTitle()));
+      link.add(new InlineLabel(riRelation.getLink()));
     }
   }
 

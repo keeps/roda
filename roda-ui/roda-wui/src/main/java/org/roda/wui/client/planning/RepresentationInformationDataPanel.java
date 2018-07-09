@@ -83,8 +83,6 @@ public class RepresentationInformationDataPanel extends Composite
   @UiField
   IncrementalFilterList filters;
 
-  private ClientLogger logger = new ClientLogger(getClass().getName());
-
   private boolean editmode;
   private boolean changed = false;
   private boolean checked = false;
@@ -117,7 +115,6 @@ public class RepresentationInformationDataPanel extends Composite
     filters.setVisible(false);
 
     ChangeHandler changeHandler = new ChangeHandler() {
-
       @Override
       public void onChange(ChangeEvent event) {
         RepresentationInformationDataPanel.this.onChange();

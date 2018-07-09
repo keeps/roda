@@ -245,7 +245,7 @@ public class FilterTest {
     Thread createThread = new Thread(new Runnable() {
       @Override
       public void run() {
-        for (int i = PREMIS_CORPORA_SIZE;; i++) {
+        for (int i = PREMIS_CORPORA_SIZE; i < 10000; i++) {
           try {
             String id = "file_" + i;
             model.createFile(aip.getId(), REPRESENTATION_ID, filePath, id, new StringContentPayload(""), true);

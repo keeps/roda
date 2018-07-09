@@ -12,7 +12,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.utils.JsonUtils;
@@ -45,19 +44,16 @@ public class RiskToVersion2 implements MigrationAction<Risk> {
 
   @Override
   public void migrate(StorageService storage) throws RODAException {
-    CloseableIterable<Resource> risks = null;
-
-    try {
-      risks = storage.listResourcesUnderDirectory(ModelUtils.getRiskContainerPath(), false);
-
+    try (CloseableIterable<Resource> risks = storage.listResourcesUnderDirectory(ModelUtils.getRiskContainerPath(),
+      false)) {
       for (Resource resource : risks) {
         if (!resource.isDirectory() && resource instanceof Binary) {
           Binary binary = (Binary) resource;
           migrate(storage, binary);
         }
       }
-    } finally {
-      IOUtils.closeQuietly(risks);
+    } catch (IOException e) {
+      throw new RODAException(e);
     }
   }
 
