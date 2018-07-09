@@ -3475,7 +3475,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .searchInputListBox .dropdown-label:after {
-    line-height: 4rem;
+    line-height: 40px;
     font-size: 20px;
     position: absolute;
     right: 0px;
