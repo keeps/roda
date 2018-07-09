@@ -451,6 +451,7 @@ public class IndexModelObserver implements ModelObserver {
     Map<String, Object> fieldsToUpdate = new HashMap<>();
     fieldsToUpdate.put(RodaConstants.INDEX_STATE, SolrUtils.formatEnum(state));
     fieldsToUpdate.put(RodaConstants.PRESERVATION_EVENT_AIP_ID, pm.getAipId());
+    fieldsToUpdate.put(RodaConstants.INDEX_ID, pm.getId());
     return SolrUtils.update(index, IndexedPreservationEvent.class, IdUtils.getPreservationId(pm), fieldsToUpdate,
       (ModelObserver) this);
   }
