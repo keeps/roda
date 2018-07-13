@@ -107,9 +107,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
   public SolrInputDocument toSolrDocument(AIP aip, Map<String, Object> preCalculatedFields,
     Map<String, Object> accumulators, Flags... flags)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-
     boolean safemode = Arrays.asList(flags).contains(Flags.SAFE_MODE_ON);
-
     SolrInputDocument doc = super.toSolrDocument(aip, preCalculatedFields, accumulators, flags);
 
     doc.addField(RodaConstants.AIP_PARENT_ID, aip.getParentId());

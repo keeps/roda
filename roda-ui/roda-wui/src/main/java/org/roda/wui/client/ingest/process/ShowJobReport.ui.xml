@@ -1,18 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
-	xmlns:i="urn:import:config.i18n.client" xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
-	xmlns:p="urn:import:org.roda.wui.client.ingest.process" xmlns:lists="urn:import:org.roda.wui.client.common.lists">
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
-
-	<ui:style>
-	.reportTitle {
-		margin-bottom: -25px;
-		margin-top: 20px;
-	}
-	</ui:style>
 
 	<g:FocusPanel ui:field="keyboardFocus">
 		<g:FlowPanel styleName="wui-ingest-new" addStyleNames="wrapper skip_padding">

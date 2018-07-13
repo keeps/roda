@@ -1,15 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
-	xmlns:i="urn:import:config.i18n.client" xmlns:m="urn:import:org.roda.wui.client.main"
-	xmlns:commonsearch="urn:import:org.roda.wui.client.common.search"
-	xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
-	xmlns:lists="urn:import:org.roda.wui.client.common.lists">
-
-	<ui:style>
-	
-	</ui:style>
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:m="urn:import:org.roda.wui.client.main"
+             xmlns:search="urn:import:org.roda.wui.client.search">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
@@ -28,11 +22,8 @@
 						</g:Label>
 					</g:FlowPanel>
 				</g:FlowPanel>
-				<m:BreadcrumbPanel ui:field="breadcrumb"
-					addStyleNames="browseBreadcrumb" />
-
-				<commonsearch:SearchPanel ui:field="eventSearch" />
-				<lists:PreservationEventList addStyleNames="searchResults" ui:field="eventList" />
+				<m:BreadcrumbPanel ui:field="breadcrumb" addStyleNames="browseBreadcrumb" />
+				<search:PreservationEventsSearch ui:field="eventSearch" addStyleNames="searchResults" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">
@@ -48,18 +39,6 @@
 								ui:field="backButton">
 								<ui:text from='{messages.preservationEventsBackButton}' />
 							</g:Button>
-						</g:FlowPanel>
-						<g:FlowPanel addStyleNames="sidebar-group">
-							<g:Label addStyleNames="h4">
-								<ui:text from='{messages.sidebarFilterDates}' />
-							</g:Label>
-							<d:DateBox
-								addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
-								ui:field="inputDateInitial" />
-							<g:Label addStyleNames="sidebar-facet-date-separator">-</g:Label>
-							<d:DateBox
-								addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
-								ui:field="inputDateFinal" />
 						</g:FlowPanel>
 					</g:FlowPanel>
 				</g:FlowPanel>

@@ -1,16 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
-	xmlns:i="urn:import:config.i18n.client" xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
-	xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag"
-	xmlns:common="urn:import:org.roda.wui.client.common" xmlns:lists="urn:import:org.roda.wui.client.common.lists">
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
-
-	<ui:style>
-	
-	</ui:style>
 
 	<g:FlowPanel styleName="wui-management-user" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">

@@ -37,6 +37,10 @@ public interface SolrCollection<I extends IsIndexed, M extends IsModelObject> {
     return new CopyField(field, field + "_sort");
   }
 
+  static CopyField getTextCopyFieldOf(String field) {
+    return new CopyField(field, field + "_txt");
+  }
+
   static List<DynamicField> getPermissionDynamicFields(boolean stored) {
     return Arrays.asList(
       new DynamicField(DynamicField.DYNAMIC_FIELD_PERMISSION_USERS, Field.TYPE_STRING).setMultiValued(true)
@@ -70,7 +74,7 @@ public interface SolrCollection<I extends IsIndexed, M extends IsModelObject> {
   }
 
   public enum Flags {
-    SAFE_MODE_ON, SAFE_MODE_OFF;
+    SAFE_MODE_ON, SAFE_MODE_OFF
   }
 
   Class<I> getIndexClass();
@@ -98,8 +102,8 @@ public interface SolrCollection<I extends IsIndexed, M extends IsModelObject> {
    *          Fields that are pre-calculated because they can be shared for
    *          several objects, like the list of ancestors for sibling objects.
    * @param accumulators
-   *          Fields to be added on upper-level collections that are calculated
-   *          by accumulating values on every lower-level collection.
+   *          Fields to be added on upper-level collections that are calculated by
+   *          accumulating values on every lower-level collection.
    * @param flags
    *          Flags to control indexing, as {@link Flags#SAFE_MODE_ON}.
    * @return the Solr Document ready to index.

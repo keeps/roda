@@ -284,14 +284,15 @@ public class FileStorageService implements StorageService {
     if (storagePath.isFromAContainer()) {
       throw new RequestNotValidException("Invalid storage path for a directory: " + storagePath);
     }
+
     Path directoryPath = FSUtils.getEntityPath(basePath, storagePath);
     Resource resource = FSUtils.convertPathToResource(basePath, directoryPath);
+
     if (resource instanceof Directory) {
       return (Directory) resource;
     } else {
       throw new RequestNotValidException("Looking for a directory but found something else: " + storagePath);
     }
-
   }
 
   @Override
@@ -326,7 +327,6 @@ public class FileStorageService implements StorageService {
       if (FSUtils.exists(binPath)) {
         throw new AlreadyExistsException("Binary already exists: " + binPath);
       } else {
-
         try {
           // ensuring parent exists
           Path parent = binPath.getParent();
@@ -446,7 +446,6 @@ public class FileStorageService implements StorageService {
       Path sourcePath = ((FileStorageService) fromService).resolve(fromStoragePath);
       Path targetPath = FSUtils.getEntityPath(basePath, toStoragePath);
       FSUtils.copy(sourcePath, targetPath, false);
-
     } else {
       Class<? extends Entity> rootEntity = fromService.getEntity(fromStoragePath);
       StorageServiceUtils.copyBetweenStorageServices(fromService, fromStoragePath, this, toStoragePath, rootEntity);

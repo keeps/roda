@@ -35,7 +35,6 @@ import config.i18n.client.ClientMessages;
 public class PreservationAgentList extends BasicAsyncTableCell<IndexedPreservationAgent> {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  private TextColumn<IndexedPreservationAgent> idColumn;
   private TextColumn<IndexedPreservationAgent> nameColumn;
   private TextColumn<IndexedPreservationAgent> typeColumn;
   private TextColumn<IndexedPreservationAgent> versionColumn;
@@ -44,32 +43,12 @@ public class PreservationAgentList extends BasicAsyncTableCell<IndexedPreservati
     RodaConstants.PRESERVATION_AGENT_ID, RodaConstants.PRESERVATION_AGENT_NAME, RodaConstants.PRESERVATION_AGENT_TYPE,
     RodaConstants.PRESERVATION_AGENT_VERSION);
 
-  public PreservationAgentList(String listId) {
-    this(listId, null, null, false);
-  }
-
   public PreservationAgentList(String listId, Filter filter, String summary, boolean selectable) {
     super(IndexedPreservationAgent.class, listId, filter, summary, selectable, fieldsToReturn);
   }
 
-  public PreservationAgentList(String listId, Filter filter, String summary, boolean selectable,
-    int initialPageSize,
-    int pageSizeIncrement) {
-    super(IndexedPreservationAgent.class, listId, filter, summary, selectable, initialPageSize,
-      pageSizeIncrement,
-      fieldsToReturn);
-  }
-
   @Override
   protected void configureDisplay(CellTable<IndexedPreservationAgent> display) {
-
-    idColumn = new TextColumn<IndexedPreservationAgent>() {
-      @Override
-      public String getValue(IndexedPreservationAgent agent) {
-        return agent != null ? agent.getId() : null;
-      }
-    };
-
     nameColumn = new TextColumn<IndexedPreservationAgent>() {
       @Override
       public String getValue(IndexedPreservationAgent agent) {
@@ -91,12 +70,10 @@ public class PreservationAgentList extends BasicAsyncTableCell<IndexedPreservati
       }
     };
 
-    idColumn.setSortable(true);
     nameColumn.setSortable(true);
     typeColumn.setSortable(true);
     versionColumn.setSortable(true);
 
-    addColumn(idColumn, messages.preservationAgentId(), true, false, 11);
     addColumn(nameColumn, messages.preservationAgentName(), true, false, 13);
     addColumn(typeColumn, messages.preservationAgentType(), false, false, 11);
     addColumn(versionColumn, messages.preservationAgentVersion(), false, false, 11);
@@ -108,7 +85,6 @@ public class PreservationAgentList extends BasicAsyncTableCell<IndexedPreservati
   @Override
   protected Sorter getSorter(ColumnSortList columnSortList) {
     Map<Column<IndexedPreservationAgent, ?>, List<String>> columnSortingKeyMap = new HashMap<>();
-    columnSortingKeyMap.put(idColumn, Arrays.asList(RodaConstants.PRESERVATION_AGENT_ID));
     columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.PRESERVATION_AGENT_NAME));
     columnSortingKeyMap.put(typeColumn, Arrays.asList(RodaConstants.PRESERVATION_AGENT_TYPE));
     columnSortingKeyMap.put(versionColumn, Arrays.asList(RodaConstants.PRESERVATION_AGENT_VERSION));

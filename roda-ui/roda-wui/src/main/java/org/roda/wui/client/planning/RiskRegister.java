@@ -23,17 +23,14 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
-import org.roda.wui.client.common.lists.RiskList;
-import org.roda.wui.client.common.lists.utils.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
-import org.roda.wui.client.common.search.SearchFilters;
-import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.CreateActionJob;
 import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.client.process.InternalProcess;
+import org.roda.wui.client.search.RiskSearch;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -42,9 +39,6 @@ import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -55,9 +49,6 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.user.datepicker.client.DateBox;
-import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
-import com.google.gwt.view.client.SelectionChangeEvent;
 
 import config.i18n.client.ClientMessages;
 
@@ -105,16 +96,7 @@ public class RiskRegister extends Composite {
   FlowPanel riskRegisterDescription;
 
   @UiField(provided = true)
-  SearchPanel searchPanel;
-
-  @UiField(provided = true)
-  RiskList riskList;
-
-  @UiField
-  DateBox inputDateInitial;
-
-  @UiField
-  DateBox inputDateFinal;
+  RiskSearch riskSearch;
 
   @UiField
   Button buttonAdd;
@@ -128,68 +110,15 @@ public class RiskRegister extends Composite {
   @UiField
   Button buttonRefresh;
 
-  private static final Filter DEFAULT_FILTER = SearchFilters.defaultFilter(IndexedRisk.class.getName());
-  private static final String ALL_FILTER = SearchFilters.allFilter(IndexedRisk.class.getName());
-
   /**
    * Create a risk register page
    *
-   * @param user
    */
   public RiskRegister() {
-    riskList = new RiskList("RiskRegister_risks", Filter.NULL, messages.risksTitle(), true);
-
-    searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, true, messages.riskRegisterSearchPlaceHolder(), false,
-      false, false);
-    searchPanel.setList(riskList);
-
-    riskList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
-      @Override
-      public void onSelectionChange(SelectionChangeEvent event) {
-        IndexedRisk selected = riskList.getSelectionModel().getSelectedObject();
-        if (selected != null) {
-          HistoryUtils.newHistory(RESOLVER, ShowRisk.RESOLVER.getHistoryToken(), selected.getId());
-        }
-      }
-    });
-
-    riskList.addCheckboxSelectionListener(new CheckboxSelectionListener<IndexedRisk>() {
-      @Override
-      public void onSelectionChange(SelectedItems<IndexedRisk> selected) {
-        boolean empty = ClientSelectedItemsUtils.isEmpty(selected);
-        buttonRemove.setEnabled(!empty);
-        startProcess.setEnabled(!empty);
-      }
-    });
-
+    riskSearch = new RiskSearch("RiskRegister_risks", "RiskRegister_riskIncidences");
+    riskSearch.defaultFilters();
     initWidget(uiBinder.createAndBindUi(this));
     riskRegisterDescription.add(new HTMLWidgetWrapper("RiskRegisterDescription.html"));
-    buttonRemove.setEnabled(false);
-    startProcess.setEnabled(false);
-
-    DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
-    ValueChangeHandler<Date> valueChangeHandler = new ValueChangeHandler<Date>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<Date> event) {
-        updateDateFilter();
-      }
-    };
-
-    inputDateInitial.setFormat(dateFormat);
-    inputDateInitial.getDatePicker().setYearArrowsVisible(true);
-    inputDateInitial.setFireNullValues(true);
-    inputDateInitial.addValueChangeHandler(valueChangeHandler);
-    inputDateInitial.setTitle(messages.dateIntervalLabelInitial());
-
-    inputDateFinal.setFormat(dateFormat);
-    inputDateFinal.getDatePicker().setYearArrowsVisible(true);
-    inputDateFinal.setFireNullValues(true);
-    inputDateFinal.addValueChangeHandler(valueChangeHandler);
-    inputDateFinal.setTitle(messages.dateIntervalLabelFinal());
-
-    inputDateInitial.getElement().setPropertyString("placeholder", messages.sidebarFilterFromDatePlaceHolder());
-    inputDateFinal.getElement().setPropertyString("placeholder", messages.sidebarFilterToDatePlaceHolder());
   }
 
   /**
@@ -210,19 +139,8 @@ public class RiskRegister extends Composite {
     JavascriptUtils.stickSidebar();
   }
 
-  private void updateDateFilter() {
-    Date dateInitial = inputDateInitial.getDatePicker().getValue();
-    Date dateFinal = inputDateFinal.getDatePicker().getValue();
-
-    DateRangeFilterParameter filterParameter = new DateRangeFilterParameter(RodaConstants.RISK_IDENTIFIED_ON,
-      dateInitial, dateFinal, RodaConstants.DateGranularity.DAY);
-
-    riskList.setFilter(new Filter(filterParameter));
-  }
-
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.isEmpty()) {
-      riskList.setFilter(Filter.ALL);
       callback.onSuccess(this);
     } else if (historyTokens.size() == 2 && historyTokens.get(0).equals(ShowRisk.RESOLVER.getHistoryToken())) {
       ShowRisk.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
@@ -252,23 +170,26 @@ public class RiskRegister extends Composite {
       @Override
       public void onFailure(Throwable caught) {
         AsyncCallbackUtils.defaultFailureTreatment(caught);
-        riskList.refresh();
+        if (riskSearch.getList() != null) {
+          riskSearch.refresh();
+        }
       }
 
       @Override
       public void onSuccess(Void result) {
         Toast.showInfo(messages.dialogRefresh(), messages.riskRefreshDone());
-        riskList.refresh();
+        if (riskSearch.getList() != null) {
+          riskSearch.refresh();
+        }
       }
     });
   }
 
   @UiHandler("buttonRemove")
   void buttonRemoveRiskHandler(ClickEvent e) {
-    final SelectedItems<IndexedRisk> selected = riskList.getSelected();
+    final SelectedItems<IndexedRisk> selected = (SelectedItems<IndexedRisk>) riskSearch.getSelected();
 
     ClientSelectedItemsUtils.size(IndexedRisk.class, selected, new AsyncCallback<Long>() {
-
       @Override
       public void onFailure(Throwable caught) {
         AsyncCallbackUtils.defaultFailureTreatment(caught);
@@ -305,7 +226,7 @@ public class RiskRegister extends Composite {
                           @Override
                           public void run() {
                             Toast.showInfo(messages.riskRemoveSuccessTitle(), messages.riskRemoveSuccessMessage(size));
-                            riskList.refresh();
+                            riskSearch.refresh();
                           }
                         };
 
@@ -329,9 +250,8 @@ public class RiskRegister extends Composite {
   @UiHandler("startProcess")
   void handleButtonProcess(ClickEvent e) {
     LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
-    selectedItems.setSelectedItems(riskList.getSelected());
+    selectedItems.setSelectedItems(riskSearch.getSelected());
     selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
     HistoryUtils.newHistory(CreateSelectedJob.RESOLVER, RodaConstants.JOB_PROCESS_ACTION);
   }
-
 }

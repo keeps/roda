@@ -244,8 +244,8 @@ public class ModelService extends ModelObservable {
    * 
    * @param aipId
    *          Suggested ID for the AIP, if <code>null</code> then an ID will be
-   *          automatically generated. If ID cannot be allowed because it
-   *          already exists or is not valid, another ID will be provided.
+   *          automatically generated. If ID cannot be allowed because it already
+   *          exists or is not valid, another ID will be provided.
    * @param sourceStorage
    * @param sourcePath
    * @return
@@ -1341,6 +1341,7 @@ public class ModelService extends ModelObservable {
     if (notify) {
       notifyPreservationMetadataUpdated(pm).failOnError();
     }
+
     return pm;
   }
 
@@ -2385,8 +2386,7 @@ public class ModelService extends ModelObservable {
   }
 
   public DIPFile createDIPFile(String dipId, List<String> directoryPath, String fileId, String dirName, boolean notify)
-    throws RequestNotValidException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
-    NotFoundException {
+    throws RequestNotValidException, GenericException, AlreadyExistsException, AuthorizationDeniedException {
 
     StoragePath filePath = ModelUtils.getDIPFileStoragePath(dipId, directoryPath, fileId);
     final Directory createdDirectory = storage.createDirectory(DefaultStoragePath.parse(filePath, dirName));
@@ -2675,13 +2675,12 @@ public class ModelService extends ModelObservable {
   }
 
   public CloseableIterable<OptionalWithCause<LogEntry>> listLogEntries(int daysToIndex) {
-    boolean recursive = false;
     CloseableIterable<OptionalWithCause<LogEntry>> inStorage = null;
     CloseableIterable<OptionalWithCause<LogEntry>> notStorage = null;
 
     try {
       final CloseableIterable<Resource> actionLogs = getStorage()
-        .listResourcesUnderContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG), recursive);
+        .listResourcesUnderContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG), false);
 
       if (daysToIndex > 0) {
         inStorage = new LogEntryStorageIterable(
@@ -2700,7 +2699,6 @@ public class ModelService extends ModelObservable {
       } else {
         notStorage = new LogEntryFileSystemIterable(RodaCoreFactory.getLogPath());
       }
-
     } catch (IOException e) {
       LOGGER.error("Error getting action log from storage", e);
     }
@@ -2718,7 +2716,6 @@ public class ModelService extends ModelObservable {
       if (LocalDate.from(dt).plus(daysToIndex + 1, ChronoUnit.DAYS).isAfter(LocalDate.now())) {
         isToIndex = true;
       }
-
     } catch (IllegalArgumentException | UnsupportedOperationException e) {
       LOGGER.error("Could not parse log file name", e);
     }

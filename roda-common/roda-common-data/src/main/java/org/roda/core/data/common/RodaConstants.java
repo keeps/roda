@@ -785,6 +785,7 @@ public final class RodaConstants {
   public static final String JOB_OUTCOME_OBJECTS_CLASS = "outcomeObjectsClass";
   public static final String JOB_IN_FINAL_STATE = "inFinalState";
   public static final String JOB_STOPPING = "stopping";
+  public static final String JOB_HAS_FAILURES = "hasFailures";
   public static final String JOB_FILE_EXTENSION = ".json";
 
   public static final String JOB_SEARCH = "search";
@@ -906,6 +907,7 @@ public final class RodaConstants {
   public static final String JOB_REPORT_JOB_NAME = "jobName";
   public static final String JOB_REPORT_SOURCE_OBJECT_LABEL = "sourceObjectLabel";
   public static final String JOB_REPORT_OUTCOME_OBJECT_LABEL = "outcomeObjectLabel";
+  public static final String JOB_REPORT_JOB_PLUGIN_TYPE = JOB_PLUGIN_TYPE;
   public static final String JOB_REPORT_FILE_EXTENSION = ".json";
   public static final String JOB_REPORT_SEARCH = "search";
 
@@ -1278,6 +1280,14 @@ public final class RodaConstants {
   public static final String SEARCH_ITEMS = "items";
   public static final String SEARCH_REPRESENTATIONS = "representations";
   public static final String SEARCH_FILES = "files";
+  public static final String SEARCH_JOBS = "jobs";
+  public static final String SEARCH_JOB_REPORTS = "job_reports";
+  public static final String SEARCH_RISKS = "risks";
+  public static final String SEARCH_INCIDENCES = "incidences";
+  public static final String SEARCH_PRESERVATION_EVENTS = "preservation_events";
+  public static final String SEARCH_ACTION_LOGS = "action_logs";
+  public static final String SEARCH_NOTIFICATIONS = "notifications";
+  public static final String SEARCH_TRANSFERRED_RESOURCES = "transferred_resources";
 
   public static final String SEARCH_FIELD_PREFIX = "ui.search.fields";
   public static final String SEARCH_FIELD_FIELDS = "fields";

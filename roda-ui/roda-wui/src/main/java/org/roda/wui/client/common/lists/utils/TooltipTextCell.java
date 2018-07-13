@@ -29,11 +29,9 @@ public class TooltipTextCell extends TextCell {
 
   @Override
   public void render(Context context, SafeHtml value, SafeHtmlBuilder sb) {
-
     sb.append(TEMPLATES.startToolTip(value.asString()));
     super.render(context, value, sb);
     sb.append(TEMPLATES.endToolTip());
-
   }
 
 }

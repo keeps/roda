@@ -31,10 +31,8 @@ import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.SelectTransferResourceDialog;
-import org.roda.wui.client.common.lists.TransferredResourceList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
-import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.Ingest;
@@ -43,7 +41,7 @@ import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.client.process.InternalProcess;
-import org.roda.wui.common.client.ClientLogger;
+import org.roda.wui.client.search.TransferredResourceSearch;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -73,8 +71,6 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.SelectionChangeEvent;
-import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
 import config.i18n.client.ClientMessages;
 
@@ -125,9 +121,6 @@ public class IngestTransfer extends Composite {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
-  @SuppressWarnings("unused")
-  private ClientLogger logger = new ClientLogger(getClass().getName());
   private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
 
   private TransferredResource resource;
@@ -142,13 +135,10 @@ public class IngestTransfer extends Composite {
   BreadcrumbPanel breadcrumb;
 
   @UiField(provided = true)
-  SearchPanel searchPanel;
+  TransferredResourceSearch resourceSearch;
 
   @UiField
   Button download;
-
-  @UiField(provided = true)
-  TransferredResourceList transferredResourceList;
 
   @UiField
   Label lastScanned;
@@ -185,36 +175,21 @@ public class IngestTransfer extends Composite {
   Button move;
 
   private IngestTransfer() {
-    transferredResourceList = new TransferredResourceList("IngestTransfer_transferredResources", Filter.NULL,
-      messages.ingestTransferList(), true);
-
-    searchPanel = new SearchPanel(Filter.NULL, RodaConstants.TRANSFERRED_RESOURCE_SEARCH, true,
-      messages.ingestTransferSearchPlaceHolder(), false, false, false);
-    searchPanel.setList(transferredResourceList);
+    resourceSearch = new TransferredResourceSearch("IngestTransfer_transferredResources");
+    resourceSearch.defaultFilters(new Filter(new EmptyKeyFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID)));
 
     initWidget(uiBinder.createAndBindUi(this));
 
     ingestTransferDescription.add(new HTMLWidgetWrapper("IngestTransferDescription.html"));
 
-    transferredResourceList.addValueChangeHandler(new ValueChangeHandler<IndexResult<TransferredResource>>() {
+    resourceSearch.getList().addValueChangeHandler(new ValueChangeHandler<IndexResult<TransferredResource>>() {
       @Override
       public void onValueChange(ValueChangeEvent<IndexResult<TransferredResource>> event) {
         updateVisibles();
       }
     });
 
-    transferredResourceList.getSelectionModel().addSelectionChangeHandler(new Handler() {
-      @Override
-      public void onSelectionChange(SelectionChangeEvent event) {
-        TransferredResource r = transferredResourceList.getSelectionModel().getSelectedObject();
-        if (r != null) {
-          searchPanel.clearSearchInputBox();
-          HistoryUtils.newHistory(RESOLVER, r.getUUID());
-        }
-      }
-    });
-
-    transferredResourceList.addCheckboxSelectionListener(new CheckboxSelectionListener<TransferredResource>() {
+    resourceSearch.getList().addCheckboxSelectionListener(new CheckboxSelectionListener<TransferredResource>() {
       @Override
       public void onSelectionChange(SelectedItems<TransferredResource> selected) {
         boolean empty = ClientSelectedItemsUtils.isEmpty(selected);
@@ -276,18 +251,14 @@ public class IngestTransfer extends Composite {
     itemIcon.getParent().removeStyleName("browseTitle-allCollections-wrapper");
 
     if (r.isFile()) {
-      searchPanel.setVisible(false);
-      transferredResourceList.setVisible(false);
+      resourceSearch.setVisible(false);
       download.setVisible(true);
       move.setEnabled(true);
     } else {
       Filter filter = new Filter(
         new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID, r.getRelativePath()));
-      transferredResourceList.setFilter(filter);
-      searchPanel.setDefaultFilter(filter, true);
-
-      searchPanel.setVisible(true);
-      transferredResourceList.setVisible(true);
+      resourceSearch.defaultFilters(filter);
+      resourceSearch.setVisible(true);
       download.setVisible(false);
     }
 
@@ -319,12 +290,10 @@ public class IngestTransfer extends Composite {
 
     move.setEnabled(resource != null);
     rename.setEnabled(resource != null);
-    searchPanel.setVisible(true);
-    transferredResourceList.setVisible(true);
+    resourceSearch.setVisible(true);
     download.setVisible(false);
 
-    transferredResourceList.setFilter(DEFAULT_FILTER);
-    searchPanel.setDefaultFilter(DEFAULT_FILTER, true);
+    resourceSearch.defaultFilters(DEFAULT_FILTER);
     breadcrumb.setVisible(false);
 
     lastScanned.setText("");
@@ -389,9 +358,7 @@ public class IngestTransfer extends Composite {
   protected void updateVisibles() {
     uploadFiles.setEnabled(resource == null || !resource.isFile());
     createFolder.setEnabled(resource == null || !resource.isFile());
-
-    boolean empty = ClientSelectedItemsUtils.isEmpty(transferredResourceList.getSelected());
-
+    boolean empty = ClientSelectedItemsUtils.isEmpty(resourceSearch.getSelected());
     remove.setEnabled(resource != null || !empty);
     startIngest.setEnabled(resource != null || !empty);
   }
@@ -411,14 +378,14 @@ public class IngestTransfer extends Composite {
           AsyncCallbackUtils.defaultFailureTreatment(caught);
         }
 
-        transferredResourceList.refresh();
+        resourceSearch.refresh();
         refresh.setEnabled(true);
       }
 
       @Override
       public void onSuccess(Void result) {
         Toast.showInfo(messages.dialogRefresh(), messages.updatedFilesUnderFolder());
-        transferredResourceList.refresh();
+        resourceSearch.refresh();
         refresh.setEnabled(true);
       }
     });
@@ -466,8 +433,7 @@ public class IngestTransfer extends Composite {
 
   @UiHandler("remove")
   void buttonRemoveHandler(ClickEvent e) {
-
-    final SelectedItems<TransferredResource> selected = transferredResourceList.getSelected();
+    final SelectedItems<TransferredResource> selected = resourceSearch.getSelected();
 
     if (ClientSelectedItemsUtils.isEmpty(selected)) {
       // Remove the whole folder
@@ -508,7 +474,6 @@ public class IngestTransfer extends Composite {
 
     } else {
       // Remove all selected resources
-
       ClientSelectedItemsUtils.size(TransferredResource.class, selected, new AsyncCallback<Long>() {
 
         @Override
@@ -535,13 +500,13 @@ public class IngestTransfer extends Composite {
                     @Override
                     public void onFailure(Throwable caught) {
                       AsyncCallbackUtils.defaultFailureTreatment(caught);
-                      transferredResourceList.refresh();
+                      resourceSearch.refresh();
                     }
 
                     @Override
                     public void onSuccess(Void result) {
                       Toast.showInfo(messages.removeSuccessTitle(), messages.removeSuccessMessage(size));
-                      transferredResourceList.refresh();
+                      resourceSearch.refresh();
                       move.setEnabled(false);
                       rename.setEnabled(false);
                     }
@@ -550,7 +515,6 @@ public class IngestTransfer extends Composite {
               }
             });
         }
-
       });
 
     }
@@ -566,17 +530,13 @@ public class IngestTransfer extends Composite {
   }
 
   public SelectedItems<TransferredResource> getSelected() {
-    SelectedItems<TransferredResource> selected = transferredResourceList.getSelected();
+    SelectedItems<TransferredResource> selected = resourceSearch.getSelected();
 
     if (ClientSelectedItemsUtils.isEmpty(selected) && resource != null) {
       selected = new SelectedItemsList<>(Arrays.asList(resource.getUUID()), TransferredResource.class.getName());
     }
 
     return selected;
-  }
-
-  public void refreshList() {
-    transferredResourceList.refresh();
   }
 
   @UiHandler("download")

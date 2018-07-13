@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.gwt.core.client.GWT;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -104,7 +105,6 @@ public class AdvancedSearchFieldsPanel extends FlowPanel implements HasValueChan
 
     searchFieldPanel.addRemoveClickHandler(clickHandler);
     searchFieldPanel.addValueChangeHandler(new ValueChangeHandler<String>() {
-
       @Override
       public void onValueChange(ValueChangeEvent<String> event) {
         setSuggestions(searchFieldPanel);
@@ -112,7 +112,6 @@ public class AdvancedSearchFieldsPanel extends FlowPanel implements HasValueChan
     });
 
     searchFieldPanel.addListBoxChangeHandler(new ChangeHandler() {
-
       @Override
       public void onChange(ChangeEvent event) {
         addWarningToDuplicateFields();
@@ -151,13 +150,13 @@ public class AdvancedSearchFieldsPanel extends FlowPanel implements HasValueChan
 
     if (searchField.getType().equals(RodaConstants.SEARCH_FIELD_TYPE_SUGGEST)) {
       if (className.equals(RodaConstants.SEARCH_ITEMS)) {
-        searchFieldPanel.addInputSearchSuggestBox(new SearchSuggestBox<IndexedAIP>(IndexedAIP.class,
+        searchFieldPanel.addInputSearchSuggestBox(new SearchSuggestBox<>(IndexedAIP.class,
           searchField.getSuggestField(), searchField.isSuggestPartial()));
       } else if (className.equals(RodaConstants.SEARCH_REPRESENTATIONS)) {
-        searchFieldPanel.addInputSearchSuggestBox(new SearchSuggestBox<IndexedRepresentation>(
+        searchFieldPanel.addInputSearchSuggestBox(new SearchSuggestBox<>(
           IndexedRepresentation.class, searchField.getSuggestField(), searchField.isSuggestPartial()));
       } else if (className.equals(RodaConstants.SEARCH_FILES)) {
-        searchFieldPanel.addInputSearchSuggestBox(new SearchSuggestBox<IndexedFile>(IndexedFile.class,
+        searchFieldPanel.addInputSearchSuggestBox(new SearchSuggestBox<>(IndexedFile.class,
           searchField.getSuggestField(), searchField.isSuggestPartial()));
       }
     }

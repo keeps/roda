@@ -24,7 +24,6 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.Validator;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
@@ -87,6 +86,7 @@ public class ValidationUtils {
     for (DescriptiveMetadata dm : descriptiveMetadata) {
       StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(dm);
       Binary binary = model.getStorage().getBinary(storagePath);
+
       if (forceDescriptiveMetadataType) {
         if (validateDescriptiveMetadata) {
           ValidationReport dmReport = validateDescriptiveBinary(binary.getContent(), fallbackMetadataType,
@@ -96,6 +96,7 @@ public class ValidationUtils {
             schemasInfo.add(Pair.of(fallbackMetadataType, fallbackMetadataVersion));
           }
         }
+
         // XXX review why should a validation method update data
         Map<String, String> properties = new HashMap<>();
         properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.METADATA_TYPE_FORCED.toString());
@@ -118,7 +119,6 @@ public class ValidationUtils {
           schemasInfo.add(pair);
         }
       }
-
     }
 
     // TODO handle premis...
@@ -127,13 +127,14 @@ public class ValidationUtils {
 
   public static ValidationReport consolidateReports(ValidationReport mainReport, ValidationReport innerReport) {
     mainReport.setValid(mainReport.isValid() && innerReport.isValid());
+
     if (StringUtils.isNotBlank(mainReport.getMessage())) {
       mainReport.setMessage(mainReport.getMessage() + "\n" + innerReport.getMessage());
     } else {
       mainReport.setMessage(innerReport.getMessage());
     }
-    mainReport.getIssues().addAll(innerReport.getIssues());
 
+    mainReport.getIssues().addAll(innerReport.getIssues());
     return mainReport;
   }
 
@@ -166,6 +167,7 @@ public class ValidationUtils {
       ret.setValid(false);
       ret.setMessage(e.getMessage());
     }
+
     return ret;
   }
 
@@ -184,6 +186,7 @@ public class ValidationUtils {
     boolean valid = true;
     List<ValidationIssue> issues = new ArrayList<>();
     List<DescriptiveMetadata> descriptiveMetadata = model.retrieveAIP(aipId).getDescriptiveMetadata();
+
     for (DescriptiveMetadata dm : descriptiveMetadata) {
       ValidationReport report = isDescriptiveMetadataValid(model, dm, failIfNoSchema);
       valid &= report.isValid();
@@ -230,7 +233,6 @@ public class ValidationUtils {
     issue.setMessage(e.getMessage());
     issue.setLineNumber(e.getLineNumber());
     issue.setColumnNumber(e.getColumnNumber());
-
     return issue;
   }
 
@@ -248,7 +250,6 @@ public class ValidationUtils {
   public static ValidationReport isPreservationMetadataValid(ModelService model, PreservationMetadata metadata,
     boolean failIfNoSchema)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-
     StoragePath storagePath = ModelUtils.getPreservationMetadataStoragePath(metadata);
     Binary binary = model.getStorage().getBinary(storagePath);
     return validatePreservationBinary(binary, failIfNoSchema);
@@ -279,9 +280,7 @@ public class ValidationUtils {
           Source source = new SAXSource(xmlReader, inputSource);
 
           Validator validator = xmlSchema.get().newValidator();
-
           validator.setErrorHandler(errorHandler);
-
           validator.validate(source);
           ret.setValid(errorHandler.getErrors().isEmpty());
           for (SAXParseException saxParseException : errorHandler.getErrors()) {
@@ -325,11 +324,10 @@ public class ValidationUtils {
    */
   public static ValidationReport validatePreservationBinary(Binary binary, boolean failIfNoSchema) {
     ValidationReport report = new ValidationReport();
-    InputStream inputStream = null;
-    try {
-      Optional<Schema> xmlSchema = RodaCoreFactory.getRodaSchema("premis-v2-0", null);
-      if (xmlSchema.isPresent()) {
-        inputStream = binary.getContent().createInputStream();
+    Optional<Schema> xmlSchema = RodaCoreFactory.getRodaSchema("premis-v2-0", null);
+
+    if (xmlSchema.isPresent()) {
+      try (InputStream inputStream = binary.getContent().createInputStream()) {
         Source xmlFile = new StreamSource(inputStream);
         Validator validator = xmlSchema.get().newValidator();
         RodaErrorHandler errorHandler = new RodaErrorHandler();
@@ -347,19 +345,16 @@ public class ValidationUtils {
             report.addIssue(convertSAXParseException(saxParseException));
           }
         }
-      } else if (failIfNoSchema) {
+      } catch (IOException e) {
         report.setValid(false);
-        report.setMessage("No schema to validate PREMIS");
+        report.setMessage(e.getMessage());
       }
-
-    } catch (IOException e) {
+    } else if (failIfNoSchema) {
       report.setValid(false);
-      report.setMessage(e.getMessage());
-    } finally {
-      IOUtils.closeQuietly(inputStream);
+      report.setMessage("No schema to validate PREMIS");
     }
-    return report;
 
+    return report;
   }
 
   private static class RodaErrorHandler extends DefaultHandler {
@@ -370,17 +365,17 @@ public class ValidationUtils {
     }
 
     @Override
-    public void warning(SAXParseException e) throws SAXException {
+    public void warning(SAXParseException e) {
       errors.add(e);
     }
 
     @Override
-    public void error(SAXParseException e) throws SAXException {
+    public void error(SAXParseException e) {
       errors.add(e);
     }
 
     @Override
-    public void fatalError(SAXParseException e) throws SAXException {
+    public void fatalError(SAXParseException e) {
       errors.add(e);
     }
 

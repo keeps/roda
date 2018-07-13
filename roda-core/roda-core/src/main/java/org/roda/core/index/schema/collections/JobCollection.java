@@ -77,6 +77,7 @@ public class JobCollection extends AbstractSolrCollection<Job, Job> {
     fields.add(new Field(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_SUCCESS, Field.TYPE_INT));
     fields.add(new Field(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_FAILURE, Field.TYPE_INT));
     fields.add(new Field(RodaConstants.JOB_OUTCOME_OBJECTS_WITH_MANUAL_INTERVENTION, Field.TYPE_INT));
+    fields.add(new Field(RodaConstants.JOB_HAS_FAILURES, Field.TYPE_BOOLEAN).setStored(false));
 
     fields.add(SolrCollection.getSearchField());
 
@@ -85,7 +86,8 @@ public class JobCollection extends AbstractSolrCollection<Job, Job> {
 
   @Override
   public List<CopyField> getCopyFields() {
-    return Arrays.asList(SolrCollection.getCopyAllToSearchField());
+    return Arrays.asList(SolrCollection.getCopyAllToSearchField(),
+      SolrCollection.getTextCopyFieldOf(RodaConstants.JOB_NAME));
   }
 
   @Override
@@ -118,7 +120,9 @@ public class JobCollection extends AbstractSolrCollection<Job, Job> {
     doc.addField(RodaConstants.JOB_PLUGIN_PARAMETERS, JsonUtils.getJsonFromObject(job.getPluginParameters()));
     doc.addField(RodaConstants.JOB_SOURCE_OBJECTS, JsonUtils.getJsonFromObject(job.getSourceObjects()));
     doc.addField(RodaConstants.JOB_OUTCOME_OBJECTS_CLASS, job.getOutcomeObjectsClass());
-    
+    doc.addField(RodaConstants.JOB_HAS_FAILURES, jobStats.getSourceObjectsProcessedWithFailure() > 0
+      || jobStats.getSourceObjectsCount() > jobStats.getSourceObjectsProcessedWithSuccess());
+
     return doc;
   }
 
@@ -168,7 +172,6 @@ public class JobCollection extends AbstractSolrCollection<Job, Job> {
     job.setOutcomeObjectsClass(SolrUtils.objectToString(doc.get(RodaConstants.JOB_OUTCOME_OBJECTS_CLASS), null));
 
     return job;
-
   }
 
 }

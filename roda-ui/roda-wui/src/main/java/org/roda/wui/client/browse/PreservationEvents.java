@@ -21,19 +21,17 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.lists.PreservationEventList;
-import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.client.planning.Planning;
+import org.roda.wui.client.search.PreservationEventsSearch;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -59,8 +57,6 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.datepicker.client.DateBox;
 import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
-import com.google.gwt.view.client.SelectionChangeEvent;
-import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
 import config.i18n.client.ClientMessages;
 
@@ -137,12 +133,6 @@ public class PreservationEvents extends Composite {
       RodaConstants.FILE_AIP_ID, RodaConstants.FILE_REPRESENTATION_ID, RodaConstants.FILE_ISDIRECTORY));
 
   @UiField
-  DateBox inputDateInitial;
-
-  @UiField
-  DateBox inputDateFinal;
-
-  @UiField
   BreadcrumbPanel breadcrumb;
 
   @UiField
@@ -152,10 +142,7 @@ public class PreservationEvents extends Composite {
   Label itemTitle;
 
   @UiField(provided = true)
-  SearchPanel eventSearch;
-
-  @UiField(provided = true)
-  PreservationEventList eventList;
+  PreservationEventsSearch eventSearch;
 
   @UiField
   FlowPanel actionsPanel;
@@ -205,32 +192,8 @@ public class PreservationEvents extends Composite {
       filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_FILE_UUID, fileUUID));
     }
 
-    eventList = new PreservationEventList("PreservationEvents_events", filter, messages.preservationEventsTitle(),
-      false);
-
-    eventList.getSelectionModel().addSelectionChangeHandler(new Handler() {
-
-      @Override
-      public void onSelectionChange(SelectionChangeEvent event) {
-        IndexedPreservationEvent selected = eventList.getSelectionModel().getSelectedObject();
-        if (selected != null) {
-          if (fileUUID != null) {
-            HistoryUtils.newHistory(ShowPreservationEvent.RESOLVER, aipId, representationUUID, fileUUID,
-              selected.getId());
-          } else if (representationUUID != null) {
-            HistoryUtils.newHistory(ShowPreservationEvent.RESOLVER, aipId, representationUUID, selected.getId());
-          } else if (aipId != null) {
-            HistoryUtils.newHistory(ShowPreservationEvent.RESOLVER, aipId, selected.getId());
-          } else {
-            HistoryUtils.newHistory(ShowPreservationEvent.RESOLVER, selected.getId());
-          }
-        }
-      }
-    });
-
-    eventSearch = new SearchPanel(filter, RodaConstants.PRESERVATION_EVENT_SEARCH, true, messages.searchPlaceHolder(),
-      false, false, true);
-    eventSearch.setList(eventList);
+    eventSearch = new PreservationEventsSearch("PreservationEvents_events");
+    eventSearch.defaultFilters(filter);
 
     initWidget(uiBinder.createAndBindUi(this));
     actionsPanel.setVisible(aipId != null);
@@ -245,44 +208,6 @@ public class PreservationEvents extends Composite {
     } else {
       breadcrumb.setVisible(false);
     }
-
-    DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
-    ValueChangeHandler<Date> valueChangeHandler = new ValueChangeHandler<Date>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<Date> event) {
-        updateDateFilter();
-      }
-    };
-
-    inputDateInitial.setFormat(dateFormat);
-    inputDateInitial.getDatePicker().setYearArrowsVisible(true);
-    inputDateInitial.setFireNullValues(true);
-    inputDateInitial.addValueChangeHandler(valueChangeHandler);
-    inputDateInitial.setTitle(messages.dateIntervalLabelInitial());
-
-    inputDateFinal.setFormat(dateFormat);
-    inputDateFinal.getDatePicker().setYearArrowsVisible(true);
-    inputDateFinal.setFireNullValues(true);
-    inputDateFinal.addValueChangeHandler(valueChangeHandler);
-    inputDateFinal.setTitle(messages.dateIntervalLabelFinal());
-
-    inputDateInitial.getElement().setPropertyString("placeholder", messages.sidebarFilterFromDatePlaceHolder());
-    inputDateFinal.getElement().setPropertyString("placeholder", messages.sidebarFilterToDatePlaceHolder());
-  }
-
-  public static final List<String> getViewItemHistoryToken(String id) {
-    return ListUtils.concat(BROWSE_RESOLVER.getHistoryPath(), id);
-  }
-
-  private void updateDateFilter() {
-    Date dateInitial = inputDateInitial.getDatePicker().getValue();
-    Date dateFinal = inputDateFinal.getDatePicker().getValue();
-
-    DateRangeFilterParameter filterParameter = new DateRangeFilterParameter(RodaConstants.PRESERVATION_EVENT_DATETIME,
-      dateInitial, dateFinal, RodaConstants.DateGranularity.DAY);
-
-    eventList.setFilter(new Filter(filterParameter));
   }
 
   /**
@@ -409,7 +334,6 @@ public class PreservationEvents extends Composite {
     if (historyTokens.size() == 1) {
       final String aipId = historyTokens.get(0);
       if (aipId.equals(this.aipId) && StringUtils.isBlank(this.representationUUID)) {
-        eventList.refresh();
         callback.onSuccess(this);
       } else {
         instance = new PreservationEvents(aipId);
@@ -424,7 +348,6 @@ public class PreservationEvents extends Composite {
 
       if (aipId.equals(this.aipId) && representationUUID.equals(this.representationUUID)
         && StringUtils.isBlank(this.fileUUID)) {
-        eventList.refresh();
         callback.onSuccess(this);
       } else {
         instance = new PreservationEvents(aipId, representationUUID);
@@ -437,7 +360,6 @@ public class PreservationEvents extends Composite {
 
       if (aipId.equals(this.aipId) && representationUUID.equals(this.representationUUID)
         && fileUUID.equals(this.fileUUID)) {
-        eventList.refresh();
         callback.onSuccess(this);
       } else {
         instance = new PreservationEvents(aipId, representationUUID, fileUUID);
@@ -451,7 +373,6 @@ public class PreservationEvents extends Composite {
 
   private void planningResolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.isEmpty() && StringUtils.isBlank(this.aipId)) {
-      eventList.refresh();
       callback.onSuccess(this);
     } else {
       instance = new PreservationEvents();

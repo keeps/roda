@@ -66,11 +66,11 @@ public class IngestJobReportList extends BasicAsyncTableCell<IndexedReport> {
   private final Map<String, PluginInfo> pluginsInfo;
 
   public IngestJobReportList(String listId) {
-    this(listId, null, null, new HashMap<String, PluginInfo>(), false);
+    this(listId, null, null, new HashMap<>(), false);
   }
 
-  public IngestJobReportList(String listId, Filter filter, String summary,
-    Map<String, PluginInfo> pluginsInfo, boolean selectable) {
+  public IngestJobReportList(String listId, Filter filter, String summary, Map<String, PluginInfo> pluginsInfo,
+    boolean selectable) {
     super(IndexedReport.class, listId, filter, summary, selectable, fieldsToReturn);
     this.pluginsInfo = pluginsInfo;
   }
@@ -79,7 +79,6 @@ public class IngestJobReportList extends BasicAsyncTableCell<IndexedReport> {
   protected void configureDisplay(CellTable<IndexedReport> display) {
 
     sourceObjectColumn = new TooltipTextColumn<IndexedReport>() {
-
       @Override
       public String getValue(IndexedReport report) {
         String value = "";
@@ -105,7 +104,7 @@ public class IngestJobReportList extends BasicAsyncTableCell<IndexedReport> {
         if (report != null) {
           if (StringUtils.isNotBlank(report.getOutcomeObjectLabel())) {
             value = report.getOutcomeObjectLabel() + " (" + report.getOutcomeObjectId() + ")";
-          } else {
+          } else if(StringUtils.isNotBlank(report.getOutcomeObjectId())){
             value = report.getOutcomeObjectId();
           }
         }
@@ -117,27 +116,27 @@ public class IngestJobReportList extends BasicAsyncTableCell<IndexedReport> {
     updatedDateColumn = new Column<IndexedReport, Date>(
       new DateCell(DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT))) {
       @Override
-      public Date getValue(IndexedReport job) {
-        return job != null ? job.getDateUpdated() : null;
+      public Date getValue(IndexedReport report) {
+        return report != null ? report.getDateUpdated() : null;
       }
     };
 
     lastPluginRunColumn = new TextColumn<IndexedReport>() {
 
       @Override
-      public String getValue(IndexedReport job) {
+      public String getValue(IndexedReport report) {
         String value = null;
-        if (job != null && job.getPlugin() != null) {
-          PluginInfo pluginInfo = pluginsInfo.get(job.getPlugin());
+        if (report != null && report.getPlugin() != null) {
+          PluginInfo pluginInfo = pluginsInfo.get(report.getPlugin());
           String pluginName;
           if (pluginInfo != null) {
             pluginName = pluginInfo.getName();
           } else {
-            pluginName = job.getPlugin();
+            pluginName = report.getPlugin();
           }
 
-          if (StringUtils.isNotBlank(job.getPluginVersion())) {
-            value = messages.pluginLabelWithVersion(pluginName, job.getPluginVersion());
+          if (StringUtils.isNotBlank(report.getPluginVersion())) {
+            value = messages.pluginLabelWithVersion(pluginName, report.getPluginVersion());
           } else {
             value = messages.pluginLabel(pluginName);
           }
@@ -168,6 +167,7 @@ public class IngestJobReportList extends BasicAsyncTableCell<IndexedReport> {
               break;
           }
         }
+
         return ret;
       }
     };

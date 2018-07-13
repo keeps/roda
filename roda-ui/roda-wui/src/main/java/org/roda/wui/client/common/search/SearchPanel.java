@@ -204,34 +204,36 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
 
     if (fieldsPanel != null && fieldsPanel.getParent() != null && fieldsPanel.getParent().isVisible()) {
       for (int i = 0; i < fieldsPanel.getWidgetCount(); i++) {
-        SearchFieldPanel searchAdvancedFieldPanel = (SearchFieldPanel) fieldsPanel.getWidget(i);
-        String searchFieldId = searchAdvancedFieldPanel.getSearchField().getId();
-        FilterParameter oldFilterParameter = advancedSearchFilters.get(searchFieldId);
-        FilterParameter filterParameter = searchAdvancedFieldPanel.getFilter();
+        if (fieldsPanel.getWidget(i) instanceof SearchFieldPanel) {
+          SearchFieldPanel searchAdvancedFieldPanel = (SearchFieldPanel) fieldsPanel.getWidget(i);
+          String searchFieldId = searchAdvancedFieldPanel.getSearchField().getId();
+          FilterParameter oldFilterParameter = advancedSearchFilters.get(searchFieldId);
+          FilterParameter filterParameter = searchAdvancedFieldPanel.getFilter();
 
-        if (filterParameter instanceof SimpleFilterParameter) {
-          SimpleFilterParameter parameter = (SimpleFilterParameter) filterParameter;
-          if (RodaConstants.AIP_LEVEL.equals(parameter.getName())
-            && RodaConstants.NONE_SELECTED_LEVEL.equals(parameter.getValue())) {
-            filterParameter = null;
-          }
-        }
-
-        if (filterParameter != null) {
-          if (oldFilterParameter != null) {
-            if (oldFilterParameter instanceof OrFiltersParameters) {
-              List<FilterParameter> filterParameters = ((OrFiltersParameters) oldFilterParameter).getValues();
-              filterParameters.add(filterParameter);
-              ((OrFiltersParameters) oldFilterParameter).setValues(filterParameters);
-              advancedSearchFilters.put(searchFieldId, oldFilterParameter);
-            } else {
-              List<FilterParameter> filterParameters = new ArrayList<>();
-              filterParameters.add(oldFilterParameter);
-              filterParameters.add(filterParameter);
-              advancedSearchFilters.put(searchFieldId, new OrFiltersParameters(filterParameters));
+          if (filterParameter instanceof SimpleFilterParameter) {
+            SimpleFilterParameter parameter = (SimpleFilterParameter) filterParameter;
+            if (RodaConstants.AIP_LEVEL.equals(parameter.getName())
+              && RodaConstants.NONE_SELECTED_LEVEL.equals(parameter.getValue())) {
+              filterParameter = null;
             }
-          } else {
-            advancedSearchFilters.put(searchFieldId, filterParameter);
+          }
+
+          if (filterParameter != null) {
+            if (oldFilterParameter != null) {
+              if (oldFilterParameter instanceof OrFiltersParameters) {
+                List<FilterParameter> filterParameters = ((OrFiltersParameters) oldFilterParameter).getValues();
+                filterParameters.add(filterParameter);
+                ((OrFiltersParameters) oldFilterParameter).setValues(filterParameters);
+                advancedSearchFilters.put(searchFieldId, oldFilterParameter);
+              } else {
+                List<FilterParameter> filterParameters = new ArrayList<>();
+                filterParameters.add(oldFilterParameter);
+                filterParameters.add(filterParameter);
+                advancedSearchFilters.put(searchFieldId, new OrFiltersParameters(filterParameters));
+              }
+            } else {
+              advancedSearchFilters.put(searchFieldId, filterParameter);
+            }
           }
         }
       }
@@ -253,7 +255,6 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
       filter = new Filter(parameters);
       searchPreFilters.setVisible(false);
     }
-
     return filter;
   }
 

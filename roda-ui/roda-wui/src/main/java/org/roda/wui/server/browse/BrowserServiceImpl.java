@@ -248,7 +248,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public List<SearchField> retrieveSearchFields(String className, String localeString) throws GenericException {
+  public List<SearchField> retrieveSearchFields(String className, String localeString) {
     List<SearchField> searchFields = new ArrayList<>();
     List<String> fields = RodaUtils.copyList(RodaCoreFactory.getRodaConfiguration()
       .getList(RodaCoreFactory.getConfigurationKey(RodaConstants.SEARCH_FIELD_PREFIX, className)));
@@ -310,8 +310,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   @Override
   public Job moveAIPInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, String details)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
-    AlreadyExistsException, ValidationException {
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException{
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.moveAIPInHierarchy(user, selected, parentId, details);
   }

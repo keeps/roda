@@ -52,10 +52,6 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
     RodaConstants.LOG_DATETIME, RodaConstants.LOG_ACTION_COMPONENT, RodaConstants.LOG_ACTION_METHOD,
     RodaConstants.LOG_USERNAME, RodaConstants.LOG_DURATION, RodaConstants.LOG_ADDRESS, RodaConstants.LOG_STATE);
 
-  public LogEntryList(String listId) {
-    this(listId, null, null, false);
-  }
-
   public LogEntryList(String listId, Filter filter, String summary, boolean selectable) {
     super(LogEntry.class, listId, filter, summary, selectable, fieldsToReturn);
   }
@@ -77,14 +73,13 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
 
     actionComponentColumn = new Column<LogEntry, SafeHtml>(new SafeHtmlCell()) {
       @Override
-      public SafeHtml getValue(LogEntry entry) {
+      public SafeHtml getValue(LogEntry logEntry) {
         return SafeHtmlUtils
-          .fromSafeConstant(translate(RodaConstants.LOG_ACTION_COMPONENT, entry.getActionComponent()));
+          .fromSafeConstant(translate(RodaConstants.LOG_ACTION_COMPONENT, logEntry.getActionComponent()));
       }
     };
 
     actionMethodColumn = new TextColumn<LogEntry>() {
-
       @Override
       public String getValue(LogEntry logEntry) {
         if (logEntry == null) {
@@ -96,7 +91,6 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
     };
 
     usernameColumn = new TextColumn<LogEntry>() {
-
       @Override
       public String getValue(LogEntry logEntry) {
         return logEntry != null ? logEntry.getUsername() : null;
@@ -104,7 +98,6 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
     };
 
     durationColumn = new TextColumn<LogEntry>() {
-
       @Override
       public String getValue(LogEntry logEntry) {
         return logEntry != null ? Humanize.durationMillisToShortDHMS(logEntry.getDuration()) : null;

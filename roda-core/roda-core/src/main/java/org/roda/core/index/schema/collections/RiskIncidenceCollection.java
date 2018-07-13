@@ -61,7 +61,7 @@ public class RiskIncidenceCollection extends AbstractSolrCollection<RiskIncidenc
     fields.add(new Field(RodaConstants.RISK_INCIDENCE_FILE_ID, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.RISK_INCIDENCE_OBJECT_CLASS, Field.TYPE_STRING).setRequired(true));
     fields.add(new Field(RodaConstants.RISK_INCIDENCE_RISK_ID, Field.TYPE_STRING).setRequired(true));
-    fields.add(new Field(RodaConstants.RISK_INCIDENCE_DESCRIPTION, Field.TYPE_STRING));
+    fields.add(new Field(RodaConstants.RISK_INCIDENCE_DESCRIPTION, Field.TYPE_TEXT));
     fields.add(new Field(RodaConstants.RISK_INCIDENCE_BYPLUGIN, Field.TYPE_BOOLEAN).setRequired(true));
     fields.add(new Field(RodaConstants.RISK_INCIDENCE_STATUS, Field.TYPE_STRING).setRequired(true));
     fields.add(new Field(RodaConstants.RISK_INCIDENCE_SEVERITY, Field.TYPE_STRING).setRequired(true));
@@ -69,11 +69,10 @@ public class RiskIncidenceCollection extends AbstractSolrCollection<RiskIncidenc
     fields.add(new Field(RodaConstants.RISK_INCIDENCE_DETECTED_BY, Field.TYPE_STRING).setRequired(true));
     fields.add(new Field(RodaConstants.RISK_INCIDENCE_MITIGATED_ON, Field.TYPE_DATE));
     fields.add(new Field(RodaConstants.RISK_INCIDENCE_MITIGATED_BY, Field.TYPE_STRING));
-    fields.add(new Field(RodaConstants.RISK_INCIDENCE_MITIGATED_DESCRIPTION, Field.TYPE_STRING));
+    fields.add(new Field(RodaConstants.RISK_INCIDENCE_MITIGATED_DESCRIPTION, Field.TYPE_TEXT));
     fields.add(new Field(RodaConstants.RISK_INCIDENCE_FILE_PATH_COMPUTED, Field.TYPE_STRING).setStored(false));
 
     fields.add(SolrCollection.getSearchField());
-
     return fields;
   }
 

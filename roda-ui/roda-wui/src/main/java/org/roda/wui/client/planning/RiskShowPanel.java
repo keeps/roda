@@ -161,7 +161,7 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
 
   public RiskShowPanel(Risk risk, boolean hasTitle) {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISK_ID, risk.getId()));
-    incidenceList = new RiskIncidenceList("risk_show_incidences", filter, messages.riskIncidences(), hasTitle);
+    incidenceList = new RiskIncidenceList("RiskShowPanel_riskIncidences", filter, messages.riskIncidences(), hasTitle);
 
     Filter incidenceFilter = new Filter(new BasicSearchFilterParameter(RodaConstants.RISK_INCIDENCE_SEARCH, "*"),
       new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISK_ID, risk.getId()));

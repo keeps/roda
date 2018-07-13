@@ -5,10 +5,6 @@
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
-	<ui:style>
-	
-	</ui:style>
-
 	<g:FlowPanel styleName="wui-browse-metadata-descriptive-versions"
 		addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">

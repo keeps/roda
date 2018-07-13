@@ -10,36 +10,24 @@
  */
 package org.roda.wui.client.management;
 
-import java.util.Date;
 import java.util.List;
 
-import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.filter.DateRangeFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.notifications.Notification;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.lists.NotificationList;
-import org.roda.wui.client.common.search.SearchFilters;
-import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.search.NotificationSearch;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.user.datepicker.client.DateBox;
-import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
-import com.google.gwt.view.client.SelectionChangeEvent;
 
 import config.i18n.client.ClientMessages;
 
@@ -96,65 +84,14 @@ public class NotificationRegister extends Composite {
   FlowPanel notificationDescription;
 
   @UiField(provided = true)
-  SearchPanel searchPanel;
-
-  @UiField
-  DateBox inputDateInitial;
-
-  @UiField
-  DateBox inputDateFinal;
-
-  @UiField(provided = true)
-  NotificationList notificationList;
-
-  private static final Filter DEFAULT_FILTER = SearchFilters.defaultFilter(Notification.class.getName());
-  private static final String ALL_FILTER = SearchFilters.allFilter(Notification.class.getName());
+  NotificationSearch notificationSearch;
 
   public NotificationRegister() {
-    notificationList = new NotificationList("NotificationRegister_notifications", Filter.NULL,
-      messages.notificationsTitle(), false);
-
-    searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, true, messages.messageSearchPlaceHolder(), false, false,
-      false);
-    searchPanel.setList(notificationList);
-
-    notificationList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
-
-      @Override
-      public void onSelectionChange(SelectionChangeEvent event) {
-        Notification selected = notificationList.getSelectionModel().getSelectedObject();
-        if (selected != null) {
-          HistoryUtils.newHistory(ShowNotification.RESOLVER, selected.getId());
-        }
-      }
-    });
+    notificationSearch = new NotificationSearch("NotificationRegister_notifications");
+    notificationSearch.defaultFilters(Filter.ALL);
 
     initWidget(uiBinder.createAndBindUi(this));
     notificationDescription.add(new HTMLWidgetWrapper("NotificationDescription.html"));
-
-    DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
-    ValueChangeHandler<Date> valueChangeHandler = new ValueChangeHandler<Date>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<Date> event) {
-        updateDateFilter();
-      }
-    };
-
-    inputDateInitial.setFormat(dateFormat);
-    inputDateInitial.getDatePicker().setYearArrowsVisible(true);
-    inputDateInitial.setFireNullValues(true);
-    inputDateInitial.addValueChangeHandler(valueChangeHandler);
-    inputDateInitial.setTitle(messages.dateIntervalLabelInitial());
-
-    inputDateFinal.setFormat(dateFormat);
-    inputDateFinal.getDatePicker().setYearArrowsVisible(true);
-    inputDateFinal.setFireNullValues(true);
-    inputDateFinal.addValueChangeHandler(valueChangeHandler);
-    inputDateFinal.setTitle(messages.dateIntervalLabelFinal());
-
-    inputDateInitial.getElement().setPropertyString("placeholder", messages.sidebarFilterFromDatePlaceHolder());
-    inputDateFinal.getElement().setPropertyString("placeholder", messages.sidebarFilterToDatePlaceHolder());
   }
 
   @Override
@@ -163,19 +100,9 @@ public class NotificationRegister extends Composite {
     JavascriptUtils.stickSidebar();
   }
 
-  private void updateDateFilter() {
-    Date dateInitial = inputDateInitial.getDatePicker().getValue();
-    Date dateFinal = inputDateFinal.getDatePicker().getValue();
-
-    DateRangeFilterParameter filterParameter = new DateRangeFilterParameter(RodaConstants.NOTIFICATION_SENT_ON,
-      dateInitial, dateFinal, RodaConstants.DateGranularity.DAY);
-
-    notificationList.setFilter(new Filter(filterParameter));
-  }
-
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.isEmpty()) {
-      notificationList.setFilter(Filter.ALL);
+      notificationSearch.setFilter(Filter.ALL);
       callback.onSuccess(this);
     } else if (historyTokens.size() > 1 && ShowNotification.RESOLVER.getHistoryToken().equals(historyTokens.get(0))) {
       ShowNotification.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
@@ -184,5 +111,4 @@ public class NotificationRegister extends Composite {
       callback.onSuccess(null);
     }
   }
-
 }

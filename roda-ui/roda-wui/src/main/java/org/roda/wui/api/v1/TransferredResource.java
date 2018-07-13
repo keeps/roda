@@ -136,11 +136,11 @@ public class TransferredResource {
     @ApiResponse(code = 409, message = "Already exists", response = ApiResponseMessage.class)})
   public Response createResource(
     @ApiParam(value = "The id of the parent") @QueryParam(RodaConstants.TRANSFERRED_RESOURCE_PARENT_UUID) String parentUUID,
-    @ApiParam(value = "The name of the directory to create", required = false) @QueryParam(RodaConstants.TRANSFERRED_RESOURCE_DIRECTORY_NAME) String name,
-    @ApiParam(value = "Locale", required = false) @QueryParam(RodaConstants.LOCALE) String localeString,
+    @ApiParam(value = "The name of the directory to create") @QueryParam(RodaConstants.TRANSFERRED_RESOURCE_DIRECTORY_NAME) String name,
+    @ApiParam(value = "Locale") @QueryParam(RodaConstants.LOCALE) String localeString,
     @FormDataParam(RodaConstants.API_PARAM_UPLOAD) InputStream inputStream,
     @FormDataParam(RodaConstants.API_PARAM_UPLOAD) FormDataContentDisposition fileDetail,
-    @ApiParam(value = "Commit after creation", defaultValue = "false", required = false) @QueryParam(RodaConstants.API_QUERY_PARAM_COMMIT) String commitString,
+    @ApiParam(value = "Commit after creation", defaultValue = "false") @QueryParam(RodaConstants.API_QUERY_PARAM_COMMIT) String commitString,
     @ApiParam(value = "Choose format in which to get the resource", allowableValues = RodaConstants.API_POST_PUT_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);

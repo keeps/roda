@@ -7,7 +7,6 @@
  */
 package org.roda.wui.common.client.tools;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
@@ -17,7 +16,6 @@ import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
-import org.roda.core.data.v2.ip.IndexedFile;
 
 import com.github.nmorel.gwtjackson.client.ObjectMapper;
 import com.google.gwt.core.client.GWT;
@@ -385,14 +383,6 @@ public class RestUtils {
     return b.toString();
   }
 
-  public static String createFileUploadUri(IndexedFile folder, String details) {
-    // api/v1/files?aipId={aipId}&representationId={representationdId}&folder={folder[0]}&folder={folder[1]}&details={details}
-
-    List<String> directory = new ArrayList<>(folder.getPath());
-    directory.add(folder.getId());
-    return createFileUploadUri(folder.getAipId(), folder.getRepresentationId(), directory, details);
-  }
-
   public static String createFileUploadUri(String aipId, String representationId, List<String> directory,
     String details) {
     // api/v1/files?aipId={aipId}&representationId={representationdId}&folder={folder[0]}&folder={folder[1]}&details={details}
@@ -476,8 +466,8 @@ public class RestUtils {
     // api/v1/index/findFORM?type=csv
 
     String url = RodaConstants.API_REST_V1_INDEX + "findFORM";
-    FindRequest request = new FindRequest(classToReturnName, filter, sorter, sublist, facets, onlyActive,
-      exportFacets, filename);
+    FindRequest request = new FindRequest(classToReturnName, filter, sorter, sublist, facets, onlyActive, exportFacets,
+      filename);
 
     final FormPanel form = new FormPanel();
     form.setAction(URL.encode(url));

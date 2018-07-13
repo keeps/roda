@@ -895,16 +895,15 @@ public class IndexModelObserver implements ModelObserver {
     Map<String, Object> preCalculatedFields = new HashMap<>();
 
     preCalculatedFields.put(RodaConstants.JOB_REPORT_JOB_NAME, job.getName());
-
     preCalculatedFields.put(RodaConstants.JOB_REPORT_SOURCE_OBJECT_LABEL,
       SolrUtils.getObjectLabel(index, jobReport.getSourceObjectClass(), jobReport.getSourceObjectId()));
     preCalculatedFields.put(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_LABEL,
       SolrUtils.getObjectLabel(index, jobReport.getOutcomeObjectClass(), jobReport.getOutcomeObjectId()));
+    preCalculatedFields.put(RodaConstants.JOB_REPORT_JOB_PLUGIN_TYPE, job.getPluginType());
 
     Map<String, Object> accumulators = new HashMap<>();
 
     return SolrUtils.create2(index, this, IndexedReport.class, jobReport, preCalculatedFields, accumulators);
-
   }
 
   @Override

@@ -28,6 +28,7 @@ public class IndexedReport extends Report implements IsIndexed {
   private String jobName = null;
   private String sourceObjectLabel = null;
   private String outcomeObjectLabel = null;
+  private PluginType jobPluginType = null;
 
   public IndexedReport() {
     super();
@@ -38,6 +39,7 @@ public class IndexedReport extends Report implements IsIndexed {
     jobName = report.getJobName();
     sourceObjectLabel = report.getSourceObjectLabel();
     outcomeObjectLabel = report.getOutcomeObjectLabel();
+    jobPluginType = report.getJobPluginType();
   }
 
   public String getJobName() {
@@ -62,6 +64,14 @@ public class IndexedReport extends Report implements IsIndexed {
 
   public void setOutcomeObjectLabel(String outcomeObjectLabel) {
     this.outcomeObjectLabel = outcomeObjectLabel;
+  }
+
+  public PluginType getJobPluginType() {
+    return jobPluginType;
+  }
+
+  public void setJobPluginType(PluginType jobPluginType) {
+    this.jobPluginType = jobPluginType;
   }
 
   @Override

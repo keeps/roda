@@ -53,18 +53,8 @@ public class PreservationEventList extends BasicAsyncTableCell<IndexedPreservati
     RodaConstants.PRESERVATION_EVENT_TYPE, RodaConstants.PRESERVATION_EVENT_DETAIL,
     RodaConstants.PRESERVATION_EVENT_OUTCOME);
 
-  public PreservationEventList(String listId) {
-    this(listId, null, null, false);
-  }
-
   public PreservationEventList(String listId, Filter filter, String summary, boolean selectable) {
     super(IndexedPreservationEvent.class, listId, filter, summary, selectable, fieldsToReturn);
-  }
-
-  public PreservationEventList(String listId, Filter filter, String summary, boolean selectable,
-    int initialPageSize, int pageSizeIncrement) {
-    super(IndexedPreservationEvent.class, listId, filter, summary, selectable, initialPageSize,
-      pageSizeIncrement, fieldsToReturn);
   }
 
   @Override

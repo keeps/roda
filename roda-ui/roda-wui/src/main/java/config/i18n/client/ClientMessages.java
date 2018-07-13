@@ -218,7 +218,6 @@ public interface ClientMessages extends Messages {
 
   String simpleDates(String dateInitial, String dateFinal);
 
-
   String itemWasAccepted();
 
   String itemWasRejected();
@@ -638,6 +637,22 @@ public interface ClientMessages extends Messages {
   String searchListBoxRepresentations();
 
   String searchListBoxFiles();
+
+  String searchListBoxJobs();
+
+  String searchListBoxJobReports();
+
+  String searchListBoxRisks();
+
+  String searchListBoxIncidences();
+
+  String searchListBoxPreservationEvents();
+
+  String searchListBoxActionLogs();
+
+  String searchListBoxNotifications();
+
+  String searchListBoxTransferredResources();
 
   String searchPlaceHolder();
 
@@ -1598,7 +1613,6 @@ public interface ClientMessages extends Messages {
 
   String cookiesLearnMore();
 
-
   // Control Panel
   String list();
 
@@ -1615,7 +1629,6 @@ public interface ClientMessages extends Messages {
   String createGroup();
 
   String actions();
-
 
   // Create User
   String createUserTitle();
@@ -1703,7 +1716,6 @@ public interface ClientMessages extends Messages {
   // Roles Description
 
   String role(@Select String role);
-
 
   // Register
   String registerUserDataTitle();
@@ -1800,7 +1812,6 @@ public interface ClientMessages extends Messages {
   String resetPasswordSuccessDialogButton();
 
   // statistic type classes
-
 
   String dateIntervalLabelInitial();
 

@@ -148,7 +148,6 @@ public class TransferUpload extends Composite {
   private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
     RodaConstants.TRANSFERRED_RESOURCE_ID, RodaConstants.TRANSFERRED_RESOURCE_ISFILE);
 
-  @SuppressWarnings("unused")
   private HandlerRegistration handlerRegistration;
 
   private static TransferUpload instance = null;
@@ -231,7 +230,6 @@ public class TransferUpload extends Composite {
       if (transferredResourceUUID != null) {
         BrowserService.Util.getInstance().retrieve(TransferredResource.class.getName(), transferredResourceUUID,
           fieldsToReturn, new AsyncCallback<TransferredResource>() {
-
             @Override
             public void onFailure(Throwable caught) {
               callback.onFailure(caught);
@@ -243,7 +241,6 @@ public class TransferUpload extends Composite {
               callback.onSuccess(TransferUpload.this);
               updateUploadForm();
             }
-
           });
       } else {
         HistoryUtils.newHistory(IngestTransfer.RESOLVER);
@@ -285,7 +282,6 @@ public class TransferUpload extends Composite {
       uploadList.setHTML(SafeHtmlUtils.fromSafeConstant("<ul id='upload-list'></ul>"));
 
       uploadForm.addDomHandler(new DragOverHandler() {
-
         @Override
         public void onDragOver(DragOverEvent event) {
           uploadForm.addStyleName(DRAGOVER);
@@ -293,7 +289,6 @@ public class TransferUpload extends Composite {
       }, DragOverEvent.getType());
 
       uploadForm.addDomHandler(new DragLeaveHandler() {
-
         @Override
         public void onDragLeave(DragLeaveEvent event) {
           uploadForm.removeStyleName(DRAGOVER);
@@ -301,7 +296,6 @@ public class TransferUpload extends Composite {
       }, DragLeaveEvent.getType());
 
       uploadForm.addDomHandler(new DropHandler() {
-
         @Override
         public void onDrop(DropEvent event) {
           uploadForm.removeStyleName(DRAGOVER);
