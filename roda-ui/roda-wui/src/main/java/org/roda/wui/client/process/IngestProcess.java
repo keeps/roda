@@ -10,11 +10,9 @@
  */
 package org.roda.wui.client.process;
 
-import java.util.Date;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.filter.DateRangeFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -31,9 +29,6 @@ import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -42,8 +37,6 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.user.datepicker.client.DateBox;
-import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
 
 import config.i18n.client.ClientMessages;
 
@@ -107,12 +100,9 @@ public class IngestProcess extends Composite {
   Button newJob;
 
   private IngestProcess() {
-    jobSearch = new JobSearch("IngestProcess_jobs", "IngestProcess_reports", true);
-
     Filter ingestFilter = new Filter(
       new SimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INGEST.toString()));
-    jobSearch.defaultFilters(ingestFilter);
-
+    jobSearch = new JobSearch("IngestProcess_jobs", "IngestProcess_reports", ingestFilter, true);
     initWidget(uiBinder.createAndBindUi(this));
     ingestProcessDescription.add(new HTMLWidgetWrapper("IngestProcessDescription.html"));
   }

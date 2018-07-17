@@ -908,6 +908,8 @@ public final class RodaConstants {
   public static final String JOB_REPORT_SOURCE_OBJECT_LABEL = "sourceObjectLabel";
   public static final String JOB_REPORT_OUTCOME_OBJECT_LABEL = "outcomeObjectLabel";
   public static final String JOB_REPORT_JOB_PLUGIN_TYPE = JOB_PLUGIN_TYPE;
+  public static final String JOB_REPORT_SUCCESSFUL_PLUGINS = "successfulPlugins";
+  public static final String JOB_REPORT_UNSUCCESSFUL_PLUGINS = "unsuccessfulPlugins";
   public static final String JOB_REPORT_FILE_EXTENSION = ".json";
   public static final String JOB_REPORT_SEARCH = "search";
 

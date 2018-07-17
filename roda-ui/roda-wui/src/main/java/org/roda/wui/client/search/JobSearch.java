@@ -71,7 +71,7 @@ public class JobSearch extends Composite {
 
   boolean isIngest = false;
 
-  public JobSearch(String jobsListId, String jobReportsListId, boolean isIngest) {
+  public JobSearch(String jobsListId, String jobReportsListId, Filter defaultFilter, boolean isIngest) {
     this.jobsListId = jobsListId;
     this.jobReportsListId = jobReportsListId;
     this.isIngest = isIngest;
@@ -89,10 +89,10 @@ public class JobSearch extends Composite {
     jobsSearchAdvancedFieldsPanel.addValueChangeHandler(searchAdvancedFieldsPanelHandler);
     jobReportsSearchAdvancedFieldsPanel.addValueChangeHandler(searchAdvancedFieldsPanelHandler);
 
-    defaultFilters(Filter.ALL);
+    defaultFilters(defaultFilter);
 
     searchPanel = new SearchPanel(filterJobs, RodaConstants.JOB_SEARCH, true, messages.searchPlaceHolder(), true, true,
-      false);
+      true);
 
     initWidget(uiBinder.createAndBindUi(this));
 

@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.jobs;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -30,16 +31,21 @@ public class IndexedReport extends Report implements IsIndexed {
   private String outcomeObjectLabel = null;
   private PluginType jobPluginType = null;
 
+  private List<String> successfulPlugins = new ArrayList<>();
+  private List<String> unsuccessfulPlugins = new ArrayList<>();
+
   public IndexedReport() {
     super();
   }
 
   public IndexedReport(IndexedReport report) {
     super(report);
-    jobName = report.getJobName();
-    sourceObjectLabel = report.getSourceObjectLabel();
-    outcomeObjectLabel = report.getOutcomeObjectLabel();
-    jobPluginType = report.getJobPluginType();
+    this.jobName = report.getJobName();
+    this.sourceObjectLabel = report.getSourceObjectLabel();
+    this.outcomeObjectLabel = report.getOutcomeObjectLabel();
+    this.jobPluginType = report.getJobPluginType();
+    this.successfulPlugins = report.getSuccessfulPlugins();
+    this.unsuccessfulPlugins = report.getUnsuccessfulPlugins();
   }
 
   public String getJobName() {
@@ -74,13 +80,37 @@ public class IndexedReport extends Report implements IsIndexed {
     this.jobPluginType = jobPluginType;
   }
 
+  public List<String> getSuccessfulPlugins() {
+    return successfulPlugins;
+  }
+
+  public void setSuccessfulPlugins(List<String> successfulPlugins) {
+    this.successfulPlugins = successfulPlugins;
+  }
+
+  public void addSuccessfulPlugin(String plugin) {
+    this.successfulPlugins.add(plugin);
+  }
+
+  public List<String> getUnsuccessfulPlugins() {
+    return unsuccessfulPlugins;
+  }
+
+  public void setUnsuccessfulPlugins(List<String> unsuccessfulPlugins) {
+    this.unsuccessfulPlugins = unsuccessfulPlugins;
+  }
+
+  public void addUnsuccessfulPlugin(String plugin) {
+    this.unsuccessfulPlugins.add(plugin);
+  }
+
   @Override
   public List<String> toCsvHeaders() {
     return Arrays.asList("id", "jobId", "jobName", "sourceObjectId", "sourceObjectOriginalName", "sourceObjectLabel",
       "sourceObjectClass", "sourceObjectOriginalIds", "outcomeObjectId", "outcomeObjectLabel", "outcomeObjectClass",
       "outcomeObjectState", "title", "dateCreated", "dateUpdated", "completionPercentage", "stepsCompleted",
       "totalSteps", "plugin", "pluginName", "pluginVersion", "pluginState", "pluginDetails", "htmlPluginDetails",
-      "reports");
+      "successfulPlugins", "unsuccessfulPlugins", "reports");
   }
 
   @Override
@@ -91,7 +121,8 @@ public class IndexedReport extends Report implements IsIndexed {
       super.getOutcomeObjectClass(), super.getOutcomeObjectState(), super.getTitle(), super.getDateCreated(),
       super.getDateUpdated(), super.getCompletionPercentage(), super.getStepsCompleted(), super.getTotalSteps(),
       super.getPlugin(), super.getPluginName(), super.getPluginVersion(), super.getPluginState(),
-      super.getPluginDetails(), super.isHtmlPluginDetails(), super.getReports());
+      super.getPluginDetails(), super.isHtmlPluginDetails(), getSuccessfulPlugins(), getUnsuccessfulPlugins(),
+      super.getReports());
   }
 
   @JsonIgnore

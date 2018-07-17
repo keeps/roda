@@ -83,9 +83,10 @@ public class JobReportCollection extends AbstractSolrCollection<IndexedReport, R
     fields.add(new Field(RodaConstants.JOB_REPORT_SOURCE_OBJECT_LABEL, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_LABEL, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.JOB_REPORT_JOB_PLUGIN_TYPE, Field.TYPE_STRING));
+    fields.add(new Field(RodaConstants.JOB_REPORT_SUCCESSFUL_PLUGINS, Field.TYPE_STRING).setMultiValued(true).setStored(false));
+    fields.add(new Field(RodaConstants.JOB_REPORT_UNSUCCESSFUL_PLUGINS, Field.TYPE_STRING).setMultiValued(true).setStored(false));
 
     fields.add(SolrCollection.getSearchField());
-
     return fields;
   }
 
@@ -128,7 +129,6 @@ public class JobReportCollection extends AbstractSolrCollection<IndexedReport, R
 
   @Override
   public IndexedReport fromSolrDocument(SolrDocument doc, List<String> fieldsToReturn) throws GenericException {
-
     final IndexedReport jobReport = super.fromSolrDocument(doc, fieldsToReturn);
 
     jobReport.setJobId(SolrUtils.objectToString(doc.get(RodaConstants.JOB_REPORT_JOB_ID), null));
@@ -175,8 +175,13 @@ public class JobReportCollection extends AbstractSolrCollection<IndexedReport, R
       .setSourceObjectLabel(SolrUtils.objectToString(doc.get(RodaConstants.JOB_REPORT_SOURCE_OBJECT_LABEL), null));
     jobReport
       .setOutcomeObjectLabel(SolrUtils.objectToString(doc.get(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_LABEL), null));
-    return jobReport;
 
+    jobReport.setSuccessfulPlugins(
+            SolrUtils.objectToListString(doc.get(RodaConstants.JOB_REPORT_SUCCESSFUL_PLUGINS)));
+    jobReport.setUnsuccessfulPlugins(
+            SolrUtils.objectToListString(doc.get(RodaConstants.JOB_REPORT_UNSUCCESSFUL_PLUGINS)));
+
+    return jobReport;
   }
 
 }

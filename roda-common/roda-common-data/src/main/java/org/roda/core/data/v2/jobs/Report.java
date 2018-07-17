@@ -109,6 +109,7 @@ public class Report implements IsModelObject, HasId {
     return id;
   }
 
+  @Override
   public void setId(String id) {
     this.id = id;
   }

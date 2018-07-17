@@ -10,11 +10,9 @@
  */
 package org.roda.wui.client.process;
 
-import java.util.Date;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.filter.DateRangeFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -29,17 +27,12 @@ import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.user.datepicker.client.DateBox;
-import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
 
 import config.i18n.client.ClientMessages;
 
@@ -87,11 +80,9 @@ public class InternalProcess extends Composite {
   JobSearch jobSearch;
 
   private InternalProcess() {
-    jobSearch = new JobSearch("InternalProcess_jobs", "InternalProcess_reports", false);
-
     Filter internalFilter = new Filter(
       new SimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INTERNAL.toString()));
-    jobSearch.defaultFilters(internalFilter);
+    jobSearch = new JobSearch("InternalProcess_jobs", "InternalProcess_reports", internalFilter, false);
 
     initWidget(uiBinder.createAndBindUi(this));
     internalProcessDescription.add(new HTMLWidgetWrapper("InternalProcessDescription.html"));

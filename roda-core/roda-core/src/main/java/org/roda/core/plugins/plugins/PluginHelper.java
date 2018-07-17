@@ -472,7 +472,6 @@ public final class PluginHelper {
    */
   public static <T extends IsRODAObject> void updateJobInformationAsync(Plugin<T> plugin, JobPluginInfo jobPluginInfo)
     throws JobException {
-
     Map<String, String> parameterValues = plugin.getParameterValues();
 
     if (!parameterValues.containsKey(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS)
@@ -483,7 +482,7 @@ public final class PluginHelper {
   }
 
   public static <T extends IsRODAObject> JobPluginInfo getInitialJobInformation(Plugin<T> plugin,
-    int sourceObjectsBeingProcess) throws JobException {
+    int sourceObjectsBeingProcess) {
     JobPluginInfo jobPluginInfo = plugin.getJobPluginInfo(JobPluginInfo.class);
     if (jobPluginInfo != null) {
       jobPluginInfo.setSourceObjectsBeingProcessed(sourceObjectsBeingProcess).setSourceObjectsWaitingToBeProcessed(0);

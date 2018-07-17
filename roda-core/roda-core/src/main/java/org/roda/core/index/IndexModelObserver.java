@@ -57,7 +57,9 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.ri.RepresentationInformation;
@@ -900,6 +902,22 @@ public class IndexModelObserver implements ModelObserver {
     preCalculatedFields.put(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_LABEL,
       SolrUtils.getObjectLabel(index, jobReport.getOutcomeObjectClass(), jobReport.getOutcomeObjectId()));
     preCalculatedFields.put(RodaConstants.JOB_REPORT_JOB_PLUGIN_TYPE, job.getPluginType());
+
+    List<String> successfulPlugins = new ArrayList<>();
+    List<String> unsuccessfulPlugins = new ArrayList<>();
+
+    if(job.getPluginType().equals(PluginType.INGEST)) {
+      for(Report item : jobReport.getReports()) {
+        if(item.getPluginState().equals(PluginState.SUCCESS)) {
+          successfulPlugins.add(item.getPluginName());
+        } else {
+          unsuccessfulPlugins.add(item.getPluginName());
+        }
+      }
+
+      preCalculatedFields.put(RodaConstants.JOB_REPORT_SUCCESSFUL_PLUGINS, successfulPlugins);
+      preCalculatedFields.put(RodaConstants.JOB_REPORT_UNSUCCESSFUL_PLUGINS, unsuccessfulPlugins);
+    }
 
     Map<String, Object> accumulators = new HashMap<>();
 
