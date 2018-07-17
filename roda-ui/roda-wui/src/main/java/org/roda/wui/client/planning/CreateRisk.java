@@ -77,8 +77,7 @@ public class CreateRisk extends Composite {
    *          the user to create
    */
   public CreateRisk() {
-    this.riskDataPanel = new RiskDataPanel(false, null, RodaConstants.RISK_CATEGORY, RodaConstants.RISK_IDENTIFIED_BY,
-      RodaConstants.RISK_MITIGATION_OWNER);
+    this.riskDataPanel = new RiskDataPanel(null, false);
     initWidget(uiBinder.createAndBindUi(this));
   }
 

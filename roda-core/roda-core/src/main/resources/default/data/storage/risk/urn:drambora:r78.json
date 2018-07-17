@@ -2,7 +2,7 @@
             {
 
             
-            "category": "Personnel, management and administration procedures; Operations and service delivery",
+            "categories": ["Personnel, management and administration procedures","Operations and service delivery"],
 
                 
         "id": "urn:drambora:r78",

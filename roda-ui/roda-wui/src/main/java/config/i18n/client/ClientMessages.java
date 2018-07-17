@@ -1140,7 +1140,7 @@ public interface ClientMessages extends Messages {
 
   String riskIdentifiedBy();
 
-  String riskCategory();
+  String riskCategories();
 
   String riskNotes();
 

@@ -93,7 +93,7 @@ public class EditRisk extends Composite {
 
   private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.RISK_ID,
     RodaConstants.RISK_NAME, RodaConstants.RISK_DESCRIPTION, RodaConstants.RISK_IDENTIFIED_ON,
-    RodaConstants.RISK_IDENTIFIED_BY, RodaConstants.RISK_CATEGORY, RodaConstants.RISK_NOTES,
+    RodaConstants.RISK_IDENTIFIED_BY, RodaConstants.RISK_CATEGORIES, RodaConstants.RISK_NOTES,
     RodaConstants.RISK_PRE_MITIGATION_PROBABILITY, RodaConstants.RISK_PRE_MITIGATION_IMPACT,
     RodaConstants.RISK_PRE_MITIGATION_SEVERITY, RodaConstants.RISK_POST_MITIGATION_PROBABILITY,
     RodaConstants.RISK_POST_MITIGATION_IMPACT, RodaConstants.RISK_POST_MITIGATION_SEVERITY,
@@ -127,8 +127,7 @@ public class EditRisk extends Composite {
   public EditRisk(IndexedRisk risk) {
     this.risk = risk;
     this.incidences = risk.getIncidencesCount();
-    this.riskDataPanel = new RiskDataPanel(true, risk, RodaConstants.RISK_CATEGORY, RodaConstants.RISK_IDENTIFIED_BY,
-      RodaConstants.RISK_MITIGATION_OWNER);
+    this.riskDataPanel = new RiskDataPanel(risk, true);
     initWidget(uiBinder.createAndBindUi(this));
   }
 
@@ -165,7 +164,7 @@ public class EditRisk extends Composite {
   @UiHandler("buttonRemove")
   void buttonRemoveHandler(ClickEvent e) {
     BrowserService.Util.getInstance().deleteRisk(
-      new SelectedItemsList<IndexedRisk>(Arrays.asList(risk.getUUID()), IndexedRisk.class.getName()),
+      new SelectedItemsList<>(Arrays.asList(risk.getUUID()), IndexedRisk.class.getName()),
       new AsyncCallback<Job>() {
         @Override
         public void onFailure(Throwable caught) {

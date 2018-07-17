@@ -11,11 +11,13 @@ package org.roda.wui.client.planning;
 import java.util.Date;
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.IncrementalList;
 import org.roda.wui.client.common.lists.RiskIncidenceList;
 import org.roda.wui.client.common.search.SearchSuggestBox;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
@@ -77,7 +79,7 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
   SearchSuggestBox<IndexedRisk> identifiedBy;
 
   @UiField(provided = true)
-  SearchSuggestBox<IndexedRisk> category;
+  IncrementalList categories;
 
   @UiField
   TextArea notes;
@@ -142,7 +144,6 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
   private int severityHighLimit;
   private int probabilitiesSize;
   private int impactsSize;
-  private RiskIncidenceList incidenceList;
 
   private Date createdOn;
   private String createdBy;
@@ -156,12 +157,10 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
    *          the risk to use
    *
    */
-  public RiskDataPanel(final boolean editmode, final IndexedRisk risk, final String categoryField,
-    final String identifiedByField, final String ownerField) {
-
-    category = new SearchSuggestBox<>(IndexedRisk.class, categoryField, false);
-    identifiedBy = new SearchSuggestBox<>(IndexedRisk.class, identifiedByField, false);
-    mitigationOwner = new SearchSuggestBox<>(IndexedRisk.class, ownerField, false);
+  public RiskDataPanel(final IndexedRisk risk, final boolean editmode) {
+    categories = new IncrementalList(true);
+    identifiedBy = new SearchSuggestBox<>(IndexedRisk.class, RodaConstants.RISK_IDENTIFIED_BY, false);
+    mitigationOwner = new SearchSuggestBox<>(IndexedRisk.class, RodaConstants.RISK_MITIGATION_OWNER, false);
 
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -268,8 +267,8 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     description.addChangeHandler(changeHandler);
     description.addKeyUpHandler(keyUpHandler);
     description.setVisibleLines(6);
-    identifiedOn.addValueChangeHandler(new ValueChangeHandler<Date>() {
 
+    identifiedOn.addValueChangeHandler(new ValueChangeHandler<Date>() {
       @Override
       public void onValueChange(ValueChangeEvent<Date> event) {
         onChange();
@@ -277,14 +276,19 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     });
 
     ValueChangeHandler<String> valueChangeHandler = new ValueChangeHandler<String>() {
-
       @Override
       public void onValueChange(ValueChangeEvent<String> event) {
         RiskDataPanel.this.onChange();
       }
     };
 
-    category.addValueChangeHandler(valueChangeHandler);
+    categories.addValueChangeHandler(new ValueChangeHandler<List<String>>() {
+      @Override
+      public void onValueChange(ValueChangeEvent<List<String>> event) {
+        RiskDataPanel.this.onChange();
+      }
+    });
+
     identifiedBy.addValueChangeHandler(valueChangeHandler);
     notes.addChangeHandler(changeHandler);
     notes.setVisibleLines(6);
@@ -352,13 +356,6 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
       identifiedBy.removeStyleName("isWrong");
     }
 
-    if (category.getValue().length() == 0) {
-      valid = false;
-      category.addStyleName("isWrong");
-    } else {
-      category.removeStyleName("isWrong");
-    }
-
     checked = true;
     return valid;
   }
@@ -369,7 +366,7 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     this.description.setText(risk.getDescription());
     this.identifiedOn.setValue(risk.getIdentifiedOn());
     this.identifiedBy.setValue(risk.getIdentifiedBy());
-    this.category.setValue(risk.getCategory());
+    this.categories.setTextBoxList(risk.getCategories());
     this.notes.setText(risk.getNotes());
 
     int preProbability = getIndex(risk.getPreMitigationProbability(), probabilitiesSize);
@@ -422,7 +419,7 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     risk.setDescription(description.getText());
     risk.setIdentifiedOn(identifiedOn.getValue());
     risk.setIdentifiedBy(identifiedBy.getValue());
-    risk.setCategory(category.getValue());
+    risk.setCategories(categories.getTextBoxesValue());
     risk.setNotes(notes.getText());
 
     int preProbability = getIndex(preMitigationProbability.getSelectedIndex(), probabilitiesSize);
@@ -471,7 +468,7 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     name.setText("");
     description.setText("");
     identifiedBy.setValue("");
-    category.setValue("");
+    categories.clearTextBoxes();
     notes.setText("");
 
     preMitigationProbability.setSelectedIndex(probabilitiesSize - 1);
@@ -526,9 +523,5 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
 
   public Risk getValue() {
     return getRisk();
-  }
-
-  public SelectedItems<RiskIncidence> getSelectedIncidences() {
-    return incidenceList.getSelected();
   }
 }

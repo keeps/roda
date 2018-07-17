@@ -947,7 +947,7 @@ public final class RodaConstants {
   public static final String RISK_DESCRIPTION = "description";
   public static final String RISK_IDENTIFIED_ON = "identifiedOn";
   public static final String RISK_IDENTIFIED_BY = "identifiedBy";
-  public static final String RISK_CATEGORY = "category";
+  public static final String RISK_CATEGORIES = "categories";
   public static final String RISK_NOTES = "notes";
 
   public static final String RISK_PRE_MITIGATION_PROBABILITY = "preMitigationProbability";

@@ -2,7 +2,7 @@
             {
 
             
-            "category": "Personnel, management and administration procedures; Hardware, software or communications equipment and facilities",
+            "categories": ["Personnel, management and administration procedures","Hardware, software or communications equipment and facilities"],
 
                 
         "id": "urn:drambora:r47",

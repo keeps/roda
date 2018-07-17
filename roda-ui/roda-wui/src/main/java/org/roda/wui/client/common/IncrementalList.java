@@ -49,7 +49,6 @@ public class IncrementalList extends Composite implements HasValueChangeHandlers
   Button addDynamicButton;
 
   private ArrayList<RemovableTextBox> textBoxes;
-  boolean changed = false;
 
   public IncrementalList() {
     this(false, null);

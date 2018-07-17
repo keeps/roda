@@ -611,7 +611,7 @@ public class IndexServiceTest {
       risk.setDescription("Risk description");
       risk.setIdentifiedOn(new Date());
       risk.setIdentifiedBy("Risk identifier");
-      risk.setCategory("Risk category");
+      risk.setCategories(Arrays.asList("Risk category"));
       risk.setNotes("Risk notes");
 
       risk.setPreMitigationProbability(4);

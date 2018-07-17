@@ -62,7 +62,7 @@ public class IndexedRisk extends Risk implements IsIndexed {
 
   @Override
   public List<String> toCsvHeaders() {
-    return Arrays.asList("id", "name", "description", "identifiedOn", "identifiedBy", "category", "notes",
+    return Arrays.asList("id", "name", "description", "identifiedOn", "identifiedBy", "categories", "notes",
       "preMitigationProbability", "preMitigationImpact", "preMitigationSeverity", "preMitigationNotes",
       "posMitigationProbability", "posMitigationImpact", "posMitigationSeverity", "posMitigationNotes",
       "mitigationStrategy", "mitigationOwnerType", "mitigationOwner", "mitigationRelatedEventIdentifierType",
@@ -73,7 +73,7 @@ public class IndexedRisk extends Risk implements IsIndexed {
   @Override
   public List<Object> toCsvValues() {
     return Arrays.asList(new Object[] {getId(), getName(), getDescription(), getIdentifiedOn(), getIdentifiedBy(),
-      getCategory(), getNotes(), getPreMitigationProbability(), getPreMitigationImpact(), getPreMitigationSeverity(),
+      getCategories(), getNotes(), getPreMitigationProbability(), getPreMitigationImpact(), getPreMitigationSeverity(),
       getPreMitigationNotes(), getPostMitigationProbability(), getPostMitigationImpact(), getPostMitigationSeverity(),
       getPreMitigationNotes(), getMitigationStrategy(), getMitigationOwnerType(), getMitigationOwner(),
       getMitigationRelatedEventIdentifierType(), getMitigationRelatedEventIdentifierValue(), getCreatedOn(),

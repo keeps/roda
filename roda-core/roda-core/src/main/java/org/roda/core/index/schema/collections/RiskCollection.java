@@ -58,7 +58,7 @@ public class RiskCollection extends AbstractSolrCollection<IndexedRisk, Risk> {
     fields.add(new Field(RodaConstants.RISK_DESCRIPTION, Field.TYPE_TEXT).setMultiValued(false));
     fields.add(new Field(RodaConstants.RISK_IDENTIFIED_ON, Field.TYPE_DATE).setRequired(true));
     fields.add(new Field(RodaConstants.RISK_IDENTIFIED_BY, Field.TYPE_STRING).setRequired(true));
-    fields.add(new Field(RodaConstants.RISK_CATEGORY, Field.TYPE_STRING).setRequired(true));
+    fields.add(new Field(RodaConstants.RISK_CATEGORIES, Field.TYPE_STRING).setRequired(true).setMultiValued(true));
     fields.add(new Field(RodaConstants.RISK_NOTES, Field.TYPE_TEXT).setMultiValued(false));
     fields.add(new Field(RodaConstants.RISK_PRE_MITIGATION_PROBABILITY, Field.TYPE_INT).setRequired(true));
     fields.add(new Field(RodaConstants.RISK_PRE_MITIGATION_IMPACT, Field.TYPE_INT).setRequired(true));
@@ -93,7 +93,7 @@ public class RiskCollection extends AbstractSolrCollection<IndexedRisk, Risk> {
   public List<CopyField> getCopyFields() {
     // TODO check if the _txt versions are needed
     return Arrays.asList(SolrCollection.getCopyAllToSearchField(),
-      new CopyField(RodaConstants.RISK_CATEGORY, RodaConstants.RISK_CATEGORY + "_txt"),
+      new CopyField(RodaConstants.RISK_CATEGORIES, RodaConstants.RISK_CATEGORIES + "_txt"),
       new CopyField(RodaConstants.RISK_MITIGATION_OWNER, RodaConstants.RISK_MITIGATION_OWNER + "_txt"),
       new CopyField(RodaConstants.RISK_IDENTIFIED_BY, RodaConstants.RISK_IDENTIFIED_BY + "_txt"));
   }
@@ -109,7 +109,7 @@ public class RiskCollection extends AbstractSolrCollection<IndexedRisk, Risk> {
     doc.addField(RodaConstants.RISK_DESCRIPTION, risk.getDescription());
     doc.addField(RodaConstants.RISK_IDENTIFIED_ON, SolrUtils.formatDate(risk.getIdentifiedOn()));
     doc.addField(RodaConstants.RISK_IDENTIFIED_BY, risk.getIdentifiedBy());
-    doc.addField(RodaConstants.RISK_CATEGORY, risk.getCategory());
+    doc.addField(RodaConstants.RISK_CATEGORIES, risk.getCategories());
     doc.addField(RodaConstants.RISK_NOTES, risk.getNotes());
 
     doc.addField(RodaConstants.RISK_PRE_MITIGATION_PROBABILITY, risk.getPreMitigationProbability());
@@ -127,7 +127,6 @@ public class RiskCollection extends AbstractSolrCollection<IndexedRisk, Risk> {
     }
 
     doc.addField(RodaConstants.RISK_CURRENT_SEVERITY_LEVEL, risk.getCurrentSeverityLevel().toString());
-
     doc.addField(RodaConstants.RISK_POST_MITIGATION_NOTES, risk.getPostMitigationNotes());
 
     doc.addField(RodaConstants.RISK_MITIGATION_STRATEGY, risk.getMitigationStrategy());
@@ -157,7 +156,7 @@ public class RiskCollection extends AbstractSolrCollection<IndexedRisk, Risk> {
     risk.setDescription(SolrUtils.objectToString(doc.get(RodaConstants.RISK_DESCRIPTION), null));
     risk.setIdentifiedOn(SolrUtils.objectToDate(doc.get(RodaConstants.RISK_IDENTIFIED_ON)));
     risk.setIdentifiedBy(SolrUtils.objectToString(doc.get(RodaConstants.RISK_IDENTIFIED_BY), null));
-    risk.setCategory(SolrUtils.objectToString(doc.get(RodaConstants.RISK_CATEGORY), null));
+    risk.setCategories(SolrUtils.objectToListString(doc.get(RodaConstants.RISK_CATEGORIES)));
     risk.setNotes(SolrUtils.objectToString(doc.get(RodaConstants.RISK_NOTES), null));
 
     risk.setPreMitigationProbability(

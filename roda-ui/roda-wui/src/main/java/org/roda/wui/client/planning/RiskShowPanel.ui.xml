@@ -46,9 +46,9 @@
 				</g:FlowPanel>
 				<g:FlowPanel styleName="field">
 					<g:Label styleName="label">
-						<ui:text from='{messages.riskCategory}' />
+						<ui:text from='{messages.riskCategories}' />
 					</g:Label>
-					<g:Label styleName="value" ui:field="riskCategory" />
+					<g:FlowPanel styleName="value" ui:field="riskCategories" />
 				</g:FlowPanel>
 				<g:FlowPanel styleName="field">
 					<g:Label styleName="label" ui:field="riskNotesKey">

@@ -8,6 +8,7 @@
 
 package org.roda.wui.client.planning;
 
+import com.google.gwt.user.client.ui.FlowPanel;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -75,7 +76,7 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
   Label riskIdentifiedBy;
 
   @UiField
-  Label riskCategory;
+  FlowPanel riskCategories;
 
   @UiField
   Label riskNotesKey, riskNotesValue;
@@ -143,9 +144,6 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
   @UiField(provided = true)
   RiskIncidenceList incidenceList;
 
-  @SuppressWarnings("unused")
-  private ClientLogger logger = new ClientLogger(getClass().getName());
-
   private static final Filter DEFAULT_FILTER = SearchFilters.defaultFilter(RiskIncidence.class.getName());
   private static final String ALL_FILTER = SearchFilters.allFilter(RiskIncidence.class.getName());
 
@@ -206,9 +204,14 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
 
     riskIdentifiedOn.setText(Humanize.formatDate(risk.getIdentifiedOn()));
     riskIdentifiedBy.setText(risk.getIdentifiedBy());
-    riskCategory.setText(risk.getCategory());
     riskNotesValue.setText(risk.getNotes());
     riskNotesKey.setVisible(StringUtils.isNotBlank(risk.getNotes()));
+
+    for(String category : risk.getCategories()) {
+      Label categoryLabel = new Label(category);
+      categoryLabel.addStyleName("value");
+      riskCategories.add(categoryLabel);
+    }
 
     final int preProbability = risk.getPreMitigationProbability();
     final int preImpact = risk.getPreMitigationImpact();
@@ -325,7 +328,7 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
     riskDescriptionValue.setText("");
     riskIdentifiedOn.setText("");
     riskIdentifiedBy.setText("");
-    riskCategory.setText("");
+    riskCategories.clear();
     riskNotesKey.setVisible(false);
     riskNotesValue.setText("");
 

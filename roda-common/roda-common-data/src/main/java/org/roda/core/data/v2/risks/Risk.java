@@ -7,7 +7,9 @@
  */
 package org.roda.core.data.v2.risks;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -31,7 +33,7 @@ public class Risk extends NamedIndexedModel implements IsModelObject {
   private String description = null;
   private Date identifiedOn = null;
   private String identifiedBy = null;
-  private String category = null;
+  private List<String> categories = new ArrayList<>();
   private String notes = null;
 
   private int preMitigationProbability = 0;
@@ -69,7 +71,7 @@ public class Risk extends NamedIndexedModel implements IsModelObject {
     this.description = risk.getDescription();
     this.identifiedOn = risk.getIdentifiedOn();
     this.identifiedBy = risk.getIdentifiedBy();
-    this.category = risk.getCategory();
+    this.categories = risk.getCategories();
     this.notes = risk.getNotes();
 
     this.preMitigationProbability = risk.getPreMitigationProbability();
@@ -121,12 +123,12 @@ public class Risk extends NamedIndexedModel implements IsModelObject {
     this.identifiedBy = identifiedBy;
   }
 
-  public String getCategory() {
-    return category;
+  public List<String> getCategories() {
+    return categories;
   }
 
-  public void setCategory(String category) {
-    this.category = category;
+  public void setCategories(List<String> categories) {
+    this.categories = categories;
   }
 
   public String getNotes() {
@@ -311,7 +313,7 @@ public class Risk extends NamedIndexedModel implements IsModelObject {
   @Override
   public String toString() {
     return "Risk [id=" + getId() + ", name=" + getName() + ", description=" + description + ", identifiedOn="
-      + identifiedOn + ", identifiedBy=" + identifiedBy + ", category=" + category + ", notes=" + notes
+      + identifiedOn + ", identifiedBy=" + identifiedBy + ", categories=" + categories + ", notes=" + notes
       + ", preMitigationProbability=" + preMitigationProbability + ", preMitigationImpact=" + preMitigationImpact
       + ", preMitigationSeverity=" + preMitigationSeverity + ", preMitigationNotes=" + preMitigationNotes
       + ", postMitigationProbability=" + postMitigationProbability + ", postMitigationImpact=" + postMitigationImpact
@@ -333,7 +335,7 @@ public class Risk extends NamedIndexedModel implements IsModelObject {
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
-    result = prime * result + ((category == null) ? 0 : category.hashCode());
+    result = prime * result + ((categories == null) ? 0 : categories.hashCode());
     result = prime * result + ((createdBy == null) ? 0 : createdBy.hashCode());
     result = prime * result + ((createdOn == null) ? 0 : createdOn.hashCode());
     result = prime * result + ((description == null) ? 0 : description.hashCode());
@@ -371,10 +373,10 @@ public class Risk extends NamedIndexedModel implements IsModelObject {
     if (getClass() != obj.getClass())
       return false;
     Risk other = (Risk) obj;
-    if (category == null) {
-      if (other.category != null)
+    if (categories == null) {
+      if (other.categories != null)
         return false;
-    } else if (!category.equals(other.category))
+    } else if (!categories.equals(other.categories))
       return false;
     if (createdBy == null) {
       if (other.createdBy != null)

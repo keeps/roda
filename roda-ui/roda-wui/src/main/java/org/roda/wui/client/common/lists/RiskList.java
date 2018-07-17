@@ -47,14 +47,13 @@ public class RiskList extends BasicAsyncTableCell<IndexedRisk> {
 
   private TextColumn<IndexedRisk> nameColumn;
   private Column<IndexedRisk, Date> identifiedOnColumn;
-  private TextColumn<IndexedRisk> categoryColumn;
   private TextColumn<IndexedRisk> ownerColumn;
   private Column<IndexedRisk, SafeHtml> severityColumn;
   private TextColumn<IndexedRisk> incidenceCounterColumn;
   private TextColumn<IndexedRisk> notMitigatedIncidenceCounterColumn;
 
   private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.RISK_ID,
-    RodaConstants.RISK_NAME, RodaConstants.RISK_IDENTIFIED_ON, RodaConstants.RISK_CATEGORY,
+    RodaConstants.RISK_NAME, RodaConstants.RISK_IDENTIFIED_ON, RodaConstants.RISK_CATEGORIES,
     RodaConstants.RISK_MITIGATION_OWNER, RodaConstants.RISK_CURRENT_SEVERITY_LEVEL, RodaConstants.RISK_INCIDENCES_COUNT,
     RodaConstants.RISK_UNMITIGATED_INCIDENCES_COUNT, RodaConstants.RISK_POST_MITIGATION_SEVERITY_LEVEL,
     RodaConstants.RISK_PRE_MITIGATION_SEVERITY_LEVEL);
@@ -68,8 +67,7 @@ public class RiskList extends BasicAsyncTableCell<IndexedRisk> {
     this.filter = filter;
   }
 
-  public RiskList(String listId, Filter filter, String summary, boolean selectable, int pageSize,
-    int incrementPage) {
+  public RiskList(String listId, Filter filter, String summary, boolean selectable, int pageSize, int incrementPage) {
     super(IndexedRisk.class, listId, filter, summary, selectable, pageSize, incrementPage, fieldsToReturn);
     this.filter = filter;
   }
@@ -78,7 +76,6 @@ public class RiskList extends BasicAsyncTableCell<IndexedRisk> {
   protected void configureDisplay(CellTable<IndexedRisk> display) {
 
     nameColumn = new TextColumn<IndexedRisk>() {
-
       @Override
       public String getValue(IndexedRisk risk) {
         return risk != null ? risk.getName() : null;
@@ -93,16 +90,7 @@ public class RiskList extends BasicAsyncTableCell<IndexedRisk> {
       }
     };
 
-    categoryColumn = new TextColumn<IndexedRisk>() {
-
-      @Override
-      public String getValue(IndexedRisk risk) {
-        return risk != null ? risk.getCategory() : null;
-      }
-    };
-
     ownerColumn = new TextColumn<IndexedRisk>() {
-
       @Override
       public String getValue(IndexedRisk risk) {
         return risk != null ? risk.getMitigationOwner() : null;
@@ -137,14 +125,12 @@ public class RiskList extends BasicAsyncTableCell<IndexedRisk> {
 
     nameColumn.setSortable(true);
     identifiedOnColumn.setSortable(true);
-    categoryColumn.setSortable(true);
     ownerColumn.setSortable(true);
     severityColumn.setSortable(true);
     incidenceCounterColumn.setSortable(true);
     notMitigatedIncidenceCounterColumn.setSortable(true);
 
     addColumn(nameColumn, messages.riskName(), false, false);
-    addColumn(categoryColumn, messages.riskCategory(), false, false);
     addColumn(ownerColumn, messages.riskMitigationOwner(), false, false);
     addColumn(identifiedOnColumn, messages.riskIdentifiedOn(), false, false, 8);
     addColumn(severityColumn, messages.riskPostMitigationSeverity(), false, false, 7);
@@ -160,7 +146,6 @@ public class RiskList extends BasicAsyncTableCell<IndexedRisk> {
     Map<Column<IndexedRisk, ?>, List<String>> columnSortingKeyMap = new HashMap<>();
     columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.RISK_NAME));
     columnSortingKeyMap.put(identifiedOnColumn, Arrays.asList(RodaConstants.RISK_IDENTIFIED_ON));
-    columnSortingKeyMap.put(categoryColumn, Arrays.asList(RodaConstants.RISK_CATEGORY));
     columnSortingKeyMap.put(ownerColumn, Arrays.asList(RodaConstants.RISK_MITIGATION_OWNER));
     columnSortingKeyMap.put(severityColumn, Arrays.asList(RodaConstants.RISK_CURRENT_SEVERITY_LEVEL));
     columnSortingKeyMap.put(incidenceCounterColumn, Arrays.asList(RodaConstants.RISK_INCIDENCES_COUNT));
@@ -172,7 +157,6 @@ public class RiskList extends BasicAsyncTableCell<IndexedRisk> {
   @Override
   protected ProvidesKey<IndexedRisk> getKeyProvider() {
     return new ProvidesKey<IndexedRisk>() {
-
       @Override
       public Object getKey(IndexedRisk item) {
         return item.getId();

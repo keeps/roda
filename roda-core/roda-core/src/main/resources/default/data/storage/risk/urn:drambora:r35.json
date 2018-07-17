@@ -2,7 +2,7 @@
             {
 
             
-            "category": "Physical environment; Hardware, software or communications equipment andfacilities",
+            "categories": ["Physical environment","Hardware, software or communications equipment and facilities"],
 
                 
         "id": "urn:drambora:r35",

@@ -3,7 +3,8 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
-	xmlns:commonsearch="urn:import:org.roda.wui.client.common.search">
+	xmlns:commonsearch="urn:import:org.roda.wui.client.common.search"
+	xmlns:l="urn:import:org.roda.wui.client.common">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
@@ -33,10 +34,9 @@
 				<commonsearch:SearchSuggestBox
 					ui:field="identifiedBy" addStyleNames="form-textbox" />
 				<g:Label addStyleNames="form-label">
-					<ui:text from='{messages.riskCategory}' />
+					<ui:text from='{messages.riskCategories}' />
 				</g:Label>
-				<commonsearch:SearchSuggestBox
-					ui:field="category" addStyleNames="form-textbox" />
+				<l:IncrementalList ui:field="categories"></l:IncrementalList>
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.riskNotes}' />
 				</g:Label>

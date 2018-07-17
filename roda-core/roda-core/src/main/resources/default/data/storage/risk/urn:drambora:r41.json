@@ -2,7 +2,7 @@
             {
 
             
-            "category": "Physical environment; Personnel, management and administration procedures; Operations and service delivery; Hardware, software or communications equipment andfacilities",
+            "categories": ["Physical environment","Personnel, management and administration procedures","Operations and service delivery","Hardware, software or communications equipment and facilities"],
 
                 
         "id": "urn:drambora:r41",
