@@ -68,7 +68,7 @@ public class PreservationEventsSearch extends Composite {
     defaultFilters(Filter.ALL);
 
     searchPanel = new SearchPanel(filterEvents, RodaConstants.PRESERVATION_EVENT_SEARCH, true,
-      messages.searchPlaceHolder(), true, true, false);
+      messages.searchPlaceHolder(), false, true, false);
 
     initWidget(uiBinder.createAndBindUi(this));
 

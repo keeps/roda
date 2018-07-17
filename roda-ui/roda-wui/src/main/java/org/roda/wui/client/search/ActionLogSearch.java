@@ -66,7 +66,7 @@ public class ActionLogSearch extends Composite {
     logsSearchAdvancedFieldsPanel.addValueChangeHandler(searchAdvancedFieldsPanelHandler);
     defaultFilters(Filter.ALL);
 
-    searchPanel = new SearchPanel(filterLogs, RodaConstants.LOG_SEARCH, true, messages.searchPlaceHolder(), true, true,
+    searchPanel = new SearchPanel(filterLogs, RodaConstants.LOG_SEARCH, true, messages.searchPlaceHolder(), false, true,
       false);
 
     initWidget(uiBinder.createAndBindUi(this));

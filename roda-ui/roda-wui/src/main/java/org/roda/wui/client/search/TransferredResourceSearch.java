@@ -69,7 +69,7 @@ public class TransferredResourceSearch extends Composite {
     defaultFilters(Filter.ALL);
 
     searchPanel = new SearchPanel(filterResources, RodaConstants.TRANSFERRED_RESOURCE_SEARCH, true,
-      messages.searchPlaceHolder(), true, true, false);
+      messages.searchPlaceHolder(), false, true, false);
 
     initWidget(uiBinder.createAndBindUi(this));
 
