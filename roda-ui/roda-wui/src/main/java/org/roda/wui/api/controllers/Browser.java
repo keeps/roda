@@ -3273,7 +3273,7 @@ public class Browser extends RodaWuiController {
       throw e;
     } finally {
       // register action
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_REPRESENTATION_INFORMATION_PARAM, ri);
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_REPRESENTATION_INFORMATION_ID_PARAM, ri.getId());
     }
   }
 
@@ -3294,7 +3294,7 @@ public class Browser extends RodaWuiController {
     } finally {
       // register action
       controllerAssistant.registerAction(user, ri.getId(), state,
-        RodaConstants.CONTROLLER_REPRESENTATION_INFORMATION_PARAM, ri);
+        RodaConstants.CONTROLLER_REPRESENTATION_INFORMATION_ID_PARAM, ri.getId());
     }
   }
 

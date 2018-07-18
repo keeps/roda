@@ -55,7 +55,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-@Test(groups = {RodaConstants.TEST_GROUP_TRAVIS})
+@Test(groups = {RodaConstants.TEST_GROUP_ALL})
 public class FilterTest {
   private static final Logger LOGGER = LoggerFactory.getLogger(FilterTest.class);
 
