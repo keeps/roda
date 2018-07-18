@@ -16,7 +16,9 @@ import java.util.List;
  */
 public class MultipleGenericException extends GenericException {
   private static final long serialVersionUID = 3865896551745064851L;
-  private List<Exception> causes = new ArrayList<>();
+  
+  
+  private transient List<Exception> causes = new ArrayList<>();
 
   public MultipleGenericException() {
     super();

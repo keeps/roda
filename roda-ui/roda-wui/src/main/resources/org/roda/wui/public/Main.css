@@ -320,6 +320,7 @@ div.inline {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     padding-right: 10px;
+    font-weight: 900;
 }
 
 .disseminationsCard > .h5:before {
@@ -329,6 +330,7 @@ div.inline {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     padding-right: 10px;
+    font-weight: 900;
 }
 
 .aipChildrenCard > .h5:before {
@@ -338,6 +340,7 @@ div.inline {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     padding-right: 10px;
+    font-weight: 900;
 }
 
 .representationInformationCard {
@@ -356,6 +359,7 @@ div.inline {
     -moz-osx-font-smoothing: grayscale;
     padding-right: 10px;
     color: #089de3;
+    font-weight: 900;
 }
 
 .browse_top .aipChildrenCard {
@@ -576,6 +580,7 @@ pre code {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     margin-right: 5px;
+    font-weight: 900;
 }
 
 .error pre > code {
@@ -2646,6 +2651,7 @@ td.datePickerMonth, td.datePickerYear {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     margin-right: 5px;
+    font-weight: 900;
 }
 
 .representation .header .identifiers {
@@ -2718,6 +2724,7 @@ td.datePickerMonth, td.datePickerYear {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     margin-right: 5px;
+    font-weight: 900;
 }
 
 .file .header .identifiers {
@@ -2819,6 +2826,7 @@ td.datePickerMonth, td.datePickerYear {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     margin-right: 5px;
+    font-weight: 900;
 }
 
 .event .header .identifier {
@@ -2852,6 +2860,7 @@ td.datePickerMonth, td.datePickerYear {
 .agent .header:before {
     content: '\f007';
     font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
 }
 
 .agent .subheader {
@@ -5949,7 +5958,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .plugin-list-item-icon-format_identification:before {
-	content: "\f0eb";
+	content: "\f358";
 }
 
 .plugin-list-item-icon-ingest:before {

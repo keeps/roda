@@ -1029,6 +1029,7 @@ public class IndexModelObserver implements ModelObserver {
     updateFields.putAll(SolrUtils.getPermissionsAsPreCalculatedFields(permissions));
     updateFields.put(RodaConstants.INDEX_STATE, SolrUtils.formatEnum(state));
     updateFields.put(RodaConstants.PRESERVATION_EVENT_AIP_ID, pm.getAipId());
+    updateFields.put(RodaConstants.PRESERVATION_EVENT_ID, pm.getId());
     return SolrUtils.update(index, IndexedPreservationEvent.class, IdUtils.getPreservationId(pm), updateFields, this);
 
   }
