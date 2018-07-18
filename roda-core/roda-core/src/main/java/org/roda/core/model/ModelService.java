@@ -17,6 +17,7 @@ import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAccessor;
@@ -2714,7 +2715,7 @@ public class ModelService extends ModelObservable {
     try {
       TemporalAccessor dt = LOG_NAME_DATE_FORMAT.parse(fileNameWithoutExtension);
 
-      if (Instant.from(dt).plus(daysToIndex + 1, ChronoUnit.DAYS).isAfter(Instant.now())) {
+      if (LocalDate.from(dt).plus(daysToIndex + 1, ChronoUnit.DAYS).isAfter(LocalDate.now())) {
         isToIndex = true;
       }
 

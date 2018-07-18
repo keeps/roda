@@ -98,7 +98,9 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
   @Override
   public List<CopyField> getCopyFields() {
     return Arrays.asList(SolrCollection.getCopyAllToSearchField(),
-      SolrCollection.getSortCopyFieldOf(RodaConstants.AIP_TITLE));
+      SolrCollection.getSortCopyFieldOf(RodaConstants.AIP_TITLE),
+      new CopyField(RodaConstants.INGEST_JOB_ID, RodaConstants.ALL_INGEST_JOB_IDS),
+      new CopyField(RodaConstants.INGEST_UPDATE_JOB_IDS, RodaConstants.ALL_INGEST_JOB_IDS));
   }
 
   @Override

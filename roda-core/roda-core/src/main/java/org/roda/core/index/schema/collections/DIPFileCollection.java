@@ -72,7 +72,7 @@ public class DIPFileCollection extends AbstractSolrCollection<DIPFile, DIPFile> 
 
   @Override
   public List<CopyField> getCopyFields() {
-    return Arrays.asList(new CopyField(RodaConstants.DIPFILE_ID, Field.FIELD_SEARCH),
+    return Arrays.asList(new CopyField(RodaConstants.INDEX_ID, Field.FIELD_SEARCH),
       new CopyField(RodaConstants.DIPFILE_PATH, Field.FIELD_SEARCH));
   }
 
@@ -95,7 +95,6 @@ public class DIPFileCollection extends AbstractSolrCollection<DIPFile, DIPFile> 
     }
 
     doc.addField(RodaConstants.DIPFILE_DIP_ID, file.getDipId());
-    doc.addField(RodaConstants.DIPFILE_ID, file.getId());
     doc.addField(RodaConstants.DIPFILE_IS_DIRECTORY, file.isDirectory());
     doc.addField(RodaConstants.DIPFILE_SIZE, Long.toString(file.getSize()));
 

@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @XmlRootElement(name = RodaConstants.RODA_OBJECT_DIP)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class DIP implements IsModelObject {
+public class DIP implements IsModelObject, HasId, HasPermissions {
 
   private static final long serialVersionUID = -7335470043357396783L;
   private static final int VERSION = 1;
