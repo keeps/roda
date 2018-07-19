@@ -22,6 +22,8 @@ import org.hamcrest.Matchers;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.RodaConstants.NodeType;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
@@ -78,7 +80,8 @@ public class MonitorIndexTest {
   }
 
   @AfterMethod
-  public static void cleanup() throws GenericException, RequestNotValidException, IOException {
+  public static void cleanup()
+    throws GenericException, RequestNotValidException, IOException, AuthorizationDeniedException {
     // cleanup
     FSUtils.deletePathQuietly(sips);
     Files.createDirectory(sips);
@@ -89,7 +92,7 @@ public class MonitorIndexTest {
   @Test
   public void testUpdate() throws Exception {
 
-    TransferredResourcesScanner monitor = new TransferredResourcesScanner(sips, index);
+    TransferredResourcesScanner monitor = new TransferredResourcesScanner(sips, index, RodaCoreFactory.getNodeType());
     int fileCounter = populate(sips);
     monitor.updateTransferredResources(Optional.empty(), true);
     index.commit(TransferredResource.class);
@@ -127,10 +130,10 @@ public class MonitorIndexTest {
   @Test
   public void testRemoveFile() throws Exception {
 
-    TransferredResourcesScanner monitor = new TransferredResourcesScanner(sips, index);
+    TransferredResourcesScanner monitor = new TransferredResourcesScanner(sips, index, RodaCoreFactory.getNodeType());
     int fileCounter = populate(sips);
     monitor.updateTransferredResources(Optional.empty(), true);
-    
+
     int toRemove1 = -1;
     int toRemove2 = -1;
     IndexResult<TransferredResource> transferredResources = index.find(TransferredResource.class, Filter.ALL,
@@ -161,8 +164,6 @@ public class MonitorIndexTest {
     monitor.updateTransferredResources(Optional.empty(), true);
     index.commit(TransferredResource.class);
 
-    
-    
     long resultAfterRemoves = index.count(TransferredResource.class, Filter.ALL);
 
     Assert.assertEquals(resultAfterRemoves, resultBeforeRemoves - 2);
@@ -172,7 +173,7 @@ public class MonitorIndexTest {
   @Test
   public void testRemoveFolder() throws Exception {
 
-    TransferredResourcesScanner monitor = new TransferredResourcesScanner(sips, index);
+    TransferredResourcesScanner monitor = new TransferredResourcesScanner(sips, index, RodaCoreFactory.getNodeType());
     int fileCounter = populate(sips);
     monitor.updateTransferredResources(Optional.empty(), true);
 
@@ -205,7 +206,7 @@ public class MonitorIndexTest {
   @Test
   public void testRemoveFileOnSpecificFolder() throws Exception {
 
-    TransferredResourcesScanner monitor = new TransferredResourcesScanner(sips, index);
+    TransferredResourcesScanner monitor = new TransferredResourcesScanner(sips, index, RodaCoreFactory.getNodeType());
     int fileCounter = populate(sips);
 
     monitor.updateTransferredResources(Optional.empty(), true);

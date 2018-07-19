@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.plugins.orchestrate.akka;
+package org.roda.core.common.akka;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.index.IndexService;

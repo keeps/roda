@@ -51,7 +51,7 @@ public class LogEntryCollection extends AbstractSolrCollection<LogEntry, LogEntr
 
   @Override
   public String getUniqueId(LogEntry modelObject) {
-    return modelObject.getId();
+    return modelObject.getUUID();
   }
 
   @Override
@@ -67,6 +67,8 @@ public class LogEntryCollection extends AbstractSolrCollection<LogEntry, LogEntr
     fields.add(new Field(RodaConstants.LOG_USERNAME, Field.TYPE_STRING).setRequired(true));
     fields.add(new Field(RodaConstants.LOG_STATE, Field.TYPE_STRING).setRequired(true));
     fields.add(new Field(RodaConstants.LOG_PARAMETERS, Field.TYPE_STRING).setIndexed(false).setDocValues(false));
+    fields.add(new Field(RodaConstants.LOG_INSTANCE_ID, Field.TYPE_STRING).setIndexed(true));
+    fields.add(new Field(RodaConstants.LOG_LINE_NUMBER, Field.TYPE_LONG).setIndexed(true));
 
     return fields;
   }
@@ -90,6 +92,8 @@ public class LogEntryCollection extends AbstractSolrCollection<LogEntry, LogEntr
     doc.addField(RodaConstants.LOG_RELATED_OBJECT_ID, logEntry.getRelatedObjectID());
     doc.addField(RodaConstants.LOG_USERNAME, logEntry.getUsername());
     doc.addField(RodaConstants.LOG_STATE, logEntry.getState().toString());
+    doc.addField(RodaConstants.LOG_INSTANCE_ID, logEntry.getInstanceId().toString());
+    doc.addField(RodaConstants.LOG_LINE_NUMBER, logEntry.getLineNumber());
 
     return doc;
   }
@@ -112,6 +116,8 @@ public class LogEntryCollection extends AbstractSolrCollection<LogEntry, LogEntr
       state = LOG_ENTRY_STATE
         .valueOf(SolrUtils.objectToString(doc.get(RodaConstants.LOG_STATE), LOG_ENTRY_STATE.UNKNOWN.toString()));
     }
+    final String instanceId = SolrUtils.objectToString(doc.get(RodaConstants.LOG_INSTANCE_ID), "");
+    final long lineNumber = SolrUtils.objectToLong(doc.get(RodaConstants.LOG_LINE_NUMBER), -1L);
 
     LogEntry entry = super.fromSolrDocument(doc, fieldsToReturn);
     entry.setActionComponent(actionComponent);
@@ -130,6 +136,8 @@ public class LogEntryCollection extends AbstractSolrCollection<LogEntry, LogEntr
 
     entry.setRelatedObjectID(relatedObjectId);
     entry.setUsername(username);
+    entry.setInstanceId(instanceId);
+    entry.setLineNumber(lineNumber);
     return entry;
   }
 

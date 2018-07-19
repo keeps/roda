@@ -15,6 +15,7 @@ import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
@@ -115,7 +116,7 @@ public class AddRepresentationInformationFilterPlugin extends AbstractPlugin<Rep
 
       jobPluginInfo.incrementObjectsProcessedWithSuccess();
       reportItem.setPluginState(PluginState.SUCCESS);
-    } catch (GenericException e) {
+    } catch (GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Could not update filter for representation information id: {}", representationInformation.getId(),
         e);
       jobPluginInfo.incrementObjectsProcessedWithFailure();

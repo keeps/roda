@@ -144,12 +144,12 @@ public final class TestsHelper {
   }
 
   public static List<Report> getJobReports(IndexService index, Job job)
-    throws GenericException, RequestNotValidException {
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException {
     return getJobReports(index, job, true);
   }
 
   public static List<Report> getJobReports(IndexService index, Job job, boolean failIfReportNotSucceeded)
-    throws GenericException, RequestNotValidException {
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException {
 
     index.commit(Job.class, IndexedReport.class);
 

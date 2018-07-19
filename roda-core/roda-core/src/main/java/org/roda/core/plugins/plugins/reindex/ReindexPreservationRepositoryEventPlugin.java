@@ -156,7 +156,7 @@ public class ReindexPreservationRepositoryEventPlugin extends AbstractPlugin<Voi
       LOGGER.debug("Clearing indexes");
       try {
         index.clearRepositoryEventIndex();
-      } catch (GenericException e) {
+      } catch (GenericException | AuthorizationDeniedException e) {
         throw new PluginException("Error clearing index", e);
       }
     } else {
@@ -172,7 +172,7 @@ public class ReindexPreservationRepositoryEventPlugin extends AbstractPlugin<Voi
       LOGGER.debug("Optimizing indexes");
       try {
         index.optimizeIndex(RodaConstants.INDEX_PRESERVATION_EVENTS);
-      } catch (GenericException e) {
+      } catch (GenericException | AuthorizationDeniedException e) {
         throw new PluginException("Error optimizing index", e);
       }
     }

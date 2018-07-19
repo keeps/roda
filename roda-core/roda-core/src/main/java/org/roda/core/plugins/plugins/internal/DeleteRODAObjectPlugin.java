@@ -186,7 +186,7 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
             reportItem.setPluginState(PluginState.FAILURE);
             reportItem.addPluginDetails("Could not delete sublevel AIPs: " + e.getMessage());
           });
-    } catch (GenericException | RequestNotValidException e) {
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException e) {
       reportItem.setPluginState(PluginState.FAILURE);
       reportItem.addPluginDetails("Could not delete sublevel AIPs: " + e.getMessage());
     }
@@ -465,7 +465,8 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     try {
       Job job = PluginHelper.getJob(this, index);
       index.commit((Class<? extends IsIndexed>) Class.forName(job.getSourceObjects().getSelectedClass()));
-    } catch (NotFoundException | GenericException | ClassNotFoundException | RequestNotValidException e) {
+    } catch (NotFoundException | GenericException | ClassNotFoundException | RequestNotValidException
+      | AuthorizationDeniedException e) {
       LOGGER.error("Could not commit after delete operation", e);
     }
 

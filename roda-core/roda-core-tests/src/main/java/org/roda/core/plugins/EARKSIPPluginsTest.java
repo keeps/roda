@@ -124,8 +124,8 @@ public class EARKSIPPluginsTest {
   }
 
   private static TransferredResource createIngestCorpora(Path corporaPath, IndexService index, String sipFileInCorpora,
-    String renameSipFileTo)
-    throws IOException, NotFoundException, GenericException, IsStillUpdatingException, AlreadyExistsException {
+    String renameSipFileTo) throws IOException, NotFoundException, GenericException, IsStillUpdatingException,
+    AlreadyExistsException, AuthorizationDeniedException {
     TransferredResourcesScanner f = RodaCoreFactory.getTransferredResourcesScanner();
     Path sip = corporaPath.resolve(CorporaConstants.SIP_FOLDER).resolve(sipFileInCorpora);
     String filename = renameSipFileTo == null ? sipFileInCorpora : renameSipFileTo;
@@ -137,14 +137,15 @@ public class EARKSIPPluginsTest {
     return index.retrieve(TransferredResource.class, IdUtils.createUUID(filename), new ArrayList<>());
   }
 
-  public static TransferredResource createIngestCorpora(Path corporaPath, IndexService index) throws IOException,
-    NotFoundException, GenericException, RequestNotValidException, IsStillUpdatingException, AlreadyExistsException {
+  public static TransferredResource createIngestCorpora(Path corporaPath, IndexService index)
+    throws IOException, NotFoundException, GenericException, RequestNotValidException, IsStillUpdatingException,
+    AlreadyExistsException, AuthorizationDeniedException {
     return createIngestCorpora(corporaPath, index, CorporaConstants.EARK_SIP, null);
   }
 
   public static TransferredResource createIngestUpdateCorpora(Path corporaPath, IndexService index,
     String renameSipFileTo) throws IOException, NotFoundException, GenericException, RequestNotValidException,
-    IsStillUpdatingException, AlreadyExistsException {
+    IsStillUpdatingException, AlreadyExistsException, AuthorizationDeniedException {
     return createIngestCorpora(corporaPath, index, CorporaConstants.EARK_SIP_UPDATE, renameSipFileTo);
   }
 
@@ -228,7 +229,8 @@ public class EARKSIPPluginsTest {
     Assert.assertEquals(aipUpdated.getIngestSIPIds().size(), 2);
   }
 
-  private List<String> createCorporaAncestors() throws IOException, GenericException, IsStillUpdatingException {
+  private List<String> createCorporaAncestors()
+    throws IOException, GenericException, IsStillUpdatingException, AuthorizationDeniedException {
     TransferredResourcesScanner f = RodaCoreFactory.getTransferredResourcesScanner();
     List<String> resultIDs = new ArrayList<>();
 
@@ -240,7 +242,8 @@ public class EARKSIPPluginsTest {
             TransferredResource tr = f.createFile(null, filePath.getFileName().toString(),
               Files.newInputStream(filePath));
             resultIDs.add(tr.getUUID());
-          } catch (GenericException | NotFoundException | AlreadyExistsException | IOException e) {
+          } catch (GenericException | NotFoundException | AlreadyExistsException | IOException
+            | AuthorizationDeniedException e) {
             LOGGER.error("Error creating file: " + filePath, e);
           }
         }

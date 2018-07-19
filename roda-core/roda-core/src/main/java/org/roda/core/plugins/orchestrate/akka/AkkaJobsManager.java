@@ -19,9 +19,11 @@ import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.akka.AkkaBaseActor;
+import org.roda.core.common.akka.Messages;
+import org.roda.core.common.akka.Messages.JobsManagerAcquireLock;
+import org.roda.core.common.akka.Messages.JobsManagerReleaseLock;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.plugins.orchestrate.akka.Messages.JobsManagerAcquireLock;
-import org.roda.core.plugins.orchestrate.akka.Messages.JobsManagerReleaseLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -291,7 +293,7 @@ public class AkkaJobsManager extends AkkaBaseActor {
     }
     // 20180606 hsilva: not sending any list to the sender as it will most
     // certainly end up in deadletters
-    msg.getSender().tell(new Messages.JobsManagerReplyToAcquireLock(Collections.emptyList()), getSelf());
+    msg.getSender().tell(Messages.newJobsManagerReplyToAcquireLock(Collections.emptyList()), getSelf());
 
     if (decreaseWaiting) {
       updateLockRequestsWaitingToAcquireLock(false);
@@ -336,7 +338,7 @@ public class AkkaJobsManager extends AkkaBaseActor {
     }
     // 20180606 hsilva: not sending any list to the sender as it will most
     // certainly end up in deadletters
-    getSender().tell(new Messages.JobsManagerReplyToReleaseLock(Collections.emptyList()), getSelf());
+    getSender().tell(Messages.newJobsManagerReplyToReleaseLock(Collections.emptyList()), getSelf());
   }
 
   private void processAcquiredLocksTimeout() {
@@ -361,7 +363,7 @@ public class AkkaJobsManager extends AkkaBaseActor {
 
   private void sendTick() {
     if (ticksWaitingToBeProcessed.getCount() == 0) {
-      self().tell(new Messages.JobsManagerTick(), self());
+      self().tell(Messages.newJobsManagerTick(), self());
       ticksWaitingToBeProcessed.inc();
     }
   }
@@ -379,7 +381,7 @@ public class AkkaJobsManager extends AkkaBaseActor {
     } else {
       // 20180530 hsilva: message stating that lock was not possible
       // (in order to avoid spending timeout to realize that)
-      getSender().tell(new Messages.JobsManagerNotLockableAtTheTime(
+      getSender().tell(Messages.newJobsManagerNotLockableAtTheTime(
         "Unable to acquire lock & configured to not wait for lock if already locked"), getSelf());
     }
 

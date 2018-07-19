@@ -74,7 +74,8 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 
   @Override
   public User registerUser(User user, String password, String captcha, UserExtraBundle extra, String localeString)
-    throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException, RecaptchaException {
+    throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException, RecaptchaException,
+    AuthorizationDeniedException {
     if (captcha != null) {
       RecaptchaUtils
         .recaptchaVerify(RodaCoreFactory.getRodaConfiguration().getString(RECAPTCHA_CODE_SECRET_PROPERTY, ""), captcha);
@@ -154,8 +155,8 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public void requestPasswordReset(String usernameOrEmail, String captcha, String localeString)
-    throws GenericException, NotFoundException, IllegalOperationException, RecaptchaException {
+  public void requestPasswordReset(String usernameOrEmail, String captcha, String localeString) throws GenericException,
+    NotFoundException, IllegalOperationException, RecaptchaException, AuthorizationDeniedException {
     if (captcha != null) {
       RecaptchaUtils
         .recaptchaVerify(RodaCoreFactory.getRodaConfiguration().getString(RECAPTCHA_CODE_SECRET_PROPERTY, ""), captcha);
@@ -167,7 +168,8 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 
   @Override
   public void resetUserPassword(String username, String password, String resetPasswordToken)
-    throws InvalidTokenException, IllegalOperationException, NotFoundException, GenericException {
+    throws InvalidTokenException, IllegalOperationException, NotFoundException, GenericException,
+    AuthorizationDeniedException {
     UserManagement.resetUserPassword(username, password, resetPasswordToken, getThreadLocalRequest().getRemoteAddr());
   }
 

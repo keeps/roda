@@ -10,6 +10,8 @@ package org.roda.core.plugins.orchestrate.akka;
 import java.util.ArrayList;
 import java.util.Optional;
 
+import org.roda.core.common.akka.AkkaBaseActor;
+import org.roda.core.common.akka.Messages;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -125,7 +127,7 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
       // 20160817 hsilva: the following instruction is needed for the "sync"
       // execution of a job (i.e. for testing purposes)
       jobCreator.tell("Done", getSelf());
-      jobsManager.tell(new Messages.JobsManagerJobEnded(jobId, plugin.getClass().getName()), getSelf());
+      jobsManager.tell(Messages.newJobsManagerJobEnded(jobId, plugin.getClass().getName()), getSelf());
       JobsHelper.deleteJobWorkingDirectory(jobId);
       getContext().stop(getSelf());
     }
@@ -178,7 +180,7 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
   private void handleJobStop(Object msg) {
     Messages.JobStop message = (Messages.JobStop) msg;
     markMessageProcessingAsStarted(message);
-    getSelf().tell(new Messages.JobStateUpdated(plugin, JOB_STATE.STOPPING), getSelf());
+    getSelf().tell(Messages.newJobStateUpdated(plugin, JOB_STATE.STOPPING), getSelf());
     stopping = true;
     getContext().getChildren().forEach(e -> getContext().stop(e));
     markMessageProcessingAsEnded(message);
@@ -190,7 +192,7 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
     if (stopping) {
       allChildrenAreDead = Iterables.isEmpty(getContext().getChildren());
       if (allChildrenAreDead) {
-        getSelf().tell(new Messages.JobStateUpdated(plugin, JOB_STATE.STOPPED), getSelf());
+        getSelf().tell(Messages.newJobStateUpdated(plugin, JOB_STATE.STOPPED), getSelf());
       }
     }
     LOGGER.trace("{} Ended processing message {} (stopping={} allChildrenAreDead={})", "NO_UUID",
@@ -216,7 +218,7 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
     // INFO 20160630 hsilva: the following test is needed because messages can
     // be out of order and a plugin might already arrived to the end
     if (jobInfo.isDone()) {
-      workersRouter.tell(new Messages.PluginAfterAllExecuteIsReady(plugin), getSelf());
+      workersRouter.tell(Messages.newPluginAfterAllExecuteIsReady(plugin), getSelf());
     }
     markMessageProcessingAsEnded(message);
   }
@@ -235,7 +237,7 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
       errorDuringBeforeAll = true;
       getPluginOrchestrator().setJobInError(PluginHelper.getJobId(plugin));
       getSelf().tell(
-        new Messages.JobStateUpdated(plugin, JOB_STATE.FAILED_TO_COMPLETE, Optional.ofNullable(e.getMessage())),
+        Messages.newJobStateUpdated(plugin, JOB_STATE.FAILED_TO_COMPLETE, Optional.ofNullable(e.getMessage())),
         getSelf());
 
     }
@@ -248,14 +250,14 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
     jobInfo.setDone(message.getPlugin(), message.isWithError());
 
     if (message.isWithError()) {
-      getSelf().tell(new Messages.JobStateDetailsUpdated(plugin, Optional.of(message.getErrorMessage())), getSelf());
+      getSelf().tell(Messages.newJobStateDetailsUpdated(plugin, Optional.of(message.getErrorMessage())), getSelf());
     }
 
     if (jobInfo.isDone() && jobInfo.isInitEnded()) {
       if (jobInfo.atLeastOneErrorOccurred()) {
-        getSelf().tell(new Messages.JobStateUpdated(plugin, JOB_STATE.FAILED_TO_COMPLETE), getSelf());
+        getSelf().tell(Messages.newJobStateUpdated(plugin, JOB_STATE.FAILED_TO_COMPLETE), getSelf());
       } else {
-        workersRouter.tell(new Messages.PluginAfterAllExecuteIsReady(plugin), getSelf());
+        workersRouter.tell(Messages.newPluginAfterAllExecuteIsReady(plugin), getSelf());
       }
     }
     markMessageProcessingAsEnded(message);
@@ -264,9 +266,9 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
   private void handleAfterAllExecuteIsDone(Object msg) {
     Messages.PluginAfterAllExecuteIsDone message = (Messages.PluginAfterAllExecuteIsDone) msg;
     markMessageProcessingAsStarted(message);
-    getSelf().tell(new Messages.JobCleanup(), getSelf());
+    getSelf().tell(Messages.newJobCleanup(), getSelf());
     getSelf().tell(
-      new Messages.JobStateUpdated(plugin, message.isWithError() ? JOB_STATE.FAILED_TO_COMPLETE : JOB_STATE.COMPLETED),
+      Messages.newJobStateUpdated(plugin, message.isWithError() ? JOB_STATE.FAILED_TO_COMPLETE : JOB_STATE.COMPLETED),
       getSelf());
     markMessageProcessingAsEnded(message);
   }

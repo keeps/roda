@@ -73,6 +73,7 @@
 		<grizzly.version>2.4.3</grizzly.version>
 		<solr.version>7.5.0</solr.version>
 		<akka.version>2.5.17</akka.version>
+		<!--<akka_management.version>0.17.0</akka_management.version>-->
 		<apacheds.version>2.0.0-M24</apacheds.version>
 		<httpcomponents.version>4.5.6</httpcomponents.version>
 		<poi.version>3.17</poi.version>
@@ -966,6 +967,27 @@
 				<artifactId>akka-slf4j_2.11</artifactId>
 				<version>${akka.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>com.typesafe.akka</groupId>
+				<artifactId>akka-distributed-data_2.11</artifactId>
+				<version>${akka.version}</version>
+			</dependency>
+
+			<!--<dependency>
+				<groupId>com.lightbend.akka.management</groupId>
+				<artifactId>akka-management-cluster-bootstrap_2.11</artifactId>
+				<version>${akka_management.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.lightbend.akka.discovery</groupId>
+				<artifactId>akka-discovery_2.11</artifactId>
+				<version>${akka_management.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.lightbend.akka.discovery</groupId>
+				<artifactId>akka-discovery-dns_2.11</artifactId>
+				<version>${akka_management.version}</version>
+			</dependency>-->
 			<!-- Akka related dependencies - end -->
 			<dependency>
 				<groupId>org.reflections</groupId>

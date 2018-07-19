@@ -9,6 +9,8 @@ package org.roda.core.plugins.orchestrate.akka;
 
 import java.util.Optional;
 
+import org.roda.core.common.akka.AkkaBaseActor;
+import org.roda.core.common.akka.Messages;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
@@ -39,7 +41,7 @@ public class AkkaJobActor extends AkkaBaseActor {
   private SupervisorStrategy strategy = new OneForOneStrategy(false, DeciderBuilder.matchAny(e -> {
     LOGGER.error("A child actor of {} has thrown an exception", AkkaJobActor.class.getSimpleName(), e);
     for (ActorRef actorRef : getContext().getChildren()) {
-      actorRef.tell(new Messages.JobStateUpdated(null, JOB_STATE.FAILED_TO_COMPLETE, e), ActorRef.noSender());
+      actorRef.tell(Messages.newJobStateUpdated(null, JOB_STATE.FAILED_TO_COMPLETE, e), ActorRef.noSender());
     }
     return SupervisorStrategy.resume();
   }).build());
@@ -70,7 +72,7 @@ public class AkkaJobActor extends AkkaBaseActor {
         jobsManager, jobId, JobsHelper.getNumberOfJobsWorkers()), jobId);
       super.getPluginOrchestrator().setJobContextInformation(jobId, jobStateInfoActor);
 
-      jobStateInfoActor.tell(new Messages.JobStateUpdated(plugin, JOB_STATE.STARTED), getSelf());
+      jobStateInfoActor.tell(Messages.newJobStateUpdated(plugin, JOB_STATE.STARTED), getSelf());
 
       try {
         if (job.getSourceObjects() instanceof SelectedItemsAll<?>) {
@@ -84,7 +86,7 @@ public class AkkaJobActor extends AkkaBaseActor {
         }
       } catch (Exception e) {
         LOGGER.error("Error while invoking orchestration method", e);
-        jobStateInfoActor.tell(new Messages.JobStateUpdated(plugin, JOB_STATE.FAILED_TO_COMPLETE, e), getSelf());
+        jobStateInfoActor.tell(Messages.newJobStateUpdated(plugin, JOB_STATE.FAILED_TO_COMPLETE, e), getSelf());
         getSender().tell("Failed to complete", getSelf());
       }
 

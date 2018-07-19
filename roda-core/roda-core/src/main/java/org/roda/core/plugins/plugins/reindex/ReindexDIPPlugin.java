@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -44,7 +45,7 @@ public class ReindexDIPPlugin extends ReindexRodaEntityPlugin<DIP> {
 
   @Override
   public void clearSpecificIndexes(IndexService index, List<String> ids)
-    throws GenericException, RequestNotValidException {
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException {
     index.delete(DIPFile.class, new Filter(new OneOfManyFilterParameter(RodaConstants.DIPFILE_DIP_ID, ids)));
   }
 

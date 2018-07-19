@@ -9,6 +9,8 @@ package org.roda.core.plugins.orchestrate.akka;
 
 import java.util.List;
 
+import org.roda.core.common.akka.AkkaBaseActor;
+import org.roda.core.common.akka.Messages;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.index.IndexService;
@@ -52,13 +54,13 @@ public class AkkaWorkerActor extends AkkaBaseActor {
     Plugin<IsRODAObject> messagePlugin = message.getPlugin();
     try {
       messagePlugin.execute(index, model, storage, objectsToBeProcessed);
-      getSender().tell(new Messages.PluginExecuteIsDone(messagePlugin, false), getSelf());
+      getSender().tell(Messages.newPluginExecuteIsDone(messagePlugin, false), getSelf());
     } catch (Throwable e) {
       // 20170120 hsilva: it is required to catch Throwable as there are some
       // linking errors that only will happen during the execution (e.g.
       // java.lang.NoSuchMethodError)
       LOGGER.error("Error executing plugin.execute()", e);
-      getSender().tell(new Messages.PluginExecuteIsDone(messagePlugin, true, getErrorMessage(e)), getSelf());
+      getSender().tell(Messages.newPluginExecuteIsDone(messagePlugin, true, getErrorMessage(e)), getSelf());
     }
     message.logProcessingEnded();
   }
@@ -80,13 +82,13 @@ public class AkkaWorkerActor extends AkkaBaseActor {
     Plugin<?> plugin = message.getPlugin();
     try {
       plugin.afterAllExecute(index, model, storage);
-      getSender().tell(new Messages.PluginAfterAllExecuteIsDone(plugin, false), getSelf());
+      getSender().tell(Messages.newPluginAfterAllExecuteIsDone(plugin, false), getSelf());
     } catch (Throwable e) {
       // 20170120 hsilva: it is required to catch Throwable as there are some
       // linking errors that only will happen during the execution (e.g.
       // java.lang.NoSuchMethodError)
       LOGGER.error("Error executing plugin.afterAllExecute()", e);
-      getSender().tell(new Messages.PluginAfterAllExecuteIsDone(plugin, true), getSelf());
+      getSender().tell(Messages.newPluginAfterAllExecuteIsDone(plugin, true), getSelf());
     }
     message.logProcessingEnded();
   }

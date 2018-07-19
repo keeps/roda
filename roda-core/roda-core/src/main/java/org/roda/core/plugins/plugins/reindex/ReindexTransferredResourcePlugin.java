@@ -17,6 +17,7 @@ import java.util.Optional;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
@@ -130,7 +131,7 @@ public class ReindexTransferredResourcePlugin extends AbstractPlugin<Void> {
       // FIXME 20170116 hsilva: it makes no sense relying on a count made
       // before the indexing start to set counters
       jobPluginInfo.incrementObjectsProcessedWithSuccess(resourceCounter);
-    } catch (IsStillUpdatingException | GenericException e) {
+    } catch (IsStillUpdatingException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error updating transferred resources");
       // FIXME 20170116 hsilva: it makes no sense relying on a count made
       // before the indexing start to set counters
@@ -153,7 +154,7 @@ public class ReindexTransferredResourcePlugin extends AbstractPlugin<Void> {
       LOGGER.debug("Clearing indexes");
       try {
         index.clearIndex(RodaConstants.INDEX_TRANSFERRED_RESOURCE);
-      } catch (GenericException e) {
+      } catch (GenericException | AuthorizationDeniedException e) {
         throw new PluginException("Error clearing index", e);
       }
     } else {
@@ -169,7 +170,7 @@ public class ReindexTransferredResourcePlugin extends AbstractPlugin<Void> {
       LOGGER.debug("Optimizing indexes");
       try {
         index.optimizeIndex(RodaConstants.INDEX_TRANSFERRED_RESOURCE);
-      } catch (GenericException e) {
+      } catch (GenericException | AuthorizationDeniedException e) {
         throw new PluginException("Error optimizing index", e);
       }
     }

@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.utils;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -207,6 +208,43 @@ public final class JsonUtils {
     }
 
     return obj;
+  }
+
+  public static long calculateNumberOfLines(Path file) {
+    long res = 0;
+    try (InputStream is = new BufferedInputStream(Files.newInputStream(file))) {
+      byte[] c = new byte[1024];
+
+      int readChars = is.read(c);
+      if (readChars == -1) {
+        // bail out if nothing to read
+        return res;
+      }
+
+      // make it easy for the optimizer to tune this loop
+      while (readChars == 1024) {
+        for (int i = 0; i < 1024;) {
+          if (c[i++] == '\n') {
+            ++res;
+          }
+        }
+        readChars = is.read(c);
+      }
+
+      // count remaining characters
+      while (readChars != -1) {
+        for (int i = 0; i < readChars; ++i) {
+          if (c[i] == '\n') {
+            ++res;
+          }
+        }
+        readChars = is.read(c);
+      }
+
+    } catch (IOException e) {
+      // do nothing
+    }
+    return res;
   }
 
 }

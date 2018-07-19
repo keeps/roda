@@ -19,6 +19,7 @@ import java.util.Map;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
@@ -113,7 +114,7 @@ public class ActionLogCleanerPlugin extends AbstractPlugin<Void> {
       Date until = cal.getTime();
       try {
         index.deleteActionLog(until);
-      } catch (SolrServerException | IOException e) {
+      } catch (SolrServerException | IOException | AuthorizationDeniedException e) {
         LOGGER.error("Error deleting actionlog until {}", until);
       }
     } else {
@@ -135,7 +136,7 @@ public class ActionLogCleanerPlugin extends AbstractPlugin<Void> {
     LOGGER.debug("Optimizing indexes");
     try {
       index.optimizeIndex(RodaConstants.INDEX_ACTION_LOG);
-    } catch (GenericException e) {
+    } catch (GenericException | AuthorizationDeniedException e) {
       throw new PluginException("Error optimizing index", e);
     }
     return null;

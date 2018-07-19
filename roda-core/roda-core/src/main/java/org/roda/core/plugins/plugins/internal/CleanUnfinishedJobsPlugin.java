@@ -62,7 +62,7 @@ public class CleanUnfinishedJobsPlugin extends AbstractPlugin<Job> {
     try {
       // make sure the index is up to date
       index.commit(IndexedAIP.class);
-    } catch (GenericException e) {
+    } catch (GenericException | AuthorizationDeniedException e) {
       // do nothing
     }
     return null;

@@ -13,6 +13,7 @@ import java.util.List;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.TransferredResource;
@@ -100,7 +101,7 @@ public class SIPRemovePlugin extends AbstractPlugin<TransferredResource> {
       }
 
       pluginInfo.incrementObjectsProcessedWithSuccess();
-    } catch (RuntimeException | GenericException e) {
+    } catch (RuntimeException | GenericException | AuthorizationDeniedException e) {
       if (createEvent) {
         model.createRepositoryEvent(PreservationEventType.DELETION,
           "The process of deleting an object of the repository", PluginState.SUCCESS,

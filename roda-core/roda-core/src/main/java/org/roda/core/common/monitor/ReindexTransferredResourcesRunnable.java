@@ -23,6 +23,7 @@ import java.util.Optional;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
@@ -84,8 +85,9 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
             TransferredResource resource = TransferredResourcesScanner.createTransferredResource(file, attrs, size,
               basePath, lastScanDate);
             index.create(TransferredResource.class, resource);
-          } catch (NoSuchFileException e) {
+          } catch (NoSuchFileException | AuthorizationDeniedException e) {
             // can be a broken symlink (do nothing)
+            // can be unauthorized action (do nothing)
           }
 
           return FileVisitResult.CONTINUE;
@@ -109,7 +111,11 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
               fileSizeStack.push(actualSize + fileSize);
             }
 
-            index.create(TransferredResource.class, resource);
+            try {
+              index.create(TransferredResource.class, resource);
+            } catch (AuthorizationDeniedException e) {
+              // do nothing & carry on
+            }
           }
 
           return FileVisitResult.CONTINUE;
@@ -134,7 +140,7 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
       LOGGER.info("End indexing Transferred Resources. Time elapsed: {} seconds",
         (System.currentTimeMillis() - start) / 1000);
       RodaCoreFactory.setTransferredResourcesScannerUpdateStatus(folderRelativePath, false);
-    } catch (IOException | GenericException | RuntimeException e) {
+    } catch (IOException | GenericException | RuntimeException | AuthorizationDeniedException e) {
       LOGGER.error("Error reindexing Transferred Resources", e);
     }
   }

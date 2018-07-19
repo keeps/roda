@@ -10,6 +10,7 @@ package org.roda.core.plugins.orchestrate;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.roda.core.common.akka.Messages.JobPartialUpdate;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.LockingException;
@@ -21,7 +22,6 @@ import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginOrchestrator;
-import org.roda.core.plugins.orchestrate.akka.Messages.JobPartialUpdate;
 import org.roda.core.plugins.orchestrate.akka.distributed.AkkaDistributedPlugin;
 import org.roda.core.plugins.orchestrate.akka.distributed.Frontend;
 import org.roda.core.plugins.orchestrate.akka.distributed.Master;

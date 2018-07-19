@@ -367,13 +367,13 @@ public interface StorageService {
     throws RequestNotValidException, NotFoundException, GenericException;
 
   BinaryVersion createBinaryVersion(StoragePath storagePath, Map<String, String> properties)
-    throws RequestNotValidException, NotFoundException, GenericException;
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException;
 
   void revertBinaryVersion(StoragePath storagePath, String version)
-    throws NotFoundException, RequestNotValidException, GenericException;
+    throws NotFoundException, RequestNotValidException, GenericException, AuthorizationDeniedException;
 
   void deleteBinaryVersion(StoragePath storagePath, String version)
-    throws NotFoundException, GenericException, RequestNotValidException;
+    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException;
 
   String getStoragePathAsString(StoragePath storagePath, boolean skipStoragePathContainer,
     StoragePath anotherStoragePath, boolean skipAnotherStoragePathContainer);

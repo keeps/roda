@@ -71,7 +71,6 @@ public abstract class AbstractSolrCollection<I extends IsIndexed, M extends IsMo
 
       if (SolrCollection.hasState(object.getClass())) {
         doc.addField(RodaConstants.INDEX_STATE, SolrUtils.formatEnum(((HasState) object).getState()));
-
       }
 
       if (SolrCollection.hasPermissions(object.getClass())) {

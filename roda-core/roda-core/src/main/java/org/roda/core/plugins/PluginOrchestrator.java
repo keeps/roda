@@ -9,6 +9,7 @@ package org.roda.core.plugins;
 
 import java.util.List;
 
+import org.roda.core.common.akka.Messages.JobPartialUpdate;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.LockingException;
@@ -17,7 +18,6 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.plugins.orchestrate.akka.Messages.JobPartialUpdate;
 
 /**
  * Plugin Orchestrator interface

@@ -19,9 +19,14 @@ public final class RodaConstants {
    * RODA Core properties (provided via -D in the command-line)
    */
   public static final String CORE_NODE_TYPE = "roda.node.type";
+  public static final String CORE_NODE_INSTANCE_ID = "roda.node.instanceId";
+  @Deprecated
   public static final String CORE_CLUSTER_HOSTNAME = "roda.cluster.hostname";
+  @Deprecated
   public static final String CORE_CLUSTER_PORT = "roda.cluster.port";
+  @Deprecated
   public static final String CORE_NODE_HOSTNAME = "roda.node.hostname";
+  @Deprecated
   public static final String CORE_NODE_PORT = "roda.node.port";
   public static final String INSTALL_FOLDER_SYSTEM_PROPERTY = "roda.home";
 
@@ -34,6 +39,7 @@ public final class RodaConstants {
    * RODA Core properties (provided via configuration file)
    */
   public static final String CORE_STORAGE_TYPE = "core.storage.type";
+  public static final String CORE_STORAGE_NEW_SERVICE = "core.storage.new_service";
   public static final String CORE_STORAGE_FEDORA4_URL = "core.storage.fedora4.url";
   public static final String CORE_STORAGE_FEDORA4_USERNAME = "core.storage.fedora4.username";
   public static final String CORE_STORAGE_FEDORA4_PASSWORD = "core.storage.fedora4.password";
@@ -41,7 +47,11 @@ public final class RodaConstants {
   public static final String CORE_SOLR_HTTP_URL = "core.solr.http.url";
   public static final String CORE_SOLR_CLOUD_URLS = "core.solr.cloud.urls";
 
-  public static final String CORE_STORAGE_NEW_SERVICE = "core.storage.new_service";
+  public static final String CORE_EVENTS_ENABLED = "core.events.enabled";
+  public static final String CORE_EVENTS_NOTIFIER_AND_HANDLER_ARE_THE_SAME = "core.events.notifier_and_handler_are_the_same";
+  public static final String CORE_EVENTS_NOTIFIER_CLASS = "core.events.notifier_class";
+  public static final String CORE_EVENTS_HANDLER_CLASS = "core.events.handler_class";
+
   public static final String TRASH_CONTAINER = "trash";
 
   public static final String TRANSFERRED_RESOURCES_PROCESSED_FOLDER = "PROCESSED";
@@ -489,8 +499,7 @@ public final class RodaConstants {
   public static final NodeType DEFAULT_NODE_TYPE = NodeType.MASTER;
 
   public enum OrchestratorType {
-    @Deprecated
-    EMBEDDED, AKKA, AKKA_DISTRIBUTED
+    AKKA, AKKA_DISTRIBUTED
   }
 
   public static final OrchestratorType DEFAULT_ORCHESTRATOR_TYPE = OrchestratorType.AKKA;
@@ -753,6 +762,8 @@ public final class RodaConstants {
   // @deprecated use {@link #INDEX_SEARCH} instead.
   @Deprecated()
   public static final String LOG_SEARCH = "search";
+  public static final String LOG_INSTANCE_ID = "instanceId";
+  public static final String LOG_LINE_NUMBER = "lineNumber";
 
   // MEMBER: USER or GROUP
   public static final String MEMBERS_ID = "id";

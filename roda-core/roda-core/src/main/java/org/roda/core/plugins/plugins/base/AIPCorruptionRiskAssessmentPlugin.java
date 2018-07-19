@@ -285,7 +285,8 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
   }
 
   private void updateIncidence(ModelService model, IndexService index, String aipId, String representationId,
-    List<String> filePath, String fileId, String riskId) throws GenericException, RequestNotValidException {
+    List<String> filePath, String fileId, String riskId)
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException {
     List<RiskIncidence> results = getUnmitigatedIncidences(index, aipId, representationId, filePath, fileId, riskId);
 
     for (RiskIncidence incidence : results) {

@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -37,7 +38,6 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.schema.SolrCollectionRegistry;
-import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelObserver;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
@@ -132,7 +132,7 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
         List<String> ids = list.stream().map(obj -> obj.getId()).collect(Collectors.toList());
         clearSpecificIndexes(index, ids);
       }
-    } catch (GenericException | RequestNotValidException e) {
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException e) {
       LOGGER.error("Error clearing specific indexes of a RODA entity", e);
     }
 
@@ -178,7 +178,7 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
           }
         }
       } catch (GenericException | NotFoundException | ClassNotFoundException | RequestNotValidException
-        | NotSupportedException e) {
+        | NotSupportedException | AuthorizationDeniedException e) {
         throw new PluginException("Error clearing index", e);
       }
 
@@ -200,7 +200,7 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
           .forName(job.getSourceObjects().getSelectedClass());
         index.optimizeIndexes(SolrCollectionRegistry.getCommitIndexNames(selectedClass));
       } catch (GenericException | NotFoundException | ClassNotFoundException | RequestNotValidException
-        | NotSupportedException e) {
+        | NotSupportedException | AuthorizationDeniedException e) {
         throw new PluginException("Error optimizing index", e);
       }
     }
@@ -209,7 +209,7 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
   }
 
   public abstract void clearSpecificIndexes(IndexService index, List<String> ids)
-    throws GenericException, RequestNotValidException;
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException;
 
   @Override
   public abstract Plugin<T> cloneMe();

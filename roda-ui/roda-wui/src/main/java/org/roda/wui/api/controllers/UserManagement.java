@@ -110,7 +110,8 @@ public class UserManagement extends RodaWuiController {
   }
 
   public static User registerUser(User user, String password, UserExtraBundle extra, String localeString,
-    String servletPath) throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException {
+    String servletPath)
+    throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException, AuthorizationDeniedException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
@@ -340,7 +341,8 @@ public class UserManagement extends RodaWuiController {
   }
 
   public static void requestPasswordReset(String servletPath, String usernameOrEmail, String localeString,
-    String ipAddress) throws GenericException, NotFoundException, IllegalOperationException {
+    String ipAddress)
+    throws GenericException, NotFoundException, IllegalOperationException, AuthorizationDeniedException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     String username = null;
@@ -363,7 +365,8 @@ public class UserManagement extends RodaWuiController {
   }
 
   public static void resetUserPassword(String username, String password, String resetPasswordToken, String ipAddress)
-    throws InvalidTokenException, IllegalOperationException, NotFoundException, GenericException {
+    throws InvalidTokenException, IllegalOperationException, NotFoundException, GenericException,
+    AuthorizationDeniedException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     User user = UserManagementHelper.resetUserPassword(username, password, resetPasswordToken);

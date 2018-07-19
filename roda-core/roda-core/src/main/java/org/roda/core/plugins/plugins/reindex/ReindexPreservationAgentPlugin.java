@@ -155,7 +155,7 @@ public class ReindexPreservationAgentPlugin extends AbstractPlugin<Void> {
       LOGGER.debug("Clearing indexes");
       try {
         index.clearIndex(RodaConstants.INDEX_PRESERVATION_AGENTS);
-      } catch (GenericException e) {
+      } catch (GenericException | AuthorizationDeniedException e) {
         throw new PluginException("Error clearing index", e);
       }
     } else {
@@ -171,7 +171,7 @@ public class ReindexPreservationAgentPlugin extends AbstractPlugin<Void> {
       LOGGER.debug("Optimizing indexes");
       try {
         index.optimizeIndex(RodaConstants.INDEX_PRESERVATION_AGENTS);
-      } catch (GenericException e) {
+      } catch (GenericException | AuthorizationDeniedException e) {
         throw new PluginException("Error optimizing index", e);
       }
     }

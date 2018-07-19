@@ -17,6 +17,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.HasId;
+import org.roda.core.data.v2.ip.SetsUUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -27,13 +28,14 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 @XmlRootElement(name = RodaConstants.RODA_OBJECT_LOG)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class LogEntry implements IsModelObject, IsIndexed, HasId {
+public class LogEntry implements IsModelObject, IsIndexed, HasId, SetsUUID {
   private static final long serialVersionUID = -178083792639806983L;
 
   public enum LOG_ENTRY_STATE {
     SUCCESS, UNAUTHORIZED, FAILURE, UNKNOWN
   }
 
+  private String uuid;
   private String id;
   private String address;
   private Date datetime;
@@ -42,6 +44,9 @@ public class LogEntry implements IsModelObject, IsIndexed, HasId {
   private String actionMethod;
   private String relatedObjectID;
   private long duration;
+
+  private String instanceId = "";
+  private long lineNumber = -1;
 
   private List<LogEntryParameter> parameters;
 
@@ -61,9 +66,10 @@ public class LogEntry implements IsModelObject, IsIndexed, HasId {
    *          the {@link LogEntry} to clone.
    */
   public LogEntry(LogEntry logEntry) {
-    this(logEntry.getId(), logEntry.getAddress(), logEntry.getDatetime(), logEntry.getUsername(),
+    this(logEntry.getUUID(), logEntry.getId(), logEntry.getAddress(), logEntry.getDatetime(), logEntry.getUsername(),
       logEntry.getActionComponent(), logEntry.getActionMethod(), logEntry.getParameters(),
-      logEntry.getRelatedObjectID(), logEntry.getDuration(), logEntry.getState());
+      logEntry.getRelatedObjectID(), logEntry.getDuration(), logEntry.getState(), logEntry.getInstanceId(),
+      logEntry.getLineNumber());
   }
 
   /**
@@ -84,9 +90,9 @@ public class LogEntry implements IsModelObject, IsIndexed, HasId {
    * @param relatedObjectID
    *          the ID of the object related with this action.
    */
-  public LogEntry(String id, String address, Date datetime, String username, String actionComponent,
+  public LogEntry(String uuid, String id, String address, Date datetime, String username, String actionComponent,
     String actionMethod, List<LogEntryParameter> parameters, String relatedObjectID, long duration,
-    LOG_ENTRY_STATE state) {
+    LOG_ENTRY_STATE state, String instanceId, long lineNumber) {
 
     setId(id);
     setAddress(address);
@@ -98,6 +104,8 @@ public class LogEntry implements IsModelObject, IsIndexed, HasId {
     setRelatedObjectID(relatedObjectID);
     setDuration(duration);
     setState(state);
+    setInstanceId(instanceId);
+    setLineNumber(lineNumber);
   }
 
   @JsonIgnore
@@ -108,21 +116,22 @@ public class LogEntry implements IsModelObject, IsIndexed, HasId {
 
   @Override
   public String toString() {
-    return "LogEntry [id=" + id + ", address=" + address + ", datetime=" + datetime + ", username=" + username
-      + ", actionComponent=" + actionComponent + ", actionMethod=" + actionMethod + ", relatedObjectID="
-      + relatedObjectID + ", duration=" + duration + ", parameters=" + parameters + ", state=" + state + "]";
+    return "LogEntry [uuid=" + uuid + ", id=" + id + ", address=" + address + ", datetime=" + datetime + ", username="
+      + username + ", actionComponent=" + actionComponent + ", actionMethod=" + actionMethod + ", relatedObjectID="
+      + relatedObjectID + ", duration=" + duration + ", instanceId=" + instanceId + ", lineNumber=" + lineNumber
+      + ", parameters=" + parameters + ", state=" + state + "]";
   }
 
   @Override
   public List<String> toCsvHeaders() {
-    return Arrays.asList("id", "address", "datetime", "username", "actionComponent", "actionMethod", "relatedObjectID",
-      "duration", "parameters", "state");
+    return Arrays.asList("uuid", "id", "address", "datetime", "username", "actionComponent", "actionMethod",
+      "relatedObjectID", "duration", "parameters", "state");
   }
 
   @Override
   public List<Object> toCsvValues() {
-    return Arrays.asList(id, address, datetime, username, actionComponent, actionMethod, relatedObjectID, duration,
-      parameters, state);
+    return Arrays.asList(uuid, id, address, datetime, username, actionComponent, actionMethod, relatedObjectID,
+      duration, parameters, state);
   }
 
   @Override
@@ -135,10 +144,13 @@ public class LogEntry implements IsModelObject, IsIndexed, HasId {
     result = prime * result + ((datetime == null) ? 0 : datetime.hashCode());
     result = prime * result + (int) (duration ^ (duration >>> 32));
     result = prime * result + ((id == null) ? 0 : id.hashCode());
+    result = prime * result + ((instanceId == null) ? 0 : instanceId.hashCode());
+    result = prime * result + (int) (lineNumber ^ (lineNumber >>> 32));
     result = prime * result + ((parameters == null) ? 0 : parameters.hashCode());
     result = prime * result + ((relatedObjectID == null) ? 0 : relatedObjectID.hashCode());
     result = prime * result + ((state == null) ? 0 : state.hashCode());
     result = prime * result + ((username == null) ? 0 : username.hashCode());
+    result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
     return result;
   }
 
@@ -148,7 +160,7 @@ public class LogEntry implements IsModelObject, IsIndexed, HasId {
       return true;
     if (obj == null)
       return false;
-    if (!(obj instanceof LogEntry))
+    if (getClass() != obj.getClass())
       return false;
     LogEntry other = (LogEntry) obj;
     if (actionComponent == null) {
@@ -178,6 +190,13 @@ public class LogEntry implements IsModelObject, IsIndexed, HasId {
         return false;
     } else if (!id.equals(other.id))
       return false;
+    if (instanceId == null) {
+      if (other.instanceId != null)
+        return false;
+    } else if (!instanceId.equals(other.instanceId))
+      return false;
+    if (lineNumber != other.lineNumber)
+      return false;
     if (parameters == null) {
       if (other.parameters != null)
         return false;
@@ -194,6 +213,11 @@ public class LogEntry implements IsModelObject, IsIndexed, HasId {
       if (other.username != null)
         return false;
     } else if (!username.equals(other.username))
+      return false;
+    if (uuid == null) {
+      if (other.uuid != null)
+        return false;
+    } else if (!uuid.equals(other.uuid))
       return false;
     return true;
   }
@@ -327,10 +351,29 @@ public class LogEntry implements IsModelObject, IsIndexed, HasId {
     this.duration = duration;
   }
 
-  @JsonIgnore
+  public String getInstanceId() {
+    return instanceId;
+  }
+
+  public void setInstanceId(String instanceId) {
+    this.instanceId = instanceId;
+  }
+
+  public long getLineNumber() {
+    return lineNumber;
+  }
+
+  public void setLineNumber(long lineNumber) {
+    this.lineNumber = lineNumber;
+  }
+
   @Override
   public String getUUID() {
-    return getId();
+    return uuid;
+  }
+
+  public void setUUID(String uuid) {
+    this.uuid = uuid;
   }
 
   public LOG_ENTRY_STATE getState() {
@@ -343,7 +386,7 @@ public class LogEntry implements IsModelObject, IsIndexed, HasId {
 
   @Override
   public List<String> liteFields() {
-    return Arrays.asList(RodaConstants.LOG_ID);
+    return Arrays.asList(RodaConstants.INDEX_UUID);
   }
 
 }

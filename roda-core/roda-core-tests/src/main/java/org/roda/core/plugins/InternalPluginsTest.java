@@ -153,7 +153,7 @@ public class InternalPluginsTest {
     index.execute(TransferredResource.class, Filter.ALL, new ArrayList<>(), new IndexRunnable<TransferredResource>() {
 
       @Override
-      public void run(TransferredResource item) throws GenericException {
+      public void run(TransferredResource item) throws GenericException, AuthorizationDeniedException {
         model.deleteTransferredResource(item);
       }
     }, e -> Assert.fail("Error cleaning up", e));
@@ -163,8 +163,8 @@ public class InternalPluginsTest {
     return new ByteArrayInputStream(RandomStringUtils.randomAscii(GENERATED_FILE_SIZE).getBytes());
   }
 
-  private TransferredResource createCorpora()
-    throws NotFoundException, GenericException, RequestNotValidException, AlreadyExistsException {
+  private TransferredResource createCorpora() throws NotFoundException, GenericException, RequestNotValidException,
+    AlreadyExistsException, AuthorizationDeniedException {
     TransferredResourcesScanner f = RodaCoreFactory.getTransferredResourcesScanner();
 
     String parentUUID = f.createFolder(null, "test").getUUID();

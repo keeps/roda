@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.utils.JsonUtils;
@@ -167,7 +168,7 @@ public class UpdateIncidencesPlugin extends AbstractPlugin<RiskIncidence> {
 
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
         reportItem.setPluginState(PluginState.SUCCESS);
-      } catch (GenericException e) {
+      } catch (AuthorizationDeniedException | GenericException e) {
         jobPluginInfo.incrementObjectsProcessedWithFailure();
         reportItem.setPluginState(PluginState.FAILURE)
           .setPluginDetails("Failed to update risk incidence " + incidence.getId());

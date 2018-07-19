@@ -193,7 +193,8 @@ public class FilterTest {
             }
 
             Thread.sleep(10);
-          } catch (RequestNotValidException | GenericException | InterruptedException e) {
+          } catch (RequestNotValidException | GenericException | InterruptedException
+            | AuthorizationDeniedException e) {
             // do nothing
           }
         }

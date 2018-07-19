@@ -58,7 +58,7 @@ public final class ControllerAssistantUtils {
   private static LogEntry createLogEntry(User user, String actionComponent, String actionMethod, String relatedObjectId,
     long duration, LOG_ENTRY_STATE state, List<LogEntryParameter> parameters) {
     LogEntry logEntry = new LogEntry();
-    logEntry.setId(IdUtils.createUUID());
+    logEntry.setUUID(IdUtils.createUUID());
     logEntry.setAddress(user.getIpAddress());
     logEntry.setUsername(user.getName());
     logEntry.setActionComponent(actionComponent);

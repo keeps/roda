@@ -15,6 +15,7 @@ import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.LogEntryJsonParseException;
@@ -146,7 +147,13 @@ public class ReindexActionLogPlugin extends AbstractPlugin<Void> {
       jobPluginInfo.incrementObjectsCount();
 
       if (logEntry.isPresent()) {
-        index.reindexActionLog(logEntry.get());
+        LogEntry entry = logEntry.get();
+        // 20180730 hsilva: this is needed for backwards compatibility (as
+        // before uuid was equal to id)
+        if (entry.getUUID() == null) {
+          entry.setUUID(entry.getId());
+        }
+        index.reindexActionLog(entry);
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
       } else {
         jobPluginInfo.incrementObjectsProcessedWithFailure();
@@ -191,7 +198,7 @@ public class ReindexActionLogPlugin extends AbstractPlugin<Void> {
       LOGGER.debug("Clearing indexes");
       try {
         index.clearIndex(RodaConstants.INDEX_ACTION_LOG);
-      } catch (GenericException e) {
+      } catch (GenericException | AuthorizationDeniedException e) {
         throw new PluginException("Error clearing index", e);
       }
     } else {
@@ -207,7 +214,7 @@ public class ReindexActionLogPlugin extends AbstractPlugin<Void> {
       LOGGER.debug("Optimizing indexes");
       try {
         index.optimizeIndex(RodaConstants.INDEX_ACTION_LOG);
-      } catch (GenericException e) {
+      } catch (GenericException | AuthorizationDeniedException e) {
         throw new PluginException("Error optimizing index", e);
       }
     }

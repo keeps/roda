@@ -100,7 +100,8 @@ public class BagitSIPPluginsTest {
   }
 
   private TransferredResource createCorpora()
-    throws IOException, NotFoundException, GenericException, RequestNotValidException, AlreadyExistsException {
+    throws IOException, NotFoundException, GenericException, RequestNotValidException, AlreadyExistsException,
+    AuthorizationDeniedException {
     TransferredResourcesScanner f = RodaCoreFactory.getTransferredResourcesScanner();
 
     Path sip = corporaPath.resolve(CorporaConstants.SIP_FOLDER).resolve(CorporaConstants.BAGIT_SIP);

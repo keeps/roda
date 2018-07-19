@@ -5,15 +5,15 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.plugins.orchestrate.akka;
+package org.roda.core.common.akka;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import akka.actor.DeadLetter;
-import akka.actor.UntypedActor;
+import akka.actor.UntypedAbstractActor;
 
-public class DeadLetterActor extends UntypedActor {
+public class DeadLetterActor extends UntypedAbstractActor {
   private static final Logger LOGGER = LoggerFactory.getLogger(DeadLetterActor.class);
 
   @Override

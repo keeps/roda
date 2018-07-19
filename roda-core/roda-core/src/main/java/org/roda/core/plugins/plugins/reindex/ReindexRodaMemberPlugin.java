@@ -16,6 +16,7 @@ import java.util.Map;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
@@ -151,7 +152,7 @@ public class ReindexRodaMemberPlugin extends AbstractPlugin<Void> {
       LOGGER.debug("Clearing indexes");
       try {
         index.clearIndex(RodaConstants.INDEX_MEMBERS);
-      } catch (GenericException e) {
+      } catch (GenericException | AuthorizationDeniedException e) {
         throw new PluginException("Error clearing index", e);
       }
     } else {
@@ -167,7 +168,7 @@ public class ReindexRodaMemberPlugin extends AbstractPlugin<Void> {
       LOGGER.debug("Optimizing indexes");
       try {
         index.optimizeIndex(RodaConstants.INDEX_MEMBERS);
-      } catch (GenericException e) {
+      } catch (GenericException | AuthorizationDeniedException e) {
         throw new PluginException("Error optimizing index", e);
       }
     }

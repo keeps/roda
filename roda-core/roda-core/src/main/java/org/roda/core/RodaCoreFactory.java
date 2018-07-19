@@ -12,6 +12,7 @@ import java.io.Console;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
@@ -97,6 +98,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.ReturnWithExceptions;
 import org.roda.core.data.exceptions.RoleAlreadyExistsException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
@@ -115,11 +117,15 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.events.EventsHandler;
+import org.roda.core.events.EventsManager;
+import org.roda.core.events.EventsNotifier;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.schema.SolrBootstrapUtils;
 import org.roda.core.index.schema.SolrCollectionRegistry;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.migration.MigrationManager;
+import org.roda.core.model.ModelObserver;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.PluginManager;
 import org.roda.core.plugins.PluginManagerException;
@@ -130,6 +136,7 @@ import org.roda.core.plugins.orchestrate.akka.distributed.AkkaDistributedPluginW
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.StorageServiceWrapper;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
@@ -154,6 +161,7 @@ public class RodaCoreFactory {
   private static boolean instantiated = false;
   private static boolean instantiatedWithoutErrors = true;
   private static NodeType nodeType;
+  private static String instanceId = "";
   private static boolean migrationMode = false;
   private static List<Path> toDeleteDuringShutdown = new ArrayList<>();
 
@@ -195,6 +203,9 @@ public class RodaCoreFactory {
   private static PluginManager pluginManager;
   private static PluginOrchestrator pluginOrchestrator = null;
   private static AkkaDistributedPluginWorker akkaDistributedPluginWorker;
+
+  // Events related
+  private static EventsManager eventsManager;
 
   private static LdapUtility ldapUtility;
   private static Path rodaApacheDSDataDirectory = null;
@@ -287,9 +298,34 @@ public class RodaCoreFactory {
     return instantiatedWithoutErrors;
   }
 
+  public static void checkIfWriteIsAllowedAndIfFalseThrowException(NodeType nodeType)
+    throws AuthorizationDeniedException {
+    if (!checkIfWriteIsAllowed(nodeType)) {
+      throwExceptionIfWriteIsNotAllowed();
+    }
+  }
+
+  public static void throwExceptionIfWriteIsNotAllowed() throws AuthorizationDeniedException {
+    throw new AuthorizationDeniedException("Cannot execute non read-only method in read-only instance");
+  }
+
+  public static ReturnWithExceptions<Void, ModelObserver> checkIfWriteIsAllowedAndIfFalseReturn(NodeType nodeType) {
+    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<Void, ModelObserver>();
+    try {
+      checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+    } catch (AuthorizationDeniedException e) {
+      ret.add(e);
+    }
+    return ret;
+  }
+
+  public static boolean checkIfWriteIsAllowed(NodeType nodeType) {
+    return nodeType != NodeType.SLAVE;
+  }
+
   public static void instantiate() {
     NodeType nodeType = NodeType
-      .valueOf(getSystemProperty(RodaConstants.CORE_NODE_TYPE, RodaConstants.DEFAULT_NODE_TYPE.name()));
+      .valueOf(getProperty(RodaConstants.CORE_NODE_TYPE, RodaConstants.DEFAULT_NODE_TYPE.name()));
 
     if (nodeType == NodeType.MASTER) {
       instantiate(NodeType.MASTER);
@@ -355,16 +391,17 @@ public class RodaCoreFactory {
   private static void instantiateSlaveMode() {
     INSTANTIATE_SOLR = true;
     INSTANTIATE_LDAP = true;
+    INSTANTIATE_PLUGIN_MANAGER = true;
 
     INSTANTIATE_SCANNER = false;
     INSTANTIATE_PLUGIN_ORCHESTRATOR = false;
-    INSTANTIATE_PLUGIN_MANAGER = false;
     INSTANTIATE_DEFAULT_RESOURCES = false;
     instantiate(NodeType.SLAVE);
   }
 
   private static void instantiate(NodeType nodeType) {
     RodaCoreFactory.nodeType = nodeType;
+    instanceId = getProperty(RodaConstants.CORE_NODE_INSTANCE_ID, "");
 
     if (!instantiated) {
       try {
@@ -398,6 +435,9 @@ public class RodaCoreFactory {
 
         // initialize metrics stuff
         initializeMetrics();
+
+        // instantiate events manager
+        instantiateEventsManager();
 
         // instantiate storage and model service
         instantiateStorageAndModel();
@@ -458,6 +498,109 @@ public class RodaCoreFactory {
           : (instantiatedWithoutErrors ? "with success!"
             : "with some errors!!! See logs because these errors might cause instability in the system."));
     }
+  }
+
+  /**
+   * Try to get property from 1) system property (passed in command-line via -D;
+   * if property does not start by "roda.", it will be prepended); 2)
+   * environment variable (upper case, replace '.' by '_' and if property does
+   * not start by "RODA_" after replacements, it will be prepended); 3) RODA
+   * configuration files (with original property value, ensuring that it does
+   * not start by "roda."); 4) return default value
+   * 
+   * <p>
+   * Example 1: for property = 'roda.node.type' this method will try to find the
+   * following:
+   * <ul>
+   * <li>system property: roda.node.type</li>
+   * <li>environment variable: RODA_NODE_TYPE</li>
+   * <li>configuration files: node.type</li>
+   * </p>
+   * <p>
+   * Example 2: for property = 'node.type' this method will try to find the
+   * following:
+   * <ul>
+   * <li>system property: roda.node.type</li>
+   * <li>environment variable: RODA_NODE_TYPE</li>
+   * <li>configuration files: node.type</li>
+   * </p>
+   */
+  public static String getProperty(String property, String defaultValue) {
+    String sysProperty = property;
+    if (!sysProperty.startsWith("roda.")) {
+      sysProperty = "roda." + sysProperty;
+    }
+    String ret = System.getProperty(sysProperty);
+    if (ret == null) {
+      String envProperty = sysProperty.toUpperCase().replace('.', '_');
+      ret = System.getenv(envProperty);
+      if (ret == null && getRodaConfiguration() != null) {
+        String confProperty = property.replaceFirst("^roda.", "");
+        ret = getRodaConfiguration().getString(confProperty, defaultValue);
+      }
+    }
+    if (ret == null) {
+      ret = defaultValue;
+    }
+    return ret;
+  }
+
+  /**
+   * Try to get property from 1) system property (passed in command-line via -D;
+   * if property does not start by "roda.", it will be prepended); 2)
+   * environment variable (upper case, replace '.' by '_' and if property does
+   * not start by "RODA_" after replacements, it will be prepended); 3) RODA
+   * configuration files (with original property value, ensuring that it does
+   * not start by "roda."); 4) return default value
+   * 
+   * <p>
+   * Example 1: for property = 'roda.node.type' this method will try to find the
+   * following:
+   * <ul>
+   * <li>system property: roda.node.type</li>
+   * <li>environment variable: RODA_NODE_TYPE</li>
+   * <li>configuration files: node.type</li>
+   * </p>
+   * <p>
+   * Example 2: for property = 'node.type' this method will try to find the
+   * following:
+   * <ul>
+   * <li>system property: roda.node.type</li>
+   * <li>environment variable: RODA_NODE_TYPE</li>
+   * <li>configuration files: node.type</li>
+   * </p>
+   */
+  public static boolean getProperty(String property, boolean defaultValue) {
+    return Boolean.parseBoolean(getProperty(property, Boolean.toString(defaultValue)));
+  }
+
+  /**
+   * Try to get property from 1) system property (passed in command-line via -D;
+   * if property does not start by "roda.", it will be prepended); 2)
+   * environment variable (upper case, replace '.' by '_' and if property does
+   * not start by "RODA_" after replacements, it will be prepended); 3) RODA
+   * configuration files (with original property value, ensuring that it does
+   * not start by "roda."); 4) return default value
+   * 
+   * <p>
+   * Example 1: for property = 'roda.node.type' this method will try to find the
+   * following:
+   * <ul>
+   * <li>system property: roda.node.type</li>
+   * <li>environment variable: RODA_NODE_TYPE</li>
+   * <li>configuration files: node.type</li>
+   * </p>
+   * <p>
+   * Example 2: for property = 'node.type' this method will try to find the
+   * following:
+   * <ul>
+   * <li>system property: roda.node.type</li>
+   * <li>environment variable: RODA_NODE_TYPE</li>
+   * <li>configuration files: node.type</li>
+   * </p>
+   */
+  public static int getProperty(String property, int defaultValue) {
+    return Integer.parseInt(getProperty(property, Integer.toString(defaultValue)));
   }
 
   public static boolean isConfigSymbolicLinksAllowed() {
@@ -605,8 +748,8 @@ public class RodaCoreFactory {
 
   private static void instantiateDefaultObjects() {
     if (INSTANTIATE_DEFAULT_RESOURCES) {
-      try (CloseableIterable<Resource> resources = storage.listResourcesUnderContainer(DefaultStoragePath.parse(""),
-        true)) {
+      try (CloseableIterable<Resource> resources = getStorageService()
+        .listResourcesUnderContainer(DefaultStoragePath.parse(""), true)) {
 
         Iterator<Resource> resourceIterator = resources.iterator();
         boolean hasFileResources = false;
@@ -658,10 +801,10 @@ public class RodaCoreFactory {
           // (e.g. fedora)
           FileStorageService fileStorageService = new FileStorageService(storagePath);
 
-          index.reindexRisks(fileStorageService);
-          index.reindexFormats(fileStorageService);
-          index.reindexRepresentationInformation(fileStorageService);
-          index.reindexAIPs();
+          getIndexService().reindexRisks(fileStorageService);
+          getIndexService().reindexFormats(fileStorageService);
+          getIndexService().reindexRepresentationInformation(fileStorageService);
+          getIndexService().reindexAIPs();
           // reindex other default objects HERE
         }
       } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
@@ -758,10 +901,46 @@ public class RodaCoreFactory {
     }
   }
 
+  private static void instantiateEventsManager() throws ReflectiveOperationException {
+    EventsNotifier eventsNotifier = null;
+    EventsHandler eventsHandler = null;
+
+    boolean enabled = getProperty(RodaConstants.CORE_EVENTS_ENABLED, false);
+    if (enabled) {
+      boolean notifierAndHandlerAreTheSame = getProperty(RodaConstants.CORE_EVENTS_NOTIFIER_AND_HANDLER_ARE_THE_SAME,
+        false);
+      String notifierClass = getProperty(RodaConstants.CORE_EVENTS_NOTIFIER_CLASS, "");
+      eventsNotifier = instantiateEventsProcessorClass(EventsNotifier.class, notifierClass);
+      if (notifierAndHandlerAreTheSame) {
+        eventsHandler = (EventsHandler) eventsNotifier;
+      } else {
+        String handlerClass = getProperty(RodaConstants.CORE_EVENTS_HANDLER_CLASS, "");
+        eventsHandler = instantiateEventsProcessorClass(EventsHandler.class, handlerClass);
+      }
+    }
+
+    eventsManager = new EventsManager(eventsNotifier, eventsHandler, nodeType, enabled);
+  }
+
+  private static <T extends Serializable> T instantiateEventsProcessorClass(Class<T> clazz, String eventsProcessorClass)
+    throws ReflectiveOperationException {
+    try {
+      LOGGER.debug("Going to instantiate events related class '{}'", eventsProcessorClass);
+      Class<?> eventsProcessor = Class.forName(eventsProcessorClass);
+      Constructor<?> constructor = eventsProcessor.getConstructor();
+
+      return (T) constructor.newInstance();
+    } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException
+      | InvocationTargetException e) {
+      LOGGER.warn("Error instantiating events related class '{}'", eventsProcessorClass, e);
+      throw e;
+    }
+  }
+
   private static void instantiateStorageAndModel() throws GenericException {
-    storage = instantiateStorage();
+    storage = new StorageServiceWrapper(instantiateStorage(), nodeType);
     LOGGER.debug("Finished instantiating storage...");
-    model = new ModelService(storage);
+    model = new ModelService(storage, eventsManager, nodeType, instanceId);
     LOGGER.debug("Finished instantiating model...");
   }
 
@@ -850,13 +1029,17 @@ public class RodaCoreFactory {
       }
 
       if (instantiatedWithoutErrors) {
-        // instantiate solr
-        solr = instantiateSolr(solrHome);
+        boolean writeIsAllowed = checkIfWriteIsAllowed(getNodeType());
 
-        SolrBootstrapUtils.bootstrapSchemas(solr);
+        // instantiate solr
+        solr = instantiateSolr(solrHome, writeIsAllowed);
+
+        if (writeIsAllowed) {
+          SolrBootstrapUtils.bootstrapSchemas(solr);
+        }
 
         // instantiate index related object
-        index = new IndexService(solr, model, metricsRegistry, rodaConfiguration);
+        index = new IndexService(solr, model, metricsRegistry, rodaConfiguration, nodeType);
       }
     }
 
@@ -877,7 +1060,7 @@ public class RodaCoreFactory {
     return value;
   }
 
-  private static SolrClient instantiateSolr(Path solrHome) throws GenericException {
+  private static SolrClient instantiateSolr(Path solrHome, boolean writeIsAllowed) throws GenericException {
     SolrType solrType = SolrType
       .valueOf(getConfigurationString(RodaConstants.CORE_SOLR_TYPE, RodaConstants.DEFAULT_SOLR_TYPE.toString()));
 
@@ -921,7 +1104,9 @@ public class RodaCoreFactory {
 
       waitForSolrCluster(cloudSolrClient);
 
-      bootstrap(cloudSolrClient, solrHome);
+      if (writeIsAllowed) {
+        bootstrap(cloudSolrClient, solrHome);
+      }
       return cloudSolrClient;
     } else {
       // default to Embedded
@@ -1141,7 +1326,7 @@ public class RodaCoreFactory {
       try {
         getIndexService().create(RODAMember.class, new User(RodaConstants.ADMIN));
         getIndexService().commit(RODAMember.class);
-      } catch (GenericException e) {
+      } catch (GenericException | AuthorizationDeniedException e) {
         LOGGER.warn("Could not create user admin in index for test mode", e);
       }
     }
@@ -1302,16 +1487,15 @@ public class RodaCoreFactory {
         }
 
         RodaCoreFactory.ldapUtility.initDirectoryService(ldifs);
-        indexUsersAndGroupsFromLDAP();
       } else {
         RodaCoreFactory.ldapUtility.initDirectoryService();
       }
 
       createRoles(rodaConfig);
-      indexUsersAndGroupsFromLDAP();
-    } catch (
-
-    final Exception e) {
+      if (checkIfWriteIsAllowed(getNodeType())) {
+        indexUsersAndGroupsFromLDAP();
+      }
+    } catch (final Exception e) {
       LOGGER.error("Error starting up embedded ApacheDS", e);
       instantiatedWithoutErrors = false;
     }
@@ -1355,12 +1539,12 @@ public class RodaCoreFactory {
   }
 
   private static void indexUsersAndGroupsFromLDAP() throws GenericException {
-    for (User user : model.listUsers()) {
-      model.notifyUserUpdated(user).failOnError();
+    for (User user : getModelService().listUsers()) {
+      getModelService().notifyUserUpdated(user).failOnError();
     }
 
-    for (Group group : model.listGroups()) {
-      model.notifyGroupUpdated(group).failOnError();
+    for (Group group : getModelService().listGroups()) {
+      getModelService().notifyGroupUpdated(group).failOnError();
     }
   }
 
@@ -1374,7 +1558,8 @@ public class RodaCoreFactory {
         Files.createDirectories(transferredResourcesFolderPath);
       }
 
-      transferredResourcesScanner = new TransferredResourcesScanner(transferredResourcesFolderPath, getIndexService());
+      transferredResourcesScanner = new TransferredResourcesScanner(transferredResourcesFolderPath, getIndexService(),
+        nodeType);
     } catch (final Exception e) {
       LOGGER.error("Error starting Transferred Resources Scanner: " + e.getMessage(), e);
       instantiatedWithoutErrors = false;
@@ -1416,6 +1601,10 @@ public class RodaCoreFactory {
 
   public static PluginOrchestrator getPluginOrchestrator() {
     return pluginOrchestrator;
+  }
+
+  public static EventsManager getEventsManager() {
+    return eventsManager;
   }
 
   public static TransferredResourcesScanner getTransferredResourcesScanner() {
@@ -1887,7 +2076,8 @@ public class RodaCoreFactory {
   private static void printIndexMembers(List<String> args, Filter filter, Sorter sorter, Sublist sublist, Facets facets)
     throws GenericException, RequestNotValidException {
     System.out.println("Index list " + args.get(2));
-    IndexResult<RODAMember> users = index.find(RODAMember.class, filter, sorter, sublist, facets, new ArrayList<>());
+    IndexResult<RODAMember> users = getIndexService().find(RODAMember.class, filter, sorter, sublist, facets,
+      new ArrayList<>());
     for (RODAMember rodaMember : users.getResults()) {
       System.out.println("\t" + rodaMember);
     }
@@ -2094,7 +2284,7 @@ public class RodaCoreFactory {
     throws InterruptedException, GenericException, RequestNotValidException {
     final List<String> args = Arrays.asList(argsArray);
     NodeType nodeType = NodeType
-      .valueOf(getSystemProperty(RodaConstants.CORE_NODE_TYPE, RodaConstants.DEFAULT_NODE_TYPE.name()));
+      .valueOf(getProperty(RodaConstants.CORE_NODE_TYPE, RodaConstants.DEFAULT_NODE_TYPE.name()));
 
     preInstantiateSteps(args);
     instantiate();

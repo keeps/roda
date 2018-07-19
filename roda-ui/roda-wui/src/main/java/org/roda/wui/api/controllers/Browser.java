@@ -3418,4 +3418,23 @@ public class Browser extends RodaWuiController {
 
     return extra;
   }
+
+  public static void importLogEntries(User user, InputStream inputStream, String filename) throws GenericException,
+    AlreadyExistsException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+
+    try {
+      // check user permissions
+      controllerAssistant.checkRoles(user);
+
+      // delegate
+      BrowserHelper.importLogEntries(inputStream, filename);
+    } catch (GenericException | AlreadyExistsException | RequestNotValidException | NotFoundException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_FILENAME_PARAM, filename);
+    }
+  }
 }

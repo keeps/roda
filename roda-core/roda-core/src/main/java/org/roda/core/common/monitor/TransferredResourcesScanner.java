@@ -31,7 +31,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.RodaConstants.NodeType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -56,13 +58,15 @@ public class TransferredResourcesScanner {
 
   private final Path basePath;
   private IndexService index;
+  private NodeType nodeType;
 
-  public TransferredResourcesScanner(Path basePath, IndexService index) {
+  public TransferredResourcesScanner(Path basePath, IndexService index, NodeType nodeType) {
     this.basePath = basePath;
     this.index = index;
+    this.nodeType = nodeType;
   }
 
-  public void commit() throws GenericException {
+  public void commit() throws GenericException, AuthorizationDeniedException {
     index.commit(TransferredResource.class);
   }
 
@@ -71,8 +75,11 @@ public class TransferredResourcesScanner {
   }
 
   public TransferredResource createFolder(String parentUUID, String folderName)
-    throws GenericException, NotFoundException {
+    throws GenericException, NotFoundException, AuthorizationDeniedException {
     Path parentPath;
+
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
     if (parentUUID != null) {
       TransferredResource parent = index.retrieve(TransferredResource.class, parentUUID, fieldsToReturn);
       parentPath = basePath.resolve(parent.getRelativePath());
@@ -93,8 +100,11 @@ public class TransferredResourcesScanner {
   }
 
   public TransferredResource createFile(String parentUUID, String fileName, InputStream inputStream)
-    throws GenericException, NotFoundException, AlreadyExistsException {
+    throws GenericException, NotFoundException, AlreadyExistsException, AuthorizationDeniedException {
     Path parentPath;
+
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
     if (StringUtils.isNotBlank(parentUUID)) {
       TransferredResource parent = index.retrieve(TransferredResource.class, parentUUID, fieldsToReturn);
       parentPath = basePath.resolve(parent.getRelativePath());
@@ -201,7 +211,9 @@ public class TransferredResourcesScanner {
   }
 
   public void deleteTransferredResource(List<String> ids)
-    throws NotFoundException, GenericException, RequestNotValidException {
+    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
     for (String uuid : ids) {
       TransferredResource tr = index.retrieve(TransferredResource.class, uuid, fieldsToReturn);
       Path relative = Paths.get(tr.getRelativePath());
@@ -222,7 +234,9 @@ public class TransferredResourcesScanner {
   }
 
   public void updateTransferredResources(Optional<String> folderRelativePath, boolean waitToFinish)
-    throws IsStillUpdatingException, GenericException {
+    throws IsStillUpdatingException, GenericException, AuthorizationDeniedException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
     if (!RodaCoreFactory.getTransferredResourcesScannerUpdateStatus(folderRelativePath)) {
       if (index != null) {
         ReindexTransferredResourcesRunnable reindexRunnable = new ReindexTransferredResourcesRunnable(index, basePath,
@@ -244,7 +258,10 @@ public class TransferredResourcesScanner {
   }
 
   public void updateTransferredResource(Optional<String> folderRelativePath, ContentPayload payload, String name,
-    boolean waitToFinish) throws NotFoundException, GenericException, IOException, IsStillUpdatingException {
+    boolean waitToFinish)
+    throws NotFoundException, GenericException, IOException, IsStillUpdatingException, AuthorizationDeniedException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
     if (folderRelativePath.isPresent()) {
       Path path = basePath.resolve(folderRelativePath.get());
       Path parent = path.getParent();
@@ -257,8 +274,9 @@ public class TransferredResourcesScanner {
   }
 
   public String renameTransferredResource(TransferredResource resource, String newName, boolean replaceExisting,
-    boolean reindexResources)
-    throws AlreadyExistsException, GenericException, IsStillUpdatingException, NotFoundException {
+    boolean reindexResources) throws AlreadyExistsException, GenericException, IsStillUpdatingException,
+    NotFoundException, AuthorizationDeniedException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
     if (FSUtils.exists(Paths.get(resource.getFullPath()))) {
       Path resourcePath = Paths.get(resource.getFullPath());
@@ -291,7 +309,10 @@ public class TransferredResourcesScanner {
   }
 
   public Map<String, String> moveTransferredResource(String newRelativePath, List<String> resourcesUUIDs,
-    boolean replaceExisting) throws GenericException, IsStillUpdatingException, NotFoundException {
+    boolean replaceExisting)
+    throws GenericException, IsStillUpdatingException, NotFoundException, AuthorizationDeniedException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
     List<TransferredResource> resources = Collections.emptyList();
     try {
       List<String> resourceFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.TRANSFERRED_RESOURCE_FULLPATH,
@@ -305,13 +326,16 @@ public class TransferredResourcesScanner {
 
   public Map<String, String> moveTransferredResource(List<TransferredResource> resources, String newRelativePath,
     boolean replaceExisting, boolean reindexResources)
-    throws GenericException, IsStillUpdatingException, NotFoundException {
+    throws GenericException, IsStillUpdatingException, NotFoundException, AuthorizationDeniedException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
     return moveTransferredResource(resources, newRelativePath, replaceExisting, reindexResources, false);
   }
 
   public Map<String, String> moveTransferredResource(List<TransferredResource> resources, String newRelativePath,
     boolean replaceExisting, boolean reindexResources, boolean addOldRelativePathToNewRelativePath)
-    throws IsStillUpdatingException, GenericException, NotFoundException {
+    throws IsStillUpdatingException, GenericException, NotFoundException, AuthorizationDeniedException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
     Map<String, String> oldToNewTransferredResourceIds = new HashMap<>();
     List<TransferredResource> resourcesToIndex = new ArrayList<>();
@@ -379,7 +403,10 @@ public class TransferredResourcesScanner {
     return oldToNewTransferredResourceIds;
   }
 
-  public void reindexOldResourcesParentsAfterMove(List<TransferredResource> resources) throws GenericException {
+  public void reindexOldResourcesParentsAfterMove(List<TransferredResource> resources)
+    throws GenericException, AuthorizationDeniedException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
     try {
       List<String> resourceUUIDs = resources.stream().map(tr -> tr.getUUID()).collect(Collectors.toList());
       index.delete(TransferredResource.class, resourceUUIDs);

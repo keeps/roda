@@ -22,7 +22,6 @@ import javax.xml.xpath.XPathExpressionException;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -782,7 +781,7 @@ public class IndexModelObserver implements ModelObserver {
 
   private ReturnWithExceptions<Void, ModelObserver> indexJobReports(Job job) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
-    StorageService storage = RodaCoreFactory.getStorageService();
+    StorageService storage = model.getStorage();
     try (CloseableIterable<Resource> listResourcesUnderDirectory = storage
       .listResourcesUnderDirectory(ModelUtils.getJobReportsStoragePath(job.getId()), true)) {
 

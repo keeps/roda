@@ -1552,6 +1552,8 @@ public class LdapUtility {
         setMemberDirectRoles(session, userDN, modifiedUser.getDirectRoles());
       }
 
+    } catch (final LdapNoSuchObjectException e) {
+      throw new NotFoundException("Error modifying user " + modifiedUser.getName() + " - " + e.getMessage(), e);
     } catch (final LdapException e) {
       throw new GenericException("Error modifying user " + modifiedUser.getName() + " - " + e.getMessage(), e);
     } catch (final NoSuchAlgorithmException e) {
