@@ -9,17 +9,9 @@ package org.roda.core.common;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Date;
 
-public interface ConsumesOutputStream {
-  void consumeOutputStream(OutputStream out) throws IOException;
-  
-  long getSize();
-  
-  Date getLastModified();
+public interface ConsumesSkipableOutputStream extends ConsumesOutputStream {
 
-  String getFileName();
-
-  String getMediaType();
+  void consumeOutputStream(OutputStream output, int from, int len) throws IOException;
 
 }

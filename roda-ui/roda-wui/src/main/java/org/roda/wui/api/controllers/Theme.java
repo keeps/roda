@@ -48,8 +48,8 @@ public class Theme extends RodaWuiController {
 
   public static StreamResponse getThemeResourceStreamResponse(
     final Pair<String, InputStream> themeResourceInputstream) {
-    String resourceId = themeResourceInputstream.getFirst();
-    String mimeType = MimeTypeHelper.getContentType(resourceId);
+    final String resourceId = themeResourceInputstream.getFirst();
+    final String mimeType = MimeTypeHelper.getContentType(resourceId);
 
     ConsumesOutputStream stream = new ConsumesOutputStream() {
 
@@ -69,9 +69,25 @@ public class Theme extends RodaWuiController {
           IOUtils.copy(in, out);
         }
       }
+
+      @Override
+      public Date getLastModified() {
+        Date lastModified = null;
+        try {
+          lastModified = Theme.getLastModifiedDate(resourceId);
+        } catch (IOException e) {
+          // do nothing
+        }
+        return lastModified;
+      }
+
+      @Override
+      public long getSize() {
+        return -1;
+      }
     };
 
-    return new StreamResponse(resourceId, mimeType, stream);
+    return new StreamResponse(stream);
   }
 
   public static Date getLastModifiedDate(String resourceId) throws IOException {

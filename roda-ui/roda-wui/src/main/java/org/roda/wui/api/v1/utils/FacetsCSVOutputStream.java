@@ -10,6 +10,7 @@ package org.roda.wui.api.v1.utils;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.csv.CSVPrinter;
@@ -54,6 +55,16 @@ public class FacetsCSVOutputStream extends CSVOutputStream {
     }
 
     writer.flush();
+  }
+
+  @Override
+  public Date getLastModified() {
+    return null;
+  }
+
+  @Override
+  public long getSize() {
+    return -1;
   }
 
 }

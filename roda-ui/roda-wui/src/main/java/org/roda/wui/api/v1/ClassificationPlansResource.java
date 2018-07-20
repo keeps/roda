@@ -53,7 +53,7 @@ public class ClassificationPlansResource {
     // delegate action to controller
     ConsumesOutputStream cos = Browser.retrieveClassificationPlan(user, filename);
 
-    return ApiUtils.okResponse(new StreamResponse(cos.getFileName(), cos.getMediaType(), cos));
+    return ApiUtils.okResponse(new StreamResponse(cos));
   }
 
 }

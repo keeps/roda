@@ -28,7 +28,7 @@ public class RodaStreamingOutput implements StreamingOutput {
   }
 
   public StreamResponse toStreamResponse() {
-    return new StreamResponse(outputHandler.getFileName(), outputHandler.getMediaType(), outputHandler);
+    return new StreamResponse(outputHandler);
   }
 
 }

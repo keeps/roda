@@ -7,25 +7,27 @@
  */
 package org.roda.core.common;
 
+import java.util.Date;
+
 public class StreamResponse implements EntityResponse {
   private String filename;
   private String mediaType;
   private long fileSize = -1;
+  private Date lastModified;
   private ConsumesOutputStream stream;
 
-  public StreamResponse(String filename, String mediaType, ConsumesOutputStream stream) {
+  public StreamResponse(ConsumesOutputStream stream) {
     super();
-    this.filename = filename;
-    this.mediaType = mediaType;
+    this.filename = stream.getFileName();
+    this.fileSize = stream.getSize();
+    this.mediaType = stream.getMediaType();
+    this.lastModified = stream.getLastModified();
     this.stream = stream;
   }
 
-  public StreamResponse(String filename, String mediaType, long fileSize, ConsumesOutputStream stream) {
-    super();
-    this.filename = filename;
-    this.mediaType = mediaType;
+  public StreamResponse(ConsumesOutputStream stream, long fileSize) {
+    this(stream);
     this.fileSize = fileSize;
-    this.stream = stream;
   }
 
   public String getFilename() {
@@ -60,6 +62,21 @@ public class StreamResponse implements EntityResponse {
 
   public void setStream(ConsumesOutputStream stream) {
     this.stream = stream;
+  }
+
+  /**
+   * @return the lastModified
+   */
+  public Date getLastModified() {
+    return lastModified;
+  }
+
+  /**
+   * @param lastModified
+   *          the lastModified to set
+   */
+  public void setLastModified(Date lastModified) {
+    this.lastModified = lastModified;
   }
 
 }

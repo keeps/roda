@@ -21,13 +21,17 @@ import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.ConsumesOutputStream;
+import org.roda.core.common.ConsumesSkipableOutputStream;
 import org.roda.core.common.DownloadUtils;
 import org.roda.core.common.EntityResponse;
 import org.roda.core.common.StreamResponse;
@@ -188,12 +192,12 @@ public class ApiUtils {
     return response.cacheControl(cacheControl).lastModified(lastModifiedDate).build();
   }
 
-  public static Response okResponse(StreamResponse streamResponse, CacheControl cacheControl, EntityTag tag) {
-    return okResponse(streamResponse, cacheControl, tag, false);
+  public static Response okResponse(StreamResponse streamResponse, Request request) {
+    return okResponse(streamResponse, false, request);
   }
 
-  public static Response okResponse(StreamResponse streamResponse, CacheControl cacheControl, EntityTag tag,
-    boolean inline) {
+  public static Response okResponse(StreamResponse streamResponse, boolean inline, Request request) {
+
     StreamingOutput so = new StreamingOutput() {
       @Override
       public void write(OutputStream output) throws IOException, WebApplicationException {
@@ -209,7 +213,87 @@ public class ApiUtils {
       response.header(HttpHeaders.CONTENT_LENGTH, streamResponse.getFileSize());
     }
 
-    return response.cacheControl(cacheControl).tag(tag).build();
+    Date lastModifiedDate = streamResponse.getLastModified();
+    if (lastModifiedDate != null) {
+      CacheControl cc = new CacheControl();
+      cc.setMaxAge(CACHE_CONTROL_MAX_AGE);
+      cc.setPrivate(true);
+      EntityTag etag = null;
+      etag = new EntityTag(Long.toString(lastModifiedDate.getTime()));
+      ResponseBuilder builder = request.evaluatePreconditions(etag);
+      if (builder != null) {
+        return builder.cacheControl(cc).tag(etag).build();
+      }
+
+      response.header(HttpHeaders.LAST_MODIFIED, streamResponse.getLastModified());
+      response.cacheControl(cc).tag(etag);
+    }
+
+    return response.build();
+  }
+
+  private static final int CACHE_CONTROL_MAX_AGE = 60;
+  
+  public static Response okResponse(StreamResponse streamResponse, boolean inline, final String range,
+    Request request) {
+
+    // range not requested : Firefox, Opera, IE do not send range headers
+    // cannot skip content
+    // cannot calculate file size
+    if (range == null || !(streamResponse.getStream() instanceof ConsumesSkipableOutputStream)
+      || streamResponse.getFileSize() < 0) {
+      return okResponse(streamResponse, inline);
+    }
+
+    String[] ranges = range.split("=")[1].split("-");
+    final int from = Integer.parseInt(ranges[0]);
+    
+    long fileSize = streamResponse.getFileSize();
+    int to = (int) (fileSize - 1);
+    if (ranges.length == 2) {
+      to = Integer.parseInt(ranges[1]);
+    }
+
+    final String responseRange = String.format("bytes %d-%d/%d", from, to, fileSize);
+    final int len = to - from + 1;
+
+    StreamingOutput so = new StreamingOutput() {
+      @Override
+      public void write(OutputStream output) throws IOException, WebApplicationException {
+        try {
+        ((ConsumesSkipableOutputStream) streamResponse.getStream()).consumeOutputStream(output, from, len);
+        } catch (IOException e) {
+          // ignoring 
+        }
+      }
+    };
+
+    Response.ResponseBuilder response = Response.status(Status.PARTIAL_CONTENT).entity(so)
+      .header("Accept-Ranges", "bytes").header("Content-Range", responseRange).header(HttpHeaders.CONTENT_LENGTH, len)
+      .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition(inline) + CONTENT_DISPOSITION_FILENAME_ARGUMENT + "\""
+        + streamResponse.getFilename() + "\"");
+
+    if (streamResponse.getFileSize() > 0) {
+      response.header(HttpHeaders.CONTENT_LENGTH, streamResponse.getFileSize());
+    }
+
+    Date lastModifiedDate = streamResponse.getLastModified();
+    if (lastModifiedDate != null) {
+      CacheControl cc = new CacheControl();
+      cc.setMaxAge(CACHE_CONTROL_MAX_AGE);
+      cc.setPrivate(true);
+      EntityTag etag = null;
+      etag = new EntityTag(Long.toString(lastModifiedDate.getTime()));
+      ResponseBuilder builder = request.evaluatePreconditions(etag);
+      if (builder != null) {
+        return builder.cacheControl(cc).tag(etag).build();
+      }
+
+      response.header(HttpHeaders.LAST_MODIFIED, streamResponse.getLastModified());
+      response.cacheControl(cc).tag(etag);
+    }
+
+    return response.build();
   }
 
   public static Response okResponse(StreamResponse streamResponse) {
@@ -319,13 +403,15 @@ public class ApiUtils {
     return (RODAObjectList<R>) ret;
   }
 
-  public static StreamResponse download(Resource resource) {
+  public static StreamResponse download(Resource resource)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     return download(resource, null);
   }
 
-  public static StreamResponse download(Resource resource, String fileName) {
+  public static StreamResponse download(Resource resource, String fileName)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     ConsumesOutputStream download = DownloadUtils.download(RodaCoreFactory.getStorageService(), resource, fileName);
-    return new StreamResponse(download.getFileName(), download.getMediaType(), download);
+    return new StreamResponse(download);
   }
 
   public static <T extends IsIndexed> Response okResponse(T indexed, String acceptFormat, String mediaType)

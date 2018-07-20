@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -22,6 +23,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.xml.transform.TransformerException;
 
@@ -96,7 +98,8 @@ public class DIPFilesResource {
   public Response retrieve(
     @ApiParam(value = "The UUID of the existing DIP file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_DIP_FILE_UUID) String dipFileUUID,
     @ApiParam(value = "Choose format in which to get the file", allowableValues = RodaConstants.API_GET_FILE_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
-    @QueryParam(RodaConstants.API_QUERY_KEY_INLINE) boolean inline) throws RODAException {
+    @QueryParam(RodaConstants.API_QUERY_KEY_INLINE) boolean inline, @HeaderParam("Range") String range,
+    @Context Request req) throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
@@ -109,7 +112,7 @@ public class DIPFilesResource {
       ObjectResponse<DIPFile> file = (ObjectResponse<DIPFile>) efile;
       return Response.ok(file.getObject(), mediaType).build();
     } else {
-      return ApiUtils.okResponse((StreamResponse) efile, inline);
+      return ApiUtils.okResponse((StreamResponse) efile, inline, range, req);
     }
   }
 

@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -70,31 +71,14 @@ public class ClassificationPlanUtils {
       }
 
       root.set("dos", array);
-      return new ConsumesOutputStream() {
 
-        @Override
-        public void consumeOutputStream(OutputStream out) throws IOException {
-          try {
-            mapper.writeValue(out, root);
-          } catch (IOException e) {
-            throw e;
-          } finally {
-            IOUtils.closeQuietly(out);
-          }
-
+      return new DefaultConsumesOutputStream(filename, RodaConstants.MEDIA_TYPE_APPLICATION_JSON, out -> {
+        try {
+          mapper.writeValue(out, root);
+        } catch (IOException e) {
+          // do nothing
         }
-
-        @Override
-        public String getFileName() {
-          return filename;
-        }
-
-        @Override
-        public String getMediaType() {
-          return RodaConstants.MEDIA_TYPE_APPLICATION_JSON;
-        }
-
-      };
+      });
     } catch (IOException e) {
       throw new GenericException(e);
     }

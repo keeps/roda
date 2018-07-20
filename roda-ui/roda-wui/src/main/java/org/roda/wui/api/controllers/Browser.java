@@ -2011,7 +2011,7 @@ public class Browser extends RodaWuiController {
   }
 
   public static EntityResponse retrieveTransferredResource(User user, String resourceId, String acceptFormat)
-    throws AuthorizationDeniedException, NotFoundException, GenericException {
+    throws RODAException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -3273,7 +3273,8 @@ public class Browser extends RodaWuiController {
       throw e;
     } finally {
       // register action
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_REPRESENTATION_INFORMATION_ID_PARAM, ri.getId());
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_REPRESENTATION_INFORMATION_ID_PARAM,
+        ri.getId());
     }
   }
 

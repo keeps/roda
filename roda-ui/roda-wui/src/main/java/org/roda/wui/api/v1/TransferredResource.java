@@ -108,7 +108,7 @@ public class TransferredResource {
   public Response getResource(
     @ApiParam(value = "The resource id", required = false) @PathParam(RodaConstants.API_PATH_PARAM_TRANSFERRED_RESOURCE_UUID) String resourceId,
     @ApiParam(value = "Choose format in which to get the resource", allowableValues = RodaConstants.API_GET_FILE_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
-    throws AuthorizationDeniedException, NotFoundException, RequestNotValidException, GenericException {
+    throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user

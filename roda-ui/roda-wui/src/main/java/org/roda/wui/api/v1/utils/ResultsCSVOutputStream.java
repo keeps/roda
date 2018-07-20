@@ -10,6 +10,7 @@ package org.roda.wui.api.v1.utils;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.util.Date;
 
 import org.apache.commons.csv.CSVPrinter;
 import org.roda.core.data.v2.index.IndexResult;
@@ -56,5 +57,15 @@ public class ResultsCSVOutputStream<T extends IsIndexed> extends CSVOutputStream
       printer.printRecord(result.toCsvValues());
     }
     writer.flush();
+  }
+
+  @Override
+  public Date getLastModified() {
+    return null;
+  }
+
+  @Override
+  public long getSize() {
+    return -1;
   }
 }

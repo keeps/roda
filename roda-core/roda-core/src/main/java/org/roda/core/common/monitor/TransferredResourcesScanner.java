@@ -140,6 +140,16 @@ public class TransferredResourcesScanner {
     }
     return ret;
   }
+  
+  public Path retrieveFilePath(String path) throws NotFoundException, RequestNotValidException, GenericException {
+    Path p = basePath.resolve(path);
+    if (!FSUtils.exists(p)) {
+      throw new NotFoundException("File not found: " + path);
+    } else if (!FSUtils.isFile(p)) {
+      throw new RequestNotValidException("Requested file is not a regular file: " + path);
+    }
+    return p;
+  }
 
   public boolean fileExists(String path) {
     Path p = basePath.resolve(path);
