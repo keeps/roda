@@ -983,6 +983,14 @@ pre code {
     content: "\f071";
 }
 
+.btn-archive:after {
+    content: "\f187";
+}
+
+.btn-sitemap:after {
+    content: "\f0e8";
+}
+
 .btn-incremental-list-add {
     margin-top: 2px;
     margin-bottom: 10px;
@@ -2255,10 +2263,6 @@ td.datePickerMonth, td.datePickerYear {
     background-image: repeating-linear-gradient(-45deg, transparent, transparent 35px, rgba(255, 255, 255, .5) 35px, rgba(255, 255, 255, .5) 70px);
 }
 
-.browseTitle {
-    margin-bottom: 10px !important;
-}
-
 .browseTitle-allCollections {
     line-height: 4rem;
     font-size: 2.4rem;
@@ -2286,9 +2290,18 @@ td.datePickerMonth, td.datePickerYear {
     padding-left: 1rem;
 }
 
+.browseItemPanelRisksEventsLogs > .gwt-Hyperlink,
+.browseItemPanelRisksEventsLogs > .gwt-Label {
+    display: inline;
+}
+
 .browseItemIcon {
     display: inline;
     vertical-align: middle;
+}
+
+.browseTitle-allCollections-wrapper {
+    display: none;
 }
 
 .browseTitle-allCollections-wrapper .browseItemIcon,
@@ -2549,6 +2562,39 @@ td.datePickerMonth, td.datePickerYear {
 .browseDownloadSublabel {
     font-size: 1rem;
     margin-left: 25px;
+}
+
+.slider-aip-permissions-entry div {
+    display: inline-block;
+}
+
+.slider-aip-permissions-table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+.slider-aip-permissions-table td {
+    border: none;
+    padding: 2px 3px;
+    text-align: center;
+}
+
+.slider-aip-permissions-table tr {
+    background-color: #089de3;
+}
+
+.slider-aip-permissions-table tr:hover {
+    background-color: #48a4e5;
+}
+
+.slider-aip-permissions-table .slider-aip-permissions-table-name {
+    text-align: left;
+}
+
+.slider-aip-permissions-table .slider-aip-permissions-table-name > div {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 .metadata-edit-area {
@@ -4367,12 +4413,12 @@ td.datePickerMonth, td.datePickerYear {
     margin-bottom: 2.5rem;
 }
 
-.viewRepresentationFile .infoFileEntry, .viewRepresentationFile .dip {
+.slider .slider-info-entry, .viewRepresentationFile .dip {
     margin-bottom: 1em;
     line-height: 1;
 }
 
-.viewRepresentationFile .infoFileEntryKey, .viewRepresentationFile .dipTitle {
+.slider .slider-info-entry-key, .viewRepresentationFile .dipTitle {
     font-size: 1.3rem;
     line-height: 1.1em;
     color: rgba(255, 255, 255, 0.8);
@@ -4402,10 +4448,18 @@ td.datePickerMonth, td.datePickerYear {
 	cursor: hand;
 }
 
-.viewRepresentationFile .infoFileEntryValue, .viewRepresentationFile .dipDescription {
+.slider .slider-info-entry-value, .viewRepresentationFile .dipDescription {
     font-size: 1.3rem;
     word-break: break-all;
     line-height: 1.1em;
+}
+
+.slider .slider-info-entry-value a, .slider a.slider-info-entry-value {
+    color: white;
+}
+
+.slider .slider-info-entry-value.slider-info-entry-value-aip-ingest-jobs a {
+    display: block;
 }
 
 .table-file-path {
@@ -5050,7 +5104,6 @@ td.datePickerMonth, td.datePickerYear {
 
 .permission-clear {
 	margin-right: 10px;
-    width: 80px;
 }
 
 @media only screen and (max-width: 999px)  {
@@ -6134,80 +6187,6 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 /***************************************
- ACTIONS
-****************************************/
-
-.actions-popup {
-	background-color: #f8f8f8;
-	border-radius: 2px;
-    width: 160px;
-	padding: 10px;
-	box-shadow: 0 0px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
-	z-index: 2;
-}
-
-.actions-popup-bottom_right::before {
-	content: "";
-	width: 0px;
-	height: 0px;
-    border: 8px solid transparent;
-    position: absolute;
-    right: 8px;
-    bottom: -16px;
-    border-top: 8px solid #089DE3;
-    border-color: #f8f8f8 transparent transparent;
-}
-
-.actions-popup-top_right::before {
-	content: "";
-	width: 0px;
-	height: 0px;
-    border: 8px solid transparent;
-    position: absolute;
-    right: 8px;
-    top: -16px;
-    border-bottom: 8px solid #089DE3;
-    border-color: transparent transparent #f8f8f8;
-}
-
-.actions-popup-top_left::before {
-	content: "";
-	width: 0px;
-	height: 0px;
-    border: 8px solid transparent;
-    position: absolute;
-    left: 8px;
-    top: -16px;
-    border-bottom: 8px solid #089DE3;
-}
-
-.actions-popup .actions-layout-title {
-	color: white;
-	margin-bottom: 5px;
-}
-
-.actions-group-button + .actions-layout-title {
-	margin-top: 10px;
-}
-
-.actions-popup .actions-layout .h4 {
-  font-size: 1.8rem;
-}
-
-.actions-popup .actions-layout > .h4:first-child {
-  margin-top: 0;
-}
-
-.actions-popup .actions-group-button {
-  font-size: 75%;
-  padding: 5px 25px 5px 8px;
-}
-
-.actions-empty-help {
-	color: #222;
-}
-
-/***************************************
  MARKDOWN STYLING
 ****************************************/
 
@@ -6556,6 +6535,79 @@ span.code {
 
 
 
+/***************************************
+ ACTIONS
+****************************************/
+
+.actions-popup {
+    background-color: #f8f8f8;
+    border-radius: 2px;
+    width: 160px;
+    padding: 10px;
+    box-shadow: 0 0px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+    z-index: 2;
+}
+
+.actions-popup-bottom_right::before {
+    content: "";
+    width: 0px;
+    height: 0px;
+    border: 8px solid transparent;
+    position: absolute;
+    right: 8px;
+    bottom: -16px;
+    border-top: 8px solid #089DE3;
+    border-color: #f8f8f8 transparent transparent;
+}
+
+.actions-popup-top_right::before {
+    content: "";
+    width: 0px;
+    height: 0px;
+    border: 8px solid transparent;
+    position: absolute;
+    right: 8px;
+    top: -16px;
+    border-bottom: 8px solid #089DE3;
+    border-color: transparent transparent #f8f8f8;
+}
+
+.actions-popup-top_left::before {
+    content: "";
+    width: 0px;
+    height: 0px;
+    border: 8px solid transparent;
+    position: absolute;
+    left: 8px;
+    top: -16px;
+    border-bottom: 8px solid #089DE3;
+}
+
+.actions-popup .actions-layout-title {
+    color: white;
+    margin-bottom: 5px;
+}
+
+.actions-group-button + .actions-layout-title {
+    margin-top: 10px;
+}
+
+.actions-popup .actions-layout .h4 {
+    font-size: 1.8rem;
+}
+
+.actions-popup .actions-layout > .h4:first-child {
+    margin-top: 0;
+}
+
+.actions-popup .actions-group-button {
+    font-size: 75%;
+    padding: 5px 25px 5px 8px;
+}
+
+.actions-empty-help {
+    color: #222;
+}
 
 
 /*****************************
@@ -6565,4 +6617,191 @@ span.code {
 
 .actionable-group-title-empty {
     display: none;
+}
+
+.actions-empty-help {
+    display: none;
+}
+
+.popupContent .actions-empty-help {
+    display: block;
+}
+
+/* Popup/menu */
+
+.actionable-popup {
+    background-color: #f8f8f8;
+    border-radius: 5px;
+    width: auto;
+    max-width: 350px;
+    padding: 5px 0;
+    box-shadow: 0 0 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+    z-index: 2;
+}
+
+.actionable-menu {
+    display: block;
+}
+
+.actionable-menu .actionable-menu-item {
+    display: block;
+    padding: 5px 10px;
+    font-size: 1.4rem;
+}
+
+.actionable-menu .actionable-menu-item:hover {
+    background-color: #eee;
+    cursor: pointer;
+}
+
+.actionable-menu .actionable-menu-item.actionable-menu-item-destroyed:hover {
+    background-color: rgba(217, 83, 79, 0.4);
+}
+
+.actionable-menu .actionable-menu-item.actionable-menu-item-update:hover {
+    background-color: rgba(8, 157, 227, 0.4);
+}
+
+.actionable-menu .actionable-menu-item .actionable-menu-item-icon {
+    display: inline-block;
+    vertical-align: middle;
+    width: 16px;
+    text-align: center;
+    margin: 0 6px;
+    color: #808080;
+}
+
+.actionable-menu .actionable-menu-item .actionable-menu-item-label {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 1rem;
+}
+
+/* Actionable Title/Header */
+
+.actionable-header-focus-panel {
+    display: inline-block;
+}
+
+.actionable-header {
+    display: inline-block;
+    padding: 0.2rem 1rem 0.2rem 0;
+    line-height: 1;
+    margin: 0;
+}
+
+.actionable-header.actionable-header-with-actions:hover {
+    cursor: pointer;
+    border-radius: 8px;
+    background-color: #eee;
+}
+
+.actionable-header .actionable-header-icon {
+    display: inline;
+    line-height: 1.2;
+    font-size: 1em;
+    vertical-align: middle;
+}
+
+.actionable-header .actionable-header-text {
+    display: inline;
+    line-height: 1.2;
+    font-size: 1em;
+    padding-left: 1rem;
+    vertical-align: middle;
+    letter-spacing: -.1rem;
+    margin-bottom: 0 !important;
+}
+
+.actionable-header .actionable-header-caret {
+    display: inline;
+    font-size: 0.75em;
+    margin-left: 1rem;
+    line-height: 1.6;
+    vertical-align: middle;
+    color: #999;
+}
+
+.actionable-header.actionable-header-with-actions:hover .actionable-header-caret {
+    color: #222;
+}
+
+/******************************
+  Navigation Toolbar
+ */
+.navigationToolbar {
+    min-height: 35px;
+    line-height: 35px;
+    background-color: #ddd;
+    position: relative;
+}
+
+.navigationToolbar-hidden {
+    display: none;
+}
+
+.navigationToolbar .navigationToolbarHeader,
+.navigationToolbar .navigationToolbarHeaderArrow {
+    display: inline-block;
+    vertical-align: bottom;
+    font-size: 1.4rem;
+    color: #222;
+}
+
+.navigationToolbar .navigationToolbarHeader {
+    margin-left: 40px;
+}
+
+.navigationToolbar .navigationToolbarHeaderArrow {
+    margin-left: 1rem;
+    margin-right: 1rem;
+}
+
+.navigationToolbar .navigationToolbarBreadcrumb {
+    margin: 0;
+    padding: 0;
+    display: inline-block;
+}
+
+.navigationToolbar .navigationToolbarIcons {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.navigationToolbar .navigationToolbarIcons .navigationToolbarLink {
+
+}
+
+.navigationToolbarLink {
+    display: inline-block;
+    font-size: 20px;
+    line-height: 35px;
+    width: 35px;
+    height: 35px;
+    cursor: pointer;
+    cursor: hand;
+    color: white;
+    background-color: #999;
+    text-align: center;
+    /*border-left: 1px SOLID WHITE;*/
+}
+
+.navigationToolbarLink.navigationToolbarLinkSmall {
+    font-size: 15px;
+    line-height: 25px;
+    width: 25px;
+    height: 25px;
+}
+
+.navigationToolbarLink:hover,
+.navigationToolbarLink-selected,
+.navigationToolbarLink.active {
+    color: white;
+    background-color: #089de3;
+}
+
+.navigationToolbarLink.disabled, .navigationToolbarLink.disabled:hover {
+    background-color: #ddd;
+    cursor: auto;
 }
