@@ -108,7 +108,6 @@ public class ActionLogSearch extends Composite {
 
   private void createLogsSearchResultPanel() {
     logsSearchResultPanel = new LogEntryList(logsListId, filterLogs, messages.searchResults(), false);
-    ListSelectionUtils.bindBrowseOpener(logsSearchResultPanel);
 
     logsSearchResultPanel.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
 
