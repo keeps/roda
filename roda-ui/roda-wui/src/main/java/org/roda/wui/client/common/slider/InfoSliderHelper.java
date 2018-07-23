@@ -190,7 +190,7 @@ public class InfoSliderHelper {
       entryList.add(new AbstractMap.SimpleEntry<>("u-" + username, permissions.getUserPermissions(username)));
     }
     for (String groupname : new TreeSet<>(permissions.getGroupnames())) {
-      entryList.add(new AbstractMap.SimpleEntry<>("g-" + groupname, permissions.getUserPermissions(groupname)));
+      entryList.add(new AbstractMap.SimpleEntry<>("g-" + groupname, permissions.getGroupPermissions(groupname)));
     }
 
     CellTable<Entry<String, Set<Permissions.PermissionType>>> table = new CellTable<>();
