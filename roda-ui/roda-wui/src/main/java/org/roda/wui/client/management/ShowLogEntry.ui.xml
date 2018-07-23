@@ -45,6 +45,12 @@
 								<g:Label styleName="value" ui:field="logDatetimeValue" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
+								<g:Label styleName="label" ui:field="logDurationLabel">
+									<ui:text from='{messages.logEntryDuration}' />
+								</g:Label>
+								<g:Label styleName="value" ui:field="logDurationValue" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
 								<g:Label styleName="label" ui:field="logRelatedObjectLabel">
 									<ui:text from='{messages.logEntryRelatedObject}' />
 								</g:Label>

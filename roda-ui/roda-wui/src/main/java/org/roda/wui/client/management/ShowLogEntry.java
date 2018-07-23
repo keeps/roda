@@ -121,6 +121,9 @@ public class ShowLogEntry extends Composite {
   Label logDatetimeLabel, logDatetimeValue;
 
   @UiField
+  Label logDurationLabel, logDurationValue;
+
+  @UiField
   Label logRelatedObjectLabel, logRelatedObjectValue;
 
   @UiField
@@ -167,6 +170,8 @@ public class ShowLogEntry extends Composite {
     logDatetimeValue.setText(Humanize.formatDateTime(logEntry.getDatetime()));
     logDatetimeLabel.setVisible(logEntry.getDatetime() != null);
     logDatetimeValue.setVisible(logEntry.getDatetime() != null);
+
+    logDurationValue.setText(Humanize.durationMillisToShortDHMS(logEntry.getDuration()));
 
     logRelatedObjectValue.setText(logEntry.getRelatedObjectID());
     logRelatedObjectLabel.setVisible(StringUtils.isNotBlank(logEntry.getRelatedObjectID()));
