@@ -150,6 +150,7 @@ public class PreservationEventsSearch extends Composite {
   public void defaultFilters(Filter filter) {
     filterEvents = new Filter(filter);
     if (searchPanel != null) {
+      setFilter(filter);
       searchPanel.setDefaultFilterIncremental(false);
     }
   }

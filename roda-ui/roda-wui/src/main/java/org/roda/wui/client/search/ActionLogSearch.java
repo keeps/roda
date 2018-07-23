@@ -137,6 +137,7 @@ public class ActionLogSearch extends Composite {
   public void defaultFilters(Filter filter) {
     filterLogs = new Filter(filter);
     if (searchPanel != null) {
+      setFilter(filter);
       searchPanel.setDefaultFilterIncremental(false);
     }
   }
