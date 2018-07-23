@@ -125,8 +125,6 @@ public class TransferredResourceSearch extends Composite {
         }
       }
     });
-
-    resourcesSearchResultPanel.autoUpdate(10000);
   }
 
   public SelectedItems<TransferredResource> getSelected() {

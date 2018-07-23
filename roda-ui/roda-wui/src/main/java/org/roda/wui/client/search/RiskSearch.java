@@ -165,8 +165,6 @@ public class RiskSearch extends Composite {
         }
       }
     });
-
-    risksSearchResultPanel.autoUpdate(10000);
   }
 
   private void createIncidencesSearchResultPanel() {

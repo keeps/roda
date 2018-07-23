@@ -134,8 +134,6 @@ public class PreservationEventsSearch extends Composite {
         }
       }
     });
-
-    eventsSearchResultPanel.autoUpdate(10000);
   }
 
   public void refresh() {

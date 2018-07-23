@@ -121,8 +121,6 @@ public class ActionLogSearch extends Composite {
         }
       }
     });
-
-    logsSearchResultPanel.autoUpdate(10000);
   }
 
   public void refresh() {

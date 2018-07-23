@@ -122,8 +122,6 @@ public class NotificationSearch extends Composite {
         }
       }
     });
-
-    notificationsSearchResultPanel.autoUpdate(10000);
   }
 
   public void refresh() {

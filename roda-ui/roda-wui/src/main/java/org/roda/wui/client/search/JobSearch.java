@@ -184,6 +184,7 @@ public class JobSearch extends Composite {
         messages.searchResults(), false);
     }
 
+    jobReportsSearchResultPanel.autoUpdate(10000);
     ListSelectionUtils.bindBrowseOpener(jobReportsSearchResultPanel);
   }
 
