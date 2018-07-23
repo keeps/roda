@@ -159,7 +159,7 @@ public class JobSearch extends Composite {
   }
 
   private void createJobsSearchResultPanel() {
-    jobsSearchResultPanel = new JobList(jobsListId, filterJobs, messages.searchResults(), false);
+    jobsSearchResultPanel = new JobList(jobsListId, filterJobs, messages.searchResults(), true);
     ListSelectionUtils.bindBrowseOpener(jobsSearchResultPanel);
 
     jobsSearchResultPanel.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {

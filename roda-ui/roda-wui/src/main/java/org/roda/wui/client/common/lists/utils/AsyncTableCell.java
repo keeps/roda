@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
@@ -131,10 +132,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
   private boolean justActive;
   private Facets facets;
   private boolean selectable;
-
   private List<String> fieldsToReturn;
-
-  private final ClientLogger logger = new ClientLogger(getClass().getName());
 
   private int initialPageSize = 20;
   private int pageSizeIncrement = 100;
@@ -143,6 +141,15 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
   private int autoUpdateTimerMillis = 0;
 
   private IndexResult<T> result;
+
+  enum AutoUpdateState {
+    AUTO_UPDATE_OFF, AUTO_UPDATE_SUCCESS, AUTO_UPDATE_ERROR, AUTO_UPDATE_PAUSED
+  }
+
+  private AutoUpdateState autoUpdateState = AutoUpdateState.AUTO_UPDATE_OFF;
+  private String autoUpdateErrorMessage = "";
+
+  private List<Consumer<AutoUpdateState>> autoUpdateConsumers = new ArrayList<>();
 
   private ActionableWidgetBuilder<T> actionableBuilder = null;
   private final CalloutPopup actionsPopup = new CalloutPopup();
@@ -314,6 +321,11 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     });
 
     updateEmptyTableWidget();
+
+    // nvieira 2018-07-23: needs to be improved to update a UI button instead of a
+    // log
+    autoUpdateConsumers.add(st -> GWT.log(st.toString()));
+    addAutoUpdateControlListener();
   }
 
   private void toggleSidePanel(boolean toggle) {
@@ -416,6 +428,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
       display.addColumn(selectColumn, selectHeader);
       display.setColumnWidth(selectColumn, "45px");
     }
+
     configureDisplay(display);
   }
 
@@ -503,11 +516,13 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
           public void onFailure(Throwable caught) {
             // disable auto-update
             autoUpdateTimer.cancel();
+            setAutoUpdateState(AutoUpdateState.AUTO_UPDATE_ERROR);
+            autoUpdateErrorMessage = caught.getMessage();
           }
 
           @Override
           public void onSuccess(Void result) {
-            // do nothing
+            setAutoUpdateState(AutoUpdateState.AUTO_UPDATE_SUCCESS);
           }
         });
       }
@@ -515,7 +530,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
     autoUpdateTimerMillis = periodMillis;
     if (this.isAttached()) {
-      autoUpdateTimer.scheduleRepeating(periodMillis);
+      resumeAutoUpdate();
     }
 
   }
@@ -523,7 +538,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
   @Override
   protected void onDetach() {
     if (autoUpdateTimer != null) {
-      autoUpdateTimer.cancel();
+      pauseAutoUpdate();
     }
     super.onDetach();
   }
@@ -531,7 +546,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
   @Override
   protected void onLoad() {
     if (autoUpdateTimer != null && autoUpdateTimerMillis > 0 && !autoUpdateTimer.isRunning()) {
-      autoUpdateTimer.scheduleRepeating(autoUpdateTimerMillis);
+      resumeAutoUpdate();
     }
     super.onLoad();
   }
@@ -601,7 +616,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
           sorter.add(new SortParameter(sortParameterKey, !columnSortInfo.isAscending()));
         }
       } else {
-        logger.warn("Selecting a sorter that is not mapped");
+        LOGGER.warn("Selecting a sorter that is not mapped");
       }
     }
     return sorter;
@@ -1072,5 +1087,37 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     for (Map.Entry<String, FacetParameter> entry : getFacets().getParameters().entrySet()) {
       entry.getValue().getValues().clear();
     }
+  }
+
+  public AutoUpdateState getAutoUpdateState() {
+    return autoUpdateState;
+  }
+
+  public void setAutoUpdateState(AutoUpdateState autoUpdateState) {
+    this.autoUpdateState = autoUpdateState;
+    autoUpdateConsumers.forEach(c -> c.accept(autoUpdateState));
+  }
+
+  public void addAutoUpdateControlListener() {
+    listeners.add(new CheckboxSelectionListener<T>() {
+      @Override
+      public void onSelectionChange(SelectedItems<T> selected) {
+        if (ClientSelectedItemsUtils.isEmpty(selected)) {
+          resumeAutoUpdate();
+        } else {
+          pauseAutoUpdate();
+        }
+      }
+    });
+  }
+
+  public void pauseAutoUpdate() {
+    autoUpdateTimer.cancel();
+    setAutoUpdateState(AutoUpdateState.AUTO_UPDATE_PAUSED);
+  }
+
+  public void resumeAutoUpdate() {
+    autoUpdateTimer.scheduleRepeating(autoUpdateTimerMillis);
+    setAutoUpdateState(AutoUpdateState.AUTO_UPDATE_SUCCESS);
   }
 }
