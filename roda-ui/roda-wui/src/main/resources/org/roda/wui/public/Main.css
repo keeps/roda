@@ -6690,7 +6690,8 @@ span.code {
     margin: 0;
 }
 
-.actionable-header.actionable-header-with-actions:hover {
+.actionable-header.actionable-header-with-actions:hover,
+.actionable-header.actionable-header-with-actions-clicked {
     cursor: pointer;
     border-radius: 8px;
     background-color: #eee;
@@ -6722,7 +6723,8 @@ span.code {
     color: #999;
 }
 
-.actionable-header.actionable-header-with-actions:hover .actionable-header-caret {
+.actionable-header.actionable-header-with-actions:hover .actionable-header-caret,
+.actionable-header.actionable-header-with-actions-clicked .actionable-header-caret {
     color: #222;
 }
 

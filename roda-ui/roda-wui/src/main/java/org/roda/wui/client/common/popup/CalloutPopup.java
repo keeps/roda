@@ -18,7 +18,7 @@ public class CalloutPopup extends PopupPanel {
   private static final int ARROW_OFFSET_PX = 16;
 
   public enum CalloutPosition {
-    BOTTOM_RIGHT, TOP_RIGHT;
+    BOTTOM_RIGHT, TOP_RIGHT, NONE
   }
 
   public CalloutPopup() {
@@ -43,13 +43,12 @@ public class CalloutPopup extends PopupPanel {
   public void showRelativeTo(final UIObject target, final CalloutPosition position) {
     addStyleDependentName(position.name().toLowerCase());
 
-    setPopupPositionAndShow(new PositionCallback() {
-
-      @Override
-      public void setPosition(int offsetWidth, int offsetHeight) {
-        showRelativeTo(target, position, offsetWidth, offsetHeight);
-      }
-    });
+    if (position.equals(CalloutPosition.NONE)) {
+      showRelativeTo(target);
+    } else {
+      setPopupPositionAndShow(
+        (offsetWidth, offsetHeight) -> showRelativeTo(target, position, offsetWidth, offsetHeight));
+    }
   }
 
   private void showRelativeTo(UIObject target, CalloutPosition position, int offsetWidth, int offsetHeight) {

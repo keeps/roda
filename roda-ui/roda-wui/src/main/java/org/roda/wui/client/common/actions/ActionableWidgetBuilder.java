@@ -295,12 +295,11 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
     final CalloutPopup popup = new CalloutPopup();
     popup.addStyleName("actionable-popup");
     popup.setWidget(createActionsMenu(actionsBundle, objects));
-    focusPanel.addClickHandler(event -> {
-      if (popup.isShowing()) {
-        popup.hide();
-      } else {
-        popup.showRelativeTo(inlineHTML, CalloutPopup.CalloutPosition.TOP_RIGHT);
-      }
+    popup.addCloseHandler(event -> inlinePanel.removeStyleName("actionable-header-with-actions-clicked"));
+
+    focusPanel.addMouseDownHandler(event -> {
+      inlinePanel.addStyleName("actionable-header-with-actions-clicked");
+      popup.showRelativeTo(inlinePanel, CalloutPopup.CalloutPosition.NONE);
     });
 
     return focusPanel;
