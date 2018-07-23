@@ -38,7 +38,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -141,9 +140,6 @@ public class RepresentationInformationNetwork extends Composite {
     Label titleLabel = new Label(messages.representationInformationRegisterTitle());
     titleLabel.addStyleName("h1 browseItemText");
     title.add(titleLabel);
-
-    InlineHTML badge = new InlineHTML("<span class='label-warning browseRepresentationOriginalIcon'>Beta</span>");
-    title.add(badge);
 
     registerDescription.add(new HTMLWidgetWrapper("RepresentationInformationNetworkDescription.html"));
   }
