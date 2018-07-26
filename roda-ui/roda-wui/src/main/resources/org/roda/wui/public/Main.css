@@ -3557,6 +3557,10 @@ td.datePickerMonth, td.datePickerYear {
     margin-right: -80px;
 }
 
+.searchPanelAdvanced .searchBox {
+    padding-right: 5rem;
+}
+
 .searchPanelRight .fa-stack {
     /*line-height: 4rem;
     height: 4rem; */
@@ -3608,6 +3612,19 @@ td.datePickerMonth, td.datePickerYear {
 
 .searchButton-html {
     font-size: 15px;
+}
+
+.searchButton-html-label {
+    font-size: 1rem;
+    text-decoration: underline;
+    white-space: nowrap;
+    line-height: 40px;
+    position: absolute;
+    right: 40px;
+    background-color: #eeeeee;
+    padding-left: 20px;
+    background: -webkit-linear-gradient(right, #eee 80%, rgba(255, 255, 255, 0) 100%);
+    background: linear-gradient(-90deg, #eee 80%, rgba(255, 255, 255, 0) 100%);
 }
 
 .searchAdvancedDisclosureButton .fa-angle-up {

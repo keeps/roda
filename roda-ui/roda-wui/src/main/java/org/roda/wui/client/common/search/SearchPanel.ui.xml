@@ -19,6 +19,9 @@
 				<wcag:AccessibleFocusPanel styleName="searchAdvancedDisclosureButton"
 					ui:field="searchAdvancedDisclosureButton">
 					<g:HTML addStyleNames="searchButton-html" ui:field="searchButton">
+						<span class="searchButton-html-label">
+							<ui:text from='{messages.searchButtonAdvancedSearch}' />
+						</span>
 						<span class="fa-stack fa-lg">
 							<i class="fa fa-angle-down fa-stack-1x"></i>
 							<i class="fa fa-angle-up fa-stack-1x"></i>

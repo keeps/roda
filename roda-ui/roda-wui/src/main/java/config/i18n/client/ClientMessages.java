@@ -1963,4 +1963,6 @@ public interface ClientMessages extends Messages {
   String editHTMLContent();
 
   String actionableEmptyHelp(@Select ActionableObject.ActionableObjectType action);
+
+  String searchButtonAdvancedSearch();
 }
