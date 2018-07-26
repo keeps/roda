@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.google.gwt.user.client.ui.FlowPanel;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -46,6 +47,7 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
+import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 /**
  * @author Luis Faria
@@ -130,6 +132,7 @@ public class PreservationEvents extends Composite {
 
   @UiField(provided = true)
   PreservationEventsSearch eventSearch;
+  @UiField FlowPanel pageDescription;
 
   private String aipId;
   private String representationUUID;
@@ -180,6 +183,8 @@ public class PreservationEvents extends Composite {
     } else {
       breadcrumb.setVisible(false);
     }
+
+    pageDescription.add(new HTMLWidgetWrapper("PreservationEventsDescription.html"));
   }
 
   /**
