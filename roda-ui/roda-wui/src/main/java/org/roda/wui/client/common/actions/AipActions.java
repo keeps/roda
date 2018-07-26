@@ -363,14 +363,14 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
   private void updatePermissions(IndexedAIP aip, AsyncCallback<ActionImpact> callback) {
     LastSelectedItemsSingleton.getInstance().setLastHistory(HistoryUtils.getCurrentHistoryPath());
-    HistoryUtils.newHistory(BrowseAIP.RESOLVER, EditPermissions.AIP_RESOLVER.getHistoryToken(), aip.getId());
+    HistoryUtils.newHistory(EditPermissions.AIP_RESOLVER, aip.getId());
     callback.onSuccess(ActionImpact.UPDATED);
   }
 
   private void updatePermissions(SelectedItems<IndexedAIP> aips, AsyncCallback<ActionImpact> callback) {
     LastSelectedItemsSingleton.getInstance().setSelectedItems(aips);
     LastSelectedItemsSingleton.getInstance().setLastHistory(HistoryUtils.getCurrentHistoryPath());
-    HistoryUtils.newHistory(BrowseAIP.RESOLVER, EditPermissions.AIP_RESOLVER.getHistoryToken());
+    HistoryUtils.newHistory(EditPermissions.AIP_RESOLVER);
     callback.onSuccess(ActionImpact.UPDATED);
   }
 

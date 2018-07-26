@@ -26,6 +26,7 @@ import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.wui.client.browse.RepresentationInformationHelper;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
+import org.roda.wui.client.common.actions.AipActions;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.ingest.process.ShowJobReport;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
@@ -46,6 +47,7 @@ import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
+import com.google.gwt.view.client.SingleSelectionModel;
 
 import config.i18n.client.ClientMessages;
 
@@ -185,6 +187,9 @@ public class InfoSliderHelper {
   private static Widget createAipPermissionDetailsHTML(BrowseAIPBundle bundle) {
     Permissions permissions = bundle.getAip().getPermissions();
 
+    final String CSS_HAS_PERMISSION = "";
+    final String CSS_NO_PERMISSION = " slider-aip-permissions-table-icon-fade";
+
     List<Entry<String, Set<Permissions.PermissionType>>> entryList = new ArrayList<>();
     for (String username : new TreeSet<>(permissions.getUsernames())) {
       entryList.add(new AbstractMap.SimpleEntry<>("u-" + username, permissions.getUserPermissions(username)));
@@ -218,17 +223,27 @@ public class InfoSliderHelper {
       }
     };
 
+    Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml> iconReadColumn = new Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml>(
+      new SafeHtmlCell()) {
+      @Override
+      public SafeHtml getValue(Entry<String, Set<Permissions.PermissionType>> object) {
+        String extraIconCss = object.getValue().contains(Permissions.PermissionType.READ) ? CSS_HAS_PERMISSION
+          : CSS_NO_PERMISSION;
+        return SafeHtmlUtils
+          .fromSafeConstant("<i title='" + messages.objectPermissionDescription(Permissions.PermissionType.READ)
+            + "' class='fa fa-eye" + extraIconCss + "'></i>");
+      }
+    };
+
     Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml> iconCreateColumn = new Column<Entry<String, Set<Permissions.PermissionType>>, SafeHtml>(
       new SafeHtmlCell()) {
       @Override
       public SafeHtml getValue(Entry<String, Set<Permissions.PermissionType>> object) {
-        if (object.getValue().contains(Permissions.PermissionType.READ)
-          && object.getValue().contains(Permissions.PermissionType.CREATE)) {
-          return SafeHtmlUtils.fromSafeConstant("<i title='"
-            + messages.objectPermissionDescription(Permissions.PermissionType.CREATE) + "' class='fa fa-sitemap'></i>");
-        } else {
-          return SafeHtmlUtils.EMPTY_SAFE_HTML;
-        }
+        String extraIconCss = object.getValue().contains(Permissions.PermissionType.CREATE) ? CSS_HAS_PERMISSION
+          : CSS_NO_PERMISSION;
+        return SafeHtmlUtils
+          .fromSafeConstant("<i title='" + messages.objectPermissionDescription(Permissions.PermissionType.CREATE)
+            + "' class='fa fa-sitemap" + extraIconCss + "'></i>");
       }
     };
 
@@ -236,13 +251,11 @@ public class InfoSliderHelper {
       new SafeHtmlCell()) {
       @Override
       public SafeHtml getValue(Entry<String, Set<Permissions.PermissionType>> object) {
-        if (object.getValue().contains(Permissions.PermissionType.READ)
-          && object.getValue().contains(Permissions.PermissionType.UPDATE)) {
-          return SafeHtmlUtils.fromSafeConstant("<i title='"
-            + messages.objectPermissionDescription(Permissions.PermissionType.UPDATE) + "' class='fa fa-edit'></i>");
-        } else {
-          return SafeHtmlUtils.EMPTY_SAFE_HTML;
-        }
+        String extraIconCss = object.getValue().contains(Permissions.PermissionType.UPDATE) ? CSS_HAS_PERMISSION
+          : CSS_NO_PERMISSION;
+        return SafeHtmlUtils
+          .fromSafeConstant("<i title='" + messages.objectPermissionDescription(Permissions.PermissionType.UPDATE)
+            + "' class='fa fa-edit" + extraIconCss + "'></i>");
       }
     };
 
@@ -250,13 +263,11 @@ public class InfoSliderHelper {
       new SafeHtmlCell()) {
       @Override
       public SafeHtml getValue(Entry<String, Set<Permissions.PermissionType>> object) {
-        if (object.getValue().contains(Permissions.PermissionType.READ)
-          && object.getValue().contains(Permissions.PermissionType.DELETE)) {
-          return SafeHtmlUtils.fromSafeConstant("<i title='"
-            + messages.objectPermissionDescription(Permissions.PermissionType.DELETE) + "' class='fa fa-ban'></i>");
-        } else {
-          return SafeHtmlUtils.EMPTY_SAFE_HTML;
-        }
+        String extraIconCss = object.getValue().contains(Permissions.PermissionType.DELETE) ? CSS_HAS_PERMISSION
+          : CSS_NO_PERMISSION;
+        return SafeHtmlUtils
+          .fromSafeConstant("<i title='" + messages.objectPermissionDescription(Permissions.PermissionType.DELETE)
+            + "' class='fa fa-ban" + extraIconCss + "'></i>");
       }
     };
 
@@ -264,30 +275,40 @@ public class InfoSliderHelper {
       new SafeHtmlCell()) {
       @Override
       public SafeHtml getValue(Entry<String, Set<Permissions.PermissionType>> object) {
-        if (object.getValue().contains(Permissions.PermissionType.READ)
-          && object.getValue().contains(Permissions.PermissionType.GRANT)) {
-          return SafeHtmlUtils.fromSafeConstant("<i title='"
-            + messages.objectPermissionDescription(Permissions.PermissionType.GRANT) + "' class='fa fa-unlock'></i>");
-        } else {
-          return SafeHtmlUtils.EMPTY_SAFE_HTML;
-        }
+        String extraIconCss = object.getValue().contains(Permissions.PermissionType.GRANT) ? CSS_HAS_PERMISSION
+          : CSS_NO_PERMISSION;
+        return SafeHtmlUtils
+          .fromSafeConstant("<i title='" + messages.objectPermissionDescription(Permissions.PermissionType.GRANT)
+            + "' class='fa fa-unlock" + extraIconCss + "'></i>");
       }
     };
 
     table.addColumn(userGroupIconColumn);
     table.addColumn(nameColumn);
+    table.addColumn(iconReadColumn);
     table.addColumn(iconCreateColumn);
     table.addColumn(iconEditColumn);
     table.addColumn(iconDeleteColumn);
     table.addColumn(iconGrantColumn);
 
     table.setColumnWidth(userGroupIconColumn, 23, Style.Unit.PX);
+    table.setColumnWidth(iconReadColumn, 23, Style.Unit.PX);
     table.setColumnWidth(iconCreateColumn, 23, Style.Unit.PX);
     table.setColumnWidth(iconEditColumn, 23, Style.Unit.PX);
     table.setColumnWidth(iconDeleteColumn, 23, Style.Unit.PX);
     table.setColumnWidth(iconGrantColumn, 23, Style.Unit.PX);
 
     nameColumn.setCellStyleNames("nowrap slider-aip-permissions-table-name");
+
+    AipActions aipActions = AipActions.get();
+    if (aipActions.canAct(AipActions.AipAction.UPDATE_PERMISSIONS, bundle.getAip())) {
+      table.addStyleName("slider-aip-permissions-table-with-grant");
+      SingleSelectionModel<Entry<String, Set<Permissions.PermissionType>>> selectionModel = new SingleSelectionModel<>(
+        item -> item.getKey().substring(2));
+      selectionModel
+        .addSelectionChangeHandler(event -> aipActions.act(AipActions.AipAction.UPDATE_PERMISSIONS, bundle.getAip()));
+      table.setSelectionModel(selectionModel);
+    }
 
     ListDataProvider<Entry<String, Set<Permissions.PermissionType>>> dataProvider = new ListDataProvider<>(entryList);
     dataProvider.addDataDisplay(table);

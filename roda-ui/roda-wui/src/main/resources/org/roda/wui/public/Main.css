@@ -2581,10 +2581,23 @@ td.datePickerMonth, td.datePickerYear {
 
 .slider-aip-permissions-table tr {
     background-color: #089de3;
+    cursor: default;
+}
+
+.slider-aip-permissions-table-with-grant tr {
+    cursor: pointer;
 }
 
 .slider-aip-permissions-table tr:hover {
-    background-color: #48a4e5;
+    text-shadow: 1px 1px 3px #666;
+}
+
+.slider-aip-permissions-table i.slider-aip-permissions-table-icon-fade {
+    color: #50aef1;
+}
+
+.slider-aip-permissions-table tr:hover i.slider-aip-permissions-table-icon-fade {
+    text-shadow: none;
 }
 
 .slider-aip-permissions-table .slider-aip-permissions-table-name {
