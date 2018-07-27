@@ -1346,7 +1346,7 @@ public class BrowserHelper {
       final ConsumesOutputStream stream;
       Binary otherMetadataBinary = RodaCoreFactory.getModelService().retrieveOtherMetadataBinary(aipId,
         representationId, filePath, fileId, suffix, type);
-      stream = new BinaryConsumesOutputStream(otherMetadataBinary, RodaConstants.MEDIA_TYPE_WILDCARD);
+      stream = new BinaryConsumesOutputStream(otherMetadataBinary);
       return new StreamResponse(stream);
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
@@ -1579,15 +1579,15 @@ public class BrowserHelper {
       iFile.getId());
 
     if (!iFile.isDirectory() && RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
-      final String filename;
-      final String mediaType;
       final ConsumesOutputStream stream;
 
       StorageService storage = RodaCoreFactory.getStorageService();
       Binary representationFileBinary = storage.getBinary(filePath);
-      filename = representationFileBinary.getStoragePath().getName();
-      mediaType = MimeTypeHelper.getContentType(filename, RodaConstants.MEDIA_TYPE_WILDCARD);
-      stream = new BinaryConsumesOutputStream(representationFileBinary, mediaType);
+      if (iFile.getFileFormat() != null && StringUtils.isNotBlank(iFile.getFileFormat().getMimeType())) {
+        stream = new BinaryConsumesOutputStream(representationFileBinary, iFile.getFileFormat().getMimeType());
+      } else {
+        stream = new BinaryConsumesOutputStream(representationFileBinary);
+      }
       return new StreamResponse(stream);
     } else if (iFile.isDirectory() && (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP.equals(acceptFormat)
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat))) {
@@ -2785,7 +2785,7 @@ public class BrowserHelper {
 
       StorageService storage = RodaCoreFactory.getStorageService();
       Binary representationFileBinary = storage.getBinary(ModelUtils.getDIPFileStoragePath(iFile));
-      stream = new BinaryConsumesOutputStream(representationFileBinary, RodaConstants.MEDIA_TYPE_WILDCARD);
+      stream = new BinaryConsumesOutputStream(representationFileBinary);
       return new StreamResponse(stream);
     } else if (iFile.isDirectory() && (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP.equals(acceptFormat)
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat))) {
@@ -2841,7 +2841,7 @@ public class BrowserHelper {
       StorageService storage = RodaCoreFactory.getStorageService();
       Binary riBinary = storage
         .getBinary(ModelUtils.getRepresentationInformationStoragePath(representationInformationId));
-      stream = new BinaryConsumesOutputStream(riBinary, RodaConstants.MEDIA_TYPE_WILDCARD);
+      stream = new BinaryConsumesOutputStream(riBinary);
       return new StreamResponse(stream);
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {

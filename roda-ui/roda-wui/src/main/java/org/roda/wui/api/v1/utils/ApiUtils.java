@@ -70,6 +70,7 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Directory;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
+import org.roda.wui.api.controllers.MimeTypeHelper;
 
 /**
  * API Utils
@@ -181,8 +182,8 @@ public class ApiUtils {
       }
     };
 
-    Response.ResponseBuilder response = Response.ok(so, streamResponse.getMediaType()).header(
-      HttpHeaders.CONTENT_DISPOSITION,
+    String mediaType = MimeTypeHelper.getContentType(streamResponse.getFilename(), streamResponse.getMediaType());
+    Response.ResponseBuilder response = Response.ok(so, mediaType).header(HttpHeaders.CONTENT_DISPOSITION,
       contentDisposition(inline) + CONTENT_DISPOSITION_FILENAME_ARGUMENT + "\"" + streamResponse.getFilename() + "\"");
 
     if (streamResponse.getFileSize() > 0) {
@@ -205,8 +206,8 @@ public class ApiUtils {
       }
     };
 
-    Response.ResponseBuilder response = Response.ok(so, streamResponse.getMediaType()).header(
-      HttpHeaders.CONTENT_DISPOSITION,
+    String mediaType = MimeTypeHelper.getContentType(streamResponse.getFilename(), streamResponse.getMediaType());
+    Response.ResponseBuilder response = Response.ok(so, mediaType).header(HttpHeaders.CONTENT_DISPOSITION,
       contentDisposition(inline) + CONTENT_DISPOSITION_FILENAME_ARGUMENT + "\"" + streamResponse.getFilename() + "\"");
 
     if (streamResponse.getFileSize() > 0) {
@@ -233,7 +234,7 @@ public class ApiUtils {
   }
 
   private static final int CACHE_CONTROL_MAX_AGE = 60;
-  
+
   public static Response okResponse(StreamResponse streamResponse, boolean inline, final String range,
     Request request) {
 
@@ -242,12 +243,12 @@ public class ApiUtils {
     // cannot calculate file size
     if (range == null || !(streamResponse.getStream() instanceof ConsumesSkipableOutputStream)
       || streamResponse.getFileSize() < 0) {
-      return okResponse(streamResponse, inline);
+      return okResponse(streamResponse, inline, request);
     }
 
     String[] ranges = range.split("=")[1].split("-");
     final int from = Integer.parseInt(ranges[0]);
-    
+
     long fileSize = streamResponse.getFileSize();
     int to = (int) (fileSize - 1);
     if (ranges.length == 2) {
@@ -261,9 +262,9 @@ public class ApiUtils {
       @Override
       public void write(OutputStream output) throws IOException, WebApplicationException {
         try {
-        ((ConsumesSkipableOutputStream) streamResponse.getStream()).consumeOutputStream(output, from, len);
+          ((ConsumesSkipableOutputStream) streamResponse.getStream()).consumeOutputStream(output, from, len);
         } catch (IOException e) {
-          // ignoring 
+          // ignoring
         }
       }
     };
@@ -308,8 +309,9 @@ public class ApiUtils {
       }
     };
 
-    Response.ResponseBuilder response = Response.ok(so, streamResponse.getMediaType()).header(
-      HttpHeaders.CONTENT_DISPOSITION,
+    String mediaType = MimeTypeHelper.getContentType(streamResponse.getFilename(), streamResponse.getMediaType());
+
+    Response.ResponseBuilder response = Response.ok(so, mediaType).header(HttpHeaders.CONTENT_DISPOSITION,
       contentDisposition(inline) + CONTENT_DISPOSITION_FILENAME_ARGUMENT + "\"" + streamResponse.getFilename() + "\"");
 
     if (streamResponse.getFileSize() > 0) {
