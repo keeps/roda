@@ -537,9 +537,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
   @Override
   protected void onDetach() {
-    if (autoUpdateTimer != null) {
-      pauseAutoUpdate();
-    }
+    pauseAutoUpdate();
     super.onDetach();
   }
 
@@ -1112,12 +1110,16 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
   }
 
   public void pauseAutoUpdate() {
-    autoUpdateTimer.cancel();
-    setAutoUpdateState(AutoUpdateState.AUTO_UPDATE_PAUSED);
+    if (autoUpdateTimer != null) {
+      autoUpdateTimer.cancel();
+      setAutoUpdateState(AutoUpdateState.AUTO_UPDATE_PAUSED);
+    }
   }
 
   public void resumeAutoUpdate() {
-    autoUpdateTimer.scheduleRepeating(autoUpdateTimerMillis);
-    setAutoUpdateState(AutoUpdateState.AUTO_UPDATE_SUCCESS);
+    if (autoUpdateTimer != null) {
+      autoUpdateTimer.scheduleRepeating(autoUpdateTimerMillis);
+      setAutoUpdateState(AutoUpdateState.AUTO_UPDATE_SUCCESS);
+    }
   }
 }
