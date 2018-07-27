@@ -269,8 +269,11 @@ public class ApiUtils {
       }
     };
 
+    String mediaType = MimeTypeHelper.getContentType(streamResponse.getFilename(), streamResponse.getMediaType());
+    
     Response.ResponseBuilder response = Response.status(Status.PARTIAL_CONTENT).entity(so)
-      .header("Accept-Ranges", "bytes").header("Content-Range", responseRange).header(HttpHeaders.CONTENT_LENGTH, len)
+      .header(HttpHeaders.CONTENT_TYPE, mediaType).header("Accept-Ranges", "bytes")
+      .header("Content-Range", responseRange).header(HttpHeaders.CONTENT_LENGTH, len)
       .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition(inline) + CONTENT_DISPOSITION_FILENAME_ARGUMENT + "\""
         + streamResponse.getFilename() + "\"");
 
