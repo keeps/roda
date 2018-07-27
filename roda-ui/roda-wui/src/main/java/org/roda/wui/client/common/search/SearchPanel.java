@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
@@ -61,6 +62,9 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
   FlowPanel searchPanel;
 
   @UiField
+  SelectedPanel searchSelectedPanel;
+
+  @UiField
   Dropdown searchInputListBox;
 
   @UiField
@@ -95,7 +99,7 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
   private boolean defaultFilterIncremental = false;
 
   private FlowPanel fieldsPanel;
-  private AsyncTableCell<?, ?> list;
+  private AsyncTableCell<IsIndexed, ?> list;
 
   private boolean hidePreFilters;
 
@@ -112,6 +116,7 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
       searchInputBox.getElement().setPropertyString("placeholder", placeholder);
     }
 
+    searchSelectedPanel.setVisible(false);
     searchInputListBox.setVisible(showSearchInputListBox);
     searchAdvancedDisclosureButton.setVisible(showSearchAdvancedDisclosureButton);
     searchAdvancedPanel.setVisible(false);
@@ -145,6 +150,14 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
       @Override
       public void onValueChange(ValueChangeEvent<String> event) {
         onChange(searchInputListBox.getSelectedValue());
+      }
+    });
+
+    searchSelectedPanel.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+      @Override
+      public void onValueChange(ValueChangeEvent<Boolean> event) {
+        searchSelectedPanel.setVisible(event.getValue());
+        searchInputListBox.setVisible(!event.getValue() && showSearchInputListBox);
       }
     });
 
@@ -298,8 +311,10 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
     searchAdvancedPanel.add(searchAdvancedPanelButtons);
   }
 
+  @SuppressWarnings("unchecked")
   public void setList(AsyncTableCell<?, ?> list) {
-    this.list = list;
+    this.list = (AsyncTableCell<IsIndexed, ?>) list;
+    searchSelectedPanel.bindList(this.list);
   }
 
   public void setDefaultFilter(Filter defaultFilter, boolean incremental) {

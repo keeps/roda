@@ -11,6 +11,7 @@
 		<g:FlowPanel styleName="searchPanel" ui:field="searchPanel">
 			<g:FlowPanel styleName="searchPanelLeft">
 				<commonsearch:Dropdown ui:field="searchInputListBox" addStyleNames="searchInputListBox" />
+				<commonsearch:SelectedPanel ui:field="searchSelectedPanel" />
 				<g:FlowPanel styleName="searchPanelLeftInput">
 					<g:TextBox title="{messages.searchButton}" ui:field="searchInputBox" addStyleNames="searchBox" />
 				</g:FlowPanel>

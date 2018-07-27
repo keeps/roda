@@ -1320,7 +1320,8 @@ pre code {
 /**********************************************
 				CUSTOM DROPDOWN
 ************************************************/
-.dropdown {
+.dropdown,
+.selected-count-panel {
     white-space: nowrap;
 }
 
@@ -3503,6 +3504,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .searchInputListBox,
+.selected-count-panel,
 .searchInputListBoxPopup {
     border: none;
 }
@@ -3511,6 +3513,7 @@ td.datePickerMonth, td.datePickerYear {
     border-top: 2px solid white;
 }
 
+.searchPanelLeft .selected-count-label,
 .searchInputListBox .dropdown-label,
 .searchInputListBoxPopup .dropdown-item {
     line-height: 4rem;
@@ -3522,6 +3525,10 @@ td.datePickerMonth, td.datePickerYear {
     padding-right: 10px;
     min-width: 175px;
     position: relative;
+}
+
+.searchPanelLeft .selected-count-label {
+    min-width: 135px;
 }
 
 .searchInputListBox .dropdown-label:after {

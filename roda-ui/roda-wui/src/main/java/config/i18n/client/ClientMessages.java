@@ -291,6 +291,8 @@ public interface ClientMessages extends Messages {
 
   String someOfAObject(@Select String objectClass);
 
+  String selected(@PluralCount int selectedCount);
+
   String inspectTransferredResource();
 
   String identifierNotFound();
