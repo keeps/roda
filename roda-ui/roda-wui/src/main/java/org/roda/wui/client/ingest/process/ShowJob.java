@@ -18,8 +18,10 @@ import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.FilterParameter;
 import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
@@ -35,6 +37,7 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -72,6 +75,7 @@ import org.roda.wui.common.client.widgets.Toast;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -106,34 +110,42 @@ public class ShowJob extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      if (historyTokens.size() == 1) {
-        String jobId = historyTokens.get(0);
-        BrowserService.Util.getInstance().retrieveJobBundle(jobId, new ArrayList<>(), new AsyncCallback<JobBundle>() {
-
-          @Override
-          public void onFailure(Throwable caught) {
-            if (caught instanceof NotFoundException) {
-              Toast.showError(messages.notFoundError(), messages.jobNotFound());
-              HistoryUtils.newHistory(Process.RESOLVER);
-            } else {
-              AsyncCallbackUtils.defaultFailureTreatment(caught);
-            }
-          }
-
-          @Override
-          public void onSuccess(JobBundle jobBundle) {
-            Map<String, PluginInfo> pluginsInfo = new HashMap<>();
-            for (PluginInfo pluginInfo : jobBundle.getPluginsInfo()) {
-              pluginsInfo.put(pluginInfo.getId(), pluginInfo);
-            }
-
-            ShowJob showJob = new ShowJob(jobBundle.getJob(), pluginsInfo);
-            callback.onSuccess(showJob);
-          }
-
-        });
-      } else if (historyTokens.size() > 1 && historyTokens.get(0).equals(ShowJobReport.RESOLVER.getHistoryToken())) {
+      if (historyTokens.size() > 1 && historyTokens.get(0).equals(ShowJobReport.RESOLVER.getHistoryToken())) {
         ShowJobReport.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+      } else if (historyTokens.size() >= 1) {
+        String jobId = historyTokens.get(0);
+        BrowserService.Util.getInstance().retrieveJobBundle(jobId, new ArrayList<>(),
+          new AsyncCallback<JobBundle>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+              if (caught instanceof NotFoundException) {
+                Toast.showError(messages.notFoundError(), messages.jobNotFound());
+                HistoryUtils.newHistory(Process.RESOLVER);
+              } else {
+                AsyncCallbackUtils.defaultFailureTreatment(caught);
+              }
+            }
+
+            @Override
+            public void onSuccess(JobBundle jobBundle) {
+              Map<String, PluginInfo> pluginsInfo = new HashMap<>();
+              for (PluginInfo pluginInfo : jobBundle.getPluginsInfo()) {
+                pluginsInfo.put(pluginInfo.getId(), pluginInfo);
+              }
+
+              List<FilterParameter> reportFilterParameters = new ArrayList<>();
+              for (int i = 1; i < historyTokens.size() - 1; i += 2) {
+                String key = historyTokens.get(i);
+                String value = historyTokens.get(i + 1);
+                reportFilterParameters.add(new SimpleFilterParameter(key, value));
+              }
+
+              ShowJob showJob = new ShowJob(jobBundle.getJob(), pluginsInfo, reportFilterParameters);
+              callback.onSuccess(showJob);
+            }
+
+          });
       } else {
         HistoryUtils.newHistory(Process.RESOLVER);
         callback.onSuccess(null);
@@ -232,12 +244,13 @@ public class ShowJob extends Composite {
   @UiField
   Button buttonAppraisal, buttonBack, buttonStop, buttonProcess;
 
-  public ShowJob(Job job, Map<String, PluginInfo> pluginsInfo) {
+  public ShowJob(Job job, Map<String, PluginInfo> pluginsInfo, List<FilterParameter> extraReportFilterParameters) {
     this.job = job;
     this.pluginsInfo = pluginsInfo;
     boolean isIngest = false;
 
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getUUID()));
+    filter.add(extraReportFilterParameters);
 
     if (job.getPluginType().equals(PluginType.INGEST)) {
       ingestJobReports = new IngestJobReportList("ShowJob_reports",
@@ -277,6 +290,18 @@ public class ShowJob extends Composite {
     SelectedItems<?> selected = job.getSourceObjects();
     selectedListPanel.setVisible(true);
 
+    ValueChangeHandler<IndexResult<IndexedReport>> jumpToSingleReportHandler = null;
+    if (!extraReportFilterParameters.isEmpty()) {
+      jumpToSingleReportHandler = event -> {
+        if (event.getValue().getTotalCount() == 1) {
+          Report jobReport = event.getValue().getResults().get(0);
+          if (jobReport != null) {
+            HistoryUtils.newHistory(ShowJobReport.RESOLVER, jobReport.getId());
+          }
+        }
+      };
+    }
+
     if (isIngest) {
       if (isJobRunning()) {
         ingestJobReports.autoUpdate(PERIOD_MILLIS);
@@ -291,6 +316,10 @@ public class ShowJob extends Composite {
           }
         }
       });
+
+      if (jumpToSingleReportHandler != null) {
+        ingestJobReports.addValueChangeHandler(jumpToSingleReportHandler);
+      }
 
       showIngestSourceObjects(selected);
     } else {
@@ -307,6 +336,10 @@ public class ShowJob extends Composite {
           }
         }
       });
+
+      if (jumpToSingleReportHandler != null) {
+        simpleJobReports.addValueChangeHandler(jumpToSingleReportHandler);
+      }
 
       showActionSourceObjects(selected);
     }

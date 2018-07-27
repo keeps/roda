@@ -28,7 +28,7 @@ import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.common.actions.AipActions;
 import org.roda.wui.client.common.utils.StringUtils;
-import org.roda.wui.client.ingest.process.ShowJobReport;
+import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
@@ -157,7 +157,8 @@ public class InfoSliderHelper {
       Anchor anchor = new Anchor();
       anchor.setText(aip.getIngestJobId());
       anchor
-        .setHref(HistoryUtils.createHistoryHashLink(ShowJobReport.RESOLVER, aip.getIngestJobId() + '-' + aip.getId()));
+        .setHref(HistoryUtils.createHistoryHashLink(ShowJob.RESOLVER, aip.getIngestJobId(),
+          RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID, aip.getId()));
 
       values.put(messages.processIdTitle(), anchor);
     }
@@ -169,7 +170,8 @@ public class InfoSliderHelper {
       for (String updateJobId : aip.getIngestUpdateJobIds()) {
         Anchor anchor = new Anchor();
         anchor.setText(updateJobId);
-        anchor.setHref(HistoryUtils.createHistoryHashLink(ShowJobReport.RESOLVER, updateJobId + '-' + aip.getId()));
+        anchor.setHref(HistoryUtils.createHistoryHashLink(ShowJob.RESOLVER, updateJobId,
+          RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID, aip.getId()));
         jobIdsList.add(anchor);
       }
 
