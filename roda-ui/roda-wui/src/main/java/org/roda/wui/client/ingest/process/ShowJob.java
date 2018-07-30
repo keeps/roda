@@ -108,31 +108,30 @@ public class ShowJob extends Composite {
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
         String jobId = historyTokens.get(0);
-        BrowserService.Util.getInstance().retrieveJobBundle(jobId, new ArrayList<>(),
-          new AsyncCallback<JobBundle>() {
+        BrowserService.Util.getInstance().retrieveJobBundle(jobId, new ArrayList<>(), new AsyncCallback<JobBundle>() {
 
-            @Override
-            public void onFailure(Throwable caught) {
-              if (caught instanceof NotFoundException) {
-                Toast.showError(messages.notFoundError(), messages.jobNotFound());
-                HistoryUtils.newHistory(Process.RESOLVER);
-              } else {
-                AsyncCallbackUtils.defaultFailureTreatment(caught);
-              }
+          @Override
+          public void onFailure(Throwable caught) {
+            if (caught instanceof NotFoundException) {
+              Toast.showError(messages.notFoundError(), messages.jobNotFound());
+              HistoryUtils.newHistory(Process.RESOLVER);
+            } else {
+              AsyncCallbackUtils.defaultFailureTreatment(caught);
+            }
+          }
+
+          @Override
+          public void onSuccess(JobBundle jobBundle) {
+            Map<String, PluginInfo> pluginsInfo = new HashMap<>();
+            for (PluginInfo pluginInfo : jobBundle.getPluginsInfo()) {
+              pluginsInfo.put(pluginInfo.getId(), pluginInfo);
             }
 
-            @Override
-            public void onSuccess(JobBundle jobBundle) {
-              Map<String, PluginInfo> pluginsInfo = new HashMap<>();
-              for (PluginInfo pluginInfo : jobBundle.getPluginsInfo()) {
-                pluginsInfo.put(pluginInfo.getId(), pluginInfo);
-              }
+            ShowJob showJob = new ShowJob(jobBundle.getJob(), pluginsInfo);
+            callback.onSuccess(showJob);
+          }
 
-              ShowJob showJob = new ShowJob(jobBundle.getJob(), pluginsInfo);
-              callback.onSuccess(showJob);
-            }
-
-          });
+        });
       } else if (historyTokens.size() > 1 && historyTokens.get(0).equals(ShowJobReport.RESOLVER.getHistoryToken())) {
         ShowJobReport.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else {
@@ -243,7 +242,7 @@ public class ShowJob extends Composite {
     if (job.getPluginType().equals(PluginType.INGEST)) {
       ingestJobReports = new IngestJobReportList("ShowJob_reports",
         new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getId())), messages.reportList(),
-        pluginsInfo, false);
+        false);
       ListSelectionUtils.bindBrowseOpener(ingestJobReports);
       simpleJobReports = new SimpleJobReportList("ShowJob_reports_hidden");
       isIngest = true;
@@ -391,7 +390,8 @@ public class ShowJob extends Composite {
 
           @Override
           public void onSuccess(Long result) {
-            InlineHTML filterHTML = new InlineHTML(messages.sourceObjectList(result, messages.someOfAObject(selected.getSelectedClass())));
+            InlineHTML filterHTML = new InlineHTML(
+              messages.sourceObjectList(result, messages.someOfAObject(selected.getSelectedClass())));
             selectedList.add(filterHTML);
 
             Button button = new Button(messages.downloadButton());
@@ -410,7 +410,7 @@ public class ShowJob extends Composite {
                   public void onSuccess(Integer result) {
                     Toast.showInfo(messages.exportListTitle(), messages.exportListMessage(result));
                     RestUtils.requestCSVExport(selected.getSelectedClass(), filter, Sorter.NONE,
-                            new Sublist(0, result.intValue()), Facets.NONE, true, false, "source_objects.csv");
+                      new Sublist(0, result.intValue()), Facets.NONE, true, false, "source_objects.csv");
                   }
                 });
               }
@@ -420,8 +420,7 @@ public class ShowJob extends Composite {
         });
       } else if (selected instanceof SelectedItemsFilter) {
         Filter filter = ((SelectedItemsFilter<?>) selected).getFilter();
-        HTML filterHTML = new HTML(
-          SearchPreFilterUtils.getFilterHTML(filter, selected.getSelectedClass()));
+        HTML filterHTML = new HTML(SearchPreFilterUtils.getFilterHTML(filter, selected.getSelectedClass()));
         selectedList.add(filterHTML);
       } else if (selected instanceof SelectedItemsAll) {
         Label filterLabel = new Label(messages.allOfAObject(selected.getSelectedClass()));
@@ -454,7 +453,8 @@ public class ShowJob extends Composite {
 
             @Override
             public void onSuccess(Long result) {
-              InlineHTML filterHTML = new InlineHTML(messages.sourceObjectList(result, messages.someOfAObject(selected.getSelectedClass())));
+              InlineHTML filterHTML = new InlineHTML(
+                messages.sourceObjectList(result, messages.someOfAObject(selected.getSelectedClass())));
               selectedList.add(filterHTML);
 
               Button button = new Button(messages.downloadButton());
@@ -613,7 +613,8 @@ public class ShowJob extends Composite {
     Label parameterName = new Label(parameter.getName());
     final FlowPanel aipPanel = new FlowPanel();
     final String value = job.getPluginParameters().containsKey(parameter.getId())
-      ? job.getPluginParameters().get(parameter.getId()) : parameter.getDefaultValue();
+      ? job.getPluginParameters().get(parameter.getId())
+      : parameter.getDefaultValue();
 
     if (value != null && !value.isEmpty()) {
       BrowserService.Util.getInstance().retrieve(IndexedAIP.class.getName(), value, aipFieldsToReturn,

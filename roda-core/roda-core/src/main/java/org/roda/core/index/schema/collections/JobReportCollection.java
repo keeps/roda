@@ -85,6 +85,7 @@ public class JobReportCollection extends AbstractSolrCollection<IndexedReport, R
     fields.add(new Field(RodaConstants.JOB_REPORT_JOB_PLUGIN_TYPE, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.JOB_REPORT_SUCCESSFUL_PLUGINS, Field.TYPE_STRING).setMultiValued(true).setStored(false));
     fields.add(new Field(RodaConstants.JOB_REPORT_UNSUCCESSFUL_PLUGINS, Field.TYPE_STRING).setMultiValued(true).setStored(false));
+    fields.add(new Field(RodaConstants.JOB_REPORT_UNSUCCESSFUL_PLUGINS_COUNTER, Field.TYPE_INT).setStored(false));
 
     fields.add(SolrCollection.getSearchField());
     return fields;

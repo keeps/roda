@@ -33,6 +33,7 @@ public class IndexedReport extends Report implements IsIndexed {
 
   private List<String> successfulPlugins = new ArrayList<>();
   private List<String> unsuccessfulPlugins = new ArrayList<>();
+  private int unsuccessfulPluginsCounter = 0;
 
   public IndexedReport() {
     super();
@@ -46,6 +47,7 @@ public class IndexedReport extends Report implements IsIndexed {
     this.jobPluginType = report.getJobPluginType();
     this.successfulPlugins = report.getSuccessfulPlugins();
     this.unsuccessfulPlugins = report.getUnsuccessfulPlugins();
+    this.unsuccessfulPluginsCounter = report.getUnsuccessfulPluginsCounter();
   }
 
   public String getJobName() {
@@ -88,20 +90,19 @@ public class IndexedReport extends Report implements IsIndexed {
     this.successfulPlugins = successfulPlugins;
   }
 
-  public void addSuccessfulPlugin(String plugin) {
-    this.successfulPlugins.add(plugin);
-  }
-
   public List<String> getUnsuccessfulPlugins() {
     return unsuccessfulPlugins;
   }
 
   public void setUnsuccessfulPlugins(List<String> unsuccessfulPlugins) {
     this.unsuccessfulPlugins = unsuccessfulPlugins;
+    if (unsuccessfulPlugins != null) {
+      this.unsuccessfulPluginsCounter = unsuccessfulPlugins.size();
+    }
   }
 
-  public void addUnsuccessfulPlugin(String plugin) {
-    this.unsuccessfulPlugins.add(plugin);
+  public int getUnsuccessfulPluginsCounter() {
+    return unsuccessfulPluginsCounter;
   }
 
   @Override

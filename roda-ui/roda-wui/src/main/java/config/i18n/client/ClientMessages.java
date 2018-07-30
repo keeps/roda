@@ -1113,6 +1113,8 @@ public interface ClientMessages extends Messages {
 
   String reportRunTasks();
 
+  String reportFailed();
+
   String jobTotalCountMessage();
 
   String jobSuccessCountMessage();

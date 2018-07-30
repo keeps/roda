@@ -7,8 +7,6 @@
  */
 package org.roda.wui.client.search;
 
-import java.util.HashMap;
-
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -178,7 +176,7 @@ public class JobSearch extends Composite {
   private void createJobReportsSearchResultPanel() {
     if (isIngest) {
       jobReportsSearchResultPanel = new IngestJobReportList(jobReportsListId, filterJobReports,
-        messages.searchResults(), new HashMap<>(), false);
+        messages.searchResults(), false);
     } else {
       jobReportsSearchResultPanel = new SimpleJobReportList(jobReportsListId, filterJobReports,
         messages.searchResults(), false);

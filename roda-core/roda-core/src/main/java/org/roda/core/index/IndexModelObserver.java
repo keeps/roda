@@ -917,6 +917,7 @@ public class IndexModelObserver implements ModelObserver {
 
       preCalculatedFields.put(RodaConstants.JOB_REPORT_SUCCESSFUL_PLUGINS, successfulPlugins);
       preCalculatedFields.put(RodaConstants.JOB_REPORT_UNSUCCESSFUL_PLUGINS, unsuccessfulPlugins);
+      preCalculatedFields.put(RodaConstants.JOB_REPORT_UNSUCCESSFUL_PLUGINS_COUNTER, unsuccessfulPlugins.size());
     }
 
     Map<String, Object> accumulators = new HashMap<>();

@@ -126,7 +126,6 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
   private void processAIP(IndexService index, ModelService model, StorageService storage, Report report,
     JobPluginInfo jobPluginInfo, Job job, AIP aip) {
     boolean aipFailed = false;
-    List<String> passedFiles = new ArrayList<>();
     List<LinkingIdentifier> sources = new ArrayList<>();
     ValidationReport validationReport = new ValidationReport();
 
@@ -156,9 +155,6 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
               sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), file.getRepresentationId(), file.getPath(),
                 file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
-              String fileEntry = file.getRepresentationId()
-                + (file.getPath().isEmpty() ? "" : '/' + String.join("/", file.getPath())) + '/' + file.getId();
-
               if (fixities != null) {
                 boolean passedFixity = true;
 
@@ -179,6 +175,8 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
                     if (!f.getMessageDigest().trim().equalsIgnoreCase(checksum.trim())) {
                       passedFixity = false;
 
+                      String fileEntry = file.getRepresentationId()
+                        + (file.getPath().isEmpty() ? "" : '/' + String.join("/", file.getPath())) + '/' + file.getId();
                       ValidationIssue issue = new ValidationIssue(
                         fileEntry + " (Checksums: [" + f.getMessageDigest().trim() + ", " + checksum.trim() + "])");
                       validationReport.addIssue(issue);
@@ -194,7 +192,6 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
                 }
 
                 if (passedFixity) {
-                  passedFiles.add(fileEntry);
                   updateIncidence(model, index, file.getAipId(), file.getRepresentationId(), file.getPath(),
                     file.getId(), risks.get(0));
                 } else {

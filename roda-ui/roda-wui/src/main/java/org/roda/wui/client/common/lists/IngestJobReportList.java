@@ -17,7 +17,6 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.jobs.IndexedReport;
-import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
 import org.roda.wui.client.common.lists.utils.TooltipTextColumn;
@@ -50,9 +49,9 @@ public class IngestJobReportList extends BasicAsyncTableCell<IndexedReport> {
   private TooltipTextColumn<IndexedReport> sourceObjectColumn;
   private TooltipTextColumn<IndexedReport> outcomeObjectColumn;
   private Column<IndexedReport, Date> updatedDateColumn;
-  private TextColumn<IndexedReport> lastPluginRunColumn;
   private Column<IndexedReport, SafeHtml> lastPluginRunStateColumn;
   private TextColumn<IndexedReport> completionStatusColumn;
+  private TextColumn<IndexedReport> failedCountColumn;
 
   private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
     RodaConstants.JOB_REPORT_ID, RodaConstants.JOB_REPORT_JOB_ID, RodaConstants.JOB_REPORT_SOURCE_OBJECT_ORIGINAL_IDS,
@@ -61,18 +60,15 @@ public class IngestJobReportList extends BasicAsyncTableCell<IndexedReport> {
     RodaConstants.JOB_REPORT_OUTCOME_OBJECT_LABEL, RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID,
     RodaConstants.JOB_REPORT_DATE_UPDATED, RodaConstants.JOB_REPORT_PLUGIN, RodaConstants.JOB_REPORT_PLUGIN_VERSION,
     RodaConstants.JOB_REPORT_PLUGIN_STATE, RodaConstants.JOB_REPORT_STEPS_COMPLETED,
-    RodaConstants.JOB_REPORT_TOTAL_STEPS, RodaConstants.JOB_REPORT_COMPLETION_PERCENTAGE);
-
-  private final Map<String, PluginInfo> pluginsInfo;
+    RodaConstants.JOB_REPORT_TOTAL_STEPS, RodaConstants.JOB_REPORT_COMPLETION_PERCENTAGE,
+    RodaConstants.JOB_REPORT_UNSUCCESSFUL_PLUGINS);
 
   public IngestJobReportList(String listId) {
-    this(listId, null, null, new HashMap<>(), false);
+    this(listId, null, null, false);
   }
 
-  public IngestJobReportList(String listId, Filter filter, String summary, Map<String, PluginInfo> pluginsInfo,
-    boolean selectable) {
+  public IngestJobReportList(String listId, Filter filter, String summary, boolean selectable) {
     super(IndexedReport.class, listId, filter, summary, selectable, fieldsToReturn);
-    this.pluginsInfo = pluginsInfo;
   }
 
   @Override
@@ -104,7 +100,7 @@ public class IngestJobReportList extends BasicAsyncTableCell<IndexedReport> {
         if (report != null) {
           if (StringUtils.isNotBlank(report.getOutcomeObjectLabel())) {
             value = report.getOutcomeObjectLabel() + " (" + report.getOutcomeObjectId() + ")";
-          } else if(StringUtils.isNotBlank(report.getOutcomeObjectId())){
+          } else if (StringUtils.isNotBlank(report.getOutcomeObjectId())) {
             value = report.getOutcomeObjectId();
           }
         }
@@ -118,31 +114,6 @@ public class IngestJobReportList extends BasicAsyncTableCell<IndexedReport> {
       @Override
       public Date getValue(IndexedReport report) {
         return report != null ? report.getDateUpdated() : null;
-      }
-    };
-
-    lastPluginRunColumn = new TextColumn<IndexedReport>() {
-
-      @Override
-      public String getValue(IndexedReport report) {
-        String value = null;
-        if (report != null && report.getPlugin() != null) {
-          PluginInfo pluginInfo = pluginsInfo.get(report.getPlugin());
-          String pluginName;
-          if (pluginInfo != null) {
-            pluginName = pluginInfo.getName();
-          } else {
-            pluginName = report.getPlugin();
-          }
-
-          if (StringUtils.isNotBlank(report.getPluginVersion())) {
-            value = messages.pluginLabelWithVersion(pluginName, report.getPluginVersion());
-          } else {
-            value = messages.pluginLabel(pluginName);
-          }
-        }
-
-        return value;
       }
     };
 
@@ -186,19 +157,32 @@ public class IngestJobReportList extends BasicAsyncTableCell<IndexedReport> {
       }
     };
 
+    failedCountColumn = new TextColumn<IndexedReport>() {
+
+      @Override
+      public String getValue(IndexedReport report) {
+        String value = "";
+        if (report != null) {
+          value = Integer.toString(report.getUnsuccessfulPluginsCounter());
+        }
+
+        return value;
+      }
+    };
+
     sourceObjectColumn.setSortable(true);
     outcomeObjectColumn.setSortable(true);
     updatedDateColumn.setSortable(true);
-    lastPluginRunColumn.setSortable(true);
     lastPluginRunStateColumn.setSortable(true);
     completionStatusColumn.setSortable(false);
+    failedCountColumn.setSortable(true);
 
     addColumn(sourceObjectColumn, messages.showSIPExtended(), true, false);
     addColumn(outcomeObjectColumn, messages.showAIPExtended(), true, false);
     addColumn(updatedDateColumn, messages.reportLastUpdatedAt(), true, false, 11);
-    addColumn(lastPluginRunColumn, messages.reportLastRunTask(), true, false);
     addColumn(lastPluginRunStateColumn, messages.reportStatus(), true, false, 8);
     addColumn(completionStatusColumn, messages.reportProgress(), true, false, 8);
+    addColumn(failedCountColumn, messages.reportFailed(), true, false, 6);
 
     Label emptyInfo = new Label(messages.noItemsToDisplay());
     display.setEmptyTableWidget(emptyInfo);
@@ -213,8 +197,8 @@ public class IngestJobReportList extends BasicAsyncTableCell<IndexedReport> {
     columnSortingKeyMap.put(sourceObjectColumn, Arrays.asList(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ID));
     columnSortingKeyMap.put(outcomeObjectColumn, Arrays.asList(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID));
     columnSortingKeyMap.put(updatedDateColumn, Arrays.asList(RodaConstants.JOB_REPORT_DATE_UPDATED));
-    columnSortingKeyMap.put(lastPluginRunColumn, Arrays.asList(RodaConstants.JOB_REPORT_PLUGIN));
     columnSortingKeyMap.put(lastPluginRunStateColumn, Arrays.asList(RodaConstants.JOB_REPORT_PLUGIN_STATE));
+    columnSortingKeyMap.put(failedCountColumn, Arrays.asList(RodaConstants.JOB_REPORT_UNSUCCESSFUL_PLUGINS_COUNTER));
     return createSorter(columnSortList, columnSortingKeyMap);
   }
 

@@ -64,22 +64,20 @@ public class SimpleJobReportList extends BasicAsyncTableCell<IndexedReport> {
     RodaConstants.JOB_REPORT_TOTAL_STEPS, RodaConstants.JOB_REPORT_COMPLETION_PERCENTAGE);
 
   private final Map<String, PluginInfo> pluginsInfo;
-  @SuppressWarnings("unused")
   private String sourceClass;
-  @SuppressWarnings("unused")
   private String outcomeClass;
 
   public SimpleJobReportList(String listId) {
-    this(listId, null, null, new HashMap<String, PluginInfo>(), false);
+    this(listId, null, null, new HashMap<>(), false);
   }
 
   public SimpleJobReportList(String listId, Filter filter, String summary, boolean selectable) {
-    this(listId, filter, summary, new HashMap<String, PluginInfo>(), selectable);
+    this(listId, filter, summary, new HashMap<>(), selectable);
   }
 
   public SimpleJobReportList(String listId, Filter filter, String summary, boolean selectable,
     int pageSize, int incrementPage) {
-    this(listId, filter, summary, new HashMap<String, PluginInfo>(), selectable, pageSize, incrementPage);
+    this(listId, filter, summary, new HashMap<>(), selectable, pageSize, incrementPage);
   }
 
   public SimpleJobReportList(String listId, Filter filter, String summary,
