@@ -15,6 +15,7 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.common.lists.TransferredResourceList;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.search.AdvancedSearchFieldsPanel;
+import org.roda.wui.client.common.search.EntitySearch;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -33,7 +34,7 @@ import com.google.gwt.view.client.SelectionChangeEvent;
 
 import config.i18n.client.ClientMessages;
 
-public class TransferredResourceSearch extends Composite {
+public class TransferredResourceSearch extends Composite implements EntitySearch {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
@@ -135,6 +136,7 @@ public class TransferredResourceSearch extends Composite {
     }
   }
 
+  @Override
   public void refresh() {
     if (resourcesSearchResultPanel != null && resourcesSearchResultPanel.hasElementsSelected()) {
       resourcesSearchResultPanel.refresh();
@@ -154,10 +156,12 @@ public class TransferredResourceSearch extends Composite {
     }
   }
 
+  @Override
   public void setFilter(Filter filter) {
     resourcesSearchResultPanel.setFilter(filter);
   }
 
+  @Override
   public TransferredResourceList getList() {
     return resourcesSearchResultPanel;
   }

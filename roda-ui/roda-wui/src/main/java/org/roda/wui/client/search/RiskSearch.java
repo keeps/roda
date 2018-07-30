@@ -19,6 +19,7 @@ import org.roda.wui.client.common.lists.RiskIncidenceList;
 import org.roda.wui.client.common.lists.RiskList;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.search.AdvancedSearchFieldsPanel;
+import org.roda.wui.client.common.search.EntitySearch;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.planning.RiskRegister;
 import org.roda.wui.client.planning.ShowRisk;
@@ -38,7 +39,7 @@ import com.google.gwt.view.client.SelectionChangeEvent;
 
 import config.i18n.client.ClientMessages;
 
-public class RiskSearch extends Composite {
+public class RiskSearch extends Composite implements EntitySearch {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
@@ -189,6 +190,7 @@ public class RiskSearch extends Composite {
     return selected;
   }
 
+  @Override
   public void refresh() {
     if (risksSearchResultPanel != null && risksSearchResultPanel.hasElementsSelected()) {
       risksSearchResultPanel.refresh();
@@ -215,10 +217,12 @@ public class RiskSearch extends Composite {
     }
   }
 
+  @Override
   public void setFilter(Filter filter) {
     risksSearchResultPanel.setFilter(filter);
   }
 
+  @Override
   public RiskList getList() {
     return risksSearchResultPanel;
   }

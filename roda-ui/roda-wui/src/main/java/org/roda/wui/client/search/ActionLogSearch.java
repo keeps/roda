@@ -12,8 +12,9 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.lists.LogEntryList;
-import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
+import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
 import org.roda.wui.client.common.search.AdvancedSearchFieldsPanel;
+import org.roda.wui.client.common.search.EntitySearch;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.management.ShowLogEntry;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -32,7 +33,7 @@ import com.google.gwt.view.client.SelectionChangeEvent;
 
 import config.i18n.client.ClientMessages;
 
-public class ActionLogSearch extends Composite {
+public class ActionLogSearch extends Composite implements EntitySearch {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   interface MyUiBinder extends UiBinder<Widget, ActionLogSearch> {
@@ -122,6 +123,7 @@ public class ActionLogSearch extends Composite {
     });
   }
 
+  @Override
   public void refresh() {
     if (logsSearchResultPanel != null && logsSearchResultPanel.hasElementsSelected()) {
       logsSearchResultPanel.refresh();
@@ -141,6 +143,12 @@ public class ActionLogSearch extends Composite {
     }
   }
 
+  @Override
+  public BasicAsyncTableCell<?> getList() {
+    return logsSearchResultPanel;
+  }
+
+  @Override
   public void setFilter(Filter filter) {
     logsSearchResultPanel.setFilter(filter);
   }

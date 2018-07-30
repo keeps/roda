@@ -13,7 +13,9 @@ import org.roda.core.data.v2.notifications.Notification;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.lists.NotificationList;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
+import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
 import org.roda.wui.client.common.search.AdvancedSearchFieldsPanel;
+import org.roda.wui.client.common.search.EntitySearch;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.management.ShowNotification;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -32,7 +34,7 @@ import com.google.gwt.view.client.SelectionChangeEvent;
 
 import config.i18n.client.ClientMessages;
 
-public class NotificationSearch extends Composite {
+public class NotificationSearch extends Composite implements EntitySearch {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
@@ -124,6 +126,7 @@ public class NotificationSearch extends Composite {
     });
   }
 
+  @Override
   public void refresh() {
     if (notificationsSearchResultPanel != null && notificationsSearchResultPanel.hasElementsSelected()) {
       notificationsSearchResultPanel.refresh();
@@ -142,6 +145,12 @@ public class NotificationSearch extends Composite {
     }
   }
 
+  @Override
+  public BasicAsyncTableCell<?> getList() {
+    return notificationsSearchResultPanel;
+  }
+
+  @Override
   public void setFilter(Filter filter) {
     notificationsSearchResultPanel.setFilter(filter);
   }

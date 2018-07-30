@@ -14,6 +14,7 @@ import org.roda.wui.client.browse.ShowPreservationEvent;
 import org.roda.wui.client.common.lists.PreservationEventList;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.search.AdvancedSearchFieldsPanel;
+import org.roda.wui.client.common.search.EntitySearch;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -32,7 +33,7 @@ import com.google.gwt.view.client.SelectionChangeEvent;
 
 import config.i18n.client.ClientMessages;
 
-public class PreservationEventsSearch extends Composite {
+public class PreservationEventsSearch extends Composite implements EntitySearch {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
@@ -136,6 +137,7 @@ public class PreservationEventsSearch extends Composite {
     });
   }
 
+  @Override
   public void refresh() {
     if (eventsSearchResultPanel != null && eventsSearchResultPanel.hasElementsSelected()) {
       eventsSearchResultPanel.refresh();
@@ -155,11 +157,13 @@ public class PreservationEventsSearch extends Composite {
     }
   }
 
+  @Override
   public void setFilter(Filter filter) {
     eventsSearchResultPanel.setFilter(filter);
   }
 
-  public PreservationEventList getList(){
+  @Override
+  public PreservationEventList getList() {
     return eventsSearchResultPanel;
   }
 }

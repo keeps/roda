@@ -21,6 +21,7 @@ import org.roda.wui.client.common.lists.SimpleJobReportList;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
 import org.roda.wui.client.common.search.AdvancedSearchFieldsPanel;
+import org.roda.wui.client.common.search.EntitySearch;
 import org.roda.wui.client.common.search.SearchPanel;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -39,7 +40,7 @@ import com.google.gwt.view.client.SelectionChangeEvent;
 
 import config.i18n.client.ClientMessages;
 
-public class JobSearch extends Composite {
+public class JobSearch extends Composite implements EntitySearch {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
@@ -203,6 +204,7 @@ public class JobSearch extends Composite {
     return selected;
   }
 
+  @Override
   public void refresh() {
     if (jobsSearchResultPanel != null && jobsSearchResultPanel.hasElementsSelected()) {
       jobsSearchResultPanel.refresh();
@@ -229,6 +231,16 @@ public class JobSearch extends Composite {
     }
   }
 
+  @Override
+  public BasicAsyncTableCell<?> getList() {
+    if (jobReportsSearchResultPanel != null) {
+      return jobReportsSearchResultPanel;
+    } else {
+      return jobsSearchResultPanel;
+    }
+  }
+
+  @Override
   public void setFilter(Filter filter) {
     jobsSearchResultPanel.setFilter(filter);
   }

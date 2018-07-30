@@ -380,8 +380,4 @@ public class MainSearch extends Composite {
       searchPanel.setDefaultFilterIncremental(true);
     }
   }
-
-  public void setAipFilter(Filter filter) {
-    filterAips = filter;
-  }
 }
