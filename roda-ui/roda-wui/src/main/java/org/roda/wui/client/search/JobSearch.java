@@ -165,6 +165,7 @@ public class JobSearch extends Composite {
       public void onSelectionChange(SelectionChangeEvent event) {
         Job job = jobsSearchResultPanel.getSelectionModel().getSelectedObject();
         if (job != null) {
+          jobsSearchResultPanel.getSelectionModel().clear();
           HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
         }
       }
