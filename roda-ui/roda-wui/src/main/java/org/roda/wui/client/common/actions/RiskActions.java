@@ -17,7 +17,10 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
-import org.roda.wui.client.common.NoAsyncCallback;
+import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
+import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
+import org.roda.wui.client.common.actions.model.ActionsBundle;
+import org.roda.wui.client.common.actions.model.ActionsGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
@@ -153,13 +156,13 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
   }
 
   private void remove(SelectedItems<IndexedRisk> objects, AsyncCallback<ActionImpact> callback) {
-    ClientSelectedItemsUtils.size(IndexedRisk.class, objects, new NoAsyncCallback<Long>() {
+    ClientSelectedItemsUtils.size(IndexedRisk.class, objects, new ActionNoAsyncCallback<Long>(callback) {
 
       @Override
       public void onSuccess(final Long size) {
         Dialogs.showConfirmDialog(messages.riskRemoveFolderConfirmDialogTitle(),
           messages.riskRemoveSelectedConfirmDialogMessage(size), messages.riskRemoveFolderConfirmDialogCancel(),
-          messages.riskRemoveFolderConfirmDialogOk(), new NoAsyncCallback<Boolean>() {
+          messages.riskRemoveFolderConfirmDialogOk(), new ActionNoAsyncCallback<Boolean>(callback) {
 
             @Override
             public void onSuccess(Boolean confirmed) {
@@ -169,6 +172,7 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
                   @Override
                   public void onFailure(Throwable caught) {
                     HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                    callback.onFailure(caught);
                   }
 
                   @Override
@@ -196,6 +200,8 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
                     });
                   }
                 });
+              } else {
+                doActionCallbackNone();
               }
             }
           });

@@ -1,9 +1,10 @@
-package org.roda.wui.client.common.actions;
+package org.roda.wui.client.common.actions.model;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.wui.client.common.actions.Actionable;
 
 /**
  * @author Bruno Ferreira <bferreira@keep.pt>

@@ -1,4 +1,4 @@
-package org.roda.wui.client.common.actions;
+package org.roda.wui.client.common.actions.model;
 
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.select.SelectedItems;

@@ -5,21 +5,24 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.client.common.actions;
+package org.roda.wui.client.common.actions.widgets;
 
 import static org.roda.wui.client.common.actions.Actionable.ActionImpact;
 
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.wui.client.common.NoAsyncCallback;
+import org.roda.wui.client.common.actions.Actionable;
+import org.roda.wui.client.common.actions.model.ActionableObject;
+import org.roda.wui.client.common.actions.model.ActionsBundle;
+import org.roda.wui.client.common.actions.model.ActionsButton;
+import org.roda.wui.client.common.actions.model.ActionsGroup;
 import org.roda.wui.client.common.popup.CalloutPopup;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 
 import com.google.gwt.core.shared.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -105,7 +108,7 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
 
   // Changing the initial actionable (to re-use the same builder)
 
-  public ActionableWidgetBuilder<T> changeActionable(Actionable<T> actionable){
+  public ActionableWidgetBuilder<T> changeActionable(Actionable<T> actionable) {
     this.actionable = actionable;
     return this;
   }
@@ -113,11 +116,6 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
   // Builder methods for lists and titles
 
   public Widget buildListWithObjects(ActionableObject<T> objects) {
-    ActionsBundle<T> actionsBundle = actionable.createActionsBundle();
-    return createActionsList(actionsBundle, objects);
-  }
-
-  public Widget buildMenuWithObjects(ActionableObject<T> objects) {
     ActionsBundle<T> actionsBundle = actionable.createActionsBundle();
     return createActionsMenu(actionsBundle, objects);
   }
@@ -137,74 +135,36 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
     FlowPanel panel = new FlowPanel();
     panel.addStyleName("actionable-menu");
 
-    // boolean isEmpty = true;
+    boolean isEmpty = true;
 
     for (ActionsGroup<T> actionGroup : actionsBundle) {
       for (ActionsButton<T> actionButton : actionGroup.getButtons()) {
         if (actionable.canAct(actionButton.getAction(), objects)) {
-          FlowPanel menuItem = new FlowPanel();
-          menuItem.setStylePrimaryName("actionable-menu-item");
-          menuItem.addStyleDependentName(actionButton.getImpact().toString().toLowerCase());
 
-          // icon
+          ActionableButton<T> button = new ActionableButton<>(actionButton);
 
-          String iconClass = "fa fa-exclamation-triangle";
-          for (String possibleIcon : actionButton.getExtraCssClasses()) {
-            if (possibleIcon.startsWith("btn-")) {
-              iconClass = possibleIcon.replaceFirst("btn-", "fa fa-");
-            }
-          }
-          HTMLPanel menuItemIcon = new HTMLPanel(SafeHtmlUtils.fromSafeConstant("<i class='" + iconClass + "'></i>"));
-          menuItemIcon.addStyleName("actionable-menu-item-icon");
-          menuItem.add(menuItemIcon);
+          button.addClickHandler(event -> {
+            button.setEnabled(false);
+            GWT.log("button disabled: " + button.getText());
+            actionable.act(actionButton.getAction(), objects, new AsyncCallback<Actionable.ActionImpact>() {
+              @Override
+              public void onFailure(Throwable caught) {
+                callback.onFailure(caught);
+                GWT.log("button enabled: " + button.getText());
+                button.setEnabled(true);
+              }
 
-          // label
+              @Override
+              public void onSuccess(Actionable.ActionImpact result) {
+                callback.onSuccess(result);
+                GWT.log("button enabled: " + button.getText());
+                button.setEnabled(true);
+              }
+            });
+          });
 
-          Label menuItemLabel = new Label(actionButton.getText());
-          menuItemLabel.addStyleName("actionable-menu-item-label");
-          menuItem.add(menuItemLabel);
-
-          menuItem.addDomHandler(event -> actionable.act(actionButton.getAction(), objects, callback),
-            ClickEvent.getType());
-
-          panel.add(menuItem);
-        }
-      }
-    }
-
-    // if (isEmpty) {
-    // Label emptyHelpText = new
-    // Label(messages.actionableEmptyHelp(objects.getType()));
-    // emptyHelpText.addStyleName("actions-menu-empty-help");
-    // panel.add(emptyHelpText);
-    // }
-
-    return panel;
-  }
-
-  private FlowPanel createActionsList(ActionsBundle<T> actionsBundle, ActionableObject<T> objects) {
-    FlowPanel panel = new FlowPanel();
-    panel.addStyleName("actions-layout");
-
-    boolean isEmpty = true;
-
-    for (ActionsGroup<T> actionGroup : actionsBundle) {
-      boolean hasButtonsOnThisGroup = false;
-      for (ActionsButton<T> button : actionGroup.getButtons()) {
-        if (actionable.canAct(button.getAction(), objects)) {
-          panel.add(createGroupTitle(actionGroup.getTitle()));
-          hasButtonsOnThisGroup = true;
+          panel.add(button);
           isEmpty = false;
-          break;
-        }
-      }
-
-      if (hasButtonsOnThisGroup) {
-        for (ActionsButton<T> actionButton : actionGroup.getButtons()) {
-          Button possibleButton = createGroupButton(actionButton, objects);
-          if (possibleButton != null) {
-            panel.add(possibleButton);
-          }
         }
       }
     }
@@ -216,50 +176,6 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
     }
 
     return panel;
-  }
-
-  private Label createGroupTitle(ActionsTitle actionsTitle) {
-    Label title = new Label(actionsTitle.getTitle());
-    title.addStyleName("h4");
-    title.addStyleName("actionable-group-title");
-    if (!actionsTitle.hasTitle()) {
-      title.addStyleName("actionable-group-title-empty");
-    }
-    return title;
-  }
-
-  private Button createGroupButton(ActionsButton<T> actionButton, ActionableObject<T> objects) {
-    if (actionable.canAct(actionButton.getAction(), objects)) {
-      // Construct
-      Button button = new Button(actionButton.getText());
-      button.setTitle(actionButton.getText());
-      button.getElement().setId(actionButton.getId());
-
-      // CSS
-      button.setStyleName("actions-group-button");
-      button.addStyleName("btn");
-      button.addStyleName("btn-block");
-
-      if (ActionImpact.DESTROYED.equals(actionButton.getImpact())) {
-        button.addStyleName("btn-danger");
-      } else if (ActionImpact.UPDATED.equals(actionButton.getImpact())) {
-        button.addStyleName("btn-primary");
-      } else {
-        button.addStyleName("btn-default");
-      }
-
-      button.addStyleDependentName(actionButton.getImpact().name().toLowerCase());
-
-      for (String extraCssClass : actionButton.getExtraCssClasses()) {
-        button.addStyleName(extraCssClass);
-      }
-
-      // Action
-      button.addClickHandler(event -> actionable.act(actionButton.getAction(), objects, callback));
-
-      return button;
-    }
-    return null;
   }
 
   private Widget createActionsTitle(ActionsBundle<T> actionsBundle, ActionableObject<T> objects) {

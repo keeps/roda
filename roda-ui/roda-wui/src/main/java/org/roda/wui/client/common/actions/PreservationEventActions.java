@@ -13,6 +13,8 @@ import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.wui.client.common.actions.model.ActionsBundle;
+import org.roda.wui.client.common.actions.model.ActionsGroup;
 import org.roda.wui.common.client.tools.RestUtils;
 
 import com.google.gwt.core.client.GWT;

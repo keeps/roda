@@ -20,7 +20,7 @@ import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.notifications.Notification.NOTIFICATION_STATE;
 import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
 import org.roda.core.data.v2.risks.RiskIncidence.INCIDENCE_STATUS;
-import org.roda.wui.client.common.actions.ActionableObject;
+import org.roda.wui.client.common.actions.model.ActionableObject;
 
 import com.google.gwt.i18n.client.Messages;
 import com.google.gwt.safehtml.shared.SafeHtml;

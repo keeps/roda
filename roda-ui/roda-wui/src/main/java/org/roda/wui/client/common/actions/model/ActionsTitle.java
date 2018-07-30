@@ -1,4 +1,4 @@
-package org.roda.wui.client.common.actions;
+package org.roda.wui.client.common.actions.model;
 
 import org.roda.wui.client.common.utils.StringUtils;
 

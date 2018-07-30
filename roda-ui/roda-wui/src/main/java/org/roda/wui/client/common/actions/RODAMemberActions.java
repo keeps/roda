@@ -6,6 +6,9 @@ import java.util.Set;
 
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.user.RODAMember;
+import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
+import org.roda.wui.client.common.actions.model.ActionsBundle;
+import org.roda.wui.client.common.actions.model.ActionsGroup;
 import org.roda.wui.client.management.CreateGroup;
 import org.roda.wui.client.management.CreateUser;
 import org.roda.wui.client.management.UserManagementService;

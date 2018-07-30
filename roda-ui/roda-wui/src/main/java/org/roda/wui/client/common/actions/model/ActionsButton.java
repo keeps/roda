@@ -1,16 +1,17 @@
-package org.roda.wui.client.common.actions;
+package org.roda.wui.client.common.actions.model;
 
 import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.wui.client.common.actions.Actionable;
 
 import com.google.gwt.user.client.Random;
 
 /**
  * @author Bruno Ferreira <bferreira@keep.pt>
  */
-class ActionsButton<T extends IsIndexed> {
+public class ActionsButton<T extends IsIndexed> {
   private String text;
   private Actionable.Action<T> action;
   private Actionable.ActionImpact impact;

@@ -16,11 +16,13 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
-import org.roda.wui.client.common.LoadingAsyncCallback;
-import org.roda.wui.client.common.NoAsyncCallback;
+import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
+import org.roda.wui.client.common.actions.callbacks.ActionLoadingAsyncCallback;
+import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
+import org.roda.wui.client.common.actions.model.ActionsBundle;
+import org.roda.wui.client.common.actions.model.ActionsGroup;
 import org.roda.wui.client.common.dialogs.EditMultipleRiskIncidenceDialog;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
-import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.planning.EditRiskIncidence;
 import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -110,7 +112,7 @@ public class RiskIncidenceActions extends AbstractActionable<RiskIncidence> {
   }
 
   private void remove(SelectedItems<RiskIncidence> objects, AsyncCallback<ActionImpact> callback) {
-    ClientSelectedItemsUtils.size(RiskIncidence.class, objects, new NoAsyncCallback<Long>() {
+    ClientSelectedItemsUtils.size(RiskIncidence.class, objects, new ActionNoAsyncCallback<Long>(callback) {
 
       @Override
       public void onSuccess(final Long result) {
@@ -139,16 +141,11 @@ public class RiskIncidenceActions extends AbstractActionable<RiskIncidence> {
 
       BrowserService.Util.getInstance().updateMultipleIncidences(objects, editDialog.getStatus(),
         editDialog.getSeverity(), editDialog.getMitigatedOn(), editDialog.getMitigatedBy(),
-        editDialog.getMitigatedDescription(), new LoadingAsyncCallback<Void>() {
+        editDialog.getMitigatedDescription(), new ActionLoadingAsyncCallback<Void>(callback) {
 
           @Override
           public void onSuccessImpl(Void result) {
-            callback.onSuccess(ActionImpact.UPDATED);
-          }
-
-          @Override
-          public void onFailureImpl(Throwable caught) {
-            AsyncCallbackUtils.defaultFailureTreatment(caught);
+            doActionCallbackUpdated();
           }
         });
     });

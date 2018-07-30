@@ -38,6 +38,7 @@ public class CalloutPopup extends PopupPanel {
 
   private void init() {
     setStyleName("actions-popup");
+    addStyleName("actionable-popup");
   }
 
   public void showRelativeTo(final UIObject target, final CalloutPosition position) {

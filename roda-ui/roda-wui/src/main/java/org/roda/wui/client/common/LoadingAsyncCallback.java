@@ -28,13 +28,15 @@ public abstract class LoadingAsyncCallback<T> implements AsyncCallback<T> {
   }
 
   @Override
-  public void onSuccess(T result) {
+  public final void onSuccess(T result) {
     loadingModel.hide();
     onSuccessImpl(result);
   }
 
   public void onFailureImpl(Throwable caught) {
-    AsyncCallbackUtils.defaultFailureTreatment(caught);
+    if (caught != null) {
+      AsyncCallbackUtils.defaultFailureTreatment(caught);
+    }
   }
 
   public abstract void onSuccessImpl(T result);

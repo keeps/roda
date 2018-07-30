@@ -25,8 +25,11 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
-import org.roda.wui.client.common.LoadingAsyncCallback;
-import org.roda.wui.client.common.NoAsyncCallback;
+import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
+import org.roda.wui.client.common.actions.callbacks.ActionLoadingAsyncCallback;
+import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
+import org.roda.wui.client.common.actions.model.ActionsBundle;
+import org.roda.wui.client.common.actions.model.ActionsGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.SelectFileDialog;
 import org.roda.wui.client.ingest.process.ShowJob;
@@ -172,24 +175,24 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
   public void rename(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
     Dialogs.showPromptDialog(messages.renameItemTitle(), null, file.getId(), null, RegExp.compile("^[^/]+$"),
-      messages.cancelButton(), messages.confirmButton(), true, false, new NoAsyncCallback<String>() {
+      messages.cancelButton(), messages.confirmButton(), true, false, new ActionNoAsyncCallback<String>(callback) {
 
         @Override
         public void onSuccess(final String newName) {
           Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
             RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
-            new NoAsyncCallback<String>() {
+            new ActionNoAsyncCallback<String>(callback) {
 
               @Override
               public void onSuccess(String details) {
                 BrowserService.Util.getInstance().renameFolder(file.getUUID(), newName, details,
-                  new LoadingAsyncCallback<IndexedFile>() {
+                  new ActionLoadingAsyncCallback<IndexedFile>(callback) {
 
                     @Override
                     public void onSuccessImpl(IndexedFile newFolder) {
                       Toast.showInfo(messages.dialogSuccess(), messages.renameSuccessful());
                       HistoryUtils.openBrowse(newFolder);
-                      callback.onSuccess(ActionImpact.UPDATED);
+                      doActionCallbackUpdated();
                     }
                   });
               }
@@ -221,12 +224,12 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
         Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
           RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
-          new NoAsyncCallback<String>() {
+          new ActionNoAsyncCallback<String>(callback) {
 
             @Override
             public void onSuccess(String details) {
               BrowserService.Util.getInstance().moveFiles(aipId, representationId, selectedItems, toFolder, details,
-                new LoadingAsyncCallback<Job>() {
+                new ActionLoadingAsyncCallback<Job>(callback) {
 
                   @Override
                   public void onSuccessImpl(Job result) {
@@ -244,7 +247,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
                             } else {
                               HistoryUtils.openBrowse(aipId, representationId);
                             }
-                            callback.onSuccess(null);
+                            doActionCallbackUpdated();
                           }
                         };
 
@@ -254,6 +257,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
                       @Override
                       public void onSuccess(final Void nothing) {
                         HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                        doActionCallbackUpdated();
                       }
                     });
                   }
@@ -262,7 +266,6 @@ public class FileActions extends AbstractActionable<IndexedFile> {
                   public void onFailureImpl(Throwable caught) {
                     HistoryUtils.newHistory(InternalProcess.RESOLVER);
                   }
-
                 });
             }
           });
@@ -274,16 +277,15 @@ public class FileActions extends AbstractActionable<IndexedFile> {
     if (file.isDirectory()) {
       Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
         RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
-        new NoAsyncCallback<String>() {
+        new ActionNoAsyncCallback<String>(callback) {
 
           @Override
           public void onSuccess(String details) {
             LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
             selectedItems.setDetailsMessage(details);
             HistoryUtils.openUpload(file);
-            callback.onSuccess(ActionImpact.UPDATED);
+            doActionCallbackUpdated();
           }
-
         });
     }
   }
@@ -291,13 +293,13 @@ public class FileActions extends AbstractActionable<IndexedFile> {
   public void createFolder(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
     Dialogs.showPromptDialog(messages.createFolderTitle(), null, null, messages.createFolderPlaceholder(),
       RegExp.compile("^[^/]+$"), messages.cancelButton(), messages.confirmButton(), false, false,
-      new NoAsyncCallback<String>() {
+      new ActionNoAsyncCallback<String>(callback) {
 
         @Override
         public void onSuccess(final String newName) {
           Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
             RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
-            new NoAsyncCallback<String>() {
+            new ActionNoAsyncCallback<String>(callback) {
 
               @Override
               public void onSuccess(String details) {
@@ -306,12 +308,12 @@ public class FileActions extends AbstractActionable<IndexedFile> {
                 String repId = folder.getRepresentationId();
                 String folderUUID = folder.getUUID();
                 BrowserService.Util.getInstance().createFolder(aipId, repId, folderUUID, newName, details,
-                  new LoadingAsyncCallback<IndexedFile>() {
+                  new ActionLoadingAsyncCallback<IndexedFile>(callback) {
 
                     @Override
                     public void onSuccessImpl(IndexedFile newFolder) {
                       HistoryUtils.openBrowse(newFolder);
-                      callback.onSuccess(ActionImpact.UPDATED);
+                      doActionCallbackUpdated();
                     }
 
                     @Override
@@ -319,11 +321,8 @@ public class FileActions extends AbstractActionable<IndexedFile> {
                       if (caught instanceof AlreadyExistsException) {
                         Dialogs.showInformationDialog(messages.createFolderAlreadyExistsTitle(),
                           messages.createFolderAlreadyExistsMessage(), messages.dialogOk(), false);
-                      } else {
-                        callback.onFailure(caught);
                       }
                     }
-
                   });
               }
             });
@@ -361,9 +360,8 @@ public class FileActions extends AbstractActionable<IndexedFile> {
       public void onFailure(Throwable caught) {
         if (caught instanceof NotFoundException) {
           Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-        } else {
-          super.onFailure(caught);
         }
+        super.onFailure(caught);
       }
     });
   }
@@ -371,45 +369,48 @@ public class FileActions extends AbstractActionable<IndexedFile> {
   public void remove(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
     Dialogs.showConfirmDialog(messages.viewRepresentationRemoveFileTitle(),
       messages.viewRepresentationRemoveFileMessage(), messages.dialogCancel(), messages.dialogYes(),
-      new NoAsyncCallback<Boolean>() {
+      new ActionNoAsyncCallback<Boolean>(callback) {
 
         @Override
         public void onSuccess(Boolean confirmed) {
           if (confirmed) {
             Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
               RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
-              new NoAsyncCallback<String>() {
+              new ActionNoAsyncCallback<String>(callback) {
 
                 @Override
                 public void onSuccess(String details) {
                   BrowserService.Util.getInstance().deleteFile(file.getUUID(), details,
                     new ActionAsyncCallback<Void>(callback) {
 
-                    @Override
-                    public void onSuccess(Void result) {
-                      Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+                      @Override
+                      public void onSuccess(Void result) {
+                        Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
 
-                      Timer timer = new Timer() {
-                        @Override
-                        public void run() {
-                          List<String> path = file.getPath();
-                          if (path.isEmpty()) {
-                            HistoryUtils.openBrowse(file.getAipId(), file.getRepresentationId());
-                          } else {
-                            int lastIndex = path.size() - 1;
-                            List<String> parentPath = new ArrayList<>(path.subList(0, lastIndex));
-                            String parentId = path.get(lastIndex);
-                            HistoryUtils.openBrowse(file.getAipId(), file.getRepresentationId(), parentPath, parentId);
-                          }
+                        Timer timer = new Timer() {
+                          @Override
+                          public void run() {
+                            List<String> path = file.getPath();
+                            if (path.isEmpty()) {
+                              HistoryUtils.openBrowse(file.getAipId(), file.getRepresentationId());
+                            } else {
+                              int lastIndex = path.size() - 1;
+                              List<String> parentPath = new ArrayList<>(path.subList(0, lastIndex));
+                              String parentId = path.get(lastIndex);
+                              HistoryUtils.openBrowse(file.getAipId(), file.getRepresentationId(), parentPath,
+                                parentId);
+                            }
                             doActionCallbackDestroyed();
-                        }
-                      };
+                          }
+                        };
 
-                      timer.schedule(RodaConstants.ACTION_TIMEOUT);
-                    }
-                  });
+                        timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                      }
+                    });
                 }
               });
+          } else {
+            doActionCallbackNone();
           }
         }
       });
@@ -417,14 +418,14 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
   public void remove(final SelectedItems<IndexedFile> selected, final AsyncCallback<ActionImpact> callback) {
     Dialogs.showConfirmDialog(messages.filesRemoveTitle(), messages.selectedFileRemoveMessage(),
-      messages.dialogCancel(), messages.dialogYes(), new NoAsyncCallback<Boolean>() {
+      messages.dialogCancel(), messages.dialogYes(), new ActionNoAsyncCallback<Boolean>(callback) {
 
         @Override
         public void onSuccess(Boolean confirmed) {
           if (confirmed) {
             Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
               RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
-              new NoAsyncCallback<String>() {
+              new ActionNoAsyncCallback<String>(callback) {
 
                 @Override
                 public void onSuccess(final String details) {
@@ -435,36 +436,40 @@ public class FileActions extends AbstractActionable<IndexedFile> {
                       Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(),
                         new ActionAsyncCallback<Void>(callback) {
 
-                        @Override
-                        public void onFailure(Throwable caught) {
-                          Toast.showInfo(messages.runningInBackgroundTitle(),
-                            messages.runningInBackgroundDescription());
+                          @Override
+                          public void onFailure(Throwable caught) {
+                            Toast.showInfo(messages.runningInBackgroundTitle(),
+                              messages.runningInBackgroundDescription());
 
-                          Timer timer = new Timer() {
-                            @Override
-                            public void run() {
-                              HistoryUtils.newHistory(HistoryUtils.getCurrentHistoryPath());
+                            Timer timer = new Timer() {
+                              @Override
+                              public void run() {
+                                HistoryUtils.newHistory(HistoryUtils.getCurrentHistoryPath());
                                 doActionCallbackDestroyed();
-                            }
-                          };
+                              }
+                            };
 
-                          timer.schedule(RodaConstants.ACTION_TIMEOUT);
-                        }
+                            timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                          }
 
-                        @Override
-                        public void onSuccess(final Void nothing) {
-                          HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-                        }
-                      });
+                          @Override
+                          public void onSuccess(final Void nothing) {
+                            HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                            doActionCallbackDestroyed();
+                          }
+                        });
                     }
 
                     @Override
                     public void onFailure(Throwable caught) {
                       HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                      callback.onFailure(caught);
                     }
                   });
                 }
               });
+          } else {
+            doActionCallbackNone();
           }
         }
       });

@@ -25,8 +25,11 @@ import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
-import org.roda.wui.client.common.LoadingAsyncCallback;
-import org.roda.wui.client.common.NoAsyncCallback;
+import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
+import org.roda.wui.client.common.actions.callbacks.ActionLoadingAsyncCallback;
+import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
+import org.roda.wui.client.common.actions.model.ActionsBundle;
+import org.roda.wui.client.common.actions.model.ActionsGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.RepresentationDialogs;
 import org.roda.wui.client.ingest.process.ShowJob;
@@ -56,7 +59,10 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
     Arrays.asList(RepresentationAction.NEW));
 
   private static final Set<RepresentationAction> POSSIBLE_ACTIONS_ON_SINGLE_REPRESENTATION = new HashSet<>(
-    Arrays.asList(RepresentationAction.values()));
+    Arrays.asList(RepresentationAction.DOWNLOAD, RepresentationAction.CHANGE_TYPE, RepresentationAction.REMOVE,
+      RepresentationAction.NEW_PROCESS, RepresentationAction.IDENTIFY_FORMATS, RepresentationAction.SHOW_EVENTS,
+      RepresentationAction.SHOW_RISKS, RepresentationAction.UPLOAD_FILES, RepresentationAction.CREATE_FOLDER,
+      RepresentationAction.CHANGE_STATE));
 
   private static final Set<RepresentationAction> POSSIBLE_ACTIONS_ON_MULTIPLE_REPRESENTATIONS = new HashSet<>(
     Arrays.asList(RepresentationAction.CHANGE_TYPE, RepresentationAction.REMOVE, RepresentationAction.NEW_PROCESS,
@@ -108,11 +114,11 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
   private void create(AsyncCallback<ActionImpact> callback) {
     Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
       RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
-      new NoAsyncCallback<String>() {
+      new ActionNoAsyncCallback<String>(callback) {
         @Override
         public void onSuccess(String details) {
           BrowserService.Util.getInstance().createRepresentation(parentAip.getId(), details,
-            new LoadingAsyncCallback<String>() {
+            new ActionLoadingAsyncCallback<String>(callback) {
               @Override
               public void onSuccessImpl(String representationId) {
                 HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, parentAip.getId(), representationId);
@@ -190,14 +196,14 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
     final AsyncCallback<ActionImpact> callback) {
 
     Dialogs.showConfirmDialog(messages.representationRemoveTitle(), messages.representationRemoveMessage(),
-      messages.dialogCancel(), messages.dialogYes(), new NoAsyncCallback<Boolean>() {
+      messages.dialogCancel(), messages.dialogYes(), new ActionNoAsyncCallback<Boolean>(callback) {
 
         @Override
         public void onSuccess(Boolean confirmed) {
           if (confirmed) {
             Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
               RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
-              new NoAsyncCallback<String>() {
+              new ActionNoAsyncCallback<String>(callback) {
 
                 @Override
                 public void onSuccess(String details) {
@@ -209,26 +215,26 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
                         Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(),
                           new ActionAsyncCallback<Void>(callback) {
 
-                          @Override
-                          public void onFailure(Throwable caught) {
-                            Timer timer = new Timer() {
-                              @Override
-                              public void run() {
+                            @Override
+                            public void onFailure(Throwable caught) {
+                              Timer timer = new Timer() {
+                                @Override
+                                public void run() {
                                   if (parentAip != null) {
                                     HistoryUtils.openBrowse(parentAip);
-                                }
+                                  }
                                   doActionCallbackDestroyed();
-                              }
-                            };
+                                }
+                              };
 
-                            timer.schedule(RodaConstants.ACTION_TIMEOUT);
-                          }
+                              timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                            }
 
-                          @Override
-                          public void onSuccess(final Void nothing) {
-                            HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-                          }
-                        });
+                            @Override
+                            public void onSuccess(final Void nothing) {
+                              HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                            }
+                          });
                       }
 
                       @Override
@@ -251,29 +257,29 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
     final AsyncCallback<ActionImpact> callback) {
 
     BrowserService.Util.getInstance().retrieveRepresentationTypeOptions(LocaleInfo.getCurrentLocale().getLocaleName(),
-      new NoAsyncCallback<Pair<Boolean, List<String>>>() {
+      new ActionNoAsyncCallback<Pair<Boolean, List<String>>>(callback) {
 
         @Override
         public void onSuccess(Pair<Boolean, List<String>> result) {
           RepresentationDialogs.showPromptDialogRepresentationTypes(messages.changeTypeTitle(), null,
             messages.cancelButton(), messages.confirmButton(), result.getSecond(), result.getFirst(),
-            new NoAsyncCallback<String>() {
+            new ActionNoAsyncCallback<String>(callback) {
 
               @Override
               public void onSuccess(final String newType) {
                 Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
                   RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
-                  new NoAsyncCallback<String>() {
+                  new ActionNoAsyncCallback<String>(callback) {
 
                     @Override
                     public void onSuccess(String details) {
                       BrowserService.Util.getInstance().changeRepresentationType(representations, newType, details,
-                        new LoadingAsyncCallback<Void>() {
+                        new ActionLoadingAsyncCallback<Void>(callback) {
 
                           @Override
                           public void onSuccessImpl(Void nothing) {
                             Toast.showInfo(messages.dialogSuccess(), messages.changeTypeSuccessful());
-                            callback.onSuccess(ActionImpact.UPDATED);
+                            doActionCallbackUpdated();
                           }
                         });
                     }
@@ -306,16 +312,15 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
       @Override
       public void onSuccess(Void object) {
         Toast.showInfo(messages.identifyingFormatsTitle(), messages.identifyingFormatsDescription());
-        doActionCallbackNone();
+        doActionCallbackUpdated();
       }
 
       @Override
       public void onFailure(Throwable caught) {
         if (caught instanceof NotFoundException) {
           Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-        } else {
-          super.onFailure(caught);
         }
+        super.onFailure(caught);
       }
     });
   }
@@ -340,32 +345,31 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
   public void createFolder(final IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
     Dialogs.showPromptDialog(messages.createFolderTitle(), null, null, messages.createFolderPlaceholder(),
       RegExp.compile("^[^/]+$"), messages.cancelButton(), messages.confirmButton(), true, false,
-      new NoAsyncCallback<String>() {
+      new ActionNoAsyncCallback<String>(callback) {
 
         @Override
         public void onSuccess(final String newName) {
           Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
             RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
-            new NoAsyncCallback<String>() {
+            new ActionNoAsyncCallback<String>(callback) {
 
               @Override
               public void onSuccess(final String details) {
                 BrowserService.Util.getInstance().createFolder(representation.getAipId(), representation.getId(), null,
-                  newName, details, new LoadingAsyncCallback<IndexedFile>() {
+                  newName, details, new ActionLoadingAsyncCallback<IndexedFile>(callback) {
 
                     @Override
                     public void onSuccessImpl(IndexedFile newFolder) {
                       HistoryUtils.openBrowse(newFolder);
-                      callback.onSuccess(ActionImpact.UPDATED);
+                      doActionCallbackUpdated();
                     }
 
                     @Override
                     public void onFailureImpl(Throwable caught) {
                       if (caught instanceof NotFoundException) {
                         Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-                      } else {
-                        callback.onFailure(caught);
                       }
+                      callback.onFailure(caught);
                     }
 
                   });
@@ -378,37 +382,38 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
   public void uploadFiles(final IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
     Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
       RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
-      new NoAsyncCallback<String>() {
+      new ActionNoAsyncCallback<String>(callback) {
 
         @Override
         public void onSuccess(String details) {
           LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
           selectedItems.setDetailsMessage(details);
           HistoryUtils.openUpload(representation);
-          callback.onSuccess(ActionImpact.UPDATED);
+          doActionCallbackUpdated();
         }
       });
   }
 
   public void changeState(final IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
     RepresentationDialogs.showPromptDialogRepresentationStates(messages.changeStatusTitle(), messages.cancelButton(),
-      messages.confirmButton(), representation.getRepresentationStates(), new NoAsyncCallback<List<String>>() {
+      messages.confirmButton(), representation.getRepresentationStates(),
+      new ActionNoAsyncCallback<List<String>>(callback) {
 
         @Override
         public void onSuccess(final List<String> newStates) {
           Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
             RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
-            new NoAsyncCallback<String>() {
+            new ActionNoAsyncCallback<String>(callback) {
 
               @Override
               public void onSuccess(String details) {
                 BrowserService.Util.getInstance().changeRepresentationStates(representation, newStates, details,
-                  new LoadingAsyncCallback<Void>() {
+                  new ActionLoadingAsyncCallback<Void>(callback) {
 
                     @Override
                     public void onSuccessImpl(Void nothing) {
                       Toast.showInfo(messages.dialogSuccess(), messages.changeStatusSuccessful());
-                      callback.onSuccess(ActionImpact.UPDATED);
+                      doActionCallbackUpdated();
                     }
                   });
               }
@@ -416,7 +421,6 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
         }
       });
   }
-
 
   @Override
   public ActionsBundle<IndexedRepresentation> createActionsBundle() {

@@ -14,6 +14,7 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.wui.client.common.NoAsyncCallback;
+import org.roda.wui.client.common.actions.model.ActionableObject;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 

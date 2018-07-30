@@ -1,4 +1,4 @@
-package org.roda.wui.client.common.actions;
+package org.roda.wui.client.common.actions.model;
 
 import java.util.ArrayList;
 import java.util.Iterator;

@@ -1,6 +1,6 @@
-package org.roda.wui.client.common.actions;
+package org.roda.wui.client.common.actions.callbacks;
 
-import org.roda.wui.client.common.NoAsyncCallback;
+import org.roda.wui.client.common.actions.Actionable;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -10,29 +10,19 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public abstract class ActionAsyncCallback<T> implements AsyncCallback<T> {
   private final AsyncCallback<Actionable.ActionImpact> actionCallback;
 
-  /**
-   * Use ActionAsyncCallback(AsyncCallback<Actionable.ActionImpact>
-   * actionCallback)
-   */
-  private ActionAsyncCallback() {
-    // This assignment is never used, but it avoids "possible null" when accessing
-    // `this.actionCallback`
-    this.actionCallback = new NoAsyncCallback<>();
-  }
-
-  ActionAsyncCallback(AsyncCallback<Actionable.ActionImpact> actionCallback) {
+  public ActionAsyncCallback(AsyncCallback<Actionable.ActionImpact> actionCallback) {
     this.actionCallback = actionCallback;
   }
 
-  void doActionCallbackNone() {
+  public void doActionCallbackNone() {
     actionCallback.onSuccess(Actionable.ActionImpact.NONE);
   }
 
-  void doActionCallbackUpdated() {
+  public void doActionCallbackUpdated() {
     actionCallback.onSuccess(Actionable.ActionImpact.UPDATED);
   }
 
-  void doActionCallbackDestroyed() {
+  public void doActionCallbackDestroyed() {
     actionCallback.onSuccess(Actionable.ActionImpact.DESTROYED);
   }
 

@@ -17,7 +17,9 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
-import org.roda.wui.client.common.NoAsyncCallback;
+import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
+import org.roda.wui.client.common.actions.model.ActionsBundle;
+import org.roda.wui.client.common.actions.model.ActionsGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
@@ -116,13 +118,13 @@ public class FormatActions extends AbstractActionable<Format> {
   }
 
   private void remove(SelectedItems<Format> formats, AsyncCallback<ActionImpact> callback) {
-    ClientSelectedItemsUtils.size(Format.class, formats, new NoAsyncCallback<Long>() {
+    ClientSelectedItemsUtils.size(Format.class, formats, new ActionNoAsyncCallback<Long>(callback) {
 
       @Override
       public void onSuccess(final Long size) {
         Dialogs.showConfirmDialog(messages.formatRemoveFolderConfirmDialogTitle(),
           messages.formatRemoveSelectedConfirmDialogMessage(size), messages.formatRemoveFolderConfirmDialogCancel(),
-          messages.formatRemoveFolderConfirmDialogOk(), new NoAsyncCallback<Boolean>() {
+          messages.formatRemoveFolderConfirmDialogOk(), new ActionNoAsyncCallback<Boolean>(callback) {
 
             @Override
             public void onSuccess(Boolean confirmed) {
@@ -132,6 +134,7 @@ public class FormatActions extends AbstractActionable<Format> {
                   @Override
                   public void onFailure(Throwable caught) {
                     HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                    callback.onFailure(caught);
                   }
 
                   @Override
@@ -145,7 +148,7 @@ public class FormatActions extends AbstractActionable<Format> {
                           public void run() {
                             Toast.showInfo(messages.formatRemoveSuccessTitle(),
                               messages.formatRemoveSuccessMessage(size));
-                            callback.onSuccess(ActionImpact.DESTROYED);
+                            doActionCallbackDestroyed();
                           }
                         };
 
@@ -155,7 +158,7 @@ public class FormatActions extends AbstractActionable<Format> {
                       @Override
                       public void onSuccess(final Void nothing) {
                         HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-                        callback.onSuccess(ActionImpact.DESTROYED);
+                        doActionCallbackDestroyed();
                       }
                     });
                   }

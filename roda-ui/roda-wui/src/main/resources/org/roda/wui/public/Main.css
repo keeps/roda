@@ -6662,6 +6662,7 @@ span.code {
 
 .popupContent .actions-empty-help {
     display: block;
+    padding: 5px 15px;
 }
 
 /* Popup/menu */
@@ -6680,26 +6681,34 @@ span.code {
     display: block;
 }
 
-.actionable-menu .actionable-menu-item {
+.actionable-menu .actionable-button {
     display: block;
     padding: 5px 10px;
     font-size: 1.4rem;
 }
 
-.actionable-menu .actionable-menu-item:hover {
+.actionable-menu .actionable-button {
+    border-radius: 2px;
+}
+
+.actionable-menu .actionable-button:hover {
     background-color: #eee;
     cursor: pointer;
 }
 
-.actionable-menu .actionable-menu-item.actionable-menu-item-destroyed:hover {
+.sidebar .actionable-menu .actionable-button:hover {
+    background-color: #ddd;
+}
+
+.actionable-menu .actionable-button-destroyed:hover {
     background-color: rgba(217, 83, 79, 0.4);
 }
 
-.actionable-menu .actionable-menu-item.actionable-menu-item-update:hover {
+.actionable-menu .actionable-button-update:hover {
     background-color: rgba(8, 157, 227, 0.4);
 }
 
-.actionable-menu .actionable-menu-item .actionable-menu-item-icon {
+.actionable-menu .actionable-button .actionable-button-icon {
     display: inline-block;
     vertical-align: middle;
     width: 16px;
@@ -6708,10 +6717,30 @@ span.code {
     color: #808080;
 }
 
-.actionable-menu .actionable-menu-item .actionable-menu-item-label {
+.actionable-menu .actionable-button .actionable-button-label {
     display: inline-block;
     vertical-align: middle;
     margin-left: 1rem;
+}
+
+.actionable-menu .actionable-button-disabled:hover,
+.sidebar .actionable-menu .actionable-button-disabled:hover{
+    cursor: default;
+    background: initial;
+}
+
+.actionable-menu .actionable-button-disabled .actionable-button-icon,
+.actionable-menu .actionable-button-disabled .actionable-button-label {
+    color: #a0a0a0;
+}
+
+
+.sidebar .actionable-button {
+    width: 100%;
+}
+
+.sidebar .actionable-button + .sidebar .actionable-button{
+    margin-top: 10px;
 }
 
 /* Actionable Title/Header */

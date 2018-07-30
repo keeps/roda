@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
@@ -28,8 +28,11 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.CreateDescriptiveMetadata;
 import org.roda.wui.client.browse.EditPermissions;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
-import org.roda.wui.client.common.LoadingAsyncCallback;
-import org.roda.wui.client.common.NoAsyncCallback;
+import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
+import org.roda.wui.client.common.actions.callbacks.ActionLoadingAsyncCallback;
+import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
+import org.roda.wui.client.common.actions.model.ActionsBundle;
+import org.roda.wui.client.common.actions.model.ActionsGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.RepresentationDialogs;
 import org.roda.wui.client.common.dialogs.SelectAipDialog;
@@ -191,17 +194,17 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   private void newChildAip(final AsyncCallback<ActionImpact> callback) {
     String aipType = RodaConstants.AIP_TYPE_MIXED;
 
-    BrowserService.Util.getInstance().createAIP(parentAipId, aipType,
-      new ActionAsyncCallback<String>(callback) {
-        @Override
-        public void onSuccess(String itemAIPId) {
+    BrowserService.Util.getInstance().createAIP(parentAipId, aipType, new ActionAsyncCallback<String>(callback) {
+      @Override
+      public void onSuccess(String itemAIPId) {
         LastSelectedItemsSingleton.getInstance().setLastHistory(HistoryUtils.getCurrentHistoryPath());
         HistoryUtils.newHistory(CreateDescriptiveMetadata.RESOLVER, RodaConstants.RODA_OBJECT_AIP, itemAIPId,
           CreateDescriptiveMetadata.NEW);
-          doActionCallbackUpdated();
+        doActionCallbackUpdated();
       }
     });
   }
+
   private void download(IndexedAIP aip, AsyncCallback<ActionImpact> callback) {
     SafeUri downloadUri = RestUtils.createAIPDownloadUri(aip.getId());
     Window.Location.assign(downloadUri.asString());
@@ -211,8 +214,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   private void move(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
     Dialogs.showConfirmDialog(messages.moveConfirmDialogTitle(),
       messages.moveAllConfirmDialogMessageSingle(StringUtils.isNotBlank(aip.getTitle()) ? aip.getTitle() : aip.getId()),
-      messages.dialogNo(), messages.dialogYes(),
-      new NoAsyncCallback<Boolean>() {
+      messages.dialogNo(), messages.dialogYes(), new ActionAsyncCallback<Boolean>(callback) {
         @Override
         public void onSuccess(Boolean confirmed) {
           if (confirmed) {
@@ -237,11 +239,11 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
                 Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
                   RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
-                  new NoAsyncCallback<String>() {
+                  new ActionNoAsyncCallback<String>(callback) {
                     @Override
                     public void onSuccess(String details) {
                       BrowserService.Util.getInstance().moveAIPInHierarchy(selected, parentId, details,
-                        new ActionAsyncCallback<Job>(callback) {
+                        new ActionNoAsyncCallback<Job>(callback) {
 
                           @Override
                           public void onSuccess(Job result) {
@@ -252,33 +254,32 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
                             } else {
                               HistoryUtils.newHistory(InternalProcess.RESOLVER);
                             }
+                            doActionCallbackUpdated();
                           }
 
                           @Override
                           public void onFailure(Throwable caught) {
-                            if (caught instanceof NotFoundException) {
-                              Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-                            } else {
-                              super.onFailure(caught);
-                            }
+                            super.onFailure(new RODAException(messages.moveNoSuchObject(caught.getMessage()), caught));
                           }
                         });
                     }
                   });
               }
             });
+          } else {
+            doActionCallbackNone();
           }
         }
       });
   }
 
   private void move(final SelectedItems<IndexedAIP> selected, final AsyncCallback<ActionImpact> callback) {
-    ClientSelectedItemsUtils.size(IndexedAIP.class, selected, new NoAsyncCallback<Long>() {
+    ClientSelectedItemsUtils.size(IndexedAIP.class, selected, new ActionNoAsyncCallback<Long>(callback) {
 
       @Override
       public void onSuccess(final Long size) {
         Dialogs.showConfirmDialog(messages.moveConfirmDialogTitle(), messages.moveSelectedConfirmDialogMessage(size),
-          messages.dialogNo(), messages.dialogYes(), new NoAsyncCallback<Boolean>() {
+          messages.dialogNo(), messages.dialogYes(), new ActionNoAsyncCallback<Boolean>(callback) {
 
             @Override
             public void onSuccess(Boolean confirmed) {
@@ -321,12 +322,12 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
                     Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null,
                       messages.outcomeDetailPlaceholder(), RegExp.compile(".*"), messages.cancelButton(),
-                      messages.confirmButton(), false, false, new NoAsyncCallback<String>() {
+                      messages.confirmButton(), false, false, new ActionNoAsyncCallback<String>(callback) {
 
                         @Override
                         public void onSuccess(String details) {
                           BrowserService.Util.getInstance().moveAIPInHierarchy(selected, parentId, details,
-                            new LoadingAsyncCallback<Job>() {
+                            new ActionLoadingAsyncCallback<Job>(callback) {
 
                               @Override
                               public void onSuccessImpl(Job result) {
@@ -343,11 +344,8 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
                               @Override
                               public void onFailureImpl(Throwable caught) {
-                                if (caught instanceof NotFoundException) {
-                                  Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-                                } else {
-                                  callback.onFailure(caught);
-                                }
+                                callback
+                                  .onFailure(new RODAException(messages.moveNoSuchObject(caught.getMessage()), caught));
                               }
                             });
                         }
@@ -378,15 +376,14 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     Dialogs.showConfirmDialog(messages.removeConfirmDialogTitle(),
       messages
         .removeAllConfirmDialogMessageSingle(StringUtils.isNotBlank(aip.getTitle()) ? aip.getTitle() : aip.getId()),
-      messages.dialogNo(), messages.dialogYes(),
-      new NoAsyncCallback<Boolean>() {
+      messages.dialogNo(), messages.dialogYes(), new ActionNoAsyncCallback<Boolean>(callback) {
 
         @Override
         public void onSuccess(Boolean confirmed) {
           if (confirmed) {
             Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
               RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
-              new NoAsyncCallback<String>() {
+              new ActionNoAsyncCallback<String>(callback) {
 
                 @Override
                 public void onSuccess(final String details) {
@@ -411,7 +408,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
                                 } else {
                                   HistoryUtils.newHistory(BrowseAIP.RESOLVER);
                                 }
-                                doActionCallbackDestroyed();
+                                callback.onFailure(caught);
                               }
                             };
 
@@ -421,64 +418,67 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
                           @Override
                           public void onSuccess(final Void nothing) {
                             HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                            doActionCallbackDestroyed();
                           }
                         });
                       }
                     });
                 }
               });
+          } else {
+            doActionCallbackNone();
           }
         }
       });
   }
 
   private void remove(final SelectedItems<IndexedAIP> selected, final AsyncCallback<ActionImpact> callback) {
-    ClientSelectedItemsUtils.size(IndexedAIP.class, selected, new NoAsyncCallback<Long>() {
+    ClientSelectedItemsUtils.size(IndexedAIP.class, selected, new ActionNoAsyncCallback<Long>(callback) {
 
       @Override
       public void onSuccess(final Long size) {
         Dialogs.showConfirmDialog(messages.removeConfirmDialogTitle(),
           messages.removeSelectedConfirmDialogMessage(size), messages.dialogNo(), messages.dialogYes(),
-          new NoAsyncCallback<Boolean>() {
+          new ActionNoAsyncCallback<Boolean>(callback) {
 
             @Override
             public void onSuccess(Boolean confirmed) {
               if (confirmed) {
                 Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
                   RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
-                  new NoAsyncCallback<String>() {
+                  new ActionNoAsyncCallback<String>(callback) {
 
                     @Override
                     public void onSuccess(final String details) {
-                      BrowserService.Util.getInstance().deleteAIP(selected, details, new LoadingAsyncCallback<Job>() {
+                      BrowserService.Util.getInstance().deleteAIP(selected, details,
+                        new ActionLoadingAsyncCallback<Job>(callback) {
 
-                        @Override
-                        public void onFailureImpl(Throwable caught) {
-                          callback.onFailure(caught);
-                        }
+                          @Override
+                          public void onSuccessImpl(Job result) {
+                            Toast.showInfo(messages.runningInBackgroundTitle(),
+                              messages.runningInBackgroundDescription());
 
-                        @Override
-                        public void onSuccessImpl(Job result) {
-                          Toast.showInfo(messages.runningInBackgroundTitle(),
-                            messages.runningInBackgroundDescription());
+                            Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(),
+                              new AsyncCallback<Void>() {
 
-                          Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(), new AsyncCallback<Void>() {
+                                @Override
+                                public void onFailure(Throwable caught) {
+                                  doActionCallbackDestroyed();
+                                }
 
-                            @Override
-                            public void onFailure(Throwable caught) {
-                              callback.onSuccess(ActionImpact.DESTROYED);
-                            }
+                                @Override
+                                public void onSuccess(final Void nothing) {
+                                  HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                                  doActionCallbackDestroyed();
+                                }
+                              });
 
-                            @Override
-                            public void onSuccess(final Void nothing) {
-                              HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-                            }
-                          });
-
-                        }
-                      });
+                          }
+                        });
                     }
                   });
+              } else {
+                doActionCallbackNone();
               }
             }
           });
@@ -510,12 +510,12 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     final boolean accept = true;
     String rejectReason = null;
     BrowserService.Util.getInstance().appraisal(objectToSelectedItems(aip, IndexedAIP.class), accept, rejectReason,
-      LocaleInfo.getCurrentLocale().getLocaleName(), new LoadingAsyncCallback<Void>() {
+      LocaleInfo.getCurrentLocale().getLocaleName(), new ActionLoadingAsyncCallback<Void>(callback) {
 
         @Override
         public void onSuccessImpl(Void result) {
           Toast.showInfo(messages.dialogDone(), messages.itemWasAccepted());
-          callback.onSuccess(ActionImpact.UPDATED);
+          doActionCallbackUpdated();
         }
       });
   }
@@ -524,12 +524,12 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     final boolean accept = true;
     String rejectReason = null;
     BrowserService.Util.getInstance().appraisal(aips, accept, rejectReason,
-      LocaleInfo.getCurrentLocale().getLocaleName(), new LoadingAsyncCallback<Void>() {
+      LocaleInfo.getCurrentLocale().getLocaleName(), new ActionLoadingAsyncCallback<Void>(callback) {
 
         @Override
         public void onSuccessImpl(Void result) {
           Toast.showInfo(messages.dialogDone(), messages.itemWasAccepted());
-          callback.onSuccess(ActionImpact.UPDATED);
+          doActionCallbackUpdated();
         }
       });
   }
@@ -537,19 +537,19 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   private void appraisalReject(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
     final boolean accept = false;
     Dialogs.showPromptDialog(messages.rejectMessage(), messages.rejectQuestion(), null, null, RegExp.compile(".+"),
-      messages.dialogCancel(), messages.dialogOk(), true, false, new NoAsyncCallback<String>() {
+      messages.dialogCancel(), messages.dialogOk(), true, false, new ActionNoAsyncCallback<String>(callback) {
 
         @Override
         public void onSuccess(final String rejectReason) {
           BrowserService.Util.getInstance().appraisal(objectToSelectedItems(aip, IndexedAIP.class), accept,
-            rejectReason,
-            LocaleInfo.getCurrentLocale().getLocaleName(), new LoadingAsyncCallback<Void>() {
+            rejectReason, LocaleInfo.getCurrentLocale().getLocaleName(),
+            new ActionLoadingAsyncCallback<Void>(callback) {
 
               @Override
               public void onSuccessImpl(Void result) {
                 Toast.showInfo(messages.dialogDone(), messages.itemWasRejected());
                 HistoryUtils.newHistory(IngestAppraisal.RESOLVER);
-                callback.onSuccess(ActionImpact.DESTROYED);
+                doActionCallbackDestroyed();
               }
             });
         }
@@ -559,18 +559,18 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   private void appraisalReject(final SelectedItems<IndexedAIP> aips, final AsyncCallback<ActionImpact> callback) {
     final boolean accept = false;
     Dialogs.showPromptDialog(messages.rejectMessage(), messages.rejectQuestion(), null, null, RegExp.compile(".+"),
-      messages.dialogCancel(), messages.dialogOk(), true, false, new NoAsyncCallback<String>() {
+      messages.dialogCancel(), messages.dialogOk(), true, false, new ActionNoAsyncCallback<String>(callback) {
 
         @Override
         public void onSuccess(final String rejectReason) {
           BrowserService.Util.getInstance().appraisal(aips, accept, rejectReason,
-            LocaleInfo.getCurrentLocale().getLocaleName(), new LoadingAsyncCallback<Void>() {
+            LocaleInfo.getCurrentLocale().getLocaleName(), new ActionLoadingAsyncCallback<Void>(callback) {
 
               @Override
               public void onSuccessImpl(Void result) {
                 Toast.showInfo(messages.dialogDone(), messages.itemWasRejected());
                 HistoryUtils.newHistory(IngestAppraisal.RESOLVER);
-                callback.onSuccess(ActionImpact.DESTROYED);
+                doActionCallbackDestroyed();
               }
             });
         }
@@ -601,29 +601,29 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
   private void changeType(final SelectedItems<IndexedAIP> aips, final AsyncCallback<ActionImpact> callback) {
     BrowserService.Util.getInstance().retrieveAIPTypeOptions(LocaleInfo.getCurrentLocale().getLocaleName(),
-      new NoAsyncCallback<Pair<Boolean, List<String>>>() {
+      new ActionNoAsyncCallback<Pair<Boolean, List<String>>>(callback) {
 
         @Override
         public void onSuccess(Pair<Boolean, List<String>> result) {
           RepresentationDialogs.showPromptDialogRepresentationTypes(messages.changeTypeTitle(), null,
             messages.cancelButton(), messages.confirmButton(), result.getSecond(), result.getFirst(),
-            new NoAsyncCallback<String>() {
+            new ActionNoAsyncCallback<String>(callback) {
 
               @Override
               public void onSuccess(final String newType) {
                 Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
                   RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
-                  new NoAsyncCallback<String>() {
+                  new ActionNoAsyncCallback<String>(callback) {
 
                     @Override
                     public void onSuccess(String details) {
                       BrowserService.Util.getInstance().changeAIPType(aips, newType, details,
-                        new LoadingAsyncCallback<Void>() {
+                        new ActionLoadingAsyncCallback<Void>(callback) {
 
                           @Override
                           public void onSuccessImpl(Void nothing) {
                             Toast.showInfo(messages.dialogSuccess(), messages.changeTypeSuccessful());
-                            callback.onSuccess(ActionImpact.UPDATED);
+                            doActionCallbackUpdated();
                           }
                         });
                     }
@@ -663,8 +663,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     appraisalGroup.addButton(messages.downloadDocumentation(), AipAction.DOWNLOAD_DOCUMENTATION, ActionImpact.NONE,
       "btn-download");
 
-    aipActionsBundle.addGroup(managementGroup).addGroup(preservationGroup)
-      .addGroup(appraisalGroup);
+    aipActionsBundle.addGroup(managementGroup).addGroup(preservationGroup).addGroup(appraisalGroup);
 
     return aipActionsBundle;
   }

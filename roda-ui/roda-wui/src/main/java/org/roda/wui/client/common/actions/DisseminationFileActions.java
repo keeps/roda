@@ -12,6 +12,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.roda.core.data.v2.ip.DIPFile;
+import org.roda.wui.client.common.actions.model.ActionsBundle;
+import org.roda.wui.client.common.actions.model.ActionsGroup;
 import org.roda.wui.common.client.tools.RestUtils;
 
 import com.google.gwt.core.client.GWT;

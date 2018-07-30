@@ -15,7 +15,10 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
-import org.roda.wui.client.common.NoAsyncCallback;
+import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
+import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
+import org.roda.wui.client.common.actions.model.ActionsBundle;
+import org.roda.wui.client.common.actions.model.ActionsGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.SelectTransferResourceDialog;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
@@ -29,8 +32,6 @@ import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -160,23 +161,25 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
     selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
     selectedItems.setSelectedItems(objects);
     HistoryUtils.newHistory(CreateSelectedJob.RESOLVER, RodaConstants.JOB_PROCESS_INGEST);
+    callback.onSuccess(ActionImpact.UPDATED);
   }
 
   private void rename(TransferredResource object, AsyncCallback<ActionImpact> callback) {
     BrowserService.Util.getInstance().retrieve(TransferredResource.class.getName(), object.getUUID(),
       Arrays.asList(RodaConstants.TRANSFERRED_RESOURCE_ID, RodaConstants.TRANSFERRED_RESOURCE_NAME),
-      new AsyncCallback<TransferredResource>() {
+      new ActionAsyncCallback<TransferredResource>(callback) {
 
         @Override
         public void onFailure(Throwable caught) {
           Toast.showInfo(messages.dialogFailure(), messages.renameSIPFailed());
+          super.onFailure(caught);
         }
 
         @Override
         public void onSuccess(final TransferredResource resultResource) {
           Dialogs.showPromptDialog(messages.renameTransferredResourcesDialogTitle(), null, resultResource.getName(),
             null, RegExp.compile("^[^/]*$"), messages.cancelButton(), messages.confirmButton(), true, false,
-            new NoAsyncCallback<String>() {
+            new ActionNoAsyncCallback<String>(callback) {
 
               @Override
               public void onSuccess(String result) {
@@ -217,7 +220,8 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
           Filter filter = new Filter();
           filter.add(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, Boolean.FALSE.toString()));
 
-          if (!resources.isEmpty() && resources.get(0) != NO_TRANSFERRED_RESOURCE && StringUtils.isNotBlank(resources.get(0).getParentUUID())) {
+          if (!resources.isEmpty() && resources.get(0) != NO_TRANSFERRED_RESOURCE
+            && StringUtils.isNotBlank(resources.get(0).getParentUUID())) {
             filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, resources.get(0).getParentUUID()));
           }
 
@@ -227,64 +231,63 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
           }
           dialog.setEmptyParentButtonVisible(true);
           dialog.showAndCenter();
-          dialog.addValueChangeHandler(new ValueChangeHandler<TransferredResource>() {
+          dialog.addValueChangeHandler(event -> {
+            final TransferredResource transferredResource = event.getValue();
 
-            @Override
-            public void onValueChange(ValueChangeEvent<TransferredResource> event) {
-              final TransferredResource transferredResource = event.getValue();
+            BrowserService.Util.getInstance().moveTransferredResource(objects, transferredResource,
+              new AsyncCallback<Job>() {
 
-              BrowserService.Util.getInstance().moveTransferredResource(objects, transferredResource,
-                new AsyncCallback<Job>() {
+                @Override
+                public void onFailure(Throwable caught) {
+                  Toast.showInfo(messages.dialogFailure(), messages.moveSIPFailed());
+                  HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                  doActionCallbackUpdated();
+                }
 
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    Toast.showInfo(messages.dialogFailure(), messages.moveSIPFailed());
-                    HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                  }
+                @Override
+                public void onSuccess(Job result) {
+                  Dialogs.showJobRedirectDialog(messages.moveJobCreatedMessage(), new AsyncCallback<Void>() {
 
-                  @Override
-                  public void onSuccess(Job result) {
-                    Dialogs.showJobRedirectDialog(messages.moveJobCreatedMessage(), new AsyncCallback<Void>() {
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
 
-                      @Override
-                      public void onFailure(Throwable caught) {
-                        Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
-
-                        Timer timer = new Timer() {
-                          @Override
-                          public void run() {
-                            if (transferredResource != null) {
-                              HistoryUtils.newHistory(IngestTransfer.RESOLVER, transferredResource.getUUID());
-                            } else {
-                              HistoryUtils.newHistory(IngestTransfer.RESOLVER);
-                            }
+                      Timer timer = new Timer() {
+                        @Override
+                        public void run() {
+                          if (transferredResource != null) {
+                            HistoryUtils.newHistory(IngestTransfer.RESOLVER, transferredResource.getUUID());
+                          } else {
+                            HistoryUtils.newHistory(IngestTransfer.RESOLVER);
                           }
-                        };
+                          doActionCallbackUpdated();
+                        }
+                      };
 
-                        timer.schedule(RodaConstants.ACTION_TIMEOUT);
-                      }
+                      timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                    }
 
-                      @Override
-                      public void onSuccess(final Void nothing) {
-                        HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-                      }
-                    });
-                  }
-                });
-            }
+                    @Override
+                    public void onSuccess(final Void nothing) {
+                      HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                      doActionCallbackUpdated();
+                    }
+                  });
+                }
+              });
           });
         }
       });
   }
 
   private void remove(SelectedItems<TransferredResource> objects, AsyncCallback<ActionImpact> callback) {
-    ClientSelectedItemsUtils.size(TransferredResource.class, objects, new NoAsyncCallback<Long>() {
+    ClientSelectedItemsUtils.size(TransferredResource.class, objects, new ActionNoAsyncCallback<Long>(callback) {
 
       @Override
       public void onSuccess(final Long size) {
         Dialogs.showConfirmDialog(messages.ingestTransferRemoveFolderConfirmDialogTitle(),
           messages.ingestTransferRemoveSelectedConfirmDialogMessage(size), messages.dialogNo(), messages.dialogYes(),
-          new NoAsyncCallback<Boolean>() {
+          new ActionNoAsyncCallback<Boolean>(callback) {
 
             @Override
             public void onSuccess(Boolean confirmed) {
@@ -295,10 +298,11 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
                     @Override
                     public void onSuccess(Void result) {
                       Toast.showInfo(messages.removeSuccessTitle(), messages.removeSuccessMessage(size));
-                      GWT.log("callback inside: " + callback);
                       doActionCallbackDestroyed();
                     }
                   });
+              } else {
+                doActionCallbackNone();
               }
             }
           });
@@ -317,9 +321,8 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
       public void onFailure(Throwable caught) {
         if (caught instanceof IsStillUpdatingException) {
           Toast.showInfo(messages.dialogRefresh(), messages.updateIsCurrentlyRunning());
-        } else {
-          super.onFailure(caught);
         }
+        super.onFailure(caught);
       }
 
       @Override
@@ -340,6 +343,7 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
     } else {
       HistoryUtils.newHistory(TransferUpload.INGEST_RESOLVER);
     }
+    callback.onSuccess(ActionImpact.UPDATED);
   }
 
   private void newFolder(AsyncCallback<ActionImpact> callback) {
@@ -349,7 +353,7 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
   private void newFolder(TransferredResource object, AsyncCallback<ActionImpact> callback) {
     Dialogs.showPromptDialog(messages.ingestTransferCreateFolderTitle(), messages.ingestTransferCreateFolderMessage(),
       null, null, RegExp.compile("^[^/]+$"), messages.dialogCancel(), messages.dialogOk(), true, false,
-      new NoAsyncCallback<String>() {
+      new ActionNoAsyncCallback<String>(callback) {
         @Override
         public void onSuccess(String folderName) {
           BrowserService.Util.getInstance().createTransferredResourcesFolder(

@@ -13,13 +13,13 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.wui.client.common.actions.ActionableObject;
-import org.roda.wui.client.common.actions.ActionableWidgetBuilder;
 import org.roda.wui.client.common.actions.AipActions;
 import org.roda.wui.client.common.actions.DisseminationActions;
 import org.roda.wui.client.common.actions.DisseminationFileActions;
 import org.roda.wui.client.common.actions.FileActions;
 import org.roda.wui.client.common.actions.RepresentationActions;
+import org.roda.wui.client.common.actions.model.ActionableObject;
+import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 
 public class OptionsSliderHelper {
 

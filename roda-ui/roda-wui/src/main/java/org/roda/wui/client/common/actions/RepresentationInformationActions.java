@@ -17,7 +17,10 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
-import org.roda.wui.client.common.NoAsyncCallback;
+import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
+import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
+import org.roda.wui.client.common.actions.model.ActionsBundle;
+import org.roda.wui.client.common.actions.model.ActionsGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
@@ -125,17 +128,19 @@ public class RepresentationInformationActions extends AbstractActionable<Represe
   private void download(RepresentationInformation object, AsyncCallback<ActionImpact> callback) {
     SafeUri downloadUri = RestUtils.createRepresentationInformationDownloadUri(object.getId());
     Window.Location.assign(downloadUri.asString());
+    callback.onSuccess(ActionImpact.NONE);
   }
 
   private void remove(SelectedItems<RepresentationInformation> objects, AsyncCallback<ActionImpact> callback) {
-    ClientSelectedItemsUtils.size(RepresentationInformation.class, objects, new NoAsyncCallback<Long>() {
+    ClientSelectedItemsUtils.size(RepresentationInformation.class, objects, new ActionNoAsyncCallback<Long>(callback) {
 
       @Override
       public void onSuccess(final Long size) {
         Dialogs.showConfirmDialog(messages.representationInformationRemoveFolderConfirmDialogTitle(),
           messages.representationInformationRemoveSelectedConfirmDialogMessage(size),
           messages.representationInformationRemoveFolderConfirmDialogCancel(),
-          messages.representationInformationRemoveFolderConfirmDialogOk(), new NoAsyncCallback<Boolean>() {
+          messages.representationInformationRemoveFolderConfirmDialogOk(),
+          new ActionNoAsyncCallback<Boolean>(callback) {
 
             @Override
             public void onSuccess(Boolean confirmed) {
@@ -145,6 +150,7 @@ public class RepresentationInformationActions extends AbstractActionable<Represe
                   @Override
                   public void onFailure(Throwable caught) {
                     HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                    callback.onFailure(caught);
                   }
 
                   @Override
