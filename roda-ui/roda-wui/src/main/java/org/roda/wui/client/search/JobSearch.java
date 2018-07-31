@@ -166,7 +166,7 @@ public class JobSearch extends Composite implements EntitySearch {
       public void onSelectionChange(SelectionChangeEvent event) {
         Job job = jobsSearchResultPanel.getSelectionModel().getSelectedObject();
         if (job != null) {
-          jobsSearchResultPanel.getSelectionModel().clear();
+          jobsSearchResultPanel.clearSelected();
           HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
         }
       }

@@ -251,7 +251,7 @@ public class ListSelectionUtils {
 
         if (selectionState != null) {
           save(selectionState);
-          list.getSelectionModel().clear();
+          list.clearSelected();
           HistoryUtils.resolve(selectionState.getSelected());
         }
       }

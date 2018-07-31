@@ -493,7 +493,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     selected = new HashSet<>();
     hideSelectAllPanel();
     display.setVisibleRangeAndClearData(new Range(0, getInitialPageSize()), true);
-    getSelectionModel().clear();
+    clearSelected();
     updateEmptyTableWidget();
   }
 
@@ -743,6 +743,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
   public void clearSelected() {
     selected.clear();
+    selectionModel.clear();
     redraw();
     fireOnCheckboxSelectionChanged();
   }
