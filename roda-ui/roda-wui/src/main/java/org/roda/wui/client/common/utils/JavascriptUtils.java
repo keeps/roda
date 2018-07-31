@@ -121,9 +121,6 @@ public class JavascriptUtils {
 						$wnd.jQuery(this).parent().find('input').click();
 					});
 
-					$wnd.dropzoneUploaded = 0;
-					$wnd.dropzoneUploadTotal = 0;
-
 					// Initialize the jQuery File Upload plugin
 					$wnd
 							.jQuery('#upload')
@@ -174,26 +171,31 @@ public class JavascriptUtils {
 
 											});
 
-											$wnd.dropzoneUploadTotal++;
-
 											// Automatically upload the file once it is added to the queue
 											var jqXHR = data.submit();
 										},
 
+										// Callback for uploads start.
+										start : function(e){
+											$wnd.jQuery('.btn').prop('disabled', true);
+											$wnd.jQuery('#upload-message').hide();
+										},
+
+										// Callback for uploads stop.
+										stop : function(e, data){
+											$wnd.jQuery('.btn').prop('disabled', false);
+											$wnd.jQuery('#upload-message').show();
+											$wnd.jQuery('html, body').animate({
+												scrollTop: $wnd.jQuery('#upload-message').offset().top
+											}, 150);
+										},
+
+										// Callback for upload progress events.
 										progress : function(e, data) {
 
 											// Calculate the completion percentage of the upload
 											var progress = parseInt(data.loaded
 													/ data.total * 100, 10);
-
-											if (progress == 100) {
-												$wnd.dropzoneUploaded++;
-											}
-
-											var globalProgress = parseInt(
-													$wnd.dropzoneUploaded
-															/ $wnd.dropzoneUploadTotal
-															* 100, 10);
 
 											// Update the hidden input field and trigger a change
 											// so that the jQuery knob plugin knows to update the dial
@@ -203,18 +205,6 @@ public class JavascriptUtils {
 											if (progress == 100) {
 												data.context
 														.removeClass('working');
-											}
-
-											if (globalProgress == 100) {
-												$wnd.jQuery('.btn').prop(
-														'disabled', false);
-												$wnd.jQuery('#upload-message')
-														.show();
-											} else {
-												$wnd.jQuery('.btn').prop(
-														'disabled', true);
-												$wnd.jQuery('#upload-message')
-														.hide();
 											}
 										},
 
