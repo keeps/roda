@@ -27,8 +27,7 @@
 
 				<g:FlowPanel ui:field="resultsPanel" visible="false" addStyleNames="card representationInformationCard representationInformationCardList">
 					<g:HTML addStyleNames="h5" ui:field="resultsPanelTitle" />
-					<commonsearch:SearchPanel ui:field="searchPanel" />
-					<lists:RepresentationInformationList addStyleNames="searchResults" ui:field="representationInformationList" />
+					<commonsearch:SearchWrapper ui:field="searchWrapper" />
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>

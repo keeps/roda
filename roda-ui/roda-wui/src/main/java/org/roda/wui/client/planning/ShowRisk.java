@@ -68,7 +68,7 @@ public class ShowRisk extends Composite {
   };
 
   private static ShowRisk instance = null;
-  private static ClientMessages messages = GWT.create(ClientMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   interface MyUiBinder extends UiBinder<Widget, ShowRisk> {
   }
@@ -95,8 +95,6 @@ public class ShowRisk extends Composite {
     }
   };
 
-  private IndexedRisk risk;
-
   @UiField(provided = true)
   RiskShowPanel riskShowPanel;
 
@@ -109,14 +107,12 @@ public class ShowRisk extends Composite {
    *
    */
   public ShowRisk() {
-    this.risk = new IndexedRisk();
-    this.riskShowPanel = new RiskShowPanel();
+    this.riskShowPanel = new RiskShowPanel("RiskShowPanel_riskIncidences");
     initWidget(uiBinder.createAndBindUi(this));
   }
 
   public ShowRisk(IndexedRisk risk) {
-    this.risk = risk;
-    this.riskShowPanel = new RiskShowPanel(risk, true);
+    this.riskShowPanel = new RiskShowPanel(risk, "RiskShowPanel_riskIncidences", true);
     initWidget(uiBinder.createAndBindUi(this));
     // actionsSidebar is set in the resolve callback
   }

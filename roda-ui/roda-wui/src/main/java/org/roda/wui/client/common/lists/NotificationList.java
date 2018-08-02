@@ -14,10 +14,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.notifications.Notification;
-import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 
@@ -36,7 +35,7 @@ import com.google.gwt.view.client.ProvidesKey;
 
 import config.i18n.client.ClientMessages;
 
-public class NotificationList extends BasicAsyncTableCell<Notification> {
+public class NotificationList extends AsyncTableCell<Notification> {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
@@ -52,19 +51,11 @@ public class NotificationList extends BasicAsyncTableCell<Notification> {
     RodaConstants.NOTIFICATION_SENT_ON, RodaConstants.NOTIFICATION_SUBJECT, RodaConstants.NOTIFICATION_IS_ACKNOWLEDGED,
     RodaConstants.NOTIFICATION_STATE);
 
-  public NotificationList(String listId) {
-    this(listId, null, null, false);
+  @Override
+  protected void adjustOptions(Options<Notification> options) {
+    options.withFieldsToReturn(fieldsToReturn);
   }
 
-  public NotificationList(String listId, Filter filter, String summary, boolean selectable) {
-    super(Notification.class, listId, filter, false, summary, selectable, fieldsToReturn);
-  }
-
-  public NotificationList(String listId, Filter filter, String summary, boolean selectable, int pageSize,
-    int incrementPage) {
-    super(Notification.class, listId, filter, false, summary, selectable, pageSize, incrementPage,
-      fieldsToReturn);
-  }
 
   @Override
   protected void configureDisplay(CellTable<Notification> display) {

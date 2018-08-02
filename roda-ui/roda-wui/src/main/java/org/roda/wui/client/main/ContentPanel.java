@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.v2.user.User;
-import org.roda.wui.client.browse.BrowseAIP;
+import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
@@ -59,7 +59,7 @@ public class ContentPanel extends SimplePanel {
   private static ClientLogger logger = new ClientLogger(ContentPanel.class.getName());
 
   private static final Set<HistoryResolver> resolvers = new HashSet<>();
-  private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private Widget currWidget;
 
@@ -89,7 +89,7 @@ public class ContentPanel extends SimplePanel {
     // Theme static pages
     resolvers.add(Theme.RESOLVER);
     // Browse
-    resolvers.add(BrowseAIP.RESOLVER);
+    resolvers.add(BrowseTop.RESOLVER);
     // Search
     resolvers.add(Search.RESOLVER);
     resolvers.add(Relation.RESOLVER);

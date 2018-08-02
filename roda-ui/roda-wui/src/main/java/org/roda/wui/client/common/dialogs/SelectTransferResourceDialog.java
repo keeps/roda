@@ -7,35 +7,23 @@
  */
 package org.roda.wui.client.common.dialogs;
 
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.common.lists.TransferredResourceList;
-import org.roda.wui.client.common.search.SearchFilters;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.ListBuilder;
 
 import com.google.gwt.core.client.GWT;
 
 import config.i18n.client.ClientMessages;
 
-public class SelectTransferResourceDialog extends DefaultSelectDialog<TransferredResource, Void> {
-
+public class SelectTransferResourceDialog extends DefaultSelectDialog<TransferredResource> {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  private static final Filter DEFAULT_FILTER = SearchFilters.defaultFilter(TransferredResource.class.getName());
-
-  private static final Boolean SELECTABLE = Boolean.FALSE;
-
-  public SelectTransferResourceDialog(String title) {
-    this(title, DEFAULT_FILTER);
-  }
-
   public SelectTransferResourceDialog(String title, Filter filter) {
-    this(title, filter, SELECTABLE);
-  }
-
-  public SelectTransferResourceDialog(String title, Filter filter, boolean selectable) {
-    super(title, filter, RodaConstants.TRANSFERRED_RESOURCE_SEARCH, new TransferredResourceList(
-      "SelectTransferResourceDialog_transferredResources", filter,
-      messages.selectTransferredResourcesSearchResults(), selectable, true), false);
+    super(title,
+      new ListBuilder<>(() -> new TransferredResourceList(true),
+        new AsyncTableCell.Options<>(TransferredResource.class, "SelectTransferResourceDialog_transferredResources")
+          .withFilter(filter).withSummary(messages.selectTransferredResourcesSearchResults())));
   }
 }

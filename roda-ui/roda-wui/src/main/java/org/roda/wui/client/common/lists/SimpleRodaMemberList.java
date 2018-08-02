@@ -13,10 +13,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.user.RODAMember;
-import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
@@ -31,7 +30,7 @@ import com.google.gwt.view.client.ProvidesKey;
 
 import config.i18n.client.ClientMessages;
 
-public class SimpleRodaMemberList extends BasicAsyncTableCell<RODAMember> {
+public class SimpleRodaMemberList extends AsyncTableCell<RODAMember> {
 
   private static final int PAGE_SIZE = 5;
 
@@ -47,12 +46,9 @@ public class SimpleRodaMemberList extends BasicAsyncTableCell<RODAMember> {
   private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.MEMBERS_ID,
     RodaConstants.MEMBERS_IS_USER, RodaConstants.MEMBERS_NAME, RodaConstants.MEMBERS_ID);
 
-  public SimpleRodaMemberList(String listId) {
-    this(listId, null, null, false);
-  }
-
-  public SimpleRodaMemberList(String listId, Filter filter, String summary, boolean selectable) {
-    super(RODAMember.class, listId, filter, summary, selectable, fieldsToReturn);
+  @Override
+  protected void adjustOptions(Options<RODAMember> options) {
+    options.withFieldsToReturn(fieldsToReturn);
   }
 
   @Override

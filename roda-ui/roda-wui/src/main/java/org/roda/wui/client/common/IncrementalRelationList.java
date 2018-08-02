@@ -45,7 +45,7 @@ import config.i18n.client.ClientMessages;
 
 public class IncrementalRelationList extends Composite implements HasHandlers {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  private static ClientMessages messages = GWT.create(ClientMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   interface MyUiBinder extends UiBinder<Widget, IncrementalRelationList> {
   }

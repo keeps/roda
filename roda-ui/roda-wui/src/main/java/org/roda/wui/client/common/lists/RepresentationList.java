@@ -15,10 +15,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
@@ -38,7 +37,7 @@ import com.google.gwt.user.client.ui.Label;
 
 import config.i18n.client.ClientMessages;
 
-public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentation> {
+public class RepresentationList extends AsyncTableCell<IndexedRepresentation> {
 
   private static final ClientLogger LOGGER = new ClientLogger(RepresentationList.class.toString());
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
@@ -57,20 +56,11 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
     RodaConstants.REPRESENTATION_CREATED_ON, RodaConstants.REPRESENTATION_UPDATED_ON,
     RodaConstants.REPRESENTATION_STATES);
 
-  public RepresentationList(String listId) {
-    this(listId, null, false, null, false);
+  @Override
+  protected void adjustOptions(Options<IndexedRepresentation> options) {
+    options.withFieldsToReturn(fieldsToReturn);
   }
 
-  public RepresentationList(String listId, Filter filter, boolean justActive, String summary,
-    boolean selectable) {
-    super(IndexedRepresentation.class, listId, filter, justActive, summary, selectable, fieldsToReturn);
-  }
-
-  public RepresentationList(String listId, Filter filter, boolean justActive, String summary,
-    boolean selectable, int initialPageSize, int pageSizeIncrement) {
-    super(IndexedRepresentation.class, listId, filter, justActive, summary, selectable, initialPageSize,
-      pageSizeIncrement, fieldsToReturn);
-  }
 
   @Override
   protected void configureDisplay(CellTable<IndexedRepresentation> display) {

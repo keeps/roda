@@ -72,7 +72,6 @@ public class RiskIncidenceCollection extends AbstractSolrCollection<RiskIncidenc
     fields.add(new Field(RodaConstants.RISK_INCIDENCE_MITIGATED_DESCRIPTION, Field.TYPE_TEXT));
     fields.add(new Field(RodaConstants.RISK_INCIDENCE_FILE_PATH_COMPUTED, Field.TYPE_STRING).setStored(false));
 
-    fields.add(SolrCollection.getSearchField());
     return fields;
   }
 

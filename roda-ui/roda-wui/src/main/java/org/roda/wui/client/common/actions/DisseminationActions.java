@@ -17,14 +17,14 @@ import org.roda.core.data.v2.ip.AIPLink;
 import org.roda.core.data.v2.ip.FileLink;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.RepresentationLink;
-import org.roda.wui.client.browse.BrowseAIP;
+import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.EditPermissions;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.actions.callbacks.ActionLoadingAsyncCallback;
 import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
-import org.roda.wui.client.common.actions.model.ActionsBundle;
-import org.roda.wui.client.common.actions.model.ActionsGroup;
+import org.roda.wui.client.common.actions.model.ActionableBundle;
+import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -54,6 +54,11 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
 
   public enum DisseminationAction implements Actionable.Action<IndexedDIP> {
     DOWNLOAD, REMOVE, NEW_PROCESS, UPDATE_PERMISSIONS;
+  }
+
+  @Override
+  public DisseminationAction actionForName(String name) {
+    return DisseminationAction.valueOf(name);
   }
 
   public static DisseminationActions get() {
@@ -185,7 +190,7 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
   private void updatePermissions(IndexedDIP dip, AsyncCallback<ActionImpact> callback) {
     LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
     selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
-    HistoryUtils.newHistory(BrowseAIP.RESOLVER, EditPermissions.DIP_RESOLVER.getHistoryToken(), dip.getId());
+    HistoryUtils.newHistory(BrowseTop.RESOLVER, EditPermissions.DIP_RESOLVER.getHistoryToken(), dip.getId());
     callback.onSuccess(ActionImpact.UPDATED);
   }
 
@@ -193,16 +198,17 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
     LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
     selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
     LastSelectedItemsSingleton.getInstance().setSelectedItems(dips);
-    HistoryUtils.newHistory(BrowseAIP.RESOLVER, EditPermissions.DIP_RESOLVER.getHistoryToken());
+    HistoryUtils.newHistory(BrowseTop.RESOLVER, EditPermissions.DIP_RESOLVER.getHistoryToken());
     callback.onSuccess(ActionImpact.UPDATED);
   }
 
   @Override
-  public ActionsBundle<IndexedDIP> createActionsBundle() {
-    ActionsBundle<IndexedDIP> dipActionsBundle = new ActionsBundle<>();
+  public ActionableBundle<IndexedDIP> createActionsBundle() {
+    ActionableBundle<IndexedDIP> dipActionableBundle = new ActionableBundle<>();
 
     // MANAGEMENT
-    ActionsGroup<IndexedDIP> managementGroup = new ActionsGroup<>(messages.viewRepresentationFileDisseminationTitle());
+    ActionableGroup<IndexedDIP> managementGroup = new ActionableGroup<>(
+      messages.viewRepresentationFileDisseminationTitle());
     managementGroup.addButton(messages.downloadButton(), DisseminationAction.DOWNLOAD, ActionImpact.NONE,
       "btn-download");
     managementGroup.addButton(messages.removeButton(), DisseminationAction.REMOVE, ActionImpact.DESTROYED, "btn-ban");
@@ -210,12 +216,12 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
       ActionImpact.UPDATED, "btn-edit");
 
     // PRESERVATION
-    ActionsGroup<IndexedDIP> preservationGroup = new ActionsGroup<>(messages.preservationTitle());
+    ActionableGroup<IndexedDIP> preservationGroup = new ActionableGroup<>(messages.preservationTitle());
     preservationGroup.addButton(messages.newProcessPreservation(), DisseminationAction.NEW_PROCESS,
       ActionImpact.UPDATED, "btn-play");
 
-    dipActionsBundle.addGroup(managementGroup).addGroup(preservationGroup);
+    dipActionableBundle.addGroup(managementGroup).addGroup(preservationGroup);
 
-    return dipActionsBundle;
+    return dipActionableBundle;
   }
 }

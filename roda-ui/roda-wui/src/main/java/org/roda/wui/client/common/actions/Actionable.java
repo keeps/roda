@@ -9,8 +9,8 @@ package org.roda.wui.client.common.actions;
 
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableObject;
-import org.roda.wui.client.common.actions.model.ActionsBundle;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -57,5 +57,7 @@ public interface Actionable<T extends IsIndexed> {
   void act(Action<T> action, SelectedItems<T> objects, AsyncCallback<ActionImpact> callback);
 
   // Layout
-  ActionsBundle<T> createActionsBundle();
+  ActionableBundle<T> createActionsBundle();
+
+  Action<T> actionForName(String name);
 }

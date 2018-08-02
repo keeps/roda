@@ -60,11 +60,11 @@ To apply the changes on the stylesheet you must ingest new content or re-index e
 Change your `roda-wui.properties` to [add an new advanced search field item](https://github.com/keeps/roda/blob/master/roda-ui/roda-wui/src/main/resources/config/roda-wui.properties#L165):
 
 ```javaproperties
-ui.search.fields.items = destructiondate # add new field to the list of fields for items (i.e. AIPs), other options are representations or files
-ui.search.fields.items.destructiondate.fields = destructiondate_txt # the id of the field in the index, equal to the one on the stylesheet you create
-ui.search.fields.items.destructiondate.i18n = ui.search.fields.items.destructiondate # key for the translation in ServerMessages.properties
-ui.search.fields.items.destructiondate.type = text # the type of the field which influences the search form input
-ui.search.fields.items.destructiondate.fixed = true # if it appears on advanced search by default or if it needs to be added via the "ADD SEARCH FIELD" button.
+ui.search.fields.IndexedAIP = destructiondate # add new field to the list of fields for items (i.e. AIPs), other options are representations or files
+ui.search.fields.IndexedAIP.destructiondate.fields = destructiondate_txt # the id of the field in the index, equal to the one on the stylesheet you create
+ui.search.fields.IndexedAIP.destructiondate.i18n = ui.search.fields.IndexedAIP.destructiondate # key for the translation in ServerMessages.properties
+ui.search.fields.IndexedAIP.destructiondate.type = text # the type of the field which influences the search form input
+ui.search.fields.IndexedAIP.destructiondate.fixed = true # if it appears on advanced search by default or if it needs to be added via the "ADD SEARCH FIELD" button.
 ```
 You should also add the necessary translations to your `$RODA_HOME/config/i18n/ServerMessages.properties`, and in all languages you which to support.
 
@@ -77,5 +77,5 @@ ui.browse.metadata.descriptive.type.golikswe_1=Golik SWE (version 1)
 Add [translations for your fields](https://github.com/keeps/roda/blob/master/roda-ui/roda-wui/src/main/resources/config/i18n/ServerMessages.properties#L2):
 
 ```javaproperties
-ui.search.fields.items.destructiondate= Destruction Date
+ui.search.fields.IndexedAIP.destructiondate= Destruction Date
 ```

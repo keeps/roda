@@ -19,8 +19,9 @@ import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
 import org.roda.wui.client.common.actions.callbacks.ActionLoadingAsyncCallback;
 import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
-import org.roda.wui.client.common.actions.model.ActionsBundle;
-import org.roda.wui.client.common.actions.model.ActionsGroup;
+import org.roda.wui.client.common.actions.model.ActionableBundle;
+import org.roda.wui.client.common.actions.model.ActionableGroup;
+import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.EditMultipleRiskIncidenceDialog;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.planning.EditRiskIncidence;
@@ -53,6 +54,11 @@ public class RiskIncidenceActions extends AbstractActionable<RiskIncidence> {
 
   public enum RiskIncidenceAction implements Action<RiskIncidence> {
     EDIT, REMOVE, START_PROCESS
+  }
+
+  @Override
+  public RiskIncidenceAction actionForName(String name) {
+    return RiskIncidenceAction.valueOf(name);
   }
 
   public static RiskIncidenceActions get() {
@@ -115,14 +121,30 @@ public class RiskIncidenceActions extends AbstractActionable<RiskIncidence> {
     ClientSelectedItemsUtils.size(RiskIncidence.class, objects, new ActionNoAsyncCallback<Long>(callback) {
 
       @Override
-      public void onSuccess(final Long result) {
-        BrowserService.Util.getInstance().deleteRiskIncidences(objects, new ActionAsyncCallback<Void>(callback) {
-          @Override
-          public void onSuccess(Void nothing) {
-            Toast.showInfo(messages.removeSuccessTitle(), messages.removeSuccessMessage(result));
-            doActionCallbackDestroyed();
-          }
-        });
+      public void onSuccess(final Long size) {
+        Dialogs.showConfirmDialog(messages.riskIncidenceRemoveConfirmDialogTitle(),
+          messages.riskIncidenceRemoveSelectedConfirmDialogMessage(size),
+          messages.riskIncidenceRemoveConfirmDialogCancel(), messages.riskIncidenceRemoveConfirmDialogOk(),
+          new ActionAsyncCallback<Boolean>(callback) {
+
+            @Override
+            public void onSuccess(Boolean confirmed) {
+              if (confirmed) {
+                BrowserService.Util.getInstance().deleteRiskIncidences(objects,
+                  new ActionAsyncCallback<Void>(callback) {
+
+                    @Override
+                    public void onSuccess(Void nothing) {
+                      Toast.showInfo(messages.riskIncidenceRemoveSuccessTitle(),
+                        messages.riskIncidenceRemoveSuccessMessage(size));
+                      doActionCallbackDestroyed();
+                    }
+                  });
+              } else {
+                doActionCallbackNone();
+              }
+            }
+          });
       }
     });
   }
@@ -152,16 +174,16 @@ public class RiskIncidenceActions extends AbstractActionable<RiskIncidence> {
   }
 
   @Override
-  public ActionsBundle<RiskIncidence> createActionsBundle() {
-    ActionsBundle<RiskIncidence> actionableBundle = new ActionsBundle<>();
+  public ActionableBundle<RiskIncidence> createActionsBundle() {
+    ActionableBundle<RiskIncidence> actionableBundle = new ActionableBundle<>();
 
     // MANAGEMENT
-    ActionsGroup<RiskIncidence> managementGroup = new ActionsGroup<>(messages.sidebarActionsTitle());
+    ActionableGroup<RiskIncidence> managementGroup = new ActionableGroup<>(messages.sidebarActionsTitle());
     managementGroup.addButton(messages.editButton(), RiskIncidenceAction.EDIT, ActionImpact.UPDATED, "btn-edit");
     managementGroup.addButton(messages.removeButton(), RiskIncidenceAction.REMOVE, ActionImpact.DESTROYED, "btn-ban");
 
     // PRESERVATION
-    ActionsGroup<RiskIncidence> preservationGroup = new ActionsGroup<>(messages.preservationTitle());
+    ActionableGroup<RiskIncidence> preservationGroup = new ActionableGroup<>(messages.preservationTitle());
     preservationGroup.addButton(messages.formatRegisterProcessButton(), RiskIncidenceAction.START_PROCESS,
       ActionImpact.UPDATED, "btn-play");
 

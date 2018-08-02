@@ -16,7 +16,7 @@
 				</g:HTML>
 				<g:FlowPanel addStyleNames="page-description" ui:field="ingestAppraisalDescription">
 				</g:FlowPanel>
-				<commonsearch:MainSearch ui:field="mainSearch" />
+				<commonsearch:CatalogueSearch ui:field="catalogueSearch" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">

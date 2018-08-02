@@ -96,6 +96,7 @@ public final class RodaConstants {
   public static final String UI_GOOGLE_RECAPTCHA_CODE_PROPERTY = "ui.google.recaptcha.code";
 
   public static final String UI_LISTS_PROPERTY = "ui.lists";
+
   public static final String UI_LISTS_FACETS_QUERY_PROPERTY = "facets.query";
   public static final String UI_LISTS_FACETS_PARAMETERS_PROPERTY = "facets.parameters";
   public static final String UI_LISTS_FACETS_PARAMETERS_TYPE_PROPERTY = "type";
@@ -108,6 +109,17 @@ public final class RodaConstants {
   public static final String UI_LISTS_FACETS_PARAMETERS_ARGS_SORT_PROPERTY = "sort";
   public static final String UI_LISTS_FACETS_PARAMETERS_ARGS_VALUES_PROPERTY = "values";
   public static final String UI_LISTS_FACETS_PARAMETERS_ARGS_MINCOUNT_PROPERTY = "minCount";
+
+  public static final String UI_LISTS_SEARCH_ENABLED_PROPERTY = "search.enabled";
+  public static final String UI_LISTS_SEARCH_PREFILTERS_VISIBLE_PROPERTY = "search.prefilters.visible";
+  public static final String UI_LISTS_SEARCH_ADVANCED_ENABLED_PROPERTY = "search.advanced.enabled";
+  public static final String UI_LISTS_SEARCH_SELECTEDINFO_ALWAYSVISIBLE_PROPERTY = "search.selectedInfo.alwaysVisible";
+  public static final String UI_LISTS_SEARCH_SELECTEDINFO_ICON_PROPERTY = "search.selectedInfo.icon";
+  public static final String UI_LISTS_SEARCH_SELECTEDINFO_LABEL_SELECTED_I18N_SINGLE_PROPERTY = "search.selectedInfo.label.selected.i18n.single";
+  public static final String UI_LISTS_SEARCH_SELECTEDINFO_LABEL_SELECTED_I18N_MULTIPLE_PROPERTY = "search.selectedInfo.label.selected.i18n.multiple";
+  public static final String UI_LISTS_SEARCH_SELECTEDINFO_LABEL_DEFAULT_I18N_PROPERTY = "search.selectedInfo.label.default.i18n";
+
+  public static final String UI_ICONS_CLASS = "ui.icons.class";
 
   /*
    * RODA objects
@@ -580,6 +592,8 @@ public final class RodaConstants {
   public static final String INDEX_UUID = "uuid";
   public static final String INDEX_ID = "id";
   public static final String INDEX_STATE = "state";
+  public static final String INDEX_SEARCH = "search";
+  public static final String INDEX_WILDCARD = "*";
 
   /*
    * AIP FIELDS
@@ -625,6 +639,8 @@ public final class RodaConstants {
   public static final String AIP_UPDATED_ON = "updatedOn";
   public static final String AIP_UPDATED_BY = "updatedBy";
 
+  // @deprecated use {@link #INDEX_SEARCH} instead.
+  @Deprecated()
   public static final String AIP_SEARCH = "search";
 
   // AIP types
@@ -657,6 +673,8 @@ public final class RodaConstants {
   public static final String REPRESENTATION_UPDATED_BY = "updatedBy";
 
   public static final String REPRESENTATION_STATES = "representationStates";
+  // @deprecated use {@link #INDEX_SEARCH} instead.
+  @Deprecated()
   public static final String REPRESENTATION_SEARCH = "search";
 
   // Representation types
@@ -733,6 +751,8 @@ public final class RodaConstants {
   public static final String LOG_PARAMETERS = "parameters";
   public static final String LOG_STATE = "state";
   public static final String LOG_FILE_ID = "fileID";
+  // @deprecated use {@link #INDEX_SEARCH} instead.
+  @Deprecated()
   public static final String LOG_SEARCH = "search";
 
   // MEMBER: USER or GROUP
@@ -745,6 +765,8 @@ public final class RodaConstants {
   public static final String MEMBERS_USERS = "users";
   public static final String MEMBERS_ROLES_DIRECT = "rolesDirect";
   public static final String MEMBERS_ROLES_ALL = "rolesAll";
+  // @deprecated use {@link #INDEX_SEARCH} instead.
+  @Deprecated()
   public static final String MEMBERS_SEARCH = "search";
   public static final String MEMBERS_EMAIL = "email";
 
@@ -759,6 +781,8 @@ public final class RodaConstants {
   public static final String TRANSFERRED_RESOURCE_SIZE = "size";
   public static final String TRANSFERRED_RESOURCE_ANCESTORS = "ancestors";
   public static final String TRANSFERRED_RESOURCE_LAST_SCAN_DATE = "lastScanDate";
+  // @deprecated use {@link #INDEX_SEARCH} instead.
+  @Deprecated()
   public static final String TRANSFERRED_RESOURCE_SEARCH = "search";
   // REST
   public static final String TRANSFERRED_RESOURCE_DIRECTORY_NAME = "name";
@@ -790,6 +814,8 @@ public final class RodaConstants {
   public static final String JOB_HAS_FAILURES = "hasFailures";
   public static final String JOB_FILE_EXTENSION = ".json";
 
+  // @deprecated use {@link #INDEX_SEARCH} instead.
+  @Deprecated()
   public static final String JOB_SEARCH = "search";
 
   /* Plugins related parameters */
@@ -916,6 +942,8 @@ public final class RodaConstants {
   public static final String JOB_REPORT_UNSUCCESSFUL_PLUGINS = "unsuccessfulPlugins";
   public static final String JOB_REPORT_UNSUCCESSFUL_PLUGINS_COUNTER = "unsuccessfulPluginsCounter";
   public static final String JOB_REPORT_FILE_EXTENSION = ".json";
+  // @deprecated use {@link #INDEX_SEARCH} instead.
+  @Deprecated()
   public static final String JOB_REPORT_SEARCH = "search";
 
   public static final String FILE_PATH = "path";
@@ -944,6 +972,8 @@ public final class RodaConstants {
   public static final String FILE_FULLTEXT = "fulltext";
   public static final String FILE_ANCESTORS = "ancestors";
   public static final String FILE_FORMAT_DESIGNATION = "formatDesignation";
+  // @deprecated use {@link #INDEX_SEARCH} instead.
+  @Deprecated()
   public static final String FILE_SEARCH = "search";
 
   /* Risks */
@@ -983,6 +1013,8 @@ public final class RodaConstants {
   public static final String RISK_UPDATED_BY = "updatedBy";
 
   public static final String RISK_FILE_EXTENSION = ".json";
+  // @deprecated use {@link #INDEX_SEARCH} instead.
+  @Deprecated()
   public static final String RISK_SEARCH = "search";
 
   public static final String RISK_INCIDENCE_ID = "id";
@@ -1006,6 +1038,8 @@ public final class RodaConstants {
   public static final String RISK_INCIDENCE_FILE_PATH_COMPUTED = "filePathComputed";
   public static final String RISK_INCIDENCE_FILE_PATH_COMPUTED_SEPARATOR = "/";
   public static final String RISK_INCIDENCE_FILE_EXTENSION = ".json";
+  // @deprecated use {@link #INDEX_SEARCH} instead.
+  @Deprecated()
   public static final String RISK_INCIDENCE_SEARCH = "search";
 
   /* Representation information */
@@ -1032,6 +1066,8 @@ public final class RodaConstants {
   public static final String REPRESENTATION_INFORMATION_UPDATED_BY = "updatedBy";
 
   public static final String REPRESENTATION_INFORMATION_FILE_EXTENSION = ".xml";
+  // @deprecated use {@link #INDEX_SEARCH} instead.
+  @Deprecated()
   public static final String REPRESENTATION_INFORMATION_SEARCH = "search";
 
   public static final String ONE_OF_FORMAT_FIELDS = "oneOfFormatFields";
@@ -1059,6 +1095,8 @@ public final class RodaConstants {
   public static final String FORMAT_VERSIONS = "versions";
 
   public static final String FORMAT_FILE_EXTENSION = ".json";
+  // @deprecated use {@link #INDEX_SEARCH} instead.
+  @Deprecated()
   public static final String FORMAT_SEARCH = "search";
 
   /* Notifications */
@@ -1074,6 +1112,8 @@ public final class RodaConstants {
   public static final String NOTIFICATION_STATE = "state";
 
   public static final String NOTIFICATION_FILE_EXTENSION = ".json";
+  // @deprecated use {@link #INDEX_SEARCH} instead.
+  @Deprecated()
   public static final String NOTIFICATION_SEARCH = "search";
   public static final String NOTIFICATION_VARIOUS_RECIPIENT_USERS = "various-recipient-users";
 
@@ -1103,6 +1143,8 @@ public final class RodaConstants {
   public static final String DIP_ALL_REPRESENTATION_UUIDS = "allRepresentationUUIDs";
 
   public static final String DIP_FILE_EXTENSION = ".json";
+  // @deprecated use {@link #INDEX_SEARCH} instead.
+  @Deprecated()
   public static final String DIP_SEARCH = "search";
 
   public static final String DIPFILE_ID = "id";
@@ -1121,6 +1163,8 @@ public final class RodaConstants {
   public static final String DIPFILE_FORMAT_EXTENSION = "formatExtension";
 
   public static final String DIPFILE_FILE_EXTENSION = ".json";
+  // @deprecated use {@link #INDEX_SEARCH} instead.
+  @Deprecated()
   public static final String DIPFILE_SEARCH = "search";
 
   /* View representation */
@@ -1155,6 +1199,8 @@ public final class RodaConstants {
   public static final String PRESERVATION_EVENT_LINKING_AGENT_IDENTIFIER = "linkingAgentIdentifier";
   public static final String PRESERVATION_EVENT_LINKING_OUTCOME_OBJECT_IDENTIFIER = "linkingOutcomeObjectIdentifier";
   public static final String PRESERVATION_EVENT_LINKING_SOURCE_OBJECT_IDENTIFIER = "linkingSourceObjectIdentifier";
+  // @deprecated use {@link #INDEX_SEARCH} instead.
+  @Deprecated()
   public static final String PRESERVATION_EVENT_SEARCH = "search";
 
   /* Preservation agents fields */
@@ -1165,6 +1211,8 @@ public final class RodaConstants {
   public static final String PRESERVATION_AGENT_VERSION = "version";
   public static final String PRESERVATION_AGENT_NOTE = "note";
   public static final String PRESERVATION_AGENT_ROLES = "roles";
+  // @deprecated use {@link #INDEX_SEARCH} instead.
+  @Deprecated()
   public static final String PRESERVATION_AGENT_SEARCH = "search";
 
   public static final String PRESERVATION_TYPE_AGENT = "agent";
@@ -1316,8 +1364,6 @@ public final class RodaConstants {
   public static final String SEARCH_FIELD_TYPE_SUGGEST_FIELD = "suggestField";
   public static final String SEARCH_FIELD_TYPE_SUGGEST_PARTIAL = "suggestPartial";
   public static final String SEARCH_FIELD_TYPE_CONTROLLED = "controlled";
-
-  public static final String SEARCH_BUTTON_EVENT_MARK = "do_search";
 
   public static final String METADATA_VERSION_SEPARATOR = "_";
   public static final String METADATA_TEMPLATE_FOLDER = "templates";

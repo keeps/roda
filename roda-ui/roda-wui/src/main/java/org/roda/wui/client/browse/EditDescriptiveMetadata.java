@@ -88,7 +88,7 @@ public class EditDescriptiveMetadata extends Composite {
             }
           });
       } else {
-        HistoryUtils.newHistory(BrowseAIP.RESOLVER);
+        HistoryUtils.newHistory(BrowseTop.RESOLVER);
         callback.onSuccess(null);
       }
     }
@@ -96,12 +96,12 @@ public class EditDescriptiveMetadata extends Composite {
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
       // TODO check for edit metadata permission
-      UserLogin.getInstance().checkRoles(new HistoryResolver[] {BrowseAIP.RESOLVER}, false, callback);
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {BrowseTop.RESOLVER}, false, callback);
     }
 
     @Override
     public List<String> getHistoryPath() {
-      return ListUtils.concat(BrowseAIP.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(BrowseTop.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     @Override

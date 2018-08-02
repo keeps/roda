@@ -5,7 +5,6 @@
 	xmlns:commonsearch="urn:import:org.roda.wui.client.common.search">
 
 	<g:FlowPanel>
-		<commonsearch:SearchPanel ui:field="searchPanel" />
-		<g:FlowPanel addStyleNames="searchResults" ui:field="searchResultPanel" />
+		<commonsearch:SearchWrapper ui:field="searchPanel" />
 	</g:FlowPanel>
 </ui:UiBinder>

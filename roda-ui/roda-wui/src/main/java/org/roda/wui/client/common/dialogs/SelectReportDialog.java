@@ -7,28 +7,17 @@
  */
 package org.roda.wui.client.common.dialogs;
 
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.wui.client.common.lists.SimpleJobReportList;
-import org.roda.wui.client.common.search.SearchFilters;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.ListBuilder;
 
-public class SelectReportDialog extends DefaultSelectDialog<IndexedReport, Void> {
-
-  private static final Filter DEFAULT_FILTER_REPORT = SearchFilters.defaultFilter(IndexedReport.class.getName());
-
-  public SelectReportDialog(String title) {
-    this(title, DEFAULT_FILTER_REPORT);
-  }
-
+public class SelectReportDialog extends DefaultSelectDialog<IndexedReport> {
   public SelectReportDialog(String title, Filter filter) {
-    this(title, filter, false);
+    super(title,
+      new ListBuilder<>(SimpleJobReportList::new,
+        new AsyncTableCell.Options<>(IndexedReport.class, "SelectReportDialog_simpleJobReports").withFilter(filter)
+          .withSummary(title)));
   }
-
-  public SelectReportDialog(String title, Filter filter, boolean selectable) {
-    super(title, filter, RodaConstants.JOB_REPORT_SEARCH,
-      new SimpleJobReportList("SelectReportDialog_simpleJobReports", filter, title, selectable),
-      false);
-  }
-
 }

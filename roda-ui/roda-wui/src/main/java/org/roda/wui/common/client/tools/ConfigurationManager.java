@@ -70,6 +70,27 @@ public class ConfigurationManager {
   }
 
   /**
+   * Used when the configuration is setup as following:
+   *
+   * keyParts: i18nKey
+   *
+   * i18nKey: returnValue
+   *
+   * This method resolves the keyParts to an 18n key and retrieves its associated
+   * translation.
+   *
+   * @return the translation for an i18n key that is the property value for the
+   *         provided keyParts
+   */
+  public static String resolveTranslation(String... keyParts) {
+    String i18nKey = getString(keyParts);
+    if (i18nKey != null) {
+      return getTranslation(i18nKey);
+    }
+    return null;
+  }
+
+  /**
    * @return The integer property value for the provided keyParts. Or
    *         {@code defaultValue} if the property value was null, not an integer
    *         or the key is not present.

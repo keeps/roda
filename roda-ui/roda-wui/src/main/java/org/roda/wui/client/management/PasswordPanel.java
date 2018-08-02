@@ -27,7 +27,7 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import config.i18n.client.ClientMessages;
 
 public class PasswordPanel extends SimplePanel implements HasValueChangeHandlers<String> {
-  private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private FlowPanel editLayout;
 

@@ -93,8 +93,6 @@ public class RepresentationCollection extends AbstractSolrCollection<IndexedRepr
     fields.add(SolrCollection.getSortFieldOf(RodaConstants.REPRESENTATION_TYPE));
     // pataki@ END
 
-    fields.add(SolrCollection.getSearchField());
-
     return fields;
   }
 

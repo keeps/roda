@@ -12,7 +12,6 @@ package org.roda.wui.client.management;
 
 import java.util.List;
 
-import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.search.NotificationSearch;
@@ -88,7 +87,6 @@ public class NotificationRegister extends Composite {
 
   public NotificationRegister() {
     notificationSearch = new NotificationSearch("NotificationRegister_notifications");
-    notificationSearch.defaultFilters(Filter.ALL);
 
     initWidget(uiBinder.createAndBindUi(this));
     notificationDescription.add(new HTMLWidgetWrapper("NotificationDescription.html"));
@@ -102,7 +100,6 @@ public class NotificationRegister extends Composite {
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.isEmpty()) {
-      notificationSearch.setFilter(Filter.ALL);
       callback.onSuccess(this);
     } else if (historyTokens.size() > 1 && ShowNotification.RESOLVER.getHistoryToken().equals(historyTokens.get(0))) {
       ShowNotification.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);

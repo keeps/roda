@@ -200,7 +200,7 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
     }
   }
 
-  private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   @SuppressWarnings("unused")
   private final ClientLogger logger = new ClientLogger(getClass().getName());

@@ -10,15 +10,10 @@
  */
 package org.roda.wui.client.planning;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.filter.FilterParameter;
-import org.roda.core.data.v2.index.filter.OrFiltersParameters;
-import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.wui.client.browse.BrowserService;
@@ -27,8 +22,10 @@ import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.RepresentationInformationDialogs;
 import org.roda.wui.client.common.lists.RepresentationInformationList;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchFilters;
-import org.roda.wui.client.common.search.SearchPanel;
+import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -50,7 +47,6 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.SelectionChangeEvent;
 
 import config.i18n.client.ClientMessages;
 
@@ -97,12 +93,6 @@ public class RepresentationInformationAssociations extends Composite {
   @UiField
   HTML description;
 
-  @UiField(provided = true)
-  SearchPanel searchPanel;
-
-  @UiField(provided = true)
-  RepresentationInformationList representationInformationList;
-
   @UiField
   FlowPanel createPanel;
 
@@ -121,30 +111,38 @@ public class RepresentationInformationAssociations extends Composite {
   @UiField
   HTML resultsPanelTitle;
 
+  @UiField(provided = true)
+  SearchWrapper searchWrapper;
+
   private SafeHtml addWithAssociationDialogTitle;
   private boolean gettingFilterResults = true;
-
-  private static final Filter DEFAULT_FILTER = SearchFilters.defaultFilter(RepresentationInformation.class.getName());
-  private static final String ALL_FILTER = SearchFilters.allFilter(RepresentationInformation.class.getName());
 
   /**
    * Create a representation information page
    */
   public RepresentationInformationAssociations() {
-    representationInformationList = new RepresentationInformationList("RepresentationInformationAssociations_RI",
-      Filter.NULL,
-      messages.representationInformationTitle(), false);
 
-    searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, true,
-      messages.representationInformationRegisterSearchPlaceHolder(), false, false, true);
-    searchPanel.setList(representationInformationList);
+    ValueChangeHandler<IndexResult<RepresentationInformation>> valueChangeHandler = event -> {
+      boolean associating = gettingFilterResults && event.getValue().getTotalCount() == 0;
+      resultsPanel.setVisible(!associating);
+      createPanel.setVisible(associating);
+    };
+
+    ListBuilder<RepresentationInformation> representationInformationAssociationsListBuilder = new ListBuilder<>(
+      RepresentationInformationList::new,
+      new AsyncTableCell.Options<>(RepresentationInformation.class, "RepresentationInformationAssociations_RI")
+        .bindOpener().addValueChangedHandler(valueChangeHandler));
+
+    searchWrapper = new SearchWrapper(false).createListAndSearchPanel(representationInformationAssociationsListBuilder,
+      messages.representationInformationRegisterSearchPlaceHolder());
 
     initWidget(uiBinder.createAndBindUi(this));
 
     resultsPanel.setVisible(false);
     createPanel.setVisible(false);
 
-    searchPanel.addValueChangeHandler(new ValueChangeHandler<String>() {
+    searchWrapper.addSearchFieldTextValueChangeHandler(RepresentationInformation.class,
+      new ValueChangeHandler<String>() {
       @Override
       public void onValueChange(ValueChangeEvent<String> valueChangeEvent) {
         // the user is searching. use this flag to avoid showing the options to
@@ -153,28 +151,6 @@ public class RepresentationInformationAssociations extends Composite {
         gettingFilterResults = false;
       }
     });
-
-    representationInformationList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
-      @Override
-      public void onSelectionChange(SelectionChangeEvent event) {
-        RepresentationInformation selected = representationInformationList.getSelectionModel().getSelectedObject();
-        if (selected != null) {
-          LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
-          selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
-          HistoryUtils.newHistory(ShowRepresentationInformation.RESOLVER, selected.getId());
-        }
-      }
-    });
-
-    representationInformationList
-      .addValueChangeHandler(new ValueChangeHandler<IndexResult<RepresentationInformation>>() {
-        @Override
-        public void onValueChange(ValueChangeEvent<IndexResult<RepresentationInformation>> event) {
-          boolean associating = gettingFilterResults && event.getValue().getTotalCount() == 0;
-          resultsPanel.setVisible(!associating);
-          createPanel.setVisible(associating);
-        }
-      });
 
     Label titleLabel = new Label(messages.representationInformationAssociationsTitle());
     titleLabel.addStyleName("h1 browseItemText");
@@ -205,7 +181,7 @@ public class RepresentationInformationAssociations extends Composite {
                           selectedItemsList.getIds().get(0));
                       } else {
                         gettingFilterResults = false;
-                        representationInformationList.refresh();
+                        searchWrapper.refreshCurrentList();
                         createPanel.setVisible(false);
                         resultsPanel.setVisible(true);
                       }
@@ -219,12 +195,7 @@ public class RepresentationInformationAssociations extends Composite {
       }
     });
 
-    buttonCreateNewRI.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent clickEvent) {
-        addToNewClickHandler();
-      }
-    });
+    buttonCreateNewRI.addClickHandler(clickEvent -> addToNewClickHandler());
   }
 
   /**
@@ -250,33 +221,21 @@ public class RepresentationInformationAssociations extends Composite {
     createPanel.setVisible(false);
     resultsPanel.setVisible(false);
 
-    if (historyTokens.size() == 2) {
-      Filter filter = createFilterFromHistoryTokens(historyTokens);
-
+    if (historyTokens.size() >= 2) {
       String[] parts = RepresentationInformationUtils.breakFilterIntoParts(historyTokens.get(1));
       createPanelTitle.setHTML(messages.representationInformationNoAssociations(parts[0], parts[1], parts[2]));
       resultsPanelTitle.setHTML(messages.representationInformationAssociatedWith(parts[0], parts[1], parts[2]));
       description.setHTML(messages.representationInformationAssociatedWithDescription(parts[0], parts[1], parts[2]));
       addWithAssociationDialogTitle = messages.representationInformationAssociateWith(parts[0], parts[1], parts[2]);
 
-      searchPanel.setDefaultFilter(filter, true);
-      representationInformationList.setFilter(filter);
-      searchPanel.clearSearchInputBox();
+      searchWrapper.setFilter(RepresentationInformation.class,
+        SearchFilters.createFilterFromHistoryTokens(historyTokens));
 
       callback.onSuccess(this);
     } else {
       HistoryUtils.newHistory(RESOLVER);
       callback.onSuccess(null);
     }
-  }
-
-  private Filter createFilterFromHistoryTokens(List<String> historyTokens) {
-    List<FilterParameter> params = new ArrayList<>();
-    if (historyTokens.size() == (2)) {
-      params.add(new SimpleFilterParameter(historyTokens.get(0), historyTokens.get(1)));
-    }
-
-    return new Filter(new OrFiltersParameters(params));
   }
 
   private void addToNewClickHandler() {

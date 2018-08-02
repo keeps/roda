@@ -12,58 +12,43 @@ package org.roda.wui.client.planning;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.filter.DateRangeFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
-import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.wui.client.browse.BrowseAIP;
+import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
-import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.common.actions.RiskIncidenceActions;
 import org.roda.wui.client.common.lists.RiskIncidenceList;
-import org.roda.wui.client.common.lists.utils.AsyncTableCell.CheckboxSelectionListener;
-import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchFilters;
-import org.roda.wui.client.common.search.SearchPanel;
+import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
-import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
-import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.user.datepicker.client.DateBox;
-import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
-import com.google.gwt.view.client.SelectionChangeEvent;
 
 import config.i18n.client.ClientMessages;
 
@@ -78,7 +63,8 @@ public class RiskIncidenceRegister extends Composite {
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
       if (historyTokens.isEmpty()) {
-        RiskIncidenceRegister riskIncidences = new RiskIncidenceRegister(null, null, null, null, Filter.ALL);
+        RiskIncidenceRegister riskIncidences = new RiskIncidenceRegister(null, null, null, null,
+          SearchFilters.allFilter());
         callback.onSuccess(riskIncidences);
       } else if (historyTokens.size() == 2
         && historyTokens.get(0).equals(ShowRiskIncidence.RESOLVER.getHistoryToken())) {
@@ -153,7 +139,7 @@ public class RiskIncidenceRegister extends Composite {
 
   private static final List<String> fileFieldsToReturn = new ArrayList<>(
     Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.FILE_PARENT_UUID, RodaConstants.FILE_PATH,
-      RodaConstants.FILE_ANCESTORS_PATH, RodaConstants.FILE_ORIGINALNAME, RodaConstants.FILE_FILE_ID,
+      RodaConstants.FILE_ANCESTORS_PATH, RodaConstants.FILE_ORIGINALNAME, RodaConstants.INDEX_ID,
       RodaConstants.FILE_AIP_ID, RodaConstants.FILE_REPRESENTATION_ID, RodaConstants.FILE_ISDIRECTORY));
 
   @UiField
@@ -166,120 +152,42 @@ public class RiskIncidenceRegister extends Composite {
   FlowPanel riskIncidenceRegisterDescription;
 
   @UiField(provided = true)
-  SearchPanel searchPanel;
-
-  @UiField(provided = true)
-  RiskIncidenceList riskIncidenceList;
-
-  @UiField
-  DateBox inputDateInitial;
-
-  @UiField
-  DateBox inputDateFinal;
-
-  @UiField
-  Button buttonRemove, buttonCancel;
-
-  private static final String ALL_FILTER = SearchFilters.allFilter(RiskIncidence.class.getName());
-
-  private String aipId = null;
-  private String representationId = null;
-  private List<String> filePath = null;
-  private String fileId = null;
-
-  /**
-   * Create a risk register page
-   *
-   * @param user
-   */
+  SearchWrapper searchWrapper;
 
   public RiskIncidenceRegister(String aipId, String representationId, List<String> filePath, String fileId,
     Filter filter) {
-    this.aipId = aipId;
-    this.representationId = representationId;
-    this.filePath = filePath;
-    this.fileId = fileId;
 
-    riskIncidenceList = new RiskIncidenceList("RiskIncidenceRegister_risks", filter, messages.riskIncidencesTitle(),
-      true);
+    ListBuilder<RiskIncidence> riskIncidenceListBuilder = new ListBuilder<>(RiskIncidenceList::new,
+      new AsyncTableCell.Options<>(RiskIncidence.class, "RiskIncidenceRegister_risks").withFilter(filter)
+        .withSummary(messages.riskIncidencesTitle()).bindOpener());
 
-    searchPanel = new SearchPanel(filter, ALL_FILTER, true, messages.riskIncidenceRegisterSearchPlaceHolder(), false,
-      false, false);
-    searchPanel.setList(riskIncidenceList);
-
-    riskIncidenceList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
-      @Override
-      public void onSelectionChange(SelectionChangeEvent event) {
-        final RiskIncidence selected = riskIncidenceList.getSelectionModel().getSelectedObject();
-        if (selected != null) {
-          LastSelectedItemsSingleton.getInstance().setLastHistory(HistoryUtils.getCurrentHistoryPath());
-          HistoryUtils.newHistory(RiskIncidenceRegister.RESOLVER, ShowRiskIncidence.RESOLVER.getHistoryToken(),
-            selected.getId());
-        }
-      }
-    });
-
-    riskIncidenceList.addCheckboxSelectionListener(new CheckboxSelectionListener<RiskIncidence>() {
-      @Override
-      public void onSelectionChange(SelectedItems<RiskIncidence> selected) {
-        boolean empty = ClientSelectedItemsUtils.isEmpty(selected);
-        if (empty) {
-          buttonRemove.setEnabled(false);
-        } else {
-          buttonRemove.setEnabled(true);
-        }
-      }
-    });
+    searchWrapper = new SearchWrapper(false).createListAndSearchPanel(riskIncidenceListBuilder,
+      RiskIncidenceActions.getForMultipleEdit(), messages.riskIncidenceRegisterSearchPlaceHolder());
 
     initWidget(uiBinder.createAndBindUi(this));
     riskIncidenceRegisterDescription.add(new HTMLWidgetWrapper("RiskIncidenceRegisterDescription.html"));
-    buttonRemove.setEnabled(false);
-
-    DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
-    ValueChangeHandler<Date> valueChangeHandler = new ValueChangeHandler<Date>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<Date> event) {
-        updateDateFilter();
-      }
-    };
-
-    inputDateInitial.setFormat(dateFormat);
-    inputDateInitial.getDatePicker().setYearArrowsVisible(true);
-    inputDateInitial.setFireNullValues(true);
-    inputDateInitial.addValueChangeHandler(valueChangeHandler);
-    inputDateInitial.setTitle(messages.dateIntervalLabelInitial());
-
-    inputDateFinal.setFormat(dateFormat);
-    inputDateFinal.getDatePicker().setYearArrowsVisible(true);
-    inputDateFinal.setFireNullValues(true);
-    inputDateFinal.addValueChangeHandler(valueChangeHandler);
-    inputDateFinal.setTitle(messages.dateIntervalLabelFinal());
-
-    inputDateInitial.getElement().setPropertyString("placeholder", messages.sidebarFilterFromDatePlaceHolder());
-    inputDateFinal.getElement().setPropertyString("placeholder", messages.sidebarFilterToDatePlaceHolder());
 
     // create breadcrumbs
     breadcrumb.setVisible(true);
     if (fileId != null) {
-      getFileBreadCrumbs();
+      getFileBreadCrumbs(aipId, representationId, filePath, fileId);
     } else if (representationId != null) {
-      getRepresentationBreadCrumbs();
+      getRepresentationBreadCrumbs(aipId, representationId);
     } else if (aipId != null) {
-      getAIPBreadCrumbs();
+      getAIPBreadCrumbs(aipId);
     } else {
       breadcrumb.setVisible(false);
     }
   }
 
-  private void getAIPBreadCrumbs() {
+  private void getAIPBreadCrumbs(String aipId) {
     BrowserService.Util.getInstance().retrieveBrowseAIPBundle(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
       aipFieldsToReturn, new AsyncCallback<BrowseAIPBundle>() {
 
         @Override
         public void onFailure(Throwable caught) {
           AsyncCallbackUtils.defaultFailureTreatment(caught);
-          HistoryUtils.newHistory(BrowseAIP.RESOLVER);
+          HistoryUtils.newHistory(BrowseTop.RESOLVER);
         }
 
         @Override
@@ -291,7 +199,7 @@ public class RiskIncidenceRegister extends Composite {
       });
   }
 
-  private void getRepresentationBreadCrumbs() {
+  private void getRepresentationBreadCrumbs(String aipId, String representationId) {
     BrowserService.Util.getInstance().retrieveBrowseRepresentationBundle(aipId, representationId,
       LocaleInfo.getCurrentLocale().getLocaleName(), representationFieldsToReturn,
       new AsyncCallback<BrowseRepresentationBundle>() {
@@ -309,7 +217,7 @@ public class RiskIncidenceRegister extends Composite {
       });
   }
 
-  private void getFileBreadCrumbs() {
+  private void getFileBreadCrumbs(String aipId, String representationId, List<String> filePath, String fileId) {
     BrowserService.Util.getInstance().retrieveBrowseFileBundle(aipId, representationId, filePath, fileId,
       fileFieldsToReturn, new AsyncCallback<BrowseFileBundle>() {
 
@@ -331,75 +239,4 @@ public class RiskIncidenceRegister extends Composite {
     super.onLoad();
     JavascriptUtils.stickSidebar();
   }
-
-  private void updateDateFilter() {
-    Date dateInitial = inputDateInitial.getDatePicker().getValue();
-    Date dateFinal = inputDateFinal.getDatePicker().getValue();
-
-    DateRangeFilterParameter filterParameter = new DateRangeFilterParameter(RodaConstants.RISK_INCIDENCE_DETECTED_ON,
-      dateInitial, dateFinal, RodaConstants.DateGranularity.DAY);
-
-    riskIncidenceList.setFilter(new Filter(filterParameter));
-  }
-
-  @UiHandler("buttonRemove")
-  void buttonRemoveRiskHandler(ClickEvent e) {
-    final SelectedItems<RiskIncidence> selected = riskIncidenceList.getSelected();
-
-    ClientSelectedItemsUtils.size(RiskIncidence.class, selected, new AsyncCallback<Long>() {
-
-      @Override
-      public void onFailure(Throwable caught) {
-        AsyncCallbackUtils.defaultFailureTreatment(caught);
-      }
-
-      @Override
-      public void onSuccess(final Long size) {
-        Dialogs.showConfirmDialog(messages.riskRemoveFolderConfirmDialogTitle(),
-          messages.riskRemoveSelectedConfirmDialogMessage(size), messages.riskRemoveFolderConfirmDialogCancel(),
-          messages.riskRemoveFolderConfirmDialogOk(), new AsyncCallback<Boolean>() {
-
-            @Override
-            public void onFailure(Throwable caught) {
-              AsyncCallbackUtils.defaultFailureTreatment(caught);
-            }
-
-            @Override
-            public void onSuccess(Boolean confirmed) {
-              if (confirmed) {
-                buttonRemove.setEnabled(false);
-                BrowserService.Util.getInstance().deleteRiskIncidences(selected, new AsyncCallback<Void>() {
-
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    AsyncCallbackUtils.defaultFailureTreatment(caught);
-                    riskIncidenceList.refresh();
-                  }
-
-                  @Override
-                  public void onSuccess(Void result) {
-                    Toast.showInfo(messages.riskRemoveSuccessTitle(), messages.riskRemoveSuccessMessage(size));
-                    riskIncidenceList.refresh();
-                  }
-                });
-              }
-            }
-          });
-      }
-    });
-  }
-
-  @UiHandler("buttonCancel")
-  void buttonCancelHandler(ClickEvent e) {
-    if (fileId != null) {
-      HistoryUtils.openBrowse(aipId, representationId, filePath, fileId);
-    } else if (representationId != null) {
-      HistoryUtils.openBrowse(aipId, representationId);
-    } else if (aipId != null) {
-      HistoryUtils.openBrowse(aipId);
-    } else {
-      HistoryUtils.newHistory(Welcome.RESOLVER);
-    }
-  }
-
 }

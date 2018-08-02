@@ -10,21 +10,18 @@
  */
 package org.roda.wui.client.planning;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.filter.FilterParameter;
-import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ri.RepresentationInformation;
-import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.RepresentationInformationActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.lists.RepresentationInformationList;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchFilters;
-import org.roda.wui.client.common.search.SearchPanel;
+import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.HistoryResolver;
@@ -41,7 +38,6 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.SelectionChangeEvent;
 
 import config.i18n.client.ClientMessages;
 
@@ -89,10 +85,7 @@ public class RepresentationInformationNetwork extends Composite {
   FlowPanel registerDescription;
 
   @UiField(provided = true)
-  SearchPanel searchPanel;
-
-  @UiField(provided = true)
-  RepresentationInformationList representationInformationList;
+  SearchWrapper searchPanel;
 
   @UiField
   FlowPanel sidebar;
@@ -103,39 +96,22 @@ public class RepresentationInformationNetwork extends Composite {
   @UiField
   SimplePanel actionsSidebar;
 
-  private static final Filter DEFAULT_FILTER = SearchFilters.defaultFilter(RepresentationInformation.class.getName());
-  private static final String ALL_FILTER = SearchFilters.allFilter(RepresentationInformation.class.getName());
-
-  private final Filter filter = DEFAULT_FILTER;
-
   /**
    * Create a representation information page
    */
   public RepresentationInformationNetwork() {
-    representationInformationList = new RepresentationInformationList("RepresentationInformationNetwork_RI", filter,
-      messages.representationInformationTitle(), true);
-    representationInformationList.setActionable(RepresentationInformationActions.get());
+    ListBuilder<RepresentationInformation> representationInformationListBuilder = new ListBuilder<>(
+      RepresentationInformationList::new,
+      new AsyncTableCell.Options<>(RepresentationInformation.class, "RepresentationInformationNetwork_RI")
+        .withSummary(messages.representationInformationTitle()).bindOpener());
 
-    searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, true,
-      messages.representationInformationRegisterSearchPlaceHolder(), false, false, false);
-    searchPanel.setList(representationInformationList);
+    searchPanel = new SearchWrapper(false).createListAndSearchPanel(representationInformationListBuilder,
+      RepresentationInformationActions.get(), messages.representationInformationRegisterSearchPlaceHolder());
 
     initWidget(uiBinder.createAndBindUi(this));
 
     actionsSidebar.setWidget(new ActionableWidgetBuilder<>(RepresentationInformationActions.get())
       .buildListWithObjects(new ActionableObject<>(RepresentationInformation.class)));
-
-    representationInformationList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
-      @Override
-      public void onSelectionChange(SelectionChangeEvent event) {
-        RepresentationInformation selected = representationInformationList.getSelectionModel().getSelectedObject();
-        if (selected != null) {
-          LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
-          selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
-          HistoryUtils.newHistory(ShowRepresentationInformation.RESOLVER, selected.getId());
-        }
-      }
-    });
 
     Label titleLabel = new Label(messages.representationInformationRegisterTitle());
     titleLabel.addStyleName("h1 browseItemText");
@@ -164,11 +140,7 @@ public class RepresentationInformationNetwork extends Composite {
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.isEmpty()) {
-      filter.setParameters(new ArrayList<>());
-      searchPanel.setDefaultFilter(filter, true);
-      representationInformationList.setFilter(filter);
-      searchPanel.clearSearchInputBox();
-
+      searchPanel.setFilter(RepresentationInformation.class, SearchFilters.allFilter());
       callback.onSuccess(this);
     } else {
       String basePage = historyTokens.remove(0);
@@ -181,25 +153,13 @@ public class RepresentationInformationNetwork extends Composite {
       } else if (RepresentationInformationAssociations.RESOLVER.getHistoryToken().equals(basePage)) {
         RepresentationInformationAssociations.RESOLVER.resolve(historyTokens, callback);
       } else if (Search.RESOLVER.getHistoryToken().equals(basePage)) {
-        setFilterFromHistoryTokens(historyTokens);
-        searchPanel.setDefaultFilter(filter, true);
-        representationInformationList.setFilter(filter);
-        searchPanel.clearSearchInputBox();
-
+        searchPanel.setFilter(RepresentationInformation.class,
+          SearchFilters.createFilterFromHistoryTokens(historyTokens));
         callback.onSuccess(this);
       } else {
         HistoryUtils.newHistory(RESOLVER);
         callback.onSuccess(null);
       }
     }
-  }
-
-  private void setFilterFromHistoryTokens(List<String> historyTokens) {
-    List<FilterParameter> params = new ArrayList<>();
-    if (historyTokens.size() == (2)) {
-      params.add(new SimpleFilterParameter(historyTokens.get(0), historyTokens.get(1)));
-    }
-
-    filter.setParameters(params);
   }
 }

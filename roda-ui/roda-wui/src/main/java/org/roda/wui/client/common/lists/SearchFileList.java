@@ -14,11 +14,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
-import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Humanize;
@@ -37,7 +36,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
 
 import config.i18n.client.ClientMessages;
 
-public class SearchFileList extends BasicAsyncTableCell<IndexedFile> {
+public class SearchFileList extends AsyncTableCell<IndexedFile> {
 
   private ClientLogger logger = new ClientLogger(getClass().getName());
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
@@ -53,22 +52,20 @@ public class SearchFileList extends BasicAsyncTableCell<IndexedFile> {
     RodaConstants.FILE_ORIGINALNAME, RodaConstants.FILE_FILE_ID, RodaConstants.FILE_PATH, RodaConstants.FILE_SIZE,
     RodaConstants.FILE_FORMAT_VERSION, RodaConstants.FILE_FILEFORMAT);
 
-  public SearchFileList(String listId) {
-    this(listId, null, false, null, false, false);
+  public SearchFileList() {
+    this(false);
   }
 
-  public SearchFileList(String listId, Filter filter, boolean justActive, String summary,
-    boolean selectable, boolean showFilePath) {
-    super(IndexedFile.class, listId, filter, justActive, summary, selectable, fieldsToReturn);
+  public SearchFileList(boolean showFilePath) {
+    super();
     this.showFilePath = showFilePath;
   }
 
-  public SearchFileList(String listId, Filter filter, boolean justActive, String summary,
-    boolean selectable, boolean showFilePath, int initialPageSize, int pageSizeIncrement) {
-    super(IndexedFile.class, listId, filter, justActive, summary, selectable, initialPageSize,
-      pageSizeIncrement, fieldsToReturn);
-    this.showFilePath = showFilePath;
+  @Override
+  protected void adjustOptions(Options<IndexedFile> options) {
+    options.withFieldsToReturn(fieldsToReturn);
   }
+
 
   @Override
   protected void configureDisplay(CellTable<IndexedFile> display) {

@@ -8,10 +8,8 @@
 package org.roda.wui.client.common.dialogs;
 
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.wui.client.common.lists.utils.AsyncTableCell;
-import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
-import org.roda.wui.client.common.search.SearchPanel;
+import org.roda.wui.client.common.lists.utils.ListBuilder;
+import org.roda.wui.client.common.search.SearchWrapper;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -25,12 +23,10 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.SelectionChangeEvent;
-import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
 import config.i18n.client.ClientMessages;
 
-public class DefaultSelectDialog<T extends IsIndexed, O> extends DialogBox implements SelectDialog<T> {
+public class DefaultSelectDialog<T extends IsIndexed> extends DialogBox implements SelectDialog<T> {
   private static final Binder binder = GWT.create(Binder.class);
 
   @SuppressWarnings("rawtypes")
@@ -40,7 +36,7 @@ public class DefaultSelectDialog<T extends IsIndexed, O> extends DialogBox imple
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   @UiField(provided = true)
-  SearchPanel searchPanel;
+  SearchWrapper searchWrapper;
 
   @UiField
   Button cancelButton;
@@ -51,16 +47,25 @@ public class DefaultSelectDialog<T extends IsIndexed, O> extends DialogBox imple
   @UiField
   Button emptyParentButton;
 
-  @UiField(provided = true)
-  AsyncTableCell<T, O> searchResultsPanel;
+  private final Class<T> objectClass;
+  private boolean singleSelectionMode = false;
 
-  public DefaultSelectDialog(String title, Filter filter, String searchField, AsyncTableCell<T, O> searchResultsPanel,
-    boolean hidePreFilters) {
-    this.searchResultsPanel = searchResultsPanel;
+  public DefaultSelectDialog(String title, ListBuilder<T> listBuilder) {
+    objectClass = listBuilder.getOptions().getClassToReturn();
+    listBuilder.getOptions().addSelectionChangeHandler(event -> {
+      T value = DefaultSelectDialog.this.getValue();
+      if (singleSelectionMode) {
+        if (value != null) {
+          ValueChangeEvent.fire(this, value);
+          hide();
+        }
+      } else {
+        selectButton.setEnabled(value != null);
+      }
+    });
 
-    searchPanel = new SearchPanel(filter, searchField, true, messages.selectAipSearchPlaceHolder(), false, false,
-      hidePreFilters);
-    searchPanel.setList(searchResultsPanel);
+    searchWrapper = new SearchWrapper(false).withListsInsideScrollPanel("selectAipResultsPanel")
+      .createListAndSearchPanel(listBuilder);
 
     setWidget(binder.createAndBindUi(this));
 
@@ -74,14 +79,11 @@ public class DefaultSelectDialog<T extends IsIndexed, O> extends DialogBox imple
 
     emptyParentButton.setVisible(false);
     selectButton.setEnabled(false);
+  }
 
-    this.searchResultsPanel.getSelectionModel().addSelectionChangeHandler(new Handler() {
-
-      @Override
-      public void onSelectionChange(SelectionChangeEvent event) {
-        selectButton.setEnabled(DefaultSelectDialog.this.getValue() != null);
-      }
-    });
+  public void setSingleSelectionMode() {
+    singleSelectionMode = true;
+    selectButton.setEnabled(false);
   }
 
   @Override
@@ -94,25 +96,6 @@ public class DefaultSelectDialog<T extends IsIndexed, O> extends DialogBox imple
     center();
   }
 
-  public void setSingleSelectionMode() {
-    selectButton.setEnabled(false);
-
-    searchResultsPanel.getSelectionModel().addSelectionChangeHandler(new Handler() {
-
-      @Override
-      public void onSelectionChange(SelectionChangeEvent event) {
-        if (DefaultSelectDialog.this.getValue() != null) {
-          onChange();
-          hide();
-        }
-      }
-    });
-  }
-
-  public void hidePreFilters() {
-    searchPanel.hidePreFilters();
-  }
-
   @UiHandler("cancelButton")
   void buttonCancelHandler(ClickEvent e) {
     hide();
@@ -120,14 +103,13 @@ public class DefaultSelectDialog<T extends IsIndexed, O> extends DialogBox imple
 
   @UiHandler("selectButton")
   void buttonSelectHandler(ClickEvent e) {
-    onChange();
+    ValueChangeEvent.fire(this, getValue());
     hide();
   }
 
   @UiHandler("emptyParentButton")
   void buttonEmptyParentHandler(ClickEvent e) {
-    searchResultsPanel.getSelectionModel().clear();
-    onChange();
+    ValueChangeEvent.fire(this, null);
     hide();
   }
 
@@ -136,16 +118,8 @@ public class DefaultSelectDialog<T extends IsIndexed, O> extends DialogBox imple
     return addHandler(handler, ValueChangeEvent.getType());
   }
 
-  protected void onChange() {
-    ValueChangeEvent.fire(this, getValue());
-  }
-
-  public T getValue() {
-    return searchResultsPanel.getSelectionModel().getSelectedObject();
-  }
-
-  public BasicAsyncTableCell<T> getList() {
-    return (BasicAsyncTableCell<T>) searchResultsPanel;
+  private T getValue() {
+    return searchWrapper.getListSelectionState(objectClass).getSelected();
   }
 
   public void setEmptyParentButtonVisible(boolean visible) {

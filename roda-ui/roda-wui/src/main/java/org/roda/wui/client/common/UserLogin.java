@@ -46,7 +46,7 @@ import config.i18n.client.ClientMessages;
 public class UserLogin {
 
   private static final ClientLogger logger = new ClientLogger(UserLogin.class.getName());
-  private static final ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private static UserLoginServiceAsync userLoginService;
   private static UserLogin instance = null;

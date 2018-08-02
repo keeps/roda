@@ -26,7 +26,6 @@ import org.roda.wui.client.common.IncrementalRelationList;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.FormUtilities;
-import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -57,7 +56,7 @@ public class RepresentationInformationDataPanel extends Composite
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  private static ClientMessages messages = GWT.create(ClientMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   @UiField
   TextBox name;

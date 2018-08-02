@@ -14,10 +14,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.IndexedDIP;
-import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.core.client.GWT;
@@ -32,7 +31,7 @@ import com.google.gwt.user.client.ui.Label;
 
 import config.i18n.client.ClientMessages;
 
-public class DIPList extends BasicAsyncTableCell<IndexedDIP> {
+public class DIPList extends AsyncTableCell<IndexedDIP> {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
@@ -43,19 +42,11 @@ public class DIPList extends BasicAsyncTableCell<IndexedDIP> {
   private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID,
     RodaConstants.DIP_DATE_CREATED, RodaConstants.DIP_LAST_MODIFIED, RodaConstants.DIP_TITLE);
 
-  public DIPList(String listId) {
-    this(listId, null, null, false);
+  @Override
+  protected void adjustOptions(Options<IndexedDIP> options) {
+    options.withFieldsToReturn(fieldsToReturn);
   }
 
-  public DIPList(String listId, Filter filter, String summary, boolean selectable) {
-    super(IndexedDIP.class, listId, filter, summary, selectable, fieldsToReturn);
-  }
-
-  public DIPList(String listId, Filter filter, String summary, boolean selectable, int initialPageSize,
-    int pageSizeIncrement) {
-    super(IndexedDIP.class, listId, filter, summary, selectable, initialPageSize, pageSizeIncrement,
-      fieldsToReturn);
-  }
 
   @Override
   protected void configureDisplay(CellTable<IndexedDIP> display) {

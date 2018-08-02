@@ -14,17 +14,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.google.gwt.user.client.ui.FlowPanel;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.actions.PreservationEventActions;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
@@ -35,6 +31,7 @@ import org.roda.wui.client.search.PreservationEventsSearch;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.LocaleInfo;
@@ -42,12 +39,12 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
-import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 /**
  * @author Luis Faria
@@ -64,12 +61,12 @@ public class PreservationEvents extends Composite {
 
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRoles(new HistoryResolver[] {BrowseAIP.RESOLVER}, false, callback);
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {BrowseTop.RESOLVER}, false, callback);
     }
 
     @Override
     public List<String> getHistoryPath() {
-      return ListUtils.concat(BrowseAIP.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(BrowseTop.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     @Override
@@ -107,7 +104,7 @@ public class PreservationEvents extends Composite {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private static final List<String> aipFieldsToReturn = new ArrayList<>(
     Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_GHOST, RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL));
@@ -131,7 +128,8 @@ public class PreservationEvents extends Composite {
   Label itemTitle;
 
   @UiField(provided = true)
-  PreservationEventsSearch eventSearch;
+  PreservationEventsSearch eventsSearch;
+
   @UiField FlowPanel pageDescription;
 
   private String aipId;
@@ -155,21 +153,7 @@ public class PreservationEvents extends Composite {
     this.representationUUID = representationUUID;
     this.fileUUID = fileUUID;
 
-    Filter filter = new Filter();
-
-    if (aipId != null) {
-      filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, aipId));
-    }
-    if (representationUUID != null) {
-      filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_REPRESENTATION_UUID, representationUUID));
-    }
-    if (fileUUID != null) {
-      filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_FILE_UUID, fileUUID));
-    }
-
-    eventSearch = new PreservationEventsSearch("PreservationEvents_events");
-    eventSearch.defaultFilters(filter);
-    eventSearch.getList().setActionable(PreservationEventActions.get(aipId, representationUUID, fileUUID));
+    eventsSearch = new PreservationEventsSearch("PreservationEvents_events", aipId, representationUUID, fileUUID);
 
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -212,7 +196,7 @@ public class PreservationEvents extends Composite {
         @Override
         public void onFailure(Throwable caught) {
           AsyncCallbackUtils.defaultFailureTreatment(caught);
-          HistoryUtils.newHistory(BrowseAIP.RESOLVER);
+          HistoryUtils.newHistory(BrowseTop.RESOLVER);
         }
 
         @Override
@@ -319,7 +303,7 @@ public class PreservationEvents extends Composite {
         callback.onSuccess(instance);
       }
     } else {
-      HistoryUtils.newHistory(BrowseAIP.RESOLVER);
+      HistoryUtils.newHistory(BrowseTop.RESOLVER);
       callback.onSuccess(null);
     }
   }

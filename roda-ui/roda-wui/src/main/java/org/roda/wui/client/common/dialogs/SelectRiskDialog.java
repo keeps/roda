@@ -7,27 +7,15 @@
  */
 package org.roda.wui.client.common.dialogs;
 
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.wui.client.common.lists.RiskList;
-import org.roda.wui.client.common.search.SearchFilters;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.ListBuilder;
 
-public class SelectRiskDialog extends DefaultSelectDialog<IndexedRisk, Void> {
-
-  private static final Filter DEFAULT_FILTER_RISK = SearchFilters.defaultFilter(IndexedRisk.class.getName());
-
-  public SelectRiskDialog(String title) {
-    this(title, DEFAULT_FILTER_RISK);
-  }
-
+public class SelectRiskDialog extends DefaultSelectDialog<IndexedRisk> {
   public SelectRiskDialog(String title, Filter filter) {
-    this(title, filter, false);
+    super(title, new ListBuilder<>(RiskList::new,
+      new AsyncTableCell.Options<>(IndexedRisk.class, "SelectRiskDialog_risks").withFilter(filter).withSummary(title)));
   }
-
-  public SelectRiskDialog(String title, Filter filter, boolean selectable) {
-    super(title, filter, RodaConstants.RISK_SEARCH, new RiskList("SelectRiskDialog_risks", filter, title, selectable),
-      false);
-  }
-
 }

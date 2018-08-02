@@ -109,7 +109,7 @@ public class ResetPassword extends Composite {
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   @UiField
   FlowPanel recoverPanel;

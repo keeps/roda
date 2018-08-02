@@ -103,7 +103,7 @@ public class EditRisk extends Composite {
     RodaConstants.RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_VALUE);
 
   private Risk risk;
-  private static ClientMessages messages = GWT.create(ClientMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private int incidences = 0;
 
   @UiField

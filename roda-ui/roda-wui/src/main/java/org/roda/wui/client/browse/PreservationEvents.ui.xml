@@ -24,7 +24,7 @@
 					<g:FlowPanel addStyleNames="page-description" ui:field="pageDescription"/>
 				</g:FlowPanel>
 				<m:BreadcrumbPanel ui:field="breadcrumb" addStyleNames="browseBreadcrumb" />
-				<search:PreservationEventsSearch ui:field="eventSearch" addStyleNames="searchResults" />
+				<search:PreservationEventsSearch ui:field="eventsSearch" addStyleNames="searchResults" />
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>

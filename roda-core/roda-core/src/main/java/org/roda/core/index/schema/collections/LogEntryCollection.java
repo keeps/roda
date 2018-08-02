@@ -68,8 +68,6 @@ public class LogEntryCollection extends AbstractSolrCollection<LogEntry, LogEntr
     fields.add(new Field(RodaConstants.LOG_STATE, Field.TYPE_STRING).setRequired(true));
     fields.add(new Field(RodaConstants.LOG_PARAMETERS, Field.TYPE_STRING).setIndexed(false).setDocValues(false));
 
-    fields.add(SolrCollection.getSearchField());
-
     return fields;
   }
 

@@ -13,16 +13,11 @@
 			<common:NavigationToolbar ui:field="navigationToolbar" header="{messages.catalogueItemTitle}" />
 			<g:FlowPanel addStyleNames="row full_width skip_padding" ui:field="center">
 				<g:FlowPanel addStyleNames="col_12 content">
-					<!-- HEADER -->
-					<g:SimplePanel ui:field="bigTitle" />
-					<g:FlowPanel addStyleNames="page-description" ui:field="browseDescription">
-					</g:FlowPanel>
-
 					<!-- STATUS -->
 					<g:HTML ui:field="aipState" />
 
 					<!-- IDENTIFICATION -->
-					<g:FlowPanel styleName="browseItemPanel browseTitle-allCollections-wrapper" ui:field="identificationPanel">
+					<g:FlowPanel styleName="browseItemPanel" ui:field="identificationPanel">
 						<g:Label addStyleNames="browseItemHeader" ui:field="browseItemHeader">
 							<ui:text from='{messages.catalogueItemTitle}' />
 						</g:Label>
@@ -46,26 +41,22 @@
 
 					<!-- REPRESENTATIONS -->
 					<g:FlowPanel addStyleNames="card">
-						<g:SimplePanel ui:field="representationsTitle" />
-						<commonsearch:SearchPanel ui:field="representationsSearch" />
-						<lists:RepresentationList addStyleNames="searchResults" ui:field="representationsList" />
+						<commonsearch:SearchWrapper ui:field="representationsSearchWrapper" />
 					</g:FlowPanel>
 
 					<!-- DIPs -->
 					<g:FlowPanel addStyleNames="card disseminationsCard">
-						<g:Label addStyleNames="h5" ui:field="disseminationsTitle">
-							<ui:text from='{messages.disseminationsTitle}' />
-						</g:Label>
-						<commonsearch:SearchPanel ui:field="disseminationsSearch" />
-						<lists:DIPList addStyleNames="searchResults" ui:field="disseminationsList" />
+						<commonsearch:SearchWrapper ui:field="disseminationsSearchWrapper" />
 					</g:FlowPanel>
 
 					<!-- AIP CHILDREN -->
 					<g:FlowPanel addStyleNames="card aipChildrenCard">
-						<g:SimplePanel ui:field="aipChildrenTitle" />
-						<commonsearch:SearchPanel ui:field="aipChildrenSearch" />
-						<lists:AIPList addStyleNames="searchResults" ui:field="aipChildrenList" />
+						<commonsearch:SearchWrapper ui:field="aipChildrenSearchWrapper" />
 					</g:FlowPanel>
+
+					<!-- ADD NEW -->
+					<g:SimplePanel ui:field="addRepresentation" addStyleNames="ActionableStyleButtons" />
+					<g:SimplePanel ui:field="addChildAip" addStyleNames="ActionableStyleButtons" />
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>

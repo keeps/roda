@@ -108,7 +108,7 @@ public class ShowRepresentationInformation extends Composite {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  private static ClientMessages messages = GWT.create(ClientMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private static final List<String> fieldsToReturn = new ArrayList<>();
 
@@ -158,6 +158,7 @@ public class ShowRepresentationInformation extends Composite {
 
   @UiField
   SimplePanel actionsSidebar;
+
   private ActionableWidgetBuilder<RepresentationInformation> actionableWidgetBuilder;
 
   private List<FilterParameter> aipParams = new ArrayList<>();

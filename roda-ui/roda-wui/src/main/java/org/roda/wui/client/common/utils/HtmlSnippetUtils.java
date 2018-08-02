@@ -27,8 +27,8 @@ import org.roda.core.data.v2.notifications.Notification.NOTIFICATION_STATE;
 import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.risks.RiskIncidence.INCIDENCE_STATUS;
-import org.roda.wui.client.browse.BrowseAIP;
 import org.roda.wui.client.browse.BrowseRepresentation;
+import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.MetadataValue;
 import org.roda.wui.client.browse.RepresentationInformationHelper;
 import org.roda.wui.client.planning.RepresentationInformationAssociations;
@@ -269,7 +269,7 @@ public class HtmlSnippetUtils {
     final Anchor objectLink) {
     if (AIP.class.getSimpleName().equals(incidence.getObjectClass())) {
       objectLabel.setText(messages.showAIPExtended());
-      objectLink.setHref(HistoryUtils.createHistoryHashLink(BrowseAIP.RESOLVER, incidence.getAipId()));
+      objectLink.setHref(HistoryUtils.createHistoryHashLink(BrowseTop.RESOLVER, incidence.getAipId()));
       objectLink.setText(incidence.getAipId());
     } else if (Representation.class.getSimpleName().equals(incidence.getObjectClass())) {
       objectLabel.setText(messages.showRepresentationExtended());

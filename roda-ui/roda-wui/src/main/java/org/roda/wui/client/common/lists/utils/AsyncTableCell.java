@@ -8,6 +8,7 @@
 package org.roda.wui.client.common.lists.utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,14 +33,11 @@ import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.model.ActionableObject;
-import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.lists.pagination.ListSelectionState;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
-import org.roda.wui.client.common.popup.CalloutPopup;
-import org.roda.wui.client.common.popup.CalloutPopup.CalloutPosition;
+import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.StringUtils;
@@ -89,11 +87,12 @@ import com.google.gwt.view.client.CellPreviewEvent.Handler;
 import com.google.gwt.view.client.DefaultSelectionEventManager;
 import com.google.gwt.view.client.ProvidesKey;
 import com.google.gwt.view.client.Range;
+import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SingleSelectionModel;
 
 import config.i18n.client.ClientMessages;
 
-public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
+public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
   implements HasValueChangeHandlers<IndexResult<T>> {
 
   public static final Integer DEFAULT_INITIAL_PAGE_SIZE = 20;
@@ -102,22 +101,24 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private static final ClientLogger LOGGER = new ClientLogger(AsyncTableCell.class.getName());
 
-  private final Class<T> classToReturn;
-  private final O object;
-  private final String listId;
+  private Options<T> options;
 
-  private final FlowPanel mainPanel;
-  private final FlowPanel sidePanel;
+  private Class<T> classToReturn;
+  private String listId;
+  private Actionable<T> actionable;
 
-  private final MyAsyncDataProvider<T> dataProvider;
-  private final SingleSelectionModel<T> selectionModel;
-  private final AsyncHandler columnSortHandler;
+  private FlowPanel mainPanel;
+  private FlowPanel sidePanel;
 
-  private final AccessibleSimplePager resultsPager;
-  private final RodaPageSizePager pageSizePager;
+  private MyAsyncDataProvider<T> dataProvider;
+  private SingleSelectionModel<T> selectionModel;
+  private AsyncHandler columnSortHandler;
+
+  private AccessibleSimplePager resultsPager;
+  private RodaPageSizePager pageSizePager;
+
   private Button csvDownloadButton;
-  private Button actionsButton;
-  private final CellTable<T> display;
+  private CellTable<T> display;
 
   private FlowPanel selectAllPanel;
   private FlowPanel selectAllPanelBody;
@@ -134,8 +135,8 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
   private boolean selectable;
   private List<String> fieldsToReturn;
 
-  private int initialPageSize = 20;
-  private int pageSizeIncrement = 100;
+  private int initialPageSize;
+  private int pageSizeIncrement;
 
   private Timer autoUpdateTimer = null;
   private int autoUpdateTimerMillis = 0;
@@ -151,42 +152,31 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
   private List<Consumer<AutoUpdateState>> autoUpdateConsumers = new ArrayList<>();
 
-  private ActionableWidgetBuilder<T> actionableBuilder = null;
-  private final CalloutPopup actionsPopup = new CalloutPopup();
-
-  public AsyncTableCell(Class<T> classToReturn, String listId, List<String> fieldsToReturn) {
-    this(classToReturn, listId, null, false, null, null, false, DEFAULT_INITIAL_PAGE_SIZE, DEFAULT_PAGE_SIZE_INCREMENT,
-      null, fieldsToReturn);
-  }
-
-  public AsyncTableCell(Class<T> classToReturn, String listId, Filter filter, boolean justActive, Facets facets,
-    String summary, boolean selectable, O object, List<String> fieldsToReturn) {
-    this(classToReturn, listId, filter, justActive, facets, summary, selectable, DEFAULT_INITIAL_PAGE_SIZE,
-      DEFAULT_PAGE_SIZE_INCREMENT, object, fieldsToReturn);
-  }
-
-  public AsyncTableCell(final Class<T> classToReturn, final String listId, final Filter filter,
-    final boolean justActive, final Facets facets, final String summary, final boolean selectable,
-    final int initialPageSize, final int pageSizeIncrement, final O object, List<String> fieldsToReturn) {
+  public AsyncTableCell() {
     super();
+  }
 
-    this.classToReturn = classToReturn;
-    this.initialPageSize = initialPageSize;
-    this.pageSizeIncrement = pageSizeIncrement;
-    this.object = object;
-    this.listId = listId;
+  AsyncTableCell<T> initialize(Options<T> options) {
+    adjustOptions(options);
 
-    final String notNullSummary = StringUtils.isNotBlank(summary) ? summary : "summary" + Random.nextInt(1000);
+    this.classToReturn = options.classToReturn;
+    this.initialPageSize = options.initialPageSize;
+    this.pageSizeIncrement = options.pageSizeIncrement;
+    this.listId = options.listId;
+    this.actionable = options.actionable;
 
-    this.filter = filter;
-    this.justActive = justActive;
-    this.facets = facets;
-    this.selectable = selectable;
+    final String notNullSummary = StringUtils.isNotBlank(options.summary) ? options.summary
+      : "summary" + Random.nextInt(1000);
 
-    this.fieldsToReturn = fieldsToReturn;
+    this.filter = options.filter;
+    this.justActive = options.justActive;
+    this.facets = options.facets;
+    this.selectable = actionable != null;
+
+    this.fieldsToReturn = options.fieldsToReturn;
 
     display = new AccessibleCellTable<>(getInitialPageSize(),
-      (MyCellTableResources) GWT.create(MyCellTableResources.class), getKeyProvider(), summary);
+      (MyCellTableResources) GWT.create(MyCellTableResources.class), getKeyProvider(), options.summary);
     display.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.DISABLED);
     display.setLoadingIndicator(new HTML(HtmlSnippetUtils.LOADING));
 
@@ -238,10 +228,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
     csvDownloadButton = new Button(messages.tableDownloadCSV());
     csvDownloadButton.addStyleName("btn btn-link csvDownloadButton");
-
-    actionsButton = new Button(messages.tableAction());
-    actionsButton.addStyleName("btn btn-link actionsButton");
-    actionsButton.setVisible(actionableBuilder != null);
+    csvDownloadButton.setVisible(options.csvDownloadButtonVisibility);
 
     createSelectAllPanel();
 
@@ -258,7 +245,6 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     mainPanel.add(resultsPager);
     mainPanel.add(pageSizePager);
     mainPanel.add(csvDownloadButton);
-    mainPanel.add(actionsButton);
 
     SimplePanel clearfix = new SimplePanel();
     clearfix.addStyleName("clearfix");
@@ -284,14 +270,6 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
               new Sublist(0, result), getFacets(), getJustActive(), false, notNullSummary + ".csv");
           }
         });
-      }
-    });
-
-    actionsButton.addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        showActions();
       }
     });
 
@@ -326,6 +304,44 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     // log
     autoUpdateConsumers.add(st -> GWT.log(st.toString()));
     addAutoUpdateControlListener();
+
+    if (options.bindOpener) {
+      ListSelectionUtils.bindBrowseOpener(this);
+    }
+
+    for (CheckboxSelectionListener<T> listener : options.checkboxSelectionListeners) {
+      addCheckboxSelectionListener(listener);
+    }
+
+    for (ValueChangeHandler<IndexResult<T>> handler : options.indexResultValueChangeHandlers) {
+      addValueChangeHandler(handler);
+    }
+
+    for (SelectionChangeEvent.Handler handler : options.selectionChangeHandlers) {
+      getSelectionModel().addSelectionChangeHandler(handler);
+    }
+
+    for (RedrawEvent.Handler handler : options.redrawEventHandlers) {
+      display.addRedrawHandler(handler);
+    }
+
+    for (String extraStyleName : options.extraStyleNames) {
+      addStyleName(extraStyleName);
+    }
+
+    if (options.autoUpdate != null) {
+      autoUpdate(options.autoUpdate);
+    }
+
+    if (options.startHidden) {
+      this.setVisible(false);
+    }
+
+    return this;
+  }
+
+  protected void adjustOptions(Options<T> options) {
+    // override this to add defaults or enforce rules
   }
 
   private void toggleSidePanel(boolean toggle) {
@@ -704,10 +720,6 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     return selectable;
   }
 
-  public void setSelectable(boolean selectable) {
-    this.selectable = selectable;
-  }
-
   public SelectedItems<T> getSelected() {
     SelectedItems<T> ret;
     if (isAllSelected()) {
@@ -827,10 +839,6 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     return selectAllCheckBox.getValue();
   }
 
-  public O getObject() {
-    return object;
-  }
-
   public String getListId() {
     return listId;
   }
@@ -919,61 +927,16 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     return true;
   }
 
-  public void setCsvDownloadButtonVisibility(boolean isVisible) {
-    csvDownloadButton.setVisible(isVisible);
-  }
-
-  public void setActionable(Actionable<T> actionable) {
-    this.actionableBuilder = new ActionableWidgetBuilder<>(actionable);
-    actionsButton.setVisible(true);
-  }
-
-  protected void showActions() {
-    if (actionableBuilder != null) {
-      if (actionsPopup.isShowing()) {
-        actionsPopup.hide();
-      } else {
-
-        actionableBuilder.withCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
-          @Override
-          public void onSuccess(Actionable.ActionImpact impact) {
-            if (Actionable.ActionImpact.DESTROYED.equals(impact)) {
-              Timer timer = new Timer() {
-                @Override
-                public void run() {
-                  update();
-                }
-              };
-
-              timer.schedule(RodaConstants.ACTION_TIMEOUT);
-            } else if (!Actionable.ActionImpact.NONE.equals(impact)) {
-              update();
-            }
-            actionsPopup.hide();
-          }
-        });
-
-        if (isAllSelected()) {
-          actionsPopup.setWidget(actionableBuilder.buildListWithObjects(new ActionableObject<>(getSelected())));
-        } else if (selected.size() == 1) {
-          actionsPopup
-            .setWidget(actionableBuilder.buildListWithObjects(new ActionableObject<>(selected.iterator().next())));
-        } else if (selected.size() > 1) {
-          // TODO create action layout based on selected set
-          actionsPopup.setWidget(actionableBuilder.buildListWithObjects(new ActionableObject<>(getSelected())));
-        } else {
-          Label emptyHelpText = new Label(messages.actionableEmptyHelp(ActionableObject.ActionableObjectType.NONE));
-          emptyHelpText.addStyleName("actions-empty-help");
-          actionsPopup.setWidget(emptyHelpText);
-        }
-
-        actionsPopup.showRelativeTo(actionsButton, CalloutPosition.BOTTOM_RIGHT);
-      }
+  public ActionableObject<T> getActionableObject() {
+    if (isAllSelected()) {
+      return new ActionableObject<>(getSelected());
+    } else if (selected.size() == 1) {
+      return new ActionableObject<>(selected.iterator().next());
+    } else if (selected.size() > 1) {
+      return new ActionableObject<>(getSelected());
+    } else {
+      return new ActionableObject<T>(classToReturn);
     }
-  }
-
-  public void addRedrawHandler(RedrawEvent.Handler handler) {
-    display.addRedrawHandler(handler);
   }
 
   private boolean createAndBindFacets(FlowPanel facetsPanel) {
@@ -1121,6 +1084,143 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     if (autoUpdateTimer != null) {
       autoUpdateTimer.scheduleRepeating(autoUpdateTimerMillis);
       setAutoUpdateState(AutoUpdateState.AUTO_UPDATE_SUCCESS);
+    }
+  }
+
+  public static class Options<T extends IsIndexed> {
+    private final Class<T> classToReturn;
+    private final String listId;
+    private Filter filter;
+    private boolean justActive;
+    private Facets facets;
+    private String summary;
+    private List<String> fieldsToReturn;
+    private int initialPageSize;
+    private int pageSizeIncrement;
+    private Actionable<T> actionable;
+    private boolean bindOpener;
+    private List<CheckboxSelectionListener<T>> checkboxSelectionListeners;
+    private List<ValueChangeHandler<IndexResult<T>>> indexResultValueChangeHandlers;
+    private List<SelectionChangeEvent.Handler> selectionChangeHandlers;
+    private List<RedrawEvent.Handler> redrawEventHandlers;
+    private List<String> extraStyleNames;
+    private Integer autoUpdate;
+    private boolean csvDownloadButtonVisibility;
+    private boolean startHidden;
+
+    public Options(Class<T> classToReturn, String listId) {
+      this.classToReturn = classToReturn;
+      this.listId = listId;
+
+      // set defaults
+      actionable = null;
+      filter = SearchFilters.allFilter();
+      justActive = false;
+      facets = ConfigurationManager.FacetFactory.getFacets(listId);
+      summary = messages.searchResults();
+      fieldsToReturn = Collections.emptyList();
+      initialPageSize = DEFAULT_INITIAL_PAGE_SIZE;
+      pageSizeIncrement = DEFAULT_PAGE_SIZE_INCREMENT;
+      checkboxSelectionListeners = new ArrayList<>();
+      indexResultValueChangeHandlers = new ArrayList<>();
+      extraStyleNames = new ArrayList<>();
+      selectionChangeHandlers = new ArrayList<>();
+      redrawEventHandlers = new ArrayList<>();
+      autoUpdate = null;
+      csvDownloadButtonVisibility = true;
+      startHidden = false;
+    }
+
+    public Class<T> getClassToReturn() {
+      return classToReturn;
+    }
+
+    public Options<T> withActionable(Actionable<T> actionable) {
+      this.actionable = actionable;
+      return this;
+    }
+
+    public Options<T> withFilter(Filter filter) {
+      this.filter = filter;
+      return this;
+    }
+
+    public Options<T> withJustActive(boolean justActive) {
+
+      this.justActive = justActive;
+      return this;
+    }
+
+    public Options<T> withFacets(Facets facets) {
+      this.facets = facets;
+      return this;
+    }
+
+    public Options<T> withSummary(String summary) {
+      this.summary = summary;
+      return this;
+    }
+
+    public Options<T> withFieldsToReturn(List<String> fieldsToReturn) {
+      this.fieldsToReturn = fieldsToReturn;
+      return this;
+    }
+
+    public Options<T> withInitialPageSize(int initialPageSize) {
+      this.initialPageSize = initialPageSize;
+      return this;
+    }
+
+    public Options<T> withPageSizeIncrement(int pageSizeIncrement) {
+      this.pageSizeIncrement = pageSizeIncrement;
+      return this;
+    }
+
+    public Options<T> withAutoUpdate(Integer autoUpdate) {
+      this.autoUpdate = autoUpdate;
+      return this;
+    }
+
+    // move this to the searchWrapper and/or use actionable
+    @Deprecated
+    public Options<T> withCsvDownloadButtonVisibility(boolean csvDownloadButtonVisibility) {
+      this.csvDownloadButtonVisibility = csvDownloadButtonVisibility;
+      return this;
+    }
+
+    public Options<T> bindOpener() {
+      this.bindOpener = true;
+      return this;
+    }
+
+    public Options<T> withStartHidden(boolean startHidden) {
+      this.startHidden = startHidden;
+      return this;
+    }
+
+    public Options<T> addCheckboxSelectionListener(CheckboxSelectionListener<T> checkboxSelectionListener) {
+      checkboxSelectionListeners.add(checkboxSelectionListener);
+      return this;
+    }
+
+    public Options<T> addValueChangedHandler(ValueChangeHandler<IndexResult<T>> handler) {
+      indexResultValueChangeHandlers.add(handler);
+      return this;
+    }
+
+    public Options<T> addStyleName(String styleName) {
+      extraStyleNames.add(styleName);
+      return this;
+    }
+
+    public Options<T> addSelectionChangeHandler(SelectionChangeEvent.Handler handler) {
+      selectionChangeHandlers.add(handler);
+      return this;
+    }
+
+    public Options<T> addRedrawHandler(RedrawEvent.Handler handler) {
+      redrawEventHandlers.add(handler);
+      return this;
     }
   }
 }

@@ -19,11 +19,11 @@ import java.util.Map;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
@@ -40,8 +40,9 @@ import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.lists.DIPList;
 import org.roda.wui.client.common.lists.SearchFileList;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
-import org.roda.wui.client.common.search.SearchFilters;
-import org.roda.wui.client.common.search.SearchPanel;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.ListBuilder;
+import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -98,7 +99,7 @@ import config.i18n.client.ClientMessages;
  */
 public class BrowseRepresentation extends Composite {
   private static final MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  private static final ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
@@ -131,12 +132,12 @@ public class BrowseRepresentation extends Composite {
 
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRole(BrowseAIP.RESOLVER, callback);
+      UserLogin.getInstance().checkRole(BrowseTop.RESOLVER, callback);
     }
 
     @Override
     public List<String> getHistoryPath() {
-      return ListUtils.concat(BrowseAIP.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(BrowseTop.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     @Override
@@ -145,7 +146,7 @@ public class BrowseRepresentation extends Composite {
     }
 
     private void errorRedirect(AsyncCallback<Widget> callback) {
-      HistoryUtils.newHistory(BrowseAIP.RESOLVER);
+      HistoryUtils.newHistory(BrowseTop.RESOLVER);
       callback.onSuccess(null);
     }
   };
@@ -164,8 +165,6 @@ public class BrowseRepresentation extends Composite {
 
   private static final List<String> representationFields = new ArrayList<>(Arrays.asList(RodaConstants.INDEX_UUID,
     RodaConstants.REPRESENTATION_AIP_ID, RodaConstants.REPRESENTATION_ID, RodaConstants.REPRESENTATION_TYPE));
-
-  private static final String ALL_FILTER = SearchFilters.allFilter(IndexedFile.class.getName());
 
   // Focus
   @UiField
@@ -204,10 +203,7 @@ public class BrowseRepresentation extends Composite {
   // FILES
 
   @UiField(provided = true)
-  SearchPanel filesSearch;
-
-  @UiField(provided = true)
-  SearchFileList filesList;
+  SearchWrapper filesSearch;
 
   // DISSEMINATIONS
 
@@ -215,10 +211,7 @@ public class BrowseRepresentation extends Composite {
   Label disseminationsTitle;
 
   @UiField(provided = true)
-  SearchPanel disseminationsSearch;
-
-  @UiField(provided = true)
-  DIPList disseminationsList;
+  SearchWrapper disseminationsSearch;
 
   // SIDEBAR
 
@@ -245,33 +238,33 @@ public class BrowseRepresentation extends Composite {
 
     final AIPState state = bundle.getAip().getState();
     final boolean justActive = AIPState.ACTIVE.equals(state);
-    boolean selectable = true;
     boolean showFilesPath = false;
+
+    LastSelectedItemsSingleton.getInstance().setSelectedJustActive(justActive);
 
     // FILES
 
-    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_UUID, repUUID),
+    Filter filesFilter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_UUID, repUUID),
       new EmptyKeyFilterParameter(RodaConstants.FILE_PARENT_UUID));
 
-    filesList = new SearchFileList("BrowseRepresentation_files", filter, justActive, summary, selectable,
-      showFilesPath);
-    LastSelectedItemsSingleton.getInstance().setSelectedJustActive(justActive);
-    filesList.setActionable(FileActions.get(aipId, repId));
+    ListBuilder<IndexedFile> fileListBuilder = new ListBuilder<>(() -> new SearchFileList(showFilesPath),
+      new AsyncTableCell.Options<>(IndexedFile.class, "BrowseRepresentation_files").withFilter(filesFilter)
+        .withJustActive(justActive).withSummary(summary).bindOpener());
 
-    ListSelectionUtils.bindBrowseOpener(filesList);
-
-    filesSearch = new SearchPanel(filter, ALL_FILTER, true, messages.searchPlaceHolder(), false, false, true);
-    filesSearch.setList(filesList);
+    filesSearch = new SearchWrapper(false).createListAndSearchPanel(fileListBuilder, FileActions.get(aipId, repId));
 
     // DISSEMINATIONS
-    disseminationsList = new DIPList("BrowseRepresentation_disseminations", Filter.NULL,
-      messages.listOfDisseminations(), true);
-    disseminationsList.setActionable(DisseminationActions.get());
-    ListSelectionUtils.bindBrowseOpener(disseminationsList);
 
-    disseminationsSearch = new SearchPanel(Filter.NULL, RodaConstants.DIP_SEARCH, true, messages.searchPlaceHolder(),
-      false, false, true);
-    disseminationsSearch.setList(disseminationsList);
+    Filter disseminationsFilter = new Filter(
+      new SimpleFilterParameter(RodaConstants.DIP_REPRESENTATION_UUIDS, repUUID));
+
+    ListBuilder<IndexedDIP> disseminationsListBuilder = new ListBuilder<>(DIPList::new,
+      new AsyncTableCell.Options<>(IndexedDIP.class, "BrowseRepresentation_disseminations")
+        .withFilter(disseminationsFilter).withSummary(messages.listOfDisseminations()).bindOpener()
+        .withJustActive(justActive));
+
+    disseminationsSearch = new SearchWrapper(false).createListAndSearchPanel(disseminationsListBuilder,
+      DisseminationActions.get());
 
     // INIT
     initWidget(uiBinder.createAndBindUi(this));
@@ -353,14 +346,10 @@ public class BrowseRepresentation extends Composite {
     }
 
     // DISSEMINATIONS (POST-INIT)
+    disseminationsSearch.setVisible(bundle.getDipCount() > 0);
     if (bundle.getDipCount() > 0) {
-      Filter disseminationsFilter = new Filter(
-        new SimpleFilterParameter(RodaConstants.DIP_REPRESENTATION_UUIDS, repUUID));
-      disseminationsList.set(disseminationsFilter, state.equals(AIPState.ACTIVE), Facets.NONE);
-      disseminationsSearch.setDefaultFilter(disseminationsFilter, true);
-      disseminationsSearch.clearSearchInputBox();
+      disseminationsSearch.setFilter(IndexedDIP.class, disseminationsFilter);
     }
-    disseminationsList.getParent().setVisible(bundle.getDipCount() > 0);
 
     ListSelectionUtils.bindLayout(representation, searchPrevious, searchNext, keyboardFocus, true, false, false,
       searchSection);

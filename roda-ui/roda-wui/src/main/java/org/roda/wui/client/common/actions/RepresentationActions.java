@@ -28,8 +28,8 @@ import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
 import org.roda.wui.client.common.actions.callbacks.ActionLoadingAsyncCallback;
 import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
-import org.roda.wui.client.common.actions.model.ActionsBundle;
-import org.roda.wui.client.common.actions.model.ActionsGroup;
+import org.roda.wui.client.common.actions.model.ActionableBundle;
+import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.RepresentationDialogs;
 import org.roda.wui.client.ingest.process.ShowJob;
@@ -77,6 +77,11 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
   public enum RepresentationAction implements Actionable.Action<IndexedRepresentation> {
     NEW, DOWNLOAD, CHANGE_TYPE, REMOVE, NEW_PROCESS, IDENTIFY_FORMATS, SHOW_EVENTS, SHOW_RISKS, UPLOAD_FILES,
     CREATE_FOLDER, CHANGE_STATE
+  }
+
+  @Override
+  public RepresentationAction actionForName(String name) {
+    return RepresentationAction.valueOf(name);
   }
 
   public static RepresentationActions get() {
@@ -423,11 +428,11 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
   }
 
   @Override
-  public ActionsBundle<IndexedRepresentation> createActionsBundle() {
-    ActionsBundle<IndexedRepresentation> representationActionableBundle = new ActionsBundle<>();
+  public ActionableBundle<IndexedRepresentation> createActionsBundle() {
+    ActionableBundle<IndexedRepresentation> representationActionableBundle = new ActionableBundle<>();
 
     // MANAGEMENT
-    ActionsGroup<IndexedRepresentation> managementGroup = new ActionsGroup<>(messages.representation());
+    ActionableGroup<IndexedRepresentation> managementGroup = new ActionableGroup<>(messages.representation());
     managementGroup.addButton(messages.newRepresentationButton(), RepresentationAction.NEW, ActionImpact.UPDATED,
       "btn-plus");
     managementGroup.addButton(messages.downloadButton(), RepresentationAction.DOWNLOAD, ActionImpact.NONE,
@@ -439,7 +444,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
     managementGroup.addButton(messages.removeButton(), RepresentationAction.REMOVE, ActionImpact.DESTROYED, "btn-ban");
 
     // PRESERVATION
-    ActionsGroup<IndexedRepresentation> preservationGroup = new ActionsGroup<>(messages.preservationTitle());
+    ActionableGroup<IndexedRepresentation> preservationGroup = new ActionableGroup<>(messages.preservationTitle());
     preservationGroup.addButton(messages.newProcessPreservation(), RepresentationAction.NEW_PROCESS,
       ActionImpact.UPDATED, "btn-play");
     preservationGroup.addButton(messages.identifyFormatsButton(), RepresentationAction.IDENTIFY_FORMATS,
@@ -450,7 +455,8 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
       "btn-play");
 
     // FILES AND FOLDERS
-    ActionsGroup<IndexedRepresentation> filesAndFoldersGroup = new ActionsGroup<>(messages.sidebarFoldersFilesTitle());
+    ActionableGroup<IndexedRepresentation> filesAndFoldersGroup = new ActionableGroup<>(
+      messages.sidebarFoldersFilesTitle());
     filesAndFoldersGroup.addButton(messages.uploadFilesButton(), RepresentationAction.UPLOAD_FILES,
       ActionImpact.UPDATED, "btn-upload");
     filesAndFoldersGroup.addButton(messages.createFolderButton(), RepresentationAction.CREATE_FOLDER,

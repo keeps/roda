@@ -13,11 +13,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
-import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.ClientLogger;
 
@@ -32,7 +31,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
 
 import config.i18n.client.ClientMessages;
 
-public class RodaMemberList extends BasicAsyncTableCell<RODAMember> {
+public class RodaMemberList extends AsyncTableCell<RODAMember> {
 
   @SuppressWarnings("unused")
   private final ClientLogger logger = new ClientLogger(getClass().getName());
@@ -48,18 +47,11 @@ public class RodaMemberList extends BasicAsyncTableCell<RODAMember> {
     RodaConstants.MEMBERS_IS_USER, RodaConstants.MEMBERS_NAME, RodaConstants.MEMBERS_FULLNAME,
     RodaConstants.MEMBERS_GROUPS, RodaConstants.MEMBERS_IS_ACTIVE);
 
-  public RodaMemberList(String listId) {
-    this(listId, null, null, false);
+  @Override
+  protected void adjustOptions(Options<RODAMember> options) {
+    options.withFieldsToReturn(fieldsToReturn);
   }
 
-  public RodaMemberList(String listId, Filter filter, String summary, boolean selectable) {
-    super(RODAMember.class, listId, filter, summary, selectable, fieldsToReturn);
-  }
-
-  public RodaMemberList(String listId, Filter filter, String summary, boolean selectable, int pageSize,
-    int incrementPage) {
-    super(RODAMember.class, listId, filter, summary, selectable, pageSize, incrementPage, fieldsToReturn);
-  }
 
   @Override
   protected void configureDisplay(CellTable<RODAMember> display) {

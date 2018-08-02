@@ -8,18 +8,18 @@
 package org.roda.wui.client.common.lists;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.Report.PluginState;
-import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.lists.utils.TooltipTextColumn;
 import org.roda.wui.client.common.utils.StringUtils;
 
@@ -43,7 +43,7 @@ import config.i18n.client.ClientMessages;
  * @author Luis Faria <lfaria@keep.pt>
  *
  */
-public class SimpleJobReportList extends BasicAsyncTableCell<IndexedReport> {
+public class SimpleJobReportList extends AsyncTableCell<IndexedReport> {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
@@ -64,32 +64,20 @@ public class SimpleJobReportList extends BasicAsyncTableCell<IndexedReport> {
     RodaConstants.JOB_REPORT_TOTAL_STEPS, RodaConstants.JOB_REPORT_COMPLETION_PERCENTAGE);
 
   private final Map<String, PluginInfo> pluginsInfo;
-  private String sourceClass;
-  private String outcomeClass;
 
-  public SimpleJobReportList(String listId) {
-    this(listId, null, null, new HashMap<>(), false);
+  public SimpleJobReportList() {
+    super();
+    this.pluginsInfo = Collections.emptyMap();
   }
 
-  public SimpleJobReportList(String listId, Filter filter, String summary, boolean selectable) {
-    this(listId, filter, summary, new HashMap<>(), selectable);
-  }
-
-  public SimpleJobReportList(String listId, Filter filter, String summary, boolean selectable,
-    int pageSize, int incrementPage) {
-    this(listId, filter, summary, new HashMap<>(), selectable, pageSize, incrementPage);
-  }
-
-  public SimpleJobReportList(String listId, Filter filter, String summary,
-    Map<String, PluginInfo> pluginsInfo, boolean selectable) {
-    super(IndexedReport.class, listId, filter, summary, selectable, fieldsToReturn);
+  public SimpleJobReportList(Map<String, PluginInfo> pluginsInfo) {
+    super();
     this.pluginsInfo = pluginsInfo;
   }
 
-  public SimpleJobReportList(String listId, Filter filter, String summary,
-    Map<String, PluginInfo> pluginsInfo, boolean selectable, int pageSize, int incrementPage) {
-    super(IndexedReport.class, listId, filter, summary, selectable, pageSize, incrementPage, fieldsToReturn);
-    this.pluginsInfo = pluginsInfo;
+  @Override
+  protected void adjustOptions(Options<IndexedReport> options) {
+    options.withFieldsToReturn(fieldsToReturn);
   }
 
   @Override
@@ -103,7 +91,6 @@ public class SimpleJobReportList extends BasicAsyncTableCell<IndexedReport> {
         if (report != null) {
           value = report.getSourceObjectOriginalIds().isEmpty() ? report.getSourceObjectId()
             : StringUtils.prettyPrint(report.getSourceObjectOriginalIds());
-          sourceClass = report.getSourceObjectClass();
         }
         return value;
       }

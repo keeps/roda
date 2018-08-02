@@ -13,8 +13,8 @@ import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
-import org.roda.wui.client.common.actions.model.ActionsBundle;
-import org.roda.wui.client.common.actions.model.ActionsGroup;
+import org.roda.wui.client.common.actions.model.ActionableBundle;
+import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.common.client.tools.RestUtils;
 
 import com.google.gwt.core.client.GWT;
@@ -37,6 +37,11 @@ public class PreservationAgentActions extends AbstractActionable<IndexedPreserva
 
   public enum PreservationAgentAction implements Action<IndexedPreservationAgent> {
     DOWNLOAD;
+  }
+
+  @Override
+  public PreservationAgentAction actionForName(String name) {
+    return PreservationAgentAction.valueOf(name);
   }
 
   public static PreservationAgentActions get() {
@@ -67,11 +72,11 @@ public class PreservationAgentActions extends AbstractActionable<IndexedPreserva
   }
 
   @Override
-  public ActionsBundle<IndexedPreservationAgent> createActionsBundle() {
-    ActionsBundle<IndexedPreservationAgent> preservationAgentActionableBundle = new ActionsBundle<>();
+  public ActionableBundle<IndexedPreservationAgent> createActionsBundle() {
+    ActionableBundle<IndexedPreservationAgent> preservationAgentActionableBundle = new ActionableBundle<>();
 
     // MANAGEMENT
-    ActionsGroup<IndexedPreservationAgent> managementGroup = new ActionsGroup<>(messages.sidebarActionsTitle());
+    ActionableGroup<IndexedPreservationAgent> managementGroup = new ActionableGroup<>(messages.sidebarActionsTitle());
     managementGroup.addButton(messages.downloadButton(), PreservationAgentAction.DOWNLOAD, ActionImpact.NONE,
       "btn-download");
 

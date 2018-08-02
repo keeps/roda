@@ -16,7 +16,7 @@
 				</g:HTML>
 				<g:FlowPanel addStyleNames="page-description" ui:field="searchDescription">
 				</g:FlowPanel>
-				<commonsearch:MainSearch ui:field="mainSearch" />
+				<commonsearch:CatalogueSearch ui:field="catalogueSearch" />
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>

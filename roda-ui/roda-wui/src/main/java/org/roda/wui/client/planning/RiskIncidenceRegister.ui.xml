@@ -11,44 +11,13 @@
 
 	<g:FlowPanel styleName="wui-risk-register" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
-			<g:FlowPanel addStyleNames="col_10 content">
+			<g:FlowPanel addStyleNames="col_12 content">
 				<g:Label styleName="h1" ui:field="riskIncidenceRegisterTitle">
 					<ui:text from='{messages.riskIncidenceRegisterTitle}' />
 				</g:Label>
 				<m:BreadcrumbPanel ui:field="breadcrumb" addStyleNames="browseBreadcrumb" />
 				<g:FlowPanel addStyleNames="page-description" ui:field="riskIncidenceRegisterDescription"/>
-				<commonsearch:SearchPanel ui:field="searchPanel" />
-				<lists:RiskIncidenceList addStyleNames="searchResults" ui:field="riskIncidenceList" />
-			</g:FlowPanel>
-			<g:FlowPanel addStyleNames="col_2 last sidebar">
-				<g:FlowPanel addStyleNames="sticky-flow">
-					<g:FlowPanel addStyleNames="sticky-padding">
-						<g:FlowPanel addStyleNames="sidebar-group" ui:field="risksSidebar">
-							<g:Label addStyleNames="h4">
-								<ui:text from='{messages.sidebarRiskIncidencesTitle}' />
-							</g:Label>
-							<g:Button addStyleNames="btn btn-danger btn-block btn-ban" ui:field="buttonRemove">
-								<ui:text from='{messages.removeButton}' />
-							</g:Button>
-							<g:Button addStyleNames="btn btn-block btn-default btn-times-circle"
-							ui:field="buttonCancel">
-								<ui:text from='{messages.cancelButton}' />
-							</g:Button>
-						</g:FlowPanel>
-						<g:FlowPanel addStyleNames="sidebar-group">
-							<g:Label addStyleNames="h4">
-								<ui:text from='{messages.sidebarFilterDates}' />
-							</g:Label>
-							<d:DateBox
-								addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
-								ui:field="inputDateInitial" />
-							<g:Label addStyleNames="sidebar-facet-date-separator">-</g:Label>
-							<d:DateBox
-								addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
-								ui:field="inputDateFinal" />
-						</g:FlowPanel>
-					</g:FlowPanel>
-				</g:FlowPanel>
+				<commonsearch:SearchWrapper ui:field="searchWrapper" />
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>

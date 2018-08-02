@@ -84,8 +84,6 @@ public class RiskCollection extends AbstractSolrCollection<IndexedRisk, Risk> {
     fields.add(new Field(RodaConstants.RISK_INCIDENCES_COUNT, Field.TYPE_INT));
     fields.add(new Field(RodaConstants.RISK_UNMITIGATED_INCIDENCES_COUNT, Field.TYPE_INT));
 
-    fields.add(SolrCollection.getSearchField());
-
     return fields;
   }
 

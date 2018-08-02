@@ -19,9 +19,12 @@ import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.user.client.Window;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
+import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -30,22 +33,30 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 public class Dropdown extends Composite implements HasValueChangeHandlers<String> {
   private FocusPanel focusPanel;
   private SimplePanel panel;
+  private FlowPanel iconAndLabelPanel;
   private Label selectedLabel;
+  private InlineHTML selectedIcon;
   private PopupPanel popup;
   private VerticalPanel popupPanel;
   private boolean popupShowing = false;
 
   private Map<String, String> popupValues;
+  private Map<String, String> popupIcons;
 
   public Dropdown() {
     focusPanel = new FocusPanel();
     panel = new SimplePanel();
+    iconAndLabelPanel = new FlowPanel();
     selectedLabel = new Label();
+    selectedIcon = new InlineHTML();
     popup = new PopupPanel(true);
     popupPanel = new VerticalPanel();
     popupValues = new HashMap<>();
+    popupIcons = new HashMap<>();
 
-    panel.add(selectedLabel);
+    iconAndLabelPanel.add(selectedIcon);
+    iconAndLabelPanel.add(selectedLabel);
+    panel.add(iconAndLabelPanel);
     focusPanel.add(panel);
 
     focusPanel.addClickHandler(new ClickHandler() {
@@ -68,25 +79,37 @@ public class Dropdown extends Composite implements HasValueChangeHandlers<String
 
     focusPanel.addStyleName("dropdown");
     panel.addStyleName("dropdown-panel");
-    selectedLabel.addStyleName("dropdown-label");
+    iconAndLabelPanel.addStyleName("dropdown-label");
     popup.addStyleName("dropdown-popup");
   }
 
-  public void addItem(final String label, final String value) {
+  public void addItem(final String label, final String value, final String icon) {
     popupValues.put(label, value);
-    Label item = new Label(label);
-    popupPanel.add(item);
+    popupIcons.put(label, icon);
+
+    FlowPanel item = new FlowPanel();
+
+    InlineHTML iconPanel = new InlineHTML();
+    iconPanel.setHTML(createHtmlForIcon(icon));
+    item.add(iconPanel);
+
+    Label labelWidget = new Label(label);
     item.addStyleName("dropdown-item");
 
-    item.addClickHandler(new ClickHandler() {
+    item.addDomHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {
         selectedLabel.setText(label);
+        selectedIcon.setHTML(createHtmlForIcon(icon));
         onChange();
         popup();
       }
-    });
+    }, ClickEvent.getType());
+
+    item.add(labelWidget);
+
+    popupPanel.add(item);
 
     popup.setWidget(popupPanel);
     setPanelWidth();
@@ -135,6 +158,7 @@ public class Dropdown extends Composite implements HasValueChangeHandlers<String
 
     if (label != null) {
       selectedLabel.setText(label);
+      selectedIcon.setHTML(createHtmlForIcon(popupIcons.get(label)));
       if (fire) {
         onChange();
       }
@@ -153,5 +177,9 @@ public class Dropdown extends Composite implements HasValueChangeHandlers<String
 
   public void addPopupStyleName(String styleName) {
     popup.addStyleName(styleName);
+  }
+
+  private SafeHtml createHtmlForIcon(String icon) {
+    return SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-" + icon + "\"></i>");
   }
 }

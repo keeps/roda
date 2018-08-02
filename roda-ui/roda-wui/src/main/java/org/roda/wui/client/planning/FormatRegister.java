@@ -13,14 +13,14 @@ package org.roda.wui.client.planning;
 import java.util.List;
 
 import org.roda.core.data.v2.formats.Format;
-import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.FormatActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.lists.FormatList;
-import org.roda.wui.client.common.search.SearchFilters;
-import org.roda.wui.client.common.search.SearchPanel;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.ListBuilder;
+import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -37,7 +37,6 @@ import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.SelectionChangeEvent;
 
 import config.i18n.client.ClientMessages;
 
@@ -84,40 +83,26 @@ public class FormatRegister extends Composite {
   @UiField
   FlowPanel formatRegisterDescription;
 
-  @UiField(provided = true)
-  SearchPanel searchPanel;
-
-  @UiField(provided = true)
-  FormatList formatList;
-
   @UiField
   SimplePanel actionsSidebar;
-  private ActionableWidgetBuilder<Format> actionableWidgetBuilder;
 
-  private static final Filter DEFAULT_FILTER = SearchFilters.defaultFilter(Format.class.getName());
-  private static final String ALL_FILTER = SearchFilters.allFilter(Format.class.getName());
+  @UiField(provided = true)
+  SearchWrapper searchWrapper;
+
+  private ActionableWidgetBuilder<Format> actionableWidgetBuilder;
 
   /**
    * Create a format register page
    */
   public FormatRegister() {
     actionableWidgetBuilder = new ActionableWidgetBuilder<>(FormatActions.get());
-    formatList = new FormatList("FormatRegister_formats", Filter.ALL, messages.formatsTitle(), true);
-    formatList.setActionable(FormatActions.get());
 
-    searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, true, messages.formatRegisterSearchPlaceHolder(), false,
-      false, true);
-    searchPanel.setList(formatList);
+    ListBuilder<Format> formatListBuilder = new ListBuilder<>(FormatList::new,
+      new AsyncTableCell.Options<>(Format.class, "FormatRegister_formats").withSummary(messages.formatsTitle())
+        .bindOpener());
 
-    formatList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
-      @Override
-      public void onSelectionChange(SelectionChangeEvent event) {
-        Format selected = formatList.getSelectionModel().getSelectedObject();
-        if (selected != null) {
-          HistoryUtils.newHistory(ShowFormat.RESOLVER, selected.getId());
-        }
-      }
-    });
+    searchWrapper = new SearchWrapper(false).createListAndSearchPanel(formatListBuilder, FormatActions.get(),
+      messages.formatRegisterSearchPlaceHolder());
 
     initWidget(uiBinder.createAndBindUi(this));
     actionsSidebar.setWidget(actionableWidgetBuilder.buildListWithObjects(new ActionableObject<>(Format.class)));
@@ -152,8 +137,7 @@ public class FormatRegister extends Composite {
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.isEmpty()) {
-      formatList.refresh();
-      formatList.setFilter(Filter.ALL);
+      searchWrapper.resetToDefaultFilter(Format.class);
       callback.onSuccess(this);
     } else if (historyTokens.size() == 2 && historyTokens.get(0).equals(ShowFormat.RESOLVER.getHistoryToken())) {
       ShowFormat.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);

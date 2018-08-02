@@ -7,16 +7,16 @@
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
-	<g:FlowPanel>
+	<g:FlowPanel styleName="searchPanelContainer">
 		<g:FlowPanel styleName="searchPanel" ui:field="searchPanel">
 			<g:FlowPanel styleName="searchPanelLeft">
-				<commonsearch:Dropdown ui:field="searchInputListBox" addStyleNames="searchInputListBox" />
+				<g:SimplePanel ui:field="searchPanelSelectionDropdownWrapper" />
 				<commonsearch:SelectedPanel ui:field="searchSelectedPanel" />
 				<g:FlowPanel styleName="searchPanelLeftInput">
 					<g:TextBox title="{messages.searchButton}" ui:field="searchInputBox" addStyleNames="searchBox" />
 				</g:FlowPanel>
 			</g:FlowPanel>
-			<g:FlowPanel styleName="searchPanelRight">
+			<g:FlowPanel styleName="searchPanelRight" ui:field="searchPanelRight">
 				<wcag:AccessibleFocusPanel styleName="searchAdvancedDisclosureButton"
 					ui:field="searchAdvancedDisclosureButton">
 					<g:HTML addStyleNames="searchButton-html" ui:field="searchButton">
@@ -29,11 +29,17 @@
 						</span>
 					</g:HTML>
 				</wcag:AccessibleFocusPanel>
-				<wcag:AccessibleFocusPanel styleName="searchButton"
-					ui:field="searchInputButton">
+				<wcag:AccessibleFocusPanel styleName="searchButton" ui:field="searchInputButton">
 					<g:HTML addStyleNames="searchButton-html">
 						<span class="fa-stack fa-lg">
 							<i class="fa fa-search fa-stack-1x"></i>
+						</span>
+					</g:HTML>
+				</wcag:AccessibleFocusPanel>
+				<wcag:AccessibleFocusPanel styleName="actions-button searchPanelButtonsSeparator" ui:field="actionsButton">
+					<g:HTML>
+						<span class="fa-stack fa-lg">
+							<i class="fa fa-ellipsis-v fa-stack-1x"></i>
 						</span>
 					</g:HTML>
 				</wcag:AccessibleFocusPanel>

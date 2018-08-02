@@ -13,10 +13,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
-import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.cellview.client.CellTable;
@@ -32,7 +31,7 @@ import config.i18n.client.ClientMessages;
  * @author Luis Faria <lfaria@keep.pt>
  *
  */
-public class PreservationAgentList extends BasicAsyncTableCell<IndexedPreservationAgent> {
+public class PreservationAgentList extends AsyncTableCell<IndexedPreservationAgent> {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private TextColumn<IndexedPreservationAgent> nameColumn;
@@ -43,9 +42,11 @@ public class PreservationAgentList extends BasicAsyncTableCell<IndexedPreservati
     RodaConstants.PRESERVATION_AGENT_ID, RodaConstants.PRESERVATION_AGENT_NAME, RodaConstants.PRESERVATION_AGENT_TYPE,
     RodaConstants.PRESERVATION_AGENT_VERSION);
 
-  public PreservationAgentList(String listId, Filter filter, String summary, boolean selectable) {
-    super(IndexedPreservationAgent.class, listId, filter, summary, selectable, fieldsToReturn);
+  @Override
+  protected void adjustOptions(Options<IndexedPreservationAgent> options) {
+    options.withFieldsToReturn(fieldsToReturn);
   }
+
 
   @Override
   protected void configureDisplay(CellTable<IndexedPreservationAgent> display) {

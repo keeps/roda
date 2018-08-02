@@ -159,8 +159,7 @@
 					<g:Label styleName="h4">
 						<ui:text from='{messages.riskIncidences}' />
 					</g:Label>
-					<commonsearch:SearchPanel ui:field="searchPanel" />
-					<lists:RiskIncidenceList addStyleNames="searchResults" ui:field="incidenceList" />
+					<commonsearch:SearchWrapper ui:field="searchWrapper" />
 				</g:FlowPanel>
 
 			</g:FlowPanel>

@@ -8,24 +8,19 @@
 
 package org.roda.wui.client.planning;
 
-import com.google.gwt.user.client.ui.FlowPanel;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
-import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.actions.RiskIncidenceActions;
 import org.roda.wui.client.common.lists.RiskIncidenceList;
-import org.roda.wui.client.common.search.SearchFilters;
-import org.roda.wui.client.common.search.SearchPanel;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.ListBuilder;
+import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.StringUtils;
-import org.roda.wui.common.client.ClientLogger;
-import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
 
 import com.google.gwt.core.client.GWT;
@@ -37,6 +32,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
@@ -53,7 +49,7 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  private static ClientMessages messages = GWT.create(ClientMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   @UiField
   Label title;
@@ -137,45 +133,28 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
   Label riskMitigationRelatedEventIdentifierValueKey, riskMitigationRelatedEventIdentifierValueValue;
 
   @UiField(provided = true)
-  SearchPanel searchPanel;
+  SearchWrapper searchWrapper;
 
-  @UiField(provided = true)
-  RiskIncidenceList incidenceList;
+  public RiskShowPanel(String listId) {
 
-  private static final Filter DEFAULT_FILTER = SearchFilters.defaultFilter(RiskIncidence.class.getName());
-  private static final String ALL_FILTER = SearchFilters.allFilter(RiskIncidence.class.getName());
+    ListBuilder<RiskIncidence> riskIncidenceListBuilder = new ListBuilder<>(RiskIncidenceList::new,
+      new AsyncTableCell.Options<>(RiskIncidence.class, listId).withSummary(messages.riskIncidences()));
 
-  public RiskShowPanel() {
-    incidenceList = new RiskIncidenceList("RiskShowPanel_riskIncidences", Filter.NULL, messages.riskIncidences(), true);
-    incidenceList.setActionable(RiskIncidenceActions.getForMultipleEdit());
-
-    searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, true, messages.riskIncidenceRegisterSearchPlaceHolder(),
-      false, false, false);
-    searchPanel.setList(incidenceList);
+    searchWrapper = new SearchWrapper(false).createListAndSearchPanel(riskIncidenceListBuilder,
+      RiskIncidenceActions.getForMultipleEdit(), messages.riskIncidenceRegisterSearchPlaceHolder());
 
     initWidget(uiBinder.createAndBindUi(this));
   }
 
-  public RiskShowPanel(Risk risk, boolean hasTitle) {
+  public RiskShowPanel(Risk risk, String listId, boolean hasTitle) {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISK_ID, risk.getId()));
-    incidenceList = new RiskIncidenceList("RiskShowPanel_riskIncidences", filter, messages.riskIncidences(), hasTitle);
-    incidenceList.setActionable(RiskIncidenceActions.getForMultipleEdit());
 
-    Filter incidenceFilter = new Filter(new BasicSearchFilterParameter(RodaConstants.RISK_INCIDENCE_SEARCH, "*"),
-      new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISK_ID, risk.getId()));
+    ListBuilder<RiskIncidence> riskIncidenceListBuilder = new ListBuilder<>(RiskIncidenceList::new,
+      new AsyncTableCell.Options<>(RiskIncidence.class, listId).withSummary(messages.riskIncidences())
+        .withFilter(filter).bindOpener());
 
-    searchPanel = new SearchPanel(incidenceFilter, ALL_FILTER, true, messages.riskIncidenceRegisterSearchPlaceHolder(),
-      false, false, false);
-    searchPanel.setList(incidenceList);
-
-    incidenceList.getSelectionModel().addSelectionChangeHandler(event -> {
-      final RiskIncidence selected = incidenceList.getSelectionModel().getSelectedObject();
-      if (selected != null) {
-        LastSelectedItemsSingleton.getInstance().setLastHistory(HistoryUtils.getCurrentHistoryPath());
-        HistoryUtils.newHistory(RiskIncidenceRegister.RESOLVER, ShowRiskIncidence.RESOLVER.getHistoryToken(),
-          selected.getId());
-      }
-    });
+    searchWrapper = new SearchWrapper(false).createListAndSearchPanel(riskIncidenceListBuilder,
+      RiskIncidenceActions.getForMultipleEdit(), messages.riskIncidenceRegisterSearchPlaceHolder());
 
     initWidget(uiBinder.createAndBindUi(this));
     title.setVisible(hasTitle);
@@ -351,13 +330,5 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
   @Override
   public HandlerRegistration addValueChangeHandler(ValueChangeHandler<Risk> handler) {
     return addHandler(handler, ValueChangeEvent.getType());
-  }
-
-  public SelectedItems<RiskIncidence> getSelectedIncidences() {
-    return incidenceList.getSelected();
-  }
-
-  public void refreshList() {
-    incidenceList.refresh();
   }
 }

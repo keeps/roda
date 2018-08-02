@@ -38,6 +38,8 @@ public abstract class AbstractSolrCollection<I extends IsIndexed, M extends IsMo
         .setDefaultValue(AIPState.getDefault().toString()));
     }
 
+    ret.add(SolrCollection.getSearchField());
+
     return ret;
   }
 

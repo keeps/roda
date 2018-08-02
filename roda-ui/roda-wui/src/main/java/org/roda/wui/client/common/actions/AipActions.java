@@ -23,7 +23,7 @@ import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.wui.client.browse.BrowseAIP;
+import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.CreateDescriptiveMetadata;
 import org.roda.wui.client.browse.EditPermissions;
@@ -31,8 +31,8 @@ import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
 import org.roda.wui.client.common.actions.callbacks.ActionLoadingAsyncCallback;
 import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
-import org.roda.wui.client.common.actions.model.ActionsBundle;
-import org.roda.wui.client.common.actions.model.ActionsGroup;
+import org.roda.wui.client.common.actions.model.ActionableBundle;
+import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.RepresentationDialogs;
 import org.roda.wui.client.common.dialogs.SelectAipDialog;
@@ -92,6 +92,11 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   public enum AipAction implements Actionable.Action<IndexedAIP> {
     NEW_CHILD_AIP, DOWNLOAD, MOVE_IN_HIERARCHY, UPDATE_PERMISSIONS, REMOVE, NEW_PROCESS, DOWNLOAD_EVENTS,
     APPRAISAL_ACCEPT, APPRAISAL_REJECT, DOWNLOAD_DOCUMENTATION, CHANGE_TYPE
+  }
+
+  @Override
+  public AipAction actionForName(String name) {
+    return AipAction.valueOf(name);
   }
 
   public static AipActions get() {
@@ -224,7 +229,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
             Filter filter = new Filter(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, aipId));
             SelectAipDialog selectAipDialog = new SelectAipDialog(
               messages.moveItemTitle() + " " + (StringUtils.isNotBlank(aip.getTitle()) ? aip.getTitle() : aip.getId()),
-              filter, justActive, false);
+              filter, justActive);
             selectAipDialog.setEmptyParentButtonVisible(true);
             selectAipDialog.setSingleSelectionMode();
             selectAipDialog.showAndCenter();
@@ -305,8 +310,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
                   filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, parentAipId));
                 }
 
-                SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle(), filter, justActive,
-                  true);
+                SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle(), filter, justActive);
                 selectAipDialog.setEmptyParentButtonVisible(parentAipId != null);
                 selectAipDialog.showAndCenter();
                 if (counter > 0 && counter <= RodaConstants.DIALOG_FILTER_LIMIT_NUMBER) {
@@ -404,9 +408,9 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
                               @Override
                               public void run() {
                                 if (parentId != null) {
-                                  HistoryUtils.newHistory(BrowseAIP.RESOLVER, parentId);
+                                  HistoryUtils.newHistory(BrowseTop.RESOLVER, parentId);
                                 } else {
-                                  HistoryUtils.newHistory(BrowseAIP.RESOLVER);
+                                  HistoryUtils.newHistory(BrowseTop.RESOLVER);
                                 }
                                 callback.onFailure(caught);
                               }
@@ -635,11 +639,11 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   }
 
   @Override
-  public ActionsBundle<IndexedAIP> createActionsBundle() {
-    ActionsBundle<IndexedAIP> aipActionsBundle = new ActionsBundle<>();
+  public ActionableBundle<IndexedAIP> createActionsBundle() {
+    ActionableBundle<IndexedAIP> aipActionableBundle = new ActionableBundle<>();
 
     // MANAGEMENT
-    ActionsGroup<IndexedAIP> managementGroup = new ActionsGroup<>(messages.intellectualEntity());
+    ActionableGroup<IndexedAIP> managementGroup = new ActionableGroup<>(messages.intellectualEntity());
     managementGroup.addButton(messages.newArchivalPackage(), AipAction.NEW_CHILD_AIP, ActionImpact.UPDATED, "btn-plus");
     managementGroup.addButton(messages.changeTypeButton(), AipAction.CHANGE_TYPE, ActionImpact.UPDATED, "btn-edit");
     managementGroup.addButton(messages.moveArchivalPackage(), AipAction.MOVE_IN_HIERARCHY, ActionImpact.UPDATED,
@@ -650,21 +654,21 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     managementGroup.addButton(messages.downloadButton(), AipAction.DOWNLOAD, ActionImpact.NONE, "btn-download");
 
     // PRESERVATION
-    ActionsGroup<IndexedAIP> preservationGroup = new ActionsGroup<>(messages.preservationTitle());
+    ActionableGroup<IndexedAIP> preservationGroup = new ActionableGroup<>(messages.preservationTitle());
     preservationGroup.addButton(messages.newProcessPreservation(), AipAction.NEW_PROCESS, ActionImpact.UPDATED,
       "btn-play");
     preservationGroup.addButton(messages.preservationEventsDownloadButton(), AipAction.DOWNLOAD_EVENTS,
       ActionImpact.NONE, "btn-download");
 
     // APPRAISAL
-    ActionsGroup<IndexedAIP> appraisalGroup = new ActionsGroup<>(messages.appraisalTitle());
+    ActionableGroup<IndexedAIP> appraisalGroup = new ActionableGroup<>(messages.appraisalTitle());
     appraisalGroup.addButton(messages.appraisalAccept(), AipAction.APPRAISAL_ACCEPT, ActionImpact.UPDATED, "btn-play");
     appraisalGroup.addButton(messages.appraisalReject(), AipAction.APPRAISAL_REJECT, ActionImpact.DESTROYED, "btn-ban");
     appraisalGroup.addButton(messages.downloadDocumentation(), AipAction.DOWNLOAD_DOCUMENTATION, ActionImpact.NONE,
       "btn-download");
 
-    aipActionsBundle.addGroup(managementGroup).addGroup(preservationGroup).addGroup(appraisalGroup);
+    aipActionableBundle.addGroup(managementGroup).addGroup(preservationGroup).addGroup(appraisalGroup);
 
-    return aipActionsBundle;
+    return aipActionableBundle;
   }
 }

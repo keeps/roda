@@ -24,8 +24,9 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.dialogs.Dialogs;
-import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
+import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.lists.utils.ListFactory;
+import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.PluginUtils;
 import org.roda.wui.client.search.Search;
@@ -71,11 +72,12 @@ public class CreateActionJob extends CreateSelectedJob<IsIndexed> {
       }
 
       ListFactory listFactory = new ListFactory();
-      BasicAsyncTableCell<?> list = listFactory.getList(selected.getSelectedClass(),
-        messages.allOfAObject(selected.getSelectedClass()), filter, selectable, 10, 10);
+      ListBuilder<? extends IsIndexed> listBuilder = listFactory.getListBuilder("CreateActionJob",
+        selected.getSelectedClass(), messages.allOfAObject(selected.getSelectedClass()), filter, 10, 10);
 
-      if (list != null) {
-        getTargetPanel().add(list);
+      if (listBuilder != null) {
+        SearchWrapper search = new SearchWrapper(false).createListAndSearchPanel(listBuilder);
+        getTargetPanel().add(search);
       } else {
         HistoryUtils.newHistory(CreateDefaultJob.RESOLVER);
       }

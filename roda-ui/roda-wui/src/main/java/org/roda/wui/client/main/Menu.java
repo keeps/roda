@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.roda.core.data.v2.user.User;
-import org.roda.wui.client.browse.BrowseAIP;
+import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -44,7 +44,6 @@ import org.roda.wui.client.welcome.Help;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.LoginStatusListener;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.wcag.AcessibleMenuBar;
 
@@ -70,7 +69,7 @@ import config.i18n.client.ClientMessages;
 public class Menu extends Composite {
 
   private ClientLogger logger = new ClientLogger(getClass().getName());
-  private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
   interface MyUiBinder extends UiBinder<Widget, Menu> {
@@ -129,7 +128,7 @@ public class Menu extends Composite {
     about = customMenuItem("fa fa-home", messages.title("about"), "menu-item-label", null,
       createCommand(Welcome.RESOLVER.getHistoryPath()));
 
-    disseminationBrowse = new MenuItem(messages.title("browse"), createCommand(BrowseAIP.RESOLVER.getHistoryPath()));
+    disseminationBrowse = new MenuItem(messages.title("browse"), createCommand(BrowseTop.RESOLVER.getHistoryPath()));
     disseminationBrowse.addStyleName("browse_menu_item");
     disseminationSearchBasic = new MenuItem(messages.title("search"), createCommand(Search.RESOLVER.getHistoryPath()));
     disseminationSearchBasic.addStyleName("search_menu_item");
@@ -197,13 +196,7 @@ public class Menu extends Composite {
     userMenu = new AcessibleMenuBar(true);
     MenuItem profile = userMenu.addItem(messages.loginProfile(), createCommand(Profile.RESOLVER.getHistoryPath()));
     profile.addStyleName("profile_user_item");
-    MenuItem login = userMenu.addItem(messages.loginLogout(), new ScheduledCommand() {
-
-      @Override
-      public void execute() {
-        UserLogin.getInstance().logout();
-      }
-    });
+    MenuItem login = userMenu.addItem(messages.loginLogout(), () -> UserLogin.getInstance().logout());
     login.addStyleName("login_user_item");
 
     languagesMenu = new AcessibleMenuBar(true);
@@ -222,41 +215,20 @@ public class Menu extends Composite {
       public void onSuccess(User user) {
         updateVisibles(user);
       }
-
     });
 
-    UserLogin.getInstance().addLoginStatusListener(new LoginStatusListener() {
-
-      @Override
-      public void onLoginStatusChanged(User user) {
-        updateVisibles(user);
-      }
-
-    });
+    UserLogin.getInstance().addLoginStatusListener(this::updateVisibles);
   }
 
   private ScheduledCommand createCommand(final List<String> path) {
-    return new ScheduledCommand() {
-
-      @Override
-      public void execute() {
-        HistoryUtils.newHistory(path);
-      }
-    };
+    return () -> HistoryUtils.newHistory(path);
   }
 
   private ScheduledCommand createLoginCommand() {
-    return new ScheduledCommand() {
-
-      @Override
-      public void execute() {
-        UserLogin.getInstance().login();
-      }
-    };
+    return () -> UserLogin.getInstance().login();
   }
 
   private void updateVisibles(User user) {
-
     leftMenu.clearItems();
     leftMenuItemCount = 0;
     rightMenu.clearItems();
@@ -267,7 +239,7 @@ public class Menu extends Composite {
     updateResolverTopItemVisibility(Welcome.RESOLVER, about, 0);
 
     // Dissemination
-    updateResolverTopItemVisibility(BrowseAIP.RESOLVER, disseminationBrowse, 1);
+    updateResolverTopItemVisibility(BrowseTop.RESOLVER, disseminationBrowse, 1);
     updateResolverTopItemVisibility(Search.RESOLVER, disseminationSearchBasic, 2);
 
     // Ingest
@@ -337,8 +309,9 @@ public class Menu extends Composite {
     String iconHTML = "<i class='" + icon + "'></i>";
 
     b.append(SafeHtmlUtils.fromSafeConstant(iconHTML));
-    if (label != null)
+    if (label != null) {
       b.append(SafeHtmlUtils.fromSafeConstant(label));
+    }
 
     MenuItem menuItem;
     if (subMenu != null) {
@@ -423,13 +396,8 @@ public class Menu extends Composite {
         languagesMenu.addItem(languageMenuItem);
         selectedLanguage = value;
       } else {
-        MenuItem languageMenuItem = new MenuItem(SafeHtmlUtils.fromSafeConstant(value), new ScheduledCommand() {
-
-          @Override
-          public void execute() {
-            JavascriptUtils.changeLocale(key);
-          }
-        });
+        MenuItem languageMenuItem = new MenuItem(SafeHtmlUtils.fromSafeConstant(value),
+          () -> JavascriptUtils.changeLocale(key));
         languagesMenu.addItem(languageMenuItem);
         languageMenuItem.addStyleName("menu-item-language");
       }

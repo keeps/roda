@@ -13,13 +13,13 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.wui.client.common.lists.DIPFileList;
-import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
-import org.roda.wui.client.common.search.SearchPanel;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.ListBuilder;
+import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.common.client.tools.RestUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -46,20 +46,11 @@ public class DipFilePreview extends BitstreamPreview<DIPFile> {
     final Filter filter = new Filter(
       new SimpleFilterParameter(RodaConstants.DIPFILE_PARENT_UUID, getObject().getUUID()));
 
-    final FlowPanel layout = new FlowPanel();
+    ListBuilder<DIPFile> dipFileListBuilder = new ListBuilder<>(DIPFileList::new,
+      new AsyncTableCell.Options<>(DIPFile.class, "DipFilePreview_files").withFilter(filter)
+        .withSummary(messages.allOfAObject(DIPFile.class.getName())).bindOpener());
 
-    final SearchPanel dipFileSearch = new SearchPanel(filter, RodaConstants.DIPFILE_SEARCH, true,
-      messages.searchPlaceHolder(), false, false, true);
-
-    final DIPFileList folderList = new DIPFileList("DipFilePreview_files", filter,
-      messages.allOfAObject(DIPFile.class.getName()), false);
-    dipFileSearch.setList(folderList);
-
-    layout.add(dipFileSearch);
-    layout.add(folderList);
-
-    ListSelectionUtils.bindBrowseOpener(folderList);
-    return layout;
+    return new SearchWrapper(false).createListAndSearchPanel(dipFileListBuilder);
   }
 
 }

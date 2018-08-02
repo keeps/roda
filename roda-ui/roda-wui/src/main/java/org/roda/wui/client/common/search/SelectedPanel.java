@@ -1,18 +1,20 @@
 package org.roda.wui.client.common.search;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.common.client.tools.ConfigurationManager;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 
@@ -21,52 +23,89 @@ import config.i18n.client.ClientMessages;
 /**
  * @author Bruno Ferreira <bferreira@keep.pt>
  */
-public class SelectedPanel extends SimplePanel implements HasValueChangeHandlers<Boolean> {
+public class SelectedPanel<T extends IsIndexed> extends SimplePanel implements HasValueChangeHandlers<Boolean> {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  private AsyncTableCell<IsIndexed, ?> boundList = null;
-  private AsyncTableCell.CheckboxSelectionListener<IsIndexed> checkboxSelectionListener = null;
+  public static String getIconForList(String listId, String classSimpleName) {
+    // get icon for list
+    String searchSelectedPanelIcon = ConfigurationManager.getString(RodaConstants.UI_LISTS_PROPERTY, listId,
+      RodaConstants.UI_LISTS_SEARCH_SELECTEDINFO_ICON_PROPERTY);
 
-  private List<HandlerRegistration> valueChangedHandlers = new ArrayList<>();
+    if (searchSelectedPanelIcon == null) {
+      // fallback: get icon for class
+      searchSelectedPanelIcon = ConfigurationManager.getString(RodaConstants.UI_ICONS_CLASS, classSimpleName);
 
-  private Label selectedLabel;
+      if (searchSelectedPanelIcon == null) {
+        // second fallback: use a default icon
+        searchSelectedPanelIcon = "question-circle";
+      }
+    }
 
-  public SelectedPanel() {
-    selectedLabel = new Label();
-    add(selectedLabel);
-
-    addStyleName("selected-count-panel");
-    selectedLabel.addStyleName("selected-count-label");
-    selectedLabel.setText("10 selected");
+    return searchSelectedPanelIcon;
   }
 
-  public void bindList(AsyncTableCell<IsIndexed, ?> list) {
-    if (boundList != null) {
-      boundList.removeCheckboxSelectionListener(checkboxSelectionListener);
-    }
-    boundList = list;
+  SelectedPanel(AsyncTableCell<T> list) {
 
-    checkboxSelectionListener = selected -> {
+    // get default text to be shown when nothing is selected
+    String defaultLabelText = ConfigurationManager.resolveTranslation(RodaConstants.UI_LISTS_PROPERTY, list.getListId(),
+      RodaConstants.UI_LISTS_SEARCH_SELECTEDINFO_LABEL_DEFAULT_I18N_PROPERTY);
+    if (defaultLabelText == null) {
+      defaultLabelText = messages.someOfAObject(list.getClassToReturn().getName());
+    }
+
+    // get "items" part for "1 item selected"
+    String selectedSingleItemTextTmp = ConfigurationManager.resolveTranslation(RodaConstants.UI_LISTS_PROPERTY,
+      list.getListId(), RodaConstants.UI_LISTS_SEARCH_SELECTEDINFO_LABEL_SELECTED_I18N_SINGLE_PROPERTY);
+    if (selectedSingleItemTextTmp == null) {
+      selectedSingleItemTextTmp = messages.oneOfAObject(list.getClassToReturn().getName());
+    }
+    String selectedSingleItemText = selectedSingleItemTextTmp;
+
+    // get "items" part for "N items selected"
+    String selectedMultipleItemTextTmp = ConfigurationManager.resolveTranslation(RodaConstants.UI_LISTS_PROPERTY,
+      list.getListId(), RodaConstants.UI_LISTS_SEARCH_SELECTEDINFO_LABEL_SELECTED_I18N_MULTIPLE_PROPERTY);
+    if (selectedMultipleItemTextTmp == null) {
+      selectedMultipleItemTextTmp = messages.someOfAObject(list.getClassToReturn().getName());
+    }
+    final String selectedMultipleItemText = selectedMultipleItemTextTmp;
+
+    // build widgets
+    FlowPanel innerPanel = new FlowPanel();
+    addStyleName("selected-count-panel");
+    add(innerPanel);
+
+    InlineHTML iconPanel = new InlineHTML();
+    iconPanel.setHTML(SafeHtmlUtils.fromSafeConstant(
+      "<i class=\"fa fa-" + getIconForList(list.getListId(), list.getClassToReturn().getSimpleName()) + "\"></i>"));
+    innerPanel.add(iconPanel);
+
+    Label selectedLabel = new Label(defaultLabelText);
+    selectedLabel.addStyleName("inline selected-count-panel-default");
+    innerPanel.add(selectedLabel);
+
+    list.addCheckboxSelectionListener(selected -> {
       int count = 0;
       if (selected instanceof SelectedItemsList) {
         count = ((SelectedItemsList) selected).getIds().size();
       } else if (selected instanceof SelectedItemsFilter) {
-        long longCount = boundList.getResult().getTotalCount();
+        long longCount = list.getResult().getTotalCount();
         count = longCount > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) longCount;
       }
 
-      // messages handles count of 0, 1 and N in different ways, but 0 and 1 are only
-      // supported for integers
-      selectedLabel.setText(messages.selected(count));
+      if (count == 0) {
+        selectedLabel.setText(selectedMultipleItemText);
+        selectedLabel.addStyleName("selected-count-panel-default");
+      } else {
+        selectedLabel.removeStyleName("selected-count-panel-default");
+        selectedLabel.setText(messages.selected(count, count == 1 ? selectedSingleItemText : selectedMultipleItemText));
+      }
 
       ValueChangeEvent.fire(SelectedPanel.this, count > 0);
-    };
-    boundList.addCheckboxSelectionListener(checkboxSelectionListener);
+    });
   }
 
   @Override
   public HandlerRegistration addValueChangeHandler(ValueChangeHandler<Boolean> handler) {
     return addHandler(handler, ValueChangeEvent.getType());
   }
-
 }

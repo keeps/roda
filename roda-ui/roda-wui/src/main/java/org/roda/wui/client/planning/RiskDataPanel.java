@@ -12,13 +12,10 @@ import java.util.Date;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
-import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.IncrementalList;
-import org.roda.wui.client.common.lists.RiskIncidenceList;
 import org.roda.wui.client.common.search.SearchSuggestBox;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.common.client.ClientLogger;
@@ -58,7 +55,7 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  private static ClientMessages messages = GWT.create(ClientMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   @UiField
   Label id;

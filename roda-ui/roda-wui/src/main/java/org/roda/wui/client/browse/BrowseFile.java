@@ -11,13 +11,12 @@
 package org.roda.wui.client.browse;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
-import org.roda.core.data.v2.index.sort.SortParameter;
-import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
@@ -78,12 +77,12 @@ public class BrowseFile extends Composite {
 
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRole(BrowseAIP.RESOLVER, callback);
+      UserLogin.getInstance().checkRole(BrowseTop.RESOLVER, callback);
     }
 
     @Override
     public List<String> getHistoryPath() {
-      return ListUtils.concat(BrowseAIP.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(BrowseTop.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     @Override
@@ -99,7 +98,7 @@ public class BrowseFile extends Composite {
         final String historyFileId = historyTokens.get(historyTokens.size() - 1);
 
         BrowserService.Util.getInstance().retrieveBrowseFileBundle(historyAipId, historyRepresentationId,
-          historyFilePath, historyFileId, fileFieldsToReturn, new AsyncCallback<BrowseFileBundle>() {
+          historyFilePath, historyFileId, Collections.emptyList(), new AsyncCallback<BrowseFileBundle>() {
 
             @Override
             public void onFailure(Throwable caught) {
@@ -131,13 +130,8 @@ public class BrowseFile extends Composite {
 
   private static BrowseFile instance = null;
 
-  public static final Sorter DEFAULT_FILE_SORTER = new Sorter(new SortParameter(RodaConstants.FILE_FILE_ID, false));
-  public static final Integer DEFAULT_FILE_INDEX = -1;
-
   private final BrowseFileBundle bundle;
   private SliderPanel disseminationsSlider;
-
-  private static final List<String> fileFieldsToReturn = new ArrayList<>();
 
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());

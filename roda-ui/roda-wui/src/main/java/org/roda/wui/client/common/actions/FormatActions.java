@@ -18,8 +18,8 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
-import org.roda.wui.client.common.actions.model.ActionsBundle;
-import org.roda.wui.client.common.actions.model.ActionsGroup;
+import org.roda.wui.client.common.actions.model.ActionableBundle;
+import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
@@ -55,6 +55,11 @@ public class FormatActions extends AbstractActionable<Format> {
 
   public enum FormatAction implements Action<Format> {
     NEW, REMOVE, START_PROCESS, EDIT
+  }
+
+  @Override
+  public FormatAction actionForName(String name) {
+    return FormatAction.valueOf(name);
   }
 
   public static FormatActions get() {
@@ -181,17 +186,17 @@ public class FormatActions extends AbstractActionable<Format> {
   }
 
   @Override
-  public ActionsBundle<Format> createActionsBundle() {
-    ActionsBundle<Format> formatActionableBundle = new ActionsBundle<>();
+  public ActionableBundle<Format> createActionsBundle() {
+    ActionableBundle<Format> formatActionableBundle = new ActionableBundle<>();
 
     // MANAGEMENT
-    ActionsGroup<Format> managementGroup = new ActionsGroup<>(messages.sidebarActionsTitle());
+    ActionableGroup<Format> managementGroup = new ActionableGroup<>(messages.sidebarActionsTitle());
     managementGroup.addButton(messages.newButton(), FormatAction.NEW, ActionImpact.UPDATED, "btn-plus");
     managementGroup.addButton(messages.editButton(), FormatAction.EDIT, ActionImpact.UPDATED, "btn-edit");
     managementGroup.addButton(messages.removeButton(), FormatAction.REMOVE, ActionImpact.DESTROYED, "btn-ban");
 
     // PRESERVATION
-    ActionsGroup<Format> preservationGroup = new ActionsGroup<>(messages.preservationTitle());
+    ActionableGroup<Format> preservationGroup = new ActionableGroup<>(messages.preservationTitle());
     preservationGroup.addButton(messages.formatRegisterProcessButton(), FormatAction.START_PROCESS,
       ActionImpact.UPDATED, "btn-play");
 

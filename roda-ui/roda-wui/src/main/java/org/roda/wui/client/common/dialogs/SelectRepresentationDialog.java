@@ -7,39 +7,23 @@
  */
 package org.roda.wui.client.common.dialogs;
 
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.common.lists.RepresentationList;
-import org.roda.wui.client.common.search.SearchFilters;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.ListBuilder;
 
 import com.google.gwt.core.client.GWT;
 
 import config.i18n.client.ClientMessages;
 
-public class SelectRepresentationDialog extends DefaultSelectDialog<IndexedRepresentation, Void> {
-
+public class SelectRepresentationDialog extends DefaultSelectDialog<IndexedRepresentation> {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  private static final Filter DEFAULT_FILTER_REPRESENTATION = SearchFilters
-    .defaultFilter(IndexedRepresentation.class.getName());
-
-  private static final Boolean DEFAULT_JUST_ACTIVE = Boolean.TRUE;
-  private static final Boolean SELECTABLE = Boolean.FALSE;
-
-  public SelectRepresentationDialog(String title, boolean hidePreFilters) {
-    this(title, DEFAULT_FILTER_REPRESENTATION, DEFAULT_JUST_ACTIVE, hidePreFilters);
-  }
-
-  public SelectRepresentationDialog(String title, Filter filter, boolean justActive, boolean hidePreFilters) {
-    this(title, filter, justActive, hidePreFilters, SELECTABLE);
-  }
-
-  public SelectRepresentationDialog(String title, Filter filter, boolean justActive, boolean hidePreFilters,
-    boolean selectable) {
-    super(title, filter, RodaConstants.REPRESENTATION_SEARCH,
-      new RepresentationList("SelectRepresentationDialog_representations",
-      filter, justActive,
-      messages.selectRepresentationSearchResults(), selectable), hidePreFilters);
+  public SelectRepresentationDialog(String title, Filter filter, boolean justActive) {
+    super(title,
+      new ListBuilder<>(RepresentationList::new,
+        new AsyncTableCell.Options<>(IndexedRepresentation.class, "SelectRepresentationDialog_representations")
+          .withFilter(filter).withJustActive(justActive).withSummary(messages.selectRepresentationSearchResults())));
   }
 }

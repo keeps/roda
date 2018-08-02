@@ -23,8 +23,7 @@
 					</g:FlowPanel>
 				</g:FlowPanel>
 
-				<commonsearch:SearchPanel ui:field="agentSearch" />
-				<lists:PreservationAgentList addStyleNames="searchResults" ui:field="agentList" />
+				<commonsearch:SearchWrapper ui:field="searchWrapper" />
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>

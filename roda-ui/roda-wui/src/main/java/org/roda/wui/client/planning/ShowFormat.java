@@ -80,7 +80,7 @@ public class ShowFormat extends Composite {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  private static ClientMessages messages = GWT.create(ClientMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.FORMAT_ID,
     RodaConstants.FORMAT_NAME, RodaConstants.FORMAT_DEFINITION, RodaConstants.FORMAT_CATEGORY,
@@ -172,6 +172,7 @@ public class ShowFormat extends Composite {
 
   @UiField
   SimplePanel actionsSidebar;
+
   private ActionableWidgetBuilder<Format> actionableWidgetBuilder = new ActionableWidgetBuilder<>(FormatActions.get())
     .withCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
       @Override

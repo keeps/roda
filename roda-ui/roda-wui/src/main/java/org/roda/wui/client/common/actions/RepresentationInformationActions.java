@@ -19,8 +19,8 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
 import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
-import org.roda.wui.client.common.actions.model.ActionsBundle;
-import org.roda.wui.client.common.actions.model.ActionsGroup;
+import org.roda.wui.client.common.actions.model.ActionableBundle;
+import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
@@ -60,6 +60,11 @@ public class RepresentationInformationActions extends AbstractActionable<Represe
 
   public enum RepresentationInformationAction implements Action<RepresentationInformation> {
     NEW, REMOVE, START_PROCESS, EDIT, DOWNLOAD
+  }
+
+  @Override
+  public RepresentationInformationAction actionForName(String name) {
+    return RepresentationInformationAction.valueOf(name);
   }
 
   public static RepresentationInformationActions get() {
@@ -200,11 +205,11 @@ public class RepresentationInformationActions extends AbstractActionable<Represe
   }
 
   @Override
-  public ActionsBundle<RepresentationInformation> createActionsBundle() {
-    ActionsBundle<RepresentationInformation> formatActionableBundle = new ActionsBundle<>();
+  public ActionableBundle<RepresentationInformation> createActionsBundle() {
+    ActionableBundle<RepresentationInformation> formatActionableBundle = new ActionableBundle<>();
 
     // MANAGEMENT
-    ActionsGroup<RepresentationInformation> managementGroup = new ActionsGroup<>(messages.sidebarActionsTitle());
+    ActionableGroup<RepresentationInformation> managementGroup = new ActionableGroup<>(messages.sidebarActionsTitle());
     managementGroup.addButton(messages.newButton(), RepresentationInformationAction.NEW, ActionImpact.UPDATED,
       "btn-plus");
     managementGroup.addButton(messages.editButton(), RepresentationInformationAction.EDIT, ActionImpact.UPDATED,
@@ -215,7 +220,7 @@ public class RepresentationInformationActions extends AbstractActionable<Represe
       "btn-ban");
 
     // PRESERVATION
-    ActionsGroup<RepresentationInformation> preservationGroup = new ActionsGroup<>(messages.preservationTitle());
+    ActionableGroup<RepresentationInformation> preservationGroup = new ActionableGroup<>(messages.preservationTitle());
     preservationGroup.addButton(messages.formatRegisterProcessButton(), RepresentationInformationAction.START_PROCESS,
       ActionImpact.UPDATED, "btn-play");
 

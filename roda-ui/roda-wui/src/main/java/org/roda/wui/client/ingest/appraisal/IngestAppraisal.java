@@ -24,12 +24,11 @@ import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.AipActions;
 import org.roda.wui.client.common.actions.AipActions.AipAction;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
-import org.roda.wui.client.common.search.MainSearch;
+import org.roda.wui.client.common.search.CatalogueSearch;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
@@ -53,7 +52,7 @@ import config.i18n.client.ClientMessages;
  */
 public class IngestAppraisal extends Composite {
 
-  private static final ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private static final Filter BASE_FILTER = new Filter(
     new SimpleFilterParameter(RodaConstants.INDEX_STATE, AIPState.UNDER_APPRAISAL.toString()));
@@ -92,15 +91,11 @@ public class IngestAppraisal extends Composite {
   FlowPanel ingestAppraisalDescription;
 
   @UiField(provided = true)
-  MainSearch mainSearch;
+  CatalogueSearch catalogueSearch;
 
   @UiField(provided = true)
   Button acceptButton, rejectButton;
 
-  // cannot let representations and files to be selectable for now
-  boolean itemsSelectable = true;
-  boolean representationsSelectable = false;
-  boolean filesSelectable = false;
   boolean justActive = false;
 
   private IngestAppraisal() {
@@ -108,8 +103,11 @@ public class IngestAppraisal extends Composite {
     rejectButton = new Button();
 
     // Create main search
-    mainSearch = new MainSearch(justActive, itemsSelectable, representationsSelectable, filesSelectable,
-      "IngestAppraisal_searchAIPs", "IngestAppraisal_searchRepresentations", "IngestAppraisal_searchFiles", null,
+
+    // TODO tmp ver o porquê deste warning sobre os selectables:
+    // cannot let representations and files to be selectable for now
+    catalogueSearch = new CatalogueSearch(false, "IngestAppraisal_searchAIPs", "IngestAppraisal_searchRepresentations",
+      "IngestAppraisal_searchFiles", null,
       AIPState.UNDER_APPRAISAL);
 
     initWidget(uiBinder.createAndBindUi(this));
@@ -132,26 +130,14 @@ public class IngestAppraisal extends Composite {
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-    mainSearch.setDefaultFilters(BASE_FILTER);
-    if (historyTokens.isEmpty()) {
-      mainSearch.search(true);
-      callback.onSuccess(this);
-    } else {
-      // #search/TYPE/key/value/key/value
-      boolean successful = mainSearch.setSearch(historyTokens);
-      if (successful) {
-        mainSearch.search(true);
-        callback.onSuccess(this);
-      } else {
-        HistoryUtils.newHistory(RESOLVER);
-        callback.onSuccess(null);
-      }
-    }
+    catalogueSearch.setFilters(historyTokens);
+    callback.onSuccess(this);
   }
 
   @SuppressWarnings("unchecked")
   private void appraise(boolean accept) {
-    SelectedItems<?> selected = mainSearch.getSelected();
+    // TODO tmp (also FIXME) replace with actionable. this is just awful
+    SelectedItems<?> selected = catalogueSearch.getSelected();
 
     if (ClientSelectedItemsUtils.isEmpty(selected)) {
       Toast.showInfo(messages.appraisalNoItemsSelectedTitle(), messages.appraisalNoItemsSelectedMessage());
@@ -168,7 +154,7 @@ public class IngestAppraisal extends Composite {
 
         @Override
         public void onSuccess(Actionable.ActionImpact result) {
-          mainSearch.refresh();
+          catalogueSearch.refresh();
         }
       });
     }

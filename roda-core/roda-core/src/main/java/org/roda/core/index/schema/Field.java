@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.apache.solr.client.solrj.request.schema.SchemaRequest.AddField;
 import org.apache.solr.client.solrj.request.schema.SchemaRequest.Update;
+import org.roda.core.data.common.RodaConstants;
 
 public class Field {
 
@@ -25,7 +26,7 @@ public class Field {
   public static final String TYPE_DATE = "pdate";
   public static final String TYPE_STRING = "string";
 
-  public static final String FIELD_SEARCH = "search";
+  public static final String FIELD_SEARCH = RodaConstants.INDEX_SEARCH;
   public static final String TYPE_SEARCH = TYPE_TEXT;
 
   private final String name;

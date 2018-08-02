@@ -14,10 +14,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 
 import com.google.gwt.cell.client.DateCell;
@@ -33,7 +32,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
 
 import config.i18n.client.ClientMessages;
 
-public class RiskIncidenceList extends BasicAsyncTableCell<RiskIncidence> {
+public class RiskIncidenceList extends AsyncTableCell<RiskIncidence> {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
@@ -51,18 +50,9 @@ public class RiskIncidenceList extends BasicAsyncTableCell<RiskIncidence> {
     RodaConstants.RISK_INCIDENCE_DETECTED_ON, RodaConstants.RISK_INCIDENCE_DETECTED_BY,
     RodaConstants.RISK_INCIDENCE_STATUS);
 
-  public RiskIncidenceList(String listId) {
-    this(listId, null, null, false);
-  }
-
-  public RiskIncidenceList(String listId, Filter filter, String summary, boolean selectable) {
-    super(RiskIncidence.class, listId, filter, true, summary, selectable, fieldsToReturn);
-  }
-
-  public RiskIncidenceList(String listId, Filter filter, String summary, boolean selectable,
-    int initialPageSize, int pageSizeIncrement) {
-    super(RiskIncidence.class, listId, filter, true, summary, selectable, initialPageSize, pageSizeIncrement,
-      fieldsToReturn);
+  @Override
+  protected void adjustOptions(Options<RiskIncidence> options) {
+    options.withFieldsToReturn(fieldsToReturn);
   }
 
   @Override

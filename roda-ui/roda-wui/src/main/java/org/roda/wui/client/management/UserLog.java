@@ -10,34 +10,30 @@
  */
 package org.roda.wui.client.management;
 
-import java.util.Date;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.filter.DateRangeFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.log.LogEntry;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.lists.LogEntryList;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.ListBuilder;
+import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.client.search.ActionLogSearch;
-import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.user.datepicker.client.DateBox;
-import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
 
 import config.i18n.client.ClientMessages;
 
@@ -94,13 +90,16 @@ public class UserLog extends Composite {
   FlowPanel userLogDescription;
 
   @UiField(provided = true)
-  ActionLogSearch logSearch;
+  SearchWrapper searchWrapper;
 
   public UserLog() {
-    logSearch = new ActionLogSearch("UserLog_logEntries");
-    logSearch.defaultFilters(Filter.ALL);
+    // TODO tmp why no bindOpener?
+    ListBuilder<LogEntry> logEntryListBuilder = new ListBuilder<>(LogEntryList::new,
+      new AsyncTableCell.Options<>(LogEntry.class, "UserLog_logEntries"));
+    searchWrapper = new SearchWrapper(false).createListAndSearchPanel(logEntryListBuilder);
 
     initWidget(uiBinder.createAndBindUi(this));
+
     userLogDescription.add(new HTMLWidgetWrapper("UserLogDescription.html"));
   }
 
@@ -112,13 +111,14 @@ public class UserLog extends Composite {
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.isEmpty()) {
-      logSearch.setFilter(Filter.ALL);
+      searchWrapper.resetToDefaultFilter(LogEntry.class);
       callback.onSuccess(this);
     } else if (historyTokens.size() > 1 && ShowLogEntry.RESOLVER.getHistoryToken().equals(historyTokens.get(0))) {
       ShowLogEntry.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.size() == 1) {
       final String aipId = historyTokens.get(0);
-      logSearch.setFilter(new Filter(new SimpleFilterParameter(RodaConstants.LOG_RELATED_OBJECT_ID, aipId)));
+      searchWrapper.setFilter(LogEntry.class,
+        new Filter(new SimpleFilterParameter(RodaConstants.LOG_RELATED_OBJECT_ID, aipId)));
       callback.onSuccess(this);
     } else {
       HistoryUtils.newHistory(RESOLVER);

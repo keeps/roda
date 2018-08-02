@@ -14,9 +14,8 @@ import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.formats.Format;
-import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
-import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.utils.StringUtils;
 
 import com.google.gwt.core.client.GWT;
@@ -34,7 +33,7 @@ import config.i18n.client.ClientMessages;
  * @author Luis Faria <lfaria@keep.pt>
  *
  */
-public class FormatList extends BasicAsyncTableCell<Format> {
+public class FormatList extends AsyncTableCell<Format> {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
@@ -47,18 +46,11 @@ public class FormatList extends BasicAsyncTableCell<Format> {
     RodaConstants.FORMAT_NAME, RodaConstants.FORMAT_CATEGORY, RodaConstants.FORMAT_MIMETYPES,
     RodaConstants.FORMAT_PRONOMS);
 
-  public FormatList(String listId) {
-    this(listId, null, null, false);
+  @Override
+  protected void adjustOptions(Options<Format> options) {
+    options.withFieldsToReturn(fieldsToReturn);
   }
 
-  public FormatList(String listId, Filter filter, String summary, boolean selectable) {
-    super(Format.class, listId, filter, summary, selectable, fieldsToReturn);
-  }
-
-  public FormatList(String listId, Filter filter, String summary, boolean selectable, int pageSize,
-    int incrementPage) {
-    super(Format.class, listId, filter, summary, selectable, pageSize, incrementPage, fieldsToReturn);
-  }
 
   @Override
   protected void configureDisplay(CellTable<Format> display) {

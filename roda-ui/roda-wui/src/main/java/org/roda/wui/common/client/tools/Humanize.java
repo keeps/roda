@@ -18,7 +18,7 @@ import com.google.gwt.i18n.client.NumberFormat;
 import config.i18n.client.ClientMessages;
 
 public class Humanize {
-  private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   public static final long ONE_SECOND = 1000;
   public static final long SECONDS = 60;

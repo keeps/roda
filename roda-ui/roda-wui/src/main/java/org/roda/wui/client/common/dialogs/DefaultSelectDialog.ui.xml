@@ -15,10 +15,7 @@
 
 	<g:FlowPanel addStyleNames="selectAip wui-dialog-confirm wrapper skip_padding">
 		<g:FlowPanel addStyleNames="wui-dialog-layout">
-			<commonsearch:SearchPanel ui:field="searchPanel" />
-			<g:ScrollPanel addStyleNames="selectAipResultsPanel">
-				<lists:AsyncTableCell ui:field="searchResultsPanel" />
-			</g:ScrollPanel>
+			<commonsearch:SearchWrapper ui:field="searchWrapper" />
 			<g:FlowPanel addStyleNames="wui-dialog-layout-footer">
 				<g:Button addStyleNames="btn btn-link" ui:field="cancelButton">
 					<ui:text from='{messages.selectAipCancelButton}' />

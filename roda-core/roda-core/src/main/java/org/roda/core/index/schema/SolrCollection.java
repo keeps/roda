@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -26,7 +27,7 @@ public interface SolrCollection<I extends IsIndexed, M extends IsModelObject> {
   }
 
   static CopyField getCopyAllToSearchField() {
-    return new CopyField("*", Field.FIELD_SEARCH);
+    return new CopyField(RodaConstants.INDEX_WILDCARD, Field.FIELD_SEARCH);
   }
 
   static Field getSortFieldOf(String field) {

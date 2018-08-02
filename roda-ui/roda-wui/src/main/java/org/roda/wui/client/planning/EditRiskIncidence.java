@@ -102,7 +102,7 @@ public class EditRiskIncidence extends Composite {
     RodaConstants.RISK_INCIDENCE_MITIGATED_DESCRIPTION);
 
   private RiskIncidence incidence;
-  private static ClientMessages messages = GWT.create(ClientMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   @UiField
   Button buttonApply;

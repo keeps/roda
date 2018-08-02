@@ -7,28 +7,17 @@
  */
 package org.roda.wui.client.common.dialogs;
 
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.wui.client.common.lists.LogEntryList;
-import org.roda.wui.client.common.search.SearchFilters;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.ListBuilder;
 
-public class SelectLogEntryDialog extends DefaultSelectDialog<LogEntry, Void> {
-
-  private static final Filter DEFAULT_FILTER_LOG = SearchFilters.defaultFilter(LogEntry.class.getName());
-
-  public SelectLogEntryDialog(String title) {
-    this(title, DEFAULT_FILTER_LOG);
-  }
-
+public class SelectLogEntryDialog extends DefaultSelectDialog<LogEntry> {
   public SelectLogEntryDialog(String title, Filter filter) {
-    this(title, filter, false);
+    super(title,
+      new ListBuilder<>(LogEntryList::new,
+        new AsyncTableCell.Options<>(LogEntry.class, "SelectLogEntryDialog_logEntries").withFilter(filter)
+          .withSummary(title)));
   }
-
-  public SelectLogEntryDialog(String title, Filter filter, boolean selectable) {
-    super(title, filter, RodaConstants.LOG_SEARCH,
-      new LogEntryList("SelectLogEntryDialog_logEntries", filter, title, selectable),
-      false);
-  }
-
 }

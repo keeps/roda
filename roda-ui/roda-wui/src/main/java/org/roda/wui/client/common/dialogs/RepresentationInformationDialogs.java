@@ -26,6 +26,8 @@ import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ri.RelationObjectType;
 import org.roda.core.data.v2.ri.RepresentationInformation;
@@ -39,10 +41,10 @@ import org.roda.wui.client.common.lists.RepresentationInformationList;
 import org.roda.wui.client.common.lists.RepresentationList;
 import org.roda.wui.client.common.lists.SimpleFileList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
-import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
+import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.Dropdown;
-import org.roda.wui.client.common.search.SearchFilters;
-import org.roda.wui.client.common.search.SearchPanel;
+import org.roda.wui.client.common.search.SearchWrapper;
+import org.roda.wui.client.common.search.SelectedPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.planning.RelationTypeTranslationsBundle;
@@ -57,20 +59,22 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.user.cellview.client.AbstractHasData;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TextBox;
 
 import config.i18n.client.ClientMessages;
 
 public class RepresentationInformationDialogs {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
+
+  private static final String SEARCH_ITEMS = IndexedAIP.class.getSimpleName();
+  private static final String SEARCH_REPRESENTATIONS = IndexedRepresentation.class.getSimpleName();
+  private static final String SEARCH_FILES = IndexedFile.class.getSimpleName();
 
   private RepresentationInformationDialogs() {
     // do nothing
@@ -123,14 +127,21 @@ public class RepresentationInformationDialogs {
     dialogBox.setGlassEnabled(true);
     dialogBox.setAnimationEnabled(false);
 
+    final String aipListId = "RepresentationInformationDialogs_AIPs";
+    final String representationsListId = "RepresentationInformationDialogs_representations";
+    final String filesListId = "RepresentationInformationDialogs_files";
+
     final Dropdown dropDown = new Dropdown();
     dropDown.setStyleName("searchInputListBox ri-dropdown-listbox");
     dropDown.addPopupStyleName("searchInputListBoxPopup");
     dropDown.setVisible(true);
     dropDown.setLabel(messages.searchListBoxItems());
-    dropDown.addItem(messages.searchListBoxItems(), RodaConstants.SEARCH_ITEMS);
-    dropDown.addItem(messages.searchListBoxRepresentations(), RodaConstants.SEARCH_REPRESENTATIONS);
-    dropDown.addItem(messages.searchListBoxFiles(), RodaConstants.SEARCH_FILES);
+    dropDown.addItem(messages.searchListBoxItems(), SEARCH_ITEMS,
+      SelectedPanel.getIconForList(aipListId, IndexedAIP.class.getSimpleName()));
+    dropDown.addItem(messages.searchListBoxRepresentations(), SEARCH_REPRESENTATIONS,
+      SelectedPanel.getIconForList(representationsListId, IndexedRepresentation.class.getSimpleName()));
+    dropDown.addItem(messages.searchListBoxFiles(), SEARCH_FILES,
+      SelectedPanel.getIconForList(filesListId, IndexedFile.class.getSimpleName()));
 
     final FlowPanel fieldsPanel = new FlowPanel();
     fieldsPanel.setStyleName("ri-content-group");
@@ -162,17 +173,17 @@ public class RepresentationInformationDialogs {
           if (!ri.getFilters().isEmpty()) {
             if (ri.getFilters().get(0).startsWith(Representation.class.getSimpleName())) {
               appropriateFields.addAll(result.getObjectClassFields().get(Representation.class.getSimpleName()));
-              dropDown.setSelectedValue(RodaConstants.SEARCH_REPRESENTATIONS, true);
+              dropDown.setSelectedValue(SEARCH_REPRESENTATIONS, true);
             } else if (ri.getFilters().get(0).startsWith(File.class.getSimpleName())) {
               appropriateFields.addAll(result.getObjectClassFields().get(File.class.getSimpleName()));
-              dropDown.setSelectedValue(RodaConstants.SEARCH_FILES, true);
+              dropDown.setSelectedValue(SEARCH_FILES, true);
             } else if (ri.getFilters().get(0).startsWith(AIP.class.getSimpleName())) {
               appropriateFields.addAll(result.getObjectClassFields().get(AIP.class.getSimpleName()));
-              dropDown.setSelectedValue(RodaConstants.SEARCH_ITEMS, true);
+              dropDown.setSelectedValue(SEARCH_ITEMS, true);
             }
           } else {
             appropriateFields.addAll(result.getObjectClassFields().get(AIP.class.getSimpleName()));
-            dropDown.setSelectedValue(RodaConstants.SEARCH_ITEMS, true);
+            dropDown.setSelectedValue(SEARCH_ITEMS, true);
           }
 
           dialogBox.center();
@@ -184,18 +195,14 @@ public class RepresentationInformationDialogs {
               ri.setFilters(new ArrayList<String>());
 
               String className;
-              switch (dropDown.getSelectedValue()) {
-                case RodaConstants.SEARCH_ITEMS:
-                  className = AIP.class.getSimpleName();
-                  break;
-                case RodaConstants.SEARCH_REPRESENTATIONS:
-                  className = Representation.class.getSimpleName();
-                  break;
-                case RodaConstants.SEARCH_FILES:
-                  className = File.class.getSimpleName();
-                  break;
-                default:
-                  return;
+              if (SEARCH_ITEMS.equals(dropDown.getSelectedValue())) {
+                className = AIP.class.getSimpleName();
+              } else if (SEARCH_REPRESENTATIONS.equals(dropDown.getSelectedValue())) {
+                className = Representation.class.getSimpleName();
+              } else if (SEARCH_FILES.equals(dropDown.getSelectedValue())) {
+                className = File.class.getSimpleName();
+              } else {
+                return;
               }
 
               for (String field : values.keySet()) {
@@ -226,35 +233,30 @@ public class RepresentationInformationDialogs {
               listPanel.clear();
 
               if (!filterList.isEmpty()) {
-                BasicAsyncTableCell<?> table = null;
+                ListBuilder<?> listBuilder = null;
                 Filter tableFilter = new Filter(new OrFiltersParameters(filterList));
-                switch (dropDown.getSelectedValue()) {
-                  case RodaConstants.SEARCH_ITEMS:
-                    table = new AIPList("RepresentationInformationDialogs_AIPs", tableFilter, true, "", false, 5, 5);
-                    break;
-                  case RodaConstants.SEARCH_REPRESENTATIONS:
-                    table = new RepresentationList("RepresentationInformationDialogs_representations", tableFilter,
-                      true, "", false, 5, 5);
-                    break;
-                  case RodaConstants.SEARCH_FILES:
-                    table = new SimpleFileList("RepresentationInformationDialogs_files", tableFilter, true, "", false,
-                      5, 5);
-                    break;
-                  default:
-                    break;
+
+                if (SEARCH_ITEMS.equals(dropDown.getSelectedValue())) {
+                  listBuilder = new ListBuilder<>(AIPList::new,
+                    new AsyncTableCell.Options<>(IndexedAIP.class, aipListId).withFilter(tableFilter)
+                      .withJustActive(true).withCsvDownloadButtonVisibility(false).addRedrawHandler(dialogBox::center));
+
+                } else if (SEARCH_REPRESENTATIONS.equals(dropDown.getSelectedValue())) {
+                  listBuilder = new ListBuilder<>(RepresentationList::new,
+                    new AsyncTableCell.Options<>(IndexedRepresentation.class, representationsListId)
+                      .withFilter(tableFilter).withJustActive(true).withCsvDownloadButtonVisibility(false)
+                      .addRedrawHandler(dialogBox::center));
+
+                } else if (SEARCH_FILES.equals(dropDown.getSelectedValue())) {
+                  listBuilder = new ListBuilder<>(SimpleFileList::new,
+                    new AsyncTableCell.Options<>(IndexedFile.class, filesListId).withFilter(tableFilter)
+                      .withJustActive(true).withCsvDownloadButtonVisibility(false).addRedrawHandler(dialogBox::center));
+
                 }
 
-                if (table != null) {
-                  table.setCsvDownloadButtonVisibility(false);
-                  table.addRedrawHandler(new AbstractHasData.RedrawEvent.Handler() {
-                    @Override
-                    public void onRedraw() {
-                      dialogBox.center();
-                    }
-                  });
-
+                if (listBuilder != null) {
                   listPanel.add(section);
-                  listPanel.add(table);
+                  listPanel.add(listBuilder.build());
                 }
               } else {
                 dialogBox.center();
@@ -288,11 +290,11 @@ public class RepresentationInformationDialogs {
     fieldsPanel.clear();
     String className = null;
 
-    if (dropDown.getSelectedValue().equals(RodaConstants.SEARCH_ITEMS)) {
+    if (dropDown.getSelectedValue().equals(SEARCH_ITEMS)) {
       className = AIP.class.getSimpleName();
-    } else if (dropDown.getSelectedValue().equals(RodaConstants.SEARCH_REPRESENTATIONS)) {
+    } else if (dropDown.getSelectedValue().equals(SEARCH_REPRESENTATIONS)) {
       className = Representation.class.getSimpleName();
-    } else if (dropDown.getSelectedValue().equals(RodaConstants.SEARCH_FILES)) {
+    } else if (dropDown.getSelectedValue().equals(SEARCH_FILES)) {
       className = File.class.getSimpleName();
     }
 
@@ -321,12 +323,7 @@ public class RepresentationInformationDialogs {
       values.put(field, valuesForThisField);
 
       IncrementalList incrementalList = new IncrementalList(true, valuesForThisField);
-      incrementalList.addValueChangeHandler(new ValueChangeHandler<List<String>>() {
-        @Override
-        public void onValueChange(ValueChangeEvent<List<String>> event) {
-          values.put(field, event.getValue());
-        }
-      });
+      incrementalList.addValueChangeHandler(event -> values.put(field, event.getValue()));
 
       fieldPanel.add(incrementalList);
       fieldsPanel.add(fieldPanel);
@@ -518,7 +515,6 @@ public class RepresentationInformationDialogs {
                   Filter filter = new Filter(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, ri.getId()));
                   SelectRepresentationInformationDialog selectDialog = new SelectRepresentationInformationDialog(
                     messages.chooseEntityTitle(), filter, false);
-                  selectDialog.getList().setCsvDownloadButtonVisibility(false);
                   selectDialog.setSingleSelectionMode();
                   selectDialog.showAndCenter();
                   selectDialog.addValueChangeHandler(new ValueChangeHandler<RepresentationInformation>() {
@@ -749,7 +745,6 @@ public class RepresentationInformationDialogs {
 
         Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, aipsAlreadyLinked));
         SelectAipDialog selectAipDialog = new SelectAipDialog(messages.chooseEntityTitle(), filter, false, false);
-        selectAipDialog.getList().setCsvDownloadButtonVisibility(false);
         selectAipDialog.setSingleSelectionMode();
         selectAipDialog.showAndCenter();
         selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {
@@ -857,31 +852,13 @@ public class RepresentationInformationDialogs {
     container.addStyleName("wui-dialog-message");
 
     // create search box and results list
-    Filter defaultFilter = SearchFilters.defaultFilter(RepresentationInformation.class.getName());
-    final RepresentationInformationList representationInformationList = new RepresentationInformationList(
-      "RepresentationInformationDialogs_RI", defaultFilter, messages.representationInformationTitle(), true, 10, 10);
-    representationInformationList.setCsvDownloadButtonVisibility(false);
-    representationInformationList.addRedrawHandler(new AbstractHasData.RedrawEvent.Handler() {
-      @Override
-      public void onRedraw() {
-        dialogBox.center();
-      }
-    });
 
-    SearchPanel representationInformationSearch = new SearchPanel(Filter.NULL,
-      RodaConstants.REPRESENTATION_INFORMATION_SEARCH, true, messages.searchPlaceHolder(), false, false, true);
-    representationInformationSearch.setList(representationInformationList);
-
-    container.add(representationInformationSearch);
-
-    ScrollPanel representationInformationListScrollPanel = new ScrollPanel(representationInformationList);
-    representationInformationListScrollPanel.addStyleName("ri-dialog-list-scroll");
-    container.add(representationInformationListScrollPanel);
-
-    representationInformationList
-      .addCheckboxSelectionListener(new AsyncTableCell.CheckboxSelectionListener<RepresentationInformation>() {
-        @Override
-        public void onSelectionChange(SelectedItems<RepresentationInformation> selected) {
+    ListBuilder<RepresentationInformation> representationInformationListBuilder = new ListBuilder<>(
+      RepresentationInformationList::new,
+      new AsyncTableCell.Options<>(RepresentationInformation.class, "RepresentationInformationDialogs_RI")
+        .withSummary(messages.representationInformationTitle()).withInitialPageSize(10).withPageSizeIncrement(10)
+        .withCsvDownloadButtonVisibility(false).addRedrawHandler(dialogBox::center)
+        .addCheckboxSelectionListener(selected -> {
           if (selected instanceof SelectedItemsList) {
             SelectedItemsList<RepresentationInformation> list = (SelectedItemsList<RepresentationInformation>) selected;
             addToSelectedRIButton.setEnabled(!list.getIds().isEmpty());
@@ -890,23 +867,25 @@ public class RepresentationInformationDialogs {
             // (is it needed?)
             throw new RuntimeException("Only SelectedItemsList is supported on RI, for now");
           }
-        }
-      });
+        }));
 
-    addToSelectedRIButton.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        dialogBox.hide();
+    SearchWrapper searchWrapper = new SearchWrapper(false).withListsInsideScrollPanel("ri-dialog-list-scroll")
+      .createListAndSearchPanel(representationInformationListBuilder);
 
-        SelectedItems<RepresentationInformation> selected = representationInformationList.getSelected();
-        if (selected instanceof SelectedItemsList) {
-          SelectedItemsList<RepresentationInformation> list = (SelectedItemsList<RepresentationInformation>) selected;
-          callback.onSuccess(list);
-        } else {
-          // TODO bferreira 2017-12-04: add support for SelectedItemsFilter (is
-          // it needed?)
-          throw new RuntimeException("Only SelectedItemsList is supported on RI, for now");
-        }
+    container.add(searchWrapper);
+
+    addToSelectedRIButton.addClickHandler(event -> {
+      dialogBox.hide();
+
+      SelectedItems<RepresentationInformation> selected = searchWrapper
+        .getSelectedItems(RepresentationInformation.class);
+      if (selected instanceof SelectedItemsList) {
+        SelectedItemsList<RepresentationInformation> list = (SelectedItemsList<RepresentationInformation>) selected;
+        callback.onSuccess(list);
+      } else {
+        // TODO bferreira 2017-12-04: add support for SelectedItemsFilter (is
+        // it needed?)
+        throw new RuntimeException("Only SelectedItemsList is supported on RI, for now");
       }
     });
 

@@ -23,22 +23,28 @@ import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.wui.client.browse.BrowseAIP;
+import org.roda.core.data.v2.user.RODAMember;
 import org.roda.wui.client.browse.BrowseDIP;
 import org.roda.wui.client.browse.BrowseFile;
 import org.roda.wui.client.browse.BrowseRepresentation;
+import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.browse.ShowPreservationEvent;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.ingest.process.ShowJobReport;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.client.ingest.transfer.TransferUpload;
+import org.roda.wui.client.management.EditGroup;
+import org.roda.wui.client.management.EditUser;
 import org.roda.wui.client.management.ShowNotification;
 import org.roda.wui.client.planning.ShowRepresentationInformation;
 import org.roda.wui.client.planning.ShowRisk;
@@ -155,37 +161,23 @@ public class HistoryUtils {
   }
 
   public static String createHistoryHashLink(HistoryResolver resolver, String... extrapath) {
-    List<String> path = ListUtils.concat(resolver.getHistoryPath(), extrapath);
-    return createHistoryHashLink(path);
+    return createHistoryHashLink(getHistory(resolver, extrapath));
   }
 
   public static String createHistoryHashLink(HistoryResolver resolver, List<String> extrapath) {
-    List<String> path = ListUtils.concat(resolver.getHistoryPath(), extrapath);
-    return createHistoryHashLink(path);
+    return createHistoryHashLink(getHistory(resolver, extrapath));
   }
 
   public static List<String> getHistoryBrowse(String aipId) {
-    List<String> history = new ArrayList<>();
-    history.addAll(BrowseAIP.RESOLVER.getHistoryPath());
-    history.add(aipId);
-    return history;
+    return getHistory(BrowseTop.RESOLVER, aipId);
   }
 
   public static List<String> getHistoryBrowseDIP(String dipId) {
-    List<String> history = new ArrayList<>();
-    history.addAll(BrowseAIP.RESOLVER.getHistoryPath());
-    history.add(BrowseDIP.RESOLVER.getHistoryToken());
-    history.add(dipId);
-    return history;
+    return getHistory(BrowseDIP.RESOLVER, dipId);
   }
 
   public static List<String> getHistoryBrowseDIPFile(String dipId, String dipFileUUID) {
-    List<String> history = new ArrayList<>();
-    history.addAll(BrowseAIP.RESOLVER.getHistoryPath());
-    history.add(BrowseDIP.RESOLVER.getHistoryToken());
-    history.add(dipId);
-    history.add(dipFileUUID);
-    return history;
+    return getHistory(BrowseDIP.RESOLVER, dipId, dipFileUUID);
   }
 
   public static List<String> getHistoryBrowse(DIPFile dipFile) {
@@ -213,12 +205,7 @@ public class HistoryUtils {
   }
 
   public static List<String> getHistoryBrowse(String aipId, String representationId) {
-    List<String> history = new ArrayList<>();
-    history.addAll(BrowseAIP.RESOLVER.getHistoryPath());
-    history.add(BrowseRepresentation.RESOLVER.getHistoryToken());
-    history.add(aipId);
-    history.add(representationId);
-    return history;
+    return getHistory(BrowseRepresentation.RESOLVER, aipId, representationId);
   }
 
   public static List<String> getHistoryBrowse(IndexedRepresentation representation) {
@@ -235,14 +222,12 @@ public class HistoryUtils {
 
   public static List<String> getHistoryBrowse(String aipId, String representationId, List<String> filePath,
     String fileId) {
-    List<String> history = new ArrayList<>();
-    history.addAll(BrowseAIP.RESOLVER.getHistoryPath());
-    history.add(BrowseFile.RESOLVER.getHistoryToken());
-    history.add(aipId);
-    history.add(representationId);
-    history.addAll(filePath);
-    history.add(fileId);
-    return history;
+    List<String> tokens = new ArrayList<>();
+    tokens.add(aipId);
+    tokens.add(representationId);
+    tokens.addAll(filePath);
+    tokens.add(fileId);
+    return getHistory(BrowseFile.RESOLVER, tokens);
   }
 
   public static List<String> getHistoryBrowse(IndexedFile file) {
@@ -258,14 +243,12 @@ public class HistoryUtils {
   }
 
   public static List<String> getHistoryUpload(IndexedFile folder) {
-    List<String> history = new ArrayList<>();
-    history.addAll(BrowseAIP.RESOLVER.getHistoryPath());
-    history.add(TransferUpload.BROWSE_RESOLVER.getHistoryToken());
-    history.add(folder.getAipId());
-    history.add(folder.getRepresentationId());
-    history.addAll(folder.getPath());
-    history.add(folder.getId());
-    return history;
+    List<String> tokens = new ArrayList<>();
+    tokens.add(folder.getAipId());
+    tokens.add(folder.getRepresentationId());
+    tokens.addAll(folder.getPath());
+    tokens.add(folder.getId());
+    return getHistory(TransferUpload.BROWSE_FILE_RESOLVER, tokens);
   }
 
   public static void openUpload(IndexedRepresentation representation) {
@@ -273,12 +256,7 @@ public class HistoryUtils {
   }
 
   public static List<String> getHistoryUpload(IndexedRepresentation representation) {
-    List<String> history = new ArrayList<>();
-    history.addAll(BrowseAIP.RESOLVER.getHistoryPath());
-    history.add(TransferUpload.BROWSE_RESOLVER.getHistoryToken());
-    history.add(representation.getAipId());
-    history.add(representation.getId());
-    return history;
+    return getHistory(TransferUpload.BROWSE_RESOLVER, representation.getAipId(), representation.getId());
   }
 
   public static void openUpload(IndexedFile folder) {
@@ -287,11 +265,20 @@ public class HistoryUtils {
     }
   }
 
-  public static List<String> getHistory(List<String> resolverPath, String resourceUUID) {
-    List<String> history = new ArrayList<>();
-    history.addAll(resolverPath);
-    history.add(resourceUUID);
-    return history;
+  public static List<String> getHistory(List<String> resolverPath, String... extraPath) {
+    return ListUtils.concat(resolverPath, extraPath);
+  }
+
+  public static List<String> getHistory(List<String> resolverPath, List<String> extraPath) {
+    return ListUtils.concat(resolverPath, extraPath);
+  }
+
+  public static List<String> getHistory(HistoryResolver resolver, String... extrapath) {
+    return getHistory(resolver.getHistoryPath(), extrapath);
+  }
+
+  public static List<String> getHistory(HistoryResolver resolver, List<String> extrapath) {
+    return getHistory(resolver.getHistoryPath(), extrapath);
   }
 
   public static String getSearchHistoryByRepresentationInformationFilter(List<String> filters, String searchType) {
@@ -373,6 +360,28 @@ public class HistoryUtils {
     } else if (object instanceof IndexedReport) {
       IndexedReport report = (IndexedReport) object;
       path = HistoryUtils.getHistory(ShowJobReport.RESOLVER.getHistoryPath(), report.getUUID());
+    } else if (object instanceof RODAMember) {
+      RODAMember member = (RODAMember) object;
+      HistoryUtils.newHistory(member.isUser() ? EditUser.RESOLVER : EditGroup.RESOLVER, member.getId());
+    } else if (object instanceof IndexedPreservationEvent) {
+      IndexedPreservationEvent preservationEvent = (IndexedPreservationEvent) object;
+
+      String eventId = preservationEvent.getId();
+      String aipUUID = preservationEvent.getAipID();
+      String representationUUID = preservationEvent.getRepresentationUUID();
+      String fileUUID = preservationEvent.getFileUUID();
+
+      if (StringUtils.isNotBlank(fileUUID)) {
+        path = HistoryUtils.getHistory(ShowPreservationEvent.RESOLVER.getHistoryPath(), aipUUID, representationUUID,
+          fileUUID, eventId);
+      } else if (StringUtils.isNotBlank(representationUUID)) {
+        path = HistoryUtils.getHistory(ShowPreservationEvent.RESOLVER.getHistoryPath(), aipUUID, representationUUID,
+          eventId);
+      } else if (StringUtils.isNotBlank(aipUUID)) {
+        path = HistoryUtils.getHistory(ShowPreservationEvent.RESOLVER.getHistoryPath(), aipUUID, eventId);
+      } else {
+        path = HistoryUtils.getHistory(ShowPreservationEvent.RESOLVER.getHistoryPath(), eventId);
+      }
     } else {
       Toast.showError("Resolve of class not supported: " + object.getClass().getName());
     }

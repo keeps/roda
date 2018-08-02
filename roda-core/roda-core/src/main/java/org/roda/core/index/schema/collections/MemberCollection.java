@@ -68,8 +68,6 @@ public class MemberCollection extends AbstractSolrCollection<RODAMember, RODAMem
     fields.add(new Field(RodaConstants.MEMBERS_FULLNAME, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.MEMBERS_EMAIL, Field.TYPE_STRING));
 
-    fields.add(SolrCollection.getSearchField());
-
     return fields;
   }
 

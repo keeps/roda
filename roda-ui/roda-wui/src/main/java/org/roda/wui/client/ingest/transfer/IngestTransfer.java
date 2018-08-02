@@ -110,7 +110,7 @@ public class IngestTransfer extends Composite {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private TransferredResource resource;
   private ActionableWidgetBuilder<TransferredResource> actionableWidgetBuilder;
@@ -146,22 +146,11 @@ public class IngestTransfer extends Composite {
   SimplePanel actionsSidebar;
 
   private IngestTransfer() {
-    resourceSearch = new TransferredResourceSearch("IngestTransfer_transferredResources");
-    resourceSearch.defaultFilters(new Filter(new EmptyKeyFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID)));
-    resourceSearch.getList().setActionable(TransferredResourceActions.get(null));
-
-    actionableWidgetBuilder = new ActionableWidgetBuilder<>(TransferredResourceActions.get(null));
-
-    initWidget(uiBinder.createAndBindUi(this));
-
-    ingestTransferDescription.add(new HTMLWidgetWrapper("IngestTransferDescription.html"));
-
-    actionableWidgetBuilder.withCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
-
+    NoAsyncCallback<Actionable.ActionImpact> actionCallback = new NoAsyncCallback<Actionable.ActionImpact>() {
       @Override
       public void onFailure(Throwable caught) {
         super.onFailure(caught);
-        resourceSearch.getList().refresh();
+        resourceSearch.refresh();
       }
 
       @Override
@@ -172,7 +161,7 @@ public class IngestTransfer extends Composite {
           } else {
             view();
           }
-          resourceSearch.getList().refresh();
+          resourceSearch.refresh();
         } else if (Actionable.ActionImpact.DESTROYED.equals(impact)) {
           String parentUUID = resource != null ? resource.getParentUUID() : null;
           if (parentUUID != null) {
@@ -182,8 +171,24 @@ public class IngestTransfer extends Composite {
           }
         }
       }
-    });
+    };
 
+    // TODO tmp activar o actionable callback acima quando o botao de actionable que
+    // está dentro da pesquisa é clicado
+
+    resourceSearch = new TransferredResourceSearch("IngestTransfer_transferredResources",
+      new Filter(new EmptyKeyFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID)),
+      TransferredResourceActions.get(null));
+
+    actionableWidgetBuilder = new ActionableWidgetBuilder<>(TransferredResourceActions.get(null));
+
+    initWidget(uiBinder.createAndBindUi(this));
+
+    ingestTransferDescription.add(new HTMLWidgetWrapper("IngestTransferDescription.html"));
+
+    actionableWidgetBuilder.withCallback(actionCallback);
+
+    // TODO 20180807 bferreira: remove sidebar and use actionable in searchwrapper
     actionsSidebar
       .setWidget(actionableWidgetBuilder.buildListWithObjects(new ActionableObject<>(TransferredResource.class)));
   }
@@ -233,7 +238,7 @@ public class IngestTransfer extends Composite {
     } else {
       Filter filter = new Filter(
         new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID, r.getRelativePath()));
-      resourceSearch.defaultFilters(filter);
+      resourceSearch.setDefaultFilters(filter);
       resourceSearch.setVisible(true);
       download.setVisible(false);
     }
@@ -266,7 +271,7 @@ public class IngestTransfer extends Composite {
     resourceSearch.setVisible(true);
     download.setVisible(false);
 
-    resourceSearch.defaultFilters(DEFAULT_FILTER);
+    resourceSearch.setDefaultFilters(DEFAULT_FILTER);
     breadcrumb.setVisible(false);
 
     lastScanned.setText("");

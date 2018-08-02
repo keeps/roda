@@ -7,27 +7,21 @@
  */
 package org.roda.wui.client.common.dialogs;
 
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.wui.client.common.lists.RepresentationInformationList;
-import org.roda.wui.client.common.search.SearchFilters;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.ListBuilder;
 
-public class SelectRepresentationInformationDialog extends DefaultSelectDialog<RepresentationInformation, Void> {
-
-  private static final Filter DEFAULT_FILTER_FORMAT = SearchFilters
-    .defaultFilter(RepresentationInformation.class.getName());
-
-  public SelectRepresentationInformationDialog(String title) {
-    this(title, DEFAULT_FILTER_FORMAT);
-  }
-
+public class SelectRepresentationInformationDialog extends DefaultSelectDialog<RepresentationInformation> {
   public SelectRepresentationInformationDialog(String title, Filter filter) {
-    this(title, filter, false);
+    this(title, filter, true);
   }
 
-  public SelectRepresentationInformationDialog(String title, Filter filter, boolean selectable) {
-    super(title, filter, RodaConstants.REPRESENTATION_INFORMATION_SEARCH,
-      new RepresentationInformationList("SelectRepresentationInformationDialog_RI", filter, title, selectable), false);
+  public SelectRepresentationInformationDialog(String title, Filter filter, boolean exportCsvVisible) {
+    super(title,
+      new ListBuilder<>(RepresentationInformationList::new,
+        new AsyncTableCell.Options<>(RepresentationInformation.class, "SelectRepresentationInformationDialog_RI")
+          .withFilter(filter).withSummary(title).withCsvDownloadButtonVisibility(exportCsvVisible)));
   }
 }

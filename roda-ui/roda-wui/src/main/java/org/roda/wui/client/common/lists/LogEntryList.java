@@ -14,10 +14,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.log.LogEntry;
-import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.tools.Humanize;
@@ -36,7 +35,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
 
 import config.i18n.client.ClientMessages;
 
-public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
+public class LogEntryList extends AsyncTableCell<LogEntry> {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
@@ -52,14 +51,11 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
     RodaConstants.LOG_DATETIME, RodaConstants.LOG_ACTION_COMPONENT, RodaConstants.LOG_ACTION_METHOD,
     RodaConstants.LOG_USERNAME, RodaConstants.LOG_DURATION, RodaConstants.LOG_ADDRESS, RodaConstants.LOG_STATE);
 
-  public LogEntryList(String listId, Filter filter, String summary, boolean selectable) {
-    super(LogEntry.class, listId, filter, summary, selectable, fieldsToReturn);
+  @Override
+  protected void adjustOptions(Options<LogEntry> options) {
+    options.withFieldsToReturn(fieldsToReturn);
   }
 
-  public LogEntryList(String listId, Filter filter, String summary, boolean selectable, int pageSize,
-    int incrementPage) {
-    super(LogEntry.class, listId, filter, summary, selectable, pageSize, incrementPage, fieldsToReturn);
-  }
 
   @Override
   protected void configureDisplay(CellTable<LogEntry> display) {

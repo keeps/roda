@@ -81,8 +81,6 @@ public class DIPCollection extends AbstractSolrCollection<IndexedDIP, DIP> {
     fields.add(
       new Field(RodaConstants.DIP_ALL_REPRESENTATION_UUIDS, Field.TYPE_STRING).setStored(false).setMultiValued(true));
 
-    fields.add(SolrCollection.getSearchField());
-
     return fields;
   }
 

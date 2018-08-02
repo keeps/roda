@@ -18,7 +18,6 @@ import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
-import org.roda.core.index.schema.SolrCollection;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.util.IdUtils;
@@ -66,7 +65,6 @@ public class DIPFileCollection extends AbstractSolrCollection<DIPFile, DIPFile> 
     fields.add(new Field(RodaConstants.DIPFILE_SIZE, Field.TYPE_LONG).setRequired(true));
     fields.add(new Field(RodaConstants.DIPFILE_STORAGE_PATH, Field.TYPE_STRING));
 
-    fields.add(SolrCollection.getSearchField());
     return fields;
   }
 

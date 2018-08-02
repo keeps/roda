@@ -14,10 +14,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.risks.IndexedRisk;
-import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 
 import com.google.gwt.cell.client.DateCell;
@@ -39,11 +38,8 @@ import config.i18n.client.ClientMessages;
  * @author Luis Faria <lfaria@keep.pt>
  *
  */
-public class RiskList extends BasicAsyncTableCell<IndexedRisk> {
-
-  private Filter filter;
-
-  private static ClientMessages messages = GWT.create(ClientMessages.class);
+public class RiskList extends AsyncTableCell<IndexedRisk> {
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private TextColumn<IndexedRisk> nameColumn;
   private Column<IndexedRisk, Date> identifiedOnColumn;
@@ -58,19 +54,11 @@ public class RiskList extends BasicAsyncTableCell<IndexedRisk> {
     RodaConstants.RISK_UNMITIGATED_INCIDENCES_COUNT, RodaConstants.RISK_POST_MITIGATION_SEVERITY_LEVEL,
     RodaConstants.RISK_PRE_MITIGATION_SEVERITY_LEVEL);
 
-  public RiskList(String listId) {
-    this(listId, null, null, false);
+  @Override
+  protected void adjustOptions(Options<IndexedRisk> options) {
+    options.withFieldsToReturn(fieldsToReturn);
   }
 
-  public RiskList(String listId, Filter filter, String summary, boolean selectable) {
-    super(IndexedRisk.class, listId, filter, summary, selectable, fieldsToReturn);
-    this.filter = filter;
-  }
-
-  public RiskList(String listId, Filter filter, String summary, boolean selectable, int pageSize, int incrementPage) {
-    super(IndexedRisk.class, listId, filter, summary, selectable, pageSize, incrementPage, fieldsToReturn);
-    this.filter = filter;
-  }
 
   @Override
   protected void configureDisplay(CellTable<IndexedRisk> display) {
@@ -163,16 +151,4 @@ public class RiskList extends BasicAsyncTableCell<IndexedRisk> {
       }
     };
   }
-
-  @Override
-  public void setFilter(Filter filter) {
-    if (filter == null) {
-      super.setFilter(this.filter);
-    } else {
-      super.setFilter(filter);
-    }
-
-    refresh();
-  }
-
 }

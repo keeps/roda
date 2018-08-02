@@ -13,10 +13,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.DIPFile;
-import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
@@ -33,7 +32,7 @@ import com.google.gwt.user.client.ui.Label;
 
 import config.i18n.client.ClientMessages;
 
-public class DIPFileList extends BasicAsyncTableCell<DIPFile> {
+public class DIPFileList extends AsyncTableCell<DIPFile> {
 
   private final ClientLogger logger = new ClientLogger(getClass().getName());
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
@@ -44,18 +43,9 @@ public class DIPFileList extends BasicAsyncTableCell<DIPFile> {
   private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
     RodaConstants.DIPFILE_IS_DIRECTORY, RodaConstants.DIPFILE_ID, RodaConstants.DIPFILE_DIP_ID);
 
-  public DIPFileList(String listId) {
-    this(listId, null, null, false);
-  }
-
-  public DIPFileList(String listId, Filter filter, String summary, boolean selectable) {
-    super(DIPFile.class, listId, filter, summary, selectable, fieldsToReturn);
-  }
-
-  public DIPFileList(String listId, Filter filter, String summary, boolean selectable,
-    int initialPageSize, int pageSizeIncrement) {
-    super(DIPFile.class, listId, filter, summary, selectable, initialPageSize, pageSizeIncrement,
-      fieldsToReturn);
+  @Override
+  protected void adjustOptions(Options<DIPFile> options) {
+    options.withFieldsToReturn(fieldsToReturn);
   }
 
   @Override

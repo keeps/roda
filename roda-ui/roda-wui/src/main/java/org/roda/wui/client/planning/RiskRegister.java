@@ -92,9 +92,7 @@ public class RiskRegister extends Composite {
    * Create a risk register page
    */
   public RiskRegister() {
-    riskSearch = new RiskSearch("RiskRegister_risks", "RiskRegister_riskIncidences");
-    riskSearch.defaultFilters();
-    riskSearch.getList().setActionable(RiskActions.get());
+    riskSearch = new RiskSearch();
 
     initWidget(uiBinder.createAndBindUi(this));
     riskRegisterDescription.add(new HTMLWidgetWrapper("RiskRegisterDescription.html"));
@@ -102,8 +100,8 @@ public class RiskRegister extends Composite {
       new ActionableWidgetBuilder<>(RiskActions.get()).withCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
         @Override
         public void onSuccess(Actionable.ActionImpact result) {
-          if (result.equals(Actionable.ActionImpact.DESTROYED)) {
-            HistoryUtils.newHistory(RiskRegister.RESOLVER);
+          if (Actionable.ActionImpact.DESTROYED.equals(result) || Actionable.ActionImpact.UPDATED.equals(result)) {
+            riskSearch.refresh();
           }
         }
       }).buildListWithObjects(new ActionableObject<>(IndexedRisk.class)));

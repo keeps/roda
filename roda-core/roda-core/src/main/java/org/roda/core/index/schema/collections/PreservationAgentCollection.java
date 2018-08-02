@@ -66,8 +66,6 @@ public class PreservationAgentCollection
     fields.add(new Field(RodaConstants.PRESERVATION_AGENT_NOTE, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.PRESERVATION_AGENT_VERSION, Field.TYPE_STRING));
 
-    fields.add(SolrCollection.getSearchField());
-
     return fields;
   }
 

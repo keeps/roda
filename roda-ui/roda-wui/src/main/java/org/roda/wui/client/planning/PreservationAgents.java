@@ -12,13 +12,13 @@ package org.roda.wui.client.planning;
 
 import java.util.List;
 
-import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.PreservationAgentActions;
 import org.roda.wui.client.common.lists.PreservationAgentList;
-import org.roda.wui.client.common.search.SearchPanel;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.ListBuilder;
+import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -32,8 +32,6 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.SelectionChangeEvent;
-import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
 import config.i18n.client.ClientMessages;
 
@@ -72,7 +70,7 @@ public class PreservationAgents extends Composite {
   private static PreservationAgents instance = null;
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   @UiField
   SimplePanel itemIcon;
@@ -81,29 +79,14 @@ public class PreservationAgents extends Composite {
   Label itemTitle;
 
   @UiField(provided = true)
-  SearchPanel agentSearch;
-
-  @UiField(provided = true)
-  PreservationAgentList agentList;
+  SearchWrapper searchWrapper;
 
   public PreservationAgents() {
-    agentList = new PreservationAgentList("PreservationAgents_agents", Filter.ALL, messages.preservationAgentsTitle(),
-      true);
-    agentList.setActionable(PreservationAgentActions.get());
+    ListBuilder<IndexedPreservationAgent> preservationAgentListBuilder = new ListBuilder<>(PreservationAgentList::new,
+      new AsyncTableCell.Options<>(IndexedPreservationAgent.class, "PreservationAgents_agents").bindOpener());
 
-    agentList.getSelectionModel().addSelectionChangeHandler(new Handler() {
-      @Override
-      public void onSelectionChange(SelectionChangeEvent event) {
-        IndexedPreservationAgent selected = agentList.getSelectionModel().getSelectedObject();
-        if (selected != null) {
-          HistoryUtils.newHistory(ShowPreservationAgent.RESOLVER, selected.getId());
-        }
-      }
-    });
-
-    agentSearch = new SearchPanel(Filter.ALL, RodaConstants.PRESERVATION_AGENT_SEARCH, true,
-      messages.searchPlaceHolder(), false, false, true);
-    agentSearch.setList(agentList);
+    searchWrapper = new SearchWrapper(false).createListAndSearchPanel(preservationAgentListBuilder,
+      PreservationAgentActions.get());
 
     initWidget(uiBinder.createAndBindUi(this));
   }
@@ -128,7 +111,7 @@ public class PreservationAgents extends Composite {
 
   private void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.isEmpty()) {
-      agentList.refresh();
+      searchWrapper.refreshCurrentList();
       callback.onSuccess(this);
     } else if (!historyTokens.isEmpty()
       && historyTokens.get(0).equals(ShowPreservationAgent.RESOLVER.getHistoryToken())) {

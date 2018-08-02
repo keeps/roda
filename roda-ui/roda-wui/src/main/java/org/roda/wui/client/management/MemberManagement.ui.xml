@@ -15,8 +15,7 @@
 				</g:Label>
 				<g:FlowPanel addStyleNames="page-description" ui:field="memberManagementDescription">
 				</g:FlowPanel>
-				<commonsearch:SearchPanel ui:field="searchPanel" />
-				<lists:RodaMemberList addStyleNames="searchResults" ui:field="list" />
+				<commonsearch:SearchWrapper ui:field="searchWrapper" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">

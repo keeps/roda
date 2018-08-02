@@ -6,22 +6,20 @@ import java.util.List;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.wui.client.common.actions.Actionable;
 
-import com.google.gwt.user.client.Random;
-
 /**
  * @author Bruno Ferreira <bferreira@keep.pt>
  */
-public class ActionsButton<T extends IsIndexed> {
+public class ActionableButton<T extends IsIndexed> {
   private String text;
   private Actionable.Action<T> action;
   private Actionable.ActionImpact impact;
   private List<String> extraCssClasses;
 
-  public ActionsButton() {
+  public ActionableButton() {
 
   }
 
-  public ActionsButton(String text, Actionable.Action<T> action, Actionable.ActionImpact impact,
+  public ActionableButton(String text, Actionable.Action<T> action, Actionable.ActionImpact impact,
     String... extraCssClasses) {
     this.text = text;
     this.action = action;
@@ -45,8 +43,11 @@ public class ActionsButton<T extends IsIndexed> {
     return extraCssClasses;
   }
 
+  @Deprecated
   public String getId() {
-    // TODO: generate an ID based on the action and i18n key
-    return String.valueOf(Random.nextInt(100000));
+    // TODO 2018-08-21 bferreira: generate an ID based on the action (and maybe also
+    // something else) to make the button configurable via .properties and in
+    // theme.css
+    return null;
   }
 }

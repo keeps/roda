@@ -9,15 +9,15 @@ package org.roda.wui.client.management;
 
 import java.util.List;
 
-import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.RODAMemberActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.lists.RodaMemberList;
-import org.roda.wui.client.common.search.SearchFilters;
-import org.roda.wui.client.common.search.SearchPanel;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.ListBuilder;
+import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -32,12 +32,10 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.SelectionChangeEvent;
 
 import config.i18n.client.ClientMessages;
 
 public class MemberManagement extends Composite {
-  private static final String EDIT_GROUP_HISTORY_TOKEN = EditGroup.RESOLVER.getHistoryToken();
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
@@ -64,7 +62,6 @@ public class MemberManagement extends Composite {
   };
 
   private static MemberManagement instance = null;
-  private ActionableWidgetBuilder<RODAMember> actionableWidgetBuilder;
 
   /**
    * Get the singleton instance
@@ -88,43 +85,27 @@ public class MemberManagement extends Composite {
   @UiField
   FlowPanel memberManagementDescription;
 
-  @UiField(provided = true)
-  SearchPanel searchPanel;
-
-  @UiField(provided = true)
-  RodaMemberList list;
-
   @UiField
   SimplePanel actionsSidebar;
 
-  private static final Filter DEFAULT_FILTER = SearchFilters.defaultFilter(RODAMember.class.getName());
-  private static final String ALL_FILTER = SearchFilters.allFilter(RODAMember.class.getName());
+  @UiField(provided = true)
+  SearchWrapper searchWrapper;
 
   public MemberManagement() {
-    actionableWidgetBuilder = new ActionableWidgetBuilder<>(RODAMemberActions.get());
-    list = new RodaMemberList("MemberManagement_rodaMembers", DEFAULT_FILTER, messages.usersAndGroupsTitle(), true);
-    list.setActionable(RODAMemberActions.get());
 
-    searchPanel = new SearchPanel(DEFAULT_FILTER, ALL_FILTER, true, messages.usersAndGroupsSearchPlaceHolder(), false,
-      false, false);
-    searchPanel.setList(list);
+
+    ListBuilder<RODAMember> rodaMemberListBuilder = new ListBuilder<>(RodaMemberList::new,
+      new AsyncTableCell.Options<>(RODAMember.class, "MemberManagement_rodaMembers")
+        .withSummary(messages.usersAndGroupsTitle()).bindOpener());
+
+    searchWrapper = new SearchWrapper(false).createListAndSearchPanel(rodaMemberListBuilder, RODAMemberActions.get(),
+      messages.usersAndGroupsSearchPlaceHolder());
 
     initWidget(uiBinder.createAndBindUi(this));
 
-    actionsSidebar.setWidget(actionableWidgetBuilder.buildListWithObjects(new ActionableObject<>(RODAMember.class)));
+    actionsSidebar.setWidget(new ActionableWidgetBuilder<>(RODAMemberActions.get())
+      .buildListWithObjects(new ActionableObject<>(RODAMember.class)));
     memberManagementDescription.add(new HTMLWidgetWrapper("MemberManagementDescription.html"));
-
-    list.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
-
-      @Override
-      public void onSelectionChange(SelectionChangeEvent event) {
-        RODAMember selected = list.getSelectionModel().getSelectedObject();
-        if (selected != null) {
-          HistoryUtils.newHistory(RESOLVER,
-            (selected.isUser() ? EditUser.RESOLVER.getHistoryToken() : EDIT_GROUP_HISTORY_TOKEN), selected.getId());
-        }
-      }
-    });
   }
 
   @Override
@@ -134,7 +115,7 @@ public class MemberManagement extends Composite {
   }
 
   private void refresh() {
-    list.refresh();
+    searchWrapper.refreshCurrentList();
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
@@ -152,7 +133,7 @@ public class MemberManagement extends Composite {
     } else if (historyTokens.size() == 2) {
       if (historyTokens.get(0).equals(EditUser.RESOLVER.getHistoryToken())) {
         EditUser.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
-      } else if (historyTokens.get(0).equals(EDIT_GROUP_HISTORY_TOKEN)) {
+      } else if (historyTokens.get(0).equals(EditGroup.RESOLVER.getHistoryToken())) {
         EditGroup.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else {
         HistoryUtils.newHistory(RESOLVER);

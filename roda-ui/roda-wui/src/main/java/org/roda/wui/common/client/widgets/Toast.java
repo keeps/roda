@@ -56,7 +56,7 @@ public class Toast extends PopupPanel {
     ERROR_MESSAGE, INFO
   }
 
-  private static final ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private final int slotNumber;
 

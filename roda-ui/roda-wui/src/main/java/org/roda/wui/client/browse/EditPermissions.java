@@ -77,7 +77,7 @@ public class EditPermissions extends Composite {
 
             @Override
             public void onFailure(Throwable caught) {
-              HistoryUtils.newHistory(BrowseAIP.RESOLVER);
+              HistoryUtils.newHistory(BrowseTop.RESOLVER);
               callback.onSuccess(null);
             }
 
@@ -98,7 +98,7 @@ public class EditPermissions extends Composite {
 
               @Override
               public void onFailure(Throwable caught) {
-                HistoryUtils.newHistory(BrowseAIP.RESOLVER);
+                HistoryUtils.newHistory(BrowseTop.RESOLVER);
                 callback.onSuccess(null);
               }
 
@@ -111,7 +111,7 @@ public class EditPermissions extends Composite {
             });
         }
       } else {
-        HistoryUtils.newHistory(BrowseAIP.RESOLVER);
+        HistoryUtils.newHistory(BrowseTop.RESOLVER);
         callback.onSuccess(null);
       }
     }
@@ -123,7 +123,7 @@ public class EditPermissions extends Composite {
 
     @Override
     public List<String> getHistoryPath() {
-      return ListUtils.concat(BrowseAIP.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(BrowseTop.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     @Override
@@ -164,7 +164,7 @@ public class EditPermissions extends Composite {
 
               @Override
               public void onFailure(Throwable caught) {
-                HistoryUtils.newHistory(BrowseAIP.RESOLVER);
+                HistoryUtils.newHistory(BrowseTop.RESOLVER);
                 callback.onSuccess(null);
               }
 
@@ -177,7 +177,7 @@ public class EditPermissions extends Composite {
             });
         }
       } else {
-        HistoryUtils.newHistory(BrowseAIP.RESOLVER);
+        HistoryUtils.newHistory(BrowseTop.RESOLVER);
         callback.onSuccess(null);
       }
     }
@@ -189,7 +189,7 @@ public class EditPermissions extends Composite {
 
     @Override
     public List<String> getHistoryPath() {
-      return ListUtils.concat(BrowseAIP.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(BrowseTop.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     @Override
@@ -202,7 +202,7 @@ public class EditPermissions extends Composite {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  private static ClientMessages messages = GWT.create(ClientMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   @UiField
   FlowPanel editPermissionsDescription;
@@ -508,7 +508,7 @@ public class EditPermissions extends Composite {
         HistoryUtils.openBrowse((IndexedDIP) objects.get(0));
       }
     } else {
-      HistoryUtils.newHistory(BrowseAIP.RESOLVER);
+      HistoryUtils.newHistory(BrowseTop.RESOLVER);
     }
   }
 

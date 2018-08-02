@@ -7,27 +7,15 @@
  */
 package org.roda.wui.client.common.dialogs;
 
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.common.lists.JobList;
-import org.roda.wui.client.common.search.SearchFilters;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.ListBuilder;
 
-public class SelectJobDialog extends DefaultSelectDialog<Job, Void> {
-
-  private static final Filter DEFAULT_FILTER_JOB = SearchFilters.defaultFilter(Job.class.getName());
-
-  public SelectJobDialog(String title) {
-    this(title, DEFAULT_FILTER_JOB);
-  }
-
+public class SelectJobDialog extends DefaultSelectDialog<Job> {
   public SelectJobDialog(String title, Filter filter) {
-    this(title, filter, false);
+    super(title, new ListBuilder<>(JobList::new,
+      new AsyncTableCell.Options<>(Job.class, "SelectJobDialog_jobs").withFilter(filter).withSummary(title)));
   }
-
-  public SelectJobDialog(String title, Filter filter, boolean selectable) {
-    super(title, filter, RodaConstants.JOB_SEARCH, new JobList("SelectJobDialog_jobs", filter, title, selectable),
-      false);
-  }
-
 }

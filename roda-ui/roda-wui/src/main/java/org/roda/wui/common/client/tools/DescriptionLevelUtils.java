@@ -20,7 +20,7 @@ import config.i18n.client.ClientMessages;
 public class DescriptionLevelUtils {
 
   @SuppressWarnings("unused")
-  private static ClientMessages messages = GWT.create(ClientMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private static final String TOP_ICON = "<span class='roda-logo'></span>";
 

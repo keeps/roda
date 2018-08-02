@@ -11,10 +11,8 @@
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
 				<g:FlowPanel ui:field="title"></g:FlowPanel>
-				<g:FlowPanel addStyleNames="page-description" ui:field="formatRegisterDescription">
-				</g:FlowPanel>
-				<commonsearch:SearchPanel ui:field="searchPanel" />
-				<lists:FormatList addStyleNames="searchResults" ui:field="formatList" />
+				<g:FlowPanel addStyleNames="page-description" ui:field="formatRegisterDescription"></g:FlowPanel>
+				<commonsearch:SearchWrapper ui:field="searchWrapper" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">

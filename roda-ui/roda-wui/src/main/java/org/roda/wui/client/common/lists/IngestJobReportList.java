@@ -14,11 +14,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Report.PluginState;
-import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.lists.utils.TooltipTextColumn;
 import org.roda.wui.client.common.utils.StringUtils;
 
@@ -42,7 +41,7 @@ import config.i18n.client.ClientMessages;
  * @author Luis Faria <lfaria@keep.pt>
  *
  */
-public class IngestJobReportList extends BasicAsyncTableCell<IndexedReport> {
+public class IngestJobReportList extends AsyncTableCell<IndexedReport> {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
@@ -63,13 +62,11 @@ public class IngestJobReportList extends BasicAsyncTableCell<IndexedReport> {
     RodaConstants.JOB_REPORT_TOTAL_STEPS, RodaConstants.JOB_REPORT_COMPLETION_PERCENTAGE,
     RodaConstants.JOB_REPORT_UNSUCCESSFUL_PLUGINS);
 
-  public IngestJobReportList(String listId) {
-    this(listId, null, null, false);
+  @Override
+  protected void adjustOptions(Options<IndexedReport> options) {
+    options.withFieldsToReturn(fieldsToReturn);
   }
 
-  public IngestJobReportList(String listId, Filter filter, String summary, boolean selectable) {
-    super(IndexedReport.class, listId, filter, summary, selectable, fieldsToReturn);
-  }
 
   @Override
   protected void configureDisplay(CellTable<IndexedReport> display) {

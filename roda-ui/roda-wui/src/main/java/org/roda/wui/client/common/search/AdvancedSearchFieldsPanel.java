@@ -8,11 +8,11 @@
 package org.roda.wui.client.common.search;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gwt.core.client.GWT;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -36,17 +36,18 @@ import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 
 public class AdvancedSearchFieldsPanel extends FlowPanel implements HasValueChangeHandlers<Integer> {
-  private String className;
+  private String classSimpleName;
   private final Map<String, SearchField> searchFields = new HashMap<>();
   private ListBox searchAdvancedFieldOptions;
 
-  public AdvancedSearchFieldsPanel(String className) {
+  public AdvancedSearchFieldsPanel(String classSimpleName) {
     super();
 
-    this.className = className;
-    searchAdvancedFieldOptions = new ListBox();
+    this.classSimpleName = classSimpleName;
 
-    BrowserService.Util.getInstance().retrieveSearchFields(className, LocaleInfo.getCurrentLocale().getLocaleName(),
+    searchAdvancedFieldOptions = new ListBox();
+    BrowserService.Util.getInstance().retrieveSearchFields(this.classSimpleName,
+      LocaleInfo.getCurrentLocale().getLocaleName(),
       new AsyncCallback<List<SearchField>>() {
         @Override
         public void onFailure(Throwable caught) {
@@ -149,17 +150,21 @@ public class AdvancedSearchFieldsPanel extends FlowPanel implements HasValueChan
     SearchField searchField = searchFieldPanel.getSearchField();
 
     if (searchField.getType().equals(RodaConstants.SEARCH_FIELD_TYPE_SUGGEST)) {
-      if (className.equals(RodaConstants.SEARCH_ITEMS)) {
-        searchFieldPanel.addInputSearchSuggestBox(new SearchSuggestBox<>(IndexedAIP.class,
+      if (classSimpleName.equals(IndexedAIP.class.getSimpleName())) {
+        searchFieldPanel.addInputSearchSuggestBox(
+          new SearchSuggestBox<>(IndexedAIP.class, searchField.getSuggestField(), searchField.isSuggestPartial()));
+      } else if (classSimpleName.equals(IndexedRepresentation.class.getSimpleName())) {
+        searchFieldPanel.addInputSearchSuggestBox(new SearchSuggestBox<>(IndexedRepresentation.class,
           searchField.getSuggestField(), searchField.isSuggestPartial()));
-      } else if (className.equals(RodaConstants.SEARCH_REPRESENTATIONS)) {
-        searchFieldPanel.addInputSearchSuggestBox(new SearchSuggestBox<>(
-          IndexedRepresentation.class, searchField.getSuggestField(), searchField.isSuggestPartial()));
-      } else if (className.equals(RodaConstants.SEARCH_FILES)) {
-        searchFieldPanel.addInputSearchSuggestBox(new SearchSuggestBox<>(IndexedFile.class,
-          searchField.getSuggestField(), searchField.isSuggestPartial()));
+      } else if (classSimpleName.equals(IndexedFile.class.getSimpleName())) {
+        searchFieldPanel.addInputSearchSuggestBox(
+          new SearchSuggestBox<>(IndexedFile.class, searchField.getSuggestField(), searchField.isSuggestPartial()));
       }
     }
+  }
+
+  public Collection<SearchField> getSearchFields() {
+    return searchFields.values();
   }
 
   @Override

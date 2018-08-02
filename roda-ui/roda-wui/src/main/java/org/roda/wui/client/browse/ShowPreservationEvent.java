@@ -104,14 +104,14 @@ public class ShowPreservationEvent extends Composite {
           eventId);
         callback.onSuccess(preservationEvents);
       } else {
-        HistoryUtils.newHistory(BrowseAIP.RESOLVER);
+        HistoryUtils.newHistory(BrowseTop.RESOLVER);
         callback.onSuccess(null);
       }
     }
 
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRoles(new HistoryResolver[] {BrowseAIP.RESOLVER}, false, callback);
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {BrowseTop.RESOLVER}, false, callback);
     }
 
     @Override
@@ -133,7 +133,7 @@ public class ShowPreservationEvent extends Composite {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   @UiField
   SimplePanel itemIcon;

@@ -18,9 +18,9 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.common.actions.AbstractActionable;
 import org.roda.wui.client.common.actions.Actionable;
+import org.roda.wui.client.common.actions.model.ActionableBundle;
+import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.actions.model.ActionableObject;
-import org.roda.wui.client.common.actions.model.ActionsBundle;
-import org.roda.wui.client.common.actions.model.ActionsGroup;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.popup.CalloutPopup;
@@ -154,6 +154,7 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
     }
   }
 
+  // TODO 2018-08-21 bferreira: change this to use button/action whitelist
   private static class SearchAipActions extends AbstractActionable<IndexedAIP> {
     private static final SearchAipActions INSTANCE = new SearchAipActions();
 
@@ -165,6 +166,11 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
 
     public enum SearchAipAction implements Actionable.Action<IndexedAIP> {
       SEARCH_DESCENDANTS, SEARCH_PACKAGE
+    }
+
+    @Override
+    public Action<IndexedAIP> actionForName(String name) {
+      return SearchAipAction.valueOf(name);
     }
 
     public static SearchAipActions get() {
@@ -190,19 +196,18 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
     }
 
     @Override
-    public ActionsBundle<IndexedAIP> createActionsBundle() {
-      ActionsBundle<IndexedAIP> actionsBundle = new ActionsBundle<>();
+    public ActionableBundle<IndexedAIP> createActionsBundle() {
+      ActionableBundle<IndexedAIP> actionableBundle = new ActionableBundle<>();
 
       // SEARCH
-      ActionsGroup<IndexedAIP> searchGroup = new ActionsGroup<>();
+      ActionableGroup<IndexedAIP> searchGroup = new ActionableGroup<>();
       searchGroup.addButton(messages.searchContext(), SearchAipAction.SEARCH_DESCENDANTS, ActionImpact.NONE,
         "btn-sitemap");
       searchGroup.addButton(messages.searchAIP(), SearchAipAction.SEARCH_PACKAGE, ActionImpact.NONE, "btn-archive");
 
-      actionsBundle.addGroup(searchGroup);
+      actionableBundle.addGroup(searchGroup);
 
-      return actionsBundle;
+      return actionableBundle;
     }
-
   }
 }

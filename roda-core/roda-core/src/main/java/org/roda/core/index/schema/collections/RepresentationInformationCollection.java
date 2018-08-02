@@ -79,8 +79,6 @@ public class RepresentationInformationCollection
 
     fields.add(SolrCollection.getSortFieldOf(RodaConstants.REPRESENTATION_INFORMATION_NAME));
 
-    fields.add(SolrCollection.getSearchField());
-
     return fields;
   }
 

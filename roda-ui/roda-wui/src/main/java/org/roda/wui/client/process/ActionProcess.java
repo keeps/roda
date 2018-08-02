@@ -86,7 +86,7 @@ public class ActionProcess extends Composite {
     Filter actionFilter = new Filter(
       new NotSimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INTERNAL.toString()),
       new NotSimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INGEST.toString()));
-    jobSearch = new JobSearch("ActionProcess_jobs", "ActionProcess_reports", actionFilter, false);
+    jobSearch = new JobSearch("ActionProcess_jobs", "ActionProcess_reports", actionFilter, actionFilter, false);
 
     initWidget(uiBinder.createAndBindUi(this));
     preservationProcessDescription.add(new HTMLWidgetWrapper("PreservationProcessDescription.html"));

@@ -27,7 +27,6 @@ import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
-import org.roda.core.index.schema.SolrCollection;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
@@ -99,8 +98,6 @@ public class FileCollection extends AbstractSolrCollection<IndexedFile, File> {
     fields.add(new Field(RodaConstants.INGEST_SIP_IDS, Field.TYPE_STRING).setMultiValued(true));
     fields.add(new Field(RodaConstants.INGEST_JOB_ID, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.INGEST_UPDATE_JOB_IDS, Field.TYPE_STRING).setMultiValued(true));
-
-    fields.add(SolrCollection.getSearchField());
 
     return fields;
   }

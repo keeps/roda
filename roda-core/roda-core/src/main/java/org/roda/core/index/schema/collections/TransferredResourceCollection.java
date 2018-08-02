@@ -17,7 +17,6 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
-import org.roda.core.index.schema.SolrCollection;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
@@ -66,8 +65,6 @@ public class TransferredResourceCollection extends AbstractSolrCollection<Transf
     fields.add(new Field(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, Field.TYPE_BOOLEAN));
     fields.add(new Field(RodaConstants.TRANSFERRED_RESOURCE_NAME, Field.TYPE_STRING).setRequired(true));
     fields.add(new Field(RodaConstants.TRANSFERRED_RESOURCE_SIZE, Field.TYPE_LONG).setRequired(true));
-
-    fields.add(SolrCollection.getSearchField());
 
     return fields;
   }

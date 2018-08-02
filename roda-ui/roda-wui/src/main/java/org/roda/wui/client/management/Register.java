@@ -103,7 +103,7 @@ public class Register extends Composite {
 
   private boolean recaptchaActive = true;
   private RecaptchaWidget recaptchaWidget;
-  private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());

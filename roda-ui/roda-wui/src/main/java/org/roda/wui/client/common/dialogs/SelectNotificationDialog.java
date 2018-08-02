@@ -7,28 +7,17 @@
  */
 package org.roda.wui.client.common.dialogs;
 
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.wui.client.common.lists.NotificationList;
-import org.roda.wui.client.common.search.SearchFilters;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.ListBuilder;
 
-public class SelectNotificationDialog extends DefaultSelectDialog<Notification, Void> {
-
-  private static final Filter DEFAULT_FILTER_NOTIFICATION = SearchFilters.defaultFilter(Notification.class.getName());
-
-  public SelectNotificationDialog(String title) {
-    this(title, DEFAULT_FILTER_NOTIFICATION);
-  }
-
+public class SelectNotificationDialog extends DefaultSelectDialog<Notification> {
   public SelectNotificationDialog(String title, Filter filter) {
-    this(title, filter, false);
+    super(title,
+      new ListBuilder<>(NotificationList::new,
+        new AsyncTableCell.Options<>(Notification.class, "SelectNotificationDialog_notifications").withFilter(filter)
+          .withSummary(title)));
   }
-
-  public SelectNotificationDialog(String title, Filter filter, boolean selectable) {
-    super(title, filter, RodaConstants.NOTIFICATION_SEARCH,
-      new NotificationList("SelectNotificationDialog_notifications", filter, title, selectable),
-      false);
-  }
-
 }

@@ -17,8 +17,8 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
 import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
-import org.roda.wui.client.common.actions.model.ActionsBundle;
-import org.roda.wui.client.common.actions.model.ActionsGroup;
+import org.roda.wui.client.common.actions.model.ActionableBundle;
+import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.SelectTransferResourceDialog;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
@@ -72,6 +72,11 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
 
   public enum TransferredResourceAction implements Actionable.Action<TransferredResource> {
     REFRESH, RENAME, MOVE, UPLOAD, NEW_FOLDER, REMOVE, NEW_PROCESS
+  }
+
+  @Override
+  public TransferredResourceAction actionForName(String name) {
+    return TransferredResourceAction.valueOf(name);
   }
 
   public static TransferredResourceActions get(TransferredResource parentTransferredResource) {
@@ -370,11 +375,11 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
   }
 
   @Override
-  public ActionsBundle<TransferredResource> createActionsBundle() {
-    ActionsBundle<TransferredResource> transferredResourcesActionsBundle = new ActionsBundle<>();
+  public ActionableBundle<TransferredResource> createActionsBundle() {
+    ActionableBundle<TransferredResource> transferredResourcesActionableBundle = new ActionableBundle<>();
 
     // MANAGEMENT
-    ActionsGroup<TransferredResource> managementGroup = new ActionsGroup<>(messages.sidebarFoldersFilesTitle());
+    ActionableGroup<TransferredResource> managementGroup = new ActionableGroup<>(messages.sidebarFoldersFilesTitle());
     managementGroup.addButton(messages.refreshButton(), TransferredResourceAction.REFRESH, ActionImpact.UPDATED,
       "btn-refresh");
     // TODO: add title:
@@ -389,12 +394,12 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
     managementGroup.addButton(messages.removeWholeFolderButton(), TransferredResourceAction.REMOVE,
       ActionImpact.DESTROYED, "btn-danger btn-ban");
 
-    ActionsGroup<TransferredResource> preservationGroup = new ActionsGroup<>(messages.sidebarIngestTitle());
+    ActionableGroup<TransferredResource> preservationGroup = new ActionableGroup<>(messages.sidebarIngestTitle());
     preservationGroup.addButton(messages.ingestWholeFolderButton(), TransferredResourceAction.NEW_PROCESS,
       ActionImpact.UPDATED, "btn-play");
 
-    transferredResourcesActionsBundle.addGroup(managementGroup).addGroup(preservationGroup);
+    transferredResourcesActionableBundle.addGroup(managementGroup).addGroup(preservationGroup);
 
-    return transferredResourcesActionsBundle;
+    return transferredResourcesActionableBundle;
   }
 }

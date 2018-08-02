@@ -90,7 +90,6 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     fields.add(new Field(RodaConstants.AIP_DATE_FINAL, Field.TYPE_DATE));
 
     fields.add(SolrCollection.getSortFieldOf(RodaConstants.AIP_TITLE));
-    fields.add(SolrCollection.getSearchField());
 
     return fields;
   }

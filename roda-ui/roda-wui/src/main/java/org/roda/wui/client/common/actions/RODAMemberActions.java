@@ -7,8 +7,8 @@ import java.util.Set;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
-import org.roda.wui.client.common.actions.model.ActionsBundle;
-import org.roda.wui.client.common.actions.model.ActionsGroup;
+import org.roda.wui.client.common.actions.model.ActionableBundle;
+import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.management.CreateGroup;
 import org.roda.wui.client.management.CreateUser;
 import org.roda.wui.client.management.UserManagementService;
@@ -43,6 +43,11 @@ public class RODAMemberActions extends AbstractActionable<RODAMember> {
 
   public enum RODAMemberAction implements Actionable.Action<RODAMember> {
     NEW_USER, NEW_GROUP, ACTIVATE, DEACTIVATE, REMOVE
+  }
+
+  @Override
+  public RODAMemberAction actionForName(String name) {
+    return RODAMemberAction.valueOf(name);
   }
 
   public static RODAMemberActions get() {
@@ -146,21 +151,22 @@ public class RODAMemberActions extends AbstractActionable<RODAMember> {
   }
 
   @Override
-  public ActionsBundle<RODAMember> createActionsBundle() {
-    ActionsBundle<RODAMember> transferredResourcesActionsBundle = new ActionsBundle<>();
+  public ActionableBundle<RODAMember> createActionsBundle() {
+    ActionableBundle<RODAMember> transferredResourcesActionableBundle = new ActionableBundle<>();
 
     // ACTIONS
-    ActionsGroup<RODAMember> actionsGroup = new ActionsGroup<>(messages.sidebarActionsTitle());
-    actionsGroup.addButton(messages.addUserButton(), RODAMemberAction.NEW_USER, ActionImpact.UPDATED, "btn-plus");
-    actionsGroup.addButton(messages.addGroupButton(), RODAMemberAction.NEW_GROUP, ActionImpact.UPDATED, "btn-plus");
+    ActionableGroup<RODAMember> actionableGroup = new ActionableGroup<>(messages.sidebarActionsTitle());
+    actionableGroup.addButton(messages.addUserButton(), RODAMemberAction.NEW_USER, ActionImpact.UPDATED, "btn-plus");
+    actionableGroup.addButton(messages.addGroupButton(), RODAMemberAction.NEW_GROUP, ActionImpact.UPDATED, "btn-plus");
 
-    actionsGroup.addButton(messages.editUserActivate(), RODAMemberAction.ACTIVATE, ActionImpact.UPDATED, "btn-check");
-    actionsGroup.addButton(messages.editUserDeactivate(), RODAMemberAction.DEACTIVATE, ActionImpact.UPDATED,
+    actionableGroup.addButton(messages.editUserActivate(), RODAMemberAction.ACTIVATE, ActionImpact.UPDATED,
       "btn-check");
-    actionsGroup.addButton(messages.editUserRemove(), RODAMemberAction.REMOVE, ActionImpact.DESTROYED, "btn-ban");
+    actionableGroup.addButton(messages.editUserDeactivate(), RODAMemberAction.DEACTIVATE, ActionImpact.UPDATED,
+      "btn-check");
+    actionableGroup.addButton(messages.editUserRemove(), RODAMemberAction.REMOVE, ActionImpact.DESTROYED, "btn-ban");
 
-    transferredResourcesActionsBundle.addGroup(actionsGroup);
+    transferredResourcesActionableBundle.addGroup(actionableGroup);
 
-    return transferredResourcesActionsBundle;
+    return transferredResourcesActionableBundle;
   }
 }

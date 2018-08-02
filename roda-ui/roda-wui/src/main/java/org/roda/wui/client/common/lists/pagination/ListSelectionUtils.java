@@ -242,7 +242,7 @@ public class ListSelectionUtils {
 
   }
 
-  public static <T extends IsIndexed> void bindBrowseOpener(final AsyncTableCell<T, ?> list) {
+  public static <T extends IsIndexed> void bindBrowseOpener(final AsyncTableCell<T> list) {
     list.getSelectionModel().addSelectionChangeHandler(new Handler() {
 
       @Override

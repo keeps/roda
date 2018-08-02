@@ -13,10 +13,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
@@ -32,7 +31,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
 
 import config.i18n.client.ClientMessages;
 
-public class SimpleFileList extends BasicAsyncTableCell<IndexedFile> {
+public class SimpleFileList extends AsyncTableCell<IndexedFile> {
 
   private final ClientLogger logger = new ClientLogger(getClass().getName());
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
@@ -45,20 +44,11 @@ public class SimpleFileList extends BasicAsyncTableCell<IndexedFile> {
     RodaConstants.FILE_REPRESENTATION_UUID, RodaConstants.FILE_ORIGINALNAME, RodaConstants.FILE_FILE_ID,
     RodaConstants.FILE_SIZE, RodaConstants.FILE_FORMAT_VERSION, RodaConstants.FILE_FILEFORMAT);
 
-  public SimpleFileList(String listId) {
-    this(listId, null, false, null, false);
+  @Override
+  protected void adjustOptions(Options<IndexedFile> options) {
+    options.withFieldsToReturn(fieldsToReturn);
   }
 
-  public SimpleFileList(String listId, Filter filter, boolean justActive, String summary,
-    boolean selectable) {
-    super(IndexedFile.class, listId, filter, justActive, summary, selectable, fieldsToReturn);
-  }
-
-  public SimpleFileList(String listId, Filter filter, boolean justActive, String summary,
-    boolean selectable, int initialPageSize, int pageSizeIncrement) {
-    super(IndexedFile.class, listId, filter, justActive, summary, selectable, initialPageSize,
-      pageSizeIncrement, fieldsToReturn);
-  }
 
   @Override
   protected void configureDisplay(CellTable<IndexedFile> display) {

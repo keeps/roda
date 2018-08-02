@@ -7,32 +7,15 @@
  */
 package org.roda.wui.client.common.search;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.DIP;
-import org.roda.core.data.v2.ip.DIPFile;
-import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedDIP;
-import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.jobs.IndexedReport;
-import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.log.LogEntry;
-import org.roda.core.data.v2.notifications.Notification;
-import org.roda.core.data.v2.ri.RepresentationInformation;
-import org.roda.core.data.v2.risks.IndexedRisk;
-import org.roda.core.data.v2.risks.Risk;
-import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.core.data.v2.user.RODAMember;
-
-import com.google.gwt.core.shared.GWT;
+import org.roda.core.data.v2.index.filter.FilterParameter;
+import org.roda.core.data.v2.index.filter.OrFiltersParameters;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 
 public class SearchFilters {
 
@@ -40,78 +23,54 @@ public class SearchFilters {
     // do nothing
   }
 
-  public static Filter defaultFilter(String actualClass) {
-    if (actualClass.equals(AIP.class.getName()) || actualClass.equals(IndexedAIP.class.getName())) {
-      return new Filter(new BasicSearchFilterParameter(RodaConstants.AIP_SEARCH, "*"));
-    } else if (actualClass.equals(Representation.class.getName())
-      || actualClass.equals(IndexedRepresentation.class.getName())) {
-      return new Filter(new BasicSearchFilterParameter(RodaConstants.REPRESENTATION_SEARCH, "*"));
-    } else if (actualClass.equals(File.class.getName()) || actualClass.equals(IndexedFile.class.getName())) {
-      return new Filter(new BasicSearchFilterParameter(RodaConstants.FILE_SEARCH, "*"));
-    } else if (actualClass.equals(RepresentationInformation.class.getName())) {
-      return new Filter(new BasicSearchFilterParameter(RodaConstants.REPRESENTATION_INFORMATION_SEARCH, "*"));
-    } else if (actualClass.equals(IndexedRisk.class.getName()) || actualClass.equals(Risk.class.getName())) {
-      return new Filter(new BasicSearchFilterParameter(RodaConstants.RISK_SEARCH, "*"));
-    } else if (actualClass.equals(RiskIncidence.class.getName())) {
-      return new Filter(new BasicSearchFilterParameter(RodaConstants.RISK_INCIDENCE_SEARCH, "*"));
-    } else if (actualClass.equals(Job.class.getName())) {
-      return new Filter(new BasicSearchFilterParameter(RodaConstants.JOB_SEARCH, "*"));
-    } else if (actualClass.equals(Report.class.getName()) || actualClass.equals(IndexedReport.class.getName())) {
-      return new Filter(new BasicSearchFilterParameter(RodaConstants.JOB_REPORT_SEARCH, "*"));
-    } else if (actualClass.equals(TransferredResource.class.getName())) {
-      return new Filter(new BasicSearchFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_SEARCH, "*"));
-    } else if (actualClass.equals(Notification.class.getName())) {
-      return new Filter(new BasicSearchFilterParameter(RodaConstants.NOTIFICATION_SEARCH, "*"));
-    } else if (actualClass.equals(LogEntry.class.getName())) {
-      return new Filter(new BasicSearchFilterParameter(RodaConstants.LOG_SEARCH, "*"));
-    } else if (actualClass.equals(RODAMember.class.getName())) {
-      return new Filter(new BasicSearchFilterParameter(RodaConstants.MEMBERS_SEARCH, "*"));
-    } else if (actualClass.equals(DIP.class.getName()) || actualClass.equals(IndexedDIP.class.getName())) {
-      return new Filter(new BasicSearchFilterParameter(RodaConstants.DIP_SEARCH, "*"));
-    } else if (actualClass.equals(DIPFile.class.getName())) {
-      return new Filter(new BasicSearchFilterParameter(RodaConstants.DIPFILE_SEARCH, "*"));
-    } else if (actualClass.equals(Format.class.getName())) {
-      return new Filter(new BasicSearchFilterParameter(RodaConstants.FORMAT_SEARCH, "*"));
-    } else {
-      return Filter.NULL;
-    }
+  public static Filter allFilter() {
+    return new Filter(new BasicSearchFilterParameter(searchField(), RodaConstants.INDEX_WILDCARD));
   }
 
-  public static String allFilter(String actualClass) {
-    if (actualClass.equals(AIP.class.getName()) || actualClass.equals(IndexedAIP.class.getName())) {
-      return RodaConstants.AIP_SEARCH;
-    } else if (actualClass.equals(Representation.class.getName())
-      || actualClass.equals(IndexedRepresentation.class.getName())) {
-      return RodaConstants.REPRESENTATION_SEARCH;
-    } else if (actualClass.equals(File.class.getName()) || actualClass.equals(IndexedFile.class.getName())) {
-      return RodaConstants.FILE_SEARCH;
-    } else if (actualClass.equals(RepresentationInformation.class.getName())) {
-      return RodaConstants.REPRESENTATION_INFORMATION_SEARCH;
-    } else if (actualClass.equals(IndexedRisk.class.getName()) || actualClass.equals(Risk.class.getName())) {
-      return RodaConstants.RISK_SEARCH;
-    } else if (actualClass.equals(RiskIncidence.class.getName())) {
-      return RodaConstants.RISK_INCIDENCE_SEARCH;
-    } else if (actualClass.equals(Job.class.getName())) {
-      return RodaConstants.JOB_SEARCH;
-    } else if (actualClass.equals(Report.class.getName()) || actualClass.equals(IndexedReport.class.getName())) {
-      return RodaConstants.JOB_REPORT_SEARCH;
-    } else if (actualClass.equals(TransferredResource.class.getName())) {
-      return RodaConstants.TRANSFERRED_RESOURCE_SEARCH;
-    } else if (actualClass.equals(Notification.class.getName())) {
-      return RodaConstants.NOTIFICATION_SEARCH;
-    } else if (actualClass.equals(LogEntry.class.getName())) {
-      return RodaConstants.LOG_SEARCH;
-    } else if (actualClass.equals(RODAMember.class.getName())) {
-      return RodaConstants.MEMBERS_SEARCH;
-    } else if (actualClass.equals(DIP.class.getName()) || actualClass.equals(IndexedDIP.class.getName())) {
-      return RodaConstants.DIP_SEARCH;
-    } else if (actualClass.equals(DIPFile.class.getName())) {
-      return RodaConstants.DIPFILE_SEARCH;
-    } else if (actualClass.equals(Format.class.getName())) {
-      return RodaConstants.FORMAT_SEARCH;
-    } else {
-      GWT.log("The search is failing due to missing search field key on query");
-      return "";
+  public static String searchField() {
+    return RodaConstants.INDEX_SEARCH;
+  }
+
+  public static Filter createIncrementalFilterFromTokens(final List<String> historyTokens, Filter baseFilter) {
+    // historyTokens like TYPE/key/value/key/value or key/value/key/value
+
+    Filter resultingFilter = baseFilter == null ? new Filter() : new Filter(baseFilter);
+
+    List<String> parts = new ArrayList<>(historyTokens);
+    if (!parts.isEmpty()) {
+      String operator = RodaConstants.OPERATOR_AND;
+      if (parts.size() % 2 == 1) {
+        operator = parts.remove(0);
+      }
+
+      if (parts.size() % 2 == 0 && operator.equals(RodaConstants.OPERATOR_AND)
+        || operator.equals(RodaConstants.OPERATOR_OR)) {
+        List<FilterParameter> filterParameterList = new ArrayList<>();
+
+        for (int i = 0; i < parts.size() - 1; i += 2) {
+          String key = parts.get(i);
+          String value = parts.get(i + 1);
+          filterParameterList.add(new SimpleFilterParameter(key, value));
+        }
+
+        if (!filterParameterList.isEmpty()) {
+          if (RodaConstants.OPERATOR_AND.equals(operator)) {
+            resultingFilter.add(filterParameterList);
+          } else {
+            resultingFilter.add(new OrFiltersParameters(filterParameterList));
+          }
+        }
+      }
     }
+
+    return baseFilter;
+  }
+
+  public static Filter createFilterFromHistoryTokens(final List<String> historyTokens) {
+    return createIncrementalFilterFromTokens(historyTokens, null);
+  }
+
+  public static boolean shouldBeIncremental(final Filter filter) {
+    return filter.getParameters().isEmpty() || SearchFilters.allFilter().equals(filter);
   }
 }

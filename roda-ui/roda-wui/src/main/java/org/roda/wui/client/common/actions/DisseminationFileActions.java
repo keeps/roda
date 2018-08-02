@@ -12,8 +12,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.roda.core.data.v2.ip.DIPFile;
-import org.roda.wui.client.common.actions.model.ActionsBundle;
-import org.roda.wui.client.common.actions.model.ActionsGroup;
+import org.roda.wui.client.common.actions.model.ActionableBundle;
+import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.common.client.tools.RestUtils;
 
 import com.google.gwt.core.client.GWT;
@@ -36,6 +36,11 @@ public class DisseminationFileActions extends AbstractActionable<DIPFile> {
 
   public enum DisseminationFileAction implements Actionable.Action<DIPFile> {
     DOWNLOAD;
+  }
+
+  @Override
+  public DisseminationFileAction actionForName(String name) {
+    return DisseminationFileAction.valueOf(name);
   }
 
   public static DisseminationFileActions get() {
@@ -68,11 +73,11 @@ public class DisseminationFileActions extends AbstractActionable<DIPFile> {
   }
 
   @Override
-  public ActionsBundle<DIPFile> createActionsBundle() {
-    ActionsBundle<DIPFile> dipFileActionableBundle = new ActionsBundle<>();
+  public ActionableBundle<DIPFile> createActionsBundle() {
+    ActionableBundle<DIPFile> dipFileActionableBundle = new ActionableBundle<>();
 
     // MANAGEMENT
-    ActionsGroup<DIPFile> managementGroup = new ActionsGroup<>(messages.disseminationFile());
+    ActionableGroup<DIPFile> managementGroup = new ActionableGroup<>(messages.disseminationFile());
     managementGroup.addButton(messages.downloadButton(), DisseminationFileAction.DOWNLOAD, ActionImpact.NONE,
       "btn-download");
 

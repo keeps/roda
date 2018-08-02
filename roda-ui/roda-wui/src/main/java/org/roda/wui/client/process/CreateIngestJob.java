@@ -28,6 +28,9 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.lists.TransferredResourceList;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.ListBuilder;
+import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
@@ -60,20 +63,25 @@ public class CreateIngestJob extends CreateSelectedJob<TransferredResource> {
     boolean isEmpty = false;
 
     if (selected != null) {
-      if (selected instanceof SelectedItemsList) {
-        List<String> ids = ((SelectedItemsList) selected).getIds();
-        Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, ids));
-        TransferredResourceList list = new TransferredResourceList("CreateIngestJob_transferredResources", filter,
-          messages.transferredResourcesTitle(), false, 10, 10);
+      if (selected instanceof SelectedItemsList || selected instanceof SelectedItemsFilter) {
+        Filter filter;
+        if (selected instanceof SelectedItemsList) {
+          List<String> ids = ((SelectedItemsList) selected).getIds();
+          filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, ids));
+          isEmpty = ids.isEmpty();
+        } else {
+          filter = ((SelectedItemsFilter) selected).getFilter();
+        }
+
+        ListBuilder<TransferredResource> transferredResourceListBuilder = new ListBuilder<>(
+          TransferredResourceList::new,
+          new AsyncTableCell.Options<>(TransferredResource.class, "CreateIngestJob_transferredResources")
+            .withFilter(filter).withSummary(messages.transferredResourcesTitle()).withInitialPageSize(10)
+            .withPageSizeIncrement(10));
+
+        SearchWrapper search = new SearchWrapper(false).createListAndSearchPanel(transferredResourceListBuilder);
         getTargetPanel().clear();
-        getTargetPanel().add(list);
-        isEmpty = ids.isEmpty();
-      } else if (selected instanceof SelectedItemsFilter) {
-        Filter filter = ((SelectedItemsFilter) selected).getFilter();
-        TransferredResourceList list = new TransferredResourceList("CreateIngestJob_transferredResources", filter,
-          messages.transferredResourcesTitle(), false, 10, 10);
-        getTargetPanel().clear();
-        getTargetPanel().add(list);
+        getTargetPanel().add(search);
       } else {
         isEmpty = true;
       }

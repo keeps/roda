@@ -88,7 +88,7 @@ public class EditGroup extends Composite {
 
   private Group group;
 
-  private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   @UiField
   Button buttonApply;

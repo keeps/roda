@@ -18,7 +18,6 @@ import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
@@ -48,10 +47,11 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.lists.IngestJobReportList;
 import org.roda.wui.client.common.lists.SimpleJobReportList;
-import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
-import org.roda.wui.client.common.search.SearchPanel;
+import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchPreFilterUtils;
+import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -74,7 +74,6 @@ import org.roda.wui.common.client.widgets.Toast;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -92,8 +91,6 @@ import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.SelectionChangeEvent;
-import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
 import config.i18n.client.ClientMessages;
 
@@ -228,16 +225,7 @@ public class ShowJob extends Composite {
   Label reportsLabel;
 
   @UiField(provided = true)
-  SearchPanel ingestJobReportsSearchPanel;
-
-  @UiField(provided = true)
-  IngestJobReportList ingestJobReports;
-
-  @UiField(provided = true)
-  SearchPanel simpleJobReportsSearchPanel;
-
-  @UiField(provided = true)
-  SimpleJobReportList simpleJobReports;
+  SearchWrapper searchWrapper;
 
   @UiField
   Button buttonAppraisal, buttonBack, buttonStop, buttonProcess;
@@ -245,39 +233,38 @@ public class ShowJob extends Composite {
   public ShowJob(Job job, Map<String, PluginInfo> pluginsInfo, List<FilterParameter> extraReportFilterParameters) {
     this.job = job;
     this.pluginsInfo = pluginsInfo;
-    boolean isIngest = false;
+    boolean isIngest = job.getPluginType().equals(PluginType.INGEST);
 
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getUUID()));
     filter.add(extraReportFilterParameters);
 
-    if (job.getPluginType().equals(PluginType.INGEST)) {
-      ingestJobReports = new IngestJobReportList("ShowJob_reports",
-        new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getId())), messages.reportList(),
-        false);
-      ListSelectionUtils.bindBrowseOpener(ingestJobReports);
-      simpleJobReports = new SimpleJobReportList("ShowJob_reports_hidden");
-      isIngest = true;
+    AsyncTableCell.Options<IndexedReport> jobReportListBuilderOptions = new AsyncTableCell.Options<>(
+      IndexedReport.class, "ShowJob_reports");
+    jobReportListBuilderOptions.addValueChangedHandler(event -> {
+      if (!extraReportFilterParameters.isEmpty() && event.getValue().getTotalCount() == 1) {
+        Report jobReport = event.getValue().getResults().get(0);
+        if (jobReport != null) {
+          HistoryUtils.newHistory(ShowJobReport.RESOLVER, jobReport.getId());
+        }
+      }
+    });
+    jobReportListBuilderOptions.withFilter(filter);
+    jobReportListBuilderOptions.withAutoUpdate(isJobRunning() ? PERIOD_MILLIS : null);
+    jobReportListBuilderOptions.withSummary(messages.reportList());
+    jobReportListBuilderOptions.bindOpener();
+
+    ListBuilder<IndexedReport> jobReportListBuilder;
+    if (isIngest) {
+      jobReportListBuilder = new ListBuilder<>(IngestJobReportList::new, jobReportListBuilderOptions);
     } else {
-      simpleJobReports = new SimpleJobReportList("ShowJob_reports",
-        new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getId())), messages.reportList(),
-        pluginsInfo, false);
-      ListSelectionUtils.bindBrowseOpener(simpleJobReports);
-      ingestJobReports = new IngestJobReportList("ShowJob_reports_hidden");
+      jobReportListBuilder = new ListBuilder<>(() -> new SimpleJobReportList(pluginsInfo), jobReportListBuilderOptions);
     }
 
-    ingestJobReportsSearchPanel = new SearchPanel(filter, RodaConstants.JOB_REPORT_SEARCH, true,
-      messages.jobProcessedSearchPlaceHolder(), false, false, false);
-    ingestJobReportsSearchPanel.setList(ingestJobReports);
-
-    simpleJobReportsSearchPanel = new SearchPanel(filter, RodaConstants.JOB_REPORT_SEARCH, true,
-      messages.jobProcessedSearchPlaceHolder(), false, false, false);
-    simpleJobReportsSearchPanel.setList(simpleJobReports);
+    searchWrapper = new SearchWrapper(false).createListAndSearchPanel(jobReportListBuilder,
+      messages.jobProcessedSearchPlaceHolder());
 
     initWidget(uiBinder.createAndBindUi(this));
-    simpleJobReportsSearchPanel.setVisible(!isIngest);
-    simpleJobReports.setVisible(!isIngest);
-    ingestJobReportsSearchPanel.setVisible(isIngest);
-    ingestJobReports.setVisible(isIngest);
+
     buttonProcess.setVisible(isIngest);
 
     name.setText(job.getName());
@@ -288,57 +275,9 @@ public class ShowJob extends Composite {
     SelectedItems<?> selected = job.getSourceObjects();
     selectedListPanel.setVisible(true);
 
-    ValueChangeHandler<IndexResult<IndexedReport>> jumpToSingleReportHandler = null;
-    if (!extraReportFilterParameters.isEmpty()) {
-      jumpToSingleReportHandler = event -> {
-        if (event.getValue().getTotalCount() == 1) {
-          Report jobReport = event.getValue().getResults().get(0);
-          if (jobReport != null) {
-            HistoryUtils.newHistory(ShowJobReport.RESOLVER, jobReport.getId());
-          }
-        }
-      };
-    }
-
     if (isIngest) {
-      if (isJobRunning()) {
-        ingestJobReports.autoUpdate(PERIOD_MILLIS);
-      }
-
-      ingestJobReports.getSelectionModel().addSelectionChangeHandler(new Handler() {
-        @Override
-        public void onSelectionChange(SelectionChangeEvent event) {
-          Report jobReport = ingestJobReports.getSelectionModel().getSelectedObject();
-          if (jobReport != null) {
-            HistoryUtils.newHistory(ShowJobReport.RESOLVER, jobReport.getId());
-          }
-        }
-      });
-
-      if (jumpToSingleReportHandler != null) {
-        ingestJobReports.addValueChangeHandler(jumpToSingleReportHandler);
-      }
-
       showIngestSourceObjects(selected);
     } else {
-      if (isJobRunning()) {
-        simpleJobReports.autoUpdate(PERIOD_MILLIS);
-      }
-
-      simpleJobReports.getSelectionModel().addSelectionChangeHandler(new Handler() {
-        @Override
-        public void onSelectionChange(SelectionChangeEvent event) {
-          Report jobReport = simpleJobReports.getSelectionModel().getSelectedObject();
-          if (jobReport != null) {
-            HistoryUtils.newHistory(ShowJobReport.RESOLVER, jobReport.getId());
-          }
-        }
-      });
-
-      if (jumpToSingleReportHandler != null) {
-        simpleJobReports.addValueChangeHandler(jumpToSingleReportHandler);
-      }
-
       showActionSourceObjects(selected);
     }
 

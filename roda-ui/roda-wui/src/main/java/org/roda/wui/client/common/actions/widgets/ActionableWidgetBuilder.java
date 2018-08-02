@@ -9,13 +9,16 @@ package org.roda.wui.client.common.actions.widgets;
 
 import static org.roda.wui.client.common.actions.Actionable.ActionImpact;
 
+import java.util.List;
+
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.actions.Actionable;
+import org.roda.wui.client.common.actions.model.ActionableBundle;
+import org.roda.wui.client.common.actions.model.ActionableButton;
+import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.actions.model.ActionableObject;
-import org.roda.wui.client.common.actions.model.ActionsBundle;
-import org.roda.wui.client.common.actions.model.ActionsButton;
-import org.roda.wui.client.common.actions.model.ActionsGroup;
+import org.roda.wui.client.common.actions.model.ActionableTitle;
 import org.roda.wui.client.common.popup.CalloutPopup;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
@@ -56,14 +59,6 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
   }
 
   // Adding a title
-
-  public ActionableWidgetBuilder<T> withTitle(String title, String icon) {
-    this.title = title;
-    this.icon = handleIconCss(icon);
-    this.titleCss = TITLE_CSS_H1_DEFAULT;
-    return this;
-  }
-
   public ActionableWidgetBuilder<T> withTitle(String title) {
     this.title = title;
     this.icon = null;
@@ -71,30 +66,9 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
     return this;
   }
 
-  public ActionableWidgetBuilder<T> withTitleForCard(String title, String icon) {
-    this.title = title;
-    this.icon = handleIconCss(icon);
-    this.titleCss = TITLE_CSS_H5;
-    return this;
-  }
-
   public ActionableWidgetBuilder<T> withTitleSmall(String title, String icon) {
     this.title = title;
     this.icon = handleIconCss(icon);
-    this.titleCss = TITLE_CSS_H2;
-    return this;
-  }
-
-  public ActionableWidgetBuilder<T> withTitleLoading() {
-    this.title = messages.browseLoading();
-    this.icon = null;
-    this.titleCss = TITLE_CSS_H1_DEFAULT;
-    return this;
-  }
-
-  public ActionableWidgetBuilder<T> withTitleSmallLoading() {
-    this.title = messages.browseLoading();
-    this.icon = null;
     this.titleCss = TITLE_CSS_H2;
     return this;
   }
@@ -116,13 +90,27 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
   // Builder methods for lists and titles
 
   public Widget buildListWithObjects(ActionableObject<T> objects) {
-    ActionsBundle<T> actionsBundle = actionable.createActionsBundle();
-    return createActionsMenu(actionsBundle, objects);
+    ActionableBundle<T> actionableBundle = actionable.createActionsBundle();
+    return createActionsMenu(actionableBundle, objects);
+  }
+
+  public Widget buildListWithObjects(ActionableObject<T> objects, List<Actionable.Action<T>> actionWhitelist) {
+    ActionableBundle<T> actionableBundle = actionable.createActionsBundle();
+
+    if (!actionWhitelist.isEmpty()) {
+      // remove unwanted buttons, and the whole group if it is empty
+      actionableBundle.getGroups().removeIf(group -> {
+        group.getButtons().removeIf(button -> !actionWhitelist.contains(button.getAction()));
+        return group.getButtons().isEmpty();
+      });
+    }
+
+    return createActionsMenu(actionableBundle, objects);
   }
 
   public Widget buildTitleWithObjects(ActionableObject<T> objects) {
-    ActionsBundle<T> actionsBundle = actionable.createActionsBundle();
-    return createActionsTitle(actionsBundle, objects);
+    ActionableBundle<T> actionableBundle = actionable.createActionsBundle();
+    return createActionsTitle(actionableBundle, objects);
   }
 
   public Widget buildTitleWithoutActions() {
@@ -131,40 +119,54 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
 
   // Internal (GUI elements creation)
 
-  private FlowPanel createActionsMenu(ActionsBundle<T> actionsBundle, ActionableObject<T> objects) {
+  private FlowPanel createActionsMenu(ActionableBundle<T> actionableBundle, ActionableObject<T> objects) {
     FlowPanel panel = new FlowPanel();
     panel.addStyleName("actionable-menu");
 
     boolean isEmpty = true;
 
-    for (ActionsGroup<T> actionGroup : actionsBundle) {
-      for (ActionsButton<T> actionButton : actionGroup.getButtons()) {
-        if (actionable.canAct(actionButton.getAction(), objects)) {
+    for (ActionableGroup<T> actionGroup : actionableBundle.getGroups()) {
+      boolean hasButtonsOnThisGroup = false;
+      for (ActionableButton<T> button : actionGroup.getButtons()) {
+        if (actionable.canAct(button.getAction(), objects)) {
+          ActionableTitle actionableTitle = actionGroup.getTitle();
+          Label groupTitle = new Label(actionableTitle.getTitle());
+          groupTitle.addStyleName("h4 actionable-title");
+          if (!actionableTitle.hasTitle()) {
+            groupTitle.addStyleName("actionable-title-empty");
+          }
+          panel.add(groupTitle);
+          hasButtonsOnThisGroup = true;
+          break;
+        }
+      }
 
-          ActionableButton<T> button = new ActionableButton<>(actionButton);
+      if (hasButtonsOnThisGroup) {
+        for (ActionableButton<T> actionButton : actionGroup.getButtons()) {
+          if (actionable.canAct(actionButton.getAction(), objects)) {
 
-          button.addClickHandler(event -> {
-            button.setEnabled(false);
-            GWT.log("button disabled: " + button.getText());
-            actionable.act(actionButton.getAction(), objects, new AsyncCallback<Actionable.ActionImpact>() {
-              @Override
-              public void onFailure(Throwable caught) {
-                callback.onFailure(caught);
-                GWT.log("button enabled: " + button.getText());
-                button.setEnabled(true);
-              }
+            ActionButton<T> button = new ActionButton<>(actionButton);
 
-              @Override
-              public void onSuccess(Actionable.ActionImpact result) {
-                callback.onSuccess(result);
-                GWT.log("button enabled: " + button.getText());
-                button.setEnabled(true);
-              }
+            button.addClickHandler(event -> {
+              button.setEnabled(false);
+              actionable.act(actionButton.getAction(), objects, new AsyncCallback<Actionable.ActionImpact>() {
+                @Override
+                public void onFailure(Throwable caught) {
+                  callback.onFailure(caught);
+                  button.setEnabled(true);
+                }
+
+                @Override
+                public void onSuccess(Actionable.ActionImpact result) {
+                  callback.onSuccess(result);
+                  button.setEnabled(true);
+                }
+              });
             });
-          });
 
-          panel.add(button);
-          isEmpty = false;
+            panel.add(button);
+            isEmpty = false;
+          }
         }
       }
     }
@@ -178,7 +180,7 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
     return panel;
   }
 
-  private Widget createActionsTitle(ActionsBundle<T> actionsBundle, ActionableObject<T> objects) {
+  private Widget createActionsTitle(ActionableBundle<T> actionableBundle, ActionableObject<T> objects) {
     // build inner-container
     FlowPanel inlinePanel = new FlowPanel();
     inlinePanel.addStyleName("actionable-header actionable-header-with-actions " + titleCss);
@@ -209,8 +211,8 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
 
     // add actions popup
     final CalloutPopup popup = new CalloutPopup();
-    popup.addStyleName("actionable-popup");
-    popup.setWidget(createActionsMenu(actionsBundle, objects));
+    popup.addStyleName("actionable-popup ActionableStyleMenu");
+    popup.setWidget(createActionsMenu(actionableBundle, objects));
     popup.addCloseHandler(event -> inlinePanel.removeStyleName("actionable-header-with-actions-clicked"));
 
     focusPanel.addMouseDownHandler(event -> {

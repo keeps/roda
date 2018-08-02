@@ -13,14 +13,11 @@ package org.roda.wui.client.search;
 import java.util.Arrays;
 import java.util.List;
 
-import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.search.MainSearch;
+import org.roda.wui.client.common.search.CatalogueSearch;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.core.client.GWT;
@@ -71,17 +68,12 @@ public class Search extends Composite {
   FlowPanel searchDescription;
 
   @UiField(provided = true)
-  MainSearch mainSearch;
-
-  boolean justActive = true;
-  boolean itemsSelectable = true;
-  boolean representationsSelectable = true;
-  boolean filesSelectable = true;
+  CatalogueSearch catalogueSearch;
 
   private Search() {
     // Create main search
     String parentAipId = null;
-    mainSearch = new MainSearch(justActive, itemsSelectable, representationsSelectable, filesSelectable, "Search_AIPs",
+    catalogueSearch = new CatalogueSearch(true, "Search_AIPs",
       "Search_representations", "Search_files", parentAipId, AIPState.ACTIVE);
 
     initWidget(uiBinder.createAndBindUi(this));
@@ -102,30 +94,7 @@ public class Search extends Composite {
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-    mainSearch.defaultFilters();
-    if (historyTokens.isEmpty()) {
-      mainSearch.search(false);
-      callback.onSuccess(this);
-    } else {
-      // #search/TYPE/key/value/key/value
-      boolean successful = mainSearch.setSearch(historyTokens);
-      if (successful) {
-        mainSearch.search(true);
-        callback.onSuccess(this);
-      } else {
-        HistoryUtils.newHistory(RESOLVER);
-        callback.onSuccess(null);
-      }
-    }
+    catalogueSearch.setFilters(historyTokens);
+    callback.onSuccess(this);
   }
-
-  public void clearSelected() {
-    mainSearch.clearSelected();
-  }
-
-  @Deprecated
-  public SelectedItems<? extends IsIndexed> getSelected() {
-    return mainSearch.getSelected();
-  }
-
 }

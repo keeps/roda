@@ -28,8 +28,8 @@ import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
 import org.roda.wui.client.common.actions.callbacks.ActionLoadingAsyncCallback;
 import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
-import org.roda.wui.client.common.actions.model.ActionsBundle;
-import org.roda.wui.client.common.actions.model.ActionsGroup;
+import org.roda.wui.client.common.actions.model.ActionableBundle;
+import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.SelectFileDialog;
 import org.roda.wui.client.ingest.process.ShowJob;
@@ -81,6 +81,11 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
   public enum FileAction implements Actionable.Action<IndexedFile> {
     DOWNLOAD, RENAME, MOVE, REMOVE, UPLOAD_FILES, CREATE_FOLDER, NEW_PROCESS, IDENTIFY_FORMATS, SHOW_EVENTS, SHOW_RISKS;
+  }
+
+  @Override
+  public FileAction actionForName(String name) {
+    return FileAction.valueOf(name);
   }
 
   public static FileActions get() {
@@ -212,7 +217,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_AIP_ID, aipId),
       new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_ID, representationId),
       new SimpleFilterParameter(RodaConstants.FILE_ISDIRECTORY, Boolean.toString(true)));
-    SelectFileDialog selectFileDialog = new SelectFileDialog(messages.moveItemTitle(), filter, true, false);
+    SelectFileDialog selectFileDialog = new SelectFileDialog(messages.moveItemTitle(), filter, true);
     selectFileDialog.setEmptyParentButtonVisible(true);
     selectFileDialog.setSingleSelectionMode();
     selectFileDialog.showAndCenter();
@@ -496,11 +501,11 @@ public class FileActions extends AbstractActionable<IndexedFile> {
   }
 
   @Override
-  public ActionsBundle<IndexedFile> createActionsBundle() {
-    ActionsBundle<IndexedFile> fileActionableBundle = new ActionsBundle<>();
+  public ActionableBundle<IndexedFile> createActionsBundle() {
+    ActionableBundle<IndexedFile> fileActionableBundle = new ActionableBundle<>();
 
     // MANAGEMENT
-    ActionsGroup<IndexedFile> managementGroup = new ActionsGroup<>(messages.sidebarFoldersFilesTitle());
+    ActionableGroup<IndexedFile> managementGroup = new ActionableGroup<>(messages.sidebarFoldersFilesTitle());
     managementGroup.addButton(messages.downloadButton(), FileAction.DOWNLOAD, ActionImpact.NONE, "btn-download",
       "fileDownloadButton");
     managementGroup.addButton(messages.renameButton(), FileAction.RENAME, ActionImpact.UPDATED, "btn-edit",
@@ -515,7 +520,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
       "fileRemoveButton");
 
     // PRESERVATION
-    ActionsGroup<IndexedFile> preservationGroup = new ActionsGroup<>(messages.preservationTitle());
+    ActionableGroup<IndexedFile> preservationGroup = new ActionableGroup<>(messages.preservationTitle());
     preservationGroup.addButton(messages.newProcessPreservation(), FileAction.NEW_PROCESS, ActionImpact.UPDATED,
       "btn-play", "fileNewProcessButton");
     preservationGroup.addButton(messages.identifyFormatsButton(), FileAction.IDENTIFY_FORMATS, ActionImpact.UPDATED,

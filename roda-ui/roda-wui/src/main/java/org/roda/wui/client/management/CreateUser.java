@@ -71,7 +71,7 @@ public class CreateUser extends Composite {
 
   private User user;
 
-  private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   @UiField
   Button buttonApply;

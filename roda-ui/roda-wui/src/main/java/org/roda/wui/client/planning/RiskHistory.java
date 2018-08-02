@@ -97,7 +97,7 @@ public class RiskHistory extends Composite {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  private static ClientMessages messages = GWT.create(ClientMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private final String riskId;
   private RiskVersionsBundle bundle;
@@ -128,7 +128,7 @@ public class RiskHistory extends Composite {
     this.riskId = riskId;
     this.bundle = bundle;
 
-    oldRisk = new RiskShowPanel(bundle.getLastRisk(), false);
+    oldRisk = new RiskShowPanel(bundle.getLastRisk(), "RiskHistory_riskIncidences", false);
 
     initWidget(uiBinder.createAndBindUi(this));
     init();

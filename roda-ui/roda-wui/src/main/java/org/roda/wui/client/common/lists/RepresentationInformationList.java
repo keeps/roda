@@ -13,10 +13,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ri.RepresentationInformation;
-import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
@@ -31,7 +30,7 @@ import com.google.gwt.view.client.ProvidesKey;
 
 import config.i18n.client.ClientMessages;
 
-public class RepresentationInformationList extends BasicAsyncTableCell<RepresentationInformation> {
+public class RepresentationInformationList extends AsyncTableCell<RepresentationInformation> {
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
@@ -44,19 +43,9 @@ public class RepresentationInformationList extends BasicAsyncTableCell<Represent
     RodaConstants.REPRESENTATION_INFORMATION_TAGS, RodaConstants.REPRESENTATION_INFORMATION_SUPPORT,
     RodaConstants.REPRESENTATION_INFORMATION_FAMILY);
 
-  public RepresentationInformationList(String listId) {
-    this(listId, null, null, false);
-  }
-
-  public RepresentationInformationList(String listId, Filter filter, String summary,
-    boolean selectable) {
-    super(RepresentationInformation.class, listId, filter, summary, selectable, fieldsToReturn);
-  }
-
-  public RepresentationInformationList(String listId, Filter filter, String summary, boolean selectable,
-    int pageSize, int incrementPage) {
-    super(RepresentationInformation.class, listId, filter, summary, selectable, pageSize, incrementPage,
-      fieldsToReturn);
+  @Override
+  protected void adjustOptions(Options<RepresentationInformation> options) {
+    options.withFieldsToReturn(fieldsToReturn);
   }
 
   @Override

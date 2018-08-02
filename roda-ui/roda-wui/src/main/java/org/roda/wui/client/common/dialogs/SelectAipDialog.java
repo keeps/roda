@@ -7,36 +7,32 @@
  */
 package org.roda.wui.client.common.dialogs;
 
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.common.lists.AIPList;
-import org.roda.wui.client.common.search.SearchFilters;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.ListBuilder;
 
 import com.google.gwt.core.client.GWT;
 
 import config.i18n.client.ClientMessages;
 
-public class SelectAipDialog extends DefaultSelectDialog<IndexedAIP, Void> {
-
+public class SelectAipDialog extends DefaultSelectDialog<IndexedAIP> {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  private static final Filter DEFAULT_FILTER_AIP = SearchFilters.defaultFilter(IndexedAIP.class.getName());
+  private static final String listId = "SelectAipDialog_AIPs";
 
-  private static final Boolean DEFAULT_JUST_ACTIVE = Boolean.TRUE;
-  private static final Boolean SELECTABLE = Boolean.FALSE;
-
-  public SelectAipDialog(String title, boolean hidePreFilters) {
-    this(title, DEFAULT_FILTER_AIP, DEFAULT_JUST_ACTIVE, hidePreFilters);
+  public SelectAipDialog(String title) {
+    super(title, new ListBuilder<>(AIPList::new, new AsyncTableCell.Options<>(IndexedAIP.class, listId)
+      .withSummary(messages.selectAipSearchResults()).withJustActive(true)));
   }
 
-  public SelectAipDialog(String title, Filter filter, boolean justActive, boolean hidePreFilters) {
-    this(title, filter, justActive, hidePreFilters, SELECTABLE);
+  public SelectAipDialog(String title, Filter filter, boolean justActive) {
+    this(title, filter, justActive, true);
   }
 
-  public SelectAipDialog(String title, Filter filter, boolean justActive, boolean hidePreFilters, boolean selectable) {
-    super(title, filter, RodaConstants.AIP_SEARCH,
-      new AIPList("SelectAipDialog_AIPs", filter, justActive, messages.selectAipSearchResults(), selectable),
-      hidePreFilters);
+  public SelectAipDialog(String title, Filter filter, boolean justActive, boolean exportCsvVisible) {
+    super(title, new ListBuilder<>(AIPList::new, new AsyncTableCell.Options<>(IndexedAIP.class, listId)
+      .withSummary(messages.selectAipSearchResults()).withJustActive(justActive).withFilter(filter)));
   }
 }

@@ -14,10 +14,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.wui.client.common.lists.utils.BasicAsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Humanize;
 
@@ -40,7 +39,7 @@ import config.i18n.client.ClientMessages;
  * @author Luis Faria <lfaria@keep.pt>
  *
  */
-public class TransferredResourceList extends BasicAsyncTableCell<TransferredResource> {
+public class TransferredResourceList extends AsyncTableCell<TransferredResource> {
 
   private final ClientLogger logger = new ClientLogger(getClass().getName());
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
@@ -57,33 +56,19 @@ public class TransferredResourceList extends BasicAsyncTableCell<TransferredReso
     RodaConstants.TRANSFERRED_RESOURCE_NAME, RodaConstants.TRANSFERRED_RESOURCE_SIZE,
     RodaConstants.TRANSFERRED_RESOURCE_DATE, RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH);
 
-  public TransferredResourceList(String listId) {
-    this(listId, null, null, false);
+  public TransferredResourceList() {
+    this(false);
   }
 
-  public TransferredResourceList(String listId, Filter filter, String summary, boolean selectable) {
-    super(TransferredResource.class, listId, filter, summary, selectable, fieldsToReturn);
-    this.addParentPath = false;
-  }
-
-  public TransferredResourceList(String listId, Filter filter, String summary, boolean selectable,
-    boolean addParentPath) {
-    super(TransferredResource.class, listId, filter, summary, selectable, fieldsToReturn);
+  public TransferredResourceList(boolean addParentPath) {
+    super();
     this.addParentPath = addParentPath;
   }
 
-  public TransferredResourceList(String listId, Filter filter, String summary, boolean selectable,
-    int initialPageSize, int pageSizeIncrement) {
-    super(TransferredResource.class, listId, filter, summary, selectable, initialPageSize, pageSizeIncrement,
-      fieldsToReturn);
-    this.addParentPath = false;
-  }
 
-  public TransferredResourceList(String listId, Filter filter, String summary, boolean selectable,
-    int initialPageSize, int pageSizeIncrement, boolean addParentPath) {
-    super(TransferredResource.class, listId, filter, summary, selectable, initialPageSize, pageSizeIncrement,
-      fieldsToReturn);
-    this.addParentPath = addParentPath;
+  @Override
+  protected void adjustOptions(Options<TransferredResource> options) {
+    options.withFieldsToReturn(fieldsToReturn);
   }
 
   @Override

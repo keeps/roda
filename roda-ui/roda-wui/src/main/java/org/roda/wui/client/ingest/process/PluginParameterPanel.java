@@ -253,7 +253,7 @@ public class PluginParameterPanel extends Composite {
 
       @Override
       public void onClick(ClickEvent event) {
-        SelectAipDialog selectAipDialog = new SelectAipDialog(parameter.getName(), false);
+        SelectAipDialog selectAipDialog = new SelectAipDialog(parameter.getName());
         selectAipDialog.setSingleSelectionMode();
         selectAipDialog.showAndCenter();
         selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {

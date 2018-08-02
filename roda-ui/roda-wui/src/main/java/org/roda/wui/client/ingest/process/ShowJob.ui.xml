@@ -89,12 +89,7 @@
 								<g:Label addStyleNames="h4" ui:field="reportsLabel">
 									<ui:text from='{messages.jobProcessed}' />
 								</g:Label>
-
-								<commonsearch:SearchPanel ui:field="ingestJobReportsSearchPanel" />
-								<lists:IngestJobReportList addStyleNames="searchResults" ui:field="ingestJobReports" />
-
-								<commonsearch:SearchPanel ui:field="simpleJobReportsSearchPanel" />
-								<lists:SimpleJobReportList addStyleNames="searchResults" ui:field="simpleJobReports" />
+								<commonsearch:SearchWrapper ui:field="searchWrapper" />
 							</g:FlowPanel>
 
 						</g:FlowPanel>

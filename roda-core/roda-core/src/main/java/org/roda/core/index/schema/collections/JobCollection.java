@@ -79,8 +79,6 @@ public class JobCollection extends AbstractSolrCollection<Job, Job> {
     fields.add(new Field(RodaConstants.JOB_OUTCOME_OBJECTS_WITH_MANUAL_INTERVENTION, Field.TYPE_INT));
     fields.add(new Field(RodaConstants.JOB_HAS_FAILURES, Field.TYPE_BOOLEAN).setStored(false));
 
-    fields.add(SolrCollection.getSearchField());
-
     return fields;
   }
 

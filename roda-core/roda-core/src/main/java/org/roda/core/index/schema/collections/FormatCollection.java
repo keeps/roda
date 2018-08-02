@@ -72,7 +72,6 @@ public class FormatCollection extends AbstractSolrCollection<Format, Format> {
     fields.add(new Field(RodaConstants.FORMAT_ALTERNATIVE_DESIGNATIONS, Field.TYPE_STRING).setMultiValued(true));
     fields.add(new Field(RodaConstants.FORMAT_VERSIONS, Field.TYPE_STRING).setMultiValued(true));
 
-    fields.add(SolrCollection.getSearchField());
     fields.add(SolrCollection.getSortFieldOf(RodaConstants.FORMAT_NAME));
 
     return fields;

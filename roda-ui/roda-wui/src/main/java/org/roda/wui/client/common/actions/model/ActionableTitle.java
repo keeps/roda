@@ -5,10 +5,10 @@ import org.roda.wui.client.common.utils.StringUtils;
 /**
  * @author Bruno Ferreira <bferreira@keep.pt>
  */
-public class ActionsTitle {
+public class ActionableTitle {
   private final String title;
 
-  ActionsTitle(String title) {
+  ActionableTitle(String title) {
     this.title = title;
   }
 

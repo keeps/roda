@@ -2,7 +2,8 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
              xmlns:g="urn:import:com.google.gwt.user.client.ui"
-             xmlns:search="urn:import:org.roda.wui.client.search">
+             xmlns:search="urn:import:org.roda.wui.client.search"
+			 xmlns:commonsearch="urn:import:org.roda.wui.client.common.search">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
@@ -14,7 +15,7 @@
 				</g:Label>
 				<g:FlowPanel addStyleNames="page-description" ui:field="userLogDescription">
 				</g:FlowPanel>
-				<search:ActionLogSearch ui:field="logSearch" />
+				<commonsearch:SearchWrapper ui:field="searchWrapper" />
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>

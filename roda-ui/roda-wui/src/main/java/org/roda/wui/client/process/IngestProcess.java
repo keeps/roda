@@ -102,7 +102,7 @@ public class IngestProcess extends Composite {
   private IngestProcess() {
     Filter ingestFilter = new Filter(
       new SimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INGEST.toString()));
-    jobSearch = new JobSearch("IngestProcess_jobs", "IngestProcess_reports", ingestFilter, true);
+    jobSearch = new JobSearch("IngestProcess_jobs", "IngestProcess_reports", ingestFilter, ingestFilter, true);
     initWidget(uiBinder.createAndBindUi(this));
     ingestProcessDescription.add(new HTMLWidgetWrapper("IngestProcessDescription.html"));
   }

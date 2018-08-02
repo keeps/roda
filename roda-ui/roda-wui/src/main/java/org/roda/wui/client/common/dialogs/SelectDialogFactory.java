@@ -28,37 +28,34 @@ import org.roda.core.data.v2.risks.Risk;
 
 public class SelectDialogFactory {
 
-  public <T extends IsIndexed> DefaultSelectDialog getSelectDialog(Class<T> actualClass, String title, Filter filter,
-    boolean selectable) throws NotFoundException {
-    return getSelectDialog(actualClass.getName(), title, filter, selectable);
+  public <T extends IsIndexed> DefaultSelectDialog getSelectDialog(Class<T> actualClass, String title, Filter filter)
+    throws NotFoundException {
+    return getSelectDialog(actualClass.getName(), title, filter);
   }
 
-  public DefaultSelectDialog getSelectDialog(String actualClass, String title, Filter filter, boolean selectable)
+  public DefaultSelectDialog getSelectDialog(String actualClass, String title, Filter filter)
     throws NotFoundException {
     if (actualClass.equals(AIP.class.getName()) || actualClass.equals(IndexedAIP.class.getName())) {
-      boolean justActive = true;
-      return new SelectAipDialog(title, filter, justActive, false, selectable);
+      return new SelectAipDialog(title, filter, true);
     } else if (actualClass.equals(Representation.class.getName())
       || actualClass.equals(IndexedRepresentation.class.getName())) {
-      boolean justActive = true;
-      return new SelectRepresentationDialog(title, filter, justActive, false, selectable);
+      return new SelectRepresentationDialog(title, filter, true);
     } else if (actualClass.equals(File.class.getName()) || actualClass.equals(IndexedFile.class.getName())) {
-      boolean justActive = true;
-      return new SelectFileDialog(title, filter, justActive, false, selectable);
+      return new SelectFileDialog(title, filter, true);
     } else if (actualClass.equals(RepresentationInformation.class.getName())) {
-      return new SelectRepresentationInformationDialog(title, filter, selectable);
+      return new SelectRepresentationInformationDialog(title, filter);
     } else if (actualClass.equals(IndexedRisk.class.getName()) || actualClass.equals(Risk.class.getName())) {
-      return new SelectRiskDialog(title, filter, selectable);
+      return new SelectRiskDialog(title, filter);
     } else if (actualClass.equals(Job.class.getName())) {
-      return new SelectJobDialog(title, filter, selectable);
+      return new SelectJobDialog(title, filter);
     } else if (actualClass.equals(Report.class.getName()) || actualClass.equals(IndexedReport.class.getName())) {
-      return new SelectReportDialog(title, filter, selectable);
+      return new SelectReportDialog(title, filter);
     } else if (actualClass.equals(TransferredResource.class.getName())) {
-      return new SelectTransferResourceDialog(title, filter, selectable);
+      return new SelectTransferResourceDialog(title, filter);
     } else if (actualClass.equals(Notification.class.getName())) {
-      return new SelectNotificationDialog(title, filter, selectable);
+      return new SelectNotificationDialog(title, filter);
     } else if (actualClass.equals(LogEntry.class.getName())) {
-      return new SelectLogEntryDialog(title, filter, selectable);
+      return new SelectLogEntryDialog(title, filter);
     } else {
       throw new NotFoundException();
     }

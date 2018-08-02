@@ -291,7 +291,9 @@ public interface ClientMessages extends Messages {
 
   String someOfAObject(@Select String objectClass);
 
-  String selected(@PluralCount int selectedCount);
+  String oneOfAObject(@Select String objectClass);
+
+  String selected(@PluralCount int selectedCount, String entity);
 
   String inspectTransferredResource();
 
@@ -649,6 +651,8 @@ public interface ClientMessages extends Messages {
   String aipLevelItem();
 
   /************* Search ****************/
+  String searchDropdownLabels(@Select String objectClass);
+
   String searchListBoxItems();
 
   String searchListBoxRepresentations();
@@ -939,13 +943,13 @@ public interface ClientMessages extends Messages {
 
   String editRiskNotFound(String name);
 
-  String riskRemoveFolderConfirmDialogTitle();
+  String riskRemoveConfirmDialogTitle();
 
   String riskRemoveSelectedConfirmDialogMessage(Long size);
 
-  String riskRemoveFolderConfirmDialogCancel();
+  String riskRemoveConfirmDialogCancel();
 
-  String riskRemoveFolderConfirmDialogOk();
+  String riskRemoveConfirmDialogOk();
 
   String riskRemoveSuccessTitle();
 
@@ -962,6 +966,18 @@ public interface ClientMessages extends Messages {
   String editIncidenceNotFound(String incidence);
 
   String editIncidenceFailure(String errorMessage);
+
+  String riskIncidenceRemoveConfirmDialogTitle();
+
+  String riskIncidenceRemoveSelectedConfirmDialogMessage(Long size);
+
+  String riskIncidenceRemoveConfirmDialogCancel();
+
+  String riskIncidenceRemoveConfirmDialogOk();
+
+  String riskIncidenceRemoveSuccessTitle();
+
+  String riskIncidenceRemoveSuccessMessage(Long size);
 
   /************* RepresentationInformation register ****************/
 

@@ -18,7 +18,7 @@ import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.wui.client.browse.BrowseAIP;
+import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
@@ -38,7 +38,7 @@ import config.i18n.client.ClientMessages;
 
 public class BreadcrumbUtils {
 
-  private static ClientMessages messages = (ClientMessages) GWT.create(ClientMessages.class);
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private BreadcrumbUtils() {
     // do nothing
@@ -71,7 +71,7 @@ public class BreadcrumbUtils {
   public static List<BreadcrumbItem> getAipBreadcrumbs(List<IndexedAIP> aipAncestors, IndexedAIP aip, boolean events) {
     List<BreadcrumbItem> breadcrumb = new ArrayList<>();
     breadcrumb
-      .add(new BreadcrumbItem(DescriptionLevelUtils.getTopIconSafeHtml(), "", BrowseAIP.RESOLVER.getHistoryPath()));
+      .add(new BreadcrumbItem(DescriptionLevelUtils.getTopIconSafeHtml(), "", BrowseTop.RESOLVER.getHistoryPath()));
 
     if (aipAncestors != null) {
       for (IndexedAIP ancestor : aipAncestors) {
@@ -119,7 +119,7 @@ public class BreadcrumbUtils {
     IndexedRepresentation representation) {
     List<BreadcrumbItem> breadcrumb = new ArrayList<>();
     breadcrumb
-      .add(new BreadcrumbItem(DescriptionLevelUtils.getTopIconSafeHtml(), "", BrowseAIP.RESOLVER.getHistoryPath()));
+      .add(new BreadcrumbItem(DescriptionLevelUtils.getTopIconSafeHtml(), "", BrowseTop.RESOLVER.getHistoryPath()));
 
     if (aipAncestors != null) {
       for (IndexedAIP ancestor : aipAncestors) {
@@ -127,7 +127,7 @@ public class BreadcrumbUtils {
           SafeHtml breadcrumbLabel = getBreadcrumbLabel(ancestor);
           String breadcrumbTitle = getBreadcrumbTitle(ancestor);
           BreadcrumbItem ancestorBreadcrumb = new BreadcrumbItem(breadcrumbLabel, breadcrumbTitle,
-            ListUtils.concat(BrowseAIP.RESOLVER.getHistoryPath(), ancestor.getId()));
+            ListUtils.concat(BrowseTop.RESOLVER.getHistoryPath(), ancestor.getId()));
           breadcrumb.add(1, ancestorBreadcrumb);
         } else {
           SafeHtml breadcrumbLabel = DescriptionLevelUtils.getElementLevelIconSafeHtml(RodaConstants.AIP_GHOST, false);
@@ -324,11 +324,11 @@ public class BreadcrumbUtils {
   }
 
   private static final List<String> getViewItemEventsHistoryToken(String id) {
-    return ListUtils.concat(BrowseAIP.RESOLVER.getHistoryPath(), PreservationEvents.BROWSE_RESOLVER.getHistoryToken(),
+    return ListUtils.concat(BrowseTop.RESOLVER.getHistoryPath(), PreservationEvents.BROWSE_RESOLVER.getHistoryToken(),
       id);
   }
 
   private static final List<String> getViewItemHistoryToken(String id) {
-    return ListUtils.concat(BrowseAIP.RESOLVER.getHistoryPath(), id);
+    return ListUtils.concat(BrowseTop.RESOLVER.getHistoryPath(), id);
   }
 }
