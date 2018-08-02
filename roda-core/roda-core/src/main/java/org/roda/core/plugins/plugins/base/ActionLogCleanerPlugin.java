@@ -45,7 +45,7 @@ public class ActionLogCleanerPlugin extends AbstractPlugin<Void> {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS, "Delete older than X days",
         PluginParameterType.INTEGER, "90", false, false,
-        "The plugin will delete all the logs before the introduced number of days."));
+        "The plugin will delete all logs older than the specified number of days."));
   }
 
   @Override
@@ -70,7 +70,7 @@ public class ActionLogCleanerPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getDescription() {
-    return "Removes all entries in the activity log that are older than the introduced number of"
+    return "Removes all entries in the activity log that are older than the specified number of"
       + " days. The log is preserved as external physical files, however older entries will not be displayed on the graphical user interface. "
       + "To access older log entries one needs access to the storage layer of the repository server.\nIf log entries were never deleted, it "
       + "would eventually fill the index with rarely used information. Activity log truncation automatically frees index space and improves "
