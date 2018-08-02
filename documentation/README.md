@@ -2,7 +2,7 @@
 
 RODA is a **digital repository solution** that delivers functionality for all the main units of the OAIS reference model. RODA is capable of ingesting, managing and providing access to the various types of digital content produced by large corporations or public bodies. RODA is based on open-source technologies and is supported by existing standards such as the Open Archival Information System (OAIS), Metadata Encoding and Transmission Standard (METS), Encoded Archival Description (EAD), Dublin Core (DC) and PREMIS (Preservation Metadata).
 
-This page links to an assortment of **technical information articles** that will help usuers, developers, translators and implementers to adapt this product to their particular needs.
+This page links to an assortment of **technical information articles** that will help users, developers, translators and implementers to adapt this product to their particular needs.
 
 
 ## Table of contents
