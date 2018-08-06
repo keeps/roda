@@ -18,6 +18,7 @@ public class MimeTypeHelper {
     MIMEMAP.addMimeTypes("text/css css CSS");
     MIMEMAP.addMimeTypes("application/javascript js JS");
     MIMEMAP.addMimeTypes("image/svg+xml svg SVG");
+    MIMEMAP.addMimeTypes("video/mp4 mp4 MP4");
   }
 
   public static String getContentType(String filename) {
