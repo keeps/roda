@@ -28,6 +28,7 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.xml.transform.TransformerException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.roda.core.common.EntityResponse;
@@ -39,6 +40,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.Files;
@@ -77,6 +79,8 @@ public class FilesResource {
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
   public Response listFiles(
+    @ApiParam(value = "The ID of the AIP to retrieve files from (must be used together with Representation id)", defaultValue = "") @QueryParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
+    @ApiParam(value = "The ID of the Representation to retrieve files from (must be used together with AIP id)", defaultValue = "") @QueryParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
     @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam(RodaConstants.API_QUERY_KEY_START) String start,
     @ApiParam(value = "Maximum number of elements to return", defaultValue = RodaConstants.DEFAULT_PAGINATION_STRING_VALUE) @QueryParam(RodaConstants.API_QUERY_KEY_LIMIT) String limit,
     @ApiParam(value = "Choose format in which to get the file", allowableValues = RodaConstants.API_LIST_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
@@ -89,7 +93,14 @@ public class FilesResource {
     // delegate action to controller
     boolean justActive = false;
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
-    IndexResult<IndexedFile> result = Browser.find(IndexedFile.class, Filter.NULL, Sorter.NONE,
+
+    Filter filter = Filter.NULL;
+    if (StringUtils.isNotBlank(aipId) && StringUtils.isNotBlank(representationId)) {
+      filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_AIP_ID, aipId),
+        new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_ID, representationId));
+    }
+
+    IndexResult<IndexedFile> result = Browser.find(IndexedFile.class, filter, Sorter.NONE,
       new Sublist(pagingParams.getFirst(), pagingParams.getSecond()), null, user, justActive, new ArrayList<>());
     return Response.ok(ApiUtils.indexedResultToRODAObjectList(IndexedFile.class, result), mediaType).build();
   }
