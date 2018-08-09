@@ -29,7 +29,6 @@ import com.codahale.metrics.Histogram;
  */
 
 public class IterableIndexResult<T extends IsIndexed> implements CloseableIterable<T> {
-
   private static int PAGE_SIZE = -1;
   private static int RETRIES = -1;
   private static int SLEEP_BETWEEN_RETRIES = -1;
@@ -39,9 +38,7 @@ public class IterableIndexResult<T extends IsIndexed> implements CloseableIterab
   private final IndexResultIterator<T> iterator;
 
   public IterableIndexResult(final SolrClient solrClient, final Class<T> returnClass, final Filter filter,
-    final User user, final boolean justActive, final List<String> fieldsToReturn)
-    throws GenericException, RequestNotValidException {
-
+    final User user, final boolean justActive, final List<String> fieldsToReturn) {
     iterator = new IndexResultIterator<>(solrClient, returnClass, filter, user, justActive, fieldsToReturn);
 
     if (PAGE_SIZE > 0) {
@@ -59,7 +56,6 @@ public class IterableIndexResult<T extends IsIndexed> implements CloseableIterab
     if (HISTOGRAM != null) {
       iterator.setHistogram(HISTOGRAM);
     }
-
   }
 
   @Override

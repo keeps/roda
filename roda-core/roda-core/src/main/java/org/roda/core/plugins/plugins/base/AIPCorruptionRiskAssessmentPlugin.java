@@ -32,6 +32,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
@@ -303,9 +304,11 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
       filter.add(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, representationId));
     }
 
-    if (filePath != null) {
+    if (filePath != null && !filePath.isEmpty()) {
       filter.add(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_FILE_PATH_COMPUTED,
         StringUtils.join(filePath, RodaConstants.RISK_INCIDENCE_FILE_PATH_COMPUTED_SEPARATOR)));
+    } else {
+      filter.add(new EmptyKeyFilterParameter(RodaConstants.RISK_INCIDENCE_FILE_PATH_COMPUTED));
     }
 
     if (fileId != null) {
