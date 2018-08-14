@@ -3,29 +3,34 @@ services:
     zoo1:
         image: zookeeper
         hostname: zoo1
+        restart: unless-stopped
         environment:
             ZOO_MY_ID: 1
             ZOO_SERVERS: server.1=zoo1:2888:3888 server.2=zoo2:2888:3888 server.3=zoo3:2888:3888
     zoo2:
         image: zookeeper
         hostname: zoo2
+        restart: unless-stopped
         environment:
             ZOO_MY_ID: 2
             ZOO_SERVERS: server.1=zoo1:2888:3888 server.2=zoo2:2888:3888 server.3=zoo3:2888:3888
     zoo3:
         image: zookeeper
         hostname: zoo3
+        restart: unless-stopped
         environment:
             ZOO_MY_ID: 3
             ZOO_SERVERS: server.1=zoo1:2888:3888 server.2=zoo2:2888:3888 server.3=zoo3:2888:3888
     solr1:
         image: solr:7
         hostname: solr1
+        restart: unless-stopped
         ports:
           - 8983:8983
         environment:
             SOLR_HOST: solr1
             ZK_HOST: zoo1:2181,zoo2:2181,zoo3:2181
+            SOLR_HEAP: 1g
         depends_on:
             - zoo1
             - zoo2
@@ -33,9 +38,13 @@ services:
     solr2:
         image: solr:7
         hostname: solr2
+        restart: unless-stopped
+        ports:
+          - 8984:8983
         environment:
             SOLR_HOST: solr2
             ZK_HOST: zoo1:2181,zoo2:2181,zoo3:2181
+            SOLR_HEAP: 1g
         depends_on:
             - zoo1
             - zoo2
@@ -43,15 +52,20 @@ services:
     solr3:
         image: solr:7
         hostname: solr3
+        restart: unless-stopped
+        ports:
+          - 8985:8983
         environment:
             SOLR_HOST: solr3
             ZK_HOST: zoo1:2181,zoo2:2181,zoo3:2181
+            SOLR_HEAP: 1g
         depends_on:
             - zoo1
             - zoo2
             - zoo3
     roda:
       image: keeps/roda:latest
+      restart: unless-stopped
       ports:
         - 8080:8080
         - 5005:5005 # remote debug

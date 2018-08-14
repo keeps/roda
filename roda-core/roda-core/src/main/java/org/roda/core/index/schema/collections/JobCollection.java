@@ -64,13 +64,13 @@ public class JobCollection extends AbstractSolrCollection<Job, Job> {
     fields.add(new Field(RodaConstants.JOB_START_DATE, Field.TYPE_DATE));
     fields.add(new Field(RodaConstants.JOB_END_DATE, Field.TYPE_DATE));
     fields.add(new Field(RodaConstants.JOB_STATE, Field.TYPE_STRING));
-    fields.add(new Field(RodaConstants.JOB_STATE_DETAILS, Field.TYPE_STRING).setIndexed(false));
+    fields.add(new Field(RodaConstants.JOB_STATE_DETAILS, Field.TYPE_STRING).setIndexed(false).setDocValues(false));
     fields.add(new Field(RodaConstants.JOB_COMPLETION_PERCENTAGE, Field.TYPE_INT));
     fields.add(new Field(RodaConstants.JOB_PLUGIN, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.JOB_PLUGIN_TYPE, Field.TYPE_STRING));
-    fields.add(new Field(RodaConstants.JOB_PLUGIN_PARAMETERS, Field.TYPE_STRING).setIndexed(false));
-    fields.add(new Field(RodaConstants.JOB_SOURCE_OBJECTS, Field.TYPE_STRING).setIndexed(false));
-    fields.add(new Field(RodaConstants.JOB_OUTCOME_OBJECTS_CLASS, Field.TYPE_STRING).setIndexed(false));
+    fields.add(new Field(RodaConstants.JOB_PLUGIN_PARAMETERS, Field.TYPE_STRING).setIndexed(false).setDocValues(false));
+    fields.add(new Field(RodaConstants.JOB_SOURCE_OBJECTS, Field.TYPE_STRING).setIndexed(false).setDocValues(false));
+    fields.add(new Field(RodaConstants.JOB_OUTCOME_OBJECTS_CLASS, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.JOB_SOURCE_OBJECTS_COUNT, Field.TYPE_INT));
     fields.add(new Field(RodaConstants.JOB_SOURCE_OBJECTS_WAITING_TO_BE_PROCESSED, Field.TYPE_INT));
     fields.add(new Field(RodaConstants.JOB_SOURCE_OBJECTS_BEING_PROCESSED, Field.TYPE_INT));
