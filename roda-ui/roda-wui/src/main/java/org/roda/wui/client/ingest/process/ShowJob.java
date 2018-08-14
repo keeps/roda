@@ -22,7 +22,6 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
-import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsAll;
@@ -114,38 +113,37 @@ public class ShowJob extends Composite {
         ShowJobReport.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else if (historyTokens.size() >= 1) {
         String jobId = historyTokens.get(0);
-        BrowserService.Util.getInstance().retrieveJobBundle(jobId, new ArrayList<>(),
-          new AsyncCallback<JobBundle>() {
+        BrowserService.Util.getInstance().retrieveJobBundle(jobId, new ArrayList<>(), new AsyncCallback<JobBundle>() {
 
-            @Override
-            public void onFailure(Throwable caught) {
-              if (caught instanceof NotFoundException) {
-                Toast.showError(messages.notFoundError(), messages.jobNotFound());
-                HistoryUtils.newHistory(Process.RESOLVER);
-              } else {
-                AsyncCallbackUtils.defaultFailureTreatment(caught);
-              }
+          @Override
+          public void onFailure(Throwable caught) {
+            if (caught instanceof NotFoundException) {
+              Toast.showError(messages.notFoundError(), messages.jobNotFound());
+              HistoryUtils.newHistory(Process.RESOLVER);
+            } else {
+              AsyncCallbackUtils.defaultFailureTreatment(caught);
+            }
+          }
+
+          @Override
+          public void onSuccess(JobBundle jobBundle) {
+            Map<String, PluginInfo> pluginsInfo = new HashMap<>();
+            for (PluginInfo pluginInfo : jobBundle.getPluginsInfo()) {
+              pluginsInfo.put(pluginInfo.getId(), pluginInfo);
             }
 
-            @Override
-            public void onSuccess(JobBundle jobBundle) {
-              Map<String, PluginInfo> pluginsInfo = new HashMap<>();
-              for (PluginInfo pluginInfo : jobBundle.getPluginsInfo()) {
-                pluginsInfo.put(pluginInfo.getId(), pluginInfo);
-              }
-
-              List<FilterParameter> reportFilterParameters = new ArrayList<>();
-              for (int i = 1; i < historyTokens.size() - 1; i += 2) {
-                String key = historyTokens.get(i);
-                String value = historyTokens.get(i + 1);
-                reportFilterParameters.add(new SimpleFilterParameter(key, value));
-              }
-
-              ShowJob showJob = new ShowJob(jobBundle.getJob(), pluginsInfo, reportFilterParameters);
-              callback.onSuccess(showJob);
+            List<FilterParameter> reportFilterParameters = new ArrayList<>();
+            for (int i = 1; i < historyTokens.size() - 1; i += 2) {
+              String key = historyTokens.get(i);
+              String value = historyTokens.get(i + 1);
+              reportFilterParameters.add(new SimpleFilterParameter(key, value));
             }
 
-          });
+            ShowJob showJob = new ShowJob(jobBundle.getJob(), pluginsInfo, reportFilterParameters);
+            callback.onSuccess(showJob);
+          }
+
+        });
       } else {
         HistoryUtils.newHistory(Process.RESOLVER);
         callback.onSuccess(null);
@@ -413,44 +411,34 @@ public class ShowJob extends Composite {
         selectedListPanel.add(noSourceLabel);
       } else if (selected instanceof SelectedItemsList) {
         List<String> ids = ((SelectedItemsList<?>) selected).getIds();
-        final Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, ids));
-        BrowserService.Util.getInstance().count(selected.getSelectedClass(), filter, true, new AsyncCallback<Long>() {
-          @Override
-          public void onFailure(Throwable caught) {
-            Label noSourceLabel = new Label(messages.noItemsToDisplay());
-            selectedListPanel.add(noSourceLabel);
-          }
+        final Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.INDEX_UUID, job.getUUID()));
+        InlineHTML filterHTML = new InlineHTML(
+          messages.sourceObjectList(ids.size(), messages.someOfAObject(selected.getSelectedClass())));
+        selectedList.add(filterHTML);
 
+        Button button = new Button(messages.downloadButton());
+        button.addStyleName("btn btn-separator-left btn-link");
+        button.addClickHandler(new ClickHandler() {
           @Override
-          public void onSuccess(Long result) {
-            InlineHTML filterHTML = new InlineHTML(
-              messages.sourceObjectList(result, messages.someOfAObject(selected.getSelectedClass())));
-            selectedList.add(filterHTML);
+          public void onClick(ClickEvent event) {
+            BrowserService.Util.getInstance().getExportLimit(new AsyncCallback<Integer>() {
 
-            Button button = new Button(messages.downloadButton());
-            button.addStyleName("btn btn-separator-left btn-link");
-            button.addClickHandler(new ClickHandler() {
               @Override
-              public void onClick(ClickEvent event) {
-                BrowserService.Util.getInstance().getExportLimit(new AsyncCallback<Integer>() {
+              public void onFailure(Throwable caught) {
+                AsyncCallbackUtils.defaultFailureTreatment(caught);
+              }
 
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    AsyncCallbackUtils.defaultFailureTreatment(caught);
-                  }
-
-                  @Override
-                  public void onSuccess(Integer result) {
-                    Toast.showInfo(messages.exportListTitle(), messages.exportListMessage(result));
-                    RestUtils.requestCSVExport(selected.getSelectedClass(), filter, Sorter.NONE,
-                      new Sublist(0, result.intValue()), Facets.NONE, true, false, "source_objects.csv");
-                  }
-                });
+              @Override
+              public void onSuccess(Integer result) {
+                Toast.showInfo(messages.exportListTitle(), messages.exportListMessage(result));
+                RestUtils.requestCSVExport(Job.class.getName(), filter, Sorter.NONE, new Sublist(0, result),
+                  Facets.NONE, true, false, "job.csv");
               }
             });
-            selectedList.add(button);
           }
         });
+
+        selectedList.add(button);
       } else if (selected instanceof SelectedItemsFilter) {
         Filter filter = ((SelectedItemsFilter<?>) selected).getFilter();
         HTML filterHTML = new HTML(SearchPreFilterUtils.getFilterHTML(filter, selected.getSelectedClass()));
@@ -476,44 +464,34 @@ public class ShowJob extends Composite {
           Label noSourceLabel = new Label(messages.noItemsToDisplay());
           selectedListPanel.add(noSourceLabel);
         } else {
-          final Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, ids));
-          BrowserService.Util.getInstance().count(selected.getSelectedClass(), filter, true, new AsyncCallback<Long>() {
-            @Override
-            public void onFailure(Throwable caught) {
-              Label noSourceLabel = new Label(messages.noItemsToDisplay());
-              selectedListPanel.add(noSourceLabel);
-            }
+          final Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.INDEX_UUID, job.getUUID()));
+          InlineHTML filterHTML = new InlineHTML(
+            messages.sourceObjectList(ids.size(), messages.someOfAObject(selected.getSelectedClass())));
+          selectedList.add(filterHTML);
 
+          Button button = new Button(messages.downloadButton());
+          button.addStyleName("btn btn-separator-left btn-link");
+          button.addClickHandler(new ClickHandler() {
             @Override
-            public void onSuccess(Long result) {
-              InlineHTML filterHTML = new InlineHTML(
-                messages.sourceObjectList(result, messages.someOfAObject(selected.getSelectedClass())));
-              selectedList.add(filterHTML);
+            public void onClick(ClickEvent event) {
+              BrowserService.Util.getInstance().getExportLimit(new AsyncCallback<Integer>() {
 
-              Button button = new Button(messages.downloadButton());
-              button.addStyleName("btn btn-separator-left btn-link");
-              button.addClickHandler(new ClickHandler() {
                 @Override
-                public void onClick(ClickEvent event) {
-                  BrowserService.Util.getInstance().getExportLimit(new AsyncCallback<Integer>() {
+                public void onFailure(Throwable caught) {
+                  AsyncCallbackUtils.defaultFailureTreatment(caught);
+                }
 
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      AsyncCallbackUtils.defaultFailureTreatment(caught);
-                    }
-
-                    @Override
-                    public void onSuccess(Integer result) {
-                      Toast.showInfo(messages.exportListTitle(), messages.exportListMessage(result));
-                      RestUtils.requestCSVExport(selected.getSelectedClass(), filter, Sorter.NONE,
-                        new Sublist(0, result.intValue()), Facets.NONE, true, false, "source_objects.csv");
-                    }
-                  });
+                @Override
+                public void onSuccess(Integer result) {
+                  Toast.showInfo(messages.exportListTitle(), messages.exportListMessage(result));
+                  RestUtils.requestCSVExport(Job.class.getName(), filter, Sorter.NONE, new Sublist(0, result),
+                    Facets.NONE, true, false, "job.csv");
                 }
               });
-              selectedList.add(button);
             }
           });
+
+          selectedList.add(button);
         }
       } else if (selected instanceof SelectedItemsFilter) {
         Filter filter = ((SelectedItemsFilter<?>) selected).getFilter();
