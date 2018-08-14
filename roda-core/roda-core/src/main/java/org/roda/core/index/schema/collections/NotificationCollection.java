@@ -63,7 +63,7 @@ public class NotificationCollection extends AbstractSolrCollection<Notification,
     fields.add(new Field(RodaConstants.NOTIFICATION_ACKNOWLEDGE_TOKEN, Field.TYPE_STRING).setRequired(true));
     fields.add(new Field(RodaConstants.NOTIFICATION_IS_ACKNOWLEDGED, Field.TYPE_BOOLEAN).setRequired(true));
     fields.add(new Field(RodaConstants.NOTIFICATION_STATE, Field.TYPE_STRING).setRequired(true));
-    fields.add(new Field(RodaConstants.NOTIFICATION_ACKNOWLEDGED_USERS, Field.TYPE_STRING).setIndexed(false));
+    fields.add(new Field(RodaConstants.NOTIFICATION_ACKNOWLEDGED_USERS, Field.TYPE_STRING).setIndexed(false).setDocValues(false));
 
     fields.add(SolrCollection.getSearchField());
 

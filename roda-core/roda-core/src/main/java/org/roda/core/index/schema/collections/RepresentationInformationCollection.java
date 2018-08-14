@@ -67,7 +67,7 @@ public class RepresentationInformationCollection
     fields.add(new Field(RodaConstants.REPRESENTATION_INFORMATION_EXTRAS, Field.TYPE_TEXT).setMultiValued(false));
 
     fields.add(new Field(RodaConstants.REPRESENTATION_INFORMATION_SUPPORT, Field.TYPE_STRING));
-    fields.add(new Field(RodaConstants.REPRESENTATION_INFORMATION_RELATIONS, Field.TYPE_STRING).setIndexed(false));
+    fields.add(new Field(RodaConstants.REPRESENTATION_INFORMATION_RELATIONS, Field.TYPE_STRING).setIndexed(false).setDocValues(false));
     fields.add(new Field(RodaConstants.REPRESENTATION_INFORMATION_RELATIONS_WITH_RI, Field.TYPE_STRING).setStored(false)
       .setMultiValued(true));
     fields.add(new Field(RodaConstants.REPRESENTATION_INFORMATION_FILTERS, Field.TYPE_STRING).setMultiValued(true));

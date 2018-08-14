@@ -76,9 +76,9 @@ public class JobReportCollection extends AbstractSolrCollection<IndexedReport, R
     fields.add(new Field(RodaConstants.JOB_REPORT_PLUGIN_NAME, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.JOB_REPORT_PLUGIN_VERSION, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.JOB_REPORT_PLUGIN_STATE, Field.TYPE_STRING));
-    fields.add(new Field(RodaConstants.JOB_REPORT_PLUGIN_DETAILS, Field.TYPE_STRING).setIndexed(false));
-    fields.add(new Field(RodaConstants.JOB_REPORT_HTML_PLUGIN_DETAILS, Field.TYPE_BOOLEAN).setIndexed(false));
-    fields.add(new Field(RodaConstants.JOB_REPORT_REPORTS, Field.TYPE_STRING).setIndexed(false));
+    fields.add(new Field(RodaConstants.JOB_REPORT_PLUGIN_DETAILS, Field.TYPE_STRING).setIndexed(false).setDocValues(false));
+    fields.add(new Field(RodaConstants.JOB_REPORT_HTML_PLUGIN_DETAILS, Field.TYPE_BOOLEAN).setIndexed(false).setDocValues(false));
+    fields.add(new Field(RodaConstants.JOB_REPORT_REPORTS, Field.TYPE_STRING).setIndexed(false).setDocValues(false));
     fields.add(new Field(RodaConstants.JOB_REPORT_JOB_NAME, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.JOB_REPORT_SOURCE_OBJECT_LABEL, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_LABEL, Field.TYPE_STRING));
