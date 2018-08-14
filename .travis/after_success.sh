@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -ex
+set -x
 
 # code coverage
 # bash <(curl -s https://codecov.io/bash)

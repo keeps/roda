@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -ex
+set -x
 
 # install dependencies
 curl https://bintray.com/user/downloadSubjectPublicKey?username=bintray | sudo apt-key add -
