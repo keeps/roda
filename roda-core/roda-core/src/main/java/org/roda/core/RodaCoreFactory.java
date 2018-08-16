@@ -221,9 +221,10 @@ public class RodaCoreFactory {
     Arrays.asList("roda-core.properties", "roda-roles.properties"));
 
   /**
-   * Shared configuration and message properties (cache). Includes properties from
-   * {@code rodaConfiguration} and translations from ServerMessages, filtered by
-   * the {@code ui.sharedProperties.*} properties in {@code roda-wui.properties}.
+   * Shared configuration and message properties (cache). Includes properties
+   * from {@code rodaConfiguration} and translations from ServerMessages,
+   * filtered by the {@code ui.sharedProperties.*} properties in
+   * {@code roda-wui.properties}.
    *
    * This cache provides the complete set of properties to be shared with the
    * client browser.
@@ -914,12 +915,16 @@ public class RodaCoreFactory {
       Optional<String> zkChroot;
 
       // parse config
-      String[] split = solrCloudZooKeeperUrls.split("/");
-      if (split.length == 1 || split.length == 2) {
-        zkHosts = Arrays.asList(split[0].split(","));
-        zkChroot = split.length > 1 && StringUtils.isNotBlank(split[1]) ? Optional.of(split[1]) : Optional.empty();
+      int indexOfSlash = solrCloudZooKeeperUrls.indexOf('/');
+
+      if (indexOfSlash > 0) {
+        // has chroot
+        zkHosts = Arrays.asList(solrCloudZooKeeperUrls.substring(0, indexOfSlash).split(","));
+        zkChroot = Optional.of(solrCloudZooKeeperUrls.substring(indexOfSlash));
       } else {
-        throw new GenericException("Bad solrCloudZooKeeperUrls configuration: " + solrCloudZooKeeperUrls);
+        // does not have chroot
+        zkHosts = Arrays.asList(solrCloudZooKeeperUrls.split(","));
+        zkChroot = Optional.empty();
       }
 
       CloudSolrClient cloudSolrClient = new CloudSolrClient.Builder(zkHosts, zkChroot).build();
@@ -1743,7 +1748,8 @@ public class RodaCoreFactory {
    * {@code rodaConfiguration}.
    *
    * The properties that should be shared with the client browser are defined by
-   * the {@code ui.sharedProperties.*} properties in {@code roda-wui.properties}.
+   * the {@code ui.sharedProperties.*} properties in
+   * {@code roda-wui.properties}.
    *
    * @return The configuration properties that should be shared with the client
    *         browser.
