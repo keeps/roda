@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>roda-core</artifactId>
@@ -247,6 +248,13 @@
 				<exclusion>
 					<groupId>org.apache.hadoop</groupId>
 					<artifactId>hadoop-common</artifactId>
+				</exclusion>
+				<!-- 20180820 hsilva: when updating solr to 7.4, this dependency is introduced 
+					&, depending on the class loading order of things, might lead slf4j to try 
+					to use the log4j binding (instead of logback binding) -->
+				<exclusion>
+					<groupId>org.apache.logging.log4j</groupId>
+					<artifactId>log4j-slf4j-impl</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
