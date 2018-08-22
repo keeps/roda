@@ -81,7 +81,9 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
   public void onReceive(Object msg) throws Exception {
     super.setup(msg);
     if (msg instanceof Messages.JobStateUpdated) {
-      handleJobStateUpdated(msg);
+      handleJobStateUpdated((Messages.JobStateUpdated) msg);
+    } else if (msg instanceof Messages.JobStateDetailsUpdated) {
+      handleJobStateDetailsUpdated((Messages.JobStateDetailsUpdated) msg);
     } else if (msg instanceof Messages.JobSourceObjectsUpdated) {
       handleJobSourceObjectsUpdated(msg);
     } else if (msg instanceof Messages.JobInfoUpdated) {
@@ -108,8 +110,7 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
     }
   }
 
-  private void handleJobStateUpdated(Object msg) {
-    Messages.JobStateUpdated message = (Messages.JobStateUpdated) msg;
+  private void handleJobStateUpdated(Messages.JobStateUpdated message) {
     markMessageProcessingAsStarted(message);
     Plugin<?> p = message.getPlugin() == null ? this.plugin : message.getPlugin();
     try {
@@ -128,6 +129,13 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
       JobsHelper.deleteJobWorkingDirectory(jobId);
       getContext().stop(getSelf());
     }
+    markMessageProcessingAsEnded(message);
+  }
+
+  private void handleJobStateDetailsUpdated(Messages.JobStateDetailsUpdated message) {
+    markMessageProcessingAsStarted(message);
+    Plugin<?> p = message.getPlugin() == null ? this.plugin : message.getPlugin();
+    JobsHelper.updateJobStateDetails(p, getModel(), message.getStateDatails());
     markMessageProcessingAsEnded(message);
   }
 
@@ -237,9 +245,18 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
   private void handleExecuteIsDone(Object msg) {
     Messages.PluginExecuteIsDone message = (Messages.PluginExecuteIsDone) msg;
     markMessageProcessingAsStarted(message);
-    jobInfo.setDone(message.getPlugin());
+    jobInfo.setDone(message.getPlugin(), message.isWithError());
+
+    if (message.isWithError()) {
+      getSelf().tell(new Messages.JobStateDetailsUpdated(plugin, Optional.of(message.getErrorMessage())), getSelf());
+    }
+
     if (jobInfo.isDone() && jobInfo.isInitEnded()) {
-      workersRouter.tell(new Messages.PluginAfterAllExecuteIsReady(plugin), getSelf());
+      if (jobInfo.atLeastOneErrorOccurred()) {
+        getSelf().tell(new Messages.JobStateUpdated(plugin, JOB_STATE.FAILED_TO_COMPLETE), getSelf());
+      } else {
+        workersRouter.tell(new Messages.PluginAfterAllExecuteIsReady(plugin), getSelf());
+      }
     }
     markMessageProcessingAsEnded(message);
   }

@@ -299,34 +299,24 @@ public class Messages {
     }
   }
 
-  public static final class JobStateUpdated extends JobPartialUpdate {
+  public static class JobStateDetailsUpdated extends JobPartialUpdate {
     private static final long serialVersionUID = 1946036502369851214L;
 
     private Plugin<?> plugin;
-    private JOB_STATE state;
     private SerializableOptional<String> stateDatails;
 
-    public JobStateUpdated(Plugin<?> plugin, JOB_STATE state) {
-      this(plugin, state, Optional.empty());
-    }
-
-    public JobStateUpdated(Plugin<?> plugin, JOB_STATE state, Optional<String> stateDatails) {
+    public JobStateDetailsUpdated(Plugin<?> plugin, Optional<String> stateDatails) {
       super();
       this.plugin = plugin;
-      this.state = state;
       this.stateDatails = SerializableOptional.setOptional(stateDatails);
     }
 
-    public JobStateUpdated(Plugin<?> plugin, JOB_STATE state, Throwable throwable) {
-      this(plugin, state, Optional.of(throwable.getClass().getName() + ": " + throwable.getMessage()));
+    public JobStateDetailsUpdated(Plugin<?> plugin, Throwable throwable) {
+      this(plugin, Optional.of(throwable.getClass().getName() + ": " + throwable.getMessage()));
     }
 
     public Plugin<?> getPlugin() {
       return plugin;
-    }
-
-    public JOB_STATE getState() {
-      return state;
     }
 
     public Optional<String> getStateDatails() {
@@ -335,7 +325,36 @@ public class Messages {
 
     @Override
     public String toString() {
-      return "JobStateUpdated [plugin=" + plugin + ", state=" + state + ", stateDatails=" + stateDatails + "]";
+      return "JobStateDetailsUpdated [plugin=" + plugin + ", stateDatails=" + stateDatails + "]";
+    }
+  }
+
+  public static final class JobStateUpdated extends JobStateDetailsUpdated {
+    private static final long serialVersionUID = 1946036502369851214L;
+
+    private JOB_STATE state;
+
+    public JobStateUpdated(Plugin<?> plugin, JOB_STATE state) {
+      this(plugin, state, Optional.empty());
+    }
+
+    public JobStateUpdated(Plugin<?> plugin, JOB_STATE state, Optional<String> stateDatails) {
+      super(plugin, stateDatails);
+      this.state = state;
+    }
+
+    public JobStateUpdated(Plugin<?> plugin, JOB_STATE state, Throwable throwable) {
+      this(plugin, state, Optional.of(throwable.getClass().getName() + ": " + throwable.getMessage()));
+    }
+
+    public JOB_STATE getState() {
+      return state;
+    }
+
+    @Override
+    public String toString() {
+      return "JobStateUpdated [plugin=" + getPlugin() + ", state=" + state + ", stateDatails=" + getStateDatails()
+        + "]";
     }
   }
 
@@ -405,11 +424,19 @@ public class Messages {
 
     private Plugin<?> plugin;
     private boolean withError;
+    private String errorMessage = "";
 
     public PluginMethodIsDone(Plugin<?> plugin, boolean withError) {
       super();
       this.plugin = plugin;
       this.withError = withError;
+    }
+
+    public PluginMethodIsDone(Plugin<?> plugin, boolean withError, String errorMessage) {
+      super();
+      this.plugin = plugin;
+      this.withError = withError;
+      this.errorMessage = errorMessage;
     }
 
     public Plugin<?> getPlugin() {
@@ -420,9 +447,14 @@ public class Messages {
       return withError;
     }
 
+    public String getErrorMessage() {
+      return errorMessage;
+    }
+
     @Override
     public String toString() {
-      return "PluginMethodIsDone [plugin=" + plugin + ", withError=" + withError + "]";
+      return "PluginMethodIsDone [plugin=" + plugin + ", withError=" + withError + ", errorMessage=" + errorMessage
+        + "]";
     }
   }
 
@@ -485,9 +517,14 @@ public class Messages {
       super(plugin, withError);
     }
 
+    public PluginExecuteIsDone(Plugin<?> plugin, boolean withError, String errorMessage) {
+      super(plugin, withError, errorMessage);
+    }
+
     @Override
     public String toString() {
-      return "PluginExecuteIsDone [getPlugin()=" + getPlugin() + ", isWithError()=" + isWithError() + "]";
+      return "PluginExecuteIsDone [getPlugin()=" + getPlugin() + ", isWithError()=" + isWithError()
+        + ", getErrorMessage()=" + getErrorMessage() + "]";
     }
   }
 

@@ -58,9 +58,20 @@ public class AkkaWorkerActor extends AkkaBaseActor {
       // linking errors that only will happen during the execution (e.g.
       // java.lang.NoSuchMethodError)
       LOGGER.error("Error executing plugin.execute()", e);
-      getSender().tell(new Messages.PluginExecuteIsDone(messagePlugin, true), getSelf());
+      getSender().tell(new Messages.PluginExecuteIsDone(messagePlugin, true, getErrorMessage(e)), getSelf());
     }
     message.logProcessingEnded();
+  }
+
+  private String getErrorMessage(Throwable e) {
+    StringBuilder ret = new StringBuilder();
+    ret.append("An exception has occurred. Exception '").append(e.getClass().getName()).append("' with message '")
+      .append(e.getMessage()).append("'");
+    if (e.getCause() != null) {
+      ret.append(" [inner exception '").append(e.getCause().getClass().getName()).append("' with message '")
+        .append(e.getCause().getMessage()).append("']");
+    }
+    return ret.toString();
   }
 
   private void handlePluginAfterAllExecuteIsReady(Object msg) {

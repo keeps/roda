@@ -65,6 +65,8 @@ public final class JobsHelper {
   private static final int DEFAULT_SYNC_TIMEOUT = 600;
   private static final String MAX_JOBS_IN_PARALLEL_PROPERTY = "core.orchestrator.max_jobs_in_parallel";
 
+  private static final String LINE_SEPARATOR = System.lineSeparator();
+
   private JobsHelper() {
     // do nothing
   }
@@ -104,16 +106,20 @@ public final class JobsHelper {
   public static <T extends IsRODAObject> void updateJobState(Plugin<T> plugin, ModelService model, JOB_STATE state,
     Optional<String> stateDetails) {
     try {
-      Job job = PluginHelper.getJob(plugin, model);
-      job.setState(state);
+      Job jobFromModel = PluginHelper.getJob(plugin, model);
+      jobFromModel.setState(state);
       if (stateDetails.isPresent()) {
-        job.setStateDetails(stateDetails.get());
+        if ("".equals(jobFromModel.getStateDetails())) {
+          jobFromModel.setStateDetails(stateDetails.get());
+        } else {
+          jobFromModel.setStateDetails(jobFromModel.getStateDetails() + LINE_SEPARATOR + stateDetails.get());
+        }
       }
-      if (job.isInFinalState()) {
-        job.setEndDate(new Date());
+      if (jobFromModel.isInFinalState()) {
+        jobFromModel.setEndDate(new Date());
       }
 
-      model.createOrUpdateJob(job);
+      model.createOrUpdateJob(jobFromModel);
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
       LOGGER.error("Unable to get or update Job from model", e);
     }
@@ -124,10 +130,32 @@ public final class JobsHelper {
       Job jobFromModel = PluginHelper.getJob(job.getId(), model);
       jobFromModel.setState(state);
       if (stateDetails.isPresent()) {
-        jobFromModel.setStateDetails(stateDetails.get());
+        if ("".equals(job.getStateDetails())) {
+          jobFromModel.setStateDetails(stateDetails.get());
+        } else {
+          jobFromModel.setStateDetails(job.getStateDetails() + LINE_SEPARATOR + stateDetails.get());
+        }
       }
       if (jobFromModel.isInFinalState()) {
         jobFromModel.setEndDate(new Date());
+      }
+
+      model.createOrUpdateJob(jobFromModel);
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      LOGGER.error("Unable to get or update Job from model", e);
+    }
+  }
+
+  public static <T extends IsRODAObject> void updateJobStateDetails(Plugin<T> plugin, ModelService model,
+    Optional<String> stateDetails) {
+    try {
+      Job jobFromModel = PluginHelper.getJob(plugin, model);
+      if (stateDetails.isPresent()) {
+        if ("".equals(jobFromModel.getStateDetails())) {
+          jobFromModel.setStateDetails(stateDetails.get());
+        } else {
+          jobFromModel.setStateDetails(jobFromModel.getStateDetails() + LINE_SEPARATOR + stateDetails.get());
+        }
       }
 
       model.createOrUpdateJob(jobFromModel);

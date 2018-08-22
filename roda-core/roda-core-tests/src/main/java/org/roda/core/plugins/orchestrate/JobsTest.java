@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
 import org.roda.core.data.common.RodaConstants;
@@ -28,12 +29,14 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
+import org.roda.core.data.v2.jobs.JobStats;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.DummyPlugin;
+import org.roda.core.plugins.plugins.PluginThatFailsDuringExecuteMethod;
 import org.roda.core.plugins.plugins.PluginThatFailsDuringInit;
 import org.roda.core.plugins.plugins.PluginThatFailsDuringXMethod;
 import org.roda.core.plugins.plugins.PluginThatStopsItself;
@@ -109,7 +112,64 @@ public class JobsTest {
     Map<String, String> parameters = new HashMap<>();
     parameters.put(PluginThatFailsDuringXMethod.ON_EXECUTE, "");
     TestsHelper.executeJob(PluginThatFailsDuringXMethod.class, parameters, PluginType.MISC, SelectedItemsNone.create(),
-      JOB_STATE.COMPLETED);
+      JOB_STATE.FAILED_TO_COMPLETE);
+  }
+
+  @Test
+  public void testJobExecutingPluginThatFailsDuringExecuteInParallel() throws RequestNotValidException,
+    GenericException, NotFoundException, AuthorizationDeniedException, AlreadyExistsException {
+    JobsHelper.setBlockSize(1);
+
+    ModelService modelService = RodaCoreFactory.getModelService();
+    String aip1 = modelService.createAIP(null, "misc", new Permissions(), RodaConstants.ADMIN).getId();
+    String aip2 = modelService.createAIP(null, "misc", new Permissions(), RodaConstants.ADMIN).getId();
+
+    Map<String, String> parameters = new HashMap<>();
+    Job job;
+    JobStats jobStats;
+
+    // 1) don't fail at all
+    parameters.put(aip1, "false");
+    parameters.put(aip2, "false");
+    job = TestsHelper.executeJob(PluginThatFailsDuringExecuteMethod.class, parameters, PluginType.MISC,
+      SelectedItemsList.create(AIP.class, aip1, aip2), JOB_STATE.COMPLETED);
+    Assert.assertNotNull(job.getStateDetails());
+    Assert.assertEquals(job.getStateDetails(), "");
+    jobStats = job.getJobStats();
+    assertJobStats(jobStats, 100, 0, 2, 0, 2, 0);
+
+    // 2) fail in one (order doesn't matter as orchestration is asynchronous)
+    parameters.put(aip1, "false");
+    parameters.put(aip2, "true");
+    job = TestsHelper.executeJob(PluginThatFailsDuringExecuteMethod.class, parameters, PluginType.MISC,
+      SelectedItemsList.create(AIP.class, aip1, aip2), JOB_STATE.FAILED_TO_COMPLETE);
+    Assert.assertNotNull(job.getStateDetails());
+    Assert.assertTrue(StringUtils.containsIgnoreCase(job.getStateDetails(), "exception"));
+    jobStats = job.getJobStats();
+    assertJobStats(jobStats, 100, 0, 2, 1, 1, 0);
+
+    // 3) fail in both
+    parameters.put(aip1, "true");
+    parameters.put(aip2, "true");
+    job = TestsHelper.executeJob(PluginThatFailsDuringExecuteMethod.class, parameters, PluginType.MISC,
+      SelectedItemsList.create(AIP.class, aip1, aip2), JOB_STATE.FAILED_TO_COMPLETE);
+    Assert.assertNotNull(job.getStateDetails());
+    Assert.assertTrue(StringUtils.containsIgnoreCase(job.getStateDetails(), "exception"));
+    jobStats = job.getJobStats();
+    assertJobStats(jobStats, 100, 0, 2, 2, 0, 0);
+  }
+
+  private void assertJobStats(JobStats jobStats, int expectedCompletionPercentage,
+    int expectedSourceObjectsBeingProcessed, int expectedSourceObjectsCount,
+    int expectedSourceObjectsProcessedWithFailure, int expectedSourceObjectsProcessedWithSuccess,
+    int expectedSourceObjectsWaitingToBeProcessed) {
+
+    Assert.assertEquals(jobStats.getSourceObjectsCount(), expectedSourceObjectsCount);
+    Assert.assertEquals(jobStats.getSourceObjectsProcessedWithSuccess(), expectedSourceObjectsProcessedWithSuccess);
+    Assert.assertEquals(jobStats.getSourceObjectsProcessedWithFailure(), expectedSourceObjectsProcessedWithFailure);
+    Assert.assertEquals(jobStats.getSourceObjectsBeingProcessed(), expectedSourceObjectsBeingProcessed);
+    Assert.assertEquals(jobStats.getSourceObjectsWaitingToBeProcessed(), expectedSourceObjectsWaitingToBeProcessed);
+    Assert.assertEquals(jobStats.getCompletionPercentage(), expectedCompletionPercentage);
   }
 
   @Test

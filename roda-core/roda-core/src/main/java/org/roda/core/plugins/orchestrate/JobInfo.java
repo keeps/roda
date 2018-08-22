@@ -26,6 +26,7 @@ public class JobInfo implements Serializable {
   private int objectsCount;
   private boolean initEnded;
   private boolean done;
+  private boolean atLeastOneErrorOccurred;
 
   public JobInfo() {
     mappingNumber = 1;
@@ -35,6 +36,7 @@ public class JobInfo implements Serializable {
     objectsCount = 0;
     initEnded = false;
     done = false;
+    atLeastOneErrorOccurred = false;
   }
 
   public Map<Integer, JobPluginInfo> getJobInfo() {
@@ -91,10 +93,15 @@ public class JobInfo implements Serializable {
     pluginsDone.put(getId(innerPlugin), false);
   }
 
-  public <T extends IsRODAObject> void setDone(Plugin<T> innerPlugin) {
+  public <T extends IsRODAObject> void setDone(Plugin<T> innerPlugin, boolean withError) {
     pluginsDone.put(getId(innerPlugin), true);
     // 20161220 hsilva: remove so it can be garbage collected
     mapping.remove(innerPlugin);
+    atLeastOneErrorOccurred = atLeastOneErrorOccurred || withError;
+  }
+
+  public boolean atLeastOneErrorOccurred() {
+    return atLeastOneErrorOccurred;
   }
 
   @Override
