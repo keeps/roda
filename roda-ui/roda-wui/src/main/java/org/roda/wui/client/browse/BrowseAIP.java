@@ -81,6 +81,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TabPanel;
@@ -190,6 +191,9 @@ public class BrowseAIP extends Composite {
 
   @UiField
   Button newDescriptiveMetadata;
+
+  private SimplePanel descriptiveMetadataButtons;
+  private Map<Integer, HTMLPanel> descriptiveMetadataSavedButtons;
 
   // REPRESENTATIONS
   @UiField
@@ -343,7 +347,7 @@ public class BrowseAIP extends Composite {
         final HTML html = pair.getSecond();
         final DescriptiveMetadataViewBundle descBundle = bundles.get(descId);
         if (html.getText().length() == 0) {
-          getDescriptiveMetadataHTML(aipId, descId, descBundle, new AsyncCallback<SafeHtml>() {
+          getDescriptiveMetadataHTML(aipId, descId, descBundle, event.getSelectedItem(), new AsyncCallback<SafeHtml>() {
 
             @Override
             public void onFailure(Throwable caught) {
@@ -374,6 +378,20 @@ public class BrowseAIP extends Composite {
     addTab.addStyleName("addTab");
     addTab.getElement().setId("aipNewDescriptiveMetadata");
     addTab.getParent().addStyleName("addTabWrapper");
+
+    descriptiveMetadataSavedButtons = new HashMap<>();
+    descriptiveMetadataButtons = new SimplePanel();
+    descriptiveMetadataButtons.addStyleName("descriptiveMetadataTabButtons");
+    descriptiveMetadata.getTabBar().getElement().getStyle().clearProperty("width");
+    descriptiveMetadata.getTabBar().getElement().getParentElement()
+      .insertFirst(descriptiveMetadataButtons.getElement());
+    descriptiveMetadata.addSelectionHandler(event -> {
+      if (descriptiveMetadataSavedButtons.containsKey(event.getSelectedItem())) {
+        descriptiveMetadataButtons.setWidget(descriptiveMetadataSavedButtons.get(event.getSelectedItem()));
+      } else {
+        descriptiveMetadataButtons.clear();
+      }
+    });
 
     if (descMetadata != null && !descMetadata.isEmpty()) {
       descriptiveMetadata.setVisible(true);
@@ -429,7 +447,7 @@ public class BrowseAIP extends Composite {
   }
 
   private void getDescriptiveMetadataHTML(final String aipId, final String descId,
-    final DescriptiveMetadataViewBundle bundle, final AsyncCallback<SafeHtml> callback) {
+    final DescriptiveMetadataViewBundle bundle, final Integer selectedIndex, final AsyncCallback<SafeHtml> callback) {
     SafeUri uri = RestUtils.createDescriptiveMetadataHTMLUri(aipId, descId);
     RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri.asString());
     try {
@@ -468,6 +486,12 @@ public class BrowseAIP extends Composite {
             b.append(SafeHtmlUtils.fromSafeConstant(downloadLinkHtml));
 
             b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
+
+            HTMLPanel buttons = new HTMLPanel(b.toSafeHtml());
+            descriptiveMetadataSavedButtons.put(selectedIndex, buttons);
+            descriptiveMetadataButtons.setWidget(buttons);
+
+            b = new SafeHtmlBuilder();
 
             b.append(SafeHtmlUtils.fromSafeConstant("<div class='descriptiveMetadataHTML'>"));
             b.append(SafeHtmlUtils.fromTrustedString(html));

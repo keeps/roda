@@ -355,30 +355,7 @@ div.inline {
 }
 
 .descriptiveMetadataCard {
-	background-color: inherit;
-	box-shadow: none;
-	padding: 0;
-	transition: none;
-}
-
-.descriptiveMetadataCard:hover {
-	box-shadow: none;
-}
-
-.descriptiveMetadataCard .label {
-    font-size: 1.5rem;
-    font-weight: 300;
-    color: #999;
-    display: inline-block;
-    width: 200px;
-    line-height: 1em;
-}
-
-.descriptiveMetadataCard .value {
-    font-size: 1.5rem;
-    display: inline-block;
-    color: rgb(88, 89, 91);
-    vertical-align: top;
+    padding: 0;
 }
 
 .slider-container {
@@ -1148,6 +1125,10 @@ pre code {
 
 .col_12 .my-asyncdatagrid-side-panel {
     margin-left: 30px;
+}
+
+.card .my-asyncdatagrid-side-panel {
+    margin-left: 15px;
 }
 
 .my-asyncdatagrid-side-panel .sidebar-facet-panel {
@@ -2400,23 +2381,17 @@ td.datePickerMonth, td.datePickerYear {
     margin: 10px 0 10px 0;
 }
 
-.browseItemMetadata.gwt-TabBar {
+.browseItemMetadata .gwt-TabBar {
+    background-color: #eee;
+    line-height: 3.5rem;
+    width: auto !important; /* needed so buttons appear on the right */
     border-collapse: collapse;
 }
 
 .browseItemMetadata .gwt-TabPanelBottom {
     background-color: transparent;
-    padding: 5px 10px;
+    padding: 20px 25px;
     min-height: 25px;
-}
-
-.browseItemMetadata .gwt-TabBarRest-wrapper {
-    border-bottom: 1px solid rgba(167, 169, 172, 0.5);
-}
-
-.browseItemMetadata .gwt-TabBarItem-wrapper {
-    border-bottom: 1px solid rgba(167, 169, 172, 0.5);
-    padding-right: 20px;
 }
 
 .browseItemMetadata .gwt-TabBarItem {
@@ -2426,30 +2401,13 @@ td.datePickerMonth, td.datePickerYear {
     cursor: pointer;
     cursor: hand;
     font-size: 15px;
-    padding-bottom: 0px;
-    padding-left: 0px;
-    padding-right: 0px;
+    padding: 0;
     position: relative;
-    color: #a7a9ac;
+    color: #999;
 }
 
 .browseItemMetadata .gwt-TabBarItem > div {
     padding-bottom: 3px;
-}
-
-.browseItemMetadata .gwt-TabBarItem:after {
-    content: '';
-    display: block;
-    position: absolute;
-    height: 2px;
-    left: 50%;
-    background-color: #089de3;
-    -webkit-transition: all 0.2s;
-    -moz-transition: all 0.2s;
-    -o-transition: all 0.2s;
-    transition: all 0.2s;
-    width: 0px;
-    bottom: -1px;
 }
 
 .browseItemMetadata .gwt-TabBarItem:hover {
@@ -2457,8 +2415,8 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .browseItemMetadata .addTabWrapper {
+    padding-left: 13px;
     background-color: transparent;
-    color: #089de3;
 }
 
 .browseItemMetadata .addTabWrapper > div {
@@ -2473,7 +2431,8 @@ td.datePickerMonth, td.datePickerYear {
     width: 0;
 }
 
-.browseItemMetadata .gwt-TabBarItem .premisTab, .browseItemMetadata .gwt-TabBarItem .addTab {
+.browseItemMetadata .gwt-TabBarItem .premisTab,
+.browseItemMetadata .gwt-TabBarItem .addTab {
     font-weight: normal;
     font-size: 1.3rem;
     white-space: nowrap;
@@ -2485,16 +2444,6 @@ td.datePickerMonth, td.datePickerYear {
 
 .browseItemMetadata .gwt-TabBarItem .premisTab .gwt-HTML {
     margin-right: 5px;
-}
-
-.browseItemMetadata .gwt-TabBarItem .gwt-Label {
-    color: inherit;
-    font-weight: 300;
-    font-size: 1.5rem;
-}
-
-.browseItemMetadata .gwt-TabBarItem-wrapper-selected {
-    /* 	border-bottom: none; */
 }
 
 .browseItemMetadata .gwt-TabBarItem-selected {
@@ -2509,8 +2458,39 @@ td.datePickerMonth, td.datePickerYear {
     left: 0;
 }
 
-.browseItemMetadata .gwt-TabBarItem-selected .gwt-Label {
+.browseItemMetadata .gwt-TabBarItem .gwt-Label {
+    padding-left: 10px;
+    padding-right: 10px;
     color: inherit;
+    font-weight: 300;
+    font-size: 1.5rem;
+}
+
+.browseItemMetadata .gwt-TabBarItem-wrapper-selected .gwt-Label {
+    background-color: white;
+}
+
+.browseItemMetadata .gwt-TabBarFirst-wrapper {
+    padding-right: 3px;
+}
+
+.browseItemMetadata .addTabWrapper .fa {
+    vertical-align: sub;
+}
+
+.browseItemMetadata .toolbarLink {
+    line-height: 4rem;
+    width: 40px;
+    height: 40px;
+    border-left: 1px solid #aaa;
+}
+
+.browseItemMetadata .descriptiveMetadataLinks {
+    margin:0;
+}
+
+.browseItemMetadata .descriptiveMetadataTabButtons {
+    float:right;
 }
 
 .descriptiveMetadataHTML {
@@ -3499,7 +3479,12 @@ td.datePickerMonth, td.datePickerYear {
     margin-bottom: 6px;
 }
 
+.card .searchPanelContainer.with-prefilters{
+    margin-bottom: 0;
+}
+
 .card .searchPanelContainer {
+    margin-bottom: 15px;
     margin-top: -15px;
     margin-left: -15px;
     margin-right: -15px;
