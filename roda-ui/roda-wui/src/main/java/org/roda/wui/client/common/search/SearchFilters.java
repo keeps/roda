@@ -63,7 +63,7 @@ public class SearchFilters {
       }
     }
 
-    return baseFilter;
+    return resultingFilter;
   }
 
   public static Filter createFilterFromHistoryTokens(final List<String> historyTokens) {
@@ -71,6 +71,6 @@ public class SearchFilters {
   }
 
   public static boolean shouldBeIncremental(final Filter filter) {
-    return filter.getParameters().isEmpty() || SearchFilters.allFilter().equals(filter);
+    return !filter.getParameters().isEmpty() && !SearchFilters.allFilter().equals(filter);
   }
 }

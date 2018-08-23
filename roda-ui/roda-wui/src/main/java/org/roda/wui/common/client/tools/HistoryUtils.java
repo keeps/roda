@@ -75,7 +75,7 @@ public class HistoryUtils {
   public static final String HISTORY_PERMISSION_SEP = ".";
 
   public static <T> List<T> tail(List<T> list) {
-    return list.subList(1, list.size());
+    return ListUtils.tail(list);
   }
 
   public static <T> List<T> removeLast(List<T> list) {

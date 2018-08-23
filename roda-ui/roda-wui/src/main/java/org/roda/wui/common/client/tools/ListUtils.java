@@ -31,4 +31,11 @@ public class ListUtils {
     return ret;
   }
 
+  public static <T> List<T> tail(List<T> list) {
+    if (list.size() <= 1) {
+      return new ArrayList<>();
+    }
+    return list.subList(1, list.size());
+  }
+
 }

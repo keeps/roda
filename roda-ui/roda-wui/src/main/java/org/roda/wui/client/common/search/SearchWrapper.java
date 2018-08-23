@@ -192,13 +192,13 @@ public class SearchWrapper extends Composite {
   public <T extends IsIndexed> void setFilter(String objectClassSimpleName, Filter filter) {
     SearchPanel<T> searchPanel = components.getSearchPanel(objectClassSimpleName);
     searchPanel.clearSearchInputBox();
-    searchPanel.setDefaultFilter(filter, !SearchFilters.allFilter().equals(filter));
+    searchPanel.setDefaultFilter(filter, SearchFilters.shouldBeIncremental(filter));
   }
 
   public <T extends IsIndexed> void setFilter(Class<T> objectClass, Filter filter) {
     SearchPanel<T> searchPanel = components.getSearchPanel(objectClass);
     searchPanel.clearSearchInputBox();
-    searchPanel.setDefaultFilter(filter, !SearchFilters.allFilter().equals(filter));
+    searchPanel.setDefaultFilter(filter, SearchFilters.shouldBeIncremental(filter));
   }
 
   public <T extends IsIndexed> void resetToDefaultFilter(String objectClassSimpleName) {
@@ -267,7 +267,7 @@ public class SearchWrapper extends Composite {
   }
 
   /**
-   * Auxiliary manager for inner components (groups of one searchPanel and one
+   * Auxiliary manager for inner components (groups of one searchWrapper and one
    * BasicAsyncTableCell, at least for now) that is used to enforce type coherence
    */
   @SuppressWarnings("unchecked")
@@ -281,7 +281,7 @@ public class SearchWrapper extends Composite {
      * @param objectClass
      *          the classe to associate the components with
      * @param searchPanel
-     *          the searchPanel component
+     *          the searchWrapper component
      * @param list
      *          the BasicAsyncTableCell component
      * @param <T>

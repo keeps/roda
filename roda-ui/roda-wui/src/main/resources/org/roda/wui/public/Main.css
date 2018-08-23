@@ -6790,6 +6790,7 @@ span.code {
 }
 
 .sidebar .actionable-button,
+.slider .actionable-button,
 .ActionableStyleButtons .actionable-button {
     /* mimic <button> and .btn */
     border-radius: 2px;
@@ -6820,26 +6821,31 @@ span.code {
     line-height: normal;
 }
 
-.sidebar .actionable-title {
+.sidebar .actionable-title,
+.slider .actionable-title {
     display: block;
 }
 
 .sidebar .actionable-button:hover,
+.slider .actionable-button:hover,
 .ActionableStyleButtons .actionable-button:hover {
     background-color: #2988c0;
 }
 
 .sidebar .actionable-button-disabled,
+.slider .actionable-button-disabled,
 .ActionableStyleButtons .actionable-button-disabled{
     background-color: #ddd;
 }
 
 .sidebar .actionable-button + .sidebar .actionable-button,
+.slider .actionable-button + .slider .actionable-button,
 .ActionableStyleButtons .actionable-button + .ActionableStyleButtons .actionable-button {
     margin-top: 10px;
 }
 
 .sidebar .actionable-button-icon,
+.slider .actionable-button-icon,
 .ActionableStyleButtons .actionable-button-icon {
     display: inline-block;
     vertical-align: middle;
