@@ -10,7 +10,7 @@ package org.roda.wui.api.controllers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -110,9 +110,9 @@ public class UserManagementHelper {
     if (members instanceof SelectedItemsFilter) {
       Filter filter = ((SelectedItemsFilter) members).getFilter();
       Iterable<RODAMember> all = RodaCoreFactory.getIndexService().findAll(RODAMember.class, filter,
-        Collections.singletonList(RodaConstants.INDEX_UUID));
+        Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.INDEX_ID, RodaConstants.MEMBERS_IS_USER));
       for (RODAMember rodaMember : all) {
-        uuids.add(rodaMember.getId());
+        uuids.add(rodaMember.getUUID());
       }
     } else if (members instanceof SelectedItemsList) {
       uuids.addAll(((SelectedItemsList<RODAMember>) members).getIds());
