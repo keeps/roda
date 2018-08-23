@@ -39,7 +39,6 @@ import org.roda.core.data.v2.risks.Risk;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
-import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
@@ -119,7 +118,7 @@ public class CreateDefaultJob extends Composite {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   @SuppressWarnings("rawtypes")
-  private AsyncTableCell list = null;
+  private SearchWrapper search = null;
   private List<PluginInfo> plugins = null;
   private PluginInfo selectedPlugin = null;
   private boolean isListEmpty = true;
@@ -468,7 +467,7 @@ public class CreateDefaultJob extends Composite {
       listBuilder.getOptions().addStyleName("searchResults").addCheckboxSelectionListener(
         (CheckboxSelectionListener) selected -> isListEmpty = ClientSelectedItemsUtils.isEmpty(selected));
 
-      SearchWrapper search = new SearchWrapper(false).createListAndSearchPanel(listBuilder);
+      search = new SearchWrapper(false).createListAndSearchPanel(listBuilder);
 
       targetListPanel.add(search);
       targetListPanel.setVisible(true);
@@ -483,7 +482,7 @@ public class CreateDefaultJob extends Composite {
   public void buttonCreateHandler(ClickEvent e) {
     buttonCreate.setEnabled(false);
     String jobName = getName().getText();
-    SelectedItems selected = list.getSelected();
+    SelectedItems selected = search.getSelectedItemsInCurrentList();
 
     if (org.roda.core.data.v2.Void.class.getName().equals(targetList.getSelectedValue())) {
       selected = new SelectedItemsNone();
@@ -512,7 +511,7 @@ public class CreateDefaultJob extends Composite {
   @UiHandler("buttonObtainCommand")
   public void buttonObtainCommandHandler(ClickEvent e) {
     String jobName = getName().getText();
-    SelectedItems selected = list.getSelected();
+    SelectedItems selected = search.getSelectedItemsInCurrentList();
 
     if (org.roda.core.data.v2.Void.class.getName().equals(targetList.getSelectedValue())) {
       selected = new SelectedItemsNone();

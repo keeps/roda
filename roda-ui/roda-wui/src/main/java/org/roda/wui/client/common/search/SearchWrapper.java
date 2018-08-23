@@ -9,6 +9,7 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.lists.pagination.ListSelectionState;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
@@ -39,11 +40,13 @@ public class SearchWrapper extends Composite {
   private String scrollPanelCssClasses = null;
 
   private Dropdown searchPanelSelectionDropdown;
+  private String listClassForSingleSearchPanel;
 
   private final Components components;
 
   public SearchWrapper(boolean hasMultipleSearchPanels, String preselectedDropdownValue) {
     this.searchPanelSelectionDropdown = null;
+    this.listClassForSingleSearchPanel = null;
     this.hasMultipleSearchPanels = hasMultipleSearchPanels;
     this.preselectedDropdownValue = preselectedDropdownValue;
     this.components = new Components();
@@ -111,6 +114,8 @@ public class SearchWrapper extends Composite {
       initSearchPanelSelectionDropdown();
       searchPanelSelectionDropdown.addItem(defaultLabelText, dropdownValue,
         SelectedPanel.getIconForList(list.getListId(), list.getClassToReturn().getSimpleName()));
+    } else {
+      listClassForSingleSearchPanel = listBuilder.getOptions().getClassToReturn().getSimpleName();
     }
     searchPanel.setVisible(searchEnabled);
 
@@ -137,15 +142,21 @@ public class SearchWrapper extends Composite {
   }
 
   public SelectedItems<? extends IsIndexed> getSelectedItemsInCurrentList() {
-    return components.getList(searchPanelSelectionDropdown.getSelectedValue()).getSelected();
+    String lookupClassSimpleName = searchPanelSelectionDropdown != null
+      ? searchPanelSelectionDropdown.getSelectedValue()
+      : listClassForSingleSearchPanel;
+    AsyncTableCell<IsIndexed> list = components.getList(lookupClassSimpleName);
+    return list != null ? list.getSelected() : new SelectedItemsNone<>();
   }
 
   public <T extends IsIndexed> SelectedItems<T> getSelectedItems(Class<T> objectClass) {
-    return components.getList(objectClass).getSelected();
+    AsyncTableCell<T> list = components.getList(objectClass);
+    return list != null ? list.getSelected() : new SelectedItemsNone<>();
   }
 
   public <T extends IsIndexed> ListSelectionState<T> getListSelectionState(Class<T> objectClass) {
-    return components.getList(objectClass).getListSelectionState();
+    AsyncTableCell<T> list = components.getList(objectClass);
+    return list != null ? list.getListSelectionState() : null;
   }
 
   public boolean changeDropdownSelectedValue(String objectClassSimpleName) {
@@ -166,12 +177,16 @@ public class SearchWrapper extends Composite {
 
   private <T extends IsIndexed> void refreshList(String objectClassSimpleName) {
     AsyncTableCell<T> list = components.getList(objectClassSimpleName);
-    list.refresh();
+    if (list != null) {
+      list.refresh();
+    }
   }
 
   private <T extends IsIndexed> void refreshList(Class<T> objectClass) {
     AsyncTableCell<T> list = components.getList(objectClass);
-    list.refresh();
+    if (list != null) {
+      list.refresh();
+    }
   }
 
   public <T extends IsIndexed> void setFilter(String objectClassSimpleName, Filter filter) {
