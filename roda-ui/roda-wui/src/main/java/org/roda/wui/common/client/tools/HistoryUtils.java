@@ -23,6 +23,7 @@ import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
@@ -46,6 +47,7 @@ import org.roda.wui.client.ingest.transfer.TransferUpload;
 import org.roda.wui.client.management.EditGroup;
 import org.roda.wui.client.management.EditUser;
 import org.roda.wui.client.management.ShowNotification;
+import org.roda.wui.client.planning.ShowPreservationAgent;
 import org.roda.wui.client.planning.ShowRepresentationInformation;
 import org.roda.wui.client.planning.ShowRisk;
 import org.roda.wui.client.planning.ShowRiskIncidence;
@@ -363,6 +365,9 @@ public class HistoryUtils {
     } else if (object instanceof RODAMember) {
       RODAMember member = (RODAMember) object;
       HistoryUtils.newHistory(member.isUser() ? EditUser.RESOLVER : EditGroup.RESOLVER, member.getId());
+    } else if (object instanceof IndexedPreservationAgent) {
+      IndexedPreservationAgent agent = (IndexedPreservationAgent) object;
+      HistoryUtils.newHistory(ShowPreservationAgent.RESOLVER, agent.getId());
     } else if (object instanceof IndexedPreservationEvent) {
       IndexedPreservationEvent preservationEvent = (IndexedPreservationEvent) object;
 

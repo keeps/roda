@@ -85,7 +85,6 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TabPanel;
@@ -178,7 +177,7 @@ public class BrowseRepresentation extends Composite {
   // IDENTIFICATION
 
   @UiField
-  SimplePanel representationIcon;
+  HTML representationIcon;
 
   @UiField
   FlowPanel representationTitle;
@@ -375,10 +374,7 @@ public class BrowseRepresentation extends Composite {
 
     // IDENTIFICATION
 
-    HTMLPanel representationIconHtmlPanel = new HTMLPanel(
-      DescriptionLevelUtils.getRepresentationTypeIcon(representation.getType(), false));
-    representationIconHtmlPanel.addStyleName("browseItemIcon-other");
-    representationIcon.setWidget(representationIconHtmlPanel);
+    representationIcon.setHTML(DescriptionLevelUtils.getRepresentationTypeIcon(representation.getType(), false));
 
     String title = representation.getTitle() != null ? representation.getTitle() : representation.getType();
     title = title == null ? representation.getId() : title;

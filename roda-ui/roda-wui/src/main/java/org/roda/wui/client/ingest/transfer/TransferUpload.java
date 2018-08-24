@@ -47,7 +47,6 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -136,15 +135,6 @@ public class TransferUpload extends Composite {
 
   @UiField
   Label uploadTitle;
-
-  @UiField
-  SimplePanel itemIcon;
-
-  @UiField
-  Label itemTitle;
-
-  @UiField
-  Label itemDates;
 
   @UiField
   Button done;

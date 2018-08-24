@@ -11,16 +11,12 @@
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_12 content">
 				<g:FlowPanel styleName="browseItemPanel">
-					<g:SimplePanel styleName="browseItemIcon" ui:field="itemIcon" />
-					<g:HTML styleName="browseItemIcon-other">
+					<g:HTML styleName="h3 browseItemIcon">
 						<i class="fa fa-clock-o"></i>
 					</g:HTML>
-					<g:FlowPanel styleName="browseItemPanelText">
-						<g:Label styleName="h4" addStyleNames="browseItemText"
-							ui:field="itemTitle">
-							<ui:text from='{messages.preservationAgentsTitle}' />
-						</g:Label>
-					</g:FlowPanel>
+					<g:Label addStyleNames="h3 browseItemText">
+						<ui:text from='{messages.preservationAgentsTitle}'/>
+					</g:Label>
 				</g:FlowPanel>
 
 				<commonsearch:SearchWrapper ui:field="searchWrapper" />

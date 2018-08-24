@@ -11,18 +11,11 @@
 				<g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
 					<g:FlowPanel addStyleNames="row full_width no_padding">
 						<g:FlowPanel addStyleNames="wui-data-panel">
-							<g:FlowPanel styleName="browseItemPanel">
-								<g:SimplePanel styleName="browseItemIcon"
-									ui:field="itemIcon" />
-								<g:HTML styleName="browseItemIcon-other">
-									<i class="fa fa-clock-o"></i>
-								</g:HTML>
-								<g:FlowPanel styleName="browseItemPanelText">
-									<g:Label styleName="h1" addStyleNames="browseItemText"
-										ui:field="itemTitle">
-										<ui:text from='{messages.preservationEventTitle}' />
-									</g:Label>
-								</g:FlowPanel>
+							<g:FlowPanel addStyleNames="browseItemPanel">
+								<g:HTML addStyleNames="h3 browseItemIcon"><i class="fa fa-clock-o"></i></g:HTML>
+								<g:Label addStyleNames="h3 browseItemText">
+									<ui:text from='{messages.preservationEventTitle}' />
+								</g:Label>
 							</g:FlowPanel>
 							<g:FlowPanel>
 								<g:FlowPanel styleName="field">

@@ -136,12 +136,6 @@ public class ShowPreservationEvent extends Composite {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   @UiField
-  SimplePanel itemIcon;
-
-  @UiField
-  Label itemTitle;
-
-  @UiField
   Label eventIdValue;
 
   @UiField

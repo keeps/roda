@@ -168,18 +168,16 @@ public class BrowseAIP extends Composite {
   @UiField
   NavigationToolbar<IndexedAIP> navigationToolbar;
 
-  @UiField
-  SimplePanel smallTitle;
-
   // STATUS
 
   @UiField
   HTML aipState;
 
   // IDENTIFICATION
-
   @UiField
-  Label browseItemHeader;
+  Label itemTitle;
+  @UiField
+  HTML itemIcon;
 
   @UiField
   FlowPanel identificationPanel;
@@ -408,10 +406,8 @@ public class BrowseAIP extends Composite {
   private void updateSectionIdentification(BrowseAIPBundle bundle) {
     IndexedAIP aip = bundle.getAip();
 
-    smallTitle.setWidget(new ActionableWidgetBuilder<>(AipActions.get())
-      .withTitleSmall(aip.getTitle() != null ? aip.getTitle() : aip.getId(),
-        DescriptionLevelUtils.getElementLevelIconCssClass(aip.getLevel()))
-      .buildTitleWithObjects(new ActionableObject<>(aip)));
+    itemIcon.setHTML(DescriptionLevelUtils.getElementLevelIconSafeHtml(aip.getLevel(), false));
+    itemTitle.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());
 
     Sliders.createAipInfoSlider(center, navigationToolbar.getSidebarButton(), bundle);
 

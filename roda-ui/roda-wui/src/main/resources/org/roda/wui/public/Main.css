@@ -472,6 +472,10 @@ div.inline {
     content: "\e900";
 }
 
+.breadcrumb .roda-logo {
+    vertical-align: text-bottom;
+}
+
 code {
     padding: .2rem .5rem;
     margin: 0 .2rem;
@@ -1958,8 +1962,6 @@ td.datePickerMonth, td.datePickerYear {
 .main .wui-breadcrumbPanel .breadcrumb-last {
     color: #404142;
     text-decoration: none;
-
-    max-width: 100px;
 }
 
 .viewRepresentationBreadcrumb .breadcrumb-last {
@@ -1976,6 +1978,11 @@ td.datePickerMonth, td.datePickerYear {
     font-size: 1.2rem;
     color: #a7a9ac;
     cursor: text;
+}
+
+.main .navigationToolbarBreadcrumb .breadcrumb,
+.main .navigationToolbarBreadcrumb .breadcrumb-separator {
+    font-size: 1.4rem;
 }
 
 /**********************************************
@@ -2258,11 +2265,6 @@ td.datePickerMonth, td.datePickerYear {
     background-image: repeating-linear-gradient(-45deg, transparent, transparent 35px, rgba(255, 255, 255, .5) 35px, rgba(255, 255, 255, .5) 70px);
 }
 
-.browseTitle-allCollections {
-    line-height: 4rem;
-    font-size: 2.4rem;
-}
-
 .browseBreadcrumb {
 }
 
@@ -2279,20 +2281,21 @@ td.datePickerMonth, td.datePickerYear {
     margin-bottom: 1.5rem;
 }
 
-.browseItemPanelText {
-    display: inline;
-    vertical-align: middle;
-    padding-left: 1rem;
-}
-
 .browseItemPanelRisksEventsLogs > .gwt-Hyperlink,
 .browseItemPanelRisksEventsLogs > .gwt-Label {
     display: inline;
 }
 
+.browseItemIcon + .browseItemText {
+    padding-left: 1rem;
+}
+
 .browseItemIcon {
     display: inline;
-    vertical-align: middle;
+}
+
+.browseItemIcon div {
+    display: inline-block;
 }
 
 .browseItemHeader {
@@ -2308,24 +2311,9 @@ td.datePickerMonth, td.datePickerYear {
     font-weight: 300;
 }
 
-.browseItemIcon-all {
-    display: inline-block;
-    font-size: 3.2rem;
-    line-height: 3.2rem;
-}
-
-.browseItemIcon-other {
-    display: inline-block;
-    font-size: 3.2rem;
-    line-height: 3.2rem;
-}
-
 .browseItemText {
     display: inline;
-    margin-bottom: 0 !important;
-    font-size: 3.2rem;
-    line-height: 1.2;
-    letter-spacing: -.1rem;
+    vertical-align: bottom;
 }
 
 .browseItemTextWithoutFontSize {
@@ -3712,6 +3700,10 @@ td.datePickerMonth, td.datePickerYear {
 
 .col_12 .searchResults {
     margin-top: 30px;
+}
+
+.wui-ingest-transfer .searchResults {
+    margin-top: 0;
 }
 
 .card .searchResults {
@@ -6928,7 +6920,7 @@ span.code {
 .navigationToolbar .navigationToolbarHeaderArrow {
     display: inline-block;
     vertical-align: bottom;
-    font-size: 1.4rem;
+    font-size: 1.6rem;
     color: #222;
 }
 

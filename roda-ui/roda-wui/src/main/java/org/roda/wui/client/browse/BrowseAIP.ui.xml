@@ -18,15 +18,14 @@
 
 					<!-- IDENTIFICATION -->
 					<g:FlowPanel styleName="browseItemPanel" ui:field="identificationPanel">
-						<g:Label addStyleNames="browseItemHeader" ui:field="browseItemHeader">
-							<ui:text from='{messages.catalogueItemTitle}' />
-						</g:Label>
-						<g:SimplePanel ui:field="smallTitle" />
+						<g:HTML addStyleNames="h2 browseItemIcon" ui:field="itemIcon"/>
+						<g:Label addStyleNames="h2 browseItemText" ui:field="itemTitle"/>
+
+						<!--<g:SimplePanel ui:field="smallTitle" />-->
 						<g:FlowPanel addStyleNames="browseItemPanelRisksEventsLogs" ui:field="risksEventsLogs" />
 						<g:Label addStyleNames="browseItemId" ui:field="dateCreatedAndModified" />
 					</g:FlowPanel>
-					<m:BreadcrumbPanel ui:field="breadcrumb"
-						addStyleNames="browseBreadcrumb" />
+					<m:BreadcrumbPanel ui:field="breadcrumb" addStyleNames="browseBreadcrumb"/>
 
 					<!-- DESCRIPTIVE METADATA -->
 					<g:FlowPanel addStyleNames="card descriptiveMetadataCard">

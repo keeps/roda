@@ -40,8 +40,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -120,12 +118,6 @@ public class PreservationEvents extends Composite {
 
   @UiField
   BreadcrumbPanel breadcrumb;
-
-  @UiField
-  SimplePanel itemIcon;
-
-  @UiField
-  Label itemTitle;
 
   @UiField(provided = true)
   PreservationEventsSearch eventsSearch;

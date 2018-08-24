@@ -10,15 +10,7 @@
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
 				<g:Label styleName="h1" ui:field="uploadTitle"/>
-				
-				<g:FlowPanel styleName="browseItemPanel">
-					<g:SimplePanel styleName="browseItemIcon" ui:field="itemIcon" />
-					<g:FlowPanel styleName="browseItemPanelText">
-						<g:Label styleName="h4" addStyleNames="browseItemText"
-							ui:field="itemTitle" />
-						<g:Label addStyleNames="browseItemDates" ui:field="itemDates" />
-					</g:FlowPanel>
-				</g:FlowPanel>
+
 				<g:HTML ui:field="uploadMessage"/>
 				<g:HTML ui:field="uploadForm" />
 				<g:HTML ui:field="uploadList">

@@ -94,12 +94,6 @@ public class ShowPreservationAgent extends Composite {
     RodaConstants.PRESERVATION_AGENT_EXTENSION);
 
   @UiField
-  SimplePanel itemIcon;
-
-  @UiField
-  Label itemTitle;
-
-  @UiField
   Label agentId, agentName, agentType, agentVersion, agentNote, agentExtension;
 
   @UiField

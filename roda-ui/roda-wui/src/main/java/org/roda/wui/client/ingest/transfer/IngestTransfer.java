@@ -56,7 +56,6 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -134,7 +133,7 @@ public class IngestTransfer extends Composite {
   Label lastScanned;
 
   @UiField
-  SimplePanel itemIcon;
+  HTML itemIcon;
 
   @UiField
   Label itemTitle;
@@ -220,17 +219,17 @@ public class IngestTransfer extends Composite {
     ingestTransferTitle.setVisible(false);
     ingestTransferDescription.setVisible(false);
 
-    HTML itemIconHtmlPanel = new HTML(
-      r.isFile() ? DescriptionLevelUtils.getElementLevelIconSafeHtml(RodaConstants.VIEW_REPRESENTATION_FILE, false)
-        : DescriptionLevelUtils.getElementLevelIconSafeHtml(RodaConstants.VIEW_REPRESENTATION_FOLDER, false));
-    itemIconHtmlPanel.addStyleName("browseItemIcon-other");
+    if (r.isFile()) {
+      itemIcon
+        .setHTML(DescriptionLevelUtils.getElementLevelIconSafeHtml(RodaConstants.VIEW_REPRESENTATION_FILE, false));
+    } else {
+      itemIcon
+        .setHTML(DescriptionLevelUtils.getElementLevelIconSafeHtml(RodaConstants.VIEW_REPRESENTATION_FOLDER, false));
+    }
 
-    itemIcon.setWidget(itemIconHtmlPanel);
     itemTitle.setText(r.getName());
     itemDates.setText(messages.ingestTransferItemInfo(Humanize.formatDateTime(r.getCreationDate()),
       Humanize.readableFileSize(r.getSize())));
-    itemTitle.removeStyleName("browseTitle-allCollections");
-    itemIcon.getParent().removeStyleName("browseTitle-allCollections-wrapper");
 
     if (r.isFile()) {
       resourceSearch.setVisible(false);
@@ -259,14 +258,9 @@ public class IngestTransfer extends Composite {
     ingestTransferTitle.setVisible(true);
     ingestTransferDescription.setVisible(true);
 
-    HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getTopIconHTMLPanel();
-    itemIconHtmlPanel.addStyleName("browseItemIcon-all");
-
-    itemIcon.setWidget(itemIconHtmlPanel);
+    itemIcon.setHTML(DescriptionLevelUtils.getTopIconSafeHtml());
     itemTitle.setText(messages.ingestAllTransferredPackages());
     itemDates.setText("");
-    itemTitle.addStyleName("browseTitle-allCollections");
-    itemIcon.getParent().addStyleName("browseTitle-allCollections-wrapper");
 
     resourceSearch.setVisible(true);
     download.setVisible(false);

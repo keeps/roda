@@ -65,7 +65,6 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -124,7 +123,7 @@ public class ShowRepresentationInformation extends Composite {
   Label representationInformationTitle;
 
   @UiField
-  SimplePanel representationInformationIcon;
+  HTML representationInformationIcon;
 
   @UiField
   Label representationInformationDescriptionKey;
@@ -180,12 +179,8 @@ public class ShowRepresentationInformation extends Composite {
   }
 
   public void initElements() {
-    HTMLPanel itemIconHtmlPanel = new HTMLPanel("<i class='fa fa-info-circle'></i>");
-    itemIconHtmlPanel.addStyleName("browseItemIcon-other");
-    representationInformationIcon.setWidget(itemIconHtmlPanel);
+    representationInformationIcon.setHTML("<i class='fa fa-info-circle'></i>");
     representationInformationTitle.setText(ri.getName());
-    representationInformationTitle.removeStyleName("browseTitle-allCollections");
-    representationInformationIcon.getParent().removeStyleName("browseTitle-allCollections-wrapper");
 
     representationInformationId.setText(messages.representationInformationIdentifier() + ": " + ri.getId());
 

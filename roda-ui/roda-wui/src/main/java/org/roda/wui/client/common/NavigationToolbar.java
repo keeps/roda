@@ -18,6 +18,7 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.common.actions.AbstractActionable;
 import org.roda.wui.client.common.actions.Actionable;
+import org.roda.wui.client.common.actions.AipActions;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.actions.model.ActionableObject;
@@ -75,6 +76,9 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
   @UiField
   AccessibleFocusPanel sidebarButton;
 
+  @UiField
+  AccessibleFocusPanel actionsButton;
+
   private T currentObject = null;
   private HandlerRegistration searchPopupClickHandler = null;
 
@@ -107,6 +111,28 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
   public void refresh() {
     ListSelectionUtils.bindLayout(currentObject, previousButton, nextButton, keyboardFocus, true, false, false);
     setupSearchPopup();
+    setupActions();
+  }
+
+  private void setupActions() {
+    if (currentObject instanceof IndexedAIP) {
+      CalloutPopup popup = new CalloutPopup();
+      popup.addStyleName("ActionableStyleMenu");
+
+      AipActions aipActions;
+      IndexedAIP aip = (IndexedAIP) this.currentObject;
+      if (aip.getParentID() != null) {
+        aipActions = AipActions.get(aip.getParentID(), aip.getState());
+      } else {
+        aipActions = AipActions.get();
+      }
+
+      popup.setWidget(new ActionableWidgetBuilder<>(aipActions).buildListWithObjects(new ActionableObject<>(aip)));
+      actionsButton.addClickHandler(event -> popup.showRelativeTo(actionsButton));
+      actionsButton.setVisible(true);
+    } else {
+      actionsButton.setVisible(false);
+    }
   }
 
   // Breadcrumb management

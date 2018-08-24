@@ -38,6 +38,11 @@
 						<i class="fa fa-chevron-right"></i>
 					</g:HTML>
 				</wcag:AccessibleFocusPanel>
+				<wcag:AccessibleFocusPanel ui:field="actionsButton" addStyleNames="navigationToolbarLink">
+					<g:HTML>
+						<i class="fa fa-ellipsis-v"></i>
+					</g:HTML>
+				</wcag:AccessibleFocusPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</wcag:AccessibleFocusPanel>

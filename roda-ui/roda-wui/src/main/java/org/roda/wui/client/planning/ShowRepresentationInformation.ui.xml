@@ -12,16 +12,12 @@
 					<g:FlowPanel addStyleNames="row full_width no_padding">
 						<g:FlowPanel addStyleNames="wui-data-panel">
 							<g:FlowPanel
-								styleName="browseItemPanelWithMargin browseTitle-allCollections-wrapper">
+								styleName="browseItemPanelWithMargin">
 								<g:Label addStyleNames="browseItemHeader" ui:field="browseItemHeader">
 									<ui:text from='{messages.showRepresentationInformationTitle}' />
 								</g:Label>
-								<g:SimplePanel styleName="browseItemIcon"
-									ui:field="representationInformationIcon" />
-								<g:FlowPanel styleName="browseItemPanelText">
-									<g:Label styleName="h4" addStyleNames="browseItemText"
-										ui:field="representationInformationTitle" />
-								</g:FlowPanel>
+								<g:HTML addStyleNames="h4 browseItemIcon" ui:field="representationInformationIcon" />
+								<g:Label addStyleNames="h4 browseItemText" ui:field="representationInformationTitle" />
 								<g:Label addStyleNames="browseItemId" ui:field="representationInformationId"
 									title="{messages.representationInformationIdentifier}" />
 								<g:Label addStyleNames="browseItemId" ui:field="dateCreated"/>

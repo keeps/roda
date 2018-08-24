@@ -147,7 +147,7 @@ public class HtmlSnippetUtils {
 
       Anchor icon = new Anchor();
       icon.setHTML(b.toSafeHtml());
-      icon.addStyleName("representation-information-badge");
+      icon.addStyleName("h6 representation-information-badge");
 
       final String filter = RepresentationInformationUtils.createRepresentationInformationFilter(
         RodaConstants.INDEX_REPRESENTATION, RodaConstants.REPRESENTATION_STATES, state);
