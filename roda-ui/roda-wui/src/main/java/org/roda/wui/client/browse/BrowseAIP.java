@@ -21,6 +21,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
@@ -107,11 +108,13 @@ public class BrowseAIP extends Composite {
         if (id == null) {
           HistoryUtils.newHistory(BrowseTop.RESOLVER);
         } else {
+          List<String> fieldsToReturn = new ArrayList<>(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+          fieldsToReturn.addAll(new ArrayList<>(Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_STATE,
+            RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL, RodaConstants.INGEST_SIP_IDS, RodaConstants.INGEST_JOB_ID,
+            RodaConstants.INGEST_UPDATE_JOB_IDS)));
+
           BrowserService.Util.getInstance().retrieveBrowseAIPBundle(id, LocaleInfo.getCurrentLocale().getLocaleName(),
-            new ArrayList<>(Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_STATE, RodaConstants.AIP_TITLE,
-              RodaConstants.AIP_LEVEL, RodaConstants.INGEST_SIP_IDS, RodaConstants.INGEST_JOB_ID,
-              RodaConstants.INGEST_UPDATE_JOB_IDS)),
-            new AsyncCallback<BrowseAIPBundle>() {
+            fieldsToReturn, new AsyncCallback<BrowseAIPBundle>() {
 
               @Override
               public void onFailure(Throwable caught) {

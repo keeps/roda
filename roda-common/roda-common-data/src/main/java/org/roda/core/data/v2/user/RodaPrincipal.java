@@ -34,7 +34,7 @@ public abstract class RodaPrincipal implements Serializable, RODAMember, IsModel
   }
 
   public RodaPrincipal(final String id, final String name) {
-    this(id, name, new HashSet<String>(), new HashSet<String>());
+    this(id, name, new HashSet<>(), new HashSet<>());
   }
 
   public RodaPrincipal(final String id, final String name, final Set<String> allRoles, final Set<String> directRoles) {

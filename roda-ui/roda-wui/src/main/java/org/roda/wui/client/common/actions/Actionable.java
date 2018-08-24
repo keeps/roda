@@ -7,6 +7,8 @@
  */
 package org.roda.wui.client.common.actions;
 
+import java.util.List;
+
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
@@ -16,12 +18,12 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface Actionable<T extends IsIndexed> {
 
-  static interface Action<T> {
-
+  interface Action<T> {
+    List<String> getMethods();
   }
 
-  public enum ActionImpact {
-    NONE, UPDATED, DESTROYED;
+  enum ActionImpact {
+    NONE, UPDATED, DESTROYED
   }
 
   // Generic, implemented in AbstractActionable

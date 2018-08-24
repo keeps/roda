@@ -218,7 +218,7 @@ public class RodaCoreFactory {
     });
 
   private static List<String> CONFIGURATIONS = new ArrayList<>(
-    Arrays.asList("roda-core.properties", "roda-roles.properties"));
+    Arrays.asList("roda-core.properties", "roda-roles.properties", "roda-permissions.properties"));
 
   /**
    * Shared configuration and message properties (cache). Includes properties
@@ -1829,6 +1829,7 @@ public class RodaCoreFactory {
           }
         }
       }
+
       rodaPropertiesCache.put(cacheName, newCacheEntry);
     }
   }

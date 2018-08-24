@@ -17,7 +17,6 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.common.actions.AbstractActionable;
-import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.AipActions;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
@@ -190,8 +189,19 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
       // do nothing
     }
 
-    public enum SearchAipAction implements Actionable.Action<IndexedAIP> {
-      SEARCH_DESCENDANTS, SEARCH_PACKAGE
+    public enum SearchAipAction implements Action<IndexedAIP> {
+      SEARCH_DESCENDANTS(), SEARCH_PACKAGE();
+
+      private List<String> methods;
+
+      SearchAipAction(String... methods) {
+        this.methods = Arrays.asList(methods);
+      }
+
+      @Override
+      public List<String> getMethods() {
+        return this.methods;
+      }
     }
 
     @Override
@@ -232,7 +242,6 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
       searchGroup.addButton(messages.searchAIP(), SearchAipAction.SEARCH_PACKAGE, ActionImpact.NONE, "btn-archive");
 
       actionableBundle.addGroup(searchGroup);
-
       return actionableBundle;
     }
   }

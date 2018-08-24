@@ -9,6 +9,7 @@ package org.roda.wui.client.common.actions;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
@@ -59,7 +60,21 @@ public class RepresentationInformationActions extends AbstractActionable<Represe
   }
 
   public enum RepresentationInformationAction implements Action<RepresentationInformation> {
-    NEW, REMOVE, START_PROCESS, EDIT, DOWNLOAD
+    NEW("org.roda.wui.api.controllers.Browser.createRepresentationInformation"),
+    REMOVE("org.roda.wui.api.controllers.Browser.delete(RepresentationInformation)"),
+    START_PROCESS("org.roda.wui.api.controllers.Jobs.createJob"),
+    EDIT("org.roda.wui.api.controllers.Browser.updateRepresentationInformation"), DOWNLOAD();
+
+    private List<String> methods;
+
+    RepresentationInformationAction(String... methods) {
+      this.methods = Arrays.asList(methods);
+    }
+
+    @Override
+    public List<String> getMethods() {
+      return this.methods;
+    }
   }
 
   @Override
@@ -73,17 +88,17 @@ public class RepresentationInformationActions extends AbstractActionable<Represe
 
   @Override
   public boolean canAct(Action<RepresentationInformation> action) {
-    return POSSIBLE_ACTIONS_WITHOUT_RI.contains(action);
+    return hasPermissions(action) && POSSIBLE_ACTIONS_WITHOUT_RI.contains(action);
   }
 
   @Override
   public boolean canAct(Action<RepresentationInformation> action, RepresentationInformation object) {
-    return POSSIBLE_ACTIONS_ON_SINGLE_RI.contains(action);
+    return hasPermissions(action) && POSSIBLE_ACTIONS_ON_SINGLE_RI.contains(action);
   }
 
   @Override
   public boolean canAct(Action<RepresentationInformation> action, SelectedItems<RepresentationInformation> objects) {
-    return POSSIBLE_ACTIONS_ON_MULTIPLE_RI.contains(action);
+    return hasPermissions(action) && POSSIBLE_ACTIONS_ON_MULTIPLE_RI.contains(action);
   }
 
   @Override
@@ -225,7 +240,6 @@ public class RepresentationInformationActions extends AbstractActionable<Represe
       ActionImpact.UPDATED, "btn-play");
 
     formatActionableBundle.addGroup(managementGroup).addGroup(preservationGroup);
-
     return formatActionableBundle;
   }
 }

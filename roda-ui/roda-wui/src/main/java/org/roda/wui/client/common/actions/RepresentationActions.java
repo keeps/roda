@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
@@ -20,6 +21,7 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.browse.BrowserService;
@@ -74,9 +76,28 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
     this.parentAip = parentAip;
   }
 
-  public enum RepresentationAction implements Actionable.Action<IndexedRepresentation> {
-    NEW, DOWNLOAD, CHANGE_TYPE, REMOVE, NEW_PROCESS, IDENTIFY_FORMATS, SHOW_EVENTS, SHOW_RISKS, UPLOAD_FILES,
-    CREATE_FOLDER, CHANGE_STATE
+  public enum RepresentationAction implements Action<IndexedRepresentation> {
+    NEW("org.roda.wui.api.controllers.Browser.createRepresentation"), DOWNLOAD(),
+    CHANGE_TYPE("org.roda.wui.api.controllers.Browser.changeRepresentationType"),
+    REMOVE("org.roda.wui.api.controllers.Browser.delete(IndexedRepresentation)"),
+    NEW_PROCESS("org.roda.wui.api.controllers.Jobs.createJob"),
+    IDENTIFY_FORMATS("org.roda.wui.api.controllers.Jobs.createJob"),
+    SHOW_EVENTS("org.roda.wui.api.controllers.Browser.find(IndexedPreservationEvent)"),
+    SHOW_RISKS("org.roda.wui.api.controllers.Browser.find(IndexedRisk)"),
+    UPLOAD_FILES("org.roda.wui.api.controllers.Browser.createFile"),
+    CREATE_FOLDER("org.roda.wui.api.controllers.Browser.createFolder"),
+    CHANGE_STATE("org.roda.wui.api.controllers.Browser.changeRepresentationStates");
+
+    private List<String> methods;
+
+    RepresentationAction(String... methods) {
+      this.methods = Arrays.asList(methods);
+    }
+
+    @Override
+    public List<String> getMethods() {
+      return this.methods;
+    }
   }
 
   @Override
@@ -94,17 +115,18 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
 
   @Override
   public boolean canAct(Action<IndexedRepresentation> action) {
-    return POSSIBLE_ACTIONS_WITHOUT_REPRESENTATION.contains(action) && parentAip != null;
+    return hasPermissions(action) && POSSIBLE_ACTIONS_WITHOUT_REPRESENTATION.contains(action) && parentAip != null;
   }
 
   @Override
   public boolean canAct(Action<IndexedRepresentation> action, IndexedRepresentation representation) {
-    return POSSIBLE_ACTIONS_ON_SINGLE_REPRESENTATION.contains(action);
+    return hasPermissions(action, Optional.of(representation))
+      && POSSIBLE_ACTIONS_ON_SINGLE_REPRESENTATION.contains(action);
   }
 
   @Override
   public boolean canAct(Action<IndexedRepresentation> action, SelectedItems<IndexedRepresentation> selectedItems) {
-    return POSSIBLE_ACTIONS_ON_MULTIPLE_REPRESENTATIONS.contains(action);
+    return hasPermissions(action) && POSSIBLE_ACTIONS_ON_MULTIPLE_REPRESENTATIONS.contains(action);
   }
 
   @Override
@@ -135,7 +157,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
   }
 
   @Override
-  public void act(Actionable.Action<IndexedRepresentation> action, IndexedRepresentation representation,
+  public void act(Action<IndexedRepresentation> action, IndexedRepresentation representation,
     AsyncCallback<ActionImpact> callback) {
     if (RepresentationAction.DOWNLOAD.equals(action)) {
       download(representation, callback);
@@ -166,7 +188,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
    * Act on multiple files from different representations
    */
   @Override
-  public void act(Actionable.Action<IndexedRepresentation> action, SelectedItems<IndexedRepresentation> selectedItems,
+  public void act(Action<IndexedRepresentation> action, SelectedItems<IndexedRepresentation> selectedItems,
     AsyncCallback<ActionImpact> callback) {
     if (RepresentationAction.REMOVE.equals(action)) {
       remove(selectedItems, callback);
@@ -463,7 +485,6 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
       ActionImpact.UPDATED, "btn-plus");
 
     representationActionableBundle.addGroup(managementGroup).addGroup(preservationGroup).addGroup(filesAndFoldersGroup);
-
     return representationActionableBundle;
   }
 }

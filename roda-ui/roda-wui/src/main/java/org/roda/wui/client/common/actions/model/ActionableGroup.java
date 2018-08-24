@@ -4,7 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.ip.HasPermissions;
+import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.common.client.tools.ConfigurationManager;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
  * @author Bruno Ferreira <bferreira@keep.pt>

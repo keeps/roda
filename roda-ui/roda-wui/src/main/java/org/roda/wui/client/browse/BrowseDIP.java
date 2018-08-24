@@ -32,6 +32,7 @@ import org.roda.wui.client.browse.bundle.DipBundle;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.DIPFileList;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
+import org.roda.wui.client.common.lists.pagination.ListSelectionUtils.ProcessRelativeItem;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
@@ -137,8 +138,6 @@ public class BrowseDIP extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
-  public static final int DEFAULT_DIPFILE_INDEX = 0;
   public static final Sorter DEFAULT_DIPFILE_SORTER = new Sorter(new SortParameter(RodaConstants.DIPFILE_ID, false));
 
   // system
@@ -154,7 +153,6 @@ public class BrowseDIP extends Composite {
   private DIPFile dipFile;
   private List<DIPFile> dipFileAncestors;
 
-  @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
   // interface
@@ -243,7 +241,7 @@ public class BrowseDIP extends Composite {
       refererBreadcrumb.updatePath(BreadcrumbUtils.getFileBreadcrumbs(aip, representation, file));
       refererBreadcrumb.setVisible(true);
       ListSelectionUtils.bindLayout(file, refererPreviousButton, refererNextButton, keyboardFocus, requireCtrlModifier,
-        requireShiftModifier, requireAltModifier, new ListSelectionUtils.ProcessRelativeItem<IndexedFile>() {
+        requireShiftModifier, requireAltModifier, new ProcessRelativeItem<IndexedFile>() {
 
           @Override
           public void process(final IndexedFile file) {
@@ -258,7 +256,7 @@ public class BrowseDIP extends Composite {
       refererBreadcrumb.setVisible(true);
       ListSelectionUtils.bindLayout(representation, refererPreviousButton, refererNextButton, keyboardFocus,
         requireCtrlModifier, requireShiftModifier, requireAltModifier,
-        new ListSelectionUtils.ProcessRelativeItem<IndexedRepresentation>() {
+        new ProcessRelativeItem<IndexedRepresentation>() {
 
           @Override
           public void process(final IndexedRepresentation representation) {
@@ -273,7 +271,7 @@ public class BrowseDIP extends Composite {
       refererBreadcrumb.updatePath(BreadcrumbUtils.getAipBreadcrumbs(aip));
       refererBreadcrumb.setVisible(true);
       ListSelectionUtils.bindLayout(aip, refererPreviousButton, refererNextButton, keyboardFocus, requireCtrlModifier,
-        requireShiftModifier, requireAltModifier, new ListSelectionUtils.ProcessRelativeItem<IndexedAIP>() {
+        requireShiftModifier, requireAltModifier, new ProcessRelativeItem<IndexedAIP>() {
 
           @Override
           public void process(final IndexedAIP aip) {
@@ -335,9 +333,7 @@ public class BrowseDIP extends Composite {
 
       SimplePanel layout = new SimplePanel();
       layout.add(search);
-
       center.add(layout);
-
       layout.addStyleName("browseDip-topList");
     }
 
@@ -379,7 +375,6 @@ public class BrowseDIP extends Composite {
           }
         }
       });
-
   }
 
   private List<BreadcrumbItem> getBreadcrumbs() {

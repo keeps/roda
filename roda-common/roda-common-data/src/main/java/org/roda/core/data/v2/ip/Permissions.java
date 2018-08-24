@@ -24,7 +24,7 @@ public class Permissions implements Serializable {
   private static final long serialVersionUID = -3534275853026959624L;
 
   public enum PermissionType {
-    CREATE, READ, UPDATE, DELETE, GRANT;
+    CREATE, READ, UPDATE, DELETE, GRANT
   }
 
   private Map<PermissionType, Set<String>> users;

@@ -32,9 +32,6 @@ import org.roda.core.storage.StorageService;
 
 public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
 
-  // private static final Logger LOGGER =
-  // LoggerFactory.getLogger(AIPCollection.class);
-
   @Override
   public Class<IndexedAIP> getIndexClass() {
     return IndexedAIP.class;
@@ -198,7 +195,6 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
 
   @Override
   public IndexedAIP fromSolrDocument(SolrDocument doc, List<String> fieldsToReturn) throws GenericException {
-
     final IndexedAIP ret = super.fromSolrDocument(doc, fieldsToReturn);
 
     final String parentId = SolrUtils.objectToString(doc.get(RodaConstants.AIP_PARENT_ID), null);

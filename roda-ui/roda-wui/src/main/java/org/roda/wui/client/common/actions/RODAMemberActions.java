@@ -2,6 +2,7 @@ package org.roda.wui.client.common.actions;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.v2.index.select.SelectedItems;
@@ -39,10 +40,26 @@ public class RODAMemberActions extends AbstractActionable<RODAMember> {
     Arrays.asList(RODAMemberAction.ACTIVATE, RODAMemberAction.DEACTIVATE, RODAMemberAction.REMOVE));
 
   private RODAMemberActions() {
+    // do nothing
   }
 
-  public enum RODAMemberAction implements Actionable.Action<RODAMember> {
-    NEW_USER, NEW_GROUP, ACTIVATE, DEACTIVATE, REMOVE
+  public enum RODAMemberAction implements Action<RODAMember> {
+    NEW_USER("org.roda.wui.api.controllers.UserManagement.createUser"),
+    NEW_GROUP("org.roda.wui.api.controllers.UserManagement.createGroup"),
+    ACTIVATE("org.roda.wui.api.controllers.UserManagement.updateUser"),
+    DEACTIVATE("org.roda.wui.api.controllers.UserManagement.updateUser"),
+    REMOVE("org.roda.wui.api.controllers.UserManagement.deleteUser");
+
+    private List<String> methods;
+
+    RODAMemberAction(String... methods) {
+      this.methods = Arrays.asList(methods);
+    }
+
+    @Override
+    public List<String> getMethods() {
+      return this.methods;
+    }
   }
 
   @Override
@@ -56,22 +73,27 @@ public class RODAMemberActions extends AbstractActionable<RODAMember> {
 
   @Override
   public boolean canAct(Action<RODAMember> action) {
-    return POSSIBLE_ACTIONS_WITHOUT_MEMBER.contains(action);
+    return hasPermissions(action) && POSSIBLE_ACTIONS_WITHOUT_MEMBER.contains(action);
   }
 
   @Override
   public boolean canAct(Action<RODAMember> action, RODAMember object) {
-    if (object.isUser()) {
-      return (action.equals(RODAMemberAction.DEACTIVATE) && object.isActive())
-        || (action.equals(RODAMemberAction.ACTIVATE) && !object.isActive()) || (action.equals(RODAMemberAction.REMOVE));
+    if (hasPermissions(action)) {
+      if (object.isUser()) {
+        return (action.equals(RODAMemberAction.DEACTIVATE) && object.isActive())
+          || (action.equals(RODAMemberAction.ACTIVATE) && !object.isActive())
+          || (action.equals(RODAMemberAction.REMOVE));
+      } else {
+        return POSSIBLE_ACTIONS_ON_GROUP.contains(action);
+      }
     } else {
-      return POSSIBLE_ACTIONS_ON_GROUP.contains(action);
+      return false;
     }
   }
 
   @Override
   public boolean canAct(Action<RODAMember> action, SelectedItems<RODAMember> objects) {
-    return POSSIBLE_ACTIONS_ON_MEMBERS.contains(action);
+    return hasPermissions(action) && POSSIBLE_ACTIONS_ON_MEMBERS.contains(action);
   }
 
   @Override
@@ -166,7 +188,6 @@ public class RODAMemberActions extends AbstractActionable<RODAMember> {
     actionableGroup.addButton(messages.editUserRemove(), RODAMemberAction.REMOVE, ActionImpact.DESTROYED, "btn-ban");
 
     transferredResourcesActionableBundle.addGroup(actionableGroup);
-
     return transferredResourcesActionableBundle;
   }
 }

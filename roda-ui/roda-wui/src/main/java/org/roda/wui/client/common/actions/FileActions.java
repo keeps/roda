@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
@@ -79,8 +80,28 @@ public class FileActions extends AbstractActionable<IndexedFile> {
     this.representationId = representationId;
   }
 
-  public enum FileAction implements Actionable.Action<IndexedFile> {
-    DOWNLOAD, RENAME, MOVE, REMOVE, UPLOAD_FILES, CREATE_FOLDER, NEW_PROCESS, IDENTIFY_FORMATS, SHOW_EVENTS, SHOW_RISKS;
+  // MANAGEMENT
+  public enum FileAction implements Action<IndexedFile> {
+    DOWNLOAD(), RENAME("org.roda.wui.api.controllers.Browser.renameFolder"),
+    MOVE("org.roda.wui.api.controllers.Browser.moveFiles"),
+    REMOVE("org.roda.wui.api.controllers.Browser.delete(IndexedFile)"),
+    UPLOAD_FILES("org.roda.wui.api.controllers.Browser.createFile"),
+    CREATE_FOLDER("org.roda.wui.api.controllers.Browser.createFolder"),
+    NEW_PROCESS("org.roda.wui.api.controllers.Jobs.createJob"),
+    IDENTIFY_FORMATS("org.roda.wui.api.controllers.Jobs.createJob"),
+    SHOW_EVENTS("org.roda.wui.api.controllers.Browser.find(IndexedPreservationEvent)"),
+    SHOW_RISKS("org.roda.wui.api.controllers.Browser.find(IndexedRisk)");
+
+    private List<String> methods;
+
+    FileAction(String... methods) {
+      this.methods = Arrays.asList(methods);
+    }
+
+    @Override
+    public List<String> getMethods() {
+      return this.methods;
+    }
   }
 
   @Override
@@ -98,29 +119,36 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
   @Override
   public boolean canAct(Action<IndexedFile> action, IndexedFile file) {
-    boolean ret;
-    if (file.isDirectory()) {
-      ret = POSSIBLE_ACTIONS_ON_SINGLE_FILE_DIRECTORY.contains(action);
-    } else {
-      ret = POSSIBLE_ACTIONS_ON_SINGLE_FILE_BITSTREAM.contains(action);
+    boolean canAct = false;
+
+    if (hasPermissions(action, Optional.of(file))) {
+      if (file.isDirectory()) {
+        canAct = POSSIBLE_ACTIONS_ON_SINGLE_FILE_DIRECTORY.contains(action);
+      } else {
+        canAct = POSSIBLE_ACTIONS_ON_SINGLE_FILE_BITSTREAM.contains(action);
+      }
     }
-    return ret;
+
+    return canAct;
   }
 
   @Override
   public boolean canAct(Action<IndexedFile> action, SelectedItems<IndexedFile> selectedItems) {
-    boolean ret;
-    if (aipId != null && representationId != null) {
-      ret = POSSIBLE_ACTIONS_ON_MULTIPLE_FILES_FROM_THE_SAME_REPRESENTATION.contains(action);
-    } else {
-      ret = POSSIBLE_ACTIONS_ON_MULTIPLE_FILES_FROM_DIFFERENT_REPRESENTATIONS.contains(action);
+    boolean canAct = false;
+
+    if (hasPermissions(action)) {
+      if (aipId != null && representationId != null) {
+        canAct = POSSIBLE_ACTIONS_ON_MULTIPLE_FILES_FROM_THE_SAME_REPRESENTATION.contains(action);
+      } else {
+        canAct = POSSIBLE_ACTIONS_ON_MULTIPLE_FILES_FROM_DIFFERENT_REPRESENTATIONS.contains(action);
+      }
     }
 
-    return ret;
+    return canAct;
   }
 
   @Override
-  public void act(Actionable.Action<IndexedFile> action, IndexedFile file, AsyncCallback<ActionImpact> callback) {
+  public void act(Action<IndexedFile> action, IndexedFile file, AsyncCallback<ActionImpact> callback) {
     if (FileAction.DOWNLOAD.equals(action)) {
       download(file, callback);
     } else if (FileAction.RENAME.equals(action)) {
@@ -150,7 +178,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
    * Act on multiple files from different representations
    */
   @Override
-  public void act(Actionable.Action<IndexedFile> action, SelectedItems<IndexedFile> selectedItems,
+  public void act(Action<IndexedFile> action, SelectedItems<IndexedFile> selectedItems,
     AsyncCallback<ActionImpact> callback) {
     if (FileAction.MOVE.equals(action) && aipId != null && representationId != null) {
       move(aipId, representationId, selectedItems, callback);
@@ -208,7 +236,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
   public void move(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
     move(file.getAipId(), file.getRepresentationId(),
-      new SelectedItemsList<IndexedFile>(Arrays.asList(file.getUUID()), IndexedFile.class.getName()), callback);
+      new SelectedItemsList<>(Arrays.asList(file.getUUID()), IndexedFile.class.getName()), callback);
   }
 
   public void move(final String aipId, final String representationId, final SelectedItems<IndexedFile> selectedItems,
@@ -336,8 +364,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
   }
 
   public void newProcess(IndexedFile file, final AsyncCallback<ActionImpact> callback) {
-    newProcess(new SelectedItemsList<IndexedFile>(Arrays.asList(file.getUUID()), IndexedFile.class.getName()),
-      callback);
+    newProcess(new SelectedItemsList<>(Arrays.asList(file.getUUID()), IndexedFile.class.getName()), callback);
   }
 
   public void newProcess(SelectedItems<IndexedFile> selected, final AsyncCallback<ActionImpact> callback) {
@@ -349,8 +376,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
   }
 
   public void identifyFormats(IndexedFile file, final AsyncCallback<ActionImpact> callback) {
-    identifyFormats(new SelectedItemsList<IndexedFile>(Arrays.asList(file.getUUID()), IndexedFile.class.getName()),
-      callback);
+    identifyFormats(new SelectedItemsList<>(Arrays.asList(file.getUUID()), IndexedFile.class.getName()), callback);
   }
 
   public void identifyFormats(SelectedItems<IndexedFile> selected, final AsyncCallback<ActionImpact> callback) {
@@ -531,7 +557,6 @@ public class FileActions extends AbstractActionable<IndexedFile> {
       "fileShowRisksButton");
 
     fileActionableBundle.addGroup(managementGroup).addGroup(preservationGroup);
-
     return fileActionableBundle;
   }
 }

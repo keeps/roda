@@ -8,6 +8,7 @@
 package org.roda.wui.common.client.tools;
 
 import java.util.LinkedList;
+import java.util.Optional;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -34,6 +35,10 @@ public abstract class CachedAsynRequest<T> {
       waitQueue.add(callback);
       ensureIsLoadingFromServer();
     }
+  }
+
+  public Optional<T> getCached() {
+    return Optional.ofNullable(cached);
   }
 
   private void ensureIsLoadingFromServer() {

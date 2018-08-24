@@ -60,7 +60,6 @@ public class UserLoginServiceImpl extends RemoteServiceServlet implements UserLo
   @Override
   public Map<String, String> getRodaProperties() {
     return RodaCoreFactory.getPropertiesFromCache(WUI_LOGIN_CACHE, WUI_LOGIN_CACHE_PREFIXES);
-
   }
 
 }

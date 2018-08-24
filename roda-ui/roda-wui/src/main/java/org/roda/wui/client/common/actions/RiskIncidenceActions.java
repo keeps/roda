@@ -9,6 +9,7 @@ package org.roda.wui.client.common.actions;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
@@ -53,7 +54,20 @@ public class RiskIncidenceActions extends AbstractActionable<RiskIncidence> {
   }
 
   public enum RiskIncidenceAction implements Action<RiskIncidence> {
-    EDIT, REMOVE, START_PROCESS
+    EDIT("org.roda.wui.api.controllers.Browser.updateRiskIncidence"),
+    REMOVE("org.roda.wui.api.controllers.Browser.delete(RiskIncidence)"),
+    START_PROCESS("org.roda.wui.api.controllers.Jobs.createJob");
+
+    private List<String> methods;
+
+    RiskIncidenceAction(String... methods) {
+      this.methods = Arrays.asList(methods);
+    }
+
+    @Override
+    public List<String> getMethods() {
+      return this.methods;
+    }
   }
 
   @Override
@@ -71,12 +85,12 @@ public class RiskIncidenceActions extends AbstractActionable<RiskIncidence> {
 
   @Override
   public boolean canAct(Action<RiskIncidence> action, RiskIncidence object) {
-    return POSSIBLE_ACTIONS_ON_SINGLE_RISK_INCIDENCE.contains(action);
+    return hasPermissions(action) && POSSIBLE_ACTIONS_ON_SINGLE_RISK_INCIDENCE.contains(action);
   }
 
   @Override
   public boolean canAct(Action<RiskIncidence> action, SelectedItems<RiskIncidence> objects) {
-    return POSSIBLE_ACTIONS_ON_MULTIPLE_RISK_INCIDENCES.contains(action);
+    return hasPermissions(action) && POSSIBLE_ACTIONS_ON_MULTIPLE_RISK_INCIDENCES.contains(action);
   }
 
   @Override
@@ -188,7 +202,6 @@ public class RiskIncidenceActions extends AbstractActionable<RiskIncidence> {
       ActionImpact.UPDATED, "btn-play");
 
     actionableBundle.addGroup(managementGroup).addGroup(preservationGroup);
-
     return actionableBundle;
   }
 }

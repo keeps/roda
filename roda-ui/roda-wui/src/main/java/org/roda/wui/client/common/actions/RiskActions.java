@@ -9,6 +9,7 @@ package org.roda.wui.client.common.actions;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
@@ -61,7 +62,22 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
   }
 
   public enum IndexedRiskAction implements Action<IndexedRisk> {
-    NEW, REMOVE, START_PROCESS, EDIT, REFRESH, HISTORY
+    NEW("org.roda.wui.api.controllers.Risks.createRisk"),
+    REMOVE("org.roda.wui.api.controllers.Browser.delete(IndexedRisk)"),
+    START_PROCESS("org.roda.wui.api.controllers.Jobs.createJob"),
+    EDIT("org.roda.wui.api.controllers.Browser.updateRisk"), REFRESH(),
+    HISTORY("org.roda.wui.api.controllers.Browser.retrieveRiskVersions");
+
+    private List<String> methods;
+
+    IndexedRiskAction(String... methods) {
+      this.methods = Arrays.asList(methods);
+    }
+
+    @Override
+    public List<String> getMethods() {
+      return this.methods;
+    }
   }
 
   @Override
@@ -79,17 +95,18 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
 
   @Override
   public boolean canAct(Action<IndexedRisk> action) {
-    return POSSIBLE_ACTIONS_WITHOUT_RISK.contains(action);
+    return hasPermissions(action) && POSSIBLE_ACTIONS_WITHOUT_RISK.contains(action);
   }
 
   @Override
   public boolean canAct(Action<IndexedRisk> action, IndexedRisk object) {
-    return POSSIBLE_ACTIONS_ON_SINGLE_RISK.contains(action) || (action.equals(IndexedRiskAction.HISTORY) && hasHistory);
+    return hasPermissions(action)
+      && (POSSIBLE_ACTIONS_ON_SINGLE_RISK.contains(action) || (action.equals(IndexedRiskAction.HISTORY) && hasHistory));
   }
 
   @Override
   public boolean canAct(Action<IndexedRisk> action, SelectedItems<IndexedRisk> objects) {
-    return POSSIBLE_ACTIONS_ON_MULTIPLE_RISKS.contains(action);
+    return hasPermissions(action) && POSSIBLE_ACTIONS_ON_MULTIPLE_RISKS.contains(action);
   }
 
   @Override
@@ -242,7 +259,6 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
       ActionImpact.UPDATED, "btn-play");
 
     formatActionableBundle.addGroup(managementGroup).addGroup(preservationGroup);
-
     return formatActionableBundle;
   }
 }

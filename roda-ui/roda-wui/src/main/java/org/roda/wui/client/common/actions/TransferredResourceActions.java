@@ -70,8 +70,24 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
     this.parentTransferredResource = parentTransferredResource;
   }
 
-  public enum TransferredResourceAction implements Actionable.Action<TransferredResource> {
-    REFRESH, RENAME, MOVE, UPLOAD, NEW_FOLDER, REMOVE, NEW_PROCESS
+  public enum TransferredResourceAction implements Action<TransferredResource> {
+    REFRESH, RENAME("org.roda.wui.api.controllers.Browser.renameTransferredResource"),
+    MOVE("org.roda.wui.api.controllers.Browser.moveTransferredResource"),
+    UPLOAD("org.roda.wui.api.controllers.Browser.createTransferredResourceFile"),
+    NEW_FOLDER("org.roda.wui.api.controllers.Browser.createTransferredResourcesFolder"),
+    REMOVE("org.roda.wui.api.controllers.Browser.delete(TransferredResource)"),
+    NEW_PROCESS("org.roda.wui.api.controllers.Jobs.createJob");
+
+    private List<String> methods;
+
+    TransferredResourceAction(String... methods) {
+      this.methods = Arrays.asList(methods);
+    }
+
+    @Override
+    public List<String> getMethods() {
+      return this.methods;
+    }
   }
 
   @Override
@@ -89,21 +105,21 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
 
   @Override
   public boolean canAct(Action<TransferredResource> action) {
-    return POSSIBLE_ACTIONS_WITHOUT_TRANSFERRED_RESOURCE.contains(action);
+    return hasPermissions(action) && POSSIBLE_ACTIONS_WITHOUT_TRANSFERRED_RESOURCE.contains(action);
   }
 
   @Override
   public boolean canAct(Action<TransferredResource> action, TransferredResource object) {
     if (object.isFile()) {
-      return POSSIBLE_ACTIONS_ON_FILE_TRANSFERRED_RESOURCE.contains(action);
+      return hasPermissions(action) && POSSIBLE_ACTIONS_ON_FILE_TRANSFERRED_RESOURCE.contains(action);
     } else {
-      return POSSIBLE_ACTIONS_ON_FOLDER_TRANSFERRED_RESOURCE.contains(action);
+      return hasPermissions(action) && POSSIBLE_ACTIONS_ON_FOLDER_TRANSFERRED_RESOURCE.contains(action);
     }
   }
 
   @Override
   public boolean canAct(Action<TransferredResource> action, SelectedItems<TransferredResource> objects) {
-    return POSSIBLE_ACTIONS_ON_MULTIPLE_TRANSFERRED_RESOURCES.contains(action);
+    return hasPermissions(action) && POSSIBLE_ACTIONS_ON_MULTIPLE_TRANSFERRED_RESOURCES.contains(action);
   }
 
   @Override
@@ -399,7 +415,6 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
       ActionImpact.UPDATED, "btn-play");
 
     transferredResourcesActionableBundle.addGroup(managementGroup).addGroup(preservationGroup);
-
     return transferredResourcesActionableBundle;
   }
 }

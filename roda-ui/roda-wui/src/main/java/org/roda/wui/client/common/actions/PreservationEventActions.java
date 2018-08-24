@@ -9,6 +9,7 @@ package org.roda.wui.client.common.actions;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
@@ -47,7 +48,18 @@ public class PreservationEventActions extends AbstractActionable<IndexedPreserva
   }
 
   public enum PreservationEventAction implements Action<IndexedPreservationEvent> {
-    DOWNLOAD;
+    DOWNLOAD();
+
+    private List<String> methods;
+
+    PreservationEventAction(String... methods) {
+      this.methods = Arrays.asList(methods);
+    }
+
+    @Override
+    public List<String> getMethods() {
+      return this.methods;
+    }
   }
 
   @Override
@@ -72,7 +84,7 @@ public class PreservationEventActions extends AbstractActionable<IndexedPreserva
 
   @Override
   public boolean canAct(Action<IndexedPreservationEvent> action, IndexedPreservationEvent event) {
-    return POSSIBLE_ACTIONS_ON_SINGLE_EVENT.contains(action);
+    return hasPermissions(action) && POSSIBLE_ACTIONS_ON_SINGLE_EVENT.contains(action);
   }
 
   @Override
@@ -111,7 +123,6 @@ public class PreservationEventActions extends AbstractActionable<IndexedPreserva
       "btn-download");
 
     preservationEventActionableBundle.addGroup(managementGroup);
-
     return preservationEventActionableBundle;
   }
 }

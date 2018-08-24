@@ -3042,27 +3042,6 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static void changeRepresentationType(User user, SelectedItems<IndexedRepresentation> selected, String newType,
-    String details) throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
-
-    try {
-      BrowserHelper.changeRepresentationType(user, selected, newType, details);
-    } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
-      throw e;
-    } finally {
-      // register action
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selected,
-        RodaConstants.CONTROLLER_TYPE_PARAM, newType);
-    }
-  }
-
   public static void changeAIPType(User user, SelectedItems<IndexedAIP> selected, String newType, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -3074,6 +3053,27 @@ public class Browser extends RodaWuiController {
 
     try {
       BrowserHelper.changeAIPType(user, selected, newType, details);
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selected,
+        RodaConstants.CONTROLLER_TYPE_PARAM, newType);
+    }
+  }
+
+  public static void changeRepresentationType(User user, SelectedItems<IndexedRepresentation> selected, String newType,
+    String details) throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+
+    try {
+      BrowserHelper.changeRepresentationType(user, selected, newType, details);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;

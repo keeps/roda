@@ -9,6 +9,8 @@ package org.roda.wui.client.common.actions;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
@@ -52,8 +54,21 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
   private DisseminationActions() {
   }
 
-  public enum DisseminationAction implements Actionable.Action<IndexedDIP> {
-    DOWNLOAD, REMOVE, NEW_PROCESS, UPDATE_PERMISSIONS;
+  public enum DisseminationAction implements Action<IndexedDIP> {
+    DOWNLOAD(), REMOVE("org.roda.wui.api.controllers.Browser.delete(IndexedDIP)"),
+    NEW_PROCESS("org.roda.wui.api.controllers.Jobs.createJob"),
+    UPDATE_PERMISSIONS("org.roda.wui.api.controllers.Browser.updateDIPPermissions");
+
+    private List<String> methods;
+
+    DisseminationAction(String... methods) {
+      this.methods = Arrays.asList(methods);
+    }
+
+    @Override
+    public List<String> getMethods() {
+      return this.methods;
+    }
   }
 
   @Override
@@ -67,17 +82,16 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
 
   @Override
   public boolean canAct(Action<IndexedDIP> action, IndexedDIP dip) {
-    return POSSIBLE_ACTIONS_ON_SINGLE_DISSEMINATION.contains(action);
+    return hasPermissions(action, Optional.of(dip)) && POSSIBLE_ACTIONS_ON_SINGLE_DISSEMINATION.contains(action);
   }
 
   @Override
   public boolean canAct(Action<IndexedDIP> action, SelectedItems<IndexedDIP> selectedItems) {
-    return POSSIBLE_ACTIONS_ON_MULTIPLE_DISSEMINATIONS.contains(action);
+    return hasPermissions(action) && POSSIBLE_ACTIONS_ON_MULTIPLE_DISSEMINATIONS.contains(action);
   }
 
   @Override
-  public void act(Actionable.Action<IndexedDIP> action, IndexedDIP dissemination,
-    AsyncCallback<ActionImpact> callback) {
+  public void act(Action<IndexedDIP> action, IndexedDIP dissemination, AsyncCallback<ActionImpact> callback) {
     if (DisseminationAction.DOWNLOAD.equals(action)) {
       download(dissemination, callback);
     } else if (DisseminationAction.REMOVE.equals(action)) {
@@ -95,7 +109,7 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
    * Act on multiple files from different representations
    */
   @Override
-  public void act(Actionable.Action<IndexedDIP> action, SelectedItems<IndexedDIP> selectedItems,
+  public void act(Action<IndexedDIP> action, SelectedItems<IndexedDIP> selectedItems,
     AsyncCallback<ActionImpact> callback) {
     if (DisseminationAction.REMOVE.equals(action)) {
       remove(selectedItems, callback);
@@ -221,7 +235,6 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
       ActionImpact.UPDATED, "btn-play");
 
     dipActionableBundle.addGroup(managementGroup).addGroup(preservationGroup);
-
     return dipActionableBundle;
   }
 }

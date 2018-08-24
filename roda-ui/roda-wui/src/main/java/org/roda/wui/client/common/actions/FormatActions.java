@@ -9,6 +9,7 @@ package org.roda.wui.client.common.actions;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
@@ -54,7 +55,21 @@ public class FormatActions extends AbstractActionable<Format> {
   }
 
   public enum FormatAction implements Action<Format> {
-    NEW, REMOVE, START_PROCESS, EDIT
+    NEW("org.roda.wui.api.controllers.Browser.createFormat"),
+    REMOVE("org.roda.wui.api.controllers.Browser.delete(Format)"),
+    START_PROCESS("org.roda.wui.api.controllers.Jobs.createJob"),
+    EDIT("org.roda.wui.api.controllers.Browser.updateFormat");
+
+    private List<String> methods;
+
+    FormatAction(String... methods) {
+      this.methods = Arrays.asList(methods);
+    }
+
+    @Override
+    public List<String> getMethods() {
+      return this.methods;
+    }
   }
 
   @Override
@@ -68,17 +83,17 @@ public class FormatActions extends AbstractActionable<Format> {
 
   @Override
   public boolean canAct(Action<Format> action) {
-    return POSSIBLE_ACTIONS_WITHOUT_FORMAT.contains(action);
+    return hasPermissions(action) && POSSIBLE_ACTIONS_WITHOUT_FORMAT.contains(action);
   }
 
   @Override
   public boolean canAct(Action<Format> action, Format object) {
-    return POSSIBLE_ACTIONS_ON_SINGLE_FORMAT.contains(action);
+    return hasPermissions(action) && POSSIBLE_ACTIONS_ON_SINGLE_FORMAT.contains(action);
   }
 
   @Override
   public boolean canAct(Action<Format> action, SelectedItems<Format> objects) {
-    return POSSIBLE_ACTIONS_ON_MULTIPLE_FORMATS.contains(action);
+    return hasPermissions(action) && POSSIBLE_ACTIONS_ON_MULTIPLE_FORMATS.contains(action);
   }
 
   @Override
@@ -201,7 +216,6 @@ public class FormatActions extends AbstractActionable<Format> {
       ActionImpact.UPDATED, "btn-play");
 
     formatActionableBundle.addGroup(managementGroup).addGroup(preservationGroup);
-
     return formatActionableBundle;
   }
 }

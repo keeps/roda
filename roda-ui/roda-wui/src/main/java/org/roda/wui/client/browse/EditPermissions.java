@@ -149,7 +149,7 @@ public class EditPermissions extends Composite {
 
             @Override
             public void onSuccess(IndexedDIP dip) {
-              EditPermissions edit = new EditPermissions(IndexedDIP.class.getName(), (HasPermissions) dip);
+              EditPermissions edit = new EditPermissions(IndexedDIP.class.getName(), dip);
               callback.onSuccess(edit);
             }
           });

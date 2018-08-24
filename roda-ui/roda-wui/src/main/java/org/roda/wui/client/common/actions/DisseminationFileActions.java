@@ -9,9 +9,12 @@ package org.roda.wui.client.common.actions;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.roda.core.data.v2.ip.DIPFile;
+import org.roda.core.data.v2.ip.Permissions;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.common.client.tools.RestUtils;
@@ -34,8 +37,19 @@ public class DisseminationFileActions extends AbstractActionable<DIPFile> {
     // do nothing
   }
 
-  public enum DisseminationFileAction implements Actionable.Action<DIPFile> {
-    DOWNLOAD;
+  public enum DisseminationFileAction implements Action<DIPFile> {
+    DOWNLOAD();
+
+    private List<String> methods;
+
+    DisseminationFileAction(String... methods) {
+      this.methods = Arrays.asList(methods);
+    }
+
+    @Override
+    public List<String> getMethods() {
+      return this.methods;
+    }
   }
 
   @Override
@@ -49,11 +63,11 @@ public class DisseminationFileActions extends AbstractActionable<DIPFile> {
 
   @Override
   public boolean canAct(Action<DIPFile> action, DIPFile dip) {
-    return POSSIBLE_ACTIONS_ON_SINGLE_DISSEMINATION_FILE.contains(action);
+    return hasPermissions(action, Optional.of(dip)) && POSSIBLE_ACTIONS_ON_SINGLE_DISSEMINATION_FILE.contains(action);
   }
 
   @Override
-  public void act(Actionable.Action<DIPFile> action, DIPFile disseminationFile, AsyncCallback<ActionImpact> callback) {
+  public void act(Action<DIPFile> action, DIPFile disseminationFile, AsyncCallback<ActionImpact> callback) {
     if (DisseminationFileAction.DOWNLOAD.equals(action)) {
       download(disseminationFile, callback);
     } else {
@@ -82,7 +96,6 @@ public class DisseminationFileActions extends AbstractActionable<DIPFile> {
       "btn-download");
 
     dipFileActionableBundle.addGroup(managementGroup);
-
     return dipFileActionableBundle;
   }
 }
