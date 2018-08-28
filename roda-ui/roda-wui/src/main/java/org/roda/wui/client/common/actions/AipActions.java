@@ -22,6 +22,7 @@ import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.BrowserService;
@@ -64,7 +65,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   public static final String NO_AIP_PARENT = null;
   public static final AIPState NO_AIP_STATE = null;
 
-  private static final AipActions GENERAL_INSTANCE = new AipActions(NO_AIP_PARENT, NO_AIP_STATE);
+  private static final AipActions GENERAL_INSTANCE = new AipActions(NO_AIP_PARENT, NO_AIP_STATE, null);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private static final Set<AipAction> POSSIBLE_ACTIONS_ON_NO_AIP_TOP = new HashSet<>(
@@ -86,10 +87,12 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
   private final String parentAipId;
   private final AIPState parentAipState;
+  private final Permissions permissions;
 
-  private AipActions(String parentAipId, AIPState parentAipState) {
+  private AipActions(String parentAipId, AIPState parentAipState, Permissions permissions) {
     this.parentAipId = parentAipId;
     this.parentAipState = parentAipState;
+    this.permissions = permissions;
   }
 
   public enum AipAction implements Action<IndexedAIP> {
@@ -124,41 +127,36 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     return GENERAL_INSTANCE;
   }
 
-  public static AipActions get(String parentAipId, AIPState parentAipState) {
-    return new AipActions(parentAipId, parentAipState);
+  public static AipActions get(String parentAipId, AIPState parentAipState, Permissions permissions) {
+    return new AipActions(parentAipId, parentAipState, permissions);
   }
 
   @Override
   public boolean canAct(Action<IndexedAIP> action) {
     if (parentAipId == NO_AIP_PARENT) {
-      return hasPermissions(action) && POSSIBLE_ACTIONS_ON_NO_AIP_TOP.contains(action);
+      return hasPermissions(action, permissions) && POSSIBLE_ACTIONS_ON_NO_AIP_TOP.contains(action);
     } else {
-      return hasPermissions(action) && POSSIBLE_ACTIONS_ON_NO_AIP_BELOW.contains(action);
+      return hasPermissions(action, permissions) && POSSIBLE_ACTIONS_ON_NO_AIP_BELOW.contains(action);
     }
   }
 
   @Override
   public boolean canAct(Action<IndexedAIP> action, IndexedAIP aip) {
-    boolean canAct = false;
-
-    if (hasPermissions(action, aip.getPermissions())) {
-      if (aip == NO_AIP_OBJECT) {
-        canAct = POSSIBLE_ACTIONS_ON_NO_AIP_BELOW.contains(action);
-      } else if (AIPState.UNDER_APPRAISAL.equals(aip.getState())) {
-        canAct = POSSIBLE_ACTIONS_ON_SINGLE_AIP.contains(action) || APPRAISAL_ACTIONS.contains(action);
-      } else {
-        canAct = POSSIBLE_ACTIONS_ON_SINGLE_AIP.contains(action);
-      }
+    if (aip == NO_AIP_OBJECT) {
+      return hasPermissions(action, permissions) && POSSIBLE_ACTIONS_ON_NO_AIP_BELOW.contains(action);
+    } else if (AIPState.UNDER_APPRAISAL.equals(aip.getState())) {
+      return hasPermissions(action, aip.getPermissions())
+        && (POSSIBLE_ACTIONS_ON_SINGLE_AIP.contains(action) || APPRAISAL_ACTIONS.contains(action));
+    } else {
+      return hasPermissions(action, aip.getPermissions()) && POSSIBLE_ACTIONS_ON_SINGLE_AIP.contains(action);
     }
-
-    return canAct;
   }
 
   @Override
   public boolean canAct(Action<IndexedAIP> action, SelectedItems<IndexedAIP> objects) {
     boolean canAct = false;
 
-    if (hasPermissions(action)) {
+    if (hasPermissions(action, permissions)) {
       if (AIPState.UNDER_APPRAISAL.equals(parentAipState)) {
         canAct = POSSIBLE_ACTIONS_ON_MULTIPLE_AIPS.contains(action) || APPRAISAL_ACTIONS.contains(action);
       } else {

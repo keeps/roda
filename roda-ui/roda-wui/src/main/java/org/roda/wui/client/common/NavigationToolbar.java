@@ -130,7 +130,7 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
       AipActions aipActions;
       IndexedAIP aip = (IndexedAIP) this.currentObject;
       if (aip.getParentID() != null) {
-        aipActions = AipActions.get(aip.getParentID(), aip.getState());
+        aipActions = AipActions.get(aip.getParentID(), aip.getState(), aip.getPermissions());
       } else {
         aipActions = AipActions.get();
       }

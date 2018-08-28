@@ -72,9 +72,8 @@ public class Search extends Composite {
 
   private Search() {
     // Create main search
-    String parentAipId = null;
     catalogueSearch = new CatalogueSearch(true, "Search_AIPs",
-      "Search_representations", "Search_files", parentAipId, AIPState.ACTIVE);
+      "Search_representations", "Search_files", null, AIPState.ACTIVE, null);
 
     initWidget(uiBinder.createAndBindUi(this));
     searchDescription.add(new HTMLWidgetWrapper("SearchDescription.html"));

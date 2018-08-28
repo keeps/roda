@@ -107,13 +107,10 @@ public class IngestAppraisal extends Composite {
     // TODO tmp ver o porquê deste warning sobre os selectables:
     // cannot let representations and files to be selectable for now
     catalogueSearch = new CatalogueSearch(false, "IngestAppraisal_searchAIPs", "IngestAppraisal_searchRepresentations",
-      "IngestAppraisal_searchFiles", null,
-      AIPState.UNDER_APPRAISAL);
+      "IngestAppraisal_searchFiles", null, AIPState.UNDER_APPRAISAL, null);
 
     initWidget(uiBinder.createAndBindUi(this));
-
     ingestAppraisalDescription.add(new HTMLWidgetWrapper("IngestAppraisalDescription.html"));
-
   }
 
   public static IngestAppraisal getInstance() {

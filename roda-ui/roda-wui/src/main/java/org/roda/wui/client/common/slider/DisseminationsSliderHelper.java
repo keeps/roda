@@ -7,6 +7,7 @@
  */
 package org.roda.wui.client.common.slider;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -82,13 +83,13 @@ public class DisseminationsSliderHelper {
     Sublist sublist = new Sublist(0, 100);
     Facets facets = Facets.NONE;
     String localeString = LocaleInfo.getCurrentLocale().getLocaleName();
-    boolean justActive = true;
 
-    List<String> dipFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID, RodaConstants.DIP_TITLE,
-      RodaConstants.DIP_DESCRIPTION, RodaConstants.DIP_DELETE_EXTERNAL_URL, RodaConstants.DIP_OPEN_EXTERNAL_URL);
+    List<String> dipFields = new ArrayList<>(RodaConstants.DIP_PERMISSIONS_FIELDS_TO_RETURN);
+    dipFields.addAll(Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID, RodaConstants.DIP_TITLE,
+      RodaConstants.DIP_DESCRIPTION, RodaConstants.DIP_DELETE_EXTERNAL_URL, RodaConstants.DIP_OPEN_EXTERNAL_URL));
 
     BrowserService.Util.getInstance().find(IndexedDIP.class.getName(), filter, sorter, sublist, facets, localeString,
-      justActive, dipFields, new AsyncCallback<IndexResult<IndexedDIP>>() {
+      true, dipFields, new AsyncCallback<IndexResult<IndexedDIP>>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -103,7 +104,6 @@ public class DisseminationsSliderHelper {
   }
 
   private static void updateDisseminationsSliderPanel(List<IndexedDIP> dips, SliderPanel disseminationsSliderPanel) {
-
     disseminationsSliderPanel.clear();
     disseminationsSliderPanel.addTitle(new Label(messages.viewRepresentationFileDisseminationTitle()));
 
@@ -170,7 +170,8 @@ public class DisseminationsSliderHelper {
           @Override
           public void onSuccess(Boolean showEmbedded) {
             if (StringUtils.isNotBlank(dip.getOpenExternalURL()) && !showEmbedded) {
-              String url = IndexedDIPUtils.interpolateOpenExternalURL(dip, LocaleInfo.getCurrentLocale().getLocaleName());
+              String url = IndexedDIPUtils.interpolateOpenExternalURL(dip,
+                LocaleInfo.getCurrentLocale().getLocaleName());
               Window.open(url, "_blank", "");
               Toast.showInfo(messages.browseFileDipOpenedExternalURL(), url);
             } else {
@@ -220,8 +221,8 @@ public class DisseminationsSliderHelper {
         }
       };
 
-      actionsPopup.setWidget(new ActionableWidgetBuilder<>(DisseminationActions.get()).withCallback(callback)
-        .buildListWithObjects(new ActionableObject<>(dip)));
+      actionsPopup.setWidget(new ActionableWidgetBuilder<>(DisseminationActions.get(dip.getPermissions()))
+        .withCallback(callback).buildListWithObjects(new ActionableObject<>(dip)));
       actionsPopup.showRelativeTo(actionsButton, CalloutPosition.TOP_RIGHT);
     }
 

@@ -18,6 +18,7 @@ import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.Permissions;
 import org.roda.wui.client.common.actions.AipActions;
 import org.roda.wui.client.common.actions.FileActions;
 import org.roda.wui.client.common.actions.RepresentationActions;
@@ -51,12 +52,14 @@ public class CatalogueSearch extends Composite {
   // state
   final String parentAipId;
   final AIPState parentAipState;
+  final Permissions permissions;
 
   public CatalogueSearch(boolean justActive, String itemsListId, String representationsListId, String filesListId,
-    String parentAipId, AIPState parentAipState) {
+    String parentAipId, AIPState parentAipState, Permissions permissions) {
 
     this.parentAipId = parentAipId;
     this.parentAipState = parentAipState;
+    this.permissions = permissions;
 
     // prepare lists
     ListBuilder<IndexedAIP> aipListBuilder = new ListBuilder<>(AIPList::new,
@@ -76,7 +79,7 @@ public class CatalogueSearch extends Composite {
     // TODO tmp check why aip has actions with a parent but representation doesnt.
     // bug?
     searchWrapper = new SearchWrapper(true, IndexedAIP.class.getSimpleName())
-      .createListAndSearchPanel(aipListBuilder, AipActions.get(parentAipId, parentAipState))
+      .createListAndSearchPanel(aipListBuilder, AipActions.get(parentAipId, parentAipState, permissions))
       .createListAndSearchPanel(representationListBuilder, RepresentationActions.get())
       .createListAndSearchPanel(fileListBuilder, FileActions.get());
 

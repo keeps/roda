@@ -227,10 +227,10 @@ public class BrowseAIP extends Composite {
     aipId = aip.getId();
     boolean justActive = AIPState.ACTIVE.equals(aip.getState());
 
-    RepresentationActions representationActions = RepresentationActions.get(bundle.getAip().getId(),
-      bundle.getAip().getPermissions());
+    RepresentationActions representationActions = RepresentationActions.get(aip.getId(),
+      aip.getPermissions());
     DisseminationActions disseminationActions = DisseminationActions.get();
-    AipActions aipActions = AipActions.get(aip.getId(), aip.getState());
+    AipActions aipActions = AipActions.get(aip.getId(), aip.getState(), aip.getPermissions());
 
     // REPRESENTATIONS
 

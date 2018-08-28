@@ -18,6 +18,7 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.AIPLink;
 import org.roda.core.data.v2.ip.FileLink;
 import org.roda.core.data.v2.ip.IndexedDIP;
+import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.RepresentationLink;
 import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.BrowserService;
@@ -42,7 +43,7 @@ import config.i18n.client.ClientMessages;
 
 public class DisseminationActions extends AbstractActionable<IndexedDIP> {
 
-  private static final DisseminationActions INSTANCE = new DisseminationActions();
+  private static final DisseminationActions INSTANCE = new DisseminationActions(null);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private static final Set<DisseminationAction> POSSIBLE_ACTIONS_ON_SINGLE_DISSEMINATION = new HashSet<>(
@@ -51,8 +52,10 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
   private static final Set<DisseminationAction> POSSIBLE_ACTIONS_ON_MULTIPLE_DISSEMINATIONS = new HashSet<>(
     Arrays.asList(DisseminationAction.REMOVE, DisseminationAction.NEW_PROCESS, DisseminationAction.UPDATE_PERMISSIONS));
 
-  private DisseminationActions() {
-    // do nothing
+  private final Permissions permissions;
+
+  private DisseminationActions(Permissions permissions) {
+    this.permissions = permissions;
   }
 
   public enum DisseminationAction implements Action<IndexedDIP> {
@@ -81,6 +84,10 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
     return INSTANCE;
   }
 
+  public static DisseminationActions get(Permissions permissions) {
+    return new DisseminationActions(permissions);
+  }
+
   @Override
   public boolean canAct(Action<IndexedDIP> action, IndexedDIP dip) {
     return hasPermissions(action, dip.getPermissions()) && POSSIBLE_ACTIONS_ON_SINGLE_DISSEMINATION.contains(action);
@@ -88,7 +95,7 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
 
   @Override
   public boolean canAct(Action<IndexedDIP> action, SelectedItems<IndexedDIP> selectedItems) {
-    return hasPermissions(action) && POSSIBLE_ACTIONS_ON_MULTIPLE_DISSEMINATIONS.contains(action);
+    return hasPermissions(action, permissions) && POSSIBLE_ACTIONS_ON_MULTIPLE_DISSEMINATIONS.contains(action);
   }
 
   @Override

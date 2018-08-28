@@ -35,10 +35,10 @@ public class DisseminationFileActions extends AbstractActionable<DIPFile> {
   private static final Set<DisseminationFileAction> POSSIBLE_ACTIONS_ON_SINGLE_DISSEMINATION_FILE = new HashSet<>(
     Arrays.asList(DisseminationFileAction.values()));
 
-  private IndexedDIP dip;
+  private Permissions permissions;
 
-  private DisseminationFileActions(IndexedDIP dip) {
-    this.dip = dip;
+  private DisseminationFileActions(Permissions permissions) {
+    this.permissions = permissions;
   }
 
   public enum DisseminationFileAction implements Action<DIPFile> {
@@ -65,9 +65,13 @@ public class DisseminationFileActions extends AbstractActionable<DIPFile> {
     return INSTANCE;
   }
 
+  public static DisseminationFileActions get(Permissions permissions) {
+    return new DisseminationFileActions(permissions);
+  }
+
   @Override
   public boolean canAct(Action<DIPFile> action, DIPFile dipFile) {
-    return hasPermissions(action, dip.getPermissions()) && POSSIBLE_ACTIONS_ON_SINGLE_DISSEMINATION_FILE.contains(action);
+    return hasPermissions(action, permissions) && POSSIBLE_ACTIONS_ON_SINGLE_DISSEMINATION_FILE.contains(action);
   }
 
   @Override
