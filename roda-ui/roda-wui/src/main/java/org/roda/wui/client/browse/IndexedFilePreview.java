@@ -15,6 +15,7 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.Permissions;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.actions.FileActions;
 import org.roda.wui.client.common.lists.SearchFileList;
@@ -36,12 +37,14 @@ public class IndexedFilePreview extends BitstreamPreview<IndexedFile> {
 
   private SearchWrapper searchWrapper = null;
   private boolean justActive;
+  private Permissions permissions;
 
-  public IndexedFilePreview(Viewers viewers, IndexedFile file, boolean justActive, Command onPreviewFailure) {
+  public IndexedFilePreview(Viewers viewers, IndexedFile file, boolean justActive, Permissions permissions, Command onPreviewFailure) {
     super(viewers, RestUtils.createRepresentationFileDownloadUri(file.getUUID(), CONTENT_DISPOSITION_INLINE),
       file.getFileFormat(), file.getOriginalName() != null ? file.getOriginalName() : file.getId(), file.getSize(),
       file.isDirectory(), onPreviewFailure, file);
     this.justActive = justActive;
+    this.permissions = permissions;
   }
 
   @Override
@@ -55,7 +58,7 @@ public class IndexedFilePreview extends BitstreamPreview<IndexedFile> {
     LastSelectedItemsSingleton.getInstance().setSelectedJustActive(justActive);
 
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(folderListBuilder,
-      FileActions.get(getObject().getAipId(), getObject().getRepresentationId()), messages.searchPlaceHolder());
+      FileActions.get(getObject().getAipId(), getObject().getRepresentationId(), permissions), messages.searchPlaceHolder());
     return searchWrapper;
   }
 

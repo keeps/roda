@@ -14,6 +14,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.roda.core.data.v2.ip.DIPFile;
+import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
@@ -27,14 +29,16 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import config.i18n.client.ClientMessages;
 
 public class DisseminationFileActions extends AbstractActionable<DIPFile> {
-  private static final DisseminationFileActions INSTANCE = new DisseminationFileActions();
+  private static final DisseminationFileActions INSTANCE = new DisseminationFileActions(null);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private static final Set<DisseminationFileAction> POSSIBLE_ACTIONS_ON_SINGLE_DISSEMINATION_FILE = new HashSet<>(
     Arrays.asList(DisseminationFileAction.values()));
 
-  private DisseminationFileActions() {
-    // do nothing
+  private IndexedDIP dip;
+
+  private DisseminationFileActions(IndexedDIP dip) {
+    this.dip = dip;
   }
 
   public enum DisseminationFileAction implements Action<DIPFile> {
@@ -62,8 +66,8 @@ public class DisseminationFileActions extends AbstractActionable<DIPFile> {
   }
 
   @Override
-  public boolean canAct(Action<DIPFile> action, DIPFile dip) {
-    return hasPermissions(action, Optional.of(dip)) && POSSIBLE_ACTIONS_ON_SINGLE_DISSEMINATION_FILE.contains(action);
+  public boolean canAct(Action<DIPFile> action, DIPFile dipFile) {
+    return hasPermissions(action, dip.getPermissions()) && POSSIBLE_ACTIONS_ON_SINGLE_DISSEMINATION_FILE.contains(action);
   }
 
   @Override

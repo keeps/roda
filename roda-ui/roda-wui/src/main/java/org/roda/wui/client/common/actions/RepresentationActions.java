@@ -120,7 +120,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
 
   @Override
   public boolean canAct(Action<IndexedRepresentation> action, IndexedRepresentation representation) {
-    return hasPermissions(action, Optional.of(representation))
+    return hasPermissions(action, parentAip.getPermissions())
       && POSSIBLE_ACTIONS_ON_SINGLE_REPRESENTATION.contains(action);
   }
 

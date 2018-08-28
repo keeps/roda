@@ -135,7 +135,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   public boolean canAct(Action<IndexedAIP> action, IndexedAIP aip) {
     boolean canAct = false;
 
-    if (hasPermissions(action, Optional.of(aip))) {
+    if (hasPermissions(action, aip.getPermissions())) {
       if (aip == NO_AIP_OBJECT) {
         canAct = POSSIBLE_ACTIONS_ON_NO_AIP.contains(action);
       } else if (AIPState.UNDER_APPRAISAL.equals(aip.getState())) {

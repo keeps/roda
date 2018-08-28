@@ -22,6 +22,7 @@ import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.model.ActionableObject;
+import org.roda.wui.client.common.utils.PermissionUtils;
 import org.roda.wui.common.client.tools.ConfigurationManager;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -133,44 +134,10 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
   }
 
   public boolean hasPermissions(Action<T> action) {
-    return hasPermissions(action, Optional.empty());
+    return hasPermissions(action, null);
   }
 
-  public boolean hasPermissions(Action<T> action, Optional<T> object) {
-    boolean canAct = true;
-    Optional<User> authenticatedUser = UserLogin.getInstance().getCachedUser();
-
-    if (authenticatedUser.isPresent()) {
-      User user = authenticatedUser.get();
-
-      for (String method : action.getMethods()) {
-        canAct &= user.hasRole(ConfigurationManager.getString("core.roles." + method));
-
-        String permissionKey = ConfigurationManager.getString("core.permissions." + method);
-        if (canAct && object.isPresent() && object.get() instanceof HasPermissions && permissionKey != null) {
-          HasPermissions objectWithPermission = (HasPermissions) object.get();
-          Permissions permissions = objectWithPermission.getPermissions();
-          PermissionType permissionType = PermissionType.valueOf(permissionKey);
-
-          if (permissions != null && permissionType != null) {
-            if (permissions.getUserPermissions(user.getName()).contains(permissionType)) {
-              canAct = true;
-            } else {
-              boolean containGroup = false;
-              for (String group : user.getGroups()) {
-                if (permissions.getGroupPermissions(group).contains(permissionType)) {
-                  containGroup = true;
-                  break;
-                }
-              }
-
-              canAct = containGroup;
-            }
-          }
-        }
-      }
-    }
-
-    return canAct;
+  public boolean hasPermissions(Action<T> action, Permissions permissions) {
+    return PermissionUtils.hasPermissions(action.getMethods(), permissions);
   }
 }

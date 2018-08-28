@@ -21,7 +21,6 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
-import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
@@ -45,6 +44,7 @@ import org.roda.wui.client.common.slider.Sliders;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.common.utils.PermissionUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.management.UserLog;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
@@ -263,6 +263,9 @@ public class BrowseAIP extends Composite {
 
     // INIT
     initWidget(uiBinder.createAndBindUi(this));
+
+    PermissionUtils.bindPermission(newDescriptiveMetadata, aip.getPermissions(),
+      "org.roda.wui.api.controllers.Browser.createDescriptiveMetadataFile");
 
     // CSS
     newDescriptiveMetadata.getElement().setId("aipNewDescriptiveMetadata");

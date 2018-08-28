@@ -22,6 +22,7 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.PreservationEvents;
@@ -33,6 +34,7 @@ import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.SelectFileDialog;
+import org.roda.wui.client.common.utils.PermissionUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.planning.Planning;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
@@ -55,7 +57,7 @@ import config.i18n.client.ClientMessages;
 
 public class FileActions extends AbstractActionable<IndexedFile> {
 
-  private static final FileActions GENERAL_INSTANCE = new FileActions(null, null);
+  private static final FileActions GENERAL_INSTANCE = new FileActions(null, null, null);
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
@@ -74,10 +76,12 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
   private final String aipId;
   private final String representationId;
+  private final Permissions permissions;
 
-  private FileActions(String aipId, String representationId) {
+  private FileActions(String aipId, String representationId, Permissions permissions) {
     this.aipId = aipId;
     this.representationId = representationId;
+    this.permissions = permissions;
   }
 
   // MANAGEMENT
@@ -113,15 +117,15 @@ public class FileActions extends AbstractActionable<IndexedFile> {
     return GENERAL_INSTANCE;
   }
 
-  public static FileActions get(String aipId, String representationId) {
-    return new FileActions(aipId, representationId);
+  public static FileActions get(String aipId, String representationId, Permissions permissions) {
+    return new FileActions(aipId, representationId, permissions);
   }
 
   @Override
   public boolean canAct(Action<IndexedFile> action, IndexedFile file) {
     boolean canAct = false;
 
-    if (hasPermissions(action, Optional.of(file))) {
+    if (hasPermissions(action, permissions)) {
       if (file.isDirectory()) {
         canAct = POSSIBLE_ACTIONS_ON_SINGLE_FILE_DIRECTORY.contains(action);
       } else {

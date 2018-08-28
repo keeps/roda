@@ -159,7 +159,7 @@ public class BrowseFile extends Composite {
     final boolean justActive = AIPState.ACTIVE.equals(bundle.getAip().getState());
 
     // initialize preview
-    filePreview = new IndexedFilePreview(viewers, bundle.getFile(), justActive, new Command() {
+    filePreview = new IndexedFilePreview(viewers, bundle.getFile(), justActive, bundle.getAip().getPermissions(), new Command() {
 
       @Override
       public void execute() {
