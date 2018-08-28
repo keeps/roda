@@ -158,7 +158,7 @@ public class JobReportCollection extends AbstractSolrCollection<IndexedReport, R
         SolrUtils.getObjectLabel(index, jobReport.getSourceObjectClass(), jobReport.getSourceObjectId()));
       preCalculatedFields.put(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_LABEL,
         SolrUtils.getObjectLabel(index, jobReport.getOutcomeObjectClass(), jobReport.getOutcomeObjectId()));
-      preCalculatedFields.put(RodaConstants.JOB_REPORT_JOB_PLUGIN_TYPE, job.getPluginType());
+      preCalculatedFields.put(RodaConstants.JOB_REPORT_JOB_PLUGIN_TYPE, SolrUtils.formatEnum(job.getPluginType()));
 
       List<String> successfulPlugins = new ArrayList<>();
       List<String> unsuccessfulPlugins = new ArrayList<>();

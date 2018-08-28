@@ -84,8 +84,8 @@ public class ActionProcess extends Composite {
 
   private ActionProcess() {
     Filter actionFilter = new Filter(
-      new NotSimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INTERNAL.toString()),
-      new NotSimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INGEST.toString()));
+      new NotSimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INTERNAL.name()),
+      new NotSimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INGEST.name()));
     jobSearch = new JobSearch("ActionProcess_jobs", "ActionProcess_reports", actionFilter, actionFilter, false);
 
     initWidget(uiBinder.createAndBindUi(this));
