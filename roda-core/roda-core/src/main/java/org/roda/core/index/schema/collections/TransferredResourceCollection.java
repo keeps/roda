@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
@@ -14,6 +13,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.index.IndexingAdditionalInfo;
 import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
@@ -75,11 +75,10 @@ public class TransferredResourceCollection extends AbstractSolrCollection<Transf
   }
 
   @Override
-  public SolrInputDocument toSolrDocument(TransferredResource tr, Map<String, Object> preCalculatedFields,
-    Map<String, Object> accumulators, Flags... flags)
+  public SolrInputDocument toSolrDocument(TransferredResource tr, IndexingAdditionalInfo info)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
-    SolrInputDocument doc = super.toSolrDocument(tr, preCalculatedFields, accumulators, flags);
+    SolrInputDocument doc = super.toSolrDocument(tr, info);
 
     doc.addField(RodaConstants.TRANSFERRED_RESOURCE_FULLPATH, tr.getFullPath());
     if (tr.getParentId() != null) {

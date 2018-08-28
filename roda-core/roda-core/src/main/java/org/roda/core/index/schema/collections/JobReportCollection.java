@@ -2,11 +2,14 @@ package org.roda.core.index.schema.collections;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -15,8 +18,11 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.jobs.IndexedReport;
+import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.core.index.IndexingAdditionalInfo;
 import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
@@ -76,15 +82,19 @@ public class JobReportCollection extends AbstractSolrCollection<IndexedReport, R
     fields.add(new Field(RodaConstants.JOB_REPORT_PLUGIN_NAME, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.JOB_REPORT_PLUGIN_VERSION, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.JOB_REPORT_PLUGIN_STATE, Field.TYPE_STRING));
-    fields.add(new Field(RodaConstants.JOB_REPORT_PLUGIN_DETAILS, Field.TYPE_STRING).setIndexed(false).setDocValues(false));
-    fields.add(new Field(RodaConstants.JOB_REPORT_HTML_PLUGIN_DETAILS, Field.TYPE_BOOLEAN).setIndexed(false).setDocValues(false));
+    fields
+      .add(new Field(RodaConstants.JOB_REPORT_PLUGIN_DETAILS, Field.TYPE_STRING).setIndexed(false).setDocValues(false));
+    fields.add(new Field(RodaConstants.JOB_REPORT_HTML_PLUGIN_DETAILS, Field.TYPE_BOOLEAN).setIndexed(false)
+      .setDocValues(false));
     fields.add(new Field(RodaConstants.JOB_REPORT_REPORTS, Field.TYPE_STRING).setIndexed(false).setDocValues(false));
     fields.add(new Field(RodaConstants.JOB_REPORT_JOB_NAME, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.JOB_REPORT_SOURCE_OBJECT_LABEL, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_LABEL, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.JOB_REPORT_JOB_PLUGIN_TYPE, Field.TYPE_STRING));
-    fields.add(new Field(RodaConstants.JOB_REPORT_SUCCESSFUL_PLUGINS, Field.TYPE_STRING).setMultiValued(true).setStored(false));
-    fields.add(new Field(RodaConstants.JOB_REPORT_UNSUCCESSFUL_PLUGINS, Field.TYPE_STRING).setMultiValued(true).setStored(false));
+    fields.add(
+      new Field(RodaConstants.JOB_REPORT_SUCCESSFUL_PLUGINS, Field.TYPE_STRING).setMultiValued(true).setStored(false));
+    fields.add(new Field(RodaConstants.JOB_REPORT_UNSUCCESSFUL_PLUGINS, Field.TYPE_STRING).setMultiValued(true)
+      .setStored(false));
     fields.add(new Field(RodaConstants.JOB_REPORT_UNSUCCESSFUL_PLUGINS_COUNTER, Field.TYPE_INT).setStored(false));
 
     return fields;
@@ -96,11 +106,10 @@ public class JobReportCollection extends AbstractSolrCollection<IndexedReport, R
   }
 
   @Override
-  public SolrInputDocument toSolrDocument(Report jobReport, Map<String, Object> preCalculatedFields,
-    Map<String, Object> accumulators, Flags... flags)
+  public SolrInputDocument toSolrDocument(Report jobReport, IndexingAdditionalInfo info)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
-    SolrInputDocument doc = super.toSolrDocument(jobReport, preCalculatedFields, accumulators, flags);
+    SolrInputDocument doc = super.toSolrDocument(jobReport, info);
 
     doc.addField(RodaConstants.JOB_REPORT_JOB_ID, jobReport.getJobId());
     doc.addField(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ID, jobReport.getSourceObjectId());
@@ -125,6 +134,51 @@ public class JobReportCollection extends AbstractSolrCollection<IndexedReport, R
     doc.addField(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_CLASS, jobReport.getOutcomeObjectClass());
 
     return doc;
+  }
+
+  public static class Info extends IndexingAdditionalInfo {
+
+    private final Report jobReport;
+    private final Job job;
+
+    public Info(Report jobReport, Job job) {
+      super();
+      this.jobReport = jobReport;
+      this.job = job;
+    }
+
+    @Override
+    public Map<String, Object> getPreCalculatedFields() {
+      Map<String, Object> preCalculatedFields = new HashMap<>();
+
+      SolrClient index = RodaCoreFactory.getIndexService().getSolrClient();
+
+      preCalculatedFields.put(RodaConstants.JOB_REPORT_JOB_NAME, job.getName());
+      preCalculatedFields.put(RodaConstants.JOB_REPORT_SOURCE_OBJECT_LABEL,
+        SolrUtils.getObjectLabel(index, jobReport.getSourceObjectClass(), jobReport.getSourceObjectId()));
+      preCalculatedFields.put(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_LABEL,
+        SolrUtils.getObjectLabel(index, jobReport.getOutcomeObjectClass(), jobReport.getOutcomeObjectId()));
+      preCalculatedFields.put(RodaConstants.JOB_REPORT_JOB_PLUGIN_TYPE, job.getPluginType());
+
+      List<String> successfulPlugins = new ArrayList<>();
+      List<String> unsuccessfulPlugins = new ArrayList<>();
+
+      if (job.getPluginType().equals(PluginType.INGEST)) {
+        for (Report item : jobReport.getReports()) {
+          if (item.getPluginState().equals(PluginState.SUCCESS)) {
+            successfulPlugins.add(item.getPluginName());
+          } else {
+            unsuccessfulPlugins.add(item.getPluginName());
+          }
+        }
+
+        preCalculatedFields.put(RodaConstants.JOB_REPORT_SUCCESSFUL_PLUGINS, successfulPlugins);
+        preCalculatedFields.put(RodaConstants.JOB_REPORT_UNSUCCESSFUL_PLUGINS, unsuccessfulPlugins);
+        preCalculatedFields.put(RodaConstants.JOB_REPORT_UNSUCCESSFUL_PLUGINS_COUNTER, unsuccessfulPlugins.size());
+      }
+      return preCalculatedFields;
+    }
+
   }
 
   @Override
@@ -177,10 +231,9 @@ public class JobReportCollection extends AbstractSolrCollection<IndexedReport, R
     jobReport
       .setOutcomeObjectLabel(SolrUtils.objectToString(doc.get(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_LABEL), null));
 
-    jobReport.setSuccessfulPlugins(
-            SolrUtils.objectToListString(doc.get(RodaConstants.JOB_REPORT_SUCCESSFUL_PLUGINS)));
-    jobReport.setUnsuccessfulPlugins(
-            SolrUtils.objectToListString(doc.get(RodaConstants.JOB_REPORT_UNSUCCESSFUL_PLUGINS)));
+    jobReport.setSuccessfulPlugins(SolrUtils.objectToListString(doc.get(RodaConstants.JOB_REPORT_SUCCESSFUL_PLUGINS)));
+    jobReport
+      .setUnsuccessfulPlugins(SolrUtils.objectToListString(doc.get(RodaConstants.JOB_REPORT_UNSUCCESSFUL_PLUGINS)));
 
     return jobReport;
   }

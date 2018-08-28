@@ -18,6 +18,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.JobStats;
 import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.index.IndexingAdditionalInfo;
 import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
@@ -89,11 +90,10 @@ public class JobCollection extends AbstractSolrCollection<Job, Job> {
   }
 
   @Override
-  public SolrInputDocument toSolrDocument(Job job, Map<String, Object> preCalculatedFields,
-    Map<String, Object> accumulators, Flags... flags)
+  public SolrInputDocument toSolrDocument(Job job, IndexingAdditionalInfo info)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
-    SolrInputDocument doc = super.toSolrDocument(job, preCalculatedFields, accumulators, flags);
+    SolrInputDocument doc = super.toSolrDocument(job, info);
 
     doc.addField(RodaConstants.JOB_NAME, job.getName());
     doc.addField(RodaConstants.JOB_USERNAME, job.getUsername());

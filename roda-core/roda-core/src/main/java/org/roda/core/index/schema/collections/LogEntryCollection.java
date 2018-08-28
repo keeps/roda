@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
@@ -17,6 +16,7 @@ import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.log.LogEntryParameter;
+import org.roda.core.index.IndexingAdditionalInfo;
 import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
@@ -77,10 +77,9 @@ public class LogEntryCollection extends AbstractSolrCollection<LogEntry, LogEntr
   }
 
   @Override
-  public SolrInputDocument toSolrDocument(LogEntry logEntry, Map<String, Object> preCalculatedFields,
-    Map<String, Object> accumulators, Flags... flags)
+  public SolrInputDocument toSolrDocument(LogEntry logEntry, IndexingAdditionalInfo info)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    SolrInputDocument doc = super.toSolrDocument(logEntry, preCalculatedFields, accumulators, flags);
+    SolrInputDocument doc = super.toSolrDocument(logEntry, info);
 
     doc.addField(RodaConstants.LOG_ACTION_COMPONENT, logEntry.getActionComponent());
     doc.addField(RodaConstants.LOG_ACTION_METHOD, logEntry.getActionMethod());

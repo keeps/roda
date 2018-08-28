@@ -2,6 +2,7 @@ package org.roda.core.index.schema.collections;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +15,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.index.IndexingAdditionalInfo;
 import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
@@ -97,11 +99,10 @@ public class RiskCollection extends AbstractSolrCollection<IndexedRisk, Risk> {
   }
 
   @Override
-  public SolrInputDocument toSolrDocument(Risk risk, Map<String, Object> preCalculatedFields,
-    Map<String, Object> accumulators, Flags... flags)
+  public SolrInputDocument toSolrDocument(Risk risk, IndexingAdditionalInfo info)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
-    SolrInputDocument doc = super.toSolrDocument(risk, preCalculatedFields, accumulators, flags);
+    SolrInputDocument doc = super.toSolrDocument(risk, info);
 
     doc.addField(RodaConstants.RISK_NAME, risk.getName());
     doc.addField(RodaConstants.RISK_DESCRIPTION, risk.getDescription());
@@ -143,6 +144,33 @@ public class RiskCollection extends AbstractSolrCollection<IndexedRisk, Risk> {
     // TODO calculate incidences count here
 
     return doc;
+  }
+
+  public static class Info extends IndexingAdditionalInfo {
+
+    private final Risk risk;
+    private final int incidences;
+
+    public Info(Risk risk, int incidences) {
+      super();
+      this.risk = risk;
+      this.incidences = incidences;
+    }
+
+    @Override
+    public Map<String, Object> getPreCalculatedFields() {
+      Map<String, Object> preCalculatedFields = new HashMap<>();
+      if (risk instanceof IndexedRisk) {
+        preCalculatedFields.put(RodaConstants.RISK_INCIDENCES_COUNT, ((IndexedRisk) risk).getIncidencesCount());
+        preCalculatedFields.put(RodaConstants.RISK_UNMITIGATED_INCIDENCES_COUNT,
+          ((IndexedRisk) risk).getUnmitigatedIncidencesCount());
+      } else {
+        preCalculatedFields.put(RodaConstants.RISK_INCIDENCES_COUNT, incidences);
+        preCalculatedFields.put(RodaConstants.RISK_UNMITIGATED_INCIDENCES_COUNT, incidences);
+      }
+      return preCalculatedFields;
+    }
+
   }
 
   @Override

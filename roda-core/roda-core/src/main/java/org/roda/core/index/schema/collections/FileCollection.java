@@ -20,10 +20,12 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
+import org.roda.core.index.IndexingAdditionalInfo;
 import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
@@ -138,11 +140,10 @@ public class FileCollection extends AbstractSolrCollection<IndexedFile, File> {
   }
 
   @Override
-  public SolrInputDocument toSolrDocument(File file, Map<String, Object> preCalculatedFields,
-    Map<String, Object> accumulators, Flags... flags)
+  public SolrInputDocument toSolrDocument(File file, IndexingAdditionalInfo info)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
-    SolrInputDocument doc = super.toSolrDocument(file, preCalculatedFields, accumulators, flags);
+    SolrInputDocument doc = super.toSolrDocument(file, info);
 
     List<String> path = file.getPath();
     doc.addField(RodaConstants.FILE_PATH, path);
@@ -188,7 +189,7 @@ public class FileCollection extends AbstractSolrCollection<IndexedFile, File> {
       }
     }
 
-    accumulators.put(RodaConstants.FILE_SIZE, sizeInBytes);
+    info.getAccumulators().put(RodaConstants.FILE_SIZE, sizeInBytes);
 
     // Add full text
     String fulltext = getFileFulltext(file);
@@ -197,6 +198,34 @@ public class FileCollection extends AbstractSolrCollection<IndexedFile, File> {
     }
 
     return doc;
+  }
+
+  public static class Info extends IndexingAdditionalInfo {
+
+    private final AIP aip;
+    private final List<String> ancestors;
+
+    public Info(AIP aip, List<String> ancestors) {
+      super();
+      this.aip = aip;
+      this.ancestors = ancestors;
+    }
+
+    @Override
+    public Map<String, Object> getPreCalculatedFields() {
+      Map<String, Object> preCalculatedFields = new HashMap<>();
+
+      // indexing AIP inherited info
+      preCalculatedFields.put(RodaConstants.INDEX_STATE, SolrUtils.formatEnum(aip.getState()));
+      preCalculatedFields.put(RodaConstants.INGEST_SIP_IDS, aip.getIngestSIPIds());
+      preCalculatedFields.put(RodaConstants.INGEST_JOB_ID, aip.getIngestJobId());
+      preCalculatedFields.put(RodaConstants.INGEST_UPDATE_JOB_IDS, aip.getIngestUpdateJobIds());
+      preCalculatedFields.put(RodaConstants.FILE_ANCESTORS, ancestors);
+
+      preCalculatedFields.putAll(SolrUtils.getPermissionsAsPreCalculatedFields(aip.getPermissions()));
+      return preCalculatedFields;
+    }
+
   }
 
   private Binary getFilePremisFile(File file) {

@@ -13,8 +13,10 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.index.IndexingAdditionalInfo;
 import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
@@ -75,10 +77,9 @@ public class DIPFileCollection extends AbstractSolrCollection<DIPFile, DIPFile> 
   }
 
   @Override
-  public SolrInputDocument toSolrDocument(DIPFile file, Map<String, Object> preCalculatedFields,
-    Map<String, Object> accumulators, Flags... flags)
+  public SolrInputDocument toSolrDocument(DIPFile file, IndexingAdditionalInfo info)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    SolrInputDocument doc = super.toSolrDocument(file, preCalculatedFields, accumulators, flags);
+    SolrInputDocument doc = super.toSolrDocument(file, info);
 
     List<String> path = file.getPath();
     doc.addField(RodaConstants.DIPFILE_PATH, path);
@@ -121,6 +122,22 @@ public class DIPFileCollection extends AbstractSolrCollection<DIPFile, DIPFile> 
     }
 
     return ancestorsPath;
+  }
+
+  public static class Info extends IndexingAdditionalInfo {
+
+    private final DIP dip;
+
+    public Info(DIP dip) {
+      super();
+      this.dip = dip;
+    }
+
+    @Override
+    public Map<String, Object> getPreCalculatedFields() {
+      return SolrUtils.getPermissionsAsPreCalculatedFields(dip.getPermissions());
+    }
+
   }
 
   @Override

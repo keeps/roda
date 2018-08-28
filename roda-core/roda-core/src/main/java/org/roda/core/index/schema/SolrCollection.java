@@ -2,7 +2,6 @@ package org.roda.core.index.schema;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
@@ -19,6 +18,7 @@ import org.roda.core.data.v2.ip.HasPermissions;
 import org.roda.core.data.v2.ip.HasState;
 import org.roda.core.data.v2.ip.HasStateFilter;
 import org.roda.core.data.v2.ip.SetsUUID;
+import org.roda.core.index.IndexingAdditionalInfo;
 
 public interface SolrCollection<I extends IsIndexed, M extends IsModelObject> {
 
@@ -74,9 +74,7 @@ public interface SolrCollection<I extends IsIndexed, M extends IsModelObject> {
     return HasState.class.isAssignableFrom(resultClass);
   }
 
-  public enum Flags {
-    SAFE_MODE_ON, SAFE_MODE_OFF
-  }
+
 
   Class<I> getIndexClass();
 
@@ -103,8 +101,8 @@ public interface SolrCollection<I extends IsIndexed, M extends IsModelObject> {
    *          Fields that are pre-calculated because they can be shared for
    *          several objects, like the list of ancestors for sibling objects.
    * @param accumulators
-   *          Fields to be added on upper-level collections that are calculated by
-   *          accumulating values on every lower-level collection.
+   *          Fields to be added on upper-level collections that are calculated
+   *          by accumulating values on every lower-level collection.
    * @param flags
    *          Flags to control indexing, as {@link Flags#SAFE_MODE_ON}.
    * @return the Solr Document ready to index.
@@ -113,9 +111,10 @@ public interface SolrCollection<I extends IsIndexed, M extends IsModelObject> {
    * @throws NotFoundException
    * @throws AuthorizationDeniedException
    */
-  SolrInputDocument toSolrDocument(M object, Map<String, Object> preCalculatedFields, Map<String, Object> accumulators,
-    Flags... flags) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException;
+  SolrInputDocument toSolrDocument(M object, IndexingAdditionalInfo info)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException;
 
   I fromSolrDocument(SolrDocument doc, List<String> fieldsToReturn) throws GenericException;
+  
 
 }

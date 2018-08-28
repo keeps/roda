@@ -3,7 +3,6 @@ package org.roda.core.index.schema.collections;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
@@ -18,6 +17,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.validation.ValidationException;
+import org.roda.core.index.IndexingAdditionalInfo;
 import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
@@ -79,11 +79,10 @@ public class PreservationAgentCollection
   }
 
   @Override
-  public SolrInputDocument toSolrDocument(PreservationMetadata pm, Map<String, Object> preCalculatedFields,
-    Map<String, Object> accumulators, Flags... flags)
+  public SolrInputDocument toSolrDocument(PreservationMetadata pm, IndexingAdditionalInfo info)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
-    SolrInputDocument doc = super.toSolrDocument(pm, preCalculatedFields, accumulators, flags);
+    SolrInputDocument doc = super.toSolrDocument(pm, info);
 
     Binary binary = RodaCoreFactory.getModelService().retrievePreservationAgent(pm.getId());
 

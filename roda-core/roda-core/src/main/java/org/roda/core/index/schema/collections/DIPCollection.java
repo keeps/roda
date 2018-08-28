@@ -20,6 +20,7 @@ import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.FileLink;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.RepresentationLink;
+import org.roda.core.index.IndexingAdditionalInfo;
 import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
@@ -90,10 +91,9 @@ public class DIPCollection extends AbstractSolrCollection<IndexedDIP, DIP> {
   }
 
   @Override
-  public SolrInputDocument toSolrDocument(DIP dip, Map<String, Object> preCalculatedFields,
-    Map<String, Object> accumulators, Flags... flags)
+  public SolrInputDocument toSolrDocument(DIP dip, IndexingAdditionalInfo info)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    SolrInputDocument doc = super.toSolrDocument(dip, preCalculatedFields, accumulators, flags);
+    SolrInputDocument doc = super.toSolrDocument(dip, info);
 
     doc.addField(RodaConstants.DIP_TITLE, dip.getTitle());
     doc.addField(RodaConstants.DIP_DESCRIPTION, dip.getDescription());

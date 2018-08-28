@@ -3,7 +3,6 @@ package org.roda.core.index.schema.collections;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.solr.common.SolrDocument;
@@ -17,6 +16,7 @@ import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.ri.RelationObjectType;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.ri.RepresentationInformationSupport;
+import org.roda.core.index.IndexingAdditionalInfo;
 import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
@@ -67,7 +67,8 @@ public class RepresentationInformationCollection
     fields.add(new Field(RodaConstants.REPRESENTATION_INFORMATION_EXTRAS, Field.TYPE_TEXT).setMultiValued(false));
 
     fields.add(new Field(RodaConstants.REPRESENTATION_INFORMATION_SUPPORT, Field.TYPE_STRING));
-    fields.add(new Field(RodaConstants.REPRESENTATION_INFORMATION_RELATIONS, Field.TYPE_STRING).setIndexed(false).setDocValues(false));
+    fields.add(new Field(RodaConstants.REPRESENTATION_INFORMATION_RELATIONS, Field.TYPE_STRING).setIndexed(false)
+      .setDocValues(false));
     fields.add(new Field(RodaConstants.REPRESENTATION_INFORMATION_RELATIONS_WITH_RI, Field.TYPE_STRING).setStored(false)
       .setMultiValued(true));
     fields.add(new Field(RodaConstants.REPRESENTATION_INFORMATION_FILTERS, Field.TYPE_STRING).setMultiValued(true));
@@ -89,11 +90,10 @@ public class RepresentationInformationCollection
   }
 
   @Override
-  public SolrInputDocument toSolrDocument(RepresentationInformation ri, Map<String, Object> preCalculatedFields,
-    Map<String, Object> accumulators, Flags... flags)
+  public SolrInputDocument toSolrDocument(RepresentationInformation ri, IndexingAdditionalInfo info)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
-    SolrInputDocument doc = super.toSolrDocument(ri, preCalculatedFields, accumulators, flags);
+    SolrInputDocument doc = super.toSolrDocument(ri, info);
 
     doc.addField(RodaConstants.REPRESENTATION_INFORMATION_NAME, ri.getName());
     doc.addField(RodaConstants.REPRESENTATION_INFORMATION_DESCRIPTION, ri.getDescription());

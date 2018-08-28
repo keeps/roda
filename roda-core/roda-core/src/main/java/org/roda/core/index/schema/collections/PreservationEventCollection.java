@@ -3,6 +3,7 @@ package org.roda.core.index.schema.collections;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,11 +18,14 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent.PreservationMetadataEventClass;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.validation.ValidationException;
+import org.roda.core.index.IndexingAdditionalInfo;
 import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
@@ -94,11 +98,10 @@ public class PreservationEventCollection
   }
 
   @Override
-  public SolrInputDocument toSolrDocument(PreservationMetadata pm, Map<String, Object> preCalculatedFields,
-    Map<String, Object> accumulators, Flags... flags)
+  public SolrInputDocument toSolrDocument(PreservationMetadata pm, IndexingAdditionalInfo info)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
-    SolrInputDocument doc = super.toSolrDocument(pm, preCalculatedFields, accumulators, flags);
+    SolrInputDocument doc = super.toSolrDocument(pm, info);
 
     String objectClass = PreservationMetadataEventClass.REPOSITORY.toString();
 
@@ -182,6 +185,30 @@ public class PreservationEventCollection
     }
 
     return doc;
+  }
+
+  public static class Info extends IndexingAdditionalInfo {
+
+    private final AIP aip;
+
+    public Info(AIP aip) {
+      super();
+      this.aip = aip;
+    }
+
+    @Override
+    public Map<String, Object> getPreCalculatedFields() {
+      Map<String, Object> preCalculatedFields = new HashMap<>();
+
+      if (aip != null) {
+        preCalculatedFields.put(RodaConstants.INDEX_STATE, SolrUtils.formatEnum(aip.getState()));
+        preCalculatedFields.putAll(SolrUtils.getPermissionsAsPreCalculatedFields(aip.getPermissions()));
+      } else {
+        preCalculatedFields.put(RodaConstants.INDEX_STATE, SolrUtils.formatEnum(AIPState.ACTIVE));
+      }
+      return preCalculatedFields;
+    }
+
   }
 
   @Override

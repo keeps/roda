@@ -14,9 +14,12 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.RepresentationState;
+import org.roda.core.index.IndexingAdditionalInfo;
+import org.roda.core.index.IndexingAdditionalInfo.Flags;
 import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
@@ -104,13 +107,12 @@ public class RepresentationCollection extends AbstractSolrCollection<IndexedRepr
   }
 
   @Override
-  public SolrInputDocument toSolrDocument(Representation rep, Map<String, Object> preCalculatedFields,
-    Map<String, Object> accumulators, Flags... flags)
+  public SolrInputDocument toSolrDocument(Representation rep, IndexingAdditionalInfo info)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
-    boolean safemode = Arrays.asList(flags).contains(Flags.SAFE_MODE_ON);
+    boolean safemode = info.getFlags().contains(Flags.SAFE_MODE_ON);
 
-    SolrInputDocument doc = super.toSolrDocument(rep, preCalculatedFields, accumulators, flags);
+    SolrInputDocument doc = super.toSolrDocument(rep, info);
 
     doc.addField(RodaConstants.REPRESENTATION_AIP_ID, rep.getAipId());
     doc.addField(RodaConstants.REPRESENTATION_ORIGINAL, rep.isOriginal());
@@ -155,6 +157,55 @@ public class RepresentationCollection extends AbstractSolrCollection<IndexedRepr
     doc.addField(RodaConstants.REPRESENTATION_NUMBER_OF_SCHEMA_FILES, numberOfSchemaFiles);
 
     return doc;
+  }
+
+  public static class Info extends IndexingAdditionalInfo {
+
+    private final AIP aip;
+    private final List<String> ancestors;
+    private final Long sizeInBytes;
+    private final Long numberOfDataFiles;
+    private final Long numberOfDataFolders;
+
+    private final boolean safemode;
+
+    public Info(AIP aip, List<String> ancestors, Long sizeInBytes, Long numberOfDataFiles, Long numberOfDataFolders,
+      boolean safemode) {
+      super();
+      this.aip = aip;
+      this.ancestors = ancestors;
+      this.sizeInBytes = sizeInBytes;
+      this.numberOfDataFiles = numberOfDataFiles;
+      this.numberOfDataFolders = numberOfDataFolders;
+      this.safemode = safemode;
+    }
+
+    @Override
+    public Map<String, Object> getPreCalculatedFields() {
+      Map<String, Object> preCalculatedFields = new HashMap<>();
+
+      // indexing file size and number
+      preCalculatedFields.put(RodaConstants.REPRESENTATION_SIZE_IN_BYTES, sizeInBytes);
+      preCalculatedFields.put(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES, numberOfDataFiles);
+      preCalculatedFields.put(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FOLDERS, numberOfDataFolders);
+
+      // indexing active state and permissions
+      preCalculatedFields.put(RodaConstants.INDEX_STATE, SolrUtils.formatEnum(aip.getState()));
+      preCalculatedFields.put(RodaConstants.INGEST_SIP_IDS, aip.getIngestSIPIds());
+      preCalculatedFields.put(RodaConstants.INGEST_JOB_ID, aip.getIngestJobId());
+      preCalculatedFields.put(RodaConstants.INGEST_UPDATE_JOB_IDS, aip.getIngestUpdateJobIds());
+
+      preCalculatedFields.put(RodaConstants.AIP_ANCESTORS, ancestors);
+
+      preCalculatedFields.putAll(SolrUtils.getPermissionsAsPreCalculatedFields(aip.getPermissions()));
+      return preCalculatedFields;
+    }
+
+    @Override
+    public List<Flags> getFlags() {
+      return Arrays.asList(safemode ? Flags.SAFE_MODE_ON : Flags.SAFE_MODE_OFF);
+    }
+
   }
 
   @Override

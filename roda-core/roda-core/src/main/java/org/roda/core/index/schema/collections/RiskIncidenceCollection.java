@@ -3,7 +3,6 @@ package org.roda.core.index.schema.collections;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.common.SolrDocument;
@@ -15,6 +14,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.core.index.IndexingAdditionalInfo;
 import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
@@ -81,11 +81,10 @@ public class RiskIncidenceCollection extends AbstractSolrCollection<RiskIncidenc
   }
 
   @Override
-  public SolrInputDocument toSolrDocument(RiskIncidence incidence, Map<String, Object> preCalculatedFields,
-    Map<String, Object> accumulators, Flags... flags)
+  public SolrInputDocument toSolrDocument(RiskIncidence incidence, IndexingAdditionalInfo info)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
-    SolrInputDocument doc = super.toSolrDocument(incidence, preCalculatedFields, accumulators, flags);
+    SolrInputDocument doc = super.toSolrDocument(incidence, info);
 
     doc.addField(RodaConstants.RISK_INCIDENCE_AIP_ID, incidence.getAipId());
     doc.addField(RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, incidence.getRepresentationId());

@@ -112,8 +112,8 @@ import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ri.RelationObjectType;
 import org.roda.core.data.v2.ri.RepresentationInformationRelation;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.index.IndexingAdditionalInfo;
 import org.roda.core.index.schema.SolrCollection;
-import org.roda.core.index.schema.SolrCollection.Flags;
 import org.roda.core.index.schema.SolrCollectionRegistry;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
@@ -1202,13 +1202,11 @@ public class SolrUtils {
   }
 
   public static <I extends IsIndexed, M extends IsModelObject, S extends Object> ReturnWithExceptions<Void, S> create2(
-    SolrClient index, S source, Class<I> indexClass, M object, Map<String, Object> preCalculatedFields,
-    Map<String, Object> accumulators, Flags... flags) {
+    SolrClient index, S source, Class<I> indexClass, M object, IndexingAdditionalInfo utils) {
     ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<Void, S>(source);
     if (object != null) {
       try {
-        SolrInputDocument solrDocument = SolrCollectionRegistry.toSolrDocument(indexClass, object, preCalculatedFields,
-          accumulators, flags);
+        SolrInputDocument solrDocument = SolrCollectionRegistry.toSolrDocument(indexClass, object, utils);
         if (solrDocument != null) {
           index.add(SolrCollectionRegistry.getIndexName(indexClass), solrDocument);
         }
@@ -1224,7 +1222,7 @@ public class SolrUtils {
 
   public static <I extends IsIndexed, M extends IsModelObject, S extends Object> ReturnWithExceptions<Void, S> create2(
     SolrClient index, S source, Class<I> indexClass, M object) {
-    return create2(index, source, indexClass, object, Collections.emptyMap(), Collections.emptyMap());
+    return create2(index, source, indexClass, object, IndexingAdditionalInfo.empty());
   }
 
   public static <T extends IsIndexed, M extends IsModelObject, S extends Object> ReturnWithExceptions<Void, S> create(

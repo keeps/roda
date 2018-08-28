@@ -3,7 +3,6 @@ package org.roda.core.index.schema.collections;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
@@ -14,6 +13,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.index.IndexingAdditionalInfo;
 import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
@@ -63,7 +63,8 @@ public class NotificationCollection extends AbstractSolrCollection<Notification,
     fields.add(new Field(RodaConstants.NOTIFICATION_ACKNOWLEDGE_TOKEN, Field.TYPE_STRING).setRequired(true));
     fields.add(new Field(RodaConstants.NOTIFICATION_IS_ACKNOWLEDGED, Field.TYPE_BOOLEAN).setRequired(true));
     fields.add(new Field(RodaConstants.NOTIFICATION_STATE, Field.TYPE_STRING).setRequired(true));
-    fields.add(new Field(RodaConstants.NOTIFICATION_ACKNOWLEDGED_USERS, Field.TYPE_STRING).setIndexed(false).setDocValues(false));
+    fields.add(new Field(RodaConstants.NOTIFICATION_ACKNOWLEDGED_USERS, Field.TYPE_STRING).setIndexed(false)
+      .setDocValues(false));
 
     return fields;
   }
@@ -74,11 +75,10 @@ public class NotificationCollection extends AbstractSolrCollection<Notification,
   }
 
   @Override
-  public SolrInputDocument toSolrDocument(Notification notification, Map<String, Object> preCalculatedFields,
-    Map<String, Object> accumulators, Flags... flags)
+  public SolrInputDocument toSolrDocument(Notification notification, IndexingAdditionalInfo info)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
-    SolrInputDocument doc = super.toSolrDocument(notification, preCalculatedFields, accumulators, flags);
+    SolrInputDocument doc = super.toSolrDocument(notification, info);
 
     doc.addField(RodaConstants.NOTIFICATION_SUBJECT, notification.getSubject());
     doc.addField(RodaConstants.NOTIFICATION_BODY, notification.getBody());

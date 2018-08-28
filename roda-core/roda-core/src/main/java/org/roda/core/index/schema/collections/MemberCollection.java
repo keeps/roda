@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -18,6 +17,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.index.IndexingAdditionalInfo;
 import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
@@ -77,11 +77,10 @@ public class MemberCollection extends AbstractSolrCollection<RODAMember, RODAMem
   }
 
   @Override
-  public SolrInputDocument toSolrDocument(RODAMember member, Map<String, Object> preCalculatedFields,
-    Map<String, Object> accumulators, Flags... flags)
+  public SolrInputDocument toSolrDocument(RODAMember member, IndexingAdditionalInfo info)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
-    SolrInputDocument doc = super.toSolrDocument(member, preCalculatedFields, accumulators, flags);
+    SolrInputDocument doc = super.toSolrDocument(member, info);
 
     doc.addField(RodaConstants.MEMBERS_IS_ACTIVE, member.isActive());
     doc.addField(RodaConstants.MEMBERS_IS_USER, member.isUser());

@@ -16,7 +16,7 @@ import org.roda.core.data.exceptions.NotSupportedException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.index.schema.SolrCollection.Flags;
+import org.roda.core.index.IndexingAdditionalInfo;
 import org.roda.core.index.schema.collections.AIPCollection;
 import org.roda.core.index.schema.collections.DIPCollection;
 import org.roda.core.index.schema.collections.DIPFileCollection;
@@ -118,12 +118,11 @@ public final class SolrCollectionRegistry {
   }
 
   public static <I extends IsIndexed, M extends IsModelObject> SolrInputDocument toSolrDocument(Class<I> indexClass,
-    M object, Map<String, Object> preCalculatedFields, Map<String, Object> accumulators, Flags... flags)
-    throws GenericException, NotSupportedException, RequestNotValidException, NotFoundException,
-    AuthorizationDeniedException {
+    M object, IndexingAdditionalInfo utils) throws GenericException, NotSupportedException, RequestNotValidException,
+    NotFoundException, AuthorizationDeniedException {
     SolrCollection<I, M> solrCollection = get(indexClass);
     if (solrCollection != null) {
-      return solrCollection.toSolrDocument(object, preCalculatedFields, accumulators, flags);
+      return solrCollection.toSolrDocument(object, utils);
     } else {
       throw new NotSupportedException(
         "Could not find Solr collection relative to '" + indexClass.getName() + "' in registry.");
@@ -133,7 +132,7 @@ public final class SolrCollectionRegistry {
   public static <I extends IsIndexed, M extends IsModelObject> SolrInputDocument toSolrDocument(Class<I> indexClass,
     M object) throws GenericException, NotSupportedException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException {
-    return toSolrDocument(indexClass, object, Collections.emptyMap(), Collections.emptyMap());
+    return toSolrDocument(indexClass, object, IndexingAdditionalInfo.empty());
   }
 
   public static <I extends IsIndexed> String getIndexName(Class<I> indexClass) throws NotSupportedException {
