@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -29,26 +28,22 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataViewBundle;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
-import org.roda.wui.client.common.NoAsyncCallback;
+import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.DisseminationActions;
 import org.roda.wui.client.common.actions.FileActions;
-import org.roda.wui.client.common.actions.RepresentationActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.lists.DIPList;
 import org.roda.wui.client.common.lists.SearchFileList;
-import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
+import org.roda.wui.client.common.slider.Sliders;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
-import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.client.main.BreadcrumbItem;
-import org.roda.wui.client.main.BreadcrumbPanel;
-import org.roda.wui.client.main.BreadcrumbUtils;
+import org.roda.wui.client.common.utils.StringUtils;
+import org.roda.wui.client.planning.RiskIncidenceRegister;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -80,11 +75,13 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TabPanel;
@@ -158,9 +155,6 @@ public class BrowseRepresentation extends Composite {
   private String aipId;
   private String repId;
   private String repUUID;
-  private ActionableWidgetBuilder<IndexedRepresentation> actionableWidgetBuilder;
-
-  private List<BreadcrumbItem> breadcrumbItems = new ArrayList<>();
 
   private static final List<String> representationFields = new ArrayList<>(Arrays.asList(RodaConstants.INDEX_UUID,
     RodaConstants.REPRESENTATION_AIP_ID, RodaConstants.REPRESENTATION_ID, RodaConstants.REPRESENTATION_TYPE));
@@ -176,21 +170,6 @@ public class BrowseRepresentation extends Composite {
 
   // IDENTIFICATION
 
-  @UiField
-  HTML representationIcon;
-
-  @UiField
-  FlowPanel representationTitle;
-
-  @UiField
-  FlowPanel representationId, representationType;
-
-  @UiField
-  Label dateCreated, dateUpdated;
-
-  @UiField
-  BreadcrumbPanel breadcrumb;
-
   // DESCRIPTIVE METADATA
 
   @UiField
@@ -199,6 +178,9 @@ public class BrowseRepresentation extends Composite {
   @UiField
   Button newDescriptiveMetadata;
 
+  private SimplePanel descriptiveMetadataButtons;
+  private Map<Integer, HTMLPanel> descriptiveMetadataSavedButtons;
+
   // FILES
 
   @UiField(provided = true)
@@ -206,22 +188,26 @@ public class BrowseRepresentation extends Composite {
 
   // DISSEMINATIONS
 
-  @UiField
-  Label disseminationsTitle;
-
   @UiField(provided = true)
   SearchWrapper disseminationsSearch;
 
-  // SIDEBAR
+  @UiField
+  FlowPanel center;
 
   @UiField
-  SimplePanel actionsSidebar;
+  NavigationToolbar<IndexedRepresentation> navigationToolbar;
 
   @UiField
-  FlowPanel searchSection;
+  HTML representationIcon;
 
   @UiField
-  Button searchPrevious, searchNext;
+  FlowPanel representationTitle;
+
+  @UiField
+  FlowPanel risksEventsLogs;
+
+  @UiField
+  Label dateCreatedAndModified;
 
   public BrowseRepresentation(BrowseRepresentationBundle bundle) {
     this.representation = bundle.getRepresentation();
@@ -229,8 +215,6 @@ public class BrowseRepresentation extends Composite {
     this.aipId = representation.getAipId();
     this.repId = representation.getId();
     this.repUUID = representation.getUUID();
-
-    actionableWidgetBuilder = new ActionableWidgetBuilder<>(RepresentationActions.get(bundle.getAip()));
 
     handlers = new ArrayList<>();
     String summary = messages.representationListOfFiles();
@@ -270,9 +254,9 @@ public class BrowseRepresentation extends Composite {
 
     updateLayout(bundle, state, justActive);
 
-    breadcrumbItems = BreadcrumbUtils.getRepresentationBreadcrumbs(bundle);
-    breadcrumb.updatePath(breadcrumbItems);
-    breadcrumb.setVisible(true);
+    // NAVIGATION TOOLBAR
+    navigationToolbar.setObject(representation);
+    navigationToolbar.show();
 
     // DESCRIPTIVE METADATA
 
@@ -297,7 +281,7 @@ public class BrowseRepresentation extends Composite {
           final HTML html = pair.getSecond();
           final DescriptiveMetadataViewBundle bundle = bundles.get(descId);
           if (html.getText().length() == 0) {
-            getDescriptiveMetadataHTML(descId, bundle, new AsyncCallback<SafeHtml>() {
+            getDescriptiveMetadataHTML(descId, bundle, event.getSelectedItem(), new AsyncCallback<SafeHtml>() {
 
               @Override
               public void onFailure(Throwable caught) {
@@ -335,6 +319,19 @@ public class BrowseRepresentation extends Composite {
     handlers.add(tabHandler);
     handlers.add(addTabHandler);
 
+    descriptiveMetadataSavedButtons = new HashMap<>();
+    descriptiveMetadataButtons = new SimplePanel();
+    descriptiveMetadataButtons.addStyleName("descriptiveMetadataTabButtons");
+    itemMetadata.getTabBar().getElement().getStyle().clearProperty("width");
+    itemMetadata.getTabBar().getElement().getParentElement().insertFirst(descriptiveMetadataButtons.getElement());
+    itemMetadata.addSelectionHandler(event -> {
+      if (descriptiveMetadataSavedButtons.containsKey(event.getSelectedItem())) {
+        descriptiveMetadataButtons.setWidget(descriptiveMetadataSavedButtons.get(event.getSelectedItem()));
+      } else {
+        descriptiveMetadataButtons.clear();
+      }
+    });
+
     if (!bundle.getRepresentationDescriptiveMetadata().isEmpty()) {
       newDescriptiveMetadata.setVisible(false);
       itemMetadata.setVisible(true);
@@ -345,13 +342,11 @@ public class BrowseRepresentation extends Composite {
     }
 
     // DISSEMINATIONS (POST-INIT)
-    disseminationsSearch.setVisible(bundle.getDipCount() > 0);
     if (bundle.getDipCount() > 0) {
       disseminationsSearch.setFilter(IndexedDIP.class, disseminationsFilter);
     }
-
-    ListSelectionUtils.bindLayout(representation, searchPrevious, searchNext, keyboardFocus, true, false, false,
-      searchSection);
+    disseminationsSearch.setVisible(bundle.getDipCount() > 0);
+    disseminationsSearch.getParent().setVisible(bundle.getDipCount() > 0);
 
     // CSS
     this.addStyleName("browse");
@@ -373,78 +368,44 @@ public class BrowseRepresentation extends Composite {
     aipState.setVisible(!justActive);
 
     // IDENTIFICATION
-
     representationIcon.setHTML(DescriptionLevelUtils.getRepresentationTypeIcon(representation.getType(), false));
+    Sliders.createRepresentationInfoSlider(center, navigationToolbar.getSidebarButton(), bundle);
+
+    Anchor risksLink = new Anchor(messages.aipRiskIncidences(bundle.getRiskIncidenceCount()), HistoryUtils
+      .createHistoryHashLink(RiskIncidenceRegister.RESOLVER, representation.getAipId(), representation.getId()));
+    Anchor eventsLink = new Anchor(messages.aipEvents(bundle.getPreservationEventCount()), HistoryUtils
+      .createHistoryHashLink(PreservationEvents.BROWSE_RESOLVER, representation.getAipId(), representation.getUUID()));
+
+    risksEventsLogs.clear();
+    risksEventsLogs.add(risksLink);
+    risksEventsLogs.add(new Label(" " + messages.and() + " "));
+    risksEventsLogs.add(eventsLink);
+
+    if (representation.getCreatedOn() != null && StringUtils.isNotBlank(representation.getCreatedBy())
+      && representation.getUpdatedOn() != null && StringUtils.isNotBlank(representation.getUpdatedBy())) {
+      dateCreatedAndModified.setText(messages.dateCreatedAndUpdated(Humanize.formatDate(representation.getCreatedOn()),
+        representation.getCreatedBy(), Humanize.formatDate(representation.getUpdatedOn()),
+        representation.getUpdatedBy()));
+    } else if (representation.getCreatedOn() != null && StringUtils.isNotBlank(representation.getCreatedBy())) {
+      dateCreatedAndModified.setText(
+        messages.dateCreated(Humanize.formatDateTime(representation.getCreatedOn()), representation.getCreatedBy()));
+    } else if (representation.getUpdatedOn() != null && StringUtils.isNotBlank(representation.getUpdatedBy())) {
+      dateCreatedAndModified.setText(
+        messages.dateUpdated(Humanize.formatDateTime(representation.getUpdatedOn()), representation.getUpdatedBy()));
+    } else {
+      dateCreatedAndModified.setText("");
+    }
 
     String title = representation.getTitle() != null ? representation.getTitle() : representation.getType();
     title = title == null ? representation.getId() : title;
     representationTitle.clear();
     HtmlSnippetUtils.getRepresentationTypeHTML(representationTitle, title, representation.getRepresentationStates());
 
-    representationId.clear();
-    final String idFilter = RepresentationInformationUtils.createRepresentationInformationFilter(
-      RodaConstants.INDEX_REPRESENTATION, RodaConstants.INDEX_UUID, representation.getUUID());
-    RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(
-      SafeHtmlUtils.fromString(messages.representationId() + ": " + representation.getId()), idFilter, representationId,
-      bundle.getRepresentationInformationFields().contains(RodaConstants.INDEX_UUID));
-
-    if (representation.getType() != null) {
-      representationType.clear();
-      final String typeFilter = RepresentationInformationUtils.createRepresentationInformationFilter(
-        RodaConstants.INDEX_REPRESENTATION, RodaConstants.REPRESENTATION_TYPE, representation.getType());
-      RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(
-        SafeHtmlUtils.fromString(messages.representationType() + ": " + representation.getType()), typeFilter,
-        representationType, bundle.getRepresentationInformationFields().contains(RodaConstants.REPRESENTATION_TYPE));
-    }
-
-    if (!breadcrumbItems.isEmpty()) {
-      breadcrumbItems.remove(breadcrumbItems.size() - 1);
-      breadcrumbItems.add(BreadcrumbUtils.getBreadcrumbItem(representation));
-      breadcrumb.updatePath(breadcrumbItems);
-    }
-
-    if (representation.getCreatedOn() != null) {
-      dateCreated.setText(
-        messages.dateCreated(Humanize.formatDateTime(representation.getCreatedOn()), representation.getCreatedBy()));
-    }
-
-    if (representation.getUpdatedOn() != null) {
-      dateUpdated.setText(
-        messages.dateUpdated(Humanize.formatDateTime(representation.getUpdatedOn()), representation.getUpdatedBy()));
-    }
-
-    // SIDEBAR
-    actionableWidgetBuilder.withCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
-      @Override
-      public void onSuccess(Actionable.ActionImpact impact) {
-        if (Actionable.ActionImpact.UPDATED.equals(impact)) {
-          BrowserService.Util.getInstance().retrieve(IndexedRepresentation.class.getName(), representation.getUUID(),
-            representationFields, new AsyncCallback<IndexedRepresentation>() {
-
-              @Override
-              public void onFailure(Throwable caught) {
-                AsyncCallbackUtils.defaultFailureTreatment(caught);
-              }
-
-              @Override
-              public void onSuccess(IndexedRepresentation rep) {
-                representation = rep;
-                updateLayout(bundle, state, justActive);
-              }
-            });
-        }
-      }
-    });
-    actionsSidebar.setWidget(actionableWidgetBuilder.buildListWithObjects(new ActionableObject<>(representation)));
-  }
-
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
+    navigationToolbar.updateBreadcrumb(bundle);
   }
 
   private void getDescriptiveMetadataHTML(final String descId, final DescriptiveMetadataViewBundle bundle,
+    final Integer selectedIndex,
     final AsyncCallback<SafeHtml> callback) {
     SafeUri uri = RestUtils.createRepresentationDescriptiveMetadataHTMLUri(aipId, repId, descId);
     RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri.asString());
@@ -481,6 +442,12 @@ public class BrowseRepresentation extends Composite {
             b.append(SafeHtmlUtils.fromSafeConstant(downloadLinkHtml));
 
             b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
+
+            HTMLPanel buttons = new HTMLPanel(b.toSafeHtml());
+            descriptiveMetadataSavedButtons.put(selectedIndex, buttons);
+            descriptiveMetadataButtons.setWidget(buttons);
+
+            b = new SafeHtmlBuilder();
 
             b.append(SafeHtmlUtils.fromSafeConstant("<div class='descriptiveMetadataHTML'>"));
             b.append(SafeHtmlUtils.fromTrustedString(html));

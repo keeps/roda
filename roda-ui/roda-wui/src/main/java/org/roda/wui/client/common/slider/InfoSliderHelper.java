@@ -26,6 +26,7 @@ import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.wui.client.browse.RepresentationInformationHelper;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
+import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.common.actions.AipActions;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
@@ -117,6 +118,32 @@ public class InfoSliderHelper {
 
       values.put(messages.representationOriginal(), new InlineHTML(SafeHtmlUtils.fromString(
         representation.isOriginal() ? messages.originalRepresentation() : messages.alternativeRepresentation())));
+    }
+
+    populate(infoSliderPanel, values);
+  }
+
+  public static void updateInfoSliderPanel(BrowseRepresentationBundle bundle, SliderPanel infoSliderPanel) {
+    IndexedRepresentation representation = bundle.getRepresentation();
+
+    HashMap<String, Widget> values = new HashMap<>();
+    infoSliderPanel.clear();
+    infoSliderPanel.addTitle(new Label(messages.viewRepresentationInfoTitle()));
+
+    values.put(messages.representationId(), createIdHTML(bundle));
+
+    if (representation.getCreatedOn() != null && StringUtils.isNotBlank(representation.getCreatedBy())) {
+      values.put(messages.aipCreated(), new InlineHTML(messages
+        .dateCreatedOrUpdated(Humanize.formatDateTime(representation.getCreatedOn()), representation.getCreatedBy())));
+    }
+
+    if (representation.getUpdatedOn() != null && StringUtils.isNotBlank(representation.getUpdatedBy())) {
+      values.put(messages.aipUpdated(), new InlineHTML(messages
+        .dateCreatedOrUpdated(Humanize.formatDateTime(representation.getUpdatedOn()), representation.getUpdatedBy())));
+    }
+
+    if (StringUtils.isNotBlank(representation.getType())) {
+      values.put(messages.representationType(), createRepresentationTypeHTML(bundle));
     }
 
     populate(infoSliderPanel, values);
@@ -501,6 +528,19 @@ public class InfoSliderHelper {
     return panel;
   }
 
+  private static FlowPanel createIdHTML(BrowseRepresentationBundle bundle) {
+    IndexedRepresentation representation = bundle.getRepresentation();
+    FlowPanel panel = new FlowPanel();
+
+    final String riFilter = RepresentationInformationUtils.createRepresentationInformationFilter(
+      RodaConstants.INDEX_REPRESENTATION, RodaConstants.INDEX_UUID, representation.getUUID());
+    RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(
+      SafeHtmlUtils.fromString(representation.getId()), riFilter, panel,
+      bundle.getRepresentationInformationFields().contains(RodaConstants.INDEX_UUID));
+
+    return panel;
+  }
+
   private static FlowPanel createAipTypeHTML(BrowseAIPBundle bundle) {
     IndexedAIP aip = bundle.getAip();
     FlowPanel panel = new FlowPanel();
@@ -520,6 +560,19 @@ public class InfoSliderHelper {
     RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(
       SafeHtmlUtils.fromString(DescriptionLevelUtils.getElementLevelLabel(aip.getLevel())), riFilter, panel,
       bundle.getRepresentationInformationFields().contains(RodaConstants.AIP_LEVEL));
+
+    return panel;
+  }
+
+  private static FlowPanel createRepresentationTypeHTML(BrowseRepresentationBundle bundle) {
+    IndexedRepresentation representation = bundle.getRepresentation();
+    FlowPanel panel = new FlowPanel();
+
+    final String riFilter = RepresentationInformationUtils.createRepresentationInformationFilter(
+      RodaConstants.INDEX_REPRESENTATION, RodaConstants.REPRESENTATION_TYPE, representation.getType());
+    RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(
+      SafeHtmlUtils.fromString(representation.getType()), riFilter, panel,
+      bundle.getRepresentationInformationFields().contains(RodaConstants.REPRESENTATION_TYPE));
 
     return panel;
   }

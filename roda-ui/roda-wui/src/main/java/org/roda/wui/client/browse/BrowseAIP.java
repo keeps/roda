@@ -43,7 +43,6 @@ import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.slider.Sliders;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.PermissionUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.management.UserLog;
@@ -118,7 +117,7 @@ public class BrowseAIP extends Composite {
 
               @Override
               public void onFailure(Throwable caught) {
-                AsyncCallbackUtils.treatCommonFailures(caught, Welcome.RESOLVER.getHistoryPath());
+                AsyncCallbackUtils.defaultFailureTreatment(caught, Welcome.RESOLVER.getHistoryPath());
               }
 
               @Override
@@ -228,7 +227,7 @@ public class BrowseAIP extends Composite {
     aipId = aip.getId();
     boolean justActive = AIPState.ACTIVE.equals(aip.getState());
 
-    RepresentationActions representationActions = RepresentationActions.get(bundle.getAip());
+    RepresentationActions representationActions = RepresentationActions.get(bundle.getAip().getId());
     DisseminationActions disseminationActions = DisseminationActions.get();
     AipActions aipActions = AipActions.get(aip.getId(), aip.getState());
 
@@ -320,12 +319,6 @@ public class BrowseAIP extends Composite {
     aipChildrenSearchWrapper.getParent().setVisible(bundle.getChildAIPCount() > 0);
 
     keyboardFocus.setFocus(true);
-  }
-
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
   }
 
   private void updateSectionDescriptiveMetadata(BrowseAIPBundle bundle) {

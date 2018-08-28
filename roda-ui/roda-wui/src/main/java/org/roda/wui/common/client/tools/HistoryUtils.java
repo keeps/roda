@@ -253,12 +253,20 @@ public class HistoryUtils {
     return getHistory(TransferUpload.BROWSE_FILE_RESOLVER, tokens);
   }
 
+  public static void openUpload(String aipId, String representationId) {
+    HistoryUtils.newHistory(getHistoryUpload(aipId, representationId));
+  }
+
   public static void openUpload(IndexedRepresentation representation) {
     HistoryUtils.newHistory(getHistoryUpload(representation));
   }
 
   public static List<String> getHistoryUpload(IndexedRepresentation representation) {
     return getHistory(TransferUpload.BROWSE_RESOLVER, representation.getAipId(), representation.getId());
+  }
+
+  public static List<String> getHistoryUpload(String aipId, String representationId) {
+    return getHistory(TransferUpload.BROWSE_RESOLVER, aipId, representationId);
   }
 
   public static void openUpload(IndexedFile folder) {

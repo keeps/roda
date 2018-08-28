@@ -590,6 +590,10 @@ pre code {
 	margin-right: 5px;
 }
 
+.browseNewDescriptiveMetadataButton {
+    margin-top: 10px;
+}
+
 .panelDescriptiveMetadata .form-separator:first-child {
 	margin-top:0px !important;
 }
@@ -1824,7 +1828,7 @@ td.datePickerMonth, td.datePickerYear {
     cursor: pointer;
     cursor: hand;
     font-weight: 500;
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     font-variant: normal;
     color: #fff;
     padding: 5px 10px;
@@ -2264,13 +2268,6 @@ td.datePickerMonth, td.datePickerYear {
 .browse.under_appraisal, .browse.deleted, .browse.created, .browse.ingest_processing {
     background-color: #efefef;
     background-image: repeating-linear-gradient(-45deg, transparent, transparent 35px, rgba(255, 255, 255, .5) 35px, rgba(255, 255, 255, .5) 70px);
-}
-
-.browseBreadcrumb {
-}
-
-.browseNewDescriptiveMetadataButton {
-    margin-bottom: 20px;
 }
 
 .browseItemPanel {
@@ -4292,9 +4289,7 @@ td.datePickerMonth, td.datePickerYear {
 .viewRepresentationFile .filePreviewToolbar .browseItemHeader {
 	display: inline-block;
 	vertical-align: bottom;
-    margin-left: 40px;
     margin-right: 2px;
-    font-size: 1.4rem;
     color: #222;
 }
 
@@ -6787,7 +6782,7 @@ span.code {
 .ActionableStyleButtons .actionable-button {
     /* mimic <button> and .btn */
     border-radius: 2px;
-    padding: 8px 10px 8px 10px;
+    padding: 8px 8px 8px 10px;
     border: none;
     background-color: #089de3;
     color: white;
@@ -6831,9 +6826,9 @@ span.code {
     background-color: #ddd;
 }
 
-.sidebar .actionable-button + .sidebar .actionable-button,
-.slider .actionable-button + .slider .actionable-button,
-.ActionableStyleButtons .actionable-button + .ActionableStyleButtons .actionable-button {
+.sidebar .actionable-button + .actionable-button,
+.slider .actionable-button + .actionable-button,
+.ActionableStyleButtons .actionable-button + .actionable-button {
     margin-top: 10px;
 }
 
@@ -6850,6 +6845,7 @@ span.code {
 
 .card + .ActionableStyleButtons, .ActionableStyleButtons + .ActionableStyleButtons {
     margin-top: 20px;
+    line-height: 1rem;
 }
 
 /* Actionable Title/Header */

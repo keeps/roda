@@ -61,7 +61,7 @@ public class HtmlSnippetUtils {
   private static final String OPEN_SPAN_CLASS_LABEL_SUCCESS = "<span class='label-success'>";
 
   private static final String OPEN_SPAN_ORIGINAL_LABEL_SUCCESS = "<span class='label-success browseRepresentationOriginalIcon'>";
-  private static final String OPEN_H4_CLASS_LABEL_SUCCESS = "<span class='h4' style='font-size: 3.2rem'>";
+  private static final String OPEN_H2_CLASS_LABEL_SUCCESS = "<span class='h2'>";
   private static final String CLOSE_SPAN = "</span>";
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
@@ -137,7 +137,7 @@ public class HtmlSnippetUtils {
 
   public static void getRepresentationTypeHTML(FlowPanel panel, String title, List<String> representationStates) {
     RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(
-      SafeHtmlUtils.fromSafeConstant(OPEN_H4_CLASS_LABEL_SUCCESS + title + CLOSE_SPAN), null, panel, false);
+      SafeHtmlUtils.fromSafeConstant(OPEN_H2_CLASS_LABEL_SUCCESS + title + CLOSE_SPAN), null, panel, false);
 
     for (String state : representationStates) {
       SafeHtmlBuilder b = new SafeHtmlBuilder();

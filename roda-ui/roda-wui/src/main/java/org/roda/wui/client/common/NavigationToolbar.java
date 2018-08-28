@@ -15,9 +15,12 @@ import java.util.Set;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
+import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.common.actions.AbstractActionable;
 import org.roda.wui.client.common.actions.AipActions;
+import org.roda.wui.client.common.actions.RepresentationActions;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.actions.model.ActionableObject;
@@ -129,6 +132,19 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
       popup.setWidget(new ActionableWidgetBuilder<>(aipActions).buildListWithObjects(new ActionableObject<>(aip)));
       actionsButton.addClickHandler(event -> popup.showRelativeTo(actionsButton));
       actionsButton.setVisible(true);
+    } else if (currentObject instanceof IndexedRepresentation) {
+      CalloutPopup popup = new CalloutPopup();
+      popup.addStyleName("ActionableStyleMenu");
+
+      RepresentationActions representationActions;
+      IndexedRepresentation representation = (IndexedRepresentation) this.currentObject;
+
+      representationActions = RepresentationActions.get(representation.getAipId());
+
+      popup.setWidget(new ActionableWidgetBuilder<>(representationActions)
+        .buildListWithObjects(new ActionableObject<>(representation)));
+      actionsButton.addClickHandler(event -> popup.showRelativeTo(actionsButton));
+      actionsButton.setVisible(true);
     } else {
       actionsButton.setVisible(false);
     }
@@ -142,6 +158,10 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
 
   public void updateBreadcrumb(BrowseAIPBundle bundle) {
     breadcrumb.updatePath(BreadcrumbUtils.getAipBreadcrumbs(bundle.getAIPAncestors(), bundle.getAip()));
+  }
+
+  public void updateBreadcrumb(BrowseRepresentationBundle bundle) {
+    breadcrumb.updatePath(BreadcrumbUtils.getRepresentationBreadcrumbs(bundle));
   }
 
   public void updateBreadcrumbPath(BreadcrumbItem... items) {

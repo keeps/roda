@@ -102,4 +102,11 @@ public class AsyncCallbackUtils {
     }
   }
 
+  public static final void defaultFailureTreatment(Throwable caught, final List<String> redirectPath) {
+    if (!treatCommonFailures(caught, redirectPath)) {
+      Toast.showError(caught.getClass().getSimpleName(), caught.getMessage());
+      LOGGER.error("Async request error", caught);
+    }
+  }
+
 }

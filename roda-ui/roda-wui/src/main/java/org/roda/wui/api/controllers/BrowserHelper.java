@@ -278,6 +278,17 @@ public class BrowserHelper {
     Long dipCount = RodaCoreFactory.getIndexService().count(IndexedDIP.class, dipsFilter);
     bundle.setDipCount(dipCount);
 
+    Filter riskIncidenceFilter = new Filter(
+      new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, representation.getId()));
+    Long riskIncidenceCount = RodaCoreFactory.getIndexService().count(RiskIncidence.class, riskIncidenceFilter);
+    bundle.setRiskIncidenceCount(riskIncidenceCount);
+
+    Filter preservationEventFilter = new Filter(
+      new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_REPRESENTATION_UUID, representation.getUUID()));
+    Long preservationEventCount = RodaCoreFactory.getIndexService().count(IndexedPreservationEvent.class,
+      preservationEventFilter);
+    bundle.setPreservationEventCount(preservationEventCount);
+
     List<String> rodaConfigurationAsList = RodaCoreFactory.getRodaConfigurationAsList("core.ri.rule.Representation")
       .stream().map(r -> RodaCoreFactory.getRodaConfigurationAsString(r, RodaConstants.SEARCH_FIELD_FIELDS))
       .collect(Collectors.toList());

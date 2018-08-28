@@ -4,7 +4,8 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:m="urn:import:org.roda.wui.client.main"
 	xmlns:commonsearch="urn:import:org.roda.wui.client.common.search"
-	xmlns:lists="urn:import:org.roda.wui.client.common.lists" xmlns:common="urn:import:org.roda.wui.client.common">
+	xmlns:lists="urn:import:org.roda.wui.client.common.lists"
+	xmlns:common="urn:import:org.roda.wui.client.common">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
@@ -21,21 +22,17 @@
 						<g:HTML addStyleNames="h2 browseItemIcon" ui:field="itemIcon"/>
 						<g:Label addStyleNames="h2 browseItemText" ui:field="itemTitle"/>
 
-						<!--<g:SimplePanel ui:field="smallTitle" />-->
 						<g:FlowPanel addStyleNames="browseItemPanelRisksEventsLogs" ui:field="risksEventsLogs" />
 						<g:Label addStyleNames="browseItemId" ui:field="dateCreatedAndModified" />
 					</g:FlowPanel>
-					<m:BreadcrumbPanel ui:field="breadcrumb" addStyleNames="browseBreadcrumb"/>
 
 					<!-- DESCRIPTIVE METADATA -->
+					<g:Button addStyleNames="btn btn-block btn-plus browseNewDescriptiveMetadataButton" ui:field="newDescriptiveMetadata">
+						<ui:text from='{messages.newDescriptiveMetadataTitle}' />
+					</g:Button>
 					<g:FlowPanel addStyleNames="card descriptiveMetadataCard">
 						<g:TabPanel ui:field="descriptiveMetadata"
 							addStyleNames="browseItemMetadata" />
-						<g:Button
-							addStyleNames="btn btn-block btn-plus browseNewDescriptiveMetadataButton"
-							ui:field="newDescriptiveMetadata">
-							<ui:text from='{messages.newDescriptiveMetadataTitle}' />
-						</g:Button>
 					</g:FlowPanel>
 
 					<!-- REPRESENTATIONS -->

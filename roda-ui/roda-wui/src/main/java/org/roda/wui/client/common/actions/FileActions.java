@@ -27,6 +27,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
+import org.roda.wui.client.common.actions.Actionable.Action;
 import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
 import org.roda.wui.client.common.actions.callbacks.ActionLoadingAsyncCallback;
 import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
@@ -60,6 +61,9 @@ public class FileActions extends AbstractActionable<IndexedFile> {
   private static final FileActions GENERAL_INSTANCE = new FileActions(null, null, null);
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
+
+  private static final Set<FileAction> POSSIBLE_ACTIONS_WITH_REPRESENTATION = new HashSet<>(
+    Arrays.asList(FileAction.UPLOAD_FILES, FileAction.CREATE_FOLDER));
 
   private static final Set<FileAction> POSSIBLE_ACTIONS_ON_SINGLE_FILE_DIRECTORY = new HashSet<>(
     Arrays.asList(FileAction.values()));
@@ -122,6 +126,11 @@ public class FileActions extends AbstractActionable<IndexedFile> {
   }
 
   @Override
+  public boolean canAct(Action<IndexedFile> action) {
+    return aipId != null && representationId != null && POSSIBLE_ACTIONS_WITH_REPRESENTATION.contains(action);
+  }
+
+  @Override
   public boolean canAct(Action<IndexedFile> action, IndexedFile file) {
     boolean canAct = false;
 
@@ -149,6 +158,17 @@ public class FileActions extends AbstractActionable<IndexedFile> {
     }
 
     return canAct;
+  }
+
+  @Override
+  public void act(Action<IndexedFile> action, AsyncCallback<ActionImpact> callback) {
+    if (FileAction.UPLOAD_FILES.equals(action)) {
+      uploadFiles(callback);
+    } else if (FileAction.CREATE_FOLDER.equals(action)) {
+      createFolder(callback);
+    } else {
+      unsupportedAction(action, callback);
+    }
   }
 
   @Override
@@ -199,7 +219,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
   // ACTIONS
 
-  public void download(IndexedFile file, final AsyncCallback<ActionImpact> callback) {
+  private void download(IndexedFile file, final AsyncCallback<ActionImpact> callback) {
     SafeUri downloadUri = null;
     if (file != null) {
       downloadUri = RestUtils.createRepresentationFileDownloadUri(file.getUUID());
@@ -210,7 +230,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
     callback.onSuccess(ActionImpact.NONE);
   }
 
-  public void rename(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
+  private void rename(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
     Dialogs.showPromptDialog(messages.renameItemTitle(), null, file.getId(), null, RegExp.compile("^[^/]+$"),
       messages.cancelButton(), messages.confirmButton(), true, false, new ActionNoAsyncCallback<String>(callback) {
 
@@ -238,12 +258,12 @@ public class FileActions extends AbstractActionable<IndexedFile> {
       });
   }
 
-  public void move(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
+  private void move(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
     move(file.getAipId(), file.getRepresentationId(),
       new SelectedItemsList<>(Arrays.asList(file.getUUID()), IndexedFile.class.getName()), callback);
   }
 
-  public void move(final String aipId, final String representationId, final SelectedItems<IndexedFile> selectedItems,
+  private void move(final String aipId, final String representationId, final SelectedItems<IndexedFile> selectedItems,
     final AsyncCallback<ActionImpact> callback) {
     // FIXME missing filter to remove the files themselves
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_AIP_ID, aipId),
@@ -310,7 +330,22 @@ public class FileActions extends AbstractActionable<IndexedFile> {
     });
   }
 
-  public void uploadFiles(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
+  private void uploadFiles(final AsyncCallback<ActionImpact> callback) {
+    Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
+      RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+      new ActionNoAsyncCallback<String>(callback) {
+
+        @Override
+        public void onSuccess(String details) {
+          LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
+          selectedItems.setDetailsMessage(details);
+          HistoryUtils.openUpload(aipId, representationId);
+          doActionCallbackUpdated();
+        }
+      });
+  }
+
+  private void uploadFiles(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
     if (file.isDirectory()) {
       Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
         RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
@@ -327,7 +362,44 @@ public class FileActions extends AbstractActionable<IndexedFile> {
     }
   }
 
-  public void createFolder(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
+  private void createFolder(final AsyncCallback<ActionImpact> callback) {
+    Dialogs.showPromptDialog(messages.createFolderTitle(), null, null, messages.createFolderPlaceholder(),
+      RegExp.compile("^[^/]+$"), messages.cancelButton(), messages.confirmButton(), true, false,
+      new ActionNoAsyncCallback<String>(callback) {
+
+        @Override
+        public void onSuccess(final String newName) {
+          Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
+            RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+            new ActionNoAsyncCallback<String>(callback) {
+
+              @Override
+              public void onSuccess(final String details) {
+                BrowserService.Util.getInstance().createFolder(aipId, representationId, null, newName, details,
+                  new ActionLoadingAsyncCallback<IndexedFile>(callback) {
+
+                    @Override
+                    public void onSuccessImpl(IndexedFile newFolder) {
+                      HistoryUtils.openBrowse(newFolder);
+                      doActionCallbackUpdated();
+                    }
+
+                    @Override
+                    public void onFailureImpl(Throwable caught) {
+                      if (caught instanceof NotFoundException) {
+                        Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
+                      }
+                      callback.onFailure(caught);
+                    }
+
+                  });
+              }
+            });
+        }
+      });
+  }
+
+  private void createFolder(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
     Dialogs.showPromptDialog(messages.createFolderTitle(), null, null, messages.createFolderPlaceholder(),
       RegExp.compile("^[^/]+$"), messages.cancelButton(), messages.confirmButton(), false, false,
       new ActionNoAsyncCallback<String>(callback) {
@@ -367,11 +439,13 @@ public class FileActions extends AbstractActionable<IndexedFile> {
       });
   }
 
-  public void newProcess(IndexedFile file, final AsyncCallback<ActionImpact> callback) {
-    newProcess(new SelectedItemsList<>(Arrays.asList(file.getUUID()), IndexedFile.class.getName()), callback);
+
+  private void newProcess(IndexedFile file, final AsyncCallback<ActionImpact> callback) {
+    newProcess(new SelectedItemsList<>(Arrays.asList(file.getUUID()), IndexedFile.class.getName()),
+      callback);
   }
 
-  public void newProcess(SelectedItems<IndexedFile> selected, final AsyncCallback<ActionImpact> callback) {
+  private void newProcess(SelectedItems<IndexedFile> selected, final AsyncCallback<ActionImpact> callback) {
     LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
     selectedItems.setSelectedItems(selected);
     selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
@@ -379,11 +453,12 @@ public class FileActions extends AbstractActionable<IndexedFile> {
     callback.onSuccess(ActionImpact.UPDATED);
   }
 
-  public void identifyFormats(IndexedFile file, final AsyncCallback<ActionImpact> callback) {
-    identifyFormats(new SelectedItemsList<>(Arrays.asList(file.getUUID()), IndexedFile.class.getName()), callback);
+  private void identifyFormats(IndexedFile file, final AsyncCallback<ActionImpact> callback) {
+    identifyFormats(new SelectedItemsList<>(Arrays.asList(file.getUUID()), IndexedFile.class.getName()),
+      callback);
   }
 
-  public void identifyFormats(SelectedItems<IndexedFile> selected, final AsyncCallback<ActionImpact> callback) {
+  private void identifyFormats(SelectedItems<IndexedFile> selected, final AsyncCallback<ActionImpact> callback) {
     BrowserService.Util.getInstance().createFormatIdentificationJob(selected, new ActionAsyncCallback<Void>(callback) {
       @Override
       public void onSuccess(Void object) {
@@ -401,7 +476,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
     });
   }
 
-  public void remove(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
+  private void remove(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
     Dialogs.showConfirmDialog(messages.viewRepresentationRemoveFileTitle(),
       messages.viewRepresentationRemoveFileMessage(), messages.dialogCancel(), messages.dialogYes(),
       new ActionNoAsyncCallback<Boolean>(callback) {
@@ -451,7 +526,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
       });
   }
 
-  public void remove(final SelectedItems<IndexedFile> selected, final AsyncCallback<ActionImpact> callback) {
+  private void remove(final SelectedItems<IndexedFile> selected, final AsyncCallback<ActionImpact> callback) {
     Dialogs.showConfirmDialog(messages.filesRemoveTitle(), messages.selectedFileRemoveMessage(),
       messages.dialogCancel(), messages.dialogYes(), new ActionNoAsyncCallback<Boolean>(callback) {
 
@@ -510,7 +585,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
       });
   }
 
-  public void showEvents(IndexedFile file, final AsyncCallback<ActionImpact> callback) {
+  private void showEvents(IndexedFile file, final AsyncCallback<ActionImpact> callback) {
     List<String> history = new ArrayList<>();
     history.add(file.getAipId());
     history.add(file.getRepresentationUUID());
@@ -519,7 +594,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
     callback.onSuccess(ActionImpact.NONE);
   }
 
-  public void showRisks(IndexedFile file, final AsyncCallback<ActionImpact> callback) {
+  private void showRisks(IndexedFile file, final AsyncCallback<ActionImpact> callback) {
     List<String> history = new ArrayList<>();
     history.add(RiskIncidenceRegister.RESOLVER.getHistoryToken());
     history.add(file.getAipId());

@@ -7,25 +7,19 @@
  */
 package org.roda.wui.client.common.actions;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
 import org.roda.wui.client.common.actions.callbacks.ActionLoadingAsyncCallback;
@@ -35,8 +29,6 @@ import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.RepresentationDialogs;
 import org.roda.wui.client.ingest.process.ShowJob;
-import org.roda.wui.client.planning.Planning;
-import org.roda.wui.client.planning.RiskIncidenceRegister;
 import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.client.process.InternalProcess;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -62,18 +54,16 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
 
   private static final Set<RepresentationAction> POSSIBLE_ACTIONS_ON_SINGLE_REPRESENTATION = new HashSet<>(
     Arrays.asList(RepresentationAction.DOWNLOAD, RepresentationAction.CHANGE_TYPE, RepresentationAction.REMOVE,
-      RepresentationAction.NEW_PROCESS, RepresentationAction.IDENTIFY_FORMATS, RepresentationAction.SHOW_EVENTS,
-      RepresentationAction.SHOW_RISKS, RepresentationAction.UPLOAD_FILES, RepresentationAction.CREATE_FOLDER,
-      RepresentationAction.CHANGE_STATE));
+      RepresentationAction.NEW_PROCESS, RepresentationAction.IDENTIFY_FORMATS, RepresentationAction.CHANGE_STATE));
 
   private static final Set<RepresentationAction> POSSIBLE_ACTIONS_ON_MULTIPLE_REPRESENTATIONS = new HashSet<>(
     Arrays.asList(RepresentationAction.CHANGE_TYPE, RepresentationAction.REMOVE, RepresentationAction.NEW_PROCESS,
       RepresentationAction.IDENTIFY_FORMATS));
 
-  private final IndexedAIP parentAip;
+  private final String parentAipId;
 
-  private RepresentationActions(IndexedAIP parentAip) {
-    this.parentAip = parentAip;
+  private RepresentationActions(String parentAipId) {
+    this.parentAipId = parentAipId;
   }
 
   public enum RepresentationAction implements Action<IndexedRepresentation> {
@@ -82,10 +72,6 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
     REMOVE("org.roda.wui.api.controllers.Browser.delete(IndexedRepresentation)"),
     NEW_PROCESS("org.roda.wui.api.controllers.Jobs.createJob"),
     IDENTIFY_FORMATS("org.roda.wui.api.controllers.Jobs.createJob"),
-    SHOW_EVENTS("org.roda.wui.api.controllers.Browser.find(IndexedPreservationEvent)"),
-    SHOW_RISKS("org.roda.wui.api.controllers.Browser.find(IndexedRisk)"),
-    UPLOAD_FILES("org.roda.wui.api.controllers.Browser.createFile"),
-    CREATE_FOLDER("org.roda.wui.api.controllers.Browser.createFolder"),
     CHANGE_STATE("org.roda.wui.api.controllers.Browser.changeRepresentationStates");
 
     private List<String> methods;
@@ -109,13 +95,13 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
     return GENERAL_INSTANCE;
   }
 
-  public static RepresentationActions get(IndexedAIP aip) {
-    return new RepresentationActions(aip);
+  public static RepresentationActions get(String parentAipId) {
+    return new RepresentationActions(parentAipId);
   }
 
   @Override
   public boolean canAct(Action<IndexedRepresentation> action) {
-    return hasPermissions(action) && POSSIBLE_ACTIONS_WITHOUT_REPRESENTATION.contains(action) && parentAip != null;
+    return hasPermissions(action) && POSSIBLE_ACTIONS_WITHOUT_REPRESENTATION.contains(action) && parentAipId != null;
   }
 
   @Override
@@ -144,11 +130,11 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
       new ActionNoAsyncCallback<String>(callback) {
         @Override
         public void onSuccess(String details) {
-          BrowserService.Util.getInstance().createRepresentation(parentAip.getId(), details,
+          BrowserService.Util.getInstance().createRepresentation(parentAipId, details,
             new ActionLoadingAsyncCallback<String>(callback) {
               @Override
               public void onSuccessImpl(String representationId) {
-                HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, parentAip.getId(), representationId);
+                HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, parentAipId, representationId);
                 callback.onSuccess(ActionImpact.UPDATED);
               }
             });
@@ -169,14 +155,6 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
       newProcess(representation, callback);
     } else if (RepresentationAction.IDENTIFY_FORMATS.equals(action)) {
       identifyFormats(representation, callback);
-    } else if (RepresentationAction.SHOW_EVENTS.equals(action)) {
-      showEvents(representation, callback);
-    } else if (RepresentationAction.SHOW_RISKS.equals(action)) {
-      showRisks(representation, callback);
-    } else if (RepresentationAction.UPLOAD_FILES.equals(action)) {
-      uploadFiles(representation, callback);
-    } else if (RepresentationAction.CREATE_FOLDER.equals(action)) {
-      createFolder(representation, callback);
     } else if (RepresentationAction.CHANGE_STATE.equals(action)) {
       changeState(representation, callback);
     } else {
@@ -247,8 +225,8 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
                               Timer timer = new Timer() {
                                 @Override
                                 public void run() {
-                                  if (parentAip != null) {
-                                    HistoryUtils.openBrowse(parentAip);
+                                  if (parentAipId != null) {
+                                    HistoryUtils.openBrowse(parentAipId);
                                   }
                                   doActionCallbackDestroyed();
                                 }
@@ -352,75 +330,6 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
     });
   }
 
-  public void showEvents(IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
-    List<String> history = new ArrayList<>();
-    history.add(representation.getAipId());
-    history.add(representation.getUUID());
-    HistoryUtils.newHistory(PreservationEvents.BROWSE_RESOLVER, history);
-    callback.onSuccess(ActionImpact.NONE);
-  }
-
-  public void showRisks(IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
-    List<String> history = new ArrayList<>();
-    history.add(RiskIncidenceRegister.RESOLVER.getHistoryToken());
-    history.add(representation.getAipId());
-    history.add(representation.getId());
-    HistoryUtils.newHistory(Planning.RESOLVER, history);
-    callback.onSuccess(ActionImpact.NONE);
-  }
-
-  public void createFolder(final IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
-    Dialogs.showPromptDialog(messages.createFolderTitle(), null, null, messages.createFolderPlaceholder(),
-      RegExp.compile("^[^/]+$"), messages.cancelButton(), messages.confirmButton(), true, false,
-      new ActionNoAsyncCallback<String>(callback) {
-
-        @Override
-        public void onSuccess(final String newName) {
-          Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-            RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
-            new ActionNoAsyncCallback<String>(callback) {
-
-              @Override
-              public void onSuccess(final String details) {
-                BrowserService.Util.getInstance().createFolder(representation.getAipId(), representation.getId(), null,
-                  newName, details, new ActionLoadingAsyncCallback<IndexedFile>(callback) {
-
-                    @Override
-                    public void onSuccessImpl(IndexedFile newFolder) {
-                      HistoryUtils.openBrowse(newFolder);
-                      doActionCallbackUpdated();
-                    }
-
-                    @Override
-                    public void onFailureImpl(Throwable caught) {
-                      if (caught instanceof NotFoundException) {
-                        Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-                      }
-                      callback.onFailure(caught);
-                    }
-
-                  });
-              }
-            });
-        }
-      });
-  }
-
-  public void uploadFiles(final IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
-    Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
-      RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
-      new ActionNoAsyncCallback<String>(callback) {
-
-        @Override
-        public void onSuccess(String details) {
-          LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
-          selectedItems.setDetailsMessage(details);
-          HistoryUtils.openUpload(representation);
-          doActionCallbackUpdated();
-        }
-      });
-  }
-
   public void changeState(final IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
     RepresentationDialogs.showPromptDialogRepresentationStates(messages.changeStatusTitle(), messages.cancelButton(),
       messages.confirmButton(), representation.getRepresentationStates(),
@@ -456,7 +365,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
     // MANAGEMENT
     ActionableGroup<IndexedRepresentation> managementGroup = new ActionableGroup<>(messages.representation());
     managementGroup.addButton(messages.newRepresentationButton(), RepresentationAction.NEW, ActionImpact.UPDATED,
-      "btn-plus");
+      "btn-plus-circle");
     managementGroup.addButton(messages.downloadButton(), RepresentationAction.DOWNLOAD, ActionImpact.NONE,
       "btn-download");
     managementGroup.addButton(messages.changeTypeButton(), RepresentationAction.CHANGE_TYPE, ActionImpact.UPDATED,
@@ -471,20 +380,8 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
       ActionImpact.UPDATED, "btn-play");
     preservationGroup.addButton(messages.identifyFormatsButton(), RepresentationAction.IDENTIFY_FORMATS,
       ActionImpact.UPDATED, "btn-play");
-    preservationGroup.addButton(messages.preservationEvents(), RepresentationAction.SHOW_EVENTS, ActionImpact.NONE,
-      "btn-play");
-    preservationGroup.addButton(messages.preservationRisks(), RepresentationAction.SHOW_RISKS, ActionImpact.NONE,
-      "btn-play");
 
-    // FILES AND FOLDERS
-    ActionableGroup<IndexedRepresentation> filesAndFoldersGroup = new ActionableGroup<>(
-      messages.sidebarFoldersFilesTitle());
-    filesAndFoldersGroup.addButton(messages.uploadFilesButton(), RepresentationAction.UPLOAD_FILES,
-      ActionImpact.UPDATED, "btn-upload");
-    filesAndFoldersGroup.addButton(messages.createFolderButton(), RepresentationAction.CREATE_FOLDER,
-      ActionImpact.UPDATED, "btn-plus");
-
-    representationActionableBundle.addGroup(managementGroup).addGroup(preservationGroup).addGroup(filesAndFoldersGroup);
+    representationActionableBundle.addGroup(managementGroup).addGroup(preservationGroup);
     return representationActionableBundle;
   }
 }

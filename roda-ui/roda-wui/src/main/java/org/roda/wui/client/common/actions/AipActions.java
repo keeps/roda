@@ -669,7 +669,8 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
     // MANAGEMENT
     ActionableGroup<IndexedAIP> managementGroup = new ActionableGroup<>(messages.intellectualEntity());
-    managementGroup.addButton(messages.newArchivalPackage(), AipAction.NEW_CHILD_AIP, ActionImpact.UPDATED, "btn-plus");
+    managementGroup.addButton(messages.newArchivalPackage(), AipAction.NEW_CHILD_AIP, ActionImpact.UPDATED,
+      "btn-plus-circle");
     managementGroup.addButton(messages.changeTypeButton(), AipAction.CHANGE_TYPE, ActionImpact.UPDATED, "btn-edit");
     managementGroup.addButton(messages.moveArchivalPackage(), AipAction.MOVE_IN_HIERARCHY, ActionImpact.UPDATED,
       "btn-edit");

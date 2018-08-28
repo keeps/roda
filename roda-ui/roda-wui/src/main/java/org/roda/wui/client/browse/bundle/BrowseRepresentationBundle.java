@@ -24,6 +24,8 @@ public class BrowseRepresentationBundle implements Serializable {
   private List<DescriptiveMetadataViewBundle> representationDescriptiveMetadata = new ArrayList<>();
   private Long dipCount;
   private List<String> representationInformationFields;
+  private Long riskIncidenceCount;
+  private Long preservationEventCount;
 
   public BrowseRepresentationBundle() {
     super();
@@ -88,5 +90,21 @@ public class BrowseRepresentationBundle implements Serializable {
 
   public void setRepresentationInformationFields(List<String> representationInformationFields) {
     this.representationInformationFields = representationInformationFields;
+  }
+
+  public Long getRiskIncidenceCount() {
+    return riskIncidenceCount;
+  }
+
+  public void setRiskIncidenceCount(Long riskIncidenceCount) {
+    this.riskIncidenceCount = riskIncidenceCount;
+  }
+
+  public Long getPreservationEventCount() {
+    return preservationEventCount;
+  }
+
+  public void setPreservationEventCount(Long preservationEventCount) {
+    this.preservationEventCount = preservationEventCount;
   }
 }

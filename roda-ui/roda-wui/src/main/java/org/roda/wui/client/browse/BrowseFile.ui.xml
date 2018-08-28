@@ -10,13 +10,13 @@
 
 	<wcag:AccessibleFocusPanel ui:field="keyboardFocus">
 		<g:FlowPanel styleName="viewRepresentationFile">
-			<g:FlowPanel addStyleNames="filePreviewToolbar">
-				<g:Label addStyleNames="browseItemHeader" ui:field="browseItemHeader">
+			<g:FlowPanel addStyleNames="filePreviewToolbar navigationToolbar">
+				<g:Label addStyleNames="browseItemHeader navigationToolbarHeader" ui:field="browseItemHeader">
 					<ui:text from='{messages.catalogueFileTitle}' />
 					&rsaquo;
 				</g:Label>
 				<m:BreadcrumbPanel ui:field="breadcrumb"
-					addStyleNames="viewRepresentationBreadcrumb" />
+					addStyleNames="viewRepresentationBreadcrumb navigationToolbarBreadcrumb" />
 
 				<!-- STATUS -->
 				<g:HTML ui:field="aipState" styleName="aipState small" />
