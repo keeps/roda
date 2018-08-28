@@ -156,10 +156,10 @@ public class BrowseAIP extends Composite {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private String aipId;
+  private IndexedAIP aip;
 
   // Focus
   @UiField
@@ -223,11 +223,12 @@ public class BrowseAIP extends Composite {
   Label dateCreatedAndModified;
 
   private BrowseAIP(BrowseAIPBundle bundle) {
-    IndexedAIP aip = bundle.getAip();
+    aip = bundle.getAip();
     aipId = aip.getId();
     boolean justActive = AIPState.ACTIVE.equals(aip.getState());
 
-    RepresentationActions representationActions = RepresentationActions.get(bundle.getAip().getId());
+    RepresentationActions representationActions = RepresentationActions.get(bundle.getAip().getId(),
+      bundle.getAip().getPermissions());
     DisseminationActions disseminationActions = DisseminationActions.get();
     AipActions aipActions = AipActions.get(aip.getId(), aip.getState());
 
@@ -311,7 +312,7 @@ public class BrowseAIP extends Composite {
       LastSelectedItemsSingleton.getInstance().setSelectedJustActive(justActive);
     } else {
       addChildAip.setWidget(new ActionableWidgetBuilder<>(aipActions).buildListWithObjects(
-        new ActionableObject<>(IndexedAIP.class), Collections.singletonList(AipActions.AipAction.NEW_CHILD_AIP)));
+        new ActionableObject<>(IndexedAIP.class), Collections.singletonList(AipActions.AipAction.NEW_CHILD_AIP_BELOW)));
     }
 
     addChildAip.setVisible(bundle.getChildAIPCount() == 0);
@@ -362,19 +363,22 @@ public class BrowseAIP extends Composite {
       }
     });
 
-    final int addTabIndex = descriptiveMetadata.getWidgetCount();
-    FlowPanel addTab = new FlowPanel();
-    addTab.add(new HTML(SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-plus-circle\"></i>")));
-    descriptiveMetadata.add(new Label(), addTab);
-    descriptiveMetadata.addSelectionHandler(event -> {
-      if (event.getSelectedItem() == addTabIndex) {
-        newDescriptiveMetadataRedirect();
-      }
-    });
+    if (PermissionUtils.hasPermissions(aip.getPermissions(),
+      "org.roda.wui.api.controllers.Browser.createDescriptiveMetadataFile")) {
+      final int addTabIndex = descriptiveMetadata.getWidgetCount();
+      FlowPanel addTab = new FlowPanel();
+      addTab.add(new HTML(SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-plus-circle\"></i>")));
+      descriptiveMetadata.add(new Label(), addTab);
+      descriptiveMetadata.addSelectionHandler(event -> {
+        if (event.getSelectedItem() == addTabIndex) {
+          newDescriptiveMetadataRedirect();
+        }
+      });
 
-    addTab.addStyleName("addTab");
-    addTab.getElement().setId("aipNewDescriptiveMetadata");
-    addTab.getParent().addStyleName("addTabWrapper");
+      addTab.addStyleName("addTab");
+      addTab.getElement().setId("aipNewDescriptiveMetadata");
+      addTab.getParent().addStyleName("addTabWrapper");
+    }
 
     descriptiveMetadataSavedButtons = new HashMap<>();
     descriptiveMetadataButtons = new SimplePanel();
@@ -404,7 +408,6 @@ public class BrowseAIP extends Composite {
 
   private void updateSectionIdentification(BrowseAIPBundle bundle) {
     IndexedAIP aip = bundle.getAip();
-
     itemIcon.setHTML(DescriptionLevelUtils.getElementLevelIconSafeHtml(aip.getLevel(), false));
     itemTitle.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());
 
@@ -458,7 +461,8 @@ public class BrowseAIP extends Composite {
             SafeHtmlBuilder b = new SafeHtmlBuilder();
             b.append(SafeHtmlUtils.fromSafeConstant("<div class='descriptiveMetadataLinks'>"));
 
-            if (bundle.hasHistory()) {
+            if (bundle.hasHistory() && PermissionUtils.hasPermissions(aip.getPermissions(),
+              "org.roda.wui.api.controllers.Browser.retrieveDescriptiveMetadataVersionsBundle")) {
               // History link
               String historyLink = HistoryUtils.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId,
                 escapedDescId);
@@ -468,11 +472,14 @@ public class BrowseAIP extends Composite {
             }
 
             // Edit link
-            String editLink = HistoryUtils.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId,
-              escapedDescId);
-            String editLinkHtml = "<a href='" + editLink
-              + "' class='toolbarLink' id='aipEditDescriptiveMetadata'><i class='fa fa-edit'></i></a>";
-            b.append(SafeHtmlUtils.fromSafeConstant(editLinkHtml));
+            if (PermissionUtils.hasPermissions(aip.getPermissions(),
+              "org.roda.wui.api.controllers.Browser.updateDescriptiveMetadataFile")) {
+              String editLink = HistoryUtils.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId,
+                escapedDescId);
+              String editLinkHtml = "<a href='" + editLink
+                + "' class='toolbarLink' id='aipEditDescriptiveMetadata'><i class='fa fa-edit'></i></a>";
+              b.append(SafeHtmlUtils.fromSafeConstant(editLinkHtml));
+            }
 
             // Download link
             SafeUri downloadUri = RestUtils.createDescriptiveMetadataDownloadUri(aipId, escapedDescId);
@@ -481,24 +488,21 @@ public class BrowseAIP extends Composite {
             b.append(SafeHtmlUtils.fromSafeConstant(downloadLinkHtml));
 
             b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
-
             HTMLPanel buttons = new HTMLPanel(b.toSafeHtml());
             descriptiveMetadataSavedButtons.put(selectedIndex, buttons);
             descriptiveMetadataButtons.setWidget(buttons);
 
             b = new SafeHtmlBuilder();
-
             b.append(SafeHtmlUtils.fromSafeConstant("<div class='descriptiveMetadataHTML'>"));
             b.append(SafeHtmlUtils.fromTrustedString(html));
             b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
             SafeHtml safeHtml = b.toSafeHtml();
-
             callback.onSuccess(safeHtml);
           } else {
             String text = response.getText();
             String message;
             try {
-              RestErrorOverlayType error = (RestErrorOverlayType) JsonUtils.safeEval(text);
+              RestErrorOverlayType error = JsonUtils.safeEval(text);
               message = error.getMessage();
             } catch (IllegalArgumentException e) {
               message = text;
@@ -507,7 +511,8 @@ public class BrowseAIP extends Composite {
             SafeHtmlBuilder b = new SafeHtmlBuilder();
             b.append(SafeHtmlUtils.fromSafeConstant("<div class='descriptiveMetadataLinks'>"));
 
-            if (bundle.hasHistory()) {
+            if (bundle.hasHistory() && PermissionUtils.hasPermissions(aip.getPermissions(),
+              "org.roda.wui.api.controllers.Browser.retrieveDescriptiveMetadataVersionsBundle")) {
               // History link
               String historyLink = HistoryUtils.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId,
                 escapedDescId);
@@ -517,10 +522,13 @@ public class BrowseAIP extends Composite {
             }
 
             // Edit link
-            String editLink = HistoryUtils.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId,
-              escapedDescId);
-            String editLinkHtml = "<a href='" + editLink + "' class='toolbarLink'><i class='fa fa-edit'></i></a>";
-            b.append(SafeHtmlUtils.fromSafeConstant(editLinkHtml));
+            if (PermissionUtils.hasPermissions(aip.getPermissions(),
+              "org.roda.wui.api.controllers.Browser.updateDescriptiveMetadataFile")) {
+              String editLink = HistoryUtils.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId,
+                escapedDescId);
+              String editLinkHtml = "<a href='" + editLink + "' class='toolbarLink'><i class='fa fa-edit'></i></a>";
+              b.append(SafeHtmlUtils.fromSafeConstant(editLinkHtml));
+            }
 
             b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
 

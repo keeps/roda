@@ -16,6 +16,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.Permissions;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.common.actions.AbstractActionable;
@@ -82,6 +83,7 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
   AccessibleFocusPanel actionsButton;
 
   private T currentObject = null;
+  private Permissions permissions = null;
   private HandlerRegistration searchPopupClickHandler = null;
 
   public NavigationToolbar() {
@@ -90,8 +92,12 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
   }
 
   public void setObject(T object) {
-    currentObject = object;
+    this.currentObject = object;
     refresh();
+  }
+
+  public void setPermissions(Permissions permissions) {
+    this.permissions = permissions;
   }
 
   public AccessibleFocusPanel getSidebarButton() {
@@ -139,7 +145,7 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
       RepresentationActions representationActions;
       IndexedRepresentation representation = (IndexedRepresentation) this.currentObject;
 
-      representationActions = RepresentationActions.get(representation.getAipId());
+      representationActions = RepresentationActions.get(representation.getAipId(), permissions);
 
       popup.setWidget(new ActionableWidgetBuilder<>(representationActions)
         .buildListWithObjects(new ActionableObject<>(representation)));

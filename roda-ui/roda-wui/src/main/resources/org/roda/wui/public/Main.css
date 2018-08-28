@@ -6978,3 +6978,9 @@ span.code {
     background-color: #ddd;
     cursor: auto;
 }
+
+/* Permission related */
+
+.hasNoPermissions {
+    display: none;
+}

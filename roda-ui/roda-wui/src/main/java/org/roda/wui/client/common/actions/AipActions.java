@@ -10,7 +10,6 @@ package org.roda.wui.client.common.actions;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
@@ -23,7 +22,6 @@ import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.BrowserService;
@@ -69,8 +67,11 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   private static final AipActions GENERAL_INSTANCE = new AipActions(NO_AIP_PARENT, NO_AIP_STATE);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  private static final Set<AipAction> POSSIBLE_ACTIONS_ON_NO_AIP = new HashSet<>(
-    Arrays.asList(AipAction.NEW_CHILD_AIP));
+  private static final Set<AipAction> POSSIBLE_ACTIONS_ON_NO_AIP_TOP = new HashSet<>(
+    Arrays.asList(AipAction.NEW_CHILD_AIP_TOP));
+
+  private static final Set<AipAction> POSSIBLE_ACTIONS_ON_NO_AIP_BELOW = new HashSet<>(
+    Arrays.asList(AipAction.NEW_CHILD_AIP_BELOW));
 
   private static final Set<AipAction> POSSIBLE_ACTIONS_ON_SINGLE_AIP = new HashSet<>(
     Arrays.asList(AipAction.DOWNLOAD, AipAction.MOVE_IN_HIERARCHY, AipAction.UPDATE_PERMISSIONS, AipAction.REMOVE,
@@ -92,7 +93,8 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   }
 
   public enum AipAction implements Action<IndexedAIP> {
-    NEW_CHILD_AIP("org.roda.wui.api.controllers.Browser.createAIPBelow"), DOWNLOAD(),
+    NEW_CHILD_AIP_BELOW("org.roda.wui.api.controllers.Browser.createAIPBelow"),
+    NEW_CHILD_AIP_TOP("org.roda.wui.api.controllers.Browser.createAIPTop"), DOWNLOAD(),
     MOVE_IN_HIERARCHY("org.roda.wui.api.controllers.Browser.moveAIPInHierarchy"),
     UPDATE_PERMISSIONS("org.roda.wui.api.controllers.Browser.updateAIPPermissions"),
     REMOVE("org.roda.wui.api.controllers.Browser.delete(IndexedAIP)"),
@@ -128,7 +130,11 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
   @Override
   public boolean canAct(Action<IndexedAIP> action) {
-    return hasPermissions(action) && POSSIBLE_ACTIONS_ON_NO_AIP.contains(action);
+    if (parentAipId == NO_AIP_PARENT) {
+      return hasPermissions(action) && POSSIBLE_ACTIONS_ON_NO_AIP_TOP.contains(action);
+    } else {
+      return hasPermissions(action) && POSSIBLE_ACTIONS_ON_NO_AIP_BELOW.contains(action);
+    }
   }
 
   @Override
@@ -137,7 +143,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
     if (hasPermissions(action, aip.getPermissions())) {
       if (aip == NO_AIP_OBJECT) {
-        canAct = POSSIBLE_ACTIONS_ON_NO_AIP.contains(action);
+        canAct = POSSIBLE_ACTIONS_ON_NO_AIP_BELOW.contains(action);
       } else if (AIPState.UNDER_APPRAISAL.equals(aip.getState())) {
         canAct = POSSIBLE_ACTIONS_ON_SINGLE_AIP.contains(action) || APPRAISAL_ACTIONS.contains(action);
       } else {
@@ -165,7 +171,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
   @Override
   public void act(Action<IndexedAIP> action, AsyncCallback<ActionImpact> callback) {
-    if (AipAction.NEW_CHILD_AIP.equals(action)) {
+    if (AipAction.NEW_CHILD_AIP_TOP.equals(action) || AipAction.NEW_CHILD_AIP_BELOW.equals(action)) {
       newChildAip(callback);
     } else {
       unsupportedAction(action, callback);
@@ -669,7 +675,9 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
     // MANAGEMENT
     ActionableGroup<IndexedAIP> managementGroup = new ActionableGroup<>(messages.intellectualEntity());
-    managementGroup.addButton(messages.newArchivalPackage(), AipAction.NEW_CHILD_AIP, ActionImpact.UPDATED,
+    managementGroup.addButton(messages.newArchivalPackage(), AipAction.NEW_CHILD_AIP_TOP, ActionImpact.UPDATED,
+      "btn-plus-circle");
+    managementGroup.addButton(messages.newArchivalPackage(), AipAction.NEW_CHILD_AIP_BELOW, ActionImpact.UPDATED,
       "btn-plus-circle");
     managementGroup.addButton(messages.changeTypeButton(), AipAction.CHANGE_TYPE, ActionImpact.UPDATED, "btn-edit");
     managementGroup.addButton(messages.moveArchivalPackage(), AipAction.MOVE_IN_HIERARCHY, ActionImpact.UPDATED,

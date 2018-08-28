@@ -22,6 +22,7 @@ import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
@@ -32,8 +33,6 @@ import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.DisseminationActions;
 import org.roda.wui.client.common.actions.FileActions;
-import org.roda.wui.client.common.actions.model.ActionableObject;
-import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.lists.DIPList;
 import org.roda.wui.client.common.lists.SearchFileList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
@@ -42,6 +41,7 @@ import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.slider.Sliders;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
+import org.roda.wui.client.common.utils.PermissionUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
 import org.roda.wui.common.client.HistoryResolver;
@@ -151,6 +151,7 @@ public class BrowseRepresentation extends Composite {
   }
 
   private List<HandlerRegistration> handlers;
+  private IndexedAIP aip;
   private IndexedRepresentation representation;
   private String aipId;
   private String repId;
@@ -211,6 +212,7 @@ public class BrowseRepresentation extends Composite {
 
   public BrowseRepresentation(BrowseRepresentationBundle bundle) {
     this.representation = bundle.getRepresentation();
+    this.aip = bundle.getAip();
 
     this.aipId = representation.getAipId();
     this.repId = representation.getId();
@@ -219,7 +221,7 @@ public class BrowseRepresentation extends Composite {
     handlers = new ArrayList<>();
     String summary = messages.representationListOfFiles();
 
-    final AIPState state = bundle.getAip().getState();
+    final AIPState state = aip.getState();
     final boolean justActive = AIPState.ACTIVE.equals(state);
     boolean showFilesPath = false;
 
@@ -234,7 +236,8 @@ public class BrowseRepresentation extends Composite {
       new AsyncTableCell.Options<>(IndexedFile.class, "BrowseRepresentation_files").withFilter(filesFilter)
         .withJustActive(justActive).withSummary(summary).bindOpener());
 
-    filesSearch = new SearchWrapper(false).createListAndSearchPanel(fileListBuilder, FileActions.get(aipId, repId));
+    filesSearch = new SearchWrapper(false).createListAndSearchPanel(fileListBuilder,
+      FileActions.get(aipId, repId, aip.getPermissions()));
 
     // DISSEMINATIONS
 
@@ -256,6 +259,7 @@ public class BrowseRepresentation extends Composite {
 
     // NAVIGATION TOOLBAR
     navigationToolbar.setObject(representation);
+    navigationToolbar.setPermissions(aip.getPermissions());
     navigationToolbar.show();
 
     // DESCRIPTIVE METADATA
@@ -315,6 +319,9 @@ public class BrowseRepresentation extends Composite {
     addTab.addStyleName("addTab");
     addTab.getElement().setId("representationNewDescriptiveMetadata");
     addTab.getParent().addStyleName("addTabWrapper");
+
+    PermissionUtils.bindPermission(newDescriptiveMetadata, aip.getPermissions(),
+      "org.roda.wui.api.controllers.Browser.createDescriptiveMetadataFile");
 
     handlers.add(tabHandler);
     handlers.add(addTabHandler);
@@ -405,8 +412,7 @@ public class BrowseRepresentation extends Composite {
   }
 
   private void getDescriptiveMetadataHTML(final String descId, final DescriptiveMetadataViewBundle bundle,
-    final Integer selectedIndex,
-    final AsyncCallback<SafeHtml> callback) {
+    final Integer selectedIndex, final AsyncCallback<SafeHtml> callback) {
     SafeUri uri = RestUtils.createRepresentationDescriptiveMetadataHTMLUri(aipId, repId, descId);
     RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri.asString());
     try {
@@ -420,7 +426,8 @@ public class BrowseRepresentation extends Composite {
             SafeHtmlBuilder b = new SafeHtmlBuilder();
             b.append(SafeHtmlUtils.fromSafeConstant("<div class='descriptiveMetadataLinks'>"));
 
-            if (bundle.hasHistory()) {
+            if (bundle.hasHistory() && PermissionUtils.hasPermissions(aip.getPermissions(),
+              "org.roda.wui.api.controllers.Browser.retrieveDescriptiveMetadataVersionsBundle")) {
               // History link
               String historyLink = HistoryUtils.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId, repId,
                 descId);
@@ -429,11 +436,14 @@ public class BrowseRepresentation extends Composite {
               b.append(SafeHtmlUtils.fromSafeConstant(historyLinkHtml));
             }
             // Edit link
-            String editLink = HistoryUtils.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId, repId,
-              descId);
-            String editLinkHtml = "<a href='" + editLink
-              + "' class='toolbarLink' id='representationEditDescriptiveMetadata'><i class='fa fa-edit'></i></a>";
-            b.append(SafeHtmlUtils.fromSafeConstant(editLinkHtml));
+            if (PermissionUtils.hasPermissions(aip.getPermissions(),
+              "org.roda.wui.api.controllers.Browser.updateDescriptiveMetadataFile")) {
+              String editLink = HistoryUtils.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId, repId,
+                descId);
+              String editLinkHtml = "<a href='" + editLink
+                + "' class='toolbarLink' id='representationEditDescriptiveMetadata'><i class='fa fa-edit'></i></a>";
+              b.append(SafeHtmlUtils.fromSafeConstant(editLinkHtml));
+            }
 
             // Download link
             SafeUri downloadUri = RestUtils.createRepresentationDescriptiveMetadataDownloadUri(aipId, repId, descId);
@@ -459,7 +469,7 @@ public class BrowseRepresentation extends Composite {
             String text = response.getText();
             String message;
             try {
-              RestErrorOverlayType error = (RestErrorOverlayType) JsonUtils.safeEval(text);
+              RestErrorOverlayType error = JsonUtils.safeEval(text);
               message = error.getMessage();
             } catch (IllegalArgumentException e) {
               message = text;
@@ -468,7 +478,8 @@ public class BrowseRepresentation extends Composite {
             SafeHtmlBuilder b = new SafeHtmlBuilder();
             b.append(SafeHtmlUtils.fromSafeConstant("<div class='descriptiveMetadataLinks'>"));
 
-            if (bundle.hasHistory()) {
+            if (bundle.hasHistory() && PermissionUtils.hasPermissions(aip.getPermissions(),
+              "org.roda.wui.api.controllers.Browser.retrieveDescriptiveMetadataVersionsBundle")) {
               // History link
               String historyLink = HistoryUtils.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId, repId,
                 descId);
@@ -478,10 +489,13 @@ public class BrowseRepresentation extends Composite {
             }
 
             // Edit link
-            String editLink = HistoryUtils.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId, repId,
-              descId);
-            String editLinkHtml = "<a href='" + editLink + "' class='toolbarLink'><i class='fa fa-edit'></i></a>";
-            b.append(SafeHtmlUtils.fromSafeConstant(editLinkHtml));
+            if (PermissionUtils.hasPermissions(aip.getPermissions(),
+              "org.roda.wui.api.controllers.Browser.updateDescriptiveMetadataFile")) {
+              String editLink = HistoryUtils.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId, repId,
+                descId);
+              String editLinkHtml = "<a href='" + editLink + "' class='toolbarLink'><i class='fa fa-edit'></i></a>";
+              b.append(SafeHtmlUtils.fromSafeConstant(editLinkHtml));
+            }
 
             b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
 

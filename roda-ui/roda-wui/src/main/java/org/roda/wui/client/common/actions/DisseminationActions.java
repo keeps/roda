@@ -52,6 +52,7 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
     Arrays.asList(DisseminationAction.REMOVE, DisseminationAction.NEW_PROCESS, DisseminationAction.UPDATE_PERMISSIONS));
 
   private DisseminationActions() {
+    // do nothing
   }
 
   public enum DisseminationAction implements Action<IndexedDIP> {

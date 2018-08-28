@@ -27,6 +27,7 @@ import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.FormUtilities;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.common.utils.PermissionUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -293,6 +294,9 @@ public class EditDescriptiveMetadata extends Composite {
         }
       });
 
+    PermissionUtils.bindPermission(buttonRemove, bundle.getPermissions(),
+      "org.roda.wui.api.controllers.Browser.deleteDescriptiveMetadataFile");
+
     Element firstElement = showXml.getElement().getFirstChildElement();
     if ("input".equalsIgnoreCase(firstElement.getTagName())) {
       firstElement.setAttribute("title", "browse input");
@@ -453,13 +457,12 @@ public class EditDescriptiveMetadata extends Composite {
     String version = null;
 
     if (typeText.contains(RodaConstants.METADATA_VERSION_SEPARATOR)) {
-      version = typeText.substring(typeText.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR) + 1,
-        typeText.length());
+      version = typeText.substring(typeText.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR) + 1);
       typeText = typeText.substring(0, typeText.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR));
     }
 
     DescriptiveMetadataEditBundle updatedBundle = new DescriptiveMetadataEditBundle(bundle.getId(), typeText, version,
-      content);
+      content, bundle.getPermissions());
 
     BrowserService.Util.getInstance().updateDescriptiveMetadataFile(aipId, representationId, updatedBundle,
       new AsyncCallback<Void>() {

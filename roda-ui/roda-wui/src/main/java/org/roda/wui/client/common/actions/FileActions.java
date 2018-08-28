@@ -127,7 +127,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
   @Override
   public boolean canAct(Action<IndexedFile> action) {
-    return aipId != null && representationId != null && POSSIBLE_ACTIONS_WITH_REPRESENTATION.contains(action);
+    return aipId != null && representationId != null && hasPermissions(action, permissions) && POSSIBLE_ACTIONS_WITH_REPRESENTATION.contains(action);
   }
 
   @Override
@@ -149,7 +149,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
   public boolean canAct(Action<IndexedFile> action, SelectedItems<IndexedFile> selectedItems) {
     boolean canAct = false;
 
-    if (hasPermissions(action)) {
+    if (hasPermissions(action, permissions)) {
       if (aipId != null && representationId != null) {
         canAct = POSSIBLE_ACTIONS_ON_MULTIPLE_FILES_FROM_THE_SAME_REPRESENTATION.contains(action);
       } else {

@@ -10,6 +10,7 @@ package org.roda.wui.client.browse.bundle;
 import java.io.Serializable;
 import java.util.Set;
 
+import org.roda.core.data.v2.ip.Permissions;
 import org.roda.wui.client.browse.MetadataValue;
 
 public class DescriptiveMetadataEditBundle implements Serializable {
@@ -23,13 +24,14 @@ public class DescriptiveMetadataEditBundle implements Serializable {
   private String rawTemplate;
   private Set<MetadataValue> values;
   private boolean similar;
+  private Permissions permissions;
 
   public DescriptiveMetadataEditBundle() {
     super();
   }
 
   public DescriptiveMetadataEditBundle(String id, String type, String version, String xml, String rawTemplate,
-    Set<MetadataValue> values, boolean similar) {
+    Set<MetadataValue> values, boolean similar, Permissions permissions) {
     super();
     this.id = id;
     this.type = type;
@@ -38,14 +40,16 @@ public class DescriptiveMetadataEditBundle implements Serializable {
     this.rawTemplate = rawTemplate;
     this.values = values;
     this.similar = similar;
+    this.permissions = permissions;
   }
 
-  public DescriptiveMetadataEditBundle(String id, String type, String version, String xml) {
+  public DescriptiveMetadataEditBundle(String id, String type, String version, String xml, Permissions permissions) {
     super();
     this.id = id;
     this.type = type;
     this.xml = xml;
     this.version = version;
+    this.permissions = permissions;
   }
 
   public String getId() {
@@ -102,5 +106,13 @@ public class DescriptiveMetadataEditBundle implements Serializable {
 
   public void setSimilar(boolean similar) {
     this.similar = similar;
+  }
+
+  public Permissions getPermissions() {
+    return permissions;
+  }
+
+  public void setPermissions(Permissions permissions) {
+    this.permissions = permissions;
   }
 }

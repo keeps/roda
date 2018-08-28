@@ -22,6 +22,7 @@ import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.common.utils.PermissionUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -175,6 +176,11 @@ public class DescriptiveMetadataHistory extends Composite {
         updatePreview();
       }
     });
+
+    PermissionUtils.bindPermission(buttonRevert, bundle.getPermissions(),
+      "org.roda.wui.api.controllers.Browser.revertDescriptiveMetadataVersion");
+    PermissionUtils.bindPermission(buttonRemove, bundle.getPermissions(),
+      "org.roda.wui.api.controllers.Browser.deleteDescriptiveMetadataVersion");
 
     Element firstElement = showXml.getElement().getFirstChildElement();
     if ("input".equalsIgnoreCase(firstElement.getTagName())) {

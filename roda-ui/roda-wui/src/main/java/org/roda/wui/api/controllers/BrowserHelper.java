@@ -508,7 +508,7 @@ public class BrowserHelper {
         }
       }
 
-      ret = new DescriptiveMetadataEditBundle(descriptiveMetadataId, type, version, xml, template, values, similar);
+      ret = new DescriptiveMetadataEditBundle(descriptiveMetadataId, type, version, xml, template, values, similar, aip.getPermissions());
     } catch (IOException e) {
       throw new GenericException("Error getting descriptive metadata edit bundle: " + e.getMessage());
     } finally {
@@ -1996,6 +1996,9 @@ public class BrowserHelper {
     }
 
     bundle.setVersions(versionBundles);
+
+    IndexedAIP aip = retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+    bundle.setPermissions(aip.getPermissions());
     return bundle;
   }
 

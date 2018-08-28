@@ -21,6 +21,10 @@ public class PermissionUtils {
     // do nothing
   }
 
+  public static <T extends IsIndexed> boolean hasPermissions(Permissions permissions, String... methods) {
+    return hasPermissions(Arrays.asList(methods), permissions);
+  }
+
   public static <T extends IsIndexed> boolean hasPermissions(List<String> methods, Permissions permissions) {
     boolean canAct = true;
     Optional<User> authenticatedUser = UserLogin.getInstance().getCachedUser();
@@ -69,6 +73,5 @@ public class PermissionUtils {
     } else {
       widget.addStyleName(HAS_NO_PERMISSION_CLASS);
     }
-
   }
 }

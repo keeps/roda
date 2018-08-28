@@ -344,7 +344,7 @@ public class CreateDescriptiveMetadata extends Composite {
         values = selectedBundle.getValues();
       }
       DescriptiveMetadataEditBundle newBundle = new DescriptiveMetadataEditBundle(idText, typeText, typeVersion,
-        xmlText, template, values, true);
+        xmlText, template, values, true, null);
 
       BrowserService.Util.getInstance().createDescriptiveMetadataFile(aipId, representationId, newBundle,
         new AsyncCallback<Void>() {

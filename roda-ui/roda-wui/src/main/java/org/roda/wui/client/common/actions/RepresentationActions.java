@@ -17,6 +17,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.browse.BrowserService;
@@ -46,7 +47,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import config.i18n.client.ClientMessages;
 
 public class RepresentationActions extends AbstractActionable<IndexedRepresentation> {
-  private static final RepresentationActions GENERAL_INSTANCE = new RepresentationActions(null);
+  private static final RepresentationActions GENERAL_INSTANCE = new RepresentationActions(null, null);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private static final Set<RepresentationAction> POSSIBLE_ACTIONS_WITHOUT_REPRESENTATION = new HashSet<>(
@@ -61,9 +62,11 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
       RepresentationAction.IDENTIFY_FORMATS));
 
   private final String parentAipId;
+  private final Permissions permissions;
 
-  private RepresentationActions(String parentAipId) {
+  private RepresentationActions(String parentAipId, Permissions permissions) {
     this.parentAipId = parentAipId;
+    this.permissions = permissions;
   }
 
   public enum RepresentationAction implements Action<IndexedRepresentation> {
@@ -95,24 +98,24 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
     return GENERAL_INSTANCE;
   }
 
-  public static RepresentationActions get(String parentAipId) {
-    return new RepresentationActions(parentAipId);
+  public static RepresentationActions get(String parentAipId, Permissions permissions) {
+    return new RepresentationActions(parentAipId, permissions);
   }
 
   @Override
   public boolean canAct(Action<IndexedRepresentation> action) {
-    return hasPermissions(action) && POSSIBLE_ACTIONS_WITHOUT_REPRESENTATION.contains(action) && parentAipId != null;
+    return hasPermissions(action, permissions) && POSSIBLE_ACTIONS_WITHOUT_REPRESENTATION.contains(action) && parentAipId != null;
   }
 
   @Override
   public boolean canAct(Action<IndexedRepresentation> action, IndexedRepresentation representation) {
-    return hasPermissions(action, parentAip.getPermissions())
+    return hasPermissions(action, permissions)
       && POSSIBLE_ACTIONS_ON_SINGLE_REPRESENTATION.contains(action);
   }
 
   @Override
   public boolean canAct(Action<IndexedRepresentation> action, SelectedItems<IndexedRepresentation> selectedItems) {
-    return hasPermissions(action) && POSSIBLE_ACTIONS_ON_MULTIPLE_REPRESENTATIONS.contains(action);
+    return hasPermissions(action, permissions) && POSSIBLE_ACTIONS_ON_MULTIPLE_REPRESENTATIONS.contains(action);
   }
 
   @Override
