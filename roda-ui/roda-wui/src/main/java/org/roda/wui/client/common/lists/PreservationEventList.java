@@ -18,12 +18,14 @@ import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.utils.StringUtils;
 
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
@@ -57,7 +59,6 @@ public class PreservationEventList extends AsyncTableCell<IndexedPreservationEve
     options.withFieldsToReturn(fieldsToReturn);
   }
 
-
   @Override
   protected void configureDisplay(CellTable<IndexedPreservationEvent> display) {
 
@@ -88,16 +89,29 @@ public class PreservationEventList extends AsyncTableCell<IndexedPreservationEve
       public SafeHtml getValue(IndexedPreservationEvent event) {
         SafeHtml ret = null;
         if (event != null) {
-          PluginState outcome = PluginState.valueOf(event.getEventOutcome());
-          if (PluginState.SUCCESS.equals(outcome)) {
-            ret = SafeHtmlUtils
-              .fromSafeConstant("<span class='label-success'>" + messages.pluginStateMessage(outcome) + "</span>");
-          } else if (PluginState.FAILURE.equals(outcome)) {
-            ret = SafeHtmlUtils
-              .fromSafeConstant("<span class='label-danger'>" + messages.pluginStateMessage(outcome) + "</span>");
-          } else {
-            ret = SafeHtmlUtils
-              .fromSafeConstant("<span class='label-warning'>" + messages.pluginStateMessage(outcome) + "</span>");
+          try {
+            PluginState outcome = PluginState.valueOf(event.getEventOutcome());
+            if (PluginState.SUCCESS.equals(outcome)) {
+              ret = SafeHtmlUtils
+                .fromSafeConstant("<span class='label-success'>" + messages.pluginStateMessage(outcome) + "</span>");
+            } else if (PluginState.FAILURE.equals(outcome)) {
+              ret = SafeHtmlUtils
+                .fromSafeConstant("<span class='label-danger'>" + messages.pluginStateMessage(outcome) + "</span>");
+            } else {
+              ret = SafeHtmlUtils
+                .fromSafeConstant("<span class='label-warning'>" + messages.pluginStateMessage(outcome) + "</span>");
+            }
+          } catch (IllegalArgumentException e) {
+            GWT.log("Unrecognized event outcome: " + event.getEventOutcome());
+
+            SafeHtmlBuilder b = new SafeHtmlBuilder();
+            b.append(SafeHtmlUtils.fromSafeConstant("<span class='label-danger'>"));
+            if (StringUtils.isNotBlank(event.getEventOutcome())) {
+              b.append(SafeHtmlUtils.fromString(event.getEventOutcome()));
+            }
+            b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
+
+            ret = b.toSafeHtml();
           }
         }
         return ret;

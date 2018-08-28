@@ -202,7 +202,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     } catch (GenericException e) {
       LOGGER.error("Unexpected error in find", e);
       throw e;
-
     }
   }
 

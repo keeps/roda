@@ -529,6 +529,7 @@ pre code {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     margin-right: 5px;
+    font-weight: 900;
 }
 
 .success {
