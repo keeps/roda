@@ -24,23 +24,9 @@
 
 						<g:FlowPanel addStyleNames="browseItemPanelRisksEventsLogs" ui:field="risksEventsLogs" />
 						<g:Label addStyleNames="browseItemId" ui:field="dateCreatedAndModified" />
-
-
-
-						<!--<g:Label addStyleNames="browseItemHeader" ui:field="browseItemHeader">-->
-							<!--<ui:text from='{messages.catalogueRepresentationTitle}' />-->
-						<!--</g:Label>-->
-						<!--<g:HTML addStyleNames="h3 browseItemIcon" ui:field="representationIcon"/>-->
-						<!--<g:FlowPanel addStyleNames="h3 browseItemText" ui:field="representationTitle"/>-->
-						<!--<g:FlowPanel addStyleNames="browseRepresentationId" ui:field="representationId"-->
-							<!--title="{messages.representationId}" />						-->
-						<!--<g:Label addStyleNames="browseRepresentationId" ui:field="dateCreated" />-->
-						<!--<g:Label addStyleNames="browseRepresentationId" ui:field="dateUpdated" />-->
-						<!--<g:FlowPanel addStyleNames="browseRepresentationId" ui:field="representationType"-->
-							<!--title="{messages.representationType}" />-->
 					</g:FlowPanel>
 
-					<!-- DESCRIPTIVE METADATA // ?? falta por os botoes no sitio -->
+					<!-- DESCRIPTIVE METADATA -->
 					<g:Button addStyleNames="btn btn-block btn-plus browseNewDescriptiveMetadataButton" ui:field="newDescriptiveMetadata">
 						<ui:text from='{messages.newDescriptiveMetadataTitle}' />
 					</g:Button>

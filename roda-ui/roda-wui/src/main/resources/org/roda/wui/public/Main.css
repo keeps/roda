@@ -6809,6 +6809,11 @@ span.code {
     line-height: normal;
 }
 
+.ActionableStyleButtons .actionable-button,
+.browseNewDescriptiveMetadataButton {
+    max-width: 250px;
+}
+
 .sidebar .actionable-title,
 .slider .actionable-title {
     display: block;
