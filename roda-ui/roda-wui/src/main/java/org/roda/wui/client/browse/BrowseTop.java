@@ -17,17 +17,13 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.AipActions;
-import org.roda.wui.client.common.actions.model.ActionableObject;
-import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.ingest.transfer.TransferUpload;
-import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -40,7 +36,8 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -118,17 +115,16 @@ public class BrowseTop extends Composite {
 
   private static BrowseTop instance = null;
 
-  @UiField
-  NavigationToolbar<IndexedAIP> navigationToolbar;
 
   @UiField
   FlowPanel browseDescription;
 
-  @UiField
-  SimplePanel title;
-
   @UiField(provided = true)
   SearchWrapper search;
+  @UiField
+  HTML itemIcon;
+  @UiField
+  Label itemTitle;
 
   private BrowseTop() {
     // AIP LIST, it has the same id as the AIP children list because facets should
@@ -144,14 +140,10 @@ public class BrowseTop extends Composite {
     // INIT
     initWidget(uiBinder.createAndBindUi(this));
 
-    // TOOLBAR
-    navigationToolbar.getSidebarButton().setVisible(false);
-    navigationToolbar.updateBreadcrumbPath(
-      new BreadcrumbItem(DescriptionLevelUtils.getTopIconSafeHtml(), "", RESOLVER.getHistoryPath()));
-
     // HEADER
-    title.setWidget(new ActionableWidgetBuilder<>(AipActions.get()).withTitle(messages.allCollectionsTitle())
-      .buildTitleWithObjects(new ActionableObject<>(IndexedAIP.class)));
+    itemIcon.setHTML(DescriptionLevelUtils.getTopIconSafeHtml());
+    itemTitle.setText(messages.allCollectionsTitle());
+
     browseDescription.add(new HTMLWidgetWrapper("BrowseDescription.html"));
 
     // CSS

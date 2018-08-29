@@ -10,10 +10,12 @@
 
 	<g:FocusPanel>
 		<g:FlowPanel styleName="browse" addStyleNames="wrapper skip_padding">
-			<common:NavigationToolbar ui:field="navigationToolbar" header="{messages.catalogueItemTitle}" />
 			<g:FlowPanel addStyleNames="row full_width skip_padding">
 				<g:FlowPanel addStyleNames="col_12 content">
-					<g:SimplePanel ui:field="title" />
+					<g:FlowPanel styleName="browseItemPanel">
+						<g:HTML addStyleNames="h2 browseItemIcon" ui:field="itemIcon"/>
+						<g:Label addStyleNames="h2 browseItemText" ui:field="itemTitle"/>
+					</g:FlowPanel>
 					<g:FlowPanel addStyleNames="page-description" ui:field="browseDescription" />
 					<commonsearch:SearchWrapper ui:field="search" />
 				</g:FlowPanel>
