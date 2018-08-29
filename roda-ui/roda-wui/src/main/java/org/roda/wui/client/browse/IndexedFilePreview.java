@@ -59,7 +59,7 @@ public class IndexedFilePreview extends BitstreamPreview<IndexedFile> {
     LastSelectedItemsSingleton.getInstance().setSelectedJustActive(justActive);
 
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(folderListBuilder,
-      FileActions.get(getObject().getAipId(), getObject().getRepresentationId(), permissions),
+      FileActions.get(getObject().getAipId(), getObject().getRepresentationId(), getObject(), permissions),
       messages.searchPlaceHolder());
     return searchWrapper;
   }

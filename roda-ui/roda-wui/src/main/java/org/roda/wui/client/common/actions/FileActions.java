@@ -24,7 +24,6 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
 import org.roda.wui.client.common.actions.callbacks.ActionLoadingAsyncCallback;
@@ -34,8 +33,6 @@ import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.SelectFileDialog;
 import org.roda.wui.client.ingest.process.ShowJob;
-import org.roda.wui.client.planning.Planning;
-import org.roda.wui.client.planning.RiskIncidenceRegister;
 import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.client.process.InternalProcess;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -55,7 +52,7 @@ import config.i18n.client.ClientMessages;
 
 public class FileActions extends AbstractActionable<IndexedFile> {
 
-  private static final FileActions GENERAL_INSTANCE = new FileActions(null, null, null);
+  private static final FileActions GENERAL_INSTANCE = new FileActions(null, null, null, null);
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
@@ -63,7 +60,8 @@ public class FileActions extends AbstractActionable<IndexedFile> {
     Arrays.asList(FileAction.UPLOAD_FILES, FileAction.CREATE_FOLDER));
 
   private static final Set<FileAction> POSSIBLE_ACTIONS_ON_SINGLE_FILE_DIRECTORY = new HashSet<>(
-    Arrays.asList(FileAction.values()));
+    Arrays.asList(FileAction.DOWNLOAD, FileAction.MOVE, FileAction.REMOVE, FileAction.REMOVE, FileAction.NEW_PROCESS,
+      FileAction.IDENTIFY_FORMATS, FileAction.SHOW_EVENTS, FileAction.SHOW_RISKS));
 
   private static final Set<FileAction> POSSIBLE_ACTIONS_ON_SINGLE_FILE_BITSTREAM = new HashSet<>(
     Arrays.asList(FileAction.DOWNLOAD, FileAction.MOVE, FileAction.REMOVE, FileAction.NEW_PROCESS,
@@ -77,12 +75,14 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
   private final String aipId;
   private final String representationId;
+  private final IndexedFile parentFolder;
   private final Permissions permissions;
 
-  private FileActions(String aipId, String representationId, Permissions permissions) {
+  private FileActions(String aipId, String representationId, IndexedFile parentFolder, Permissions permissions) {
     this.aipId = aipId;
     this.representationId = representationId;
     this.permissions = permissions;
+    this.parentFolder = parentFolder != null && parentFolder.isDirectory() ? parentFolder : null;
   }
 
   // MANAGEMENT
@@ -119,7 +119,12 @@ public class FileActions extends AbstractActionable<IndexedFile> {
   }
 
   public static FileActions get(String aipId, String representationId, Permissions permissions) {
-    return new FileActions(aipId, representationId, permissions);
+    return new FileActions(aipId, representationId, null, permissions);
+  }
+
+  public static FileActions get(String aipId, String representationId, IndexedFile parentFolder,
+    Permissions permissions) {
+    return new FileActions(aipId, representationId, parentFolder, permissions);
   }
 
   @Override
@@ -161,9 +166,17 @@ public class FileActions extends AbstractActionable<IndexedFile> {
   @Override
   public void act(Action<IndexedFile> action, AsyncCallback<ActionImpact> callback) {
     if (FileAction.UPLOAD_FILES.equals(action)) {
-      uploadFiles(callback);
+      if (parentFolder != null) {
+        uploadFiles(parentFolder, callback);
+      } else {
+        uploadFiles(callback);
+      }
     } else if (FileAction.CREATE_FOLDER.equals(action)) {
-      createFolder(callback);
+      if (parentFolder != null) {
+        createFolder(parentFolder, callback);
+      } else {
+        createFolder(callback);
+      }
     } else {
       unsupportedAction(action, callback);
     }
@@ -177,20 +190,12 @@ public class FileActions extends AbstractActionable<IndexedFile> {
       rename(file, callback);
     } else if (FileAction.MOVE.equals(action)) {
       move(file, callback);
-    } else if (FileAction.UPLOAD_FILES.equals(action)) {
-      uploadFiles(file, callback);
-    } else if (FileAction.CREATE_FOLDER.equals(action)) {
-      createFolder(file, callback);
     } else if (FileAction.REMOVE.equals(action)) {
       remove(file, callback);
     } else if (FileAction.NEW_PROCESS.equals(action)) {
       newProcess(file, callback);
     } else if (FileAction.IDENTIFY_FORMATS.equals(action)) {
       identifyFormats(file, callback);
-    } else if (FileAction.SHOW_EVENTS.equals(action)) {
-      showEvents(file, callback);
-    } else if (FileAction.SHOW_RISKS.equals(action)) {
-      showRisks(file, callback);
     } else {
       unsupportedAction(action, callback);
     }
@@ -580,26 +585,6 @@ public class FileActions extends AbstractActionable<IndexedFile> {
       });
   }
 
-  private void showEvents(IndexedFile file, final AsyncCallback<ActionImpact> callback) {
-    List<String> history = new ArrayList<>();
-    history.add(file.getAipId());
-    history.add(file.getRepresentationUUID());
-    history.add(file.getUUID());
-    HistoryUtils.newHistory(PreservationEvents.BROWSE_RESOLVER, history);
-    callback.onSuccess(ActionImpact.NONE);
-  }
-
-  private void showRisks(IndexedFile file, final AsyncCallback<ActionImpact> callback) {
-    List<String> history = new ArrayList<>();
-    history.add(RiskIncidenceRegister.RESOLVER.getHistoryToken());
-    history.add(file.getAipId());
-    history.add(file.getRepresentationId());
-    history.addAll(file.getPath());
-    history.add(file.getId());
-    HistoryUtils.newHistory(Planning.RESOLVER, history);
-    callback.onSuccess(ActionImpact.NONE);
-  }
-
   @Override
   public ActionableBundle<IndexedFile> createActionsBundle() {
     ActionableBundle<IndexedFile> fileActionableBundle = new ActionableBundle<>();
@@ -625,10 +610,6 @@ public class FileActions extends AbstractActionable<IndexedFile> {
       "btn-play", "fileNewProcessButton");
     preservationGroup.addButton(messages.identifyFormatsButton(), FileAction.IDENTIFY_FORMATS, ActionImpact.UPDATED,
       "btn-play", "fileIdentifyFormatsButton");
-    preservationGroup.addButton(messages.preservationEvents(), FileAction.SHOW_EVENTS, ActionImpact.NONE, "btn-play",
-      "fileShowEventsButton");
-    preservationGroup.addButton(messages.preservationRisks(), FileAction.SHOW_RISKS, ActionImpact.NONE, "btn-play",
-      "fileShowRisksButton");
 
     fileActionableBundle.addGroup(managementGroup).addGroup(preservationGroup);
     return fileActionableBundle;

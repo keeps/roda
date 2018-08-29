@@ -19,16 +19,13 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedDIP;
+import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
+import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.slider.SliderPanel;
 import org.roda.wui.client.common.slider.Sliders;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.common.utils.HtmlSnippetUtils;
-import org.roda.wui.client.main.BreadcrumbItem;
-import org.roda.wui.client.main.BreadcrumbPanel;
-import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -45,7 +42,6 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -130,7 +126,6 @@ public class BrowseFile extends Composite {
 
   private static BrowseFile instance = null;
 
-  private final BrowseFileBundle bundle;
   private SliderPanel disseminationsSlider;
 
   private ClientLogger logger = new ClientLogger(getClass().getName());
@@ -138,23 +133,16 @@ public class BrowseFile extends Composite {
   @UiField
   AccessibleFocusPanel keyboardFocus;
 
-  @UiField
-  BreadcrumbPanel breadcrumb;
-
-  @UiField
-  HTML aipState;
-
   @UiField(provided = true)
   IndexedFilePreview filePreview;
 
   @UiField
-  AccessibleFocusPanel optionsButton, infoFileButton, disseminationsButton, previousButton, nextButton;
-
-  @UiField
   FlowPanel center;
 
+  @UiField
+  NavigationToolbar<IndexedFile> navigationToolbar;
+
   public BrowseFile(Viewers viewers, final BrowseFileBundle bundle) {
-    this.bundle = bundle;
     final boolean justActive = AIPState.ACTIVE.equals(bundle.getAip().getState());
 
     // initialize preview
@@ -191,30 +179,19 @@ public class BrowseFile extends Composite {
     // initialize widget
     initWidget(uiBinder.createAndBindUi(this));
 
-    // breadcrumb
-    breadcrumb.updatePath(getBreadcrumbs());
-    breadcrumb.setVisible(true);
+    navigationToolbar.setObject(bundle.getFile());
+    navigationToolbar.updateBreadcrumb(bundle);
 
     // STATUS
     this.addStyleName(bundle.getAip().getState().toString().toLowerCase());
-    aipState.setHTML(HtmlSnippetUtils.getAIPStateHTML(bundle.getAip().getState()));
-    aipState.setVisible(AIPState.ACTIVE != bundle.getAip().getState());
-
-    // set title
-    infoFileButton.setTitle(messages.viewRepresentationInfoFileButton());
-
-    // update visibles
-    disseminationsButton.setVisible(bundle.getDipCount() > 0);
 
     // bind slider buttons
-    disseminationsSlider = Sliders.createDisseminationsSlider(center, disseminationsButton, bundle.getFile());
-    Sliders.createFileInfoSlider(center, infoFileButton, bundle);
-    Sliders.createOptionsSlider(center, optionsButton, bundle.getFile());
+    disseminationsSlider = Sliders.createDisseminationsSlider(center, navigationToolbar.getDisseminationsButton(),
+      bundle.getFile());
+    Sliders.createFileInfoSlider(center, navigationToolbar.getInfoSidebarButton(), bundle);
+    navigationToolbar.getDisseminationsButton().setVisible(bundle.getDipCount() > 0);
 
     keyboardFocus.setFocus(true);
-
-    // bind previous and next buttons
-    ListSelectionUtils.bindLayout(bundle.getFile(), previousButton, nextButton, keyboardFocus, true, false, false);
 
     this.addStyleName("browse");
     this.addStyleName("browse-file");
@@ -226,13 +203,4 @@ public class BrowseFile extends Composite {
 
     WCAGUtilities.getInstance().makeAccessible(center.getElement());
   }
-
-  private List<BreadcrumbItem> getBreadcrumbs() {
-    return BreadcrumbUtils.getFileBreadcrumbs(getBundle());
-  }
-
-  public BrowseFileBundle getBundle() {
-    return bundle;
-  }
-
 }

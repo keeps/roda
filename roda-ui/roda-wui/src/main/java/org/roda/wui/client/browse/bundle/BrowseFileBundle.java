@@ -25,6 +25,8 @@ public class BrowseFileBundle implements Serializable {
   private Long totalSiblingCount;
   private Long dipCount;
   private List<String> representationInformationFields;
+  private Long riskIncidenceCount;
+  private Long preservationEventCount;
 
   public BrowseFileBundle() {
     super();
@@ -86,4 +88,19 @@ public class BrowseFileBundle implements Serializable {
     this.representationInformationFields = representationInformationFields;
   }
 
+  public Long getRiskIncidenceCount() {
+    return riskIncidenceCount;
+  }
+
+  public void setRiskIncidenceCount(Long riskIncidenceCount) {
+    this.riskIncidenceCount = riskIncidenceCount;
+  }
+
+  public Long getPreservationEventCount() {
+    return preservationEventCount;
+  }
+
+  public void setPreservationEventCount(Long preservationEventCount) {
+    this.preservationEventCount = preservationEventCount;
+  }
 }

@@ -411,7 +411,7 @@ public class BrowseAIP extends Composite {
     itemIcon.setHTML(DescriptionLevelUtils.getElementLevelIconSafeHtml(aip.getLevel(), false));
     itemTitle.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());
 
-    Sliders.createAipInfoSlider(center, navigationToolbar.getSidebarButton(), bundle);
+    Sliders.createAipInfoSlider(center, navigationToolbar.getInfoSidebarButton(), bundle);
 
     Anchor risksLink = new Anchor(messages.aipRiskIncidences(bundle.getRiskIncidenceCount()),
       HistoryUtils.createHistoryHashLink(RiskIncidenceRegister.RESOLVER, aip.getId()));

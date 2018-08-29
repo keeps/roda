@@ -4,58 +4,16 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:m="urn:import:org.roda.wui.client.main"
 	xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag"
-	xmlns:b="urn:import:org.roda.wui.client.browse">
+	xmlns:b="urn:import:org.roda.wui.client.browse"
+	xmlns:common="urn:import:org.roda.wui.client.common">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
 	<wcag:AccessibleFocusPanel ui:field="keyboardFocus">
 		<g:FlowPanel styleName="viewRepresentationFile">
-			<g:FlowPanel addStyleNames="filePreviewToolbar navigationToolbar">
-				<g:Label addStyleNames="browseItemHeader navigationToolbarHeader" ui:field="browseItemHeader">
-					<ui:text from='{messages.catalogueFileTitle}' />
-					&rsaquo;
-				</g:Label>
-				<m:BreadcrumbPanel ui:field="breadcrumb"
-					addStyleNames="viewRepresentationBreadcrumb navigationToolbarBreadcrumb" />
-
-				<!-- STATUS -->
-				<g:HTML ui:field="aipState" styleName="aipState small" />
-				
-				<g:FlowPanel addStyleNames="filePreviewToolbarIcons">
-					<wcag:AccessibleFocusPanel ui:field="disseminationsButton"
-						addStyleNames="toolbarLink filePreviewToolbarInfoIcon">
-						<g:HTML>
-							<i class="fa fa-play-circle-o"></i>
-						</g:HTML>
-					</wcag:AccessibleFocusPanel>
-					<wcag:AccessibleFocusPanel ui:field="infoFileButton"
-						addStyleNames="toolbarLink filePreviewToolbarInfoIcon">
-						<g:HTML>
-							<i class="fa fa-list-alt"></i>
-						</g:HTML>
-					</wcag:AccessibleFocusPanel>
-					<wcag:AccessibleFocusPanel ui:field="previousButton" addStyleNames="toolbarLink">
-						<g:HTML>
-							<i class="fa fa-chevron-left"></i>
-						</g:HTML>
-					</wcag:AccessibleFocusPanel>
-					<wcag:AccessibleFocusPanel ui:field="nextButton" addStyleNames="toolbarLink">
-						<g:HTML>
-							<i class="fa fa-chevron-right"></i>
-						</g:HTML>
-					</wcag:AccessibleFocusPanel>
-					<wcag:AccessibleFocusPanel ui:field="optionsButton"
-						addStyleNames="toolbarLink filePreviewToolbarOptionsIcon">
-						<g:HTML>
-							<i class="fa fa-ellipsis-v"></i>
-						</g:HTML>
-					</wcag:AccessibleFocusPanel>
-				</g:FlowPanel>
-			</g:FlowPanel>
-			<g:FlowPanel addStyleNames="viewRepresentationFile-center"
-				ui:field="center">
-				<b:IndexedFilePreview addStyleNames="viewRepresentationFilePreview"
-					ui:field="filePreview"></b:IndexedFilePreview>
+			<common:NavigationToolbar ui:field="navigationToolbar" header="{messages.catalogueFileTitle}" />
+			<g:FlowPanel addStyleNames="viewRepresentationFile-center" ui:field="center">
+				<b:IndexedFilePreview addStyleNames="viewRepresentationFilePreview" ui:field="filePreview" />
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</wcag:AccessibleFocusPanel>

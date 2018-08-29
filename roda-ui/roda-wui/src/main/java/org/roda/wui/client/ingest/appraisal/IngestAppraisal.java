@@ -142,7 +142,7 @@ public class IngestAppraisal extends Composite {
 
     ListBuilder<IndexedRepresentation> representationListBuilder = new ListBuilder<>(RepresentationList::new,
       new AsyncTableCellOptions<>(IndexedRepresentation.class, "IngestAppraisal_searchRepresentations")
-        .withJustActive(false).withFilter(BASE_FILTER).bindOpener().withStartHidden(true));
+        .withJustActive(false).withFilter(BASE_FILTER).bindOpener());
 
     ListBuilder<IndexedFile> fileListBuilder = new ListBuilder<>(() -> new SearchFileList(true),
       new AsyncTableCellOptions<>(IndexedFile.class, "IngestAppraisal_searchFiles").withJustActive(false)

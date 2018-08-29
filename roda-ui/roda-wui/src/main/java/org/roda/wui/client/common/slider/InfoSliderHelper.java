@@ -23,6 +23,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
+import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.browse.RepresentationInformationHelper;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
@@ -30,6 +31,7 @@ import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.common.actions.AipActions;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
+import org.roda.wui.client.planning.RiskIncidenceRegister;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
@@ -422,6 +424,20 @@ public class InfoSliderHelper {
         values.put(messages.viewRepresentationInfoStoragePath(), new InlineHTML(b.toSafeHtml()));
       }
     }
+
+    List<String> history = new ArrayList<>();
+    history.add(file.getAipId());
+    history.add(file.getRepresentationId());
+    history.addAll(file.getPath());
+    history.add(file.getId());
+    Anchor risksLink = new Anchor(messages.aipRiskIncidences(bundle.getRiskIncidenceCount()),
+      HistoryUtils.createHistoryHashLink(RiskIncidenceRegister.RESOLVER, history));
+    values.put(messages.preservationRisks(), risksLink);
+
+    Anchor eventsLink = new Anchor(messages.aipEvents(bundle.getPreservationEventCount()),
+      HistoryUtils.createHistoryHashLink(PreservationEvents.BROWSE_RESOLVER, file.getAipId(),
+        file.getRepresentationUUID(), file.getUUID()));
+    values.put(messages.preservationEvents(), eventsLink);
 
     populate(infoSliderPanel, values);
   }

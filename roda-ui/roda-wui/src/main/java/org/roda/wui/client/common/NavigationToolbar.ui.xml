@@ -17,8 +17,17 @@
 			<g:Label addStyleNames="navigationToolbarHeaderArrow">&rsaquo;</g:Label>
 			<m:BreadcrumbPanel ui:field="breadcrumb" addStyleNames="navigationToolbarBreadcrumb" />
 
+			<!-- STATUS -->
+			<g:HTML ui:field="aipState" styleName="aipState small" />
+
 			<g:FlowPanel addStyleNames="navigationToolbarIcons">
-				<wcag:AccessibleFocusPanel ui:field="sidebarButton" addStyleNames="navigationToolbarLink">
+
+				<wcag:AccessibleFocusPanel ui:field="disseminationsButton" addStyleNames="navigationToolbarLink">
+					<g:HTML>
+						<i class="fa fa-play-circle-o"></i>
+					</g:HTML>
+				</wcag:AccessibleFocusPanel>
+				<wcag:AccessibleFocusPanel ui:field="infoSidebarButton" addStyleNames="navigationToolbarLink">
 					<g:HTML>
 						<i class="fa fa-list-alt"></i>
 					</g:HTML>

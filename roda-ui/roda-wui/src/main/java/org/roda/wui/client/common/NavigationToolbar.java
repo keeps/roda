@@ -14,13 +14,17 @@ import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
+import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.common.actions.AbstractActionable;
 import org.roda.wui.client.common.actions.AipActions;
+import org.roda.wui.client.common.actions.FileActions;
 import org.roda.wui.client.common.actions.RepresentationActions;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
@@ -28,6 +32,7 @@ import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.popup.CalloutPopup;
+import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
@@ -42,6 +47,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -65,7 +71,13 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
   @UiField
   BreadcrumbPanel breadcrumb;
 
+  @UiField
+  HTML aipState;
+
   // buttons on the right side
+
+  @UiField
+  AccessibleFocusPanel disseminationsButton;
 
   @UiField
   AccessibleFocusPanel searchButton;
@@ -77,7 +89,7 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
   AccessibleFocusPanel nextButton;
 
   @UiField
-  AccessibleFocusPanel sidebarButton;
+  AccessibleFocusPanel infoSidebarButton;
 
   @UiField
   AccessibleFocusPanel actionsButton;
@@ -102,8 +114,14 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
     refresh();
   }
 
-  public AccessibleFocusPanel getSidebarButton() {
-    return sidebarButton;
+  public AccessibleFocusPanel getInfoSidebarButton() {
+    infoSidebarButton.setVisible(true);
+    return infoSidebarButton;
+  }
+
+  public AccessibleFocusPanel getDisseminationsButton() {
+    disseminationsButton.setVisible(true);
+    return disseminationsButton;
   }
 
   public void setHeader(String headerText) {
@@ -118,16 +136,35 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
     this.removeStyleName("navigationToolbar-hidden");
   }
 
+  private void hideButtons() {
+    aipState.setVisible(false);
+
+    disseminationsButton.setVisible(false);
+    searchButton.setVisible(false);
+    previousButton.setVisible(false);
+    nextButton.setVisible(false);
+    infoSidebarButton.setVisible(false);
+    actionsButton.setVisible(false);
+  }
+
   public void refresh() {
+    hideButtons();
     ListSelectionUtils.bindLayout(currentObject, previousButton, nextButton, keyboardFocus, true, false, false);
-    setupSearchPopup();
     setupActions();
   }
 
   private void setupActions() {
+    clearSearchPopupHandlers();
+
+    CalloutPopup popup = new CalloutPopup();
+    popup.addStyleName("ActionableStyleMenu");
+
     if (currentObject instanceof IndexedAIP) {
-      CalloutPopup popup = new CalloutPopup();
-      popup.addStyleName("ActionableStyleMenu");
+      SearchPopup searchPopup = new SearchPopup((IndexedAIP) currentObject);
+      searchPopup.addStyleName("ActionableStyleMenu");
+      searchPopupClickHandler = searchButton
+        .addClickHandler(event -> searchPopup.showRelativeTo(searchButton, CalloutPopup.CalloutPosition.TOP_RIGHT));
+      searchButton.setVisible(true);
 
       AipActions aipActions;
       IndexedAIP aip = (IndexedAIP) this.currentObject;
@@ -141,20 +178,23 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
       actionsButton.addClickHandler(event -> popup.showRelativeTo(actionsButton));
       actionsButton.setVisible(true);
     } else if (currentObject instanceof IndexedRepresentation) {
-      CalloutPopup popup = new CalloutPopup();
-      popup.addStyleName("ActionableStyleMenu");
-
-      RepresentationActions representationActions;
       IndexedRepresentation representation = (IndexedRepresentation) this.currentObject;
-
-      representationActions = RepresentationActions.get(representation.getAipId(), permissions);
+      RepresentationActions representationActions = RepresentationActions.get(representation.getAipId(), permissions);
 
       popup.setWidget(new ActionableWidgetBuilder<>(representationActions)
         .buildListWithObjects(new ActionableObject<>(representation)));
       actionsButton.addClickHandler(event -> popup.showRelativeTo(actionsButton));
       actionsButton.setVisible(true);
-    } else {
-      actionsButton.setVisible(false);
+    } else if (currentObject instanceof IndexedFile) {
+      infoSidebarButton.setTitle(messages.viewRepresentationInfoFileButton());
+
+      IndexedFile file = (IndexedFile) this.currentObject;
+      FileActions fileActions = FileActions.get(file.getAipId(), file.getRepresentationId(),
+        file.isDirectory() ? file : null, permissions);
+
+      popup.setWidget(new ActionableWidgetBuilder<>(fileActions).buildListWithObjects(new ActionableObject<>(file)));
+      actionsButton.addClickHandler(event -> popup.showRelativeTo(actionsButton));
+      actionsButton.setVisible(true);
     }
   }
 
@@ -172,24 +212,19 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
     breadcrumb.updatePath(BreadcrumbUtils.getRepresentationBreadcrumbs(bundle));
   }
 
+  public void updateBreadcrumb(BrowseFileBundle bundle) {
+    breadcrumb.updatePath(BreadcrumbUtils.getFileBreadcrumbs(bundle));
+
+    aipState.setHTML(HtmlSnippetUtils.getAIPStateHTML(bundle.getAip().getState()));
+    aipState.setVisible(AIPState.ACTIVE != bundle.getAip().getState());
+  }
+
   public void updateBreadcrumbPath(BreadcrumbItem... items) {
     updateBreadcrumbPath(Arrays.asList(items));
   }
 
   public void updateBreadcrumbPath(List<BreadcrumbItem> items) {
     breadcrumb.updatePath(items);
-  }
-
-  private void setupSearchPopup() {
-    clearSearchPopupHandlers();
-    if (currentObject instanceof IndexedAIP) {
-      SearchPopup popup = new SearchPopup((IndexedAIP) currentObject);
-      searchPopupClickHandler = searchButton
-        .addClickHandler(event -> popup.showRelativeTo(searchButton, CalloutPopup.CalloutPosition.TOP_RIGHT));
-      searchButton.setVisible(true);
-    } else {
-      searchButton.setVisible(false);
-    }
   }
 
   private void clearSearchPopupHandlers() {

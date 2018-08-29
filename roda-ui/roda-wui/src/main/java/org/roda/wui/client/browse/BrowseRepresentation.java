@@ -373,7 +373,7 @@ public class BrowseRepresentation extends Composite {
 
     // IDENTIFICATION
     representationIcon.setHTML(DescriptionLevelUtils.getRepresentationTypeIcon(representation.getType(), false));
-    Sliders.createRepresentationInfoSlider(center, navigationToolbar.getSidebarButton(), bundle);
+    Sliders.createRepresentationInfoSlider(center, navigationToolbar.getInfoSidebarButton(), bundle);
 
     Anchor risksLink = new Anchor(messages.aipRiskIncidences(bundle.getRiskIncidenceCount()), HistoryUtils
       .createHistoryHashLink(RiskIncidenceRegister.RESOLVER, representation.getAipId(), representation.getId()));

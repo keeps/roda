@@ -278,11 +278,13 @@ public class BrowserHelper {
     Long dipCount = RodaCoreFactory.getIndexService().count(IndexedDIP.class, dipsFilter);
     bundle.setDipCount(dipCount);
 
+    // Count risk incidences
     Filter riskIncidenceFilter = new Filter(
       new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, representation.getId()));
     Long riskIncidenceCount = RodaCoreFactory.getIndexService().count(RiskIncidence.class, riskIncidenceFilter);
     bundle.setRiskIncidenceCount(riskIncidenceCount);
 
+    // Count preservation events
     Filter preservationEventFilter = new Filter(
       new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_REPRESENTATION_UUID, representation.getUUID()));
     Long preservationEventCount = RodaCoreFactory.getIndexService().count(IndexedPreservationEvent.class,
@@ -327,6 +329,19 @@ public class BrowserHelper {
     Filter dipsFilter = new Filter(new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, file.getUUID()));
     Long dipCount = RodaCoreFactory.getIndexService().count(IndexedDIP.class, dipsFilter);
     bundle.setDipCount(dipCount);
+
+    // Count risk incidences
+    Filter riskIncidenceFilter = new Filter(
+      new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_FILE_ID, file.getUUID()));
+    Long riskIncidenceCount = RodaCoreFactory.getIndexService().count(RiskIncidence.class, riskIncidenceFilter);
+    bundle.setRiskIncidenceCount(riskIncidenceCount);
+
+    // Count preservation events
+    Filter preservationEventFilter = new Filter(
+      new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_FILE_UUID, file.getUUID()));
+    Long preservationEventCount = RodaCoreFactory.getIndexService().count(IndexedPreservationEvent.class,
+      preservationEventFilter);
+    bundle.setPreservationEventCount(preservationEventCount);
 
     List<String> rodaConfigurationAsList = RodaCoreFactory.getRodaConfigurationAsList("core.ri.rule.File").stream()
       .map(r -> RodaCoreFactory.getRodaConfigurationAsString(r, RodaConstants.SEARCH_FIELD_FIELDS))
