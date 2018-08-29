@@ -57,7 +57,6 @@ public class AIPList extends AsyncTableCell<IndexedAIP> {
     options.withFieldsToReturn(fieldsToReturn);
   }
 
-
   @Override
   protected void configureDisplay(CellTable<IndexedAIP> display) {
     levelColumn = new Column<IndexedAIP, SafeHtml>(new SafeHtmlCell()) {
