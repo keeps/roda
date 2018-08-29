@@ -276,6 +276,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
     selectFileDialog.setEmptyParentButtonVisible(true);
     selectFileDialog.setSingleSelectionMode();
     selectFileDialog.showAndCenter();
+    selectFileDialog.addCloseHandler(e -> callback.onSuccess(ActionImpact.NONE));
     selectFileDialog.addValueChangeHandler(new ValueChangeHandler<IndexedFile>() {
 
       @Override

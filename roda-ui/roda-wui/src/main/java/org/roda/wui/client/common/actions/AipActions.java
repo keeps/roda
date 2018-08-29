@@ -270,6 +270,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
             selectAipDialog.setEmptyParentButtonVisible(true);
             selectAipDialog.setSingleSelectionMode();
             selectAipDialog.showAndCenter();
+            selectAipDialog.addCloseHandler(e -> callback.onSuccess(ActionImpact.NONE));
             selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {
 
               @Override
@@ -354,6 +355,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
                   selectAipDialog.addStyleName("object-dialog");
                 }
 
+                selectAipDialog.addCloseHandler(e -> callback.onSuccess(ActionImpact.NONE));
                 selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {
 
                   @Override

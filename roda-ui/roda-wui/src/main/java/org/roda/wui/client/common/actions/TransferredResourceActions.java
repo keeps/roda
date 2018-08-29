@@ -252,6 +252,7 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
           }
           dialog.setEmptyParentButtonVisible(true);
           dialog.showAndCenter();
+          dialog.addCloseHandler(e -> callback.onSuccess(ActionImpact.NONE));
           dialog.addValueChangeHandler(event -> {
             final TransferredResource transferredResource = event.getValue();
 
