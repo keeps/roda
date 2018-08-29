@@ -35,7 +35,7 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.RODAObjectProcessingLogic;
+import org.roda.core.plugins.RODAObjectProcessingLogicNew;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.DirectResourceAccess;
@@ -104,7 +104,7 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> liteList) throws PluginException {
-    return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<AIP>() {
+    return PluginHelper.processObjects(this, new RODAObjectProcessingLogicNew<AIP>() {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {

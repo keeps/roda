@@ -27,7 +27,7 @@ import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.RODAObjectProcessingLogic;
+import org.roda.core.plugins.RODAObjectProcessingLogicNew;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
@@ -94,7 +94,7 @@ public class BagitToAIPPlugin extends SIPToAIPPlugin {
     computedSearchScope = PluginHelper.getSearchScopeFromParameters(this, model);
     forceSearchScope = PluginHelper.getForceParentIdFromParameters(this);
 
-    return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<TransferredResource>() {
+    return PluginHelper.processObjects(this, new RODAObjectProcessingLogicNew<TransferredResource>() {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<TransferredResource> plugin, TransferredResource object) {
