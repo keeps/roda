@@ -40,7 +40,7 @@ import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.RepresentationInformationList;
 import org.roda.wui.client.common.lists.RepresentationList;
 import org.roda.wui.client.common.lists.SimpleFileList;
-import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.Dropdown;
 import org.roda.wui.client.common.search.SearchWrapper;
@@ -238,18 +238,18 @@ public class RepresentationInformationDialogs {
 
                 if (SEARCH_ITEMS.equals(dropDown.getSelectedValue())) {
                   listBuilder = new ListBuilder<>(AIPList::new,
-                    new AsyncTableCell.Options<>(IndexedAIP.class, aipListId).withFilter(tableFilter)
+                    new AsyncTableCellOptions<>(IndexedAIP.class, aipListId).withFilter(tableFilter)
                       .withJustActive(true).withCsvDownloadButtonVisibility(false).addRedrawHandler(dialogBox::center));
 
                 } else if (SEARCH_REPRESENTATIONS.equals(dropDown.getSelectedValue())) {
                   listBuilder = new ListBuilder<>(RepresentationList::new,
-                    new AsyncTableCell.Options<>(IndexedRepresentation.class, representationsListId)
+                    new AsyncTableCellOptions<>(IndexedRepresentation.class, representationsListId)
                       .withFilter(tableFilter).withJustActive(true).withCsvDownloadButtonVisibility(false)
                       .addRedrawHandler(dialogBox::center));
 
                 } else if (SEARCH_FILES.equals(dropDown.getSelectedValue())) {
                   listBuilder = new ListBuilder<>(SimpleFileList::new,
-                    new AsyncTableCell.Options<>(IndexedFile.class, filesListId).withFilter(tableFilter)
+                    new AsyncTableCellOptions<>(IndexedFile.class, filesListId).withFilter(tableFilter)
                       .withJustActive(true).withCsvDownloadButtonVisibility(false).addRedrawHandler(dialogBox::center));
 
                 }
@@ -855,7 +855,7 @@ public class RepresentationInformationDialogs {
 
     ListBuilder<RepresentationInformation> representationInformationListBuilder = new ListBuilder<>(
       RepresentationInformationList::new,
-      new AsyncTableCell.Options<>(RepresentationInformation.class, "RepresentationInformationDialogs_RI")
+      new AsyncTableCellOptions<>(RepresentationInformation.class, "RepresentationInformationDialogs_RI")
         .withSummary(messages.representationInformationTitle()).withInitialPageSize(10).withPageSizeIncrement(10)
         .withCsvDownloadButtonVisibility(false).addRedrawHandler(dialogBox::center)
         .addCheckboxSelectionListener(selected -> {

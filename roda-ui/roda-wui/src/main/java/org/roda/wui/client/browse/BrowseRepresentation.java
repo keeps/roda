@@ -35,7 +35,7 @@ import org.roda.wui.client.common.actions.DisseminationActions;
 import org.roda.wui.client.common.actions.FileActions;
 import org.roda.wui.client.common.lists.DIPList;
 import org.roda.wui.client.common.lists.SearchFileList;
-import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.slider.Sliders;
@@ -169,8 +169,6 @@ public class BrowseRepresentation extends Composite {
   @UiField
   HTML aipState;
 
-  // IDENTIFICATION
-
   // DESCRIPTIVE METADATA
 
   @UiField
@@ -233,7 +231,7 @@ public class BrowseRepresentation extends Composite {
       new EmptyKeyFilterParameter(RodaConstants.FILE_PARENT_UUID));
 
     ListBuilder<IndexedFile> fileListBuilder = new ListBuilder<>(() -> new SearchFileList(showFilesPath),
-      new AsyncTableCell.Options<>(IndexedFile.class, "BrowseRepresentation_files").withFilter(filesFilter)
+      new AsyncTableCellOptions<>(IndexedFile.class, "BrowseRepresentation_files").withFilter(filesFilter)
         .withJustActive(justActive).withSummary(summary).bindOpener());
 
     filesSearch = new SearchWrapper(false).createListAndSearchPanel(fileListBuilder,
@@ -245,7 +243,7 @@ public class BrowseRepresentation extends Composite {
       new SimpleFilterParameter(RodaConstants.DIP_REPRESENTATION_UUIDS, repUUID));
 
     ListBuilder<IndexedDIP> disseminationsListBuilder = new ListBuilder<>(DIPList::new,
-      new AsyncTableCell.Options<>(IndexedDIP.class, "BrowseRepresentation_disseminations")
+      new AsyncTableCellOptions<>(IndexedDIP.class, "BrowseRepresentation_disseminations")
         .withFilter(disseminationsFilter).withSummary(messages.listOfDisseminations()).bindOpener()
         .withJustActive(justActive));
 
@@ -258,8 +256,7 @@ public class BrowseRepresentation extends Composite {
     updateLayout(bundle, state, justActive);
 
     // NAVIGATION TOOLBAR
-    navigationToolbar.setObject(representation);
-    navigationToolbar.setPermissions(aip.getPermissions());
+    navigationToolbar.setObject(representation, aip.getPermissions());
     navigationToolbar.show();
 
     // DESCRIPTIVE METADATA

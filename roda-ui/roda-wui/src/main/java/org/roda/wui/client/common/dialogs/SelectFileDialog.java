@@ -10,7 +10,7 @@ package org.roda.wui.client.common.dialogs;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.wui.client.common.lists.SimpleFileList;
-import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 
 import com.google.gwt.core.client.GWT;
@@ -23,7 +23,7 @@ public class SelectFileDialog extends DefaultSelectDialog<IndexedFile> {
   public SelectFileDialog(String title, Filter filter, boolean justActive) {
     super(title,
       new ListBuilder<>(SimpleFileList::new,
-        new AsyncTableCell.Options<>(IndexedFile.class, "SelectFileDialog_simpleFiles").withFilter(filter)
+        new AsyncTableCellOptions<>(IndexedFile.class, "SelectFileDialog_simpleFiles").withFilter(filter)
           .withJustActive(justActive).withSummary(messages.selectFileSearchResults())));
   }
 }

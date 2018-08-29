@@ -60,55 +60,55 @@ public class ListFactory {
   public ListBuilder<? extends IsIndexed> getListBuilder(String listIdPrefix, String actualClass, String title,
     Filter filter, int pageSize, int incrementPage) {
 
-    AsyncTableCell.Options<? extends IsIndexed> options;
+    AsyncTableCellOptions<? extends IsIndexed> options;
     Supplier<AsyncTableCell<? extends IsIndexed>> listConstructor;
 
     if (actualClass.equals(AIP.class.getName()) || actualClass.equals(IndexedAIP.class.getName())) {
-      options = new AsyncTableCell.Options<>(IndexedAIP.class, listIdPrefix + "_AIP");
+      options = new AsyncTableCellOptions<>(IndexedAIP.class, listIdPrefix + "_AIP");
       listConstructor = AIPList::new;
     } else if (actualClass.equals(Representation.class.getName())
       || actualClass.equals(IndexedRepresentation.class.getName())) {
-      options = new AsyncTableCell.Options<>(IndexedRepresentation.class, listIdPrefix + "_representation");
+      options = new AsyncTableCellOptions<>(IndexedRepresentation.class, listIdPrefix + "_representation");
       listConstructor = RepresentationList::new;
     } else if (actualClass.equals(File.class.getName()) || actualClass.equals(IndexedFile.class.getName())) {
-      options = new AsyncTableCell.Options<>(IndexedFile.class, listIdPrefix + "_simpleFile");
+      options = new AsyncTableCellOptions<>(IndexedFile.class, listIdPrefix + "_simpleFile");
       listConstructor = SimpleFileList::new;
     } else if (actualClass.equals(RepresentationInformation.class.getName())) {
-      options = new AsyncTableCell.Options<>(RepresentationInformation.class,
+      options = new AsyncTableCellOptions<>(RepresentationInformation.class,
         listIdPrefix + "_representationInformation");
       listConstructor = RepresentationInformationList::new;
     } else if (actualClass.equals(IndexedRisk.class.getName()) || actualClass.equals(Risk.class.getName())) {
-      options = new AsyncTableCell.Options<>(IndexedRisk.class, listIdPrefix + "_risk");
+      options = new AsyncTableCellOptions<>(IndexedRisk.class, listIdPrefix + "_risk");
       listConstructor = RiskList::new;
     } else if (actualClass.equals(Format.class.getName())) {
-      options = new AsyncTableCell.Options<>(Format.class, listIdPrefix + "_format");
+      options = new AsyncTableCellOptions<>(Format.class, listIdPrefix + "_format");
       listConstructor = FormatList::new;
     } else if (actualClass.equals(RiskIncidence.class.getName())) {
-      options = new AsyncTableCell.Options<>(RiskIncidence.class, listIdPrefix + "_riskIncidence");
+      options = new AsyncTableCellOptions<>(RiskIncidence.class, listIdPrefix + "_riskIncidence");
       listConstructor = RiskIncidenceList::new;
     } else if (actualClass.equals(Job.class.getName())) {
-      options = new AsyncTableCell.Options<>(Job.class, listIdPrefix + "_job");
+      options = new AsyncTableCellOptions<>(Job.class, listIdPrefix + "_job");
       listConstructor = JobList::new;
     } else if (actualClass.equals(Report.class.getName()) || actualClass.equals(IndexedReport.class.getName())) {
-      options = new AsyncTableCell.Options<>(IndexedReport.class, listIdPrefix + "_simpleJob");
+      options = new AsyncTableCellOptions<>(IndexedReport.class, listIdPrefix + "_simpleJob");
       listConstructor = SimpleJobReportList::new;
     } else if (actualClass.equals(TransferredResource.class.getName())) {
-      options = new AsyncTableCell.Options<>(TransferredResource.class, listIdPrefix + "_transferredResource");
+      options = new AsyncTableCellOptions<>(TransferredResource.class, listIdPrefix + "_transferredResource");
       listConstructor = TransferredResourceList::new;
     } else if (actualClass.equals(Notification.class.getName())) {
-      options = new AsyncTableCell.Options<>(Notification.class, listIdPrefix + "_notification");
+      options = new AsyncTableCellOptions<>(Notification.class, listIdPrefix + "_notification");
       listConstructor = NotificationList::new;
     } else if (actualClass.equals(LogEntry.class.getName())) {
-      options = new AsyncTableCell.Options<>(LogEntry.class, listIdPrefix + "_logEntry");
+      options = new AsyncTableCellOptions<>(LogEntry.class, listIdPrefix + "_logEntry");
       listConstructor = LogEntryList::new;
     } else if (actualClass.equals(RODAMember.class.getName())) {
-      options = new AsyncTableCell.Options<>(RODAMember.class, listIdPrefix + "_rodaMember");
+      options = new AsyncTableCellOptions<>(RODAMember.class, listIdPrefix + "_rodaMember");
       listConstructor = RodaMemberList::new;
     } else if (actualClass.equals(DIP.class.getName()) || actualClass.equals(IndexedDIP.class.getName())) {
-      options = new AsyncTableCell.Options<>(IndexedDIP.class, listIdPrefix + "_DIP");
+      options = new AsyncTableCellOptions<>(IndexedDIP.class, listIdPrefix + "_DIP");
       listConstructor = DIPList::new;
     } else if (actualClass.equals(DIPFile.class.getName())) {
-      options = new AsyncTableCell.Options<>(DIPFile.class, listIdPrefix + "_DIPFile");
+      options = new AsyncTableCellOptions<>(DIPFile.class, listIdPrefix + "_DIPFile");
       listConstructor = DIPFileList::new;
     } else {
       return null;

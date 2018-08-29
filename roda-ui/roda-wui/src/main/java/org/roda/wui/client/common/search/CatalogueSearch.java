@@ -25,7 +25,7 @@ import org.roda.wui.client.common.actions.RepresentationActions;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.RepresentationList;
 import org.roda.wui.client.common.lists.SearchFileList;
-import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.common.client.tools.ListUtils;
 
@@ -63,15 +63,15 @@ public class CatalogueSearch extends Composite {
 
     // prepare lists
     ListBuilder<IndexedAIP> aipListBuilder = new ListBuilder<>(AIPList::new,
-      new AsyncTableCell.Options<>(IndexedAIP.class, itemsListId).withJustActive(justActive).bindOpener()
+      new AsyncTableCellOptions<>(IndexedAIP.class, itemsListId).withJustActive(justActive).bindOpener()
         .withStartHidden(true));
 
     ListBuilder<IndexedRepresentation> representationListBuilder = new ListBuilder<>(RepresentationList::new,
-      new AsyncTableCell.Options<>(IndexedRepresentation.class, representationsListId).withJustActive(justActive)
+      new AsyncTableCellOptions<>(IndexedRepresentation.class, representationsListId).withJustActive(justActive)
         .bindOpener().withStartHidden(true));
 
     ListBuilder<IndexedFile> fileListBuilder = new ListBuilder<>(() -> new SearchFileList(true),
-      new AsyncTableCell.Options<>(IndexedFile.class, filesListId).withJustActive(justActive).bindOpener()
+      new AsyncTableCellOptions<>(IndexedFile.class, filesListId).withJustActive(justActive).bindOpener()
         .withStartHidden(true));
 
     // add lists to search

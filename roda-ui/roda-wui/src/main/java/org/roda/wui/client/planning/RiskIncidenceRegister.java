@@ -26,7 +26,7 @@ import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.RiskIncidenceActions;
 import org.roda.wui.client.common.lists.RiskIncidenceList;
-import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchWrapper;
@@ -158,7 +158,7 @@ public class RiskIncidenceRegister extends Composite {
     Filter filter) {
 
     ListBuilder<RiskIncidence> riskIncidenceListBuilder = new ListBuilder<>(RiskIncidenceList::new,
-      new AsyncTableCell.Options<>(RiskIncidence.class, "RiskIncidenceRegister_risks").withFilter(filter)
+      new AsyncTableCellOptions<>(RiskIncidence.class, "RiskIncidenceRegister_risks").withFilter(filter)
         .withSummary(messages.riskIncidencesTitle()).bindOpener());
 
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(riskIncidenceListBuilder,

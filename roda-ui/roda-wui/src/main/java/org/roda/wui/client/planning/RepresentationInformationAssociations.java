@@ -22,7 +22,7 @@ import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.RepresentationInformationDialogs;
 import org.roda.wui.client.common.lists.RepresentationInformationList;
-import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchWrapper;
@@ -130,7 +130,7 @@ public class RepresentationInformationAssociations extends Composite {
 
     ListBuilder<RepresentationInformation> representationInformationAssociationsListBuilder = new ListBuilder<>(
       RepresentationInformationList::new,
-      new AsyncTableCell.Options<>(RepresentationInformation.class, "RepresentationInformationAssociations_RI")
+      new AsyncTableCellOptions<>(RepresentationInformation.class, "RepresentationInformationAssociations_RI")
         .bindOpener().addValueChangedHandler(valueChangeHandler));
 
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(representationInformationAssociationsListBuilder,

@@ -10,7 +10,7 @@ package org.roda.wui.client.common.dialogs;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.wui.client.common.lists.RepresentationInformationList;
-import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 
 public class SelectRepresentationInformationDialog extends DefaultSelectDialog<RepresentationInformation> {
@@ -21,7 +21,7 @@ public class SelectRepresentationInformationDialog extends DefaultSelectDialog<R
   public SelectRepresentationInformationDialog(String title, Filter filter, boolean exportCsvVisible) {
     super(title,
       new ListBuilder<>(RepresentationInformationList::new,
-        new AsyncTableCell.Options<>(RepresentationInformation.class, "SelectRepresentationInformationDialog_RI")
+        new AsyncTableCellOptions<>(RepresentationInformation.class, "SelectRepresentationInformationDialog_RI")
           .withFilter(filter).withSummary(title).withCsvDownloadButtonVisibility(exportCsvVisible)));
   }
 }

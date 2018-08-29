@@ -13,7 +13,7 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.wui.client.common.actions.PreservationEventActions;
 import org.roda.wui.client.common.lists.PreservationEventList;
-import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
 
@@ -51,7 +51,7 @@ public class PreservationEventsSearch extends Composite {
 
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(
       new ListBuilder<>(PreservationEventList::new,
-        new AsyncTableCell.Options<>(IndexedPreservationEvent.class, eventsListId).withFilter(filter)
+        new AsyncTableCellOptions<>(IndexedPreservationEvent.class, eventsListId).withFilter(filter)
           .withSummary(messages.searchResults()).bindOpener()),
       PreservationEventActions.get(aipId, representationUUID, fileUUID), messages.searchPlaceHolder());
 

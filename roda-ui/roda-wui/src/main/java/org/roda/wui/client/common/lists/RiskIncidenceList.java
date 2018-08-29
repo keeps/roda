@@ -17,6 +17,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 
 import com.google.gwt.cell.client.DateCell;
@@ -51,7 +52,7 @@ public class RiskIncidenceList extends AsyncTableCell<RiskIncidence> {
     RodaConstants.RISK_INCIDENCE_STATUS);
 
   @Override
-  protected void adjustOptions(Options<RiskIncidence> options) {
+  protected void adjustOptions(AsyncTableCellOptions<RiskIncidence> options) {
     options.withFieldsToReturn(fieldsToReturn);
   }
 

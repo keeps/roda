@@ -18,7 +18,7 @@ import org.roda.wui.client.common.actions.FormatActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.lists.FormatList;
-import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -98,7 +98,7 @@ public class FormatRegister extends Composite {
     actionableWidgetBuilder = new ActionableWidgetBuilder<>(FormatActions.get());
 
     ListBuilder<Format> formatListBuilder = new ListBuilder<>(FormatList::new,
-      new AsyncTableCell.Options<>(Format.class, "FormatRegister_formats").withSummary(messages.formatsTitle())
+      new AsyncTableCellOptions<>(Format.class, "FormatRegister_formats").withSummary(messages.formatsTitle())
         .bindOpener());
 
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(formatListBuilder, FormatActions.get(),

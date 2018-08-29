@@ -17,6 +17,7 @@ import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.ClientLogger;
 
@@ -48,7 +49,7 @@ public class RodaMemberList extends AsyncTableCell<RODAMember> {
     RodaConstants.MEMBERS_GROUPS, RodaConstants.MEMBERS_IS_ACTIVE);
 
   @Override
-  protected void adjustOptions(Options<RODAMember> options) {
+  protected void adjustOptions(AsyncTableCellOptions<RODAMember> options) {
     options.withFieldsToReturn(fieldsToReturn);
   }
 
@@ -112,7 +113,7 @@ public class RodaMemberList extends AsyncTableCell<RODAMember> {
     addColumn(nameColumn, messages.userIdentifier(), true, false);
     addColumn(fullNameColumn, messages.userFullName(), true, false);
     addColumn(groupsColumn, messages.userGroups(), true, false);
-    addColumn(activeColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-check-circle'></i>"), false, false, 2);
+    addColumn(activeColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-check-circle'></i>"), false, false, 3);
 
     addStyleName("my-list-rodamember");
   }

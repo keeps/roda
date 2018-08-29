@@ -13,7 +13,7 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.wui.client.common.lists.DIPFileList;
-import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.common.client.tools.RestUtils;
@@ -47,7 +47,7 @@ public class DipFilePreview extends BitstreamPreview<DIPFile> {
       new SimpleFilterParameter(RodaConstants.DIPFILE_PARENT_UUID, getObject().getUUID()));
 
     ListBuilder<DIPFile> dipFileListBuilder = new ListBuilder<>(DIPFileList::new,
-      new AsyncTableCell.Options<>(DIPFile.class, "DipFilePreview_files").withFilter(filter)
+      new AsyncTableCellOptions<>(DIPFile.class, "DipFilePreview_files").withFilter(filter)
         .withSummary(messages.allOfAObject(DIPFile.class.getName())).bindOpener());
 
     return new SearchWrapper(false).createListAndSearchPanel(dipFileListBuilder);

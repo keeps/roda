@@ -16,6 +16,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
@@ -47,7 +48,7 @@ public class SimpleRodaMemberList extends AsyncTableCell<RODAMember> {
     RodaConstants.MEMBERS_IS_USER, RodaConstants.MEMBERS_NAME, RodaConstants.MEMBERS_ID);
 
   @Override
-  protected void adjustOptions(Options<RODAMember> options) {
+  protected void adjustOptions(AsyncTableCellOptions<RODAMember> options) {
     options.withFieldsToReturn(fieldsToReturn);
   }
 

@@ -16,6 +16,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.Humanize;
@@ -52,7 +53,7 @@ public class AIPList extends AsyncTableCell<IndexedAIP> {
     RodaConstants.AIP_HAS_REPRESENTATIONS);
 
   @Override
-  protected void adjustOptions(Options<IndexedAIP> options) {
+  protected void adjustOptions(AsyncTableCellOptions<IndexedAIP> options) {
     options.withFieldsToReturn(fieldsToReturn);
   }
 

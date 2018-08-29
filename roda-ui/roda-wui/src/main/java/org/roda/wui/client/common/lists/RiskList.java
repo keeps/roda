@@ -17,6 +17,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 
 import com.google.gwt.cell.client.DateCell;
@@ -55,7 +56,7 @@ public class RiskList extends AsyncTableCell<IndexedRisk> {
     RodaConstants.RISK_PRE_MITIGATION_SEVERITY_LEVEL);
 
   @Override
-  protected void adjustOptions(Options<IndexedRisk> options) {
+  protected void adjustOptions(AsyncTableCellOptions<IndexedRisk> options) {
     options.withFieldsToReturn(fieldsToReturn);
   }
 

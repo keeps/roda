@@ -28,7 +28,7 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.lists.TransferredResourceList;
-import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
@@ -75,7 +75,7 @@ public class CreateIngestJob extends CreateSelectedJob<TransferredResource> {
 
         ListBuilder<TransferredResource> transferredResourceListBuilder = new ListBuilder<>(
           TransferredResourceList::new,
-          new AsyncTableCell.Options<>(TransferredResource.class, "CreateIngestJob_transferredResources")
+          new AsyncTableCellOptions<>(TransferredResource.class, "CreateIngestJob_transferredResources")
             .withFilter(filter).withSummary(messages.transferredResourcesTitle()).withInitialPageSize(10)
             .withPageSizeIncrement(10));
 

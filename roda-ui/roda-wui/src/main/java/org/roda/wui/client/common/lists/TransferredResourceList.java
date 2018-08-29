@@ -17,6 +17,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Humanize;
 
@@ -67,7 +68,7 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
 
 
   @Override
-  protected void adjustOptions(Options<TransferredResource> options) {
+  protected void adjustOptions(AsyncTableCellOptions<TransferredResource> options) {
     options.withFieldsToReturn(fieldsToReturn);
   }
 

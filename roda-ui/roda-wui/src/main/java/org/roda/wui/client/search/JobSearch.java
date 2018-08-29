@@ -13,7 +13,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.common.lists.IngestJobReportList;
 import org.roda.wui.client.common.lists.JobList;
 import org.roda.wui.client.common.lists.SimpleJobReportList;
-import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
 
@@ -41,12 +41,12 @@ public class JobSearch extends Composite {
     boolean isIngest) {
 
     ListBuilder<Job> jobListBuilder = new ListBuilder<>(JobList::new,
-      new AsyncTableCell.Options<>(Job.class, jobsListId).withFilter(new Filter(defaultJobFilter)).withAutoUpdate(10000)
+      new AsyncTableCellOptions<>(Job.class, jobsListId).withFilter(new Filter(defaultJobFilter)).withAutoUpdate(10000)
         .bindOpener());
 
     ListBuilder<IndexedReport> jobReportListBuilder = new ListBuilder<>(
       isIngest ? IngestJobReportList::new : SimpleJobReportList::new,
-      new AsyncTableCell.Options<>(IndexedReport.class, jobReportsListId).withFilter(new Filter(defaultJobReportFilter))
+      new AsyncTableCellOptions<>(IndexedReport.class, jobReportsListId).withFilter(new Filter(defaultJobReportFilter))
         .withAutoUpdate(10000).bindOpener());
 
     searchWrapper = new SearchWrapper(true).createListAndSearchPanel(jobListBuilder)

@@ -16,6 +16,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.utils.StringUtils;
 
 import com.google.gwt.core.client.GWT;
@@ -47,7 +48,7 @@ public class FormatList extends AsyncTableCell<Format> {
     RodaConstants.FORMAT_PRONOMS);
 
   @Override
-  protected void adjustOptions(Options<Format> options) {
+  protected void adjustOptions(AsyncTableCellOptions<Format> options) {
     options.withFieldsToReturn(fieldsToReturn);
   }
 

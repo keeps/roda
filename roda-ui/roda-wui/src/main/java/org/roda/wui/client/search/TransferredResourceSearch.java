@@ -12,7 +12,7 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.common.actions.TransferredResourceActions;
 import org.roda.wui.client.common.lists.TransferredResourceList;
-import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
 
@@ -40,7 +40,7 @@ public class TransferredResourceSearch extends Composite {
     TransferredResourceActions transferredResourceActions) {
 
     ListBuilder<TransferredResource> transferredResourceListBuilder = new ListBuilder<>(TransferredResourceList::new,
-      new AsyncTableCell.Options<>(TransferredResource.class, resourcesListId).withFilter(filter).bindOpener());
+      new AsyncTableCellOptions<>(TransferredResource.class, resourcesListId).withFilter(filter).bindOpener());
 
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(transferredResourceListBuilder,
       transferredResourceActions);

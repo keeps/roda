@@ -16,6 +16,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.cellview.client.CellTable;
@@ -43,7 +44,7 @@ public class PreservationAgentList extends AsyncTableCell<IndexedPreservationAge
     RodaConstants.PRESERVATION_AGENT_VERSION);
 
   @Override
-  protected void adjustOptions(Options<IndexedPreservationAgent> options) {
+  protected void adjustOptions(AsyncTableCellOptions<IndexedPreservationAgent> options) {
     options.withFieldsToReturn(fieldsToReturn);
   }
 

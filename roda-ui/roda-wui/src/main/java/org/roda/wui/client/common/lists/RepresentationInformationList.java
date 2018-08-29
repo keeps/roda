@@ -16,6 +16,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
@@ -44,7 +45,7 @@ public class RepresentationInformationList extends AsyncTableCell<Representation
     RodaConstants.REPRESENTATION_INFORMATION_FAMILY);
 
   @Override
-  protected void adjustOptions(Options<RepresentationInformation> options) {
+  protected void adjustOptions(AsyncTableCellOptions<RepresentationInformation> options) {
     options.withFieldsToReturn(fieldsToReturn);
   }
 

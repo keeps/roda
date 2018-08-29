@@ -15,7 +15,7 @@ import org.roda.wui.client.common.actions.RODAMemberActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.lists.RodaMemberList;
-import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -95,7 +95,7 @@ public class MemberManagement extends Composite {
 
 
     ListBuilder<RODAMember> rodaMemberListBuilder = new ListBuilder<>(RodaMemberList::new,
-      new AsyncTableCell.Options<>(RODAMember.class, "MemberManagement_rodaMembers")
+      new AsyncTableCellOptions<>(RODAMember.class, "MemberManagement_rodaMembers")
         .withSummary(messages.usersAndGroupsTitle()).bindOpener());
 
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(rodaMemberListBuilder, RODAMemberActions.get(),

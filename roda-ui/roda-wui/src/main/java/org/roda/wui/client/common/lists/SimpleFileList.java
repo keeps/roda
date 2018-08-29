@@ -16,6 +16,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
@@ -45,7 +46,7 @@ public class SimpleFileList extends AsyncTableCell<IndexedFile> {
     RodaConstants.FILE_SIZE, RodaConstants.FILE_FORMAT_VERSION, RodaConstants.FILE_FILEFORMAT);
 
   @Override
-  protected void adjustOptions(Options<IndexedFile> options) {
+  protected void adjustOptions(AsyncTableCellOptions<IndexedFile> options) {
     options.withFieldsToReturn(fieldsToReturn);
   }
 

@@ -13,7 +13,7 @@ import org.roda.wui.client.common.actions.RiskActions;
 import org.roda.wui.client.common.actions.RiskIncidenceActions;
 import org.roda.wui.client.common.lists.RiskIncidenceList;
 import org.roda.wui.client.common.lists.RiskList;
-import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
 
@@ -39,10 +39,10 @@ public class RiskSearch extends Composite {
 
   public RiskSearch() {
     ListBuilder<IndexedRisk> riskListBuilder = new ListBuilder<>(RiskList::new,
-      new AsyncTableCell.Options<>(IndexedRisk.class, "RiskRegister_risks").bindOpener());
+      new AsyncTableCellOptions<>(IndexedRisk.class, "RiskRegister_risks").bindOpener());
 
     ListBuilder<RiskIncidence> riskIncidenceListBuilder = new ListBuilder<>(RiskIncidenceList::new,
-      new AsyncTableCell.Options<>(RiskIncidence.class, "RiskRegister_riskIncidences").bindOpener());
+      new AsyncTableCellOptions<>(RiskIncidence.class, "RiskRegister_riskIncidences").bindOpener());
 
     searchWrapper = new SearchWrapper(true)
       .createListAndSearchPanel(riskListBuilder, RiskActions.get(), messages.searchPlaceHolder())

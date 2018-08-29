@@ -18,7 +18,7 @@ import org.roda.wui.client.common.actions.RepresentationInformationActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.lists.RepresentationInformationList;
-import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchWrapper;
@@ -102,7 +102,7 @@ public class RepresentationInformationNetwork extends Composite {
   public RepresentationInformationNetwork() {
     ListBuilder<RepresentationInformation> representationInformationListBuilder = new ListBuilder<>(
       RepresentationInformationList::new,
-      new AsyncTableCell.Options<>(RepresentationInformation.class, "RepresentationInformationNetwork_RI")
+      new AsyncTableCellOptions<>(RepresentationInformation.class, "RepresentationInformationNetwork_RI")
         .withSummary(messages.representationInformationTitle()).bindOpener());
 
     searchPanel = new SearchWrapper(false).createListAndSearchPanel(representationInformationListBuilder,

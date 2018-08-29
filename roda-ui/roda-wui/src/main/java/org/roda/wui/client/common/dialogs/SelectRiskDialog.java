@@ -10,12 +10,12 @@ package org.roda.wui.client.common.dialogs;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.wui.client.common.lists.RiskList;
-import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 
 public class SelectRiskDialog extends DefaultSelectDialog<IndexedRisk> {
   public SelectRiskDialog(String title, Filter filter) {
     super(title, new ListBuilder<>(RiskList::new,
-      new AsyncTableCell.Options<>(IndexedRisk.class, "SelectRiskDialog_risks").withFilter(filter).withSummary(title)));
+      new AsyncTableCellOptions<>(IndexedRisk.class, "SelectRiskDialog_risks").withFilter(filter).withSummary(title)));
   }
 }

@@ -38,6 +38,9 @@ public class ActionButton<T extends IsIndexed> extends Composite implements HasE
     for (String possibleIcon : actionButton.getExtraCssClasses()) {
       if (possibleIcon.startsWith("btn-")) {
         iconClass = possibleIcon.replaceFirst("btn-", "fa fa-");
+      } else if (possibleIcon.startsWith("fas fa-") || possibleIcon.startsWith("far fa-")
+        || possibleIcon.startsWith("fal fa-")) {
+        iconClass = possibleIcon;
       }
     }
     HTMLPanel icon = new HTMLPanel(SafeHtmlUtils.fromSafeConstant("<i class='" + iconClass + "'></i>"));

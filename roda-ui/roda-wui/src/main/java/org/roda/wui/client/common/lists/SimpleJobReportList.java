@@ -20,6 +20,7 @@ import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.TooltipTextColumn;
 import org.roda.wui.client.common.utils.StringUtils;
 
@@ -76,7 +77,7 @@ public class SimpleJobReportList extends AsyncTableCell<IndexedReport> {
   }
 
   @Override
-  protected void adjustOptions(Options<IndexedReport> options) {
+  protected void adjustOptions(AsyncTableCellOptions<IndexedReport> options) {
     options.withFieldsToReturn(fieldsToReturn);
   }
 

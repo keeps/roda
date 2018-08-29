@@ -16,7 +16,7 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.PreservationAgentActions;
 import org.roda.wui.client.common.lists.PreservationAgentList;
-import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -75,7 +75,7 @@ public class PreservationAgents extends Composite {
 
   public PreservationAgents() {
     ListBuilder<IndexedPreservationAgent> preservationAgentListBuilder = new ListBuilder<>(PreservationAgentList::new,
-      new AsyncTableCell.Options<>(IndexedPreservationAgent.class, "PreservationAgents_agents").bindOpener());
+      new AsyncTableCellOptions<>(IndexedPreservationAgent.class, "PreservationAgents_agents").bindOpener());
 
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(preservationAgentListBuilder,
       PreservationAgentActions.get());

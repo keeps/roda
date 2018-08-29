@@ -23,7 +23,7 @@ import org.roda.wui.client.common.actions.AipActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.lists.AIPList;
-import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.ingest.transfer.TransferUpload;
@@ -135,7 +135,7 @@ public class BrowseTop extends Composite {
     // be the same
 
     ListBuilder<IndexedAIP> listBuilder = new ListBuilder<>(AIPList::new,
-      new AsyncTableCell.Options<>(IndexedAIP.class, "BrowseTop_aip")
+      new AsyncTableCellOptions<>(IndexedAIP.class, "BrowseTop_aip")
         .withFilter(new Filter(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID))).withJustActive(true)
         .withSummary(messages.listOfAIPs()).bindOpener());
 

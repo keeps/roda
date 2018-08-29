@@ -17,6 +17,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.TooltipTextColumn;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.common.client.tools.Humanize;
@@ -63,7 +64,7 @@ public class JobList extends AsyncTableCell<Job> {
     RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_FAILURE, RodaConstants.JOB_COMPLETION_PERCENTAGE);
 
   @Override
-  protected void adjustOptions(Options<Job> options) {
+  protected void adjustOptions(AsyncTableCellOptions<Job> options) {
     options.withFieldsToReturn(fieldsToReturn);
   }
 

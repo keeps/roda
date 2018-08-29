@@ -13,11 +13,11 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.wui.client.common.actions.Actionable;
 
 public class ListBuilder<T extends IsIndexed> {
-  private final AsyncTableCell.Options<T> options;
+  private final AsyncTableCellOptions<T> options;
   private final Supplier<AsyncTableCell<T>> listSupplier;
   private Actionable<T> actionable = null;
 
-  public ListBuilder(Supplier<AsyncTableCell<T>> listSupplier, AsyncTableCell.Options<T> options) {
+  public ListBuilder(Supplier<AsyncTableCell<T>> listSupplier, AsyncTableCellOptions<T> options) {
     this.options = options;
     this.listSupplier = listSupplier;
   }
@@ -29,7 +29,7 @@ public class ListBuilder<T extends IsIndexed> {
     return listSupplier.get().initialize(options);
   }
 
-  public AsyncTableCell.Options<T> getOptions() {
+  public AsyncTableCellOptions<T> getOptions() {
     return options;
   }
 }

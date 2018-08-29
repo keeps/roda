@@ -18,6 +18,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
@@ -57,7 +58,7 @@ public class RepresentationList extends AsyncTableCell<IndexedRepresentation> {
     RodaConstants.REPRESENTATION_STATES);
 
   @Override
-  protected void adjustOptions(Options<IndexedRepresentation> options) {
+  protected void adjustOptions(AsyncTableCellOptions<IndexedRepresentation> options) {
     options.withFieldsToReturn(fieldsToReturn);
   }
 

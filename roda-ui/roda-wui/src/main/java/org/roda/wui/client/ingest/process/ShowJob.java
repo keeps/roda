@@ -47,7 +47,7 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.lists.IngestJobReportList;
 import org.roda.wui.client.common.lists.SimpleJobReportList;
-import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchPreFilterUtils;
@@ -238,7 +238,7 @@ public class ShowJob extends Composite {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getUUID()));
     filter.add(extraReportFilterParameters);
 
-    AsyncTableCell.Options<IndexedReport> jobReportListBuilderOptions = new AsyncTableCell.Options<>(
+    AsyncTableCellOptions<IndexedReport> jobReportListBuilderOptions = new AsyncTableCellOptions<>(
       IndexedReport.class, "ShowJob_reports");
     jobReportListBuilderOptions.addValueChangedHandler(event -> {
       if (!extraReportFilterParameters.isEmpty() && event.getValue().getTotalCount() == 1) {

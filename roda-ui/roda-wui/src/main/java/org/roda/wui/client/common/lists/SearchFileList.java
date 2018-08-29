@@ -18,6 +18,7 @@ import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Humanize;
@@ -62,7 +63,7 @@ public class SearchFileList extends AsyncTableCell<IndexedFile> {
   }
 
   @Override
-  protected void adjustOptions(Options<IndexedFile> options) {
+  protected void adjustOptions(AsyncTableCellOptions<IndexedFile> options) {
     options.withFieldsToReturn(fieldsToReturn);
   }
 

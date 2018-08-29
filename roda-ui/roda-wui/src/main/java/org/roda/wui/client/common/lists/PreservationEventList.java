@@ -18,6 +18,7 @@ import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.utils.StringUtils;
 
 import com.google.gwt.cell.client.DateCell;
@@ -55,7 +56,7 @@ public class PreservationEventList extends AsyncTableCell<IndexedPreservationEve
     RodaConstants.PRESERVATION_EVENT_OUTCOME);
 
   @Override
-  protected void adjustOptions(Options<IndexedPreservationEvent> options) {
+  protected void adjustOptions(AsyncTableCellOptions<IndexedPreservationEvent> options) {
     options.withFieldsToReturn(fieldsToReturn);
   }
 

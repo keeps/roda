@@ -16,6 +16,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
@@ -44,7 +45,7 @@ public class DIPFileList extends AsyncTableCell<DIPFile> {
     RodaConstants.DIPFILE_IS_DIRECTORY, RodaConstants.DIPFILE_ID, RodaConstants.DIPFILE_DIP_ID);
 
   @Override
-  protected void adjustOptions(Options<DIPFile> options) {
+  protected void adjustOptions(AsyncTableCellOptions<DIPFile> options) {
     options.withFieldsToReturn(fieldsToReturn);
   }
 

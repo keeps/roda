@@ -19,7 +19,7 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.actions.FileActions;
 import org.roda.wui.client.common.lists.SearchFileList;
-import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
@@ -52,7 +52,7 @@ public class IndexedFilePreview extends BitstreamPreview<IndexedFile> {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_PARENT_UUID, getObject().getUUID()));
 
     ListBuilder<IndexedFile> folderListBuilder = new ListBuilder<>(SearchFileList::new,
-      new AsyncTableCell.Options<>(IndexedFile.class, "IndexedFilePreview_files").withFilter(filter)
+      new AsyncTableCellOptions<>(IndexedFile.class, "IndexedFilePreview_files").withFilter(filter)
         .withSummary(messages.representationListOfFiles()).withJustActive(justActive).bindOpener());
 
     LastSelectedItemsSingleton.getInstance().setSelectedJustActive(justActive);

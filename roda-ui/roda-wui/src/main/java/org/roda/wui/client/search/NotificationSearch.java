@@ -9,7 +9,7 @@ package org.roda.wui.client.search;
 
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.wui.client.common.lists.NotificationList;
-import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
 
@@ -36,7 +36,7 @@ public class NotificationSearch extends Composite {
   public NotificationSearch(String notificationsListId) {
 
     ListBuilder<Notification> notificationListBuilder = new ListBuilder<>(NotificationList::new,
-      new AsyncTableCell.Options<>(Notification.class, notificationsListId).bindOpener());
+      new AsyncTableCellOptions<>(Notification.class, notificationsListId).bindOpener());
 
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(notificationListBuilder);
 

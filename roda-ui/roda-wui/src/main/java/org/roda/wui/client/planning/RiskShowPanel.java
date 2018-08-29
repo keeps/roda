@@ -16,7 +16,7 @@ import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.actions.RiskIncidenceActions;
 import org.roda.wui.client.common.lists.RiskIncidenceList;
-import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
@@ -138,7 +138,7 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
   public RiskShowPanel(String listId) {
 
     ListBuilder<RiskIncidence> riskIncidenceListBuilder = new ListBuilder<>(RiskIncidenceList::new,
-      new AsyncTableCell.Options<>(RiskIncidence.class, listId).withSummary(messages.riskIncidences()));
+      new AsyncTableCellOptions<>(RiskIncidence.class, listId).withSummary(messages.riskIncidences()));
 
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(riskIncidenceListBuilder,
       RiskIncidenceActions.getForMultipleEdit(), messages.riskIncidenceRegisterSearchPlaceHolder());
@@ -150,7 +150,7 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISK_ID, risk.getId()));
 
     ListBuilder<RiskIncidence> riskIncidenceListBuilder = new ListBuilder<>(RiskIncidenceList::new,
-      new AsyncTableCell.Options<>(RiskIncidence.class, listId).withSummary(messages.riskIncidences())
+      new AsyncTableCellOptions<>(RiskIncidence.class, listId).withSummary(messages.riskIncidences())
         .withFilter(filter).bindOpener());
 
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(riskIncidenceListBuilder,

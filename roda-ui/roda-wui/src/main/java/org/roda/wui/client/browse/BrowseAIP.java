@@ -37,7 +37,7 @@ import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.DIPList;
 import org.roda.wui.client.common.lists.RepresentationList;
-import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.slider.Sliders;
@@ -235,7 +235,7 @@ public class BrowseAIP extends Composite {
     // REPRESENTATIONS
 
     ListBuilder<IndexedRepresentation> representationsListBuilder = new ListBuilder<>(RepresentationList::new,
-      new AsyncTableCell.Options<>(IndexedRepresentation.class, "BrowseAIP_representations")
+      new AsyncTableCellOptions<>(IndexedRepresentation.class, "BrowseAIP_representations")
         .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aip.getId())))
         .withJustActive(justActive).withSummary(messages.listOfRepresentations()).bindOpener());
 
@@ -245,7 +245,7 @@ public class BrowseAIP extends Composite {
     // DISSEMINATIONS
 
     ListBuilder<IndexedDIP> disseminationsListBuilder = new ListBuilder<>(DIPList::new,
-      new AsyncTableCell.Options<>(IndexedDIP.class, "BrowseAIP_disseminations")
+      new AsyncTableCellOptions<>(IndexedDIP.class, "BrowseAIP_disseminations")
         .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.DIP_AIP_UUIDS, aip.getId())))
         .withJustActive(justActive).withSummary(messages.listOfDisseminations()).bindOpener());
 
@@ -255,7 +255,7 @@ public class BrowseAIP extends Composite {
     // AIP CHILDREN
 
     ListBuilder<IndexedAIP> aipChildrenListBuilder = new ListBuilder<>(AIPList::new,
-      new AsyncTableCell.Options<>(IndexedAIP.class, "BrowseAIP_aipChildren")
+      new AsyncTableCellOptions<>(IndexedAIP.class, "BrowseAIP_aipChildren")
         .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aip.getId())))
         .withJustActive(justActive).withSummary(messages.listOfAIPs()).bindOpener());
 

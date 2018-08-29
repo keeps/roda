@@ -17,6 +17,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 
@@ -52,7 +53,7 @@ public class NotificationList extends AsyncTableCell<Notification> {
     RodaConstants.NOTIFICATION_STATE);
 
   @Override
-  protected void adjustOptions(Options<Notification> options) {
+  protected void adjustOptions(AsyncTableCellOptions<Notification> options) {
     options.withFieldsToReturn(fieldsToReturn);
   }
 

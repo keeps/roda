@@ -17,6 +17,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.core.client.GWT;
@@ -43,7 +44,7 @@ public class DIPList extends AsyncTableCell<IndexedDIP> {
     RodaConstants.DIP_DATE_CREATED, RodaConstants.DIP_LAST_MODIFIED, RodaConstants.DIP_TITLE);
 
   @Override
-  protected void adjustOptions(Options<IndexedDIP> options) {
+  protected void adjustOptions(AsyncTableCellOptions<IndexedDIP> options) {
     options.withFieldsToReturn(fieldsToReturn);
   }
 

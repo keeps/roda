@@ -95,9 +95,11 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
     this.currentObject = object;
     refresh();
   }
-
-  public void setPermissions(Permissions permissions) {
+  
+  public void setObject(T object, Permissions permissions) {
+    this.currentObject = object;
     this.permissions = permissions;
+    refresh();
   }
 
   public AccessibleFocusPanel getSidebarButton() {

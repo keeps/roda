@@ -17,6 +17,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.tools.Humanize;
@@ -52,7 +53,7 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
     RodaConstants.LOG_USERNAME, RodaConstants.LOG_DURATION, RodaConstants.LOG_ADDRESS, RodaConstants.LOG_STATE);
 
   @Override
-  protected void adjustOptions(Options<LogEntry> options) {
+  protected void adjustOptions(AsyncTableCellOptions<LogEntry> options) {
     options.withFieldsToReturn(fieldsToReturn);
   }
 

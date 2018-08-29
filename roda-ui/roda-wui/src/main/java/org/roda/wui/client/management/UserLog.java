@@ -18,7 +18,7 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.LogEntryList;
-import org.roda.wui.client.common.lists.utils.AsyncTableCell;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -95,7 +95,7 @@ public class UserLog extends Composite {
   public UserLog() {
     // TODO tmp why no bindOpener?
     ListBuilder<LogEntry> logEntryListBuilder = new ListBuilder<>(LogEntryList::new,
-      new AsyncTableCell.Options<>(LogEntry.class, "UserLog_logEntries"));
+      new AsyncTableCellOptions<>(LogEntry.class, "UserLog_logEntries"));
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(logEntryListBuilder);
 
     initWidget(uiBinder.createAndBindUi(this));
