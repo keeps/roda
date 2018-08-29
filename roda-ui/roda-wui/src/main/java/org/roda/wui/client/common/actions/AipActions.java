@@ -133,10 +133,14 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
   @Override
   public boolean canAct(Action<IndexedAIP> action) {
-    if (parentAipId == NO_AIP_PARENT) {
-      return hasPermissions(action, permissions) && POSSIBLE_ACTIONS_ON_NO_AIP_TOP.contains(action);
+    if (!AIPState.UNDER_APPRAISAL.equals(parentAipState)) {
+      if (parentAipId == NO_AIP_PARENT) {
+        return hasPermissions(action, permissions) && POSSIBLE_ACTIONS_ON_NO_AIP_TOP.contains(action);
+      } else {
+        return hasPermissions(action, permissions) && POSSIBLE_ACTIONS_ON_NO_AIP_BELOW.contains(action);
+      }
     } else {
-      return hasPermissions(action, permissions) && POSSIBLE_ACTIONS_ON_NO_AIP_BELOW.contains(action);
+      return false;
     }
   }
 
@@ -144,6 +148,9 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   public boolean canAct(Action<IndexedAIP> action, IndexedAIP aip) {
     if (aip == NO_AIP_OBJECT) {
       return hasPermissions(action, permissions) && POSSIBLE_ACTIONS_ON_NO_AIP_BELOW.contains(action);
+    } else if (AIPState.UNDER_APPRAISAL.equals(aip.getState()) && AIPState.UNDER_APPRAISAL.equals(parentAipState)
+      && parentAipId == NO_AIP_PARENT) {
+      return hasPermissions(action, aip.getPermissions()) && APPRAISAL_ACTIONS.contains(action);
     } else if (AIPState.UNDER_APPRAISAL.equals(aip.getState())) {
       return hasPermissions(action, aip.getPermissions())
         && (POSSIBLE_ACTIONS_ON_SINGLE_AIP.contains(action) || APPRAISAL_ACTIONS.contains(action));
@@ -158,7 +165,8 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
     if (hasPermissions(action, permissions)) {
       if (AIPState.UNDER_APPRAISAL.equals(parentAipState)) {
-        canAct = POSSIBLE_ACTIONS_ON_MULTIPLE_AIPS.contains(action) || APPRAISAL_ACTIONS.contains(action);
+        canAct = (parentAipId != NO_AIP_PARENT && POSSIBLE_ACTIONS_ON_MULTIPLE_AIPS.contains(action))
+          || APPRAISAL_ACTIONS.contains(action);
       } else {
         canAct = POSSIBLE_ACTIONS_ON_MULTIPLE_AIPS.contains(action);
       }

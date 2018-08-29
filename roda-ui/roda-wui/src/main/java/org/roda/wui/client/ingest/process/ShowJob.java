@@ -44,7 +44,9 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.common.actions.JobActions;
+import org.roda.wui.client.common.actions.model.ActionableObject;
+import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.lists.IngestJobReportList;
 import org.roda.wui.client.common.lists.SimpleJobReportList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
@@ -56,12 +58,7 @@ import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.StringUtils;
-import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
-import org.roda.wui.client.process.ActionProcess;
-import org.roda.wui.client.process.IngestProcess;
-import org.roda.wui.client.process.InternalProcess;
 import org.roda.wui.client.process.Process;
-import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -78,7 +75,6 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
@@ -90,6 +86,7 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RadioButton;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -227,8 +224,13 @@ public class ShowJob extends Composite {
   @UiField(provided = true)
   SearchWrapper searchWrapper;
 
+  // SIDEBAR
+
   @UiField
   Button buttonAppraisal, buttonBack, buttonStop, buttonProcess;
+
+  @UiField
+  SimplePanel actionsSidebar;
 
   public ShowJob(Job job, Map<String, PluginInfo> pluginsInfo, List<FilterParameter> extraReportFilterParameters) {
     this.job = job;
@@ -312,6 +314,9 @@ public class ShowJob extends Composite {
       pluginPanel.setVisible(false);
       pluginOptions.setVisible(false);
     }
+
+    actionsSidebar.setWidget(new ActionableWidgetBuilder<>(JobActions.get(ShowJob.RESOLVER))
+      .buildListWithObjects(new ActionableObject<>(job)));
   }
 
   @Override
@@ -681,67 +686,6 @@ public class ShowJob extends Composite {
       Label pHelp = new Label(description);
       pluginOptions.add(pHelp);
       pHelp.addStyleName("form-help");
-    }
-  }
-
-  @UiHandler("buttonAppraisal")
-  void buttonAppraisalHandler(ClickEvent e) {
-    HistoryUtils.newHistory(IngestAppraisal.RESOLVER, RodaConstants.SEARCH_ITEMS, RodaConstants.INGEST_JOB_ID,
-      job.getId());
-  }
-
-  @UiHandler("buttonBack")
-  void buttonCancelHandler(ClickEvent e) {
-    cancel();
-  }
-
-  @UiHandler("buttonStop")
-  void buttonStopHandler(ClickEvent e) {
-    stop();
-  }
-
-  private void cancel() {
-    if (job.getPluginType().equals(PluginType.INGEST)) {
-      HistoryUtils.newHistory(IngestProcess.RESOLVER);
-    } else if (job.getPluginType().equals(PluginType.INTERNAL)) {
-      HistoryUtils.newHistory(InternalProcess.RESOLVER);
-    } else {
-      HistoryUtils.newHistory(ActionProcess.RESOLVER);
-    }
-  }
-
-  private void stop() {
-    Dialogs.showConfirmDialog(messages.jobStopConfirmDialogTitle(), messages.jobStopConfirmDialogMessage(),
-      messages.dialogCancel(), messages.dialogYes(), new AsyncCallback<Boolean>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          // nothing to do
-        }
-
-        @Override
-        public void onSuccess(Boolean confirmed) {
-          if (confirmed) {
-            BrowserService.Util.getInstance().stopJob(job.getId(), new AsyncCallback<Void>() {
-              @Override
-              public void onFailure(Throwable caught) {
-                // FIXME 20160826 hsilva: do proper handling of the failure
-              }
-
-              @Override
-              public void onSuccess(Void result) {
-                // FIXME 20160826 hsilva: do proper handling of the success
-              }
-            });
-          }
-        }
-      });
-  }
-
-  @UiHandler("buttonProcess")
-  void buttonProcessHandler(ClickEvent e) {
-    if (job != null) {
-      HistoryUtils.newHistory(Search.RESOLVER, "items", RodaConstants.ALL_INGEST_JOB_IDS, job.getId());
     }
   }
 }

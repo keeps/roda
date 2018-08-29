@@ -11,9 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -75,30 +73,12 @@ public class CatalogueSearch extends Composite {
         .withStartHidden(true));
 
     // add lists to search
-
-    // TODO tmp check why aip has actions with a parent but representation doesnt.
-    // bug?
     searchWrapper = new SearchWrapper(true, IndexedAIP.class.getSimpleName())
       .createListAndSearchPanel(aipListBuilder, AipActions.get(parentAipId, parentAipState, permissions))
       .createListAndSearchPanel(representationListBuilder, RepresentationActions.get())
       .createListAndSearchPanel(fileListBuilder, FileActions.get());
 
     initWidget(uiBinder.createAndBindUi(this));
-
-    // searchWrapper.setDropdownLabel(messages.searchListBoxItems());
-    // searchWrapper.addDropdownItem(messages.searchListBoxItems(),
-    // RodaConstants.SEARCH_ITEMS);
-    // searchWrapper.addDropdownItem(messages.searchListBoxRepresentations(),
-    // RodaConstants.SEARCH_REPRESENTATIONS);
-    // searchWrapper.addDropdownItem(messages.searchListBoxFiles(),
-    // RodaConstants.SEARCH_FILES);
-    // searchWrapper.addDropdownPopupStyleName("searchInputListBoxPopup");
-  }
-
-  // TODO this is used in appraisal, but it should be using actionable
-  @Deprecated
-  public SelectedItems<? extends IsIndexed> getSelected() {
-    return searchWrapper.getSelectedItemsInCurrentList();
   }
 
   public void refresh() {

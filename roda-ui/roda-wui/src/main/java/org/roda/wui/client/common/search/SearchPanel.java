@@ -352,9 +352,9 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
         Widget widget = actionableBuilder.buildListWithObjects(new ActionableObject<T>(list.getClassToReturn()),
           Collections.singletonList(action));
 
-        // CSS de single action
+        // add single action CSS
 
-        // inserir antes do actionsbutton
+        // insert this button before actionsbutton
         searchPanelRight.insert(widget, searchPanelRight.getWidgetIndex(actionsButton));
         updateRightButtonsCss();
       } else {

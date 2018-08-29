@@ -50,7 +50,7 @@ public class AIPList extends AsyncTableCell<IndexedAIP> {
 
   private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_LEVEL,
     RodaConstants.AIP_TITLE, RodaConstants.AIP_DATE_INITIAL, RodaConstants.AIP_DATE_FINAL,
-    RodaConstants.AIP_HAS_REPRESENTATIONS);
+    RodaConstants.AIP_HAS_REPRESENTATIONS, RodaConstants.AIP_STATE);
 
   @Override
   protected void adjustOptions(AsyncTableCellOptions<IndexedAIP> options) {
