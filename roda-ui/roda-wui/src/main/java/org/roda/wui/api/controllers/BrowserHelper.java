@@ -508,7 +508,8 @@ public class BrowserHelper {
         }
       }
 
-      ret = new DescriptiveMetadataEditBundle(descriptiveMetadataId, type, version, xml, template, values, similar, aip.getPermissions());
+      ret = new DescriptiveMetadataEditBundle(descriptiveMetadataId, type, version, xml, template, values, similar,
+        aip.getPermissions());
     } catch (IOException e) {
       throw new GenericException("Error getting descriptive metadata edit bundle: " + e.getMessage());
     } finally {
@@ -2515,14 +2516,13 @@ public class BrowserHelper {
     }
   }
 
-  public static IndexedFile renameFolder(User user, String folderUUID, String newName, String details)
+  public static IndexedFile renameFolder(User user, IndexedFile ifolder, String newName, String details)
     throws GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException,
     AuthorizationDeniedException {
     String eventDescription = "The process of updating an object of the repository.";
 
     ModelService model = RodaCoreFactory.getModelService();
     IndexService index = RodaCoreFactory.getIndexService();
-    IndexedFile ifolder = index.retrieve(IndexedFile.class, folderUUID, RodaConstants.FILE_FIELDS_TO_RETURN);
     String oldName = ifolder.getId();
 
     try {
@@ -2581,16 +2581,14 @@ public class BrowserHelper {
       "Could not execute move transferred resources action");
   }
 
-  public static IndexedFile createFolder(User user, String aipId, String representationId, String folderUUID,
-    String newName, String details) throws GenericException, RequestNotValidException, AlreadyExistsException,
-    NotFoundException, AuthorizationDeniedException {
+  public static IndexedFile createFolder(User user, IndexedRepresentation irep, String folderUUID, String newName,
+    String details) throws GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException,
+    AuthorizationDeniedException {
     String eventDescription = "The process of creating an object of the repository.";
 
     ModelService model = RodaCoreFactory.getModelService();
     IndexService index = RodaCoreFactory.getIndexService();
     File newFolder;
-    IndexedRepresentation irep = index.retrieve(IndexedRepresentation.class,
-      IdUtils.getRepresentationId(aipId, representationId), RodaConstants.REPRESENTATION_FIELDS_TO_RETURN);
 
     try {
       if (folderUUID != null) {
@@ -2602,15 +2600,15 @@ public class BrowserHelper {
       }
 
       String outcomeText = "The folder '" + newName + "' has been manually created.";
-      model.createUpdateAIPEvent(aipId, irep.getId(), null, null, PreservationEventType.CREATION, eventDescription,
-        PluginState.SUCCESS, outcomeText, details, user.getName(), true);
+      model.createUpdateAIPEvent(irep.getAipId(), irep.getId(), null, null, PreservationEventType.CREATION,
+        eventDescription, PluginState.SUCCESS, outcomeText, details, user.getName(), true);
 
       index.commit(IndexedFile.class);
       return index.retrieve(IndexedFile.class, IdUtils.getFileId(newFolder), new ArrayList<>());
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       String outcomeText = "The folder '" + newName + "' has not been manually created.";
-      model.createUpdateAIPEvent(aipId, irep.getId(), null, null, PreservationEventType.CREATION, eventDescription,
-        PluginState.FAILURE, outcomeText, details, user.getName(), true);
+      model.createUpdateAIPEvent(irep.getAipId(), irep.getId(), null, null, PreservationEventType.CREATION,
+        eventDescription, PluginState.FAILURE, outcomeText, details, user.getName(), true);
 
       throw e;
     }

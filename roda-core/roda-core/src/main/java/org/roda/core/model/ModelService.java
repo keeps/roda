@@ -2292,8 +2292,7 @@ public class ModelService extends ModelObservable {
     String json = JsonUtils.getJsonFromObject(dip);
     DefaultStoragePath metadataStoragePath = DefaultStoragePath.parse(storagePath,
       RodaConstants.STORAGE_DIP_METADATA_FILENAME);
-    boolean asReference = false;
-    storage.createBinary(metadataStoragePath, new StringContentPayload(json), asReference);
+    storage.createBinary(metadataStoragePath, new StringContentPayload(json), false);
   }
 
   private void updateDIPMetadata(DIP dip, StoragePath storagePath)

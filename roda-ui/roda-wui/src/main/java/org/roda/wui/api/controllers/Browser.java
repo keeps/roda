@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import javax.ws.rs.core.MultivaluedMap;
-import javax.xml.transform.TransformerException;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.ConsumesOutputStream;
@@ -51,7 +50,6 @@ import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -498,45 +496,6 @@ public class Browser extends RodaWuiController {
    * ---------------------------------------------------------------------------
    */
 
-  /**
-   * @param user
-   *          The user
-   * @param selected
-   *          The filter to select the AIPs to export
-   * @param acceptFormat
-   *          The output format
-   * @return
-   * @throws GenericException
-   * @throws AuthorizationDeniedException
-   * @throws NotFoundException
-   * @throws RequestNotValidException
-   * @throws IOException
-   */
-  public static StreamResponse exportAIP(User user, SelectedItems<IndexedAIP> selected, String acceptFormat)
-    throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // validate input
-    BrowserHelper.validateExportAIPParams(acceptFormat);
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-    controllerAssistant.checkObjectPermissions(user, selected);
-
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
-
-    try {
-      // delegate
-      return BrowserHelper.retrieveAIPs(selected, acceptFormat);
-    } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
-      throw e;
-    } finally {
-      // register action
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_ITEMS_PARAM, selected);
-    }
-  }
-
   public static EntityResponse retrieveAIPRepresentation(User user, String aipId, String representationId,
     String acceptFormat)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
@@ -682,8 +641,8 @@ public class Browser extends RodaWuiController {
   }
 
   public static EntityResponse retrieveAIPDescriptiveMetadata(User user, String aipId, String metadataId,
-    String acceptFormat, String language) throws AuthorizationDeniedException, GenericException,
-    NotFoundException, RequestNotValidException {
+    String acceptFormat, String language)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // validate input
@@ -2503,8 +2462,12 @@ public class Browser extends RodaWuiController {
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
     try {
+      IndexedFile folder = RodaCoreFactory.getIndexService().retrieve(IndexedFile.class, folderUUID,
+        RodaConstants.FILE_FIELDS_TO_RETURN);
+      controllerAssistant.checkObjectPermissions(user, folder);
+
       // delegate
-      return BrowserHelper.renameFolder(user, folderUUID, newName, details);
+      return BrowserHelper.renameFolder(user, folder, newName, details);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;
@@ -2522,6 +2485,8 @@ public class Browser extends RodaWuiController {
 
     // check user permissions
     controllerAssistant.checkRoles(user);
+    controllerAssistant.checkObjectPermissions(user, selectedFiles);
+    controllerAssistant.checkObjectPermissions(user, toFolder);
 
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
@@ -2550,8 +2515,12 @@ public class Browser extends RodaWuiController {
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
     try {
+      IndexedRepresentation irep = RodaCoreFactory.getIndexService().retrieve(IndexedRepresentation.class,
+        IdUtils.getRepresentationId(aipId, representationId), RodaConstants.REPRESENTATION_FIELDS_TO_RETURN);
+      controllerAssistant.checkObjectPermissions(user, irep);
+
       // delegate
-      return BrowserHelper.createFolder(user, aipId, representationId, folderUUID, newName, details);
+      return BrowserHelper.createFolder(user, irep, folderUUID, newName, details);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;
@@ -2759,52 +2728,13 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static DIP createDIP(User user, DIP dip) throws GenericException, AuthorizationDeniedException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
-
-    try {
-      return BrowserHelper.createDIP(dip);
-    } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
-      throw e;
-    } finally {
-      // register action
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_DIP_PARAM, dip);
-    }
-  }
-
-  public static DIP updateDIP(User user, DIP dip)
-    throws AuthorizationDeniedException, GenericException, NotFoundException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
-
-    try {
-      // delegate
-      return BrowserHelper.updateDIP(dip);
-    } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
-      throw e;
-    } finally {
-      // register action
-      controllerAssistant.registerAction(user, dip.getId(), state, RodaConstants.CONTROLLER_DIP_PARAM, dip);
-    }
-  }
-
   public static void deleteDIPs(User user, SelectedItems<IndexedDIP> dips)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
     controllerAssistant.checkRoles(user);
+    controllerAssistant.checkObjectPermissions(user, dips);
 
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
@@ -2889,6 +2819,10 @@ public class Browser extends RodaWuiController {
     Path file = Files.createTempFile("descriptive", ".tmp");
 
     try {
+      IndexedDIP dip = RodaCoreFactory.getIndexService().retrieve(IndexedDIP.class, dipId,
+        RodaConstants.DIP_PERMISSIONS_FIELDS_TO_RETURN);
+      controllerAssistant.checkObjectPermissions(user, dip);
+
       Files.copy(is, file, StandardCopyOption.REPLACE_EXISTING);
       ContentPayload payload = new FSPathContentPayload(file);
 
@@ -2920,6 +2854,7 @@ public class Browser extends RodaWuiController {
     try {
       // delegate
       DIPFile dipFile = BrowserHelper.retrieve(DIPFile.class, parentUUID, RodaConstants.DIPFILE_FIELDS_TO_RETURN);
+      controllerAssistant.checkObjectPermissions(user, dipFile);
 
       Files.copy(is, file, StandardCopyOption.REPLACE_EXISTING);
       ContentPayload payload = new FSPathContentPayload(file);
@@ -2953,6 +2888,7 @@ public class Browser extends RodaWuiController {
     try {
       // delegate
       DIPFile dipFile = BrowserHelper.retrieve(DIPFile.class, fileUUID, RodaConstants.DIPFILE_FIELDS_TO_RETURN);
+      controllerAssistant.checkObjectPermissions(user, dipFile);
 
       Files.copy(is, file, StandardCopyOption.REPLACE_EXISTING);
       ContentPayload payload = new FSPathContentPayload(file);
@@ -2976,6 +2912,7 @@ public class Browser extends RodaWuiController {
 
     // check user permissions
     controllerAssistant.checkRoles(user);
+    controllerAssistant.checkObjectPermissions(user, files);
 
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
@@ -3048,6 +2985,7 @@ public class Browser extends RodaWuiController {
 
     // check user permissions
     controllerAssistant.checkRoles(user);
+    controllerAssistant.checkObjectPermissions(user, selected);
 
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
@@ -3069,6 +3007,7 @@ public class Browser extends RodaWuiController {
 
     // check user permissions
     controllerAssistant.checkRoles(user);
+    controllerAssistant.checkObjectPermissions(user, selected);
 
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
@@ -3090,6 +3029,7 @@ public class Browser extends RodaWuiController {
 
     // check user permissions
     controllerAssistant.checkRoles(user);
+    controllerAssistant.checkObjectPermissions(user, representation);
 
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 

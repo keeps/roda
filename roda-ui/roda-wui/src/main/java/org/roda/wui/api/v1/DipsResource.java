@@ -38,6 +38,7 @@ import org.roda.core.data.v2.ip.DIPs;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.Browser;
+import org.roda.wui.api.controllers.Dips;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.ExtraMediaType;
@@ -76,10 +77,9 @@ public class DipsResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    boolean justActive = false;
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
     IndexResult<IndexedDIP> result = Browser.find(IndexedDIP.class, Filter.NULL, Sorter.NONE,
-      new Sublist(pagingParams.getFirst(), pagingParams.getSecond()), null, user, justActive, new ArrayList<>());
+      new Sublist(pagingParams.getFirst(), pagingParams.getSecond()), null, user, false, new ArrayList<>());
 
     return Response.ok(ApiUtils.indexedResultToRODAObjectList(IndexedDIP.class, result), mediaType).build();
   }
@@ -125,7 +125,7 @@ public class DipsResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    DIP createdDip = Browser.createDIP(user, dip);
+    DIP createdDip = Dips.createDIP(user, dip);
     return Response.ok(createdDip, mediaType).build();
   }
 
@@ -143,7 +143,7 @@ public class DipsResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    DIP updatedDIP = Browser.updateDIP(user, dip);
+    DIP updatedDIP = Dips.updateDIP(user, dip);
     return Response.ok(updatedDIP, mediaType).build();
   }
 
