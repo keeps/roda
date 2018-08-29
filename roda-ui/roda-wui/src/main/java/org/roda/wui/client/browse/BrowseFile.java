@@ -133,7 +133,6 @@ public class BrowseFile extends Composite {
   private final BrowseFileBundle bundle;
   private SliderPanel disseminationsSlider;
 
-  @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
   @UiField
@@ -159,34 +158,35 @@ public class BrowseFile extends Composite {
     final boolean justActive = AIPState.ACTIVE.equals(bundle.getAip().getState());
 
     // initialize preview
-    filePreview = new IndexedFilePreview(viewers, bundle.getFile(), justActive, bundle.getAip().getPermissions(), new Command() {
+    filePreview = new IndexedFilePreview(viewers, bundle.getFile(), justActive, bundle.getAip().getPermissions(),
+      new Command() {
 
-      @Override
-      public void execute() {
-        Scheduler.get().scheduleDeferred(new Command() {
-          @Override
-          public void execute() {
-            Filter filter = new Filter(
-              new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, bundle.getFile().getUUID()));
-            BrowserService.Util.getInstance().count(IndexedDIP.class.getName(), filter, justActive,
-              new AsyncCallback<Long>() {
+        @Override
+        public void execute() {
+          Scheduler.get().scheduleDeferred(new Command() {
+            @Override
+            public void execute() {
+              Filter filter = new Filter(
+                new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, bundle.getFile().getUUID()));
+              BrowserService.Util.getInstance().count(IndexedDIP.class.getName(), filter, justActive,
+                new AsyncCallback<Long>() {
 
-                @Override
-                public void onFailure(Throwable caught) {
-                  AsyncCallbackUtils.defaultFailureTreatment(caught);
-                }
-
-                @Override
-                public void onSuccess(Long dipCount) {
-                  if (dipCount > 0) {
-                    disseminationsSlider.open();
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    AsyncCallbackUtils.defaultFailureTreatment(caught);
                   }
-                }
-              });
-          }
-        });
-      }
-    });
+
+                  @Override
+                  public void onSuccess(Long dipCount) {
+                    if (dipCount > 0) {
+                      disseminationsSlider.open();
+                    }
+                  }
+                });
+            }
+          });
+        }
+      });
 
     // initialize widget
     initWidget(uiBinder.createAndBindUi(this));

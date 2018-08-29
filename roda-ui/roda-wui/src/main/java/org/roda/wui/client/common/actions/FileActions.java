@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
@@ -27,7 +26,6 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
-import org.roda.wui.client.common.actions.Actionable.Action;
 import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
 import org.roda.wui.client.common.actions.callbacks.ActionLoadingAsyncCallback;
 import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
@@ -35,7 +33,6 @@ import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.SelectFileDialog;
-import org.roda.wui.client.common.utils.PermissionUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.planning.Planning;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
@@ -127,7 +124,8 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
   @Override
   public boolean canAct(Action<IndexedFile> action) {
-    return aipId != null && representationId != null && hasPermissions(action, permissions) && POSSIBLE_ACTIONS_WITH_REPRESENTATION.contains(action);
+    return aipId != null && representationId != null && hasPermissions(action, permissions)
+      && POSSIBLE_ACTIONS_WITH_REPRESENTATION.contains(action);
   }
 
   @Override
@@ -439,10 +437,8 @@ public class FileActions extends AbstractActionable<IndexedFile> {
       });
   }
 
-
   private void newProcess(IndexedFile file, final AsyncCallback<ActionImpact> callback) {
-    newProcess(new SelectedItemsList<>(Arrays.asList(file.getUUID()), IndexedFile.class.getName()),
-      callback);
+    newProcess(new SelectedItemsList<>(Arrays.asList(file.getUUID()), IndexedFile.class.getName()), callback);
   }
 
   private void newProcess(SelectedItems<IndexedFile> selected, final AsyncCallback<ActionImpact> callback) {
@@ -454,8 +450,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
   }
 
   private void identifyFormats(IndexedFile file, final AsyncCallback<ActionImpact> callback) {
-    identifyFormats(new SelectedItemsList<>(Arrays.asList(file.getUUID()), IndexedFile.class.getName()),
-      callback);
+    identifyFormats(new SelectedItemsList<>(Arrays.asList(file.getUUID()), IndexedFile.class.getName()), callback);
   }
 
   private void identifyFormats(SelectedItems<IndexedFile> selected, final AsyncCallback<ActionImpact> callback) {

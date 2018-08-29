@@ -39,7 +39,8 @@ public class IndexedFilePreview extends BitstreamPreview<IndexedFile> {
   private boolean justActive;
   private Permissions permissions;
 
-  public IndexedFilePreview(Viewers viewers, IndexedFile file, boolean justActive, Permissions permissions, Command onPreviewFailure) {
+  public IndexedFilePreview(Viewers viewers, IndexedFile file, boolean justActive, Permissions permissions,
+    Command onPreviewFailure) {
     super(viewers, RestUtils.createRepresentationFileDownloadUri(file.getUUID(), CONTENT_DISPOSITION_INLINE),
       file.getFileFormat(), file.getOriginalName() != null ? file.getOriginalName() : file.getId(), file.getSize(),
       file.isDirectory(), onPreviewFailure, file);
@@ -58,7 +59,8 @@ public class IndexedFilePreview extends BitstreamPreview<IndexedFile> {
     LastSelectedItemsSingleton.getInstance().setSelectedJustActive(justActive);
 
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(folderListBuilder,
-      FileActions.get(getObject().getAipId(), getObject().getRepresentationId(), permissions), messages.searchPlaceHolder());
+      FileActions.get(getObject().getAipId(), getObject().getRepresentationId(), permissions),
+      messages.searchPlaceHolder());
     return searchWrapper;
   }
 

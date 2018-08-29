@@ -25,7 +25,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.transform.TransformerException;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -245,31 +244,25 @@ public class AipsResource {
     @ApiParam(value = "Choose format in which to get the metadata", allowableValues = RodaConstants.API_GET_METADATA_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
     @ApiParam(value = "The language for the HTML output", allowableValues = RodaConstants.API_DESCRIPTIVE_METADATA_LANGUAGES, defaultValue = RodaConstants.API_QUERY_VALUE_LANG_DEFAULT) @DefaultValue(RodaConstants.API_QUERY_VALUE_LANG_DEFAULT) @QueryParam(RodaConstants.API_QUERY_KEY_LANG) String language)
     throws RODAException {
-    try {
-      String mediaType = ApiUtils.getMediaType(acceptFormat, request);
+    String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
-      // get user
-      User user = UserUtility.getApiUser(request);
+    // get user
+    User user = UserUtility.getApiUser(request);
 
-      // delegate action to controller
-      EntityResponse aipDescriptiveMetadata;
-      if (versionId == null) {
-        aipDescriptiveMetadata = Browser.retrieveAIPDescriptiveMetadata(user, aipId, metadataId, acceptFormat,
-          language);
-      } else {
-        aipDescriptiveMetadata = Browser.retrieveAIPDescriptiveMetadataVersion(user, aipId, metadataId, versionId,
-          acceptFormat, language);
-      }
+    // delegate action to controller
+    EntityResponse aipDescriptiveMetadata;
+    if (versionId == null) {
+      aipDescriptiveMetadata = Browser.retrieveAIPDescriptiveMetadata(user, aipId, metadataId, acceptFormat, language);
+    } else {
+      aipDescriptiveMetadata = Browser.retrieveAIPDescriptiveMetadataVersion(user, aipId, metadataId, versionId,
+        acceptFormat, language);
+    }
 
-      if (aipDescriptiveMetadata instanceof ObjectResponse) {
-        ObjectResponse<DescriptiveMetadata> dm = (ObjectResponse<DescriptiveMetadata>) aipDescriptiveMetadata;
-        return Response.ok(dm.getObject(), mediaType).build();
-      } else {
-        return ApiUtils.okResponse((StreamResponse) aipDescriptiveMetadata);
-      }
-
-    } catch (TransformerException e) {
-      return ApiUtils.errorResponse(e);
+    if (aipDescriptiveMetadata instanceof ObjectResponse) {
+      ObjectResponse<DescriptiveMetadata> dm = (ObjectResponse<DescriptiveMetadata>) aipDescriptiveMetadata;
+      return Response.ok(dm.getObject(), mediaType).build();
+    } else {
+      return ApiUtils.okResponse((StreamResponse) aipDescriptiveMetadata);
     }
   }
 

@@ -77,7 +77,7 @@ public class UserUtility {
   public static User getUser(final HttpServletRequest request, final boolean returnGuestIfNoUserInSession) {
     User user = (User) request.getSession().getAttribute(RODA_USER);
     if (user == null) {
-      if(returnGuestIfNoUserInSession){
+      if (returnGuestIfNoUserInSession) {
         user = getGuest(request.getRemoteAddr());
         request.getSession().setAttribute(RODA_USER, user);
       }
@@ -152,6 +152,70 @@ public class UserUtility {
         user.getName(), configKey);
       throw new AuthorizationDeniedException(
         "Unable to determine which roles the user needs because the config. key '" + configKey + "' is not defined");
+    }
+  }
+
+  public static <T extends IsIndexed> void checkObjectPermissions(final User user, T obj,
+    final Class<?> invokingMethodInnerClass, final Class<?> classToReturn) throws AuthorizationDeniedException {
+    final Method method = invokingMethodInnerClass.getEnclosingMethod();
+    final String classParam = (classToReturn == null) ? "" : "(" + classToReturn.getSimpleName() + ")";
+    final String configKey = String.format("core.permissions.%s.%s%s", method.getDeclaringClass().getName(),
+      method.getName(), classParam);
+
+    if (RodaCoreFactory.getRodaConfiguration().containsKey(configKey)) {
+      LOGGER.trace("Testing if user '{}' has permissions to '{}'", user.getName(), configKey);
+      String configValue = RodaCoreFactory.getRodaConfigurationAsString(configKey);
+
+      try {
+        PermissionType permissionType = PermissionType.valueOf(configValue);
+        checkObjectPermissions(user, obj, permissionType);
+      } catch (IllegalArgumentException e) {
+        LOGGER.error(
+          "Unable to determine which permissions the user '{}' needs because the config value '{}' is not a permission type",
+          user.getName(), configValue);
+        throw new AuthorizationDeniedException(
+          "Unable to determine which permissions the user needs because the config value '" + configValue
+            + "' is not a permission type");
+      }
+    } else {
+      LOGGER.error(
+        "Unable to determine which permissions the user '{}' needs because the config key '{}' is not defined",
+        user.getName(), configKey);
+      throw new AuthorizationDeniedException(
+        "Unable to determine which permissions the user needs because the config key '" + configKey
+          + "' is not defined");
+    }
+  }
+
+  public static <T extends IsIndexed> void checkObjectPermissions(final User user, SelectedItems<T> objs,
+    final Class<?> invokingMethodInnerClass, final Class<?> classToReturn)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
+    final Method method = invokingMethodInnerClass.getEnclosingMethod();
+    final String classParam = (classToReturn == null) ? "" : "(" + classToReturn.getSimpleName() + ")";
+    final String configKey = String.format("core.permissions.%s.%s%s", method.getDeclaringClass().getName(),
+      method.getName(), classParam);
+    if (RodaCoreFactory.getRodaConfiguration().containsKey(configKey)) {
+      LOGGER.trace("Testing if user '{}' has permissions to '{}'", user.getName(), configKey);
+      String configValue = RodaCoreFactory.getRodaConfigurationAsString(configKey);
+
+      try {
+        PermissionType permissionType = PermissionType.valueOf(configValue);
+        checkObjectPermissions(user, objs, permissionType);
+      } catch (IllegalArgumentException e) {
+        LOGGER.error(
+          "Unable to determine which permissions the user '{}' needs because the config value '{}' is not a permission type",
+          user.getName(), configValue);
+        throw new AuthorizationDeniedException(
+          "Unable to determine which permissions the user needs because the config value '" + configValue
+            + "' is not a permission type");
+      }
+    } else {
+      LOGGER.error(
+        "Unable to determine which permissions the user '{}' needs because the config. key '{}' is not defined",
+        user.getName(), configKey);
+      throw new AuthorizationDeniedException(
+        "Unable to determine which permissions the user needs because the config. key '" + configKey
+          + "' is not defined");
     }
   }
 
