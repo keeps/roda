@@ -26,6 +26,7 @@ import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
+import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
@@ -64,14 +65,51 @@ public abstract class AbstractAIPComponentsPlugin<T extends IsRODAObject> extend
     }, index, model, storage, liteList);
   }
 
-  protected abstract Report executeOnAIP(IndexService index, ModelService model, StorageService storage, Report report,
-    JobPluginInfo jobPluginInfo, List<AIP> list, Job job) throws PluginException;
+  @Deprecated
+  protected Report executeOnAIP(IndexService index, ModelService model, StorageService storage, Report report,
+    SimpleJobPluginInfo jobPluginInfo, List<AIP> list, Job job) throws PluginException {
+    // XXX define this method as abstract when removing the deprecated legacy
+    // method
+    throw new PluginException("Deprecated method");
+  }
 
-  protected abstract Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage,
-    Report report, JobPluginInfo jobPluginInfo, List<Representation> list, Job job) throws PluginException;
+  @Deprecated
+  protected Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage,
+    Report report, SimpleJobPluginInfo jobPluginInfo, List<Representation> list, Job job) throws PluginException {
+    // XXX define this method as abstract when removing the deprecated legacy
+    // method
+    throw new PluginException("Deprecated method");
+  }
 
-  protected abstract Report executeOnFile(IndexService index, ModelService model, StorageService storage, Report report,
-    JobPluginInfo jobPluginInfo, List<File> list, Job job) throws PluginException;
+  @Deprecated
+  protected Report executeOnFile(IndexService index, ModelService model, StorageService storage, Report report,
+    SimpleJobPluginInfo jobPluginInfo, List<File> list, Job job) throws PluginException {
+    // XXX define this method as abstract when removing the deprecated legacy
+    // method
+    throw new PluginException("Deprecated method");
+  }
+
+  protected Report executeOnAIP(IndexService index, ModelService model, StorageService storage, Report report,
+    JobPluginInfo jobPluginInfo, List<AIP> list, Job job) throws PluginException {
+    // XXX define this method as abstract when removing the corresponding
+    // deprecated legacy method
+
+    return executeOnAIP(index, model, storage, report, (SimpleJobPluginInfo) jobPluginInfo, list, job);
+  }
+
+  protected Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage,
+    Report report, JobPluginInfo jobPluginInfo, List<Representation> list, Job job) throws PluginException {
+    // XXX define this method as abstract when removing the corresponding
+    // deprecated legacy method
+    return executeOnRepresentation(index, model, storage, report, (JobPluginInfo) jobPluginInfo, list, job);
+  }
+
+  protected Report executeOnFile(IndexService index, ModelService model, StorageService storage, Report report,
+    JobPluginInfo jobPluginInfo, List<File> list, Job job) throws PluginException {
+    // XXX define this method as abstract when removing the corresponding
+    // deprecated legacy method
+    return executeOnFile(index, model, storage, report, (JobPluginInfo) jobPluginInfo, list, job);
+  }
 
   protected Report executeOnIncidence(IndexService index, ModelService model, StorageService storage, Report report,
     JobPluginInfo jobPluginInfo, List<RiskIncidence> list, Job job) throws PluginException {
