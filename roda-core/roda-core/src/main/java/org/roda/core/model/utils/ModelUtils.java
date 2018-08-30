@@ -10,18 +10,14 @@ package org.roda.core.model.utils;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.time.Instant;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.RodaUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.tools.ZipEntryInfo;
 import org.roda.core.data.common.RodaConstants;
@@ -60,7 +56,6 @@ import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.index.IndexService;
-import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.storage.Binary;
@@ -350,9 +345,13 @@ public final class ModelUtils {
     String container = path.getContainerName();
     List<String> directoryPath = path.getDirectoryPath();
 
-    if (container.equals(RodaConstants.STORAGE_CONTAINER_AIP) && directoryPath.size() > 2
+    if (container.equals(RodaConstants.STORAGE_CONTAINER_AIP) && directoryPath.size() > 1
       && directoryPath.get(1).equals(RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS)) {
-      return Optional.of(directoryPath.get(2));
+      if (directoryPath.size() > 2) {
+        return Optional.of(directoryPath.get(2));
+      } else {
+        return Optional.of(path.getName());
+      }
     }
 
     return Optional.empty();
@@ -437,10 +436,14 @@ public final class ModelUtils {
     String container = path.getContainerName();
     List<String> directoryPath = path.getDirectoryPath();
 
-    if (container.equals(RodaConstants.STORAGE_CONTAINER_AIP) && directoryPath.size() > 3
+    if (container.equals(RodaConstants.STORAGE_CONTAINER_AIP) && directoryPath.size() > 2
       && directoryPath.get(1).equals(RodaConstants.STORAGE_DIRECTORY_METADATA)
       && directoryPath.get(2).equals(RodaConstants.STORAGE_DIRECTORY_OTHER)) {
-      return Optional.of(directoryPath.get(3));
+      if (directoryPath.size() > 3) {
+        return Optional.of(directoryPath.get(3));
+      } else {
+        return Optional.of(path.getName());
+      }
     }
 
     return Optional.empty();
@@ -467,11 +470,15 @@ public final class ModelUtils {
     String container = path.getContainerName();
     List<String> directoryPath = path.getDirectoryPath();
 
-    if (container.equals(RodaConstants.STORAGE_CONTAINER_AIP) && directoryPath.size() > 5
+    if (container.equals(RodaConstants.STORAGE_CONTAINER_AIP) && directoryPath.size() > 4
       && directoryPath.get(1).equals(RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS)
       && directoryPath.get(3).equals(RodaConstants.STORAGE_DIRECTORY_METADATA)
       && directoryPath.get(4).equals(RodaConstants.STORAGE_DIRECTORY_OTHER)) {
-      return Optional.of(directoryPath.get(5));
+      if (directoryPath.size() > 5) {
+        return Optional.of(directoryPath.get(5));
+      } else {
+        return Optional.of(path.getName());
+      }
     }
 
     return Optional.empty();

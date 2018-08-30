@@ -44,6 +44,7 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.select.SelectedItemsAll;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
@@ -346,6 +347,107 @@ public class InternalPluginsTest {
     parameters.put(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS, FAKE_REPORTING_CLASS);
     Job job = TestsHelper.executeJob(SiegfriedPlugin.class, parameters, PluginType.AIP_TO_AIP,
       SelectedItemsList.create(AIP.class, aip.getId()));
+    TestsHelper.getJobReports(index, job, true);
+
+    aip = model.retrieveAIP(aip.getId());
+
+    // Files with Siegfried output
+    AssertJUnit.assertEquals(CORPORA_FILES_COUNT,
+      Iterables.size(model.listOtherMetadata(aip.getId(), RodaConstants.OTHER_METADATA_TYPE_SIEGFRIED, true)));
+
+    Binary om = model.retrieveOtherMetadataBinary(aip.getId(), aip.getRepresentations().get(0).getId(),
+      Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT, SiegfriedPlugin.FILE_SUFFIX,
+      RodaConstants.OTHER_METADATA_TYPE_SIEGFRIED);
+
+    AssertJUnit.assertNotNull(om);
+
+    Binary fpo_bin = model.retrievePreservationFile(aip.getId(), aip.getRepresentations().get(0).getId(),
+      Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT);
+
+    gov.loc.premis.v3.File fpo = PremisV3Utils.binaryToFile(fpo_bin.getContent(), true);
+
+    FormatComplexType format = fpo.getObjectCharacteristicsArray(0).getFormatArray(0);
+    AssertJUnit.assertEquals("Plain Text File", format.getFormatDesignation().getFormatName().getStringValue());
+    FormatRegistryComplexType pronomRegistry = PremisV3Utils.getFormatRegistry(fpo,
+      RodaConstants.PRESERVATION_REGISTRY_PRONOM);
+    AssertJUnit.assertEquals(RodaConstants.PRESERVATION_REGISTRY_PRONOM,
+      pronomRegistry.getFormatRegistryName().getStringValue());
+    AssertJUnit.assertEquals("x-fmt/111", pronomRegistry.getFormatRegistryKey().getStringValue());
+
+    FormatRegistryComplexType mimeRegistry = PremisV3Utils.getFormatRegistry(fpo,
+      RodaConstants.PRESERVATION_REGISTRY_MIME);
+    String mimetype = "text/plain";
+    AssertJUnit.assertEquals(mimetype, mimeRegistry.getFormatRegistryKey().getStringValue());
+
+    index.commitAIPs();
+
+    IndexedFile indFile = index.retrieve(IndexedFile.class, IdUtils.getFileId(aip.getId(),
+      aip.getRepresentations().get(0).getId(), Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT), new ArrayList<>());
+
+    AssertJUnit.assertEquals(mimetype, indFile.getFileFormat().getMimeType());
+    AssertJUnit.assertEquals("x-fmt/111", indFile.getFileFormat().getPronom());
+    AssertJUnit.assertEquals("Plain Text File", indFile.getFileFormat().getFormatDesignationName());
+
+    List<String> suggest = index.suggest(IndexedFile.class, RodaConstants.FILE_FORMAT_MIMETYPE,
+      mimetype.substring(0, 1), null, false, false);
+    MatcherAssert.assertThat(suggest, Matchers.contains(mimetype));
+
+    Plugin<? extends IsRODAObject> plugin = RodaCoreFactory.getPluginManager()
+      .getPlugin(SiegfriedPlugin.class.getName());
+    String agentID = PluginHelper.getPluginAgentId(plugin);
+
+    boolean found = false;
+
+    try (CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationMetadataList = model
+      .listPreservationMetadata(aip.getId(), true)) {
+      for (OptionalWithCause<PreservationMetadata> opm : preservationMetadataList) {
+        if (opm.isPresent()) {
+          PreservationMetadata pm = opm.get();
+          if (pm.getType().equals(PreservationMetadataType.EVENT)) {
+            EventComplexType event = PremisV3Utils
+              .binaryToEvent(model.retrievePreservationEvent(pm.getAipId(), pm.getRepresentationId(),
+                pm.getFileDirectoryPath(), pm.getFileId(), pm.getId()).getContent().createInputStream());
+            if (event.getLinkingAgentIdentifierArray() != null && event.getLinkingAgentIdentifierArray().length > 0) {
+              for (LinkingAgentIdentifierComplexType laict : event.getLinkingAgentIdentifierArray()) {
+                if (laict.getLinkingAgentIdentifierValue() != null
+                  && laict.getLinkingAgentIdentifierValue().equalsIgnoreCase(agentID)) {
+                  found = true;
+                  break;
+                }
+              }
+              if (found) {
+                break;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    AssertJUnit.assertTrue(found);
+
+    Filter filter = new Filter();
+    filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_TYPE,
+      PreservationEventType.FORMAT_IDENTIFICATION.toString()));
+    filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, aip.getId()));
+    IndexResult<IndexedPreservationEvent> events = index.find(IndexedPreservationEvent.class, filter, null,
+      new Sublist(0, 10), new ArrayList<>());
+    AssertJUnit.assertEquals(1, events.getTotalCount());
+  }
+
+  @Test
+  public void testSiegfriedUsingRepresentation() throws RODAException, IOException, XmlException {
+    AIP aip = ingestCorpora();
+
+    // ensure PREMIS objects are created
+    TestsHelper.executeJob(PremisSkeletonPlugin.class, PluginType.AIP_TO_AIP,
+      SelectedItemsList.create(AIP.class, aip.getId()));
+
+    // run siegfried
+    Map<String, String> parameters = new HashMap<>();
+    parameters.put(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS, FAKE_REPORTING_CLASS);
+    Job job = TestsHelper.executeJob(SiegfriedPlugin.class, parameters, PluginType.AIP_TO_AIP,
+      SelectedItemsAll.create(org.roda.core.data.v2.ip.Representation.class));
     TestsHelper.getJobReports(index, job, true);
 
     aip = model.retrieveAIP(aip.getId());
