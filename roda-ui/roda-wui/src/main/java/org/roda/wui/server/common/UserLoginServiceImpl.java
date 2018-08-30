@@ -35,8 +35,6 @@ public class UserLoginServiceImpl extends RemoteServiceServlet implements UserLo
   private static final long serialVersionUID = -6898933466651262033L;
   @SuppressWarnings("unused")
   private static final String LOG_ACTION_WUI_LOGIN = "RODAWUI.login";
-  private static final String WUI_LOGIN_CACHE = "WUI_LOGIN_CACHE";
-  private static final List<String> WUI_LOGIN_CACHE_PREFIXES = Arrays.asList("ui.menu.", "ui.role.");
   private static Logger logger = LoggerFactory.getLogger(UserLoginServiceImpl.class);
 
   public static UserLoginServiceImpl getInstance() {
@@ -44,7 +42,7 @@ public class UserLoginServiceImpl extends RemoteServiceServlet implements UserLo
   }
 
   @Override
-  public User getAuthenticatedUser() throws RODAException {
+  public User getAuthenticatedUser() {
     User user = UserUtility.getUser(this.getThreadLocalRequest());
     logger.debug("Serving user {}", user);
     return user;
@@ -56,10 +54,4 @@ public class UserLoginServiceImpl extends RemoteServiceServlet implements UserLo
     logger.debug("Logged user {}", user);
     return user;
   }
-
-  @Override
-  public Map<String, String> getRodaProperties() {
-    return RodaCoreFactory.getPropertiesFromCache(WUI_LOGIN_CACHE, WUI_LOGIN_CACHE_PREFIXES);
-  }
-
 }

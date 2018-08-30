@@ -25,6 +25,7 @@ import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.regexp.shared.RegExp;
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
@@ -96,7 +97,7 @@ public class Dialogs {
 
   public static void showInformationDialog(String title, final String message, String continueButtonText,
     boolean canCopyMessage) {
-    showInformationDialog(title, message, continueButtonText, canCopyMessage, new NoAsyncCallback<Void>());
+    showInformationDialog(title, message, continueButtonText, canCopyMessage, new NoAsyncCallback<>());
   }
 
   public static void showInformationDialog(String title, final String message, String continueButtonText,
@@ -117,10 +118,46 @@ public class Dialogs {
           Toast.showInfo(messages.copiedToClipboardTitle(), messages.copiedToClipboardMessage());
         }
       });
-
     } else {
       messageLabel = new HTML(message);
     }
+
+    layout.add(messageLabel);
+
+    Button continueButton = new Button(continueButtonText);
+    layout.add(continueButton);
+
+    dialogBox.setWidget(layout);
+
+    dialogBox.setGlassEnabled(true);
+    dialogBox.setAnimationEnabled(false);
+
+    continueButton.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        dialogBox.hide();
+        callback.onSuccess(null);
+      }
+
+    });
+
+    dialogBox.addStyleName("wui-dialog-information");
+    layout.addStyleName("wui-dialog-layout");
+    messageLabel.addStyleName("wui-dialog-message");
+    continueButton.addStyleName("btn btn-play");
+
+    dialogBox.center();
+    dialogBox.show();
+  }
+
+  public static void showInformationDialog(String title, final SafeHtml message, String continueButtonText,
+    final AsyncCallback<Void> callback) {
+    final DialogBox dialogBox = new DialogBox(false, true);
+    dialogBox.setText(title);
+
+    FlowPanel layout = new FlowPanel();
+    HTML messageLabel = new HTML(message);
 
     layout.add(messageLabel);
 

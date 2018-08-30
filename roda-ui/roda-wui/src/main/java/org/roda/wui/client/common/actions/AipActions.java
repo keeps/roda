@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
@@ -38,6 +37,7 @@ import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.RepresentationDialogs;
 import org.roda.wui.client.common.dialogs.SelectAipDialog;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.ingest.process.ShowJob;
@@ -302,7 +302,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
                           @Override
                           public void onFailure(Throwable caught) {
-                            super.onFailure(new RODAException(messages.moveNoSuchObject(caught.getMessage()), caught));
+                            AsyncCallbackUtils.defaultFailureTreatment(caught);
                           }
                         });
                     }
@@ -387,8 +387,9 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
                               @Override
                               public void onFailureImpl(Throwable caught) {
-                                callback
-                                  .onFailure(new RODAException(messages.moveNoSuchObject(caught.getMessage()), caught));
+                                AsyncCallbackUtils.defaultFailureTreatment(caught);
+                                // AsyncCallbackUtils.defaultFailureTreatment(new
+                                // RODAException(messages.moveNoSuchObject(caught.getMessage()), caught));
                               }
                             });
                         }
@@ -564,10 +565,8 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   }
 
   private void appraisalAccept(final SelectedItems<IndexedAIP> aips, final AsyncCallback<ActionImpact> callback) {
-    final boolean accept = true;
-    String rejectReason = null;
-    BrowserService.Util.getInstance().appraisal(aips, accept, rejectReason,
-      LocaleInfo.getCurrentLocale().getLocaleName(), new ActionLoadingAsyncCallback<Void>(callback) {
+    BrowserService.Util.getInstance().appraisal(aips, true, null, LocaleInfo.getCurrentLocale().getLocaleName(),
+      new ActionLoadingAsyncCallback<Void>(callback) {
 
         @Override
         public void onSuccessImpl(Void result) {
@@ -578,15 +577,13 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   }
 
   private void appraisalReject(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
-    final boolean accept = false;
     Dialogs.showPromptDialog(messages.rejectMessage(), messages.rejectQuestion(), null, null, RegExp.compile(".+"),
       messages.dialogCancel(), messages.dialogOk(), true, false, new ActionNoAsyncCallback<String>(callback) {
 
         @Override
         public void onSuccess(final String rejectReason) {
-          BrowserService.Util.getInstance().appraisal(objectToSelectedItems(aip, IndexedAIP.class), accept,
-            rejectReason, LocaleInfo.getCurrentLocale().getLocaleName(),
-            new ActionLoadingAsyncCallback<Void>(callback) {
+          BrowserService.Util.getInstance().appraisal(objectToSelectedItems(aip, IndexedAIP.class), false, rejectReason,
+            LocaleInfo.getCurrentLocale().getLocaleName(), new ActionLoadingAsyncCallback<Void>(callback) {
 
               @Override
               public void onSuccessImpl(Void result) {
@@ -600,13 +597,12 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   }
 
   private void appraisalReject(final SelectedItems<IndexedAIP> aips, final AsyncCallback<ActionImpact> callback) {
-    final boolean accept = false;
     Dialogs.showPromptDialog(messages.rejectMessage(), messages.rejectQuestion(), null, null, RegExp.compile(".+"),
       messages.dialogCancel(), messages.dialogOk(), true, false, new ActionNoAsyncCallback<String>(callback) {
 
         @Override
         public void onSuccess(final String rejectReason) {
-          BrowserService.Util.getInstance().appraisal(aips, accept, rejectReason,
+          BrowserService.Util.getInstance().appraisal(aips, false, rejectReason,
             LocaleInfo.getCurrentLocale().getLocaleName(), new ActionLoadingAsyncCallback<Void>(callback) {
 
               @Override
@@ -622,7 +618,6 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
   private void downloadDocumentation(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
     BrowserService.Util.getInstance().hasDocumentation(aip.getId(), new ActionAsyncCallback<Boolean>(callback) {
-
       @Override
       public void onSuccess(Boolean result) {
         if (result) {

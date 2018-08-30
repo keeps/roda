@@ -81,18 +81,18 @@ public class Menu extends Composite {
   @UiField
   AcessibleMenuBar rightMenu;
 
-  private final MenuItem about;
+  private MenuItem about;
 
   private MenuItem disseminationBrowse;
   private MenuItem disseminationSearchBasic;
 
-  private final AcessibleMenuBar ingestMenu;
+  private AcessibleMenuBar ingestMenu;
   private MenuItem ingestPre;
   private MenuItem ingestTransfer;
   private MenuItem ingestList;
   private MenuItem ingestAppraisal;
 
-  private final AcessibleMenuBar administrationMenu;
+  private AcessibleMenuBar administrationMenu;
   private MenuItem administrationActions;
   private MenuItem administrationInternalActions;
   private MenuItem administrationUser;
@@ -101,7 +101,7 @@ public class Menu extends Composite {
   private MenuItem administrationStatistics;
   // private MenuItem administrationPreferences;
 
-  private final AcessibleMenuBar planningMenu;
+  private AcessibleMenuBar planningMenu;
   // private MenuItem planningMonitoring;
   private MenuItem planningRepresentationInformation;
   private MenuItem planningRisk;
@@ -109,9 +109,9 @@ public class Menu extends Composite {
   private MenuItem planningAgent;
   private MenuItem planningFormat;
 
-  private final MenuItem help;
-  private final AcessibleMenuBar userMenu;
-  private final AcessibleMenuBar languagesMenu;
+  private MenuItem help;
+  private AcessibleMenuBar userMenu;
+  private AcessibleMenuBar languagesMenu;
 
   // private final MenuBar settingsMenu;
 
@@ -124,7 +124,9 @@ public class Menu extends Composite {
    */
   public Menu() {
     initWidget(uiBinder.createAndBindUi(this));
+  }
 
+  public void init() {
     about = customMenuItem("fa fa-home", messages.title("about"), "menu-item-label", null,
       createCommand(Welcome.RESOLVER.getHistoryPath()));
 

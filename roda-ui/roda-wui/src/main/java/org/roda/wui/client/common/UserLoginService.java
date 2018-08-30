@@ -69,11 +69,5 @@ public interface UserLoginService extends RemoteService {
    */
   public User login(String username, String password) throws AuthenticationDeniedException, GenericException;
 
-  /**
-   * Get RODA properties
-   * 
-   * @return
-   */
-  public Map<String, String> getRodaProperties();
 
 }

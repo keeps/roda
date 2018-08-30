@@ -10,9 +10,7 @@ package org.roda.wui.client.ingest;
 import java.util.Arrays;
 import java.util.List;
 
-import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.ingest.preingest.PreIngest;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
@@ -23,7 +21,6 @@ import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -114,51 +111,4 @@ public class Ingest {
       }
     }
   }
-
-  /**
-   * Open new window to download RODA-in
-   * 
-   * @param targetUser
-   *          the user for which to download the RODA-in Installer, or null to
-   *          use the logged user
-   * 
-   * @param os
-   *          the target operative system, e.g. windows, linux or mac. Use null
-   *          to get a cross-platform installer
-   */
-  public static void downloadRodaIn(final User targetUser, final String os) {
-    UserLogin.getRodaProperty("roda.in.installer.url", new AsyncCallback<String>() {
-
-      @Override
-      public void onFailure(Throwable caught) {
-        AsyncCallbackUtils.defaultFailureTreatment(caught);
-      }
-
-      @Override
-      public void onSuccess(final String rodaInUrl) {
-        UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<User>() {
-
-          @Override
-          public void onFailure(Throwable caught) {
-            AsyncCallbackUtils.defaultFailureTreatment(caught);
-          }
-
-          @Override
-          public void onSuccess(User user) {
-            User target = targetUser == null ? user : targetUser;
-            String url = rodaInUrl.replaceAll("$USERNAME", user.getName()) + "/" + target.getName();
-            if (os != null) {
-              url += "?os=" + os;
-            }
-            Window.open(url, "_blank", "");
-          }
-
-        });
-
-      }
-
-    });
-
-  }
-
 }

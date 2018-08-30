@@ -11,18 +11,10 @@
 package org.roda.wui.client.common;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Queue;
-import java.util.Set;
 import java.util.Vector;
 
-import com.google.common.collect.Sets;
-import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.ip.HasPermissions;
-import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
@@ -33,6 +25,7 @@ import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.LoginStatusListener;
 import org.roda.wui.common.client.tools.CachedAsynRequest;
+import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.core.client.GWT;
@@ -54,62 +47,7 @@ public class UserLogin {
   private static final ClientLogger logger = new ClientLogger(UserLogin.class.getName());
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  private static UserLoginServiceAsync userLoginService;
   private static UserLogin instance = null;
-  private static Map<String, String> rodaProperties;
-  private static boolean initialized = false;
-  private static boolean initializing = false;
-  private static Queue<AsyncCallback<Map<String, String>>> initQueue = new LinkedList<>();
-
-  private static void init(final AsyncCallback<Map<String, String>> callback) {
-    initQueue.add(callback);
-
-    if (!initialized && !initializing) {
-      initializing = true;
-
-      userLoginService = UserLoginService.Util.getInstance();
-      userLoginService.getRodaProperties(new AsyncCallback<Map<String, String>>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          logger.fatal("Error getting role mapping", caught);
-          callback.onFailure(caught);
-        }
-
-        @Override
-        public void onSuccess(Map<String, String> properties) {
-          rodaProperties = properties;
-          initialized = true;
-          treatInitQueue();
-        }
-
-      });
-    } else if (initialized) {
-      treatInitQueue();
-    }
-  }
-
-  private static void treatInitQueue() {
-    while (!initQueue.isEmpty()) {
-      initQueue.poll().onSuccess(rodaProperties);
-    }
-  }
-
-  static {
-    init(new AsyncCallback<Map<String, String>>() {
-
-      @Override
-      public void onFailure(Throwable caught) {
-        logger.error("Error initializing", caught);
-      }
-
-      @Override
-      public void onSuccess(Map<String, String> properties) {
-        // nothing to do
-      }
-
-    });
-  }
 
   /**
    * Get the singleton instance
@@ -133,7 +71,7 @@ public class UserLogin {
 
     @Override
     public void getFromServer(AsyncCallback<User> callback) {
-      userLoginService.getAuthenticatedUser(callback);
+      UserLoginService.Util.getInstance().getAuthenticatedUser(callback);
     }
   };
 
@@ -178,7 +116,7 @@ public class UserLogin {
   }
 
   public void login(String username, String password, final AsyncCallback<User> callback) {
-    userLoginService.login(username, password, new AsyncCallback<User>() {
+    UserLoginService.Util.getInstance().login(username, password, new AsyncCallback<User>() {
 
       @Override
       public void onFailure(Throwable caught) {
@@ -268,49 +206,6 @@ public class UserLogin {
   }
 
   /**
-   * Get RODA properties
-   * 
-   * @param callback
-   */
-  public static void getRodaProperties(final AsyncCallback<Map<String, String>> callback) {
-    init(new AsyncCallback<Map<String, String>>() {
-
-      @Override
-      public void onFailure(Throwable caught) {
-        callback.onFailure(caught);
-      }
-
-      @Override
-      public void onSuccess(Map<String, String> properties) {
-        callback.onSuccess(properties);
-
-      }
-    });
-  }
-
-  /**
-   * Get a RODA property
-   * 
-   * @param key
-   * @param callback
-   */
-  public static void getRodaProperty(final String key, final AsyncCallback<String> callback) {
-    init(new AsyncCallback<Map<String, String>>() {
-
-      @Override
-      public void onFailure(Throwable caught) {
-        callback.onFailure(caught);
-      }
-
-      @Override
-      public void onSuccess(Map<String, String> properties) {
-        callback.onSuccess(properties.get(key));
-      }
-
-    });
-  }
-
-  /**
    * Check if current user has permission to access a history resolver
    * 
    * @param res
@@ -319,18 +214,8 @@ public class UserLogin {
   public void checkRole(final HistoryResolver res, final AsyncCallback<Boolean> callback) {
     String historyKey = StringUtils.join(res.getHistoryPath(), HistoryUtils.HISTORY_PERMISSION_SEP);
     final String propertyName = "ui.menu." + historyKey + ".role";
-    UserLogin.getRodaProperty(propertyName, new AsyncCallback<String>() {
-
-      @Override
-      public void onFailure(Throwable caught) {
-        callback.onFailure(caught);
-      }
-
-      @Override
-      public void onSuccess(final String role) {
-        checkRole(role, callback);
-      }
-    });
+    String role = ConfigurationManager.getString(propertyName);
+    checkRole(role, callback);
   }
 
   public void checkRole(final String role, final AsyncCallback<Boolean> callback) {
@@ -396,7 +281,6 @@ public class UserLogin {
             }
           }
         }
-
       });
     }
   }

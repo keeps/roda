@@ -55,7 +55,6 @@ public class ContentPanel extends SimplePanel {
 
   private static ContentPanel instance = null;
 
-  @SuppressWarnings("unused")
   private static ClientLogger logger = new ClientLogger(ContentPanel.class.getName());
 
   private static final Set<HistoryResolver> resolvers = new HashSet<>();
@@ -162,7 +161,7 @@ public class ContentPanel extends SimplePanel {
                 UserLogin.getInstance().showSuggestLoginDialog();
               } else {
                 Dialogs.showInformationDialog(messages.authorizationDeniedAlert(),
-                  messages.authorizationDeniedAlertMessageExceptionSimple(), messages.dialogOk(), false,
+                  messages.authorizationDeniedAlertMessageExceptionSimple(""), messages.dialogOk(),
                   new AsyncCallback<Void>() {
                     @Override
                     public void onFailure(Throwable caught) {

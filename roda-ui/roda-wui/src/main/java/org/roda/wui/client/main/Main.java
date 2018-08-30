@@ -127,6 +127,7 @@ public class Main extends Composite implements EntryPoint {
    * Initialize
    */
   public void init() {
+    menu.init();
     contentPanel.init();
     onHistoryChanged(History.getToken());
     History.addValueChangeHandler(event -> onHistoryChanged(event.getValue()));

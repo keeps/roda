@@ -1383,6 +1383,7 @@ public class SolrUtils {
   }
 
   public static Permissions getPermissions(SolrDocument doc) {
+    
     Permissions permissions = new Permissions();
 
     EnumMap<PermissionType, Set<String>> userPermissions = new EnumMap<>(PermissionType.class);

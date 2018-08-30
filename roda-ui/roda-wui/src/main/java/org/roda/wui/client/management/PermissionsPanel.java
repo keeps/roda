@@ -23,6 +23,7 @@ import java.util.Vector;
 
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.ClientLogger;
+import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.widgets.LoadingPopup;
 import org.roda.wui.common.client.widgets.wcag.WCAGUtilities;
 
@@ -47,20 +48,18 @@ import config.i18n.client.ClientMessages;
  */
 public class PermissionsPanel extends FlowPanel implements HasValueChangeHandlers<List<String>> {
 
-  private class Permission extends HorizontalPanel implements HasValueChangeHandlers<String>, Comparable<Permission> {
+  private class Permission extends HorizontalPanel implements HasValueChangeHandlers<String>{
 
-    private final String sortingkeyword;
     private final String role;
     private boolean locked;
     private boolean enabled;
     private final CheckBox checkbox;
     private final Label descriptionLabel;
 
-    public Permission(String role, String description, String sortingkeyword) {
+    public Permission(String role, String description) {
       this.role = role;
       this.checkbox = new CheckBox();
       this.descriptionLabel = new Label(description);
-      this.sortingkeyword = sortingkeyword;
       this.add(checkbox);
       this.add(descriptionLabel);
       this.locked = false;
@@ -131,58 +130,6 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
     }
 
     @Override
-    public int compareTo(Permission permission) {
-      return sortingkeyword.compareTo(permission.sortingkeyword);
-    }
-
-    @Override
-    public int hashCode() {
-      final int prime = 31;
-      int result = 1;
-      result = prime * result + getOuterType().hashCode();
-      result = prime * result + ((checkbox == null) ? 0 : checkbox.hashCode());
-      result = prime * result + ((descriptionLabel == null) ? 0 : descriptionLabel.hashCode());
-      result = prime * result + (enabled ? 1231 : 1237);
-      result = prime * result + (locked ? 1231 : 1237);
-      result = prime * result + ((role == null) ? 0 : role.hashCode());
-      result = prime * result + ((sortingkeyword == null) ? 0 : sortingkeyword.hashCode());
-      return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      if (this == obj)
-        return true;
-      if (obj == null)
-        return false;
-      if (getClass() != obj.getClass())
-        return false;
-      Permission other = (Permission) obj;
-      if (!getOuterType().equals(other.getOuterType()))
-        return false;
-      if (enabled != other.enabled)
-        return false;
-      if (locked != other.locked)
-        return false;
-      if (role == null) {
-        if (other.role != null)
-          return false;
-      } else if (!role.equals(other.role))
-        return false;
-      if (sortingkeyword == null) {
-        if (other.sortingkeyword != null)
-          return false;
-      } else if (!sortingkeyword.equals(other.sortingkeyword))
-        return false;
-      return true;
-    }
-
-    @SuppressWarnings("unused")
-    public String getSortingkeyword() {
-      return sortingkeyword;
-    }
-
-    @Override
     public HandlerRegistration addValueChangeHandler(ValueChangeHandler<String> handler) {
       return addHandler(handler, ValueChangeEvent.getType());
     }
@@ -229,54 +176,33 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
   }
 
   public void init(final AsyncCallback<Boolean> callback) {
-    UserLogin.getRodaProperties(new AsyncCallback<Map<String, String>>() {
-
-      @Override
-      public void onFailure(Throwable caught) {
-        loading.hide();
-        callback.onFailure(caught);
+    List<String> roles = ConfigurationManager.getStringList("ui.role");
+    for (String role : roles) {
+      String description;
+      try {
+        description = messages.role(role);
+      } catch (MissingResourceException e) {
+        description = role + " (needs translation)";
       }
 
-      @Override
-      public void onSuccess(Map<String, String> rodaProperties) {
-        for (Entry<String, String> entry : rodaProperties.entrySet()) {
-          String key = entry.getKey();
-          if (key.startsWith("ui.role.")) {
-            String role = entry.getValue();
-            String description;
-            try {
-              description = messages.role(role);
-            } catch (MissingResourceException e) {
-              description = role + " (needs translation)";
-            }
+      Permission permission = new Permission(role, description);
+      PermissionsPanel.this.add(permission);
+      permission.addValueChangeHandler(new ValueChangeHandler<String>() {
 
-            Permission permission = new Permission(role, description, key);
-            permissions.add(permission);
+        @Override
+        public void onValueChange(ValueChangeEvent<String> event) {
+          if (userSelections.contains(event.getValue())) {
+            userSelections.remove(event.getValue());
+          } else {
+            userSelections.add(event.getValue());
           }
+          onChange();
         }
+      });
+    }
 
-        Collections.sort(permissions);
-
-        for (final Permission permission : permissions) {
-          PermissionsPanel.this.add(permission);
-          permission.addValueChangeHandler(new ValueChangeHandler<String>() {
-
-            @Override
-            public void onValueChange(ValueChangeEvent<String> event) {
-              if (userSelections.contains(event.getValue())) {
-                userSelections.remove(event.getValue());
-              } else {
-                userSelections.add(event.getValue());
-              }
-              onChange();
-            }
-          });
-        }
-
-        loading.hide();
-        callback.onSuccess(true);
-      }
-    });
+    loading.hide();
+    callback.onSuccess(true);
   }
 
   public List<String> getUserSelections() {

@@ -7,6 +7,7 @@
  */
 package org.roda.wui.client.common.lists;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -48,9 +49,12 @@ public class AIPList extends AsyncTableCell<IndexedAIP> {
   private TextColumn<IndexedAIP> datesColumn;
   private Column<IndexedAIP, SafeHtml> hasRepresentationsColumn;
 
-  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_LEVEL,
-    RodaConstants.AIP_TITLE, RodaConstants.AIP_DATE_INITIAL, RodaConstants.AIP_DATE_FINAL,
-    RodaConstants.AIP_HAS_REPRESENTATIONS, RodaConstants.AIP_STATE);
+  private static final List<String> fieldsToReturn = new ArrayList<>(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+  static {
+    fieldsToReturn.addAll(Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_LEVEL, RodaConstants.AIP_TITLE,
+      RodaConstants.AIP_DATE_INITIAL, RodaConstants.AIP_DATE_FINAL, RodaConstants.AIP_HAS_REPRESENTATIONS,
+      RodaConstants.AIP_STATE));
+  }
 
   @Override
   protected void adjustOptions(AsyncTableCellOptions<IndexedAIP> options) {

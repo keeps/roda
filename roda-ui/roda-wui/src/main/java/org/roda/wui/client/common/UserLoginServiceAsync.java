@@ -10,8 +10,6 @@
  */
 package org.roda.wui.client.common;
 
-import java.util.Map;
-
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.user.User;
 
@@ -40,12 +38,4 @@ public interface UserLoginServiceAsync {
    * @throws RODAException
    */
   public void login(String username, String password, AsyncCallback<User> callback);
-
-  /**
-   * Get RODA properties
-   * 
-   * @return
-   */
-  public void getRodaProperties(AsyncCallback<Map<String, String>> callback);
-
 }

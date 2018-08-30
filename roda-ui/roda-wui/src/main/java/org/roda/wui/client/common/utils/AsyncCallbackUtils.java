@@ -19,6 +19,7 @@ import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.StatusCodeException;
 
@@ -61,7 +62,7 @@ public class AsyncCallbackUtils {
           if (user.isGuest()) {
             UserLogin.getInstance().showSuggestLoginDialog();
           } else {
-            String message = messages.authorizationDeniedAlertMessageExceptionSimple();
+            SafeHtml message = messages.authorizationDeniedAlertMessageExceptionSimple(caught.getMessage());
             if (!authExp.getMissingRoles().isEmpty()) {
               List<String> missingRolesTranslation = new ArrayList<>();
               for (String missingRole : authExp.getMissingRoles()) {
@@ -70,7 +71,7 @@ public class AsyncCallbackUtils {
               message = messages.authorizationDeniedAlertMessageMissingRoles(missingRolesTranslation);
             }
 
-            Dialogs.showInformationDialog(messages.authorizationDeniedAlert(), message, messages.dialogOk(), false,
+            Dialogs.showInformationDialog(messages.authorizationDeniedAlert(), message, messages.dialogOk(),
               new AsyncCallback<Void>() {
                 @Override
                 public void onFailure(Throwable caught) {
