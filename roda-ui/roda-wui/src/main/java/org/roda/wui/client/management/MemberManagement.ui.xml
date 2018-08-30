@@ -9,20 +9,13 @@
 
 	<g:FlowPanel styleName="wui-management-user" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
-			<g:FlowPanel addStyleNames="col_10 content">
+			<g:FlowPanel addStyleNames="col_12 content">
 				<g:Label styleName="h1">
 					<ui:text from='{messages.usersAndGroupsTitle}' />
 				</g:Label>
 				<g:FlowPanel addStyleNames="page-description" ui:field="memberManagementDescription">
 				</g:FlowPanel>
 				<commonsearch:SearchWrapper ui:field="searchWrapper" />
-			</g:FlowPanel>
-			<g:FlowPanel addStyleNames="col_2 last sidebar">
-				<g:FlowPanel addStyleNames="sticky-flow">
-					<g:FlowPanel addStyleNames="sticky-padding">
-						<g:SimplePanel addStyleNames="sidebar-group" ui:field="actionsSidebar" />
-					</g:FlowPanel>
-				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>

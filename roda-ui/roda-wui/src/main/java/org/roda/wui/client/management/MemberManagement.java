@@ -12,8 +12,6 @@ import java.util.List;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.RODAMemberActions;
-import org.roda.wui.client.common.actions.model.ActionableObject;
-import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.lists.RodaMemberList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
@@ -30,7 +28,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -85,9 +82,6 @@ public class MemberManagement extends Composite {
   @UiField
   FlowPanel memberManagementDescription;
 
-  @UiField
-  SimplePanel actionsSidebar;
-
   @UiField(provided = true)
   SearchWrapper searchWrapper;
 
@@ -103,8 +97,6 @@ public class MemberManagement extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
 
-    actionsSidebar.setWidget(new ActionableWidgetBuilder<>(RODAMemberActions.get())
-      .buildListWithObjects(new ActionableObject<>(RODAMember.class)));
     memberManagementDescription.add(new HTMLWidgetWrapper("MemberManagementDescription.html"));
   }
 
