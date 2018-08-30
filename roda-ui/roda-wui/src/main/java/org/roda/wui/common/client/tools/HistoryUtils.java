@@ -250,7 +250,7 @@ public class HistoryUtils {
     tokens.add(folder.getRepresentationId());
     tokens.addAll(folder.getPath());
     tokens.add(folder.getId());
-    return getHistory(TransferUpload.BROWSE_FILE_RESOLVER, tokens);
+    return getHistory(TransferUpload.BROWSE_RESOLVER, tokens);
   }
 
   public static void openUpload(String aipId, String representationId) {

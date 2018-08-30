@@ -179,7 +179,7 @@ public class BrowseFile extends Composite {
     // initialize widget
     initWidget(uiBinder.createAndBindUi(this));
 
-    navigationToolbar.setObject(bundle.getFile());
+    navigationToolbar.setObject(bundle.getFile(), bundle.getAip().getPermissions());
     navigationToolbar.updateBreadcrumb(bundle);
 
     // STATUS

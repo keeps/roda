@@ -36,16 +36,12 @@ public class IndexedFilePreview extends BitstreamPreview<IndexedFile> {
   private static final boolean CONTENT_DISPOSITION_INLINE = true;
 
   private SearchWrapper searchWrapper = null;
-  private boolean justActive;
-  private Permissions permissions;
 
   public IndexedFilePreview(Viewers viewers, IndexedFile file, boolean justActive, Permissions permissions,
     Command onPreviewFailure) {
     super(viewers, RestUtils.createRepresentationFileDownloadUri(file.getUUID(), CONTENT_DISPOSITION_INLINE),
       file.getFileFormat(), file.getOriginalName() != null ? file.getOriginalName() : file.getId(), file.getSize(),
-      file.isDirectory(), onPreviewFailure, file);
-    this.justActive = justActive;
-    this.permissions = permissions;
+      file.isDirectory(), onPreviewFailure, file, justActive, permissions);
   }
 
   @Override
@@ -54,18 +50,17 @@ public class IndexedFilePreview extends BitstreamPreview<IndexedFile> {
 
     ListBuilder<IndexedFile> folderListBuilder = new ListBuilder<>(SearchFileList::new,
       new AsyncTableCellOptions<>(IndexedFile.class, "IndexedFilePreview_files").withFilter(filter)
-        .withSummary(messages.representationListOfFiles()).withJustActive(justActive).bindOpener());
+        .withSummary(messages.representationListOfFiles()).withJustActive(getJustActive()).bindOpener());
 
-    LastSelectedItemsSingleton.getInstance().setSelectedJustActive(justActive);
+    LastSelectedItemsSingleton.getInstance().setSelectedJustActive(getJustActive());
 
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(folderListBuilder,
-      FileActions.get(getObject().getAipId(), getObject().getRepresentationId(), getObject(), permissions),
+      FileActions.get(getObject().getAipId(), getObject().getRepresentationId(), getObject(), getPermissions()),
       messages.searchPlaceHolder());
     return searchWrapper;
   }
 
   public SelectedItems<IndexedFile> getSelected() {
-
     SelectedItems<IndexedFile> ret = SelectedItemsList.create(IndexedFile.class,
       Collections.singletonList(getObject().getUUID()));
     if (searchWrapper != null) {

@@ -10,6 +10,7 @@ package org.roda.wui.client.browse;
 import org.apache.commons.httpclient.HttpStatus;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.IndexedDIP;
+import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.wui.client.common.utils.IndexedDIPUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -74,6 +75,9 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
   // other
   private final Command onPreviewFailure;
 
+  private boolean justActive;
+  private Permissions permissions;
+
   private final T object;
 
   public BitstreamPreview(Viewers viewers, SafeUri bitstreamDownloadUri, FileFormat format, String filename, long size,
@@ -89,6 +93,11 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
 
   public BitstreamPreview(Viewers viewers, SafeUri bitstreamDownloadUri, FileFormat format, String filename, long size,
     boolean isDirectory, Command onPreviewFailure, T object) {
+    this(viewers, bitstreamDownloadUri, format, filename, size, isDirectory, onPreviewFailure, object, false, null);
+  }
+
+  public BitstreamPreview(Viewers viewers, SafeUri bitstreamDownloadUri, FileFormat format, String filename, long size,
+    boolean isDirectory, Command onPreviewFailure, T object, boolean justActive, Permissions permissions) {
     super();
     this.object = object;
     this.panel = new FlowPanel();
@@ -103,6 +112,9 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
 
     this.onPreviewFailure = onPreviewFailure;
 
+    this.justActive = justActive;
+    this.permissions = permissions;
+
     initWidget(panel);
 
     setStyleName("bitstreamPreview");
@@ -111,7 +123,6 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
     }
 
     init();
-
   }
 
   public SafeUri getBitstreamDownloadUri() {
@@ -135,7 +146,6 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
   }
 
   private void init() {
-
     if (!isDirectory) {
       String type = viewerType();
       if (type != null) {
@@ -466,6 +476,14 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
 
   public T getObject() {
     return object;
+  }
+
+  public boolean getJustActive() {
+    return justActive;
+  }
+
+  public Permissions getPermissions() {
+    return permissions;
   }
 
 }

@@ -107,7 +107,7 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
     this.currentObject = object;
     refresh();
   }
-  
+
   public void setObject(T object, Permissions permissions) {
     this.currentObject = object;
     this.permissions = permissions;
