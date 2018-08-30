@@ -29,6 +29,7 @@ import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.browse.bundle.DipBundle;
+import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.DIPFileList;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
@@ -179,6 +180,18 @@ public class BrowseDIP extends Composite {
   @UiField
   AccessibleFocusPanel previousButton, nextButton, dipOptionsButton;
 
+  @UiField
+  NavigationToolbar<IndexedDIP> dipNavigationToolbar;
+
+  @UiField
+  NavigationToolbar<IndexedAIP> aipNavigationToolbar;
+
+  @UiField
+  NavigationToolbar<IndexedRepresentation> representationNavigationToolbar;
+
+  @UiField
+  NavigationToolbar<IndexedFile> fileNavigationToolbar;
+
   public BrowseDIP(Viewers viewers, DipBundle bundle) {
     this.viewers = viewers;
 
@@ -206,17 +219,30 @@ public class BrowseDIP extends Composite {
 
     keyboardFocus.setFocus(true);
 
+    navigationToolbar.updateBreadcrumb(bundle);
+
+    // TODO: working on refererOptionsButton
+    // get an example on how it should be working and go from there since i havent
+    // seen a use like this before
+
     if (file != null) {
-      Sliders.createDisseminationsSlider(center, disseminationsButton, file);
-      Sliders.createInfoSlider(center, refererInfoButton, file);
+      fileNavigationToolbar.setObject(file, aip.getPermissions());
+      fileNavigationToolbar.updateReferrerBreadcrumb(bundle);
+      Sliders.createDisseminationsSlider(center, fileNavigationToolbar.getDisseminationsButton(), file);
+      Sliders.createInfoSlider(center, fileNavigationToolbar.getInfoSidebarButton(), file);
       Sliders.createOptionsSlider(center, refererOptionsButton, file);
     } else if (representation != null) {
-      Sliders.createDisseminationsSlider(center, disseminationsButton, representation);
-      Sliders.createInfoSlider(center, refererInfoButton, representation);
+      representationNavigationToolbar.setObject(representation, aip.getPermissions());
+      representationNavigationToolbar.updateReferrerBreadcrumb(bundle);
+      Sliders.createDisseminationsSlider(center, representationNavigationToolbar.getDisseminationsButton(),
+        representation);
+      Sliders.createInfoSlider(center, representationNavigationToolbar.getInfoSidebarButton(), representation);
       Sliders.createOptionsSlider(center, refererOptionsButton, representation);
     } else if (aip != null) {
-      Sliders.createDisseminationsSlider(center, disseminationsButton, aip);
-      Sliders.createInfoSlider(center, refererInfoButton, aip);
+      aipNavigationToolbar.setObject(aip, aip.getPermissions());
+      aipNavigationToolbar.updateReferrerBreadcrumb(bundle);
+      Sliders.createDisseminationsSlider(center, aipNavigationToolbar.getDisseminationsButton(), aip);
+      Sliders.createInfoSlider(center, aipNavigationToolbar.getInfoSidebarButton(), aip);
       refererOptionsButton.setVisible(false);
     } else {
       disseminationsButton.setVisible(false);

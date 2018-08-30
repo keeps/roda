@@ -3,12 +3,18 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:m="urn:import:org.roda.wui.client.main"
-	xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag">
+	xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag"
+	xmlns:common="urn:import:org.roda.wui.client.common">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
 	<wcag:AccessibleFocusPanel ui:field="keyboardFocus">
 		<g:FlowPanel styleName="viewRepresentationFile">
+			<common:NavigationToolbar visible="false" ui:field="aipNavigationToolbar" header="{messages.catalogueItemTitle}" />
+			<common:NavigationToolbar visible="false" ui:field="representationNavigationToolbar" header="{messages.catalogueRepresentationTitle}" />
+			<common:NavigationToolbar visible="false" ui:field="fileNavigationToolbar" header="{messages.catalogueFileTitle}" />
+			<common:NavigationToolbar ui:field="dipNavigationToolbar" header="{messages.catalogueDIPTitle}" />
+
 			<g:FlowPanel addStyleNames="filePreviewToolbar" ui:field="refererToolbar">
 				<g:Label addStyleNames="browseItemHeader" ui:field="refererTitle" />
 				<g:HTML styleName="browseItemHeader-charot">&rsaquo;</g:HTML>
@@ -73,9 +79,7 @@
 					</wcag:AccessibleFocusPanel>
 				</g:FlowPanel>
 			</g:FlowPanel>
-			<g:FlowPanel addStyleNames="viewRepresentationFile-center"
-				ui:field="center" />
-
+			<g:FlowPanel addStyleNames="viewRepresentationFile-center" ui:field="center" />
 		</g:FlowPanel>
 	</wcag:AccessibleFocusPanel>
 </ui:UiBinder>

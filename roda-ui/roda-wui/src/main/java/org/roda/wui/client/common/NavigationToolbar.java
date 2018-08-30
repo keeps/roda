@@ -22,6 +22,7 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
+import org.roda.wui.client.browse.bundle.DipBundle;
 import org.roda.wui.client.common.actions.AbstractActionable;
 import org.roda.wui.client.common.actions.AipActions;
 import org.roda.wui.client.common.actions.FileActions;
@@ -31,6 +32,7 @@ import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
+import org.roda.wui.client.common.lists.pagination.ListSelectionUtils.ProcessRelativeItem;
 import org.roda.wui.client.common.popup.CalloutPopup;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.main.BreadcrumbItem;
@@ -83,10 +85,8 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
   AccessibleFocusPanel searchButton;
 
   @UiField
-  AccessibleFocusPanel previousButton;
-
-  @UiField
-  AccessibleFocusPanel nextButton;
+  AccessibleFocusPanel nextButton, previousButton;
+  ProcessRelativeItem<T> processor;
 
   @UiField
   AccessibleFocusPanel infoSidebarButton;
@@ -100,18 +100,26 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
 
   public NavigationToolbar() {
     initWidget(uiBinder.createAndBindUi(this));
-    refresh();
+    setup();
   }
 
   public void setObject(T object) {
-    this.currentObject = object;
-    refresh();
+    setObject(object, null, null);
+  }
+
+  public void setObject(T object, ProcessRelativeItem<T> processor) {
+    setObject(object, null, processor);
   }
 
   public void setObject(T object, Permissions permissions) {
+    setObject(object, permissions, null);
+  }
+
+  public void setObject(T object, Permissions permissions, ProcessRelativeItem<T> processor) {
     this.currentObject = object;
     this.permissions = permissions;
-    refresh();
+    this.processor = processor;
+    setup();
   }
 
   public AccessibleFocusPanel getInfoSidebarButton() {
@@ -147,9 +155,14 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
     actionsButton.setVisible(false);
   }
 
-  public void refresh() {
+  private void setup() {
     hideButtons();
-    ListSelectionUtils.bindLayout(currentObject, previousButton, nextButton, keyboardFocus, true, false, false);
+    if (processor != null) {
+      ListSelectionUtils.bindLayout(currentObject, previousButton, nextButton, keyboardFocus, true, false, false,
+        processor);
+    } else {
+      ListSelectionUtils.bindLayout(currentObject, previousButton, nextButton, keyboardFocus, true, false, false);
+    }
     setupActions();
   }
 
@@ -217,6 +230,17 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
 
     aipState.setHTML(HtmlSnippetUtils.getAIPStateHTML(bundle.getAip().getState()));
     aipState.setVisible(AIPState.ACTIVE != bundle.getAip().getState());
+  }
+
+  public void updateReferrerBreadcrumb(DipBundle bundle) {
+    if (bundle.getFile() != null) {
+      breadcrumb
+        .updatePath(BreadcrumbUtils.getFileBreadcrumbs(bundle.getAip(), bundle.getRepresentation(), bundle.getFile()));
+    } else if (bundle.getRepresentation() != null) {
+      breadcrumb.updatePath(BreadcrumbUtils.getRepresentationBreadcrumbs(bundle.getAip(), bundle.getRepresentation()));
+    } else if (bundle.getAip() != null) {
+      breadcrumb.updatePath(BreadcrumbUtils.getAipBreadcrumbs(bundle.getAip()));
+    }
   }
 
   public void updateBreadcrumbPath(BreadcrumbItem... items) {

@@ -201,6 +201,7 @@ public class DisseminationsSliderHelper {
 
   protected static void showActions(final IndexedDIP dip, final UIObject actionsButton) {
     final CalloutPopup actionsPopup = new CalloutPopup();
+    actionsPopup.addStyleName("ActionableStyleMenu");
 
     if (actionsPopup.isShowing()) {
       actionsPopup.hide();
