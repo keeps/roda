@@ -139,6 +139,7 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.plugins.plugins.characterization.SiegfriedPlugin;
 import org.roda.core.plugins.plugins.ingest.AutoAcceptSIPPlugin;
+import org.roda.core.plugins.plugins.internal.ChangeTypePlugin;
 import org.roda.core.plugins.plugins.internal.DeleteRODAObjectPlugin;
 import org.roda.core.plugins.plugins.internal.MovePlugin;
 import org.roda.core.plugins.plugins.internal.UpdateAIPPermissionsPlugin;
@@ -2878,80 +2879,22 @@ public class BrowserHelper {
       PluginType.MISC, user, Collections.emptyMap(), "Could not execute format identification using Siegfrid action");
   }
 
-  public static void changeRepresentationType(User user, SelectedItems<IndexedRepresentation> selected, String newType,
-    String details) throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
-    String eventDescription = "The process of updating an object of the repository.";
-
-    List<String> representationIds = consolidate(user, IndexedRepresentation.class, selected);
-    ModelService model = RodaCoreFactory.getModelService();
-    IndexService index = RodaCoreFactory.getIndexService();
-
-    Filter filter = new Filter();
-    filter.add(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, representationIds));
-    IndexResult<IndexedRepresentation> reps = index.find(IndexedRepresentation.class, filter, Sorter.NONE,
-      new Sublist(0, representationIds.size()), Arrays.asList(RodaConstants.REPRESENTATION_ID,
-        RodaConstants.REPRESENTATION_TYPE, RodaConstants.REPRESENTATION_AIP_ID));
-
-    for (IndexedRepresentation irep : reps.getResults()) {
-      String oldType = irep.getType();
-      List<LinkingIdentifier> sources = new ArrayList<>();
-      sources.add(PluginHelper.getLinkingIdentifier(irep.getAipId(), irep.getId(),
-        RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
-
-      try {
-        model.changeRepresentationType(irep.getAipId(), irep.getId(), newType, user.getName());
-        index.commit(IndexedRepresentation.class);
-        StringBuilder outcomeText = new StringBuilder().append("The representation '").append(irep.getId())
-          .append("' changed its type from '").append(oldType).append("' to '").append(newType).append("'.");
-
-        model.createEvent(irep.getAipId(), irep.getId(), null, null, PreservationEventType.UPDATE, eventDescription,
-          sources, null, PluginState.SUCCESS, outcomeText.toString(), details, user.getName(), true);
-      } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-        StringBuilder outcomeText = new StringBuilder().append("The representation '").append(irep.getId())
-          .append("' did not change its type from '").append(oldType).append("' to '").append(newType).append("'.");
-
-        model.createEvent(irep.getAipId(), irep.getId(), null, null, PreservationEventType.UPDATE, eventDescription,
-          sources, null, PluginState.FAILURE, outcomeText.toString(), details, user.getName(), true);
-        throw e;
-      }
-    }
+  public static Job changeAIPType(User user, SelectedItems<IndexedAIP> selected, String newType, String details)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    Map<String, String> pluginParameters = new HashMap<>();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_NEW_TYPE, newType);
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
+    return createAndExecuteInternalJob("Change AIP type", selected, ChangeTypePlugin.class, user, pluginParameters,
+      "Could not change AIP type");
   }
 
-  public static void changeAIPType(User user, SelectedItems<IndexedAIP> selected, String newType, String details)
-    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
-    String eventDescription = "The process of updating an object of the repository.";
-
-    List<String> aipIds = consolidate(user, IndexedAIP.class, selected);
-    ModelService model = RodaCoreFactory.getModelService();
-    IndexService index = RodaCoreFactory.getIndexService();
-
-    Filter filter = new Filter();
-    filter.add(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, aipIds));
-    IndexResult<IndexedAIP> aips = index.find(IndexedAIP.class, filter, Sorter.NONE, new Sublist(0, aipIds.size()),
-      Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_ID, RodaConstants.AIP_TYPE));
-
-    for (IndexedAIP iaip : aips.getResults()) {
-      String oldType = iaip.getType();
-      List<LinkingIdentifier> sources = new ArrayList<>();
-      sources.add(PluginHelper.getLinkingIdentifier(iaip.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
-
-      try {
-        model.changeAIPType(iaip.getId(), newType, user.getName());
-        index.commit(IndexedAIP.class);
-        StringBuilder outcomeText = new StringBuilder().append("The AIP '").append(iaip.getId())
-          .append("' changed its type from '").append(oldType).append("' to '").append(newType).append("'.");
-
-        model.createEvent(iaip.getId(), null, null, null, PreservationEventType.UPDATE, eventDescription, sources, null,
-          PluginState.SUCCESS, outcomeText.toString(), details, user.getName(), true);
-      } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-        StringBuilder outcomeText = new StringBuilder().append("The AIP '").append(iaip.getId())
-          .append("' did not change its type from '").append(oldType).append("' to '").append(newType).append("'.");
-
-        model.createEvent(iaip.getId(), null, null, null, PreservationEventType.UPDATE, eventDescription, sources, null,
-          PluginState.FAILURE, outcomeText.toString(), details, user.getName(), true);
-        throw e;
-      }
-    }
+  public static Job changeRepresentationType(User user, SelectedItems<IndexedRepresentation> selected, String newType,
+    String details) throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    Map<String, String> pluginParameters = new HashMap<>();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_NEW_TYPE, newType);
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
+    return createAndExecuteInternalJob("Change representation type", selected, ChangeTypePlugin.class, user,
+      pluginParameters, "Could not change representation type");
   }
 
   public static void changeRepresentationStates(User user, IndexedRepresentation representation, List<String> newStates,
