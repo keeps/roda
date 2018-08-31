@@ -15,7 +15,9 @@ import java.util.Set;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
@@ -25,6 +27,8 @@ import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.DipBundle;
 import org.roda.wui.client.common.actions.AbstractActionable;
 import org.roda.wui.client.common.actions.AipActions;
+import org.roda.wui.client.common.actions.DisseminationActions;
+import org.roda.wui.client.common.actions.DisseminationFileActions;
 import org.roda.wui.client.common.actions.FileActions;
 import org.roda.wui.client.common.actions.RepresentationActions;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
@@ -58,6 +62,10 @@ import config.i18n.client.ClientMessages;
 public class NavigationToolbar<T extends IsIndexed> extends Composite implements HasHandlers {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
+
+  private boolean requireControlKeyModifier;
+  private boolean requireShiftKeyModifier;
+  private boolean requireAltKeyModifier;
 
   interface MyUiBinder extends UiBinder<Widget, NavigationToolbar> {
   }
@@ -100,7 +108,8 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
 
   public NavigationToolbar() {
     initWidget(uiBinder.createAndBindUi(this));
-    setup();
+    withModifierKeys(true, false, false);
+    hideButtons();
   }
 
   public void setObject(T object) {
@@ -132,6 +141,14 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
     return disseminationsButton;
   }
 
+  public NavigationToolbar<T> withModifierKeys(boolean requireControlKeyModifier, boolean requireShiftKeyModifier,
+    boolean requireAltKeyModifier) {
+    this.requireControlKeyModifier = requireControlKeyModifier;
+    this.requireShiftKeyModifier = requireShiftKeyModifier;
+    this.requireAltKeyModifier = requireAltKeyModifier;
+    return this;
+  }
+
   public void setHeader(String headerText) {
     navigationToolbarHeader.setText(headerText);
   }
@@ -158,12 +175,44 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
   private void setup() {
     hideButtons();
     if (processor != null) {
-      ListSelectionUtils.bindLayout(currentObject, previousButton, nextButton, keyboardFocus, true, false, false,
-        processor);
+      ListSelectionUtils.bindLayout(currentObject, previousButton, nextButton, keyboardFocus, requireControlKeyModifier,
+        requireShiftKeyModifier, requireAltKeyModifier, processor);
     } else {
-      ListSelectionUtils.bindLayout(currentObject, previousButton, nextButton, keyboardFocus, true, false, false);
+      ListSelectionUtils.bindLayout(currentObject, previousButton, nextButton, keyboardFocus, requireControlKeyModifier,
+        requireShiftKeyModifier, requireAltKeyModifier);
     }
+    setNavigationButtonTitles();
     setupActions();
+  }
+
+  private void setNavigationButtonTitles() {
+    StringBuilder modifiers = new StringBuilder();
+
+    if (requireControlKeyModifier) {
+      if (modifiers.length() > 0) {
+        modifiers.append('+');
+      }
+      modifiers.append("CTRL");
+    }
+
+    if (requireShiftKeyModifier) {
+      if (modifiers.length() > 0) {
+        modifiers.append('+');
+      }
+      modifiers.append("Shift");
+    }
+
+    if (requireAltKeyModifier) {
+      if (modifiers.length() > 0) {
+        modifiers.append('+');
+      }
+      modifiers.append("Alt");
+    }
+
+    modifiers.append(' ');
+
+    previousButton.setTitle(modifiers.toString() + "&#8678;");
+    nextButton.setTitle(modifiers.toString() + "&#8680;");
   }
 
   private void setupActions() {
@@ -208,6 +257,26 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
       popup.setWidget(new ActionableWidgetBuilder<>(fileActions).buildListWithObjects(new ActionableObject<>(file)));
       actionsButton.addClickHandler(event -> popup.showRelativeTo(actionsButton));
       actionsButton.setVisible(true);
+    } else if (currentObject instanceof IndexedDIP) {
+      infoSidebarButton.setTitle(messages.dissemination());
+
+      IndexedDIP dip = (IndexedDIP) this.currentObject;
+      DisseminationActions disseminationActions = DisseminationActions.get(permissions);
+
+      popup.setWidget(
+        new ActionableWidgetBuilder<>(disseminationActions).buildListWithObjects(new ActionableObject<>(dip)));
+      actionsButton.addClickHandler(event -> popup.showRelativeTo(actionsButton));
+      actionsButton.setVisible(true);
+    } else if (currentObject instanceof DIPFile) {
+      infoSidebarButton.setTitle(messages.disseminationFile());
+
+      DIPFile dipFile = (DIPFile) this.currentObject;
+      DisseminationFileActions disseminationFileActions = DisseminationFileActions.get(permissions);
+
+      popup.setWidget(
+        new ActionableWidgetBuilder<>(disseminationFileActions).buildListWithObjects(new ActionableObject<>(dipFile)));
+      actionsButton.addClickHandler(event -> popup.showRelativeTo(actionsButton));
+      actionsButton.setVisible(true);
     }
   }
 
@@ -230,6 +299,10 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
 
     aipState.setHTML(HtmlSnippetUtils.getAIPStateHTML(bundle.getAip().getState()));
     aipState.setVisible(AIPState.ACTIVE != bundle.getAip().getState());
+  }
+
+  public void updateBreadcrumb(DipBundle bundle) {
+    BreadcrumbUtils.getDipBreadcrumbs(bundle.getDip(), bundle.getDipFile(), bundle.getDipFileAncestors());
   }
 
   public void updateReferrerBreadcrumb(DipBundle bundle) {

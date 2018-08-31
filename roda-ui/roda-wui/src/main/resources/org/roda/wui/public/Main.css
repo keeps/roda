@@ -6922,6 +6922,10 @@ span.code {
     display: none;
 }
 
+.navigationToolbar-hidden {
+    background-color: #eee;
+}
+
 .navigationToolbar .navigationToolbarHeader,
 .navigationToolbar .navigationToolbarHeaderArrow {
     display: inline-block;

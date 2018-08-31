@@ -283,6 +283,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     columnSortHandler = new AsyncHandler(display);
     display.addColumnSortHandler(columnSortHandler);
 
+    getElement().setId("list-" + listId);
     addStyleName("my-asyncdatagrid");
     resultsPager.addStyleName("my-asyncdatagrid-pager-results");
     pageSizePager.addStyleName("my-asyncdatagrid-pager-pagesize");
@@ -299,12 +300,12 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     updateEmptyTableWidget();
 
     // nvieira 2018-07-23: needs to be improved to update a UI button instead of
-    // a
-    // log
+    // a log
     autoUpdateConsumers.add(st -> GWT.log(st.toString()));
     addAutoUpdateControlListener();
 
     if (options.isBindOpener()) {
+      GWT.log("resolve binder");
       ListSelectionUtils.bindBrowseOpener(this);
     }
 
