@@ -309,7 +309,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   @Override
   public Job moveAIPInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, String details)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException{
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.moveAIPInHierarchy(user, selected, parentId, details);
   }
@@ -808,11 +808,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void deleteRiskIncidences(SelectedItems<RiskIncidence> selected)
-    throws JobAlreadyStartedException, AuthorizationDeniedException, GenericException, RequestNotValidException,
-    NotFoundException, InvalidParameterException {
+  public void deleteRiskIncidences(SelectedItems<RiskIncidence> selected, String details)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.deleteRiskIncidences(user, selected);
+    Browser.deleteRiskIncidences(user, selected, details);
   }
 
   @Override
@@ -869,10 +868,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void deleteDIPs(SelectedItems<IndexedDIP> dips)
+  public void deleteDIPs(SelectedItems<IndexedDIP> dips, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.deleteDIPs(user, dips);
+    Browser.deleteDIPs(user, dips, details);
   }
 
   @Override

@@ -284,7 +284,7 @@ public interface BrowserService extends RemoteService {
 
   void updateRiskIncidence(RiskIncidence incidence) throws AuthorizationDeniedException, GenericException;
 
-  void deleteRiskIncidences(SelectedItems<RiskIncidence> selected)
+  void deleteRiskIncidences(SelectedItems<RiskIncidence> selected, String details)
     throws JobAlreadyStartedException, AuthorizationDeniedException, GenericException, RequestNotValidException,
     NotFoundException, InvalidParameterException;
 
@@ -321,7 +321,7 @@ public interface BrowserService extends RemoteService {
   DipBundle retrieveDipBundle(String dipUUID, String dipFileUUID)
     throws RequestNotValidException, AuthorizationDeniedException, GenericException, NotFoundException;
 
-  void deleteDIPs(SelectedItems<IndexedDIP> dips)
+  void deleteDIPs(SelectedItems<IndexedDIP> dips, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   <T extends IsIndexed> T retrieveFromModel(String classNameToReturn, String id) throws RODAException;

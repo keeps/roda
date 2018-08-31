@@ -13,6 +13,7 @@ import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
@@ -189,6 +190,7 @@ public class DIPFilesResource {
 
   public Response delete(
     @ApiParam(value = "The UUID of the existing DIP file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_DIP_FILE_UUID) String fileUUID,
+    @ApiParam(value = "Reason to delete AIP", required = true) @FormParam(RodaConstants.API_QUERY_PARAM_DETAILS) String details,
     @ApiParam(value = "Choose format in which to get the response", allowableValues = RodaConstants.API_DELETE_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
@@ -198,7 +200,7 @@ public class DIPFilesResource {
 
     // delegate action to controller
     SelectedItemsList<DIPFile> list = SelectedItemsList.create(DIPFile.class, java.util.Arrays.asList(fileUUID));
-    Browser.deleteDIPFile(user, list);
+    Browser.deleteDIPFile(user, list, details);
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "DIP File deleted"), mediaType).build();
   }
 

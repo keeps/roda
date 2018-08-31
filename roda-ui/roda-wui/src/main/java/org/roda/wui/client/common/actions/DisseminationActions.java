@@ -10,7 +10,6 @@ package org.roda.wui.client.common.actions;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
@@ -34,6 +33,7 @@ import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.RestUtils;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
@@ -149,23 +149,31 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
         @Override
         public void onSuccess(Boolean confirmed) {
           if (confirmed) {
-            BrowserService.Util.getInstance().deleteDIPs(objectToSelectedItems(dip, IndexedDIP.class),
-              new ActionLoadingAsyncCallback<Void>(callback) {
+            Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
+              RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+              new ActionNoAsyncCallback<String>(callback) {
 
                 @Override
-                public void onSuccessImpl(Void result) {
-                  if (!dip.getFileIds().isEmpty()) {
-                    FileLink link = dip.getFileIds().get(0);
-                    HistoryUtils.openBrowse(link.getAipId(), link.getRepresentationId(), link.getPath(),
-                      link.getFileId());
-                  } else if (!dip.getRepresentationIds().isEmpty()) {
-                    RepresentationLink link = dip.getRepresentationIds().get(0);
-                    HistoryUtils.openBrowse(link.getAipId(), link.getRepresentationId());
-                  } else if (!dip.getAipIds().isEmpty()) {
-                    AIPLink link = dip.getAipIds().get(0);
-                    HistoryUtils.openBrowse(link.getAipId());
-                  }
-                  doActionCallbackDestroyed();
+                public void onSuccess(final String details) {
+                  BrowserService.Util.getInstance().deleteDIPs(objectToSelectedItems(dip, IndexedDIP.class), details,
+                    new ActionLoadingAsyncCallback<Void>(callback) {
+
+                      @Override
+                      public void onSuccessImpl(Void result) {
+                        if (!dip.getFileIds().isEmpty()) {
+                          FileLink link = dip.getFileIds().get(0);
+                          HistoryUtils.openBrowse(link.getAipId(), link.getRepresentationId(), link.getPath(),
+                            link.getFileId());
+                        } else if (!dip.getRepresentationIds().isEmpty()) {
+                          RepresentationLink link = dip.getRepresentationIds().get(0);
+                          HistoryUtils.openBrowse(link.getAipId(), link.getRepresentationId());
+                        } else if (!dip.getAipIds().isEmpty()) {
+                          AIPLink link = dip.getAipIds().get(0);
+                          HistoryUtils.openBrowse(link.getAipId());
+                        }
+                        doActionCallbackDestroyed();
+                      }
+                    });
                 }
               });
           } else {
@@ -183,14 +191,23 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
         @Override
         public void onSuccess(Boolean confirmed) {
           if (confirmed) {
-            BrowserService.Util.getInstance().deleteDIPs(selectedItems, new ActionLoadingAsyncCallback<Void>(callback) {
+            Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
+              RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+              new ActionNoAsyncCallback<String>(callback) {
 
-              @Override
-              public void onSuccessImpl(Void result) {
-                History.fireCurrentHistoryState();
-                doActionCallbackDestroyed();
-              }
-            });
+                @Override
+                public void onSuccess(final String details) {
+                  BrowserService.Util.getInstance().deleteDIPs(selectedItems, details,
+                    new ActionLoadingAsyncCallback<Void>(callback) {
+
+                      @Override
+                      public void onSuccessImpl(Void result) {
+                        History.fireCurrentHistoryState();
+                        doActionCallbackDestroyed();
+                      }
+                    });
+                }
+              });
           }
         }
       });

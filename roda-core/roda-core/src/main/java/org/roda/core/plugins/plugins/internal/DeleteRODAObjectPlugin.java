@@ -34,6 +34,8 @@ import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.ip.DIP;
+import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Representation;
@@ -132,6 +134,12 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
           processRepresentationInformation(model, report, jobPluginInfo, cachedJob, (RepresentationInformation) object);
         } else if (object instanceof Format) {
           processFormat(index, model, report, jobPluginInfo, cachedJob, (Format) object);
+        } else if (object instanceof RiskIncidence) {
+          processRiskIncidence(model, report, jobPluginInfo, cachedJob, (RiskIncidence) object);
+        } else if (object instanceof DIP) {
+          processDIP(model, report, jobPluginInfo, cachedJob, (DIP) object);
+        } else if (object instanceof DIPFile) {
+          processDIPFile(model, report, jobPluginInfo, cachedJob, (DIPFile) object);
         }
       }
     }, index, model, storage, liteList);
@@ -397,6 +405,55 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     }
   }
 
+  private void processRiskIncidence(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job,
+    RiskIncidence incidence) {
+    Report reportItem = PluginHelper.initPluginReportItem(this, incidence.getId(), RiskIncidence.class);
+    PluginState state = PluginState.SUCCESS;
+
+    try {
+      model.deleteRiskIncidence(incidence.getId(), true);
+    } catch (GenericException | NotFoundException | AuthorizationDeniedException | RequestNotValidException e) {
+      state = PluginState.FAILURE;
+    }
+
+    report.addReport(reportItem.setPluginState(state));
+    PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
+    jobPluginInfo.incrementObjectsProcessed(state);
+  }
+
+  private void processDIP(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job, DIP dip) {
+    PluginState state = PluginState.SUCCESS;
+    Report reportItem = PluginHelper.initPluginReportItem(this, dip.getId(), DIP.class);
+
+    try {
+      model.deleteDIP(dip.getId());
+    } catch (NotFoundException | GenericException | AuthorizationDeniedException e) {
+      state = PluginState.FAILURE;
+      reportItem.addPluginDetails("Could not delete DIP: " + e.getMessage());
+    }
+
+    report.addReport(reportItem.setPluginState(state));
+    PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
+    jobPluginInfo.incrementObjectsProcessed(state);
+  }
+
+  private void processDIPFile(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job,
+    DIPFile dipFile) {
+    PluginState state = PluginState.SUCCESS;
+    Report reportItem = PluginHelper.initPluginReportItem(this, dipFile.getId(), DIPFile.class);
+
+    try {
+      model.deleteDIPFile(dipFile.getDipId(), dipFile.getPath(), dipFile.getId(), false);
+    } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
+      state = PluginState.FAILURE;
+      reportItem.addPluginDetails("Could not delete DIP file: " + e.getMessage());
+    }
+
+    report.addReport(reportItem.setPluginState(state));
+    PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
+    jobPluginInfo.incrementObjectsProcessed(state);
+  }
+
   @Override
   public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
@@ -464,6 +521,9 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     list.add(Risk.class);
     list.add(RepresentationInformation.class);
     list.add(Format.class);
+    list.add(RiskIncidence.class);
+    list.add(DIP.class);
+    list.add(DIPFile.class);
     return (List) list;
   }
 }

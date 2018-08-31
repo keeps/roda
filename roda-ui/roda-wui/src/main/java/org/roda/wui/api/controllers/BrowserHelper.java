@@ -2707,12 +2707,12 @@ public class BrowserHelper {
     return new Reports(results);
   }
 
-  public static void deleteRiskIncidences(User user, SelectedItems<RiskIncidence> selected)
-    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
-    List<String> idList = consolidate(user, RiskIncidence.class, selected);
-    for (String incidenceId : idList) {
-      RodaCoreFactory.getModelService().deleteRiskIncidence(incidenceId, true);
-    }
+  public static Job deleteRiskIncidences(User user, SelectedItems<RiskIncidence> selected, String details)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    Map<String, String> pluginParameters = new HashMap<>();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
+    return createAndExecuteInternalJob("Delete risk incidences", selected, DeleteRODAObjectPlugin.class, user,
+      pluginParameters, "Could not execute risk incidence delete action");
   }
 
   public static void updateMultipleIncidences(SelectedItems<RiskIncidence> selected, String status, String severity,
@@ -2772,12 +2772,12 @@ public class BrowserHelper {
     return RodaCoreFactory.getModelService().updateDIP(dip);
   }
 
-  public static void deleteDIPs(SelectedItems<IndexedDIP> selected, User user)
-    throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException {
-    for (String dipId : consolidate(user, IndexedDIP.class, selected)) {
-      RodaCoreFactory.getModelService().deleteDIP(dipId);
-    }
-    RodaCoreFactory.getIndexService().commit(IndexedDIP.class);
+  public static Job deleteDIPs(User user, SelectedItems<IndexedDIP> selected, String details)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    Map<String, String> pluginParameters = new HashMap<>();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
+    return createAndExecuteInternalJob("Delete DIP", selected, DeleteRODAObjectPlugin.class, user, pluginParameters,
+      "Could not execute DIP delete action");
   }
 
   protected static EntityResponse retrieveDIP(String dipId, String acceptFormat)
@@ -2842,20 +2842,12 @@ public class BrowserHelper {
       notify);
   }
 
-  public static void deleteDIPFiles(SelectedItems<DIPFile> selected, User user)
+  public static Job deleteDIPFiles(User user, SelectedItems<DIPFile> selected, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    List<String> fileIds = consolidate(user, DIPFile.class, selected);
-
-    Filter filter = new Filter();
-    filter.add(new OneOfManyFilterParameter(RodaConstants.INDEX_UUID, fileIds));
-    IndexResult<DIPFile> files = RodaCoreFactory.getIndexService().find(DIPFile.class, filter, Sorter.NONE,
-      new Sublist(0, fileIds.size()), RodaConstants.DIPFILE_FIELDS_TO_RETURN);
-
-    for (DIPFile file : files.getResults()) {
-      RodaCoreFactory.getModelService().deleteDIPFile(file.getDipId(), file.getPath(), file.getId(), true);
-    }
-
-    RodaCoreFactory.getIndexService().commit(DIPFile.class);
+    Map<String, String> pluginParameters = new HashMap<>();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
+    return createAndExecuteInternalJob("Delete DIP file", selected, DeleteRODAObjectPlugin.class, user,
+      pluginParameters, "Could not execute DIP file delete action");
   }
 
   public static EntityResponse retrieveRepresentationInformation(String representationInformationId,

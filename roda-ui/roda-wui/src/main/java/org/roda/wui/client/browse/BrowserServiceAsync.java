@@ -182,7 +182,7 @@ public interface BrowserServiceAsync {
 
   void deleteRisk(SelectedItems<IndexedRisk> selected, AsyncCallback<Job> asyncCallback);
 
-  void deleteRiskIncidences(SelectedItems<RiskIncidence> selected, AsyncCallback<Void> asyncCallback);
+  void deleteRiskIncidences(SelectedItems<RiskIncidence> selected, String details, AsyncCallback<Void> asyncCallback);
 
   void createProcess(String jobName, SelectedItems<?> selected, String id, Map<String, String> value,
     String selectedClass, AsyncCallback<Job> asyncCallback);
@@ -231,7 +231,7 @@ public interface BrowserServiceAsync {
 
   void retrieveDipBundle(String dipUUID, String dipFileUUID, AsyncCallback<DipBundle> callback);
 
-  void deleteDIPs(SelectedItems<IndexedDIP> dips, AsyncCallback<Void> async);
+  void deleteDIPs(SelectedItems<IndexedDIP> dips, String details, AsyncCallback<Void> async);
 
   void retrieveBrowseRepresentationBundle(String aipId, String representationId, String localeString,
     List<String> representationFieldsToReturn, AsyncCallback<BrowseRepresentationBundle> callback);

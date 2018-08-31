@@ -32,6 +32,7 @@ import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import config.i18n.client.ClientMessages;
@@ -144,14 +145,22 @@ public class RiskIncidenceActions extends AbstractActionable<RiskIncidence> {
             @Override
             public void onSuccess(Boolean confirmed) {
               if (confirmed) {
-                BrowserService.Util.getInstance().deleteRiskIncidences(objects,
-                  new ActionAsyncCallback<Void>(callback) {
+                Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
+                  RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+                  new ActionNoAsyncCallback<String>(callback) {
 
                     @Override
-                    public void onSuccess(Void nothing) {
-                      Toast.showInfo(messages.riskIncidenceRemoveSuccessTitle(),
-                        messages.riskIncidenceRemoveSuccessMessage(size));
-                      doActionCallbackDestroyed();
+                    public void onSuccess(final String details) {
+                      BrowserService.Util.getInstance().deleteRiskIncidences(objects, details,
+                        new ActionAsyncCallback<Void>(callback) {
+
+                          @Override
+                          public void onSuccess(Void nothing) {
+                            Toast.showInfo(messages.riskIncidenceRemoveSuccessTitle(),
+                              messages.riskIncidenceRemoveSuccessMessage(size));
+                            doActionCallbackDestroyed();
+                          }
+                        });
                     }
                   });
               } else {

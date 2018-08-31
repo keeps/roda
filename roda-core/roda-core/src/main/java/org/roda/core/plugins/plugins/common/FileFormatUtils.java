@@ -33,6 +33,8 @@ public class FileFormatUtils {
         String pronomExtensions = RodaCoreFactory.getRodaConfigurationAsString(CORE, TOOLS, "pronom", pronom);
         if (StringUtils.isNotBlank(pronomExtensions)) {
           map.put(pronom, Arrays.asList(pronomExtensions.split(" ")));
+        } else {
+          map.put(pronom, Collections.emptyList());
         }
       }
     }
@@ -50,6 +52,8 @@ public class FileFormatUtils {
         String mimeExtensions = RodaCoreFactory.getRodaConfigurationAsString(CORE, TOOLS, "mimetype", mimetype);
         if (StringUtils.isNotBlank(mimeExtensions)) {
           map.put(mimetype, Arrays.asList(mimeExtensions.split(" ")));
+        } else {
+          map.put(mimetype, Collections.emptyList());
         }
       }
     }

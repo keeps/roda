@@ -11,6 +11,7 @@ import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -155,6 +156,7 @@ public class DipsResource {
 
   public Response deleteDIP(
     @ApiParam(value = "The ID of the DIP to delete.", required = true) @PathParam(RodaConstants.API_PATH_PARAM_DIP_ID) String dipId,
+    @ApiParam(value = "Reason to delete AIP", required = true) @FormParam(RodaConstants.API_QUERY_PARAM_DETAILS) String details,
     @ApiParam(value = "Choose format in which to get the response", allowableValues = RodaConstants.API_DELETE_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
@@ -163,7 +165,7 @@ public class DipsResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    Browser.deleteDIPs(user, SelectedItemsList.create(IndexedDIP.class, dipId));
+    Browser.deleteDIPs(user, SelectedItemsList.create(IndexedDIP.class, dipId), details);
 
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "DIP deleted"), mediaType).build();
   }

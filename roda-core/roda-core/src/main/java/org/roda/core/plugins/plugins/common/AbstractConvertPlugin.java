@@ -868,10 +868,10 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
     String newFileFormat = fileFormat;
 
     if (!applicableTo.isEmpty()) {
-      if (filePronom != null && !filePronom.isEmpty() && pronomToExtension.get(filePronom) != null
+      if (StringUtils.isNotBlank(filePronom) && pronomToExtension.get(filePronom) != null
         && !pronomToExtension.get(filePronom).contains(fileFormat)) {
         newFileFormat = pronomToExtension.get(filePronom).get(0);
-      } else if (fileMimetype != null && !fileMimetype.isEmpty() && mimetypeToExtension.get(fileMimetype) != null
+      } else if (StringUtils.isNotBlank(fileMimetype) && mimetypeToExtension.get(fileMimetype) != null
         && !mimetypeToExtension.get(fileMimetype).contains(fileFormat)) {
         newFileFormat = mimetypeToExtension.get(fileMimetype).get(0);
       }

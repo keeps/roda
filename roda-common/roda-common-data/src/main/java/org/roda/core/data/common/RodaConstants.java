@@ -392,7 +392,6 @@ public final class RodaConstants {
   public static final String CONTROLLER_DIP_PARAM = RODA_OBJECT_DIP;
   public static final String CONTROLLER_DIPS_PARAM = RODA_OBJECT_DIPS;
   public static final String CONTROLLER_DIP_ID_PARAM = "dipId";
-  public static final String CONTROLLER_DIP_FILE_PARAM = RODA_OBJECT_DIPFILE;
   public static final String CONTROLLER_DIP_FILE_ID_PARAM = "dipFileId";
   public static final String CONTROLLER_DIP_FILE_UUID_PARAM = "dipFileUUID";
   public static final String CONTROLLER_AGENT_ID_PARAM = "agentId";
@@ -414,7 +413,6 @@ public final class RodaConstants {
   public static final String CONTROLLER_JOB_ID_PARAM = "jobId";
   public static final String CONTROLLER_REPRESENTATION_INFORMATION_PARAM = RODA_OBJECT_REPRESENTATION_INFORMATION;
   public static final String CONTROLLER_REPRESENTATION_INFORMATION_ID_PARAM = "representationInformationId";
-  public static final String CONTROLLER_REPRESENTATION_INFORMATION_FAMILY_PARAM = "family";
   public static final String CONTROLLER_FORMAT_PARAM = RODA_OBJECT_FORMAT;
   public static final String CONTROLLER_FORMAT_ID_PARAM = "formatId";
 
@@ -466,6 +464,7 @@ public final class RodaConstants {
   public static final String CONTROLLER_STATES_PARAM = "states";
   public static final String CONTROLLER_REPRESENTATION_INFORMATION_FILTER_PARAM = "filter";
   public static final String CONTROLLER_ACTIVATE_PARAM = "activate";
+  public static final String CONTROLLER_DETAILS_PARAM = "details";
 
   /*
    * Core (storage, index, orchestrator, etc.)

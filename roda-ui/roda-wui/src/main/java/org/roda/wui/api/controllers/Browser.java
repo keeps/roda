@@ -1252,7 +1252,7 @@ public class Browser extends RodaWuiController {
     } finally {
       // register action
       controllerAssistant.registerAction(user, parentId, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selected,
-        RodaConstants.CONTROLLER_TO_PARENT_PARAM, parentId);
+        RodaConstants.CONTROLLER_TO_PARENT_PARAM, parentId, RodaConstants.CONTROLLER_DETAILS_PARAM, details);
     }
   }
 
@@ -1374,7 +1374,8 @@ public class Browser extends RodaWuiController {
       throw e;
     } finally {
       // register action
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, aips);
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, aips,
+        RodaConstants.CONTROLLER_DETAILS_PARAM, details);
     }
   }
 
@@ -1395,7 +1396,8 @@ public class Browser extends RodaWuiController {
       throw e;
     } finally {
       // register action
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, representations);
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, representations,
+        RodaConstants.CONTROLLER_DETAILS_PARAM, details);
     }
   }
 
@@ -1416,7 +1418,8 @@ public class Browser extends RodaWuiController {
       throw e;
     } finally {
       // register action
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, files);
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, files,
+        RodaConstants.CONTROLLER_DETAILS_PARAM, details);
     }
   }
 
@@ -1558,7 +1561,8 @@ public class Browser extends RodaWuiController {
     } finally {
       // register action
       controllerAssistant.registerAction(user, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
-        RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId, RodaConstants.CONTROLLER_TYPE_PARAM, type);
+        RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId, RodaConstants.CONTROLLER_TYPE_PARAM, type,
+        RodaConstants.CONTROLLER_DETAILS_PARAM, details);
     }
   }
 
@@ -2095,7 +2099,7 @@ public class Browser extends RodaWuiController {
     } finally {
       // register action
       controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_AIPS_PARAM, aips,
-        RodaConstants.CONTROLLER_PERMISSIONS_PARAM, permissions);
+        RodaConstants.CONTROLLER_PERMISSIONS_PARAM, permissions, RodaConstants.CONTROLLER_DETAILS_PARAM, details);
     }
   }
 
@@ -2119,7 +2123,7 @@ public class Browser extends RodaWuiController {
     } finally {
       // register action
       controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_DIPS_PARAM, dips,
-        RodaConstants.CONTROLLER_PERMISSIONS_PARAM, permissions);
+        RodaConstants.CONTROLLER_PERMISSIONS_PARAM, permissions, RodaConstants.CONTROLLER_DETAILS_PARAM, details);
     }
   }
 
@@ -2474,7 +2478,7 @@ public class Browser extends RodaWuiController {
     } finally {
       // register action
       controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_FILE_UUID_PARAM, folderUUID,
-        RodaConstants.CONTROLLER_FOLDERNAME_PARAM, newName);
+        RodaConstants.CONTROLLER_FOLDERNAME_PARAM, newName, RodaConstants.CONTROLLER_DETAILS_PARAM, details);
     }
   }
 
@@ -2500,7 +2504,7 @@ public class Browser extends RodaWuiController {
       // register action
       controllerAssistant.registerAction(user, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
         RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId, RodaConstants.CONTROLLER_FILES_PARAM,
-        selectedFiles, RodaConstants.CONTROLLER_FILE_PARAM, toFolder);
+        selectedFiles, RodaConstants.CONTROLLER_FILE_PARAM, toFolder, RodaConstants.CONTROLLER_DETAILS_PARAM, details);
     }
   }
 
@@ -2528,7 +2532,8 @@ public class Browser extends RodaWuiController {
       // register action
       controllerAssistant.registerAction(user, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
         RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId, RodaConstants.CONTROLLER_FILE_UUID_PARAM,
-        folderUUID, RodaConstants.CONTROLLER_FOLDERNAME_PARAM, newName);
+        folderUUID, RodaConstants.CONTROLLER_FOLDERNAME_PARAM, newName, RodaConstants.CONTROLLER_DETAILS_PARAM,
+        details);
     }
   }
 
@@ -2607,7 +2612,8 @@ public class Browser extends RodaWuiController {
       // register action
       controllerAssistant.registerAction(user, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
         RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId,
-        RodaConstants.CONTROLLER_DIRECTORY_PATH_PARAM, directoryPath, RodaConstants.CONTROLLER_FILE_ID_PARAM, fileId);
+        RodaConstants.CONTROLLER_DIRECTORY_PATH_PARAM, directoryPath, RodaConstants.CONTROLLER_FILE_ID_PARAM, fileId,
+        RodaConstants.CONTROLLER_DETAILS_PARAM, details);
     }
   }
 
@@ -2661,7 +2667,8 @@ public class Browser extends RodaWuiController {
     } finally {
       // register action
       String id = file == null ? fileUUID : file.getAipId();
-      controllerAssistant.registerAction(user, id, state, RodaConstants.CONTROLLER_FILE_UUID_PARAM, fileUUID);
+      controllerAssistant.registerAction(user, id, state, RodaConstants.CONTROLLER_FILE_UUID_PARAM, fileUUID,
+        RodaConstants.CONTROLLER_DETAILS_PARAM, details);
     }
   }
 
@@ -2708,7 +2715,7 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static void deleteRiskIncidences(User user, SelectedItems<RiskIncidence> selected)
+  public static void deleteRiskIncidences(User user, SelectedItems<RiskIncidence> selected, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -2718,17 +2725,18 @@ public class Browser extends RodaWuiController {
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
     try {
-      BrowserHelper.deleteRiskIncidences(user, selected);
+      BrowserHelper.deleteRiskIncidences(user, selected, details);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;
     } finally {
       // register action
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selected);
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selected,
+        RodaConstants.CONTROLLER_DETAILS_PARAM, details);
     }
   }
 
-  public static void deleteDIPs(User user, SelectedItems<IndexedDIP> dips)
+  public static void deleteDIPs(User user, SelectedItems<IndexedDIP> dips, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -2740,13 +2748,14 @@ public class Browser extends RodaWuiController {
 
     try {
       // delegate
-      BrowserHelper.deleteDIPs(dips, user);
+      BrowserHelper.deleteDIPs(user, dips, details);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;
     } finally {
       // register action
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, dips);
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, dips,
+        RodaConstants.CONTROLLER_DETAILS_PARAM, details, RodaConstants.CONTROLLER_DETAILS_PARAM, details);
     }
   }
 
@@ -2906,7 +2915,7 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static void deleteDIPFile(User user, SelectedItems<DIPFile> files)
+  public static void deleteDIPFile(User user, SelectedItems<DIPFile> files, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -2918,13 +2927,14 @@ public class Browser extends RodaWuiController {
 
     try {
       // delegate
-      BrowserHelper.deleteDIPFiles(files, user);
+      BrowserHelper.deleteDIPFiles(user, files, details);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;
     } finally {
       // register action
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, files);
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, files,
+        RodaConstants.CONTROLLER_DETAILS_PARAM, details);
     }
   }
 
@@ -2997,7 +3007,7 @@ public class Browser extends RodaWuiController {
     } finally {
       // register action
       controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selected,
-        RodaConstants.CONTROLLER_TYPE_PARAM, newType);
+        RodaConstants.CONTROLLER_TYPE_PARAM, newType, RodaConstants.CONTROLLER_DETAILS_PARAM, details);
     }
   }
 
@@ -3019,7 +3029,7 @@ public class Browser extends RodaWuiController {
     } finally {
       // register action
       controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selected,
-        RodaConstants.CONTROLLER_TYPE_PARAM, newType);
+        RodaConstants.CONTROLLER_TYPE_PARAM, newType, RodaConstants.CONTROLLER_DETAILS_PARAM, details);
     }
   }
 
@@ -3041,7 +3051,7 @@ public class Browser extends RodaWuiController {
     } finally {
       // register action
       controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_REPRESENTATION_PARAM, representation,
-        RodaConstants.CONTROLLER_STATES_PARAM, newStates);
+        RodaConstants.CONTROLLER_STATES_PARAM, newStates, RodaConstants.CONTROLLER_DETAILS_PARAM, details);
     }
   }
 
