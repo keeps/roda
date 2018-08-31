@@ -8,6 +8,7 @@
 package org.roda.core.plugins.plugins.common;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,9 +28,13 @@ public class FileFormatUtils {
     Map<String, List<String>> map = new HashMap<>();
     String inputFormatPronoms = RodaCoreFactory.getRodaConfigurationAsString(CORE, TOOLS, tool, "inputFormatPronoms");
 
-    for (String pronom : Arrays.asList(inputFormatPronoms.split(" "))) {
-      String pronomExtensions = RodaCoreFactory.getRodaConfigurationAsString(CORE, TOOLS, "pronom", pronom);
-      map.put(pronom, Arrays.asList(pronomExtensions.split(" ")));
+    if (StringUtils.isNotBlank(inputFormatPronoms)) {
+      for (String pronom : Arrays.asList(inputFormatPronoms.split(" "))) {
+        String pronomExtensions = RodaCoreFactory.getRodaConfigurationAsString(CORE, TOOLS, "pronom", pronom);
+        if (StringUtils.isNotBlank(pronomExtensions)) {
+          map.put(pronom, Arrays.asList(pronomExtensions.split(" ")));
+        }
+      }
     }
 
     return map;
@@ -55,6 +60,10 @@ public class FileFormatUtils {
   public static List<String> getInputExtensions(String tool) {
     String inputFormatExtensions = RodaCoreFactory.getRodaConfigurationAsString(CORE, TOOLS, tool,
       "inputFormatExtensions");
-    return Arrays.asList(inputFormatExtensions.split(" "));
+    if (StringUtils.isNotBlank(inputFormatExtensions)) {
+      return Arrays.asList(inputFormatExtensions.split(" "));
+    } else {
+      return Collections.emptyList();
+    }
   }
 }
