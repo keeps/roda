@@ -101,14 +101,14 @@ public abstract class AbstractAIPComponentsPlugin<T extends IsRODAObject> extend
     Report report, JobPluginInfo jobPluginInfo, List<Representation> list, Job job) throws PluginException {
     // XXX define this method as abstract when removing the corresponding
     // deprecated legacy method
-    return executeOnRepresentation(index, model, storage, report, (JobPluginInfo) jobPluginInfo, list, job);
+    return executeOnRepresentation(index, model, storage, report, (SimpleJobPluginInfo) jobPluginInfo, list, job);
   }
 
   protected Report executeOnFile(IndexService index, ModelService model, StorageService storage, Report report,
     JobPluginInfo jobPluginInfo, List<File> list, Job job) throws PluginException {
     // XXX define this method as abstract when removing the corresponding
     // deprecated legacy method
-    return executeOnFile(index, model, storage, report, (JobPluginInfo) jobPluginInfo, list, job);
+    return executeOnFile(index, model, storage, report, (SimpleJobPluginInfo) jobPluginInfo, list, job);
   }
 
   protected Report executeOnIncidence(IndexService index, ModelService model, StorageService storage, Report report,
