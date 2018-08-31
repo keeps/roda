@@ -734,17 +734,16 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void updateRiskCounters()
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+  public void updateRiskCounters() throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Browser.updateRiskCounters(user);
   }
 
   @Override
-  public void appraisal(SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason, String localeString)
+  public void appraisal(SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.appraisal(user, selected, accept, rejectReason, ServerTools.parseLocale(localeString));
+    Browser.appraisal(user, selected, accept, rejectReason);
   }
 
   @Override

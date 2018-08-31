@@ -192,8 +192,7 @@ public interface BrowserServiceAsync {
 
   void updateRiskCounters(AsyncCallback<Void> asyncCallback);
 
-  void appraisal(SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason, String localeString,
-    AsyncCallback<Void> callback);
+  void appraisal(SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason, AsyncCallback<Void> callback);
 
   void renameTransferredResource(String transferredResourceId, String newName, AsyncCallback<String> asyncCallback);
 

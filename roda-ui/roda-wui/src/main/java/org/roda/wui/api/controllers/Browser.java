@@ -2388,8 +2388,8 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static void appraisal(User user, SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason,
-    Locale locale) throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
+  public static void appraisal(User user, SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -2400,7 +2400,7 @@ public class Browser extends RodaWuiController {
 
     try {
       // delegate
-      BrowserHelper.appraisal(user, selected, accept, rejectReason, locale);
+      BrowserHelper.appraisal(user, selected, accept, rejectReason);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;

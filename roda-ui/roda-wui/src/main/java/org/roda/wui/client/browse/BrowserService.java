@@ -265,7 +265,7 @@ public interface BrowserService extends RemoteService {
   void updateRiskCounters()
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
-  void appraisal(SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason, String localeString)
+  void appraisal(SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
 
   String renameTransferredResource(String transferredResourceId, String newName)

@@ -877,6 +877,8 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_REPRESENTATION_TYPE = "parameter.representation_type";
   public static final String PLUGIN_PARAMS_OUTCOMEOBJECTID_TO_SOURCEOBJECTID_MAP = "parameter.outcomeobjectid_to_sourceobjectid_map";
   public static final String PLUGIN_PARAMS_NEW_TYPE = "parameter.new_type";
+  public static final String PLUGIN_PARAMS_ACCEPT = "parameter.accept";
+  public static final String PLUGIN_PARAMS_REJECT_REASON = "parameter.reject_reason";
 
   public static final String PLUGIN_PARAMS_INCLUDE_SELECTED_DESCRIPTIVE_METADATA = "parameter.include_selected_descriptive_metadata";
   public static final String PLUGIN_PARAMS_SELECTED_DESCRIPTIVE_METADATA = "parameter.selected_descriptive_metadata";

@@ -554,18 +554,6 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     final boolean accept = true;
     String rejectReason = null;
     BrowserService.Util.getInstance().appraisal(objectToSelectedItems(aip, IndexedAIP.class), accept, rejectReason,
-      LocaleInfo.getCurrentLocale().getLocaleName(), new ActionLoadingAsyncCallback<Void>(callback) {
-
-        @Override
-        public void onSuccessImpl(Void result) {
-          Toast.showInfo(messages.dialogDone(), messages.itemWasAccepted());
-          doActionCallbackUpdated();
-        }
-      });
-  }
-
-  private void appraisalAccept(final SelectedItems<IndexedAIP> aips, final AsyncCallback<ActionImpact> callback) {
-    BrowserService.Util.getInstance().appraisal(aips, true, null, LocaleInfo.getCurrentLocale().getLocaleName(),
       new ActionLoadingAsyncCallback<Void>(callback) {
 
         @Override
@@ -576,6 +564,17 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
       });
   }
 
+  private void appraisalAccept(final SelectedItems<IndexedAIP> aips, final AsyncCallback<ActionImpact> callback) {
+    BrowserService.Util.getInstance().appraisal(aips, true, null, new ActionLoadingAsyncCallback<Void>(callback) {
+
+      @Override
+      public void onSuccessImpl(Void result) {
+        Toast.showInfo(messages.dialogDone(), messages.itemWasAccepted());
+        doActionCallbackUpdated();
+      }
+    });
+  }
+
   private void appraisalReject(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
     Dialogs.showPromptDialog(messages.rejectMessage(), messages.rejectQuestion(), null, null, RegExp.compile(".+"),
       messages.dialogCancel(), messages.dialogOk(), true, false, new ActionNoAsyncCallback<String>(callback) {
@@ -583,7 +582,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
         @Override
         public void onSuccess(final String rejectReason) {
           BrowserService.Util.getInstance().appraisal(objectToSelectedItems(aip, IndexedAIP.class), false, rejectReason,
-            LocaleInfo.getCurrentLocale().getLocaleName(), new ActionLoadingAsyncCallback<Void>(callback) {
+            new ActionLoadingAsyncCallback<Void>(callback) {
 
               @Override
               public void onSuccessImpl(Void result) {
@@ -603,7 +602,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
         @Override
         public void onSuccess(final String rejectReason) {
           BrowserService.Util.getInstance().appraisal(aips, false, rejectReason,
-            LocaleInfo.getCurrentLocale().getLocaleName(), new ActionLoadingAsyncCallback<Void>(callback) {
+            new ActionLoadingAsyncCallback<Void>(callback) {
 
               @Override
               public void onSuccessImpl(Void result) {

@@ -138,7 +138,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.plugins.plugins.characterization.SiegfriedPlugin;
-import org.roda.core.plugins.plugins.ingest.AutoAcceptSIPPlugin;
+import org.roda.core.plugins.plugins.internal.AppraisalPlugin;
 import org.roda.core.plugins.plugins.internal.ChangeTypePlugin;
 import org.roda.core.plugins.plugins.internal.DeleteRODAObjectPlugin;
 import org.roda.core.plugins.plugins.internal.MovePlugin;
@@ -2376,115 +2376,13 @@ public class BrowserHelper {
     index.commit(IndexedRisk.class);
   }
 
-  public static void appraisal(User user, SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason,
-    Locale locale) throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
-    List<String> listOfIds = consolidate(user, IndexedAIP.class, selected);
-
-    ModelService model = RodaCoreFactory.getModelService();
-    IndexService index = RodaCoreFactory.getIndexService();
-    Date now = new Date();
-
-    // map of job id -> (total, accepted)
-    Map<String, Pair<Integer, Integer>> jobState = new HashMap<>();
-    List<String> aipsToDelete = new ArrayList<>();
-
-    String userAgentId;
-    try {
-      boolean notifyAgent = true;
-      PreservationMetadata pm = PremisV3Utils.createPremisUserAgentBinary(user.getName(), model, index, notifyAgent);
-      userAgentId = pm.getId();
-    } catch (AlreadyExistsException e) {
-      userAgentId = IdUtils.getUserAgentId(user.getName());
-    } catch (ValidationException e) {
-      throw new GenericException(e);
-    }
-
-    for (String aipId : listOfIds) {
-      AIP aip = model.retrieveAIP(aipId);
-      String jobId = aip.getIngestJobId();
-      String ingestSIPUUID = aip.getIngestSIPUUID();
-      if (accept) {
-        // Accept AIP
-        aip.setState(AIPState.ACTIVE);
-        model.updateAIPState(aip, user.getName());
-
-        // create preservation event
-        String id = IdUtils.createPreservationMetadataId(PreservationMetadataType.EVENT);
-        PreservationEventType type = PreservationEventType.ACCESSION;
-        String preservationEventDescription = AutoAcceptSIPPlugin.DESCRIPTION;
-        List<LinkingIdentifier> sources = new ArrayList<>();
-        List<LinkingIdentifier> outcomes = Arrays
-          .asList(PluginHelper.getLinkingIdentifier(aipId, RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
-        PluginState outcome = PluginState.SUCCESS;
-        String outcomeDetailNote = AutoAcceptSIPPlugin.SUCCESS_MESSAGE;
-        String outcomeDetailExtension = null;
-        boolean notifyEvent = true;
-        try {
-          ContentPayload premisEvent = PremisV3Utils.createPremisEventBinary(id, now, type.toString(),
-            preservationEventDescription, sources, outcomes, outcome.name(), outcomeDetailNote, outcomeDetailExtension,
-            Arrays.asList(userAgentId));
-
-          model.createPreservationMetadata(PreservationMetadataType.EVENT, id, aipId, null, null, null, premisEvent,
-            notifyEvent);
-        } catch (AlreadyExistsException | ValidationException e) {
-          throw new GenericException(e);
-        }
-
-      } else {
-        // Reject AIP
-        model.deleteAIP(aipId);
-        aipsToDelete.add(aipId);
-      }
-
-      // create job report
-      Job job = model.retrieveJob(jobId);
-      Report report = model.retrieveJobReport(jobId, ingestSIPUUID, aipId);
-
-      Report reportItem = new Report();
-      Messages messages = RodaCoreFactory.getI18NMessages(locale);
-      reportItem.setTitle(messages.getTranslation(RodaConstants.I18N_UI_APPRAISAL));
-      reportItem.setPlugin(messages.getTranslation(RodaConstants.I18N_UI_APPRAISAL));
-      reportItem.setPluginDetails(rejectReason);
-      reportItem.setPluginState(accept ? PluginState.SUCCESS : PluginState.FAILURE);
-      reportItem.setOutcomeObjectState(accept ? AIPState.ACTIVE : AIPState.DELETED);
-      reportItem.setDateCreated(now);
-      report.addReport(reportItem);
-
-      model.createOrUpdateJobReport(report, job);
-
-      // save job state
-      Pair<Integer, Integer> pair = jobState.get(jobId);
-      if (pair == null) {
-        jobState.put(jobId, Pair.of(1, accept ? 1 : 0));
-      } else {
-        jobState.put(jobId, Pair.of(pair.getFirst() + 1, pair.getSecond() + (accept ? 1 : 0)));
-      }
-    }
-
-    // update job counters
-    for (Entry<String, Pair<Integer, Integer>> entry : jobState.entrySet()) {
-      String jobId = entry.getKey();
-      int total = entry.getValue().getFirst();
-      int accepted = entry.getValue().getSecond();
-      int rejected = total - accepted;
-      Job job = model.retrieveJob(jobId);
-      if (rejected > 0) {
-        // change counter to failure
-        job.getJobStats()
-          .setSourceObjectsProcessedWithSuccess(job.getJobStats().getSourceObjectsProcessedWithSuccess() - rejected);
-        job.getJobStats()
-          .setSourceObjectsProcessedWithFailure(job.getJobStats().getSourceObjectsProcessedWithFailure() + rejected);
-      }
-
-      // decrement manual interaction counter
-      job.getJobStats()
-        .setOutcomeObjectsWithManualIntervention(job.getJobStats().getOutcomeObjectsWithManualIntervention() - total);
-
-      model.createOrUpdateJob(job);
-    }
-
-    RodaCoreFactory.getIndexService().commit(IndexedAIP.class, Job.class, IndexedReport.class,
-      IndexedPreservationEvent.class);
+  public static Job appraisal(User user, SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
+    Map<String, String> pluginParameters = new HashMap<>();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_ACCEPT, Boolean.toString(accept));
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_REJECT_REASON, rejectReason);
+    return createAndExecuteInternalJob("AIP appraisal", selected, AppraisalPlugin.class, user, pluginParameters,
+      "Could not execute appraisal action on AIP");
   }
 
   public static String retrieveDescriptiveMetadataPreview(SupportedMetadataTypeBundle bundle) throws GenericException {
