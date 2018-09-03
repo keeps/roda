@@ -234,7 +234,7 @@ public class BrowseAIP extends Composite {
 
     // REPRESENTATIONS
 
-    ListBuilder<IndexedRepresentation> representationsListBuilder = new ListBuilder<>(RepresentationList::new,
+    ListBuilder<IndexedRepresentation> representationsListBuilder = new ListBuilder<>(() -> new RepresentationList(),
       new AsyncTableCellOptions<>(IndexedRepresentation.class, "BrowseAIP_representations")
         .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aip.getId())))
         .withJustActive(justActive).withSummary(messages.listOfRepresentations()).bindOpener());
@@ -244,7 +244,7 @@ public class BrowseAIP extends Composite {
 
     // DISSEMINATIONS
 
-    ListBuilder<IndexedDIP> disseminationsListBuilder = new ListBuilder<>(DIPList::new,
+    ListBuilder<IndexedDIP> disseminationsListBuilder = new ListBuilder<>(() -> new DIPList(),
       new AsyncTableCellOptions<>(IndexedDIP.class, "BrowseAIP_disseminations")
         .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.DIP_AIP_UUIDS, aip.getId())))
         .withJustActive(justActive).withSummary(messages.listOfDisseminations()).bindOpener());
@@ -254,7 +254,7 @@ public class BrowseAIP extends Composite {
 
     // AIP CHILDREN
 
-    ListBuilder<IndexedAIP> aipChildrenListBuilder = new ListBuilder<>(AIPList::new,
+    ListBuilder<IndexedAIP> aipChildrenListBuilder = new ListBuilder<>(() -> new AIPList(),
       new AsyncTableCellOptions<>(IndexedAIP.class, "BrowseAIP_aipChildren")
         .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aip.getId())))
         .withJustActive(justActive).withSummary(messages.listOfAIPs()).bindOpener());

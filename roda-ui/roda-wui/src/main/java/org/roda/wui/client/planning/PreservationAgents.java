@@ -74,7 +74,7 @@ public class PreservationAgents extends Composite {
   SearchWrapper searchWrapper;
 
   public PreservationAgents() {
-    ListBuilder<IndexedPreservationAgent> preservationAgentListBuilder = new ListBuilder<>(PreservationAgentList::new,
+    ListBuilder<IndexedPreservationAgent> preservationAgentListBuilder = new ListBuilder<>(() -> new PreservationAgentList(),
       new AsyncTableCellOptions<>(IndexedPreservationAgent.class, "PreservationAgents_agents").bindOpener());
 
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(preservationAgentListBuilder,

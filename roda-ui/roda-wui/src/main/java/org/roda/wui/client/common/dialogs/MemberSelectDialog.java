@@ -16,7 +16,7 @@ import org.roda.wui.client.common.lists.utils.ListBuilder;
 public class MemberSelectDialog extends DefaultSelectDialog<RODAMember> {
   public MemberSelectDialog(String title, Filter filter) {
     super(title,
-      new ListBuilder<>(RodaMemberList::new,
+      new ListBuilder<>(() -> new RodaMemberList(),
         new AsyncTableCellOptions<>(RODAMember.class, "MemberSelectDialog_rodaMembers").withFilter(filter)
           .withSummary(title)));
   }

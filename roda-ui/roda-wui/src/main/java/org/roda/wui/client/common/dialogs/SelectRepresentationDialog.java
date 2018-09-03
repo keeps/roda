@@ -22,7 +22,7 @@ public class SelectRepresentationDialog extends DefaultSelectDialog<IndexedRepre
 
   public SelectRepresentationDialog(String title, Filter filter, boolean justActive) {
     super(title,
-      new ListBuilder<>(RepresentationList::new,
+      new ListBuilder<>(() -> new RepresentationList(),
         new AsyncTableCellOptions<>(IndexedRepresentation.class, "SelectRepresentationDialog_representations")
           .withFilter(filter).withJustActive(justActive).withSummary(messages.selectRepresentationSearchResults())));
   }

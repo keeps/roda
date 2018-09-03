@@ -101,7 +101,7 @@ public class RepresentationInformationNetwork extends Composite {
    */
   public RepresentationInformationNetwork() {
     ListBuilder<RepresentationInformation> representationInformationListBuilder = new ListBuilder<>(
-      RepresentationInformationList::new,
+      () -> new RepresentationInformationList(),
       new AsyncTableCellOptions<>(RepresentationInformation.class, "RepresentationInformationNetwork_RI")
         .withSummary(messages.representationInformationTitle()).bindOpener());
 

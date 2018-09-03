@@ -242,7 +242,7 @@ public class BrowseRepresentation extends Composite {
     Filter disseminationsFilter = new Filter(
       new SimpleFilterParameter(RodaConstants.DIP_REPRESENTATION_UUIDS, repUUID));
 
-    ListBuilder<IndexedDIP> disseminationsListBuilder = new ListBuilder<>(DIPList::new,
+    ListBuilder<IndexedDIP> disseminationsListBuilder = new ListBuilder<>(() -> new DIPList(),
       new AsyncTableCellOptions<>(IndexedDIP.class, "BrowseRepresentation_disseminations")
         .withFilter(disseminationsFilter).withSummary(messages.listOfDisseminations()).bindOpener()
         .withJustActive(justActive));

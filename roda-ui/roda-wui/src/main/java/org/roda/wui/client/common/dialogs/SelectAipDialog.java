@@ -23,7 +23,7 @@ public class SelectAipDialog extends DefaultSelectDialog<IndexedAIP> {
   private static final String listId = "SelectAipDialog_AIPs";
 
   public SelectAipDialog(String title) {
-    super(title, new ListBuilder<>(AIPList::new, new AsyncTableCellOptions<>(IndexedAIP.class, listId)
+    super(title, new ListBuilder<>(() -> new AIPList(), new AsyncTableCellOptions<>(IndexedAIP.class, listId)
       .withSummary(messages.selectAipSearchResults()).withJustActive(true)));
   }
 
@@ -32,7 +32,7 @@ public class SelectAipDialog extends DefaultSelectDialog<IndexedAIP> {
   }
 
   public SelectAipDialog(String title, Filter filter, boolean justActive, boolean exportCsvVisible) {
-    super(title, new ListBuilder<>(AIPList::new, new AsyncTableCellOptions<>(IndexedAIP.class, listId)
+    super(title, new ListBuilder<>(() -> new AIPList(), new AsyncTableCellOptions<>(IndexedAIP.class, listId)
       .withSummary(messages.selectAipSearchResults()).withJustActive(justActive).withFilter(filter)));
   }
 }

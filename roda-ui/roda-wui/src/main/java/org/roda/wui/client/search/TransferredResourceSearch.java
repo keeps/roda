@@ -39,7 +39,7 @@ public class TransferredResourceSearch extends Composite {
   public TransferredResourceSearch(String resourcesListId, Filter filter,
     TransferredResourceActions transferredResourceActions) {
 
-    ListBuilder<TransferredResource> transferredResourceListBuilder = new ListBuilder<>(TransferredResourceList::new,
+    ListBuilder<TransferredResource> transferredResourceListBuilder = new ListBuilder<>(() -> new TransferredResourceList(),
       new AsyncTableCellOptions<>(TransferredResource.class, resourcesListId).withFilter(filter).bindOpener());
 
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(transferredResourceListBuilder,

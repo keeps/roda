@@ -237,18 +237,18 @@ public class RepresentationInformationDialogs {
                 Filter tableFilter = new Filter(new OrFiltersParameters(filterList));
 
                 if (SEARCH_ITEMS.equals(dropDown.getSelectedValue())) {
-                  listBuilder = new ListBuilder<>(AIPList::new,
+                  listBuilder = new ListBuilder<>(() -> new AIPList(),
                     new AsyncTableCellOptions<>(IndexedAIP.class, aipListId).withFilter(tableFilter)
                       .withJustActive(true).withCsvDownloadButtonVisibility(false).addRedrawHandler(dialogBox::center));
 
                 } else if (SEARCH_REPRESENTATIONS.equals(dropDown.getSelectedValue())) {
-                  listBuilder = new ListBuilder<>(RepresentationList::new,
+                  listBuilder = new ListBuilder<>(() -> new RepresentationList(),
                     new AsyncTableCellOptions<>(IndexedRepresentation.class, representationsListId)
                       .withFilter(tableFilter).withJustActive(true).withCsvDownloadButtonVisibility(false)
                       .addRedrawHandler(dialogBox::center));
 
                 } else if (SEARCH_FILES.equals(dropDown.getSelectedValue())) {
-                  listBuilder = new ListBuilder<>(SimpleFileList::new,
+                  listBuilder = new ListBuilder<>(() -> new SimpleFileList(),
                     new AsyncTableCellOptions<>(IndexedFile.class, filesListId).withFilter(tableFilter)
                       .withJustActive(true).withCsvDownloadButtonVisibility(false).addRedrawHandler(dialogBox::center));
 
@@ -854,7 +854,7 @@ public class RepresentationInformationDialogs {
     // create search box and results list
 
     ListBuilder<RepresentationInformation> representationInformationListBuilder = new ListBuilder<>(
-      RepresentationInformationList::new,
+      () -> new RepresentationInformationList(),
       new AsyncTableCellOptions<>(RepresentationInformation.class, "RepresentationInformationDialogs_RI")
         .withSummary(messages.representationInformationTitle()).withInitialPageSize(10).withPageSizeIncrement(10)
         .withCsvDownloadButtonVisibility(false).addRedrawHandler(dialogBox::center)

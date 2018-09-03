@@ -120,7 +120,7 @@ public class IngestAppraisal extends Composite {
       });
 
     // prepare lists
-    ListBuilder<IndexedAIP> aipListBuilder = new ListBuilder<>(AIPList::new,
+    ListBuilder<IndexedAIP> aipListBuilder = new ListBuilder<>(() -> new AIPList(),
       new AsyncTableCellOptions<>(IndexedAIP.class, "IngestAppraisal_searchAIPs").withJustActive(false)
         .withFilter(BASE_FILTER).bindOpener().addCheckboxSelectionListener(selected -> {
           if (selected instanceof SelectedItemsList) {
@@ -140,7 +140,7 @@ public class IngestAppraisal extends Composite {
           }
         }));
 
-    ListBuilder<IndexedRepresentation> representationListBuilder = new ListBuilder<>(RepresentationList::new,
+    ListBuilder<IndexedRepresentation> representationListBuilder = new ListBuilder<>(() -> new RepresentationList(),
       new AsyncTableCellOptions<>(IndexedRepresentation.class, "IngestAppraisal_searchRepresentations")
         .withJustActive(false).withFilter(BASE_FILTER).bindOpener());
 

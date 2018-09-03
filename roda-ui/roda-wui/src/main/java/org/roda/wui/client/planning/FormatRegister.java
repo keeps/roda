@@ -97,7 +97,7 @@ public class FormatRegister extends Composite {
   public FormatRegister() {
     actionableWidgetBuilder = new ActionableWidgetBuilder<>(FormatActions.get());
 
-    ListBuilder<Format> formatListBuilder = new ListBuilder<>(FormatList::new,
+    ListBuilder<Format> formatListBuilder = new ListBuilder<>(() -> new FormatList(),
       new AsyncTableCellOptions<>(Format.class, "FormatRegister_formats").withSummary(messages.formatsTitle())
         .bindOpener());
 

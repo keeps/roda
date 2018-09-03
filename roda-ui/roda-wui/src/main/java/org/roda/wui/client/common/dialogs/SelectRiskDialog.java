@@ -15,7 +15,7 @@ import org.roda.wui.client.common.lists.utils.ListBuilder;
 
 public class SelectRiskDialog extends DefaultSelectDialog<IndexedRisk> {
   public SelectRiskDialog(String title, Filter filter) {
-    super(title, new ListBuilder<>(RiskList::new,
+    super(title, new ListBuilder<>(() -> new RiskList(),
       new AsyncTableCellOptions<>(IndexedRisk.class, "SelectRiskDialog_risks").withFilter(filter).withSummary(title)));
   }
 }

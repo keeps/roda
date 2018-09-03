@@ -35,7 +35,7 @@ public class NotificationSearch extends Composite {
 
   public NotificationSearch(String notificationsListId) {
 
-    ListBuilder<Notification> notificationListBuilder = new ListBuilder<>(NotificationList::new,
+    ListBuilder<Notification> notificationListBuilder = new ListBuilder<>(() -> new NotificationList(),
       new AsyncTableCellOptions<>(Notification.class, notificationsListId).bindOpener());
 
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(notificationListBuilder);

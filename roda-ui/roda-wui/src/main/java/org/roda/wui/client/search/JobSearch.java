@@ -40,12 +40,12 @@ public class JobSearch extends Composite {
   public JobSearch(String jobsListId, String jobReportsListId, Filter defaultJobFilter, Filter defaultJobReportFilter,
     boolean isIngest) {
 
-    ListBuilder<Job> jobListBuilder = new ListBuilder<>(JobList::new,
+    ListBuilder<Job> jobListBuilder = new ListBuilder<>(() -> new JobList(),
       new AsyncTableCellOptions<>(Job.class, jobsListId).withFilter(new Filter(defaultJobFilter)).withAutoUpdate(10000)
         .bindOpener());
 
     ListBuilder<IndexedReport> jobReportListBuilder = new ListBuilder<>(
-      isIngest ? IngestJobReportList::new : SimpleJobReportList::new,
+      isIngest ? () -> new IngestJobReportList() : () -> new SimpleJobReportList(),
       new AsyncTableCellOptions<>(IndexedReport.class, jobReportsListId).withFilter(new Filter(defaultJobReportFilter))
         .withAutoUpdate(10000).bindOpener());
 

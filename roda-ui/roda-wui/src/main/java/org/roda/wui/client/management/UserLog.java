@@ -94,7 +94,7 @@ public class UserLog extends Composite {
 
   public UserLog() {
     // TODO tmp why no bindOpener?
-    ListBuilder<LogEntry> logEntryListBuilder = new ListBuilder<>(LogEntryList::new,
+    ListBuilder<LogEntry> logEntryListBuilder = new ListBuilder<>(() -> new LogEntryList(),
       new AsyncTableCellOptions<>(LogEntry.class, "UserLog_logEntries"));
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(logEntryListBuilder);
 

@@ -16,7 +16,7 @@ import org.roda.wui.client.common.lists.utils.ListBuilder;
 public class SelectLogEntryDialog extends DefaultSelectDialog<LogEntry> {
   public SelectLogEntryDialog(String title, Filter filter) {
     super(title,
-      new ListBuilder<>(LogEntryList::new,
+      new ListBuilder<>(() -> new LogEntryList(),
         new AsyncTableCellOptions<>(LogEntry.class, "SelectLogEntryDialog_logEntries").withFilter(filter)
           .withSummary(title)));
   }

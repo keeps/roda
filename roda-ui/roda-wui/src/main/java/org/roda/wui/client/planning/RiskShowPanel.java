@@ -137,7 +137,7 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
 
   public RiskShowPanel(String listId) {
 
-    ListBuilder<RiskIncidence> riskIncidenceListBuilder = new ListBuilder<>(RiskIncidenceList::new,
+    ListBuilder<RiskIncidence> riskIncidenceListBuilder = new ListBuilder<>(() -> new RiskIncidenceList(),
       new AsyncTableCellOptions<>(RiskIncidence.class, listId).withSummary(messages.riskIncidences()));
 
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(riskIncidenceListBuilder,
@@ -149,7 +149,7 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
   public RiskShowPanel(Risk risk, String listId, boolean hasTitle) {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISK_ID, risk.getId()));
 
-    ListBuilder<RiskIncidence> riskIncidenceListBuilder = new ListBuilder<>(RiskIncidenceList::new,
+    ListBuilder<RiskIncidence> riskIncidenceListBuilder = new ListBuilder<>(() -> new RiskIncidenceList(),
       new AsyncTableCellOptions<>(RiskIncidence.class, listId).withSummary(messages.riskIncidences())
         .withFilter(filter).bindOpener());
 

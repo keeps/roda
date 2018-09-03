@@ -74,7 +74,7 @@ public class CreateIngestJob extends CreateSelectedJob<TransferredResource> {
         }
 
         ListBuilder<TransferredResource> transferredResourceListBuilder = new ListBuilder<>(
-          TransferredResourceList::new,
+          () -> new TransferredResourceList(),
           new AsyncTableCellOptions<>(TransferredResource.class, "CreateIngestJob_transferredResources")
             .withFilter(filter).withSummary(messages.transferredResourcesTitle()).withInitialPageSize(10)
             .withPageSizeIncrement(10));

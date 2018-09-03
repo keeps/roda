@@ -50,7 +50,7 @@ public class PreservationEventsSearch extends Composite {
     }
 
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(
-      new ListBuilder<>(PreservationEventList::new,
+      new ListBuilder<>(() -> new PreservationEventList(),
         new AsyncTableCellOptions<>(IndexedPreservationEvent.class, eventsListId).withFilter(filter)
           .withSummary(messages.searchResults()).bindOpener()),
       PreservationEventActions.get(aipId, representationUUID, fileUUID), messages.searchPlaceHolder());

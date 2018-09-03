@@ -129,7 +129,7 @@ public class RepresentationInformationAssociations extends Composite {
     };
 
     ListBuilder<RepresentationInformation> representationInformationAssociationsListBuilder = new ListBuilder<>(
-      RepresentationInformationList::new,
+      () -> new RepresentationInformationList(),
       new AsyncTableCellOptions<>(RepresentationInformation.class, "RepresentationInformationAssociations_RI")
         .bindOpener().addValueChangedHandler(valueChangeHandler));
 

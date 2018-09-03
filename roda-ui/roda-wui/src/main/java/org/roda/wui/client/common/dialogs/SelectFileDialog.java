@@ -22,7 +22,7 @@ public class SelectFileDialog extends DefaultSelectDialog<IndexedFile> {
 
   public SelectFileDialog(String title, Filter filter, boolean justActive) {
     super(title,
-      new ListBuilder<>(SimpleFileList::new,
+      new ListBuilder<>(() -> new SimpleFileList(),
         new AsyncTableCellOptions<>(IndexedFile.class, "SelectFileDialog_simpleFiles").withFilter(filter)
           .withJustActive(justActive).withSummary(messages.selectFileSearchResults())));
   }

@@ -157,7 +157,7 @@ public class RiskIncidenceRegister extends Composite {
   public RiskIncidenceRegister(String aipId, String representationId, List<String> filePath, String fileId,
     Filter filter) {
 
-    ListBuilder<RiskIncidence> riskIncidenceListBuilder = new ListBuilder<>(RiskIncidenceList::new,
+    ListBuilder<RiskIncidence> riskIncidenceListBuilder = new ListBuilder<>(() -> new RiskIncidenceList(),
       new AsyncTableCellOptions<>(RiskIncidence.class, "RiskIncidenceRegister_risks").withFilter(filter)
         .withSummary(messages.riskIncidencesTitle()).bindOpener());
 

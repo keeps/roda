@@ -257,7 +257,7 @@ public class ShowJob extends Composite {
 
     ListBuilder<IndexedReport> jobReportListBuilder;
     if (isIngest) {
-      jobReportListBuilder = new ListBuilder<>(IngestJobReportList::new, jobReportListBuilderOptions);
+      jobReportListBuilder = new ListBuilder<>(() -> new IngestJobReportList(), jobReportListBuilderOptions);
     } else {
       jobReportListBuilder = new ListBuilder<>(() -> new SimpleJobReportList(pluginsInfo), jobReportListBuilderOptions);
     }

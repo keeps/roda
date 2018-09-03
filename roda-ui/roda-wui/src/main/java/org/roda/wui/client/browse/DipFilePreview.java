@@ -46,7 +46,7 @@ public class DipFilePreview extends BitstreamPreview<DIPFile> {
     final Filter filter = new Filter(
       new SimpleFilterParameter(RodaConstants.DIPFILE_PARENT_UUID, getObject().getUUID()));
 
-    ListBuilder<DIPFile> dipFileListBuilder = new ListBuilder<>(DIPFileList::new,
+    ListBuilder<DIPFile> dipFileListBuilder = new ListBuilder<>(() -> new DIPFileList(),
       new AsyncTableCellOptions<>(DIPFile.class, "DipFilePreview_files").withFilter(filter)
         .withSummary(messages.allOfAObject(DIPFile.class.getName())).bindOpener());
 

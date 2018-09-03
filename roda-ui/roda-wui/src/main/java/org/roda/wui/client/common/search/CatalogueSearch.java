@@ -60,11 +60,11 @@ public class CatalogueSearch extends Composite {
     this.permissions = permissions;
 
     // prepare lists
-    ListBuilder<IndexedAIP> aipListBuilder = new ListBuilder<>(AIPList::new,
+    ListBuilder<IndexedAIP> aipListBuilder = new ListBuilder<>(() -> new AIPList(),
       new AsyncTableCellOptions<>(IndexedAIP.class, itemsListId).withJustActive(justActive).bindOpener()
         .withStartHidden(true));
 
-    ListBuilder<IndexedRepresentation> representationListBuilder = new ListBuilder<>(RepresentationList::new,
+    ListBuilder<IndexedRepresentation> representationListBuilder = new ListBuilder<>(() -> new RepresentationList(),
       new AsyncTableCellOptions<>(IndexedRepresentation.class, representationsListId).withJustActive(justActive)
         .bindOpener().withStartHidden(true));
 

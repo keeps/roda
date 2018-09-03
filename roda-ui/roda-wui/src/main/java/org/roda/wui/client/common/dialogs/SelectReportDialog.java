@@ -16,7 +16,7 @@ import org.roda.wui.client.common.lists.utils.ListBuilder;
 public class SelectReportDialog extends DefaultSelectDialog<IndexedReport> {
   public SelectReportDialog(String title, Filter filter) {
     super(title,
-      new ListBuilder<>(SimpleJobReportList::new,
+      new ListBuilder<>(() -> new SimpleJobReportList(),
         new AsyncTableCellOptions<>(IndexedReport.class, "SelectReportDialog_simpleJobReports").withFilter(filter)
           .withSummary(title)));
   }

@@ -20,7 +20,7 @@ public class SelectRepresentationInformationDialog extends DefaultSelectDialog<R
 
   public SelectRepresentationInformationDialog(String title, Filter filter, boolean exportCsvVisible) {
     super(title,
-      new ListBuilder<>(RepresentationInformationList::new,
+      new ListBuilder<>(() -> new RepresentationInformationList(),
         new AsyncTableCellOptions<>(RepresentationInformation.class, "SelectRepresentationInformationDialog_RI")
           .withFilter(filter).withSummary(title).withCsvDownloadButtonVisibility(exportCsvVisible)));
   }

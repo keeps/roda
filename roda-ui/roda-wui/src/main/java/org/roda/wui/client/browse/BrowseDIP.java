@@ -268,7 +268,7 @@ public class BrowseDIP extends Composite {
       final Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIPFILE_DIP_ID, dip.getId()),
         new EmptyKeyFilterParameter(RodaConstants.DIPFILE_PARENT_UUID));
 
-      ListBuilder<DIPFile> dipFileListBuilder = new ListBuilder<>(DIPFileList::new,
+      ListBuilder<DIPFile> dipFileListBuilder = new ListBuilder<>(() -> new DIPFileList(),
         new AsyncTableCellOptions<>(DIPFile.class, "BrowseDIP_dipFiles").withFilter(filter)
           .withSummary(messages.allOfAObject(DIPFile.class.getName())).bindOpener());
 

@@ -48,7 +48,7 @@ public class IndexedFilePreview extends BitstreamPreview<IndexedFile> {
   protected Widget directoryPreview() {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_PARENT_UUID, getObject().getUUID()));
 
-    ListBuilder<IndexedFile> folderListBuilder = new ListBuilder<>(SearchFileList::new,
+    ListBuilder<IndexedFile> folderListBuilder = new ListBuilder<>(() -> new SearchFileList(),
       new AsyncTableCellOptions<>(IndexedFile.class, "IndexedFilePreview_files").withFilter(filter)
         .withSummary(messages.representationListOfFiles()).withJustActive(getJustActive()).bindOpener());
 

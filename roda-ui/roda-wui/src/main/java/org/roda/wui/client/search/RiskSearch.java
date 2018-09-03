@@ -38,10 +38,10 @@ public class RiskSearch extends Composite {
   SearchWrapper searchWrapper;
 
   public RiskSearch() {
-    ListBuilder<IndexedRisk> riskListBuilder = new ListBuilder<>(RiskList::new,
+    ListBuilder<IndexedRisk> riskListBuilder = new ListBuilder<>(() -> new RiskList(),
       new AsyncTableCellOptions<>(IndexedRisk.class, "RiskRegister_risks").bindOpener());
 
-    ListBuilder<RiskIncidence> riskIncidenceListBuilder = new ListBuilder<>(RiskIncidenceList::new,
+    ListBuilder<RiskIncidence> riskIncidenceListBuilder = new ListBuilder<>(() -> new RiskIncidenceList(),
       new AsyncTableCellOptions<>(RiskIncidence.class, "RiskRegister_riskIncidences").bindOpener());
 
     searchWrapper = new SearchWrapper(true)

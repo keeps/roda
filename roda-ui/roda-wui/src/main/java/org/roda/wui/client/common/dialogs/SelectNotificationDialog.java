@@ -16,7 +16,7 @@ import org.roda.wui.client.common.lists.utils.ListBuilder;
 public class SelectNotificationDialog extends DefaultSelectDialog<Notification> {
   public SelectNotificationDialog(String title, Filter filter) {
     super(title,
-      new ListBuilder<>(NotificationList::new,
+      new ListBuilder<>(() -> new NotificationList(),
         new AsyncTableCellOptions<>(Notification.class, "SelectNotificationDialog_notifications").withFilter(filter)
           .withSummary(title)));
   }

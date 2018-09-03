@@ -15,7 +15,7 @@ import org.roda.wui.client.common.lists.utils.ListBuilder;
 
 public class SelectJobDialog extends DefaultSelectDialog<Job> {
   public SelectJobDialog(String title, Filter filter) {
-    super(title, new ListBuilder<>(JobList::new,
+    super(title, new ListBuilder<>(() -> new JobList(),
       new AsyncTableCellOptions<>(Job.class, "SelectJobDialog_jobs").withFilter(filter).withSummary(title)));
   }
 }
