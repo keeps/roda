@@ -12,8 +12,9 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
 import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.core.data.v2.risks.RiskIncidence.INCIDENCE_STATUS;
 import org.roda.core.index.IndexingAdditionalInfo;
 import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
@@ -61,7 +62,7 @@ public class RiskIncidenceCollection extends AbstractSolrCollection<RiskIncidenc
     fields.add(new Field(RodaConstants.RISK_INCIDENCE_FILE_ID, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.RISK_INCIDENCE_OBJECT_CLASS, Field.TYPE_STRING).setRequired(true));
     fields.add(new Field(RodaConstants.RISK_INCIDENCE_RISK_ID, Field.TYPE_STRING).setRequired(true));
-    fields.add(new Field(RodaConstants.RISK_INCIDENCE_DESCRIPTION, Field.TYPE_TEXT));
+    fields.add(new Field(RodaConstants.RISK_INCIDENCE_DESCRIPTION, Field.TYPE_TEXT).setMultiValued(false));
     fields.add(new Field(RodaConstants.RISK_INCIDENCE_BYPLUGIN, Field.TYPE_BOOLEAN).setRequired(true));
     fields.add(new Field(RodaConstants.RISK_INCIDENCE_STATUS, Field.TYPE_STRING).setRequired(true));
     fields.add(new Field(RodaConstants.RISK_INCIDENCE_SEVERITY, Field.TYPE_STRING).setRequired(true));
@@ -69,7 +70,7 @@ public class RiskIncidenceCollection extends AbstractSolrCollection<RiskIncidenc
     fields.add(new Field(RodaConstants.RISK_INCIDENCE_DETECTED_BY, Field.TYPE_STRING).setRequired(true));
     fields.add(new Field(RodaConstants.RISK_INCIDENCE_MITIGATED_ON, Field.TYPE_DATE));
     fields.add(new Field(RodaConstants.RISK_INCIDENCE_MITIGATED_BY, Field.TYPE_STRING));
-    fields.add(new Field(RodaConstants.RISK_INCIDENCE_MITIGATED_DESCRIPTION, Field.TYPE_TEXT));
+    fields.add(new Field(RodaConstants.RISK_INCIDENCE_MITIGATED_DESCRIPTION, Field.TYPE_TEXT).setMultiValued(false));
     fields.add(new Field(RodaConstants.RISK_INCIDENCE_FILE_PATH_COMPUTED, Field.TYPE_STRING).setStored(false));
 
     return fields;
@@ -83,7 +84,6 @@ public class RiskIncidenceCollection extends AbstractSolrCollection<RiskIncidenc
   @Override
   public SolrInputDocument toSolrDocument(RiskIncidence incidence, IndexingAdditionalInfo info)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-
     SolrInputDocument doc = super.toSolrDocument(incidence, info);
 
     doc.addField(RodaConstants.RISK_INCIDENCE_AIP_ID, incidence.getAipId());
@@ -109,7 +109,6 @@ public class RiskIncidenceCollection extends AbstractSolrCollection<RiskIncidenc
 
   @Override
   public RiskIncidence fromSolrDocument(SolrDocument doc, List<String> fieldsToReturn) throws GenericException {
-
     final RiskIncidence incidence = super.fromSolrDocument(doc, fieldsToReturn);
 
     incidence.setAipId(SolrUtils.objectToString(doc.get(RodaConstants.RISK_INCIDENCE_AIP_ID), null));
@@ -121,12 +120,12 @@ public class RiskIncidenceCollection extends AbstractSolrCollection<RiskIncidenc
     incidence.setRiskId(SolrUtils.objectToString(doc.get(RodaConstants.RISK_INCIDENCE_RISK_ID), null));
     incidence.setDescription(SolrUtils.objectToString(doc.get(RodaConstants.RISK_INCIDENCE_DESCRIPTION), null));
     if (doc.containsKey(RodaConstants.RISK_INCIDENCE_STATUS)) {
-      incidence.setStatus(RiskIncidence.INCIDENCE_STATUS.valueOf(SolrUtils.objectToString(
-        doc.get(RodaConstants.RISK_INCIDENCE_STATUS), RiskIncidence.INCIDENCE_STATUS.UNMITIGATED.toString())));
+      incidence.setStatus(INCIDENCE_STATUS.valueOf(SolrUtils
+        .objectToString(doc.get(RodaConstants.RISK_INCIDENCE_STATUS), INCIDENCE_STATUS.UNMITIGATED.toString())));
     }
     if (doc.containsKey(RodaConstants.RISK_INCIDENCE_SEVERITY)) {
-      incidence.setSeverity(Risk.SEVERITY_LEVEL.valueOf(SolrUtils
-        .objectToString(doc.get(RodaConstants.RISK_INCIDENCE_SEVERITY), Risk.SEVERITY_LEVEL.MODERATE.toString())));
+      incidence.setSeverity(SEVERITY_LEVEL.valueOf(
+        SolrUtils.objectToString(doc.get(RodaConstants.RISK_INCIDENCE_SEVERITY), SEVERITY_LEVEL.MODERATE.toString())));
     }
     incidence.setDetectedOn(SolrUtils.objectToDate(doc.get(RodaConstants.RISK_INCIDENCE_DETECTED_ON)));
     incidence.setDetectedBy(SolrUtils.objectToString(doc.get(RodaConstants.RISK_INCIDENCE_DETECTED_BY), null));
@@ -136,7 +135,6 @@ public class RiskIncidenceCollection extends AbstractSolrCollection<RiskIncidenc
       SolrUtils.objectToString(doc.get(RodaConstants.RISK_INCIDENCE_MITIGATED_DESCRIPTION), null));
 
     return incidence;
-
   }
 
 }

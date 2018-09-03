@@ -208,12 +208,6 @@ public class ShowRiskIncidence extends Composite {
     JavascriptUtils.stickSidebar();
   }
 
-  // Java method
-  public native boolean isValidUrl(String url) /*-{
-		var pattern = /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
-		return pattern.test(url);
-  }-*/;
-
   void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 1) {
       String riskIncidenceId = historyTokens.get(0);

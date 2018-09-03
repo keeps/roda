@@ -837,6 +837,10 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_RISK_CATEGORY = "parameter.risk_category";
   public static final String PLUGIN_PARAMS_RISK_INCIDENCE_DESCRIPTION = "parameter.risk_incidence_description";
   public static final String PLUGIN_PARAMS_RISK_INCIDENCE_SEVERITY = "parameter.risk_incidence_severity";
+  public static final String PLUGIN_PARAMS_RISK_INCIDENCE_STATUS = "parameter.risk_incidence_status";
+  public static final String PLUGIN_PARAMS_RISK_INCIDENCE_MITIGATED_ON = "parameter.risk_incidence_mitigated_on";
+  public static final String PLUGIN_PARAMS_RISK_INCIDENCE_MITIGATED_BY = "parameter.risk_incidence_mitigated_by";
+  public static final String PLUGIN_PARAMS_RISK_INCIDENCE_MITIGATED_DESCRIPTION = "parameter.risk_incidence_mitigated_description";
   public static final String PLUGIN_PARAMS_DO_VIRUS_CHECK = "parameter.do_virus_check";
   public static final String PLUGIN_PARAMS_DO_DESCRIPTIVE_METADATA_VALIDATION = "parameter.do_descriptive_metadata_validation";
   public static final String PLUGIN_PARAMS_CREATE_PREMIS_SKELETON = "parameter.create.premis.skeleton";

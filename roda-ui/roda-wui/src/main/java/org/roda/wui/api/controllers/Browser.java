@@ -2704,7 +2704,7 @@ public class Browser extends RodaWuiController {
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
     try {
-      BrowserHelper.updateMultipleIncidences(selected, status, severity, mitigatedOn, mitigatedBy,
+      BrowserHelper.updateMultipleIncidences(user, selected, status, severity, mitigatedOn, mitigatedBy,
         mitigatedDescription);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;

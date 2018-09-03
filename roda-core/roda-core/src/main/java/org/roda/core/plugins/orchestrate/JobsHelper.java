@@ -41,7 +41,6 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.JobStats;
@@ -241,15 +240,6 @@ public final class JobsHelper {
     } catch (InvalidParameterException e) {
       LOGGER.error("Error setting plugin parameters", e);
     }
-  }
-
-  public static List<TransferredResource> getTransferredResources(IndexService index, List<String> uuids)
-    throws NotFoundException, GenericException, RequestNotValidException {
-    List<TransferredResource> ret = index.retrieve(TransferredResource.class, uuids, new ArrayList<>());
-    if (ret.isEmpty()) {
-      throw new NotFoundException("Could not retrieve the Transferred Resources");
-    }
-    return ret;
   }
 
   public static List<AIP> getAIPs(ModelService model, List<String> uuids) throws NotFoundException {

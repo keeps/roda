@@ -125,7 +125,6 @@ import org.roda.core.data.v2.ri.RelationObjectType;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
-import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.risks.RiskIncidence.INCIDENCE_STATUS;
 import org.roda.core.data.v2.user.User;
@@ -143,6 +142,7 @@ import org.roda.core.plugins.plugins.internal.ChangeTypePlugin;
 import org.roda.core.plugins.plugins.internal.DeleteRODAObjectPlugin;
 import org.roda.core.plugins.plugins.internal.MovePlugin;
 import org.roda.core.plugins.plugins.internal.UpdateAIPPermissionsPlugin;
+import org.roda.core.plugins.plugins.internal.UpdateIncidencesPlugin;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryConsumesOutputStream;
 import org.roda.core.storage.BinaryVersion;
@@ -2614,45 +2614,18 @@ public class BrowserHelper {
       pluginParameters, "Could not execute risk incidence delete action");
   }
 
-  public static void updateMultipleIncidences(SelectedItems<RiskIncidence> selected, String status, String severity,
-    Date mitigatedOn, String mitigatedBy, String mitigatedDescription)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    IndexService index = RodaCoreFactory.getIndexService();
-    ModelService model = RodaCoreFactory.getModelService();
-
-    if (selected instanceof SelectedItemsList) {
-      SelectedItemsList<RiskIncidence> list = (SelectedItemsList<RiskIncidence>) selected;
-      List<String> ids = list.getIds();
-
-      for (String id : ids) {
-        RiskIncidence incidence = RodaCoreFactory.getModelService().retrieveRiskIncidence(id);
-        incidence.setStatus(INCIDENCE_STATUS.valueOf(status));
-        incidence.setSeverity(SEVERITY_LEVEL.valueOf(severity));
-        incidence.setMitigatedOn(mitigatedOn);
-        incidence.setMitigatedBy(mitigatedBy);
-        incidence.setMitigatedDescription(mitigatedDescription);
-        model.updateRiskIncidence(incidence, false);
-      }
-
-      index.commit(RiskIncidence.class);
-    } else if (selected instanceof SelectedItemsFilter) {
-      SelectedItemsFilter<RiskIncidence> filter = (SelectedItemsFilter<RiskIncidence>) selected;
-
-      int counter = index.count(RiskIncidence.class, filter.getFilter()).intValue();
-      IndexResult<RiskIncidence> incidences = index.find(RiskIncidence.class, filter.getFilter(), Sorter.NONE,
-        new Sublist(0, counter), new ArrayList<>());
-
-      for (RiskIncidence incidence : incidences.getResults()) {
-        incidence.setStatus(INCIDENCE_STATUS.valueOf(status));
-        incidence.setSeverity(SEVERITY_LEVEL.valueOf(severity));
-        incidence.setMitigatedOn(mitigatedOn);
-        incidence.setMitigatedBy(mitigatedBy);
-        incidence.setMitigatedDescription(mitigatedDescription);
-        model.updateRiskIncidence(incidence, false);
-      }
-
-      index.commit(RiskIncidence.class);
-    }
+  public static Job updateMultipleIncidences(User user, SelectedItems<RiskIncidence> selected, String status,
+    String severity, Date mitigatedOn, String mitigatedBy, String mitigatedDescription)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    Map<String, String> pluginParameters = new HashMap<>();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_STATUS, status);
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_SEVERITY, severity);
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_MITIGATED_ON,
+      JsonUtils.getJsonFromObject(mitigatedOn));
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_MITIGATED_BY, mitigatedBy);
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_MITIGATED_DESCRIPTION, mitigatedDescription);
+    return createAndExecuteInternalJob("Update risk incidences", selected, UpdateIncidencesPlugin.class, user,
+      pluginParameters, "Could not execute risk incidence update action");
   }
 
   public static TransferredResource reindexTransferredResource(String path)
