@@ -22,8 +22,10 @@ public interface RODAObjectProcessingLogic<T extends IsRODAObject> extends RODAO
    * @deprecated use {@link #process(IndexService, ModelService, StorageService, Report, Job, JobPluginInfo, Plugin, IsRODAObject)} instead.
    */
   @Deprecated
-  public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-    SimpleJobPluginInfo jobPluginInfo, Plugin<T> plugin, T object);
+  public default void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+    SimpleJobPluginInfo jobPluginInfo, Plugin<T> plugin, T object) {
+    throw new IllegalStateException("Should implement this method or non-deprecated version of it.");
+  }
 
   public default void process(IndexService index, ModelService model, StorageService storage, Report report,
     Job cachedJob, JobPluginInfo jobPluginInfo, Plugin<T> plugin, T object) {

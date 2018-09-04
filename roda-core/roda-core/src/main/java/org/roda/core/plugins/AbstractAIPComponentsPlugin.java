@@ -60,7 +60,6 @@ public abstract class AbstractAIPComponentsPlugin<T extends IsRODAObject> extend
             report.setPluginState(PluginState.FAILURE);
           }
         }
-
       }
     }, index, model, storage, liteList);
   }
@@ -148,7 +147,6 @@ public abstract class AbstractAIPComponentsPlugin<T extends IsRODAObject> extend
     return report;
   }
 
-  @SuppressWarnings({"unchecked", "rawtypes"})
   @Override
   public List<Class<T>> getObjectClasses() {
     List<Class<? extends IsRODAObject>> list = new ArrayList<>();
