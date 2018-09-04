@@ -254,7 +254,7 @@ public class BrowseRepresentation extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
 
     // NAVIGATION TOOLBAR
-    navigationToolbar.setObject(representation, aip.getPermissions());
+    navigationToolbar.withObject(representation).withPermissions(aip.getPermissions()).build();
     navigationToolbar.show();
 
     updateLayout(bundle, state, justActive);

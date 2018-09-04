@@ -598,6 +598,8 @@ public class BrowserHelper {
       bundle.setAip(aip);
     }
 
+    // get DIP permissions TODO nuno usar bundle.setReferrerPermissions();
+
     return bundle;
   }
 

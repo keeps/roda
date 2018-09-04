@@ -283,7 +283,7 @@ public class BrowseAIP extends Composite {
     aipState.setVisible(!justActive);
 
     // NAVIGATION TOOLBAR
-    navigationToolbar.setObject(aip, aip.getPermissions());
+    navigationToolbar.withObject(aip).withPermissions(aip.getPermissions()).build();
     navigationToolbar.show();
 
     // IDENTIFICATION

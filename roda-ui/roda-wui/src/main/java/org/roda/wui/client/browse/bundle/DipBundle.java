@@ -15,6 +15,7 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.Permissions;
 
 public class DipBundle implements Serializable {
 
@@ -28,6 +29,8 @@ public class DipBundle implements Serializable {
 
   private DIPFile dipFile;
   private List<DIPFile> dipFileAncestors;
+
+  private Permissions referrerPermissions;
 
   public DipBundle() {
     super();
@@ -81,4 +84,11 @@ public class DipBundle implements Serializable {
     this.dipFileAncestors = dipFileAncestors;
   }
 
+  public Permissions getReferrerPermissions() {
+    return referrerPermissions;
+  }
+
+  public void setReferrerPermissions(Permissions referrerPermissions) {
+    this.referrerPermissions = referrerPermissions;
+  }
 }

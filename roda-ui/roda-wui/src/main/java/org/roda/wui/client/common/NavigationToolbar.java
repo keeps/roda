@@ -63,9 +63,9 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  private boolean requireControlKeyModifier;
-  private boolean requireShiftKeyModifier;
-  private boolean requireAltKeyModifier;
+  private boolean requireControlKeyModifier = true;
+  private boolean requireShiftKeyModifier = false;
+  private boolean requireAltKeyModifier = false;
 
   interface MyUiBinder extends UiBinder<Widget, NavigationToolbar> {
   }
@@ -112,23 +112,19 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
     hideButtons();
   }
 
-  public void setObject(T object) {
-    setObject(object, null, null);
-  }
-
-  public void setObject(T object, ProcessRelativeItem<T> processor) {
-    setObject(object, null, processor);
-  }
-
-  public void setObject(T object, Permissions permissions) {
-    setObject(object, permissions, null);
-  }
-
-  public void setObject(T object, Permissions permissions, ProcessRelativeItem<T> processor) {
+  public NavigationToolbar<T> withObject(T object) {
     this.currentObject = object;
-    this.permissions = permissions;
+    return this;
+  }
+
+  public NavigationToolbar<T> withProcessor(ProcessRelativeItem<T> processor) {
     this.processor = processor;
-    setup();
+    return this;
+  }
+
+  public NavigationToolbar<T> withPermissions(Permissions permissions) {
+    this.permissions = permissions;
+    return this;
   }
 
   public AccessibleFocusPanel getInfoSidebarButton() {
@@ -172,7 +168,7 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
     actionsButton.setVisible(false);
   }
 
-  private void setup() {
+  public void build() {
     hideButtons();
     if (processor != null) {
       ListSelectionUtils.bindLayout(currentObject, previousButton, nextButton, keyboardFocus, requireControlKeyModifier,

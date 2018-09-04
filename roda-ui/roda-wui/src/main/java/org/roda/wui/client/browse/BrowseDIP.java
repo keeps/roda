@@ -32,6 +32,7 @@ import org.roda.wui.client.browse.bundle.DipBundle;
 import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.DIPFileList;
+import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
@@ -133,18 +134,6 @@ public class BrowseDIP extends Composite {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
   public static final Sorter DEFAULT_DIPFILE_SORTER = new Sorter(new SortParameter(RodaConstants.DIPFILE_ID, false));
 
-  // system
-  private final Viewers viewers;
-
-  // source
-  private IndexedAIP aip;
-  private IndexedRepresentation representation;
-  private IndexedFile file;
-
-  // target
-  private IndexedDIP dip;
-  private DIPFile dipFile;
-
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
   // interface
@@ -156,78 +145,79 @@ public class BrowseDIP extends Composite {
   FlowPanel center;
 
   @UiField
-  NavigationToolbar<IndexedDIP> dipNavigationToolbar;
-
-  @UiField
-  NavigationToolbar<DIPFile> dipFileNavigationToolbar;
-
-  @UiField
-  NavigationToolbar<IndexedAIP> aipNavigationToolbar;
-
-  @UiField
-  NavigationToolbar<IndexedRepresentation> representationNavigationToolbar;
-
-  @UiField
-  NavigationToolbar<IndexedFile> fileNavigationToolbar;
-
+  FlowPanel container;
 
   public BrowseDIP(Viewers viewers, DipBundle bundle) {
-    this.viewers = viewers;
+    // source
+    IndexedAIP aip = bundle.getAip();
+    IndexedRepresentation representation = bundle.getRepresentation();
+    IndexedFile file = bundle.getFile();
 
-    this.aip = bundle.getAip();
-    this.representation = bundle.getRepresentation();
-    this.file = bundle.getFile();
-
-    this.dip = bundle.getDip();
-    this.dipFile = bundle.getDipFile();
+    // target
+    IndexedDIP dip = bundle.getDip();
+    DIPFile dipFile = bundle.getDipFile();
 
     initWidget(uiBinder.createAndBindUi(this));
 
-    update();
+    if (dipFile != null) {
+      center.add(new DipFilePreview(viewers, dipFile));
+    } else if (dip.getOpenExternalURL() != null) {
+      center.add(new DipUrlPreview(viewers, dip));
+    } else {
+      final Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIPFILE_DIP_ID, dip.getId()),
+        new EmptyKeyFilterParameter(RodaConstants.DIPFILE_PARENT_UUID));
 
-    dipNavigationToolbar.withModifierKeys(true, false, false);
-    fileNavigationToolbar.withModifierKeys(true, true, false);
-    representationNavigationToolbar.withModifierKeys(true, true, false);
-    aipNavigationToolbar.withModifierKeys(true, true, false);
+      ListBuilder<DIPFile> dipFileListBuilder = new ListBuilder<>(() -> new DIPFileList(),
+        new AsyncTableCellOptions<>(DIPFile.class, "BrowseDIP_dipFiles").withFilter(filter)
+          .withSummary(messages.allOfAObject(DIPFile.class.getName())).bindOpener());
+
+      SearchWrapper search = new SearchWrapper(false).createListAndSearchPanel(dipFileListBuilder);
+
+      SimplePanel layout = new SimplePanel();
+      layout.add(search);
+      center.add(layout);
+      layout.addStyleName("browseDip-topList");
+    }
 
     keyboardFocus.setFocus(true);
 
-    // setup top toolbar (referrer)
-    if (file != null) {
-      fileNavigationToolbar.setObject(file, aip.getPermissions(), referredObject -> openReferred(referredObject,
-        new Filter(new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, referredObject.getUUID()))));
-      fileNavigationToolbar.updateReferrerBreadcrumb(bundle);
-      Sliders.createDisseminationsSlider(center, fileNavigationToolbar.getDisseminationsButton(), file);
-      Sliders.createInfoSlider(center, fileNavigationToolbar.getInfoSidebarButton(), file);
-      fileNavigationToolbar.setVisible(true);
-    } else if (representation != null) {
-      representationNavigationToolbar.setObject(representation, aip.getPermissions(),
-        referredObject -> openReferred(referredObject,
-          new Filter(new SimpleFilterParameter(RodaConstants.DIP_REPRESENTATION_UUIDS, referredObject.getUUID()))));
-      representationNavigationToolbar.updateReferrerBreadcrumb(bundle);
-      Sliders.createDisseminationsSlider(center, representationNavigationToolbar.getDisseminationsButton(),
-        representation);
-      Sliders.createInfoSlider(center, representationNavigationToolbar.getInfoSidebarButton(), representation);
-      representationNavigationToolbar.setVisible(true);
-    } else if (aip != null) {
-      aipNavigationToolbar.setObject(aip, aip.getPermissions(), referredObject -> openReferred(referredObject,
-        new Filter(new SimpleFilterParameter(RodaConstants.DIP_AIP_UUIDS, referredObject.getUUID()))));
-      aipNavigationToolbar.updateReferrerBreadcrumb(bundle);
-      Sliders.createDisseminationsSlider(center, aipNavigationToolbar.getDisseminationsButton(), aip);
-      Sliders.createInfoSlider(center, aipNavigationToolbar.getInfoSidebarButton(), aip);
-      aipNavigationToolbar.setVisible(true);
-    }
+    NavigationToolbar<IsIndexed> bottomNavigationToolbar = new NavigationToolbar<>();
+    bottomNavigationToolbar.withObject(dipFile != null ? dipFile : dip);
+    bottomNavigationToolbar.withPermissions(dip.getPermissions());
+    bottomNavigationToolbar.updateBreadcrumb(bundle);
+    bottomNavigationToolbar.build();
+    container.insert(bottomNavigationToolbar, 0);
 
-    if (dipFile != null) {
-      dipFileNavigationToolbar.setObject(dipFile);
-      dipFileNavigationToolbar.updateBreadcrumb(bundle);
-      dipFileNavigationToolbar.setVisible(true);
-    } else {
-      dipNavigationToolbar.setObject(dip);
-      dipNavigationToolbar.updateBreadcrumb(bundle);
-      dipNavigationToolbar.setVisible(true);
-    }
+    if (aip != null) {
+      NavigationToolbar<IsIndexed> topNavigationToolbar = new NavigationToolbar<>();
+      ListSelectionUtils.ProcessRelativeItem<IsIndexed> processor;
+      IsIndexed referrer;
 
+      if (file != null) {
+        referrer = file;
+        processor = referredObject -> openReferred(referredObject,
+          new Filter(new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, referrer.getUUID())));
+      } else if (representation != null) {
+        referrer = representation;
+        processor = referredObject -> openReferred(referredObject,
+          new Filter(new SimpleFilterParameter(RodaConstants.DIP_REPRESENTATION_UUIDS, referredObject.getUUID())));
+      } else {
+        referrer = aip;
+        processor = referredObject -> openReferred(referredObject,
+          new Filter(new SimpleFilterParameter(RodaConstants.DIP_AIP_UUIDS, referredObject.getUUID())));
+      }
+
+      topNavigationToolbar.withObject(referrer);
+      topNavigationToolbar.withProcessor(processor);
+      topNavigationToolbar.withModifierKeys(true, true, false);
+      topNavigationToolbar.withPermissions(bundle.getReferrerPermissions());
+      topNavigationToolbar.updateReferrerBreadcrumb(bundle);
+      topNavigationToolbar.build();
+      Sliders.createDisseminationsSlider(center, topNavigationToolbar.getDisseminationsButton(), referrer);
+      Sliders.createInfoSlider(center, topNavigationToolbar.getInfoSidebarButton(), referrer);
+
+      container.insert(topNavigationToolbar, 0);
+    }
   }
 
   private static <T extends IsIndexed> void openReferred(final T object, Filter filter) {
@@ -257,27 +247,5 @@ public class BrowseDIP extends Composite {
   protected void onLoad() {
     super.onLoad();
     JavascriptUtils.smoothScroll(keyboardFocus.getElement());
-  }
-
-  private void update() {
-    if (dipFile != null) {
-      center.add(new DipFilePreview(viewers, dipFile));
-    } else if (dip.getOpenExternalURL() != null) {
-      center.add(new DipUrlPreview(viewers, dip));
-    } else {
-      final Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.DIPFILE_DIP_ID, dip.getId()),
-        new EmptyKeyFilterParameter(RodaConstants.DIPFILE_PARENT_UUID));
-
-      ListBuilder<DIPFile> dipFileListBuilder = new ListBuilder<>(() -> new DIPFileList(),
-        new AsyncTableCellOptions<>(DIPFile.class, "BrowseDIP_dipFiles").withFilter(filter)
-          .withSummary(messages.allOfAObject(DIPFile.class.getName())).bindOpener());
-
-      SearchWrapper search = new SearchWrapper(false).createListAndSearchPanel(dipFileListBuilder);
-
-      SimplePanel layout = new SimplePanel();
-      layout.add(search);
-      center.add(layout);
-      layout.addStyleName("browseDip-topList");
-    }
   }
 }
