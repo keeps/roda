@@ -7,11 +7,10 @@
  */
 package org.roda.wui.client.browse.bundle;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 
-public class BinaryVersionBundle implements Serializable {
+public class BinaryVersionBundle implements Bundle {
 
   private static final long serialVersionUID = 7901536603462531124L;
 

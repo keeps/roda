@@ -1985,4 +1985,10 @@ public interface ClientMessages extends Messages {
   String actionableEmptyHelp(@Select ActionableObject.ActionableObjectType action);
 
   String searchButtonAdvancedSearch();
+
+  String infoSliderRepresentationTitle();
+
+  String infoSliderAipInfoTitle();
+
+  String infoSliderFileInfoTitle();
 }

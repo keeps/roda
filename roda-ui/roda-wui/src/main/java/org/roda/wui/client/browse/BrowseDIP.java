@@ -24,11 +24,12 @@ import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.DIPFile;
-import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
-import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.wui.client.browse.bundle.DipBundle;
+import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
+import org.roda.wui.client.browse.bundle.BrowseDipBundle;
+import org.roda.wui.client.browse.bundle.BrowseFileBundle;
+import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
+import org.roda.wui.client.browse.bundle.Bundle;
 import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.DisseminationFileActions;
@@ -103,7 +104,7 @@ public class BrowseDIP extends Composite {
         final String historyDipFileUUID = historyTokens.size() > 1 ? historyTokens.get(1) : null;
 
         BrowserService.Util.getInstance().retrieveDipBundle(historyDipUUID, historyDipFileUUID,
-          new AsyncCallback<DipBundle>() {
+          LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<BrowseDipBundle>() {
 
             @Override
             public void onFailure(Throwable caught) {
@@ -111,8 +112,8 @@ public class BrowseDIP extends Composite {
             }
 
             @Override
-            public void onSuccess(DipBundle dipBundle) {
-              callback.onSuccess(new BrowseDIP(viewers, dipBundle));
+            public void onSuccess(BrowseDipBundle browseDipBundle) {
+              callback.onSuccess(new BrowseDIP(viewers, browseDipBundle));
             }
           });
 
@@ -148,12 +149,7 @@ public class BrowseDIP extends Composite {
   @UiField
   FlowPanel container;
 
-  public BrowseDIP(Viewers viewers, DipBundle bundle) {
-    // source
-    IndexedAIP aip = bundle.getAip();
-    IndexedRepresentation representation = bundle.getRepresentation();
-    IndexedFile file = bundle.getFile();
-
+  public BrowseDIP(Viewers viewers, BrowseDipBundle bundle) {
     // target
     IndexedDIP dip = bundle.getDip();
     DIPFile dipFile = bundle.getDipFile();
@@ -187,42 +183,43 @@ public class BrowseDIP extends Composite {
     bottomNavigationToolbar.withPermissions(dip.getPermissions());
     bottomNavigationToolbar.updateBreadcrumb(bundle);
     bottomNavigationToolbar.setHeader(messages.catalogueDIPTitle());
-    bottomNavigationToolbar.addStyleDependentName("alt");
     bottomNavigationToolbar.build();
     container.insert(bottomNavigationToolbar, 0);
 
-    if (aip != null) {
+    Bundle referrerBundle = bundle.getReferrerBundle();
+
+    // if referrerBundle is not present (lack of permissions), show only the DIP
+    if (referrerBundle instanceof BrowseAIPBundle || referrerBundle instanceof BrowseRepresentationBundle
+      || referrerBundle instanceof BrowseFileBundle) {
+      bottomNavigationToolbar.addStyleDependentName("alt");
+
       NavigationToolbar<IsIndexed> topNavigationToolbar = new NavigationToolbar<>();
       ListSelectionUtils.ProcessRelativeItem<IsIndexed> processor;
-      IsIndexed referrer;
       String title;
 
-      if (file != null) {
-        referrer = file;
+      if (referrerBundle instanceof BrowseFileBundle) {
         processor = referredObject -> openReferred(referredObject,
-          new Filter(new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, referrer.getUUID())));
+          new Filter(new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, referredObject.getUUID())));
         title = messages.catalogueFileTitle();
-      } else if (representation != null) {
-        referrer = representation;
+      } else if (referrerBundle instanceof BrowseRepresentationBundle) {
         processor = referredObject -> openReferred(referredObject,
           new Filter(new SimpleFilterParameter(RodaConstants.DIP_REPRESENTATION_UUIDS, referredObject.getUUID())));
         title = messages.catalogueRepresentationTitle();
       } else {
-        referrer = aip;
         processor = referredObject -> openReferred(referredObject,
           new Filter(new SimpleFilterParameter(RodaConstants.DIP_AIP_UUIDS, referredObject.getUUID())));
         title = messages.catalogueItemTitle();
       }
 
       topNavigationToolbar.setHeader(title);
-      topNavigationToolbar.withObject(referrer);
+      topNavigationToolbar.withObject(bundle.getReferrer());
       topNavigationToolbar.withProcessor(processor);
       topNavigationToolbar.withModifierKeys(true, true, false);
       topNavigationToolbar.withPermissions(bundle.getReferrerPermissions());
-      topNavigationToolbar.updateReferrerBreadcrumb(bundle);
+      topNavigationToolbar.updateBreadcrumb(bundle.getReferrerBundle());
       topNavigationToolbar.build();
-      Sliders.createDisseminationsSlider(center, topNavigationToolbar.getDisseminationsButton(), referrer);
-      Sliders.createInfoSlider(center, topNavigationToolbar.getInfoSidebarButton(), referrer);
+      Sliders.createDisseminationsSlider(center, topNavigationToolbar.getDisseminationsButton(), bundle.getReferrer());
+      Sliders.createInfoSlider(center, topNavigationToolbar.getInfoSidebarButton(), bundle.getReferrerBundle());
 
       container.insert(topNavigationToolbar, 0);
     }

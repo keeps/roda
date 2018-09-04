@@ -7,7 +7,6 @@
  */
 package org.roda.wui.client.browse.bundle;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +17,7 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 
-public class PreservationEventViewBundle implements Serializable {
+public class PreservationEventViewBundle implements Bundle {
 
   private static final long serialVersionUID = -8540304346599230183L;
   private IndexedPreservationEvent event;

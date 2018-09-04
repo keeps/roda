@@ -84,11 +84,11 @@ import org.roda.wui.api.controllers.Jobs;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.Viewers;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
+import org.roda.wui.client.browse.bundle.BrowseDipBundle;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
-import org.roda.wui.client.browse.bundle.DipBundle;
 import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
@@ -860,10 +860,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public DipBundle retrieveDipBundle(String dipUUID, String dipFileUUID)
+  public BrowseDipBundle retrieveDipBundle(String dipUUID, String dipFileUUID, String localeString)
     throws RequestNotValidException, AuthorizationDeniedException, GenericException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.retrieveDipBundle(user, dipUUID, dipFileUUID);
+    Locale locale = ServerTools.parseLocale(localeString);
+    return Browser.retrieveDipBundle(user, dipUUID, dipFileUUID, locale);
   }
 
   @Override

@@ -79,11 +79,11 @@ import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
+import org.roda.wui.client.browse.bundle.BrowseDipBundle;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
-import org.roda.wui.client.browse.bundle.DipBundle;
 import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
@@ -298,7 +298,7 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static DipBundle retrieveDipBundle(User user, String dipUUID, String dipFileUUID)
+  public static BrowseDipBundle retrieveDipBundle(User user, String dipUUID, String dipFileUUID, Locale locale)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -313,7 +313,7 @@ public class Browser extends RodaWuiController {
         RodaConstants.DIP_PERMISSIONS_FIELDS_TO_RETURN);
       controllerAssistant.checkObjectPermissions(user, dip);
 
-      return BrowserHelper.retrieveDipBundle(dipUUID, dipFileUUID, user);
+      return BrowserHelper.retrieveDipBundle(dipUUID, dipFileUUID, user, locale);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;

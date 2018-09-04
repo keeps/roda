@@ -7,23 +7,19 @@
  */
 package org.roda.wui.client.browse.bundle;
 
-import java.io.Serializable;
 import java.util.List;
 
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.DIPFile;
-import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
-import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 
-public class DipBundle implements Serializable {
+public class BrowseDipBundle implements Bundle {
 
   private static final long serialVersionUID = 1L;
 
-  private IndexedAIP aip;
-  private IndexedRepresentation representation;
-  private IndexedFile file;
+  private IsIndexed referrer;
+  private Bundle referrerBundle;
 
   private IndexedDIP dip;
 
@@ -32,32 +28,24 @@ public class DipBundle implements Serializable {
 
   private Permissions referrerPermissions;
 
-  public DipBundle() {
+  public BrowseDipBundle() {
     super();
   }
 
-  public IndexedAIP getAip() {
-    return aip;
+  public IsIndexed getReferrer() {
+    return referrer;
   }
 
-  public void setAip(IndexedAIP aip) {
-    this.aip = aip;
+  public void setReferrer(IsIndexed referrer) {
+    this.referrer = referrer;
   }
 
-  public IndexedRepresentation getRepresentation() {
-    return representation;
+  public Bundle getReferrerBundle() {
+    return referrerBundle;
   }
 
-  public void setRepresentation(IndexedRepresentation representation) {
-    this.representation = representation;
-  }
-
-  public IndexedFile getFile() {
-    return file;
-  }
-
-  public void setFile(IndexedFile file) {
-    this.file = file;
+  public void setReferrerBundle(Bundle referrerBundle) {
+    this.referrerBundle = referrerBundle;
   }
 
   public IndexedDIP getDip() {

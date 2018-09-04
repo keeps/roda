@@ -7,14 +7,13 @@
  */
 package org.roda.wui.client.browse.bundle;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 
-public class BrowseRepresentationBundle implements Serializable {
+public class BrowseRepresentationBundle implements Bundle {
 
   private static final long serialVersionUID = 7901536603462531124L;
 

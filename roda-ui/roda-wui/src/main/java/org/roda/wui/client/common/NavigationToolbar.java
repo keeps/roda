@@ -22,9 +22,10 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
+import org.roda.wui.client.browse.bundle.BrowseDipBundle;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
-import org.roda.wui.client.browse.bundle.DipBundle;
+import org.roda.wui.client.browse.bundle.Bundle;
 import org.roda.wui.client.common.actions.AbstractActionable;
 import org.roda.wui.client.common.actions.AipActions;
 import org.roda.wui.client.common.actions.DisseminationActions;
@@ -298,18 +299,21 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
     aipState.setVisible(AIPState.ACTIVE != bundle.getAip().getState());
   }
 
-  public void updateBreadcrumb(DipBundle bundle) {
+  public void updateBreadcrumb(BrowseDipBundle bundle) {
     breadcrumb.updatePath(
       BreadcrumbUtils.getDipBreadcrumbs(bundle.getDip(), bundle.getDipFile(), bundle.getDipFileAncestors()));
   }
 
-  public void updateReferrerBreadcrumb(DipBundle bundle) {
-    if (bundle.getFile() != null) {
+  public void updateBreadcrumb(Bundle dipReferrerBundle) {
+    if (dipReferrerBundle instanceof BrowseFileBundle) {
+      BrowseFileBundle bundle = (BrowseFileBundle) dipReferrerBundle;
       breadcrumb
         .updatePath(BreadcrumbUtils.getFileBreadcrumbs(bundle.getAip(), bundle.getRepresentation(), bundle.getFile()));
-    } else if (bundle.getRepresentation() != null) {
+    } else if (dipReferrerBundle instanceof BrowseRepresentationBundle) {
+      BrowseRepresentationBundle bundle = (BrowseRepresentationBundle) dipReferrerBundle;
       breadcrumb.updatePath(BreadcrumbUtils.getRepresentationBreadcrumbs(bundle.getAip(), bundle.getRepresentation()));
-    } else if (bundle.getAip() != null) {
+    } else if (dipReferrerBundle instanceof BrowseAIPBundle) {
+      BrowseAIPBundle bundle = (BrowseAIPBundle) dipReferrerBundle;
       breadcrumb.updatePath(BreadcrumbUtils.getAipBreadcrumbs(bundle.getAip()));
     }
   }

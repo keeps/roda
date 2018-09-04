@@ -158,12 +158,12 @@ import org.roda.wui.api.v1.utils.ObjectResponse;
 import org.roda.wui.client.browse.MetadataValue;
 import org.roda.wui.client.browse.bundle.BinaryVersionBundle;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
+import org.roda.wui.client.browse.bundle.BrowseDipBundle;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataViewBundle;
-import org.roda.wui.client.browse.bundle.DipBundle;
 import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
@@ -535,9 +535,9 @@ public class BrowserHelper {
     return ret;
   }
 
-  public static DipBundle retrieveDipBundle(String dipUUID, String dipFileUUID, User user)
-    throws GenericException, NotFoundException, RequestNotValidException {
-    DipBundle bundle = new DipBundle();
+  public static BrowseDipBundle retrieveDipBundle(String dipUUID, String dipFileUUID, User user, Locale locale)
+    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+    BrowseDipBundle bundle = new BrowseDipBundle();
 
     bundle.setDip(retrieve(IndexedDIP.class, dipUUID,
       Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID, RodaConstants.DIP_TITLE, RodaConstants.DIP_AIP_IDS,
@@ -581,21 +581,26 @@ public class BrowserHelper {
 
     // infer from DIP
     IndexedDIP dip = bundle.getDip();
-    if (!dip.getFileIds().isEmpty()) {
-      IndexedFile file = BrowserHelper.retrieve(IndexedFile.class, IdUtils.getFileId(dip.getFileIds().get(0)),
-        fileFields);
-      bundle.setFile(file);
-      bundle.setRepresentation(
-        BrowserHelper.retrieve(IndexedRepresentation.class, file.getRepresentationUUID(), representationFields));
-      bundle.setAip(BrowserHelper.retrieve(IndexedAIP.class, file.getAipId(), aipFields));
-    } else if (!dip.getRepresentationIds().isEmpty()) {
-      IndexedRepresentation representation = BrowserHelper.retrieve(IndexedRepresentation.class,
-        IdUtils.getRepresentationId(dip.getRepresentationIds().get(0)), representationFields);
-      bundle.setRepresentation(representation);
-      bundle.setAip(BrowserHelper.retrieve(IndexedAIP.class, representation.getAipId(), aipFields));
-    } else if (!dip.getAipIds().isEmpty()) {
-      IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, dip.getAipIds().get(0).getAipId(), aipFields);
-      bundle.setAip(aip);
+    try {
+      if (!dip.getFileIds().isEmpty()) {
+        IndexedFile file = BrowserHelper.retrieve(IndexedFile.class, IdUtils.getFileId(dip.getFileIds().get(0)),
+          fileFields);
+        bundle.setReferrer(file);
+        bundle.setReferrerBundle(retrieveBrowseFileBundle(retrieve(IndexedAIP.class, file.getAipId(), aipFields),
+          retrieve(IndexedRepresentation.class, file.getRepresentationUUID(), representationFields), file, user));
+      } else if (!dip.getRepresentationIds().isEmpty()) {
+        IndexedRepresentation representation = BrowserHelper.retrieve(IndexedRepresentation.class,
+          IdUtils.getRepresentationId(dip.getRepresentationIds().get(0)), representationFields);
+        bundle.setReferrer(representation);
+        bundle.setReferrerBundle(retrieveBrowseRepresentationBundle(
+          retrieve(IndexedAIP.class, representation.getAipId(), aipFields), representation, locale));
+      } else if (!dip.getAipIds().isEmpty()) {
+        IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, dip.getAipIds().get(0).getAipId(), aipFields);
+        bundle.setReferrer(aip);
+        bundle.setReferrerBundle(retrieveBrowseAipBundle(user, aip, locale));
+      }
+    } catch (AuthorizationDeniedException | NotFoundException e) {
+      // ignore this as it is normal to have access to the DIP but not its referrer
     }
 
     // get DIP permissions TODO nuno usar bundle.setReferrerPermissions();

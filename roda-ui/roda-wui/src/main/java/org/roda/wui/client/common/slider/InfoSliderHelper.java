@@ -62,10 +62,10 @@ public class InfoSliderHelper {
   }
 
   protected static <T extends IsIndexed> void updateInfoObjectSliderPanel(T object, SliderPanel slider) {
-    if (object instanceof IndexedRepresentation) {
-      updateInfoSliderPanel((IndexedRepresentation) object, slider);
-    } else if (object instanceof IndexedAIP) {
+    if (object instanceof IndexedAIP) {
       updateInfoSliderPanel((IndexedAIP) object, slider);
+    } else if (object instanceof IndexedRepresentation) {
+      updateInfoSliderPanel((IndexedRepresentation) object, slider);
     } else {
       // do nothing
     }
@@ -75,7 +75,7 @@ public class InfoSliderHelper {
     HashMap<String, Widget> values = new HashMap<>();
 
     infoSliderPanel.clear();
-    infoSliderPanel.addTitle(new Label(messages.viewRepresentationInfoTitle()));
+    infoSliderPanel.addTitle(new Label(messages.infoSliderAipInfoTitle()));
 
     if (aip != null) {
       if (StringUtils.isNotBlank(aip.getLevel())) {
@@ -100,7 +100,7 @@ public class InfoSliderHelper {
     HashMap<String, Widget> values = new HashMap<>();
 
     infoSliderPanel.clear();
-    infoSliderPanel.addTitle(new Label(messages.viewRepresentationInfoTitle()));
+    infoSliderPanel.addTitle(new Label(messages.infoSliderRepresentationTitle()));
 
     if (representation != null) {
       if (StringUtils.isNotBlank(messages.representationType())) {
@@ -130,7 +130,7 @@ public class InfoSliderHelper {
 
     HashMap<String, Widget> values = new HashMap<>();
     infoSliderPanel.clear();
-    infoSliderPanel.addTitle(new Label(messages.viewRepresentationInfoTitle()));
+    infoSliderPanel.addTitle(new Label(messages.infoSliderRepresentationTitle()));
 
     values.put(messages.representationId(), createIdHTML(bundle));
 
@@ -156,7 +156,7 @@ public class InfoSliderHelper {
 
     HashMap<String, Widget> values = new HashMap<>();
     infoSliderPanel.clear();
-    infoSliderPanel.addTitle(new Label(messages.viewRepresentationInfoTitle()));
+    infoSliderPanel.addTitle(new Label(messages.infoSliderAipInfoTitle()));
 
     values.put(messages.itemId(), createIdHTML(bundle));
 
@@ -350,7 +350,7 @@ public class InfoSliderHelper {
   public static void updateInfoSliderPanel(BrowseFileBundle bundle, SliderPanel infoSliderPanel) {
     HashMap<String, Widget> values = new HashMap<>();
     infoSliderPanel.clear();
-    infoSliderPanel.addTitle(new Label(messages.viewRepresentationInfoTitle()));
+    infoSliderPanel.addTitle(new Label(messages.infoSliderFileInfoTitle()));
     IndexedFile file = bundle.getFile();
 
     if (file != null) {

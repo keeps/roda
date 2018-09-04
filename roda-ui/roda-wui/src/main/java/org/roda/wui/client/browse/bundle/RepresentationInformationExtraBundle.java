@@ -7,14 +7,13 @@
  */
 package org.roda.wui.client.browse.bundle;
 
-import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.wui.client.browse.MetadataValue;
 
-public class RepresentationInformationExtraBundle implements Serializable {
+public class RepresentationInformationExtraBundle implements Bundle {
   private static final long serialVersionUID = 3601928680426998750L;
 
   private RepresentationInformation representationInformation;

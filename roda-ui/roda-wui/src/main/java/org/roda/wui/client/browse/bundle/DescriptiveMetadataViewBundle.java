@@ -7,9 +7,7 @@
  */
 package org.roda.wui.client.browse.bundle;
 
-import java.io.Serializable;
-
-public class DescriptiveMetadataViewBundle implements Serializable {
+public class DescriptiveMetadataViewBundle implements Bundle {
 
   private static final long serialVersionUID = 515251862250083594L;
 

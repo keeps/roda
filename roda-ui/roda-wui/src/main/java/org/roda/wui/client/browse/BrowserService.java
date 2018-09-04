@@ -48,11 +48,11 @@ import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
+import org.roda.wui.client.browse.bundle.BrowseDipBundle;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
-import org.roda.wui.client.browse.bundle.DipBundle;
 import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
@@ -318,7 +318,7 @@ public interface BrowserService extends RemoteService {
   void changeRepresentationStates(IndexedRepresentation selectedRepresentation, List<String> newStates, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
-  DipBundle retrieveDipBundle(String dipUUID, String dipFileUUID)
+  BrowseDipBundle retrieveDipBundle(String dipUUID, String dipFileUUID, String localeString)
     throws RequestNotValidException, AuthorizationDeniedException, GenericException, NotFoundException;
 
   void deleteDIPs(SelectedItems<IndexedDIP> dips, String details)

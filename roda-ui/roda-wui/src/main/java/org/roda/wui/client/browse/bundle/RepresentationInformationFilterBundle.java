@@ -7,12 +7,11 @@
  */
 package org.roda.wui.client.browse.bundle;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class RepresentationInformationFilterBundle implements Serializable {
+public class RepresentationInformationFilterBundle implements Bundle {
   private static final long serialVersionUID = 2188826656915820770L;
 
   private Map<String, List<String>> objectClassFields;

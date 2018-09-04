@@ -11,6 +11,7 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
+import org.roda.wui.client.browse.bundle.Bundle;
 
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
@@ -41,6 +42,17 @@ public class Sliders {
     SliderPanel slider = createSlider(container, toggleButton);
     InfoSliderHelper.updateInfoObjectSliderPanel(object, slider);
     return slider;
+  }
+
+  public static SliderPanel createInfoSlider(FlowPanel container, FocusPanel toggleButton, Bundle bundle) {
+    if (bundle instanceof BrowseFileBundle) {
+      return createFileInfoSlider(container, toggleButton, (BrowseFileBundle) bundle);
+    } else if (bundle instanceof BrowseRepresentationBundle) {
+      return createRepresentationInfoSlider(container, toggleButton, (BrowseRepresentationBundle) bundle);
+    } else if (bundle instanceof BrowseAIPBundle) {
+      return createAipInfoSlider(container, toggleButton, (BrowseAIPBundle) bundle);
+    }
+    return null;
   }
 
   public static SliderPanel createFileInfoSlider(FlowPanel container, FocusPanel toggleButton,

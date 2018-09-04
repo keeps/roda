@@ -7,12 +7,11 @@
  */
 package org.roda.wui.client.browse.bundle;
 
-import java.io.Serializable;
 import java.util.List;
 
 import org.roda.core.data.v2.ip.IndexedAIP;
 
-public class BrowseAIPBundle implements Serializable {
+public class BrowseAIPBundle implements Bundle {
 
   private static final long serialVersionUID = 7901536603462531124L;
 
