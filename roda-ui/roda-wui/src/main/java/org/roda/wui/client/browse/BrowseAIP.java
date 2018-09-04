@@ -284,7 +284,6 @@ public class BrowseAIP extends Composite {
 
     // NAVIGATION TOOLBAR
     navigationToolbar.withObject(aip).withPermissions(aip.getPermissions()).build();
-    navigationToolbar.show();
 
     // IDENTIFICATION
     updateSectionIdentification(bundle);

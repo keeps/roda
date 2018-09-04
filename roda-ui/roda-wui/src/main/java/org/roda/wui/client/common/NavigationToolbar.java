@@ -53,6 +53,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
@@ -102,6 +103,9 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
   @UiField
   AccessibleFocusPanel actionsButton;
 
+  @UiField
+  FlowPanel toolbarPanel;
+
   private T currentObject = null;
   private Permissions permissions = null;
   private HandlerRegistration searchPopupClickHandler = null;
@@ -127,6 +131,11 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
     return this;
   }
 
+  public NavigationToolbar<T> withAlternativeStyle(boolean useAltStyle) {
+    toolbarPanel.setStyleDependentName("alt", useAltStyle);
+    return this;
+  }
+
   public AccessibleFocusPanel getInfoSidebarButton() {
     infoSidebarButton.setVisible(true);
     return infoSidebarButton;
@@ -147,14 +156,6 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
 
   public void setHeader(String headerText) {
     navigationToolbarHeader.setText(headerText);
-  }
-
-  public void hide() {
-    this.addStyleName("navigationToolbar-hidden");
-  }
-
-  public void show() {
-    this.removeStyleName("navigationToolbar-hidden");
   }
 
   private void hideButtons() {
@@ -207,8 +208,8 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
 
     modifiers.append(' ');
 
-    previousButton.setTitle(modifiers.toString() + "&#8678;");
-    nextButton.setTitle(modifiers.toString() + "&#8680;");
+    previousButton.setTitle(modifiers.toString() + '\u21E6');
+    nextButton.setTitle(modifiers.toString() + '\u21E8');
   }
 
   private void setupActions() {
@@ -298,7 +299,8 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
   }
 
   public void updateBreadcrumb(DipBundle bundle) {
-    BreadcrumbUtils.getDipBreadcrumbs(bundle.getDip(), bundle.getDipFile(), bundle.getDipFileAncestors());
+    breadcrumb.updatePath(
+      BreadcrumbUtils.getDipBreadcrumbs(bundle.getDip(), bundle.getDipFile(), bundle.getDipFileAncestors()));
   }
 
   public void updateReferrerBreadcrumb(DipBundle bundle) {

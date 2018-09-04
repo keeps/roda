@@ -12,7 +12,7 @@
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
 	<wcag:AccessibleFocusPanel ui:field="keyboardFocus">
-		<g:FlowPanel addStyleNames="navigationToolbar">
+		<g:FlowPanel stylePrimaryName="navigationToolbar" ui:field="toolbarPanel">
 			<g:Label addStyleNames="navigationToolbarHeader" ui:field="navigationToolbarHeader" />
 			<g:Label addStyleNames="navigationToolbarHeaderArrow">&rsaquo;</g:Label>
 			<m:BreadcrumbPanel ui:field="breadcrumb" addStyleNames="navigationToolbarBreadcrumb" />

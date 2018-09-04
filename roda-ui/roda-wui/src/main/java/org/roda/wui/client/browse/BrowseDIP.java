@@ -31,6 +31,7 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.browse.bundle.DipBundle;
 import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.actions.DisseminationFileActions;
 import org.roda.wui.client.common.lists.DIPFileList;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
@@ -171,7 +172,8 @@ public class BrowseDIP extends Composite {
         new AsyncTableCellOptions<>(DIPFile.class, "BrowseDIP_dipFiles").withFilter(filter)
           .withSummary(messages.allOfAObject(DIPFile.class.getName())).bindOpener());
 
-      SearchWrapper search = new SearchWrapper(false).createListAndSearchPanel(dipFileListBuilder);
+      SearchWrapper search = new SearchWrapper(false).createListAndSearchPanel(dipFileListBuilder,
+        DisseminationFileActions.get(dip.getPermissions()));
 
       SimplePanel layout = new SimplePanel();
       layout.add(search);
@@ -179,12 +181,13 @@ public class BrowseDIP extends Composite {
       layout.addStyleName("browseDip-topList");
     }
 
-    keyboardFocus.setFocus(true);
-
     NavigationToolbar<IsIndexed> bottomNavigationToolbar = new NavigationToolbar<>();
+    bottomNavigationToolbar.withAlternativeStyle(true);
     bottomNavigationToolbar.withObject(dipFile != null ? dipFile : dip);
     bottomNavigationToolbar.withPermissions(dip.getPermissions());
     bottomNavigationToolbar.updateBreadcrumb(bundle);
+    bottomNavigationToolbar.setHeader(messages.catalogueDIPTitle());
+    bottomNavigationToolbar.addStyleDependentName("alt");
     bottomNavigationToolbar.build();
     container.insert(bottomNavigationToolbar, 0);
 
@@ -192,21 +195,26 @@ public class BrowseDIP extends Composite {
       NavigationToolbar<IsIndexed> topNavigationToolbar = new NavigationToolbar<>();
       ListSelectionUtils.ProcessRelativeItem<IsIndexed> processor;
       IsIndexed referrer;
+      String title;
 
       if (file != null) {
         referrer = file;
         processor = referredObject -> openReferred(referredObject,
           new Filter(new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, referrer.getUUID())));
+        title = messages.catalogueFileTitle();
       } else if (representation != null) {
         referrer = representation;
         processor = referredObject -> openReferred(referredObject,
           new Filter(new SimpleFilterParameter(RodaConstants.DIP_REPRESENTATION_UUIDS, referredObject.getUUID())));
+        title = messages.catalogueRepresentationTitle();
       } else {
         referrer = aip;
         processor = referredObject -> openReferred(referredObject,
           new Filter(new SimpleFilterParameter(RodaConstants.DIP_AIP_UUIDS, referredObject.getUUID())));
+        title = messages.catalogueItemTitle();
       }
 
+      topNavigationToolbar.setHeader(title);
       topNavigationToolbar.withObject(referrer);
       topNavigationToolbar.withProcessor(processor);
       topNavigationToolbar.withModifierKeys(true, true, false);
@@ -218,6 +226,8 @@ public class BrowseDIP extends Composite {
 
       container.insert(topNavigationToolbar, 0);
     }
+
+    keyboardFocus.setFocus(true);
   }
 
   private static <T extends IsIndexed> void openReferred(final T object, Filter filter) {

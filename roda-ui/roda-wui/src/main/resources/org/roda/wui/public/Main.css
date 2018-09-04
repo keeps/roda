@@ -6918,11 +6918,7 @@ span.code {
     position: relative;
 }
 
-.navigationToolbar-hidden {
-    display: none;
-}
-
-.navigationToolbar-hidden {
+.navigationToolbar-alt {
     background-color: #eee;
 }
 
@@ -6982,14 +6978,29 @@ span.code {
 
 .navigationToolbarLink:hover,
 .navigationToolbarLink-selected,
-.navigationToolbarLink.active {
+.navigationToolbarLink.active,
+.navigationToolbar-alt .navigationToolbarLink:hover,
+.navigationToolbar-alt .navigationToolbarLink-selected,
+.navigationToolbar-alt .navigationToolbarLink.active {
     color: white;
     background-color: #089de3;
 }
 
-.navigationToolbarLink.disabled, .navigationToolbarLink.disabled:hover {
+.navigationToolbarLink.disabled,
+.navigationToolbarLink.disabled:hover {
     background-color: #ddd;
     cursor: auto;
+}
+
+.navigationToolbar-alt .navigationToolbarLink {
+    background-color: #eee;
+    color: #999;
+}
+
+.navigationToolbar-alt .navigationToolbarLink.disabled,
+.navigationToolbar-alt .navigationToolbarLink.disabled:hover {
+    color: #ddd;
+    background-color: #eee;
 }
 
 /* Permission related */

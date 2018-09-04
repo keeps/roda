@@ -255,7 +255,6 @@ public class BrowseRepresentation extends Composite {
 
     // NAVIGATION TOOLBAR
     navigationToolbar.withObject(representation).withPermissions(aip.getPermissions()).build();
-    navigationToolbar.show();
 
     updateLayout(bundle, state, justActive);
 
