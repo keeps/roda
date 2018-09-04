@@ -18,7 +18,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -184,7 +183,7 @@ public class SolrUtils {
   }
 
   public static <T extends IsIndexed> List<T> retrieve(SolrClient index, Class<T> classToRetrieve, List<String> id,
-    List<String> fieldsToReturn) throws NotFoundException, GenericException {
+    List<String> fieldsToReturn) throws GenericException {
     List<T> ret = new ArrayList<>();
     try {
       int block = RodaConstants.DEFAULT_PAGINATION_VALUE;
@@ -334,7 +333,7 @@ public class SolrUtils {
    * ____________________________________________________________________________________________________________________
    */
 
-  private static <T> boolean hasPermissionFilters(Class<T> resultClass) throws GenericException {
+  private static <T> boolean hasPermissionFilters(Class<T> resultClass) {
     return HasPermissionFilters.class.isAssignableFrom(resultClass);
   }
 
@@ -351,7 +350,7 @@ public class SolrUtils {
    */
   // FIXME perhaps && and || are not being properly escaped: see how to do it
   public static String escapeSolrSpecialChars(String string) {
-    return string.replaceAll("([+&|!(){}\\[\\-\\]\\^\\\\~?:\"/])", "\\\\$1");
+    return string.replaceAll("([+&|!(){}\\[\\-\\]\\^\\\\~:\"/])", "\\\\$1");
   }
 
   public static List<String> objectToListString(Object object) {
@@ -381,7 +380,6 @@ public class SolrUtils {
       ret = new ArrayList<>();
     } else if (object instanceof String) {
       try {
-        @SuppressWarnings("unchecked")
         List<LinkedHashMap<String, String>> l = JsonUtils.getObjectFromJson((String) object, List.class);
         ret = new ArrayList<>();
         for (LinkedHashMap<String, String> entry : l) {
@@ -992,7 +990,6 @@ public class SolrUtils {
     return processToDate(toValue, granularity, timeZoneOffset, true);
   }
 
-  @SuppressWarnings("deprecation")
   private static String processToDate(Date toValue, DateGranularity granularity, int timeZoneOffset,
     boolean returnAsteriskOnNull) {
     final String ret;
@@ -1203,7 +1200,7 @@ public class SolrUtils {
 
   public static <I extends IsIndexed, M extends IsModelObject, S extends Object> ReturnWithExceptions<Void, S> create2(
     SolrClient index, S source, Class<I> indexClass, M object, IndexingAdditionalInfo utils) {
-    ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<Void, S>(source);
+    ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<>(source);
     if (object != null) {
       try {
         SolrInputDocument solrDocument = SolrCollectionRegistry.toSolrDocument(indexClass, object, utils);
@@ -1383,7 +1380,7 @@ public class SolrUtils {
   }
 
   public static Permissions getPermissions(SolrDocument doc) {
-    
+
     Permissions permissions = new Permissions();
 
     EnumMap<PermissionType, Set<String>> userPermissions = new EnumMap<>(PermissionType.class);

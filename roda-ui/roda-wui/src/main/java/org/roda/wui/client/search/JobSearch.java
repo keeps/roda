@@ -23,11 +23,10 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.ClientMessages;
-
 public class JobSearch extends Composite {
 
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
+  // private static final ClientMessages messages =
+  // GWT.create(ClientMessages.class);
 
   interface MyUiBinder extends UiBinder<Widget, JobSearch> {
   }
