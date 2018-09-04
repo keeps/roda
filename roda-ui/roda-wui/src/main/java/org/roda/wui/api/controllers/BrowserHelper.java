@@ -2116,7 +2116,8 @@ public class BrowserHelper {
     RodaCoreFactory.getModelService().deleteRisk(riskId, commit);
   }
 
-  public static RiskIncidence createRiskIncidence(RiskIncidence incidence, boolean commit) throws GenericException {
+  public static RiskIncidence createRiskIncidence(RiskIncidence incidence, boolean commit)
+    throws GenericException, AlreadyExistsException, NotFoundException {
     return RodaCoreFactory.getModelService().createRiskIncidence(incidence, commit);
   }
 

@@ -207,7 +207,7 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
           incidence.setSeverity(Risk.SEVERITY_LEVEL.valueOf(severity));
           incidence.setDescription(incidenceDescription);
           model.createRiskIncidence(incidence, false);
-        } catch (GenericException e) {
+        } catch (GenericException | AlreadyExistsException | NotFoundException e) {
           state = PluginState.FAILURE;
         }
       }
@@ -248,7 +248,7 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
           incidence.setStatus(INCIDENCE_STATUS.UNMITIGATED);
           incidence.setSeverity(SEVERITY_LEVEL.valueOf(severity));
           model.createRiskIncidence(incidence, false);
-        } catch (GenericException e) {
+        } catch (GenericException | AlreadyExistsException | NotFoundException e) {
           state = PluginState.FAILURE;
         }
       }
@@ -292,7 +292,7 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
           incidence.setStatus(INCIDENCE_STATUS.UNMITIGATED);
           incidence.setSeverity(SEVERITY_LEVEL.valueOf(severity));
           model.createRiskIncidence(incidence, false);
-        } catch (GenericException e) {
+        } catch (GenericException | AlreadyExistsException | NotFoundException e) {
           state = PluginState.FAILURE;
         }
       }

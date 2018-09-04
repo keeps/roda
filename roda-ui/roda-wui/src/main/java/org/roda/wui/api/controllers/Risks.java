@@ -8,6 +8,7 @@
 package org.roda.wui.api.controllers;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -97,7 +98,7 @@ public class Risks extends RodaWuiController {
   }
 
   public static RiskIncidence createRiskIncidence(User user, RiskIncidence incidence)
-    throws AuthorizationDeniedException, GenericException {
+    throws AuthorizationDeniedException, GenericException, AlreadyExistsException, NotFoundException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions

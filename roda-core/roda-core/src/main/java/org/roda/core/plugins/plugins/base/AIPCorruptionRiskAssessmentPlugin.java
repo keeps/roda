@@ -260,7 +260,7 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
 
   private void createIncidence(ModelService model, IndexService index, String aipId, String representationId,
     List<String> filePath, String fileId, String riskId)
-    throws RequestNotValidException, GenericException, AuthorizationDeniedException {
+          throws RequestNotValidException, GenericException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
     List<RiskIncidence> results = getUnmitigatedIncidences(index, aipId, representationId, filePath, fileId, riskId);
 
     if (results.isEmpty()) {

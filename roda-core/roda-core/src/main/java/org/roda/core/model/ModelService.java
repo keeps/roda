@@ -2106,7 +2106,8 @@ public class ModelService extends ModelObservable {
     return currentVersion;
   }
 
-  public RiskIncidence createRiskIncidence(RiskIncidence riskIncidence, boolean commit) throws GenericException {
+  public RiskIncidence createRiskIncidence(RiskIncidence riskIncidence, boolean commit)
+    throws AlreadyExistsException, NotFoundException, GenericException {
     try {
       riskIncidence.setId(IdUtils.createUUID());
       riskIncidence.setDetectedOn(new Date());
