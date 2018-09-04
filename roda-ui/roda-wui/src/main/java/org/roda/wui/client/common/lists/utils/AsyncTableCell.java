@@ -14,7 +14,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
@@ -45,6 +44,7 @@ import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.widgets.MyCellTableResources;
 import org.roda.wui.common.client.widgets.Toast;
 import org.roda.wui.common.client.widgets.wcag.AccessibleCellTable;
+import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 import org.roda.wui.common.client.widgets.wcag.AccessibleSimplePager;
 import org.roda.wui.common.client.widgets.wcag.AcessibleCheckboxCell;
 
@@ -78,6 +78,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.view.client.CellPreviewEvent;
@@ -136,19 +137,22 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
   private int initialPageSize;
   private int pageSizeIncrement;
 
-  private Timer autoUpdateTimer = null;
-  private int autoUpdateTimerMillis = 0;
-
   private IndexResult<T> result;
 
   enum AutoUpdateState {
-    AUTO_UPDATE_OFF, AUTO_UPDATE_SUCCESS, AUTO_UPDATE_ERROR, AUTO_UPDATE_PAUSED
+    AUTO_UPDATE_OFF, AUTO_UPDATE_ON, AUTO_UPDATE_ERROR, AUTO_UPDATE_PAUSED, AUTO_UPDATE_WORKING
   }
 
+  private Timer autoUpdateTimer = null;
+  private int autoUpdateTimerMillis = 0;
   private AutoUpdateState autoUpdateState = AutoUpdateState.AUTO_UPDATE_OFF;
   private String autoUpdateErrorMessage = "";
+  private AccessibleFocusPanel autoUpdatePanel;
+  private InlineHTML autoUpdateSignal = new InlineHTML("");
+  private HandlerRegistration autoUpdateHandler;
 
-  private List<Consumer<AutoUpdateState>> autoUpdateConsumers = new ArrayList<>();
+  // private List<Consumer<AutoUpdateState>> autoUpdateConsumers = new
+  // ArrayList<>();
 
   public AsyncTableCell() {
     super();
@@ -173,8 +177,8 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
 
     this.fieldsToReturn = options.getFieldsToReturn();
 
-    display = new AccessibleCellTable<>(getInitialPageSize(),
-      (MyCellTableResources) GWT.create(MyCellTableResources.class), getKeyProvider(), options.getSummary());
+    display = new AccessibleCellTable<>(getInitialPageSize(), GWT.create(MyCellTableResources.class), getKeyProvider(),
+      options.getSummary());
     display.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.DISABLED);
     display.setLoadingIndicator(new HTML(HtmlSnippetUtils.LOADING));
 
@@ -217,8 +221,8 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     dataProvider.addDataDisplay(display);
 
     resultsPager = new AccessibleSimplePager(AccessibleSimplePager.TextLocation.LEFT,
-      (SimplePager.Resources) GWT.create(SimplePager.Resources.class), false, initialPageSize, false, false,
-      (SimplePager.ImageButtonsConstants) GWT.create(SimplePager.ImageButtonsConstants.class));
+      GWT.create(SimplePager.Resources.class), false, initialPageSize, false, false,
+      GWT.create(SimplePager.ImageButtonsConstants.class));
     resultsPager.setDisplay(display);
 
     pageSizePager = new RodaPageSizePager(getPageSizePagerIncrement());
@@ -238,10 +242,14 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     mainPanel.addStyleName("my-asyncdatagrid-main-panel");
     add(mainPanel);
 
+    autoUpdatePanel = new AccessibleFocusPanel();
+    autoUpdatePanel.add(autoUpdateSignal);
+
     mainPanel.add(selectAllPanel);
     mainPanel.add(display);
     mainPanel.add(resultsPager);
     mainPanel.add(pageSizePager);
+    mainPanel.add(autoUpdatePanel);
     mainPanel.add(csvDownloadButton);
 
     SimplePanel clearfix = new SimplePanel();
@@ -287,6 +295,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     addStyleName("my-asyncdatagrid");
     resultsPager.addStyleName("my-asyncdatagrid-pager-results");
     pageSizePager.addStyleName("my-asyncdatagrid-pager-pagesize");
+    autoUpdatePanel.addStyleName("my-asyncdatagrid-autoupdate-signal");
     display.addStyleName("my-asyncdatagrid-display");
 
     addValueChangeHandler(new ValueChangeHandler<IndexResult<T>>() {
@@ -301,11 +310,10 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
 
     // nvieira 2018-07-23: needs to be improved to update a UI button instead of
     // a log
-    autoUpdateConsumers.add(st -> GWT.log(st.toString()));
+    // autoUpdateConsumers.add(st -> GWT.log(st.toString()));
     addAutoUpdateControlListener();
 
     if (options.isBindOpener()) {
-      GWT.log("resolve binder");
       ListSelectionUtils.bindBrowseOpener(this);
     }
 
@@ -526,6 +534,8 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
 
       @Override
       public void run() {
+        setAutoUpdateState(AutoUpdateState.AUTO_UPDATE_WORKING);
+
         dataProvider.update(fieldsToReturn, new AsyncCallback<Void>() {
 
           @Override
@@ -538,7 +548,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
 
           @Override
           public void onSuccess(Void result) {
-            setAutoUpdateState(AutoUpdateState.AUTO_UPDATE_SUCCESS);
+            setAutoUpdateState(AutoUpdateState.AUTO_UPDATE_ON);
           }
         });
       }
@@ -935,7 +945,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     } else if (selected.size() > 1) {
       return new ActionableObject<>(getSelected());
     } else {
-      return new ActionableObject<T>(classToReturn);
+      return new ActionableObject<>(classToReturn);
     }
   }
 
@@ -1057,7 +1067,39 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
 
   public void setAutoUpdateState(AutoUpdateState autoUpdateState) {
     this.autoUpdateState = autoUpdateState;
-    autoUpdateConsumers.forEach(c -> c.accept(autoUpdateState));
+    ClickHandler clickHandler = null;
+
+    if (autoUpdateState.equals(AutoUpdateState.AUTO_UPDATE_OFF)) {
+      autoUpdateSignal.setHTML("");
+    } else if (autoUpdateState.equals(AutoUpdateState.AUTO_UPDATE_ON)) {
+      autoUpdateSignal.setHTML(
+        "<i class=\"fas fa-sync\" title=\"Updating every 10 seconds, click to pause.\" style=\"cursor: pointer\"></i>");
+
+      clickHandler = event -> pauseAutoUpdate();
+    } else if (autoUpdateState.equals(AutoUpdateState.AUTO_UPDATE_WORKING)) {
+      autoUpdateSignal.setHTML("<i class=\"fas fa-sync fa-spin\" title=\"Updating...\" style=\"cursor: pointer\"></i>");
+    } else if (autoUpdateState.equals(AutoUpdateState.AUTO_UPDATE_PAUSED)) {
+      autoUpdateSignal.setHTML(
+        "<i class=\"fas fa-pause-circle\" title=\"Paused, click to resume auto-update.\" style=\"cursor: pointer; color: #222\"></i>");
+
+      clickHandler = event -> resumeAutoUpdate();
+    } else if (autoUpdateState.equals(AutoUpdateState.AUTO_UPDATE_ERROR)) {
+      autoUpdateSignal.setHTML(
+        "<span class=\"fa-layers fa-fw fa-1x\" title=\"An error occurred while updating: could not connect to server. Click to retry.\" style=\"cursor: pointer\">\n"
+          + "    <i class=\"fas fa-plug\" data-fa-transform=\"grow-2\" style=\"color: #222\"></i>\n"
+          + "    <i class=\"fas fa-times\" data-fa-transform=\"shrink-10 down-7 right-5\" style=\"color:Tomato\"></i>\n"
+          + "  </span>");
+
+      clickHandler = event -> resumeAutoUpdate();
+    }
+
+    if (autoUpdateHandler != null) {
+      autoUpdateHandler.removeHandler();
+    }
+
+    if (clickHandler != null) {
+      autoUpdateHandler = autoUpdatePanel.addClickHandler(clickHandler);
+    }
   }
 
   public void addAutoUpdateControlListener() {
@@ -1083,7 +1125,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
   public void resumeAutoUpdate() {
     if (autoUpdateTimer != null) {
       autoUpdateTimer.scheduleRepeating(autoUpdateTimerMillis);
-      setAutoUpdateState(AutoUpdateState.AUTO_UPDATE_SUCCESS);
+      setAutoUpdateState(AutoUpdateState.AUTO_UPDATE_ON);
     }
   }
 }

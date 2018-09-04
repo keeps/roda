@@ -1190,6 +1190,13 @@ pre code {
     background-color: #3998d0;
 }
 
+.my-asyncdatagrid-autoupdate-signal {
+    padding-top: 2px;
+    padding-right: 2px;
+    display: inline-block;
+    float: right;
+}
+
 .my-asyncdatagrid-display {
     width: 100%;
     table-layout: fixed;
