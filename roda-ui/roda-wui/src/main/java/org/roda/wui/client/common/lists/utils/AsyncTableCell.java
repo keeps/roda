@@ -175,7 +175,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
 
     this.fieldsToReturn = options.getFieldsToReturn();
 
-    this.setVisible(options.isStartHidden());
+    this.setVisible(!options.isStartHidden());
 
     display = new AccessibleCellTable<>(getInitialPageSize(), GWT.create(MyCellTableResources.class), getKeyProvider(),
       options.getSummary());
