@@ -54,7 +54,8 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
       TransferredResourceAction.NEW_FOLDER));
 
   private static final Set<TransferredResourceAction> POSSIBLE_ACTIONS_ON_FOLDER_TRANSFERRED_RESOURCE = new HashSet<>(
-    Arrays.asList(TransferredResourceAction.values()));
+    Arrays.asList(TransferredResourceAction.RENAME, TransferredResourceAction.MOVE, TransferredResourceAction.REMOVE,
+      TransferredResourceAction.NEW_PROCESS));
 
   private static final Set<TransferredResourceAction> POSSIBLE_ACTIONS_ON_FILE_TRANSFERRED_RESOURCE = new HashSet<>(
     Arrays.asList(TransferredResourceAction.RENAME, TransferredResourceAction.MOVE, TransferredResourceAction.REMOVE,

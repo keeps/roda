@@ -52,14 +52,9 @@ public class PreservationEventsSearch extends Composite {
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(
       new ListBuilder<>(() -> new PreservationEventList(),
         new AsyncTableCellOptions<>(IndexedPreservationEvent.class, eventsListId).withFilter(filter)
-          .withSummary(messages.searchResults()).bindOpener()),
-      PreservationEventActions.get(aipId, representationUUID, fileUUID), messages.searchPlaceHolder());
+          .withSummary(messages.searchResults()).bindOpener()
+          .withActionable(PreservationEventActions.get(aipId, representationUUID, fileUUID))));
 
     initWidget(uiBinder.createAndBindUi(this));
-
-    // TODO tmp
-    // searchPanel.setDropdownLabel(messages.searchListBoxPreservationEvents());
-    // searchPanel.addDropdownItem(messages.searchListBoxPreservationEvents(),
-    // RodaConstants.SEARCH_PRESERVATION_EVENTS);
   }
 }

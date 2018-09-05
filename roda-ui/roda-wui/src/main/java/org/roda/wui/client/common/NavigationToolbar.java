@@ -21,6 +21,7 @@ import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
+import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.BrowseDipBundle;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
@@ -32,6 +33,7 @@ import org.roda.wui.client.common.actions.DisseminationActions;
 import org.roda.wui.client.common.actions.DisseminationFileActions;
 import org.roda.wui.client.common.actions.FileActions;
 import org.roda.wui.client.common.actions.RepresentationActions;
+import org.roda.wui.client.common.actions.TransferredResourceActions;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.actions.model.ActionableObject;
@@ -108,6 +110,7 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
   FlowPanel toolbarPanel;
 
   private T currentObject = null;
+  private Object parentObject = null;
   private Permissions permissions = null;
   private HandlerRegistration searchPopupClickHandler = null;
 
@@ -275,6 +278,16 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
         new ActionableWidgetBuilder<>(disseminationFileActions).buildListWithObjects(new ActionableObject<>(dipFile)));
       actionsButton.addClickHandler(event -> popup.showRelativeTo(actionsButton));
       actionsButton.setVisible(true);
+    } else if (currentObject instanceof TransferredResource) {
+      infoSidebarButton.setTitle(messages.oneOfAObject(TransferredResource.class.getName()));
+
+      TransferredResource transferredResource = (TransferredResource) this.currentObject;
+      TransferredResourceActions transferredResourceActions = TransferredResourceActions.get(null);
+
+      popup.setWidget(new ActionableWidgetBuilder<>(transferredResourceActions)
+        .buildListWithObjects(new ActionableObject<>(transferredResource)));
+      actionsButton.addClickHandler(event -> popup.showRelativeTo(actionsButton));
+      actionsButton.setVisible(true);
     }
   }
 
@@ -316,6 +329,10 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
       BrowseAIPBundle bundle = (BrowseAIPBundle) dipReferrerBundle;
       breadcrumb.updatePath(BreadcrumbUtils.getAipBreadcrumbs(bundle.getAip()));
     }
+  }
+
+  public void updateBreadcrumb(TransferredResource transferredResource) {
+    breadcrumb.updatePath(BreadcrumbUtils.getTransferredResourceBreadcrumbs(transferredResource));
   }
 
   public void updateBreadcrumbPath(BreadcrumbItem... items) {

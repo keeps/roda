@@ -18,23 +18,17 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
-import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.TransferredResourceActions;
-import org.roda.wui.client.common.actions.model.ActionableObject;
-import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.dialogs.Dialogs;
-import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.Ingest;
-import org.roda.wui.client.main.BreadcrumbPanel;
-import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.client.search.TransferredResourceSearch;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
@@ -57,7 +51,6 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -75,7 +68,50 @@ public class IngestTransfer extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-      getInstance().resolve(historyTokens, callback);
+      if (historyTokens.isEmpty()) {
+        callback.onSuccess(new IngestTransfer());
+      } else if (historyTokens.get(0).equals(TransferUpload.INGEST_RESOLVER.getHistoryToken())) {
+        TransferUpload.INGEST_RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+      } else {
+        String transferredResourceUUID = historyTokens.get(0);
+        if (transferredResourceUUID != null) {
+          BrowserService.Util.getInstance().retrieve(TransferredResource.class.getName(), transferredResourceUUID,
+            fieldsToReturn, new AsyncCallback<TransferredResource>() {
+
+              @Override
+              public void onFailure(Throwable caught) {
+                if (caught instanceof NotFoundException) {
+                  Dialogs.showInformationDialog(messages.ingestTransferNotFoundDialogTitle(),
+                    messages.ingestTransferNotFoundDialogMessage(), messages.ingestTransferNotFoundDialogButton(),
+                    false, new AsyncCallback<Void>() {
+
+                      @Override
+                      public void onFailure(Throwable caught) {
+                        // do nothing
+                      }
+
+                      @Override
+                      public void onSuccess(Void result) {
+                        HistoryUtils.newHistory(IngestTransfer.RESOLVER);
+                      }
+                    });
+                } else {
+                  AsyncCallbackUtils.defaultFailureTreatment(caught);
+                  HistoryUtils.newHistory(IngestTransfer.RESOLVER);
+                }
+
+                callback.onSuccess(null);
+              }
+
+              @Override
+              public void onSuccess(TransferredResource resource) {
+                callback.onSuccess(new IngestTransfer(resource));
+              }
+            });
+        } else {
+          callback.onSuccess(new IngestTransfer());
+        }
+      }
     }
 
     @Override
@@ -111,17 +147,13 @@ public class IngestTransfer extends Composite {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  private TransferredResource resource;
-  private ActionableWidgetBuilder<TransferredResource> actionableWidgetBuilder;
+  private final TransferredResource resource;
 
   @UiField
   Label ingestTransferTitle;
 
   @UiField
   FlowPanel ingestTransferDescription;
-
-  @UiField
-  BreadcrumbPanel breadcrumb;
 
   @UiField(provided = true)
   TransferredResourceSearch resourceSearch;
@@ -142,197 +174,105 @@ public class IngestTransfer extends Composite {
   Label itemDates;
 
   @UiField
-  SimplePanel actionsSidebar;
+  NavigationToolbar<TransferredResource> navigationToolbar;
 
-  private IngestTransfer() {
-    NoAsyncCallback<Actionable.ActionImpact> actionCallback = new NoAsyncCallback<Actionable.ActionImpact>() {
-      @Override
-      public void onFailure(Throwable caught) {
-        super.onFailure(caught);
-        resourceSearch.refresh();
-      }
+  private NoAsyncCallback<Actionable.ActionImpact> actionCallback = new NoAsyncCallback<Actionable.ActionImpact>() {
+    @Override
+    public void onFailure(Throwable caught) {
+      super.onFailure(caught);
+      resourceSearch.refresh();
+    }
 
-      @Override
-      public void onSuccess(Actionable.ActionImpact impact) {
-        if (Actionable.ActionImpact.UPDATED.equals(impact)) {
-          if (resource != null) {
-            updateView(resource.getUUID(), new NoAsyncCallback<>());
-          } else {
-            view();
-          }
-          resourceSearch.refresh();
-        } else if (Actionable.ActionImpact.DESTROYED.equals(impact)) {
-          String parentUUID = resource != null ? resource.getParentUUID() : null;
-          if (parentUUID != null) {
-            HistoryUtils.newHistory(RESOLVER, parentUUID);
-          } else {
-            HistoryUtils.newHistory(RESOLVER);
-          }
+    @Override
+    public void onSuccess(Actionable.ActionImpact impact) {
+      if (Actionable.ActionImpact.UPDATED.equals(impact)) {
+        if (resource != null) {
+          HistoryUtils.newHistory(RESOLVER, resource.getUUID());
+        } else {
+          HistoryUtils.newHistory(RESOLVER);
+        }
+      } else if (Actionable.ActionImpact.DESTROYED.equals(impact)) {
+        String parentUUID = resource != null ? resource.getParentUUID() : null;
+        if (parentUUID != null) {
+          HistoryUtils.newHistory(RESOLVER, parentUUID);
+        } else {
+          HistoryUtils.newHistory(RESOLVER);
         }
       }
-    };
+    }
+  };
 
-    // TODO tmp activar o actionable callback acima quando o botao de actionable que
-    // está dentro da pesquisa é clicado
+  private IngestTransfer(final TransferredResource resource) {
+    this.resource = resource;
 
-    resourceSearch = new TransferredResourceSearch("IngestTransfer_transferredResources",
-      new Filter(new EmptyKeyFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID)),
-      TransferredResourceActions.get(null));
-
-    actionableWidgetBuilder = new ActionableWidgetBuilder<>(TransferredResourceActions.get(null));
+    if (resource.isFile()) {
+      resourceSearch = new TransferredResourceSearch();
+    } else {
+      resourceSearch = new TransferredResourceSearch("IngestTransfer_transferredResources",
+        new Filter(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID, resource.getRelativePath())),
+        TransferredResourceActions.get(resource), actionCallback);
+    }
 
     initWidget(uiBinder.createAndBindUi(this));
 
+    navigationToolbar.setHeader(messages.oneOfAObject(TransferredResource.class.getName()));
+
     ingestTransferDescription.add(new HTMLWidgetWrapper("IngestTransferDescription.html"));
 
-    actionableWidgetBuilder.withCallback(actionCallback);
-
-    // TODO 20180807 bferreira: remove sidebar and use actionable in searchwrapper
-    actionsSidebar
-      .setWidget(actionableWidgetBuilder.buildListWithObjects(new ActionableObject<>(TransferredResource.class)));
+    draw();
   }
 
-  /**
-   * Get the singleton instance
-   * 
-   * @return the instance
-   */
-  public static IngestTransfer getInstance() {
-    if (instance == null) {
-      instance = new IngestTransfer();
-    }
-    return instance;
+  private IngestTransfer() {
+    this.resource = null;
+
+    resourceSearch = new TransferredResourceSearch("IngestTransfer_transferredResources",
+      new Filter(new EmptyKeyFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID)),
+      TransferredResourceActions.get(null), actionCallback);
+
+    initWidget(uiBinder.createAndBindUi(this));
+
+    navigationToolbar.setHeader(messages.oneOfAObject(TransferredResource.class.getName()));
+
+    ingestTransferDescription.add(new HTMLWidgetWrapper("IngestTransferDescription.html"));
+
+    draw();
   }
 
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
-  }
+  private void draw() {
+    if (resource == null) {
+      ingestTransferTitle.setVisible(true);
+      ingestTransferDescription.setVisible(true);
 
-  protected void view(TransferredResource r) {
-    resource = r;
-
-    actionableWidgetBuilder.changeActionable(TransferredResourceActions.get(resource));
-    actionsSidebar.setWidget(actionableWidgetBuilder.buildListWithObjects(new ActionableObject<>(resource)));
-
-    ingestTransferTitle.setVisible(false);
-    ingestTransferDescription.setVisible(false);
-
-    if (r.isFile()) {
-      itemIcon
-        .setHTML(DescriptionLevelUtils.getElementLevelIconSafeHtml(RodaConstants.VIEW_REPRESENTATION_FILE, false));
-    } else {
-      itemIcon
-        .setHTML(DescriptionLevelUtils.getElementLevelIconSafeHtml(RodaConstants.VIEW_REPRESENTATION_FOLDER, false));
-    }
-
-    itemTitle.setText(r.getName());
-    itemDates.setText(messages.ingestTransferItemInfo(Humanize.formatDateTime(r.getCreationDate()),
-      Humanize.readableFileSize(r.getSize())));
-
-    if (r.isFile()) {
-      resourceSearch.setVisible(false);
-      download.setVisible(true);
-    } else {
-      Filter filter = new Filter(
-        new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID, r.getRelativePath()));
-      resourceSearch.setDefaultFilters(filter);
-      resourceSearch.setVisible(true);
+      itemIcon.setHTML(DescriptionLevelUtils.getTopIconSafeHtml());
+      itemTitle.setText(messages.ingestAllTransferredPackages());
+      itemDates.setText("");
       download.setVisible(false);
-    }
+      navigationToolbar.setVisible(false);
 
-    breadcrumb.updatePath(BreadcrumbUtils.getTransferredResourceBreadcrumbs(r));
-    breadcrumb.setVisible(true);
-
-    lastScanned.setText(messages.ingestTransferLastScanned(resource.getLastScanDate()));
-  }
-
-  protected void view() {
-    resource = null;
-
-    actionableWidgetBuilder.changeActionable(TransferredResourceActions.get(null));
-    actionsSidebar
-      .setWidget(actionableWidgetBuilder.buildListWithObjects(new ActionableObject<>(TransferredResource.class)));
-
-    ingestTransferTitle.setVisible(true);
-    ingestTransferDescription.setVisible(true);
-
-    itemIcon.setHTML(DescriptionLevelUtils.getTopIconSafeHtml());
-    itemTitle.setText(messages.ingestAllTransferredPackages());
-    itemDates.setText("");
-
-    resourceSearch.setVisible(true);
-    download.setVisible(false);
-
-    resourceSearch.setDefaultFilters(DEFAULT_FILTER);
-    breadcrumb.setVisible(false);
-
-    lastScanned.setText("");
-  }
-
-  public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-    if (historyTokens.isEmpty()) {
-      view();
-      callback.onSuccess(this);
-    } else if (historyTokens.get(0).equals(TransferUpload.INGEST_RESOLVER.getHistoryToken())) {
-      TransferUpload.INGEST_RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+      lastScanned.setText("");
     } else {
-      String transferredResourceUUID = historyTokens.get(0);
-      if (transferredResourceUUID != null) {
-        updateView(transferredResourceUUID, callback);
+      navigationToolbar.updateBreadcrumb(resource);
+      navigationToolbar.withObject(resource).build();
+      navigationToolbar.setVisible(true);
+
+      ingestTransferTitle.setVisible(false);
+      ingestTransferDescription.setVisible(false);
+
+      if (resource.isFile()) {
+        itemIcon
+          .setHTML(DescriptionLevelUtils.getElementLevelIconSafeHtml(RodaConstants.VIEW_REPRESENTATION_FILE, false));
       } else {
-        view();
-        callback.onSuccess(this);
+        itemIcon
+          .setHTML(DescriptionLevelUtils.getElementLevelIconSafeHtml(RodaConstants.VIEW_REPRESENTATION_FOLDER, false));
       }
+
+      itemTitle.setText(resource.getName());
+      itemDates.setText(messages.ingestTransferItemInfo(Humanize.formatDateTime(resource.getCreationDate()),
+        Humanize.readableFileSize(resource.getSize())));
+
+      download.setVisible(resource.isFile());
+      lastScanned.setText(messages.ingestTransferLastScanned(resource.getLastScanDate()));
     }
-  }
-
-  private void updateView(String transferredResourceUUID, AsyncCallback<Widget> callback) {
-    BrowserService.Util.getInstance().retrieve(TransferredResource.class.getName(), transferredResourceUUID,
-      fieldsToReturn, new AsyncCallback<TransferredResource>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          if (caught instanceof NotFoundException) {
-            Dialogs.showInformationDialog(messages.ingestTransferNotFoundDialogTitle(),
-              messages.ingestTransferNotFoundDialogMessage(), messages.ingestTransferNotFoundDialogButton(), false,
-              new AsyncCallback<Void>() {
-
-                @Override
-                public void onFailure(Throwable caught) {
-                  // do nothing
-                }
-
-                @Override
-                public void onSuccess(Void result) {
-                  HistoryUtils.newHistory(IngestTransfer.RESOLVER);
-                }
-              });
-          } else {
-            AsyncCallbackUtils.defaultFailureTreatment(caught);
-            HistoryUtils.newHistory(IngestTransfer.RESOLVER);
-          }
-
-          callback.onSuccess(null);
-        }
-
-        @Override
-        public void onSuccess(TransferredResource r) {
-          view(r);
-          callback.onSuccess(IngestTransfer.this);
-        }
-      });
-  }
-
-  public SelectedItems<TransferredResource> getSelected() {
-    SelectedItems<TransferredResource> selected = resourceSearch.getSelected();
-
-    if (ClientSelectedItemsUtils.isEmpty(selected) && resource != null) {
-      selected = new SelectedItemsList<>(Arrays.asList(resource.getUUID()), TransferredResource.class.getName());
-    }
-
-    return selected;
   }
 
   @UiHandler("download")

@@ -159,10 +159,11 @@ public class RiskIncidenceRegister extends Composite {
 
     ListBuilder<RiskIncidence> riskIncidenceListBuilder = new ListBuilder<>(() -> new RiskIncidenceList(),
       new AsyncTableCellOptions<>(RiskIncidence.class, "RiskIncidenceRegister_risks").withFilter(filter)
-        .withSummary(messages.riskIncidencesTitle()).bindOpener());
+        .withSummary(messages.riskIncidencesTitle()).bindOpener()
+        .withSearchPlaceholder(messages.riskIncidenceRegisterSearchPlaceHolder())
+        .withActionable(RiskIncidenceActions.getForMultipleEdit()));
 
-    searchWrapper = new SearchWrapper(false).createListAndSearchPanel(riskIncidenceListBuilder,
-      RiskIncidenceActions.getForMultipleEdit(), messages.riskIncidenceRegisterSearchPlaceHolder());
+    searchWrapper = new SearchWrapper(false).createListAndSearchPanel(riskIncidenceListBuilder);
 
     initWidget(uiBinder.createAndBindUi(this));
     riskIncidenceRegisterDescription.add(new HTMLWidgetWrapper("RiskIncidenceRegisterDescription.html"));

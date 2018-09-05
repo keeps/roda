@@ -39,24 +39,17 @@ public class RiskSearch extends Composite {
 
   public RiskSearch() {
     ListBuilder<IndexedRisk> riskListBuilder = new ListBuilder<>(() -> new RiskList(),
-      new AsyncTableCellOptions<>(IndexedRisk.class, "RiskRegister_risks").bindOpener());
+      new AsyncTableCellOptions<>(IndexedRisk.class, "RiskRegister_risks").withActionable(RiskActions.get())
+        .bindOpener());
 
     ListBuilder<RiskIncidence> riskIncidenceListBuilder = new ListBuilder<>(() -> new RiskIncidenceList(),
-      new AsyncTableCellOptions<>(RiskIncidence.class, "RiskRegister_riskIncidences").bindOpener());
+      new AsyncTableCellOptions<>(RiskIncidence.class, "RiskRegister_riskIncidences")
+        .withActionable(RiskIncidenceActions.getForMultipleEdit()).bindOpener());
 
     searchWrapper = new SearchWrapper(true)
-      .createListAndSearchPanel(riskListBuilder, RiskActions.get(), messages.searchPlaceHolder())
-      .createListAndSearchPanel(riskIncidenceListBuilder, RiskIncidenceActions.getForMultipleEdit(),
-        messages.searchPlaceHolder());
+      .createListAndSearchPanel(riskListBuilder).createListAndSearchPanel(riskIncidenceListBuilder);
 
     initWidget(uiBinder.createAndBindUi(this));
-
-    // TODO tmp
-    // searchWrapper.setDropdownLabel(messages.searchListBoxRisks());
-    // searchWrapper.addDropdownItem(messages.searchListBoxRisks(),
-    // RodaConstants.SEARCH_RISKS);
-    // searchWrapper.addDropdownItem(messages.searchListBoxIncidences(),
-    // RodaConstants.SEARCH_INCIDENCES);
   }
 
   public void refresh() {

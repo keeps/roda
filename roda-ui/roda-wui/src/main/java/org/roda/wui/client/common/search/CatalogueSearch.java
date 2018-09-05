@@ -62,21 +62,20 @@ public class CatalogueSearch extends Composite {
     // prepare lists
     ListBuilder<IndexedAIP> aipListBuilder = new ListBuilder<>(() -> new AIPList(),
       new AsyncTableCellOptions<>(IndexedAIP.class, itemsListId).withJustActive(justActive).bindOpener()
-        .withStartHidden(true));
+        .withStartHidden(true).withActionable(AipActions.get(parentAipId, parentAipState, permissions)));
 
     ListBuilder<IndexedRepresentation> representationListBuilder = new ListBuilder<>(() -> new RepresentationList(),
       new AsyncTableCellOptions<>(IndexedRepresentation.class, representationsListId).withJustActive(justActive)
-        .bindOpener().withStartHidden(true));
+        .bindOpener().withStartHidden(true).withActionable(RepresentationActions.get()));
 
     ListBuilder<IndexedFile> fileListBuilder = new ListBuilder<>(() -> new SearchFileList(true),
       new AsyncTableCellOptions<>(IndexedFile.class, filesListId).withJustActive(justActive).bindOpener()
-        .withStartHidden(true));
+        .withStartHidden(true).withActionable(FileActions.get()));
 
     // add lists to search
     searchWrapper = new SearchWrapper(true, IndexedAIP.class.getSimpleName())
-      .createListAndSearchPanel(aipListBuilder, AipActions.get(parentAipId, parentAipState, permissions))
-      .createListAndSearchPanel(representationListBuilder, RepresentationActions.get())
-      .createListAndSearchPanel(fileListBuilder, FileActions.get());
+      .createListAndSearchPanel(aipListBuilder).createListAndSearchPanel(representationListBuilder)
+      .createListAndSearchPanel(fileListBuilder);
 
     initWidget(uiBinder.createAndBindUi(this));
   }

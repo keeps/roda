@@ -232,10 +232,10 @@ public class BrowseRepresentation extends Composite {
 
     ListBuilder<IndexedFile> fileListBuilder = new ListBuilder<>(() -> new SearchFileList(showFilesPath),
       new AsyncTableCellOptions<>(IndexedFile.class, "BrowseRepresentation_files").withFilter(filesFilter)
-        .withJustActive(justActive).withSummary(summary).bindOpener());
+        .withJustActive(justActive).withSummary(summary).bindOpener()
+        .withActionable(FileActions.get(aipId, repId, aip.getPermissions())));
 
-    filesSearch = new SearchWrapper(false).createListAndSearchPanel(fileListBuilder,
-      FileActions.get(aipId, repId, aip.getPermissions()));
+    filesSearch = new SearchWrapper(false).createListAndSearchPanel(fileListBuilder);
 
     // DISSEMINATIONS
 
@@ -245,10 +245,9 @@ public class BrowseRepresentation extends Composite {
     ListBuilder<IndexedDIP> disseminationsListBuilder = new ListBuilder<>(() -> new DIPList(),
       new AsyncTableCellOptions<>(IndexedDIP.class, "BrowseRepresentation_disseminations")
         .withFilter(disseminationsFilter).withSummary(messages.listOfDisseminations()).bindOpener()
-        .withJustActive(justActive));
+        .withJustActive(justActive).withActionable(DisseminationActions.get()));
 
-    disseminationsSearch = new SearchWrapper(false).createListAndSearchPanel(disseminationsListBuilder,
-      DisseminationActions.get());
+    disseminationsSearch = new SearchWrapper(false).createListAndSearchPanel(disseminationsListBuilder);
 
     // INIT
     initWidget(uiBinder.createAndBindUi(this));

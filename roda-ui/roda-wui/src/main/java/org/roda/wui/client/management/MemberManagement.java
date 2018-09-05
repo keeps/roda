@@ -90,10 +90,10 @@ public class MemberManagement extends Composite {
 
     ListBuilder<RODAMember> rodaMemberListBuilder = new ListBuilder<>(() -> new RodaMemberList(),
       new AsyncTableCellOptions<>(RODAMember.class, "MemberManagement_rodaMembers")
-        .withSummary(messages.usersAndGroupsTitle()).bindOpener());
+        .withSummary(messages.usersAndGroupsTitle()).bindOpener()
+        .withSearchPlaceholder(messages.usersAndGroupsSearchPlaceHolder()).withActionable(RODAMemberActions.get()));
 
-    searchWrapper = new SearchWrapper(false).createListAndSearchPanel(rodaMemberListBuilder, RODAMemberActions.get(),
-      messages.usersAndGroupsSearchPlaceHolder());
+    searchWrapper = new SearchWrapper(false).createListAndSearchPanel(rodaMemberListBuilder);
 
     initWidget(uiBinder.createAndBindUi(this));
 

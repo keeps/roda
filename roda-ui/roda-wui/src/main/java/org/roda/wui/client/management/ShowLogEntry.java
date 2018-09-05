@@ -10,7 +10,6 @@
  */
 package org.roda.wui.client.management;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -18,7 +17,6 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryParameter;
 import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -29,13 +27,10 @@ import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.ListUtils;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -141,9 +136,6 @@ public class ShowLogEntry extends Composite {
   @UiField
   HTML logStateValue;
 
-  @UiField
-  Button buttonCancel;
-
   /**
    * Create a new panel to view a log entry
    *
@@ -207,16 +199,4 @@ public class ShowLogEntry extends Composite {
     super.onLoad();
     JavascriptUtils.stickSidebar();
   }
-
-  @UiHandler("buttonCancel")
-  void handleButtonCancel(ClickEvent e) {
-    cancel();
-  }
-
-  private void cancel() {
-    List<String> lastHistory = new ArrayList<>(LastSelectedItemsSingleton.getInstance().getLastHistory());
-    LastSelectedItemsSingleton.getInstance().clearLastHistory();
-    HistoryUtils.newHistory(lastHistory);
-  }
-
 }

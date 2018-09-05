@@ -138,10 +138,11 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
   public RiskShowPanel(String listId) {
 
     ListBuilder<RiskIncidence> riskIncidenceListBuilder = new ListBuilder<>(() -> new RiskIncidenceList(),
-      new AsyncTableCellOptions<>(RiskIncidence.class, listId).withSummary(messages.riskIncidences()));
+      new AsyncTableCellOptions<>(RiskIncidence.class, listId).withSummary(messages.riskIncidences())
+        .withSearchPlaceholder(messages.riskIncidenceRegisterSearchPlaceHolder())
+        .withActionable(RiskIncidenceActions.getForMultipleEdit()));
 
-    searchWrapper = new SearchWrapper(false).createListAndSearchPanel(riskIncidenceListBuilder,
-      RiskIncidenceActions.getForMultipleEdit(), messages.riskIncidenceRegisterSearchPlaceHolder());
+    searchWrapper = new SearchWrapper(false).createListAndSearchPanel(riskIncidenceListBuilder);
 
     initWidget(uiBinder.createAndBindUi(this));
   }
@@ -151,10 +152,10 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
 
     ListBuilder<RiskIncidence> riskIncidenceListBuilder = new ListBuilder<>(() -> new RiskIncidenceList(),
       new AsyncTableCellOptions<>(RiskIncidence.class, listId).withSummary(messages.riskIncidences())
-        .withFilter(filter).bindOpener());
+        .withFilter(filter).bindOpener().withSearchPlaceholder(messages.riskIncidenceRegisterSearchPlaceHolder())
+        .withActionable(RiskIncidenceActions.getForMultipleEdit()));
 
-    searchWrapper = new SearchWrapper(false).createListAndSearchPanel(riskIncidenceListBuilder,
-      RiskIncidenceActions.getForMultipleEdit(), messages.riskIncidenceRegisterSearchPlaceHolder());
+    searchWrapper = new SearchWrapper(false).createListAndSearchPanel(riskIncidenceListBuilder);
 
     initWidget(uiBinder.createAndBindUi(this));
     title.setVisible(hasTitle);

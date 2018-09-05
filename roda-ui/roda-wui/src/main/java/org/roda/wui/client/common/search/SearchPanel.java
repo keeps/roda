@@ -43,6 +43,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -126,7 +127,8 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
   }
 
   SearchPanel(AsyncTableCell<T> list, Filter defaultFilter, String allFilter, boolean incremental, String placeholder,
-    boolean showSearchInputListBox, Actionable<T> actionable) {
+    boolean showSearchInputListBox, Actionable<T> actionable,
+    AsyncCallback<Actionable.ActionImpact> actionableCallback) {
     this.defaultFilter = defaultFilter;
     this.allFilter = allFilter;
     this.defaultFilterIncremental = incremental;
@@ -145,7 +147,8 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
 
     // setup search input textfield and search button
     searchInputButton.addClickHandler(event -> doSearch());
-    searchInputBox.getElement().setPropertyString("placeholder", placeholder == null ? "" : placeholder);
+    searchInputBox.getElement().setPropertyString("placeholder",
+      placeholder == null ? messages.searchPlaceHolder() : placeholder);
     searchInputBox.addKeyDownHandler(event -> {
       if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
         doSearch();
@@ -159,6 +162,9 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
     actionsPopup.addStyleName("ActionableStyleMenu");
 
     actionableBuilder = actionable != null ? new ActionableWidgetBuilder<>(actionable) : null;
+    if (actionableBuilder != null && actionableCallback != null) {
+      actionableBuilder.withCallback(actionableCallback);
+    }
     actionsButton.setVisible(actionableBuilder != null && list.isSelectable());
     actionsButton.addClickHandler(event -> {
       if (actionableBuilder != null) {

@@ -8,59 +8,44 @@
 package org.roda.wui.client.search;
 
 import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.TransferredResourceActions;
 import org.roda.wui.client.common.lists.TransferredResourceList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.SimplePanel;
 
-public class TransferredResourceSearch extends Composite {
-
-  // private static final ClientMessages messages =
-  // GWT.create(ClientMessages.class);
-
-  interface MyUiBinder extends UiBinder<Widget, TransferredResourceSearch> {
-  }
-
-  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
-  @UiField(provided = true)
+public class TransferredResourceSearch extends SimplePanel {
   SearchWrapper searchWrapper;
 
-  public TransferredResourceSearch(String resourcesListId, Filter filter,
-    TransferredResourceActions transferredResourceActions) {
+  public TransferredResourceSearch() {
 
-    ListBuilder<TransferredResource> transferredResourceListBuilder = new ListBuilder<>(() -> new TransferredResourceList(),
-      new AsyncTableCellOptions<>(TransferredResource.class, resourcesListId).withFilter(filter).bindOpener());
-
-    searchWrapper = new SearchWrapper(false).createListAndSearchPanel(transferredResourceListBuilder,
-      transferredResourceActions);
-
-    initWidget(uiBinder.createAndBindUi(this));
-
-    // TODO tmp
-    // searchPanel.setDropdownLabel(messages.searchListBoxTransferredResources());
-    // searchPanel.addDropdownItem(messages.searchListBoxTransferredResources(),
-    // RodaConstants.SEARCH_TRANSFERRED_RESOURCES);
   }
 
-  public SelectedItems<TransferredResource> getSelected() {
-    return searchWrapper.getSelectedItems(TransferredResource.class);
+  public TransferredResourceSearch(String resourcesListId, Filter filter,
+    TransferredResourceActions transferredResourceActions, AsyncCallback<Actionable.ActionImpact> actionCallback) {
+
+    ListBuilder<TransferredResource> transferredResourceListBuilder = new ListBuilder<>(() -> new TransferredResourceList(),
+      new AsyncTableCellOptions<>(TransferredResource.class, resourcesListId).withFilter(filter).bindOpener()
+        .withActionable(transferredResourceActions).withActionableCallback(actionCallback));
+
+    searchWrapper = new SearchWrapper(false).createListAndSearchPanel(transferredResourceListBuilder);
+    add(searchWrapper);
   }
 
   public void setDefaultFilters(Filter filter) {
-    searchWrapper.setFilter(TransferredResource.class, filter);
+    if (searchWrapper != null) {
+      searchWrapper.setFilter(TransferredResource.class, filter);
+    }
   }
 
   public void refresh() {
-    searchWrapper.refreshCurrentList();
+    if (searchWrapper != null) {
+      searchWrapper.refreshCurrentList();
+    }
   }
 }

@@ -132,9 +132,9 @@ public class BrowseTop extends Composite {
     ListBuilder<IndexedAIP> listBuilder = new ListBuilder<>(() -> new AIPList(),
       new AsyncTableCellOptions<>(IndexedAIP.class, "BrowseTop_aip")
         .withFilter(new Filter(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID))).withJustActive(true)
-        .withSummary(messages.listOfAIPs()).bindOpener());
+        .withSummary(messages.listOfAIPs()).bindOpener().withActionable(AipActions.get()));
 
-    search = new SearchWrapper(false).createListAndSearchPanel(listBuilder, AipActions.get());
+    search = new SearchWrapper(false).createListAndSearchPanel(listBuilder);
 
     // INIT
     initWidget(uiBinder.createAndBindUi(this));

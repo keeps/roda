@@ -122,7 +122,8 @@ public class IngestAppraisal extends Composite {
     // prepare lists
     ListBuilder<IndexedAIP> aipListBuilder = new ListBuilder<>(() -> new AIPList(),
       new AsyncTableCellOptions<>(IndexedAIP.class, "IngestAppraisal_searchAIPs").withJustActive(false)
-        .withFilter(BASE_FILTER).bindOpener().addCheckboxSelectionListener(selected -> {
+        .withFilter(BASE_FILTER).bindOpener().withActionable(appraisalAipActions)
+        .addCheckboxSelectionListener(selected -> {
           if (selected instanceof SelectedItemsList) {
             SelectedItemsList selectedItemsList = (SelectedItemsList) selected;
             if (!selectedItemsList.getIds().isEmpty()) {
@@ -150,7 +151,7 @@ public class IngestAppraisal extends Composite {
 
     // add lists to search
     searchWrapper = new SearchWrapper(true, IndexedAIP.class.getSimpleName())
-      .createListAndSearchPanel(aipListBuilder, appraisalAipActions).createListAndSearchPanel(representationListBuilder)
+      .createListAndSearchPanel(aipListBuilder).createListAndSearchPanel(representationListBuilder)
       .createListAndSearchPanel(fileListBuilder);
 
     initWidget(uiBinder.createAndBindUi(this));

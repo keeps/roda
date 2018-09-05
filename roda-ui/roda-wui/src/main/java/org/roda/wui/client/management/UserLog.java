@@ -93,9 +93,8 @@ public class UserLog extends Composite {
   SearchWrapper searchWrapper;
 
   public UserLog() {
-    // TODO tmp why no bindOpener?
     ListBuilder<LogEntry> logEntryListBuilder = new ListBuilder<>(() -> new LogEntryList(),
-      new AsyncTableCellOptions<>(LogEntry.class, "UserLog_logEntries"));
+      new AsyncTableCellOptions<>(LogEntry.class, "UserLog_logEntries").bindOpener());
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(logEntryListBuilder);
 
     initWidget(uiBinder.createAndBindUi(this));

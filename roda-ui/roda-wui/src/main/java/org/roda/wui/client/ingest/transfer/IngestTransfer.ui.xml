@@ -3,13 +3,15 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 			 xmlns:g="urn:import:com.google.gwt.user.client.ui"
 			 xmlns:search="urn:import:org.roda.wui.client.search"
-			 xmlns:m="urn:import:org.roda.wui.client.main" >
+			 xmlns:m="urn:import:org.roda.wui.client.main"
+			 xmlns:common="urn:import:org.roda.wui.client.common">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
 	<g:FlowPanel styleName="wui-ingest-transfer" addStyleNames="wrapper skip_padding">
+		<common:NavigationToolbar ui:field="navigationToolbar" visible="false"/>
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
-			<g:FlowPanel addStyleNames="col_10 content">
+			<g:FlowPanel addStyleNames="col_12 content">
 				<g:Label styleName="h1" ui:field="ingestTransferTitle">
 					<ui:text from='{messages.ingestTransferTitle}' />
 				</g:Label>
@@ -20,20 +22,11 @@
 					<g:Label addStyleNames="h3 browseItemText" ui:field="itemTitle" />
 					<g:Label addStyleNames="browseItemDates" ui:field="itemDates" />
 				</g:FlowPanel>
-				<m:BreadcrumbPanel ui:field="breadcrumb"
-					addStyleNames="browseBreadcrumb" />
 				<search:TransferredResourceSearch ui:field="resourceSearch" addStyleNames="searchResults" />
 				<g:Button addStyleNames="btn btn-download" ui:field="download">
 					<ui:text from='{messages.downloadButton}' />
 				</g:Button>
 				<g:Label styleName="ingest-transfer-lastscanned" ui:field="lastScanned" />
-			</g:FlowPanel>
-			<g:FlowPanel addStyleNames="col_2 last sidebar">
-				<g:FlowPanel addStyleNames="sticky-flow">
-					<g:FlowPanel addStyleNames="sticky-padding">
-						<g:SimplePanel addStyleNames="sidebar-group" ui:field="actionsSidebar" />
-					</g:FlowPanel>
-				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>

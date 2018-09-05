@@ -40,10 +40,5 @@ public class NotificationSearch extends Composite {
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(notificationListBuilder);
 
     initWidget(uiBinder.createAndBindUi(this));
-
-    // TODO tmp
-    // searchPanel.setDropdownLabel(messages.searchListBoxNotifications());
-    // searchPanel.addDropdownItem(messages.searchListBoxNotifications(),
-    // RodaConstants.SEARCH_NOTIFICATIONS);
   }
 }

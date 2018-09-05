@@ -254,6 +254,7 @@ public class ShowJob extends Composite {
     jobReportListBuilderOptions.withAutoUpdate(isJobRunning() ? PERIOD_MILLIS : null);
     jobReportListBuilderOptions.withSummary(messages.reportList());
     jobReportListBuilderOptions.bindOpener();
+    jobReportListBuilderOptions.withSearchPlaceholder(messages.jobProcessedSearchPlaceHolder());
 
     ListBuilder<IndexedReport> jobReportListBuilder;
     if (isIngest) {
@@ -262,8 +263,7 @@ public class ShowJob extends Composite {
       jobReportListBuilder = new ListBuilder<>(() -> new SimpleJobReportList(pluginsInfo), jobReportListBuilderOptions);
     }
 
-    searchWrapper = new SearchWrapper(false).createListAndSearchPanel(jobReportListBuilder,
-      messages.jobProcessedSearchPlaceHolder());
+    searchWrapper = new SearchWrapper(false).createListAndSearchPanel(jobReportListBuilder);
 
     initWidget(uiBinder.createAndBindUi(this));
 

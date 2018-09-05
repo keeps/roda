@@ -10,7 +10,6 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsNone;
-import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.lists.pagination.ListSelectionState;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
@@ -65,26 +64,6 @@ public class SearchWrapper extends Composite {
   }
 
   public <T extends IsIndexed> SearchWrapper createListAndSearchPanel(ListBuilder<T> listBuilder) {
-    return createListAndSearchPanel(listBuilder, null, messages.searchPlaceHolder());
-  }
-
-  public <T extends IsIndexed> SearchWrapper createListAndSearchPanel(ListBuilder<T> listBuilder,
-    Actionable<T> actionable) {
-    return createListAndSearchPanel(listBuilder, actionable, messages.searchPlaceHolder());
-  }
-
-  public <T extends IsIndexed> SearchWrapper createListAndSearchPanel(ListBuilder<T> listBuilder,
-    String searchPlaceholder) {
-    return createListAndSearchPanel(listBuilder, null, searchPlaceholder);
-  }
-
-  public <T extends IsIndexed> SearchWrapper createListAndSearchPanel(ListBuilder<T> listBuilder,
-    Actionable<T> actionable, String searchPlaceholder) {
-
-    // FIXME use non-placeholder values for searchSelectedPanel icon and default
-    // value
-
-    listBuilder.getOptions().withActionable(actionable);
     AsyncTableCell<T> list = listBuilder.build();
 
     SearchPanel<T> searchPanel;
@@ -107,9 +86,9 @@ public class SearchWrapper extends Composite {
     String dropdownValue = list.getClassToReturn().getSimpleName();
 
     // create
-
-    searchPanel = new SearchPanel<>(list, filter, allFilter, incremental, searchPlaceholder, hasMultipleSearchPanels,
-      actionable);
+    searchPanel = new SearchPanel<>(list, filter, allFilter, incremental,
+      listBuilder.getOptions().getSearchPlaceholder(), hasMultipleSearchPanels,
+      listBuilder.getOptions().getActionable(), listBuilder.getOptions().getActionableCallback());
     if (hasMultipleSearchPanels) {
       initSearchPanelSelectionDropdown();
       searchPanelSelectionDropdown.addItem(defaultLabelText, dropdownValue,

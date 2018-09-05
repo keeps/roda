@@ -6842,7 +6842,6 @@ span.code {
     background-color: #ddd;
 }
 
-.sidebar .actionable-button + .actionable-button,
 .slider .actionable-button + .actionable-button,
 .ActionableStyleButtons .actionable-button + .actionable-button {
     margin-top: 10px;
@@ -6939,6 +6938,7 @@ span.code {
 
 .navigationToolbar .navigationToolbarHeader {
     margin-left: 40px;
+    text-transform: capitalize;
 }
 
 .navigationToolbar .navigationToolbarHeaderArrow {

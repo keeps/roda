@@ -52,12 +52,5 @@ public class JobSearch extends Composite {
       .createListAndSearchPanel(jobReportListBuilder);
 
     initWidget(uiBinder.createAndBindUi(this));
-
-    // TODO tmp: remove this if this is not used
-    // searchWrapper.setDropdownLabel(messages.searchListBoxJobs());
-    // searchWrapper.addDropdownItem(messages.searchListBoxJobs(),
-    // RodaConstants.SEARCH_JOBS);
-    // searchWrapper.addDropdownItem(messages.searchListBoxJobReports(),
-    // RodaConstants.SEARCH_JOB_REPORTS);
   }
 }

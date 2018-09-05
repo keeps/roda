@@ -166,10 +166,10 @@ public class BrowseDIP extends Composite {
 
       ListBuilder<DIPFile> dipFileListBuilder = new ListBuilder<>(() -> new DIPFileList(),
         new AsyncTableCellOptions<>(DIPFile.class, "BrowseDIP_dipFiles").withFilter(filter)
-          .withSummary(messages.allOfAObject(DIPFile.class.getName())).bindOpener());
+          .withSummary(messages.allOfAObject(DIPFile.class.getName())).bindOpener()
+          .withActionable(DisseminationFileActions.get(dip.getPermissions())));
 
-      SearchWrapper search = new SearchWrapper(false).createListAndSearchPanel(dipFileListBuilder,
-        DisseminationFileActions.get(dip.getPermissions()));
+      SearchWrapper search = new SearchWrapper(false).createListAndSearchPanel(dipFileListBuilder);
 
       SimplePanel layout = new SimplePanel();
       layout.add(search);

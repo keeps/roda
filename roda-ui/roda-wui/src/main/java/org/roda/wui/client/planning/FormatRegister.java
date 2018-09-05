@@ -99,10 +99,10 @@ public class FormatRegister extends Composite {
 
     ListBuilder<Format> formatListBuilder = new ListBuilder<>(() -> new FormatList(),
       new AsyncTableCellOptions<>(Format.class, "FormatRegister_formats").withSummary(messages.formatsTitle())
+        .withSearchPlaceholder(messages.formatRegisterSearchPlaceHolder()).withActionable(FormatActions.get())
         .bindOpener());
 
-    searchWrapper = new SearchWrapper(false).createListAndSearchPanel(formatListBuilder, FormatActions.get(),
-      messages.formatRegisterSearchPlaceHolder());
+    searchWrapper = new SearchWrapper(false).createListAndSearchPanel(formatListBuilder);
 
     initWidget(uiBinder.createAndBindUi(this));
     actionsSidebar.setWidget(actionableWidgetBuilder.buildListWithObjects(new ActionableObject<>(Format.class)));

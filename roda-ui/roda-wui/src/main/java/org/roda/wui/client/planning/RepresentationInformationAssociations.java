@@ -131,10 +131,10 @@ public class RepresentationInformationAssociations extends Composite {
     ListBuilder<RepresentationInformation> representationInformationAssociationsListBuilder = new ListBuilder<>(
       () -> new RepresentationInformationList(),
       new AsyncTableCellOptions<>(RepresentationInformation.class, "RepresentationInformationAssociations_RI")
-        .bindOpener().addValueChangedHandler(valueChangeHandler));
+        .bindOpener().addValueChangedHandler(valueChangeHandler)
+        .withSearchPlaceholder(messages.representationInformationRegisterSearchPlaceHolder()));
 
-    searchWrapper = new SearchWrapper(false).createListAndSearchPanel(representationInformationAssociationsListBuilder,
-      messages.representationInformationRegisterSearchPlaceHolder());
+    searchWrapper = new SearchWrapper(false).createListAndSearchPanel(representationInformationAssociationsListBuilder);
 
     initWidget(uiBinder.createAndBindUi(this));
 

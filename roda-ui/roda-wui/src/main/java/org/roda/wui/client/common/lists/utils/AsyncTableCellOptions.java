@@ -14,6 +14,7 @@ import org.roda.wui.common.client.tools.ConfigurationManager;
 
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.cellview.client.AbstractHasData.RedrawEvent;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.view.client.SelectionChangeEvent;
 
 public class AsyncTableCellOptions<T extends IsIndexed> {
@@ -27,6 +28,7 @@ public class AsyncTableCellOptions<T extends IsIndexed> {
   private int initialPageSize;
   private int pageSizeIncrement;
   private Actionable<T> actionable;
+  private AsyncCallback<Actionable.ActionImpact> actionableCallback;
   private boolean bindOpener;
   private List<AsyncTableCell.CheckboxSelectionListener<T>> checkboxSelectionListeners;
   private List<ValueChangeHandler<IndexResult<T>>> indexResultValueChangeHandlers;
@@ -36,6 +38,7 @@ public class AsyncTableCellOptions<T extends IsIndexed> {
   private Integer autoUpdate;
   private boolean csvDownloadButtonVisibility;
   private boolean startHidden;
+  private String searchPlaceholder;
 
   public AsyncTableCellOptions(Class<T> classToReturn, String listId) {
     this.classToReturn = classToReturn;
@@ -43,6 +46,7 @@ public class AsyncTableCellOptions<T extends IsIndexed> {
 
     // set defaults
     actionable = null;
+    actionableCallback = null;
     filter = SearchFilters.allFilter();
     justActive = false;
     facets = ConfigurationManager.FacetFactory.getFacets(listId);
@@ -58,6 +62,7 @@ public class AsyncTableCellOptions<T extends IsIndexed> {
     autoUpdate = null;
     csvDownloadButtonVisibility = true;
     startHidden = false;
+    searchPlaceholder = null;
   }
 
   public Class<T> getClassToReturn() {
@@ -153,133 +158,93 @@ public class AsyncTableCellOptions<T extends IsIndexed> {
     return this;
   }
 
-  /**
-   * @return the listId
-   */
   public String getListId() {
     return listId;
   }
 
-  /**
-   * @return the filter
-   */
   public Filter getFilter() {
     return filter;
   }
 
-  /**
-   * @return the justActive
-   */
   public boolean isJustActive() {
     return justActive;
   }
 
-  /**
-   * @return the facets
-   */
   public Facets getFacets() {
     return facets;
   }
 
-  /**
-   * @return the summary
-   */
   public String getSummary() {
     return summary;
   }
 
-  /**
-   * @return the fieldsToReturn
-   */
   public List<String> getFieldsToReturn() {
     return fieldsToReturn;
   }
 
-  /**
-   * @return the initialPageSize
-   */
   public int getInitialPageSize() {
     return initialPageSize;
   }
 
-  /**
-   * @return the pageSizeIncrement
-   */
   public int getPageSizeIncrement() {
     return pageSizeIncrement;
   }
 
-  /**
-   * @return the actionable
-   */
   public Actionable<T> getActionable() {
     return actionable;
   }
 
-  /**
-   * @return the bindOpener
-   */
   public boolean isBindOpener() {
     return bindOpener;
   }
 
-  /**
-   * @return the checkboxSelectionListeners
-   */
   public List<AsyncTableCell.CheckboxSelectionListener<T>> getCheckboxSelectionListeners() {
     return checkboxSelectionListeners;
   }
 
-  /**
-   * @return the indexResultValueChangeHandlers
-   */
   public List<ValueChangeHandler<IndexResult<T>>> getIndexResultValueChangeHandlers() {
     return indexResultValueChangeHandlers;
   }
 
-  /**
-   * @return the selectionChangeHandlers
-   */
   public List<SelectionChangeEvent.Handler> getSelectionChangeHandlers() {
     return selectionChangeHandlers;
   }
 
-  /**
-   * @return the redrawEventHandlers
-   */
   public List<RedrawEvent.Handler> getRedrawEventHandlers() {
     return redrawEventHandlers;
   }
 
-  /**
-   * @return the extraStyleNames
-   */
   public List<String> getExtraStyleNames() {
     return extraStyleNames;
   }
 
-  /**
-   * @return the autoUpdate
-   */
   public Integer getAutoUpdate() {
     return autoUpdate;
   }
 
-  /**
-   * @return the csvDownloadButtonVisibility
-   */
   public boolean isCsvDownloadButtonVisibility() {
     return csvDownloadButtonVisibility;
   }
 
-  /**
-   * @return the startHidden
-   */
   public boolean isStartHidden() {
     return startHidden;
   }
-  
-  
-  
-  
+
+  public String getSearchPlaceholder() {
+    return searchPlaceholder;
+  }
+
+  public AsyncTableCellOptions<T> withSearchPlaceholder(String searchPlaceholder) {
+    this.searchPlaceholder = searchPlaceholder;
+    return this;
+  }
+
+  public AsyncCallback<Actionable.ActionImpact> getActionableCallback() {
+    return actionableCallback;
+  }
+
+  public AsyncTableCellOptions<T> withActionableCallback(AsyncCallback<Actionable.ActionImpact> actionableCallback) {
+    this.actionableCallback = actionableCallback;
+    return this;
+  }
 }

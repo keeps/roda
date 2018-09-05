@@ -103,10 +103,11 @@ public class RepresentationInformationNetwork extends Composite {
     ListBuilder<RepresentationInformation> representationInformationListBuilder = new ListBuilder<>(
       () -> new RepresentationInformationList(),
       new AsyncTableCellOptions<>(RepresentationInformation.class, "RepresentationInformationNetwork_RI")
-        .withSummary(messages.representationInformationTitle()).bindOpener());
+        .withSummary(messages.representationInformationTitle()).bindOpener()
+        .withSearchPlaceholder(messages.representationInformationRegisterSearchPlaceHolder())
+        .withActionable(RepresentationInformationActions.get()));
 
-    searchPanel = new SearchWrapper(false).createListAndSearchPanel(representationInformationListBuilder,
-      RepresentationInformationActions.get(), messages.representationInformationRegisterSearchPlaceHolder());
+    searchPanel = new SearchWrapper(false).createListAndSearchPanel(representationInformationListBuilder);
 
     initWidget(uiBinder.createAndBindUi(this));
 

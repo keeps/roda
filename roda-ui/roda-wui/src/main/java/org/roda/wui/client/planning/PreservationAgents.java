@@ -75,10 +75,10 @@ public class PreservationAgents extends Composite {
 
   public PreservationAgents() {
     ListBuilder<IndexedPreservationAgent> preservationAgentListBuilder = new ListBuilder<>(() -> new PreservationAgentList(),
-      new AsyncTableCellOptions<>(IndexedPreservationAgent.class, "PreservationAgents_agents").bindOpener());
+      new AsyncTableCellOptions<>(IndexedPreservationAgent.class, "PreservationAgents_agents").bindOpener()
+        .withActionable(PreservationAgentActions.get()));
 
-    searchWrapper = new SearchWrapper(false).createListAndSearchPanel(preservationAgentListBuilder,
-      PreservationAgentActions.get());
+    searchWrapper = new SearchWrapper(false).createListAndSearchPanel(preservationAgentListBuilder);
 
     initWidget(uiBinder.createAndBindUi(this));
   }

@@ -27,6 +27,7 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
@@ -46,6 +47,7 @@ import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.client.ingest.transfer.TransferUpload;
 import org.roda.wui.client.management.EditGroup;
 import org.roda.wui.client.management.EditUser;
+import org.roda.wui.client.management.ShowLogEntry;
 import org.roda.wui.client.management.ShowNotification;
 import org.roda.wui.client.planning.ShowPreservationAgent;
 import org.roda.wui.client.planning.ShowRepresentationInformation;
@@ -395,6 +397,9 @@ public class HistoryUtils {
       } else {
         path = HistoryUtils.getHistory(ShowPreservationEvent.RESOLVER.getHistoryPath(), eventId);
       }
+    } else if (object instanceof LogEntry) {
+      LogEntry logEntry = (LogEntry) object;
+      HistoryUtils.newHistory(ShowLogEntry.RESOLVER, logEntry.getUUID());
     } else {
       Toast.showError("Resolve of class not supported: " + object.getClass().getName());
     }
