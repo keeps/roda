@@ -572,8 +572,9 @@ public class BrowserHelper {
       }
     }
 
-    List<String> aipFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL,
-      RodaConstants.AIP_DATE_FINAL, RodaConstants.AIP_DATE_INITIAL, RodaConstants.AIP_GHOST);
+    List<String> aipFields = new ArrayList<>(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+    aipFields.addAll(Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL,
+      RodaConstants.AIP_DATE_FINAL, RodaConstants.AIP_DATE_INITIAL, RodaConstants.AIP_GHOST));
     List<String> representationFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.REPRESENTATION_TYPE,
       RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES, RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FOLDERS,
       RodaConstants.REPRESENTATION_ORIGINAL, RodaConstants.REPRESENTATION_AIP_ID, RodaConstants.REPRESENTATION_ID);
@@ -585,25 +586,27 @@ public class BrowserHelper {
       if (!dip.getFileIds().isEmpty()) {
         IndexedFile file = BrowserHelper.retrieve(IndexedFile.class, IdUtils.getFileId(dip.getFileIds().get(0)),
           fileFields);
+        IndexedAIP aip = retrieve(IndexedAIP.class, file.getAipId(), aipFields);
         bundle.setReferrer(file);
-        bundle.setReferrerBundle(retrieveBrowseFileBundle(retrieve(IndexedAIP.class, file.getAipId(), aipFields),
+        bundle.setReferrerBundle(retrieveBrowseFileBundle(aip,
           retrieve(IndexedRepresentation.class, file.getRepresentationUUID(), representationFields), file, user));
+        bundle.setReferrerPermissions(aip.getPermissions());
       } else if (!dip.getRepresentationIds().isEmpty()) {
         IndexedRepresentation representation = BrowserHelper.retrieve(IndexedRepresentation.class,
           IdUtils.getRepresentationId(dip.getRepresentationIds().get(0)), representationFields);
+        IndexedAIP aip = retrieve(IndexedAIP.class, representation.getAipId(), aipFields);
         bundle.setReferrer(representation);
-        bundle.setReferrerBundle(retrieveBrowseRepresentationBundle(
-          retrieve(IndexedAIP.class, representation.getAipId(), aipFields), representation, locale));
+        bundle.setReferrerBundle(retrieveBrowseRepresentationBundle(aip, representation, locale));
+        bundle.setReferrerPermissions(aip.getPermissions());
       } else if (!dip.getAipIds().isEmpty()) {
         IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, dip.getAipIds().get(0).getAipId(), aipFields);
         bundle.setReferrer(aip);
         bundle.setReferrerBundle(retrieveBrowseAipBundle(user, aip, locale));
+        bundle.setReferrerPermissions(aip.getPermissions());
       }
     } catch (AuthorizationDeniedException | NotFoundException e) {
       // ignore this as it is normal to have access to the DIP but not its referrer
     }
-
-    // get DIP permissions TODO nuno usar bundle.setReferrerPermissions();
 
     return bundle;
   }
