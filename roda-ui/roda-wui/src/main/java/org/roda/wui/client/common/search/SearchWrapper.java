@@ -170,25 +170,21 @@ public class SearchWrapper extends Composite {
 
   public <T extends IsIndexed> void setFilter(String objectClassSimpleName, Filter filter) {
     SearchPanel<T> searchPanel = components.getSearchPanel(objectClassSimpleName);
-    searchPanel.clearSearchInputBox();
     searchPanel.setDefaultFilter(filter, SearchFilters.shouldBeIncremental(filter));
   }
 
   public <T extends IsIndexed> void setFilter(Class<T> objectClass, Filter filter) {
     SearchPanel<T> searchPanel = components.getSearchPanel(objectClass);
-    searchPanel.clearSearchInputBox();
     searchPanel.setDefaultFilter(filter, SearchFilters.shouldBeIncremental(filter));
   }
 
   public <T extends IsIndexed> void resetToDefaultFilter(String objectClassSimpleName) {
     SearchPanel<T> searchPanel = components.getSearchPanel(objectClassSimpleName);
-    searchPanel.clearSearchInputBox();
     searchPanel.setDefaultFilter(SearchFilters.allFilter(), false);
   }
 
   public <T extends IsIndexed> void resetToDefaultFilter(Class<T> objectClass) {
     SearchPanel<T> searchPanel = components.getSearchPanel(objectClass);
-    searchPanel.clearSearchInputBox();
     searchPanel.setDefaultFilter(SearchFilters.allFilter(), false);
   }
 

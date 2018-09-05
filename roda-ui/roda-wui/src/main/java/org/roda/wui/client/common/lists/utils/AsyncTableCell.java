@@ -100,8 +100,6 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
   static final ClientMessages messages = GWT.create(ClientMessages.class);
   private static final ClientLogger LOGGER = new ClientLogger(AsyncTableCell.class.getName());
 
-  private AsyncTableCellOptions<T> options;
-
   private Class<T> classToReturn;
   private String listId;
   private Actionable<T> actionable;
@@ -176,6 +174,8 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     this.selectable = actionable != null;
 
     this.fieldsToReturn = options.getFieldsToReturn();
+
+    this.setVisible(options.isStartHidden());
 
     display = new AccessibleCellTable<>(getInitialPageSize(), GWT.create(MyCellTableResources.class), getKeyProvider(),
       options.getSummary());
@@ -341,10 +341,6 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
       autoUpdate(options.getAutoUpdate());
     }
 
-    if (options.isStartHidden()) {
-      this.setVisible(false);
-    }
-
     return this;
   }
 
@@ -478,14 +474,14 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
 
   private void getData(Filter filter, Sublist sublist, Sorter sorter, List<String> fieldsToReturn,
     AsyncCallback<IndexResult<T>> callback) {
-    if (filter == null) {
+    if (isSearchRestricted()) {
       callback.onSuccess(null);
     } else {
       getData(sublist, sorter, fieldsToReturn, callback);
     }
   }
 
-  protected void getData(Sublist sublist, Sorter sorter, List<String> fieldsToReturn,
+  private void getData(Sublist sublist, Sorter sorter, List<String> fieldsToReturn,
     AsyncCallback<IndexResult<T>> callback) {
     BrowserService.Util.getInstance().find(getClassToReturn().getName(), getFilter(), sorter, sublist, getFacets(),
       LocaleInfo.getCurrentLocale().getLocaleName(), getJustActive(), fieldsToReturn, callback);
@@ -581,6 +577,10 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
 
   public Filter getFilter() {
     return filter;
+  }
+
+  public boolean isSearchRestricted() {
+    return !isAttached() || !isVisible();
   }
 
   public boolean getJustActive() {
@@ -1126,6 +1126,14 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     if (autoUpdateTimer != null) {
       autoUpdateTimer.scheduleRepeating(autoUpdateTimerMillis);
       setAutoUpdateState(AutoUpdateState.AUTO_UPDATE_ON);
+    }
+  }
+
+  @Override
+  protected void onAttach() {
+    super.onAttach();
+    if (!isSearchRestricted()) {
+      refresh();
     }
   }
 }

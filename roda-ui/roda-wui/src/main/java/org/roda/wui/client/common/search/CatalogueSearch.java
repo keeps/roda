@@ -53,7 +53,7 @@ public class CatalogueSearch extends Composite {
   final Permissions permissions;
 
   public CatalogueSearch(boolean justActive, String itemsListId, String representationsListId, String filesListId,
-    String parentAipId, AIPState parentAipState, Permissions permissions) {
+    String parentAipId, AIPState parentAipState, Permissions permissions, boolean startHidden) {
 
     this.parentAipId = parentAipId;
     this.parentAipState = parentAipState;
@@ -62,15 +62,15 @@ public class CatalogueSearch extends Composite {
     // prepare lists
     ListBuilder<IndexedAIP> aipListBuilder = new ListBuilder<>(() -> new AIPList(),
       new AsyncTableCellOptions<>(IndexedAIP.class, itemsListId).withJustActive(justActive).bindOpener()
-        .withStartHidden(true).withActionable(AipActions.get(parentAipId, parentAipState, permissions)));
+        .withStartHidden(startHidden).withActionable(AipActions.get(parentAipId, parentAipState, permissions)));
 
     ListBuilder<IndexedRepresentation> representationListBuilder = new ListBuilder<>(() -> new RepresentationList(),
       new AsyncTableCellOptions<>(IndexedRepresentation.class, representationsListId).withJustActive(justActive)
-        .bindOpener().withStartHidden(true).withActionable(RepresentationActions.get()));
+        .bindOpener().withStartHidden(startHidden).withActionable(RepresentationActions.get()));
 
     ListBuilder<IndexedFile> fileListBuilder = new ListBuilder<>(() -> new SearchFileList(true),
       new AsyncTableCellOptions<>(IndexedFile.class, filesListId).withJustActive(justActive).bindOpener()
-        .withStartHidden(true).withActionable(FileActions.get()));
+        .withStartHidden(startHidden).withActionable(FileActions.get()));
 
     // add lists to search
     searchWrapper = new SearchWrapper(true, IndexedAIP.class.getSimpleName())

@@ -31,38 +31,13 @@ import com.google.gwt.user.client.ui.Widget;
  * @author Luis Faria
  * 
  */
-public class Search extends Composite {
+public class SearchWithPreFilters extends Composite {
 
-  public static final HistoryResolver RESOLVER = new HistoryResolver() {
+  // Used by Search.RESOLVER
 
-    @Override
-    public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-      if (historyTokens.size() > 1) {
-        SearchWithPreFilters.getInstance().resolve(historyTokens, callback);
-      } else {
-        getInstance().resolve(callback);
-      }
-    }
+  private static SearchWithPreFilters instance = null;
 
-    @Override
-    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRole(this, callback);
-    }
-
-    @Override
-    public List<String> getHistoryPath() {
-      return Arrays.asList(getHistoryToken());
-    }
-
-    @Override
-    public String getHistoryToken() {
-      return "search";
-    }
-  };
-
-  private static Search instance = null;
-
-  interface MyUiBinder extends UiBinder<Widget, Search> {
+  interface MyUiBinder extends UiBinder<Widget, SearchWithPreFilters> {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
@@ -73,23 +48,24 @@ public class Search extends Composite {
   @UiField(provided = true)
   CatalogueSearch catalogueSearch;
 
-  private Search() {
+  private SearchWithPreFilters() {
     // Create main search
     catalogueSearch = new CatalogueSearch(true, "Search_AIPs", "Search_representations", "Search_files", null,
-      AIPState.ACTIVE, null, true);
+      AIPState.ACTIVE, null, false);
 
     initWidget(uiBinder.createAndBindUi(this));
     searchDescription.add(new HTMLWidgetWrapper("SearchDescription.html"));
   }
 
-  public static Search getInstance() {
+  public static SearchWithPreFilters getInstance() {
     if (instance == null) {
-      instance = new Search();
+      instance = new SearchWithPreFilters();
     }
     return instance;
   }
 
-  public void resolve(AsyncCallback<Widget> callback) {
+  public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
+    catalogueSearch.setFilters(historyTokens);
     callback.onSuccess(this);
   }
 }

@@ -252,6 +252,7 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
    *          if subsequent searches should add to or replace the existing filter
    */
   public void setDefaultFilter(Filter defaultFilter, boolean incremental) {
+    clearSearchInputBox();
     this.defaultFilter = defaultFilter;
     this.defaultFilterIncremental = incremental;
     doSearch(false);
@@ -295,11 +296,11 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
   }
 
   private void doSearch(boolean makeListVisible) {
-    list.setFilter(buildSearchFilter());
-    onChange(searchInputBox.getValue());
     if (makeListVisible) {
       list.setVisible(true);
     }
+    list.setFilter(buildSearchFilter());
+    onChange(searchInputBox.getValue());
   }
 
   private void onChange(String value) {
