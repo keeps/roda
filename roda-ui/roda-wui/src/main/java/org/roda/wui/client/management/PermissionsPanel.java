@@ -11,17 +11,12 @@
 package org.roda.wui.client.management;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.MissingResourceException;
 import java.util.Set;
-import java.util.Vector;
 
-import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.widgets.LoadingPopup;
@@ -48,7 +43,7 @@ import config.i18n.client.ClientMessages;
  */
 public class PermissionsPanel extends FlowPanel implements HasValueChangeHandlers<List<String>> {
 
-  private class Permission extends HorizontalPanel implements HasValueChangeHandlers<String>{
+  private class Permission extends HorizontalPanel implements HasValueChangeHandlers<String> {
 
     private final String role;
     private boolean locked;
@@ -164,8 +159,8 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
    *
    */
   public PermissionsPanel() {
-    this.permissions = new Vector<>();
-    this.userSelections = new Vector<>();
+    this.permissions = new ArrayList<>();
+    this.userSelections = new ArrayList<>();
 
     loading = new LoadingPopup(this);
     loading.show();
@@ -186,6 +181,7 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
       }
 
       Permission permission = new Permission(role, description);
+      permissions.add(permission);
       PermissionsPanel.this.add(permission);
       permission.addValueChangeHandler(new ValueChangeHandler<String>() {
 
