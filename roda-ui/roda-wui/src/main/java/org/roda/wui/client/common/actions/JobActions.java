@@ -58,7 +58,9 @@ public class JobActions extends AbstractActionable<Job> {
   }
 
   public enum JobAction implements Action<Job> {
-    NEW_PROCESS(), STOP(), INGEST_APPRAISAL(), INGEST_PROCESS();
+    NEW_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB), STOP(RodaConstants.PERMISSION_METHOD_STOP_JOB),
+    INGEST_APPRAISAL(RodaConstants.PERMISSION_METHOD_APPRAISAL),
+    INGEST_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB);
 
     private List<String> methods;
 

@@ -62,11 +62,9 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
   }
 
   public enum IndexedRiskAction implements Action<IndexedRisk> {
-    NEW("org.roda.wui.api.controllers.Risks.createRisk"),
-    REMOVE("org.roda.wui.api.controllers.Browser.delete(IndexedRisk)"),
-    START_PROCESS("org.roda.wui.api.controllers.Jobs.createJob"),
-    EDIT("org.roda.wui.api.controllers.Browser.updateRisk"), REFRESH(),
-    HISTORY("org.roda.wui.api.controllers.Browser.retrieveRiskVersions");
+    NEW(RodaConstants.PERMISSION_METHOD_CREATE_RISK), REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_RISK),
+    START_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB), EDIT(RodaConstants.PERMISSION_METHOD_UPDATE_RISK),
+    REFRESH(), HISTORY(RodaConstants.PERMISSION_METHOD_RETRIEVE_RISK_VERSIONS);
 
     private List<String> methods;
 

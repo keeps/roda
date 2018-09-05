@@ -25,6 +25,7 @@ import org.roda.wui.client.common.lists.RepresentationList;
 import org.roda.wui.client.common.lists.SearchFileList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
+import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 
 import com.google.gwt.core.client.GWT;
@@ -56,19 +57,23 @@ public class CatalogueSearch extends Composite {
         .withStartHidden(startHidden)
         .withActionable(AipActions.getWithoutNoAipActions(null, AIPState.ACTIVE, permissions)));
 
-    ListBuilder<IndexedRepresentation> representationListBuilder = new ListBuilder<>(() -> new RepresentationList(),
-      new AsyncTableCellOptions<>(IndexedRepresentation.class, representationsListId).withJustActive(justActive)
-        .bindOpener().withStartHidden(startHidden)
-        .withActionable(RepresentationActions.getWithoutNoRepresentationActions(null, null)));
-
-    ListBuilder<IndexedFile> fileListBuilder = new ListBuilder<>(() -> new SearchFileList(true),
-      new AsyncTableCellOptions<>(IndexedFile.class, filesListId).withJustActive(justActive).bindOpener()
-        .withStartHidden(startHidden).withActionable(FileActions.getWithoutNoFileActions(null, null, null, null)));
-
     // add lists to search
-    searchWrapper = new SearchWrapper(true, IndexedAIP.class.getSimpleName())
-      .createListAndSearchPanel(aipListBuilder).createListAndSearchPanel(representationListBuilder)
-      .createListAndSearchPanel(fileListBuilder);
+    searchWrapper = new SearchWrapper(true, IndexedAIP.class.getSimpleName()).createListAndSearchPanel(aipListBuilder);
+
+    if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_REPRESENTATION)) {
+      ListBuilder<IndexedRepresentation> representationListBuilder = new ListBuilder<>(() -> new RepresentationList(),
+        new AsyncTableCellOptions<>(IndexedRepresentation.class, representationsListId).withJustActive(justActive)
+          .bindOpener().withStartHidden(startHidden)
+          .withActionable(RepresentationActions.getWithoutNoRepresentationActions(null, null)));
+      searchWrapper.createListAndSearchPanel(representationListBuilder);
+    }
+
+    if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_FILE)) {
+      ListBuilder<IndexedFile> fileListBuilder = new ListBuilder<>(() -> new SearchFileList(true),
+        new AsyncTableCellOptions<>(IndexedFile.class, filesListId).withJustActive(justActive).bindOpener()
+          .withStartHidden(startHidden).withActionable(FileActions.getWithoutNoFileActions(null, null, null, null)));
+      searchWrapper.createListAndSearchPanel(fileListBuilder);
+    }
 
     initWidget(uiBinder.createAndBindUi(this));
   }

@@ -33,6 +33,7 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.user.User;
@@ -572,4 +573,41 @@ public class UserUtility {
     return user;
   }
 
+  public static boolean hasPermissions(User user, String... methods) {
+    return hasPermissions(user, Arrays.asList(methods), null);
+  }
+
+  public static boolean hasPermissions(User user, Permissions permissions, String... methods) {
+    return hasPermissions(user, Arrays.asList(methods), permissions);
+  }
+
+  public static boolean hasPermissions(User user, List<String> methods, Permissions permissions) {
+    boolean canAct = true;
+    for (String method : methods) {
+      canAct &= user.hasRole(RodaCoreFactory.getRodaConfigurationAsString("core.roles." + method));
+
+      String permissionKey = RodaCoreFactory.getRodaConfigurationAsString("core.permissions." + method);
+      if (canAct && permissions != null && permissionKey != null) {
+        PermissionType permissionType = PermissionType.valueOf(permissionKey);
+
+        if (permissionType != null) {
+          if (permissions.getUserPermissions(user.getName()).contains(permissionType)) {
+            canAct = true;
+          } else {
+            boolean containGroup = false;
+            for (String group : user.getGroups()) {
+              if (permissions.getGroupPermissions(group).contains(permissionType)) {
+                containGroup = true;
+                break;
+              }
+            }
+
+            canAct = containGroup;
+          }
+        }
+      }
+    }
+
+    return canAct;
+  }
 }

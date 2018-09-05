@@ -18,9 +18,7 @@ import java.nio.file.Paths;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -369,7 +367,7 @@ public class IndexServiceTest {
     index.commitAIPs();
 
     IndexedAIP aip = index.retrieve(IndexedAIP.class, CorporaConstants.OTHER_AIP_ID, new ArrayList<>());
-    List<IndexedAIP> ancestors = index.retrieveAncestors(aip, new ArrayList<>());
+    List<IndexedAIP> ancestors = index.retrieveAncestors(aip, new User("admin"), new ArrayList<>());
     MatcherAssert.assertThat(ancestors,
       Matchers.hasItem(Matchers.<IndexedAIP> hasProperty("id", Matchers.equalTo(CorporaConstants.SOURCE_AIP_ID))));
   }

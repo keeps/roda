@@ -36,19 +36,13 @@
 					</g:FlowPanel>
 
 					<!-- REPRESENTATIONS -->
-					<g:FlowPanel addStyleNames="card">
-						<commonsearch:SearchWrapper ui:field="representationsSearchWrapper" />
-					</g:FlowPanel>
+					<g:SimplePanel ui:field="representationsCard" addStyleNames="card representationsCard"/>
 
 					<!-- DIPs -->
-					<g:FlowPanel addStyleNames="card disseminationsCard">
-						<commonsearch:SearchWrapper ui:field="disseminationsSearchWrapper" />
-					</g:FlowPanel>
+					<g:SimplePanel ui:field="disseminationsCard" addStyleNames="card disseminationsCard"/>
 
 					<!-- AIP CHILDREN -->
-					<g:FlowPanel addStyleNames="card aipChildrenCard">
-						<commonsearch:SearchWrapper ui:field="aipChildrenSearchWrapper" />
-					</g:FlowPanel>
+					<g:SimplePanel ui:field="aipChildrenCard" addStyleNames="card aipChildrenCard"/>
 
 					<!-- ADD NEW -->
 					<g:SimplePanel ui:field="addRepresentation" addStyleNames="ActionableStyleButtons" />

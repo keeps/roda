@@ -148,7 +148,7 @@ public class Browser extends RodaWuiController {
       controllerAssistant.checkObjectPermissions(user, aip);
 
       // delegate
-      return BrowserHelper.retrieveBrowseRepresentationBundle(aip, representation, locale);
+      return BrowserHelper.retrieveBrowseRepresentationBundle(user, aip, representation, locale);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;

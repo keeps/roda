@@ -55,10 +55,8 @@ public class FormatActions extends AbstractActionable<Format> {
   }
 
   public enum FormatAction implements Action<Format> {
-    NEW("org.roda.wui.api.controllers.Browser.createFormat"),
-    REMOVE("org.roda.wui.api.controllers.Browser.delete(Format)"),
-    START_PROCESS("org.roda.wui.api.controllers.Jobs.createJob"),
-    EDIT("org.roda.wui.api.controllers.Browser.updateFormat");
+    NEW(RodaConstants.PERMISSION_METHOD_CREATE_FORMAT), REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_FORMAT),
+    START_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB), EDIT(RodaConstants.PERMISSION_METHOD_UPDATE_FORMAT);
 
     private List<String> methods;
 

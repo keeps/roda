@@ -96,15 +96,14 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   }
 
   public enum AipAction implements Action<IndexedAIP> {
-    NEW_CHILD_AIP_BELOW("org.roda.wui.api.controllers.Browser.createAIPBelow"),
-    NEW_CHILD_AIP_TOP("org.roda.wui.api.controllers.Browser.createAIPTop"), DOWNLOAD(),
-    MOVE_IN_HIERARCHY("org.roda.wui.api.controllers.Browser.moveAIPInHierarchy"),
-    UPDATE_PERMISSIONS("org.roda.wui.api.controllers.Browser.updateAIPPermissions"),
-    REMOVE("org.roda.wui.api.controllers.Browser.delete(IndexedAIP)"),
-    NEW_PROCESS("org.roda.wui.api.controllers.Jobs.createJob"), DOWNLOAD_EVENTS(),
-    APPRAISAL_ACCEPT("org.roda.wui.api.controllers.Browser.appraisal"),
-    APPRAISAL_REJECT("org.roda.wui.api.controllers.Browser.appraisal"), DOWNLOAD_DOCUMENTATION(),
-    CHANGE_TYPE("org.roda.wui.api.controllers.Browser.changeAIPType");
+    NEW_CHILD_AIP_BELOW(RodaConstants.PERMISSION_METHOD_CREATE_AIP_BELOW),
+    NEW_CHILD_AIP_TOP(RodaConstants.PERMISSION_METHOD_CREATE_AIP_TOP), DOWNLOAD(),
+    MOVE_IN_HIERARCHY(RodaConstants.PERMISSION_METHOD_MOVE_AIP_IN_HIERARCHY),
+    UPDATE_PERMISSIONS(RodaConstants.PERMISSION_METHOD_UPDATE_AIP_PERMISSIONS),
+    REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_AIP), NEW_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
+    DOWNLOAD_EVENTS(), APPRAISAL_ACCEPT(RodaConstants.PERMISSION_METHOD_APPRAISAL),
+    APPRAISAL_REJECT(RodaConstants.PERMISSION_METHOD_APPRAISAL), DOWNLOAD_DOCUMENTATION(),
+    CHANGE_TYPE(RodaConstants.PERMISSION_METHOD_CHANGE_AIP_TYPE);
 
     private List<String> methods;
 

@@ -27,7 +27,7 @@ import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.FormUtilities;
 import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.client.common.utils.PermissionUtils;
+import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -294,8 +294,8 @@ public class EditDescriptiveMetadata extends Composite {
         }
       });
 
-    PermissionUtils.bindPermission(buttonRemove, bundle.getPermissions(),
-      "org.roda.wui.api.controllers.Browser.deleteDescriptiveMetadataFile");
+    PermissionClientUtils.bindPermission(buttonRemove, bundle.getPermissions(),
+      RodaConstants.PERMISSION_METHOD_DELETE_DESCRIPTIVE_METADATA_FILE);
 
     Element firstElement = showXml.getElement().getFirstChildElement();
     if ("input".equalsIgnoreCase(firstElement.getTagName())) {

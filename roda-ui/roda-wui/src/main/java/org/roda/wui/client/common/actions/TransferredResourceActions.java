@@ -72,12 +72,13 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
   }
 
   public enum TransferredResourceAction implements Action<TransferredResource> {
-    REFRESH, RENAME("org.roda.wui.api.controllers.Browser.renameTransferredResource"),
-    MOVE("org.roda.wui.api.controllers.Browser.moveTransferredResource"),
-    UPLOAD("org.roda.wui.api.controllers.Browser.createTransferredResourceFile"),
-    NEW_FOLDER("org.roda.wui.api.controllers.Browser.createTransferredResourcesFolder"),
-    REMOVE("org.roda.wui.api.controllers.Browser.delete(TransferredResource)"),
-    NEW_PROCESS("org.roda.wui.api.controllers.Jobs.createJob");
+    REFRESH(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
+    RENAME(RodaConstants.PERMISSION_METHOD_RENAME_TRANSFERRED_RESOURCE),
+    MOVE(RodaConstants.PERMISSION_METHOD_MOVE_TRANSFERRED_RESOURCE),
+    UPLOAD(RodaConstants.PERMISSION_METHOD_CREATE_TRANSFERRED_RESOURCE_FILE),
+    NEW_FOLDER(RodaConstants.PERMISSION_METHOD_CREATE_TRANSFERRED_RESOURCE_FOLDER),
+    REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_TRANSFERRED_RESOURCE),
+    NEW_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB);
 
     private List<String> methods;
 

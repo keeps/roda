@@ -4,9 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.Permissions;
-import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.tools.ConfigurationManager;
@@ -14,20 +12,24 @@ import org.roda.wui.common.client.tools.ConfigurationManager;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Widget;
 
-public class PermissionUtils {
+public class PermissionClientUtils {
   public static final String HAS_NO_PERMISSION_CLASS = "hasNoPermissions";
 
-  private PermissionUtils() {
+  private PermissionClientUtils() {
     // do nothing
   }
 
-  public static <T extends IsIndexed> boolean hasPermissions(Permissions permissions, String... methods) {
+  public static boolean hasPermissions(String... methods) {
+    return hasPermissions(Arrays.asList(methods), null);
+  }
+
+  public static boolean hasPermissions(Permissions permissions, String... methods) {
     return hasPermissions(Arrays.asList(methods), permissions);
   }
 
-  public static <T extends IsIndexed> boolean hasPermissions(List<String> methods, Permissions permissions) {
-    boolean canAct = true;
+  public static boolean hasPermissions(List<String> methods, Permissions permissions) {
     Optional<User> authenticatedUser = UserLogin.getInstance().getCachedUser();
+    boolean canAct = true;
 
     if (authenticatedUser.isPresent()) {
       User user = authenticatedUser.get();
@@ -36,10 +38,10 @@ public class PermissionUtils {
         canAct &= user.hasRole(ConfigurationManager.getString("core.roles." + method));
 
         String permissionKey = ConfigurationManager.getString("core.permissions." + method);
-        if (canAct && permissionKey != null) {
-          PermissionType permissionType = PermissionType.valueOf(permissionKey);
+        if (canAct && permissions != null && permissionKey != null) {
+          Permissions.PermissionType permissionType = Permissions.PermissionType.valueOf(permissionKey);
 
-          if (permissions != null && permissionType != null) {
+          if (permissionType != null) {
             if (permissions.getUserPermissions(user.getName()).contains(permissionType)) {
               canAct = true;
             } else {

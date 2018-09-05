@@ -70,12 +70,12 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
   }
 
   public enum RepresentationAction implements Action<IndexedRepresentation> {
-    NEW("org.roda.wui.api.controllers.Browser.createRepresentation"), DOWNLOAD(),
-    CHANGE_TYPE("org.roda.wui.api.controllers.Browser.changeRepresentationType"),
-    REMOVE("org.roda.wui.api.controllers.Browser.delete(IndexedRepresentation)"),
-    NEW_PROCESS("org.roda.wui.api.controllers.Jobs.createJob"),
-    IDENTIFY_FORMATS("org.roda.wui.api.controllers.Jobs.createJob"),
-    CHANGE_STATE("org.roda.wui.api.controllers.Browser.changeRepresentationStates");
+    NEW(RodaConstants.PERMISSION_METHOD_CREATE_REPRESENTATION), DOWNLOAD(),
+    CHANGE_TYPE(RodaConstants.PERMISSION_METHOD_CHANGE_REPRESENTATION_TYPE),
+    REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_REPRESENTATION),
+    NEW_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
+    IDENTIFY_FORMATS(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
+    CHANGE_STATE(RodaConstants.PERMISSION_METHOD_CHANGE_REPRESENTATION_STATES);
 
     private List<String> methods;
 
@@ -113,13 +113,13 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
 
   @Override
   public boolean canAct(Action<IndexedRepresentation> action) {
-    return hasPermissions(action, permissions) && POSSIBLE_ACTIONS_WITHOUT_REPRESENTATION.contains(action) && parentAipId != null;
+    return hasPermissions(action, permissions) && POSSIBLE_ACTIONS_WITHOUT_REPRESENTATION.contains(action)
+      && parentAipId != null;
   }
 
   @Override
   public boolean canAct(Action<IndexedRepresentation> action, IndexedRepresentation representation) {
-    return hasPermissions(action, permissions)
-      && POSSIBLE_ACTIONS_ON_SINGLE_REPRESENTATION.contains(action);
+    return hasPermissions(action, permissions) && POSSIBLE_ACTIONS_ON_SINGLE_REPRESENTATION.contains(action);
   }
 
   @Override

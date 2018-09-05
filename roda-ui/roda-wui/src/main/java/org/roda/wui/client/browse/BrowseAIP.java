@@ -43,7 +43,7 @@ import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.slider.Sliders;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
-import org.roda.wui.client.common.utils.PermissionUtils;
+import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.management.UserLog;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
 import org.roda.wui.client.welcome.Welcome;
@@ -199,20 +199,19 @@ public class BrowseAIP extends Composite {
   @UiField
   SimplePanel addRepresentation;
 
-  @UiField(provided = true)
-  SearchWrapper representationsSearchWrapper;
+  @UiField
+  SimplePanel representationsCard;
 
   // DISSEMINATIONS
-
-  @UiField(provided = true)
-  SearchWrapper disseminationsSearchWrapper;
+  @UiField
+  SimplePanel disseminationsCard;
 
   // AIP CHILDREN
   @UiField
-  SimplePanel addChildAip;
+  SimplePanel aipChildrenCard;
 
-  @UiField(provided = true)
-  SearchWrapper aipChildrenSearchWrapper;
+  @UiField
+  SimplePanel addChildAip;
 
   @UiField
   FlowPanel risksEventsLogs;
@@ -227,45 +226,54 @@ public class BrowseAIP extends Composite {
     aipId = aip.getId();
     boolean justActive = AIPState.ACTIVE.equals(aip.getState());
 
-    RepresentationActions representationActions = RepresentationActions.get(aip.getId(),
-      aip.getPermissions());
+    RepresentationActions representationActions = RepresentationActions.get(aip.getId(), aip.getPermissions());
     DisseminationActions disseminationActions = DisseminationActions.get();
     AipActions aipActions = AipActions.get(aip.getId(), aip.getState(), aip.getPermissions());
-
-    // REPRESENTATIONS
-
-    ListBuilder<IndexedRepresentation> representationsListBuilder = new ListBuilder<>(() -> new RepresentationList(),
-      new AsyncTableCellOptions<>(IndexedRepresentation.class, "BrowseAIP_representations")
-        .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aip.getId())))
-        .withJustActive(justActive).withSummary(messages.listOfRepresentations()).bindOpener()
-        .withActionable(representationActions));
-
-    representationsSearchWrapper = new SearchWrapper(false).createListAndSearchPanel(representationsListBuilder);
-
-    // DISSEMINATIONS
-
-    ListBuilder<IndexedDIP> disseminationsListBuilder = new ListBuilder<>(() -> new DIPList(),
-      new AsyncTableCellOptions<>(IndexedDIP.class, "BrowseAIP_disseminations")
-        .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.DIP_AIP_UUIDS, aip.getId())))
-        .withJustActive(justActive).withSummary(messages.listOfDisseminations()).bindOpener()
-        .withActionable(disseminationActions));
-
-    disseminationsSearchWrapper = new SearchWrapper(false).createListAndSearchPanel(disseminationsListBuilder);
-
-    // AIP CHILDREN
-
-    ListBuilder<IndexedAIP> aipChildrenListBuilder = new ListBuilder<>(() -> new AIPList(),
-      new AsyncTableCellOptions<>(IndexedAIP.class, "BrowseAIP_aipChildren")
-        .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aip.getId())))
-        .withJustActive(justActive).withSummary(messages.listOfAIPs()).bindOpener().withActionable(aipActions));
-
-    aipChildrenSearchWrapper = new SearchWrapper(false).createListAndSearchPanel(aipChildrenListBuilder);
 
     // INIT
     initWidget(uiBinder.createAndBindUi(this));
 
-    PermissionUtils.bindPermission(newDescriptiveMetadata, aip.getPermissions(),
-      "org.roda.wui.api.controllers.Browser.createDescriptiveMetadataFile");
+    // REPRESENTATIONS
+    if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_REPRESENTATION)) {
+      ListBuilder<IndexedRepresentation> representationsListBuilder = new ListBuilder<>(() -> new RepresentationList(),
+        new AsyncTableCellOptions<>(IndexedRepresentation.class, "BrowseAIP_representations")
+          .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aip.getId())))
+          .withJustActive(justActive).withSummary(messages.listOfRepresentations()).bindOpener()
+          .withActionable(representationActions));
+
+      SearchWrapper representationsSearchWrapper = new SearchWrapper(false)
+        .createListAndSearchPanel(representationsListBuilder);
+      representationsCard.setWidget(representationsSearchWrapper);
+    }
+
+    // DISSEMINATIONS
+
+    if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_DIP)) {
+      ListBuilder<IndexedDIP> disseminationsListBuilder = new ListBuilder<>(() -> new DIPList(),
+        new AsyncTableCellOptions<>(IndexedDIP.class, "BrowseAIP_disseminations")
+          .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.DIP_AIP_UUIDS, aip.getId())))
+          .withJustActive(justActive).withSummary(messages.listOfDisseminations()).bindOpener()
+          .withActionable(disseminationActions));
+
+      SearchWrapper disseminationsSearchWrapper = new SearchWrapper(false)
+        .createListAndSearchPanel(disseminationsListBuilder);
+      disseminationsCard.setWidget(disseminationsSearchWrapper);
+    }
+
+    // AIP CHILDREN
+    if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_AIP)) {
+      ListBuilder<IndexedAIP> aipChildrenListBuilder = new ListBuilder<>(() -> new AIPList(),
+        new AsyncTableCellOptions<>(IndexedAIP.class, "BrowseAIP_aipChildren")
+          .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aip.getId())))
+          .withJustActive(justActive).withSummary(messages.listOfAIPs()).bindOpener().withActionable(aipActions));
+
+      SearchWrapper aipChildrenSearchWrapper = new SearchWrapper(false)
+        .createListAndSearchPanel(aipChildrenListBuilder);
+      aipChildrenCard.setWidget(aipChildrenSearchWrapper);
+    }
+
+    PermissionClientUtils.bindPermission(newDescriptiveMetadata, aip.getPermissions(),
+      RodaConstants.PERMISSION_METHOD_CREATE_DESCRIPTIVE_METADATA_FILE);
 
     // CSS
     newDescriptiveMetadata.getElement().setId("aipNewDescriptiveMetadata");
@@ -299,12 +307,10 @@ public class BrowseAIP extends Composite {
     }
 
     addRepresentation.setVisible(bundle.getRepresentationCount() == 0);
-    representationsSearchWrapper.setVisible(bundle.getRepresentationCount() > 0);
-    representationsSearchWrapper.getParent().setVisible(bundle.getRepresentationCount() > 0);
+    representationsCard.setVisible(bundle.getRepresentationCount() > 0);
 
     // DISSEMINATIONS
-    disseminationsSearchWrapper.setVisible(bundle.getDipCount() > 0);
-    disseminationsSearchWrapper.getParent().setVisible(bundle.getDipCount() > 0);
+    disseminationsCard.setVisible(bundle.getDipCount() > 0);
 
     // AIP CHILDREN
     if (bundle.getChildAIPCount() > 0) {
@@ -315,8 +321,7 @@ public class BrowseAIP extends Composite {
     }
 
     addChildAip.setVisible(bundle.getChildAIPCount() == 0);
-    aipChildrenSearchWrapper.setVisible(bundle.getChildAIPCount() > 0);
-    aipChildrenSearchWrapper.getParent().setVisible(bundle.getChildAIPCount() > 0);
+    aipChildrenCard.setVisible(bundle.getChildAIPCount() > 0);
 
     keyboardFocus.setFocus(true);
   }
@@ -362,8 +367,8 @@ public class BrowseAIP extends Composite {
       }
     });
 
-    if (PermissionUtils.hasPermissions(aip.getPermissions(),
-      "org.roda.wui.api.controllers.Browser.createDescriptiveMetadataFile")) {
+    if (PermissionClientUtils.hasPermissions(aip.getPermissions(),
+      RodaConstants.PERMISSION_METHOD_CREATE_DESCRIPTIVE_METADATA_FILE)) {
       final int addTabIndex = descriptiveMetadata.getWidgetCount();
       FlowPanel addTab = new FlowPanel();
       addTab.add(new HTML(SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-plus-circle\"></i>")));
@@ -412,19 +417,42 @@ public class BrowseAIP extends Composite {
 
     Sliders.createAipInfoSlider(center, navigationToolbar.getInfoSidebarButton(), bundle);
 
-    Anchor risksLink = new Anchor(messages.aipRiskIncidences(bundle.getRiskIncidenceCount()),
-      HistoryUtils.createHistoryHashLink(RiskIncidenceRegister.RESOLVER, aip.getId()));
-    Anchor eventsLink = new Anchor(messages.aipEvents(bundle.getPreservationEventCount()),
-      HistoryUtils.createHistoryHashLink(PreservationEvents.BROWSE_RESOLVER, aip.getId()));
-    Anchor logsLink = new Anchor(messages.aipLogs(bundle.getLogCount()),
-      HistoryUtils.createHistoryHashLink(UserLog.RESOLVER, aip.getId()));
-
     risksEventsLogs.clear();
-    risksEventsLogs.add(risksLink);
-    risksEventsLogs.add(new Label(", "));
-    risksEventsLogs.add(eventsLink);
-    risksEventsLogs.add(new Label(" " + messages.and() + " "));
-    risksEventsLogs.add(logsLink);
+    long incidenceCount = bundle.getRiskIncidenceCount();
+    long eventCount = bundle.getPreservationEventCount();
+    long logCount = bundle.getLogCount();
+
+    if (incidenceCount >= 0) {
+      Anchor risksLink = new Anchor(messages.aipRiskIncidences(bundle.getRiskIncidenceCount()),
+        HistoryUtils.createHistoryHashLink(RiskIncidenceRegister.RESOLVER, aip.getId()));
+      risksEventsLogs.add(risksLink);
+    }
+
+    if (eventCount >= 0) {
+      Anchor eventsLink = new Anchor(messages.aipEvents(bundle.getPreservationEventCount()),
+        HistoryUtils.createHistoryHashLink(PreservationEvents.BROWSE_RESOLVER, aip.getId()));
+
+      if (incidenceCount >= 0) {
+        if (eventCount >= 0) {
+          risksEventsLogs.add(new Label(", "));
+        } else {
+          risksEventsLogs.add(new Label(" and "));
+        }
+      }
+
+      risksEventsLogs.add(eventsLink);
+    }
+
+    if (logCount >= 0) {
+      Anchor logsLink = new Anchor(messages.aipLogs(bundle.getLogCount()),
+        HistoryUtils.createHistoryHashLink(UserLog.RESOLVER, aip.getId()));
+
+      if (incidenceCount >= 0 || eventCount >= 0) {
+        risksEventsLogs.add(new Label(" and "));
+      }
+
+      risksEventsLogs.add(logsLink);
+    }
 
     navigationToolbar.updateBreadcrumb(bundle);
 
@@ -460,8 +488,8 @@ public class BrowseAIP extends Composite {
             SafeHtmlBuilder b = new SafeHtmlBuilder();
             b.append(SafeHtmlUtils.fromSafeConstant("<div class='descriptiveMetadataLinks'>"));
 
-            if (bundle.hasHistory() && PermissionUtils.hasPermissions(aip.getPermissions(),
-              "org.roda.wui.api.controllers.Browser.retrieveDescriptiveMetadataVersionsBundle")) {
+            if (bundle.hasHistory() && PermissionClientUtils.hasPermissions(aip.getPermissions(),
+              RodaConstants.PERMISSION_METHOD_RETRIEVE_DESCRIPTIVE_METADATA_VERSIONS_BUNDLE)) {
               // History link
               String historyLink = HistoryUtils.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId,
                 escapedDescId);
@@ -471,8 +499,8 @@ public class BrowseAIP extends Composite {
             }
 
             // Edit link
-            if (PermissionUtils.hasPermissions(aip.getPermissions(),
-              "org.roda.wui.api.controllers.Browser.updateDescriptiveMetadataFile")) {
+            if (PermissionClientUtils.hasPermissions(aip.getPermissions(),
+              RodaConstants.PERMISSION_METHOD_UPDATE_DESCRIPTIVE_METADATA_FILE)) {
               String editLink = HistoryUtils.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId,
                 escapedDescId);
               String editLinkHtml = "<a href='" + editLink
@@ -510,8 +538,8 @@ public class BrowseAIP extends Composite {
             SafeHtmlBuilder b = new SafeHtmlBuilder();
             b.append(SafeHtmlUtils.fromSafeConstant("<div class='descriptiveMetadataLinks'>"));
 
-            if (bundle.hasHistory() && PermissionUtils.hasPermissions(aip.getPermissions(),
-              "org.roda.wui.api.controllers.Browser.retrieveDescriptiveMetadataVersionsBundle")) {
+            if (bundle.hasHistory() && PermissionClientUtils.hasPermissions(aip.getPermissions(),
+              RodaConstants.PERMISSION_METHOD_RETRIEVE_DESCRIPTIVE_METADATA_VERSIONS_BUNDLE)) {
               // History link
               String historyLink = HistoryUtils.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId,
                 escapedDescId);
@@ -521,8 +549,8 @@ public class BrowseAIP extends Composite {
             }
 
             // Edit link
-            if (PermissionUtils.hasPermissions(aip.getPermissions(),
-              "org.roda.wui.api.controllers.Browser.updateDescriptiveMetadataFile")) {
+            if (PermissionClientUtils.hasPermissions(aip.getPermissions(),
+              RodaConstants.PERMISSION_METHOD_UPDATE_DESCRIPTIVE_METADATA_FILE)) {
               String editLink = HistoryUtils.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId,
                 escapedDescId);
               String editLinkHtml = "<a href='" + editLink + "' class='toolbarLink'><i class='fa fa-edit'></i></a>";

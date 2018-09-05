@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
@@ -44,11 +45,9 @@ public class RODAMemberActions extends AbstractActionable<RODAMember> {
   }
 
   public enum RODAMemberAction implements Action<RODAMember> {
-    NEW_USER("org.roda.wui.api.controllers.UserManagement.createUser"),
-    NEW_GROUP("org.roda.wui.api.controllers.UserManagement.createGroup"),
-    ACTIVATE("org.roda.wui.api.controllers.UserManagement.updateUser"),
-    DEACTIVATE("org.roda.wui.api.controllers.UserManagement.updateUser"),
-    REMOVE("org.roda.wui.api.controllers.UserManagement.deleteUser");
+    NEW_USER(RodaConstants.PERMISSION_METHOD_CREATE_USER), NEW_GROUP(RodaConstants.PERMISSION_METHOD_CREATE_GROUP),
+    ACTIVATE(RodaConstants.PERMISSION_METHOD_UPDATE_USER), DEACTIVATE(RodaConstants.PERMISSION_METHOD_UPDATE_USER),
+    REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_USER);
 
     private List<String> methods;
 

@@ -87,15 +87,13 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
   // MANAGEMENT
   public enum FileAction implements Action<IndexedFile> {
-    DOWNLOAD(), RENAME("org.roda.wui.api.controllers.Browser.renameFolder"),
-    MOVE("org.roda.wui.api.controllers.Browser.moveFiles"),
-    REMOVE("org.roda.wui.api.controllers.Browser.delete(IndexedFile)"),
-    UPLOAD_FILES("org.roda.wui.api.controllers.Browser.createFile"),
-    CREATE_FOLDER("org.roda.wui.api.controllers.Browser.createFolder"),
-    NEW_PROCESS("org.roda.wui.api.controllers.Jobs.createJob"),
-    IDENTIFY_FORMATS("org.roda.wui.api.controllers.Jobs.createJob"),
-    SHOW_EVENTS("org.roda.wui.api.controllers.Browser.find(IndexedPreservationEvent)"),
-    SHOW_RISKS("org.roda.wui.api.controllers.Browser.find(IndexedRisk)");
+    DOWNLOAD(), RENAME(RodaConstants.PERMISSION_METHOD_RENAME_FOLDER), MOVE(RodaConstants.PERMISSION_METHOD_MOVE_FILES),
+    REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_FILE), UPLOAD_FILES(RodaConstants.PERMISSION_METHOD_CREATE_FILE),
+    CREATE_FOLDER(RodaConstants.PERMISSION_METHOD_CREATE_FOLDER),
+    NEW_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
+    IDENTIFY_FORMATS(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
+    SHOW_EVENTS(RodaConstants.PERMISSION_METHOD_FIND_PRESERVATION_EVENT),
+    SHOW_RISKS(RodaConstants.PERMISSION_METHOD_FIND_RISK);
 
     private List<String> methods;
 

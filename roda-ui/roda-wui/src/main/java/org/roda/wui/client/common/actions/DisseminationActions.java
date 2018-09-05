@@ -59,9 +59,9 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
   }
 
   public enum DisseminationAction implements Action<IndexedDIP> {
-    DOWNLOAD(), REMOVE("org.roda.wui.api.controllers.Browser.delete(IndexedDIP)"),
-    NEW_PROCESS("org.roda.wui.api.controllers.Jobs.createJob"),
-    UPDATE_PERMISSIONS("org.roda.wui.api.controllers.Browser.updateDIPPermissions");
+    DOWNLOAD(), REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_DIP),
+    NEW_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
+    UPDATE_PERMISSIONS(RodaConstants.PERMISSION_METHOD_UPDATE_DIP_PERMISSIONS);
 
     private List<String> methods;
 

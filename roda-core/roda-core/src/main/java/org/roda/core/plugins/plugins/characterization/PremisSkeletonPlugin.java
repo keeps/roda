@@ -130,7 +130,6 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
             reportItem.setPluginState(PluginState.SUCCESS);
           } catch (RODAException | XmlException | IOException e) {
             LOGGER.error("Error processing AIP {}", aip.getId(), e);
-
             jobPluginInfo.incrementObjectsProcessedWithFailure();
             reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
           }

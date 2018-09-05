@@ -1501,6 +1501,73 @@ public final class RodaConstants {
     RodaConstants.DIPFILE_ID, RodaConstants.DIPFILE_PATH, RodaConstants.DIPFILE_DIP_ID,
     RodaConstants.DIPFILE_IS_DIRECTORY);
 
+  public static final String PERMISSION_METHOD_FIND_AIP = "org.roda.wui.api.controllers.Browser.find(IndexedAIP)";
+  public static final String PERMISSION_METHOD_FIND_REPRESENTATION = "org.roda.wui.api.controllers.Browser.find(IndexedRepresentation)";
+  public static final String PERMISSION_METHOD_FIND_FILE = "org.roda.wui.api.controllers.Browser.find(IndexedFile)";
+  public static final String PERMISSION_METHOD_FIND_DIP = "org.roda.wui.api.controllers.Browser.find(IndexedDIP)";
+  public static final String PERMISSION_METHOD_FIND_RISK_INCIDENCE = "org.roda.wui.api.controllers.Browser.find(RiskIncidence)";
+  public static final String PERMISSION_METHOD_FIND_PRESERVATION_EVENT = "org.roda.wui.api.controllers.Browser.find(IndexedPreservationEvent)";
+  public static final String PERMISSION_METHOD_FIND_LOG_ENTRY = "org.roda.wui.api.controllers.Browser.find(LogEntry)";
+  public static final String PERMISSION_METHOD_FIND_REPRESENTATION_INFORMATION = "org.roda.wui.api.controllers.Browser.find(RepresentationInformation)";
+  public static final String PERMISSION_METHOD_FIND_RISK = "org.roda.wui.api.controllers.Browser.find(IndexedRisk)";
+
+  public static final String PERMISSION_METHOD_DELETE_AIP = "org.roda.wui.api.controllers.Browser.delete(IndexedAIP)";
+  public static final String PERMISSION_METHOD_DELETE_DIP = "org.roda.wui.api.controllers.Browser.delete(IndexedDIP)";
+  public static final String PERMISSION_METHOD_DELETE_REPRESENTATION = "org.roda.wui.api.controllers.Browser.delete(IndexedRepresentation)";
+  public static final String PERMISSION_METHOD_DELETE_FILE = "org.roda.wui.api.controllers.Browser.delete(IndexedFile)";
+  public static final String PERMISSION_METHOD_DELETE_FORMAT = "org.roda.wui.api.controllers.Browser.delete(Format)";
+  public static final String PERMISSION_METHOD_DELETE_REPRESENTATION_INFORMATION = "org.roda.wui.api.controllers.Browser.delete(RepresentationInformation)";
+  public static final String PERMISSION_METHOD_DELETE_RISK = "org.roda.wui.api.controllers.Browser.delete(IndexedRisk)";
+  public static final String PERMISSION_METHOD_DELETE_RISK_INCIDENCE = "org.roda.wui.api.controllers.Browser.delete(RiskIncidence)";
+  public static final String PERMISSION_METHOD_DELETE_TRANSFERRED_RESOURCE = "org.roda.wui.api.controllers.Browser.delete(TransferredResource)";
+
+  public static final String PERMISSION_METHOD_RETRIEVE_AIP = "org.roda.wui.api.controllers.Browser.retrieve(IndexedAIP)";
+  public static final String PERMISSION_METHOD_RETRIEVE_REPRESENTATION = "org.roda.wui.api.controllers.Browser.retrieve(IndexedRepresentation)";
+  public static final String PERMISSION_METHOD_RETRIEVE_FILE = "org.roda.wui.api.controllers.Browser.retrieve(IndexedFile)";
+
+  public static final String PERMISSION_METHOD_LIST_AIP_DESCRIPTIVE_METADATA = "org.roda.wui.api.controllers.Browser.listAIPDescriptiveMetadata";
+  public static final String PERMISSION_METHOD_LIST_REPRESENTATION_DESCRIPTIVE_METADATA = "org.roda.wui.api.controllers.Browser.listRepresentationDescriptiveMetadata";
+  public static final String PERMISSION_METHOD_CREATE_AIP_BELOW = "org.roda.wui.api.controllers.Browser.createAIPBelow";
+  public static final String PERMISSION_METHOD_CREATE_AIP_TOP = "org.roda.wui.api.controllers.Browser.createAIPTop";
+  public static final String PERMISSION_METHOD_CREATE_REPRESENTATION = "org.roda.wui.api.controllers.Browser.createRepresentation";
+  public static final String PERMISSION_METHOD_MOVE_AIP_IN_HIERARCHY = "org.roda.wui.api.controllers.Browser.moveAIPInHierarchy";
+  public static final String PERMISSION_METHOD_UPDATE_AIP_PERMISSIONS = "org.roda.wui.api.controllers.Browser.updateAIPPermissions";
+  public static final String PERMISSION_METHOD_UPDATE_DIP_PERMISSIONS = "org.roda.wui.api.controllers.Browser.updateDIPPermissions";
+  public static final String PERMISSION_METHOD_CREATE_JOB = "org.roda.wui.api.controllers.Jobs.createJob";
+  public static final String PERMISSION_METHOD_APPRAISAL = "org.roda.wui.api.controllers.Browser.appraisal";
+  public static final String PERMISSION_METHOD_CHANGE_AIP_TYPE = "org.roda.wui.api.controllers.Browser.changeAIPType";
+  public static final String PERMISSION_METHOD_CHANGE_REPRESENTATION_TYPE = "org.roda.wui.api.controllers.Browser.changeRepresentationType";
+  public static final String PERMISSION_METHOD_RENAME_FOLDER = "org.roda.wui.api.controllers.Browser.renameFolder";
+  public static final String PERMISSION_METHOD_MOVE_FILES = "org.roda.wui.api.controllers.Browser.moveFiles";
+  public static final String PERMISSION_METHOD_CREATE_FILE = "org.roda.wui.api.controllers.Browser.createFile";
+  public static final String PERMISSION_METHOD_CHANGE_REPRESENTATION_STATES = "org.roda.wui.api.controllers.Browser.changeRepresentationStates";
+  public static final String PERMISSION_METHOD_CREATE_FOLDER = "org.roda.wui.api.controllers.Browser.createFolder";
+  public static final String PERMISSION_METHOD_CREATE_FORMAT = "org.roda.wui.api.controllers.Browser.createFormat";
+  public static final String PERMISSION_METHOD_UPDATE_FORMAT = "org.roda.wui.api.controllers.Browser.updateFormat";
+  public static final String PERMISSION_METHOD_CREATE_REPRESENTATION_INFORMATION = "org.roda.wui.api.controllers.Browser.createRepresentationInformation";
+  public static final String PERMISSION_METHOD_UPDATE_REPRESENTATION_INFORMATION = "org.roda.wui.api.controllers.Browser.updateRepresentationInformation";
+  public static final String PERMISSION_METHOD_CREATE_RISK = "org.roda.wui.api.controllers.Risks.createRisk";
+  public static final String PERMISSION_METHOD_UPDATE_RISK = "org.roda.wui.api.controllers.Browser.updateRisk";
+  public static final String PERMISSION_METHOD_RETRIEVE_RISK_VERSIONS = "org.roda.wui.api.controllers.Browser.retrieveRiskVersions";
+  public static final String PERMISSION_METHOD_UPDATE_RISK_INCIDENCE = "org.roda.wui.api.controllers.Browser.updateRiskIncidence";
+  public static final String PERMISSION_METHOD_RENAME_TRANSFERRED_RESOURCE = "org.roda.wui.api.controllers.Browser.renameTransferredResource";
+  public static final String PERMISSION_METHOD_MOVE_TRANSFERRED_RESOURCE = "org.roda.wui.api.controllers.Browser.moveTransferredResource";
+  public static final String PERMISSION_METHOD_CREATE_TRANSFERRED_RESOURCE_FILE = "org.roda.wui.api.controllers.Browser.createTransferredResourceFile";
+  public static final String PERMISSION_METHOD_CREATE_TRANSFERRED_RESOURCE_FOLDER = "org.roda.wui.api.controllers.Browser.createTransferredResourcesFolder";
+  public static final String PERMISSION_METHOD_REVERT_DESCRIPTIVE_METADATA_VERSION = "org.roda.wui.api.controllers.Browser.revertDescriptiveMetadataVersion";
+  public static final String PERMISSION_METHOD_DELETE_DESCRIPTIVE_METADATA_VERSION = "org.roda.wui.api.controllers.Browser.deleteDescriptiveMetadataVersion";
+  public static final String PERMISSION_METHOD_CREATE_DESCRIPTIVE_METADATA_FILE = "org.roda.wui.api.controllers.Browser.createDescriptiveMetadataFile";
+  public static final String PERMISSION_METHOD_UPDATE_DESCRIPTIVE_METADATA_FILE = "org.roda.wui.api.controllers.Browser.updateDescriptiveMetadataFile";
+  public static final String PERMISSION_METHOD_DELETE_DESCRIPTIVE_METADATA_FILE = "org.roda.wui.api.controllers.Browser.deleteDescriptiveMetadataFile";
+  public static final String PERMISSION_METHOD_RETRIEVE_DESCRIPTIVE_METADATA_VERSIONS_BUNDLE = "org.roda.wui.api.controllers.Browser.retrieveDescriptiveMetadataVersionsBundle";
+
+  public static final String PERMISSION_METHOD_CREATE_USER = "org.roda.wui.api.controllers.UserManagement.createUser";
+  public static final String PERMISSION_METHOD_CREATE_GROUP = "org.roda.wui.api.controllers.UserManagement.createGroup";
+  public static final String PERMISSION_METHOD_UPDATE_USER = "org.roda.wui.api.controllers.UserManagement.updateUser";
+  public static final String PERMISSION_METHOD_DELETE_USER = "org.roda.wui.api.controllers.UserManagement.deleteUser";
+
+  public static final String PERMISSION_METHOD_STOP_JOB = "core.roles.org.roda.wui.api.controllers.Jobs.stopJob";
+
   public static final String ENV_CONFIG_SYMBOLIC_LINKS_FORBIDDEN = "RODA_CONFIG_SYMBOLIC_LINKS_FORBIDDEN";
 
   /** Private empty constructor */

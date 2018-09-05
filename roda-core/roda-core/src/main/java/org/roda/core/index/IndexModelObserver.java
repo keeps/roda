@@ -67,7 +67,6 @@ import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
-import org.roda.core.index.IndexingAdditionalInfo.Flags;
 import org.roda.core.index.schema.collections.AIPCollection;
 import org.roda.core.index.schema.collections.DIPFileCollection;
 import org.roda.core.index.schema.collections.FileCollection;
@@ -157,7 +156,8 @@ public class IndexModelObserver implements ModelObserver {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
     try (CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationMetadata = (representationId == null)
-      ? model.listPreservationMetadata(aipId, true) : model.listPreservationMetadata(aipId, representationId)) {
+      ? model.listPreservationMetadata(aipId, true)
+      : model.listPreservationMetadata(aipId, representationId)) {
 
       for (OptionalWithCause<PreservationMetadata> opm : preservationMetadata) {
         if (opm.isPresent()) {
@@ -875,8 +875,30 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> dipPermissionsUpdated(DIP dip) {
-    return SolrUtils.update(index, IndexedDIP.class, dip.getId(),
-      SolrUtils.getPermissionsAsPreCalculatedFields(dip.getPermissions()), (ModelObserver) this);
+    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
+    SolrUtils.update(index, IndexedDIP.class, dip.getId(),
+      SolrUtils.getPermissionsAsPreCalculatedFields(dip.getPermissions()), (ModelObserver) this).addTo(ret);
+
+    if (ret.isEmpty()) {
+      try (CloseableIterable<OptionalWithCause<DIPFile>> allFiles = model.listDIPFilesUnder(dip.getId(), true)) {
+
+        for (OptionalWithCause<DIPFile> dipFile : allFiles) {
+          if (dipFile.isPresent()) {
+            SolrUtils.update(index, DIPFile.class, IdUtils.getDIPFileId(dipFile.get()),
+              SolrUtils.getPermissionsAsPreCalculatedFields(dip.getPermissions()), (ModelObserver) this).addTo(ret);
+          } else {
+            LOGGER.error("Cannot do a partial update on DIP file", dipFile.getCause());
+            ret.add(dipFile.getCause());
+          }
+        }
+      } catch (AuthorizationDeniedException | IOException | NotFoundException | GenericException
+        | RequestNotValidException e) {
+        LOGGER.error("Cannot do a partial update", e);
+        ret.add(e);
+      }
+    }
+
+    return ret;
   }
 
   private ReturnWithExceptions<Void, ModelObserver> representationsPermissionsUpdated(final AIP aip) {
@@ -891,50 +913,26 @@ public class IndexModelObserver implements ModelObserver {
     final Representation representation) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
-    try (CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(representation.getAipId(),
-      representation.getId(), true)) {
+    SolrUtils.update(index, IndexedRepresentation.class, IdUtils.getRepresentationId(representation),
+      SolrUtils.getPermissionsAsPreCalculatedFields(aip.getPermissions()), (ModelObserver) this).addTo(ret);
 
-      SolrUtils.update(index, IndexedRepresentation.class, IdUtils.getRepresentationId(representation),
-        SolrUtils.getPermissionsAsPreCalculatedFields(aip.getPermissions()), (ModelObserver) this).addTo(ret);
+    if (ret.isEmpty()) {
+      try (CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(representation.getAipId(),
+        representation.getId(), true)) {
 
-      if (ret.isEmpty()) {
         for (OptionalWithCause<File> file : allFiles) {
           if (file.isPresent()) {
-            filePermissionsUpdated(aip, file.get(), false).addTo(ret);
+            SolrUtils.update(index, IndexedFile.class, IdUtils.getFileId(file.get()),
+              SolrUtils.getPermissionsAsPreCalculatedFields(aip.getPermissions()), (ModelObserver) this).addTo(ret);
           } else {
             LOGGER.error("Cannot do a partial update on file", file.getCause());
             ret.add(file.getCause());
           }
         }
-      }
-    } catch (AuthorizationDeniedException | IOException | NotFoundException | GenericException
-      | RequestNotValidException e) {
-      LOGGER.error("Cannot do a partial update", e);
-      ret.add(e);
-    }
 
-    return ret;
-  }
-
-  private ReturnWithExceptions<Void, ModelObserver> filePermissionsUpdated(AIP aip, File file, boolean recursive) {
-    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
-
-    SolrUtils.update(index, IndexedFile.class, IdUtils.getFileId(file),
-      SolrUtils.getPermissionsAsPreCalculatedFields(aip.getPermissions()), (ModelObserver) this).addTo(ret);
-
-    if (ret.isEmpty() && recursive && file.isDirectory()) {
-      try (CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(file, true)) {
-        for (OptionalWithCause<File> subfile : allFiles) {
-          if (subfile.isPresent()) {
-            filePermissionsUpdated(aip, subfile.get(), false).addTo(ret);
-          } else {
-            LOGGER.error("Cannot index file sub-resources file", subfile.getCause());
-            ret.add(subfile.getCause());
-          }
-        }
-      } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException
-        | IOException e) {
-        LOGGER.error("Cannot index file sub-resources: {}", file, e);
+      } catch (AuthorizationDeniedException | IOException | NotFoundException | GenericException
+        | RequestNotValidException e) {
+        LOGGER.error("Cannot do a partial update", e);
         ret.add(e);
       }
     }

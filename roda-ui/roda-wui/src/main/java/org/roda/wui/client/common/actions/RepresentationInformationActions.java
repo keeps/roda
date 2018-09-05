@@ -60,10 +60,10 @@ public class RepresentationInformationActions extends AbstractActionable<Represe
   }
 
   public enum RepresentationInformationAction implements Action<RepresentationInformation> {
-    NEW("org.roda.wui.api.controllers.Browser.createRepresentationInformation"),
-    REMOVE("org.roda.wui.api.controllers.Browser.delete(RepresentationInformation)"),
-    START_PROCESS("org.roda.wui.api.controllers.Jobs.createJob"),
-    EDIT("org.roda.wui.api.controllers.Browser.updateRepresentationInformation"), DOWNLOAD();
+    NEW(RodaConstants.PERMISSION_METHOD_CREATE_REPRESENTATION_INFORMATION),
+    REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_REPRESENTATION_INFORMATION),
+    START_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
+    EDIT(RodaConstants.PERMISSION_METHOD_UPDATE_REPRESENTATION_INFORMATION), DOWNLOAD();
 
     private List<String> methods;
 

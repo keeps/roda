@@ -121,19 +121,21 @@ public class IndexService {
       rodaConfiguration.getInt("core.index_result.sleep", IndexResultIterator.DEFAULT_SLEEP_BETWEEN_RETRIES));
   }
 
-  public IndexedAIP getParent(IndexedAIP aip, List<String> fieldsToReturn) throws NotFoundException, GenericException {
-    return SolrUtils.retrieve(getSolrClient(), IndexedAIP.class, aip.getParentID(), fieldsToReturn);
+  public IndexedAIP getParent(IndexedAIP aip, User user, List<String> fieldsToReturn)
+    throws NotFoundException, GenericException, AuthorizationDeniedException {
+    return SolrUtils.retrieve(getSolrClient(), IndexedAIP.class, aip.getParentID(), user, fieldsToReturn);
   }
 
-  public List<IndexedAIP> retrieveAncestors(IndexedAIP aip, List<String> fieldsToReturn) throws GenericException {
+  public List<IndexedAIP> retrieveAncestors(IndexedAIP aip, User user, List<String> fieldsToReturn)
+    throws GenericException {
     List<IndexedAIP> ancestors = new ArrayList<>();
     IndexedAIP parent;
     IndexedAIP actual = aip;
 
     while (actual != null && actual.getParentID() != null) {
       try {
-        parent = getParent(actual, fieldsToReturn);
-      } catch (NotFoundException e) {
+        parent = getParent(actual, user, fieldsToReturn);
+      } catch (NotFoundException | AuthorizationDeniedException e) {
         parent = null;
         LOGGER.warn("Ancestor not found: {}", actual.getParentID());
       }

@@ -58,6 +58,7 @@ import org.apache.solr.common.params.FacetParams;
 import org.apache.solr.handler.loader.XMLLoader;
 import org.roda.core.common.MetadataFileUtils;
 import org.roda.core.common.RodaUtils;
+import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.DateGranularity;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -160,6 +161,13 @@ public class SolrUtils {
     boolean justActive) throws GenericException, RequestNotValidException {
     return find(index, classToRetrieve, filter, null, new Sublist(0, 0), null, user, justActive, new ArrayList<>())
       .getTotalCount();
+  }
+
+  public static <T extends IsIndexed> T retrieve(SolrClient index, Class<T> classToRetrieve, String id, User user,
+    List<String> fieldsToReturn) throws NotFoundException, GenericException, AuthorizationDeniedException {
+    T ret = retrieve(index, classToRetrieve, id, fieldsToReturn);
+    UserUtility.checkObjectPermissions(user, ret, PermissionType.READ);
+    return ret;
   }
 
   public static <T extends IsIndexed> T retrieve(SolrClient index, Class<T> classToRetrieve, String id,

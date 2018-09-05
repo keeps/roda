@@ -41,7 +41,7 @@ import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.slider.Sliders;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
-import org.roda.wui.client.common.utils.PermissionUtils;
+import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
@@ -315,8 +315,8 @@ public class BrowseRepresentation extends Composite {
     addTab.getElement().setId("representationNewDescriptiveMetadata");
     addTab.getParent().addStyleName("addTabWrapper");
 
-    PermissionUtils.bindPermission(newDescriptiveMetadata, aip.getPermissions(),
-      "org.roda.wui.api.controllers.Browser.createDescriptiveMetadataFile");
+    PermissionClientUtils.bindPermission(newDescriptiveMetadata, aip.getPermissions(),
+      RodaConstants.PERMISSION_METHOD_CREATE_DESCRIPTIVE_METADATA_FILE);
 
     handlers.add(tabHandler);
     handlers.add(addTabHandler);
@@ -421,8 +421,8 @@ public class BrowseRepresentation extends Composite {
             SafeHtmlBuilder b = new SafeHtmlBuilder();
             b.append(SafeHtmlUtils.fromSafeConstant("<div class='descriptiveMetadataLinks'>"));
 
-            if (bundle.hasHistory() && PermissionUtils.hasPermissions(aip.getPermissions(),
-              "org.roda.wui.api.controllers.Browser.retrieveDescriptiveMetadataVersionsBundle")) {
+            if (bundle.hasHistory() && PermissionClientUtils.hasPermissions(aip.getPermissions(),
+              RodaConstants.PERMISSION_METHOD_RETRIEVE_DESCRIPTIVE_METADATA_VERSIONS_BUNDLE)) {
               // History link
               String historyLink = HistoryUtils.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId, repId,
                 descId);
@@ -431,8 +431,8 @@ public class BrowseRepresentation extends Composite {
               b.append(SafeHtmlUtils.fromSafeConstant(historyLinkHtml));
             }
             // Edit link
-            if (PermissionUtils.hasPermissions(aip.getPermissions(),
-              "org.roda.wui.api.controllers.Browser.updateDescriptiveMetadataFile")) {
+            if (PermissionClientUtils.hasPermissions(aip.getPermissions(),
+              RodaConstants.PERMISSION_METHOD_UPDATE_DESCRIPTIVE_METADATA_FILE)) {
               String editLink = HistoryUtils.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId, repId,
                 descId);
               String editLinkHtml = "<a href='" + editLink
@@ -473,8 +473,8 @@ public class BrowseRepresentation extends Composite {
             SafeHtmlBuilder b = new SafeHtmlBuilder();
             b.append(SafeHtmlUtils.fromSafeConstant("<div class='descriptiveMetadataLinks'>"));
 
-            if (bundle.hasHistory() && PermissionUtils.hasPermissions(aip.getPermissions(),
-              "org.roda.wui.api.controllers.Browser.retrieveDescriptiveMetadataVersionsBundle")) {
+            if (bundle.hasHistory() && PermissionClientUtils.hasPermissions(aip.getPermissions(),
+              RodaConstants.PERMISSION_METHOD_RETRIEVE_DESCRIPTIVE_METADATA_VERSIONS_BUNDLE)) {
               // History link
               String historyLink = HistoryUtils.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId, repId,
                 descId);
@@ -484,8 +484,8 @@ public class BrowseRepresentation extends Composite {
             }
 
             // Edit link
-            if (PermissionUtils.hasPermissions(aip.getPermissions(),
-              "org.roda.wui.api.controllers.Browser.updateDescriptiveMetadataFile")) {
+            if (PermissionClientUtils.hasPermissions(aip.getPermissions(),
+              RodaConstants.PERMISSION_METHOD_UPDATE_DESCRIPTIVE_METADATA_FILE)) {
               String editLink = HistoryUtils.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId, repId,
                 descId);
               String editLinkHtml = "<a href='" + editLink + "' class='toolbarLink'><i class='fa fa-edit'></i></a>";

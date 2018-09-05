@@ -55,9 +55,9 @@ public class RiskIncidenceActions extends AbstractActionable<RiskIncidence> {
   }
 
   public enum RiskIncidenceAction implements Action<RiskIncidence> {
-    EDIT("org.roda.wui.api.controllers.Browser.updateRiskIncidence"),
-    REMOVE("org.roda.wui.api.controllers.Browser.delete(RiskIncidence)"),
-    START_PROCESS("org.roda.wui.api.controllers.Jobs.createJob");
+    EDIT(RodaConstants.PERMISSION_METHOD_UPDATE_RISK_INCIDENCE),
+    REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_RISK_INCIDENCE),
+    START_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB);
 
     private List<String> methods;
 

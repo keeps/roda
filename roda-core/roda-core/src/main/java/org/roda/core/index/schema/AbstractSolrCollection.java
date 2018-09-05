@@ -29,7 +29,7 @@ public abstract class AbstractSolrCollection<I extends IsIndexed, M extends IsMo
     List<Field> ret = new ArrayList<>();
 
     if (SolrCollection.hasId(getIndexClass())) {
-      ret.add(new Field(RodaConstants.INDEX_ID, Field.TYPE_STRING).setRequired(true));
+      ret.add(new Field(RodaConstants.INDEX_ID, Field.TYPE_STRING));
     }
 
     if (SolrCollection.hasStateFilter(getIndexClass())) {
