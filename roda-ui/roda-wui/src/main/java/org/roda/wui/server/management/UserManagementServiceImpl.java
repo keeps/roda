@@ -190,7 +190,16 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   public UserExtraBundle retrieveUserExtraBundle(String name)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return UserManagement.retrieveUserExtraBundle(user, name);
+
+    UserExtraBundle ret;
+
+    if (user.getName().equals(name)) {
+      ret = UserManagement.retrieveOwnUserExtraBundle(user);
+    } else {
+      ret = UserManagement.retrieveUserExtraBundle(user, name);
+    }
+
+    return ret;
   }
 
   @Override

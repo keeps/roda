@@ -431,6 +431,21 @@ public class UserManagement extends RodaWuiController {
       throw new GenericException("Problem sending email", e);
     }
   }
+  
+  public static UserExtraBundle retrieveOwnUserExtraBundle(User user) throws AuthorizationDeniedException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check permissions
+    controllerAssistant.checkRoles(user);
+
+    // delegate
+    UserExtraBundle extraBudle = UserManagementHelper.retrieveUserExtraBundle(user.getName());
+
+    // register action
+    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
+
+    return extraBudle;
+  }
 
   public static UserExtraBundle retrieveUserExtraBundle(User user, String name) throws AuthorizationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};

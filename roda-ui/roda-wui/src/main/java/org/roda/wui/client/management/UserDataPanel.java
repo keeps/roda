@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.bundle.UserExtraBundle;
@@ -262,7 +263,13 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
         @Override
         public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
+          if (caught instanceof AuthorizationDeniedException) {
+            // TODO inform user he does not have permissions to see to which
+            // groups he belongs to.
+            GWT.log("No permissions: " + caught.getMessage());
+          } else {
+            AsyncCallbackUtils.defaultFailureTreatment(caught);
+          }
         }
 
         @Override
@@ -293,8 +300,13 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
       @Override
       public void onFailure(Throwable caught) {
-        AsyncCallbackUtils.defaultFailureTreatment(caught);
-        HistoryUtils.newHistory(MemberManagement.RESOLVER);
+        if (caught instanceof AuthorizationDeniedException) {
+          // TODO inform user he does not have permissions to see to which
+          // groups he belongs to.
+        } else {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
+          HistoryUtils.newHistory(MemberManagement.RESOLVER);
+        }
       }
     });
   }
@@ -351,7 +363,12 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
         @Override
         public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
+          if (caught instanceof AuthorizationDeniedException) {
+            // TODO inform user he does not have permissions to see to which
+            // groups he belongs to.
+          } else {
+            AsyncCallbackUtils.defaultFailureTreatment(caught);
+          }
         }
       });
     }
