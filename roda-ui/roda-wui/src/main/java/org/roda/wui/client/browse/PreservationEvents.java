@@ -23,7 +23,6 @@ import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.client.planning.Planning;
@@ -31,6 +30,7 @@ import org.roda.wui.client.search.PreservationEventsSearch;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.core.client.GWT;

@@ -29,8 +29,8 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.InactiveUserException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.wui.api.controllers.UserLogin;
-import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.welcome.Welcome;
+import org.roda.wui.common.client.tools.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

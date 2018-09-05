@@ -19,7 +19,7 @@ import org.roda.core.data.v2.notifications.Notification;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
-import org.roda.wui.client.common.utils.StringUtils;
+import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.SafeHtmlCell;

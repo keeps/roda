@@ -10,7 +10,7 @@ package org.roda.wui.client.common;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.roda.wui.client.common.utils.StringUtils;
+import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;

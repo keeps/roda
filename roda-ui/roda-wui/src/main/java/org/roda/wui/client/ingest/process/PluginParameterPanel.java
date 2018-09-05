@@ -31,9 +31,9 @@ import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.common.IncrementalAssociativeList;
 import org.roda.wui.client.common.dialogs.SelectAipDialog;
 import org.roda.wui.client.common.utils.PluginUtils;
-import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
+import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;

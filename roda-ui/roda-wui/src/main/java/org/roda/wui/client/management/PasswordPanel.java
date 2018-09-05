@@ -7,7 +7,7 @@
  */
 package org.roda.wui.client.management;
 
-import org.roda.wui.client.common.utils.StringUtils;
+import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;

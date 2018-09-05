@@ -33,8 +33,8 @@ import org.roda.wui.client.common.popup.CalloutPopup;
 import org.roda.wui.client.common.popup.CalloutPopup.CalloutPosition;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.IndexedDIPUtils;
-import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;

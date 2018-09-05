@@ -46,8 +46,8 @@ import org.roda.wui.client.common.search.Dropdown;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.search.SelectedPanel;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.planning.RelationTypeTranslationsBundle;
+import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
 

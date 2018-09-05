@@ -22,13 +22,13 @@ import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.SelectTransferResourceDialog;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
-import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.client.ingest.transfer.TransferUpload;
 import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.client.process.InternalProcess;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;

@@ -15,8 +15,8 @@ import java.util.List;
 
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.LoginStatusListener;
+import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;

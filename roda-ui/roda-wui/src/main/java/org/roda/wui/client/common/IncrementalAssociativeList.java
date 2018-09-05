@@ -21,7 +21,7 @@ import org.roda.core.data.v2.index.filter.FilterParameter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.wui.client.common.dialogs.SelectDialog;
 import org.roda.wui.client.common.dialogs.SelectDialogFactory;
-import org.roda.wui.client.common.utils.StringUtils;
+import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Document;

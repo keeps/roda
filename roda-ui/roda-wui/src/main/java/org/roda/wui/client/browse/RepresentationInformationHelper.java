@@ -11,10 +11,10 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.planning.RepresentationInformationAssociations;
 import org.roda.wui.client.planning.ShowRepresentationInformation;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;

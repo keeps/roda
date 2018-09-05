@@ -20,8 +20,8 @@ import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.model.ActionableTitle;
 import org.roda.wui.client.common.popup.CalloutPopup;
-import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
+import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;

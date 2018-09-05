@@ -23,11 +23,11 @@ import org.roda.wui.client.common.actions.FormatActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;

@@ -29,12 +29,12 @@ import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.common.actions.AipActions;
-import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
+import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;

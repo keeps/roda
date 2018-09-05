@@ -22,7 +22,7 @@ import org.roda.core.data.v2.index.facet.FacetFieldResult;
 import org.roda.core.data.v2.index.facet.FacetValue;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.user.RODAMember;
-import org.roda.wui.client.common.utils.StringUtils;
+import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.server.ServerTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

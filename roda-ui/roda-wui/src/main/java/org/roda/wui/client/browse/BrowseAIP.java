@@ -44,7 +44,6 @@ import org.roda.wui.client.common.slider.Sliders;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.PermissionUtils;
-import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.management.UserLog;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
 import org.roda.wui.client.welcome.Welcome;
@@ -54,6 +53,7 @@ import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.RestErrorOverlayType;
 import org.roda.wui.common.client.tools.RestUtils;
+import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
 import org.roda.wui.common.client.widgets.wcag.WCAGUtilities;
 

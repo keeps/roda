@@ -9,14 +9,12 @@ package org.roda.wui.server.browse;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.MissingResourceException;
 import java.util.Optional;
 import java.util.Set;
 
@@ -93,8 +91,6 @@ import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
-import org.roda.wui.client.common.search.SearchField;
-import org.roda.wui.client.common.utils.Tree;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.ingest.process.JobBundle;
 import org.roda.wui.client.planning.MitigationPropertiesBundle;
@@ -244,67 +240,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     User user = UserUtility.getUser(getThreadLocalRequest());
     Class<T> classToReturn = SelectedItemsUtils.parseClass(classNameToReturn);
     return Browser.suggest(user, classToReturn, field, query, allowPartial);
-  }
-
-  @Override
-  public List<SearchField> retrieveSearchFields(String className, String localeString) {
-    List<SearchField> searchFields = new ArrayList<>();
-    List<String> fields = RodaUtils.copyList(RodaCoreFactory.getRodaConfiguration()
-      .getList(RodaCoreFactory.getConfigurationKey(RodaConstants.SEARCH_FIELD_PREFIX, className)));
-    Locale locale = ServerTools.parseLocale(localeString);
-    Messages messages = RodaCoreFactory.getI18NMessages(locale);
-    for (String field : fields) {
-      SearchField searchField = new SearchField();
-      String fieldsNames = RodaCoreFactory.getRodaConfigurationAsString(RodaConstants.SEARCH_FIELD_PREFIX, className,
-        field, RodaConstants.SEARCH_FIELD_FIELDS);
-      String fieldType = RodaCoreFactory.getRodaConfigurationAsString(RodaConstants.SEARCH_FIELD_PREFIX, className,
-        field, RodaConstants.SEARCH_FIELD_TYPE);
-      String fieldLabelI18N = RodaCoreFactory.getRodaConfigurationAsString(RodaConstants.SEARCH_FIELD_PREFIX, className,
-        field, RodaConstants.SEARCH_FIELD_I18N);
-      String fieldI18NPrefix = RodaCoreFactory.getRodaConfigurationAsString(RodaConstants.SEARCH_FIELD_PREFIX,
-        className, field, RodaConstants.SEARCH_FIELD_I18N_PREFIX);
-      List<String> fieldsValues = RodaCoreFactory.getRodaConfigurationAsList(RodaConstants.SEARCH_FIELD_PREFIX,
-        className, field, RodaConstants.SEARCH_FIELD_VALUES);
-      String suggestField = RodaCoreFactory.getRodaConfigurationAsString(RodaConstants.SEARCH_FIELD_PREFIX, className,
-        field, RodaConstants.SEARCH_FIELD_TYPE_SUGGEST_FIELD);
-
-      boolean fieldFixed = Boolean.parseBoolean(RodaCoreFactory.getRodaConfigurationAsString(
-        RodaConstants.SEARCH_FIELD_PREFIX, className, field, RodaConstants.SEARCH_FIELD_FIXED));
-      boolean suggestPartial = Boolean.parseBoolean(RodaCoreFactory.getRodaConfigurationAsString(
-        RodaConstants.SEARCH_FIELD_PREFIX, className, field, RodaConstants.SEARCH_FIELD_TYPE_SUGGEST_PARTIAL));
-
-      if (fieldsNames != null && fieldType != null && fieldLabelI18N != null) {
-        List<String> fieldsNamesList = Arrays.asList(fieldsNames.split(","));
-
-        searchField.setId(field);
-        searchField.setSearchFields(fieldsNamesList);
-        searchField.setType(fieldType);
-        try {
-          searchField.setLabel(messages.getTranslation(fieldLabelI18N));
-        } catch (MissingResourceException e) {
-          searchField.setLabel(fieldLabelI18N);
-        }
-        searchField.setFixed(fieldFixed);
-
-        if (fieldsValues != null) {
-          Map<String, String> labels = messages.getTranslations(fieldI18NPrefix, String.class, false);
-          Tree<String> terms = new Tree<>(field, field);
-          for (String value : fieldsValues) {
-            terms.addChild(labels.get(fieldI18NPrefix + "." + value), value);
-          }
-          searchField.setTerms(terms);
-        }
-
-        if (suggestField != null) {
-          searchField.setSuggestField(suggestField);
-        }
-
-        searchField.setSuggestPartial(suggestPartial);
-        searchFields.add(searchField);
-      }
-    }
-
-    return searchFields;
   }
 
   @Override

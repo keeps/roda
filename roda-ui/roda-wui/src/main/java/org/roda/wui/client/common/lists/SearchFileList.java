@@ -19,9 +19,9 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
-import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Humanize;
+import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;

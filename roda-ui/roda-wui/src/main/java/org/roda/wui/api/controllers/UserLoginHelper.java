@@ -22,7 +22,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InactiveUserException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.user.User;
-import org.roda.wui.client.common.utils.StringUtils;
+import org.roda.wui.common.client.tools.StringUtils;
 
 /**
  * Helper class to perform users login.

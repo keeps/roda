@@ -21,7 +21,6 @@ import org.roda.wui.client.browse.bundle.UserExtraBundle;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.main.Login;
 import org.roda.wui.client.management.recaptcha.RecaptchaException;
 import org.roda.wui.client.management.recaptcha.RecaptchaWidget;
@@ -30,6 +29,7 @@ import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;

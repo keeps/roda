@@ -19,7 +19,6 @@ import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.dialogs.Dialogs;
-import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
@@ -27,6 +26,7 @@ import org.roda.wui.common.client.LoginStatusListener;
 import org.roda.wui.common.client.tools.CachedAsynRequest;
 import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.URL;

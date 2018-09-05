@@ -14,7 +14,7 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.wui.client.common.utils.IndexedDIPUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.client.common.utils.StringUtils;
+import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;

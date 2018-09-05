@@ -57,7 +57,6 @@ import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.process.Process;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
@@ -66,6 +65,7 @@ import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.Humanize.DHMSFormat;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.RestUtils;
+import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;

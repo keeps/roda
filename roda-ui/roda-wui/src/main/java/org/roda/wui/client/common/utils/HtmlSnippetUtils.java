@@ -33,6 +33,7 @@ import org.roda.wui.client.browse.MetadataValue;
 import org.roda.wui.client.browse.RepresentationInformationHelper;
 import org.roda.wui.client.planning.RepresentationInformationAssociations;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.LocaleInfo;

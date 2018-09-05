@@ -1,6 +1,6 @@
 package org.roda.wui.client.common.actions.model;
 
-import org.roda.wui.client.common.utils.StringUtils;
+import org.roda.wui.common.client.tools.StringUtils;
 
 /**
  * @author Bruno Ferreira <bferreira@keep.pt>

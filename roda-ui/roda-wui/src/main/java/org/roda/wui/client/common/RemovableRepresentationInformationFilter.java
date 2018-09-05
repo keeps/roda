@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.utils.RepresentationInformationUtils;
-import org.roda.wui.client.common.utils.StringUtils;
+import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;

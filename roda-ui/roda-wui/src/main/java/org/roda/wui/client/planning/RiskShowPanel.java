@@ -20,8 +20,8 @@ import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
-import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.tools.Humanize;
+import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;

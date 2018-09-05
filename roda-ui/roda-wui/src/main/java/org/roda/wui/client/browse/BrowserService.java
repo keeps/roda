@@ -57,7 +57,6 @@ import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
-import org.roda.wui.client.common.search.SearchField;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.ingest.process.JobBundle;
 import org.roda.wui.client.planning.MitigationPropertiesBundle;
@@ -121,8 +120,6 @@ public interface BrowserService extends RemoteService {
   DescriptiveMetadataEditBundle retrieveDescriptiveMetadataEditBundle(String aipId, String representationId,
     String descId, String localeString)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
-
-  List<SearchField> retrieveSearchFields(String className, String locale) throws GenericException;
 
   Job moveAIPInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,

@@ -17,9 +17,9 @@ import java.util.Set;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.user.Group;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.wcag.WCAGUtilities;
 
 import com.google.gwt.core.client.GWT;

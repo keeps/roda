@@ -40,7 +40,6 @@ import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.ShowPreservationEvent;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.ingest.process.ShowJobReport;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;

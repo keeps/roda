@@ -38,13 +38,13 @@ import org.roda.wui.client.common.dialogs.RepresentationDialogs;
 import org.roda.wui.client.common.dialogs.SelectAipDialog;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.client.process.InternalProcess;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.RestUtils;
+import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
