@@ -27,7 +27,6 @@ import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -60,13 +59,14 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Lis
     public GroupCheckbox(Group group, String description, String sortingkeyword) {
       this.group = group;
       this.checkbox = new CheckBox();
+      this.checkbox.setTitle(description);
+      this.checkbox.getElement().getFirstChildElement().setTitle(description);
       this.descriptionLabel = new Label(description);
       this.sortingkeyword = sortingkeyword;
       this.add(checkbox);
       this.add(descriptionLabel);
 
       this.descriptionLabel.addClickHandler(new ClickHandler() {
-
         @Override
         public void onClick(ClickEvent event) {
           checkbox.setValue(!checkbox.getValue());
@@ -75,7 +75,6 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Lis
       });
 
       this.checkbox.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-
         @Override
         public void onValueChange(ValueChangeEvent<Boolean> event) {
           onChange();
@@ -169,8 +168,6 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Lis
       return GroupSelect.this;
     }
   }
-
-  private ClientLogger logger = new ClientLogger(getClass().getName());
 
   private final List<String> blacklist;
   private final List<GroupCheckbox> groups;
