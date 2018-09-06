@@ -37,7 +37,7 @@ public class SelectedPanel<T extends IsIndexed> extends SimplePanel implements H
 
       if (searchSelectedPanelIcon == null) {
         // second fallback: use a default icon
-        searchSelectedPanelIcon = "question-circle";
+        searchSelectedPanelIcon = "fa fa-question-circle";
       }
     }
 
@@ -76,7 +76,7 @@ public class SelectedPanel<T extends IsIndexed> extends SimplePanel implements H
 
     InlineHTML iconPanel = new InlineHTML();
     iconPanel.setHTML(SafeHtmlUtils.fromSafeConstant(
-      "<i class=\"fa fa-" + getIconForList(list.getListId(), list.getClassToReturn().getSimpleName()) + "\"></i>"));
+      "<i class=\"" + getIconForList(list.getListId(), list.getClassToReturn().getSimpleName()) + "\"></i>"));
     innerPanel.add(iconPanel);
 
     Label selectedLabel = new Label(defaultLabelText);

@@ -180,6 +180,6 @@ public class Dropdown extends Composite implements HasValueChangeHandlers<String
   }
 
   private SafeHtml createHtmlForIcon(String icon) {
-    return SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-" + icon + "\"></i>");
+    return SafeHtmlUtils.fromSafeConstant("<i class=\"" + icon + "\"></i>");
   }
 }
