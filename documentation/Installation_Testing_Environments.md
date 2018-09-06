@@ -1,4 +1,4 @@
-# Installation in testing environments
+# Installation
 
 This is the easiest way to install RODA. If you want to test drive the software, just follow these instructions based on your operating system. We support MacOS, Windows and Linux.
 
@@ -26,7 +26,7 @@ On Linux, follow these instructions:
 4. Access RODA on your browser: [http://localhost:8080](http://localhost:8080)
 
 NOTE: the docker commands only need `sudo` if your user does not belong to the `docker` group.
-   
+
 NOTE 2: if one wants to run some cronjobs in RODA container, there're two possibilities. But before, lets create a cronjob file with the right permissions (chmod 644 ~/cronjob). In this example we are updating, at 2 am, siegfried signature file:
 
 ```
@@ -68,3 +68,14 @@ These are the steps to start `supervisord`:
 1. Create user 'roda': `sudo adduser roda`
 2. Add user 'roda' to 'docker' group: `sudo usermod -aG docker roda`
 3. Then restart supervisord (`sudo service supervisord restart`)
+
+
+# Going into production
+
+Every production environment is tailored for the specific requirements of the repository to be made available.
+
+Consideration on data volume (size, number of object, heterogeneity of formats), infrastructure type, designated community, high availability requirements, systems to integrated and so forth need to be taken into account when designing  the architecture to put into production.
+
+Many of the production environments we have made involve the use of docker containers, as shown in this instructions. A startup example is available [here](https://github.com/keeps/roda/blob/master/deploys/cloud/docker-compose.yaml).
+
+If you need help scaling your system into production, we provide commercial services for installation, maintenance, support, training, data migration, system integration, custom development and digital preservation consultancy. Please contact [sales@keep.pt](mailto:sales@keep.pt).
