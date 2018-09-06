@@ -30,6 +30,7 @@
 		</repository>
 	</distributionManagement>
 	<repositories>
+		<!--
 		<repository>
 			<id>temporary_dependencies_repository</id>
 			<name>temporary_dependencies_repository</name>
@@ -42,31 +43,11 @@
 			</snapshots>
 			<url>file://${roda.temporary.repository}/repository/</url>
 		</repository>
+		-->
 		<repository>
 			<id>KEEPS-Artifacts</id>
 			<name>KEEP Artifacts-releases (fits, etc.)</name>
 			<url>http://artifactory.keep.pt/keep</url>
-		</repository>
-		<repository>
-			<id>com.springsource.repository.bundles.external</id>
-			<name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
-			<url>http://repository.springsource.com/maven/bundles/external</url>
-		</repository>
-		<repository>
-			<id>google-snapshots</id>
-			<url>https://oss.sonatype.org/content/repositories/google-snapshots/</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>ApacheSVN</id>
-			<name>Apache SVN (saxon, etc.)</name>
-			<url>http://svn.apache.org/repos/asf/servicemix/m2-repo</url>
-		</repository>
-		<repository>
-			<id>ja-sig</id>
-			<url>http://oss.sonatype.org/content/repositories/releases/</url>
 		</repository>
 		<repository>
 			<id>jcenter</id>
@@ -74,10 +55,6 @@
 			<url>http://jcenter.bintray.com</url>
 		</repository>
 	</repositories>
-	<ciManagement>
-		<system>Jenkins</system>
-		<url>http://ci.keep.pt</url>
-	</ciManagement>
 	<developers>
 		<developer>
 			<id>lfaria</id>
@@ -1093,11 +1070,6 @@
 				<groupId>io.dropwizard.metrics</groupId>
 				<artifactId>metrics-jvm</artifactId>
 				<version>${metrics.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.mapdb</groupId>
-				<artifactId>mapdb</artifactId>
-				<version>3.0.6</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
