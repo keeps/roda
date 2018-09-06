@@ -13,7 +13,6 @@ package org.roda.wui.client.search;
 import java.util.Arrays;
 import java.util.List;
 
-import org.roda.core.data.v2.ip.AIPState;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.search.CatalogueSearch;
 import org.roda.wui.common.client.HistoryResolver;
@@ -75,8 +74,7 @@ public class Search extends Composite {
 
   private Search() {
     // Create main search
-    catalogueSearch = new CatalogueSearch(true, "Search_AIPs", "Search_representations", "Search_files", null,
-      AIPState.ACTIVE, null, true);
+    catalogueSearch = new CatalogueSearch(true, "Search_AIPs", "Search_representations", "Search_files", null, true);
 
     initWidget(uiBinder.createAndBindUi(this));
     searchDescription.add(new HTMLWidgetWrapper("SearchDescription.html"));

@@ -47,30 +47,23 @@ public class CatalogueSearch extends Composite {
   @UiField(provided = true)
   SearchWrapper searchWrapper;
 
-  // state
-  final String parentAipId;
-  final AIPState parentAipState;
-  final Permissions permissions;
-
   public CatalogueSearch(boolean justActive, String itemsListId, String representationsListId, String filesListId,
-    String parentAipId, AIPState parentAipState, Permissions permissions, boolean startHidden) {
-
-    this.parentAipId = parentAipId;
-    this.parentAipState = parentAipState;
-    this.permissions = permissions;
+    Permissions permissions, boolean startHidden) {
 
     // prepare lists
     ListBuilder<IndexedAIP> aipListBuilder = new ListBuilder<>(() -> new AIPList(),
       new AsyncTableCellOptions<>(IndexedAIP.class, itemsListId).withJustActive(justActive).bindOpener()
-        .withStartHidden(startHidden).withActionable(AipActions.get(parentAipId, parentAipState, permissions)));
+        .withStartHidden(startHidden)
+        .withActionable(AipActions.getWithoutNoAipActions(null, AIPState.ACTIVE, permissions)));
 
     ListBuilder<IndexedRepresentation> representationListBuilder = new ListBuilder<>(() -> new RepresentationList(),
       new AsyncTableCellOptions<>(IndexedRepresentation.class, representationsListId).withJustActive(justActive)
-        .bindOpener().withStartHidden(startHidden).withActionable(RepresentationActions.get()));
+        .bindOpener().withStartHidden(startHidden)
+        .withActionable(RepresentationActions.getWithoutNoRepresentationActions(null, null)));
 
     ListBuilder<IndexedFile> fileListBuilder = new ListBuilder<>(() -> new SearchFileList(true),
       new AsyncTableCellOptions<>(IndexedFile.class, filesListId).withJustActive(justActive).bindOpener()
-        .withStartHidden(startHidden).withActionable(FileActions.get()));
+        .withStartHidden(startHidden).withActionable(FileActions.getWithoutNoFileActions(null, null, null, null)));
 
     // add lists to search
     searchWrapper = new SearchWrapper(true, IndexedAIP.class.getSimpleName())

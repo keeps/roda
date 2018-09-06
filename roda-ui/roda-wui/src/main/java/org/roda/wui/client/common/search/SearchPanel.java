@@ -167,6 +167,9 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
     }
     actionsButton.setVisible(actionableBuilder != null && list.isSelectable());
     actionsButton.addClickHandler(event -> {
+      if (!list.isVisible()) {
+        doSearch();
+      }
       if (actionableBuilder != null) {
         if (actionsPopup.isShowing()) {
           actionsPopup.hide();
@@ -234,10 +237,6 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
     drawSearchPreFilters();
 
     updateRightButtonsCss();
-
-    // FIXME: WCAG stuff on dropdown (maybe do it on searchwrapper?) (also
-    // WCAGUtilies is not that great...)
-    // WCAGUtilities.getInstance().makeAccessible(searchInputListBox.getElement());
   }
 
   /**

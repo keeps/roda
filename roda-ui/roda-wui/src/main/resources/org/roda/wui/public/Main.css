@@ -1377,10 +1377,10 @@ pre code {
     display: inline;
 }
 
-.dropdown-item .fa,
-.dropdown-label .fa,
-.searchPanelLeft .selected-count-panel .fa {
-    padding-right: 1rem;
+.dropdown-item i,
+.dropdown-label i,
+.searchPanelLeft .selected-count-panel i {
+    margin-right: 1rem;
 }
 
 .open .dropdown-label:after {

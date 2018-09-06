@@ -127,6 +127,16 @@ public class FileActions extends AbstractActionable<IndexedFile> {
     return new FileActions(aipId, representationId, parentFolder, permissions);
   }
 
+  public static FileActions getWithoutNoFileActions(String aipId, String representationId, IndexedFile parentFolder,
+    Permissions permissions) {
+    return new FileActions(aipId, representationId, parentFolder, permissions) {
+      @Override
+      public boolean canAct(Action<IndexedFile> action) {
+        return false;
+      }
+    };
+  }
+
   @Override
   public boolean canAct(Action<IndexedFile> action) {
     return aipId != null && representationId != null && hasPermissions(action, permissions)

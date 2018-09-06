@@ -131,6 +131,16 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     return new AipActions(parentAipId, parentAipState, permissions);
   }
 
+  public static AipActions getWithoutNoAipActions(String parentAipId, AIPState parentAipState,
+    Permissions permissions) {
+    return new AipActions(parentAipId, parentAipState, permissions) {
+      @Override
+      public boolean canAct(Action<IndexedAIP> action) {
+        return false;
+      }
+    };
+  }
+
   @Override
   public boolean canAct(Action<IndexedAIP> action) {
     if (!AIPState.UNDER_APPRAISAL.equals(parentAipState)) {

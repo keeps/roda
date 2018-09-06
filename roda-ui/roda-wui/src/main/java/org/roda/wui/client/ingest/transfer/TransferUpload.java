@@ -242,6 +242,10 @@ public class TransferUpload extends Composite {
   protected void browseResolve(final List<String> historyTokens, final AsyncCallback<Widget> callback) {
     isIngest = false;
 
+    uploadMessage.getElement().setId("upload-message");
+    uploadMessage.setHTML("<span class='success'>" + messages.uploadDoneMessage() + "</span>");
+    uploadMessage.setVisible(false);
+
     if (historyTokens.size() >= 2) {
       aipId = historyTokens.get(0);
       representationId = historyTokens.get(1);

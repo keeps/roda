@@ -10,13 +10,9 @@
  */
 package org.roda.wui.client.search;
 
-import java.util.Arrays;
 import java.util.List;
 
-import org.roda.core.data.v2.ip.AIPState;
-import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.search.CatalogueSearch;
-import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.core.client.GWT;
@@ -50,8 +46,7 @@ public class SearchWithPreFilters extends Composite {
 
   private SearchWithPreFilters() {
     // Create main search
-    catalogueSearch = new CatalogueSearch(true, "Search_AIPs", "Search_representations", "Search_files", null,
-      AIPState.ACTIVE, null, false);
+    catalogueSearch = new CatalogueSearch(true, "Search_AIPs", "Search_representations", "Search_files", null, false);
 
     initWidget(uiBinder.createAndBindUi(this));
     searchDescription.add(new HTMLWidgetWrapper("SearchDescription.html"));

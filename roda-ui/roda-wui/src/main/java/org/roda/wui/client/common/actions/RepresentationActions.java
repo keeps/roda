@@ -102,6 +102,15 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
     return new RepresentationActions(parentAipId, permissions);
   }
 
+  public static RepresentationActions getWithoutNoRepresentationActions(String parentAipId, Permissions permissions) {
+    return new RepresentationActions(parentAipId, permissions) {
+      @Override
+      public boolean canAct(Action<IndexedRepresentation> action) {
+        return false;
+      }
+    };
+  }
+
   @Override
   public boolean canAct(Action<IndexedRepresentation> action) {
     return hasPermissions(action, permissions) && POSSIBLE_ACTIONS_WITHOUT_REPRESENTATION.contains(action) && parentAipId != null;
