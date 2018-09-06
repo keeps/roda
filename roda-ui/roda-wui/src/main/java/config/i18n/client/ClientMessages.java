@@ -1991,4 +1991,12 @@ public interface ClientMessages extends Messages {
   String infoSliderAipInfoTitle();
 
   String infoSliderFileInfoTitle();
+
+  String tableUpdateOn();
+
+  String tableUpdating();
+
+  String tableUpdatePause();
+
+  String tableUpdateErrorConnection();
 }

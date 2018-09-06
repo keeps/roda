@@ -60,6 +60,7 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.AbstractHasData.RedrawEvent;
 import com.google.gwt.user.cellview.client.CellTable;
@@ -1073,22 +1074,26 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
       autoUpdateSignal.setHTML("");
     } else if (autoUpdateState.equals(AutoUpdateState.AUTO_UPDATE_ON)) {
       autoUpdateSignal.setHTML(
-        "<i class=\"fas fa-sync\" title=\"Updating every 10 seconds, click to pause.\" style=\"cursor: pointer\"></i>");
+        "<i class='fas fa-circle-notch fa-spin' title='" + messages.tableUpdateOn() + "' style='cursor: pointer'></i>");
 
       clickHandler = event -> pauseAutoUpdate();
     } else if (autoUpdateState.equals(AutoUpdateState.AUTO_UPDATE_WORKING)) {
-      autoUpdateSignal.setHTML("<i class=\"fas fa-sync fa-spin\" title=\"Updating...\" style=\"cursor: pointer\"></i>");
+      autoUpdateSignal.setHTML(
+        "<i class='fas fa-sync fa-spin' title='" + messages.tableUpdating() + "' style='cursor: pointer'></i>");
     } else if (autoUpdateState.equals(AutoUpdateState.AUTO_UPDATE_PAUSED)) {
       autoUpdateSignal.setHTML(
-        "<i class=\"fas fa-pause-circle\" title=\"Paused, click to resume auto-update.\" style=\"cursor: pointer; color: #222\"></i>");
+        "<i class='fas fa-pause-circle' title='" + messages.tableUpdatePause()
+          + "' style='cursor: pointer; color: #222'></i>");
 
       clickHandler = event -> resumeAutoUpdate();
     } else if (autoUpdateState.equals(AutoUpdateState.AUTO_UPDATE_ERROR)) {
-      autoUpdateSignal.setHTML(
-        "<span class=\"fa-layers fa-fw fa-1x\" title=\"An error occurred while updating: could not connect to server. Click to retry.\" style=\"cursor: pointer\">\n"
-          + "    <i class=\"fas fa-plug\" data-fa-transform=\"grow-2\" style=\"color: #222\"></i>\n"
-          + "    <i class=\"fas fa-times\" data-fa-transform=\"shrink-10 down-7 right-5\" style=\"color:Tomato\"></i>\n"
-          + "  </span>");
+      SafeHtmlBuilder b = new SafeHtmlBuilder();
+      b.appendHtmlConstant("<span title='" + messages.tableUpdateErrorConnection() + "' style='cursor: pointer'>");
+      b.appendHtmlConstant("<i class='fas fa-plug ' style='color: #222'></i>");
+      b.appendHtmlConstant(
+        "<i class='fas fa-times' style='font-size: 0.5em; color: Tomato; margin-left: -2px; vertical-align: text-bottom;'></i>");
+      b.appendHtmlConstant("</span>");
+      autoUpdateSignal.setHTML(b.toSafeHtml());
 
       clickHandler = event -> resumeAutoUpdate();
     }

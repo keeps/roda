@@ -94,7 +94,7 @@ public class UserLog extends Composite {
 
   public UserLog() {
     ListBuilder<LogEntry> logEntryListBuilder = new ListBuilder<>(() -> new LogEntryList(),
-      new AsyncTableCellOptions<>(LogEntry.class, "UserLog_logEntries").bindOpener());
+      new AsyncTableCellOptions<>(LogEntry.class, "UserLog_logEntries").bindOpener().withInitialPageSize(50));
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(logEntryListBuilder);
 
     initWidget(uiBinder.createAndBindUi(this));
