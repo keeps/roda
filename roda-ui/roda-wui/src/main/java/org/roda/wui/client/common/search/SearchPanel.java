@@ -177,18 +177,29 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
           actionableBuilder.withCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
             @Override
             public void onSuccess(Actionable.ActionImpact impact) {
-              if (Actionable.ActionImpact.DESTROYED.equals(impact)) {
+              if (!Actionable.ActionImpact.NONE.equals(impact)) {
                 Timer timer = new Timer() {
                   @Override
                   public void run() {
                     list.refresh();
                   }
                 };
-                timer.schedule(RodaConstants.ACTION_TIMEOUT);
-              } else if (!Actionable.ActionImpact.NONE.equals(impact)) {
-                list.refresh();
+                timer.schedule(RodaConstants.ACTION_TIMEOUT / 2);
               }
               actionsPopup.hide();
+            }
+
+            @Override
+            public void onFailure(Throwable caught) {
+              Timer timer = new Timer() {
+                @Override
+                public void run() {
+                  list.refresh();
+                }
+              };
+              timer.schedule(RodaConstants.ACTION_TIMEOUT / 2);
+              actionsPopup.hide();
+              super.onFailure(caught);
             }
           });
 

@@ -27,7 +27,7 @@
 						<i class="fa fa-play-circle-o"></i>
 					</g:HTML>
 				</wcag:AccessibleFocusPanel>
-				<wcag:AccessibleFocusPanel ui:field="infoSidebarButton" addStyleNames="navigationToolbarLink">
+				<wcag:AccessibleFocusPanel ui:field="infoSidebarButton" addStyleNames="navigationToolbarLink" title="{messages.details}">
 					<g:HTML>
 						<i class="fa fa-list-alt"></i>
 					</g:HTML>

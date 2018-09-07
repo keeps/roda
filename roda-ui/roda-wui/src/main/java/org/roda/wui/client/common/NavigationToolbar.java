@@ -8,8 +8,10 @@
 package org.roda.wui.client.common;
 
 import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
@@ -28,6 +30,7 @@ import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.Bundle;
 import org.roda.wui.client.common.actions.AbstractActionable;
+import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.AipActions;
 import org.roda.wui.client.common.actions.DisseminationActions;
 import org.roda.wui.client.common.actions.DisseminationFileActions;
@@ -70,6 +73,7 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
   private boolean requireControlKeyModifier = true;
   private boolean requireShiftKeyModifier = false;
   private boolean requireAltKeyModifier = false;
+  private Actionable<T> actionable = null;
 
   interface MyUiBinder extends UiBinder<Widget, NavigationToolbar> {
   }
@@ -113,6 +117,17 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
   private Object parentObject = null;
   private Permissions permissions = null;
   private HandlerRegistration searchPopupClickHandler = null;
+
+  private Map<Actionable.ActionImpact, Runnable> handlers = new EnumMap<>(Actionable.ActionImpact.class);
+
+  private AsyncCallback<Actionable.ActionImpact> handler = new NoAsyncCallback<Actionable.ActionImpact>() {
+    @Override
+    public void onSuccess(Actionable.ActionImpact result) {
+      if (handlers.containsKey(result)) {
+        handlers.get(result).run();
+      }
+    }
+  };
 
   public NavigationToolbar() {
     initWidget(uiBinder.createAndBindUi(this));
@@ -183,6 +198,7 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
         requireShiftKeyModifier, requireAltKeyModifier);
     }
     setNavigationButtonTitles();
+    setupSearchPopup();
     setupActions();
   }
 
@@ -214,6 +230,25 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
 
     previousButton.setTitle(modifiers.toString() + '\u21E6');
     nextButton.setTitle(modifiers.toString() + '\u21E8');
+
+    // TODO 2018-09-07 bferreira: after fixing shortcuts, remove code below
+    previousButton.setTitle(messages.searchPrevious());
+    nextButton.setTitle(messages.searchNext());
+  }
+
+  public NavigationToolbar<T> withActionImpactHandler(Actionable.ActionImpact actionImpact, Runnable handler) {
+    this.handlers.put(actionImpact, handler);
+    return this;
+  }
+
+  private void setupSearchPopup() {
+    if (currentObject instanceof IndexedAIP) {
+      SearchPopup searchPopup = new SearchPopup((IndexedAIP) currentObject);
+      searchPopup.addStyleName("ActionableStyleMenu");
+      searchPopupClickHandler = searchButton
+        .addClickHandler(event -> searchPopup.showRelativeTo(searchButton, CalloutPopup.CalloutPosition.TOP_RIGHT));
+      searchButton.setVisible(true);
+    }
   }
 
   private void setupActions() {
@@ -223,12 +258,6 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
     popup.addStyleName("ActionableStyleMenu");
 
     if (currentObject instanceof IndexedAIP) {
-      SearchPopup searchPopup = new SearchPopup((IndexedAIP) currentObject);
-      searchPopup.addStyleName("ActionableStyleMenu");
-      searchPopupClickHandler = searchButton
-        .addClickHandler(event -> searchPopup.showRelativeTo(searchButton, CalloutPopup.CalloutPosition.TOP_RIGHT));
-      searchButton.setVisible(true);
-
       AipActions aipActions;
       IndexedAIP aip = (IndexedAIP) this.currentObject;
       if (aip.getParentID() != null) {
@@ -237,14 +266,15 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
         aipActions = AipActions.get();
       }
 
-      popup.setWidget(new ActionableWidgetBuilder<>(aipActions).buildListWithObjects(new ActionableObject<>(aip)));
+      popup.setWidget(new ActionableWidgetBuilder<>(aipActions).withCallback(handler)
+        .buildListWithObjects(new ActionableObject<>(aip)));
       actionsButton.addClickHandler(event -> popup.showRelativeTo(actionsButton));
       actionsButton.setVisible(true);
     } else if (currentObject instanceof IndexedRepresentation) {
       IndexedRepresentation representation = (IndexedRepresentation) this.currentObject;
       RepresentationActions representationActions = RepresentationActions.get(representation.getAipId(), permissions);
 
-      popup.setWidget(new ActionableWidgetBuilder<>(representationActions)
+      popup.setWidget(new ActionableWidgetBuilder<>(representationActions).withCallback(handler)
         .buildListWithObjects(new ActionableObject<>(representation)));
       actionsButton.addClickHandler(event -> popup.showRelativeTo(actionsButton));
       actionsButton.setVisible(true);
@@ -255,7 +285,8 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
       FileActions fileActions = FileActions.get(file.getAipId(), file.getRepresentationId(),
         file.isDirectory() ? file : null, permissions);
 
-      popup.setWidget(new ActionableWidgetBuilder<>(fileActions).buildListWithObjects(new ActionableObject<>(file)));
+      popup.setWidget(new ActionableWidgetBuilder<>(fileActions).withCallback(handler)
+        .buildListWithObjects(new ActionableObject<>(file)));
       actionsButton.addClickHandler(event -> popup.showRelativeTo(actionsButton));
       actionsButton.setVisible(true);
     } else if (currentObject instanceof IndexedDIP) {
@@ -265,7 +296,8 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
       DisseminationActions disseminationActions = DisseminationActions.get(permissions);
 
       popup.setWidget(
-        new ActionableWidgetBuilder<>(disseminationActions).buildListWithObjects(new ActionableObject<>(dip)));
+        new ActionableWidgetBuilder<>(disseminationActions).withCallback(handler)
+          .buildListWithObjects(new ActionableObject<>(dip)));
       actionsButton.addClickHandler(event -> popup.showRelativeTo(actionsButton));
       actionsButton.setVisible(true);
     } else if (currentObject instanceof DIPFile) {
@@ -275,7 +307,8 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
       DisseminationFileActions disseminationFileActions = DisseminationFileActions.get(permissions);
 
       popup.setWidget(
-        new ActionableWidgetBuilder<>(disseminationFileActions).buildListWithObjects(new ActionableObject<>(dipFile)));
+        new ActionableWidgetBuilder<>(disseminationFileActions).withCallback(handler)
+          .buildListWithObjects(new ActionableObject<>(dipFile)));
       actionsButton.addClickHandler(event -> popup.showRelativeTo(actionsButton));
       actionsButton.setVisible(true);
     } else if (currentObject instanceof TransferredResource) {
@@ -284,7 +317,7 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
       TransferredResource transferredResource = (TransferredResource) this.currentObject;
       TransferredResourceActions transferredResourceActions = TransferredResourceActions.get(null);
 
-      popup.setWidget(new ActionableWidgetBuilder<>(transferredResourceActions)
+      popup.setWidget(new ActionableWidgetBuilder<>(transferredResourceActions).withCallback(handler)
         .buildListWithObjects(new ActionableObject<>(transferredResource)));
       actionsButton.addClickHandler(event -> popup.showRelativeTo(actionsButton));
       actionsButton.setVisible(true);

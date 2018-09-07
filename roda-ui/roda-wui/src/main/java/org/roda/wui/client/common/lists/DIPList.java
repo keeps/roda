@@ -7,6 +7,7 @@
  */
 package org.roda.wui.client.common.lists;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -40,8 +41,11 @@ public class DIPList extends AsyncTableCell<IndexedDIP> {
   private Column<IndexedDIP, Date> dateCreated;
   private Column<IndexedDIP, Date> lastModified;
 
-  private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID,
-    RodaConstants.DIP_DATE_CREATED, RodaConstants.DIP_LAST_MODIFIED, RodaConstants.DIP_TITLE);
+  private static final List<String> fieldsToReturn = new ArrayList<>(RodaConstants.DIP_PERMISSIONS_FIELDS_TO_RETURN);
+  static {
+    fieldsToReturn.addAll(Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIP_ID, RodaConstants.DIP_DATE_CREATED,
+      RodaConstants.DIP_LAST_MODIFIED, RodaConstants.DIP_TITLE));
+  }
 
   @Override
   protected void adjustOptions(AsyncTableCellOptions<IndexedDIP> options) {

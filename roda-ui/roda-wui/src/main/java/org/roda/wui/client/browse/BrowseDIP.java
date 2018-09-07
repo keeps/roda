@@ -23,8 +23,14 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
+import org.roda.core.data.v2.ip.AIPLink;
 import org.roda.core.data.v2.ip.DIPFile;
+import org.roda.core.data.v2.ip.FileLink;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.RepresentationLink;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.BrowseDipBundle;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
@@ -32,6 +38,7 @@ import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.Bundle;
 import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.DisseminationFileActions;
 import org.roda.wui.client.common.lists.DIPFileList;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
@@ -45,6 +52,7 @@ import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 
 import com.google.gwt.core.client.GWT;
@@ -178,8 +186,22 @@ public class BrowseDIP extends Composite {
     }
 
     NavigationToolbar<IsIndexed> bottomNavigationToolbar = new NavigationToolbar<>();
-    bottomNavigationToolbar.withAlternativeStyle(true);
     bottomNavigationToolbar.withObject(dipFile != null ? dipFile : dip);
+    bottomNavigationToolbar.withActionImpactHandler(Actionable.ActionImpact.DESTROYED, () -> {
+      if (dipFile == null) {
+        // dip was removed
+        if (!dip.getFileIds().isEmpty()) {
+          FileLink link = dip.getFileIds().get(0);
+          HistoryUtils.openBrowse(link.getAipId(), link.getRepresentationId(), link.getPath(), link.getFileId());
+        } else if (!dip.getRepresentationIds().isEmpty()) {
+          RepresentationLink link = dip.getRepresentationIds().get(0);
+          HistoryUtils.openBrowse(link.getAipId(), link.getRepresentationId());
+        } else if (!dip.getAipIds().isEmpty()) {
+          AIPLink link = dip.getAipIds().get(0);
+          HistoryUtils.openBrowse(link.getAipId());
+        }
+      }
+    });
     bottomNavigationToolbar.withPermissions(dip.getPermissions());
     bottomNavigationToolbar.updateBreadcrumb(bundle);
     bottomNavigationToolbar.setHeader(messages.catalogueDIPTitle());
@@ -191,8 +213,9 @@ public class BrowseDIP extends Composite {
     // if referrerBundle is not present (lack of permissions), show only the DIP
     if (referrerBundle instanceof BrowseAIPBundle || referrerBundle instanceof BrowseRepresentationBundle
       || referrerBundle instanceof BrowseFileBundle) {
-      bottomNavigationToolbar.addStyleDependentName("alt");
+      bottomNavigationToolbar.withAlternativeStyle(true);
 
+      Runnable deleteActionImpactHandler;
       NavigationToolbar<IsIndexed> topNavigationToolbar = new NavigationToolbar<>();
       ListSelectionUtils.ProcessRelativeItem<IsIndexed> processor;
       String title;
@@ -201,19 +224,36 @@ public class BrowseDIP extends Composite {
         processor = referredObject -> openReferred(referredObject,
           new Filter(new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, referredObject.getUUID())));
         title = messages.catalogueFileTitle();
+        deleteActionImpactHandler = () -> {
+          IndexedFile file = (IndexedFile) bundle.getReferrer();
+          HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, file.getAipId(), file.getRepresentationId());
+        };
       } else if (referrerBundle instanceof BrowseRepresentationBundle) {
         processor = referredObject -> openReferred(referredObject,
           new Filter(new SimpleFilterParameter(RodaConstants.DIP_REPRESENTATION_UUIDS, referredObject.getUUID())));
         title = messages.catalogueRepresentationTitle();
+        deleteActionImpactHandler = () -> {
+          IndexedRepresentation representation = (IndexedRepresentation) bundle.getReferrer();
+          HistoryUtils.newHistory(BrowseAIP.RESOLVER, representation.getAipId());
+        };
       } else {
         processor = referredObject -> openReferred(referredObject,
           new Filter(new SimpleFilterParameter(RodaConstants.DIP_AIP_UUIDS, referredObject.getUUID())));
         title = messages.catalogueItemTitle();
+        deleteActionImpactHandler = () -> {
+          IndexedAIP aip = (IndexedAIP) bundle.getReferrer();
+          if (StringUtils.isNotBlank(aip.getParentID())) {
+            HistoryUtils.newHistory(BrowseTop.RESOLVER, aip.getParentID());
+          } else {
+            HistoryUtils.newHistory(BrowseTop.RESOLVER);
+          }
+        };
       }
 
       topNavigationToolbar.setHeader(title);
       topNavigationToolbar.withObject(bundle.getReferrer());
       topNavigationToolbar.withProcessor(processor);
+      topNavigationToolbar.withActionImpactHandler(Actionable.ActionImpact.DESTROYED, deleteActionImpactHandler);
       topNavigationToolbar.withModifierKeys(true, true, false);
       topNavigationToolbar.withPermissions(bundle.getReferrerPermissions());
       topNavigationToolbar.updateBreadcrumb(bundle.getReferrerBundle());

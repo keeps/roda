@@ -31,6 +31,7 @@ import org.roda.wui.client.browse.bundle.DescriptiveMetadataViewBundle;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.DisseminationActions;
 import org.roda.wui.client.common.actions.FileActions;
 import org.roda.wui.client.common.lists.DIPList;
@@ -253,7 +254,10 @@ public class BrowseRepresentation extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
 
     // NAVIGATION TOOLBAR
-    navigationToolbar.withObject(representation).withPermissions(aip.getPermissions()).build();
+    navigationToolbar.withObject(representation).withPermissions(aip.getPermissions())
+      .withActionImpactHandler(Actionable.ActionImpact.DESTROYED,
+        () -> HistoryUtils.newHistory(BrowseAIP.RESOLVER, representation.getAipId()))
+      .build();
 
     updateLayout(bundle, state, justActive);
 

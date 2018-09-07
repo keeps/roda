@@ -23,7 +23,6 @@ import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.CreateDescriptiveMetadata;
 import org.roda.wui.client.browse.EditPermissions;
@@ -53,7 +52,6 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.safehtml.shared.SafeUri;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -452,26 +450,13 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
                           @Override
                           public void onFailure(Throwable caught) {
                             Toast.showInfo(messages.removingSuccessTitle(), messages.removingSuccessMessage(1L));
-
-                            Timer timer = new Timer() {
-                              @Override
-                              public void run() {
-                                if (parentId != null) {
-                                  HistoryUtils.newHistory(BrowseTop.RESOLVER, parentId);
-                                } else {
-                                  HistoryUtils.newHistory(BrowseTop.RESOLVER);
-                                }
-                                callback.onFailure(caught);
-                              }
-                            };
-
-                            timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                            doActionCallbackDestroyed();
                           }
 
                           @Override
                           public void onSuccess(final Void nothing) {
                             HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-                            doActionCallbackDestroyed();
+                            doActionCallbackNone();
                           }
                         });
                       }

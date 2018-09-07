@@ -40,7 +40,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.safehtml.shared.SafeUri;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -234,22 +233,13 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
 
                             @Override
                             public void onFailure(Throwable caught) {
-                              Timer timer = new Timer() {
-                                @Override
-                                public void run() {
-                                  if (parentAipId != null) {
-                                    HistoryUtils.openBrowse(parentAipId);
-                                  }
-                                  doActionCallbackDestroyed();
-                                }
-                              };
-
-                              timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                              doActionCallbackDestroyed();
                             }
 
                             @Override
                             public void onSuccess(final Void nothing) {
                               HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                              doActionCallbackNone();
                             }
                           });
                       }
@@ -257,6 +247,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
                       @Override
                       public void onFailure(Throwable caught) {
                         HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                        doActionCallbackNone();
                       }
                     });
                 }

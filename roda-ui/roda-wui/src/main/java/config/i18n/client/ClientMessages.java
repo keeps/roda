@@ -1999,4 +1999,6 @@ public interface ClientMessages extends Messages {
   String tableUpdatePause();
 
   String tableUpdateErrorConnection();
+
+  String details();
 }

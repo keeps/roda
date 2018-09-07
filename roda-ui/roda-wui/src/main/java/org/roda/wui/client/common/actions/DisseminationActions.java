@@ -14,11 +14,8 @@ import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.ip.AIPLink;
-import org.roda.core.data.v2.ip.FileLink;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.Permissions;
-import org.roda.core.data.v2.ip.RepresentationLink;
 import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.EditPermissions;
@@ -160,17 +157,6 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
 
                       @Override
                       public void onSuccessImpl(Void result) {
-                        if (!dip.getFileIds().isEmpty()) {
-                          FileLink link = dip.getFileIds().get(0);
-                          HistoryUtils.openBrowse(link.getAipId(), link.getRepresentationId(), link.getPath(),
-                            link.getFileId());
-                        } else if (!dip.getRepresentationIds().isEmpty()) {
-                          RepresentationLink link = dip.getRepresentationIds().get(0);
-                          HistoryUtils.openBrowse(link.getAipId(), link.getRepresentationId());
-                        } else if (!dip.getAipIds().isEmpty()) {
-                          AIPLink link = dip.getAipIds().get(0);
-                          HistoryUtils.openBrowse(link.getAipId());
-                        }
                         doActionCallbackDestroyed();
                       }
                     });

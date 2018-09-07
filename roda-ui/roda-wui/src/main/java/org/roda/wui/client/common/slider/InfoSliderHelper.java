@@ -75,7 +75,7 @@ public class InfoSliderHelper {
     HashMap<String, Widget> values = new HashMap<>();
 
     infoSliderPanel.clear();
-    infoSliderPanel.addTitle(new Label(messages.infoSliderAipInfoTitle()));
+    infoSliderPanel.addTitle(new Label(messages.oneOfAObject(IndexedAIP.class.getName())));
 
     if (aip != null) {
       if (StringUtils.isNotBlank(aip.getLevel())) {
@@ -100,7 +100,7 @@ public class InfoSliderHelper {
     HashMap<String, Widget> values = new HashMap<>();
 
     infoSliderPanel.clear();
-    infoSliderPanel.addTitle(new Label(messages.infoSliderRepresentationTitle()));
+    infoSliderPanel.addTitle(new Label(messages.oneOfAObject(IndexedRepresentation.class.getName())));
 
     if (representation != null) {
       if (StringUtils.isNotBlank(messages.representationType())) {
@@ -130,7 +130,7 @@ public class InfoSliderHelper {
 
     HashMap<String, Widget> values = new HashMap<>();
     infoSliderPanel.clear();
-    infoSliderPanel.addTitle(new Label(messages.infoSliderRepresentationTitle()));
+    infoSliderPanel.addTitle(new Label(messages.oneOfAObject(IndexedRepresentation.class.getName())));
 
     values.put(messages.representationId(), createIdHTML(bundle));
 
@@ -156,7 +156,7 @@ public class InfoSliderHelper {
 
     HashMap<String, Widget> values = new HashMap<>();
     infoSliderPanel.clear();
-    infoSliderPanel.addTitle(new Label(messages.infoSliderAipInfoTitle()));
+    infoSliderPanel.addTitle(new Label(messages.oneOfAObject(IndexedAIP.class.getName())));
 
     values.put(messages.itemId(), createIdHTML(bundle));
 
@@ -350,7 +350,7 @@ public class InfoSliderHelper {
   public static void updateInfoSliderPanel(BrowseFileBundle bundle, SliderPanel infoSliderPanel) {
     HashMap<String, Widget> values = new HashMap<>();
     infoSliderPanel.clear();
-    infoSliderPanel.addTitle(new Label(messages.infoSliderFileInfoTitle()));
+    infoSliderPanel.addTitle(new Label(messages.oneOfAObject(IndexedFile.class.getName())));
     IndexedFile file = bundle.getFile();
 
     if (file != null) {

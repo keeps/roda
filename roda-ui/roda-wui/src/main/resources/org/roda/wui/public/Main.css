@@ -383,6 +383,7 @@ div.inline {
 
 .slider-title {
 	margin-top: 20px;
+    text-transform: capitalize;
 }
 
 .slider .slider-layout {

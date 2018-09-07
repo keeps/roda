@@ -29,6 +29,7 @@ import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataViewBundle;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.NavigationToolbar;
+import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.AipActions;
 import org.roda.wui.client.common.actions.DisseminationActions;
 import org.roda.wui.client.common.actions.RepresentationActions;
@@ -108,9 +109,9 @@ public class BrowseAIP extends Composite {
           HistoryUtils.newHistory(BrowseTop.RESOLVER);
         } else {
           List<String> fieldsToReturn = new ArrayList<>(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
-          fieldsToReturn.addAll(new ArrayList<>(Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_STATE,
+          fieldsToReturn.addAll(Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_STATE,
             RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL, RodaConstants.INGEST_SIP_IDS, RodaConstants.INGEST_JOB_ID,
-            RodaConstants.INGEST_UPDATE_JOB_IDS)));
+            RodaConstants.INGEST_UPDATE_JOB_IDS));
 
           BrowserService.Util.getInstance().retrieveBrowseAIPBundle(id, LocaleInfo.getCurrentLocale().getLocaleName(),
             fieldsToReturn, new AsyncCallback<BrowseAIPBundle>() {
@@ -291,7 +292,16 @@ public class BrowseAIP extends Composite {
     aipState.setVisible(!justActive);
 
     // NAVIGATION TOOLBAR
-    navigationToolbar.withObject(aip).withPermissions(aip.getPermissions()).build();
+    navigationToolbar.withObject(aip);
+    navigationToolbar.withPermissions(aip.getPermissions());
+    navigationToolbar.withActionImpactHandler(Actionable.ActionImpact.DESTROYED, () -> {
+      if (StringUtils.isNotBlank(aip.getParentID())) {
+        HistoryUtils.newHistory(BrowseTop.RESOLVER, aip.getParentID());
+      } else {
+        HistoryUtils.newHistory(BrowseTop.RESOLVER);
+      }
+    });
+    navigationToolbar.build();
 
     // IDENTIFICATION
     updateSectionIdentification(bundle);
