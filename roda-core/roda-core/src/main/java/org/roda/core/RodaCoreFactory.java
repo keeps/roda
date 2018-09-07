@@ -46,10 +46,13 @@ import java.util.stream.Collectors;
 
 import javax.xml.validation.Schema;
 
+import org.apache.commons.configuration.CombinedConfiguration;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration.tree.MergeCombiner;
+import org.apache.commons.configuration.tree.NodeCombiner;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrClient;
@@ -1484,13 +1487,18 @@ public class RodaCoreFactory {
 
   private static Configuration getConfiguration(String configurationFile) throws ConfigurationException {
     Path config = RodaCoreFactory.getConfigPath().resolve(configurationFile);
-    Configuration configuration;
+
+    NodeCombiner combiner = new MergeCombiner();
+    CombinedConfiguration cc = new CombinedConfiguration(combiner);
 
     if (FSUtils.exists(config)) {
-      configuration = getExternalConfiguration(config);
-    } else {
-      configuration = getInternalConfiguration(configurationFile);
+      cc.addConfiguration(getExternalConfiguration(config));
     }
+    
+    cc.addConfiguration(getInternalConfiguration(configurationFile));
+
+    // do variable interpolation
+    Configuration configuration = cc.interpolatedConfiguration();
 
     return configuration;
   }
@@ -1502,7 +1510,8 @@ public class RodaCoreFactory {
     return propertiesConfiguration;
   }
 
-  private static Configuration getInternalConfiguration(String configurationFile) throws ConfigurationException {
+  private static PropertiesConfiguration getInternalConfiguration(String configurationFile)
+    throws ConfigurationException {
     PropertiesConfiguration propertiesConfiguration = initConfiguration();
     InputStream inputStream = RodaCoreFactory.class
       .getResourceAsStream("/" + RodaConstants.CORE_CONFIG_FOLDER + "/" + configurationFile);
@@ -1514,13 +1523,10 @@ public class RodaCoreFactory {
       LOGGER.trace("Configuration {} doesn't exist", configurationFile);
     }
 
-    // do variable interpolation
-    Configuration configuration = propertiesConfiguration.interpolatedConfiguration();
-
-    return configuration;
+    return propertiesConfiguration;
   }
 
-  private static Configuration getExternalConfiguration(Path config) throws ConfigurationException {
+  private static PropertiesConfiguration getExternalConfiguration(Path config) throws ConfigurationException {
     PropertiesConfiguration propertiesConfiguration = initConfiguration();
     LOGGER.trace("Loading configuration from file {}", config);
     propertiesConfiguration.load(config.toFile());
@@ -1528,10 +1534,7 @@ public class RodaCoreFactory {
     rodaPropertiesReloadStrategy.setRefreshDelay(5000);
     propertiesConfiguration.setReloadingStrategy(rodaPropertiesReloadStrategy);
 
-    // do variable interpolation
-    Configuration configuration = propertiesConfiguration.interpolatedConfiguration();
-
-    return configuration;
+    return propertiesConfiguration;
   }
 
   private static boolean checkPathIsWithin(Path path, Path folder) {
