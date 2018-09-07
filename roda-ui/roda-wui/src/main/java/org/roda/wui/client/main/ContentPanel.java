@@ -61,6 +61,8 @@ public class ContentPanel extends SimplePanel {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private Widget currWidget;
+  private List<String> lastHistoryTokens = null;
+  private HistoryResolver lastResolver = null;
 
   private ContentPanel() {
     super();
@@ -193,6 +195,8 @@ public class ContentPanel extends SimplePanel {
               if (widget != null) {
                 if (widget != currWidget) {
                   currWidget = widget;
+                  ContentPanel.this.lastHistoryTokens = historyTokens;
+                  ContentPanel.this.lastResolver = resolver;
                   setWidget(widget);
                 }
                 setWindowTitle(historyTokens);

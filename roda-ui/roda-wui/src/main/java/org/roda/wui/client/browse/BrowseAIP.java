@@ -29,6 +29,7 @@ import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataViewBundle;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.NavigationToolbar;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.AipActions;
 import org.roda.wui.client.common.actions.DisseminationActions;
@@ -47,7 +48,6 @@ import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.management.UserLog;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
-import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -75,6 +75,7 @@ import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
@@ -108,28 +109,18 @@ public class BrowseAIP extends Composite {
         if (id == null) {
           HistoryUtils.newHistory(BrowseTop.RESOLVER);
         } else {
-          List<String> fieldsToReturn = new ArrayList<>(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
-          fieldsToReturn.addAll(Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_STATE,
-            RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL, RodaConstants.INGEST_SIP_IDS, RodaConstants.INGEST_JOB_ID,
-            RodaConstants.INGEST_UPDATE_JOB_IDS));
+          container = new SimplePanel();
+          refresh(id, new AsyncCallback<BrowseAIPBundle>() {
+            @Override
+            public void onFailure(Throwable caught) {
+              callback.onFailure(caught);
+            }
 
-          BrowserService.Util.getInstance().retrieveBrowseAIPBundle(id, LocaleInfo.getCurrentLocale().getLocaleName(),
-            fieldsToReturn, new AsyncCallback<BrowseAIPBundle>() {
-
-              @Override
-              public void onFailure(Throwable caught) {
-                AsyncCallbackUtils.defaultFailureTreatment(caught, Welcome.RESOLVER.getHistoryPath());
-              }
-
-              @Override
-              public void onSuccess(BrowseAIPBundle bundle) {
-                if (bundle != null) {
-                  callback.onSuccess(new BrowseAIP(bundle));
-                } else {
-                  HistoryUtils.newHistory(BrowseTop.RESOLVER);
-                }
-              }
-            });
+            @Override
+            public void onSuccess(BrowseAIPBundle result) {
+              callback.onSuccess(container);
+            }
+          });
         }
       } else {
         HistoryUtils.newHistory(RESOLVER);
@@ -152,6 +143,32 @@ public class BrowseAIP extends Composite {
       return BrowseTop.RESOLVER.getHistoryPath();
     }
   };
+
+  private static SimplePanel container;
+
+  private static void refresh(String id, AsyncCallback<BrowseAIPBundle> callback) {
+    BrowserService.Util.getInstance().retrieveBrowseAIPBundle(id, LocaleInfo.getCurrentLocale().getLocaleName(),
+      fieldsToReturn, new AsyncCallback<BrowseAIPBundle>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          callback.onFailure(caught);
+        }
+
+        @Override
+        public void onSuccess(BrowseAIPBundle bundle) {
+          container.setWidget(new BrowseAIP(bundle));
+          callback.onSuccess(bundle);
+        }
+      });
+  }
+
+  private static List<String> fieldsToReturn = new ArrayList<>(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+  static {
+    fieldsToReturn.addAll(
+      Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_STATE, RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL,
+        RodaConstants.INGEST_SIP_IDS, RodaConstants.INGEST_JOB_ID, RodaConstants.INGEST_UPDATE_JOB_IDS));
+  }
 
   interface MyUiBinder extends UiBinder<Widget, BrowseAIP> {
   }
@@ -300,6 +317,14 @@ public class BrowseAIP extends Composite {
       } else {
         HistoryUtils.newHistory(BrowseTop.RESOLVER);
       }
+    });
+    navigationToolbar.withActionImpactHandler(Actionable.ActionImpact.UPDATED, () -> {
+      refresh(aipId, new NoAsyncCallback<BrowseAIPBundle>() {
+        @Override
+        public void onSuccess(BrowseAIPBundle aipBundle) {
+          container.setWidget(new BrowseAIP(aipBundle));
+        }
+      });
     });
     navigationToolbar.build();
 
