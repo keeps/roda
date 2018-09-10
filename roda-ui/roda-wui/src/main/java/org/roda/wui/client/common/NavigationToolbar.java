@@ -198,6 +198,8 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
         requireShiftKeyModifier, requireAltKeyModifier);
     }
     setNavigationButtonTitles();
+
+    clearSearchPopupHandlers();
     setupSearchPopup();
     setupActions();
   }
@@ -252,8 +254,6 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
   }
 
   private void setupActions() {
-    clearSearchPopupHandlers();
-
     CalloutPopup popup = new CalloutPopup();
     popup.addStyleName("ActionableStyleMenu");
 

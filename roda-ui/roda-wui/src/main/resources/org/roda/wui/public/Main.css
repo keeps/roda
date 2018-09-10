@@ -2468,10 +2468,6 @@ td.datePickerMonth, td.datePickerYear {
     background-color: white;
 }
 
-.browseItemMetadata .gwt-TabBarFirst-wrapper {
-    padding-right: 3px;
-}
-
 .browseItemMetadata .addTabWrapper .fa {
     vertical-align: sub;
 }
@@ -2480,7 +2476,6 @@ td.datePickerMonth, td.datePickerYear {
     line-height: 4rem;
     width: 40px;
     height: 40px;
-    border-left: 1px solid #aaa;
 }
 
 .browseItemMetadata .descriptiveMetadataLinks {
@@ -2489,6 +2484,11 @@ td.datePickerMonth, td.datePickerYear {
 
 .browseItemMetadata .descriptiveMetadataTabButtons {
     float:right;
+}
+
+.descriptiveMetadataCard .gwt-TabBarItem-wrapper-selected {
+    background-color: white;
+    border-top: 1px solid #089de3;
 }
 
 .descriptiveMetadataHTML {
