@@ -43,7 +43,9 @@ import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.JobActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
@@ -227,10 +229,13 @@ public class ShowJob extends Composite {
   // SIDEBAR
 
   @UiField
-  Button buttonAppraisal, buttonBack, buttonStop, buttonProcess;
+  SimplePanel actionsSidebar;
 
   @UiField
-  SimplePanel actionsSidebar;
+  FlowPanel sidebar;
+
+  @UiField
+  FlowPanel content;
 
   public ShowJob(Job job, Map<String, PluginInfo> pluginsInfo, List<FilterParameter> extraReportFilterParameters) {
     this.job = job;
@@ -266,8 +271,6 @@ public class ShowJob extends Composite {
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(jobReportListBuilder);
 
     initWidget(uiBinder.createAndBindUi(this));
-
-    buttonProcess.setVisible(isIngest);
 
     name.setText(job.getName());
     creator.setText(job.getUsername());
@@ -314,9 +317,34 @@ public class ShowJob extends Composite {
       pluginPanel.setVisible(false);
       pluginOptions.setVisible(false);
     }
+  }
 
+  private void refreshSidebar() {
     actionsSidebar.setWidget(new ActionableWidgetBuilder<>(JobActions.get(ShowJob.RESOLVER))
-      .buildListWithObjects(new ActionableObject<>(job)));
+      .withActionCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
+        @Override
+        public void onSuccess(Actionable.ActionImpact result) {
+          BrowserService.Util.getInstance().retrieve(Job.class.getName(), job.getId(), fieldsToReturn,
+            new NoAsyncCallback<Job>() {
+              @Override
+              public void onSuccess(Job updatedJob) {
+                ShowJob.this.job = updatedJob;
+                update();
+              }
+            });
+        }
+      }).withWidgetCreatedHandler(buttonCount -> {
+        // hide sidebar if we don't have actions
+        if (buttonCount > 0) {
+          content.removeStyleName("col_12");
+          content.addStyleName("col_10");
+          sidebar.setVisible(true);
+        } else {
+          content.removeStyleName("col_10");
+          content.addStyleName("col_12");
+          sidebar.setVisible(false);
+        }
+      }).buildListWithObjects(new ActionableObject<>(job)));
   }
 
   @Override
@@ -522,13 +550,7 @@ public class ShowJob extends Composite {
 
     progress.setHTML(b.toSafeHtml());
 
-    buttonStop.setText(messages.stopButton());
-    buttonStop.setVisible(!job.isInFinalState());
-    buttonStop.setEnabled(!job.isStopping());
-
-    buttonAppraisal
-      .setText(messages.appraisalTitle() + " (" + job.getJobStats().getOutcomeObjectsWithManualIntervention() + ")");
-    buttonAppraisal.setVisible(job.getJobStats().getOutcomeObjectsWithManualIntervention() > 0);
+    refreshSidebar();
 
     scheduleUpdateStatus();
   }

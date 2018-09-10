@@ -258,7 +258,7 @@ public class ShowRepresentationInformation extends Composite {
       });
 
     actionableWidgetBuilder = new ActionableWidgetBuilder<>(RepresentationInformationActions.get())
-      .withCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
+      .withActionCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
         @Override
         public void onSuccess(Actionable.ActionImpact result) {
           if (result.equals(Actionable.ActionImpact.DESTROYED)) {
@@ -299,21 +299,21 @@ public class ShowRepresentationInformation extends Composite {
       aipFilter.add(new OrFiltersParameters(aipParams));
 
       BrowserService.Util.getInstance().count(IndexedAIP.class.getName(), aipFilter, true,
-        initEntityFiltersObjectPanel(RodaConstants.SEARCH_ITEMS));
+        initEntityFiltersObjectPanel(IndexedAIP.class.getSimpleName()));
     } else if (!representationParams.isEmpty()) {
       Filter representationFilter = new Filter();
       representationFilter.add(new OrFiltersParameters(representationParams));
 
       BrowserService.Util.getInstance().count(IndexedRepresentation.class.getName(), representationFilter, true,
-        initEntityFiltersObjectPanel(RodaConstants.SEARCH_REPRESENTATIONS));
+        initEntityFiltersObjectPanel(IndexedRepresentation.class.getSimpleName()));
     } else if (!fileParams.isEmpty()) {
       Filter fileFilter = new Filter();
       fileFilter.add(new OrFiltersParameters(fileParams));
 
       BrowserService.Util.getInstance().count(IndexedFile.class.getName(), fileFilter, true,
-        initEntityFiltersObjectPanel(RodaConstants.SEARCH_FILES));
+        initEntityFiltersObjectPanel(IndexedFile.class.getSimpleName()));
     } else {
-      initEntityFiltersObjectPanel(RodaConstants.SEARCH_ITEMS).onSuccess(0L);
+      initEntityFiltersObjectPanel(IndexedAIP.class.getSimpleName()).onSuccess(0L);
     }
   }
 
@@ -334,11 +334,11 @@ public class ShowRepresentationInformation extends Composite {
         InlineHTML label = new InlineHTML();
         label.addStyleName("ri-form-label-inline");
 
-        if (RodaConstants.SEARCH_ITEMS.equals(searchType)) {
+        if (IndexedAIP.class.getSimpleName().equals(searchType)) {
           label.setHTML(messages.representationInformationIntellectualEntities(size.intValue(), url));
-        } else if (RodaConstants.SEARCH_REPRESENTATIONS.equals(searchType)) {
+        } else if (IndexedRepresentation.class.getSimpleName().equals(searchType)) {
           label.setHTML(messages.representationInformationRepresentations(size.intValue(), url));
-        } else if (RodaConstants.SEARCH_FILES.equals(searchType)) {
+        } else if (IndexedFile.class.getSimpleName().equals(searchType)) {
           label.setHTML(messages.representationInformationFiles(size.intValue(), url));
         }
 

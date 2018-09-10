@@ -266,7 +266,7 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
         aipActions = AipActions.get();
       }
 
-      popup.setWidget(new ActionableWidgetBuilder<>(aipActions).withCallback(handler)
+      popup.setWidget(new ActionableWidgetBuilder<>(aipActions).withActionCallback(handler)
         .buildListWithObjects(new ActionableObject<>(aip)));
       actionsButton.addClickHandler(event -> popup.showRelativeTo(actionsButton));
       actionsButton.setVisible(true);
@@ -274,7 +274,7 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
       IndexedRepresentation representation = (IndexedRepresentation) this.currentObject;
       RepresentationActions representationActions = RepresentationActions.get(representation.getAipId(), permissions);
 
-      popup.setWidget(new ActionableWidgetBuilder<>(representationActions).withCallback(handler)
+      popup.setWidget(new ActionableWidgetBuilder<>(representationActions).withActionCallback(handler)
         .buildListWithObjects(new ActionableObject<>(representation)));
       actionsButton.addClickHandler(event -> popup.showRelativeTo(actionsButton));
       actionsButton.setVisible(true);
@@ -285,7 +285,7 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
       FileActions fileActions = FileActions.get(file.getAipId(), file.getRepresentationId(),
         file.isDirectory() ? file : null, permissions);
 
-      popup.setWidget(new ActionableWidgetBuilder<>(fileActions).withCallback(handler)
+      popup.setWidget(new ActionableWidgetBuilder<>(fileActions).withActionCallback(handler)
         .buildListWithObjects(new ActionableObject<>(file)));
       actionsButton.addClickHandler(event -> popup.showRelativeTo(actionsButton));
       actionsButton.setVisible(true);
@@ -296,7 +296,7 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
       DisseminationActions disseminationActions = DisseminationActions.get(permissions);
 
       popup.setWidget(
-        new ActionableWidgetBuilder<>(disseminationActions).withCallback(handler)
+        new ActionableWidgetBuilder<>(disseminationActions).withActionCallback(handler)
           .buildListWithObjects(new ActionableObject<>(dip)));
       actionsButton.addClickHandler(event -> popup.showRelativeTo(actionsButton));
       actionsButton.setVisible(true);
@@ -307,7 +307,7 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
       DisseminationFileActions disseminationFileActions = DisseminationFileActions.get(permissions);
 
       popup.setWidget(
-        new ActionableWidgetBuilder<>(disseminationFileActions).withCallback(handler)
+        new ActionableWidgetBuilder<>(disseminationFileActions).withActionCallback(handler)
           .buildListWithObjects(new ActionableObject<>(dipFile)));
       actionsButton.addClickHandler(event -> popup.showRelativeTo(actionsButton));
       actionsButton.setVisible(true);
@@ -317,7 +317,7 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
       TransferredResource transferredResource = (TransferredResource) this.currentObject;
       TransferredResourceActions transferredResourceActions = TransferredResourceActions.get(null);
 
-      popup.setWidget(new ActionableWidgetBuilder<>(transferredResourceActions).withCallback(handler)
+      popup.setWidget(new ActionableWidgetBuilder<>(transferredResourceActions).withActionCallback(handler)
         .buildListWithObjects(new ActionableObject<>(transferredResource)));
       actionsButton.addClickHandler(event -> popup.showRelativeTo(actionsButton));
       actionsButton.setVisible(true);
@@ -433,10 +433,10 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
     @Override
     public void act(Action<IndexedAIP> action, IndexedAIP object, AsyncCallback<ActionImpact> callback) {
       if (action.equals(SearchAipAction.SEARCH_DESCENDANTS)) {
-        HistoryUtils.newHistory(Search.RESOLVER, RodaConstants.SEARCH_ITEMS, RodaConstants.AIP_ANCESTORS,
+        HistoryUtils.newHistory(Search.RESOLVER, IndexedAIP.class.getSimpleName(), RodaConstants.AIP_ANCESTORS,
           object.getId());
       } else if (action.equals(SearchAipAction.SEARCH_PACKAGE)) {
-        HistoryUtils.newHistory(Search.RESOLVER, RodaConstants.SEARCH_REPRESENTATIONS,
+        HistoryUtils.newHistory(Search.RESOLVER, IndexedRepresentation.class.getSimpleName(),
           RodaConstants.REPRESENTATION_AIP_ID, object.getId());
       } else {
         unsupportedAction(action, callback);

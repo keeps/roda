@@ -15,8 +15,12 @@ import java.util.List;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.actions.JobActions;
+import org.roda.wui.client.common.actions.model.ActionableObject;
+import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.ingest.process.ShowJob;
@@ -28,14 +32,12 @@ import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -97,7 +99,7 @@ public class IngestProcess extends Composite {
   JobSearch jobSearch;
 
   @UiField
-  Button newJob;
+  SimplePanel actionsSidebar;
 
   private IngestProcess() {
     Filter jobIngestFilter = new Filter(
@@ -109,17 +111,15 @@ public class IngestProcess extends Composite {
       true);
     initWidget(uiBinder.createAndBindUi(this));
     ingestProcessDescription.add(new HTMLWidgetWrapper("IngestProcessDescription.html"));
+
+    actionsSidebar.setWidget(new ActionableWidgetBuilder<>(JobActions.get(IngestTransfer.RESOLVER))
+      .buildListWithObjects(new ActionableObject<>(Job.class)));
   }
 
   @Override
   protected void onLoad() {
     super.onLoad();
     JavascriptUtils.stickSidebar();
-  }
-
-  @UiHandler("newJob")
-  void handleNewJobAction(ClickEvent e) {
-    HistoryUtils.newHistory(IngestTransfer.RESOLVER);
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {

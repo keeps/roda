@@ -9,7 +9,7 @@
 
 	<g:FlowPanel styleName="wui-ingest-new" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
-			<g:FlowPanel addStyleNames="col_10 content">
+			<g:FlowPanel addStyleNames="col_10 content" ui:field="content">
 				<g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
 					<g:FlowPanel addStyleNames="row full_width no_padding">
 						<g:FlowPanel addStyleNames="wui-data-panel">
@@ -97,27 +97,10 @@
 				</g:FlowPanel>
 			</g:FlowPanel>
 
-			<g:FlowPanel addStyleNames="col_2 last sidebar">
+			<g:FlowPanel addStyleNames="col_2 last sidebar" ui:field="sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">
 					<g:FlowPanel addStyleNames="sticky-padding">
-						<g:SimplePanel visible="false" ui:field="actionsSidebar" />
-						<g:FlowPanel addStyleNames="sidebar-group">
-							<g:Label addStyleNames="h4">
-								<ui:text from='{messages.sidebarActionsTitle}' />
-							</g:Label>
-							<g:Button addStyleNames="btn btn-block btn-danger btn-stop" ui:field="buttonStop">
-								<ui:text from='{messages.stopButton}' />
-							</g:Button>
-							<g:Button addStyleNames="btn btn-block btn-play" ui:field="buttonAppraisal">
-								<ui:text from='{messages.sidebarAppraisalTitle}' />
-							</g:Button>
-							<g:Button addStyleNames="btn btn-block btn-play" ui:field="buttonProcess">
-								<ui:text from='{messages.listButton}' />
-							</g:Button>
-							<g:Button addStyleNames="btn btn-block btn-default btn-times-circle" ui:field="buttonBack">
-								<ui:text from='{messages.backButton}' />
-							</g:Button>
-						</g:FlowPanel>
+						<g:SimplePanel ui:field="actionsSidebar" />
 					</g:FlowPanel>
 				</g:FlowPanel>
 			</g:FlowPanel>

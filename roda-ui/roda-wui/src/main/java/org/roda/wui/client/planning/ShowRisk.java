@@ -150,7 +150,7 @@ public class ShowRisk extends Composite {
               @Override
               public void onFailure(Throwable caught) {
                 instance.actionsSidebar.setWidget(new ActionableWidgetBuilder<>(RiskActions.get())
-                  .withCallback(actionCallback).buildListWithObjects(new ActionableObject<>(result)));
+                  .withActionCallback(actionCallback).buildListWithObjects(new ActionableObject<>(result)));
                 callback.onSuccess(instance);
               }
 
@@ -158,10 +158,10 @@ public class ShowRisk extends Composite {
               public void onSuccess(Boolean hasHistory) {
                 if (hasHistory) {
                   instance.actionsSidebar.setWidget(new ActionableWidgetBuilder<>(RiskActions.getWithHistory())
-                    .withCallback(actionCallback).buildListWithObjects(new ActionableObject<>(result)));
+                    .withActionCallback(actionCallback).buildListWithObjects(new ActionableObject<>(result)));
                 } else {
                   instance.actionsSidebar.setWidget(new ActionableWidgetBuilder<>(RiskActions.get())
-                    .withCallback(actionCallback).buildListWithObjects(new ActionableObject<>(result)));
+                    .withActionCallback(actionCallback).buildListWithObjects(new ActionableObject<>(result)));
                 }
 
                 callback.onSuccess(instance);

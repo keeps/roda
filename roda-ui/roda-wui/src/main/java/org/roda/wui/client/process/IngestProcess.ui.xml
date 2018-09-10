@@ -19,14 +19,7 @@
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel addStyleNames="sticky-flow">
 					<g:FlowPanel addStyleNames="sticky-padding">
-						<g:FlowPanel addStyleNames="ingestProcessActions">
-							<g:Label addStyleNames="h4">
-								<ui:text from='{messages.sidebarActionsTitle}' />
-							</g:Label>
-							<g:Button addStyleNames="btn btn-block btn-plus" ui:field="newJob">
-								<ui:text from='{messages.newProcessPreservation}' />
-							</g:Button>
-						</g:FlowPanel>
+						<g:SimplePanel ui:field="actionsSidebar" />
 					</g:FlowPanel>
 				</g:FlowPanel>
 			</g:FlowPanel>

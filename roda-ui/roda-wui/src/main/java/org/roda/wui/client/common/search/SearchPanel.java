@@ -163,7 +163,7 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
 
     actionableBuilder = actionable != null ? new ActionableWidgetBuilder<>(actionable) : null;
     if (actionableBuilder != null && actionableCallback != null) {
-      actionableBuilder.withCallback(actionableCallback);
+      actionableBuilder.withActionCallback(actionableCallback);
     }
     actionsButton.setVisible(actionableBuilder != null && list.isSelectable());
     actionsButton.addClickHandler(event -> {
@@ -174,7 +174,7 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
         if (actionsPopup.isShowing()) {
           actionsPopup.hide();
         } else {
-          actionableBuilder.withCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
+          actionableBuilder.withActionCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
             @Override
             public void onSuccess(Actionable.ActionImpact impact) {
               if (!Actionable.ActionImpact.NONE.equals(impact)) {

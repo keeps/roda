@@ -15,8 +15,12 @@ import java.util.List;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.actions.JobActions;
+import org.roda.wui.client.common.actions.model.ActionableObject;
+import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.management.Management;
@@ -27,14 +31,12 @@ import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -78,7 +80,7 @@ public class ActionProcess extends Composite {
   JobSearch jobSearch;
 
   @UiField
-  Button newJob;
+  SimplePanel actionsSidebar;
 
   private static ActionProcess instance = null;
 
@@ -90,6 +92,9 @@ public class ActionProcess extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
     preservationProcessDescription.add(new HTMLWidgetWrapper("PreservationProcessDescription.html"));
+
+    actionsSidebar.setWidget(new ActionableWidgetBuilder<>(JobActions.get(CreateDefaultJob.RESOLVER))
+      .buildListWithObjects(new ActionableObject<>(Job.class)));
   }
 
   /**
@@ -112,11 +117,6 @@ public class ActionProcess extends Composite {
   protected void onLoad() {
     super.onLoad();
     JavascriptUtils.stickSidebar();
-  }
-
-  @UiHandler("newJob")
-  void handleNewJobAction(ClickEvent e) {
-    HistoryUtils.newHistory(CreateDefaultJob.RESOLVER);
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {

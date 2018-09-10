@@ -7,7 +7,6 @@
  */
 package org.roda.wui.client.common.search;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
@@ -83,18 +82,22 @@ public class CatalogueSearch extends Composite {
   }
 
   public void setFilters(List<String> historyTokens) {
-    Filter filter = SearchFilters.createFilterFromHistoryTokens(ListUtils.tail(historyTokens));
-    searchWrapper.setFilter(IndexedRepresentation.class, filter);
-    searchWrapper.setFilter(IndexedFile.class, filter);
+    if (!historyTokens.isEmpty()) {
+      Filter filter = SearchFilters.createFilterFromHistoryTokens(ListUtils.tail(historyTokens));
 
-    // handle aipId VS parentAipId
-    if (historyTokens.contains(RodaConstants.REPRESENTATION_AIP_ID)) {
-      List<String> tokensForAip = new ArrayList<>(historyTokens);
-      tokensForAip.set(historyTokens.indexOf(RodaConstants.REPRESENTATION_AIP_ID), RodaConstants.AIP_PARENT_ID);
-      searchWrapper.setFilter(IndexedAIP.class,
-        SearchFilters.createFilterFromHistoryTokens(ListUtils.tail(historyTokens)));
-    } else {
-      searchWrapper.setFilter(IndexedAIP.class, filter);
+      String classSimpleName = historyTokens.get(0);
+      if (IndexedRepresentation.class.getSimpleName().equals(classSimpleName)) {
+        searchWrapper.setFilter(IndexedRepresentation.class, filter);
+        searchWrapper.changeDropdownSelectedValue(classSimpleName);
+      } else if (IndexedFile.class.getSimpleName().equals(classSimpleName)) {
+        searchWrapper.setFilter(IndexedFile.class, filter);
+        searchWrapper.changeDropdownSelectedValue(classSimpleName);
+      } else if (IndexedAIP.class.getSimpleName().equals(classSimpleName)) {
+        searchWrapper.setFilter(IndexedAIP.class, filter);
+        searchWrapper.changeDropdownSelectedValue(classSimpleName);
+      } else {
+        GWT.log("setFilter can not handle tokens: " + historyTokens);
+      }
     }
   }
 }

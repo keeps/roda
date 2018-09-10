@@ -142,7 +142,7 @@ public class ShowRiskIncidence extends Composite {
     this.incidence = incidence;
 
     actionsSidebar.setWidget(new ActionableWidgetBuilder<>(RiskIncidenceActions.get())
-      .withCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
+      .withActionCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
         @Override
         public void onSuccess(Actionable.ActionImpact result) {
           if (result.equals(Actionable.ActionImpact.DESTROYED)) {

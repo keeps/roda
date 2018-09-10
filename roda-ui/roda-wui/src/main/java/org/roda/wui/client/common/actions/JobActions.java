@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.wui.client.browse.BrowserService;
@@ -127,12 +128,13 @@ public class JobActions extends AbstractActionable<Job> {
   }
 
   private void ingestProcess(Job object, AsyncCallback<ActionImpact> callback) {
-    HistoryUtils.newHistory(Search.RESOLVER, "items", RodaConstants.ALL_INGEST_JOB_IDS, object.getId());
+    HistoryUtils.newHistory(Search.RESOLVER, IndexedAIP.class.getSimpleName(), RodaConstants.ALL_INGEST_JOB_IDS,
+      object.getId());
     callback.onSuccess(ActionImpact.UPDATED);
   }
 
   private void ingestAppraisal(Job object, AsyncCallback<ActionImpact> callback) {
-    HistoryUtils.newHistory(IngestAppraisal.RESOLVER, RodaConstants.SEARCH_ITEMS, RodaConstants.INGEST_JOB_ID,
+    HistoryUtils.newHistory(IngestAppraisal.RESOLVER, IndexedAIP.class.getSimpleName(), RodaConstants.INGEST_JOB_ID,
       object.getId());
     callback.onSuccess(ActionImpact.UPDATED);
   }
@@ -145,12 +147,17 @@ public class JobActions extends AbstractActionable<Job> {
         public void onSuccess(Boolean confirmed) {
           if (confirmed) {
             BrowserService.Util.getInstance().stopJob(object.getId(), new ActionAsyncCallback<Void>(callback) {
-              // FIXME 20160826 hsilva: do proper handling of the failure
+              @Override
+              public void onFailure(Throwable caught) {
+                // FIXME 20160826 hsilva: do proper handling of the failure
+                super.onFailure(caught);
+                doActionCallbackDestroyed();
+              }
 
               @Override
               public void onSuccess(Void result) {
                 // FIXME 20160826 hsilva: do proper handling of the success
-                doActionCallbackUpdated();
+                doActionCallbackDestroyed();
               }
             });
           } else {
@@ -175,7 +182,7 @@ public class JobActions extends AbstractActionable<Job> {
     ActionableGroup<Job> managementGroup = new ActionableGroup<>(messages.sidebarActionsTitle());
     managementGroup.addButton(messages.newProcessPreservation(), JobAction.NEW_PROCESS, ActionImpact.UPDATED,
       "btn-plus");
-    managementGroup.addButton(messages.stopButton(), JobAction.STOP, ActionImpact.UPDATED, "btn-danger btn-stop");
+    managementGroup.addButton(messages.stopButton(), JobAction.STOP, ActionImpact.DESTROYED, "btn-stop");
 
     // FIXME 20180731 bferreira: JobAction.INGEST_APPRAISAL button text should be
     // dynamic and equal to messages.appraisalTitle() + " (" +

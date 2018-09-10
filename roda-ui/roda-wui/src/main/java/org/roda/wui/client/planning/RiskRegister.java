@@ -97,7 +97,8 @@ public class RiskRegister extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
     riskRegisterDescription.add(new HTMLWidgetWrapper("RiskRegisterDescription.html"));
     actionsSidebar.setWidget(
-      new ActionableWidgetBuilder<>(RiskActions.get()).withCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
+      new ActionableWidgetBuilder<>(RiskActions.get())
+        .withActionCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
         @Override
         public void onSuccess(Actionable.ActionImpact result) {
           if (Actionable.ActionImpact.DESTROYED.equals(result) || Actionable.ActionImpact.UPDATED.equals(result)) {

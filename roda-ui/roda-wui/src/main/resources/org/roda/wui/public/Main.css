@@ -6859,6 +6859,14 @@ span.code {
     float: right;
 }
 
+.sidebar .actionable-button-destroyed {
+    background-color: #d9534f;
+}
+
+.sidebar .actionable-button-destroyed:hover {
+    background-color: #c9302c;
+}
+
 .card + .ActionableStyleButtons, .ActionableStyleButtons + .ActionableStyleButtons {
     margin-top: 20px;
     line-height: 1rem;

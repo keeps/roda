@@ -174,7 +174,7 @@ public class ShowFormat extends Composite {
   SimplePanel actionsSidebar;
 
   private ActionableWidgetBuilder<Format> actionableWidgetBuilder = new ActionableWidgetBuilder<>(FormatActions.get())
-    .withCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
+    .withActionCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
       @Override
       public void onSuccess(Actionable.ActionImpact result) {
         if (result.equals(Actionable.ActionImpact.DESTROYED)) {

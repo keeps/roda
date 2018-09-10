@@ -17,7 +17,6 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.management.Management;
 import org.roda.wui.client.search.JobSearch;
@@ -102,12 +101,6 @@ public class InternalProcess extends Composite {
     }
 
     return instance;
-  }
-
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {

@@ -10,7 +10,6 @@
  */
 package org.roda.wui.client.ingest.appraisal;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -106,7 +105,7 @@ public class IngestAppraisal extends Composite {
     AipActions appraisalAipActions = AipActions.get(null, AIPState.UNDER_APPRAISAL, null);
 
     ActionableWidgetBuilder<IndexedAIP> sidebarActionsWidgetbuilder = new ActionableWidgetBuilder<>(appraisalAipActions)
-      .withCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
+      .withActionCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
         @Override
         public void onFailure(Throwable caught) {
           super.onFailure(caught);
@@ -177,18 +176,22 @@ public class IngestAppraisal extends Composite {
   }
 
   private void setFilters(List<String> historyTokens) {
-    Filter filter = SearchFilters.createIncrementalFilterFromTokens(ListUtils.tail(historyTokens), BASE_FILTER);
-    searchWrapper.setFilter(IndexedRepresentation.class, filter);
-    searchWrapper.setFilter(IndexedFile.class, filter);
+    if (!historyTokens.isEmpty()) {
+      Filter filter = SearchFilters.createFilterFromHistoryTokens(ListUtils.tail(historyTokens));
 
-    // handle aipId VS parentAipId
-    if (historyTokens.contains(RodaConstants.REPRESENTATION_AIP_ID)) {
-      List<String> tokensForAip = new ArrayList<>(historyTokens);
-      tokensForAip.set(historyTokens.indexOf(RodaConstants.REPRESENTATION_AIP_ID), RodaConstants.AIP_PARENT_ID);
-      searchWrapper.setFilter(IndexedAIP.class,
-        SearchFilters.createFilterFromHistoryTokens(ListUtils.tail(historyTokens)));
-    } else {
-      searchWrapper.setFilter(IndexedAIP.class, filter);
+      String classSimpleName = historyTokens.get(0);
+      if (IndexedRepresentation.class.getSimpleName().equals(classSimpleName)) {
+        searchWrapper.setFilter(IndexedRepresentation.class, filter);
+        searchWrapper.changeDropdownSelectedValue(classSimpleName);
+      } else if (IndexedFile.class.getSimpleName().equals(classSimpleName)) {
+        searchWrapper.setFilter(IndexedFile.class, filter);
+        searchWrapper.changeDropdownSelectedValue(classSimpleName);
+      } else if (IndexedAIP.class.getSimpleName().equals(classSimpleName)) {
+        searchWrapper.setFilter(IndexedAIP.class, filter);
+        searchWrapper.changeDropdownSelectedValue(classSimpleName);
+      } else {
+        GWT.log("setFilter can not handle tokens: " + historyTokens);
+      }
     }
   }
 }
