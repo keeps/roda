@@ -282,12 +282,26 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
                     @Override
                     public void onSuccess(String details) {
                       BrowserService.Util.getInstance().changeRepresentationType(representations, newType, details,
-                        new ActionLoadingAsyncCallback<Void>(callback) {
+                        new ActionLoadingAsyncCallback<Job>(callback) {
 
                           @Override
-                          public void onSuccessImpl(Void nothing) {
-                            Toast.showInfo(messages.dialogSuccess(), messages.changeTypeSuccessful());
-                            doActionCallbackUpdated();
+                          public void onSuccessImpl(Job result) {
+                            Toast.showInfo(messages.runningInBackgroundTitle(),
+                              messages.runningInBackgroundDescription());
+
+                            Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+
+                              @Override
+                              public void onFailure(Throwable caught) {
+                                doActionCallbackUpdated();
+                              }
+
+                              @Override
+                              public void onSuccess(final Void nothing) {
+                                HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                                doActionCallbackUpdated();
+                              }
+                            });
                           }
                         });
                     }
@@ -316,11 +330,23 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
 
   public void identifyFormats(SelectedItems<IndexedRepresentation> selected,
     final AsyncCallback<ActionImpact> callback) {
-    BrowserService.Util.getInstance().createFormatIdentificationJob(selected, new ActionAsyncCallback<Void>(callback) {
+    BrowserService.Util.getInstance().createFormatIdentificationJob(selected, new ActionAsyncCallback<Job>(callback) {
       @Override
-      public void onSuccess(Void object) {
+      public void onSuccess(Job result) {
         Toast.showInfo(messages.identifyingFormatsTitle(), messages.identifyingFormatsDescription());
-        doActionCallbackUpdated();
+
+        Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(), new AsyncCallback<Void>() {
+          @Override
+          public void onFailure(Throwable caught) {
+            doActionCallbackUpdated();
+          }
+
+          @Override
+          public void onSuccess(final Void nothing) {
+            HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+            doActionCallbackDestroyed();
+          }
+        });
       }
 
       @Override

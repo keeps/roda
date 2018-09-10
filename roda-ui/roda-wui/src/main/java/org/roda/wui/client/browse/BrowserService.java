@@ -213,11 +213,11 @@ public interface BrowserService extends RemoteService {
   <T extends IsIndexed> List<String> suggest(String classNameToReturn, String field, String query, boolean allowPartial)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
 
-  void updateAIPPermissions(List<IndexedAIP> aips, Permissions permissions, String details, boolean recursive)
+  Job updateAIPPermissions(SelectedItems<IndexedAIP> aips, Permissions permissions, String details, boolean recursive)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
     JobAlreadyStartedException;
 
-  void updateDIPPermissions(List<IndexedDIP> dips, Permissions permissions, String details)
+  Job updateDIPPermissions(SelectedItems<IndexedDIP> dips, Permissions permissions, String details)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
 
   Risk createRisk(Risk risk)
@@ -262,7 +262,7 @@ public interface BrowserService extends RemoteService {
   void updateRiskCounters()
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
-  void appraisal(SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason)
+  Job appraisal(SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
 
   String renameTransferredResource(String transferredResourceId, String newName)
@@ -281,11 +281,11 @@ public interface BrowserService extends RemoteService {
 
   void updateRiskIncidence(RiskIncidence incidence) throws AuthorizationDeniedException, GenericException;
 
-  void deleteRiskIncidences(SelectedItems<RiskIncidence> selected, String details)
+  Job deleteRiskIncidences(SelectedItems<RiskIncidence> selected, String details)
     throws JobAlreadyStartedException, AuthorizationDeniedException, GenericException, RequestNotValidException,
     NotFoundException, InvalidParameterException;
 
-  void updateMultipleIncidences(SelectedItems<RiskIncidence> selected, String status, String severity, Date mitigatedOn,
+  Job updateMultipleIncidences(SelectedItems<RiskIncidence> selected, String status, String severity, Date mitigatedOn,
     String mitigatedBy, String mitigatedDescription)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException;
 
@@ -303,13 +303,13 @@ public interface BrowserService extends RemoteService {
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, AlreadyExistsException,
     NotFoundException;
 
-  void createFormatIdentificationJob(SelectedItems<?> selected) throws GenericException, AuthorizationDeniedException,
+  Job createFormatIdentificationJob(SelectedItems<?> selected) throws GenericException, AuthorizationDeniedException,
     JobAlreadyStartedException, RequestNotValidException, NotFoundException;
 
-  void changeRepresentationType(SelectedItems<IndexedRepresentation> selectedRepresentation, String newType,
+  Job changeRepresentationType(SelectedItems<IndexedRepresentation> selectedRepresentation, String newType,
     String details) throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
-  void changeAIPType(SelectedItems<IndexedAIP> selectedAIP, String newType, String details)
+  Job changeAIPType(SelectedItems<IndexedAIP> selectedAIP, String newType, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
   void changeRepresentationStates(IndexedRepresentation selectedRepresentation, List<String> newStates, String details)
@@ -318,7 +318,7 @@ public interface BrowserService extends RemoteService {
   BrowseDipBundle retrieveDipBundle(String dipUUID, String dipFileUUID, String localeString)
     throws RequestNotValidException, AuthorizationDeniedException, GenericException, NotFoundException;
 
-  void deleteDIPs(SelectedItems<IndexedDIP> dips, String details)
+  Job deleteDIPs(SelectedItems<IndexedDIP> dips, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   <T extends IsIndexed> T retrieveFromModel(String classNameToReturn, String id) throws RODAException;

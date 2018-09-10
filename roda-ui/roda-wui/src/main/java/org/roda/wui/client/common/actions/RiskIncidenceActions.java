@@ -14,6 +14,7 @@ import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
@@ -25,6 +26,7 @@ import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.EditMultipleRiskIncidenceDialog;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
+import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.planning.EditRiskIncidence;
 import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -152,13 +154,27 @@ public class RiskIncidenceActions extends AbstractActionable<RiskIncidence> {
                     @Override
                     public void onSuccess(final String details) {
                       BrowserService.Util.getInstance().deleteRiskIncidences(objects, details,
-                        new ActionAsyncCallback<Void>(callback) {
+                        new ActionAsyncCallback<Job>(callback) {
 
                           @Override
-                          public void onSuccess(Void nothing) {
-                            Toast.showInfo(messages.riskIncidenceRemoveSuccessTitle(),
-                              messages.riskIncidenceRemoveSuccessMessage(size));
-                            doActionCallbackDestroyed();
+                          public void onSuccess(Job result) {
+                            Toast.showInfo(messages.runningInBackgroundTitle(),
+                              messages.runningInBackgroundDescription());
+
+                            Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(),
+                              new AsyncCallback<Void>() {
+
+                                @Override
+                                public void onFailure(Throwable caught) {
+                                  doActionCallbackDestroyed();
+                                }
+
+                                @Override
+                                public void onSuccess(final Void nothing) {
+                                  HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                                  doActionCallbackDestroyed();
+                                }
+                              });
                           }
                         });
                     }
@@ -186,11 +202,25 @@ public class RiskIncidenceActions extends AbstractActionable<RiskIncidence> {
 
       BrowserService.Util.getInstance().updateMultipleIncidences(objects, editDialog.getStatus(),
         editDialog.getSeverity(), editDialog.getMitigatedOn(), editDialog.getMitigatedBy(),
-        editDialog.getMitigatedDescription(), new ActionLoadingAsyncCallback<Void>(callback) {
+        editDialog.getMitigatedDescription(), new ActionLoadingAsyncCallback<Job>(callback) {
 
           @Override
-          public void onSuccessImpl(Void result) {
-            doActionCallbackUpdated();
+          public void onSuccessImpl(Job result) {
+            Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+
+            Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+
+              @Override
+              public void onFailure(Throwable caught) {
+                doActionCallbackUpdated();
+              }
+
+              @Override
+              public void onSuccess(final Void nothing) {
+                HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                doActionCallbackUpdated();
+              }
+            });
           }
         });
     });

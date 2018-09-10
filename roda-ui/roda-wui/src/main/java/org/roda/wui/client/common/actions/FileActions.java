@@ -468,11 +468,23 @@ public class FileActions extends AbstractActionable<IndexedFile> {
   }
 
   private void identifyFormats(SelectedItems<IndexedFile> selected, final AsyncCallback<ActionImpact> callback) {
-    BrowserService.Util.getInstance().createFormatIdentificationJob(selected, new ActionAsyncCallback<Void>(callback) {
+    BrowserService.Util.getInstance().createFormatIdentificationJob(selected, new ActionAsyncCallback<Job>(callback) {
       @Override
-      public void onSuccess(Void object) {
+      public void onSuccess(Job result) {
         Toast.showInfo(messages.identifyingFormatsTitle(), messages.identifyingFormatsDescription());
-        doActionCallbackUpdated();
+
+        Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(), new AsyncCallback<Void>() {
+          @Override
+          public void onFailure(Throwable caught) {
+            doActionCallbackUpdated();
+          }
+
+          @Override
+          public void onSuccess(final Void nothing) {
+            HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+            doActionCallbackDestroyed();
+          }
+        });
       }
 
       @Override

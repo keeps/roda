@@ -16,6 +16,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.Permissions;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.EditPermissions;
@@ -25,9 +26,11 @@ import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.RestUtils;
+import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.regexp.shared.RegExp;
@@ -153,11 +156,24 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
                 @Override
                 public void onSuccess(final String details) {
                   BrowserService.Util.getInstance().deleteDIPs(objectToSelectedItems(dip, IndexedDIP.class), details,
-                    new ActionLoadingAsyncCallback<Void>(callback) {
+                    new ActionLoadingAsyncCallback<Job>(callback) {
 
                       @Override
-                      public void onSuccessImpl(Void result) {
-                        doActionCallbackDestroyed();
+                      public void onSuccessImpl(Job result) {
+                        Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+
+                        Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(), new AsyncCallback<Void>() {
+                          @Override
+                          public void onFailure(Throwable caught) {
+                            doActionCallbackDestroyed();
+                          }
+
+                          @Override
+                          public void onSuccess(final Void nothing) {
+                            HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                            doActionCallbackDestroyed();
+                          }
+                        });
                       }
                     });
                 }
@@ -184,12 +200,25 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
                 @Override
                 public void onSuccess(final String details) {
                   BrowserService.Util.getInstance().deleteDIPs(selectedItems, details,
-                    new ActionLoadingAsyncCallback<Void>(callback) {
+                    new ActionLoadingAsyncCallback<Job>(callback) {
 
                       @Override
-                      public void onSuccessImpl(Void result) {
-                        History.fireCurrentHistoryState();
-                        doActionCallbackDestroyed();
+                      public void onSuccessImpl(Job result) {
+                        Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+
+                        Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(), new AsyncCallback<Void>() {
+                          @Override
+                          public void onFailure(Throwable caught) {
+                            History.fireCurrentHistoryState();
+                            doActionCallbackDestroyed();
+                          }
+
+                          @Override
+                          public void onSuccess(final Void nothing) {
+                            HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                            doActionCallbackDestroyed();
+                          }
+                        });
                       }
                     });
                 }

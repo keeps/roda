@@ -2001,6 +2001,16 @@ public class ModelService extends ModelObservable {
     notifyJobReportDeleted(jobReportId).failOnError();
   }
 
+  public void updateAIPPermissions(String aipId, Permissions permissions, String updatedBy)
+    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+    AIP aip = retrieveAIP(aipId);
+    aip.setPermissions(permissions);
+    aip.setUpdatedBy(updatedBy);
+    aip.setUpdatedOn(new Date());
+    updateAIPMetadata(aip);
+    notifyAipPermissionsUpdated(aip).failOnError();
+  }
+
   public void updateAIPPermissions(AIP aip, String updatedBy)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
     aip.setUpdatedBy(updatedBy);

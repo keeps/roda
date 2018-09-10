@@ -513,44 +513,42 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void updateAIPPermissions(List<IndexedAIP> aips, Permissions permissions, String details, boolean recursive)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
-    JobAlreadyStartedException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.updateAIPPermissions(user, aips, permissions, details, recursive);
-  }
-
-  @Override
-  public void updateDIPPermissions(List<IndexedDIP> dips, Permissions permissions, String details)
+  public Job updateAIPPermissions(SelectedItems<IndexedAIP> aips, Permissions permissions, String details,
+    boolean recursive)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.updateDIPPermissions(user, dips, permissions, details);
+    return Browser.updateAIPPermissions(user, aips, permissions, details, recursive);
   }
 
   @Override
-  public Risk createRisk(Risk risk)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+  public Job updateDIPPermissions(SelectedItems<IndexedDIP> dips, Permissions permissions, String details)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Browser.updateDIPPermissions(user, dips, permissions, details);
+  }
+
+  @Override
+  public Risk createRisk(Risk risk) throws AuthorizationDeniedException, GenericException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.createRisk(user, risk);
   }
 
   @Override
-  public void updateRisk(Risk risk, int incidences)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+  public void updateRisk(Risk risk, int incidences) throws AuthorizationDeniedException, GenericException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Browser.updateRisk(user, risk, incidences);
   }
 
   @Override
   public void revertRiskVersion(String riskId, String versionId)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException, IOException {
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Browser.revertRiskVersion(user, riskId, versionId);
   }
 
   @Override
   public void deleteRiskVersion(String riskId, String versionId)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException, IOException {
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Browser.deleteRiskVersion(user, riskId, versionId);
   }
@@ -675,10 +673,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void appraisal(SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason)
+  public Job appraisal(SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.appraisal(user, selected, accept, rejectReason);
+    return Browser.appraisal(user, selected, accept, rejectReason);
   }
 
   @Override
@@ -742,18 +740,18 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void deleteRiskIncidences(SelectedItems<RiskIncidence> selected, String details)
+  public Job deleteRiskIncidences(SelectedItems<RiskIncidence> selected, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.deleteRiskIncidences(user, selected, details);
+    return Browser.deleteRiskIncidences(user, selected, details);
   }
 
   @Override
-  public void updateMultipleIncidences(SelectedItems<RiskIncidence> selected, String status, String severity,
+  public Job updateMultipleIncidences(SelectedItems<RiskIncidence> selected, String status, String severity,
     Date mitigatedOn, String mitigatedBy, String mitigatedDescription)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.updateMultipleIncidences(user, selected, status, severity, mitigatedOn, mitigatedBy, mitigatedDescription);
+    return Browser.updateMultipleIncidences(user, selected, status, severity, mitigatedOn, mitigatedBy, mitigatedDescription);
   }
 
   @Override
@@ -767,24 +765,24 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void createFormatIdentificationJob(SelectedItems<?> selected) throws GenericException,
-    AuthorizationDeniedException, JobAlreadyStartedException, RequestNotValidException, NotFoundException {
+  public Job createFormatIdentificationJob(SelectedItems<?> selected)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.createFormatIdentificationJob(user, selected);
+    return Browser.createFormatIdentificationJob(user, selected);
   }
 
   @Override
-  public void changeRepresentationType(SelectedItems<IndexedRepresentation> selected, String newType, String details)
+  public Job changeRepresentationType(SelectedItems<IndexedRepresentation> selected, String newType, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.changeRepresentationType(user, selected, newType, details);
+    return Browser.changeRepresentationType(user, selected, newType, details);
   }
 
   @Override
-  public void changeAIPType(SelectedItems<IndexedAIP> selected, String newType, String details)
+  public Job changeAIPType(SelectedItems<IndexedAIP> selected, String newType, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.changeAIPType(user, selected, newType, details);
+    return Browser.changeAIPType(user, selected, newType, details);
   }
 
   @Override
@@ -803,10 +801,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void deleteDIPs(SelectedItems<IndexedDIP> dips, String details)
+  public Job deleteDIPs(SelectedItems<IndexedDIP> dips, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.deleteDIPs(user, dips, details);
+    return Browser.deleteDIPs(user, dips, details);
   }
 
   @Override

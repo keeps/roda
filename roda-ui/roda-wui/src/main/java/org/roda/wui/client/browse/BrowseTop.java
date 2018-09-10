@@ -56,9 +56,6 @@ public class BrowseTop extends Composite {
           instance = new BrowseTop();
         }
         callback.onSuccess(instance);
-      } else if (historyTokens.size() == 1
-        && !historyTokens.get(0).equals(EditPermissions.AIP_RESOLVER.getHistoryToken())) {
-        BrowseAIP.getAndRefresh(historyTokens.get(0), callback);
       } else if (historyTokens.size() > 1
         && historyTokens.get(0).equals(EditDescriptiveMetadata.RESOLVER.getHistoryToken())) {
         EditDescriptiveMetadata.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
@@ -84,6 +81,8 @@ public class BrowseTop extends Composite {
         BrowseRepresentation.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(TransferUpload.BROWSE_RESOLVER.getHistoryToken())) {
         TransferUpload.BROWSE_RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+      } else if (historyTokens.size() == 1) {
+        BrowseAIP.getAndRefresh(historyTokens.get(0), callback);
       } else {
         HistoryUtils.newHistory(RESOLVER);
         callback.onSuccess(null);

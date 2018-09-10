@@ -2078,21 +2078,19 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static void updateAIPPermissions(User user, List<IndexedAIP> aips, Permissions permissions, String details,
-    boolean recursive)
+  public static Job updateAIPPermissions(User user, SelectedItems<IndexedAIP> aips, Permissions permissions,
+    String details, boolean recursive)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
     controllerAssistant.checkRoles(user);
+    controllerAssistant.checkObjectPermissions(user, aips);
 
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
     try {
-      for (IndexedAIP aip : aips) {
-        controllerAssistant.checkObjectPermissions(user, aip);
-        BrowserHelper.updateAIPPermissions(user, aip, permissions, details, recursive);
-      }
+      return BrowserHelper.updateAIPPermissions(user, aips, permissions, details, recursive);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;
@@ -2103,20 +2101,18 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static void updateDIPPermissions(User user, List<IndexedDIP> dips, Permissions permissions, String details)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+  public static Job updateDIPPermissions(User user, SelectedItems<IndexedDIP> dips, Permissions permissions,
+    String details) throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
     controllerAssistant.checkRoles(user);
+    controllerAssistant.checkObjectPermissions(user, dips);
 
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
     try {
-      for (IndexedDIP dip : dips) {
-        controllerAssistant.checkObjectPermissions(user, dip);
-        BrowserHelper.updateDIPPermissions(dip, permissions, details);
-      }
+      return BrowserHelper.updateDIPPermissions(user, dips, permissions, details);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;
@@ -2388,7 +2384,7 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static void appraisal(User user, SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason)
+  public static Job appraisal(User user, SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -2400,7 +2396,7 @@ public class Browser extends RodaWuiController {
 
     try {
       // delegate
-      BrowserHelper.appraisal(user, selected, accept, rejectReason);
+      return BrowserHelper.appraisal(user, selected, accept, rejectReason);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;
@@ -2693,7 +2689,7 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static void updateMultipleIncidences(User user, SelectedItems<RiskIncidence> selected, String status,
+  public static Job updateMultipleIncidences(User user, SelectedItems<RiskIncidence> selected, String status,
     String severity, Date mitigatedOn, String mitigatedBy, String mitigatedDescription)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -2704,7 +2700,7 @@ public class Browser extends RodaWuiController {
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
     try {
-      BrowserHelper.updateMultipleIncidences(user, selected, status, severity, mitigatedOn, mitigatedBy,
+      return BrowserHelper.updateMultipleIncidences(user, selected, status, severity, mitigatedOn, mitigatedBy,
         mitigatedDescription);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
@@ -2715,7 +2711,7 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static void deleteRiskIncidences(User user, SelectedItems<RiskIncidence> selected, String details)
+  public static Job deleteRiskIncidences(User user, SelectedItems<RiskIncidence> selected, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -2725,7 +2721,7 @@ public class Browser extends RodaWuiController {
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
     try {
-      BrowserHelper.deleteRiskIncidences(user, selected, details);
+      return BrowserHelper.deleteRiskIncidences(user, selected, details);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;
@@ -2736,7 +2732,7 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static void deleteDIPs(User user, SelectedItems<IndexedDIP> dips, String details)
+  public static Job deleteDIPs(User user, SelectedItems<IndexedDIP> dips, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -2748,7 +2744,7 @@ public class Browser extends RodaWuiController {
 
     try {
       // delegate
-      BrowserHelper.deleteDIPs(user, dips, details);
+      return BrowserHelper.deleteDIPs(user, dips, details);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;
@@ -2915,7 +2911,7 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static void deleteDIPFile(User user, SelectedItems<DIPFile> files, String details)
+  public static Job deleteDIPFile(User user, SelectedItems<DIPFile> files, String details)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -2927,7 +2923,7 @@ public class Browser extends RodaWuiController {
 
     try {
       // delegate
-      BrowserHelper.deleteDIPFiles(user, files, details);
+      return BrowserHelper.deleteDIPFiles(user, files, details);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;
@@ -2968,7 +2964,7 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static void createFormatIdentificationJob(User user, SelectedItems<?> selected)
+  public static Job createFormatIdentificationJob(User user, SelectedItems<?> selected)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -2979,7 +2975,7 @@ public class Browser extends RodaWuiController {
 
     try {
       // delegate
-      BrowserHelper.createFormatIdentificationJob(user, selected);
+      return BrowserHelper.createFormatIdentificationJob(user, selected);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;
@@ -2989,7 +2985,7 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static void changeAIPType(User user, SelectedItems<IndexedAIP> selected, String newType, String details)
+  public static Job changeAIPType(User user, SelectedItems<IndexedAIP> selected, String newType, String details)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -3000,7 +2996,7 @@ public class Browser extends RodaWuiController {
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
     try {
-      BrowserHelper.changeAIPType(user, selected, newType, details);
+      return BrowserHelper.changeAIPType(user, selected, newType, details);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;
@@ -3011,7 +3007,7 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static void changeRepresentationType(User user, SelectedItems<IndexedRepresentation> selected, String newType,
+  public static Job changeRepresentationType(User user, SelectedItems<IndexedRepresentation> selected, String newType,
     String details) throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -3022,7 +3018,7 @@ public class Browser extends RodaWuiController {
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
     try {
-      BrowserHelper.changeRepresentationType(user, selected, newType, details);
+      return BrowserHelper.changeRepresentationType(user, selected, newType, details);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;

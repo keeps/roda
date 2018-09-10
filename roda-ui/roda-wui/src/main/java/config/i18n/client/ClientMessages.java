@@ -383,6 +383,8 @@ public interface ClientMessages extends Messages {
 
   String moveJobCreatedMessage();
 
+  String jobCreatedMessage();
+
   /****** INGEST TRANSFER UPLOAD *********/
 
   String ingestTransferUploadTitle();

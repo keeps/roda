@@ -150,11 +150,11 @@ public interface BrowserServiceAsync {
   void suggest(String classNameToReturn, String field, String query, boolean allowPartial,
     AsyncCallback<List<String>> callback);
 
-  void updateAIPPermissions(List<IndexedAIP> aips, Permissions permissions, String details, boolean recursive,
-    AsyncCallback<Void> callback);
+  void updateAIPPermissions(SelectedItems<IndexedAIP> aips, Permissions permissions, String details, boolean recursive,
+    AsyncCallback<Job> callback);
 
-  void updateDIPPermissions(List<IndexedDIP> dips, Permissions permissions, String details,
-    AsyncCallback<Void> callback);
+  void updateDIPPermissions(SelectedItems<IndexedDIP> dips, Permissions permissions, String details,
+    AsyncCallback<Job> callback);
 
   void createRisk(Risk risk, AsyncCallback<Risk> asyncCallback);
 
@@ -179,7 +179,7 @@ public interface BrowserServiceAsync {
 
   void deleteRisk(SelectedItems<IndexedRisk> selected, AsyncCallback<Job> asyncCallback);
 
-  void deleteRiskIncidences(SelectedItems<RiskIncidence> selected, String details, AsyncCallback<Void> asyncCallback);
+  void deleteRiskIncidences(SelectedItems<RiskIncidence> selected, String details, AsyncCallback<Job> asyncCallback);
 
   void createProcess(String jobName, SelectedItems<?> selected, String id, Map<String, String> value,
     String selectedClass, AsyncCallback<Job> asyncCallback);
@@ -189,7 +189,7 @@ public interface BrowserServiceAsync {
 
   void updateRiskCounters(AsyncCallback<Void> asyncCallback);
 
-  void appraisal(SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason, AsyncCallback<Void> callback);
+  void appraisal(SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason, AsyncCallback<Job> callback);
 
   void renameTransferredResource(String transferredResourceId, String newName, AsyncCallback<String> asyncCallback);
 
@@ -204,7 +204,7 @@ public interface BrowserServiceAsync {
   void updateRiskIncidence(RiskIncidence incidence, AsyncCallback<Void> asyncCallback);
 
   void updateMultipleIncidences(SelectedItems<RiskIncidence> selected, String status, String severity, Date mitigatedOn,
-    String mitigatedBy, String mitigatedDescription, AsyncCallback<Void> loadingAsyncCallback);
+    String mitigatedBy, String mitigatedDescription, AsyncCallback<Job> loadingAsyncCallback);
 
   void renameFolder(String folderUUID, String newName, String details, AsyncCallback<IndexedFile> asyncCallback);
 
@@ -214,13 +214,13 @@ public interface BrowserServiceAsync {
   void createFolder(String aipId, String representationId, String folderUUID, String newName, String details,
     AsyncCallback<IndexedFile> asyncCallback);
 
-  void createFormatIdentificationJob(SelectedItems<?> selected, AsyncCallback<Void> loadingAsyncCallback);
+  void createFormatIdentificationJob(SelectedItems<?> selected, AsyncCallback<Job> loadingAsyncCallback);
 
   void changeRepresentationType(SelectedItems<IndexedRepresentation> selectedRepresentation, String newType,
-    String details, AsyncCallback<Void> loadingAsyncCallback);
+    String details, AsyncCallback<Job> loadingAsyncCallback);
 
   void changeAIPType(SelectedItems<IndexedAIP> selectedAIP, String newType, String details,
-    AsyncCallback<Void> loadingAsyncCallback);
+    AsyncCallback<Job> loadingAsyncCallback);
 
   void changeRepresentationStates(IndexedRepresentation selectedRepresentation, List<String> newStates, String details,
     AsyncCallback<Void> loadingAsyncCallback);
@@ -228,7 +228,7 @@ public interface BrowserServiceAsync {
   void retrieveDipBundle(String dipUUID, String dipFileUUID, String localeString,
     AsyncCallback<BrowseDipBundle> callback);
 
-  void deleteDIPs(SelectedItems<IndexedDIP> dips, String details, AsyncCallback<Void> async);
+  void deleteDIPs(SelectedItems<IndexedDIP> dips, String details, AsyncCallback<Job> async);
 
   void retrieveBrowseRepresentationBundle(String aipId, String representationId, String localeString,
     List<String> representationFieldsToReturn, AsyncCallback<BrowseRepresentationBundle> callback);

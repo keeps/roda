@@ -141,8 +141,8 @@ import org.roda.core.plugins.plugins.internal.AppraisalPlugin;
 import org.roda.core.plugins.plugins.internal.ChangeTypePlugin;
 import org.roda.core.plugins.plugins.internal.DeleteRODAObjectPlugin;
 import org.roda.core.plugins.plugins.internal.MovePlugin;
-import org.roda.core.plugins.plugins.internal.UpdateAIPPermissionsPlugin;
 import org.roda.core.plugins.plugins.internal.UpdateIncidencesPlugin;
+import org.roda.core.plugins.plugins.internal.UpdatePermissionsPlugin;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryConsumesOutputStream;
 import org.roda.core.storage.BinaryVersion;
@@ -692,7 +692,7 @@ public class BrowserHelper {
   }
 
   protected static List<IndexedAIP> retrieveAncestors(IndexedAIP aip, User user, List<String> fieldsToReturn)
-    throws GenericException, RequestNotValidException {
+    throws GenericException {
     return RodaCoreFactory.getIndexService().retrieveAncestors(aip, user, fieldsToReturn);
   }
 
@@ -1497,11 +1497,9 @@ public class BrowserHelper {
 
   public static Job moveAIPInHierarchy(User user, SelectedItems<IndexedAIP> selected, String parentId, String details)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
-
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_ID, parentId);
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
-
     return createAndExecuteInternalJob("Move AIP in hierarchy", selected, MovePlugin.class, user, pluginParameters,
       "Could not execute move job");
   }
@@ -1552,7 +1550,6 @@ public class BrowserHelper {
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
-
     return createAndExecuteInternalJob("Delete AIP", selected, DeleteRODAObjectPlugin.class, user, pluginParameters,
       "Could not execute AIP delete action");
   }
@@ -1561,7 +1558,6 @@ public class BrowserHelper {
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
-
     return createAndExecuteInternalJob("Delete representations", selected, DeleteRODAObjectPlugin.class, user,
       pluginParameters, "Could not execute representations delete action");
   }
@@ -1570,7 +1566,6 @@ public class BrowserHelper {
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
-
     return createAndExecuteInternalJob("Delete files", selected, DeleteRODAObjectPlugin.class, user, pluginParameters,
       "Could not execute file delete action");
   }
@@ -1611,11 +1606,6 @@ public class BrowserHelper {
   public static void deleteDescriptiveMetadataFile(String aipId, String representationId, String descriptiveMetadataId)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     RodaCoreFactory.getModelService().deleteDescriptiveMetadata(aipId, representationId, descriptiveMetadataId);
-  }
-
-  public static DescriptiveMetadata retrieveMetadataFile(String aipId, String descriptiveMetadataId)
-    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    return RodaCoreFactory.getModelService().retrieveDescriptiveMetadata(aipId, descriptiveMetadataId);
   }
 
   public static Representation createRepresentation(User user, String aipId, String representationId, String type,
@@ -1748,7 +1738,7 @@ public class BrowserHelper {
   }
 
   public static TransferredResource createTransferredResourcesFolder(String parentUUID, String folderName,
-    boolean forceCommit) throws GenericException, RequestNotValidException, NotFoundException {
+    boolean forceCommit) throws GenericException, NotFoundException {
     TransferredResource transferredResource = RodaCoreFactory.getTransferredResourcesScanner().createFolder(parentUUID,
       folderName);
     if (forceCommit) {
@@ -1779,7 +1769,7 @@ public class BrowserHelper {
   }
 
   public static void deleteTransferredResources(SelectedItems<TransferredResource> selected, User user)
-    throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
+    throws GenericException, NotFoundException, RequestNotValidException {
     List<String> ids = consolidate(user, TransferredResource.class, selected);
 
     // check permissions
@@ -1788,8 +1778,7 @@ public class BrowserHelper {
   }
 
   public static TransferredResource createTransferredResourceFile(String parentUUID, String fileName,
-    InputStream inputStream, boolean forceCommit)
-    throws GenericException, AlreadyExistsException, RequestNotValidException, NotFoundException {
+    InputStream inputStream, boolean forceCommit) throws GenericException, AlreadyExistsException, NotFoundException {
     LOGGER.debug("createTransferredResourceFile(path={}, name={})", parentUUID, fileName);
     TransferredResource transferredResource = RodaCoreFactory.getTransferredResourcesScanner().createFile(parentUUID,
       fileName, inputStream);
@@ -2121,58 +2110,28 @@ public class BrowserHelper {
     RodaCoreFactory.getStorageService().deleteBinaryVersion(storagePath, versionId);
   }
 
-  public static Job updateAIPPermissions(User user, IndexedAIP indexedAIP, Permissions permissions, String details,
-    boolean recursive)
+  public static Job updateAIPPermissions(User user, SelectedItems<IndexedAIP> aips, Permissions permissions,
+    String details, boolean recursive)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
     final String eventDescription = "The process of updating an object of the repository.";
 
-    final ModelService model = RodaCoreFactory.getModelService();
-    AIP aip = model.retrieveAIP(indexedAIP.getId());
-    aip.setPermissions(permissions);
-    List<LinkingIdentifier> sources = Arrays
-      .asList(PluginHelper.getLinkingIdentifier(aip.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
+    Map<String, String> pluginParameters = new HashMap<>();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_PERMISSIONS_JSON, JsonUtils.getJsonFromObject(permissions));
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RECURSIVE, Boolean.toString(recursive));
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_EVENT_DESCRIPTION, eventDescription);
 
-    try {
-      model.updateAIPPermissions(aip, user.getName());
-      String outcomeText = PluginHelper.createOutcomeTextForAIP(indexedAIP, " permissions has been manually updated");
-      model.createEvent(aip.getId(), null, null, null, PreservationEventType.UPDATE, eventDescription, sources, null,
-        PluginState.SUCCESS, outcomeText, details, user.getName(), true);
-    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      String outcomeText = PluginHelper.createOutcomeTextForAIP(indexedAIP,
-        " permissions has not been manually updated");
-      model.createEvent(aip.getId(), null, null, null, PreservationEventType.UPDATE, eventDescription, sources, null,
-        PluginState.FAILURE, outcomeText, details, user.getName(), true);
-
-      throw e;
-    }
-
-    if (recursive) {
-      Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, indexedAIP.getId()));
-      SelectedItemsFilter<IndexedAIP> selectedItems = new SelectedItemsFilter<>(filter, IndexedAIP.class.getName(),
-        Boolean.FALSE);
-
-      Map<String, String> pluginParameters = new HashMap<>();
-      pluginParameters.put(RodaConstants.PLUGIN_PARAMS_AIP_ID, aip.getId());
-      pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
-      pluginParameters.put(RodaConstants.PLUGIN_PARAMS_EVENT_DESCRIPTION, eventDescription);
-      pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OUTCOME_TEXT,
-        "AIP " + indexedAIP.getId() + " permissions were updated and all sublevels will be too");
-
-      return createAndExecuteInternalJob("Update AIP permissions recursively", selectedItems,
-        UpdateAIPPermissionsPlugin.class, user, pluginParameters,
-        "Could not execute AIP permissions recursively action");
-    } else {
-      return null;
-    }
+    return createAndExecuteInternalJob("Update AIP permissions recursively", aips, UpdatePermissionsPlugin.class, user,
+      pluginParameters, "Could not execute AIP permissions recursively action");
   }
 
-  public static void updateDIPPermissions(IndexedDIP indexedDIP, Permissions permissions, String details)
-    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+  public static Job updateDIPPermissions(User user, SelectedItems<IndexedDIP> dips, Permissions permissions,
+    String details) throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
     // TODO 20170222 nvieira it should create an event associated with DIP
-    ModelService model = RodaCoreFactory.getModelService();
-    DIP dip = model.retrieveDIP(indexedDIP.getId());
-    dip.setPermissions(permissions);
-    model.updateDIPPermissions(dip);
+    Map<String, String> pluginParameters = new HashMap<>();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_PERMISSIONS_JSON, JsonUtils.getJsonFromObject(permissions));
+    return createAndExecuteInternalJob("Update DIP permissions recursively", dips, UpdatePermissionsPlugin.class, user,
+      pluginParameters, "Could not execute DIP permissions recursively action");
   }
 
   public static Risk createRisk(Risk risk, User user, boolean commit) throws GenericException {
@@ -2276,30 +2235,12 @@ public class BrowserHelper {
     return JsonUtils.getObjectFromJson(bv.getBinary().getContent().createInputStream(), Risk.class);
   }
 
-  public static void validateExportAIPParams(String acceptFormat) throws RequestNotValidException {
-    if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
-      throw new RequestNotValidException("Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT
-        + "' value. Expected values: " + Arrays.asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN));
-    }
-  }
-
   public static void validateListingParams(String acceptFormat) throws RequestNotValidException {
     if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
       && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
       throw new RequestNotValidException(
         "Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT + "' value. Expected values: " + Arrays
           .asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON, RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML));
-    }
-
-  }
-
-  public static void validateGetAIPParams(String acceptFormat) throws RequestNotValidException {
-    if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
-      && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)
-      && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP.equals(acceptFormat)) {
-      throw new RequestNotValidException("Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT
-        + "' value. Expected values: " + Arrays.asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON,
-          RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML, RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP));
     }
   }
 
@@ -2721,7 +2662,7 @@ public class BrowserHelper {
     TransferredResourcesScanner scanner = RodaCoreFactory.getTransferredResourcesScanner();
     scanner.updateTransferredResources(Optional.of(path), true);
     return RodaCoreFactory.getIndexService().retrieve(TransferredResource.class,
-      IdUtils.getTransferredResourceUUID(path), new ArrayList<>());
+      IdUtils.getTransferredResourceUUID(path), Collections.emptyList());
   }
 
   public static DIP createDIP(DIP dip) throws GenericException, AuthorizationDeniedException {

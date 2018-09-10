@@ -19,9 +19,11 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -31,7 +33,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.model.ModelService;
-import org.roda.core.plugins.plugins.internal.UpdateAIPPermissionsPlugin;
+import org.roda.core.plugins.plugins.internal.UpdatePermissionsPlugin;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,15 +104,16 @@ public class PermissionsRecursiveTest {
       Boolean.FALSE);
 
     Map<String, String> pluginParameters = new HashMap<>();
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_AIP_ID, parent.getId());
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_PERMISSIONS_JSON,
+      JsonUtils.getJsonFromObject(parent.getPermissions(), Permissions.class));
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, "Update descendant AIPs");
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_EVENT_DESCRIPTION,
       "The process of updating an object of the repository.");
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OUTCOME_TEXT,
       "Parent permissions were updated and all sublevels will be too");
 
-    Job job = TestsHelper.executeJob(UpdateAIPPermissionsPlugin.class, pluginParameters, PluginType.INTERNAL,
-      selectedItems);
+    Job job = TestsHelper.executeJob(UpdatePermissionsPlugin.class, pluginParameters, PluginType.INTERNAL,
+      (SelectedItems) selectedItems);
     assertEquals(2, job.getJobStats().getSourceObjectsCount());
 
     Set<PermissionType> permissions = model.retrieveAIP(otherChild.getId()).getPermissions()

@@ -20,11 +20,13 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.HasPermissions;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.LoadingAsyncCallback;
@@ -33,6 +35,7 @@ import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.MemberSelectDialog;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -105,7 +108,7 @@ public class EditPermissions extends Composite {
               @Override
               public void onSuccess(List<IndexedAIP> aips) {
                 List<? extends HasPermissions> hasPermissionsObjects = aips;
-                EditPermissions edit = new EditPermissions(IndexedAIP.class.getName(), hasPermissionsObjects);
+                EditPermissions edit = new EditPermissions(IndexedAIP.class.getName(), selected, hasPermissionsObjects);
                 callback.onSuccess(edit);
               }
             });
@@ -153,7 +156,6 @@ public class EditPermissions extends Composite {
               callback.onSuccess(edit);
             }
           });
-
       } else if (historyTokens.isEmpty()) {
         LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
         final SelectedItems<IndexedDIP> selected = (SelectedItems<IndexedDIP>) selectedItems.getSelectedItems();
@@ -171,7 +173,7 @@ public class EditPermissions extends Composite {
               @Override
               public void onSuccess(List<IndexedDIP> dips) {
                 List<? extends HasPermissions> hasPermissionsObjects = dips;
-                EditPermissions edit = new EditPermissions(IndexedDIP.class.getName(), hasPermissionsObjects);
+                EditPermissions edit = new EditPermissions(IndexedDIP.class.getName(), selected, hasPermissionsObjects);
                 callback.onSuccess(edit);
               }
             });
@@ -219,19 +221,23 @@ public class EditPermissions extends Composite {
   private List<HasPermissions> objects = new ArrayList<>();
   private String objectClass = null;
   private String objectId = null;
+  private SelectedItems<?> selectedItems;
 
   public EditPermissions(String objectClass, HasPermissions object) {
     this.objects.add(object);
     this.objectClass = objectClass;
     this.objectId = object.getId();
+    this.selectedItems = SelectedItemsList.create(objectClass, objectId);
     initWidget(uiBinder.createAndBindUi(this));
     buttonApplyToAll.setVisible(IndexedAIP.class.getName().equals(objectClass));
     createPermissionPanel();
   }
 
-  public EditPermissions(String objectClass, List<? extends HasPermissions> list) {
+  public EditPermissions(String objectClass, SelectedItems<? extends HasPermissions> selectedItems,
+    List<? extends HasPermissions> list) {
     this.objects.addAll(list);
     this.objectClass = objectClass;
+    this.selectedItems = selectedItems;
     initWidget(uiBinder.createAndBindUi(this));
     buttonApplyToAll.setVisible(IndexedAIP.class.getName().equals(objectClass));
     editPermissionsDescription.add(new HTMLWidgetWrapper("EditPermissionsDescription.html"));
@@ -461,27 +467,47 @@ public class EditPermissions extends Composite {
         @Override
         public void onSuccess(String details) {
           if (IndexedAIP.class.getName().equals(objectClass)) {
-            List<IndexedAIP> aips = (List<IndexedAIP>) (Object) objects;
+            SelectedItems<IndexedAIP> aips = (SelectedItems<IndexedAIP>) selectedItems;
             BrowserService.Util.getInstance().updateAIPPermissions(aips, permissions, details, recursive,
-              new LoadingAsyncCallback<Void>() {
+              new LoadingAsyncCallback<Job>() {
 
                 @Override
-                public void onSuccessImpl(Void result) {
-                  if (recursive) {
-                    Toast.showInfo(messages.dialogSuccess(), messages.permissionsWillBeChanged());
-                  } else {
-                    Toast.showInfo(messages.dialogSuccess(), messages.permissionsChanged());
-                  }
+                public void onSuccessImpl(Job result) {
+                  Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+                  Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      // do nothing
+                    }
+
+                    @Override
+                    public void onSuccess(final Void nothing) {
+                      HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                    }
+                  });
                 }
               });
           } else if (IndexedDIP.class.getName().equals(objectClass)) {
-            List<IndexedDIP> dips = (List<IndexedDIP>) (Object) objects;
+            SelectedItems<IndexedDIP> dips = (SelectedItems<IndexedDIP>) selectedItems;
             BrowserService.Util.getInstance().updateDIPPermissions(dips, permissions, details,
-              new LoadingAsyncCallback<Void>() {
+              new LoadingAsyncCallback<Job>() {
 
                 @Override
-                public void onSuccessImpl(Void result) {
-                  Toast.showInfo(messages.dialogSuccess(), messages.permissionsChanged());
+                public void onSuccessImpl(Job result) {
+                  Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+                  Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      // do nothing
+                    }
+
+                    @Override
+                    public void onSuccess(final Void nothing) {
+                      HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                    }
+                  });
                 }
               });
           }

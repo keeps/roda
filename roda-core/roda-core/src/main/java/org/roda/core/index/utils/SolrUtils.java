@@ -1222,6 +1222,7 @@ public class SolrUtils {
         ret.add(e);
       }
     }
+
     return ret;
   }
 
