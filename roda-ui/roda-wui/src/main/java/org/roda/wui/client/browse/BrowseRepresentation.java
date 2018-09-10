@@ -256,7 +256,7 @@ public class BrowseRepresentation extends Composite {
     // NAVIGATION TOOLBAR
     navigationToolbar.withObject(representation).withPermissions(aip.getPermissions())
       .withActionImpactHandler(Actionable.ActionImpact.DESTROYED,
-        () -> HistoryUtils.newHistory(BrowseAIP.RESOLVER, representation.getAipId()))
+        () -> HistoryUtils.newHistory(BrowseTop.RESOLVER, representation.getAipId()))
       .build();
 
     updateLayout(bundle, state, justActive);

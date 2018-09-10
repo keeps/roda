@@ -48,7 +48,6 @@ import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.management.UserLog;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
-import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
@@ -75,7 +74,6 @@ import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
@@ -97,52 +95,20 @@ import config.i18n.client.ClientMessages;
  */
 public class BrowseAIP extends Composite {
 
-  public static final HistoryResolver RESOLVER = new HistoryResolver() {
-
-    @Override
-    public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-      if (historyTokens.isEmpty()) {
-        BrowseTop.RESOLVER.resolve(historyTokens, callback);
-      } else if (historyTokens.size() == 1
-        && !historyTokens.get(0).equals(EditPermissions.AIP_RESOLVER.getHistoryToken())) {
-        String id = historyTokens.get(0);
-        if (id == null) {
-          HistoryUtils.newHistory(BrowseTop.RESOLVER);
-        } else {
-          container = new SimplePanel();
-          refresh(id, new AsyncCallback<BrowseAIPBundle>() {
-            @Override
-            public void onFailure(Throwable caught) {
-              callback.onFailure(caught);
-            }
-
-            @Override
-            public void onSuccess(BrowseAIPBundle result) {
-              callback.onSuccess(container);
-            }
-          });
-        }
-      } else {
-        HistoryUtils.newHistory(RESOLVER);
-        callback.onSuccess(null);
+  public static void getAndRefresh(String id, AsyncCallback<Widget> callback) {
+    container = new SimplePanel();
+    refresh(id, new AsyncCallback<BrowseAIPBundle>() {
+      @Override
+      public void onFailure(Throwable caught) {
+        callback.onFailure(caught);
       }
-    }
 
-    @Override
-    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      BrowseTop.RESOLVER.isCurrentUserPermitted(callback);
-    }
-
-    @Override
-    public String getHistoryToken() {
-      return BrowseTop.RESOLVER.getHistoryToken();
-    }
-
-    @Override
-    public List<String> getHistoryPath() {
-      return BrowseTop.RESOLVER.getHistoryPath();
-    }
-  };
+      @Override
+      public void onSuccess(BrowseAIPBundle result) {
+        callback.onSuccess(container);
+      }
+    });
+  }
 
   private static SimplePanel container;
 
@@ -322,7 +288,7 @@ public class BrowseAIP extends Composite {
       refresh(aipId, new NoAsyncCallback<BrowseAIPBundle>() {
         @Override
         public void onSuccess(BrowseAIPBundle aipBundle) {
-          container.setWidget(new BrowseAIP(aipBundle));
+          // nothing to do
         }
       });
     });
@@ -623,7 +589,7 @@ public class BrowseAIP extends Composite {
 
   private void newDescriptiveMetadataRedirect() {
     if (aipId != null) {
-      HistoryUtils.newHistory(RESOLVER, CreateDescriptiveMetadata.RESOLVER.getHistoryToken(),
+      HistoryUtils.newHistory(BrowseTop.RESOLVER, CreateDescriptiveMetadata.RESOLVER.getHistoryToken(),
         RodaConstants.RODA_OBJECT_AIP, aipId);
     }
   }

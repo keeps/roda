@@ -234,7 +234,7 @@ public class BrowseDIP extends Composite {
         title = messages.catalogueRepresentationTitle();
         deleteActionImpactHandler = () -> {
           IndexedRepresentation representation = (IndexedRepresentation) bundle.getReferrer();
-          HistoryUtils.newHistory(BrowseAIP.RESOLVER, representation.getAipId());
+          HistoryUtils.newHistory(BrowseTop.RESOLVER, representation.getAipId());
         };
       } else {
         processor = referredObject -> openReferred(referredObject,

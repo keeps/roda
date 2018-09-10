@@ -58,7 +58,7 @@ public class BrowseTop extends Composite {
         callback.onSuccess(instance);
       } else if (historyTokens.size() == 1
         && !historyTokens.get(0).equals(EditPermissions.AIP_RESOLVER.getHistoryToken())) {
-        BrowseAIP.RESOLVER.resolve(historyTokens, callback);
+        BrowseAIP.getAndRefresh(historyTokens.get(0), callback);
       } else if (historyTokens.size() > 1
         && historyTokens.get(0).equals(EditDescriptiveMetadata.RESOLVER.getHistoryToken())) {
         EditDescriptiveMetadata.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
