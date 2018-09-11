@@ -137,6 +137,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.plugins.plugins.characterization.SiegfriedPlugin;
+import org.roda.core.plugins.plugins.internal.AddRepresentationInformationFilterPlugin;
 import org.roda.core.plugins.plugins.internal.AppraisalPlugin;
 import org.roda.core.plugins.plugins.internal.ChangeTypePlugin;
 import org.roda.core.plugins.plugins.internal.DeleteRODAObjectPlugin;
@@ -3007,28 +3008,14 @@ public class BrowserHelper {
     return bundle;
   }
 
-  public static boolean updateRepresentationInformationListWithFilter(
+  public static Job updateRepresentationInformationListWithFilter(
     SelectedItems<RepresentationInformation> representationInformationItems, String filterToAdd, User user)
-    throws GenericException, RequestNotValidException {
-    ModelService model = RodaCoreFactory.getModelService();
-    boolean success = true;
-
-    // TODO 20180911 bferreira: create a plugin to do this
-    List<String> idsList = consolidate(user, RepresentationInformation.class, representationInformationItems);
-
-    for (String id : idsList) {
-      try {
-        RepresentationInformation representationInformation = model.retrieveRepresentationInformation(id);
-        if (!representationInformation.getFilters().contains(filterToAdd)) {
-          representationInformation.getFilters().add(filterToAdd);
-        }
-        model.updateRepresentationInformation(representationInformation, user.getName(), true);
-      } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
-        success = false;
-        LOGGER.error("Could not update filter for representation information id: {}", id, e);
-      }
-    }
-    return success;
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    Map<String, String> pluginParameters = new HashMap<>();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_INFORMATION_FILTER, filterToAdd);
+    return createAndExecuteInternalJob("Update representation information with filter", representationInformationItems,
+      AddRepresentationInformationFilterPlugin.class, user, pluginParameters,
+      "Could not update representation information with filter " + filterToAdd);
   }
 
   public static RepresentationInformationExtraBundle retrieveRepresentationInformationExtraBundle(

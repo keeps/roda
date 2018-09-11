@@ -751,7 +751,8 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     Date mitigatedOn, String mitigatedBy, String mitigatedDescription)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.updateMultipleIncidences(user, selected, status, severity, mitigatedOn, mitigatedBy, mitigatedDescription);
+    return Browser.updateMultipleIncidences(user, selected, status, severity, mitigatedOn, mitigatedBy,
+      mitigatedDescription);
   }
 
   @Override
@@ -908,11 +909,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void updateRepresentationInformationListWithFilter(
+  public Job updateRepresentationInformationListWithFilter(
     SelectedItems<RepresentationInformation> representationInformationItems, String filterToAdd)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+          throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.updateRepresentationInformationListWithFilter(user, representationInformationItems, filterToAdd);
+    return Browser.updateRepresentationInformationListWithFilter(user, representationInformationItems, filterToAdd);
   }
 
   @Override

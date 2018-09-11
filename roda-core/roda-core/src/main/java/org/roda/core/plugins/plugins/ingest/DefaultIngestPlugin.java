@@ -569,9 +569,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
           AIP aip = model.retrieveAIP(entry.getKey());
           TransferredResource tr = index.retrieve(TransferredResource.class, transferredResourceId,
             Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH));
-          boolean notify = true;
-          PluginHelper.createPluginEvent(this, aip.getId(), model, index, tr, PluginState.SUCCESS, "", notify,
-            eventDate);
+          PluginHelper.createPluginEvent(this, aip.getId(), model, index, tr, PluginState.SUCCESS, "", true, eventDate);
         } catch (NotFoundException | RequestNotValidException | GenericException | AuthorizationDeniedException
           | ValidationException | AlreadyExistsException e) {
           LOGGER.warn("Error creating ingest event", e);

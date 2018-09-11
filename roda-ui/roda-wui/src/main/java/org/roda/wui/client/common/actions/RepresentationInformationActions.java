@@ -151,10 +151,23 @@ public class RepresentationInformationActions extends AbstractActionable<Represe
               .get(HistoryUtils.getCurrentHistoryPath().size() - 1);
 
             BrowserService.Util.getInstance().updateRepresentationInformationListWithFilter(selectedItems, filtertoAdd,
-              new NoAsyncCallback<Void>() {
+              new NoAsyncCallback<Job>() {
                 @Override
-                public void onSuccess(Void result) {
-                  doActionCallbackUpdated();
+                public void onSuccess(Job result) {
+                  Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+
+                  Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      doActionCallbackUpdated();
+                    }
+
+                    @Override
+                    public void onSuccess(final Void nothing) {
+                      HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                    }
+                  });
                 }
               });
           } else {

@@ -48,15 +48,17 @@ public class PermissionUtils {
     for (DescriptiveMetadata descriptiveMetadata : descriptiveMetadataList) {
       Binary descriptiveMetadataBinary = model.retrieveDescriptiveMetadataBinary(aip.getId(),
         descriptiveMetadata.getId());
-      InputStream createInputStream = descriptiveMetadataBinary.getContent().createInputStream();
-      String xpath = RodaCoreFactory.getRodaConfigurationAsString("core", "permissions", "xpath");
-      String freeAccessTerm = RodaCoreFactory.getRodaConfigurationAsString("core", "permissions", "freeaccess");
 
-      if (StringUtils.isNotBlank(xpath) && StringUtils.isNotBlank(freeAccessTerm)) {
-        String useRestrict = XMLUtility.getString(createInputStream, xpath);
-        if (useRestrict.equals(freeAccessTerm)) {
-          readPermissionToUserGroup.add(Permissions.PermissionType.READ);
-          permissions.setGroupPermissions(RodaConstants.OBJECT_PERMISSIONS_USER_GROUP, readPermissionToUserGroup);
+      try(InputStream createInputStream = descriptiveMetadataBinary.getContent().createInputStream()) {
+        String xpath = RodaCoreFactory.getRodaConfigurationAsString("core", "permissions", "xpath");
+        String freeAccessTerm = RodaCoreFactory.getRodaConfigurationAsString("core", "permissions", "freeaccess");
+
+        if (StringUtils.isNotBlank(xpath) && StringUtils.isNotBlank(freeAccessTerm)) {
+          String useRestrict = XMLUtility.getString(createInputStream, xpath);
+          if (useRestrict.equals(freeAccessTerm)) {
+            readPermissionToUserGroup.add(Permissions.PermissionType.READ);
+            permissions.setGroupPermissions(RodaConstants.OBJECT_PERMISSIONS_USER_GROUP, readPermissionToUserGroup);
+          }
         }
       }
     }

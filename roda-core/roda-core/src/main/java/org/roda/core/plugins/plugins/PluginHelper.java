@@ -132,7 +132,7 @@ public final class PluginHelper {
     RODAObjectsProcessingLogic<T> objectsLogic, IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> liteList, boolean autoLocking) throws PluginException {
     Report report = PluginHelper.initPluginReport(plugin);
-    List<T> list = new ArrayList<>();
+    List<T> list;
     Throwable exceptionOccurred = null;
 
     try {
@@ -581,6 +581,7 @@ public final class PluginHelper {
     } catch (ClassCastException e) {
       jobPluginInfo = plugin.getJobPluginInfo(IngestJobPluginInfo.class);
     }
+
     if (jobPluginInfo != null) {
       jobPluginInfo.setSourceObjectsBeingProcessed(sourceObjectsBeingProcess).setSourceObjectsWaitingToBeProcessed(0);
       return jobPluginInfo;

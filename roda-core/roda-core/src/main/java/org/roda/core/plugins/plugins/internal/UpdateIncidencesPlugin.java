@@ -211,17 +211,17 @@ public class UpdateIncidencesPlugin extends AbstractPlugin<RiskIncidence> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Appraisal accept or remove AIPs";
+    return "Update multiple incidences";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "Appraisal accept or remove AIPs was successful";
+    return "Multiple incidences update was successful";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Appraisal accept or remove AIPs failed";
+    return "Multiple incidences update failed";
   }
 
   @Override

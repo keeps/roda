@@ -56,7 +56,7 @@ public class UserManagementHelper {
   }
 
   protected static User retrieveUser(String username) throws GenericException {
-    return RodaCoreFactory.getModelService().retrieveUserByName(username);
+    return RodaCoreFactory.getModelService().retrieveUser(username);
   }
 
   protected static Group retrieveGroup(String groupname) throws GenericException, NotFoundException {
@@ -143,7 +143,7 @@ public class UserManagementHelper {
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
     modifiedUser.setExtra(getUserExtra(extra));
 
-    User currentUser = RodaCoreFactory.getModelService().retrieveUserByName(modifiedUser.getName());
+    User currentUser = RodaCoreFactory.getModelService().retrieveUser(modifiedUser.getName());
     User resetUser = resetUser(modifiedUser, currentUser);
 
     User finalModifiedUser = RodaCoreFactory.getModelService().updateMyUser(resetUser, password, true);
@@ -258,7 +258,7 @@ public class UserManagementHelper {
       Set<MetadataValue> values = ServerTools.transform(template);
 
       try {
-        User user = RodaCoreFactory.getModelService().retrieveUserByName(name);
+        User user = RodaCoreFactory.getModelService().retrieveUser(name);
         String userExtra = user.getExtra();
 
         if (userExtra != null && !values.isEmpty()) {

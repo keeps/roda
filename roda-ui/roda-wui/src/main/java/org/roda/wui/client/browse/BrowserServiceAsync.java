@@ -15,6 +15,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
@@ -257,7 +260,7 @@ public interface BrowserServiceAsync {
 
   void updateRepresentationInformationListWithFilter(
     SelectedItems<RepresentationInformation> representationInformationIds, String filterToAdd,
-    AsyncCallback<Void> asyncCallback);
+    AsyncCallback<Job> asyncCallback);
 
   void deleteRepresentationInformation(SelectedItems<RepresentationInformation> selected,
     AsyncCallback<Job> asyncCallback);

@@ -1707,10 +1707,6 @@ public class ModelService extends ModelObservable {
     return UserUtility.getLdapUtility().getAuthenticatedUser(name, password);
   }
 
-  public User retrieveUserByName(String name) throws GenericException {
-    return UserUtility.getLdapUtility().getUser(name);
-  }
-
   public User retrieveUserByEmail(String email) throws GenericException {
     return UserUtility.getLdapUtility().getUserWithEmail(email);
   }

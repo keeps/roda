@@ -67,7 +67,7 @@ public class UserLoginHelper {
     User user = null;
 
     try {
-      user = RodaCoreFactory.getModelService().retrieveUserByName(username);
+      user = RodaCoreFactory.getModelService().retrieveUser(username);
     } catch (GenericException e) {
       if (!(e.getCause() instanceof LdapException)) {
         throw e;

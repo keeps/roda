@@ -343,9 +343,9 @@ public interface BrowserService extends RemoteService {
   void updateRepresentationInformation(RepresentationInformation ri, RepresentationInformationExtraBundle extra)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
-  void updateRepresentationInformationListWithFilter(
+  Job updateRepresentationInformationListWithFilter(
     SelectedItems<RepresentationInformation> representationInformationIds, String filterToAdd)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+          throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
   Job deleteRepresentationInformation(SelectedItems<RepresentationInformation> selected)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;

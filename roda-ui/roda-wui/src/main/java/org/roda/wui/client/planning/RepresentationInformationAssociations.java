@@ -97,8 +97,6 @@ public class RepresentationInformationAssociations extends Composite {
   @UiField(provided = true)
   SearchWrapper searchWrapper;
 
-
-
   public RepresentationInformationAssociations(Filter filter, String[] filterParts) {
     ListBuilder<RepresentationInformation> representationInformationAssociationsListBuilder = new ListBuilder<>(
       () -> new RepresentationInformationList(),
