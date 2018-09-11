@@ -23,6 +23,7 @@ import org.roda.core.data.v2.index.filter.OrFiltersParameters;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
+import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -40,6 +41,7 @@ import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.RepresentationInformationList;
 import org.roda.wui.client.common.lists.RepresentationList;
 import org.roda.wui.client.common.lists.SimpleFileList;
+import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.Dropdown;
@@ -85,9 +87,11 @@ public class RepresentationInformationDialogs {
     final AsyncCallback<RepresentationInformation> callback) {
     final DialogBox dialogBox = new DialogBox(true, true);
     dialogBox.addStyleName("ri-dialog");
+    dialogBox.addStyleName("wui-dialog-prompt");
     dialogBox.setText(title);
 
     final FlowPanel layout = new FlowPanel();
+    layout.addStyleName("wui-dialog-layout");
 
     HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIAssociationsDescription.html", new AsyncCallback<Void>() {
       @Override
@@ -116,10 +120,10 @@ public class RepresentationInformationDialogs {
     final FlowPanel buttonPanel = new FlowPanel();
     final Button cancelButton = new Button(cancelButtonText);
     final Button confirmButton = new Button(confirmButtonText);
-    final Button listButton = new Button(listButtonText);
+    final Button searchButton = new Button(listButtonText);
     buttonPanel.add(cancelButton);
     buttonPanel.add(confirmButton);
-    buttonPanel.add(listButton);
+    buttonPanel.add(searchButton);
 
     layout.add(buttonPanel);
     dialogBox.setWidget(layout);
@@ -218,14 +222,16 @@ public class RepresentationInformationDialogs {
             }
           });
 
-          listButton.addClickHandler(new ClickHandler() {
+          searchButton.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
               List<FilterParameter> filterList = new ArrayList<>();
-              for (String field : values.keySet()) {
-                for (String value : values.get(field)) {
-                  if (StringUtils.isNotBlank(value)) {
-                    filterList.add(new SimpleFilterParameter(field, value));
+              for (String field : appropriateFields) {
+                if (values.containsKey(field)) {
+                  for (String value : values.get(field)) {
+                    if (StringUtils.isNotBlank(value)) {
+                      filterList.add(new SimpleFilterParameter(field, value));
+                    }
                   }
                 }
               }
@@ -239,18 +245,20 @@ public class RepresentationInformationDialogs {
                 if (SEARCH_ITEMS.equals(dropDown.getSelectedValue())) {
                   listBuilder = new ListBuilder<>(() -> new AIPList(),
                     new AsyncTableCellOptions<>(IndexedAIP.class, aipListId).withFilter(tableFilter)
-                      .withJustActive(true).withCsvDownloadButtonVisibility(false).addRedrawHandler(dialogBox::center));
+                      .withJustActive(true).withCsvDownloadButtonVisibility(false)
+                      .addRedrawHandler(() -> dialogBox.center()));
 
                 } else if (SEARCH_REPRESENTATIONS.equals(dropDown.getSelectedValue())) {
                   listBuilder = new ListBuilder<>(() -> new RepresentationList(),
                     new AsyncTableCellOptions<>(IndexedRepresentation.class, representationsListId)
                       .withFilter(tableFilter).withJustActive(true).withCsvDownloadButtonVisibility(false)
-                      .addRedrawHandler(dialogBox::center));
+                      .addRedrawHandler(() -> dialogBox.center()));
 
                 } else if (SEARCH_FILES.equals(dropDown.getSelectedValue())) {
                   listBuilder = new ListBuilder<>(() -> new SimpleFileList(),
                     new AsyncTableCellOptions<>(IndexedFile.class, filesListId).withFilter(tableFilter)
-                      .withJustActive(true).withCsvDownloadButtonVisibility(false).addRedrawHandler(dialogBox::center));
+                      .withJustActive(true).withCsvDownloadButtonVisibility(false)
+                      .addRedrawHandler(() -> dialogBox.center()));
 
                 }
 
@@ -278,7 +286,7 @@ public class RepresentationInformationDialogs {
     layout.addStyleName("wui-dialog-layout");
     cancelButton.addStyleName("btn btn-link");
     confirmButton.addStyleName("pull-right left-spaced btn btn-play");
-    listButton.addStyleName("pull-right btn btn-search");
+    searchButton.addStyleName("pull-right btn btn-search");
 
     dialogBox.center();
     dialogBox.show();
@@ -336,10 +344,10 @@ public class RepresentationInformationDialogs {
     final List<HandlerRegistration> clickHandlers = new ArrayList<>();
     final DialogBox dialogBox = new DialogBox(true, true);
     dialogBox.addStyleName("ri-dialog");
-    dialogBox.setText(title);
-    final FlowPanel layout = new FlowPanel();
-
     dialogBox.addStyleName("wui-dialog-prompt");
+    dialogBox.setText(title);
+
+    final FlowPanel layout = new FlowPanel();
     layout.addStyleName("wui-dialog-layout");
 
     BrowserService.Util.getInstance().retrieveRelationTypeTranslations(LocaleInfo.getCurrentLocale().getLocaleName(),
@@ -793,7 +801,7 @@ public class RepresentationInformationDialogs {
 
   public static void showPromptAddRepresentationInformationWithAssociation(SafeHtml title,
     final String cancelButtonText, final String addToSelectedRIButtonText, final String addToNewRIButtonText,
-    final AsyncCallback<SelectedItemsList<RepresentationInformation>> callback) {
+    final AsyncCallback<SelectedItems<RepresentationInformation>> callback) {
 
     final DialogBox dialogBox = new DialogBox(true, true);
     dialogBox.addStyleName("ri-dialog");
@@ -847,7 +855,7 @@ public class RepresentationInformationDialogs {
   }
 
   public static FlowPanel createInnerAddRepresentationInformationwithAssociation(final DialogBox dialogBox,
-    final Button addToSelectedRIButton, final AsyncCallback<SelectedItemsList<RepresentationInformation>> callback) {
+    final Button addToSelectedRIButton, final AsyncCallback<SelectedItems<RepresentationInformation>> callback) {
     FlowPanel container = new FlowPanel();
     container.addStyleName("wui-dialog-message");
 
@@ -857,15 +865,16 @@ public class RepresentationInformationDialogs {
       () -> new RepresentationInformationList(),
       new AsyncTableCellOptions<>(RepresentationInformation.class, "RepresentationInformationDialogs_RI")
         .withSummary(messages.representationInformationTitle()).withInitialPageSize(10).withPageSizeIncrement(10)
-        .withCsvDownloadButtonVisibility(false).addRedrawHandler(dialogBox::center)
-        .addCheckboxSelectionListener(selected -> {
-          if (selected instanceof SelectedItemsList) {
-            SelectedItemsList<RepresentationInformation> list = (SelectedItemsList<RepresentationInformation>) selected;
-            addToSelectedRIButton.setEnabled(!list.getIds().isEmpty());
-          } else {
-            // TODO bferreira 2017-12-04: add support for SelectedItemsFilter
-            // (is it needed?)
-            throw new RuntimeException("Only SelectedItemsList is supported on RI, for now");
+        .withCsvDownloadButtonVisibility(false).addRedrawHandler(dialogBox::center).withForceSelectable(true)
+        .addCheckboxSelectionListener(new AsyncTableCell.CheckboxSelectionListener<RepresentationInformation>() {
+          @Override
+          public void onSelectionChange(SelectedItems<RepresentationInformation> selected) {
+            if (selected instanceof SelectedItemsNone
+              || (selected instanceof SelectedItemsList && ((SelectedItemsList) selected).getIds().isEmpty())) {
+              addToSelectedRIButton.setEnabled(false);
+            } else {
+              addToSelectedRIButton.setEnabled(true);
+            }
           }
         }));
 
@@ -876,17 +885,7 @@ public class RepresentationInformationDialogs {
 
     addToSelectedRIButton.addClickHandler(event -> {
       dialogBox.hide();
-
-      SelectedItems<RepresentationInformation> selected = searchWrapper
-        .getSelectedItems(RepresentationInformation.class);
-      if (selected instanceof SelectedItemsList) {
-        SelectedItemsList<RepresentationInformation> list = (SelectedItemsList<RepresentationInformation>) selected;
-        callback.onSuccess(list);
-      } else {
-        // TODO bferreira 2017-12-04: add support for SelectedItemsFilter (is
-        // it needed?)
-        throw new RuntimeException("Only SelectedItemsList is supported on RI, for now");
-      }
+      callback.onSuccess(searchWrapper.getSelectedItems(RepresentationInformation.class));
     });
 
     return container;

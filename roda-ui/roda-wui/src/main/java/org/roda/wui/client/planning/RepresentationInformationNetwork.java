@@ -15,14 +15,11 @@ import java.util.List;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.RepresentationInformationActions;
-import org.roda.wui.client.common.actions.model.ActionableObject;
-import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.lists.RepresentationInformationList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchWrapper;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -36,7 +33,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -88,13 +84,7 @@ public class RepresentationInformationNetwork extends Composite {
   SearchWrapper searchPanel;
 
   @UiField
-  FlowPanel sidebar;
-
-  @UiField
   FlowPanel content;
-
-  @UiField
-  SimplePanel actionsSidebar;
 
   /**
    * Create a representation information page
@@ -110,9 +100,6 @@ public class RepresentationInformationNetwork extends Composite {
     searchPanel = new SearchWrapper(false).createListAndSearchPanel(representationInformationListBuilder);
 
     initWidget(uiBinder.createAndBindUi(this));
-
-    actionsSidebar.setWidget(new ActionableWidgetBuilder<>(RepresentationInformationActions.get())
-      .buildListWithObjects(new ActionableObject<>(RepresentationInformation.class)));
 
     Label titleLabel = new Label(messages.representationInformationRegisterTitle());
     titleLabel.addStyleName("h1 browseItemText");
@@ -131,12 +118,6 @@ public class RepresentationInformationNetwork extends Composite {
       instance = new RepresentationInformationNetwork();
     }
     return instance;
-  }
-
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {

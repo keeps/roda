@@ -334,12 +334,12 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
             searchPreFilters.add(header);
           } else {
             InlineHTML andSeparator = new InlineHTML(messages.searchPreFilterAnd());
-            andSeparator.addStyleName("xsmall gray");
+            andSeparator.addStyleName("gray");
             searchPreFilters.add(andSeparator);
           }
 
           HTML html = new HTML(filterHTML);
-          html.addStyleName("xsmall gray inline nowrap");
+          html.addStyleName("gray inline nowrap");
           searchPreFilters.add(html);
         }
       }

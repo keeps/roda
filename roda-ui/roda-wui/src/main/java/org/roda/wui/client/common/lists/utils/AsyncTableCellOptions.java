@@ -39,6 +39,7 @@ public class AsyncTableCellOptions<T extends IsIndexed> {
   private boolean csvDownloadButtonVisibility;
   private boolean startHidden;
   private String searchPlaceholder;
+  private boolean forceSelectable;
 
   public AsyncTableCellOptions(Class<T> classToReturn, String listId) {
     this.classToReturn = classToReturn;
@@ -63,6 +64,7 @@ public class AsyncTableCellOptions<T extends IsIndexed> {
     csvDownloadButtonVisibility = true;
     startHidden = false;
     searchPlaceholder = null;
+    forceSelectable = false;
   }
 
   public Class<T> getClassToReturn() {
@@ -245,6 +247,15 @@ public class AsyncTableCellOptions<T extends IsIndexed> {
 
   public AsyncTableCellOptions<T> withActionableCallback(AsyncCallback<Actionable.ActionImpact> actionableCallback) {
     this.actionableCallback = actionableCallback;
+    return this;
+  }
+
+  public boolean getForceSelectable() {
+    return forceSelectable;
+  }
+
+  public AsyncTableCellOptions<T> withForceSelectable(boolean forceSelectable) {
+    this.forceSelectable = forceSelectable;
     return this;
   }
 }

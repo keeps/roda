@@ -3008,16 +3008,21 @@ public class BrowserHelper {
   }
 
   public static boolean updateRepresentationInformationListWithFilter(
-    SelectedItemsList<RepresentationInformation> representationInformationIds, String filterToAdd, String username) {
+    SelectedItems<RepresentationInformation> representationInformationItems, String filterToAdd, User user)
+    throws GenericException, RequestNotValidException {
     ModelService model = RodaCoreFactory.getModelService();
     boolean success = true;
-    for (String id : representationInformationIds.getIds()) {
+
+    // TODO 20180911 bferreira: create a plugin to do this
+    List<String> idsList = consolidate(user, RepresentationInformation.class, representationInformationItems);
+
+    for (String id : idsList) {
       try {
         RepresentationInformation representationInformation = model.retrieveRepresentationInformation(id);
         if (!representationInformation.getFilters().contains(filterToAdd)) {
           representationInformation.getFilters().add(filterToAdd);
         }
-        model.updateRepresentationInformation(representationInformation, username, true);
+        model.updateRepresentationInformation(representationInformation, user.getName(), true);
       } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
         success = false;
         LOGGER.error("Could not update filter for representation information id: {}", id, e);

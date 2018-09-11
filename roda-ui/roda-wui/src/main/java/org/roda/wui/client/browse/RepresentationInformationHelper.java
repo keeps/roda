@@ -47,7 +47,7 @@ public class RepresentationInformationHelper {
       icon.addStyleName("icon-left-padding");
 
       if (StringUtils.isBlank(iconCssClass)) {
-        icon.addStyleName("browseIconBlue");
+        icon.addStyleName("representationInformationPresent");
       }
 
       BrowserService.Util.getInstance().retrieveRepresentationInformationWithFilter(filter,
@@ -62,10 +62,10 @@ public class RepresentationInformationHelper {
           public void onSuccess(Pair<String, Integer> pair) {
             LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
             selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
-            icon.removeStyleName("browseIconRed");
+            icon.removeStyleName("representationInformationMissing");
 
             if (StringUtils.isBlank(iconCssClass)) {
-              icon.addStyleName("browseIconBlue");
+              icon.addStyleName("representationInformationPresent");
             }
 
             if (pair.getSecond() == 1) {
@@ -74,8 +74,8 @@ public class RepresentationInformationHelper {
               icon.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationAssociations.RESOLVER,
                 RodaConstants.REPRESENTATION_INFORMATION_FILTERS, filter));
             } else {
-              icon.addStyleName("browseIconRed");
-              icon.removeStyleName("browseIconBlue");
+              icon.addStyleName("representationInformationMissing");
+              icon.removeStyleName("representationInformationPresent");
               icon.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationAssociations.RESOLVER,
                 RodaConstants.REPRESENTATION_INFORMATION_FILTERS, filter));
             }

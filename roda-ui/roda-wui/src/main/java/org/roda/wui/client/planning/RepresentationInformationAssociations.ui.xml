@@ -11,6 +11,7 @@
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_12 content">
 				<g:FlowPanel ui:field="title"></g:FlowPanel>
+				<g:HTML addStyleNames="h4 representationInformationSubtitle" ui:field="resultsPanelTitle" />
 				<g:HTML addStyleNames="page-description" ui:field="description"></g:HTML>
 
 				<g:FlowPanel ui:field="createPanel" visible="false" addStyleNames="card representationInformationCard representationInformationCardCreate">
@@ -26,7 +27,6 @@
 				</g:FlowPanel>
 
 				<g:FlowPanel ui:field="resultsPanel" visible="false" addStyleNames="card representationInformationCard representationInformationCardList">
-					<g:HTML addStyleNames="h5" ui:field="resultsPanelTitle" />
 					<commonsearch:SearchWrapper ui:field="searchWrapper" />
 				</g:FlowPanel>
 			</g:FlowPanel>

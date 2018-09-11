@@ -3371,21 +3371,23 @@ public class Browser extends RodaWuiController {
   }
 
   public static void updateRepresentationInformationListWithFilter(User user,
-    SelectedItemsList<RepresentationInformation> representationInformationIds, String filterToAdd)
+    SelectedItems<RepresentationInformation> representationInformationItems, String filterToAdd)
     throws AuthorizationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    boolean resultSuccess = BrowserHelper.updateRepresentationInformationListWithFilter(representationInformationIds,
-      filterToAdd, user.getName());
-
-    LOG_ENTRY_STATE state = resultSuccess ? LOG_ENTRY_STATE.SUCCESS : LOG_ENTRY_STATE.FAILURE;
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    try {
+      BrowserHelper.updateRepresentationInformationListWithFilter(representationInformationItems, filterToAdd, user);
+    } catch (RequestNotValidException | GenericException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+    }
 
     // register action
     controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_REPRESENTATION_INFORMATION_PARAM,
-      representationInformationIds);
+      representationInformationItems);
   }
 
   public static RepresentationInformationExtraBundle retrieveRepresentationInformationExtraBundle(User user,

@@ -909,10 +909,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   @Override
   public void updateRepresentationInformationListWithFilter(
-    SelectedItemsList<RepresentationInformation> representationInformationIds, String filterToAdd)
+    SelectedItems<RepresentationInformation> representationInformationItems, String filterToAdd)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.updateRepresentationInformationListWithFilter(user, representationInformationIds, filterToAdd);
+    Browser.updateRepresentationInformationListWithFilter(user, representationInformationItems, filterToAdd);
   }
 
   @Override

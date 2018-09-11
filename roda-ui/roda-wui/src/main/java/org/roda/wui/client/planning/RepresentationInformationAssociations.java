@@ -14,19 +14,19 @@ import java.util.List;
 
 import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.index.select.SelectedItemsList;
+import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.actions.RepresentationInformationActions;
 import org.roda.wui.client.common.dialogs.RepresentationInformationDialogs;
 import org.roda.wui.client.common.lists.RepresentationInformationList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchWrapper;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -34,7 +34,6 @@ import org.roda.wui.common.client.tools.ListUtils;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -115,7 +114,7 @@ public class RepresentationInformationAssociations extends Composite {
   SearchWrapper searchWrapper;
 
   private SafeHtml addWithAssociationDialogTitle;
-  private boolean gettingFilterResults = true;
+  private boolean isInitializing = true;
 
   /**
    * Create a representation information page
@@ -123,34 +122,26 @@ public class RepresentationInformationAssociations extends Composite {
   public RepresentationInformationAssociations() {
 
     ValueChangeHandler<IndexResult<RepresentationInformation>> valueChangeHandler = event -> {
-      boolean associating = gettingFilterResults && event.getValue().getTotalCount() == 0;
+      boolean associating = isInitializing && event.getValue().getTotalCount() == 0;
       resultsPanel.setVisible(!associating);
       createPanel.setVisible(associating);
+      isInitializing = false;
     };
 
     ListBuilder<RepresentationInformation> representationInformationAssociationsListBuilder = new ListBuilder<>(
       () -> new RepresentationInformationList(),
       new AsyncTableCellOptions<>(RepresentationInformation.class, "RepresentationInformationAssociations_RI")
-        .bindOpener().addValueChangedHandler(valueChangeHandler)
+        .bindOpener().addValueChangedHandler(valueChangeHandler).withActionable(RepresentationInformationActions.get())
         .withSearchPlaceholder(messages.representationInformationRegisterSearchPlaceHolder()));
 
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(representationInformationAssociationsListBuilder);
+    searchWrapper.setVisible(false);
 
     initWidget(uiBinder.createAndBindUi(this));
 
     resultsPanel.setVisible(false);
     createPanel.setVisible(false);
-
-    searchWrapper.addSearchFieldTextValueChangeHandler(RepresentationInformation.class,
-      new ValueChangeHandler<String>() {
-      @Override
-      public void onValueChange(ValueChangeEvent<String> valueChangeEvent) {
-        // the user is searching. use this flag to avoid showing the options to
-        // associate the filter with RI (if this was not present, those options
-        // would show up if the search had no results)
-        gettingFilterResults = false;
-      }
-    });
+    searchWrapper.setVisible(true);
 
     Label titleLabel = new Label(messages.representationInformationAssociationsTitle());
     titleLabel.addStyleName("h1 browseItemText");
@@ -165,26 +156,20 @@ public class RepresentationInformationAssociations extends Composite {
         RepresentationInformationDialogs.showPromptAddRepresentationInformationWithAssociation(
           addWithAssociationDialogTitle, messages.cancelButton(), messages.addToExistingRepresentationInformation(),
           messages.createNewRepresentationInformation(),
-          new NoAsyncCallback<SelectedItemsList<RepresentationInformation>>() {
+          new NoAsyncCallback<SelectedItems<RepresentationInformation>>() {
             @Override
-            public void onSuccess(final SelectedItemsList<RepresentationInformation> selectedItemsList) {
-              if (selectedItemsList != null) {
+            public void onSuccess(final SelectedItems<RepresentationInformation> selectedItems) {
+              if (selectedItems != null) {
                 String filtertoAdd = HistoryUtils.getCurrentHistoryPath()
                   .get(HistoryUtils.getCurrentHistoryPath().size() - 1);
 
-                BrowserService.Util.getInstance().updateRepresentationInformationListWithFilter(selectedItemsList,
+                BrowserService.Util.getInstance().updateRepresentationInformationListWithFilter(selectedItems,
                   filtertoAdd, new NoAsyncCallback<Void>() {
                     @Override
                     public void onSuccess(Void result) {
-                      if (selectedItemsList.getIds().size() == 1) {
-                        HistoryUtils.newHistory(ShowRepresentationInformation.RESOLVER,
-                          selectedItemsList.getIds().get(0));
-                      } else {
-                        gettingFilterResults = false;
-                        searchWrapper.refreshCurrentList();
-                        createPanel.setVisible(false);
-                        resultsPanel.setVisible(true);
-                      }
+                      searchWrapper.refreshCurrentList();
+                      createPanel.setVisible(false);
+                      resultsPanel.setVisible(true);
                     }
                   });
               } else {
@@ -210,14 +195,8 @@ public class RepresentationInformationAssociations extends Composite {
     return instance;
   }
 
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
-  }
-
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-    gettingFilterResults = true;
+    isInitializing = true;
     createPanel.setVisible(false);
     resultsPanel.setVisible(false);
 

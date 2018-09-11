@@ -294,9 +294,10 @@ div.inline {
 }
 
 .card > .h5,
-.card .actionable-header {
+.card .actionable-header,
+.representationInformationSubtitle{
     margin-top: 0;
-    color: #089de3;
+    color: #999;
     font-weight: 300;
     margin-bottom: 1rem;
 }
@@ -456,6 +457,10 @@ div.inline {
     margin-bottom: 1em;
     font-size: 1.3rem;
     line-height: 1.5em;
+}
+
+.ri-dialog .page-description p {
+    max-width: 40vw;
 }
 
 .roda-logo {
@@ -2344,17 +2349,25 @@ td.datePickerMonth, td.datePickerYear {
     margin-left: 3px;
 }
 
-.browseIconRed i {
-    color: #af1612 !important;
+.representationInformationMissing i {
+    color: #af1612;
     background-color: white;
     border-radius: 1em;
     width: 1em;
     text-align: center;
 }
 
-.browseIconBlue i {
-    color: #089de3 !important;
+.representationInformationPresent i {
+    color: #089de3;
     background-color: white;
+    border-radius: 1em;
+    width: 1em;
+    text-align: center;
+}
+
+.slider .representationInformationPresent i {
+    background-color: #089de3;
+    color: white;
     border-radius: 1em;
     width: 1em;
     text-align: center;
@@ -3878,6 +3891,10 @@ td.datePickerMonth, td.datePickerYear {
 
 .search .searchInput {
     display: flex;
+}
+
+.searchPreFilters {
+    font-size: 60%;
 }
 
 /**********************************************
@@ -6529,6 +6546,10 @@ span.code {
     font-weight: inherit;
 }
 
+.representationInformationSubtitle span.code {
+    font-weight: bold;
+}
+
 .wui-data-panel .incremental-list-vertical {
     max-width: 300px;
 }
@@ -6870,6 +6891,10 @@ span.code {
 .card + .ActionableStyleButtons, .ActionableStyleButtons + .ActionableStyleButtons {
     margin-top: 20px;
     line-height: 1rem;
+}
+
+.card .searchPreFilters {
+    margin-left: 3px;
 }
 
 /* Actionable Title/Header */
