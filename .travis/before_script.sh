@@ -20,4 +20,6 @@ sudo freshclam --datadir=$CLAMAV_DATABASE
 sudo -u clamav chmod -R a+r "$CLAMAV_DATABASE"
 
 # decrypt maven setting.xml
-openssl aes-256-cbc -K $encrypted_a8a9ca6bf122_key -iv $encrypted_a8a9ca6bf122_iv -in .travis/settings.xml.enc -out settings.xml -d
+if [[ ! -z "$encrypted_a8a9ca6bf122_key" ]]; then
+  openssl aes-256-cbc -K $encrypted_a8a9ca6bf122_key -iv $encrypted_a8a9ca6bf122_iv -in .travis/settings.xml.enc -out settings.xml -d
+fi
