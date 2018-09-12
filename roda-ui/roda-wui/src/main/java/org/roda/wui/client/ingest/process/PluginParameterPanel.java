@@ -20,6 +20,7 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.jobs.AipIdPluginParameterRenderingHints;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
@@ -253,7 +254,16 @@ public class PluginParameterPanel extends Composite {
 
       @Override
       public void onClick(ClickEvent event) {
-        SelectAipDialog selectAipDialog = new SelectAipDialog(parameter.getName());
+        SelectAipDialog selectAipDialog;
+        if (parameter.getRenderingHings() != null
+          && parameter.getRenderingHings() instanceof AipIdPluginParameterRenderingHints) {
+          AipIdPluginParameterRenderingHints renderingHints = (AipIdPluginParameterRenderingHints) parameter
+            .getRenderingHings();
+          selectAipDialog = new SelectAipDialog(parameter.getName(), renderingHints.getFilter(),
+            renderingHints.isJustActive(), renderingHints.isExportCsvVisible());
+        } else {
+          selectAipDialog = new SelectAipDialog(parameter.getName());
+        }
         selectAipDialog.setSingleSelectionMode();
         selectAipDialog.showAndCenter();
         selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {
