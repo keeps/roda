@@ -165,7 +165,7 @@ public class Messages {
 
         // create bundle
         if (foundIt) {
-          bundle = new ConfigurationResourceBundle(cc, locale);
+          bundle = new ConfigurationResourceBundle(cc.interpolatedConfiguration(), locale);
         }
 
         LOGGER.info("Loading {} locale={} found={}", baseName, locale, bundle != null);
