@@ -231,6 +231,22 @@ public class IngestJobPluginInfo extends JobPluginInfo {
     }
   }
 
+  public void replaceTransferredResourceId(String oldTransferredResourceId, String newTransferredResourceId) {
+    Map<String, Report> aipReports = allReports.remove(oldTransferredResourceId);
+    allReports.put(newTransferredResourceId, aipReports);
+
+    aipReports = reportsFromBeingProcessed.remove(oldTransferredResourceId);
+    reportsFromBeingProcessed.put(newTransferredResourceId, aipReports);
+
+    List<String> aipIds = transferredResourceToAipIds.remove(oldTransferredResourceId);
+    transferredResourceToAipIds.put(newTransferredResourceId, aipIds);
+
+    for (Entry<String, List<String>> aipToTranferredResourceIds : aipIdToTransferredResourceIds.entrySet()) {
+      aipToTranferredResourceIds.getValue().remove(oldTransferredResourceId);
+      aipToTranferredResourceIds.getValue().add(newTransferredResourceId);
+    }
+  }
+
   @Override
   public int hashCode() {
     return super.hashCode();

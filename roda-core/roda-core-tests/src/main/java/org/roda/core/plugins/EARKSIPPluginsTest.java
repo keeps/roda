@@ -75,12 +75,12 @@ public class EARKSIPPluginsTest {
 
   private static final int CORPORA_FILES_COUNT = 4;
   private static final int CORPORA_FOLDERS_COUNT = 2;
-  private static Path basePath;
+  private Path basePath;
 
-  private static ModelService model;
-  private static IndexService index;
+  private ModelService model;
+  private IndexService index;
 
-  private static Path corporaPath;
+  private Path corporaPath;
 
   @BeforeClass
   public void setUp() throws Exception {
@@ -148,7 +148,8 @@ public class EARKSIPPluginsTest {
     return createIngestCorpora(corporaPath, index, CorporaConstants.EARK_SIP_UPDATE, renameSipFileTo);
   }
 
-  private AIP ingestCorpora() throws RequestNotValidException, NotFoundException, GenericException,
+  protected static <T extends Plugin<TransferredResource>> AIP ingestCorpora(Class<T> pluginClass, ModelService model,
+    IndexService index, Path corporaPath) throws RequestNotValidException, NotFoundException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, IOException, IsStillUpdatingException {
     String parentId = null;
     String aipType = RodaConstants.AIP_TYPE_MIXED;
@@ -161,7 +162,7 @@ public class EARKSIPPluginsTest {
     TransferredResource transferredResource = createIngestCorpora(corporaPath, index);
     Assert.assertNotNull(transferredResource);
 
-    Job job = TestsHelper.executeJob(EARKSIPToAIPPlugin.class, parameters, PluginType.SIP_TO_AIP,
+    Job job = TestsHelper.executeJob(pluginClass, parameters, PluginType.SIP_TO_AIP,
       SelectedItemsList.create(TransferredResource.class, transferredResource.getUUID()));
 
     TestsHelper.getJobReports(index, job, true);
@@ -201,7 +202,7 @@ public class EARKSIPPluginsTest {
 
   @Test
   public void testIngestEARKSIP() throws IOException, RODAException {
-    AIP aip = ingestCorpora();
+    AIP aip = ingestCorpora(EARKSIPToAIPPlugin.class, model, index, corporaPath);
     Assert.assertEquals(aip.getRepresentations().size(), 1);
 
     CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
@@ -216,7 +217,7 @@ public class EARKSIPPluginsTest {
 
   @Test
   public void testIngestAndUpdateEARKSIP() throws IOException, RODAException {
-    AIP aip = ingestCorpora();
+    AIP aip = ingestCorpora(EARKSIPToAIPPlugin.class, model, index, corporaPath);
     Assert.assertEquals(aip.getRepresentations().size(), 1);
     aip.setState(AIPState.ACTIVE);
     model.updateAIP(aip, CorporaConstants.EARK_SIP_UPDATE_USER);

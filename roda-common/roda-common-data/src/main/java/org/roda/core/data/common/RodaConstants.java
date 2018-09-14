@@ -47,6 +47,7 @@ public final class RodaConstants {
   public static final String TRANSFERRED_RESOURCES_PROCESSED_FOLDER = "PROCESSED";
   public static final String TRANSFERRED_RESOURCES_SUCCESSFULLY_INGESTED_FOLDER = "SUCCESSFULLY_INGESTED";
   public static final String TRANSFERRED_RESOURCES_UNSUCCESSFULLY_INGESTED_FOLDER = "UNSUCCESSFULLY_INGESTED";
+  public static final String CORE_TRANSFERRED_RESOURCES_INGEST_MOVE_WHEN_AUTOACCEPT = "core.ingest.processed.move_when_autoaccept";
 
   /*
    * Misc

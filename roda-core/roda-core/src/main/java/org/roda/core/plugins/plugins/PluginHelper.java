@@ -1120,7 +1120,7 @@ public final class PluginHelper {
       if (!success.isEmpty()) {
         successOldToNewTransferredResourceIds = RodaCoreFactory.getTransferredResourcesScanner()
           .moveTransferredResource(successPath, success, true);
-        updateReportsAfterMovingSIPs(model, jobPluginInfo, successOldToNewTransferredResourceIds);
+        updateReportsAndIngestInfoAfterMovingSIPs(model, jobPluginInfo, successOldToNewTransferredResourceIds);
       }
     } catch (GenericException | NotFoundException e) {
       LOGGER.error("Error moving successfully ingested SIPs", e);
@@ -1132,7 +1132,7 @@ public final class PluginHelper {
       if (!unsuccess.isEmpty()) {
         unsuccessOldToNewTransferredResourceIds = RodaCoreFactory.getTransferredResourcesScanner()
           .moveTransferredResource(unsuccessPath, unsuccess, true);
-        updateReportsAfterMovingSIPs(model, jobPluginInfo, unsuccessOldToNewTransferredResourceIds);
+        updateReportsAndIngestInfoAfterMovingSIPs(model, jobPluginInfo, unsuccessOldToNewTransferredResourceIds);
       }
     } catch (GenericException | NotFoundException e) {
       LOGGER.error("Error moving unsuccessfully ingested SIPs", e);
@@ -1145,10 +1145,18 @@ public final class PluginHelper {
     updateJobAfterMovingSIPsAsync(plugin, index, successOldToNewTransferredResourceIds);
   }
 
+  private static void updateReportsAndIngestInfoAfterMovingSIPs(ModelService model, IngestJobPluginInfo jobPluginInfo,
+    Map<String, String> oldToNewTransferredResourceIds) {
+    updateReportsAfterMovingSIPs(model, jobPluginInfo, oldToNewTransferredResourceIds);
+  }
+
+  /**
+   * 20180914 hsilva: use updateReportsAndIngestInfoAfterMovingSIPs instead
+   * (just different method name)
+   */
+  @Deprecated
   private static void updateReportsAfterMovingSIPs(ModelService model, IngestJobPluginInfo jobPluginInfo,
     Map<String, String> oldToNewTransferredResourceIds) {
-    // FIXME 20161017 hsilva: old sip ids should be updated in
-    // IngestJobPluginInfo
     for (Entry<String, String> oldToNewId : oldToNewTransferredResourceIds.entrySet()) {
       String oldSIPId = oldToNewId.getKey();
       String newSIPId = oldToNewId.getValue();
@@ -1157,6 +1165,9 @@ public final class PluginHelper {
         if (!report.getReports().isEmpty()) {
           report.getReports().get(0).setSourceAndOutcomeObjectId(newSIPId, report.getOutcomeObjectId());
         }
+
+        // update ingest info
+        jobPluginInfo.replaceTransferredResourceId(oldSIPId, newSIPId);
 
         // update in model
         updateJobReport(model, report);

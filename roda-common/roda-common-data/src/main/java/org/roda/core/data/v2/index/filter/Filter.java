@@ -134,11 +134,13 @@ public class Filter implements Serializable {
    * Adds the given parameter.
    * 
    * @param parameter
+   * @return
    */
-  public void add(FilterParameter parameter) {
+  public Filter add(FilterParameter parameter) {
     if (parameter != null) {
       this.parameters.add(parameter);
     }
+    return this;
   }
 
   public void add(List<FilterParameter> parameters) {
