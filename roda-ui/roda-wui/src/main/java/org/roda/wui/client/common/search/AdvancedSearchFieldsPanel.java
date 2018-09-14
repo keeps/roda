@@ -21,6 +21,7 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.common.utils.ListboxUtils;
 import org.roda.wui.client.common.utils.Tree;
 import org.roda.wui.common.client.tools.ConfigurationManager;
+import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
@@ -107,8 +108,10 @@ public class AdvancedSearchFieldsPanel extends FlowPanel implements HasValueChan
 
     searchFields.clear();
     for (SearchField searchField : searchFieldsList) {
-      ListboxUtils.insertItemByAlphabeticOrder(searchAdvancedFieldOptions, searchField.getLabel(), searchField.getId());
-      searchFields.put(searchField.getId(), searchField);
+      String id = searchField.getId();
+      String label = StringUtils.isNotBlank(searchField.getLabel()) ? searchField.getLabel() : id;
+      ListboxUtils.insertItemByAlphabeticOrder(searchAdvancedFieldOptions, label, id);
+      searchFields.put(id, searchField);
     }
 
     for (SearchField searchField : searchFieldsList) {

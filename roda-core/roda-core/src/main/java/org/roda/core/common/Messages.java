@@ -10,6 +10,7 @@ package org.roda.core.common;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,15 +19,23 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
-import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import java.util.ResourceBundle.Control;
 
+import org.apache.commons.configuration2.CombinedConfiguration;
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.commons.configuration2.tree.MergeCombiner;
+import org.apache.commons.configuration2.tree.NodeCombiner;
 import org.apache.commons.io.IOUtils;
-import org.roda.core.data.common.RodaConstants;
-import org.roda.core.storage.fs.FSUtils;
+import org.apache.xmlbeans.impl.common.IOUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Messages {
+  private static final Logger LOGGER = LoggerFactory.getLogger(Messages.class);
+
   private static final String MESSAGES_BUNDLE = "ServerMessages";
   private ResourceBundle resourceBundle;
   private Map<String, Map<String, Object>> translationsCache;
@@ -128,22 +137,41 @@ public class Messages {
       String bundleName = toBundleName(baseName, locale) + ".properties";
       ResourceBundle bundle = null;
 
-      InputStreamReader reader = null;
-      InputStream is = null;
       try {
         Path bundlePath = folder.resolve(bundleName);
 
-        // Also checks for file existence
-        if (FSUtils.exists(bundlePath)) {
-          is = Files.newInputStream(bundlePath);
-        } else {
-          is = this.getClass().getResourceAsStream(CONFIG_I18N_PATH + bundleName);
+        NodeCombiner combiner = new MergeCombiner();
+        CombinedConfiguration cc = new CombinedConfiguration(combiner);
+        boolean foundIt=false;
+
+        // external
+        if (Files.exists(bundlePath)) {
+          PropertiesConfiguration pce = new PropertiesConfiguration();
+          pce.read(Files.newBufferedReader(bundlePath));
+          cc.addConfiguration(pce);
+          foundIt=true;
         }
-        reader = new InputStreamReader(is, Charset.forName(RodaConstants.DEFAULT_ENCODING));
-        bundle = new PropertyResourceBundle(reader);
-      } finally {
-        IOUtils.closeQuietly(reader);
-        IOUtils.closeQuietly(is);
+
+        // internal
+        try (InputStream pcis = this.getClass().getResourceAsStream(CONFIG_I18N_PATH + bundleName);) {
+          if (pcis != null) {
+            String pciss = IOUtils.toString(pcis, Charset.defaultCharset());
+            PropertiesConfiguration pci = new PropertiesConfiguration();
+            pci.read(new StringReader(pciss));
+            cc.addConfiguration(pci);
+            foundIt = true;            
+          }
+        }
+
+        // create bundle
+        if (foundIt) {
+          bundle = new ConfigurationResourceBundle(cc, locale);
+        }
+
+        LOGGER.info("Loading {} locale={} found={}", baseName, locale, bundle != null);
+
+      } catch (ConfigurationException e) {
+        LOGGER.error("Error loading " + bundleName, e);
       }
       return bundle;
     }
