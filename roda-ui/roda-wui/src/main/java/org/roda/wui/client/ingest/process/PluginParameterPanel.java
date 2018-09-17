@@ -7,14 +7,16 @@
  */
 package org.roda.wui.client.ingest.process;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
+import com.google.gwt.i18n.client.DateTimeFormat;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.FilterParameter;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -239,10 +241,16 @@ public class PluginParameterPanel extends Composite {
   }
 
   private void createSelectAipLayout() {
+    AipIdPluginParameterRenderingHints renderingHints = null;
+    if (parameter.getRenderingHings() != null
+      && parameter.getRenderingHings() instanceof AipIdPluginParameterRenderingHints) {
+      renderingHints = (AipIdPluginParameterRenderingHints) parameter.getRenderingHings();
+    }
     Label parameterName = new Label(parameter.getName());
     final HorizontalPanel editPanel = new HorizontalPanel();
     final FlowPanel aipPanel = new FlowPanel();
-    final Button button = new Button(messages.pluginAipIdButton());
+    final Button button = new Button(renderingHints != null && renderingHints.getCustomizedButtonLabel() != null
+      ? renderingHints.getCustomizedButtonLabel() : messages.pluginAipIdButton());
     final FlowPanel buttonsPanel = new FlowPanel();
     final Anchor editButton = new Anchor(SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-edit\"></i>"));
     final Anchor removeButton = new Anchor(SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-remove\"></i>"));
@@ -250,22 +258,24 @@ public class PluginParameterPanel extends Composite {
     buttonsPanel.add(editButton);
     buttonsPanel.add(removeButton);
 
+    final AipIdPluginParameterRenderingHints finalRenderingHints = renderingHints;
     ClickHandler editClickHandler = new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {
         SelectAipDialog selectAipDialog;
-        if (parameter.getRenderingHings() != null
-          && parameter.getRenderingHings() instanceof AipIdPluginParameterRenderingHints) {
-          AipIdPluginParameterRenderingHints renderingHints = (AipIdPluginParameterRenderingHints) parameter
-            .getRenderingHings();
-          selectAipDialog = new SelectAipDialog(parameter.getName(), renderingHints.getFilter(),
-            renderingHints.isJustActive(), renderingHints.isExportCsvVisible());
+        if (finalRenderingHints != null) {
+
+          selectAipDialog = new SelectAipDialog(parameter.getName(), finalRenderingHints.getFilter(),
+            finalRenderingHints.isJustActive(), finalRenderingHints.isExportCsvVisible());
+
         } else {
           selectAipDialog = new SelectAipDialog(parameter.getName());
         }
-        selectAipDialog.setSingleSelectionMode();
         selectAipDialog.showAndCenter();
+        //default behaviour of selectAipDialog enabled
+        if (finalRenderingHints==null || !finalRenderingHints.isDisableSelection()) {
+        selectAipDialog.setSingleSelectionMode();
         selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {
 
           @Override
@@ -294,22 +304,21 @@ public class PluginParameterPanel extends Composite {
           }
         });
       }
+      }
     };
-
+    if (finalRenderingHints==null || !finalRenderingHints.isDisableSelection()) {
     ClickHandler removeClickHandler = new ClickHandler() {
 
-      @Override
-      public void onClick(ClickEvent event) {
+        @Override public void onClick(ClickEvent event) {
         editPanel.setVisible(false);
         button.setVisible(true);
 
         value = null;
       }
     };
-
+      removeButton.addClickHandler(removeClickHandler);
+    }
     button.addClickHandler(editClickHandler);
-    editButton.addClickHandler(editClickHandler);
-    removeButton.addClickHandler(removeClickHandler);
 
     layout.add(parameterName);
     layout.add(button);

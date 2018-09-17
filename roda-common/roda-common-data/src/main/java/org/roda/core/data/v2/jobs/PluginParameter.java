@@ -11,7 +11,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.roda.core.data.v2.index.filter.Filter;
 
 /**
  * @author Rui Castro
