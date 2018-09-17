@@ -35,7 +35,7 @@ public class Messages {
 
   private static final String MESSAGES_BUNDLE = "ServerMessages";
   private ResourceBundle resourceBundle;
-  private Map<String, Map<String, Object>> translationsCache;
+  private Map<String, Map<String, ?>> translationsCache;
 
   public Messages(Locale locale, Path folder) {
     this.resourceBundle = ResourceBundle.getBundle(MESSAGES_BUNDLE, locale, new FolderBasedUTF8Control(folder));
@@ -74,6 +74,7 @@ public class Messages {
    * 
    * prefix will be replaced by "i18n." for simplicity purposes
    */
+  @SuppressWarnings("unchecked")
   public <T extends Object> Map<String, T> getTranslations(String prefix, Class<T> valueClass,
     boolean replacePrefixFromKey) {
     // try cache first
@@ -93,7 +94,7 @@ public class Messages {
     }
 
     // cache it
-    translationsCache.put(prefix, (Map<String, Object>) map);
+    translationsCache.put(prefix, (Map<String, ?>) map);
     return map;
   }
 
@@ -109,6 +110,18 @@ public class Messages {
     public long getTimeToLive(String baseName, Locale locale) {
       // ask not to cache
       return TTL_DONT_CACHE;
+    }
+    
+    @Override
+    public Locale getFallbackLocale(String baseName, Locale locale) {
+      if (baseName == null) {
+        throw new NullPointerException();
+      }
+      // 20160712 hsilva: the following line is needed otherwise default locale
+      // is used and this can be incoherent with other parts of the code where
+      // the default locale is ENGLISH
+      Locale defaultLocale = Locale.ENGLISH;
+      return locale.equals(defaultLocale) ? null : defaultLocale;
     }
 
     @Override
@@ -153,8 +166,6 @@ public class Messages {
         if (hasExternal || hasInternal) {
           bundle = new ConfigurationResourceBundle(cc.interpolatedConfiguration(), locale);
         }
-
-        LOGGER.info("Loading {} locale={} hasInternal={}, hasExternal={}", baseName, locale, hasInternal, hasExternal);
 
       } catch (ConfigurationException e) {
         LOGGER.error("Error loading " + bundleName, e);
