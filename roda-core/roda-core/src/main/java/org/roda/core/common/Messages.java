@@ -9,7 +9,6 @@ package org.roda.core.common;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -23,13 +22,11 @@ import java.util.ResourceBundle;
 import java.util.ResourceBundle.Control;
 
 import org.apache.commons.configuration2.CombinedConfiguration;
-import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.configuration2.tree.MergeCombiner;
 import org.apache.commons.configuration2.tree.NodeCombiner;
 import org.apache.commons.io.IOUtils;
-import org.apache.xmlbeans.impl.common.IOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,18 +112,6 @@ public class Messages {
     }
 
     @Override
-    public Locale getFallbackLocale(String baseName, Locale locale) {
-      if (baseName == null) {
-        throw new NullPointerException();
-      }
-      // 20160712 hsilva: the following line is needed otherwise default locale
-      // is used and this can be incoherent with other parts of the code where
-      // the default locale is ENGLISH
-      Locale defaultLocale = Locale.ENGLISH;
-      return locale.equals(defaultLocale) ? null : defaultLocale;
-    }
-
-    @Override
     public ResourceBundle newBundle(String baseName, Locale locale, String format, ClassLoader loader, boolean reload)
       throws IllegalAccessException, InstantiationException, IOException {
 
@@ -142,14 +127,15 @@ public class Messages {
 
         NodeCombiner combiner = new MergeCombiner();
         CombinedConfiguration cc = new CombinedConfiguration(combiner);
-        boolean foundIt=false;
+        boolean hasExternal = false;
+        boolean hasInternal = false;
 
         // external
         if (Files.exists(bundlePath)) {
           PropertiesConfiguration pce = new PropertiesConfiguration();
           pce.read(Files.newBufferedReader(bundlePath));
           cc.addConfiguration(pce);
-          foundIt=true;
+          hasExternal = true;
         }
 
         // internal
@@ -159,16 +145,16 @@ public class Messages {
             PropertiesConfiguration pci = new PropertiesConfiguration();
             pci.read(new StringReader(pciss));
             cc.addConfiguration(pci);
-            foundIt = true;            
+            hasInternal = true;
           }
         }
 
         // create bundle
-        if (foundIt) {
+        if (hasExternal || hasInternal) {
           bundle = new ConfigurationResourceBundle(cc.interpolatedConfiguration(), locale);
         }
 
-        LOGGER.info("Loading {} locale={} found={}", baseName, locale, bundle != null);
+        LOGGER.info("Loading {} locale={} hasInternal={}, hasExternal={}", baseName, locale, hasInternal, hasExternal);
 
       } catch (ConfigurationException e) {
         LOGGER.error("Error loading " + bundleName, e);

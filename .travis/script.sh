@@ -44,27 +44,29 @@ mvn $MAVEN_CLI_OPTS -Dtestng.groups="travis" -Denforcer.skip=true -Proda-wui-doc
 # Deploy
 ################################################
 
-# init
-docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+if [[ ! -z "$DOCKER_USERNAME" ]]; then
+  # init
+  docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
 
-if [ "$TRAVIS_BRANCH" == "master" ]; then
-  echo "Logic for master branch"
-  deploy_to_dockerhub "latest" "$TRAVIS_BRANCH"
+  if [ "$TRAVIS_BRANCH" == "master" ]; then
+    echo "Logic for master branch"
+    deploy_to_dockerhub "latest" "$TRAVIS_BRANCH"
 
-elif [ "$TRAVIS_BRANCH" == "development" ]; then
-  echo "Logic for development branch"
-  deploy_to_dockerhub "$TRAVIS_BRANCH" "$TRAVIS_BRANCH"
-  deploy_to_artifactory
+  elif [ "$TRAVIS_BRANCH" == "development" ]; then
+    echo "Logic for development branch"
+    deploy_to_dockerhub "$TRAVIS_BRANCH" "$TRAVIS_BRANCH"
+    deploy_to_artifactory
 
-elif [ "$TRAVIS_BRANCH" == "staging" ]; then
-  echo "Logic for staging branch"
-  deploy_to_dockerhub "$TRAVIS_BRANCH" "staging"
+  elif [ "$TRAVIS_BRANCH" == "staging" ]; then
+    echo "Logic for staging branch"
+    deploy_to_dockerhub "$TRAVIS_BRANCH" "staging"
 
-elif [ "`echo $TRAVIS_BRANCH | egrep "^v[2-9]+" | wc -l`" -eq "1" ]; then
-  echo "Logic for tags"
-  deploy_to_dockerhub "$TRAVIS_BRANCH" "master"
-  deploy_to_artifactory
+  elif [ "`echo $TRAVIS_BRANCH | egrep "^v[2-9]+" | wc -l`" -eq "1" ]; then
+    echo "Logic for tags"
+    deploy_to_dockerhub "$TRAVIS_BRANCH" "master"
+    deploy_to_artifactory
+  fi
+
+  # clean up
+  docker logout
 fi
-
-# clean up
-docker logout
