@@ -2003,4 +2003,8 @@ public interface ClientMessages extends Messages {
   String tableUpdateErrorConnection();
 
   String details();
+
+  String selectAllPages();
+
+  String selectThisPage();
 }

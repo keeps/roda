@@ -1225,6 +1225,21 @@ pre code {
     display: inline-block;
 }
 
+.selectAllPopup {
+    padding: 0 15px;
+}
+
+.selectAllPopup .gwt-RadioButton {
+    display: block;
+}
+
+.selectAllPopup .gwt-RadioButton input {
+    margin: 0 0.5rem 0 0;
+}
+.selectAllPopup .gwt-RadioButton * {
+    vertical-align: middle;
+}
+
 .description-level {
     display: inline-block;
     font: normal normal normal 14px/1 "Font Awesome 5 Free";

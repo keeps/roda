@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
@@ -35,6 +36,7 @@ import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.lists.pagination.ListSelectionState;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
+import org.roda.wui.client.common.popup.CalloutPopup;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.common.client.ClientLogger;
@@ -49,7 +51,7 @@ import org.roda.wui.common.client.widgets.wcag.AccessibleSimplePager;
 import org.roda.wui.common.client.widgets.wcag.AcessibleCheckboxCell;
 
 import com.google.gwt.cell.client.FieldUpdater;
-import com.google.gwt.cell.client.ValueUpdater;
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -78,9 +80,11 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.view.client.CellPreviewEvent;
 import com.google.gwt.view.client.CellPreviewEvent.Handler;
@@ -118,12 +122,8 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
   private Button csvDownloadButton;
   private CellTable<T> display;
 
-  private FlowPanel selectAllPanel;
-  private FlowPanel selectAllPanelBody;
-  private Label selectAllLabel;
-  private CheckBox selectAllCheckBox;
-
   private Column<T, Boolean> selectColumn;
+  private RadioButton selectAllRadioButton = null;
   private Set<T> selected = new HashSet<>();
   private final List<CheckboxSelectionListener<T>> listeners = new ArrayList<>();
 
@@ -233,8 +233,6 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     csvDownloadButton.addStyleName("btn btn-link csvDownloadButton");
     csvDownloadButton.setVisible(options.isCsvDownloadButtonVisibility());
 
-    createSelectAllPanel();
-
     sidePanel = new FlowPanel();
     sidePanel.addStyleName("my-asyncdatagrid-side-panel");
     add(sidePanel);
@@ -246,7 +244,6 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     autoUpdatePanel = new AccessibleFocusPanel();
     autoUpdatePanel.add(autoUpdateSignal);
 
-    mainPanel.add(selectAllPanel);
     mainPanel.add(display);
     mainPanel.add(resultsPager);
     mainPanel.add(pageSizePager);
@@ -303,7 +300,6 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
       @Override
       public void onValueChange(ValueChangeEvent<IndexResult<T>> event) {
         selected = new HashSet<>();
-        hideSelectAllPanel();
       }
     });
 
@@ -409,42 +405,78 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
         }
       });
 
-      Header<Boolean> selectHeader = new Header<Boolean>(new AcessibleCheckboxCell(true, true)) {
+      // pair of (popup, checkbox)
+      final Pair<Boolean, Boolean> hoverState = Pair.of(false, false);
+      CalloutPopup popup = new CalloutPopup(false, false);
+      final int popupTimeoutMs = 750;
+      Scheduler.RepeatingCommand updatePopupCommand = () -> {
+        if (!hoverState.getFirst() && !hoverState.getSecond()) {
+          popup.hide();
+        } else if (resultsPager.hasNextPage() || resultsPager.hasPreviousPage()) {
+          popup.show();
+        }
+        return false; // do not repeat
+      };
 
+      FocusPanel focusPanel = new FocusPanel();
+      focusPanel.addMouseOutHandler(event -> {
+        hoverState.setFirst(false);
+        Scheduler.get().scheduleFixedDelay(updatePopupCommand, popupTimeoutMs);
+      });
+      focusPanel.addMouseOverHandler(event -> hoverState.setFirst(true));
+
+      FlowPanel popupLayout = new FlowPanel();
+      popupLayout.addStyleName("selectAllPopup");
+
+      selectAllRadioButton = new RadioButton("selectedItemsRadio", messages.selectAllPages());
+      popupLayout.add(selectAllRadioButton);
+
+      RadioButton buttonPage = new RadioButton("selectedItemsRadio", messages.selectThisPage());
+      buttonPage.setValue(true);
+      popupLayout.add(buttonPage);
+
+      focusPanel.setWidget(popupLayout);
+      popup.setWidget(focusPanel);
+
+      AccessibleHoverableCheckboxCell accessibleHoverableCheckboxCell = new AccessibleHoverableCheckboxCell(true, true);
+      accessibleHoverableCheckboxCell.setMouseOverHandlers(element -> {
+        // on mouse over
+        hoverState.setSecond(true);
+        if (resultsPager.hasNextPage() || resultsPager.hasPreviousPage()) {
+          popup.setPopupPositionAndShow(
+            (offsetWidth, offsetHeight) -> popup.setPopupPosition(element.getAbsoluteLeft() + element.getOffsetWidth(),
+              element.getAbsoluteTop() - (int) Math.round(offsetHeight / 2.0 - element.getOffsetHeight() / 2.0)));
+        }
+      }, element -> {
+        // on mouse out
+        hoverState.setSecond(false);
+        Scheduler.get().scheduleFixedDelay(updatePopupCommand, popupTimeoutMs);
+      });
+
+      Header<Boolean> selectHeader = new Header<Boolean>(accessibleHoverableCheckboxCell) {
         @Override
         public Boolean getValue() {
-          Boolean ret;
-
-          if (selected.isEmpty()) {
-            ret = false;
-          } else if (selected.containsAll(getVisibleItems())) {
-            ret = true;
-            showSelectAllPanel();
-          } else {
-            // some are selected
-            ret = false;
-            hideSelectAllPanel();
-          }
-
-          return ret;
+          return selected.containsAll(getVisibleItems());
         }
       };
 
-      selectHeader.setUpdater(new ValueUpdater<Boolean>() {
-
-        @Override
-        public void update(Boolean value) {
-          if (value) {
-            selected.addAll(getVisibleItems());
-            showSelectAllPanel();
-          } else {
-            selected.clear();
-            hideSelectAllPanel();
-          }
-          redraw();
-          fireOnCheckboxSelectionChanged();
+      selectHeader.setUpdater(value -> {
+        if (value) {
+          selected.addAll(getVisibleItems());
+        } else {
+          selected.clear();
         }
+        redraw();
+        fireOnCheckboxSelectionChanged();
       });
+
+      ValueChangeHandler<Boolean> radionButtonValueChangedHandler = event -> {
+        selected.addAll(AsyncTableCell.this.getVisibleItems());
+        AsyncTableCell.this.redraw();
+        AsyncTableCell.this.fireOnCheckboxSelectionChanged();
+      };
+      selectAllRadioButton.addValueChangeHandler(radionButtonValueChangedHandler);
+      buttonPage.addValueChangeHandler(radionButtonValueChangedHandler);
 
       display.addColumn(selectColumn, selectHeader);
       display.setColumnWidth(selectColumn, "45px");
@@ -512,7 +544,6 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
 
   public void refresh() {
     selected = new HashSet<>();
-    hideSelectAllPanel();
     display.setVisibleRangeAndClearData(new Range(0, getInitialPageSize()), true);
     clearSelected();
     updateEmptyTableWidget();
@@ -807,47 +838,8 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     }
   }
 
-  // SELECT ALL PANEL
-
-  public void createSelectAllPanel() {
-    selectAllPanel = new FlowPanel();
-    selectAllPanelBody = new FlowPanel();
-    selectAllCheckBox = new CheckBox();
-    selectAllLabel = new Label("Select all");
-
-    selectAllPanelBody.add(selectAllCheckBox);
-    selectAllPanelBody.add(selectAllLabel);
-    selectAllPanel.add(selectAllPanelBody);
-    selectAllPanel.setVisible(false);
-
-    selectAllPanel.addStyleName("panel");
-    selectAllPanelBody.addStyleName("panel-body");
-
-    selectAllCheckBox.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<Boolean> event) {
-        fireOnCheckboxSelectionChanged();
-      }
-    });
-
-  }
-
-  public void showSelectAllPanel() {
-    if (!selectAllPanel.isVisible() && resultsPager.hasNextPage() || resultsPager.hasPreviousPage()) {
-      selectAllLabel.setText(messages.listSelectAllMessage(dataProvider.getRowCount()));
-      selectAllCheckBox.setValue(false);
-      selectAllPanel.setVisible(true);
-    }
-  }
-
-  public void hideSelectAllPanel() {
-    selectAllCheckBox.setValue(false);
-    selectAllPanel.setVisible(false);
-  }
-
   public Boolean isAllSelected() {
-    return selectAllCheckBox.getValue();
+    return selectAllRadioButton.getValue() && selected.containsAll(getVisibleItems());
   }
 
   public String getListId() {
