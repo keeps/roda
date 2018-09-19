@@ -32,8 +32,10 @@ import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.model.ActionableObject;
+import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.lists.pagination.ListSelectionState;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.popup.CalloutPopup;
@@ -374,10 +376,48 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
       layout.add(l);
       layout.add(resetFacets);
       display.setEmptyTableWidget(layout);
+    } else if (actionable != null) {
+      FlowPanel emptyTablewidget = new FlowPanel();
+      emptyTablewidget.addStyleName("table-empty ActionableStyleButtons");
+
+      Label label = new Label(messages.noItemsToDisplay());
+      emptyTablewidget.add(label);
+
+      emptyTablewidget.add(
+        new ActionableWidgetBuilder<>(actionable).withActionCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
+          @Override
+          public void onSuccess(Actionable.ActionImpact impact) {
+            if (!Actionable.ActionImpact.NONE.equals(impact)) {
+              Timer timer = new Timer() {
+                @Override
+                public void run() {
+                  AsyncTableCell.this.refresh();
+                }
+              };
+              timer.schedule(RodaConstants.ACTION_TIMEOUT / 2);
+            }
+          }
+
+          @Override
+          public void onFailure(Throwable caught) {
+            Timer timer = new Timer() {
+              @Override
+              public void run() {
+                AsyncTableCell.this.refresh();
+              }
+            };
+            timer.schedule(RodaConstants.ACTION_TIMEOUT / 2);
+            super.onFailure(caught);
+          }
+        }).buildListWithObjects(new ActionableObject<T>(classToReturn)));
+
+      display.setEmptyTableWidget(emptyTablewidget);
     } else {
-      Label layout = new Label(messages.noItemsToDisplay());
-      layout.addStyleName("table-empty");
-      display.setEmptyTableWidget(layout);
+      SimplePanel container = new SimplePanel();
+      container.addStyleName("table-empty");
+      Label label = new Label(messages.noItemsToDisplay());
+      container.add(label);
+      display.setEmptyTableWidget(container);
     }
   }
 

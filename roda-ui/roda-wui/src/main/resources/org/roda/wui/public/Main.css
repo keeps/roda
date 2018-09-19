@@ -3884,9 +3884,11 @@ td.datePickerMonth, td.datePickerYear {
     margin: 0 5px;
 }
 
-.searchResults .table-empty {
-	margin: 15px;
-	font-size: 1.3rem;
+.table-empty > .gwt-Label {
+    margin: 15px;
+    font-size: 1.3rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
 }
 
 .searchResults .table-empty-clear-facets {
@@ -6893,6 +6895,24 @@ span.code {
     text-align: center;
     margin: 0;
     float: right;
+}
+
+.ActionableStyleButtons .actionable-button-label {
+    margin-right: 2em;
+}
+
+.my-asyncdatagrid-main-panel .ActionableStyleButtons .actionable-button {
+    width: auto;
+    max-width: auto;
+    margin-right: 1rem;
+}
+
+.my-asyncdatagrid-main-panel .ActionableStyleButtons .actionable-button + .actionable-button {
+    margin-top: 0;
+}
+
+.my-asyncdatagrid-main-panel .ActionableStyleButtons .actionable-menu {
+    margin: 1rem;
 }
 
 .sidebar .actionable-button-destroyed {
