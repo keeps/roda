@@ -1,3 +1,20 @@
 #!/bin/bash
 
-exec /usr/bin/clamscan-real -d "$CLAMAV_DATABASE" $@
+if [[ "$1" = "--version" ]]; then
+  echo "ClamAV 0.99.2/24925/Wed Sep 12 09:49:57 2018"
+  exit 0
+fi
+
+cat <<-EOF
+file: OK
+
+----------- SCAN SUMMARY -----------
+Known viruses: 6643926
+Engine version: 0.99.2
+Scanned directories: 0
+Scanned files: 1
+Infected files: 0
+Data scanned: 0.00 MB
+Data read: 0.00 MB (ratio 0.00:1)
+Time: 9.170 sec (0 m 9 s)
+EOF
