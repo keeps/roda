@@ -40,6 +40,7 @@ public class AsyncTableCellOptions<T extends IsIndexed> {
   private boolean startHidden;
   private String searchPlaceholder;
   private boolean forceSelectable;
+  private boolean redirectOnSingleResult;
 
   public AsyncTableCellOptions(Class<T> classToReturn, String listId) {
     this.classToReturn = classToReturn;
@@ -65,6 +66,7 @@ public class AsyncTableCellOptions<T extends IsIndexed> {
     startHidden = false;
     searchPlaceholder = null;
     forceSelectable = false;
+    redirectOnSingleResult = false;
   }
 
   public Class<T> getClassToReturn() {
@@ -257,5 +259,14 @@ public class AsyncTableCellOptions<T extends IsIndexed> {
   public AsyncTableCellOptions<T> withForceSelectable(boolean forceSelectable) {
     this.forceSelectable = forceSelectable;
     return this;
+  }
+
+  public AsyncTableCellOptions<T> withRedirectOnSingleResult(boolean redirectOnSingleResult){
+    this.redirectOnSingleResult = redirectOnSingleResult;
+    return this;
+  }
+
+  public boolean getRedirectOnSingleResult(){
+    return redirectOnSingleResult;
   }
 }

@@ -46,7 +46,8 @@ public class SearchWithPreFilters extends Composite {
 
   private SearchWithPreFilters() {
     // Create main search
-    catalogueSearch = new CatalogueSearch(true, "Search_AIPs", "Search_representations", "Search_files", null, false);
+    catalogueSearch = new CatalogueSearch(true, "Search_AIPs", "Search_representations", "Search_files", null, false,
+      true);
 
     initWidget(uiBinder.createAndBindUi(this));
     searchDescription.add(new HTMLWidgetWrapper("SearchDescription.html"));

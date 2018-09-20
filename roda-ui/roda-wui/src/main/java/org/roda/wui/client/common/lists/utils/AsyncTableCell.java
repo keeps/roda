@@ -43,6 +43,7 @@ import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.ConfigurationManager;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.MyCellTableResources;
@@ -140,6 +141,8 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
 
   private IndexResult<T> result;
   private AsyncCallback<Actionable.ActionImpact> actionableCallback = null;
+  private boolean redirectOnSingleResult;
+  private Filter originalFilter;
 
   enum AutoUpdateState {
     AUTO_UPDATE_OFF, AUTO_UPDATE_ON, AUTO_UPDATE_ERROR, AUTO_UPDATE_PAUSED, AUTO_UPDATE_WORKING
@@ -174,9 +177,11 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
       : "summary" + Random.nextInt(1000);
 
     this.filter = options.getFilter();
+    this.originalFilter = options.getFilter();
     this.justActive = options.isJustActive();
     this.facets = options.getFacets();
     this.selectable = actionable != null || options.getForceSelectable();
+    this.redirectOnSingleResult = options.getRedirectOnSingleResult();
 
     this.fieldsToReturn = options.getFieldsToReturn();
 
@@ -207,6 +212,9 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
             public void onSuccess(IndexResult<T> result) {
               setResult(result);
               callback.onSuccess(result);
+              if(redirectOnSingleResult && originalFilter.equals(AsyncTableCell.this.getFilter()) && getVisibleItems().size() == 1){
+                HistoryUtils.resolve(getVisibleItems().get(0));
+              }
             }
           });
       }
@@ -1178,6 +1186,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
   protected void onAttach() {
     super.onAttach();
     if (!isSearchRestricted()) {
+      originalFilter = this.getFilter();
       refresh();
     }
   }

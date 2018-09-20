@@ -48,12 +48,12 @@ public class CatalogueSearch extends Composite {
   SearchWrapper searchWrapper;
 
   public CatalogueSearch(boolean justActive, String itemsListId, String representationsListId, String filesListId,
-    Permissions permissions, boolean startHidden) {
+    Permissions permissions, boolean startHidden, boolean redirectOnSingleResult) {
 
     // prepare lists
     ListBuilder<IndexedAIP> aipListBuilder = new ListBuilder<>(() -> new AIPList(),
       new AsyncTableCellOptions<>(IndexedAIP.class, itemsListId).withJustActive(justActive).bindOpener()
-        .withStartHidden(startHidden)
+        .withStartHidden(startHidden).withRedirectOnSingleResult(redirectOnSingleResult)
         .withActionable(AipActions.getWithoutNoAipActions(null, AIPState.ACTIVE, permissions)));
 
     // add lists to search
@@ -62,7 +62,7 @@ public class CatalogueSearch extends Composite {
     if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_REPRESENTATION)) {
       ListBuilder<IndexedRepresentation> representationListBuilder = new ListBuilder<>(() -> new RepresentationList(),
         new AsyncTableCellOptions<>(IndexedRepresentation.class, representationsListId).withJustActive(justActive)
-          .bindOpener().withStartHidden(startHidden)
+          .bindOpener().withStartHidden(startHidden).withRedirectOnSingleResult(redirectOnSingleResult)
           .withActionable(RepresentationActions.getWithoutNoRepresentationActions(null, null)));
       searchWrapper.createListAndSearchPanel(representationListBuilder);
     }
@@ -70,7 +70,8 @@ public class CatalogueSearch extends Composite {
     if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_FILE)) {
       ListBuilder<IndexedFile> fileListBuilder = new ListBuilder<>(() -> new SearchFileList(true),
         new AsyncTableCellOptions<>(IndexedFile.class, filesListId).withJustActive(justActive).bindOpener()
-          .withStartHidden(startHidden).withActionable(FileActions.getWithoutNoFileActions(null, null, null, null)));
+          .withRedirectOnSingleResult(redirectOnSingleResult).withStartHidden(startHidden)
+          .withActionable(FileActions.getWithoutNoFileActions(null, null, null, null)));
       searchWrapper.createListAndSearchPanel(fileListBuilder);
     }
 
