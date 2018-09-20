@@ -1,30 +1,27 @@
 package org.roda.core.common;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 import org.apache.commons.configuration2.CombinedConfiguration;
 import org.apache.commons.configuration2.Configuration;
-
-import com.google.common.collect.Iterators;
 
 public class ConfigurationResourceBundle extends ResourceBundle {
 
   private Configuration configuration;
   private Locale locale;
-  private Enumeration<String> keys;
+  private Set<String> keys;
 
   public ConfigurationResourceBundle(CombinedConfiguration configuration, Locale locale) {
     super();
-    
+
     // List all keys before interpolating
-    Collection<String> keyList = new ArrayList<>();
-    Iterators.addAll(keyList, configuration.getKeys());
-    this.keys = Collections.enumeration(keyList);
+    this.keys = new HashSet<>();
+    configuration.getKeys().forEachRemaining(x -> keys.add(x));
 
     this.configuration = configuration.interpolatedConfiguration();
     this.locale = locale;
@@ -40,8 +37,13 @@ public class ConfigurationResourceBundle extends ResourceBundle {
   }
 
   @Override
-  public Enumeration<String> getKeys() {
+  protected Set<String> handleKeySet() {
     return keys;
+  }
+
+  @Override
+  public Enumeration<String> getKeys() {
+    return Collections.enumeration(keys);
   }
 
   @Override
