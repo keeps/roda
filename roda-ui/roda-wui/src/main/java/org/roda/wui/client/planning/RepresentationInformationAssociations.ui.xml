@@ -14,19 +14,7 @@
 				<g:HTML addStyleNames="h4 representationInformationSubtitle" ui:field="resultsPanelTitle" />
 				<g:HTML addStyleNames="page-description" ui:field="description"></g:HTML>
 
-				<g:FlowPanel ui:field="createPanel" visible="false" addStyleNames="card representationInformationCard representationInformationCardCreate">
-					<g:HTML addStyleNames="h5" ui:field="createPanelTitle" />
-					<g:FlowPanel>
-						<g:Button addStyleNames="btn btn-margin-right btn-plus" ui:field="buttonCreateNewRI">
-							<ui:text from='{messages.createNewRepresentationInformation}' />
-						</g:Button>
-						<g:Button addStyleNames="btn btn-margin-right btn-edit" ui:field="buttonAddToExistingRI">
-							<ui:text from='{messages.addToExistingRepresentationInformation}' />
-						</g:Button>
-					</g:FlowPanel>
-				</g:FlowPanel>
-
-				<g:FlowPanel ui:field="resultsPanel" visible="false" addStyleNames="card representationInformationCard representationInformationCardList">
+				<g:FlowPanel ui:field="resultsPanel" addStyleNames="card representationInformationCard representationInformationCardList">
 					<commonsearch:SearchWrapper ui:field="searchWrapper" />
 				</g:FlowPanel>
 			</g:FlowPanel>

@@ -13,20 +13,24 @@ import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
 import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.common.dialogs.RepresentationInformationDialogs;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.planning.CreateRepresentationInformation;
 import org.roda.wui.client.planning.EditRepresentationInformation;
+import org.roda.wui.client.planning.RepresentationInformationAssociations;
 import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.client.process.InternalProcess;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -48,6 +52,10 @@ public class RepresentationInformationActions extends AbstractActionable<Represe
   private static final Set<RepresentationInformationAction> POSSIBLE_ACTIONS_WITHOUT_RI = new HashSet<>(
     Arrays.asList(RepresentationInformationAction.NEW));
 
+  private static final Set<RepresentationInformationAction> POSSIBLE_ACTIONS_WITHOUT_RI_ASSOCIATING = new HashSet<>(
+    Arrays.asList(RepresentationInformationAction.ASSOCIATE_WITH_NEW,
+      RepresentationInformationAction.ASSOCIATE_WITH_EXISTING));
+
   private static final Set<RepresentationInformationAction> POSSIBLE_ACTIONS_ON_SINGLE_RI = new HashSet<>(
     Arrays.asList(RepresentationInformationAction.REMOVE, RepresentationInformationAction.START_PROCESS,
       RepresentationInformationAction.EDIT, RepresentationInformationAction.DOWNLOAD));
@@ -55,15 +63,23 @@ public class RepresentationInformationActions extends AbstractActionable<Represe
   private static final Set<RepresentationInformationAction> POSSIBLE_ACTIONS_ON_MULTIPLE_RI = new HashSet<>(
     Arrays.asList(RepresentationInformationAction.REMOVE, RepresentationInformationAction.START_PROCESS));
 
+  private final Filter objectsToAssociate;
+
   private RepresentationInformationActions() {
-    // do nothing
+    this.objectsToAssociate = null;
+  }
+
+  private RepresentationInformationActions(Filter objectsToAssociate) {
+    this.objectsToAssociate = objectsToAssociate;
   }
 
   public enum RepresentationInformationAction implements Action<RepresentationInformation> {
     NEW(RodaConstants.PERMISSION_METHOD_CREATE_REPRESENTATION_INFORMATION),
+    ASSOCIATE_WITH_NEW(RodaConstants.PERMISSION_METHOD_CREATE_REPRESENTATION_INFORMATION),
     REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_REPRESENTATION_INFORMATION),
     START_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
-    EDIT(RodaConstants.PERMISSION_METHOD_UPDATE_REPRESENTATION_INFORMATION), DOWNLOAD();
+    EDIT(RodaConstants.PERMISSION_METHOD_UPDATE_REPRESENTATION_INFORMATION),
+    ASSOCIATE_WITH_EXISTING(RodaConstants.PERMISSION_METHOD_UPDATE_REPRESENTATION_INFORMATION), DOWNLOAD();
 
     private List<String> methods;
 
@@ -86,9 +102,18 @@ public class RepresentationInformationActions extends AbstractActionable<Represe
     return INSTANCE;
   }
 
+  public static RepresentationInformationActions getForAssociation(Filter objectsToAssociate) {
+    return new RepresentationInformationActions(objectsToAssociate);
+  }
+
   @Override
   public boolean canAct(Action<RepresentationInformation> action) {
-    return hasPermissions(action) && POSSIBLE_ACTIONS_WITHOUT_RI.contains(action);
+    if (hasPermissions(action)) {
+      return objectsToAssociate == null ? POSSIBLE_ACTIONS_WITHOUT_RI.contains(action)
+        : POSSIBLE_ACTIONS_WITHOUT_RI_ASSOCIATING.contains(action);
+    } else {
+      return false;
+    }
   }
 
   @Override
@@ -105,9 +130,49 @@ public class RepresentationInformationActions extends AbstractActionable<Represe
   public void act(Action<RepresentationInformation> action, AsyncCallback<ActionImpact> callback) {
     if (RepresentationInformationAction.NEW.equals(action)) {
       create(callback);
+    } else if (RepresentationInformationAction.ASSOCIATE_WITH_NEW.equals(action)) {
+      associateWithNew(callback);
+    } else if (RepresentationInformationAction.ASSOCIATE_WITH_EXISTING.equals(action)) {
+      associateWithExisting(callback);
     } else {
       unsupportedAction(action, callback);
     }
+  }
+
+  private void associateWithExisting(AsyncCallback<ActionImpact> callback) {
+    RepresentationInformationDialogs.showPromptAddRepresentationInformationWithAssociation(
+      RepresentationInformationAssociations.getAssociateWithExistingDialogTitle(), messages.cancelButton(),
+      messages.addToExistingRepresentationInformation(), messages.createNewRepresentationInformation(),
+      new ActionAsyncCallback<SelectedItems<RepresentationInformation>>(callback) {
+        @Override
+        public void onSuccess(final SelectedItems<RepresentationInformation> selectedItems) {
+          if (selectedItems != null) {
+            String filtertoAdd = HistoryUtils.getCurrentHistoryPath()
+              .get(HistoryUtils.getCurrentHistoryPath().size() - 1);
+
+            BrowserService.Util.getInstance().updateRepresentationInformationListWithFilter(selectedItems, filtertoAdd,
+              new NoAsyncCallback<Void>() {
+                @Override
+                public void onSuccess(Void result) {
+                  doActionCallbackUpdated();
+                }
+              });
+          } else {
+            associateWithNew(callback);
+          }
+        }
+
+        @Override
+        public void onFailure(Throwable caught) {
+          doActionCallbackNone();
+        }
+      });
+  }
+
+  private void associateWithNew(AsyncCallback<ActionImpact> callback) {
+    LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
+    selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
+    HistoryUtils.newHistory(CreateRepresentationInformation.RESOLVER);
   }
 
   @Override
@@ -227,8 +292,12 @@ public class RepresentationInformationActions extends AbstractActionable<Represe
     ActionableGroup<RepresentationInformation> managementGroup = new ActionableGroup<>(messages.sidebarActionsTitle());
     managementGroup.addButton(messages.newButton(), RepresentationInformationAction.NEW, ActionImpact.UPDATED,
       "btn-plus");
+    managementGroup.addButton(messages.createNewRepresentationInformation(),
+      RepresentationInformationAction.ASSOCIATE_WITH_NEW, ActionImpact.UPDATED, "btn-plus");
     managementGroup.addButton(messages.editButton(), RepresentationInformationAction.EDIT, ActionImpact.UPDATED,
       "btn-edit");
+    managementGroup.addButton(messages.addToExistingRepresentationInformation(),
+      RepresentationInformationAction.ASSOCIATE_WITH_EXISTING, ActionImpact.UPDATED, "btn-edit");
     managementGroup.addButton(messages.downloadButton(), RepresentationInformationAction.DOWNLOAD, ActionImpact.NONE,
       "btn-download");
     managementGroup.addButton(messages.removeButton(), RepresentationInformationAction.REMOVE, ActionImpact.DESTROYED,
