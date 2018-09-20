@@ -139,6 +139,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
   private int pageSizeIncrement;
 
   private IndexResult<T> result;
+  private AsyncCallback<Actionable.ActionImpact> actionableCallback = null;
 
   enum AutoUpdateState {
     AUTO_UPDATE_OFF, AUTO_UPDATE_ON, AUTO_UPDATE_ERROR, AUTO_UPDATE_PAUSED, AUTO_UPDATE_WORKING
@@ -167,6 +168,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     this.pageSizeIncrement = options.getPageSizeIncrement();
     this.listId = options.getListId();
     this.actionable = options.getActionable();
+    this.actionableCallback = options.getActionableCallback();
 
     final String notNullSummary = StringUtils.isNotBlank(options.getSummary()) ? options.getSummary()
       : "summary" + Random.nextInt(1000);
@@ -396,6 +398,9 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
               };
               timer.schedule(RodaConstants.ACTION_TIMEOUT / 2);
             }
+            if (actionableCallback != null) {
+              actionableCallback.onSuccess(impact);
+            }
           }
 
           @Override
@@ -408,6 +413,9 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
             };
             timer.schedule(RodaConstants.ACTION_TIMEOUT / 2);
             super.onFailure(caught);
+            if (actionableCallback != null) {
+              actionableCallback.onFailure(caught);
+            }
           }
         }).buildListWithObjects(new ActionableObject<T>(classToReturn)));
 

@@ -162,9 +162,6 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
     actionsPopup.addStyleName("ActionableStyleMenu");
 
     actionableBuilder = actionable != null ? new ActionableWidgetBuilder<>(actionable) : null;
-    if (actionableBuilder != null && actionableCallback != null) {
-      actionableBuilder.withActionCallback(actionableCallback);
-    }
     actionsButton.setVisible(actionableBuilder != null && list.isSelectable());
     actionsButton.addClickHandler(event -> {
       if (!list.isVisible()) {
@@ -187,6 +184,9 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
                 timer.schedule(RodaConstants.ACTION_TIMEOUT / 2);
               }
               actionsPopup.hide();
+              if (actionableCallback != null) {
+                actionableCallback.onSuccess(impact);
+              }
             }
 
             @Override
@@ -200,6 +200,9 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
               timer.schedule(RodaConstants.ACTION_TIMEOUT / 2);
               actionsPopup.hide();
               super.onFailure(caught);
+              if (actionableCallback != null) {
+                actionableCallback.onFailure(caught);
+              }
             }
           });
 
