@@ -15,6 +15,7 @@ import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.resources.MyResources;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
@@ -127,6 +128,8 @@ public class Main extends Composite implements EntryPoint {
    * Initialize
    */
   public void init() {
+    MyResources.INSTANCE.css().ensureInjected();
+    
     menu.init();
     contentPanel.init();
     onHistoryChanged(History.getToken());

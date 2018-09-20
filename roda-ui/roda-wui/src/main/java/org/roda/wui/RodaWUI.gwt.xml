@@ -5,6 +5,7 @@
 	<inherits name='com.google.gwt.user.User' />
 	<inherits name="com.google.gwt.http.HTTP" />
 	<inherits name="com.google.gwt.logging.Logging" />
+	<inherits name="com.google.gwt.resources.Resources" />
 	<source path="client" />
 
 	<!-- I18N -->
@@ -13,8 +14,13 @@
 	<extend-property name="locale" values="es_CL" />
 	<set-property-fallback name="locale" value="en"/>
 
+	<!-- Locale -->
 	<set-configuration-property name="locale.useragent" value="Y"/>
 	<set-configuration-property name="locale.searchorder" value="queryparam,cookie,meta,useragent"/>
+	
+	<!-- GSS -->
+	<set-configuration-property name="CssResource.enableGss" value="true" />
+	<set-configuration-property name="CssResource.conversionMode" value="strict" />
 
 	<!-- Inherit required libraries -->
 	<inherits name="com.github.nmorel.gwtjackson.GwtJackson" />
@@ -29,7 +35,7 @@
 
 	<!-- Specify the app entry point class. -->
 	<entry-point class='org.roda.wui.client.main.Main' />
-	<stylesheet src="Main.css" />
+	<!-- <stylesheet src="Main.css" /> Replaced by MyResources -->
 	<stylesheet src="../api/v1/theme?resource_id=theme.css" />
 	<stylesheet src="../api/v1/theme?resource_id=printing.css" />
 	

@@ -51,8 +51,8 @@ public class ConfigurationManager {
   }
 
   /**
-   * @return The property value for the provided keyParts. Or {@code null} if the
-   *         property value was null or the key is not present.
+   * @return The property value for the provided keyParts. Or {@code null} if
+   *         the property value was null or the key is not present.
    */
   public static String getString(String... keyParts) {
     List<String> values = getStringList(keyParts);
@@ -76,8 +76,8 @@ public class ConfigurationManager {
    *
    * i18nKey: returnValue
    *
-   * This method resolves the keyParts to an 18n key and retrieves its associated
-   * translation.
+   * This method resolves the keyParts to an 18n key and retrieves its
+   * associated translation.
    *
    * @return the translation for an i18n key that is the property value for the
    *         provided keyParts
@@ -108,17 +108,17 @@ public class ConfigurationManager {
   }
 
   /**
-   * @return The integer property value for the provided keyParts. Or {@code null}
-   *         if the property value was null, not an integer or the key is not
-   *         present.
+   * @return The integer property value for the provided keyParts. Or
+   *         {@code null} if the property value was null, not an integer or the
+   *         key is not present.
    */
   public static Integer getInt(String... keyParts) {
     return getInt(null, keyParts);
   }
 
   /**
-   * @return The property value for the provided keyParts. Or {@code null} if the
-   *         property value was null or the key is not present.
+   * @return The property value for the provided keyParts. Or {@code null} if
+   *         the property value was null or the key is not present.
    */
   public static boolean getBoolean(boolean defaultValue, String... keyParts) {
     String value = getString(keyParts);
