@@ -879,7 +879,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
   }
 
   public Boolean isAllSelected() {
-    return selectAllRadioButton.getValue() && selected.containsAll(getVisibleItems());
+    return selectable && selectAllRadioButton.getValue() && selected.containsAll(getVisibleItems());
   }
 
   public String getListId() {
