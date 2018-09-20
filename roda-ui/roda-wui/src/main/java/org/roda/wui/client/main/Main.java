@@ -58,41 +58,22 @@ public class Main extends Composite implements EntryPoint {
     // Set uncaught exception handler
     ClientLogger.setUncaughtExceptionHandler();
 
-    // Remove loading image
-    RootPanel.getBodyElement().removeChild(DOM.getElementById("loading"));
-    NodeList<Element> bodyChilds = RootPanel.getBodyElement().getElementsByTagName("iframe");
-    for (int i = 0; i < bodyChilds.getLength(); i++) {
-      Element bodyChild = bodyChilds.getItem(i);
-      if (!bodyChild.hasAttribute("title")) {
-        bodyChild.setAttribute("title", "iframe_title");
-      }
-    }
 
-    // Add main widget to root panel
-    RootPanel.get().add(this);
-    RootPanel.get().add(footer);
-    RootPanel.get().addStyleName("roda");
+    // load shared properties before init
+    BrowserService.Util.getInstance().retrieveSharedProperties(LocaleInfo.getCurrentLocale().getLocaleName(),
+      new AsyncCallback<Map<String, List<String>>>() {
+        @Override
+        public void onFailure(Throwable caught) {
+          logger.error("Failed loading initial data", caught);
+        }
 
-    // deferred call to init
-    Scheduler.get().scheduleDeferred(new Command() {
+        @Override
+        public void onSuccess(Map<String, List<String>> sharedProperties) {
+          ConfigurationManager.initialize(sharedProperties);
+          init();
+        }
+      });
 
-      @Override
-      public void execute() {
-        BrowserService.Util.getInstance().retrieveSharedProperties(LocaleInfo.getCurrentLocale().getLocaleName(),
-          new AsyncCallback<Map<String, List<String>>>() {
-            @Override
-            public void onFailure(Throwable caught) {
-              logger.error("Failed loading initial data", caught);
-            }
-
-            @Override
-            public void onSuccess(Map<String, List<String>> sharedProperties) {
-              ConfigurationManager.initialize(sharedProperties);
-              init();
-            }
-          });
-      }
-    });
   }
 
   interface Binder extends UiBinder<Widget, Main> {
@@ -130,6 +111,22 @@ public class Main extends Composite implements EntryPoint {
   public void init() {
     MyResources.INSTANCE.css().ensureInjected();
     
+    // Remove loading image
+    RootPanel.getBodyElement().removeChild(DOM.getElementById("loading"));
+    NodeList<Element> bodyChilds = RootPanel.getBodyElement().getElementsByTagName("iframe");
+    for (int i = 0; i < bodyChilds.getLength(); i++) {
+      Element bodyChild = bodyChilds.getItem(i);
+      if (!bodyChild.hasAttribute("title")) {
+        bodyChild.setAttribute("title", "iframe_title");
+      }
+    }
+
+    // Add main widget to root panel
+    RootPanel.get().add(this);
+    RootPanel.get().add(footer);
+    RootPanel.get().addStyleName("roda");
+
+    // Initialize
     menu.init();
     contentPanel.init();
     onHistoryChanged(History.getToken());
