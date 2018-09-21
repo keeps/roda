@@ -274,7 +274,7 @@ public class BrowserHelper {
     }
 
     if (UserUtility.hasPermissions(user, RodaConstants.PERMISSION_METHOD_FIND_REPRESENTATION_INFORMATION)) {
-      List<String> rodaConfigurationAsList = RodaCoreFactory.getRodaConfigurationAsList("core.ri.rule.AIP").stream()
+      List<String> rodaConfigurationAsList = RodaCoreFactory.getRodaConfigurationAsList("ui.ri.rule.AIP").stream()
         .map(r -> RodaCoreFactory.getRodaConfigurationAsString(r, RodaConstants.SEARCH_FIELD_FIELDS))
         .collect(Collectors.toList());
       bundle.setRepresentationInformationFields(rodaConfigurationAsList);
@@ -339,7 +339,7 @@ public class BrowserHelper {
     }
 
     if (UserUtility.hasPermissions(user, RodaConstants.PERMISSION_METHOD_FIND_REPRESENTATION_INFORMATION)) {
-      List<String> rodaConfigurationAsList = RodaCoreFactory.getRodaConfigurationAsList("core.ri.rule.Representation")
+      List<String> rodaConfigurationAsList = RodaCoreFactory.getRodaConfigurationAsList("ui.ri.rule.Representation")
         .stream().map(r -> RodaCoreFactory.getRodaConfigurationAsString(r, RodaConstants.SEARCH_FIELD_FIELDS))
         .collect(Collectors.toList());
       bundle.setRepresentationInformationFields(rodaConfigurationAsList);
@@ -412,7 +412,7 @@ public class BrowserHelper {
     }
 
     if (UserUtility.hasPermissions(user, RodaConstants.PERMISSION_METHOD_FIND_REPRESENTATION_INFORMATION)) {
-      List<String> rodaConfigurationAsList = RodaCoreFactory.getRodaConfigurationAsList("core.ri.rule.File").stream()
+      List<String> rodaConfigurationAsList = RodaCoreFactory.getRodaConfigurationAsList("ui.ri.rule.File").stream()
         .map(r -> RodaCoreFactory.getRodaConfigurationAsString(r, RodaConstants.SEARCH_FIELD_FIELDS))
         .collect(Collectors.toList());
       bundle.setRepresentationInformationFields(rodaConfigurationAsList);
@@ -2922,7 +2922,7 @@ public class BrowserHelper {
 
   public static RepresentationInformationFilterBundle retrieveObjectClassFields(Messages messages) {
     RepresentationInformationFilterBundle newBundle = new RepresentationInformationFilterBundle();
-    Iterator<String> keys = RodaCoreFactory.getRodaConfiguration().getKeys("core.ri.rule");
+    Iterator<String> keys = RodaCoreFactory.getRodaConfiguration().getKeys("ui.ri.rule");
     Map<String, List<String>> fieldsResult = new HashMap<>();
     Map<String, String> translationsResult = new HashMap<>();
 
@@ -2977,7 +2977,7 @@ public class BrowserHelper {
     Map<String, String> inverseTranslations = new HashMap<>();
 
     for (RelationObjectType relationType : RelationObjectType.values()) {
-      List<String> configs = RodaCoreFactory.getRodaConfigurationAsList("core.ri.relation",
+      List<String> configs = RodaCoreFactory.getRodaConfigurationAsList("ui.ri.relation",
         relationType.toString().toLowerCase());
       Map<String, String> translations = new HashMap<>();
 
@@ -3035,7 +3035,7 @@ public class BrowserHelper {
     String representationInformationId, Locale locale)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     List<SupportedMetadataTypeBundle> supportedMetadataTypeBundles = BrowserHelper
-      .retrieveExtraSupportedMetadata(RodaCoreFactory.getRodaConfigurationAsList("core.ri.family"), locale);
+      .retrieveExtraSupportedMetadata(RodaCoreFactory.getRodaConfigurationAsList("ui.ri.family"), locale);
     Map<String, Set<MetadataValue>> familyValues = new HashMap<>();
 
     RepresentationInformation ri = RodaCoreFactory.getModelService()

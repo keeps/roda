@@ -962,7 +962,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public Map<String, String> retrieveRepresentationInformationFamilyOptions(String localeString) {
     Locale locale = ServerTools.parseLocale(localeString);
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
-    List<String> families = RodaCoreFactory.getRodaConfigurationAsList("core.ri.family");
+    List<String> families = RodaCoreFactory.getRodaConfigurationAsList("ui.ri.family");
     Map<String, String> familyAndTranslation = new HashMap<>();
 
     for (String family : families) {
