@@ -20,6 +20,10 @@
 	
 	<!-- GSS -->
 	<set-configuration-property name="CssResource.enableGss" value="true" />
+	<set-configuration-property name="CssResource.gssDefaultInUiBinder" value="true" />
+	<!-- Still needing conversion mode because default CellTable style is still provided in CSS instead of GSS  -->
+	<set-configuration-property name="CssResource.conversionMode" value="strict" />
+	
 
 	<!-- Inherit required libraries -->
 	<inherits name="com.github.nmorel.gwtjackson.GwtJackson" />
