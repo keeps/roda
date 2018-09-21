@@ -166,14 +166,19 @@ public final class PluginHelper {
       throw new PluginException("Unable to acquire locks for the objects being processed", e);
     } finally {
       if (autoLocking) {
-        String requestUuid = plugin.getParameterValues().getOrDefault(RodaConstants.PLUGIN_PARAMS_LOCK_REQUEST_UUID,
-          IdUtils.createUUID());
-        PluginHelper.releaseObjectLock(liteList.stream().filter(obj -> obj.getLite().isPresent())
-          .map(obj -> obj.getLite().get().getInfo()).collect(Collectors.toList()), requestUuid);
+        releaseObjectLocks(plugin, liteList);
       }
     }
 
     return report;
+  }
+
+  private static <T extends IsRODAObject> void releaseObjectLocks(Plugin<T> plugin,
+    List<LiteOptionalWithCause> liteList) {
+    String requestUuid = plugin.getParameterValues().getOrDefault(RodaConstants.PLUGIN_PARAMS_LOCK_REQUEST_UUID,
+      IdUtils.createUUID());
+    PluginHelper.releaseObjectLock(liteList.stream().filter(obj -> obj.getLite().isPresent())
+      .map(obj -> obj.getLite().get().getInfo()).collect(Collectors.toList()), requestUuid);
   }
 
   public static <T extends IsRODAObject> Report processObjects(Plugin<T> plugin, RODAProcessingLogic<T> beforeLogic,
@@ -249,10 +254,7 @@ public final class PluginHelper {
       throw new PluginException("Unable to acquire locks for the objects being processed", e);
     } finally {
       if (autoLocking) {
-        String requestUuid = plugin.getParameterValues().getOrDefault(RodaConstants.PLUGIN_PARAMS_LOCK_REQUEST_UUID,
-          IdUtils.createUUID());
-        PluginHelper.releaseObjectLock(liteList.stream().filter(obj -> obj.getLite().isPresent())
-          .map(obj -> obj.getLite().get().getInfo()).collect(Collectors.toList()), requestUuid);
+        releaseObjectLocks(plugin, liteList);
       }
     }
 

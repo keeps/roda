@@ -282,7 +282,12 @@ public class AkkaJobsManager extends AkkaBaseActor {
 
   private void lock(JobsManagerAcquireLock msg, boolean decreaseWaiting) {
     for (String lite : msg.getLites()) {
-      objectsLocked.put(lite, new LockInfo(msg.getRequestUuid()));
+      // reentrant test
+      if (objectsLocked.get(lite) != null) {
+        objectsLocked.get(lite).increaseReentrantAmount();
+      } else {
+        objectsLocked.put(lite, new LockInfo(msg.getRequestUuid()));
+      }
     }
     // 20180606 hsilva: not sending any list to the sender as it will most
     // certainly end up in deadletters
@@ -315,11 +320,18 @@ public class AkkaJobsManager extends AkkaBaseActor {
   private void unlock(JobsManagerReleaseLock msg) {
     for (String lite : msg.getLites()) {
       LockInfo lockInfo = objectsLocked.get(lite);
-      if (lockInfo == null || !lockInfo.requestUuid.equals(msg.getRequestUuid())) {
+      if (lockInfo == null) {
+        LOGGER.warn("Trying to remove lock from object '{}' whose lock does not exist!", lite);
+      } else if (!lockInfo.requestUuid.equals(msg.getRequestUuid())) {
         LOGGER.warn("Trying to remove lock from object '{}' whose lock wasn't created by this requester (uuid={})",
           lite, msg.getRequestUuid());
       } else {
-        objectsLocked.remove(lite);
+        // lock exists & request uuid matches
+        if (lockInfo.reentrantAmount > 0) {
+          lockInfo.decreaseReentrantAmount();
+        } else {
+          objectsLocked.remove(lite);
+        }
       }
     }
     // 20180606 hsilva: not sending any list to the sender as it will most
@@ -439,10 +451,26 @@ public class AkkaJobsManager extends AkkaBaseActor {
   private class LockInfo {
     public Date lockDate;
     public String requestUuid;
+    public int reentrantAmount;
 
     public LockInfo(String requestUuid) {
-      lockDate = new Date();
+      refreshLockDate();
       this.requestUuid = requestUuid;
+      reentrantAmount = 0;
+    }
+
+    public void refreshLockDate() {
+      lockDate = new Date();
+    }
+
+    public void increaseReentrantAmount() {
+      reentrantAmount++;
+      refreshLockDate();
+    }
+
+    public void decreaseReentrantAmount() {
+      reentrantAmount--;
+      refreshLockDate();
     }
 
     public boolean releaseLockDueToExpire(long lockTimeout) {
