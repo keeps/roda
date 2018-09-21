@@ -20,7 +20,6 @@
 	
 	<!-- GSS -->
 	<set-configuration-property name="CssResource.enableGss" value="true" />
-	<set-configuration-property name="CssResource.conversionMode" value="strict" />
 
 	<!-- Inherit required libraries -->
 	<inherits name="com.github.nmorel.gwtjackson.GwtJackson" />

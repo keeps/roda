@@ -5,6 +5,17 @@
 @def MENU_PRIMARY_COLOR eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.menu.primary\")");
 @def MENU_SECONDARY_COLOR eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.menu.secondary\")");
 
+@def FONT_PRIMARY "Ubuntu", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+@def FONT_MONOSPACED "UbuntuMono", "Lucida Console", Monaco, monospace;
+
+@defmixin fontawesome() {
+	font-family: 'Font Awesome 5 Free';
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-weight: 900;
+}
+
 /**********************************************
 				COMMON
 ************************************************/
@@ -17,8 +28,7 @@
     font-size: 1.5em;
     line-height: 1.6;
     font-weight: 400;
-    font-family: "Ubuntu", "HelveticaNeue", "Helvetica Neue", Helvetica,
-    Arial, sans-serif;
+    font-family: FONT_PRIMARY;
     color: #222;
 }
 
@@ -40,7 +50,7 @@ select {
     padding: 5px;
     line-height: 1.6;
     font-weight: 400;
-    font-family: "Ubuntu", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: FONT_PRIMARY;
     font-size: 1.3rem;
 }
 
@@ -309,22 +319,14 @@ div.inline {
 
 .filesCard > .h5:before {
     content: '\f0c5';
-    font-family: 'Font Awesome 5 Free';
-    text-rendering: auto;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
     padding-right: 10px;
-    font-weight: 900;
+    @mixin fontawesome();
 }
 
 .disseminationsCard > .h5:before {
     content: '\f144';
-    font-family: 'Font Awesome 5 Free';
-    text-rendering: auto;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
     padding-right: 10px;
-    font-weight: 900;
+    @mixin fontawesome();
 }
 
 .representationInformationCard {
@@ -337,13 +339,10 @@ div.inline {
 
 .representationInformationCard > .h5:before {
     content: '\f05a';
-    font-family: 'Font Awesome 5 Free';
-    text-rendering: auto;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    @mixin fontawesome();
     padding-right: 10px;
     color: PRIMARY_COLOR;
-    font-weight: 900;
+    
 }
 
 .browse_top .aipChildrenCard {
@@ -414,7 +413,7 @@ div.inline {
 .loading {
     background-color: white;
     color: black;
-    font-family: Verdana, Lucida, Arial, Helvetica, sans-serif;
+    font-family: FONT_PRIMARY;
     font-size: 20pt;
     font-weight: bold;
     padding: 5px;
@@ -534,13 +533,10 @@ pre code {
 
 .error:before {
     content: '\f071';
-    font-family: "Font Awesome 5 Free";
+    @mixin fontawesome();
+    
     padding-left: 5px;
-    text-rendering: auto;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
     margin-right: 5px;
-    font-weight: 900;
 }
 
 .success {
@@ -549,13 +545,10 @@ pre code {
 
 .success:before {
     content: '\f00c';
-    font-family: "Font Awesome 5 Free";
+    @mixin fontawesome();
+    
     padding-left: 5px;
-    text-rendering: auto;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
     margin-right: 5px;
-    font-weight: 900;
 }
 
 .error pre > code {
@@ -632,7 +625,7 @@ pre code {
     box-sizing: border-box;
     background-color: #f5f5f5;
     font-size: 1.5rem;
-    font-family: "Ubuntu", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: FONT_PRIMARY;
     font-weight: 300;
 }
 
@@ -765,6 +758,7 @@ pre code {
     padding: 8px 27px 8px 10px;
     border: none;
     background-color: PRIMARY_COLOR;
+    font-family: FONT_PRIMARY;
     color: white;
     font-weight: 600;
     font-size: 1.1rem;
@@ -866,14 +860,9 @@ pre code {
 
 .btn:after {
     display: inline-block;
-    font-weight: 900;
-    font-family: "Font Awesome 5 Free";
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-    display: inline-block;
-    font-style: normal;
-    font-variant: normal;
-    text-rendering: auto;
+    
+    @mixin fontawesome();
+    
     line-height: 1;
     float: right;
     margin-top: 1px;
@@ -1196,7 +1185,7 @@ pre code {
 }
 
 .my-asyncdatagrid-pager-pagesize a:hover {
-    background-color: #3998d0;
+    background-color: PRIMARY_COLOR;
 }
 
 .my-asyncdatagrid-autoupdate-signal {
@@ -1243,15 +1232,6 @@ pre code {
     vertical-align: middle;
 }
 
-.description-level {
-    display: inline-block;
-    font: normal normal normal 14px/1 "Font Awesome 5 Free";
-    font-size: inherit;
-    text-rendering: auto;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    transform: translate(0, 0);
-}
 
 
 ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
@@ -1381,19 +1361,16 @@ pre code {
 
 .dropdown-label:after {
     display: inline-block;
-    font-weight: 900;
-    font-family: "Font Awesome 5 Free";
+    
+    content: "\f107";
+    @mixin fontawesome();
+    
     font-size: inherit;
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-    font-style: normal;
-    font-variant: normal;
-    text-rendering: auto;
+    
     float: right;
     line-height: 2.5rem;
     padding-left: 5px;
     padding-right: 5px;
-    content: "\f107";
 }
 
 .dropdown-label .gwt-Label,
@@ -1888,7 +1865,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .main .menu_item {
-    font-family: 'Ubuntu', sans-serif;
+    font-family: FONT_PRIMARY;
     font-size: 8pt;
     font-variant: small-caps;
     color: #000000;
@@ -1910,7 +1887,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .main .menu_separator {
-    font-family: 'Ubuntu', sans-serif;
+    font-family: FONT_PRIMARY;
     font-size: 9pt;
     font-variant: small-caps;
     color: #666;
@@ -1998,7 +1975,7 @@ td.datePickerMonth, td.datePickerYear {
     color: #a7a9ac;
 }
 
-.main .wui-breadcrumbPanel .breadcrumb .fa, .main .wui-breadcrumbPanel .breadcrumb .description-level {
+.main .wui-breadcrumbPanel .breadcrumb .fa {
     margin: 0 3px;
     color: #a7a9ac;
 }
@@ -2110,7 +2087,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .main .contentTitle {
     padding: 10px 35px 15px 40px;
-    font-family: 'Ubuntu', sans-serif;
+    font-family: FONT_PRIMARY;
     font-size: 15pt;
     font-weight: bold;
     color: #404142;
@@ -2461,7 +2438,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .browseItemMetadata .addTabWrapper:hover {
-    color: #3998d0;
+    color: PRIMARY_COLOR;
 }
 
 .browseItemMetadata .addTabWrapper:hover:after {
@@ -2615,7 +2592,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .slider-aip-permissions-table i.slider-aip-permissions-table-icon-fade {
-    color: #50aef1;
+    color: rgba(255,255,255,0.5);
 }
 
 .slider-aip-permissions-table tr:hover i.slider-aip-permissions-table-icon-fade {
@@ -2709,12 +2686,8 @@ td.datePickerMonth, td.datePickerYear {
 
 .representation .header:before {
     content: '\f1b3';
-    font-family: 'Font Awesome 5 Free';
-    text-rendering: auto;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    @mixin fontawesome();
     margin-right: 5px;
-    font-weight: 900;
 }
 
 .representation .header .identifiers {
@@ -2782,12 +2755,8 @@ td.datePickerMonth, td.datePickerYear {
 
 .file .header:before {
     content: '\f1b2';
-    font-family: 'Font Awesome 5 Free';
-    text-rendering: auto;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    @mixin fontawesome();
     margin-right: 5px;
-    font-weight: 900;
 }
 
 .file .header .identifiers {
@@ -2884,12 +2853,8 @@ td.datePickerMonth, td.datePickerYear {
 
 .event .header:before {
     content: '\f017';
-    font-family: 'Font Awesome 5 Free';
-    text-rendering: auto;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    @mixin fontawesome();
     margin-right: 5px;
-    font-weight: 900;
 }
 
 .event .header .identifier {
@@ -2922,8 +2887,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .agent .header:before {
     content: '\f007';
-    font-family: 'Font Awesome 5 Free';
-    font-weight: 900;
+    @mixin fontawesome();
 }
 
 .agent .subheader {
@@ -3340,36 +3304,7 @@ td.datePickerMonth, td.datePickerYear {
     display: none;
 }
 
-/* @end */ /* @end */ /** Element Path Panel **/
-.wui-elementPath {
-    vertical-align: middle;
-}
-
-.wui-elementPath .elementPathItem-layout {
-    margin-left: 10px;
-    cursor: pointer;
-    cursor: hand;
-}
-
-.wui-elementPath .elementPathItem-layout .elementPathItem-icon {
-
-}
-
-.wui-elementPath .elementPathItem-layout .elementPathItem-id {
-    font-family: Verdana, Lucida, Arial, Helvetica, sans-serif;
-    font-size: 11px;
-    color: #58595b;
-    margin-left: 3px;
-    vertical-align: middle;
-}
-
-.wui-elementPath .elementPathItem-final-layout .elementPathItem-id {
-    font-weight: bold;
-}
-
-.wui-elementPath .separator {
-    margin-left: 10px;
-}
+/* @end */ /* @end */ 
 
 /** Arrangement table **/
 .wui-browse-arrangementTable { /*	background-color: white;*/
@@ -4032,7 +3967,7 @@ td.datePickerMonth, td.datePickerYear {
     left: 43px;
     top: 65px;
     width: 150px;
-    font-family: 'Ubuntu', sans-serif;
+    font-family: FONT_PRIMARY;
     font-size: 9pt;
     overflow: hidden;
     color: #58595b;
@@ -4048,7 +3983,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .wui-login .wui-login-box-pass-dummy {
     width: 150px;
-    font-family: 'Ubuntu', sans-serif;
+    font-family: FONT_PRIMARY;
     font-size: 9pt;
     color: #999;
     margin-bottom: 5px;
@@ -4081,7 +4016,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .wui-login .wui-loginLinks .loginLink a {
-    font-family: 'Ubuntu', sans-serif;
+    font-family: FONT_PRIMARY;
     font-size: 9pt;
     color: #ffffff;
     text-decoration: none;
@@ -4093,7 +4028,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .wui-login .wui-loginLinks .separator {
-    font-family: 'Ubuntu', sans-serif;
+    font-family: FONT_PRIMARY;
     font-size: 9pt;
     color: #ffffff;
 }
@@ -4660,7 +4595,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 #drop a:hover {
-    background-color: #3998d0;
+    background-color: PRIMARY_COLOR;
 }
 
 #drop input {
@@ -4708,23 +4643,20 @@ td.datePickerMonth, td.datePickerYear {
 
 #upload-list li span.icon:after {
     display: inline-block;
-    font-weight: 900;
-    font-family: "Font Awesome 5 Free";
+    
     font-size: 2rem;
     line-height: 2rem;
     width: 2rem;
     height: 2rem;
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-    font-style: normal;
-    font-variant: normal;
-    text-rendering: auto;
+    
+    content: "\f00c";
+    @mixin fontawesome();
     
     position: absolute;
     top: 20px;
     right: 20px;
     cursor: pointer;
-    content: "\f00c";
+    
     color: #24c279;
     -webkit-animation: none;
     -moz-animation: none;
@@ -5886,8 +5818,8 @@ td.datePickerMonth, td.datePickerYear {
     background: #222;
     color: #fff;
     font-size: 17px;
-    font-family: "Helvetica Neue Light", "HelveticaNeue-Light",
-    "Helvetica Neue", Calibri, Helvetica, Arial;
+    font-family: FONT_PRIMARY;
+    font-weight: 300;
     box-sizing: border-box;
 
     -webkit-animation-duration: 0.8s;
@@ -6563,7 +6495,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 span.code {
-    font-family: "UbuntuMono", "Ubuntu", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: FONT_MONOSPACED;
     font-weight: bold;
 }
 
@@ -6664,7 +6596,7 @@ span.code {
  */
 
 .search-prefilter-field, .search-prefilter-value {
-    font-family: UbuntuMono;
+    font-family: FONT_MONOSPACED;
     color: #888;
     font-weight: 800;
 }
@@ -6863,7 +6795,7 @@ span.code {
     text-shadow: none;
     display: inline-block;
     margin: 0em;
-    font-family: Arial, "Ubuntu", "HelveticaNeue", "Helvetica Neue", Helvetica, sans-serif;
+    font-family: FONT_PRIMARY;
     line-height: normal;
 }
 
